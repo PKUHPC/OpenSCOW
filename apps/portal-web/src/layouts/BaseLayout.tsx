@@ -26,9 +26,10 @@ import { publicConfig } from "src/utils/config";
 interface Props {
   footerText: string;
   versionTag: string | undefined;
+  initialLanguage: string;
 }
 
-export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
+export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
   const { loginNodes } = useStore(LoginNodeStore);
@@ -36,6 +37,8 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+
+  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
 
   const routes = useMemo(() => userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
@@ -64,7 +67,11 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
             link={publicConfig.MIS_URL}
             linkText={t("baseLayout.linkText")}
           />
-          <LanguageSwitcher />
+          {
+            systemLanguageConfig.isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={initialLanguage} />
+            ) : undefined
+          }
         </>
       )}
     >

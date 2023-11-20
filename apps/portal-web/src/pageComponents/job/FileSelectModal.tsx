@@ -171,6 +171,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
             fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
             hiddenColumns={["size", "mode"]}
             loading={isLoading}
+            pagination={false}
             rowKey={(r: FileInfo): React.Key => join(path, r.name)}
             onRow={(r) => ({
               onClick: () => {

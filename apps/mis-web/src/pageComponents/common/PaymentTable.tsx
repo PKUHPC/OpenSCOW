@@ -12,6 +12,7 @@
 
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -74,6 +75,8 @@ export const PaymentTable: React.FC<Props> = ({
 
   const [form] = Form.useForm<FilterForm>();
 
+  const [selectedName, setSelectedName] = useState<string | undefined>(accountName);
+
   const [query, setQuery] = useState(() => ({
     name: accountName,
     time: [today.subtract(1, "year"), today],
@@ -107,6 +110,7 @@ export const PaymentTable: React.FC<Props> = ({
 
   useDidUpdateEffect(() => {
     setQuery((q) => ({ ...q, name: accountName }));
+    setSelectedName(accountName);
   }, [accountName]);
 
   return (
@@ -118,7 +122,7 @@ export const PaymentTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             const { name, time } = await form.validateFields();
-            setQuery({ name: accountName ?? name, time });
+            setQuery({ name: selectedName ?? name, time });
           }}
         >
           {searchType ? (
@@ -130,14 +134,14 @@ export const PaymentTable: React.FC<Props> = ({
               {searchType === SearchType.account ? (
                 <AccountSelector
                   onChange={(item) => {
-                    setQuery({ ...query, name:item });
+                    setSelectedName(item);
                   }}
                   placeholder={t(pCommon("selectAccount"))}
                 />
               ) : (
                 <TenantSelector
                   onChange={(item) => {
-                    setQuery({ ...query, name:item });
+                    setSelectedName(item);
 
                   }}
                   placeholder={t(pCommon("selectTenant"))}
@@ -168,7 +172,10 @@ export const PaymentTable: React.FC<Props> = ({
         tableLayout="fixed"
         dataSource={data?.results as Array<TableProps>}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
       >
         {
           showAccountName ? <Table.Column dataIndex="accountName" title={t(pCommon("account"))} /> : undefined

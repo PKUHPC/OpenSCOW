@@ -19,7 +19,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -44,6 +44,10 @@ import {
 } from "src/stores/UserStore";
 import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
+const languagesMap = {
+  "zh_cn": zh_cn,
+  "en": en,
+};
 
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
@@ -59,11 +63,18 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
+      const regex = /exceeds max length/;
+      // 如果终端登录欢迎语过长会报错：Packet length xxxx exceeds max length of 262144
+      if (regex.test(e.data?.message)) {
+        message.error(t("pages._app.textExceedsLength"));
+        return;
+      }
+
       if (e.data?.code === "SSH_ERROR") {
         message.error(t("pages._app.sshError"));
         return;
       }
-
+      
       if (e.data?.code === "SFTP_ERROR") {
         message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
           e.data?.details || t("pages._app.sftpError"));
@@ -91,7 +102,7 @@ interface ExtraProps {
   footerText: string;
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
-  languageId: string;
+  initialLanguage: string;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -99,14 +110,15 @@ type Props = AppProps & { extra: ExtraProps };
 function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
-  const { current: { userInfo, primaryColor, footerText, loginNodes, languageId } } = useRef(extra);
+  const { current: { userInfo, primaryColor, footerText, loginNodes } } = useRef(extra);
 
   const userStore = useConstant(() => {
     const store = createStore(UserStore, userInfo);
     return store;
   });
 
-  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes, languageId));
+  const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
+    extra.initialLanguage));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
@@ -134,18 +146,22 @@ function MyApp({ Component, pageProps, extra }: Props) {
         />
       </Head>
       <Provider initialLanguage={{
-        id: extra.languageId,
-        definitions: extra.languageId === "en" ? en : zh_cn,
+        id: extra.initialLanguage,
+        definitions: languagesMap[extra.initialLanguage],
       }}
       >
         <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
-            <AntdConfigProvider color={primaryColor} locale={extra.languageId}>
-              <FloatButtons languageId={extra.languageId} />
+            <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}>
+              <FloatButtons languageId={ extra.initialLanguage } />
               <GlobalStyle />
               <FailEventHandler />
               <TopProgressBar />
-              <BaseLayout footerText={footerText} versionTag={publicConfig.VERSION_TAG}>
+              <BaseLayout
+                footerText={footerText}
+                versionTag={publicConfig.VERSION_TAG}
+                initialLanguage={extra.initialLanguage}
+              >
                 <Component {...pageProps} />
               </BaseLayout>
             </AntdConfigProvider>
@@ -164,7 +180,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
-    languageId: "",
+    initialLanguage: "",
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -205,7 +221,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     }, {});
 
     // 从Cookies或header中获取语言id
-    extra.languageId = getLanguageCookie(appContext.ctx.req);
+    extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

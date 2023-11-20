@@ -13,7 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
+import { createI18nStringSchema } from "src/i18n";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -36,6 +36,16 @@ export const PortalConfigSchema = Type.Object({
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
+
+  file: Type.Optional(Type.Object({
+    preview: Type.Object({
+      limitSize: Type.String({ description: "文件预览大小限制", default: "50m" }),
+    }, { description: "文件预览功能", default: {} }),
+    edit: Type.Object({
+      limitSize: Type.String({ description: "文件编辑大小限制", default: "1m" }),
+    }, { description: "文件编辑功能", default: {} }),
+  }, { description: "文件管理" })),
+
 
   submitJobDefaultPwd: Type.String({
     description: "提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录", default: "scow/jobs/{{ name }}" }),

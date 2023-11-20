@@ -499,6 +499,9 @@ export default {
         limit: "作业时间限制",
         changeLimit: "修改作业时限",
         gpus: "GPU卡数",
+        finishJobButton: "结束",
+        finishJobConfirm: "确定结束这个任务吗?",
+        finishJobSuccess: "任务结束请求已经提交!",
       },
     },
     profile:{
@@ -642,6 +645,7 @@ export default {
         confirmRemoveText:"确认要从账户",
         removeSuccess:"移出用户成功！",
         removerUser:"移出用户",
+        cannotRemoverUserWhoHaveRunningJobFromAccount:"用户还有作业在运行，已封锁该用户，请等待作业结束或手动结束作业后再移出",
       },
     },
   },
@@ -985,6 +989,7 @@ export default {
       setPlatformBilling: "设置平台作业计费",
       createTenant: "创建租户",
       tenantPay: "租户充值",
+      submitFileItemAsJob: "提交脚本",
     },
     operationDetails: {
       login: "用户登录",
@@ -1037,6 +1042,7 @@ export default {
       createTenant: "创建租户{}, 租户管理员为: {}",
       tenantPay: "为租户{}充值{}元",
       setPlatformBilling: "设置平台的计费项{}价格为{}元",
+      submitFileItemAsJob: "集群：{}，提交脚本：{}",
     },
   },
   userRoles: {

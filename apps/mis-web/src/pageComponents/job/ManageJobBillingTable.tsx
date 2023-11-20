@@ -12,6 +12,7 @@
 
 import { MinusCircleOutlined, PlusCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { numberToMoney } from "@scow/lib-decimal";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
@@ -73,9 +74,11 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
       bordered
       loading={loading}
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
+      pagination={{
+        showSizeChanger: true,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
+      }}
       expandable={{ expandedRowRender: (record) => {
-
-        const t = useI18nTranslateToString();
 
         return (
           <Table
@@ -84,7 +87,10 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                 .filter((x) => x.cluster === record.cluster && x.partition === record.partition && x.qos === record.qos)
                 .reverse()
             }
-            pagination={{ hideOnSinglePage: true }}
+            pagination={{
+              defaultPageSize: 10,
+              hideOnSinglePage: true,
+            }}
           >
             <Table.Column title={t(p("itemId"))} dataIndex={["priceItem", "itemId"]} />
             <Table.Column

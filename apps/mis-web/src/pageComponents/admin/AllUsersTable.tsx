@@ -11,6 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
@@ -64,7 +65,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
+  const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
   const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
   const [allUsers, setAllUsers] = useState<PlatformUserInfo[] | undefined>(undefined);
@@ -199,7 +200,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         loading={isLoading}
         pagination={setPageInfo ? {
           current: pageInfo.page,
-          defaultPageSize: 10,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
           total: data?.totalCount,

@@ -60,6 +60,20 @@ submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，
 # 是否启用终端功能
 shell: true
 
+# # 文件管理
+# file:
+#   # 文件预览功能
+#   preview:
+#     # 大小限制
+#     # 可接受的格式为nginx的client_max_body_size可接受的值，默认为 50m
+#     limitSize: "50m"
+#   # 文件编辑功能
+#   edit:
+#     # 文件编辑大小限制
+#     # 可接受的格式为nginx的client_max_body_size可接受的值，默认为 1m
+#     # 建议设置为较大值
+#     limitSize: "1m"
+
 # 提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录
 # submitJobDefaultPwd: scow/jobs/{{ name }}
 

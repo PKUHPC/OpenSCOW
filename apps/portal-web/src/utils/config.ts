@@ -12,10 +12,11 @@
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
-import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -74,6 +75,10 @@ export interface PublicRuntimeConfig {
   // 上传（请求）文件的大小限制
   CLIENT_MAX_BODY_SIZE: string;
 
+  FILE_EDIT_SIZE: string | undefined;
+
+  FILE_PREVIEW_SIZE: string | undefined;
+
   PUBLIC_PATH: string;
 
   NAV_LINKS?: NavLink[];
@@ -87,6 +92,8 @@ export interface PublicRuntimeConfig {
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
   }
+
+  SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
 }
 

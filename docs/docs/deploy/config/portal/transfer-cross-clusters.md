@@ -34,6 +34,11 @@ crossClusterFileTransfer:
   enabled: true
   transferNode: localhost:22222
 ```
+:::tip
+
+传输节点如果是一个新节点，则该节点需要与集群有一致的用户，即配置与该集群相同的认证系统(LDAP)，挂载相同的共享目录。
+
+:::
 
 ## 2. 建立scow节点到每个传输节点的root用户免密
 

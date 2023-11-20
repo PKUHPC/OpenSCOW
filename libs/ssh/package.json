@@ -18,8 +18,8 @@
     "shell-quote": "1.8.1"
   },
   "devDependencies": {
-    "@types/shell-quote": "1.7.1",
-    "@types/ssh2": "1.11.13",
+    "@types/shell-quote": "1.7.4",
+    "@types/ssh2": "1.11.16",
     "ts-log": "2.2.5"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",

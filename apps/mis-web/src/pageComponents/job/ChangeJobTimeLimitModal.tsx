@@ -12,7 +12,7 @@
 
 import { arrayContainsElement } from "@scow/lib-web/build/utils/array";
 import { parseMinutes, TimeUnits } from "@scow/lib-web/build/utils/datetime";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Divider, Form, InputNumber, Modal, Progress, Select } from "antd";
 import { useRef, useState } from "react";
 import { api } from "src/apis";

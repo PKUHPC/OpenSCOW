@@ -186,6 +186,23 @@ export default {
       },
     },
     fileManagerComp: {
+      fileEditModal: {
+        edit: "编辑",
+        prompt: "提示",
+        save: "保存",
+        doNotSave: "不保存",
+        notSaved: "未保存",
+        notSavePrompt: "文件未保存，是否保存该文件？",
+        fileEdit: "文件编辑",
+        filePreview: "文件预览",
+        fileLoading: "文件正在加载...",
+        exitEdit: "退出编辑",
+        failedGetFile: "获取文件: {} 失败",
+        cantReadFile: "无法读取文件: {}",
+        saveFileFail: "文件保存失败: {}",
+        saveFileSuccess: "文件保存成功",
+        fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+      },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
         createSuccessMessage: "创建成功",
@@ -194,6 +211,9 @@ export default {
         fileName: "文件名",
       },
       fileManager: {
+        preview: {
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
+        },
         moveCopy: {
           copy: "复制",
           move: "移动",
@@ -233,6 +253,11 @@ export default {
           deleteConfirmContent: "确认删除{}?",
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
+          submitConfirmTitle: "确认提交",
+          submitConfirmContent: "确认提交{}至{}?",
+          submitConfirmOk: "确认",
+          submitSuccessMessage: "提交成功！您的新作业ID为：{}",
+          submitFailedMessage: "提交失败",
         },
       },
       fileTable: {
@@ -455,8 +480,8 @@ export default {
       },
     },
     _app: {
+      textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
-
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
     },

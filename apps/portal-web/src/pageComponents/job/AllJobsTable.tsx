@@ -13,6 +13,7 @@
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { Button, DatePicker, Form, InputNumber, Popover, Space, Table } from "antd";
 import dayjs from "dayjs";
@@ -154,7 +155,10 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
     <Table
       dataSource={data}
       loading={isLoading}
-      pagination={{ showSizeChanger: true }}
+      pagination={{
+        showSizeChanger: true,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
+      }}
       rowKey={(x) => x.jobId}
       scroll={{ x: data?.length ? 1850 : true }}
     >
