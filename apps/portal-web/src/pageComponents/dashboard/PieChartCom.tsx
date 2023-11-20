@@ -15,10 +15,10 @@ import { styled } from "styled-components"; ;
 import { Cell, Pie, PieChart } from "recharts";
 
 interface Props {
-  data: Data[];
+  pieData: PieData[];
 }
 
-interface Data {
+interface PieData {
   value: number;
   color: string;
 }
@@ -26,12 +26,12 @@ interface Data {
 const Container = styled.div`
 `;
 
-export const PieChartCom: React.FC<Props> = ({ data }) => {
+export const PieChartCom: React.FC<Props> = ({ pieData }) => {
   return (
     <Container>
       <PieChart width={800} height={220}>
         <Pie
-          data={data}
+          data={pieData}
           cx={120}
           cy={100}
           innerRadius={60}
@@ -39,7 +39,7 @@ export const PieChartCom: React.FC<Props> = ({ data }) => {
           fill="#8884d8"
           dataKey="value"
         >
-          {data.map((entry, index) => (
+          {pieData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>

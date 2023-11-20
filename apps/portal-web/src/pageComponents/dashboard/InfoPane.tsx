@@ -50,7 +50,7 @@ interface Tag {
   unit?: string;
 }
 
-interface Data {
+interface PaneData {
   itemName: string;
   num: number;
   color: string;
@@ -58,7 +58,7 @@ interface Data {
 interface Props {
   title?: Title;
   tag: Tag;
-  data: Data[];
+  paneData: PaneData[];
   loading: boolean;
 }
 
@@ -76,11 +76,11 @@ const TitleContainer = styled.div`
 const SubTitle = styled.span`
   color: #999;
 `;
-export const InfoPane: React.FC<Props> = ({ title, tag, data, loading }) => {
+export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => {
 
   return (
     <Container>
-      <Card style={{ width: 300 }} bordered={false}>
+      <Card style={{ width: 300 }} bordered={false} loading={loading}>
         {title ? (
           <TitleContainer>
             <span>{title.title}</span>
@@ -102,11 +102,11 @@ export const InfoPane: React.FC<Props> = ({ title, tag, data, loading }) => {
         </div>
         <div style={{ height:"120px" }}>
           {
-            data.map((item, idx) =>
+            paneData.map((item, idx) =>
               <Line key={idx} itemName={item.itemName} num={item.num} color={item.color}></Line>)
           }
         </div>
-        <PieChartCom data={data.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom>
+        <PieChartCom pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom>
       </Card>
 
     </Container>

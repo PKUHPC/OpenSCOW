@@ -44,7 +44,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
         loading={loading}
         title={{ title:"节点信息", subTitle:`${clusterName}-${partitionName}` }}
         tag={{ itemName:"节点", num:nodeCount }}
-        data={ [{ itemName:"运行中", num:runningNodeCount, color:"#00C49F" },
+        paneData={ [{ itemName:"运行中", num:runningNodeCount, color:"#00C49F" },
           { itemName:"空闲", num:idleNodeCount, color:"#0088FE" },
           { itemName:"不可用", num:notAvailableNodeCount, color:"#c04851" }]}
       ></InfoPane>
@@ -53,7 +53,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
           loading={loading}
           title={{ title:"资源信息", subTitle:`${clusterName}-${partitionName}` }}
           tag={{ itemName:"CPU", num:cpuCoreCount, unit:"核" }}
-          data={ [{ itemName:"运行中", num:runningCpuCount, color:"#00C49F" },
+          paneData={ [{ itemName:"运行中", num:runningCpuCount, color:"#00C49F" },
             { itemName:"空闲", num:idleCpuCount, color:"#0088FE" },
             { itemName:"不可用", num:notAvailableCpuCount, color:"#c04851" }]}
         ></InfoPane>
@@ -61,7 +61,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
           loading={loading}
           title={{ title:"", subTitle:"" }}
           tag={{ itemName:"GPU", num:gpuCoreCount, unit:"卡" }}
-          data={ [{ itemName:"运行中", num:runningGpuCount, color:"#00C49F" },
+          paneData={ [{ itemName:"运行中", num:runningGpuCount, color:"#00C49F" },
             { itemName:"空闲", num:idleGpuCount, color:"#0088FE" },
             { itemName:"不可用", num:notAvailableGpuCount, color:"#c04851" }]}
         ></InfoPane>
@@ -70,7 +70,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
         loading={loading}
         title={{ title:"作业", subTitle:`${clusterName}-${partitionName}` }}
         tag={{ itemName:"作业", num:jobCount }}
-        data={ [{ itemName:"运行中", num:runningJobCount, color:"#00C49F" },
+        paneData={ [{ itemName:"运行中", num:runningJobCount, color:"#00C49F" },
           { itemName:"排队中", num:pendingJobCount, color:"#c04851" }]}
       ></InfoPane>
     </Container>
