@@ -1,5 +1,26 @@
 # @scow/auth
 
+## 1.2.0
+
+### Minor Changes
+
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+
+### Patch Changes
+
+- af6a53dfcf: portal-server,auth,mis-server,audit-server 下 pino 日志的时间格式修改为八时区下的 YYYY-MM-DD HH:mm:ss
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/utils@1.1.0
+  - @scow/lib-server@1.1.0
+
 ## 1.1.0
 
 ### Minor Changes

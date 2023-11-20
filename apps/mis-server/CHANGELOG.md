@@ -1,5 +1,34 @@
 # @scow/mis-server
 
+## 1.2.0
+
+### Minor Changes
+
+- 35e026be3e: 修改获取消费记录方式为分别获取当前页面详细记录及消费记录的总量，总额。在 ChargeRecord 实体中添加(time,type,account_name,tenant_name)的复合索引,索引名 query_info
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+
+### Patch Changes
+
+- 3e13a35d2d: 移出用户前增加用户是否有运行中作业的判断
+- af6a53dfcf: portal-server,auth,mis-server,audit-server 下 pino 日志的时间格式修改为八时区下的 YYYY-MM-DD HH:mm:ss
+- 3bb178aebd: 修改页面表格默认显示数量为 50
+- 438cf1aba4: 修改账户计费逻辑，由根据用户账户关系计算改为根据账户计算
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/scheduler-adapter-protos@1.1.0
+  - @scow/lib-scheduler-adapter@1.1.0
+  - @scow/utils@1.1.0
+  - @scow/lib-server@1.1.0
+  - @scow/protos@1.0.2
+  - @scow/lib-hook@1.0.2
+
 ## 1.1.0
 
 ### Minor Changes
