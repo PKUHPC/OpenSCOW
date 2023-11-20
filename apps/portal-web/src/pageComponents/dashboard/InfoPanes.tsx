@@ -16,7 +16,8 @@ import { styled } from "styled-components"; ;
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
 
 interface Props {
-  selectItem: ClusterInfo
+  selectItem: ClusterInfo;
+  loading: boolean;
 }
 
 const Container = styled.div`
@@ -30,43 +31,47 @@ const InfoPaneContainer = styled.div`
   justify-content: flex-start;
 `;
 
-export const InfoPanes: React.FC<Props> = ({ selectItem }) => {
+export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
 
-  const { clusterName, partitionName, nodes, runningNodes, idleNodes, noAvailableNodes,
-    cpuCores, runningCpus, idleCpus, noAvailableCpus,
-    gpuCores, runningGpus, idleGpus, noAvailableGpus,
-    jobNum, runningJob, pendingJob,
+  const { clusterName, partitionName, nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
+    cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
+    gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount,
+    jobCount, runningJobCount, pendingJobCount,
   } = selectItem;
   return (
     <Container>
       <InfoPane
+        loading={loading}
         title={{ title:"节点信息", subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:"节点", num:nodes }}
-        data={ [{ itemName:"运行中", num:runningNodes, color:"#00C49F" },
-          { itemName:"空闲", num:idleNodes, color:"#0088FE" },
-          { itemName:"不可用", num:noAvailableNodes, color:"#c04851" }]}
+        tag={{ itemName:"节点", num:nodeCount }}
+        data={ [{ itemName:"运行中", num:runningNodeCount, color:"#00C49F" },
+          { itemName:"空闲", num:idleNodeCount, color:"#0088FE" },
+          { itemName:"不可用", num:notAvailableNodeCount, color:"#c04851" }]}
       ></InfoPane>
       <InfoPaneContainer>
         <InfoPane
+          loading={loading}
           title={{ title:"资源信息", subTitle:`${clusterName}-${partitionName}` }}
-          tag={{ itemName:"CPU", num:cpuCores, unit:"核" }}
-          data={ [{ itemName:"运行中", num:runningCpus, color:"#00C49F" },
-            { itemName:"空闲", num:idleCpus, color:"#0088FE" },
-            { itemName:"不可用", num:noAvailableCpus, color:"#c04851" }]}
+          tag={{ itemName:"CPU", num:cpuCoreCount, unit:"核" }}
+          data={ [{ itemName:"运行中", num:runningCpuCount, color:"#00C49F" },
+            { itemName:"空闲", num:idleCpuCount, color:"#0088FE" },
+            { itemName:"不可用", num:notAvailableCpuCount, color:"#c04851" }]}
         ></InfoPane>
         <InfoPane
+          loading={loading}
           title={{ title:"", subTitle:"" }}
-          tag={{ itemName:"GPU", num:gpuCores, unit:"卡" }}
-          data={ [{ itemName:"运行中", num:runningGpus, color:"#00C49F" },
-            { itemName:"空闲", num:idleGpus, color:"#0088FE" },
-            { itemName:"不可用", num:noAvailableGpus, color:"#c04851" }]}
+          tag={{ itemName:"GPU", num:gpuCoreCount, unit:"卡" }}
+          data={ [{ itemName:"运行中", num:runningGpuCount, color:"#00C49F" },
+            { itemName:"空闲", num:idleGpuCount, color:"#0088FE" },
+            { itemName:"不可用", num:notAvailableGpuCount, color:"#c04851" }]}
         ></InfoPane>
       </InfoPaneContainer>
       <InfoPane
+        loading={loading}
         title={{ title:"作业", subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:"作业", num:jobNum }}
-        data={ [{ itemName:"运行中", num:runningJob, color:"#00C49F" },
-          { itemName:"排队中", num:pendingJob, color:"#c04851" }]}
+        tag={{ itemName:"作业", num:jobCount }}
+        data={ [{ itemName:"运行中", num:runningJobCount, color:"#00C49F" },
+          { itemName:"排队中", num:pendingJobCount, color:"#c04851" }]}
       ></InfoPane>
     </Container>
 

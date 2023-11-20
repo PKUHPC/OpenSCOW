@@ -106,21 +106,25 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
     promiseFn: useCallback(async () => {
       const clusters = publicConfig.CLUSTERS;
 
-      // const { sessions } = await api.getAppSessions({});
+      const rawClusterInfo =
+      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })));
 
-      // return sessions.map((x) => ({
-      //   ...x,
-      //   remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
-      //     x.state === "PENDING" ? "" : x.timeLimit,
-      // }));
-
+      return rawClusterInfo.flatMap((cluster) =>
+        cluster.clusterInfo.partitions.map((x) => ({
+          clusterName: cluster.clusterInfo.clusterName,
+          ...x,
+        })),
+      );
     }, []),
   });
 
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      <OverviewTable clusterInfo={data.map((item, idx) => ({ ...item, id:idx }))} />
+      <OverviewTable
+        isLoading={isLoading}
+        clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+      />
     </div>
   );
 });

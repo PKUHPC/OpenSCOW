@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
@@ -17,41 +18,24 @@ import { styled } from "styled-components";
 
 interface Props {
   clusterInfo: ClusterInfo[];
+  isLoading: boolean;
 }
 
-export interface ClusterInfo {
+export interface ClusterInfo extends PartitionInfo {
   id: number;
   clusterName: string;
-  partitionName: string;
-  nodes: number;
-  runningNodes: number;
-  idleNodes: number;
-  noAvailableNodes: number;
-  cpuCores: number;
-  runningCpus: number;
-  idleCpus: number;
-  noAvailableCpus: number;
-  gpuCores: number;
-  runningGpus: number;
-  idleGpus: number;
-  noAvailableGpus: number;
-  jobNum: number;
-  runningJob: number;
-  pendingJob: number;
-  usageRate: string;
-  status: string;
 }
 
 interface TableProps {
   id: number;
   clusterName: string;
   partitionName: string;
-  nodes: number;
-  runningNodes: number;
-  cpuCores: number;
-  gpuCores: number;
-  usageRate: string;
-  status: string;
+  nodeCount: number;
+  runningNodeCount: number;
+  cpuCoreCount: number;
+  gpuCoreCount: number;
+  usageRatePercentage: number;
+  partitionStatus: PartitionInfo_PartitionStatus;
 }
 const Container = styled.div`
   /* 修改滚动条样式 */
@@ -72,7 +56,7 @@ const Container = styled.div`
   }
 `;
 
-export const OverviewTable: React.FC<Props> = ({ clusterInfo }) => {
+export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
 
   const [selectId, setSelectId] = useState(0);
 
@@ -82,7 +66,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo }) => {
       <Table
         tableLayout="fixed"
         dataSource={clusterInfo as Array<TableProps>}
-        // loading={isLoading}
+        loading={isLoading}
         pagination={false}
         scroll={{ y:275 }}
         onRow={(r) => {
@@ -95,23 +79,23 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo }) => {
       >
         <Table.Column dataIndex="clusterName" width="15%" title="集群" />
         <Table.Column dataIndex="partitionName" title="分区" />
-        <Table.Column dataIndex="nodes" title="节点总数" />
-        <Table.Column dataIndex="runningNodes" title="运行中节点数" />
-        <Table.Column dataIndex="cpuCores" title="CPU核心数" />
-        <Table.Column dataIndex="gpuCores" title="GPU卡数" />
-        <Table.Column dataIndex="usageRate" title="节点使用率" />
+        <Table.Column dataIndex="nodeCount" title="节点总数" />
+        <Table.Column dataIndex="runningNodeCount" title="运行中节点数" />
+        <Table.Column dataIndex="cpuCoreCount" title="CPU核心数" />
+        <Table.Column dataIndex="gpuCoreCount" title="GPU卡数" />
+        <Table.Column dataIndex="usageRatePercentage" title="节点使用率" />
         <Table.Column
-          dataIndex="status"
+          dataIndex="partitionStatus"
           title="分区状态"
-          render={(status) => {
-            return status === "不可用" ?
+          render={(partitionStatus) => {
+            console.log(partitionStatus);
+            return partitionStatus === 0 ?
               <Tag color="red">不可用</Tag> :
               <Tag color="green">可用</Tag>; }
           }
         />
       </Table>
-      <InfoPanes selectItem={selectItem} />
-
+      <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
     </Container>
 
   );

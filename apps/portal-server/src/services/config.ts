@@ -13,10 +13,12 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
+  from "@scow/protos/build/portal/config";
 import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
-export const configServiceServer = plugin((server) => {
+export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
     getClusterConfig: async ({ request }) => {
       const { cluster } = request;
@@ -28,6 +30,20 @@ export const configServiceServer = plugin((server) => {
 
       return [reply];
     },
+  });
+});
 
+export const runtimeConfigServiceServer = plugin((server) => {
+  return server.addService<runTimeConfigServiceServer>(runTimeConfigServiceService, {
+    getClusterInfo: async ({ request }) => {
+      const { cluster } = request;
+
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
+
+      const reply = await asyncClientCall(client.config, "getClusterInfo", {});
+
+      return [reply];
+    },
   });
 });

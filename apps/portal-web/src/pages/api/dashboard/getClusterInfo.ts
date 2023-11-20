@@ -12,11 +12,10 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { ConfigServiceClient } from "@scow/protos/build/common/config";
+import { ConfigServiceClient, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const PartitionInfo = Type.Object({
@@ -24,20 +23,20 @@ export const PartitionInfo = Type.Object({
   nodeCount: Type.Number(),
   runningNodeCount: Type.Number(),
   idleNodeCount: Type.Number(),
-  NotAvailableNodeCount: Type.Number(),
+  notAvailableNodeCount: Type.Number(),
   cpuCoreCount: Type.Number(),
   runningCpuCount: Type.Number(),
   idleCpuCount: Type.Number(),
-  NotAvailableCpuCount: Type.Number(),
+  notAvailableCpuCount: Type.Number(),
   gpuCoreCount: Type.Number(),
   runningGpuCount: Type.Number(),
   idleGpuCount: Type.Number(),
-  NotAvailableGpuCount: Type.Number(),
+  notAvailableGpuCount: Type.Number(),
   jobCount: Type.Number(),
   runningJobCount: Type.Number(),
   pendingJobCount: Type.Number(),
   usageRatePercentage: Type.Number(),
-  partitionStatus: Type.Number(),
+  partitionStatus: Type.Enum(PartitionInfo_PartitionStatus),
 });
 
 export type PartitionInfo = Static<typeof PartitionInfo>;
@@ -53,7 +52,7 @@ export const GetClusterRunningInfoSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
-    clusterName: Type.String(),
+    clusterId: Type.String(),
   }),
 
   responses: {
@@ -73,17 +72,14 @@ export default route(GetClusterRunningInfoSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { clusterName } = req.query;
+  const { clusterId } = req.query;
 
   const client = getClient(ConfigServiceClient);
 
-  // const reply = await asyncUnaryCall(client, "getClusterConfig", {
-  //   clusterName,
-  // });
+  const reply = await asyncUnaryCall(client, "getClusterInfo", {
+    cluster:clusterId,
+  });
 
-  return { 200: { clusterInfo: {
-    clusterName:"集群1",
-    partitions:[],
-  } } };
+  return { 200: { clusterInfo: reply } };
 
 });

@@ -39,12 +39,6 @@ const Line: React.FC<LineProps> = ({ itemName, num, color }) => {
   );
 };
 
-interface Props {
-  title?: Title;
-  tag: Tag;
-  data: Data[];
-}
-
 interface Title {
   title: string;
   subTitle: string;
@@ -61,6 +55,12 @@ interface Data {
   num: number;
   color: string;
 }
+interface Props {
+  title?: Title;
+  tag: Tag;
+  data: Data[];
+  loading: boolean;
+}
 
 const Container = styled.div`
   .ant-card-body{
@@ -76,7 +76,7 @@ const TitleContainer = styled.div`
 const SubTitle = styled.span`
   color: #999;
 `;
-export const InfoPane: React.FC<Props> = ({ title, tag, data }) => {
+export const InfoPane: React.FC<Props> = ({ title, tag, data, loading }) => {
 
   return (
     <Container>
