@@ -14,6 +14,7 @@ import {
   BookOutlined,
   CloudServerOutlined,
   CloudSyncOutlined,
+  ClusterOutlined,
   DashboardOutlined,
   DesktopOutlined,
   EyeOutlined,
@@ -142,25 +143,34 @@ export const userRoutes: (
       path: "/files",
       clickToPath: `/files/${defaultCluster.id}/~`,
       clickable: true,
-      children: publicConfig.CLUSTERS.map((cluster) => ({
-        Icon: FolderOutlined,
-        text: getI18nConfigCurrentText(cluster.name, languageId),
-        path: `/files/${cluster.id}`,
-        clickToPath: `/files/${cluster.id}/~`,
-        handleClick: () => { setDefaultCluster(cluster); },
-      } as NavItemProps)).concat(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+      children: [
         {
-          Icon: CloudSyncOutlined,
-          text: "文件传输",
-          path: "/files/fileTransfer",
+          Icon: FolderOutlined,
+          text: "集群文件管理",
+          path: "/files/",
+          clickToPath: `/files/${defaultCluster.id}/~`,
+          children: publicConfig.CLUSTERS.map((cluster) => ({
+            Icon: ClusterOutlined,
+            text: getI18nConfigCurrentText(cluster.name, languageId),
+            path: `/files/${cluster.id}`,
+            clickToPath: `/files/${cluster.id}/~`,
+            handleClick: () => { setDefaultCluster(cluster); },
+          } as NavItemProps)),
         },
-        {
-          Icon: CloudServerOutlined,
-          text: "传输进度",
-          path: "/files/currentTransferInfo",
-        },
-      ] : []),
-    }] : []),
+        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED || true ? [
+          {
+            Icon: CloudSyncOutlined,
+            text: "文件传输",
+            path: "/files/fileTransfer",
+          },
+          {
+            Icon: CloudServerOutlined,
+            text: "传输进度",
+            path: "/files/currentTransferInfo",
+          },
+        ] : []),
+      ]},
+    ] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => {
 
