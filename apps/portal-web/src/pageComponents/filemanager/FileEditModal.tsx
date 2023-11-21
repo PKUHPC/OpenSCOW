@@ -13,6 +13,7 @@
 import { CloseOutlined, FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import Editor, { loader } from "@monaco-editor/react";
 import { App, Badge, Button, Modal, Space, Spin, Tabs, Tooltip } from "antd";
+import { join } from "path";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
@@ -95,7 +96,7 @@ const p = prefix("pageComp.fileManagerComp.fileEditModal.");
 
 loader.config({
   paths: {
-    vs: publicConfig.BASE_PATH + "monaco-assets/vs",
+    vs: join(publicConfig.BASE_PATH, "/monaco-assets/vs"),
   },
 });
 
