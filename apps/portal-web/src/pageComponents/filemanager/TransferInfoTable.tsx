@@ -15,6 +15,7 @@ import { App, Button, Progress, Table } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/config";
 
 interface TransferData {
@@ -22,8 +23,11 @@ interface TransferData {
   files: TransferInfo[];
 }
 
+const p = prefix("pageComp.fileManagerComp.transferInfoTable.");
+
 export const TransferInfoTable: React.FC = () => {
   const { message, modal } = App.useApp();
+  const t = useI18nTranslateToString();
 
   const { data: transferData, reload } = useAsync({
     promiseFn: useCallback(async () => {
@@ -50,49 +54,49 @@ export const TransferInfoTable: React.FC = () => {
 
   const columns = [
     {
-      title: "发送集群",
+      title: t(p("srcCluster")),
       dataIndex: "cluster",
       sorter: (a, b) => a.cluster.localeCompare(b.cluster),
     },
     {
-      title: "接收集群",
+      title: t(p("dstCluster")),
       dataIndex: "toCluster",
     },
     {
-      title: "文件",
+      title: t(p("file")),
       dataIndex: "filePath",
     },
     {
-      title: "传输数量",
+      title: t(p("transferCount")),
       dataIndex: "transferSizeKb",
       render: (transferSizeKb: number) => transferSizeKb + "KB",
     },
     {
-      title: "传输速度",
+      title: t(p("transferSpeed")),
       dataIndex: "speedKBps",
       render: (speedKBps: number) => speedKBps.toFixed(3) + "KB/s",
     },
     {
-      title: "剩余时间",
+      title: t(p("timeLeft")),
       dataIndex: "remainingTimeSeconds",
       render: (remainingTimeSeconds: number) => remainingTimeSeconds + "s",
     },
     {
-      title: "当前进度",
+      title: t(p("currentProgress")),
       dataIndex: "progress",
       render: (progress: number) => <Progress percent={progress} />,
     },
     {
-      title: "操作",
+      title: t(p("operation")),
       dataIndex: "action",
       render: (_, row: TransferInfo & { cluster: string }) => (
         <Button
           type="link"
           onClick={() => {
             modal.confirm({
-              title: "确认取消",
-              content: `确认取消${row.cluster} -> ${row.toCluster}的文件${row.filePath}的传输吗？`,
-              okText: "确认",
+              title: t(p("confirmCancelTitle")),
+              content: t(p("confirmCancelContent"), [row.cluster, row.toCluster, row.filePath]),
+              okText: t(p("confirmOk")),
               onOk: async () => {
                 await api.terminateFileTransfer({ body: {
                   fromCluster: row.cluster,
@@ -100,14 +104,14 @@ export const TransferInfoTable: React.FC = () => {
                   fromPath: row.filePath,
                 } })
                   .then(() => {
-                    message.success("取消成功");
+                    message.success(t(p("cancelSuccess")));
                     reload();
                   });
               },
             });
           }}
         >
-            取消
+          {t(p("cancel"))}
         </Button>
 
       ),
