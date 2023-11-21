@@ -448,7 +448,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             onClick={onHiddenClick}
             icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
           >
-            {showHiddenFile ? t(p("tableInfo.hidden")) : t(p("tableInfo.notHidden"))}{t(p("tableInfo.hiddenItem"))}
+            {showHiddenFile ? t(p("tableInfo.notShowHiddenItem")) : t(p("tableInfo.showHiddenItem"))}
           </Button>
           {
             publicConfig.ENABLE_SHELL ? (

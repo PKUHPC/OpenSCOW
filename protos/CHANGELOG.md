@@ -1,5 +1,14 @@
 # @scow/grpc-api
 
+## 1.2.0
+
+### Minor Changes
+
+- 135f2b1be3: 新增 submitFileAsJob 接口，直接把文件作为作业提交调度器执行
+- 35e026be3e: 标记原有 getChargeRecords 接口为已过时，将在下一个大版本发布后被删除，新增 getPaginatedChargeRecords 与 getChargeRecordsTotalCount 接口，分别获取当前消费记录页面的详细信息与消费记录的总量，总额
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+- a78a6e0b56: GetOperationLogs 新增 operation_detail 传参用于模糊搜索
+
 ## 1.1.0
 
 ### Minor Changes

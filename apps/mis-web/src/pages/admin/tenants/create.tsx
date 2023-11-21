@@ -146,7 +146,7 @@ const CreateTenantPageForm: React.FC = () => {
   );
 };
 
-export const CreateTenantPage: NextPage = requireAuth((i) => i.tenantRoles.includes(PlatformRole.PLATFORM_ADMIN))(
+export const CreateTenantPage: NextPage = requireAuth((i) => i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(
   () => {
     const t = useI18nTranslateToString();
 
