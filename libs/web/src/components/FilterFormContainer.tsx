@@ -24,6 +24,13 @@ export const FilterFormContainer = styled.div`
     margin: 4px;
     max-width: 100%;
   }
+
+`;
+
+const NoShakeTab = styled(Tabs)`
+  .ant-tabs-nav-operations {
+    display: none !important;
+  }
 `;
 
 const TabFormContainer = styled.div`
@@ -41,7 +48,7 @@ export const FilterFormTabs: React.FC<TabbedFilterFormProps> = ({
   button, tabs, onChange,
 }) => {
   return (
-    <Tabs
+    <NoShakeTab
       defaultActiveKey={tabs.length > 0 ? tabs[0].title : ""}
       size="small"
       tabBarExtraContent={button}
@@ -56,6 +63,6 @@ export const FilterFormTabs: React.FC<TabbedFilterFormProps> = ({
           </Tabs.TabPane>
         ))
       }
-    </Tabs>
+    </NoShakeTab>
   );
 };
