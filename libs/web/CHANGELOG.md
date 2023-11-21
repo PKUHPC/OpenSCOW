@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 1.2.1
+
+### Patch Changes
+
+- b84e4f9cc4: 暂时解决 tab 标签在最右侧时的抖动问题
+
 ## 1.2.0
 
 ### Minor Changes
