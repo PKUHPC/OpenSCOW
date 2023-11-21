@@ -33,7 +33,7 @@ export default {
     },
     file: {
       fileManager: "文件管理",
-      crossClusterFileTransfer: "跨集群文件传输",
+      crossClusterFileTransfer: "文件传输",
       clusterFileManager: "集群文件管理",
       transferProgress: "传输进度",
     },

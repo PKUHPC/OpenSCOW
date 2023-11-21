@@ -18,7 +18,6 @@ import { Button, Space, Table, Tooltip } from "antd";
 import { join } from "path";
 import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SingleCrossClusterTransferSelector } from "src/pageComponents/filemanager/SingleCrossClusterTransferSelector";
 import { FileInfo } from "src/pages/api/file/list";
@@ -30,10 +29,12 @@ import { styled } from "styled-components";
 import { urlToDownload } from "./api";
 import { PathBar } from "./PathBar";
 
-const OperationBar = styled(TableTitle)`
+const OperationBar = styled.div`
+  display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 4px;
+  margin: 8px 4px;
 `;
 
 const p = prefix("pageComp.fileManagerComp.clusterFileTable.");
@@ -130,7 +131,7 @@ export const ClusterFileTable: React.FC<Props> = ({
             onClick={onHiddenClick}
             icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
           >
-            {showHiddenFile ? t(p("notShowHiddenItem")) : t(p("showHiddenItem"))},
+            {showHiddenFile ? t(p("notShowHiddenItem")) : t(p("showHiddenItem"))}
           </Button>
         </Space>
       </OperationBar>
