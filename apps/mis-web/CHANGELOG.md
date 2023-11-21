@@ -1,5 +1,13 @@
 # @scow/mis-web
 
+## 1.2.1
+
+### Patch Changes
+
+- 7afd8a7225: 修复平台管理员无法进入创建租户页面的权限问题
+- Updated dependencies [b84e4f9cc4]
+  - @scow/lib-web@1.2.1
+
 ## 1.2.0
 
 ### Minor Changes

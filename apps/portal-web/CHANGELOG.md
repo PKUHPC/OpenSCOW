@@ -1,5 +1,14 @@
 # @scow/portal-web
 
+## 1.2.1
+
+### Patch Changes
+
+- 1c10da55e5: 跨集群文件管理新增显示隐藏隐藏文件
+- 04e5d68aae: 修复文件编辑器配置加载路径缺少斜杠的问题
+- Updated dependencies [b84e4f9cc4]
+  - @scow/lib-web@1.2.1
+
 ## 1.2.0
 
 ### Minor Changes
