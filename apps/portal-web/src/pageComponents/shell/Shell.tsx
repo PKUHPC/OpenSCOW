@@ -14,7 +14,7 @@ import { debounce } from "@scow/lib-web/build/utils/debounce";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
-import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
+import { ShellInputData, ShellOutputData } from "src/server/setup/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
@@ -46,6 +46,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
   useEffect(() => {
     if (container.current) {
+      console.log("start connect");
 
       const term = new Terminal({
         cursorBlink: true,
@@ -73,7 +74,12 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
         join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
+      socket.onclose = (e) => {
+        console.log("Close", e);
+      };
+
       socket.onopen = () => {
+        console.log("open");
 
         term.clear();
 
@@ -125,7 +131,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
           term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
           break;
         }
-
       };
 
       return () => {
