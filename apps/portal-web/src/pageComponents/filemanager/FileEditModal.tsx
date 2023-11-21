@@ -96,7 +96,7 @@ const p = prefix("pageComp.fileManagerComp.fileEditModal.");
 
 loader.config({
   paths: {
-    vs: join(publicConfig.BASE_PATH, "/monaco-assets/vs"),
+    vs: join(publicConfig.BASE_PATH ?? "", "/monaco-assets/vs"),
   },
 });
 
@@ -158,7 +158,6 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const [confirm, setConfirm] = useState(false);
   const [exitType, setExitType] = useState<ExitType>(ExitType.CLOSE);
   const [isFullScreen, setIsFullScreen] = useState(false);
-
 
   const [options, setOptions] = useState({
     readOnly: true,
