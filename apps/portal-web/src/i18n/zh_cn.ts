@@ -382,6 +382,32 @@ export default {
         appCommentTitle: "说明",
       },
     },
+    dashboard:{
+      overviewTable:{
+        clusterName:"集群",
+        partitionName:"分区",
+        nodeCount:"节点总数",
+        runningNodeCount:"运行中节点数",
+        cpuCoreCount:"CPU核心数",
+        gpuCoreCount:"GPU卡数",
+        usageRatePercentage:"节点使用率",
+        partitionStatus:"分区状态",
+        available:"可用",
+        notAvailable:"不可用",
+      },
+      infoPanes:{
+        nodeInfo:"节点信息",
+        node:"节点",
+        resourceInfo:"资源信息",
+        core:"核",
+        running:"运行中",
+        idle:"空闲",
+        notAvailable:"不可用",
+        card:"卡",
+        job:"作业",
+        pending:"排队中",
+      },
+    },
   },
   component:{
     errorPages:{

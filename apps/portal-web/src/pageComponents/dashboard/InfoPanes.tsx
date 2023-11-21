@@ -13,6 +13,7 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
 
 interface Props {
@@ -31,47 +32,56 @@ const InfoPaneContainer = styled.div`
   justify-content: flex-start;
 `;
 
+const colors = {
+  running:"#00C49F",
+  idle:"#0088FE",
+  notAvailable:"#c04851",
+};
+const p = prefix("pageComp.dashboard.infoPanes.");
 export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
+
+  const t = useI18nTranslateToString();
 
   const { clusterName, partitionName, nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
     gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount,
     jobCount, runningJobCount, pendingJobCount,
   } = selectItem;
+
   return (
     <Container>
       <InfoPane
         loading={loading}
-        title={{ title:"节点信息", subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:"节点", num:nodeCount }}
-        paneData={ [{ itemName:"运行中", num:runningNodeCount, color:"#00C49F" },
-          { itemName:"空闲", num:idleNodeCount, color:"#0088FE" },
-          { itemName:"不可用", num:notAvailableNodeCount, color:"#c04851" }]}
+        title={{ title:t(p("nodeInfo")), subTitle:`${clusterName}-${partitionName}` }}
+        tag={{ itemName:t(p("node")), num:nodeCount }}
+        paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
+          { itemName:t(p("idle")), num:idleNodeCount, color:colors.idle },
+          { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.notAvailable }]}
       ></InfoPane>
       <InfoPaneContainer>
         <InfoPane
           loading={loading}
-          title={{ title:"资源信息", subTitle:`${clusterName}-${partitionName}` }}
-          tag={{ itemName:"CPU", num:cpuCoreCount, unit:"核" }}
-          paneData={ [{ itemName:"运行中", num:runningCpuCount, color:"#00C49F" },
-            { itemName:"空闲", num:idleCpuCount, color:"#0088FE" },
-            { itemName:"不可用", num:notAvailableCpuCount, color:"#c04851" }]}
+          title={{ title:t(p("resourceInfo")), subTitle:`${clusterName}-${partitionName}` }}
+          tag={{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) }}
+          paneData={ [{ itemName:t(p("running")), num:runningCpuCount, color:colors.running },
+            { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
+            { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable }]}
         ></InfoPane>
         <InfoPane
           loading={loading}
           title={{ title:"", subTitle:"" }}
-          tag={{ itemName:"GPU", num:gpuCoreCount, unit:"卡" }}
-          paneData={ [{ itemName:"运行中", num:runningGpuCount, color:"#00C49F" },
-            { itemName:"空闲", num:idleGpuCount, color:"#0088FE" },
-            { itemName:"不可用", num:notAvailableGpuCount, color:"#c04851" }]}
+          tag={{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) }}
+          paneData={ [{ itemName:t(p("running")), num:runningGpuCount, color:colors.running },
+            { itemName:t(p("idle")), num:idleGpuCount, color:colors.idle },
+            { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable }]}
         ></InfoPane>
       </InfoPaneContainer>
       <InfoPane
         loading={loading}
-        title={{ title:"作业", subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:"作业", num:jobCount }}
-        paneData={ [{ itemName:"运行中", num:runningJobCount, color:"#00C49F" },
-          { itemName:"排队中", num:pendingJobCount, color:"#c04851" }]}
+        title={{ title:t(p("job")), subTitle:`${clusterName}-${partitionName}` }}
+        tag={{ itemName:t(p("job")), num:jobCount }}
+        paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
+          { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
       ></InfoPane>
     </Container>
 

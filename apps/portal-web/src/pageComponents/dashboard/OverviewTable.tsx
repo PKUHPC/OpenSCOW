@@ -13,6 +13,7 @@
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
 import { styled } from "styled-components";
 
@@ -54,9 +55,21 @@ const Container = styled.div`
     background: #fff !important;
     }
   }
+
+  .rowBgColor{
+    background-color: #eee;
+    /* 去除鼠标经过默认的背景颜色 */
+    td {
+      background: none !important;
+  }
+  }
+
 `;
+const p = prefix("pageComp.dashboard.overviewTable.");
 
 export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
+
+  const t = useI18nTranslateToString();
 
   const [selectId, setSelectId] = useState(0);
 
@@ -69,6 +82,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
         loading={isLoading}
         pagination={false}
         scroll={{ y:275 }}
+        rowClassName={(_, index) => (index === selectId ? "rowBgColor" : "")}
         onRow={(r) => {
           return {
             onClick() {
@@ -77,21 +91,22 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
           };
         }}
       >
-        <Table.Column dataIndex="clusterName" width="15%" title="集群" />
-        <Table.Column dataIndex="partitionName" title="分区" />
-        <Table.Column dataIndex="nodeCount" title="节点总数" />
-        <Table.Column dataIndex="runningNodeCount" title="运行中节点数" />
-        <Table.Column dataIndex="cpuCoreCount" title="CPU核心数" />
-        <Table.Column dataIndex="gpuCoreCount" title="GPU卡数" />
-        <Table.Column dataIndex="usageRatePercentage" title="节点使用率" />
+        <Table.Column dataIndex="clusterName" width="15%" title={t(p("clusterName"))} />
+        <Table.Column dataIndex="partitionName" title={t(p("partitionName"))} />
+        <Table.Column dataIndex="nodeCount" title={t(p("nodeCount"))} />
+        <Table.Column dataIndex="runningNodeCount" title={t(p("runningNodeCount"))} />
+        <Table.Column dataIndex="cpuCoreCount" title={t(p("cpuCoreCount"))} />
+        <Table.Column dataIndex="gpuCoreCount" title={t(p("gpuCoreCount"))} />
+        <Table.Column
+          dataIndex="usageRatePercentage"
+          title={t(p("usageRatePercentage"))}
+          render={(usageRatePercentage) => usageRatePercentage + "%"}
+        />
         <Table.Column
           dataIndex="partitionStatus"
-          title="分区状态"
-          render={(partitionStatus) => {
-            console.log(partitionStatus);
-            return partitionStatus === 0 ?
-              <Tag color="red">不可用</Tag> :
-              <Tag color="green">可用</Tag>; }
+          title={t(p("partitionStatus"))}
+          render={(partitionStatus) => partitionStatus === 1 ?
+            <Tag color="green">{t(p("available"))}</Tag> : <Tag color="red">{t(p("notAvailable"))}</Tag>
           }
         />
       </Table>
