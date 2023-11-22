@@ -13,7 +13,7 @@
 import { DatabaseOutlined } from "@ant-design/icons";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
@@ -40,9 +40,9 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
 
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
 
-  const routes = useMemo(() => userRoutes(
+  const routes = userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
-  ), [userStore.user, defaultCluster, setDefaultCluster]);
+  );
 
   const logout = () => {
     removeDefaultCluster();
