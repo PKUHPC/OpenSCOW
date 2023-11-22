@@ -46,8 +46,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
   useEffect(() => {
     if (container.current) {
-      console.log("start connect");
-
       const term = new Terminal({
         cursorBlink: true,
       });
@@ -74,13 +72,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
         join(publicConfig.BASE_PATH, "/api/shell") + "?" + new URLSearchParams(payload).toString(),
       );
 
-      socket.onclose = (e) => {
-        console.log("Close", e);
-      };
-
       socket.onopen = () => {
-        console.log("open");
-
         term.clear();
 
         const send = (data: ShellInputData) => {
