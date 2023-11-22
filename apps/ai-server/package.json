@@ -1,0 +1,54 @@
+{
+  "name": "@scow/ai-server",
+  "version": "2.0.0",
+  "description": "",
+  "private": true,
+  "main": "build/index.js",
+  "scripts": {
+    "dev": "dotenv -e env/.env.dev -- node --watch -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "serve": "node build/index.js",
+    "test": "jest",
+    "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
+  },
+  "files": [
+    "scripts",
+    "build",
+    ".npmrc",
+    "!**/*.map"
+  ],
+  "keywords": [],
+  "author": "PKUHPC (https://github.com/PKUHPC)",
+  "license": "Mulan PSL v2",
+  "repository": "https://github.com/PKUHPC/SCOW",
+  "dependencies": {
+    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@grpc/grpc-js": "1.9.11",
+    "@mikro-orm/cli": "5.9.4",
+    "@mikro-orm/core": "5.9.4",
+    "@mikro-orm/migrations": "5.9.4",
+    "@mikro-orm/mysql": "5.9.4",
+    "@scow/config": "workspace:*",
+    "@scow/lib-config": "workspace:*",
+    "@scow/lib-decimal": "workspace:*",
+    "@scow/utils": "workspace:*",
+    "@scow/protos": "workspace:*",
+    "pino": "8.16.2",
+    "pino-pretty": "10.2.3"
+  },
+  "devDependencies": {
+    "@types/google-protobuf": "3.15.10"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./src/mikro-orm.config.ts",
+      "./src/mikro-orm.config.js"
+    ]
+  },
+  "volta": {
+    "extends": "../../package.json"
+  }
+}
