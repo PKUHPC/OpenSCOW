@@ -18,7 +18,7 @@ import { UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin,
   useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
-import { PaymentTable } from "src/pageComponents/common/PaymentTable";
+import { PaymentTable, SearchType } from "src/pageComponents/common/PaymentTable";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.accounts.accountName.payments.");
@@ -37,6 +37,7 @@ export const PaymentsPage: NextPage = requireAuth(
       <Head title={title} />
       <PageTitle titleText={title} />
       <PaymentTable
+        searchType={SearchType.selfAccount}
         accountName={accountName}
       />
     </div>
