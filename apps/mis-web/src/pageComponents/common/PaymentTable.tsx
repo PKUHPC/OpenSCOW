@@ -26,19 +26,17 @@ import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 export enum SearchType {
     account = "account",
     tenant = "tenant",
+    // 仅搜索自己账户
+    selfAccount = "selfAccount",
+    // 仅搜索自己租户
+    selfTenant = "selfTenant",
 }
 
 interface Props {
   // 账户充值记录专用项
   accountName?: string;
-  // 展示账户或租户下拉搜索，不传就不展示,同时区分后端接口，值为tenant时，获取租户的记录
-  searchType?: SearchType;
-  // 列表中是否展示账户
-  showAccountName?: boolean;
-  // 列表中是否展示租户
-  showTenantName?: boolean;
-  // 列表中是否展示IP地址和操作者ID
-  showAuditInfo?: boolean;
+  // 搜索类型, self前缀表示只搜索用户自身的账户或租户
+  searchType: SearchType;
 }
 
 // 表格展示的数据
@@ -65,11 +63,7 @@ const today = dayjs().endOf("day");
 const p = prefix("pageComp.commonComponent.paymentTable.");
 const pCommon = prefix("common.");
 
-export const PaymentTable: React.FC<Props> = ({
-  accountName, searchType, showAccountName,
-  showTenantName, showAuditInfo,
-}) => {
-
+export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -88,22 +82,11 @@ export const PaymentTable: React.FC<Props> = ({
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
       };
-
+      // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
         return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
       } else {
-        // 展示账户名时，是在搜索账户的记录
-        if (showAccountName) {
-          return api.getPayments({
-            query: { ...param, accountName:query.name },
-          });
-        }
-        else {
-          return api.getPayments({
-            query: { ...param, accountName:query.name, searchTenant:true },
-          });
-        }
-
+        return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
       }
     }, [query]),
   });
@@ -125,7 +108,7 @@ export const PaymentTable: React.FC<Props> = ({
             setQuery({ name: selectedName ?? name, time });
           }}
         >
-          {searchType ? (
+          { (searchType === SearchType.account || searchType === SearchType.tenant) ? (
             <Form.Item
               label={searchType === SearchType.account ?
                 t(pCommon("account")) : t(pCommon("tenant"))}
@@ -178,10 +161,14 @@ export const PaymentTable: React.FC<Props> = ({
         }}
       >
         {
-          showAccountName ? <Table.Column dataIndex="accountName" title={t(pCommon("account"))} /> : undefined
+          searchType === SearchType.account
+            ? <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
+            : undefined
         }
         {
-          showTenantName ? <Table.Column dataIndex="tenantName" title={t(pCommon("tenant"))} /> : undefined
+          searchType === SearchType.tenant
+            ? <Table.Column dataIndex="tenantName" title={t(pCommon("tenant"))} />
+            : undefined
         }
         <Table.Column dataIndex="time" title={t(p("paymentDate"))} width="13.5%" render={(v) => formatDateTime(v)} />
         <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(3)} />
@@ -191,7 +178,7 @@ export const PaymentTable: React.FC<Props> = ({
           width="15%"
         />
         {
-          showAuditInfo ? (
+          searchType !== SearchType.selfAccount ? (
             <>
               <Table.Column dataIndex="ipAddress" title={t(p("ipAddress"))} />
               <Table.Column dataIndex="operatorId" title={t(p("operatorId"))} />
