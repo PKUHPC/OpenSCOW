@@ -19,6 +19,7 @@ import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
+import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { UserStore } from "src/stores/UserStore";
 import { getServerI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -42,7 +43,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
+      {/* <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} /> */}
+      <QuickEntry></QuickEntry>
     </div>
   );
 });
