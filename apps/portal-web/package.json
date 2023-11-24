@@ -27,7 +27,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://glithub.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ant-design/colors": "^7.0.0",
+    "@ant-design/colors": "7.0.0",
     "@ant-design/cssinjs": "1.17.2",
     "@ant-design/icons": "5.2.6",
     "@codemirror/language": "6.9.2",

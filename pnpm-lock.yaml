@@ -681,7 +681,7 @@ importers:
   apps/portal-web:
     dependencies:
       '@ant-design/colors':
-        specifier: ^7.0.0
+        specifier: 7.0.0
         version: 7.0.0
       '@ant-design/cssinjs':
         specifier: 1.17.2
