@@ -15,7 +15,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
-import { PaymentTable } from "src/pageComponents/common/PaymentTable";
+import { PaymentTable, SearchType } from "src/pageComponents/common/PaymentTable";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.finance.payments.");
@@ -31,7 +31,7 @@ export const PaymentsPage: NextPage = requireAuth((i) =>
       <Head title={t(p("title"))} />
       <PageTitle titleText={t(p("title"))} />
       <PaymentTable
-        showAuditInfo={true}
+        searchType={SearchType.selfTenant}
       />
     </div>
   );

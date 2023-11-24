@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs";
+import { createCache, extractStyle, StyleProvider } from "@ant-design/cssinjs/lib";
 import Document from "next/document";
 import { ServerStyleSheet } from "styled-components";
 

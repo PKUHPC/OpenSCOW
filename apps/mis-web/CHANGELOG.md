@@ -1,5 +1,43 @@
 # @scow/mis-web
 
+## 1.2.1
+
+### Patch Changes
+
+- 7afd8a7225: 修复平台管理员无法进入创建租户页面的权限问题
+- Updated dependencies [b84e4f9cc4]
+  - @scow/lib-web@1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 35e026be3e: 修改获取消费记录方式为分别获取当前页面详细记录及消费记录的总量，总额。在 ChargeRecord 实体中添加(time,type,account_name,tenant_name)的复合索引,索引名 query_info
+- 135f2b1be3: 在门户系统的文件管理下，新增将文件直接作为作业文本提交调度器执行的功能，如果调度器 API 版本低于此接口版本报错
+- a78a6e0b56: 操作日志新增操作内容模糊搜索功能
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+
+### Patch Changes
+
+- 99d01eb605: 适应 scow slurm 适配器仅可取消提交当前作业用户的作业
+- 3e13a35d2d: 移出用户前增加用户是否有运行中作业的判断
+- 62c7f32eb3: 优化 web 端 table，调整列的宽度以百分比固定，使其在大屏/小屏下展示更友好
+- e20be6f9f1: 修改充值页面时间筛选与账户/租户筛选交互不一致问题。修改为只有当点击搜索时才发起查询请求。
+- a3d2f44af6: 门户及管理系统所有显示集群的地方按照集群中配置的优先级进行排序
+- 3bb178aebd: 修改页面表格默认显示数量为 50
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/utils@1.1.0
+  - @scow/lib-web@1.2.0
+  - @scow/protos@1.0.2
+  - @scow/lib-operation-log@2.0.2
+  - @scow/rich-error-model@2.0.0
+
 ## 1.1.0
 
 ### Minor Changes

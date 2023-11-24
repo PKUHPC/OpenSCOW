@@ -15,7 +15,7 @@ import { getLoginNode } from "@scow/config/build/cluster";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { ShellResponse, ShellServiceClient } from "@scow/protos/build/portal/shell";
 import { normalizePathnameWithQuery } from "@scow/utils";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -50,6 +50,7 @@ export const config = {
   },
 };
 
+
 const wss = new WebSocketServer({ noServer: true });
 
 // https://github.com/websockets/ws#how-to-detect-and-close-broken-connections
@@ -76,9 +77,6 @@ wss.on("close", function close() {
 });
 
 wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
-
-  ws.isAlive = true;
-  ws.on("pong", heartbeat);
 
   const user = await checkCookie(() => true, req);
 
@@ -110,6 +108,11 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   if (!loginNode) {
     throw new Error(`Unknown login node ${loginNodeAddress}`);
   }
+
+  ws.isAlive = true;
+  ws.on("pong", heartbeat);
+
+  ws.ping();
 
   const path = query.get("path") ?? undefined;
   const cols = query.get("cols");
@@ -158,20 +161,6 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }
   });
 
-  ws.on("error", async (err) => {
-    log("Error occurred from client. Disconnect.", err);
-    await callLog({
-      operatorUserId: user.identityId,
-      operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.shellLogin,
-      operationTypePayload: {
-        clusterId: cluster, loginNode: loginNode.address,
-      },
-    }, OperationResult.FAIL);
-    stream.write({ message: { $case: "disconnect", disconnect: {} } });
-    stream.end();
-  });
-
   ws.on("message", (data) => {
     const message = JSON.parse(data.toString()) as ShellInputData;
 
@@ -190,9 +179,23 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   });
 
+  ws.on("error", async (err) => {
+    log("Error occurred from client. Disconnect.", err);
+    await callLog({
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.shellLogin,
+      operationTypePayload: {
+        clusterId: cluster, loginNode: loginNode.address,
+      },
+    }, OperationResult.FAIL);
+    stream.write({ message: { $case: "disconnect", disconnect: {} } });
+    stream.end();
+  });
 });
 
 export const setupShellServer = (req: NextApiRequest) => {
+
   (req.socket as any).server.on("upgrade", (request, socket, head) => {
     const url = normalizePathnameWithQuery(request.url!);
     if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
@@ -206,6 +209,3 @@ export const setupShellServer = (req: NextApiRequest) => {
   });
 };
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  res.end();
-};

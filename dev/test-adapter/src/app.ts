@@ -13,6 +13,7 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { config } from "src/config/env";
 import { accountServiceServer } from "src/services/account";
+import { appServiceServer } from "src/services/app";
 import { configServiceServer } from "src/services/config";
 import { jobServiceServer } from "src/services/job";
 import { userServiceServer } from "src/services/user";
@@ -36,6 +37,7 @@ export async function createServer() {
   await server.register(userServiceServer);
   await server.register(jobServiceServer);
   await server.register(configServiceServer);
+  await server.register(appServiceServer);
   await server.register(versionServiceServer);
 
   return server;

@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-web",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "",
   "main": "index.js",
   "private": true,
@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "antd": "5.11.2",
-    "next": "13.4.10",
+    "next": "14.0.3",
     "styled-components": "6.1.1",
     "@ant-design/icons": "5.2.6",
     "dayjs": "1.11.10",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "antd": "5.11.2",
-    "next": "13.4.10",
+    "next": "14.0.3",
     "@scow/config": "workspace:*",
     "styled-components": "6.1.1",
     "@grpc/grpc-js": "1.9.11",
