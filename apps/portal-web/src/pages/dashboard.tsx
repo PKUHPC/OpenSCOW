@@ -42,9 +42,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       const clusters = publicConfig.CLUSTERS;
 
       const rawClusterInfo =
-      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } }))
-        .concat(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } }))),
-      );
+      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })));
 
       return rawClusterInfo.flatMap((cluster) =>
         cluster.clusterInfo.partitions.map((x) => ({
