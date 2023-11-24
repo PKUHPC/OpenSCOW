@@ -29,14 +29,13 @@ const Container = styled.div`
 export const PieChartCom: React.FC<Props> = ({ pieData }) => {
   return (
     <Container>
-      <PieChart width={800} height={220}>
+      <PieChart width={220} height={220}>
         <Pie
           data={pieData}
-          cx={120}
-          cy={100}
+          cx={105}
+          cy={110}
           innerRadius={60}
           outerRadius={80}
-          fill="#8884d8"
           dataKey="value"
         >
           {pieData.map((entry, index) => (

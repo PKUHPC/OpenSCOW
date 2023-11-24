@@ -57,7 +57,7 @@ const Container = styled.div`
   }
 
   .rowBgColor{
-    background-color: #eee;
+    background-color: ${({ theme }) => theme.token.colorBorder};
     /* 去除鼠标经过默认的背景颜色 */
     td {
       background: none !important;
@@ -77,6 +77,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
   return (
     <Container>
       <Table
+        title={() => t(p("title"))}
         tableLayout="fixed"
         dataSource={clusterInfo as Array<TableProps>}
         loading={isLoading}

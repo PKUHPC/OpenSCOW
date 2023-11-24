@@ -384,6 +384,7 @@ export default {
     },
     dashboard:{
       overviewTable:{
+        title:"平台概览",
         clusterName:"集群",
         partitionName:"分区",
         nodeCount:"节点总数",

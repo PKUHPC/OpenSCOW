@@ -11,9 +11,10 @@
  */
 
 import { Card, Tag } from "antd";
-import React from "react";
+import React, { useMemo } from "react";
 import { PieChartCom } from "src/pageComponents/dashboard/PieChartCom";
 import { styled } from "styled-components"; ;
+import { gray } from "@ant-design/colors";
 
 interface LineProps {
   itemName: string;
@@ -63,9 +64,7 @@ interface Props {
 }
 
 const Container = styled.div`
-  .ant-card-body{
-    padding: 5px 24px !important;
-  }
+margin: 20px 0;
 `;
 
 const TitleContainer = styled.div`
@@ -73,26 +72,31 @@ const TitleContainer = styled.div`
   font-size: 16px;
   padding-bottom: 20px;
 `;
-const SubTitle = styled.span`
-  color: #999;
+const PieChartContainer = styled.div`
+  display: flex;
+  justify-content: center;
 `;
+
 export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => {
+
+  const notEmptyData = useMemo(() => {
+    return paneData.some((x) => x.num > 0);
+  }, [paneData]);
 
   return (
     <Container>
-      <Card style={{ width: 300 }} bordered={false} loading={loading}>
+      <Card bordered={false} loading={loading}>
         {title ? (
           <TitleContainer>
             <span>{title.title}</span>
-            <SubTitle>{title.subTitle ? `[${title.subTitle}]` : " "} </SubTitle>
+            <span>{title.subTitle ? `[${title.subTitle}]` : " "} </span>
           </TitleContainer>
         )
           : undefined}
         <div>
           <Tag
             style={{ width:"100%", height: "24px", lineHeight:"24px", fontSize:"14px",
-              borderColor:"#eee", color:"#000", display:"flex", justifyContent:"center" }}
-            color="#fff"
+              display:"flex", justifyContent:"center" }}
             bordered={true}
           >
             {tag.itemName}
@@ -106,7 +110,13 @@ export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => 
               <Line key={idx} itemName={item.itemName} num={item.num} color={item.color}></Line>)
           }
         </div>
-        <PieChartCom pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom>
+        <PieChartContainer>
+          {/* 数据全为空时,饼图置灰 */}
+          {notEmptyData ?
+            <PieChartCom pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom> :
+            <PieChartCom pieData={[{ value:1, color:gray[4] }]}></PieChartCom>}
+
+        </PieChartContainer>
       </Card>
 
     </Container>

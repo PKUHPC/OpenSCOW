@@ -384,6 +384,7 @@ export default {
     },
     dashboard:{
       overviewTable:{
+        title:"platform overview",
         clusterName:"clusterName",
         partitionName:"partitionName",
         nodeCount:"nodeCount",

@@ -13,29 +13,38 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
+import { blue, green, red } from "@ant-design/colors";
+import { Col, Row } from "antd";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
-
 interface Props {
   selectItem: ClusterInfo;
   loading: boolean;
 }
 
 const Container = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 0;
+
 `;
 
 const InfoPaneContainer = styled.div`
+  min-width: 350px;
+  max-width: 500px;
+`;
+const DoubleInfoPaneContainer = styled.div`
+  min-width: 700px;
+  max-width: 1000px;
   display: flex;
-  justify-content: flex-start;
+  padding: 0 80px;
+`;
+
+const DoubleInfoPaneItem = styled.div`
+  flex: 1;
 `;
 
 const colors = {
-  running:"#00C49F",
-  idle:"#0088FE",
-  notAvailable:"#c04851",
+  running:green[4],
+  idle:blue[4],
+  notAvailable:red[4],
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
 export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
@@ -50,39 +59,57 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
 
   return (
     <Container>
-      <InfoPane
-        loading={loading}
-        title={{ title:t(p("nodeInfo")), subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:t(p("node")), num:nodeCount }}
-        paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
-          { itemName:t(p("idle")), num:idleNodeCount, color:colors.idle },
-          { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.notAvailable }]}
-      ></InfoPane>
-      <InfoPaneContainer>
-        <InfoPane
-          loading={loading}
-          title={{ title:t(p("resourceInfo")), subTitle:`${clusterName}-${partitionName}` }}
-          tag={{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) }}
-          paneData={ [{ itemName:t(p("running")), num:runningCpuCount, color:colors.running },
-            { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
-            { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable }]}
-        ></InfoPane>
-        <InfoPane
-          loading={loading}
-          title={{ title:"", subTitle:"" }}
-          tag={{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) }}
-          paneData={ [{ itemName:t(p("running")), num:runningGpuCount, color:colors.running },
-            { itemName:t(p("idle")), num:idleGpuCount, color:colors.idle },
-            { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable }]}
-        ></InfoPane>
-      </InfoPaneContainer>
-      <InfoPane
-        loading={loading}
-        title={{ title:t(p("job")), subTitle:`${clusterName}-${partitionName}` }}
-        tag={{ itemName:t(p("job")), num:jobCount }}
-        paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
-          { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
-      ></InfoPane>
+      <Row justify="space-between">
+        <Col xs={10} sm={8} xl={6}>
+          <InfoPaneContainer>
+            <InfoPane
+              loading={loading}
+              title={{ title:t(p("nodeInfo")), subTitle:`${clusterName}-${partitionName}` }}
+              tag={{ itemName:t(p("node")), num:nodeCount }}
+              paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
+                { itemName:t(p("idle")), num:idleNodeCount, color:colors.idle },
+                { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.notAvailable }]}
+            ></InfoPane>
+          </InfoPaneContainer>
+        </Col>
+
+        <Col xs={20} sm={16} xl={12}>
+          <DoubleInfoPaneContainer>
+            <DoubleInfoPaneItem>
+              <InfoPane
+                loading={loading}
+                title={{ title:t(p("resourceInfo")), subTitle:`${clusterName}-${partitionName}` }}
+                tag={{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) }}
+                paneData={ [{ itemName:t(p("running")), num:runningCpuCount, color:colors.running },
+                  { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
+                  { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable }]}
+              ></InfoPane>
+            </DoubleInfoPaneItem>
+            <DoubleInfoPaneItem>
+              <InfoPane
+                loading={loading}
+                title={{ title:"", subTitle:"" }}
+                tag={{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) }}
+                paneData={ [{ itemName:t(p("running")), num:runningGpuCount, color:colors.running },
+                  { itemName:t(p("idle")), num:idleGpuCount, color:colors.idle },
+                  { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable }]}
+              ></InfoPane>
+            </DoubleInfoPaneItem>
+          </DoubleInfoPaneContainer>
+        </Col>
+
+        <Col xs={10} sm={8} xl={6}>
+          <InfoPaneContainer>
+            <InfoPane
+              loading={loading}
+              title={{ title:t(p("job")), subTitle:`${clusterName}-${partitionName}` }}
+              tag={{ itemName:t(p("job")), num:jobCount }}
+              paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
+                { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
+            ></InfoPane>
+          </InfoPaneContainer>
+        </Col>
+      </Row>
     </Container>
 
   );
