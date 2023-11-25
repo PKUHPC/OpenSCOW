@@ -126,6 +126,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
       "EXTRA": config.gateway.extra,
+      "ALLOWED_SERVER_NAME": config.gateway.allowedServerName,
     },
     ports: { [config.port]: 80 },
     volumes: {
