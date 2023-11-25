@@ -15,15 +15,28 @@ title: 配置
 ```yaml title="install.yml"
 # 网关配置
 gateway:
-   # 更多nginx配置
-    extra: >
-        location /extra {
-            proxy_pass http://extra-web:3000;
-            include includes/headers;
-            include includes/websocket;
-         }
+  # 更多nginx配置
+  extra: >
+      location /extra {
+          proxy_pass http://extra-web:3000;
+          include includes/headers;
+          include includes/websocket;
+        }
 ```
 
 您增加`extra`配置后，可以在使用`./cli compose up -d`启动scow后，使用 ` ./cli compose exec gateway sh` 进入gateway服务，在 `/etc/nginx/http.d` 目录下的 `default.conf` 文件最下方查看到您添加的配置。
 如果gateway服务启动失败，说明您的配置不符合规范，请保证其正确性。
+
+## 域名白名单配置
+
+scow 网关默认接收来自所有域名的访问
+为了防止 host 头攻击的发生。所以可以通过设置域名白名单来限制可访问的域名或 IP
+
+```
+gateway:
+  # 更多nginx配置
+  allowedServerName: example.com www.example.com
+```
+
+多个域名或 IP 间用空格间隔即可。
 
