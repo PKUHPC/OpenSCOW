@@ -73,7 +73,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
-    "@next/bundle-analyzer": "13.4.13",
+    "@next/bundle-analyzer": "14.0.3",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.1.2",
     "@types/busboy": "1.5.3",
