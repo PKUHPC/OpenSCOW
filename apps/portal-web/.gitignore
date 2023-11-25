@@ -25,5 +25,6 @@ yarn-error.log*
 .next/
 
 public/novnc
+public/monaco-assets
 
 api-routes-schemas.json

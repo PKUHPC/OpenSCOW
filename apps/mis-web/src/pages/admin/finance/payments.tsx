@@ -32,8 +32,6 @@ export const TenantPaymentsPage: NextPage = requireAuth((i) =>
       <PageTitle titleText={t(p("chargeRecord"))} />
       <PaymentTable
         searchType={SearchType.tenant}
-        showTenantName={true}
-        showAuditInfo={true}
       />
     </div>
   );

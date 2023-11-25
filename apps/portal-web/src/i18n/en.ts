@@ -31,7 +31,12 @@ export default {
       appSessions: "Created Apps",
       createApp: "Create App",
     },
-    file: "File Management",
+    file: {
+      fileManager: "File Manager",
+      crossClusterFileTransfer: "File Transfer",
+      clusterFileManager: "Cluster File Manager",
+      transferProgress: "Transfer Progress",
+    },
   },
   // button
   button: {
@@ -186,6 +191,49 @@ export default {
       },
     },
     fileManagerComp: {
+      clusterFileTable: {
+        fileName: "File Name",
+        modificationDate: "Modification Date",
+        size: "Size",
+        permission: "Permission",
+        notShowHiddenItem: "Do not show hidden items",
+        showHiddenItem: "Show hidden items",
+      },
+      singleCrossClusterTransferSelector: {
+        placeholder: "Please select a cluster",
+      },
+      transferInfoTable: {
+        srcCluster: "Source Cluster",
+        dstCluster: "Destination Cluster",
+        file: "File",
+        transferCount: "Transfer Count",
+        transferSpeed: "Transfer Speed",
+        timeLeft: "Time Remaining",
+        currentProgress: "Current Progress",
+        operation: "Operation",
+        confirmCancelTitle: "Confirm Cancellation",
+        confirmCancelContent: "Are you sure you want to cancel the transfer of the file {} from {} to {}?",
+        confirmOk: "Confirm",
+        cancelSuccess: "Cancellation Successful",
+        cancel: "Cancel",
+      },
+      fileEditModal: {
+        edit: "Edit",
+        prompt: "Prompt",
+        save: "Save",
+        doNotSave: "Do Not Save",
+        notSaved: "Not Saved",
+        notSavePrompt: "The file has not been saved, do you want to save this file?",
+        fileEdit: "File Edit",
+        filePreview: "File Preview",
+        fileLoading: "File is loading...",
+        exitEdit: "Exit Edit Mode",
+        failedGetFile: "Failed to get file: {}",
+        cantReadFile: "Cannot read file: {}",
+        saveFileFail: "File save failed: {}",
+        saveFileSuccess: "File saved successfully",
+        fileSizeExceeded: "File too large (maximum {}), please download and edit",
+      },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
         createSuccessMessage: "Created successfully",
@@ -194,6 +242,9 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
+        preview: {
+          cantPreview: "File too large (maximum {}) or format not supported, please download to view",
+        },
         moveCopy: {
           copy: "Copy",
           move: "Move",
@@ -221,9 +272,8 @@ export default {
           paste: "Paste Here",
           operationStarted: "{} in progress, completed: ",
           operationNotStarted: "Selected {} {} items",
-          hidden: "Hidden",
-          notHidden: "Show",
-          hiddenItem: "Hidden Items",
+          notShowHiddenItem: "Do not Show Hidden Items",
+          showHiddenItem: "Show Hidden Items",
           openInShell: "Open in Terminal",
           createFile: "New File",
           mkDir: "New Directory",
@@ -406,6 +456,16 @@ export default {
       path: {
         subTitle: "The requested cluster does not exist",
         title: "File Management",
+      },
+      fileTransfer: {
+        confirmTransferTitle: "Confirm to start transfer?",
+        confirmTransferContent: "Are you sure to transfer from {} to {}?",
+        confirmOk: "Confirm",
+        transferStartInfo: "Transfer task has started",
+        transferTitle: "Cross-cluster file transfer",
+      },
+      currentTransferInfo: {
+        checkTransfer: "Check file transfer progress",
       },
     },
     jobs: {

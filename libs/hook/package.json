@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-hook",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -16,10 +16,10 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.9.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@grpc/grpc-js": "1.9.11",
     "@scow/protos": "workspace:*",
-    "bignumber.js": "9.1.1"
+    "bignumber.js": "9.1.2"
   },
   "devDependencies": {
     "@scow/config": "workspace:*",

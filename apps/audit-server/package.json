@@ -1,6 +1,6 @@
 {
   "name": "@scow/audit-server",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -22,24 +22,24 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.4",
-    "@ddadaal/tsgrpc-common": "0.2.4",
-    "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.9.5",
-    "@mikro-orm/cli": "5.7.14",
-    "@mikro-orm/core": "5.7.14",
-    "@mikro-orm/migrations": "5.7.14",
-    "@mikro-orm/mysql": "5.7.14",
+    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@grpc/grpc-js": "1.9.11",
+    "@mikro-orm/cli": "5.9.4",
+    "@mikro-orm/core": "5.9.4",
+    "@mikro-orm/migrations": "5.9.4",
+    "@mikro-orm/mysql": "5.9.4",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
-    "pino": "8.15.0",
-    "pino-pretty": "10.2.0"
+    "pino": "8.16.2",
+    "pino-pretty": "10.2.3"
   },
   "devDependencies": {
-    "@types/google-protobuf": "3.15.6"
+    "@types/google-protobuf": "3.15.10"
   },
   "mikro-orm": {
     "useTsNode": true,

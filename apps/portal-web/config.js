@@ -15,7 +15,7 @@
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+const { PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
@@ -104,7 +104,10 @@ const config = { _specs: specs };
  */
 const buildRuntimeConfig = async (phase, basePath) => {
 
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // https://github.com/vercel/next.js/issues/57927
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
+
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
 
@@ -194,6 +197,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
 
+    FILE_EDIT_SIZE: portalConfig.file?.edit.limitSize,
+
+    FILE_PREVIEW_SIZE: portalConfig.file?.preview.limitSize,
+
     CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
       Object.values(clusters).filter(
         (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1,
@@ -219,9 +226,20 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
+
+    // HACK setup ws proxy
+    setTimeout(() => {
+      const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
+      console.log("Calling setup url to initialize proxy and shell server", url);
+
+      fetch(url).then(async (res) => {
+        console.log("Call completed. Response: ", await res.text());
+      }).catch((e) => {
+        console.error("Error when calling proxy url to initialize ws proxy server", e);
+      });
+    });
+
   }
-
-
 
   return {
     serverRuntimeConfig,

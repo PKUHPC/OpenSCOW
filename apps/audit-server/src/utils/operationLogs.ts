@@ -26,6 +26,7 @@ export async function filterOperationLogs(
     endTime,
     operationType,
     operationTargetAccountName,
+    operationDetail,
   }: OperationLogFilter,
 ) {
 
@@ -35,11 +36,13 @@ export async function filterOperationLogs(
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),
     ],
-    ...(operationType || operationTargetAccountName ? {
+    ...(operationType || operationTargetAccountName || operationDetail ? {
       metaData: {
         ...((operationType) ? { $case: operationType } : {}),
         ...((operationTargetAccountName) ? { targetAccountName: operationTargetAccountName } : {}),
+        ...operationDetail ? { $like: `%${operationDetail}%` } : {},
       },
+
     } : {}),
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };

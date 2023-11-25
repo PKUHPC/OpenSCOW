@@ -58,11 +58,15 @@ message UserAdded {
 message AccountPaid {
   string account_name = 1;
   common.Money amount = 2;
+  string type = 3;
+  string comment = 4;
 }
 
 message TenantPaid {
   string tenant_name = 1;
   common.Money amount = 2;
+  string type = 3;
+  string comment = 4;
 }
 
 message JobsSaved {

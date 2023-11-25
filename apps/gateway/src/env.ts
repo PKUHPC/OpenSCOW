@@ -35,5 +35,8 @@ export const config = envConfig({
 
   PUBLIC_DIR: str({ desc: "静态文件在文件系统中的路径。以/结尾", default: "/app/apps/gateway/public/" }),
   PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
+
+  ALLOWED_SERVER_NAME: str({ desc: "允许访问的域名或 IP，多个域名和 IP 间用空格隔开", default: "_" }),
+  DEFAULT_SERVER_BLOCK: str({ desc: "当配置了ALLOWED_SERVER_NAME为特定IP或域名时，设置默认服务块拒绝其他访问", default: "" }),
 });
 

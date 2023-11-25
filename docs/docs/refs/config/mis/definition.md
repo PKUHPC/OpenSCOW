@@ -194,7 +194,7 @@ The default value is:
 
 ## jobChargeComment
 
-给作业扣费时，扣费项的备注。可以使用{price}使用作业信息中的字段。字段参考src/entities/JobInfo
+给作业扣费时，扣费项的备注。可以使用\{price\}使用作业信息中的字段。字段参考src/entities/JobInfo
 
 `jobChargeComment`
 

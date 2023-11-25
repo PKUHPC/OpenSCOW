@@ -1,5 +1,43 @@
 # @scow/portal-web
 
+## 1.2.1
+
+### Patch Changes
+
+- 1c10da55e5: 跨集群文件管理新增显示隐藏隐藏文件
+- 04e5d68aae: 修复文件编辑器配置加载路径缺少斜杠的问题
+- Updated dependencies [b84e4f9cc4]
+  - @scow/lib-web@1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 135f2b1be3: 在门户系统的文件管理下，新增将文件直接作为作业文本提交调度器执行的功能，如果调度器 API 版本低于此接口版本报错
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+- f577d9d1e4: 门户系统文件管理新增文件编辑功能
+
+### Patch Changes
+
+- 62c7f32eb3: 优化 web 端 table，调整列的宽度以百分比固定，使其在大屏/小屏下展示更友好
+- a3d2f44af6: 门户及管理系统所有显示集群的地方按照集群中配置的优先级进行排序
+- a79aa109bb: sshConnect 时，提示语过长会使得连接失败，现在捕获了这个错误并提示用户
+- 3bb178aebd: 修改页面表格默认显示数量为 50
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/utils@1.1.0
+  - @scow/lib-web@1.2.0
+  - @scow/protos@1.0.2
+  - @scow/lib-operation-log@2.0.2
+  - @scow/rich-error-model@2.0.0
+
 ## 1.1.0
 
 ### Minor Changes
