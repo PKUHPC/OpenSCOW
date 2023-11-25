@@ -64,7 +64,8 @@
   "packageManager": "pnpm@8.10.5",
   "pnpm": {
     "patchedDependencies": {
-      "react-typed-i18n@2.3.0": "patches/react-typed-i18n@2.3.0.patch"
+      "react-typed-i18n@2.3.0": "patches/react-typed-i18n@2.3.0.patch",
+      "next@14.0.3": "patches/next@14.0.3.patch"
     }
   }
 }
