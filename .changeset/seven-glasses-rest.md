@@ -1,7 +1,7 @@
 ---
-"@scow/gateway": minor
-"@scow/cli": minor
-"@scow/docs": minor
+"@scow/gateway": patch
+"@scow/cli": patch
+"@scow/docs": patch
 "@scow/auth": patch
 ---
 
