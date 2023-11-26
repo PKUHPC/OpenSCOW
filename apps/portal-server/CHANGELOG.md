@@ -1,5 +1,15 @@
 # @scow/portal-server
 
+## 1.2.2
+
+### Patch Changes
+
+- 3d83f9cbdb: 在 portal-server 中使用交互式应用的 getConnectionConfig 接口，以适配容器式的作业调度器
+  - @scow/protos@1.0.3
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.1
+  - @scow/lib-server@1.1.0
+
 ## 1.2.1
 
 ## 1.2.0
