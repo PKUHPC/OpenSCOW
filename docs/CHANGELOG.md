@@ -1,5 +1,11 @@
 # @scow/docs
 
+## 1.1.2
+
+### Patch Changes
+
+- 969457662f: 修复 scow 存在的 web 安全漏洞
+
 ## 1.1.1
 
 ### Patch Changes
