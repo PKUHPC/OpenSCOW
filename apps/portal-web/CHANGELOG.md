@@ -1,5 +1,18 @@
 # @scow/portal-web
 
+## 1.2.2
+
+### Patch Changes
+
+- ce31a2c583: 修复文件编辑保存未携带路径的问题
+- d383f8fa94: 更新至 next 14
+- 3493cd9c8f: 修复/api/proxy 路径 websocket 无法建立连接问题
+- Updated dependencies [d383f8fa94]
+  - @scow/lib-web@1.2.2
+  - @scow/protos@1.0.3
+  - @scow/lib-operation-log@2.0.3
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.1
 
 ### Patch Changes

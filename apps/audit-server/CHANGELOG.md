@@ -1,5 +1,11 @@
 # @scow/audit-server
 
+## 2.1.1
+
+### Patch Changes
+
+- @scow/protos@1.0.3
+
 ## 2.1.0
 
 ### Minor Changes

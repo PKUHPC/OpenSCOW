@@ -234,7 +234,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     const formData = new FormData();
     formData.append("file", blob);
 
-    await fetch(urlToUpload(clusterId, filename), {
+    await fetch(urlToUpload(clusterId, filePath), {
       method: "POST",
       body: formData,
     }).then((response) => {
