@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 patchedDependencies:
+  next@14.0.3:
+    hash: u3guk2b2qg64nbffn3mmconeve
+    path: patches/next@14.0.3.patch
   react-typed-i18n@2.3.0:
     hash: eybujl4up7xenffji6zpg43f3u
     path: patches/react-typed-i18n@2.3.0.patch
@@ -509,7 +512,7 @@ importers:
         version: 2.1.35
       next:
         specifier: 14.0.3
-        version: 14.0.3(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
       next-compose-plugins:
         specifier: 2.2.1
         version: 2.2.1
@@ -772,7 +775,7 @@ importers:
         version: 0.44.0
       next:
         specifier: 14.0.3
-        version: 14.0.3(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
       next-compose-plugins:
         specifier: 2.2.1
         version: 2.2.1
@@ -1216,7 +1219,7 @@ importers:
         version: 1.11.10
       next:
         specifier: 14.0.3
-        version: 14.0.3(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
+        version: 14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -3527,7 +3530,7 @@ packages:
       ajv-formats: 2.1.1(ajv@8.12.0)
       ajv-formats-draft2019: 1.6.1(ajv@8.12.0)
       fast-json-stringify: 5.8.0
-      next: 14.0.3(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
+      next: 14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
       tslib: 2.6.1
       zod: 3.22.4
     dev: false
@@ -14862,7 +14865,7 @@ packages:
     resolution: {integrity: sha512-OjJ+fV15FXO2uQXQagLD4C0abYErBjyjE0I0FHpOEIB8upw0hg1ldFP6cqHTJBH1cZqy96OeR3u1dJ+Ez2D4Bg==}
     dev: false
 
-  /next@14.0.3(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0):
+  /next@14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-AbYdRNfImBr3XGtvnwOxq8ekVCwbFTv/UJoLwmaX89nk9i051AEY4/HAWzU0YpaTDw8IofUpmuIlvzWF13jxIw==}
     engines: {node: '>=18.17.0'}
     hasBin: true
@@ -14899,6 +14902,7 @@ packages:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
+    patched: true
 
   /no-case@3.0.4:
     resolution: {integrity: sha512-fgAN3jGAh+RoxUGZHTSOLJIqUc2wmoBwGR4tbpNAKmmovFoWq0OdRkb0VkldReO2a2iBT/OEulG9XSUc10r3zg==}
