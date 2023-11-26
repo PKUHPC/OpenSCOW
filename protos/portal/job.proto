@@ -26,9 +26,18 @@ message CancelJobRequest {
 // NOT_FOUND: cluster is not found
 message CancelJobResponse {}
 
+// BLOCKED_ACCOUNTS_ONLY: account's status is blocked or user's status is blocked under unblocked accounts
+// UNBLOCKED_ACCOUNTS_ONLY: account's status and user's status are unblocked
+enum AccountStatusFilter {
+  ALL = 0;
+  BLOCKED_ONLY = 1;
+  UNBLOCKED_ONLY = 2;
+}
+
 message ListAccountsRequest {
   string user_id = 1;
   string cluster = 2;
+  optional AccountStatusFilter status_filter = 3;
 }
 
 message ListAccountsResponse {
@@ -172,19 +181,6 @@ message SubmitFileAsJobResponse {
   uint32 job_id = 1;
 }
 
-// get user's availableAccounts
-// accounts status is not blocked
-// user status in account is not blocked
-message GetAvailableAccountsRequest {
-  string cluster = 1;
-  string user_id = 2;
-  repeated string accounts = 3;
-}
-
-message GetAvailableAccountsResponse {
-  repeated string accounts = 1;
-}
-
 
 service JobService {
   rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
@@ -207,5 +203,4 @@ service JobService {
 
   rpc SubmitFileAsJob(SubmitFileAsJobRequest) returns (SubmitFileAsJobResponse);
 
-  rpc GetAvailableAccounts(GetAvailableAccountsRequest) returns (GetAvailableAccountsResponse);
 }

@@ -32,7 +32,6 @@ export const configServiceServer = plugin((server) => {
     getAvailablePartitionsForCluster: async ({ request, logger }) => {
 
       const { cluster, accountName, userId } = request;
-
       let availablePartitions: Partition[];
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
@@ -44,7 +43,6 @@ export const configServiceServer = plugin((server) => {
         logger.error(`Error occured when query the available partitions of ${userId} in ${accountName}.`);
         availablePartitions = [];
       }
-
 
       return [ { partitions: availablePartitions } ];
     },

@@ -15,16 +15,19 @@ import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin,
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { AccountStatusFilter } from "src/models/job";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { formatSize } from "src/utils/format";
 import { styled } from "styled-components";
+
+import { PartitionSelector } from "../job/PartitionSelector";
 
 const Text = styled(Typography.Paragraph)`
 `;
@@ -77,7 +80,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const appCommentI18nText = appComment ? getI18nConfigCurrentText(appComment, languageId) : undefined;
 
   const [form] = Form.useForm<FormFields>();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -130,117 +133,210 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   };
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+  const [accountsReloadTrigger, setAccountsReloadTrigger] = useState<boolean>(false);
+  const [partitionsReloadTrigger, setPartitionsReloadTrigger] = useState<boolean>(false);
+  const [accountPartitionsCacheMap, setAccountPartitionsCacheMap] = useState<Record<string, Partition[]>>({});
+  const [selectableAccounts, setSelectableAccounts] = useState<string[]>([]);
 
-  const clusterInfoQuery = useAsync({
-    promiseFn: useCallback(async () => clusterId
-      ? api.getClusterInfo({ query: { cluster:  clusterId } }) : undefined, []),
-    onResolve: async (data) => {
-      if (data) {
-        setLoading(true);
+  const account = Form.useWatch("account", form) as string;
+
+  const nodeCount = Form.useWatch("nodeCount", form) as number;
+
+  const coreCount = Form.useWatch("coreCount", form) as number;
+
+  const gpuCount = Form.useWatch("gpuCount", form) as number;
+
+  useAsync({ promiseFn: useCallback(async () => {
+
+    // 获取上一次提交记录
+    await api.getAppLastSubmission({ query: { cluster: clusterId, appId } })
+      .then(async (lastData) => {
+
         form.setFieldValue("appJobName", genAppJobName(appName));
+        // setLoading(true);
 
-        setCurrentPartitionInfo(data.clusterInfo.scheduler.partitions[0]);
+        // 进入页面时第一次请求集群下未封锁账户
+        await api.getAccounts({ query: {
+          cluster: clusterId,
+          statusFilter: AccountStatusFilter.UNBLOCKED_ONLY,
+        } })
+          .httpError(404, (error) => { message.error(error.message); })
+          .then(async (accountsResp) => {
 
-        await api.getAppLastSubmission({ query: { cluster: clusterId, appId } })
-          .then((lastSubmitData) => {
-            const lastSubmitPartition = lastSubmitData?.lastSubmissionInfo?.partition;
-            const lastSubmitQos = lastSubmitData?.lastSubmissionInfo?.qos;
-            const lastSubmitCoreCount = lastSubmitData?.lastSubmissionInfo?.coreCount;
-            const lastSubmissionNodeCount = lastSubmitData?.lastSubmissionInfo?.nodeCount;
-            const lastSubmissionGpuCount = lastSubmitData?.lastSubmissionInfo?.gpuCount;
+            // 改个名
+            let requiredInputObj = {};
 
-            // 如果存在上一次提交信息，且上一次提交信息中的分区，qos，cpu核心数满足当前集群配置，则填入上一次提交信息中的相应值
-            const setSubmitPartition = lastSubmitPartition &&
-            data.clusterInfo.scheduler.partitions.some((item) => { return item.name === lastSubmitPartition; });
+            if (accountsResp && accountsResp.accounts.length) {
 
-            const clusterPartition = setSubmitPartition
-              ? data.clusterInfo.scheduler.partitions.filter((item) => { return item.name === lastSubmitPartition; })[0]
-              : data.clusterInfo.scheduler.partitions[0];
-            setCurrentPartitionInfo(clusterPartition);
+              setSelectableAccounts(accountsResp.accounts);
+              const lastSubmission = lastData?.lastSubmissionInfo;
+              const lastAccount = lastSubmission?.account;
+              const lastPartition = lastSubmission?.partition;
+              const lastQos = lastSubmission?.qos;
+              const lastCoreCount = lastSubmission?.coreCount;
+              const lastNodeCount = lastSubmission?.nodeCount;
+              const lastGpuCount = lastSubmission?.gpuCount;
+              const lastMaxTime = lastSubmission?.maxTime;
+              const lastAttributes = lastSubmission?.customAttributes;
 
-            const clusterPartitionCoreCount = clusterPartition.cores;
-            const clusterPartitionNodeCount = clusterPartition.nodes;
-            const clusterPartitionGpuCount = clusterPartition.gpus;
+              // 如果上一次提交信息中的账户存在且在当前可选账户列表中，则填入上一次提交记录中的账户
+              // 如果上一次提交信息不存在，或者提交信息中的账户存在但不在当前可选列表中，则填入账户列表的第一个值
+              const firstInputAccount = (lastData && lastSubmission?.account &&
+              accountsResp.accounts.includes(lastSubmission?.account)) ?
+                lastSubmission.account : accountsResp.accounts[0];
 
-            const setSubmitQos = setSubmitPartition &&
-              clusterPartition.qos?.some((item) => { return item === lastSubmitQos; });
-            const setSubmitCoreCount = setSubmitPartition &&
-              lastSubmitCoreCount && clusterPartitionCoreCount && clusterPartitionCoreCount >= lastSubmitCoreCount;
-            const setSubmitNodeCount = setSubmitPartition &&
-                lastSubmissionNodeCount && clusterPartitionNodeCount &&
-                clusterPartitionNodeCount >= lastSubmissionNodeCount;
+              // 获取第一次填入账户可用分区
+              await api.getAvailablePartitionsForCluster({ query: {
+                cluster: clusterId,
+                accountName: firstInputAccount,
+              } }).then((partitionsResp) => {
 
-            const setSubmitGpuCount = setSubmitPartition && lastSubmissionGpuCount && clusterPartitionGpuCount &&
-            clusterPartitionGpuCount >= lastSubmissionGpuCount;
+                if (partitionsResp && partitionsResp.partitions.length) {
+                  // 如果上一次提交信息中的分区存在于当前账户可见分区列表,则填入上一次提交记录的分区,否则填入当前列表分区的第一项
+                  const resPartitions = partitionsResp.partitions;
+                  const setLastPartition = !!lastPartition &&
+                    resPartitions.some((item) => item.name === lastPartition);
 
-            const requiredObj = {
-              partition: setSubmitPartition ? lastSubmitPartition : clusterPartition.name,
-              qos: setSubmitQos ? lastSubmitQos : clusterPartition?.qos?.[0],
-              nodeCount: setSubmitNodeCount ? lastSubmissionNodeCount : initialValues.nodeCount,
-              coreCount: setSubmitCoreCount ? lastSubmitCoreCount : initialValues.coreCount,
-              gpuCount: setSubmitGpuCount ? lastSubmissionGpuCount : initialValues.gpuCount,
-              maxTime: lastSubmitData?.lastSubmissionInfo
-                ? lastSubmitData.lastSubmissionInfo.maxTime : initialValues.maxTime,
-            };
+                  const firstPartitionInfo: Partition = setLastPartition ?
+                    resPartitions.filter((item) => item.name === lastPartition)[0]
+                    : resPartitions[0];
 
-            // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
-            const attributesObj = {};
-            const lastSubmitAttributes = lastSubmitData?.lastSubmissionInfo?.customAttributes;
-            if (lastSubmitAttributes) {
-              attributes.forEach((attribute) => {
-                if (attribute.name in lastSubmitAttributes) {
-                  switch (attribute.type) {
-                  case "NUMBER":
-                    attributesObj[attribute.name] = parseInt(lastSubmitAttributes[attribute.name]);
-                    break;
-                  case "TEXT":
-                    attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
-                    break;
-                  case "SELECT":
-                    // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
-                    if (!clusterPartitionGpuCount) {
-                      // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
-                      const selectOptions =
-                      attribute.select.filter((x) => !x.requireGpu || (x.requireGpu && clusterPartitionGpuCount));
+                  setCurrentPartitionInfo(firstPartitionInfo);
+                  setAccountPartitionsCacheMap({ [firstInputAccount]: resPartitions });
 
-                      if (selectOptions.some((optionItem) =>
-                        optionItem.value === lastSubmitAttributes[attribute.name]))
-                      {
-                        attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
+                  const setLastQos = setLastPartition &&
+                      firstPartitionInfo.qos?.some((item) => item === lastQos);
+                  const setLastCoreCount = setLastPartition && lastCoreCount &&
+                      firstPartitionInfo.cores && firstPartitionInfo.cores >= lastCoreCount;
+                  const setLastNodeCount = setLastPartition && lastNodeCount &&
+                      firstPartitionInfo.nodes && firstPartitionInfo.nodes >= lastNodeCount;
+                  const setLastGpuCount = setLastPartition && lastGpuCount &&
+                      firstPartitionInfo.gpus && firstPartitionInfo.gpus >= lastGpuCount;
+
+                  requiredInputObj = {
+                    account: lastAccount,
+                    partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
+                    qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
+                    nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
+                    coreCount: setLastCoreCount ? lastNodeCount : initialValues.coreCount,
+                    gpuCount: setLastGpuCount ? lastGpuCount : initialValues.gpuCount,
+                    maxTime: lastMaxTime ?? initialValues.maxTime,
+                  };
+
+                  // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+                  const attributesInputObj = {};
+                  if (lastAttributes) {
+                    attributes.forEach((attribute) => {
+                      if (attribute.name in lastAttributes) {
+                        switch (attribute.type) {
+                        case "NUMBER":
+                          attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
+                          break;
+                        case "TEXT":
+                          attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                          break;
+                        case "SELECT":
+                          // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
+                          if (!firstPartitionInfo.gpus) {
+                            // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+                            const selectOptions = attribute.select.filter((x) =>
+                              !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
+
+                            if (selectOptions.some((optionItem) =>
+                              optionItem.value === lastAttributes[attribute.name]))
+                            {
+                              attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                            }
+                          }
+                          else {
+                            if (attribute.select!.some((optionItem) =>
+                              optionItem.value === lastAttributes[attribute.name]))
+                            {
+                              attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                            }
+                          }
+
+                          break;
+                        default:
+                          break;
+                        }
                       }
-                    }
-                    else {
-                      if (attribute.select!.some((optionItem) =>
-                        optionItem.value === lastSubmitAttributes[attribute.name]))
-                      {
-                        attributesObj[attribute.name] = lastSubmitAttributes[attribute.name];
-                      }
-                    }
-
-                    break;
-                  default:
-                    break;
+                    });
                   }
+
+                  form.setFieldsValue({ ...requiredInputObj, ...attributesInputObj });
                 }
+
+
               });
-            }
-            form.setFieldsValue({ ...requiredObj, ...attributesObj });
 
-            // 如果上一次提交信息存在，则填入账户值
-            if (lastSubmitData.lastSubmissionInfo) {
-              form.setFieldValue("account", lastSubmitData.lastSubmissionInfo.account);
             }
 
-          }).finally(() => {
-            setLoading(false);
+          });
+
+      }).finally(() => setLoading(false));
+  }, []) });
+
+  const handleAccountsReload = () => {
+    setAccountsReloadTrigger((prev) => prev = !prev);
+    // 账户重新获取时，清除所有保存的账户分区信息
+    setAccountPartitionsCacheMap({});
+  };
+
+  const handlePartitionsReload = () => {
+    setPartitionsReloadTrigger((prev) => prev = !prev);
+    // 分区重新获取时，刷新已选择账户的分区信息
+    const newPartitionsMap = { ...accountPartitionsCacheMap };
+    if (accountPartitionsCacheMap[account]) {
+      delete newPartitionsMap[account];
+    }
+    setAccountPartitionsCacheMap(newPartitionsMap);
+  };
+
+  const prevAccountsReloadTriggerRef = useRef<boolean>(false);
+  // 获取未封锁账户
+  const unblockedAccountsQuery = useAsync({
+    promiseFn: useCallback(async () => {
+      // 确保进入页面后在查询上一次提交记录后，如果不点击账户刷新按钮不触发额外请求
+      if (!loading && prevAccountsReloadTriggerRef.current !== accountsReloadTrigger) {
+        return await api.getAccounts({ query: {
+          cluster: clusterId,
+          statusFilter: AccountStatusFilter.UNBLOCKED_ONLY,
+        } })
+          .httpError(404, (error) => { message.error(error.message); })
+          .then((data) => {
+            setSelectableAccounts(data.accounts);
+            prevAccountsReloadTriggerRef.current = accountsReloadTrigger;
           });
       }
-    },
+    }, [accountsReloadTrigger, loading]),
+  });
+
+
+  // 获取账户的可见分区 selectAccount
+  const availablePartitionsForAccountQuery = useAsync({
+    promiseFn: useCallback(async () => {
+      if (account && selectableAccounts.includes(account) && !accountPartitionsCacheMap[account] && !loading) {
+        const newPartitionsMap = { ...accountPartitionsCacheMap };
+        return await api.getAvailablePartitionsForCluster({ query: {
+          cluster: clusterId,
+          accountName: account,
+        } })
+          .then((data) => {
+            newPartitionsMap[account] = data.partitions;
+            setAccountPartitionsCacheMap(newPartitionsMap);
+            setCurrentPartitionInfo(data.partitions[0]);
+          });
+
+      };
+      return { partitions: [] as Partition[] };
+    }, [account, partitionsReloadTrigger, selectableAccounts, loading]),
   });
 
   const handlePartitionChange = (partition: string) => {
-    const partitionInfo = clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
+    const account = form.getFieldValue("account");
+    const partitionInfo = accountPartitionsCacheMap[account]
+      ? accountPartitionsCacheMap[account].find((x) => x.name === partition)
       : undefined;
     form.setFieldValue("qos", partitionInfo?.qos?.[0]);
     if (!!partitionInfo?.gpus) {
@@ -251,6 +347,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     setCurrentPartitionInfo(partitionInfo);
 
   };
+
   const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
       ? [{ type: "integer" }, { required: item.required }]
@@ -261,7 +358,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
     const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
     const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
-    if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
     const inputItem = item.type === "NUMBER" ?
       (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
       : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
@@ -296,12 +392,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     );
   }), [attributes, currentPartitionInfo, languageId]);
 
-  const nodeCount = Form.useWatch("nodeCount", form) as number;
-
-  const coreCount = Form.useWatch("coreCount", form) as number;
-
-  const gpuCount = Form.useWatch("gpuCount", form) as number;
-
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -332,7 +422,11 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             name="account"
             rules={[{ required: true }]}
           >
-            <AccountSelector cluster={clusterId} onlyNormalAccounts={true} />
+            <AccountSelector
+              selectableAccounts={ selectableAccounts ?? []}
+              isLoading={unblockedAccountsQuery.isLoading}
+              onReload={handleAccountsReload}
+            />
           </Form.Item>
 
           <Form.Item
@@ -340,13 +434,11 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             name="partition"
             rules={[{ required: true }]}
           >
-            <Select
-              disabled={!currentPartitionInfo}
-              options={clusterInfoQuery.data
-                ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
-                  .map((x) => ({ label: x.name, value: x.name }))
-                : []
-              }
+            <PartitionSelector
+              isLoading={availablePartitionsForAccountQuery.isLoading || unblockedAccountsQuery.isLoading}
+              selectablePartitions={accountPartitionsCacheMap[account] ?
+                accountPartitionsCacheMap[account].map((x) => x.name) : []}
+              onReload={handlePartitionsReload}
               onChange={handlePartitionChange}
             />
           </Form.Item>
@@ -357,7 +449,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             rules={[{ required: true }]}
           >
             <Select
-              disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+              loading={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
               options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
             />
           </Form.Item>

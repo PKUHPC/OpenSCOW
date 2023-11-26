@@ -16,6 +16,7 @@ import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { AccountStatusFilter } from "src/models/job";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
@@ -25,6 +26,7 @@ export const GetAccountsSchema = typeboxRouteSchema({
 
   query: Type.Object({
     cluster: Type.String(),
+    statusFilter: Type.Optional(Type.Enum(AccountStatusFilter)),
   }),
 
   responses: {
@@ -46,12 +48,12 @@ export default route(GetAccountsSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster } = req.query;
+  const { cluster, statusFilter } = req.query;
 
   const client = getClient(JobServiceClient);
 
   return asyncUnaryCall(client, "listAccounts", {
-    cluster, userId: info.identityId,
+    cluster, userId: info.identityId, statusFilter,
   }).then(({ accounts }) => ({ 200: { accounts } }), handlegRPCError({
     [status.NOT_FOUND]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
     [status.INTERNAL]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),

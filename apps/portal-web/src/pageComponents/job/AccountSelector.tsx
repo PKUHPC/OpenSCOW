@@ -11,53 +11,30 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { App, Button, Input, Select, Tooltip } from "antd";
-import { useCallback, useEffect } from "react";
-import { useAsync } from "react-async";
-import { useStore } from "simstate";
-import { api } from "src/apis";
+import { Button, Input, Select, Tooltip } from "antd";
+import { useEffect } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { UserStore } from "src/stores/UserStore";
 
 interface Props {
-  cluster?: string;
+  selectableAccounts: string[];
+  isLoading: boolean;
   value?: string;
   onChange?: (value: string) => void;
-  onlyNormalAccounts?: boolean;
-  onOptionsChange?: (options: string[]) => void;
+  onReload?: () => void;
+  defaultInitialValue?: string;
 }
 
-export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onlyNormalAccounts, onOptionsChange }) => {
-  const userStore = useStore(UserStore);
-  const { message } = App.useApp();
-
-  const promiseFn = useCallback(async () => {
-    const result = cluster ? await api.getAccounts({ query: { cluster } })
-      .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
-
-    return onlyNormalAccounts ?
-      (cluster && result.accounts ?
-        await api.getAvailableAccounts({ query:
-        { cluster, accounts: result.accounts } }) : { accounts: [] as string[] }) :
-      (result);
-  }, [cluster, userStore.user]);
-
-  const { data, isLoading, reload } = useAsync({
-    promiseFn,
-    watch: userStore.user,
-  });
+export const AccountSelector: React.FC<Props> = ({ selectableAccounts, isLoading,
+  onChange, value, onReload, defaultInitialValue }) => {
 
   useEffect(() => {
-
-    if (data && data.accounts.length) {
-      if (!value || !data.accounts.includes(value)) {
-        onChange?.(data.accounts[0]);
-      }
-      if (onOptionsChange) {
-        onOptionsChange(data.accounts);
-      }
+    if (value && defaultInitialValue && value === defaultInitialValue) {
+      onChange?.(defaultInitialValue);
+    } else if (!value && selectableAccounts || (value && !selectableAccounts.includes(value))) {
+      onChange?.(selectableAccounts[0]);
     }
-  }, [data, value, onOptionsChange]);
+
+  }, [selectableAccounts, value]);
 
   const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.accountSelector.");
@@ -66,14 +43,14 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value, onl
     <Input.Group compact>
       <Select
         loading={isLoading}
-        options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
+        options={selectableAccounts ? selectableAccounts.map((x) => ({ label: x, value: x })) : []}
         placeholder={t(p("selectAccountPlaceholder"))}
         value={value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />
       <Tooltip title={t(p("refreshAccountList"))}>
-        <Button icon={<ReloadOutlined spin={isLoading} />} onClick={reload} loading={isLoading} />
+        <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => onReload?.()} loading={isLoading} />
       </Tooltip>
     </Input.Group>
   );

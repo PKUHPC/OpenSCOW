@@ -38,7 +38,6 @@ export const configServiceServer = plugin((server) => {
           accountName, userId,
         }),
       );
-
       return [reply];
     },
 

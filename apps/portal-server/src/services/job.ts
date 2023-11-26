@@ -16,7 +16,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
-import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
+import { AccountStatusFilter, JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
 import { getClusterOps } from "src/clusterops";
@@ -44,8 +44,8 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    listAccounts: async ({ request }) => {
-      const { cluster, userId } = request;
+    listAccounts: async ({ request, logger }) => {
+      const { cluster, userId, statusFilter } = request;
 
       const client = getAdapterClient(cluster);
       if (!client) { throw clusterNotFound(cluster); }
@@ -53,8 +53,46 @@ export const jobServiceServer = plugin((server) => {
       const reply = await asyncClientCall(client.account, "listAccounts", {
         userId,
       });
+      const accounts = reply.accounts;
 
-      return [{ accounts: reply.accounts }];
+      if ((statusFilter === undefined) || statusFilter === AccountStatusFilter.ALL) {
+        return [{ accounts: accounts }];
+      }
+
+      let unblockAccounts: string[] = [];
+      let blockedAccounts: string[] = [];
+      const filteredUnblockedAccounts: string[] = [];
+      const filteredBlockedAccounts: string[] = [];
+      const filteredUnblockedUserAccounts: string[] = [];
+      const filteredBlockedUserAccounts: string[] = [];
+
+      const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
+        try {
+          const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
+          resp.blocked ? filteredBlockedAccounts.push(account) : filteredUnblockedAccounts.push(account);
+        } catch (error) {
+          logger.error(`Error occured when query the block status of ${account}.`);
+        }
+      }));
+
+      const filterUserStatusPromise = Promise.allSettled(accounts.map(async (account) => {
+        try {
+          const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
+            accountName: account, userId });
+          resp.blocked ? filteredBlockedUserAccounts.push(account) : filteredUnblockedUserAccounts.push(account);
+        } catch (error) {
+          logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
+        }
+      }));
+
+      await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
+        unblockAccounts = filteredUnblockedAccounts.filter((account) =>
+          filteredUnblockedUserAccounts.includes(account));
+        blockedAccounts = Array.from(new Set(filteredBlockedAccounts.concat(filteredBlockedUserAccounts)));
+      });
+
+      return [{ accounts:
+        statusFilter === AccountStatusFilter.BLOCKED_ONLY ? blockedAccounts : unblockAccounts }];
     },
 
     getJobTemplate: async ({ request, logger }) => {
@@ -287,43 +325,44 @@ export const jobServiceServer = plugin((server) => {
       return [{ jobId: reply.jobId }];
     },
 
-    getAvailableAccounts: async ({ request, logger }) => {
-      const { cluster, accounts, userId } = request;
+    //   getAvailableAccounts: async ({ request, logger }) => {
+    //     const { cluster, accounts, userId } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
+    //     const client = getAdapterClient(cluster);
+    //     if (!client) { throw clusterNotFound(cluster); }
 
-      let availableAccounts: string[] = [];
-      const filteredStatusAccounts: string[] = [];
-      const filteredUserStatusAccounts: string[] = [];
+    //     let availableAccounts: string[] = [];
+    //     const filteredStatusAccounts: string[] = [];
+    //     const filteredUserStatusAccounts: string[] = [];
 
-      const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
-        try {
-          const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
-          if (!resp.blocked) {
-            filteredStatusAccounts.push(account); }
-        } catch (error) {
-          logger.error(`Error occured when query the block status of ${account}.`);
-        }
-      }));
+    //     const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
+    //       try {
+    //         const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
+    //         if (!resp.blocked) {
+    //           filteredStatusAccounts.push(account); }
+    //       } catch (error) {
+    //         logger.error(`Error occured when query the block status of ${account}.`);
+    //       }
+    //     }));
 
-      const filterUserStatusPromise = Promise.allSettled(accounts.map(async (account) => {
-        try {
-          const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
-            accountName: account, userId });
-          if (!resp.blocked) {
-            filteredUserStatusAccounts.push(account); }
-        } catch (error) {
-          logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
-        }
-      }));
+    //     const filterUserStatusPromise = Promise.allSettled(accounts.map(async (account) => {
+    //       try {
+    //         const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
+    //           accountName: account, userId });
+    //         if (!resp.blocked) {
+    //           filteredUserStatusAccounts.push(account); }
+    //       } catch (error) {
+    //         logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
+    //       }
+    //     }));
 
-      await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
-        availableAccounts = filteredStatusAccounts.filter((account) => filteredUserStatusAccounts.includes(account));
-      });
+    //     await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
+    //       availableAccounts = filteredStatusAccounts.filter((account) =>
+    // filteredUserStatusAccounts.includes(account));
+    //     });
 
-      return [ { accounts: availableAccounts } ];
-    },
+    //     return [ { accounts: availableAccounts } ];
+    //   },
 
   });
 

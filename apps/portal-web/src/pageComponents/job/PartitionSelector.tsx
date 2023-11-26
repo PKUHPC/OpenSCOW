@@ -16,55 +16,39 @@ import { useEffect } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
-  selectableAccounts: string[];
+  selectablePartitions: string[];
   isLoading: boolean;
   value?: string;
   onChange?: (value: string) => void;
   onReload?: () => void;
+  defaultInitialValue?: string;
 }
 
-export const AccountListSelector: React.FC<Props> = ({ selectableAccounts, isLoading, onChange, value, onReload }) => {
-  // const userStore = useStore(UserStore);
-  // const { message } = App.useApp();
-
-  // const promiseFn = useCallback(async () => {
-  //   const result = cluster ? await api.getAccounts({ query: { cluster } })
-  //     .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
-
-  //   return onlyNormalAccounts ?
-  //     (cluster && result.accounts ?
-  //       await api.getAvailableAccounts({ query:
-  //       { cluster, accounts: result.accounts } }) : { accounts: [] as string[] }) :
-  //     (result);
-  // }, [cluster, userStore.user]);
-
-  // const { data, isLoading, reload } = useAsync({
-  //   promiseFn,
-  //   watch: userStore.user,
-  // });
+export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
+  isLoading, onChange, value, onReload, defaultInitialValue }) => {
 
   useEffect(() => {
-    if (selectableAccounts && selectableAccounts.length) {
-      if (!value || !selectableAccounts.includes(value)) {
-        onChange?.(selectableAccounts[0]);
-      }
+    if (value && defaultInitialValue && value === defaultInitialValue) {
+      onChange?.(defaultInitialValue);
+    } else if (!value && selectablePartitions || (value && !selectablePartitions.includes(value))) {
+      onChange?.(selectablePartitions[0]);
     }
-  }, [selectableAccounts, value]);
+  }, [selectablePartitions, value]);
 
   const t = useI18nTranslateToString();
-  const p = prefix("pageComp.job.accountSelector.");
+  const p = prefix("pageComp.job.partitionSelector.");
 
   return (
     <Input.Group compact>
       <Select
         loading={isLoading}
-        options={selectableAccounts ? selectableAccounts.map((x) => ({ label: x, value: x })) : []}
-        placeholder={t(p("selectAccountPlaceholder"))}
+        options={selectablePartitions ? selectablePartitions.map((x) => ({ label: x, value: x })) : []}
+        placeholder={t(p("selectPartitionPlaceholder"))}
         value={value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />
-      <Tooltip title={t(p("refreshAccountList"))}>
+      <Tooltip title={t(p("refreshPartitionList"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => onReload?.()} loading={isLoading} />
       </Tooltip>
     </Input.Group>
