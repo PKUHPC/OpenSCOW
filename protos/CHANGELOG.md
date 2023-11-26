@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.3.0
+
+### Minor Changes
+
+- 5b9116e3bd: hook(accountPaid、tenantPaid) 增加的传参 type,、comment
+
 ## 1.2.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @scow/mis-web
 
+## 1.2.2
+
+### Patch Changes
+
+- d383f8fa94: 更新至 next 14
+- 63c6fd5d4b: 管理系统充值列表传参优化，删除多余参数，统一为 searchType 控制
+- Updated dependencies [d383f8fa94]
+  - @scow/lib-web@1.2.2
+  - @scow/protos@1.0.3
+  - @scow/lib-operation-log@2.0.3
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.1
 
 ### Patch Changes
