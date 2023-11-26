@@ -29,12 +29,13 @@ gateway:
 
 ## 域名白名单配置
 
-scow 网关默认接收来自所有域名的访问
-为了防止 host 头攻击的发生。所以可以通过设置域名白名单来限制可访问的域名或 IP
+scow 网关默认不限制 HTTP Host 头
+
+为了防止 host 头攻击的发生，可以通过设置域名白名单来限制 Host 的域名或 IP
 
 ```
 gateway:
-  # 更多nginx配置
+  # 同 nginx server_name 配置
   allowedServerName: example.com www.example.com
 ```
 
