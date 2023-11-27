@@ -184,8 +184,10 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const { message } = App.useApp();
 
   const handleEdit = (content) => {
-    if (content && !downloading) {
-      setIsEdit(true);
+    if (!downloading) {
+      if (content !== fileContent) {
+        setIsEdit(true);
+      }
       setFileContent(content);
     }
   };
