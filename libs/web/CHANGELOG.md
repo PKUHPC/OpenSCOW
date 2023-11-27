@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 1.2.2
+
+### Patch Changes
+
+- d383f8fa94: 更新至 next 14
+
 ## 1.2.1
 
 ### Patch Changes

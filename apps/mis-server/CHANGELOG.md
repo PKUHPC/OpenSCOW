@@ -1,5 +1,15 @@
 # @scow/mis-server
 
+## 1.2.2
+
+### Patch Changes
+
+- 5b9116e3bd: hook(accountPaid、tenantPaid)增加的传参 type,、comment
+  - @scow/protos@1.0.3
+  - @scow/lib-hook@1.0.3
+  - @scow/lib-scheduler-adapter@1.1.1
+  - @scow/lib-server@1.1.0
+
 ## 1.2.1
 
 ## 1.2.0
