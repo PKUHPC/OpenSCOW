@@ -151,7 +151,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const { open, filename, fileSize, filePath, clusterId } = previewFile;
 
   const [mode, setMode] = useState<Mode>(Mode.PREVIEW);
-  const [fileContent, setFileContent] = useState("");
+  const [fileContent, setFileContent] = useState<string | undefined>(undefined);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -196,7 +196,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     setConfirm(false);
     setIsEdit(false);
     setMode(Mode.PREVIEW);
-    setFileContent("");
+    setFileContent(undefined);
     setOptions({
       ...options,
       readOnly: true,
@@ -240,6 +240,9 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   };
 
   const handleSave = async () => {
+    if (fileContent === undefined) {
+      return;
+    }
 
     setSaving(true);
     const blob = new Blob([fileContent], { type: "text/plain" });
