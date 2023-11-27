@@ -26,7 +26,10 @@ import {
   rectSortingStrategy,
   SortableContext } from "@dnd-kit/sortable";
 import { Card, message } from "antd";
+import Router from "next/router";
+import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { Cluster } from "src/utils/config";
 import { styled } from "styled-components";
 
 import { AddEntryModal, EntryProps, EntryType } from "./AddEntryModal";
@@ -77,23 +80,40 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
     ],
   );
   // 编辑时临时的快捷入口项
-  // todo
-  const [temItems, setTemItems] = useState([...(items.map((x) => ({ ...x, id:x.id + 1 })))]);
+  const [temItems, setTemItems] = useState([...(items.map((x) => ({ ...x, id:x.id + "-" + x.cluster?.id })))]);
 
-  console.log("temItems", temItems);
   const [addEntryOpen, setAddEntryOpen] = useState(false);
+  const [changeClusterOpen, setChangeClusterOpen] = useState(false);
 
   const deleteFn = (id: string) => {
     setTemItems(temItems.filter((x) => x.id !== id));
   };
   const addItem = (item: EntryProps) => {
-    console.log("item", item);
+    item = { ...item, id:item.id + "-" + item.cluster?.id };
     if (temItems.find((x) => x.id === item.id)) {
       message.error("已存在该快捷方式");
       return;
     }
     setTemItems([...temItems, item]);
   };
+
+  const editItemCluster = (cluster: Cluster, loginNode?: string) => {
+    setTemItems(temItems.map((x) => {
+      if (x.id !== changeClusterActiveId) {
+        return x;
+      }
+      x.cluster = cluster;
+      x.loginNode = loginNode;
+      return x;
+    }));
+  };
+
+  // 要修改集信息快捷方式的id
+  const [changeClusterActiveId, setChangeClusterId] = useState<string | null>(null);
+  // 要修改集信息快捷方式的类型
+  const [changeClusterEntryType, setChangeClusterEntryType] = useState< EntryType | null>(null);
+
+  // 被拖拽的快捷方式的id
   const [activeId, setActiveId] = useState<string | number | null>(null);
   const activeItem = useMemo(() => {
     if (activeId) {
@@ -129,16 +149,39 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
     setActiveId(null);
   }, []);
 
+  const onItemClick = useCallback(
+    (item: EntryProps) => {
+      if (!isEditable) {
+        switch (item.entryType) {
+        case EntryType.static:
+          Router.push(item.path);
+          break;
+
+        case EntryType.shell:
+          Router.push(join(item.path, item.cluster!.id, item.loginNode!));
+          break;
+
+        case EntryType.app:
+          Router.push(join(item.path, item.cluster!.id, "/create", item.id));
+          break;
+
+        default:
+          break;
+        }
+      }
+    },
+    [isEditable],
+  );
+
+
   useEffect(() => {
     if (isFinish) {
-      setItems([...temItems]);
-      console.log("temItems", temItems);
+      setItems([...(temItems.map((x) => ({ ...x, id:x.id.split("-")[0] })))]);
     }
   }, [isFinish]);
 
   useEffect(() => {
-    // todo
-    setTemItems([...(items.map((x) => ({ ...x, id:x.id + 1 })))]);
+    setTemItems([...(items.map((x) => ({ ...x, id:x.id + "-" + x.cluster?.id })))]);
   }, [isEditable]);
 
   return (
@@ -153,9 +196,14 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
         <SortableContext items={(isEditable ? temItems : items)} strategy={rectSortingStrategy}>
           <ItemsContainer>
             {(isEditable ? temItems : items).map((x) => (
-              <ItemContainer key={x.id }>
+              <ItemContainer
+                key={x.id }
+                onClick={() => {
+                  onItemClick(x);
+                }}
+              >
                 <SortableItem
-                  id={x.id }
+                  id={x.id}
                   name={x.name}
                   draggable={isEditable}
                   icon={x.icon}
@@ -173,8 +221,23 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
                     undefined
                 }
                 {
-                  x.cluster?.name && isEditable && !(activeId && activeItem) ? (
-                    <ClusterContainer onClick={() => { deleteFn(x.id); }}>
+                  x.cluster?.name && !(activeId && activeItem) ? (
+                    <ClusterContainer onClick={() =>
+                    {
+                      setChangeClusterOpen(true);
+                      setChangeClusterId(x.id);
+                      setChangeClusterEntryType(x.entryType);
+                    }}
+                    >
+                      {x.cluster?.name as string}
+                    </ClusterContainer>
+                  ) :
+                    undefined
+                }
+                {
+                  // 非编辑状态显示集群信息
+                  x.cluster?.name && !isEditable ? (
+                    <ClusterContainer>
                       {x.cluster?.name as string}
                     </ClusterContainer>
                   ) :
@@ -204,7 +267,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
           {activeId && activeItem ? (
             <Item
               isDragging
-              id={activeItem.id}
+              id={activeId.toString()}
               name={activeItem.name}
               draggable={isEditable}
               icon={activeItem.icon}
@@ -214,7 +277,17 @@ const Sortable: FC<Props> = ({ isEditable, isFinish }) => {
           ) : null}
         </DragOverlay>
       </DndContext>
-      <AddEntryModal open={addEntryOpen} onClose={() => { setAddEntryOpen(false); }} addItem={addItem}></AddEntryModal>
+      <AddEntryModal
+        open={addEntryOpen}
+        onClose={() => { setAddEntryOpen(false); }}
+        addItem={addItem}
+        // 下面是修改快捷方式相关的内容
+        editItem={editItemCluster}
+        changeClusterOpen={changeClusterOpen}
+        onChangeClusterClose={() => { setChangeClusterOpen(false); }}
+        changeClusterEntryType={changeClusterEntryType}
+        changeClusterId={changeClusterActiveId}
+      ></AddEntryModal>
     </div>
 
   );

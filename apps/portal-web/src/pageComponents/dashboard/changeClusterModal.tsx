@@ -16,16 +16,14 @@ import { useStore } from "simstate";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
-import { EntryProps } from "./AddEntryModal";
+import { EntryType } from "./AddEntryModal";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   needLoginNode: boolean;
   clusters: Cluster[];
-  addItem: (item: EntryProps) => void;
-  entryInfo: EntryProps;
-  closeAddEntryModal: () => void;
+  editItem: (cluster: Cluster, loginNode?: string) => void;
 }
 
 interface FormInfo {
@@ -33,14 +31,12 @@ interface FormInfo {
   loginNode?: string;
 }
 
-export const SelectClusterModal: React.FC<Props> = ({
+export const ChangeClusterModal: React.FC<Props> = ({
   open,
   onClose,
   needLoginNode,
   clusters,
-  addItem,
-  entryInfo,
-  closeAddEntryModal,
+  editItem,
 }) => {
   const [form] = Form.useForm<FormInfo>();
 
@@ -55,11 +51,9 @@ export const SelectClusterModal: React.FC<Props> = ({
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-
-    addItem({ ...entryInfo, cluster:clusters.find((x) => x.id === cluster), loginNode });
+    editItem(clusters.find((x) => x.id === cluster) as Cluster, loginNode);
     form.resetFields();
     onClose();
-    closeAddEntryModal();
   };
   return (
     <Modal

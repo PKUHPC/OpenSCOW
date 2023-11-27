@@ -11,9 +11,10 @@
  */
 
 import { Button, Modal, Spin } from "antd";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { ChangeClusterModal } from "src/pageComponents/dashboard/changeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/selectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
@@ -24,6 +25,11 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   addItem: (item: EntryProps) => void;
+  editItem: (cluster: Cluster, loginNode?: string) => void;
+  changeClusterOpen: boolean;
+  onChangeClusterClose: () => void;
+  changeClusterEntryType: EntryType | null;
+  changeClusterId: string | null;
 }
 export interface EntryProps {
   id: string;
@@ -38,7 +44,7 @@ export interface EntryProps {
 }
 
 export enum EntryType {
-  // 路径固定
+  // 路径固定，不需要集群信息
   static = 1,
   // 交互式应用
   app = 2,
@@ -75,6 +81,13 @@ const staticEntry: EntryProps[] = [
     entryType:EntryType.static,
   },
   {
+    id:"desktop",
+    name:"桌面",
+    icon:"DesktopOutlined",
+    path: "/desktop",
+    entryType:EntryType.static,
+  },
+  {
     id:"shell",
     name:"shell",
     icon:"MacCommandOutlined",
@@ -91,10 +104,16 @@ export const AddEntryModal: React.FC<Props> = ({
   open,
   onClose,
   addItem,
+  editItem,
+  changeClusterOpen,
+  onChangeClusterClose,
+  changeClusterEntryType,
+  changeClusterId,
 }) => {
 
   const clusters = publicConfig.CLUSTERS;
 
+  // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading } = useAsync({ promiseFn: useCallback(async () => {
     const appsInfo = await Promise.all(clusters.map((x) => {
       return api.listAvailableApps({ query: { cluster: x.id } });
@@ -115,6 +134,7 @@ export const AddEntryModal: React.FC<Props> = ({
     return appWithCluster;
   }, [clusters]) });
 
+  // 所有可创建的app
   const appInfo = useMemo(() => {
     const displayApp: EntryProps[] = [];
 
@@ -143,10 +163,23 @@ export const AddEntryModal: React.FC<Props> = ({
   const [entryInfo, setEntryInfo] = useState<EntryProps>({
     id:"",
     name:"",
-    path:"/app",
+    path:"/apps",
     needCluster:true,
     entryType:EntryType.app,
   });
+
+  // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
+  useEffect(() => {
+    if (changeClusterEntryType === EntryType.shell) {
+      setNeedLoginNode(true);
+      setClustersToSelectedApp(clusters);
+    }
+    else if (changeClusterEntryType === EntryType.app) {
+      setNeedLoginNode(false);
+      setClustersToSelectedApp(apps![changeClusterId!.split("-")[0]].clusters);
+    }
+  }, [changeClusterEntryType, changeClusterId]);
+
 
   const handleClick = (item: EntryProps) => {
     if (item.entryType === EntryType.shell) {
@@ -177,7 +210,6 @@ export const AddEntryModal: React.FC<Props> = ({
       <Modal
         title="添加快捷方式"
         open={open}
-        // confirmLoading={loading}
         width={600}
         onCancel={onClose}
         destroyOnClose
@@ -233,6 +265,14 @@ export const AddEntryModal: React.FC<Props> = ({
         clusters={clustersToSelectedApp}
         addItem={addItem}
         closeAddEntryModal={onClose}
+      />
+
+      <ChangeClusterModal
+        open={changeClusterOpen}
+        onClose={onChangeClusterClose}
+        needLoginNode={needLoginNode}
+        clusters={clustersToSelectedApp}
+        editItem={editItem}
       />
     </>
 
