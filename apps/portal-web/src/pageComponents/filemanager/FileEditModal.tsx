@@ -13,8 +13,9 @@
 import { CloseOutlined, FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import Editor, { loader } from "@monaco-editor/react";
 import { App, Badge, Button, Modal, Space, Spin, Tabs, Tooltip } from "antd";
+import { editor } from "monaco-editor";
 import { join } from "path";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
@@ -158,6 +159,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const [confirm, setConfirm] = useState(false);
   const [exitType, setExitType] = useState<ExitType>(ExitType.CLOSE);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   const [options, setOptions] = useState({
     readOnly: true,
@@ -169,6 +171,15 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
       downloadFile();
     }
   }, [open]);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      const editorInstance = editorRef.current.getModel();
+
+      // 设置换行符为 LF (\n)
+      editorInstance?.setEOL(0); // 0 代表 LF，1 代表 CRLF
+    }
+  }, [editorRef.current]);
 
   const { message } = App.useApp();
 
@@ -393,6 +404,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
                   defaultLanguage={getLanguage(filename)}
                   options={options}
                   value={fileContent}
+                  onMount={(editor) => { editorRef.current = editor; }}
                   onChange={handleEdit}
                 />
               </Spin>
