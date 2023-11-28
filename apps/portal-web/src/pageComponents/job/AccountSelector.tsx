@@ -30,7 +30,7 @@ export const AccountSelector: React.FC<Props> = ({ selectableAccounts, isLoading
   useEffect(() => {
     if (value && defaultInitialValue && value === defaultInitialValue) {
       onChange?.(defaultInitialValue);
-    } else if (!value && selectableAccounts || (value && !selectableAccounts.includes(value))) {
+    } else if (!value && selectableAccounts.length || (value && !selectableAccounts.includes(value))) {
       onChange?.(selectableAccounts[0]);
     }
 

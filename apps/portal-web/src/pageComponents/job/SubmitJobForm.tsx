@@ -141,6 +141,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       form.setFieldValue("jobName", jobInitialName);
       // TODO调度器类别,K8S镜像
       const schedulerName = data?.clusterInfo.scheduler.name;
+
+      // 集群重新获取时，清除所有保存的账户分区信息
+      setAccountPartitionsCacheMap({});
     },
   });
 
@@ -201,7 +204,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
       };
       return { partitions: [] as Partition[] };
-    }, [account, partitionsReloadTrigger, selectableAccounts]),
+    }, [account, partitionsReloadTrigger, unblockedAccountsQuery.data]),
   });
 
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
@@ -251,7 +254,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   useEffect(() => {
     if (initial.account) {
       const templateData = {
-        "cluster": initial.cluster,
+        // "cluster": initial.cluster,
+        "cluster": { id: "test", name: "test" },
         "account": initial.account,
         "partition": initial.partition,
         "qos": initial.qos,

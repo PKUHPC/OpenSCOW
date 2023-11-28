@@ -30,7 +30,7 @@ export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
   useEffect(() => {
     if (value && defaultInitialValue && value === defaultInitialValue) {
       onChange?.(defaultInitialValue);
-    } else if (!value && selectablePartitions || (value && !selectablePartitions.includes(value))) {
+    } else if (!value && selectablePartitions.length || (value && !selectablePartitions.includes(value))) {
       onChange?.(selectablePartitions[0]);
     }
   }, [selectablePartitions, value]);
