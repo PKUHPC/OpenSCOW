@@ -233,6 +233,7 @@ export default {
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
         fileSizeExceeded: "File too large (maximum {}), please download and edit",
+        fileFetchAbortPrompt: "Fetch {} operation was aborted",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
