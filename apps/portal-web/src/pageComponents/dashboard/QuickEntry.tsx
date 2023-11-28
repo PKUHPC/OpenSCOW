@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Typography } from "antd";
-import { useState } from "react";
+import { Button, Spin, Typography } from "antd";
+import { useCallback, useState } from "react";
+import { useAsync } from "react-async";
+import { api } from "src/apis";
+import { EntryType, QuickEntry as QuickEntryinterface } from "src/models/User";
 import Sortable from "src/pageComponents/dashboard/Sortable";
 import { styled } from "styled-components";
 
@@ -35,7 +38,42 @@ interface Props {
 
 }
 
-export const QuickEntry: React.FC<Props> = (props) => {
+export const QuickEntry: React.FC<Props> = () => {
+  const staticEntry: QuickEntryinterface[] = [
+    {
+      id:"submitJob",
+      name:"提交作业",
+      icon:"PlusCircleOutlined",
+      path: "/jobs/submit",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"runningJob",
+      name:"未结束的作业",
+      icon:"BookOutlined",
+      path: "/jobs/runningJobs",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"allJobs",
+      name:"所有作业",
+      icon:"BookOutlined",
+      path: "/jobs/allJobs",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"savedJobs",
+      name:"作业模板",
+      icon:"SaveOutlined",
+      path: "/jobs/savedJobs",
+      entryType:EntryType.STATIC,
+    },
+  ];
+
+  const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
+    return await api.getQuickEntry({});
+  }, []) });
+
   const { Title } = Typography;
 
   const [isEditable, setIsEditable] = useState(false);
@@ -54,7 +92,14 @@ export const QuickEntry: React.FC<Props> = (props) => {
           <Button type="link" onClick={() => { setIsEditable(true); setIsFinish(false); }}>编辑</Button>}
       </TitleContainer>
       <CardsContainer>
-        <Sortable isEditable={isEditable} isFinish={isFinish}></Sortable>
+        {isLoading ?
+          <Spin /> : (
+            <Sortable
+              isEditable={isEditable}
+              isFinish={isFinish}
+              quickEntryArray={data?.quickEntry.length ? data?.quickEntry : staticEntry }
+            ></Sortable>
+          )}
       </CardsContainer>
     </ContentContainer>
   );

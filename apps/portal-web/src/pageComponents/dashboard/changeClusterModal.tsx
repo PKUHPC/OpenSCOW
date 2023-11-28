@@ -16,8 +16,6 @@ import { useStore } from "simstate";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
-import { EntryType } from "./AddEntryModal";
-
 export interface Props {
   open: boolean;
   onClose: () => void;
@@ -55,6 +53,7 @@ export const ChangeClusterModal: React.FC<Props> = ({
     form.resetFields();
     onClose();
   };
+
   return (
     <Modal
       title="选择集群"

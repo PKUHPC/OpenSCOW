@@ -22,6 +22,7 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
+import { userServiceServer } from "src/services/user";
 import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
@@ -48,6 +49,7 @@ export async function createServer() {
   await server.register(fileServiceServer);
   await server.register(shellServiceServer);
   await server.register(configServiceServer);
+  await server.register(userServiceServer);
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);

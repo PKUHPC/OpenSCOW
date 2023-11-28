@@ -10,25 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export interface UserInfo {
-  identityId: string;
-  name?: string;
-}
-
-export enum EntryType {
-  STATIC = 0,
-  APP = 1,
-  SHELL = 2,
-}
-
-export interface QuickEntry {
-  id: string;
-  name: string;
-  path: string;
-  entryType: EntryType;
-  needCluster?: boolean;
-  icon?: string;
-  logoPath?: string;
-  cluster?: {id: string;name: string};
-  loginNode?: string;
-}
+export const getUserQuickEntryFileName = (userId: string) => `${userId}-quickEntry.json`;

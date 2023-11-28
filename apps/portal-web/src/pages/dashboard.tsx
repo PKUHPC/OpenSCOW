@@ -43,7 +43,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      {/* <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} /> */}
+      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
       <QuickEntry></QuickEntry>
     </div>
   );

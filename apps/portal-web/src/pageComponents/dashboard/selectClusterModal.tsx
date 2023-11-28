@@ -11,20 +11,19 @@
  */
 
 import { Form, Modal, Select } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useStore } from "simstate";
+import { QuickEntry } from "src/models/User";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
-
-import { EntryProps } from "./AddEntryModal";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   needLoginNode: boolean;
   clusters: Cluster[];
-  addItem: (item: EntryProps) => void;
-  entryInfo: EntryProps;
+  addItem: (item: QuickEntry) => void;
+  entryInfo: QuickEntry;
   closeAddEntryModal: () => void;
 }
 
@@ -56,7 +55,7 @@ export const SelectClusterModal: React.FC<Props> = ({
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
 
-    addItem({ ...entryInfo, cluster:clusters.find((x) => x.id === cluster), loginNode });
+    addItem({ ...entryInfo, cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string}, loginNode });
     form.resetFields();
     onClose();
     closeAddEntryModal();

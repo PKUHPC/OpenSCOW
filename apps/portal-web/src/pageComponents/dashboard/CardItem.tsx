@@ -18,10 +18,6 @@ import { styled } from "styled-components";
 import { EntryItem } from "./EntryItem";
 
 const Container = styled.div`
-  .ant-card-body {
-    padding: 16px 16px 5px 16px !important;
-    border-radius: 0 0 8px 8px !important;
-  }
 `;
 
 export type ItemProps = HTMLAttributes<HTMLDivElement> & {
@@ -46,7 +42,7 @@ const CardItem = forwardRef<HTMLDivElement, ItemProps>
       "rgb(63 63 68 / 5%) 0px 2px 0px 2px, rgb(34 33 81 / 15%) 0px 2px 3px 2px" :
       "rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px",
     transform: isDragging ? "scale(1.05)" : "scale(1)",
-    margin:"20px",
+    margin:"20px 30px",
     ...style,
   };
 

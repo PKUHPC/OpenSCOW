@@ -14,6 +14,7 @@ import { Button, Modal, Spin } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { EntryType, QuickEntry } from "src/models/User";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/changeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/selectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -24,82 +25,19 @@ import { EntryItem } from "./EntryItem";
 export interface Props {
   open: boolean;
   onClose: () => void;
-  addItem: (item: EntryProps) => void;
+  addItem: (item: QuickEntry) => void;
   editItem: (cluster: Cluster, loginNode?: string) => void;
   changeClusterOpen: boolean;
   onChangeClusterClose: () => void;
   changeClusterEntryType: EntryType | null;
   changeClusterId: string | null;
 }
-export interface EntryProps {
-  id: string;
-  name: string;
-  path: string;
-  entryType: EntryType;
-  needCluster?: boolean;
-  icon?: string;
-  logoPath?: string;
-  cluster?: Cluster;
-  loginNode?: string;
-}
 
-export enum EntryType {
-  // 路径固定，不需要集群信息
-  static = 1,
-  // 交互式应用
-  app = 2,
-  shell = 3,
-}
-
-const staticEntry: EntryProps[] = [
-  {
-    id:"submitJob",
-    name:"提交作业",
-    icon:"PlusCircleOutlined",
-    path: "/jobs/submit",
-    entryType:EntryType.static,
-  },
-  {
-    id:"runningJob",
-    name:"未结束的作业",
-    icon:"BookOutlined",
-    path: "/jobs/runningJobs",
-    entryType:EntryType.static,
-  },
-  {
-    id:"allJobs",
-    name:"所有作业",
-    icon:"BookOutlined",
-    path: "/jobs/allJobs",
-    entryType:EntryType.static,
-  },
-  {
-    id:"savedJobs",
-    name:"作业模板",
-    icon:"SaveOutlined",
-    path: "/jobs/savedJobs",
-    entryType:EntryType.static,
-  },
-  {
-    id:"desktop",
-    name:"桌面",
-    icon:"DesktopOutlined",
-    path: "/desktop",
-    entryType:EntryType.static,
-  },
-  {
-    id:"shell",
-    name:"shell",
-    icon:"MacCommandOutlined",
-    path: "/shell",
-    needCluster:true,
-    entryType:EntryType.shell,
-  },
-];
 const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
 `;
+
 export const AddEntryModal: React.FC<Props> = ({
   open,
   onClose,
@@ -110,7 +48,51 @@ export const AddEntryModal: React.FC<Props> = ({
   changeClusterEntryType,
   changeClusterId,
 }) => {
-
+  const staticEntry: QuickEntry[] = [
+    {
+      id:"submitJob",
+      name:"提交作业",
+      icon:"PlusCircleOutlined",
+      path: "/jobs/submit",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"runningJob",
+      name:"未结束的作业",
+      icon:"BookOutlined",
+      path: "/jobs/runningJobs",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"allJobs",
+      name:"所有作业",
+      icon:"BookOutlined",
+      path: "/jobs/allJobs",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"savedJobs",
+      name:"作业模板",
+      icon:"SaveOutlined",
+      path: "/jobs/savedJobs",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"desktop",
+      name:"桌面",
+      icon:"DesktopOutlined",
+      path: "/desktop",
+      entryType:EntryType.STATIC,
+    },
+    {
+      id:"shell",
+      name:"shell",
+      icon:"MacCommandOutlined",
+      path: "/shell",
+      needCluster:true,
+      entryType:EntryType.SHELL,
+    },
+  ];
   const clusters = publicConfig.CLUSTERS;
 
   // apps包含在哪些集群上可以创建app
@@ -136,7 +118,7 @@ export const AddEntryModal: React.FC<Props> = ({
 
   // 所有可创建的app
   const appInfo = useMemo(() => {
-    const displayApp: EntryProps[] = [];
+    const displayApp: QuickEntry[] = [];
 
     if (apps) {
       for (const key in apps) {
@@ -147,7 +129,7 @@ export const AddEntryModal: React.FC<Props> = ({
           path:"/app",
           logoPath:x.app.logoPath,
           needCluster:true,
-          entryType:EntryType.app,
+          entryType:EntryType.APP,
         });
       }
     }
@@ -160,44 +142,60 @@ export const AddEntryModal: React.FC<Props> = ({
   // 可以创建该App的集群
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
   // 新建快捷方式的信息
-  const [entryInfo, setEntryInfo] = useState<EntryProps>({
+  const [entryInfo, setEntryInfo] = useState<QuickEntry>({
     id:"",
     name:"",
     path:"/apps",
     needCluster:true,
-    entryType:EntryType.app,
+    entryType:EntryType.APP,
   });
 
   // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
   useEffect(() => {
-    if (changeClusterEntryType === EntryType.shell) {
+    if (changeClusterEntryType === EntryType.SHELL) {
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
     }
-    else if (changeClusterEntryType === EntryType.app) {
+    else if (changeClusterEntryType === EntryType.APP) {
       setNeedLoginNode(false);
       setClustersToSelectedApp(apps![changeClusterId!.split("-")[0]].clusters);
     }
   }, [changeClusterEntryType, changeClusterId]);
 
 
-  const handleClick = (item: EntryProps) => {
-    if (item.entryType === EntryType.shell) {
+  const handleClick = (item: QuickEntry) => {
+    if (item.entryType === EntryType.SHELL) {
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
       setSelectClusterOpen(true);
-      setEntryInfo((preVal) => {
-        return { ...preVal, id:item.id, name:item.name, path:"/shell",
-          entryType:EntryType.shell, icon:item.icon, logoPath:"" };
-      });
+      setEntryInfo(
+        (preVal) => ({ ...preVal,
+          ... {
+            id:item.id,
+            name:item.name,
+            path:"/shell",
+            entryType:EntryType.SHELL,
+            icon:item.icon,
+            logoPath:"",
+          },
+        }),
+      );
     }
-    else if (item.entryType === EntryType.app) {
+    else if (item.entryType === EntryType.APP) {
       setNeedLoginNode(false);
       setClustersToSelectedApp(apps![item.id].clusters);
       setSelectClusterOpen(true);
-      setEntryInfo((preVal) => {
-        return { ...preVal, id:item.id, name:item.name, logoPath:item.logoPath, icon:item.icon };
-      });
+      setEntryInfo((preVal) => ({ ...preVal,
+        ...{
+          id:item.id,
+          name:item.name,
+          path:"/apps",
+          entryType:EntryType.APP,
+          icon:"",
+          logoPath:item.logoPath,
+        },
+      }),
+      );
     }
     else {
       addItem(item);

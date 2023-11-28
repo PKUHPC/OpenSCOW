@@ -1,8 +1,8 @@
 # 管理系统数据库的信息。可以不修改
 db:
-  host: 192.168.88.100
+  host: 172.16.20.124
   password: must!chang3this
-  port: 3308
+  port: 3306
   user: root
   dbName: scow
 
