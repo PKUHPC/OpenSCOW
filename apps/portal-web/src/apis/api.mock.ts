@@ -63,6 +63,8 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
 
+  getQuickEntry:null,
+  saveQuickEntry:null,
   getClusterInfo: null,
   listAvailableTransferClusters: null,
 
