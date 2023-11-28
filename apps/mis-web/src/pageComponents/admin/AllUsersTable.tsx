@@ -15,7 +15,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
@@ -68,7 +68,6 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [sortInfo, setSortInfo] = useState<SortInfo>({ sortField: undefined, sortOrder: undefined });
   const [currentPlatformRole, setCurrentPlatformRole] = useState<PlatformRole | undefined>(undefined);
-  const [allUsers, setAllUsers] = useState<PlatformUserInfo[] | undefined>(undefined);
 
   const promiseFn = useCallback(async () => {
 
@@ -83,30 +82,27 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   }, [query, pageInfo, sortInfo, currentPlatformRole]);
   const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
 
-  useEffect(() => {
-    if (currentPlatformRole === undefined) {
-      setAllUsers(data?.platformUsers);
-    }
-  }, [data]);
+
+  const { data: platformUsersCounts, isLoading: isCountLoading, reload: reloadUsersCounts } = useAsync({
+    promiseFn: useCallback(
+      async () => await api.getPlatformUsersCounts({ query:{ idOrName: query.idOrName } }), [query, refreshToken],
+    ),
+  });
 
   const roleChangedHandlers = useMemo(() => ({
     "ALL_USERS": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(undefined),
-      count: allUsers?.length ?? 0,
+      count: platformUsersCounts?.totalCount ?? 0,
     },
     "PLATFORM_ADMIN": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_ADMIN),
-      count: allUsers?.filter((user) => {
-        return user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN);
-      }).length ?? 0,
+      count: platformUsersCounts?.totalAdminCount ?? 0,
     },
     "PLATFORM_FINANCE": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE),
-      count: allUsers?.filter((user) => {
-        return user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE);
-      }).length ?? 0,
+      count:platformUsersCounts?.totalFinanceCount ?? 0,
     },
-  }), [allUsers]);
+  }), [platformUsersCounts]);
 
   const handleFilterRoleChange = (role: FilteredRole) => {
     roleChangedHandlers[role].setCurrentPlatformRole();
@@ -116,6 +112,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const reload = () => {
     reloadAllUsers();
+    reloadUsersCounts();
   };
 
   return (
@@ -156,7 +153,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         setPageInfo={setPageInfo}
         sortInfo={sortInfo}
         setSortInfo={setSortInfo}
-        isLoading={isLoading}
+        isLoading={isLoading || isCountLoading}
         reload={reload}
         user={user}
       />
