@@ -110,6 +110,12 @@ export const AddEntryModal: React.FC<Props> = ({
             clusters: [],
           };
         }
+
+        // 只要有一个集群配置了app图片，快捷方式就可以显示app图片了
+        if (!appWithCluster[y.id].app.logoPath && y.logoPath) {
+          appWithCluster[y.id].app.logoPath = y.logoPath;
+        }
+
         appWithCluster[y.id].clusters.push(clusters[idx]);
       });
     });
@@ -245,6 +251,7 @@ export const AddEntryModal: React.FC<Props> = ({
                   <EntryItem
                     name={item.name}
                     icon={item.icon}
+                    logoPath={item.logoPath}
                     style={{ padding:"10px" }}
                   />
                 </div>

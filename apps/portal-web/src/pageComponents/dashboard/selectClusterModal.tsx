@@ -46,10 +46,12 @@ export const SelectClusterModal: React.FC<Props> = ({
   const clustersOptions = clusters.map((x) => ({ value:x.id, label:x.name }));
   const { loginNodes } = useStore(LoginNodeStore);
   const [loginNodesOptions, setLoginNodesOptions] = useState<{}[]>([]);
+  const [loginNode, setLoginNode] = useState<string | undefined>(undefined);
 
   const handelClusterChange = (cluster: string) => {
     const nodes = loginNodes[cluster].map((x) => ({ value:x.address, label:x.name }));
     setLoginNodesOptions(nodes);
+    setLoginNode(undefined);
   };
 
   const onFinish = async () => {
@@ -94,6 +96,8 @@ export const SelectClusterModal: React.FC<Props> = ({
             name="loginNode"
           >
             <Select
+              value={loginNode}
+              onChange={(val) => { setLoginNode(val); }}
               options={loginNodesOptions}
             />
           </Form.Item>

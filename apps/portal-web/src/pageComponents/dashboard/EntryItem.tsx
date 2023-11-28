@@ -38,7 +38,6 @@ const NameContainer = styled.div`
   user-select: none;
 `;
 
-
 interface Props {
   name: string,
   icon?: string,
