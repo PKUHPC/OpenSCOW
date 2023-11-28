@@ -17,5 +17,6 @@ loginNodes:
   #       en: loginNode1
   #       zh_cn: 登录节点1
     # 登录节点的IP或者域名
+    
     # 如果设置的是域名，请确认此节点的/etc/hosts中包含了域名到IP的解析信息
     address: 192.168.88.102
