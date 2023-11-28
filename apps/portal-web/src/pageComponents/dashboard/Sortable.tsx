@@ -231,7 +231,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
                     undefined
                 }
                 {
-                  x.cluster?.name && !(activeId && activeItem) ? (
+                  x.cluster?.name && !(activeId && activeItem) && isEditable ? (
                     <ClusterContainer onClick={() =>
                     {
                       setChangeClusterOpen(true);
