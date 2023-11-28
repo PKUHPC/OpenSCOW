@@ -10,21 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// Declares all plugins in this file
-// In my yaarxiv project, there can be multiple interface augmentations separated in difference files
-// But in this project, only one augmentation is resolved.
-// Don't know why.
-
-import type { MikroORM } from "@mikro-orm/core";
+import type { EntityManager, MikroORM } from "@mikro-orm/core";
 import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { ormPlugin } from "src/plugins/orm";
 
-declare module "@ddadaal/tsgrpc-server" {
-  interface Extensions {
+declare module "fastify" {
+  interface FastifyInstance {
     orm: MikroORM<MySqlDriver>;
   }
 
-  interface Request {
+  interface FastifyRequest {
     em: SqlEntityManager<MySqlDriver>;
   }
 }

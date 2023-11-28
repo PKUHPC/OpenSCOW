@@ -10,31 +10,84 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Server } from "@ddadaal/tsgrpc-server";
-import { omitConfigSpec } from "@scow/lib-config";
-import { readVersionFile } from "@scow/utils/build/version";
+import { fastifyConnectPlugin } from "@bufbuild/connect-fastify";
+import fastify from "fastify";
+import { IncomingMessage } from "http";
+import proxy from "http-proxy";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
-// import { datasetServiceServer } from "src/services/dataset";
+import { services } from "src/services/index";
 import { loggerOptions } from "src/utils/logger";
 
-export async function createServer() {
+export async function startApp() {
 
-  const server = new Server({
-    host: config.HOST,
-    port: config.PORT,
-
+  const server = fastify({
+    http2: true,
+    https: {
+      allowHTTP1: true,
+    },
     logger: loggerOptions,
   });
 
-  server.logger.info({ version: readVersionFile() }, "@scow/ai-server: ");
-  server.logger.info({ config: omitConfigSpec(config) }, "Loaded env config");
+  const proxyServer = proxy.createProxyServer({});
+
+  function parseProxyTarget(url: string): string {
+
+    const [_empty, _proxy, _clusterId, _type, host, port, ...path] = url.split("/");
+
+    // if type is relative, path is only relative path for the app, like /index.html
+    // if type is absolute, path is the pathname shown in user's browser,
+    //  like /proxy/${platformIdentityId}/absolute/182.2.3.1/8080/index.html
+    //  which already includes base path,
+    // so in both case, we should not prepend host or port, but pass path directly
+    const target = `http://${host}:${port}/${path.join("/")}`;
+    return target;
+  }
+
+  server.all("/proxy/*", {}, (req, res) => {
+    const target = parseProxyTarget(req.url);
+    req.log.debug("Parsed proxy target %s", target);
+
+    // @ts-ignore
+    proxyServer.web(req.raw, res.raw, {
+      target, ignorePath: true, xfwd: true,
+    });
+  });
+
+  server.server.on("upgrade", (req: IncomingMessage, socket, head) => {
+    const url = req.url;
+    if (!url) { throw new Error("req.url is undefined"); }
+
+    if (!url.startsWith("/proxy/")) { return; }
+    const target = parseProxyTarget(url);
+    proxyServer.ws(req, socket, head, {
+      target, ignorePath: true, xfwd: true,
+    });
+  });
+
+  server.addContentTypeParser("*", function(req, payload, done) {
+    done(null);
+  });
 
   for (const plugin of plugins) {
     await server.register(plugin);
   }
 
-  // await server.register(datasetServiceServer);
+  // const em =server.orm.em.fork();
+  // await server.register(fastifyConnectPlugin, {
+  //   routes: (router) => {
+  //     services(router, em);}
+  // });
 
-  return server;
+  await server.register(fastifyConnectPlugin, {
+    routes: services,
+  });
+
+  server.addHook("preHandler", async (request) => {
+    const em = server.orm.em.fork();
+    request.em = em;
+  });
+
+  await server.listen({ host: config.HOST, port: config.PORT });
+
 }

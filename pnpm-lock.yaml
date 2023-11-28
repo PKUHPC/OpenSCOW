@@ -16,6 +16,12 @@ importers:
       '@bufbuild/buf':
         specifier: 1.28.1
         version: 1.28.1
+      '@bufbuild/protoc-gen-connect-es':
+        specifier: 0.13.0
+        version: 0.13.0(@bufbuild/protoc-gen-es@1.4.2)
+      '@bufbuild/protoc-gen-es':
+        specifier: 1.4.2
+        version: 1.4.2
       '@changesets/cli':
         specifier: 2.26.2
         version: 2.26.2
@@ -124,15 +130,18 @@ importers:
 
   apps/ai-server:
     dependencies:
-      '@ddadaal/tsgrpc-client':
-        specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.9.11)
-      '@ddadaal/tsgrpc-common':
-        specifier: 0.2.5
-        version: 0.2.5
-      '@ddadaal/tsgrpc-server':
-        specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.9.11)
+      '@bufbuild/connect':
+        specifier: 0.13.0
+        version: 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/connect-fastify':
+        specifier: 0.13.0
+        version: 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/connect-node':
+        specifier: 0.13.0
+        version: 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/protobuf':
+        specifier: 1.4.2
+        version: 1.4.2
       '@grpc/grpc-js':
         specifier: 1.9.11
         version: 1.9.11
@@ -163,6 +172,15 @@ importers:
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
+      '@sinclair/typebox':
+        specifier: 0.31.10
+        version: 0.31.10
+      fastify:
+        specifier: 4.24.3
+        version: 4.24.3
+      http-proxy:
+        specifier: 1.18.1
+        version: 1.18.1
       pino:
         specifier: 8.16.2
         version: 8.16.2
@@ -171,8 +189,14 @@ importers:
         version: 10.2.3
     devDependencies:
       '@types/google-protobuf':
-        specifier: 3.15.10
-        version: 3.15.10
+        specifier: 3.15.6
+        version: 3.15.6
+      '@types/http-proxy':
+        specifier: 1.17.11
+        version: 1.17.11
+      '@types/js-yaml':
+        specifier: 4.0.5
+        version: 4.0.5
 
   apps/audit-server:
     dependencies:
@@ -1121,6 +1145,9 @@ importers:
 
   libs/protos/scow:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: 1.4.2
+        version: 1.4.2
       '@grpc/grpc-js':
         specifier: 1.9.11
         version: 1.9.11
@@ -3158,6 +3185,95 @@ packages:
       '@bufbuild/buf-linux-x64': 1.28.1
       '@bufbuild/buf-win32-arm64': 1.28.1
       '@bufbuild/buf-win32-x64': 1.28.1
+    dev: true
+
+  /@bufbuild/connect-fastify@0.13.0(@bufbuild/protobuf@1.4.2):
+    resolution: {integrity: sha512-IgH1/oURuNE+T+JhSHJxA6XsffuqylQWlIbmkeRlcIrWzTlUkiU6BIN4NpBLnpYdqJ2TYJLJ7RphmFFY6Ku/+g==}
+    engines: {node: '>=16.0.0'}
+    deprecated: Connect has moved to its own org @connectrpc and has a stable v1. Run `npx @connectrpc/connect-migrate@latest` to update. See https://github.com/connectrpc/connect-es/releases/tag/v0.13.1 for details.
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.1
+    dependencies:
+      '@bufbuild/connect': 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/connect-node': 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/protobuf': 1.4.2
+      fastify: 4.24.3
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@bufbuild/connect-node@0.13.0(@bufbuild/protobuf@1.4.2):
+    resolution: {integrity: sha512-l9tYVWTD9qdVr3PD8iTLmJZoWQY4bYl4UXIyKqvNuqoaAm3pZZvrQXrz0ptS5NRWTVUKPV9DZp6Wbbch5/u55Q==}
+    engines: {node: '>=16.0.0'}
+    deprecated: Connect has moved to its own org @connectrpc and has a stable v1. Run `npx @connectrpc/connect-migrate@latest` to update. See https://github.com/connectrpc/connect-es/releases/tag/v0.13.1 for details.
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.1
+    dependencies:
+      '@bufbuild/connect': 0.13.0(@bufbuild/protobuf@1.4.2)
+      '@bufbuild/protobuf': 1.4.2
+      headers-polyfill: 3.3.0
+    dev: false
+
+  /@bufbuild/connect@0.13.0(@bufbuild/protobuf@1.4.2):
+    resolution: {integrity: sha512-eZSMbVLyUFtXiZNORgCEvv580xKZeYQdMOWj2i/nxOcpXQcrEzTMTA7SZzWv4k4gveWCOSRoWmYDeOhfWXJv0g==}
+    deprecated: Connect has moved to its own org @connectrpc and has a stable v1. Run `npx @connectrpc/connect-migrate@latest` to update. See https://github.com/connectrpc/connect-es/releases/tag/v0.13.1 for details.
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.2.1
+    dependencies:
+      '@bufbuild/protobuf': 1.4.2
+    dev: false
+
+  /@bufbuild/protobuf@1.3.1:
+    resolution: {integrity: sha512-BUyJWutgP2S8K/1NphOJokuwDckXS4qI2T1pGZAlkFdZchWae3jm6fCdkcGbLlM1QLOcNFFePd+7Feo4BYGrJQ==}
+    dev: true
+
+  /@bufbuild/protobuf@1.4.2:
+    resolution: {integrity: sha512-JyEH8Z+OD5Sc2opSg86qMHn1EM1Sa+zj/Tc0ovxdwk56ByVNONJSabuCUbLQp+eKN3rWNfrho0X+3SEqEPXIow==}
+
+  /@bufbuild/protoc-gen-connect-es@0.13.0(@bufbuild/protoc-gen-es@1.4.2):
+    resolution: {integrity: sha512-4HbxWQ799ZLszJJIJsuVMFwkBx8DJ4VEhNDNtKpPJFsTdVUOp1LyFGY66Yjfj9vcuOeH44bS0ALE5pRP3rCxXA==}
+    engines: {node: '>=16.0.0'}
+    deprecated: Connect has moved to its own org @connectrpc and has a stable v1. Run `npx @connectrpc/connect-migrate@latest` to update. See https://github.com/connectrpc/connect-es/releases/tag/v0.13.1 for details.
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/connect': 0.13.0
+      '@bufbuild/protoc-gen-es': ^1.2.1
+    peerDependenciesMeta:
+      '@bufbuild/connect':
+        optional: true
+      '@bufbuild/protoc-gen-es':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 1.3.1
+      '@bufbuild/protoc-gen-es': 1.4.2
+      '@bufbuild/protoplugin': 1.4.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@bufbuild/protoc-gen-es@1.4.2:
+    resolution: {integrity: sha512-/It7M2s8H1zTDvUMJu6vhBmtnzeFL2VS6e78RYIY38602pNXDK/vbteKUo4KrG0O07lOPFu87hHZ0Y+w5Ib6iw==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protobuf': 1.4.2
+    peerDependenciesMeta:
+      '@bufbuild/protobuf':
+        optional: true
+    dependencies:
+      '@bufbuild/protoplugin': 1.4.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
+  /@bufbuild/protoplugin@1.4.2:
+    resolution: {integrity: sha512-5IwGC1ZRD2A+KydGXeaSOErwfILLqVtvMH/RkN+cOoHcQd4EYXFStcF7g7aR+yICRDEEjQVi5tQF/qPGBSr9vg==}
+    dependencies:
+      '@bufbuild/protobuf': 1.4.2
+      '@typescript/vfs': 1.5.0
+      typescript: 4.5.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@changesets/apply-release-plan@6.1.4:
@@ -6263,6 +6379,10 @@ packages:
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
 
+  /@sinclair/typebox@0.31.10:
+    resolution: {integrity: sha512-d4xyuqhmWHQk3glt5hS2GXJ2IM9ZkUbMWJeKLpHbpQ1G80CGXZfem2smpbXlazQmbGSWNekjSrMVgCstiz1xoQ==}
+    dev: false
+
   /@sinclair/typebox@0.31.26:
     resolution: {integrity: sha512-0S5BGB/Tle1kVa1pT2k2sc+wHTCB28+ivuetmZDCRV8I0iFKaNfk6HbvVyLEFBzZy56dp0dw+YDJ9Ed+YAAL7A==}
 
@@ -6712,6 +6832,10 @@ packages:
     resolution: {integrity: sha512-uiyKJCa8hbmPE4yxwjbkMOALaBAiOVcatW/yEGbjTqwAh4kzNgQPWRlJMNPXpB5CPUM66xsYufiSX9WKHZCE9g==}
     dev: true
 
+  /@types/google-protobuf@3.15.6:
+    resolution: {integrity: sha512-pYVNNJ+winC4aek+lZp93sIKxnXt5qMkuKmaqS3WGuTq0Bw1ZDYNBgzG5kkdtwcv+GmYJGo3yEg6z2cKKAiEdw==}
+    dev: true
+
   /@types/graceful-fs@4.1.5:
     resolution: {integrity: sha512-anKkLmZZ+xm4p8JWBf4hElkM4XR+EZeA2M9BAkkTldmcyDY4mbdIJnRghDJH3Ov5ooY7/UAoENtmdMSkaAd7Cw==}
     dependencies:
@@ -6746,11 +6870,10 @@ packages:
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
     dev: false
 
-  /@types/http-proxy@1.17.9:
-    resolution: {integrity: sha512-QsbSjA/fSk7xB+UXlCT3wHBy5ai9wOcNDWwZAtud+jXhwOM3l+EYZh8Lng4+/6n8uar0J7xILzqftJdJ/Wdfkw==}
+  /@types/http-proxy@1.17.11:
+    resolution: {integrity: sha512-HC8G7c1WmaF2ekqpnFq626xd3Zz0uvaqFmBJNRZCGEZCXkvSdJoNFn/8Ygbd9fKNQj8UzLdCETaI0UWPAjK7IA==}
     dependencies:
       '@types/node': 20.9.2
-    dev: false
 
   /@types/is-ci@3.0.0:
     resolution: {integrity: sha512-Q0Op0hdWbYd1iahB+IFNQcWXFq4O0Q5MwQP7uN0souuQ4rPg1vEYcnIOfr1gY+M+6rc8FGoRaBO1mOOvL29sEQ==}
@@ -6776,6 +6899,10 @@ packages:
     dependencies:
       expect: 29.6.2
       pretty-format: 29.6.2
+    dev: true
+
+  /@types/js-yaml@4.0.5:
+    resolution: {integrity: sha512-FhpRzf927MNQdRZP0J5DLIdTXhjLYzeUTmLAu69mnVksLH9CJY3IuSeEgbKUki7GQZm0WqDkGzyxju2EZGD2wA==}
     dev: true
 
   /@types/js-yaml@4.0.9:
@@ -7190,6 +7317,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 6.11.0
       eslint-visitor-keys: 3.4.3
+    dev: true
+
+  /@typescript/vfs@1.5.0:
+    resolution: {integrity: sha512-AJS307bPgbsZZ9ggCT3wwpg3VbTKMFNHfaY/uF0ahSkYYrPF2dSSKDNIDIQAHm9qJqbLvCsSJH7yN4Vs/CsMMg==}
+    dependencies:
+      debug: 4.3.4
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@uiw/codemirror-extensions-basic-setup@4.21.20(@codemirror/autocomplete@6.6.0)(@codemirror/commands@6.2.3)(@codemirror/language@6.9.2)(@codemirror/lint@6.0.0)(@codemirror/search@6.2.3)(@codemirror/state@6.2.0)(@codemirror/view@6.22.0):
@@ -11557,6 +11692,10 @@ packages:
     hasBin: true
     dev: false
 
+  /headers-polyfill@3.3.0:
+    resolution: {integrity: sha512-5e57etwBpNcDc0b6KCVWEh/Ro063OxPvzVimUdM0/tsYM/T7Hfy3kknIGj78SFTOhNd8AZY41U8mOHoO4LzmIQ==}
+    dev: false
+
   /help-me@4.1.0:
     resolution: {integrity: sha512-5HMrkOks2j8Fpu2j5nTLhrBhT7VwHwELpqnSnx802ckofys5MO2SkLpgSz3dgNFHV7IYFX2igm5CM75SmuYidw==}
     dependencies:
@@ -11750,7 +11889,7 @@ packages:
         optional: true
     dependencies:
       '@types/express': 4.17.14
-      '@types/http-proxy': 1.17.9
+      '@types/http-proxy': 1.17.11
       http-proxy: 1.18.1
       is-glob: 4.0.3
       is-plain-obj: 3.0.0
@@ -19497,6 +19636,12 @@ packages:
     dependencies:
       is-typedarray: 1.0.0
     dev: false
+
+  /typescript@4.5.2:
+    resolution: {integrity: sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: true
 
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}

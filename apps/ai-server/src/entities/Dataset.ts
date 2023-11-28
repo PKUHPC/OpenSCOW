@@ -15,17 +15,6 @@ import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm";
 
 import { DatasetVersion } from "./DatasetVersion";
 
-export const DatasetType = {
-  IMAGE: "IMAGE",
-  TEXT: "TEXT",
-  VIDEO: "VIDEO",
-  AUDIO: "AUDIO",
-  OTHER: "OTHER",
-} as const;
-
-
-export type DatasetType = keyof typeof DatasetType;
-
 
 @Entity()
 export class Dataset {
@@ -39,11 +28,10 @@ export class Dataset {
     owner: string;
 
   @Property()
-    type: DatasetType;
+    type: string;
 
   @OneToMany(() => DatasetVersion, (datasetVersion) => datasetVersion.dataset)
     versions = new Collection<DatasetVersion>(this);
-
 
   @Property()
     isShared: boolean;
@@ -61,7 +49,7 @@ export class Dataset {
   constructor(init: {
       name: string;
       owner: string;
-      type: DatasetType;
+      type: string;
       isShared: boolean;
       scene: string;
       description: string;

@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { startApp } from "./app";
+import { ConnectRouter } from "@bufbuild/connect";
+import { datasetServiceServer } from "src/services/dataset";
 
-
-startApp();
+export const services = (router: ConnectRouter) => {
+  datasetServiceServer(router);
+};

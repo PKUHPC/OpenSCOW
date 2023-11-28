@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { HandlerContext } from "@bufbuild/connect";
 import pino from "pino";
 import { config } from "src/config/env";
 
@@ -24,3 +25,7 @@ export const loggerOptions: pino.LoggerOptions = {
 };
 
 export const logger = pino(loggerOptions);
+
+export const handlerLogger = (context: HandlerContext) => {
+  return logger.child({ method: context.method });
+};

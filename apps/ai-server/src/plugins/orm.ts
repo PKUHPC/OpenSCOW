@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
+import { FastifyInstance, FastifyPluginAsync, FastifyRequest } from "fastify";
 import { join } from "path";
 import { aiConfig } from "src/config/ai";
 import { config } from "src/config/env";
@@ -41,10 +41,11 @@ export const ormConfigs = {
   },
 } as Options<MySqlDriver>;
 
-export const ormPlugin = plugin(async (server) => {
-  // create the database if not exists.
+export const ormPlugin: FastifyPluginAsync = async (
+  server: FastifyInstance,
+) => {
 
-  const logger = server.logger.child({ plugin: "orm" });
+  const logger = server.log.child({ plugin: "orm" });
 
   const orm = await MikroORM.init<MySqlDriver>({
     ...ormConfigs,
@@ -55,16 +56,18 @@ export const ormPlugin = plugin(async (server) => {
   await schemaGenerator.ensureDatabase();
   await orm.getMigrator().up();
 
-  server.addExtension("orm", orm);
+  server.decorate("orm", orm);
+  server.decorateRequest("em", null);
 
-  server.addRequestHook((req) => {
-    req.em = orm.em.fork();
+  // 注入em,但无效
+  server.addHook("preHandler", async (request: FastifyRequest) => {
+    request.em = server.orm.em.fork();
   });
 
-  server.addCloseHook(async () => {
+  server.addHook("onClose", async (server) => {
     logger.info("Closing db connection.");
-    await orm.close();
+    await server.orm.close();
     logger.info("db connection has been closed.");
   });
 
-});
+};

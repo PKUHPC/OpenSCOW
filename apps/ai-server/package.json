@@ -9,7 +9,8 @@
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "serve": "node build/index.js",
     "test": "jest",
-    "orm": "dotenv -e env/.env.dev -- npx mikro-orm"
+    "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
+    "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create"
   },
   "files": [
     "scripts",
@@ -22,9 +23,12 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.5",
-    "@ddadaal/tsgrpc-common": "0.2.5",
-    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@bufbuild/connect": "0.13.0",
+    "@bufbuild/connect-node": "0.13.0",
+    "@bufbuild/protobuf": "1.4.2",
+    "fastify": "4.24.3",
+    "@bufbuild/connect-fastify": "0.13.0",
+    "@sinclair/typebox": "0.31.10",
     "@grpc/grpc-js": "1.9.11",
     "@mikro-orm/cli": "5.9.4",
     "@mikro-orm/core": "5.9.4",
@@ -36,10 +40,13 @@
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
     "pino": "8.16.2",
-    "pino-pretty": "10.2.3"
+    "pino-pretty": "10.2.3",
+    "http-proxy": "1.18.1"
   },
   "devDependencies": {
-    "@types/google-protobuf": "3.15.10"
+    "@types/google-protobuf": "3.15.6",
+    "@types/http-proxy": "1.17.11",
+    "@types/js-yaml": "4.0.5"
   },
   "mikro-orm": {
     "useTsNode": true,

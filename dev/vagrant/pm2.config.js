@@ -118,6 +118,19 @@ module.exports = {
       },
     },
     {
+      name: "ai-server",
+      script: "src/index.ts",
+      cwd: "./apps/ai-server",
+      watch: "./apps/ai-server",
+      interpreter,
+      interpreter_args,
+      env: {
+        PORT: "5007",
+        ...PRODUCTION_ENV,
+        ...SCOW_CONFIG_PATH_ENV,
+      },
+    },
+    {
       name: "dev:libs",
       cwd: ".",
       script: "npm",
