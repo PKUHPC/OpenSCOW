@@ -100,7 +100,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     },
     "PLATFORM_FINANCE": {
       setCurrentPlatformRole: () => setCurrentPlatformRole(PlatformRole.PLATFORM_FINANCE),
-      count:platformUsersCounts?.totalFinanceCount ?? 0,
+      count: platformUsersCounts?.totalFinanceCount ?? 0,
     },
   }), [platformUsersCounts]);
 
