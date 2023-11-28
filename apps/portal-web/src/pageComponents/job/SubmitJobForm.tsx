@@ -151,6 +151,26 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   // 判断是使用template中的cluster还是系统默认cluster，
   const defaultCluster = initial.cluster ?? currentDefaultCluster;
 
+
+  const calculateWorkingDirectory = (template: string, homePath: string = "") =>
+    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
+
+  const { data: homePath, isLoading: isHomePathLoading } = useAsync({
+    promiseFn: useCallback(async () => cluster
+      ? api.getHomeDirectory({ query: { cluster: cluster.id } }) : { path: "" }, [cluster?.id]),
+  });
+
+  const setWorkingDirectoryValue = () => {
+    if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
+      form.setFieldValue("workingDirectory",
+        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate, homePath?.path));
+    }
+  };
+
+  useEffect(() => {
+    setWorkingDirectoryValue();
+  }, [jobName, clusterInfoQuery.data, homePath?.path]);
+
   const [accountsReloadTrigger, setAccountsReloadTrigger] = useState<boolean>(false);
   const [partitionsReloadTrigger, setPartitionsReloadTrigger] = useState<boolean>(false);
   const [accountPartitionsCacheMap, setAccountPartitionsCacheMap] = useState<Record<string, Partition[]>>({});
@@ -187,7 +207,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     },
   });
 
-  // 获取账户的可见分区 selectAccount
+  // 获取账户的可见分区
   const availablePartitionsForAccountQuery = useAsync({
     promiseFn: useCallback(async () => {
 
@@ -204,27 +224,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
       };
       return { partitions: [] as Partition[] };
-    }, [account, partitionsReloadTrigger, unblockedAccountsQuery.data]),
+    }, [cluster, account, partitionsReloadTrigger]),
   });
-
-  const calculateWorkingDirectory = (template: string, homePath: string = "") =>
-    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
-
-  const { data: homePath, isLoading: isHomePathLoading } = useAsync({
-    promiseFn: useCallback(async () => cluster
-      ? api.getHomeDirectory({ query: { cluster: cluster.id } }) : { path: "" }, [cluster?.id]),
-  });
-
-  const setWorkingDirectoryValue = () => {
-    if (!form.isFieldTouched("workingDirectory") && clusterInfoQuery.data) {
-      form.setFieldValue("workingDirectory",
-        calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate, homePath?.path));
-    }
-  };
-
-  useEffect(() => {
-    setWorkingDirectoryValue();
-  }, [jobName, clusterInfoQuery.data, homePath?.path]);
 
   const currentPartitionInfo = useMemo(() => {
     if (partition && accountPartitionsCacheMap[account]) {
@@ -242,7 +243,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       }
     }
     return clusterInfoQuery.data?.clusterInfo.scheduler.partitions.find((x) => x.name === partition);
-  }, [partition, accountPartitionsCacheMap, account, clusterInfoQuery.data]);
+  }, [cluster, account, partition, accountPartitionsCacheMap]);
 
   useEffect(() => {
     if (currentPartitionInfo) {
@@ -254,8 +255,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   useEffect(() => {
     if (initial.account) {
       const templateData = {
-        // "cluster": initial.cluster,
-        "cluster": { id: "test", name: "test" },
+        "cluster": initial.cluster,
         "account": initial.account,
         "partition": initial.partition,
         "qos": initial.qos,
