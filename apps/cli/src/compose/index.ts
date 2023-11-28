@@ -113,6 +113,10 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const publicPath = "/__public__/";
   const publicDir = "/app/apps/gateway/public/";
 
+  const defaultServerBlock = `server {
+    listen 80 default_server;
+    return 444;
+  }`;
   // GATEWAY
   addService("gateway", {
     image: scowImage,
@@ -126,6 +130,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PUBLIC_PATH": publicPath,
       "PUBLIC_DIR": publicDir,
       "EXTRA": config.gateway.extra,
+      "ALLOWED_SERVER_NAME": config.gateway.allowedServerName,
+      "DEFAULT_SERVER_BLOCK": config.gateway.allowedServerName === "_" ? "" : defaultServerBlock,
     },
     ports: { [config.port]: 80 },
     volumes: {

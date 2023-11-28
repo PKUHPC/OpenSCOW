@@ -1,5 +1,13 @@
 # @scow/gateway
 
+## 1.2.2
+
+### Patch Changes
+
+- 969457662f: 修复 scow 存在的 web 安全漏洞
+
+## 1.2.1
+
 ## 1.2.0
 
 ### Patch Changes

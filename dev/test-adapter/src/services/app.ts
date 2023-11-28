@@ -10,21 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest } from "next";
-import { setupWssProxy } from "src/server/setup/proxy";
-import { setupShellServer } from "src/server/setup/shell";
+import { plugin } from "@ddadaal/tsgrpc-server";
+import { AppServiceServer, AppServiceService } from "@scow/scheduler-adapter-protos/build/protos/app";
 
-let setup = false;
+export const appServiceServer = plugin((server) => {
+  server.addService<AppServiceServer>(AppServiceService, {
+    getAppConnectionInfo: async () => {
+      return [{}];
+    },
 
-export default async (req: NextApiRequest, res) => {
-  if (setup) {
-    res.send("Already setup");
-    return;
-  }
-
-  setupWssProxy(res);
-  setupShellServer(res);
-
-  setup = true;
-  res.send("Setup complete");
-};
+  });
+});

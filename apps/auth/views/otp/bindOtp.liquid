@@ -23,7 +23,7 @@
               <button type="submit" name="action" value="backToLoginUI" class="text-x text-gray-500 mr-4">
                 {{ authTexts.bindOtp.returnLogin }}
               </button>
-              <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
+              <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}">
             </form>
           </div>
         {% unless bindLimitMinutes %}
@@ -53,7 +53,7 @@
                 {{ authTexts.bindOtp.confirm }}
             </button>
           </div>
-          <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
+          <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}">
         </form>
 
         {%  else %}
@@ -113,7 +113,7 @@
           </div>
           <input type="hidden" name="otpSessionToken" value="{{ otpSessionToken }}" />
           <input type="hidden" name="emailAddress" value="{{ emailAddress }}" />
-          <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}">
+          <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}">
         </form>
         {% endunless %}
         </div>

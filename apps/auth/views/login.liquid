@@ -97,7 +97,7 @@
               {% endif %}
 
               <input type="hidden" name="token" value="{{ token }}" />
-              <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+              <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
 
               {% if err %}
                 <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidInput }}</p>
@@ -116,7 +116,7 @@
                 <button type="submit" name="action" value="bindOtp" class="px text-gray-400">
                   {{ authTexts.login.bindOtp }}
                 </button>
-                <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+                <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
               </form>
             </div>
           {% endif %}
