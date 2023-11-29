@@ -93,7 +93,7 @@ export const QuickEntry: React.FC<Props> = () => {
   const { Title } = Typography;
 
   const [isEditable, setIsEditable] = useState(false);
-  const [isFinish, setIsFinish] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
 
   return (
     <ContentContainer>
@@ -101,18 +101,18 @@ export const QuickEntry: React.FC<Props> = () => {
         <Title level={5} style={{ marginBottom:0, lineHeight:"32px" }}>快捷入口</Title>
         {isEditable ? (
           <div>
-            <Button type="link" onClick={() => { setIsEditable(false); setIsFinish(true); }}>完成</Button>
+            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>完成</Button>
             <Button type="link" onClick={() => { setIsEditable(false); }}>取消</Button>
           </div>
         ) :
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinish(false); }}>编辑</Button>}
+          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>编辑</Button>}
       </TitleContainer>
       <CardsContainer>
         {isLoading ?
           <Spin /> : (
             <Sortable
               isEditable={isEditable}
-              isFinish={isFinish}
+              isFinished={isFinished}
               quickEntryArray={data?.quickEntries.length ? data?.quickEntries : staticEntry }
             ></Sortable>
           )}

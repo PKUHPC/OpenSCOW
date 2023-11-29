@@ -15,24 +15,6 @@ export interface UserInfo {
   name?: string;
 }
 
-// export enum EntryType {
-//   STATIC = 0,
-//   APP = 1,
-//   SHELL = 2,
-// }
-
-// export interface QuickEntry {
-//   id: string;
-//   name: string;
-//   path: string;
-//   entryType: EntryType;
-//   needCluster?: boolean;
-//   icon?: string;
-//   logoPath?: string;
-//   cluster?: {id: string;name: string};
-//   loginNode?: string;
-// }
-
 export interface Cluster {
   id: string;
   name: string;

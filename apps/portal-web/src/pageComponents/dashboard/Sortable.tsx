@@ -61,11 +61,11 @@ const ClusterContainer = styled.div`
 
 interface Props {
   isEditable: boolean,
-  isFinish: boolean,
+  isFinished: boolean,
   quickEntryArray: Entry[]
 }
 
-const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
+const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
 
   // 实际的快捷入口项
   const [items, setItems] = useState<Entry []>(
@@ -188,12 +188,12 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
   );
 
   useEffect(() => {
-    if (isFinish) {
+    if (isFinished) {
       const newItems = [...(temItems.map((x) => ({ ...x, id:x.id.split("-")[0] })))];
       setItems(newItems);
       saveItems(newItems);
     }
-  }, [isFinish]);
+  }, [isFinished]);
 
   useEffect(() => {
 
