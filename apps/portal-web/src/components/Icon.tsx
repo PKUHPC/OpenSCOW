@@ -10,13 +10,39 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import * as icons from "@ant-design/icons";
+import { BookOutlined, DesktopOutlined, MacCommandOutlined, PlusCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import React, { CSSProperties } from "react";
 
-const Icon = (props: { name: string, style?: CSSProperties }) => {
-  const { name } = props;
-  const antIcon: { [key: string]: any } = icons;
-  return React.createElement(antIcon[name], { style: { color:"#ccc", ...props.style } });
+const iconMap = {
+  PlusCircleOutlined: <PlusCircleOutlined />,
+  BookOutlined: <BookOutlined />,
+  SaveOutlined: <SaveOutlined />,
+  DesktopOutlined: <DesktopOutlined />,
+  MacCommandOutlined: <MacCommandOutlined />,
 };
 
-export default Icon;
+export const Icon = (props: { name: string, style: CSSProperties }) => {
+  const { name } = props;
+
+  // 确保图标组件接收并应用 style 属性
+  const iconElement = iconMap[name];
+  if (!iconElement) return null;
+
+  return React.cloneElement(iconElement, { style:props.style });
+};
+
+const withColor = (WrappedComponent) => {
+  return (props) => {
+    const { color, style, ...restProps } = props;
+
+    const modifiedStyle = {
+      color: color || "black",
+      ...style,
+    };
+
+    return <WrappedComponent style={modifiedStyle} {...restProps} />;
+  };
+};
+
+export const ColoredIcon = withColor(Icon);
+

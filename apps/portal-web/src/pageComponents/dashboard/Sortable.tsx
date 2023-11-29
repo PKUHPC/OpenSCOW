@@ -30,7 +30,8 @@ import Router from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { EntryType, QuickEntry } from "src/models/User";
+import { Entry } from "src/models/User";
+import { formatEntryId, getEntryClusterName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { AddEntryModal } from "./AddEntryModal";
@@ -61,28 +62,42 @@ const ClusterContainer = styled.div`
 interface Props {
   isEditable: boolean,
   isFinish: boolean,
-  quickEntryArray: QuickEntry[]
+  quickEntryArray: Entry[]
 }
 
 const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
 
   // 实际的快捷入口项
-  const [items, setItems] = useState<QuickEntry []>(
+  const [items, setItems] = useState<Entry []>(
     quickEntryArray,
   );
   // 编辑时临时的快捷入口项
   // 处理id使其唯一，因为不同集群可以有相同的交互式应用
-  const [temItems, setTemItems] = useState([...(items.map((x) => ({ ...x, id:x.id + "-" + x.cluster?.id })))]);
+  const [temItems, setTemItems] = useState([...(items.map((x) => ({ ...x, id:formatEntryId(x) }),
+  ))]);
 
   const [addEntryOpen, setAddEntryOpen] = useState(false);
   const [changeClusterOpen, setChangeClusterOpen] = useState(false);
+
+  // 要修改集信息快捷方式的id
+  const [changeClusterItem, setChangeClusterItem] = useState<Entry | null>(null);
+
+  // 被拖拽的快捷方式的id
+  const [activeId, setActiveId] = useState<string | number | null>(null);
+  const activeItem = useMemo(() => {
+    if (activeId) {
+      return temItems.find((x) => x.id === activeId.toString());
+    }
+  }, [activeId]);
+
+  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   const deleteFn = (id: string) => {
     setTemItems(temItems.filter((x) => x.id !== id));
   };
 
-  const addItem = (item: QuickEntry) => {
-    item = { ...item, id:item.id + "-" + item.cluster?.id };
+  const addItem = (item: Entry) => {
+    item = { ...item, id:formatEntryId(item) };
     if (temItems.find((x) => x.id === item.id)) {
       message.error("已存在该快捷方式");
       return;
@@ -97,29 +112,21 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
 
   const editItemCluster = (cluster: {id: string;name: string;}, loginNode?: string) => {
     setTemItems(temItems.map((x) => {
-      if (x.id !== changeClusterActiveId) {
+      if (x.id !== changeClusterItem?.id) {
         return x;
       }
-      x.cluster = cluster;
-      x.loginNode = loginNode;
+
+      if (x.entry?.$case === "shell") {
+        x.entry.shell.cluster = cluster;
+        x.entry.shell.loginNode = loginNode as string;
+      }
+      else if (x.entry?.$case === "app") {
+        x.entry.app.cluster = cluster;
+      }
+
       return x;
     }));
   };
-
-  // 要修改集信息快捷方式的id
-  const [changeClusterActiveId, setChangeClusterId] = useState<string | null>(null);
-  // 要修改集信息快捷方式的类型
-  const [changeClusterEntryType, setChangeClusterEntryType] = useState< EntryType | null>(null);
-
-  // 被拖拽的快捷方式的id
-  const [activeId, setActiveId] = useState<string | number | null>(null);
-  const activeItem = useMemo(() => {
-    if (activeId) {
-      return temItems.find((x) => x.id === activeId.toString());
-    }
-  }, [activeId]);
-
-  const sensors = useSensors(useSensor(MouseSensor), useSensor(TouchSensor));
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id);
@@ -144,19 +151,19 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
   }, []);
 
   const onItemClick = useCallback(
-    (item: QuickEntry) => {
+    (item: Entry) => {
       if (!isEditable) {
-        switch (item.entryType) {
-        case EntryType.STATIC:
-          Router.push(item.path);
+        switch (item.entry?.$case) {
+        case "pageLink":
+          Router.push(item.entry.pageLink.path);
           break;
 
-        case EntryType.SHELL:
-          Router.push(join(item.path, item.cluster!.id, item.loginNode!));
+        case "shell":
+          Router.push(join("/shell", item.entry.shell.cluster?.id as string, item.entry.shell.loginNode));
           break;
 
-        case EntryType.APP:
-          Router.push(join(item.path, item.cluster!.id, "/create", item.id));
+        case "app":
+          Router.push(join("/apps", item.entry.app.cluster?.id as string, "/create", item.id));
           break;
 
         default:
@@ -169,8 +176,8 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
 
   const saveItems = useCallback(
     async (newItems) => {
-      await api.saveQuickEntry({ body:{
-        quickEntry:newItems,
+      await api.saveQuickEntries({ body:{
+        quickEntries:newItems,
       } })
         .httpError(200, () => { message.error("保存失败"); })
         .then(() => {
@@ -191,7 +198,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
   useEffect(() => {
 
     // 处理id使其唯一，因为不同集群可以有相同的交互式应用
-    setTemItems([...(items.map((x) => ({ ...x, id:x.id + "-" + x.cluster?.id })))]);
+    setTemItems([...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
   }, [isEditable]);
 
   return (
@@ -216,11 +223,11 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
                   id={x.id}
                   name={x.name}
                   draggable={isEditable}
-                  icon={x.icon}
-                  logoPath={x.logoPath}
+                  icon={getEntryIcon(x)}
+                  logoPath={x.entry?.$case === "app" ? x.entry.app.logoPath : ""}
                 />
                 {
-                // 拖拽时隐藏删除按钮和集群信息
+                // 拖拽时隐藏删除按钮
                   isEditable && !(activeId && activeItem) ? (
                     <IconContainer onClick={() => { deleteFn(x.id); }}>
                       <MinusOutlined
@@ -231,24 +238,28 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
                     undefined
                 }
                 {
-                  x.cluster?.name && !(activeId && activeItem) && isEditable ? (
+                // 拖拽时隐藏集群信息
+                // 非编辑状态显示集群信息
+                  getEntryClusterName(x) && ((!(activeId && activeItem) && isEditable) || !isEditable) ? (
                     <ClusterContainer onClick={() =>
                     {
-                      setChangeClusterOpen(true);
-                      setChangeClusterId(x.id);
-                      setChangeClusterEntryType(x.entryType);
+                      if (isEditable) {
+                        setChangeClusterOpen(true);
+                        setChangeClusterItem(x);
+                      }
+
                     }}
                     >
-                      {x.cluster?.name as string}
+                      {getEntryClusterName(x) as string}
                     </ClusterContainer>
                   ) :
                     undefined
                 }
                 {
-                  // 非编辑状态显示集群信息
-                  x.cluster?.name && !isEditable ? (
+
+                  getEntryClusterName(x) && !isEditable ? (
                     <ClusterContainer>
-                      {x.cluster?.name as string}
+                      {getEntryClusterName(x) as string}
                     </ClusterContainer>
                   ) :
                     undefined
@@ -280,9 +291,9 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
               id={activeId.toString()}
               name={activeItem.name}
               draggable={isEditable}
-              icon={activeItem.icon}
-              logoPath={activeItem.logoPath}
-              cluster={activeItem.cluster}
+              icon={getEntryIcon(activeItem)}
+              logoPath={activeItem.entry?.$case === "app" ? activeItem.entry.app.logoPath : ""}
+              // cluster={activeItem.cluster}
             />
           ) : null}
         </DragOverlay>
@@ -295,8 +306,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinish, quickEntryArray }) => {
         editItem={editItemCluster}
         changeClusterOpen={changeClusterOpen}
         onChangeClusterClose={() => { setChangeClusterOpen(false); }}
-        changeClusterEntryType={changeClusterEntryType}
-        changeClusterId={changeClusterActiveId}
+        changeClusterItem={changeClusterItem}
       ></AddEntryModal>
     </div>
   );

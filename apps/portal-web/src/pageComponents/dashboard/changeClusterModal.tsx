@@ -11,7 +11,7 @@
  */
 
 import { Form, Modal, Select } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useStore } from "simstate";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";

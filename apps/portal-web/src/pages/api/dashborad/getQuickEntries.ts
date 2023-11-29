@@ -13,43 +13,60 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { UserServiceClient } from "@scow/protos/build/portal/user";
+import { DashboardServiceClient } from "@scow/protos/build/portal/dashboard";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-export const EntryType = Type.Enum({
-  STATIC : 0,
-  APP : 1,
-  SHELL : 2,
-});
-export type EntryType = Static<typeof EntryType>;
-
-export const QuickEntry = Type.Object({
-  id:Type.String(),
-  name:Type.String(),
-  path:Type.String(),
-  entryType: EntryType,
-  needCluster:Type.Optional(Type.Boolean()),
-  icon:Type.Optional(Type.String()),
-  logoPath:Type.Optional(Type.String()),
-  cluster:Type.Optional(Type.Object({
-    id: Type.String(),
-    name: Type.String(),
-  })),
-  loginNode:Type.Optional(Type.String()),
+const Cluster = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
 });
 
-export type QuickEntry = Static<typeof QuickEntry>;
+const PageLinkEntry = Type.Object({
+  path: Type.String(),
+  icon: Type.String(),
+});
 
-export const GetQuickEntrySchema = typeboxRouteSchema({
+const ShellEntry = Type.Object({
+  cluster: Type.Optional(Cluster),
+  loginNode: Type.String(),
+  icon: Type.String(),
+});
+
+const AppEntry = Type.Object({
+  cluster: Type.Optional(Cluster),
+  logoPath: Type.String(),
+});
+
+export const Entry = Type.Object({
+  id: Type.String(),
+  name: Type.String(),
+  entry: Type.Optional(Type.Union([
+    Type.Object({
+      $case: Type.Literal("pageLink"),
+      pageLink: PageLinkEntry,
+    }),
+    Type.Object({
+      $case: Type.Literal("shell"),
+      shell: ShellEntry,
+    }),
+    Type.Object({
+      $case: Type.Literal("app"),
+      app: AppEntry,
+    }),
+  ])),
+});
+export type Entry = Static<typeof Entry>;
+
+export const GetQuickEntriesSchema = typeboxRouteSchema({
   method: "GET",
 
   responses: {
     200: Type.Object({
-      quickEntry: Type.Array(QuickEntry),
+      quickEntries: Type.Array(Entry),
     }),
 
     404: Type.Object({ code: Type.Literal("READ_FILE_FAILED") }),
@@ -58,19 +75,19 @@ export const GetQuickEntrySchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(GetQuickEntrySchema, async (req, res) => {
+export default route(GetQuickEntriesSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const client = getClient(UserServiceClient);
+  const client = getClient(DashboardServiceClient);
 
-  return await asyncUnaryCall(client, "getQuickEntry", {
+  return await asyncUnaryCall(client, "getQuickEntries", {
     userId:info.identityId,
   }).then(async (x) => {
 
-    return { 200: { quickEntry: x.quickEntry } };
+    return { 200: { quickEntries: x.quickEntries } };
   },
   handlegRPCError({
     [status.UNAVAILABLE]: () => ({ 404: { code: "READ_FILE_FAILED" } } as const),

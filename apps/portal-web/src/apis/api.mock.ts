@@ -14,7 +14,6 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
-
 export type MockApi<TApi extends Record<
   string,
  (...args: any[]) => JsonFetchResultPromiseLike<any>>
@@ -63,8 +62,42 @@ export const job: JobInfo = {
 
 export const mockApi: MockApi<typeof api> = {
 
-  getQuickEntry:null,
-  saveQuickEntry:null,
+  getQuickEntries:async () => ({ quickEntries: [
+    {
+      id:"submitJob",
+      name:"提交作业",
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/submit",
+          icon:"PlusCircleOutlined",
+        },
+      },
+    },
+    {
+      id:"runningJob",
+      name:"未结束的作业",
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/runningJobs",
+          icon:"BookOutlined",
+        },
+      },
+    },
+    {
+      id:"allJobs",
+      name:"所有作业",
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/allJobs",
+          icon:"BookOutlined",
+        },
+      },
+    },
+  ]}),
+  saveQuickEntries:null,
   getClusterInfo: null,
   listAvailableTransferClusters: null,
 

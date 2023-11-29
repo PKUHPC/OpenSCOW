@@ -14,10 +14,11 @@ import { Button, Modal, Spin } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { EntryType, QuickEntry } from "src/models/User";
+import { Entry } from "src/models/User";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/changeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/selectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
+import { getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";
@@ -25,12 +26,11 @@ import { EntryItem } from "./EntryItem";
 export interface Props {
   open: boolean;
   onClose: () => void;
-  addItem: (item: QuickEntry) => void;
+  addItem: (item: Entry) => void;
   editItem: (cluster: Cluster, loginNode?: string) => void;
   changeClusterOpen: boolean;
   onChangeClusterClose: () => void;
-  changeClusterEntryType: EntryType | null;
-  changeClusterId: string | null;
+  changeClusterItem: Entry | null;
 }
 
 const ItemsContainer = styled.div`
@@ -45,52 +45,74 @@ export const AddEntryModal: React.FC<Props> = ({
   editItem,
   changeClusterOpen,
   onChangeClusterClose,
-  changeClusterEntryType,
-  changeClusterId,
+  changeClusterItem,
 }) => {
-  const staticEntry: QuickEntry[] = [
+  const staticEntry: Entry[] = [
     {
       id:"submitJob",
       name:"提交作业",
-      icon:"PlusCircleOutlined",
-      path: "/jobs/submit",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/submit",
+          icon:"PlusCircleOutlined",
+        },
+      },
     },
     {
       id:"runningJob",
       name:"未结束的作业",
-      icon:"BookOutlined",
-      path: "/jobs/runningJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/runningJobs",
+          icon:"BookOutlined",
+        },
+      },
     },
     {
       id:"allJobs",
       name:"所有作业",
-      icon:"BookOutlined",
-      path: "/jobs/allJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/allJobs",
+          icon:"BookOutlined",
+        },
+      },
     },
     {
       id:"savedJobs",
       name:"作业模板",
-      icon:"SaveOutlined",
-      path: "/jobs/savedJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/savedJobs",
+          icon:"SaveOutlined",
+        },
+      },
     },
     {
       id:"desktop",
       name:"桌面",
-      icon:"DesktopOutlined",
-      path: "/desktop",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/desktop",
+          icon:"DesktopOutlined",
+        },
+      },
     },
     {
       id:"shell",
       name:"shell",
-      icon:"MacCommandOutlined",
-      path: "/shell",
-      needCluster:true,
-      entryType:EntryType.SHELL,
+      entry:{
+        $case:"shell",
+        shell:{
+          loginNode:"",
+          icon:"MacCommandOutlined",
+        },
+      },
     },
   ];
   const clusters = publicConfig.CLUSTERS;
@@ -124,7 +146,7 @@ export const AddEntryModal: React.FC<Props> = ({
 
   // 所有可创建的app
   const appInfo = useMemo(() => {
-    const displayApp: QuickEntry[] = [];
+    const displayApp: Entry[] = [];
 
     if (apps) {
       for (const key in apps) {
@@ -132,10 +154,12 @@ export const AddEntryModal: React.FC<Props> = ({
         displayApp.push({
           id:x.app.id,
           name:x.app.name,
-          path:"/app",
-          logoPath:x.app.logoPath,
-          needCluster:true,
-          entryType:EntryType.APP,
+          entry:{
+            $case:"app",
+            app:{
+              logoPath:"",
+            },
+          },
         });
       }
     }
@@ -148,59 +172,56 @@ export const AddEntryModal: React.FC<Props> = ({
   // 可以创建该App的集群
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
   // 新建快捷方式的信息
-  const [entryInfo, setEntryInfo] = useState<QuickEntry>({
+  const [entryInfo, setEntryInfo] = useState<Entry>({
     id:"",
     name:"",
-    path:"/apps",
-    needCluster:true,
-    entryType:EntryType.APP,
   });
 
   // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
   useEffect(() => {
-    if (changeClusterEntryType === EntryType.SHELL) {
+    if (changeClusterItem?.entry?.$case === "shell") {
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
     }
-    else if (changeClusterEntryType === EntryType.APP) {
+    else if (changeClusterItem?.entry?.$case === "app") {
       setNeedLoginNode(false);
-      setClustersToSelectedApp(apps![changeClusterId!.split("-")[0]].clusters);
+      setClustersToSelectedApp(apps![changeClusterItem.id.split("-")[0]].clusters);
     }
-  }, [changeClusterEntryType, changeClusterId]);
+  }, [changeClusterItem]);
 
 
-  const handleClick = (item: QuickEntry) => {
-    if (item.entryType === EntryType.SHELL) {
+  const handleClick = (item: Entry) => {
+    if (item.entry?.$case === "shell") {
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
       setSelectClusterOpen(true);
-      setEntryInfo(
-        (preVal) => ({ ...preVal,
-          ... {
-            id:item.id,
-            name:item.name,
-            path:"/shell",
-            entryType:EntryType.SHELL,
-            icon:item.icon,
-            logoPath:"",
+      setEntryInfo({
+        id:item.id,
+        name:item.name,
+        entry:{
+          $case:"shell",
+          shell:{
+            loginNode:"",
+            icon:"MacCommandOutlined",
           },
-        }),
+        },
+      },
       );
     }
-    else if (item.entryType === EntryType.APP) {
+    else if (item.entry?.$case === "app") {
       setNeedLoginNode(false);
       setClustersToSelectedApp(apps![item.id].clusters);
       setSelectClusterOpen(true);
-      setEntryInfo((preVal) => ({ ...preVal,
-        ...{
-          id:item.id,
-          name:item.name,
-          path:"/apps",
-          entryType:EntryType.APP,
-          icon:"",
-          logoPath:item.logoPath,
+      setEntryInfo({
+        id:item.id,
+        name:item.name,
+        entry:{
+          $case:"app",
+          app:{
+            logoPath:item.entry.app.logoPath,
+          },
         },
-      }),
+      },
       );
     }
     else {
@@ -234,7 +255,7 @@ export const AddEntryModal: React.FC<Props> = ({
                 >
                   <EntryItem
                     name={item.name}
-                    icon={item.icon}
+                    icon={getEntryIcon(item)}
                     style={{ padding:"10px" }}
                   />
                 </div>
@@ -250,8 +271,7 @@ export const AddEntryModal: React.FC<Props> = ({
                 >
                   <EntryItem
                     name={item.name}
-                    icon={item.icon}
-                    logoPath={item.logoPath}
+                    logoPath={item.entry?.$case === "app" ? item.entry.app.logoPath : ""}
                     style={{ padding:"10px" }}
                   />
                 </div>

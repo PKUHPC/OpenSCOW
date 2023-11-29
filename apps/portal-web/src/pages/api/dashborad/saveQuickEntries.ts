@@ -13,20 +13,20 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { UserServiceClient } from "@scow/protos/build/portal/user";
+import { DashboardServiceClient } from "@scow/protos/build/portal/dashboard";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-import { QuickEntry } from "./getQuickEntry";
+import { Entry } from "./getQuickEntries";
 
-export const SaveQuickEntrySchema = typeboxRouteSchema({
+export const SaveQuickEntriesSchema = typeboxRouteSchema({
   method: "POST",
 
   body: Type.Object({
-    quickEntry: Type.Array(QuickEntry),
+    quickEntries: Type.Array(Entry),
   }),
   responses: {
     204: Type.Null(),
@@ -37,17 +37,17 @@ export const SaveQuickEntrySchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(SaveQuickEntrySchema, async (req, res) => {
+export default route(SaveQuickEntriesSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
-  const { quickEntry } = req.body;
-  const client = getClient(UserServiceClient);
+  const { quickEntries } = req.body;
+  const client = getClient(DashboardServiceClient);
 
-  return await asyncUnaryCall(client, "saveQuickEntry", {
+  return await asyncUnaryCall(client, "saveQuickEntries", {
     userId:info.identityId,
-    quickEntry,
+    quickEntries,
   }).then(() => ({ 204:null }),
     handlegRPCError(({
       [status.UNAVAILABLE]: () => ({ 500: { code: "WRITE_FILE_FAILED" } } as const),

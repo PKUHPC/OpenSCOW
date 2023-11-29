@@ -14,7 +14,7 @@ import { Button, Spin, Typography } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { EntryType, QuickEntry as QuickEntryinterface } from "src/models/User";
+import { Entry } from "src/models/User";
 import Sortable from "src/pageComponents/dashboard/Sortable";
 import { styled } from "styled-components";
 
@@ -39,39 +39,55 @@ interface Props {
 }
 
 export const QuickEntry: React.FC<Props> = () => {
-  const staticEntry: QuickEntryinterface[] = [
+  const staticEntry: Entry[] = [
     {
       id:"submitJob",
       name:"提交作业",
-      icon:"PlusCircleOutlined",
-      path: "/jobs/submit",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/submit",
+          icon:"PlusCircleOutlined",
+        },
+      },
     },
     {
       id:"runningJob",
       name:"未结束的作业",
-      icon:"BookOutlined",
-      path: "/jobs/runningJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/runningJobs",
+          icon:"BookOutlined",
+        },
+      },
     },
     {
       id:"allJobs",
       name:"所有作业",
-      icon:"BookOutlined",
-      path: "/jobs/allJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/allJobs",
+          icon:"BookOutlined",
+        },
+      },
     },
     {
       id:"savedJobs",
       name:"作业模板",
-      icon:"SaveOutlined",
-      path: "/jobs/savedJobs",
-      entryType:EntryType.STATIC,
+      entry:{
+        $case:"pageLink",
+        pageLink:{
+          path: "/jobs/savedJobs",
+          icon:"SaveOutlined",
+        },
+      },
     },
   ];
 
   const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.getQuickEntry({});
+    return await api.getQuickEntries({});
   }, []) });
 
   const { Title } = Typography;
@@ -97,7 +113,7 @@ export const QuickEntry: React.FC<Props> = () => {
             <Sortable
               isEditable={isEditable}
               isFinish={isFinish}
-              quickEntryArray={data?.quickEntry.length ? data?.quickEntry : staticEntry }
+              quickEntryArray={data?.quickEntries.length ? data?.quickEntries : staticEntry }
             ></Sortable>
           )}
       </CardsContainer>

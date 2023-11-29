@@ -12,32 +12,32 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { entryTypeFromJSON, entryTypeToJSON, QuickEntry, UserServiceServer, UserServiceService }
-  from "@scow/protos/build/portal/user";
-import fs from "fs";
+import { DashboardServiceServer, DashboardServiceService, Entry }
+  from "@scow/protos/build/portal/dashboard";
+import { promises as fsPromises } from "fs";
 import path from "path";
-import { getUserQuickEntryFileName } from "src/utils/user";
+import { getUserQuickEntryFileName } from "src/utils/dashboard";
 
-const quickEntryPath = "/etc/quickEntry";
+const quickEntryPath = "/etc/scow/quickEntries";
 
-export const userServiceServer = plugin((server) => {
-  return server.addService<UserServiceServer>(UserServiceService, {
-    getQuickEntry:async ({ request }) => {
+export const dashboardServiceServer = plugin((server) => {
+  return server.addService<DashboardServiceServer>(DashboardServiceService, {
+    getQuickEntries:async ({ request }) => {
       const { userId } = request;
       const filePath = path.join(quickEntryPath, getUserQuickEntryFileName(userId));
 
       // 读取 JSON 文件
-      let jsonObject!: QuickEntry[];
+      let jsonObject!: Entry[];
       try {
         // 同步读取 JSON 文件
-        const data = fs.readFileSync(filePath, "utf8");
+        const data = await fsPromises.readFile(filePath, "utf8");
 
         // 将 JSON 字符串解析为 JavaScript 对象
         jsonObject = JSON.parse(data);
       } catch (error) {
         // 如果文件不存在则返回空数组
         if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-          return [{ quickEntry:[]}];
+          return [{ quickEntries:[]}];
         }
 
         // 其他错误则抛错
@@ -48,41 +48,37 @@ export const userServiceServer = plugin((server) => {
       }
 
       return [{
-        quickEntry:
-        jsonObject.map((x) => ({ ...x, entryType:entryTypeFromJSON(x.entryType) })),
+        quickEntries:jsonObject,
       }];
     },
-    saveQuickEntry:async ({ request }) => {
+    saveQuickEntries:async ({ request }) => {
 
-      const { userId, quickEntry } = request;
-      const jsonContent = JSON.stringify(quickEntry.map((x) => ({ ...x, entryType:entryTypeToJSON(x.entryType) })));
+      const { userId, quickEntries } = request;
+      const jsonContent = JSON.stringify(quickEntries);
       const filePath = path.join(quickEntryPath, getUserQuickEntryFileName(userId));
 
       // 获取文件的目录路径
       const dirPath = path.dirname(filePath);
 
-      // 检查目录是否存在，如果不存在则创建目录
-      fs.mkdir(dirPath, { recursive: true }, (err) => {
-        if (err) {
-          throw <ServiceError> {
-            code: status.UNAVAILABLE,
-            message: `make dir ${dirPath} failed`,
-          };
-        } else {
+      try {
+        // 检查目录是否存在，如果不存在则创建目录
+        await fsPromises.mkdir(dirPath, { recursive: true });
 
-          // 将内容写入文件
-          fs.writeFile(filePath, jsonContent, (err) => {
-            if (err) {
-              throw <ServiceError> {
-                code: status.UNAVAILABLE,
-                message: `write file ${getUserQuickEntryFileName(userId)} failed`,
-              };
-            }
-          });
-        }
-      });
+        // 将内容写入文件
+        await fsPromises.writeFile(filePath, jsonContent);
 
-      return [{}];
+        return [{}];
+      } catch (err) {
+
+        const errorMessage = err instanceof Error && "message" in err
+          ? `Error saving quick entry for user ${userId}: ${err.message}`
+          : "";
+
+        throw <ServiceError> {
+          code: status.UNAVAILABLE,
+          message: errorMessage || `An error occurred while saving quick entry for user ${userId}`,
+        };
+      }
     },
   });
 });

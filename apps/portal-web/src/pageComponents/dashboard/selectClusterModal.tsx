@@ -13,7 +13,7 @@
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
-import { QuickEntry } from "src/models/User";
+import { Entry } from "src/models/User";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
@@ -22,8 +22,8 @@ export interface Props {
   onClose: () => void;
   needLoginNode: boolean;
   clusters: Cluster[];
-  addItem: (item: QuickEntry) => void;
-  entryInfo: QuickEntry;
+  addItem: (item: Entry) => void;
+  entryInfo: Entry;
   closeAddEntryModal: () => void;
 }
 
@@ -46,18 +46,36 @@ export const SelectClusterModal: React.FC<Props> = ({
   const clustersOptions = clusters.map((x) => ({ value:x.id, label:x.name }));
   const { loginNodes } = useStore(LoginNodeStore);
   const [loginNodesOptions, setLoginNodesOptions] = useState<{}[]>([]);
-  const [loginNode, setLoginNode] = useState<string | undefined>(undefined);
 
   const handelClusterChange = (cluster: string) => {
     const nodes = loginNodes[cluster].map((x) => ({ value:x.address, label:x.name }));
     setLoginNodesOptions(nodes);
-    setLoginNode(undefined);
+    form.resetFields(["loginNode"]);
   };
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-
-    addItem({ ...entryInfo, cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string}, loginNode });
+    if (entryInfo.entry?.$case === "shell") {
+      addItem({ ...entryInfo,
+        entry:{
+          $case:"shell",
+          shell:{
+            cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string},
+            loginNode:loginNode as string,
+            icon:"MacCommandOutlined",
+          },
+        } });
+    }
+    else if (entryInfo.entry?.$case === "app") {
+      addItem({ ...entryInfo,
+        entry:{
+          $case:"app",
+          app:{
+            cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string},
+            logoPath:entryInfo.entry.app.logoPath,
+          },
+        } });
+    }
     form.resetFields();
     onClose();
     closeAddEntryModal();
@@ -96,8 +114,6 @@ export const SelectClusterModal: React.FC<Props> = ({
             name="loginNode"
           >
             <Select
-              value={loginNode}
-              onChange={(val) => { setLoginNode(val); }}
               options={loginNodesOptions}
             />
           </Form.Item>

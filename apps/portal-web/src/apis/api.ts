@@ -24,8 +24,8 @@ import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApp
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
-import type { GetQuickEntrySchema } from "src/pages/api/dashborad/getQuickEntry";
-import type { SaveQuickEntrySchema } from "src/pages/api/dashborad/saveQuickEntry";
+import type { GetQuickEntriesSchema } from "src/pages/api/dashborad/getQuickEntries";
+import type { SaveQuickEntriesSchema } from "src/pages/api/dashborad/saveQuickEntries";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
 import type { KillDesktopSchema } from "src/pages/api/desktop/killDesktop";
 import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
@@ -74,8 +74,8 @@ export const api = {
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
-  getQuickEntry: apiClient.fromTypeboxRoute<typeof GetQuickEntrySchema>("GET", "/api/dashborad/getQuickEntry"),
-  saveQuickEntry: apiClient.fromTypeboxRoute<typeof SaveQuickEntrySchema>("POST", "/api/dashborad/saveQuickEntry"),
+  getQuickEntries: apiClient.fromTypeboxRoute<typeof GetQuickEntriesSchema>("GET", "/api/dashborad/getQuickEntries"),
+  saveQuickEntries: apiClient.fromTypeboxRoute<typeof SaveQuickEntriesSchema>("POST", "/api/dashborad/saveQuickEntries"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
   killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
   launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),

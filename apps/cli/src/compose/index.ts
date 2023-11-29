@@ -199,7 +199,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
-        "./quickEntry":"/etc/quickEntry",
+        "./quickEntries":"/etc/scow/quickEntries",
       },
     });
 

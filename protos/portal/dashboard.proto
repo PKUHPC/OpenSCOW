@@ -1,0 +1,89 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow.portal;
+
+// enum EntryType {
+//   // 路径固定，不需要集群信息
+//   STATIC = 0;
+//   // 交互式应用
+//   APP = 1;
+//   SHELL = 2;
+// }
+
+message Cluster {
+  string id = 1;
+  string name = 2;
+}
+
+// message QuickEntry {
+//   string id = 1;
+//   string name = 2;
+//   string path = 3;
+//   EntryType entry_type = 4;
+//   optional bool need_cluster = 5;
+//   optional string icon = 6;
+//   optional string logo_path = 7;
+//   optional Cluster cluster = 8;
+//   optional string login_node = 9;
+// }
+
+message PageLinkEntry {
+  string path = 1;
+  // antd的图标ID
+  string icon = 2;
+}
+
+message ShellEntry {
+  Cluster cluster = 1;
+  string login_node = 2;
+  // antd的图标ID
+  string icon = 3;
+}
+
+message AppEntry {
+  Cluster cluster = 1;
+  string logo_path = 2;
+}
+
+message Entry {
+  string id = 1;
+  string name = 2;
+
+  oneof entry {
+    PageLinkEntry page_link = 3;
+    ShellEntry shell = 4;
+    AppEntry app = 5;
+  }
+}
+message GetQuickEntriesRequest {
+  string user_id = 1;
+}
+
+message GetQuickEntriesResponse {
+  repeated Entry quick_entries = 1;
+}
+
+message SaveQuickEntriesRequest {
+  string user_id = 1;
+  repeated Entry quick_entries = 2;
+}
+
+message SaveQuickEntriesResponse {
+}
+
+service DashboardService {
+  rpc GetQuickEntries(GetQuickEntriesRequest) returns (GetQuickEntriesResponse);
+  rpc SaveQuickEntries(SaveQuickEntriesRequest) returns (SaveQuickEntriesResponse);
+}

@@ -15,20 +15,52 @@ export interface UserInfo {
   name?: string;
 }
 
-export enum EntryType {
-  STATIC = 0,
-  APP = 1,
-  SHELL = 2,
-}
+// export enum EntryType {
+//   STATIC = 0,
+//   APP = 1,
+//   SHELL = 2,
+// }
 
-export interface QuickEntry {
+// export interface QuickEntry {
+//   id: string;
+//   name: string;
+//   path: string;
+//   entryType: EntryType;
+//   needCluster?: boolean;
+//   icon?: string;
+//   logoPath?: string;
+//   cluster?: {id: string;name: string};
+//   loginNode?: string;
+// }
+
+export interface Cluster {
   id: string;
   name: string;
+}
+
+export interface PageLinkEntry {
   path: string;
-  entryType: EntryType;
-  needCluster?: boolean;
-  icon?: string;
-  logoPath?: string;
-  cluster?: {id: string;name: string};
-  loginNode?: string;
+  /** antd的图标ID */
+  icon: string;
+}
+
+export interface ShellEntry {
+  cluster?: Cluster | undefined;
+  loginNode: string;
+  /** antd的图标ID */
+  icon: string;
+}
+
+export interface AppEntry {
+  cluster?: Cluster | undefined;
+  logoPath: string;
+}
+
+export interface Entry {
+  id: string;
+  name: string;
+  entry?: { $case: "pageLink"; pageLink: PageLinkEntry } | { $case: "shell"; shell: ShellEntry } | {
+    $case: "app";
+    app: AppEntry;
+  } | undefined;
 }
