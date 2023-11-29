@@ -596,13 +596,23 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    getPlatformUsersCounts: async ({ em }) => {
-
-      const totalCount = await em.count(User);
+    getPlatformUsersCounts: async ({ request, em }) => {
+      const { idOrName } = request;
+      const idOrNameQuery = idOrName ? {
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+        ],
+      } : {};
+      const totalCount = await em.count(User, idOrNameQuery);
       const totalAdminCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` }, ...idOrNameQuery });
       const totalFinanceCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` }, ...idOrNameQuery });
 
       return [{
         totalCount: totalCount,
