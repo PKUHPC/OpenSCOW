@@ -313,7 +313,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   });
 
 
-  // 获取账户的可见分区 selectAccount
+  // 获取账户的可见分区
   const availablePartitionsForAccountQuery = useAsync({
     promiseFn: useCallback(async () => {
       if (account && selectableAccounts.includes(account) && !accountPartitionsCacheMap[account] && !loading) {

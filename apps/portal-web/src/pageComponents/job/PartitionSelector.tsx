@@ -21,16 +21,13 @@ interface Props {
   value?: string;
   onChange?: (value: string) => void;
   onReload?: () => void;
-  defaultInitialValue?: string;
 }
 
 export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
-  isLoading, onChange, value, onReload, defaultInitialValue }) => {
+  isLoading, onChange, value, onReload }) => {
 
   useEffect(() => {
-    if (value && defaultInitialValue && value === defaultInitialValue) {
-      onChange?.(defaultInitialValue);
-    } else if (!value && selectablePartitions.length || (value && !selectablePartitions.includes(value))) {
+    if (selectablePartitions.length && !value) {
       onChange?.(selectablePartitions[0]);
     }
   }, [selectablePartitions, value]);

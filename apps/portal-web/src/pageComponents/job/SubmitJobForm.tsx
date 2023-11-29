@@ -132,6 +132,21 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
+  useEffect(() => {
+    if (initial.cluster) {
+      const templateData = {
+        "cluster": initial.cluster,
+        "account": initial.account,
+        "partition": initial.partition,
+        "qos": initial.qos,
+        "coreCount": initial.coreCount,
+        "gpuCount": initial.gpuCount,
+        "cpuCount": initial.gpuCount,
+      };
+      form.setFieldsValue(templateData);
+    }
+  }, [initial.cluster]);
+
   // 获取集群信息
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -139,11 +154,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     onResolve: (data) => {
       const jobInitialName = genJobName();
       form.setFieldValue("jobName", jobInitialName);
-      // TODO调度器类别,K8S镜像
+      // TODO 调度器类别,K8S镜像
       const schedulerName = data?.clusterInfo.scheduler.name;
 
-      // 集群重新获取时，清除所有保存的账户分区信息
-      setAccountPartitionsCacheMap({});
     },
   });
 
@@ -178,8 +191,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const handleAccountsReload = () => {
     setAccountsReloadTrigger((prev) => prev = !prev);
-    // 账户重新获取时，清除所有保存的账户分区信息
-    setAccountPartitionsCacheMap({});
   };
 
   const handlePartitionsReload = () => {
@@ -195,6 +206,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   // 获取未封锁账户
   const unblockedAccountsQuery = useAsync({
     promiseFn: useCallback(async () => {
+      // 账户重新获取时，清除所有保存的账户分区信息
+      setAccountPartitionsCacheMap({});
+      form.setFieldValue("account", undefined);
       return cluster ? await api.getAccounts({ query: {
         cluster: cluster.id,
         statusFilter: AccountStatusFilter.UNBLOCKED_ONLY,
@@ -203,7 +217,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         : { accounts: [] as string [] };
     }, [cluster, accountsReloadTrigger]),
     onResolve: (data) => {
-      setSelectableAccounts(data.accounts);
+      if (data.accounts.length) {
+        setSelectableAccounts(data.accounts);
+
+        // 如果模板值存在，第一次填入模板值，之后如果账户列表刷新则重置
+        initial.account ? form.setFieldValue("account", initial.account) :
+          form.setFieldValue("account", data.accounts[0]);
+
+        initial.account = undefined;
+      }
     },
   });
 
@@ -220,52 +242,62 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           .then((data) => {
             newPartitionsMap[account] = data.partitions;
             setAccountPartitionsCacheMap(newPartitionsMap);
+
+            // 如果模板值存在，第一次填入模板值，之后如果账户列表刷新则重置
+            initial.partition ? form.setFieldValue("partition", initial.partition) :
+              form.setFieldValue("partition", data.partitions[0].name);
+            initial.qos ? form.setFieldValue("qos", initial.qos) :
+              form.setFieldValue("qos", data.partitions[0].qos);
+
+            initial.partition = undefined;
+            initial.qos = undefined;
           });
 
       };
       return { partitions: [] as Partition[] };
-    }, [cluster, account, partitionsReloadTrigger]),
+    }, [account, partitionsReloadTrigger]),
   });
 
   const currentPartitionInfo = useMemo(() => {
-    if (partition && accountPartitionsCacheMap[account]) {
-      const selectedPartition = accountPartitionsCacheMap[account].find((x) => x.name === partition);
-      // 如果之前已选中的分区在缓存的账户信息中存在则当前分区仍为之前已选中分区
-      if (selectedPartition) {
-        return selectedPartition;
+
+
+    // 如果模板值存在，第一次填入模板值，之后如果分区列表刷新则重置
+    if (initial.partition) {
+      form.setFieldValue("partition", initial.partition);
+      initial.partition = undefined;
+
+      if (account && accountPartitionsCacheMap[account] &&
+        accountPartitionsCacheMap[account].find((x) => x.name === initial.partition)) {
+        return accountPartitionsCacheMap[account].find((x) => x.name === initial.partition);
       } else {
-        // 如果之前已选中的分区在缓存的账户信息中不存在，模板值若存在置空当前分区，模板值不存在则当前分区为缓存的账户分区列表中第一项
-        if (initial.partition && partition === initial.partition) {
-          return undefined;
+        return undefined;
+      }
+    // 模板值不存在时
+    } else {
+
+      if (account && accountPartitionsCacheMap[account]) {
+        const cacheMap = accountPartitionsCacheMap[account];
+
+        if (partition && cacheMap.find((x) => x.name === partition)) {
+          return cacheMap.find((x) => x.name === partition);
         } else {
-          accountPartitionsCacheMap[account][0];
+          return accountPartitionsCacheMap[account][0];
         }
+
       }
     }
+
+
     return clusterInfoQuery.data?.clusterInfo.scheduler.partitions.find((x) => x.name === partition);
-  }, [cluster, account, partition, accountPartitionsCacheMap]);
+
+  }, [account, partition, accountPartitionsCacheMap]);
 
   useEffect(() => {
     if (currentPartitionInfo) {
       initial.qos ? form.setFieldValue("qos", initial.qos) : form.setFieldValue("qos", currentPartitionInfo.qos?.[0]);
+      initial.qos = undefined;
     }
   }, [currentPartitionInfo]);
-
-  // 模板值存在时
-  useEffect(() => {
-    if (initial.account) {
-      const templateData = {
-        "cluster": initial.cluster,
-        "account": initial.account,
-        "partition": initial.partition,
-        "qos": initial.qos,
-        "coreCount": initial.coreCount,
-        "gpuCount": initial.gpuCount,
-        "cpuCount": initial.gpuCount,
-      };
-      form.setFieldsValue(templateData);
-    }
-  }, [initial]);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -325,7 +357,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                   selectableAccounts={ selectableAccounts ?? []}
                   isLoading={unblockedAccountsQuery.isLoading}
                   onReload={handleAccountsReload}
-                  defaultInitialValue={initial.account}
                 />
               )}
           </Form.Item>
@@ -342,7 +373,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
               selectablePartitions={accountPartitionsCacheMap[account] ?
                 accountPartitionsCacheMap[account].map((x) => x.name) : []}
               onReload={handlePartitionsReload}
-              defaultInitialValue={initial.partition}
             />
           </Form.Item>
         </Col>

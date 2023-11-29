@@ -21,19 +21,16 @@ interface Props {
   value?: string;
   onChange?: (value: string) => void;
   onReload?: () => void;
-  defaultInitialValue?: string;
 }
 
 export const AccountSelector: React.FC<Props> = ({ selectableAccounts, isLoading,
-  onChange, value, onReload, defaultInitialValue }) => {
+  onChange, value, onReload }) => {
 
   useEffect(() => {
-    if (value && defaultInitialValue && value === defaultInitialValue) {
-      onChange?.(defaultInitialValue);
-    } else if (!value && selectableAccounts.length || (value && !selectableAccounts.includes(value))) {
+
+    if (selectableAccounts.length && !value) {
       onChange?.(selectableAccounts[0]);
     }
-
   }, [selectableAccounts, value]);
 
   const t = useI18nTranslateToString();
