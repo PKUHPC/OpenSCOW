@@ -198,7 +198,10 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
   useEffect(() => {
 
     // 处理id使其唯一，因为不同集群可以有相同的交互式应用
+    console.log("items", items);
     setTemItems([...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
+    console.log("TemItems", [...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
+
   }, [isEditable]);
 
   return (
