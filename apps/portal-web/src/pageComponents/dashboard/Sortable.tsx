@@ -115,6 +115,14 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
   };
 
   const editItemCluster = (clusterId: string, loginNode?: string) => {
+
+    const newId = changeClusterItem?.id.split("-")[0] + "-" + clusterId;
+
+    if (temItems.find((x) => x.id === newId) && newId !== changeClusterItem?.id) {
+      message.error(t(p("alreadyExist")));
+      return;
+    }
+
     setTemItems(temItems.map((x) => {
       if (x.id !== changeClusterItem?.id) {
         return x;
@@ -128,6 +136,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
         x.entry.app.clusterId = clusterId;
       }
 
+      x.id = newId;
       return x;
     }));
   };
