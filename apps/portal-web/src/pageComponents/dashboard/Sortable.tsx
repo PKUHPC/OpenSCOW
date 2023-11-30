@@ -293,7 +293,6 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
               draggable={isEditable}
               icon={getEntryIcon(activeItem)}
               logoPath={activeItem.entry?.$case === "app" ? activeItem.entry.app.logoPath : ""}
-              // cluster={activeItem.cluster}
             />
           ) : null}
         </DragOverlay>

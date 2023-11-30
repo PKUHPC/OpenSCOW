@@ -159,7 +159,7 @@ export const AddEntryModal: React.FC<Props> = ({
             $case:"app",
             app:{
               clusterId:"",
-              logoPath:"",
+              logoPath:x.app.logoPath,
             },
           },
         });
