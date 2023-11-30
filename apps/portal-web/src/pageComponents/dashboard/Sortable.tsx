@@ -176,6 +176,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
 
   const saveItems = useCallback(
     async (newItems) => {
+      console.log("newItems", newItems);
       await api.saveQuickEntries({ body:{
         quickEntries:newItems,
       } })
@@ -202,7 +203,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
     setTemItems([...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
     console.log("TemItems", [...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
 
-  }, [isEditable]);
+  }, [isEditable, items]);
 
   return (
     <div>

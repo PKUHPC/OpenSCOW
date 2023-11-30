@@ -72,7 +72,7 @@ export const SelectClusterModal: React.FC<Props> = ({
           $case:"app",
           app:{
             clusterId:cluster,
-            logoPath:entryInfo.entry.app.logoPath,
+            logoPath:entryInfo.entry.app.logoPath ?? "",
           },
         } });
     }
