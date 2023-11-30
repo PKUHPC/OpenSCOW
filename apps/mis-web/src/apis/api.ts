@@ -41,7 +41,7 @@ import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import type { GetChargesSchema } from "src/pages/api/finance/charges";
-import { GetChargeRecordsTotalCountSchema } from "src/pages/api/finance/getChargeRecordsTotalCount";
+import type { GetChargeRecordsTotalCountSchema } from "src/pages/api/finance/getChargeRecordsTotalCount";
 import type { GetUsedPayTypesSchema } from "src/pages/api/finance/getUsedPayTypes";
 import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";

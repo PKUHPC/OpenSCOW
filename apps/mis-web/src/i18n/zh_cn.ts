@@ -104,6 +104,7 @@ export default {
       hour: "小时",
       day: "天",
     },
+    export: "导出",
   },
   dashboard: {
     title: "仪表盘",
@@ -646,6 +647,7 @@ export default {
         removeSuccess:"移出用户成功！",
         removerUser:"移出用户",
         cannotRemoverUserWhoHaveRunningJobFromAccount:"用户还有作业在运行，已封锁该用户，请等待作业结束或手动结束作业后再移出",
+
       },
     },
   },
@@ -864,6 +866,7 @@ export default {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
+
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -990,6 +993,10 @@ export default {
       createTenant: "创建租户",
       tenantPay: "租户充值",
       submitFileItemAsJob: "提交脚本",
+      exportUser: "导出用户列表",
+      exportAccount: "导出账户列表",
+      exportChargeRecord: "导出消费记录",
+      exportPayRecord: "导出充值记录",
     },
     operationDetails: {
       login: "用户登录",
@@ -1043,6 +1050,10 @@ export default {
       tenantPay: "为租户{}充值{}元",
       setPlatformBilling: "设置平台的计费项{}价格为{}元",
       submitFileItemAsJob: "集群：{}，提交脚本：{}",
+      tenantExportUser: "导出租户{}内的用户列表",
+      adminExportUser: "导出平台的用户列表",
+      tenantExportAccount: "导出租户{}内的账户列表",
+      adminExportAccount: "导出平台的账户列表",
     },
   },
   userRoles: {

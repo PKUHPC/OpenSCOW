@@ -22,6 +22,8 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FullUserInfo, TenantRole } from "src/models/User";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 
@@ -103,6 +105,44 @@ export const AdminUserTable: React.FC<Props> = ({
     setCurrentSortInfo({ field: null, order: null });
   };
 
+  const handleExport = async (columns: string[]) => {
+
+
+    const total = filteredData?.length ?? 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(`导出明细过多，最多导出${MAX_EXPORT_COUNT}条，请重新选择!`);
+    } else if (total <= 0) {
+      message.error("导出为空，请重新选择！");
+    } else {
+      window.location.href = urlToExport({
+        exportApi: "exportUser",
+        columns,
+        count: total,
+        query: {
+          idOrName: query.idOrName,
+          selfTenant: true,
+          tenantRole: rangeSearchRole === "TENANT_ADMIN"
+            ? TenantRole.TENANT_ADMIN
+            : rangeSearchRole === "TENANT_FINANCE"
+              ? TenantRole.TENANT_FINANCE : undefined,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label: t(pCommon("userId")), value: "userId" },
+      { label: t(p("name")), value: "name" },
+      { label: t(pCommon("email")), value: "email" },
+      { label: t(p("tenantRole")), value: "tenantRoles" },
+      { label: t(pCommon("createTime")), value: "createTime" },
+      { label: t(p("affiliatedAccountName")), value: "availableAccounts" },
+    ];
+  }, [ t, p]);
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -122,6 +162,14 @@ export const AdminUserTable: React.FC<Props> = ({
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>

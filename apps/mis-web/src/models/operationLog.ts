@@ -77,6 +77,10 @@ export const OperationType: OperationTypeEnum = {
   createTenant: "createTenant",
   tenantPay: "tenantPay",
   submitFileItemAsJob: "submitFileItemAsJob",
+  exportUser: "exportUser",
+  exportAccount: "exportAccount",
+  exportChargeRecord: "exportChargeRecord",
+  exportPayRecord: "exportPayRecord",
 };
 
 export const OperationLog = Type.Object({
@@ -165,6 +169,10 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     createTenant: t(pTypes("createTenant")),
     tenantPay: t(pTypes("tenantPay")),
     submitFileItemAsJob: t(pTypes("submitFileItemAsJob")),
+    exportUser: t(pTypes("exportUser")),
+    exportAccount: t(pTypes("exportAccount")),
+    exportChargeRecord: t(pTypes("exportChargeRecord")),
+    exportPayRecord: t(pTypes("exportPayRecord")),
   };
 
 };
@@ -220,6 +228,10 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   setPlatformBilling: "040206",
   createTenant: "040301",
   tenantPay: "040302",
+  exportUser: "040303",
+  exportAccount: "040304",
+  exportChargeRecord: "040305",
+  exportPayRecord: "040306",
 };
 
 type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
@@ -368,6 +380,14 @@ export const getOperationDetail = (
         [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
     case "submitFileItemAsJob":
       return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
+    case "exportUser":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportUser"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
+    case "exportAccount":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportAccount"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
     default:
       return "-";
     }

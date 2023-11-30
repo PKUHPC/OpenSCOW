@@ -104,6 +104,7 @@ export default {
       hour: "HOUR",
       day: "DAY",
     },
+    export: "Export",
   },
   dashboard: {
     title: "Dashboard",
@@ -992,6 +993,10 @@ export default {
       createTenant: "Create Tenant",
       tenantPay: "Tenant Recharge",
       submitFileItemAsJob: "Script Submission",
+      exportUser: "Export User",
+      exportAccount: "Export Account",
+      exportChargeRecord: "Export Charge Record",
+      exportPayRecord: "Export Payment Record",
     },
     operationDetails: {
       login: "User Login",
@@ -1045,6 +1050,10 @@ export default {
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
       submitFileItemAsJob: "Cluster: {}, Submit Script: {}",
+      tenantExportUser: "",
+      adminExportUser: "",
+      tenantExportAccount: "",
+      adminExportAccount: "",
     },
   },
   userRoles: {

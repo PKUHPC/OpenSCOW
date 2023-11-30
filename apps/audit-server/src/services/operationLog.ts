@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
+import { status } from "@grpc/grpc-js";
 import { QueryOrder } from "@mikro-orm/core";
 import {
   OperationLogServiceServer,
@@ -70,6 +72,46 @@ export const operationLogServiceServer = plugin((server) => {
         results: res,
         totalCount: count,
       }];
+    },
+
+    exportOperationLog: async (call) => {
+      const { em, request, logger } = call;
+      const { count, filter } = ensureNotUndefined(request, ["filter"]);
+
+      const sqlFilter = await filterOperationLogs(filter);
+
+      logger.info("exportOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
+
+      const batchSize = 5000;
+      let offset = 0;
+
+      const { writeAsync } = createWriterExtensions(call);
+
+      while (offset < count) {
+        const limit = Math.min(batchSize, count - offset);
+        const operationLogs = await em.find(OperationLog, sqlFilter, {
+          orderBy: { operationTime: QueryOrder.DESC },
+        });
+
+        const records = operationLogs.map(toGrpcOperationLog);
+
+        if (records.length === 0) {
+          break;
+        }
+        for (const row of records) {
+          await new Promise(async (resolve) => {
+            await writeAsync({ chunk: Buffer.from(JSON.stringify(row)) });
+            resolve("done");
+          }).catch((e) => {
+            throw <ServiceError> {
+              code: status.INTERNAL,
+              message: "Error when exporting file",
+              details: e?.message,
+            };
+          });
+        }
+        offset += limit;
+      }
     },
 
   });

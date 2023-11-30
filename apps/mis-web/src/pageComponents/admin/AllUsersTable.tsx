@@ -23,6 +23,8 @@ import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormCo
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 
@@ -62,6 +64,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   });
 
   const t = useI18nTranslateToString();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -115,6 +118,50 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     reloadUsersCounts();
   };
 
+  const handleExport = async (columns: string[]) => {
+
+    let total = 0;
+
+    if (currentPlatformRole === undefined) {
+      total = platformUsersCounts?.totalCount ?? 0;
+    } else if (currentPlatformRole === PlatformRole.PLATFORM_ADMIN) {
+      total = platformUsersCounts?.totalAdminCount ?? 0;
+    } else {
+      total = platformUsersCounts?.totalFinanceCount ?? 0;
+    }
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(`导出明细过多，最多导出${MAX_EXPORT_COUNT}条，请重新选择!`);
+    } else if (total <= 0) {
+      message.error("导出为空，请重新选择！");
+    } else {
+      window.location.href = urlToExport({
+        exportApi: "exportUser",
+        columns,
+        count: total,
+        query: {
+          rtField: sortInfo.sortField,
+          sortOrder: sortInfo.sortOrder,
+          idOrName: query.idOrName,
+          platformRole: currentPlatformRole,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label:  t(p("userId")), value: "userId" },
+      { label: t(p("name")), value: "name" },
+      { label: t(p("tenant")), value: "tenantName" },
+      { label: t(p("availableAccounts")), value: "availableAccounts" },
+      { label: t(pCommon("createTime")), value: "createTime" },
+      { label: t(p("roles")), value: "platformRoles" },
+    ];
+  }, [ t, p]);
+
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -134,6 +181,14 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>

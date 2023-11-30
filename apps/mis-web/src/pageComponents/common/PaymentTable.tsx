@@ -13,13 +13,15 @@
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, DatePicker, Form, Table } from "antd";
+import { App, Button, DatePicker, Form, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
@@ -76,6 +78,8 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
     time: [today.subtract(1, "year"), today],
   }));
 
+  const { message } = App.useApp();
+
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       const param = {
@@ -85,6 +89,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
         return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
+
       } else {
         return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
       }
@@ -95,6 +100,56 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
     setQuery((q) => ({ ...q, name: accountName }));
     setSelectedName(accountName);
   }, [accountName]);
+
+  const handleExport = async (columns: string[]) => {
+
+    const total = data?.results?.length ?? 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(`导出明细过多，最多导出${MAX_EXPORT_COUNT}条，请重新选择!`);
+    } else if (total <= 0) {
+      message.error("导出为空，请重新选择！");
+    } else {
+
+      window.location.href = urlToExport({
+        exportApi: "exportPayRecord",
+        columns,
+        count: total,
+        query: {
+          startTime: query.time[0].clone().startOf("day").toISOString(),
+          endTime: query.time[1].clone().endOf("day").toISOString(),
+          targetName: query.name,
+          searchType: searchType,
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("paymentDate")), value: "time" },
+      { label: t(p("paymentAmount")), value: "amount" },
+      { label: t(pCommon("type")), value: "type" },
+
+    ];
+    const account = searchType === SearchType.account ? [
+      { label: t(pCommon("account")), value: "accountName" },
+    ] : [];
+    const tenant = searchType === SearchType.tenant ? [
+      { label: t("common.tenant"), value: "tenantName" },
+    ] : [];
+    const ipAndOperator = searchType !== SearchType.selfAccount ? [
+      { label: t(p("ipAddress")),
+        value: "ipAddress" },
+      {
+        label:t(p("operatorId")),
+        value: "operatorId",
+      },
+    ] : [];
+    const comment = [{ label: t(pCommon("comment")), value: "comment" }];
+    return [...account, ...tenant, ...common, ...ipAndOperator, ...comment];
+  }, [searchType, t, p]);
+
 
   return (
     <div>
@@ -148,6 +203,14 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
       </FilterFormContainer>

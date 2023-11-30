@@ -19,6 +19,7 @@ import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
 import { chargingServiceServer } from "src/services/charging";
 import { configServiceServer } from "src/services/config";
+import { fileServiceServer } from "src/services/file";
 import { initServiceServer } from "src/services/init";
 import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
@@ -51,6 +52,7 @@ export async function createServer() {
   await server.register(tenantServiceServer);
   await server.register(configServiceServer);
   await server.register(misConfigServiceServer);
+  await server.register(fileServiceServer);
 
   await server.ext.syncBlockStatus.sync();
 

@@ -21,7 +21,11 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { getChargesSearchType, getChargesTargetSearchParam } from "src/utils/chargesQuery";
+import {
+  getChargesSearchType,
+  getChargesTargetSearchParam,
+  getPaymentsTargetSearchParam,
+} from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
@@ -158,24 +162,8 @@ export const chargingServiceServer = plugin((server) => {
 
       const { endTime, startTime, target } =
       ensureNotUndefined(request, ["startTime", "endTime", "target"]);
-      let searchParam = {};
-      switch (target?.$case)
-      {
-      case "tenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
-        break;
-      case "allTenants":
-        searchParam = { accountName:undefined };
-        break;
-      case "accountOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };
-        break;
-      case "accountsOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
-        break;
-      default:
-        searchParam = {};
-      }
+
+      const searchParam = getPaymentsTargetSearchParam(target);
 
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
