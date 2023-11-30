@@ -10,15 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entry } from "src/models/User";
+import { I18nStringType } from "@scow/config/build/i18n";
+import { Entry } from "src/models/dashboard";
+
+import { publicConfig } from "./config";
 
 export const formatEntryId = (item: Entry) => {
-  let id: string | undefined = item.id;
+  let id: string = item.id;
   if (item.entry?.$case === "app") {
-    id = id + "-" + item.entry.app.cluster?.id;
+    id = id + "-" + item.entry.app.clusterId;
   }
   else if (item.entry?.$case === "shell") {
-    id = id + "-" + item.entry.shell.cluster?.id;
+    id = id + "-" + item.entry.shell.clusterId;
   }
   return id;
 };
@@ -36,13 +39,17 @@ export const getEntryIcon = (item: Entry) => {
 };
 
 export const getEntryClusterName = (item: Entry) => {
-  let clusterName: string | undefined = "";
+  const clusters = publicConfig.CLUSTERS;
+  let clusterName: I18nStringType | undefined = "";
 
   if (item.entry?.$case === "shell") {
-    clusterName = item.entry.shell.cluster?.name;
+    const clusterId = item.entry.shell.clusterId;
+    clusterName = clusters.find((x) => x.id === clusterId)?.name;
   }
   else if (item.entry?.$case === "app") {
-    clusterName = item.entry.app.cluster?.name;
+    const clusterId = item.entry.app.clusterId;
+    clusterName = clusters.find((x) => x.id === clusterId)?.name;
   }
+
   return clusterName;
 };

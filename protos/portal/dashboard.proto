@@ -14,11 +14,6 @@ syntax = "proto3";
 
 package scow.portal;
 
-message Cluster {
-  string id = 1;
-  string name = 2;
-}
-
 message PageLinkEntry {
   string path = 1;
   // antd的图标ID
@@ -26,14 +21,14 @@ message PageLinkEntry {
 }
 
 message ShellEntry {
-  Cluster cluster = 1;
+  string cluster_id = 1;
   string login_node = 2;
   // antd的图标ID
   string icon = 3;
 }
 
 message AppEntry {
-  Cluster cluster = 1;
+  string cluster_id = 1;
   string logo_path = 2;
 }
 

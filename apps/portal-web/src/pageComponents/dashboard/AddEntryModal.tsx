@@ -14,7 +14,7 @@ import { Button, Modal, Spin } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Entry } from "src/models/User";
+import { Entry } from "src/models/dashboard";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/changeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/selectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
@@ -27,7 +27,7 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   addItem: (item: Entry) => void;
-  editItem: (cluster: Cluster, loginNode?: string) => void;
+  editItem: (clusterId: string, loginNode?: string) => void;
   changeClusterOpen: boolean;
   onChangeClusterClose: () => void;
   changeClusterItem: Entry | null;
@@ -109,6 +109,7 @@ export const AddEntryModal: React.FC<Props> = ({
       entry:{
         $case:"shell",
         shell:{
+          clusterId:"",
           loginNode:"",
           icon:"MacCommandOutlined",
         },
@@ -157,6 +158,7 @@ export const AddEntryModal: React.FC<Props> = ({
           entry:{
             $case:"app",
             app:{
+              clusterId:"",
               logoPath:"",
             },
           },
@@ -201,6 +203,7 @@ export const AddEntryModal: React.FC<Props> = ({
         entry:{
           $case:"shell",
           shell:{
+            clusterId:"",
             loginNode:"",
             icon:"MacCommandOutlined",
           },
@@ -218,6 +221,7 @@ export const AddEntryModal: React.FC<Props> = ({
         entry:{
           $case:"app",
           app:{
+            clusterId:"",
             logoPath:item.entry.app.logoPath,
           },
         },

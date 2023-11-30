@@ -20,24 +20,19 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
-const Cluster = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-});
-
 const PageLinkEntry = Type.Object({
   path: Type.String(),
   icon: Type.String(),
 });
 
 const ShellEntry = Type.Object({
-  cluster: Type.Optional(Cluster),
+  clusterId: Type.String(),
   loginNode: Type.String(),
   icon: Type.String(),
 });
 
 const AppEntry = Type.Object({
-  cluster: Type.Optional(Cluster),
+  clusterId: Type.String(),
   logoPath: Type.String(),
 });
 

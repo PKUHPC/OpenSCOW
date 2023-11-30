@@ -30,7 +30,7 @@ import Router from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { Entry } from "src/models/User";
+import { Entry } from "src/models/dashboard";
 import { formatEntryId, getEntryClusterName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
@@ -110,18 +110,18 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
     setTemItems([...temItems, item]);
   };
 
-  const editItemCluster = (cluster: {id: string;name: string;}, loginNode?: string) => {
+  const editItemCluster = (clusterId: string, loginNode?: string) => {
     setTemItems(temItems.map((x) => {
       if (x.id !== changeClusterItem?.id) {
         return x;
       }
 
       if (x.entry?.$case === "shell") {
-        x.entry.shell.cluster = cluster;
+        x.entry.shell.clusterId = clusterId;
         x.entry.shell.loginNode = loginNode as string;
       }
       else if (x.entry?.$case === "app") {
-        x.entry.app.cluster = cluster;
+        x.entry.app.clusterId = clusterId;
       }
 
       return x;
@@ -159,11 +159,11 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
           break;
 
         case "shell":
-          Router.push(join("/shell", item.entry.shell.cluster?.id as string, item.entry.shell.loginNode));
+          Router.push(join("/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
           break;
 
         case "app":
-          Router.push(join("/apps", item.entry.app.cluster?.id as string, "/create", item.id));
+          Router.push(join("/apps", item.entry.app.clusterId, "/create", item.id));
           break;
 
         default:

@@ -187,6 +187,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
+    composeSpec.volumes["quickEntries_data"] = {};
+
     addService("portal-server", {
       image: scowImage,
       environment: {
@@ -199,7 +201,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
-        "./quickEntries":"/etc/scow/quickEntries",
+        "quickEntries_data":"/var/lib/scow/quickEntries",
       },
     });
 

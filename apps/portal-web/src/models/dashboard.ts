@@ -10,8 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export interface UserInfo {
-  identityId: string;
-  name?: string;
+export interface PageLinkEntry {
+  path: string;
+  /** antd的图标ID */
+  icon: string;
 }
 
+export interface ShellEntry {
+  clusterId: string;
+  loginNode: string;
+  /** antd的图标ID */
+  icon: string;
+}
+
+export interface AppEntry {
+  clusterId: string;
+  logoPath: string;
+}
+
+export interface Entry {
+  id: string;
+  name: string;
+  entry?: { $case: "pageLink"; pageLink: PageLinkEntry } | { $case: "shell"; shell: ShellEntry } | {
+    $case: "app";
+    app: AppEntry;
+  } | undefined;
+}

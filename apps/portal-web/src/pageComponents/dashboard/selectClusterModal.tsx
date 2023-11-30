@@ -13,7 +13,7 @@
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
-import { Entry } from "src/models/User";
+import { Entry } from "src/models/dashboard";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
@@ -60,7 +60,7 @@ export const SelectClusterModal: React.FC<Props> = ({
         entry:{
           $case:"shell",
           shell:{
-            cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string},
+            clusterId:cluster,
             loginNode:loginNode as string,
             icon:"MacCommandOutlined",
           },
@@ -71,7 +71,7 @@ export const SelectClusterModal: React.FC<Props> = ({
         entry:{
           $case:"app",
           app:{
-            cluster:clusters.find((x) => x.id === cluster) as {id: string;name: string},
+            clusterId:cluster,
             logoPath:entryInfo.entry.app.logoPath,
           },
         } });

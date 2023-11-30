@@ -18,13 +18,13 @@ import { promises as fsPromises } from "fs";
 import path from "path";
 import { getUserQuickEntryFileName } from "src/utils/dashboard";
 
-const quickEntryPath = "/etc/scow/quickEntries";
+const quickEntryPath = "/var/lib/scow/quickEntries";
 
 export const dashboardServiceServer = plugin((server) => {
   return server.addService<DashboardServiceServer>(DashboardServiceService, {
     getQuickEntries:async ({ request }) => {
       const { userId } = request;
-      const filePath = path.join(quickEntryPath, getUserQuickEntryFileName(userId));
+      const filePath = path.join(quickEntryPath, userId, getUserQuickEntryFileName(userId));
 
       // 读取 JSON 文件
       let jsonObject!: Entry[];
@@ -55,7 +55,7 @@ export const dashboardServiceServer = plugin((server) => {
 
       const { userId, quickEntries } = request;
       const jsonContent = JSON.stringify(quickEntries);
-      const filePath = path.join(quickEntryPath, getUserQuickEntryFileName(userId));
+      const filePath = path.join(quickEntryPath, userId, getUserQuickEntryFileName(userId));
 
       // 获取文件的目录路径
       const dirPath = path.dirname(filePath);

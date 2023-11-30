@@ -14,7 +14,7 @@ import { Button, Spin, Typography } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { Entry } from "src/models/User";
+import { Entry } from "src/models/dashboard";
 import Sortable from "src/pageComponents/dashboard/Sortable";
 import { styled } from "styled-components";
 

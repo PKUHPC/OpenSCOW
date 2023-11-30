@@ -21,7 +21,7 @@ export interface Props {
   onClose: () => void;
   needLoginNode: boolean;
   clusters: Cluster[];
-  editItem: (cluster: Cluster, loginNode?: string) => void;
+  editItem: (clusterId: string, loginNode?: string) => void;
 }
 
 interface FormInfo {
@@ -45,11 +45,12 @@ export const ChangeClusterModal: React.FC<Props> = ({
   const handelClusterChange = (cluster: string) => {
     const nodes = loginNodes[cluster].map((x) => ({ value:x.address, label:x.name }));
     setLoginNodesOptions(nodes);
+    form.resetFields(["loginNode"]);
   };
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-    editItem(clusters.find((x) => x.id === cluster) as Cluster, loginNode);
+    editItem(cluster, loginNode);
     form.resetFields();
     onClose();
   };
