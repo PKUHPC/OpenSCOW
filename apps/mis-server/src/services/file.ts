@@ -89,7 +89,7 @@ const getExportOptions = <T extends ExportEvent>(exportEvent: T) => {
       startTime,
       endTime,
       target,
-    } = ensureNotUndefined(exportEvent[exportType], ["startTime", "endTime"]);
+    } = ensureNotUndefined(exportEvent[exportType], ["startTime", "endTime", "target"]);
 
     const searchParam = getPaymentsTargetSearchParam(target);
     const query = {
