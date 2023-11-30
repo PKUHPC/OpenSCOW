@@ -412,6 +412,29 @@ export default {
         appCommentTitle: "说明",
       },
     },
+    dashboard:{
+      addEntryModal:{
+        addQuickEntry:"添加快捷方式",
+        cancel:"取消",
+      },
+      changeClusterModal:{
+        selectCluster:"选择集群",
+        cluster:"集群",
+        loginNode:"登录节点",
+      },
+      quickEntry:{
+        quickEntry:"快捷入口",
+        finish:"完成",
+        cancel:"取消",
+        edit:"编辑",
+      },
+      sortable:{
+        alreadyExist:"已存在该快捷方式",
+        exceedMaxSize:"最多只能添加10个快捷方式",
+        saveFailed:"保存失败",
+        saveSuccessfully:"保存成功",
+      },
+    },
   },
   component:{
     errorPages:{

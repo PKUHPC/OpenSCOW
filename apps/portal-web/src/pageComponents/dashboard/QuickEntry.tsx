@@ -14,6 +14,7 @@ import { Button, Spin, Typography } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Entry } from "src/models/dashboard";
 import Sortable from "src/pageComponents/dashboard/Sortable";
 import { styled } from "styled-components";
@@ -37,12 +38,15 @@ const CardsContainer = styled.div`
 interface Props {
 
 }
+const p = prefix("pageComp.dashboard.quickEntry.");
 
 export const QuickEntry: React.FC<Props> = () => {
+  const t = useI18nTranslateToString();
+
   const staticEntry: Entry[] = [
     {
       id:"submitJob",
-      name:"提交作业",
+      name:t("routes.job.submitJob"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -53,7 +57,7 @@ export const QuickEntry: React.FC<Props> = () => {
     },
     {
       id:"runningJob",
-      name:"未结束的作业",
+      name:t("routes.job.runningJobs"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -64,7 +68,7 @@ export const QuickEntry: React.FC<Props> = () => {
     },
     {
       id:"allJobs",
-      name:"所有作业",
+      name:t("routes.job.allJobs"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -75,7 +79,7 @@ export const QuickEntry: React.FC<Props> = () => {
     },
     {
       id:"savedJobs",
-      name:"作业模板",
+      name:t("routes.job.jobTemplates"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -98,14 +102,16 @@ export const QuickEntry: React.FC<Props> = () => {
   return (
     <ContentContainer>
       <TitleContainer>
-        <Title level={5} style={{ marginBottom:0, lineHeight:"32px" }}>快捷入口</Title>
+        <Title level={5} style={{ marginBottom:0, lineHeight:"32px" }}>{t(p("quickEntry"))}</Title>
         {isEditable ? (
           <div>
-            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>完成</Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>取消</Button>
+            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
+              {t(p("finish"))}
+            </Button>
+            <Button type="link" onClick={() => { setIsEditable(false); }}>{t(p("cancel"))}</Button>
           </div>
         ) :
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>编辑</Button>}
+          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>{t(p("edit"))}</Button>}
       </TitleContainer>
       <CardsContainer>
         {isLoading ?

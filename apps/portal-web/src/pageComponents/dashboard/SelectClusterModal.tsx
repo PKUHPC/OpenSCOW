@@ -13,6 +13,7 @@
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Entry } from "src/models/dashboard";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
@@ -31,6 +32,7 @@ interface FormInfo {
   cluster: string;
   loginNode?: string;
 }
+const p = prefix("pageComp.dashboard.changeClusterModal.");
 
 export const SelectClusterModal: React.FC<Props> = ({
   open,
@@ -41,6 +43,8 @@ export const SelectClusterModal: React.FC<Props> = ({
   entryInfo,
   closeAddEntryModal,
 }) => {
+  const t = useI18nTranslateToString();
+
   const [form] = Form.useForm<FormInfo>();
 
   const clustersOptions = clusters.map((x) => ({ value:x.id, label:x.name }));
@@ -82,7 +86,7 @@ export const SelectClusterModal: React.FC<Props> = ({
   };
   return (
     <Modal
-      title="选择集群"
+      title={t(p("selectCluster"))}
       open={open}
       onOk={onFinish}
       width={400}
@@ -98,7 +102,7 @@ export const SelectClusterModal: React.FC<Props> = ({
       >
         <Form.Item
           rules={[{ required: true }]}
-          label={"集群"}
+          label={t(p("cluster"))}
           name="cluster"
         >
           <Select
@@ -110,7 +114,7 @@ export const SelectClusterModal: React.FC<Props> = ({
         {needLoginNode ? (
           <Form.Item
             rules={[{ required: true }]}
-            label={"登录节点"}
+            label={t(p("loginNode"))}
             name="loginNode"
           >
             <Select

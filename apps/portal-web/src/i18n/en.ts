@@ -412,6 +412,29 @@ export default {
         appCommentTitle: "Explanation",
       },
     },
+    dashboard:{
+      addEntryModal:{
+        addQuickEntry:"addQuickEntry",
+        cancel:"cancel",
+      },
+      changeClusterModal:{
+        selectCluster:"selectCluster",
+        cluster:"cluster",
+        loginNode:"loginNode",
+      },
+      quickEntry:{
+        quickEntry:"quickEntry",
+        finish:"finish",
+        cancel:"cancel",
+        edit:"edit",
+      },
+      sortable:{
+        alreadyExist:"The quickEntry already exists",
+        exceedMaxSize:"Up to 10 quickEntries can be added",
+        saveFailed:"save Failed",
+        saveSuccessfully:"save Succeeded",
+      },
+    },
   },
   component: {
     errorPages: {

@@ -14,9 +14,10 @@ import { Button, Modal, Spin } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Entry } from "src/models/dashboard";
-import { ChangeClusterModal } from "src/pageComponents/dashboard/changeClusterModal";
-import { SelectClusterModal } from "src/pageComponents/dashboard/selectClusterModal";
+import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
+import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
 import { getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
@@ -38,6 +39,8 @@ const ItemsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+const p = prefix("pageComp.dashboard.addEntryModal.");
+
 export const AddEntryModal: React.FC<Props> = ({
   open,
   onClose,
@@ -47,10 +50,12 @@ export const AddEntryModal: React.FC<Props> = ({
   onChangeClusterClose,
   changeClusterItem,
 }) => {
+  const t = useI18nTranslateToString();
+
   const staticEntry: Entry[] = [
     {
       id:"submitJob",
-      name:"提交作业",
+      name:t("routes.job.submitJob"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -61,7 +66,7 @@ export const AddEntryModal: React.FC<Props> = ({
     },
     {
       id:"runningJob",
-      name:"未结束的作业",
+      name:t("routes.job.runningJobs"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -72,7 +77,7 @@ export const AddEntryModal: React.FC<Props> = ({
     },
     {
       id:"allJobs",
-      name:"所有作业",
+      name:t("routes.job.allJobs"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -83,7 +88,7 @@ export const AddEntryModal: React.FC<Props> = ({
     },
     {
       id:"savedJobs",
-      name:"作业模板",
+      name:t("routes.job.jobTemplates"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -94,7 +99,7 @@ export const AddEntryModal: React.FC<Props> = ({
     },
     {
       id:"desktop",
-      name:"桌面",
+      name:t("routes.dashboard"),
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -237,14 +242,14 @@ export const AddEntryModal: React.FC<Props> = ({
   return (
     <>
       <Modal
-        title="添加快捷方式"
+        title={t(p("addQuickEntry"))}
         open={open}
         width={600}
         onCancel={onClose}
         destroyOnClose
         footer={[
           <Button key="back" onClick={onClose}>
-            取消
+            {t(p("cancel"))}
           </Button>,
         ]}
       >

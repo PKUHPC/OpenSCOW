@@ -30,6 +30,7 @@ import Router from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Entry } from "src/models/dashboard";
 import { formatEntryId, getEntryClusterName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
@@ -55,8 +56,8 @@ const IconContainer = styled.div`
 
 const ClusterContainer = styled.div`
   position: absolute;
-  top: 18px;
-  left: 34px;
+  top: 20px;
+  left: 36px;
 `;
 
 interface Props {
@@ -64,8 +65,11 @@ interface Props {
   isFinished: boolean,
   quickEntryArray: Entry[]
 }
+const p = prefix("pageComp.dashboard.sortable.");
 
 const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
+
+  const t = useI18nTranslateToString();
 
   // 实际的快捷入口项
   const [items, setItems] = useState<Entry []>(
@@ -99,11 +103,11 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
   const addItem = (item: Entry) => {
     item = { ...item, id:formatEntryId(item) };
     if (temItems.find((x) => x.id === item.id)) {
-      message.error("已存在该快捷方式");
+      message.error(t(p("alreadyExist")));
       return;
     }
     if (temItems.length >= 10) {
-      message.error("最多只能添加10个快捷方式");
+      message.error(t(p("exceedMaxSize")));
       return;
     }
 
@@ -163,7 +167,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
           break;
 
         case "app":
-          Router.push(join("/apps", item.entry.app.clusterId, "/create", item.id));
+          Router.push(join("/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
           break;
 
         default:
@@ -176,13 +180,12 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
 
   const saveItems = useCallback(
     async (newItems) => {
-      console.log("newItems", newItems);
       await api.saveQuickEntries({ body:{
         quickEntries:newItems,
       } })
-        .httpError(200, () => { message.error("保存失败"); })
+        .httpError(200, () => { message.error(t(p("saveFailed"))); })
         .then(() => {
-          message.success("保存成功");
+          message.success(t(p("saveSuccessfully")));
         });
     },
     [],
@@ -199,10 +202,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
   useEffect(() => {
 
     // 处理id使其唯一，因为不同集群可以有相同的交互式应用
-    console.log("items", items);
     setTemItems([...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
-    console.log("TemItems", [...(items.map((x) => ({ ...x, id:formatEntryId(x) })))]);
-
   }, [isEditable, items]);
 
   return (
@@ -214,9 +214,9 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
         onDragEnd={handleDragEnd}
         onDragCancel={handleDragCancel}
       >
-        <SortableContext items={(isEditable ? temItems : items)} strategy={rectSortingStrategy}>
+        <SortableContext items={temItems} strategy={rectSortingStrategy}>
           <ItemsContainer>
-            {(isEditable ? temItems : items).map((x) => (
+            {temItems.map((x) => (
               <ItemContainer
                 key={x.id }
                 onClick={() => {
@@ -260,7 +260,6 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
                     undefined
                 }
                 {
-
                   getEntryClusterName(x) && !isEditable ? (
                     <ClusterContainer>
                       {getEntryClusterName(x) as string}
@@ -285,7 +284,6 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
                 </Card>
               ) : undefined
             }
-
           </ItemsContainer>
         </SortableContext>
         <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
