@@ -106,8 +106,7 @@ export const getPaymentsTargetSearchParam = (target:
 | { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
 | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
 | { $case: "tenant"; tenant: TenantTarget }
-| { $case: "allTenants"; allTenants: AllTenantsTarget }
-| undefined) => {
+| { $case: "allTenants"; allTenants: AllTenantsTarget }) => {
   let searchParam: { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } } = {};
   switch (target?.$case)
   {
@@ -124,7 +123,7 @@ export const getPaymentsTargetSearchParam = (target:
     searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
     break;
   default:
-    searchParam = {};
+    break;
   }
   return searchParam;
 };
