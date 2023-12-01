@@ -136,7 +136,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       { label: t(pCommon("account")), value: "accountName" },
     ] : [];
     const tenant = searchType === SearchType.tenant ? [
-      { label: t("common.tenant"), value: "tenantName" },
+      { label: t(pCommon("tenant")), value: "tenantName" },
     ] : [];
     const ipAndOperator = searchType !== SearchType.selfAccount ? [
       { label: t(p("ipAddress")),
@@ -148,7 +148,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
     ] : [];
     const comment = [{ label: t(pCommon("comment")), value: "comment" }];
     return [...account, ...tenant, ...common, ...ipAndOperator, ...comment];
-  }, [searchType, t, p]);
+  }, [searchType, t]);
 
 
   return (

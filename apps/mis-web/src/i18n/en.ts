@@ -290,6 +290,11 @@ export default {
       },
     },
     commonComponent: {
+      exportFileModal: {
+        title: "Export Data",
+        subTitle: "Select the fields to export",
+        errorMsg: "Please select one field at least!",
+      },
       paymentTable: {
         total: "Total",
         sum: "Sum",

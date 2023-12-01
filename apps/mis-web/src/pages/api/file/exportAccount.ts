@@ -13,15 +13,18 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { OperationResult } from "@scow/lib-operation-log";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { Account } from "@scow/protos/build/server/account";
 import { FileServiceClient } from "@scow/protos/build/server/file";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getT, prefix } from "src/i18n";
 import { OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
@@ -106,14 +109,19 @@ export default route(ExportAccountSchema, async (req, res) => {
       },
     });
 
+    const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const t = await getT(languageId);
+    const p = prefix("pageComp.accounts.accountTable.");
+    const pCommon = prefix("common.");
+
     const headerColumns = {
-      accountName: "Account Name",
-      owner: "Owner",
-      userCount: "User Count",
-      tenantName: "Tenant Name",
-      balance: "Balance",
-      blocked: "Blocked",
-      comment: "Comment",
+      accountName: t(p("accountName")),
+      owner: t(p("owner")),
+      userCount:  t(pCommon("userCount")),
+      tenantName: t(p("tenant")),
+      balance: t(pCommon("balance")),
+      blocked: t(p("status")),
+      comment: t(p("comment")),
     };
 
     const formatAccount = (x: Account) => {
@@ -122,8 +130,8 @@ export default route(ExportAccountSchema, async (req, res) => {
         owner: `${x.ownerName}(ID:${x.ownerId})`,
         userCount: x.userCount,
         tenantName: x.tenantName,
-        balance: nullableMoneyToString(x.balance),
-        blocked: `${x.blocked ? "blocked" : "unblocked"}`,
+        balance: nullableMoneyToString(x.balance) + t(p("unit")),
+        blocked: `${x.blocked ? t(p("block")) : t(p("normal"))}`,
         comment: x.comment,
       };
     };

@@ -13,14 +13,17 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { PaymentRecord } from "@scow/protos/build/server/charging";
 import { FileServiceClient } from "@scow/protos/build/server/file";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getT, prefix } from "src/i18n";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { SearchType } from "src/pageComponents/common/PaymentTable";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
@@ -103,6 +106,11 @@ export default route(ExportPayRecordSchema, async (req, res) => {
       },
     });
 
+    const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const t = await getT(languageId);
+    const p = prefix("pageComp.commonComponent.paymentTable.");
+    const pCommon = prefix("common.");
+
     const formatPayRecord = (x: PaymentRecord) => {
       return {
         id: x.index,
@@ -119,14 +127,14 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
     const headerColumns = {
       id: "ID",
-      accountName: "Account Name",
-      tenantName: "Tenant Name",
-      time: "Time",
-      amount: "Amount",
-      type: "Type",
-      ipAddress:  "IP Address",
-      operatorId: "Operator ID",
-      comment: "Comment",
+      accountName: t(pCommon("account")),
+      tenantName: t(pCommon("tenant")),
+      time: t(p("paymentDate")),
+      amount: t(p("paymentAmount")),
+      type: t(pCommon("type")),
+      ipAddress:  t(p("ipAddress")),
+      operatorId: t(p("operatorId")),
+      comment: t(pCommon("comment")),
     };
     const csvStringify = getCsvStringify(headerColumns, columns);
 

@@ -13,7 +13,7 @@
 import { Checkbox, Form, Modal } from "antd";
 import { useState } from "react";
 import { ModalButton } from "src/components/ModalLink";
-// import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
     options: {label: string, value: string}[]
@@ -25,11 +25,11 @@ interface Props {
 interface FormProps {
     columns: string[];
 }
-// const p = prefix("component.others.");
+const p = prefix("pageComp.commonComponent.exportFileModal.");
 
 const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) => {
 
-  // const t = useI18nTranslateToString();
+  const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
@@ -47,16 +47,15 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
       });
   };
 
-  // const languageId = useI18n().currentLanguage.id;
-
 
   return (
     <Modal
-      title="导出数据"
+      title={t(p("title"))}
       open={open}
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
+      destroyOnClose={true}
     >
       <Form
         form={form}
@@ -65,10 +64,9 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
         initialValues={{ columns: options.map((option) => option.value) }}
       >
         <Form.Item
-          rules={[{ required: true, message: "checked" }]}
-          label="请选择需要导出的字段"
+          rules={[{ required: true, message: t(p("errorMsg")) }]}
+          label={t(p("subTitle"))}
           name="columns"
-
         >
           <Checkbox.Group options={options} />
         </Form.Item>

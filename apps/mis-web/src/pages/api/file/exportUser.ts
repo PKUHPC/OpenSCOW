@@ -13,22 +13,23 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { FileServiceClient } from "@scow/protos/build/server/file";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getT, prefix } from "src/i18n";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import {
   PlatformRole,
-  PlatformRoleTexts,
   SortDirectionType,
   TenantRole,
-  TenantRoleTexts,
   UsersSortFieldType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { mapSortDirectionType, mapUsersSortFieldType } from "src/pages/api/admin/getAllUsers";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
@@ -118,16 +119,32 @@ export default route(ExportUserSchema, async (req, res) => {
       },
     });
 
+    const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const t = await getT(languageId);
+    const pAdmin = prefix("pageComp.admin.allUserTable.");
+    const pTenant = prefix("pageComp.tenant.adminUserTable.");
+    const pCommon = prefix("common.");
+
     const headerColumns = {
-      userId: "User ID",
-      name: "Name",
-      email: "Email",
-      tenantName:  "Tenant",
-      availableAccounts: "Available Accounts",
-      createTime: "Create Time",
-      tenantRoles: "Tenant Roles",
-      platformRoles: "Platform Roles",
+      userId: t(pAdmin("userId")),
+      name: t(pAdmin("name")),
+      email: t(pCommon("email")),
+      tenantName:  t(pAdmin("tenant")),
+      availableAccounts: t(pAdmin("availableAccounts")),
+      createTime: t(pCommon("createTime")),
+      tenantRoles: t(pTenant("tenantRole")),
+      platformRoles: t(pAdmin("roles")),
     };
+
+    const TenantRoleI18nTexts = {
+      [TenantRole.TENANT_FINANCE]: t("userRoles.tenantFinance"),
+      [TenantRole.TENANT_ADMIN]: t("userRoles.tenantAdmin"),
+    };
+    const PlatformRoleI18nTexts = {
+      [PlatformRole.PLATFORM_FINANCE]: t("userRoles.platformFinance"),
+      [PlatformRole.PLATFORM_ADMIN]: t("userRoles.platformAdmin"),
+    };
+
 
     const formatUser = (x: PlatformUserInfo & {tenantRoles: TenantRole[]}) => {
       return {
@@ -137,8 +154,8 @@ export default route(ExportUserSchema, async (req, res) => {
         tenantName: x.tenantName,
         availableAccounts: x.availableAccounts.join(","),
         createTime: formatDateTime(x.createTime ?? ""),
-        tenantRoles: x.tenantRoles.map((x) => TenantRoleTexts[x]).join(","),
-        platformRoles: x.platformRoles.map((x) => PlatformRoleTexts[x]).join(","),
+        tenantRoles: x.tenantRoles.map((x) => TenantRoleI18nTexts[x]).join(","),
+        platformRoles: x.platformRoles.map((x) => PlatformRoleI18nTexts[x]).join(","),
       };
     };
 

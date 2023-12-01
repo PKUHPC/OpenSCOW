@@ -13,13 +13,16 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { FileServiceClient } from "@scow/protos/build/server/file";
 import { Type } from "@sinclair/typebox";
+import { getT, prefix } from "src/i18n";
 import { SearchType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { buildChargesRequestTarget, getUserInfoForCharges } from "src/pages/api/finance/charges";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
@@ -87,6 +90,12 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       },
     });
 
+    const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const t = await getT(languageId);
+    const p = prefix("pageComp.finance.chargeTable.");
+    const pCommon = prefix("common.");
+
+
     const formatChargeRecord = (x: ChargeRecord) => {
       return {
         id: x.index,
@@ -101,12 +110,12 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
     const headerColumns = {
       id: "ID",
-      accountName: "Account Name",
-      tenantName: "Tenant Name",
-      time: "Time",
-      amount: "Amount",
-      type: "Type",
-      comment: "Comment",
+      accountName: t(pCommon("account")),
+      tenantName: t(pCommon("tenant")),
+      time: t(p("time")),
+      amount: t(p("amount")),
+      type: t(pCommon("type")),
+      comment: t(pCommon("comment")),
     };
 
     const csvStringify = getCsvStringify(headerColumns, columns);

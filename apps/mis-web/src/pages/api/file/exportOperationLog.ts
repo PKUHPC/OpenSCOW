@@ -13,16 +13,19 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
+import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { OperationLog } from "@scow/protos/build/audit/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationCodeMap, OperationLogQueryType,
+import { getT, getTArgs } from "src/i18n";
+import { getOperationDetail, getOperationResultTexts, getOperationTypeTexts, OperationCodeMap, OperationLogQueryType,
   OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { getContentType } from "src/utils/server";
 import { pipeline } from "stream";
@@ -147,15 +150,22 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
     const stream = await exportLog({ filter, count });
 
+    const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const t = await getT(languageId);
+    const tArgs = await getTArgs(languageId);
+    const OperationTypeTexts = getOperationTypeTexts(t);
+    const OperationResultTexts = getOperationResultTexts(t);
+
+
     const formatOperationLog = (x: OperationLog) => {
       return {
         id: x.operationLogId,
         operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
-        operationType: x.operationEvent?.["$case"] || "unknown",
-        operationDetail: x.operationEvent?.[x.operationEvent?.["$case"]] || "",
-        operationResult: x.operationResult,
+        operationType: OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
+        operationDetail: x.operationEvent ? getOperationDetail(x.operationEvent, t, tArgs) : "",
+        operationResult: OperationResultTexts[x.operationResult],
         operatorUserId: x.operatorUserId,
-        operationTime: x.operationTime,
+        operationTime: formatDateTime(x.operationTime ?? ""),
         operatorIp: x.operatorIp,
       };
     };

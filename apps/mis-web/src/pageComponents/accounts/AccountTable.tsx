@@ -123,7 +123,7 @@ export const AccountTable: React.FC<Props> = ({
   const exportOptions = useMemo(() => {
     const common = [
       { label: t(p("accountName")), value: "accountName" },
-      { label: t(p("owner")), value: "ownerName" },
+      { label: t(p("owner")), value: "owner" },
       { label: t(pCommon("userCount")), value: "userCount" },
     ];
 
@@ -136,7 +136,7 @@ export const AccountTable: React.FC<Props> = ({
       { label: t(p("comment")), value: "comment" },
     ];
     return [...common, ...tenant, ...remaining];
-  }, [showedTab]);
+  }, [showedTab, t]);
 
   return (
     <div>

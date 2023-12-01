@@ -154,7 +154,7 @@ export const ChargeTable: React.FC<Props> = ({
       { label: t(pCommon("account")), value: "accountName" },
     ] : [];
     const tenant = showTenantName ? [
-      { label: t("common.tenant"), value: "tenantName" },
+      { label: t(pCommon("tenant")), value: "tenantName" },
     ] : [];
     return [...account, ...tenant, ...common];
   }, [showAccountName, showTenantName]);
