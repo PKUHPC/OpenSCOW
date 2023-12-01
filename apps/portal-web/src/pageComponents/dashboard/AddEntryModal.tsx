@@ -11,10 +11,8 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Button, Modal, Spin } from "antd";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useAsync } from "react-async";
-import { api } from "src/apis";
+import { Button, Modal } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
