@@ -57,9 +57,10 @@ export async function pay(
   target.balance = target.balance.plus(amount);
 
   if (target instanceof Account) {
-    await callHook("accountPaid", { accountName: target.accountName, amount: decimalToMoney(amount) }, logger);
+    await callHook("accountPaid", {
+      accountName: target.accountName, amount: decimalToMoney(amount), type, comment }, logger);
   } else {
-    await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount) }, logger);
+    await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount), type, comment }, logger);
   }
 
   if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {

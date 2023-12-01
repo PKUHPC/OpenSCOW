@@ -1,13 +1,13 @@
 {
   "name": "@scow/mis-web",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
     "build": "npm run build:next",
-    "build:next": "next build",
+    "build:next": "cross-env BUILDING=1 next build",
     "client": "ntar client"
   },
   "files": [
@@ -43,9 +43,8 @@
     "google-protobuf": "3.21.2",
     "less": "4.2.0",
     "mime-types": "2.1.35",
-    "next": "13.4.10",
+    "next": "14.0.3",
     "next-compose-plugins": "2.2.1",
-    "next-transpile-modules": "10.0.1",
     "nookies": "2.5.2",
     "nprogress": "0.2.0",
     "react": "18.2.0",
@@ -61,7 +60,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
-    "@next/bundle-analyzer": "13.4.13",
+    "@next/bundle-analyzer": "14.0.3",
     "@types/google-protobuf": "3.15.10",
     "@types/mime-types": "2.1.4",
     "@types/node": "20.9.2",

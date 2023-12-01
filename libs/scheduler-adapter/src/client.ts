@@ -12,6 +12,7 @@
 
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { AccountServiceClient } from "@scow/scheduler-adapter-protos/build/protos/account";
+import { AppServiceClient } from "@scow/scheduler-adapter-protos/build/protos/app";
 import { ConfigServiceClient } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { JobServiceClient } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { UserServiceClient } from "@scow/scheduler-adapter-protos/build/protos/user";
@@ -26,6 +27,7 @@ export interface SchedulerAdapterClient {
   job: JobServiceClient;
   config: ConfigServiceClient;
   version: VersionServiceClient;
+  app: AppServiceClient;
 }
 
 export function getClient<TClient>(
@@ -44,5 +46,6 @@ export const getSchedulerAdapterClient = (address: string) => {
     job: getClient(address, JobServiceClient),
     config: getClient(address, ConfigServiceClient),
     version: getClient(address, VersionServiceClient),
+    app: getClient(address, AppServiceClient),
   };
 };
