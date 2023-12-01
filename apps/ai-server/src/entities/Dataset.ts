@@ -50,7 +50,7 @@ export class Dataset {
       name: string;
       owner: string;
       type: string;
-      isShared: boolean;
+      isShared?: boolean;
       scene: string;
       description: string;
       createTime?: Date;
@@ -59,7 +59,7 @@ export class Dataset {
     this.name = init.name;
     this.owner = init.owner;
     this.type = init.type;
-    this.isShared = init.isShared;
+    this.isShared = init.isShared || false;
     this.scene = init.scene;
     this.description = init.description;
 

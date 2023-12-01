@@ -10,9 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MikroORM, Options } from "@mikro-orm/core";
+import { EntityManager, MikroORM, Options } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { FastifyInstance, FastifyPluginAsync, FastifyRequest } from "fastify";
+import fastifyPlugin from "fastify-plugin";
 import { join } from "path";
 import { aiConfig } from "src/config/ai";
 import { config } from "src/config/env";
@@ -41,7 +42,7 @@ export const ormConfigs = {
   },
 } as Options<MySqlDriver>;
 
-export const ormPlugin: FastifyPluginAsync = async (
+const ormPlugin: FastifyPluginAsync = async (
   server: FastifyInstance,
 ) => {
 
@@ -56,13 +57,14 @@ export const ormPlugin: FastifyPluginAsync = async (
   await schemaGenerator.ensureDatabase();
   await orm.getMigrator().up();
 
-  server.decorate("orm", orm);
-  server.decorateRequest("em", null);
+  await server.decorate("orm", orm);
+
+  logger.info("orm has been decorated");
 
   // 注入em,但无效
-  server.addHook("preHandler", async (request: FastifyRequest) => {
-    request.em = server.orm.em.fork();
-  });
+  // server.addHook("onRequest", async (request: FastifyRequest) => {
+  //   request.em = server.orm.em.fork() as EntityManager;
+  // });
 
   server.addHook("onClose", async (server) => {
     logger.info("Closing db connection.");
@@ -71,3 +73,5 @@ export const ormPlugin: FastifyPluginAsync = async (
   });
 
 };
+
+export default fastifyPlugin(ormPlugin, "4.x");

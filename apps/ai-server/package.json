@@ -24,11 +24,9 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@bufbuild/connect": "0.13.0",
+    "@bufbuild/connect-fastify": "0.13.0",
     "@bufbuild/connect-node": "0.13.0",
     "@bufbuild/protobuf": "1.4.2",
-    "fastify": "4.24.3",
-    "@bufbuild/connect-fastify": "0.13.0",
-    "@sinclair/typebox": "0.31.10",
     "@grpc/grpc-js": "1.9.11",
     "@mikro-orm/cli": "5.9.4",
     "@mikro-orm/core": "5.9.4",
@@ -37,16 +35,21 @@
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
-    "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
+    "@scow/utils": "workspace:*",
+    "@sinclair/typebox": "0.31.10",
+    "fastify": "4.24.3",
+    "fastify-plugin": "4.5.1",
+    "http-proxy": "1.18.1",
     "pino": "8.16.2",
-    "pino-pretty": "10.2.3",
-    "http-proxy": "1.18.1"
+    "pino-pretty": "10.2.3"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.6",
     "@types/http-proxy": "1.17.11",
-    "@types/js-yaml": "4.0.5"
+    "@types/js-yaml": "4.0.5",
+    "@types/node": "20.9.2",
+    "typescript": "5.2.2"
   },
   "mikro-orm": {
     "useTsNode": true,

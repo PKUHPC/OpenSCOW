@@ -10,18 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import type { EntityManager, MikroORM } from "@mikro-orm/core";
-import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { ormPlugin } from "src/plugins/orm";
+import type { MikroORM } from "@mikro-orm/core";
+import type { MySqlDriver } from "@mikro-orm/mysql";
+import ormPlugin from "src/plugins/orm";
 
 declare module "fastify" {
   interface FastifyInstance {
     orm: MikroORM<MySqlDriver>;
   }
 
-  interface FastifyRequest {
-    em: SqlEntityManager<MySqlDriver>;
-  }
 }
 
 export const plugins = [

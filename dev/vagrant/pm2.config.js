@@ -124,9 +124,11 @@ module.exports = {
       watch: "./apps/ai-server",
       interpreter,
       interpreter_args,
+      GRPC_TRACE: "all",
+      GRPC_VERBOSITY: "DEBUG",
       env: {
         PORT: "5007",
-        ...PRODUCTION_ENV,
+        // ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
       },
     },

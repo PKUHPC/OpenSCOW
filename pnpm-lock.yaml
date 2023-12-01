@@ -178,6 +178,9 @@ importers:
       fastify:
         specifier: 4.24.3
         version: 4.24.3
+      fastify-plugin:
+        specifier: 4.5.1
+        version: 4.5.1
       http-proxy:
         specifier: 1.18.1
         version: 1.18.1
@@ -197,6 +200,12 @@ importers:
       '@types/js-yaml':
         specifier: 4.0.5
         version: 4.0.5
+      '@types/node':
+        specifier: 20.9.2
+        version: 20.9.2
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
 
   apps/audit-server:
     dependencies:
@@ -4645,7 +4654,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.10
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
 
   /@grpc/proto-loader@0.7.10:
     resolution: {integrity: sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==}
@@ -6705,7 +6714,7 @@ packages:
   /@types/asn1@0.2.3:
     resolution: {integrity: sha512-aMHAkHF/+RAZ5/OJsbmsXnatLHYgDwIAuVhwBybBn9aFbMr4xKyUMoCYgC5B1U3dbng+YKtsGPABlZtS9KwnMQ==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
     dev: true
 
   /@types/aws-lambda@8.10.114:
@@ -6937,7 +6946,7 @@ packages:
   /@types/ldapjs@2.2.5:
     resolution: {integrity: sha512-Lv/nD6QDCmcT+V1vaTRnEKE8UgOilVv5pHcQuzkU1LcRe4mbHHuUo/KHi0LKrpdHhQY8FJzryF38fcVdeUIrzg==}
     dependencies:
-      '@types/node': 18.16.14
+      '@types/node': 20.9.2
     dev: true
 
   /@types/mdast@3.0.10:
@@ -6989,10 +6998,6 @@ packages:
     resolution: {integrity: sha512-w+tIMs3rq2afQdsPJlODhoUEKzFP1ayaoyl1CcnwtIlsVe7K7bA1NGm4s3PraqTLlXnbIN84zuBlxBWo1u9BLw==}
     dev: false
 
-  /@types/node@18.16.14:
-    resolution: {integrity: sha512-+ImzUB3mw2c5ISJUq0punjDilUQ5GnUim0ZRvchHIWJmOC0G+p0kzhXBqj6cDjK0QdPFwzrHWgrJp3RPvCG5qg==}
-    dev: true
-
   /@types/node@18.18.10:
     resolution: {integrity: sha512-luANqZxPmjTll8bduz4ACs/lNTCLuWssCyjqTY9yLdsv1xnViQp3ISKwsEWOIecO13JWUqjVdig/Vjjc09o8uA==}
     dependencies:
@@ -7006,7 +7011,7 @@ packages:
   /@types/nodemailer@6.4.14:
     resolution: {integrity: sha512-fUWthHO9k9DSdPCSPRqcu6TWhYyxTBg382vlNIttSe9M7XfsT06y0f24KHXtbnijPGGRIcVvdKHTNikOI6qiHA==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
     dev: true
 
   /@types/normalize-package-data@2.4.1:
@@ -7027,7 +7032,7 @@ packages:
   /@types/prompts@2.4.8:
     resolution: {integrity: sha512-fPOEzviubkEVCiLduO45h+zFHB0RZX8tFt3C783sO5cT7fUXf3EEECpD26djtYdh4Isa9Z9tasMQuZnYPtvYzw==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
       kleur: 3.0.3
     dev: true
 
@@ -7037,7 +7042,7 @@ packages:
   /@types/qrcode@1.5.5:
     resolution: {integrity: sha512-CdfBi/e3Qk+3Z/fXYShipBT13OJ2fDO2Q2w5CIP5anLTLIndQG9z6P1cnm+8zCWSpm5dnxMFd/uREtb0EXuQzg==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
     dev: true
 
   /@types/qs@6.9.7:
@@ -7132,7 +7137,7 @@ packages:
   /@types/speakeasy@2.0.10:
     resolution: {integrity: sha512-QVRlDW5r4yl7p7xkNIbAIC/JtyOcClDIIdKfuG7PWdDT1MmyhtXSANsildohy0K+Lmvf/9RUtLbNLMacvrVwxA==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
     dev: true
 
   /@types/ssh2@1.11.16:
@@ -7172,7 +7177,7 @@ packages:
   /@types/wait-on@5.3.4:
     resolution: {integrity: sha512-EBsPjFMrFlMbbUFf9D1Fp+PAB2TwmUn7a3YtHyD9RLuTIk1jDd8SxXVAoez2Ciy+8Jsceo2MYEYZzJ/DvorOKw==}
     dependencies:
-      '@types/node': 18.18.10
+      '@types/node': 20.9.2
     dev: true
 
   /@types/ws@8.5.9:

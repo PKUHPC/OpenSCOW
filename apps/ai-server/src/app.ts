@@ -17,15 +17,15 @@ import proxy from "http-proxy";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { services } from "src/services/index";
-import { loggerOptions } from "src/utils/logger";
+import { logger, loggerOptions } from "src/utils/logger";
 
 export async function startApp() {
 
   const server = fastify({
     http2: true,
-    https: {
-      allowHTTP1: true,
-    },
+    // https: {
+    //   allowHTTP1: true,
+    // },
     logger: loggerOptions,
   });
 
@@ -73,19 +73,11 @@ export async function startApp() {
     await server.register(plugin);
   }
 
-  // const em =server.orm.em.fork();
-  // await server.register(fastifyConnectPlugin, {
-  //   routes: (router) => {
-  //     services(router, em);}
-  // });
 
   await server.register(fastifyConnectPlugin, {
-    routes: services,
-  });
-
-  server.addHook("preHandler", async (request) => {
-    const em = server.orm.em.fork();
-    request.em = em;
+    routes: (router) => {
+      services(router, server.orm);
+    },
   });
 
   await server.listen({ host: config.HOST, port: config.PORT });

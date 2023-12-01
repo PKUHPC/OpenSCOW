@@ -11,7 +11,7 @@
  */
 
 import { Code, ConnectError, ConnectRouter } from "@bufbuild/connect";
-import { QueryOrder } from "@mikro-orm/core";
+import { EntityManager, MikroORM, QueryOrder } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import {
   DatasetService,
@@ -20,14 +20,29 @@ import { Dataset } from "src/entities/Dataset";
 import { handlerLogger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
-export const datasetServiceServer = (router: ConnectRouter) => {
+export const datasetServiceServer = (router: ConnectRouter, dbConnection: MikroORM<MySqlDriver>) => {
   router.service(DatasetService, {
     createDataset: async (request, context) => {
-      const { name, owner, type, scene, description } = request;
-      const logger = handlerLogger(context);
-      // const results = request.em.findOne(Dataset, { name });
 
-      return {};
+      const logger = handlerLogger(context);
+      const em = dbConnection.em.fork();
+
+      const { name, owner, type, scene, description } = request;
+
+      const results = await em.findOne(Dataset, { name });
+      if (results) {
+        logger.warn(`Name ${name} already exists `);
+        throw new ConnectError(`Name ${name} already exists `, Code.AlreadyExists);
+      }
+
+      logger.info("results: %o", results);
+
+      const record = new Dataset({
+        name, owner, type, scene, description,
+      });
+
+      await em.persistAndFlush(record);
+      return { id: record.id };
     },
 
     listDataset: async () => {

@@ -11,8 +11,10 @@
  */
 
 import { ConnectRouter } from "@bufbuild/connect";
+import { MikroORM } from "@mikro-orm/core";
+import { MySqlDriver } from "@mikro-orm/mysql";
 import { datasetServiceServer } from "src/services/dataset";
 
-export const services = (router: ConnectRouter) => {
-  datasetServiceServer(router);
+export const services = (router: ConnectRouter, dbConnection: MikroORM<MySqlDriver>) => {
+  datasetServiceServer(router, dbConnection);
 };
