@@ -16,6 +16,7 @@ import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
 
 import { publicConfig } from "./config";
 
+
 export const formatEntryId = (item: Entry) => {
 
   if (item.entry?.$case === "app") {
@@ -41,12 +42,20 @@ export const getEntryIcon = (item: Entry) => {
   return "";
 };
 
+export const entryNameMap = {
+  submitJob:"routes.job.submitJob",
+  runningJobs:"routes.job.runningJobs",
+  allJobs:"routes.job.allJobs",
+  savedJobs:"routes.job.jobTemplates",
+  desktop:"routes.desktop",
+} as const;
+
 export const getEntryName = (item: Entry) => {
   const t = useI18nTranslateToString();
 
-  if (item.entry?.$case === "pageLink") {
-    // @ts-ignore
-    return t(item.name);
+  if (item.entry?.$case === "pageLink" && entryNameMap[item.name]) {
+
+    return t(entryNameMap[item.name]);
   }
 
   return item.name;

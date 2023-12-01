@@ -58,7 +58,7 @@ export const AddEntryModal: React.FC<Props> = ({
   const staticEntry: Entry[] = defaultEntry.concat([
     {
       id:"desktop",
-      name:"routes.desktop",
+      name:"desktop",
       entry:{
         $case:"pageLink",
         pageLink:{

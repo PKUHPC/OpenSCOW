@@ -51,7 +51,7 @@ interface Props {
 export const defaultEntry: Entry[] = [
   {
     id:"submitJob",
-    name:"routes.job.submitJob",
+    name:"submitJob",
     entry:{
       $case:"pageLink",
       pageLink:{
@@ -62,7 +62,7 @@ export const defaultEntry: Entry[] = [
   },
   {
     id:"runningJob",
-    name:"routes.job.runningJobs",
+    name:"runningJobs",
     entry:{
       $case:"pageLink",
       pageLink:{
@@ -73,7 +73,7 @@ export const defaultEntry: Entry[] = [
   },
   {
     id:"allJobs",
-    name:"routes.job.allJobs",
+    name:"allJobs",
     entry:{
       $case:"pageLink",
       pageLink:{
@@ -84,7 +84,7 @@ export const defaultEntry: Entry[] = [
   },
   {
     id:"savedJobs",
-    name:"routes.job.jobTemplates",
+    name:"savedJobs",
     entry:{
       $case:"pageLink",
       pageLink:{
