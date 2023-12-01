@@ -14,7 +14,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import React, { FC } from "react";
 
-import CardItem, { ItemProps } from "./CardItem";
+import { CardItem, ItemProps } from "./CardItem";
 
 const SortableItem: FC<ItemProps> = (props) => {
   const {

@@ -29,7 +29,6 @@ message ShellEntry {
 
 message AppEntry {
   string cluster_id = 1;
-  string logo_path = 2;
 }
 
 message Entry {

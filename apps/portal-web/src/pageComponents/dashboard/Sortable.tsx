@@ -25,18 +25,19 @@ import {
   arrayMove,
   rectSortingStrategy,
   SortableContext } from "@dnd-kit/sortable";
+import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Card, message } from "antd";
 import Router from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Entry } from "src/models/dashboard";
-import { formatEntryId, getEntryClusterName, getEntryIcon } from "src/utils/dashboard";
+import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { AddEntryModal } from "./AddEntryModal";
-import Item from "./CardItem";
+import { CardItem } from "./CardItem";
+import { AppWithCluster } from "./QuickEntry";
 import SortableItem from "./SortableItem";
 
 const ItemsContainer = styled.div`
@@ -58,23 +59,24 @@ const ClusterContainer = styled.div`
   position: absolute;
   top: 20px;
   left: 36px;
+  cursor: pointer;
 `;
+
 
 interface Props {
   isEditable: boolean,
   isFinished: boolean,
-  quickEntryArray: Entry[]
+  quickEntryArray: Entry[],
+  apps: AppWithCluster;
 }
 const p = prefix("pageComp.dashboard.sortable.");
 
-const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
+const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
 
   const t = useI18nTranslateToString();
 
   // 实际的快捷入口项
-  const [items, setItems] = useState<Entry []>(
-    quickEntryArray,
-  );
+  const [items, setItems] = useState<Entry []>(quickEntryArray);
   // 编辑时临时的快捷入口项
   // 处理id使其唯一，因为不同集群可以有相同的交互式应用
   const [temItems, setTemItems] = useState([...(items.map((x) => ({ ...x, id:formatEntryId(x) }),
@@ -205,6 +207,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
       const newItems = [...(temItems.map((x) => ({ ...x, id:x.id.split("-")[0] })))];
       setItems(newItems);
       saveItems(newItems);
+
     }
   }, [isFinished]);
 
@@ -234,10 +237,10 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
               >
                 <SortableItem
                   id={x.id}
-                  name={x.name}
+                  name={getEntryName(x)}
                   draggable={isEditable}
                   icon={getEntryIcon(x)}
-                  logoPath={x.entry?.$case === "app" ? x.entry.app.logoPath : ""}
+                  logoPath={getEntryLogoPath(x, apps)}
                 />
                 {
                 // 拖拽时隐藏删除按钮
@@ -259,18 +262,11 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
                       if (isEditable) {
                         setChangeClusterOpen(true);
                         setChangeClusterItem(x);
+                        console.log(456);
                       }
-
+                      console.log(123);
                     }}
                     >
-                      {getEntryClusterName(x) as string}
-                    </ClusterContainer>
-                  ) :
-                    undefined
-                }
-                {
-                  getEntryClusterName(x) && !isEditable ? (
-                    <ClusterContainer>
                       {getEntryClusterName(x) as string}
                     </ClusterContainer>
                   ) :
@@ -297,13 +293,13 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
         </SortableContext>
         <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
           {activeId && activeItem ? (
-            <Item
+            <CardItem
               isDragging
               id={activeId.toString()}
-              name={activeItem.name}
+              name={getEntryName(activeItem)}
               draggable={isEditable}
               icon={getEntryIcon(activeItem)}
-              logoPath={activeItem.entry?.$case === "app" ? activeItem.entry.app.logoPath : ""}
+              logoPath={getEntryLogoPath(activeItem, apps)}
             />
           ) : null}
         </DragOverlay>
@@ -311,6 +307,7 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray }) => {
       <AddEntryModal
         open={addEntryOpen}
         onClose={() => { setAddEntryOpen(false); }}
+        apps={apps}
         addItem={addItem}
         // 下面是修改快捷方式相关的内容
         editItem={editItemCluster}

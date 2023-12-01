@@ -31,12 +31,12 @@ export type ItemProps = HTMLAttributes<HTMLDivElement> & {
     isDragging?: boolean;
 };
 
-const CardItem = forwardRef<HTMLDivElement, ItemProps>
+export const CardItem = forwardRef<HTMLDivElement, ItemProps>
 (({ draggable, withOpacity, isDragging, style, ...props }, ref) => {
   const inlineStyles: CSSProperties = {
     cursor:draggable ?
       isDragging ? "grabbing" : "grab" :
-      "default",
+      "pointer",
     opacity: withOpacity ? "0.5" : "1",
     boxShadow: isDragging ?
       "rgb(63 63 68 / 5%) 0px 2px 0px 2px, rgb(34 33 81 / 15%) 0px 2px 3px 2px" :
@@ -55,4 +55,3 @@ const CardItem = forwardRef<HTMLDivElement, ItemProps>
   );
 });
 
-export default CardItem;

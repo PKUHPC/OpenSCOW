@@ -33,7 +33,6 @@ const ShellEntry = Type.Object({
 
 const AppEntry = Type.Object({
   clusterId: Type.String(),
-  logoPath: Type.String(),
 });
 
 export const Entry = Type.Object({

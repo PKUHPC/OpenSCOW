@@ -10,24 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Modal, Spin } from "antd";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Entry } from "src/models/dashboard";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
-import { getEntryIcon } from "src/utils/dashboard";
+import { getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";
+import { AppWithCluster, defaultEntry } from "./QuickEntry";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   addItem: (item: Entry) => void;
+  apps: AppWithCluster;
   editItem: (clusterId: string, loginNode?: string) => void;
   changeClusterOpen: boolean;
   onChangeClusterClose: () => void;
@@ -39,12 +41,15 @@ const ItemsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+
+
 const p = prefix("pageComp.dashboard.addEntryModal.");
 
 export const AddEntryModal: React.FC<Props> = ({
   open,
   onClose,
   addItem,
+  apps,
   editItem,
   changeClusterOpen,
   onChangeClusterClose,
@@ -52,54 +57,10 @@ export const AddEntryModal: React.FC<Props> = ({
 }) => {
   const t = useI18nTranslateToString();
 
-  const staticEntry: Entry[] = [
-    {
-      id:"submitJob",
-      name:t("routes.job.submitJob"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/submit",
-          icon:"PlusCircleOutlined",
-        },
-      },
-    },
-    {
-      id:"runningJob",
-      name:t("routes.job.runningJobs"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/runningJobs",
-          icon:"BookOutlined",
-        },
-      },
-    },
-    {
-      id:"allJobs",
-      name:t("routes.job.allJobs"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/allJobs",
-          icon:"BookOutlined",
-        },
-      },
-    },
-    {
-      id:"savedJobs",
-      name:t("routes.job.jobTemplates"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/savedJobs",
-          icon:"SaveOutlined",
-        },
-      },
-    },
+  const staticEntry: Entry[] = defaultEntry.concat([
     {
       id:"desktop",
-      name:t("routes.dashboard"),
+      name:"routes.desktop",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -120,35 +81,9 @@ export const AddEntryModal: React.FC<Props> = ({
         },
       },
     },
-  ];
+  ]);
+
   const clusters = publicConfig.CLUSTERS;
-
-  // apps包含在哪些集群上可以创建app
-  const { data:apps, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-    const appsInfo = await Promise.all(clusters.map((x) => {
-      return api.listAvailableApps({ query: { cluster: x.id } });
-    }));
-
-    const appWithCluster = {};
-    appsInfo.forEach((x, idx) => {
-      x.apps.forEach((y) => {
-        if (!appWithCluster[y.id]) {
-          appWithCluster[y.id] = {
-            app: y,
-            clusters: [],
-          };
-        }
-
-        // 只要有一个集群配置了app图片，快捷方式就可以显示app图片了
-        if (!appWithCluster[y.id].app.logoPath && y.logoPath) {
-          appWithCluster[y.id].app.logoPath = y.logoPath;
-        }
-
-        appWithCluster[y.id].clusters.push(clusters[idx]);
-      });
-    });
-    return appWithCluster;
-  }, [clusters]) });
 
   // 所有可创建的app
   const appInfo = useMemo(() => {
@@ -164,7 +99,6 @@ export const AddEntryModal: React.FC<Props> = ({
             $case:"app",
             app:{
               clusterId:"",
-              logoPath:x.app.logoPath,
             },
           },
         });
@@ -179,10 +113,7 @@ export const AddEntryModal: React.FC<Props> = ({
   // 可以创建该App的集群
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
   // 新建快捷方式的信息
-  const [entryInfo, setEntryInfo] = useState<Entry>({
-    id:"",
-    name:"",
-  });
+  const [entryInfo, setEntryInfo] = useState<Entry | null>(null);
 
   // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
   useEffect(() => {
@@ -227,7 +158,6 @@ export const AddEntryModal: React.FC<Props> = ({
           $case:"app",
           app:{
             clusterId:"",
-            logoPath:item.entry.app.logoPath,
           },
         },
       },
@@ -253,43 +183,40 @@ export const AddEntryModal: React.FC<Props> = ({
           </Button>,
         ]}
       >
-        {isLoading ? <Spin /> : (
-          <ItemsContainer>
-            {
-              staticEntry.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => { handleClick(item);
-                  }}
-                >
-                  <EntryItem
-                    name={item.name}
-                    icon={getEntryIcon(item)}
-                    style={{ padding:"10px" }}
-                  />
-                </div>
-              ),
-              )
-            }
-            {
-              appInfo.map((item, idx) => (
-                <div
-                  key={idx}
-                  onClick={() => { handleClick(item);
-                  }}
-                >
-                  <EntryItem
-                    name={item.name}
-                    logoPath={item.entry?.$case === "app" ? item.entry.app.logoPath : ""}
-                    style={{ padding:"10px" }}
-                  />
-                </div>
-              ),
-              )
-            }
-          </ItemsContainer>
-        )}
-
+        <ItemsContainer>
+          {
+            staticEntry.map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => { handleClick(item);
+                }}
+              >
+                <EntryItem
+                  name={getEntryName(item)}
+                  icon={getEntryIcon(item)}
+                  style={{ padding:"10px" }}
+                />
+              </div>
+            ),
+            )
+          }
+          {
+            appInfo.map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => { handleClick(item);
+                }}
+              >
+                <EntryItem
+                  name={item.name}
+                  logoPath={getEntryLogoPath(item, apps)}
+                  style={{ padding:"10px" }}
+                />
+              </div>
+            ),
+            )
+          }
+        </ItemsContainer>
       </Modal>
       <SelectClusterModal
         open={selectClusterOpen}

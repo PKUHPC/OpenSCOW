@@ -10,46 +10,71 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { I18nStringType } from "@scow/config/build/i18n";
-import { Entry } from "src/models/dashboard";
+import { Entry } from "@scow/protos/build/portal/dashboard";
+import { useI18nTranslateToString } from "src/i18n";
+import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
 
 import { publicConfig } from "./config";
 
 export const formatEntryId = (item: Entry) => {
-  let id: string = item.id;
+
   if (item.entry?.$case === "app") {
-    id = id + "-" + item.entry.app.clusterId;
+    return `${item.id}-${item.entry.app.clusterId}`;
   }
+
   else if (item.entry?.$case === "shell") {
-    id = id + "-" + item.entry.shell.clusterId;
+    return `${item.id}-${item.entry.shell.clusterId}`;
   }
-  return id;
+
+  return item.id;
 };
 
 export const getEntryIcon = (item: Entry) => {
-  let icon: string = "";
 
   if (item.entry?.$case === "pageLink") {
-    icon = item.entry.pageLink.icon;
+    return item.entry.pageLink.icon;
   }
+
   else if (item.entry?.$case === "shell") {
-    icon = item.entry.shell.icon;
+    return item.entry.shell.icon;
   }
-  return icon;
+  return "";
+};
+
+export const getEntryName = (item: Entry) => {
+  const t = useI18nTranslateToString();
+
+  if (item.entry?.$case === "pageLink") {
+    // @ts-ignore
+    return t(item.name);
+  }
+
+  return item.name;
 };
 
 export const getEntryClusterName = (item: Entry) => {
   const clusters = publicConfig.CLUSTERS;
-  let clusterName: I18nStringType | undefined = "";
 
   if (item.entry?.$case === "shell") {
     const clusterId = item.entry.shell.clusterId;
-    clusterName = clusters.find((x) => x.id === clusterId)?.name;
-  }
-  else if (item.entry?.$case === "app") {
-    const clusterId = item.entry.app.clusterId;
-    clusterName = clusters.find((x) => x.id === clusterId)?.name;
+    return clusters.find((x) => x.id === clusterId)?.name;
   }
 
-  return clusterName;
+  else if (item.entry?.$case === "app") {
+    const clusterId = item.entry.app.clusterId;
+    return clusters.find((x) => x.id === clusterId)?.name;
+  }
+
+  return "";
+};
+
+export const getEntryLogoPath = (item: Entry, apps: AppWithCluster) => {
+
+  const appId = item.id.split("-")[0];
+
+  if (item.entry?.$case === "app" && apps[appId]) {
+    return apps[appId].app.logoPath;
+  }
+
+  return "";
 };

@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Entry } from "src/models/dashboard";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
@@ -24,7 +24,7 @@ export interface Props {
   needLoginNode: boolean;
   clusters: Cluster[];
   addItem: (item: Entry) => void;
-  entryInfo: Entry;
+  entryInfo: Entry | null;
   closeAddEntryModal: () => void;
 }
 
@@ -59,7 +59,7 @@ export const SelectClusterModal: React.FC<Props> = ({
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-    if (entryInfo.entry?.$case === "shell") {
+    if (entryInfo && entryInfo.entry?.$case === "shell") {
       addItem({ ...entryInfo,
         entry:{
           $case:"shell",
@@ -70,13 +70,12 @@ export const SelectClusterModal: React.FC<Props> = ({
           },
         } });
     }
-    else if (entryInfo.entry?.$case === "app") {
+    else if (entryInfo && entryInfo.entry?.$case === "app") {
       addItem({ ...entryInfo,
         entry:{
           $case:"app",
           app:{
             clusterId:cluster,
-            logoPath:entryInfo.entry.app.logoPath ?? "",
           },
         } });
     }

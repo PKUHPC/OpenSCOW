@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Spin, Typography } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Entry } from "src/models/dashboard";
 import Sortable from "src/pageComponents/dashboard/Sortable";
+import { App } from "src/pages/api/app/listAvailableApps";
+import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
 
 const ContentContainer = styled.div`
@@ -35,64 +37,102 @@ const CardsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+export interface AppWithCluster {
+  [key: string]: {
+    app: App;
+    clusters: Cluster[];
+  };
+}
+
 interface Props {
 
 }
+
+export const defaultEntry: Entry[] = [
+  {
+    id:"submitJob",
+    name:"routes.job.submitJob",
+    entry:{
+      $case:"pageLink",
+      pageLink:{
+        path: "/jobs/submit",
+        icon:"PlusCircleOutlined",
+      },
+    },
+  },
+  {
+    id:"runningJob",
+    name:"routes.job.runningJobs",
+    entry:{
+      $case:"pageLink",
+      pageLink:{
+        path: "/jobs/runningJobs",
+        icon:"BookOutlined",
+      },
+    },
+  },
+  {
+    id:"allJobs",
+    name:"routes.job.allJobs",
+    entry:{
+      $case:"pageLink",
+      pageLink:{
+        path: "/jobs/allJobs",
+        icon:"BookOutlined",
+      },
+    },
+  },
+  {
+    id:"savedJobs",
+    name:"routes.job.jobTemplates",
+    entry:{
+      $case:"pageLink",
+      pageLink:{
+        path: "/jobs/savedJobs",
+        icon:"SaveOutlined",
+      },
+    },
+  },
+];
 const p = prefix("pageComp.dashboard.quickEntry.");
 
 export const QuickEntry: React.FC<Props> = () => {
   const t = useI18nTranslateToString();
 
-  const staticEntry: Entry[] = [
-    {
-      id:"submitJob",
-      name:t("routes.job.submitJob"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/submit",
-          icon:"PlusCircleOutlined",
-        },
-      },
-    },
-    {
-      id:"runningJob",
-      name:t("routes.job.runningJobs"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/runningJobs",
-          icon:"BookOutlined",
-        },
-      },
-    },
-    {
-      id:"allJobs",
-      name:t("routes.job.allJobs"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/allJobs",
-          icon:"BookOutlined",
-        },
-      },
-    },
-    {
-      id:"savedJobs",
-      name:t("routes.job.jobTemplates"),
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/savedJobs",
-          icon:"SaveOutlined",
-        },
-      },
-    },
-  ];
 
-  const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
+
+  const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
+
+  const clusters = publicConfig.CLUSTERS;
+
+  // apps包含在哪些集群上可以创建app
+  const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {
+    const appsInfo = await Promise.all(clusters.map((x) => {
+      return api.listAvailableApps({ query: { cluster: x.id } });
+    }));
+
+    const appWithCluster: AppWithCluster = {};
+    appsInfo.forEach((x, idx) => {
+      x.apps.forEach((y) => {
+        if (!appWithCluster[y.id]) {
+          appWithCluster[y.id] = {
+            app: y,
+            clusters: [],
+          };
+        }
+
+        // 只要有一个集群配置了app图片，快捷方式就可以显示app图片了
+        if (!appWithCluster[y.id].app.logoPath && y.logoPath) {
+          appWithCluster[y.id].app.logoPath = y.logoPath;
+        }
+
+        appWithCluster[y.id].clusters.push(clusters[idx]);
+      });
+    });
+    return appWithCluster;
+  }, [clusters]) });
 
   const { Title } = Typography;
 
@@ -114,12 +154,13 @@ export const QuickEntry: React.FC<Props> = () => {
           <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>{t(p("edit"))}</Button>}
       </TitleContainer>
       <CardsContainer>
-        {isLoading ?
+        {getQuickEntriesLoading || getAppsLoading ?
           <Spin /> : (
             <Sortable
               isEditable={isEditable}
               isFinished={isFinished}
-              quickEntryArray={data?.quickEntries.length ? data?.quickEntries : staticEntry }
+              quickEntryArray={data?.quickEntries.length ? data?.quickEntries : defaultEntry }
+              apps={apps ?? {}}
             ></Sortable>
           )}
       </CardsContainer>

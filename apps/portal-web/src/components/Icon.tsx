@@ -11,7 +11,7 @@
  */
 
 import { BookOutlined, DesktopOutlined, MacCommandOutlined, PlusCircleOutlined, SaveOutlined } from "@ant-design/icons";
-import React, { CSSProperties } from "react";
+import React, { ComponentType, CSSProperties, ReactElement } from "react";
 
 const iconMap = {
   PlusCircleOutlined: <PlusCircleOutlined />,
@@ -21,7 +21,12 @@ const iconMap = {
   MacCommandOutlined: <MacCommandOutlined />,
 };
 
-export const Icon = (props: { name: string, style: CSSProperties }) => {
+interface IconProps {
+  name: string;
+  style: CSSProperties;
+}
+
+export const Icon = (props: IconProps) => {
   const { name } = props;
 
   // 确保图标组件接收并应用 style 属性
@@ -31,18 +36,27 @@ export const Icon = (props: { name: string, style: CSSProperties }) => {
   return React.cloneElement(iconElement, { style:props.style });
 };
 
-const withColor = (WrappedComponent) => {
-  return (props) => {
+interface WithColorProps {
+  color?: string;
+  style?: CSSProperties;
+}
+
+const withColor = <P extends IconProps>(
+  WrappedComponent: ComponentType<P & WithColorProps>,
+): ComponentType<P & WithColorProps> => {
+  return (props: P & WithColorProps): ReactElement => {
     const { color, style, ...restProps } = props;
 
-    const modifiedStyle = {
+    const modifiedStyle: CSSProperties = {
       color: color || "black",
       ...style,
     };
 
-    return <WrappedComponent style={modifiedStyle} {...restProps} />;
+    return <WrappedComponent {...restProps as P} style={modifiedStyle} />;
   };
 };
 
 export const ColoredIcon = withColor(Icon);
+
+
 
