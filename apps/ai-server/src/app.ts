@@ -11,6 +11,8 @@
  */
 
 import { fastifyConnectPlugin } from "@bufbuild/connect-fastify";
+import cors from "@fastify/cors";
+import { fastifyTRPCPlugin } from "@trpc/server/adapters/fastify";
 import fastify from "fastify";
 import { IncomingMessage } from "http";
 import proxy from "http-proxy";
@@ -18,6 +20,9 @@ import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { services } from "src/services/index";
 import { logger, loggerOptions } from "src/utils/logger";
+import { fastifyTRPCOpenApiPlugin } from "trpc-openapi";
+
+import { appRouter, createContext } from "./router";
 
 export async function startApp() {
 
@@ -73,6 +78,22 @@ export async function startApp() {
     await server.register(plugin);
   }
 
+  // 注册 CORS
+  await server.register(cors);
+
+  // 注册 tRPC
+  await server.register(fastifyTRPCPlugin, {
+    prefix: "/trpc",
+    useWss: false,
+    trpcOptions: { router: appRouter, createContext },
+  } as any);
+
+  // 注册 OpenAPI
+  await server.register(fastifyTRPCOpenApiPlugin, {
+    basePath: "/api",
+    router: appRouter,
+    createContext,
+  });
 
   await server.register(fastifyConnectPlugin, {
     routes: (router) => {

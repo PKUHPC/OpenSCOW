@@ -45,8 +45,10 @@ export const datasetServiceServer = (router: ConnectRouter, dbConnection: MikroO
       return { id: record.id };
     },
 
-    listDataset: async () => {
+    listDataset: async (request, context) => {
 
+      const logger = handlerLogger(context);
+      const em = dbConnection.em.fork();
       return { results: [], totalCount: 0 };
     },
 

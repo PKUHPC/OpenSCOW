@@ -27,6 +27,7 @@
     "@bufbuild/connect-fastify": "0.13.0",
     "@bufbuild/connect-node": "0.13.0",
     "@bufbuild/protobuf": "1.4.2",
+    "@fastify/cors": "^8.4.1",
     "@grpc/grpc-js": "1.9.11",
     "@mikro-orm/cli": "5.9.4",
     "@mikro-orm/core": "5.9.4",
@@ -38,11 +39,14 @@
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.31.10",
+    "@trpc/server": "^10.44.1",
     "fastify": "4.24.3",
     "fastify-plugin": "4.5.1",
     "http-proxy": "1.18.1",
     "pino": "8.16.2",
-    "pino-pretty": "10.2.3"
+    "pino-pretty": "10.2.3",
+    "trpc-openapi": "1.2.0",
+    "zod": "3.22.4"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.6",
