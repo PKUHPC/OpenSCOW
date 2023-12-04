@@ -169,6 +169,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    PROTOCOL: commonConfig.protocol || "http",
+
   };
 
   if (!building) {

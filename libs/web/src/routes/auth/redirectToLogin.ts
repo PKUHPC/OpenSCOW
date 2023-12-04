@@ -15,9 +15,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 
 export const redirectToAuthLogin = (
-  req: NextApiRequest, res: NextApiResponse, basePath: string, authExternalUrl: string,
+  req: NextApiRequest, res: NextApiResponse, protocol: string, basePath: string, authExternalUrl: string,
 ) => {
-  const protocol = req.headers["x-forwarded-proto"] || "http";
   const url = new URL(req.url!, `${protocol}://${req.headers.host}`);
 
   const callbackUrl = url.origin + join(basePath, "/api/auth/callback");

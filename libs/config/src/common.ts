@@ -59,6 +59,8 @@ export const CommonConfigSchema = Type.Object({
     Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM, { description: "SCOW使用的文本语言，不再允许手动切换" }),
   ], { description: "", default: { autoDetectWhenUserNotSet: true, default: SYSTEM_VALID_LANGUAGE_ENUM.zh_cn } })),
 
+  protocol: Type.Optional(Type.String({ description: "scow 的访问协议", default: "http" })),
+
 });
 
 export const getSystemLanguageConfig = (systemLanguage: SystemLanguage): SystemLanguageConfig => {
