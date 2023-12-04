@@ -20,7 +20,7 @@ import {
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
-import { filterOperationLogs, toGrpcOperationLog } from "src/utils/operationLogs";
+import { filterOperationLogs, getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
@@ -37,10 +37,7 @@ export const operationLogServiceServer = plugin((server) => {
       } = request;
 
       const metaData = operationEvent || {};
-      const operationType = operationEvent?.$case;
-      const targetAccountName = (operationEvent && operationType)
-        ? operationEvent[operationType].accountName
-        : undefined;
+      const targetAccountName = getTargetAccountName(operationEvent);
 
       const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
 

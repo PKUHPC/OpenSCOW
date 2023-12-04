@@ -337,6 +337,31 @@ message ExportChargeRecord {
   }
 }
 
+message ExportOperationLog {
+  message User {
+    string user_id = 1;
+  }
+  message Account {
+    string account_name = 2;
+  }
+  message Tenant {
+    string tenant_name = 3;
+  }
+  message Admin {
+
+  }
+  oneof source {
+    // 导出用户的操作记录
+    User user = 1;
+    // 导出账户的操作记录
+    Account account = 2;
+    // 导出租户的操作记录
+    Tenant tenant = 3;
+    // 导出平台的操作记录
+    Admin admin = 4;
+  }
+}
+
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -396,6 +421,7 @@ message CreateOperationLogRequest {
     ExportAccount export_account = 55;
     ExportPayRecord export_pay_record = 56;
     ExportChargeRecord export_charge_record = 57;
+    ExportOperationLog export_operation_log = 58;
   }
 }
 
@@ -461,6 +487,7 @@ message OperationLog {
     ExportAccount export_account = 57;
     ExportPayRecord export_pay_record = 58;
     ExportChargeRecord export_charge_record = 59;
+    ExportOperationLog export_operation_log = 60;
   }
 }
 

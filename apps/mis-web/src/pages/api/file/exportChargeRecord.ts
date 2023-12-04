@@ -18,15 +18,17 @@ import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { FileServiceClient } from "@scow/protos/build/server/file";
 import { Type } from "@sinclair/typebox";
 import { getT, prefix } from "src/i18n";
+import { OperationResult, OperationType } from "src/models/operationLog";
 import { SearchType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { buildChargesRequestTarget, getUserInfoForCharges } from "src/pages/api/finance/charges";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
-import { getContentType } from "src/utils/server";
+import { getContentType, parseIp } from "src/utils/server";
 import { pipeline } from "stream";
 
 export const ExportChargeRecordSchema = typeboxRouteSchema({
@@ -61,8 +63,20 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
   if (!info) { return; }
 
+
+  const target = buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords);
+
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.exportChargeRecord,
+    operationTypePayload:{
+      target,
+    },
+  };
+
   if (count > MAX_EXPORT_COUNT) {
-    // await callLog(logInfo, OperationResult.FAIL);
+    await callLog(logInfo, OperationResult.FAIL);
     return { 409: { code: "TOO_MANY_DATA" } } as const;
 
   } else {
@@ -85,7 +99,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
           startTime,
           endTime,
           type,
-          target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+          target,
         },
       },
     });
@@ -127,9 +141,12 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       transform,
       csvStringify,
       res,
-      (err) => {
+      async (err) => {
         if (err) {
           console.error("Pipeline failed", err);
+          await callLog(logInfo, OperationResult.FAIL);
+        } else {
+          await callLog(logInfo, OperationResult.SUCCESS);
         }
       },
     );

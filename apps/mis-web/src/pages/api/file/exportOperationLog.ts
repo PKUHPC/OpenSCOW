@@ -15,19 +15,20 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-import { OperationLog } from "@scow/protos/build/audit/operation_log";
+import { ExportOperationLog, OperationLog } from "@scow/protos/build/audit/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, getTArgs } from "src/i18n";
 import { getOperationDetail, getOperationResultTexts, getOperationTypeTexts, OperationCodeMap, OperationLogQueryType,
   OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
-import { getContentType } from "src/utils/server";
+import { getContentType, parseIp } from "src/utils/server";
 import { pipeline } from "stream";
 
 
@@ -73,6 +74,43 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
   },
 });
 
+const getExportSource = (
+  type: OperationLogQueryType,
+  info: UserInfo,
+  accountName: string | undefined): ExportOperationLog["source"] => {
+
+  switch (type) {
+  case OperationLogQueryType.USER:
+    return {
+      $case: "user",
+      user: {
+        userId: info.identityId,
+      },
+    };
+  case OperationLogQueryType.ACCOUNT:
+    return accountName
+      ? {
+        $case: "account",
+        account: {
+          accountName,
+        },
+      }
+      : undefined;
+  case OperationLogQueryType.TENANT:
+    return {
+      $case: "tenant",
+      tenant: {
+        tenantName: info.tenant,
+      },
+    };
+  default:
+    return {
+      $case: "admin",
+      admin: {},
+    };
+  }
+};
+
 export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
   const auth = authenticate(() => true);
 
@@ -86,8 +124,20 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     count, columns, type, operatorUserIds, startTime, endTime,
     operationType, operationResult, operationDetail, operationTargetAccountName } = req.query;
 
+
+  const logSource = getExportSource(type, info, operationTargetAccountName);
+
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.exportOperationLog,
+    operationTypePayload:{
+      source: logSource,
+    },
+  };
+
   if (count > MAX_EXPORT_COUNT) {
-    // await callLog(logInfo, OperationResult.FAIL);
+    await callLog(logInfo, OperationResult.FAIL);
     return { 409: { code: "TOO_MANY_DATA" } } as const;
   } else {
     const filter = {
@@ -103,6 +153,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
     if (type === OperationLogQueryType.ACCOUNT) {
       if (!filter.operationTargetAccountName) {
+        await callLog(logInfo, OperationResult.FAIL);
         return { 400: null };
       }
 
@@ -112,12 +163,14 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
           .find((au) => au.accountName === filter.operationTargetAccountName
       && (au.role === UserRole.ADMIN || au.role === UserRole.OWNER))
       ) {
+        await callLog(logInfo, OperationResult.FAIL);
         return { 403: null };
       }
     };
 
     if (type === OperationLogQueryType.TENANT) {
       if (!info.tenantRoles.includes(TenantRole.TENANT_ADMIN)) {
+        await callLog(logInfo, OperationResult.FAIL);
         return { 403: null };
       }
       // 查看该租户下所有用户的操作日志
@@ -134,6 +187,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
     if (type === OperationLogQueryType.PLATFORM) {
       if (!info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        await callLog(logInfo, OperationResult.FAIL);
         return { 403: null };
       }
     }
@@ -190,9 +244,12 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       transform,
       csvStringify,
       res,
-      (err) => {
+      async (err) => {
         if (err) {
           console.error("Pipeline failed", err);
+          await callLog(logInfo, OperationResult.FAIL);
+        } else {
+          await callLog(logInfo, OperationResult.SUCCESS);
         }
       },
     );
