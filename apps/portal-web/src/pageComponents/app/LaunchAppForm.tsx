@@ -15,13 +15,13 @@ import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin,
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountStatusFilter } from "src/models/job";
-import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { AccountListSelector } from "src/pageComponents/job/AccountListSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { formatSize } from "src/utils/format";
@@ -153,7 +153,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       .then(async (lastData) => {
 
         form.setFieldValue("appJobName", genAppJobName(appName));
-        // setLoading(true);
 
         // 进入页面时第一次请求集群下未封锁账户
         await api.getAccounts({ query: {
@@ -163,27 +162,27 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           .httpError(404, (error) => { message.error(error.message); })
           .then(async (accountsResp) => {
 
-            // 改个名
+            // 保存配置表单以外必填项的对象
             let requiredInputObj = {};
 
             if (accountsResp && accountsResp.accounts.length) {
 
               setSelectableAccounts(accountsResp.accounts);
-              const lastSubmission = lastData?.lastSubmissionInfo;
-              const lastAccount = lastSubmission?.account;
-              const lastPartition = lastSubmission?.partition;
-              const lastQos = lastSubmission?.qos;
-              const lastCoreCount = lastSubmission?.coreCount;
-              const lastNodeCount = lastSubmission?.nodeCount;
-              const lastGpuCount = lastSubmission?.gpuCount;
-              const lastMaxTime = lastSubmission?.maxTime;
-              const lastAttributes = lastSubmission?.customAttributes;
+              const lastSub = lastData?.lastSubmissionInfo;
+              const lastAccount = lastSub?.account;
+              const lastPartition = lastSub?.partition;
+              const lastQos = lastSub?.qos;
+              const lastCoreCount = lastSub?.coreCount;
+              const lastNodeCount = lastSub?.nodeCount;
+              const lastGpuCount = lastSub?.gpuCount;
+              const lastMaxTime = lastSub?.maxTime;
+              const lastAttributes = lastSub?.customAttributes;
 
               // 如果上一次提交信息中的账户存在且在当前可选账户列表中，则填入上一次提交记录中的账户
               // 如果上一次提交信息不存在，或者提交信息中的账户存在但不在当前可选列表中，则填入账户列表的第一个值
-              const firstInputAccount = (lastData && lastSubmission?.account &&
-              accountsResp.accounts.includes(lastSubmission?.account)) ?
-                lastSubmission.account : accountsResp.accounts[0];
+              const firstInputAccount = (lastData && lastAccount &&
+              accountsResp.accounts.includes(lastSub?.account)) ?
+                lastAccount : accountsResp.accounts[0];
 
               // 获取第一次填入账户可用分区
               await api.getAvailablePartitionsForCluster({ query: {
@@ -214,7 +213,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                       firstPartitionInfo.gpus && firstPartitionInfo.gpus >= lastGpuCount;
 
                   requiredInputObj = {
-                    account: lastAccount,
+                    account: firstInputAccount,
                     partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
                     qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
                     nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
@@ -326,12 +325,25 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             newPartitionsMap[account] = data.partitions;
             setAccountPartitionsCacheMap(newPartitionsMap);
             setCurrentPartitionInfo(data.partitions[0]);
+            restPartitionInfo(data.partitions[0]);
           });
-
       };
       return { partitions: [] as Partition[] };
     }, [account, partitionsReloadTrigger, selectableAccounts, loading]),
   });
+
+  // 当需要重置分区信息时，分区信息重置
+  const restPartitionInfo = (partitionInfo: Partition) => {
+    form.setFieldsValue({
+      partition: partitionInfo.name,
+      qos: partitionInfo.qos?.[0],
+    });
+    if (!!partitionInfo?.gpus) {
+      form.setFieldValue("gpuCount", 1);
+    } else {
+      form.setFieldValue("coreCount", 1);
+    }
+  };
 
   const handlePartitionChange = (partition: string) => {
     const account = form.getFieldValue("account");
@@ -345,8 +357,16 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       form.setFieldValue("coreCount", 1);
     }
     setCurrentPartitionInfo(partitionInfo);
-
   };
+
+  useEffect(() => {
+    if (account && accountPartitionsCacheMap[account]) {
+      const cacheMap = accountPartitionsCacheMap[account];
+      setCurrentPartitionInfo(cacheMap[0]);
+      restPartitionInfo(cacheMap[0]);
+    }
+  }, [account]);
+
 
   const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
@@ -422,7 +442,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             name="account"
             rules={[{ required: true }]}
           >
-            <AccountSelector
+            <AccountListSelector
               selectableAccounts={ selectableAccounts ?? []}
               isLoading={unblockedAccountsQuery.isLoading}
               onReload={handleAccountsReload}
