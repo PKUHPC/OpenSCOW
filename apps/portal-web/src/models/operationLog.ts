@@ -76,4 +76,5 @@ export const OperationType: OperationTypeEnum = {
   exportAccount: "exportAccount",
   exportChargeRecord: "exportChargeRecord",
   exportPayRecord: "exportPayRecord",
+  exportOperationLog: "exportOperationLog",
 };
