@@ -18,7 +18,6 @@ import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 import { Entry } from "./getQuickEntries";
 
@@ -49,9 +48,6 @@ export default route(SaveQuickEntriesSchema, async (req, res) => {
     userId:info.identityId,
     quickEntries,
   }).then(() => ({ 204:null }),
-    handlegRPCError(({
-      [status.UNAVAILABLE]: () => ({ 500: { code: "WRITE_FILE_FAILED" } } as const),
-    })),
   );
 
 });

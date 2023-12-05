@@ -27,18 +27,19 @@ import {
   SortableContext } from "@dnd-kit/sortable";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Card, message } from "antd";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { publicConfig } from "src/utils/config";
 import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { AddEntryModal } from "./AddEntryModal";
 import { CardItem } from "./CardItem";
 import { AppWithCluster } from "./QuickEntry";
-import SortableItem from "./SortableItem";
+import { SortableItem } from "./SortableItem";
 
 const ItemsContainer = styled.div`
   display: flex;
@@ -62,7 +63,6 @@ const ClusterContainer = styled.div`
   cursor: pointer;
 `;
 
-
 interface Props {
   isEditable: boolean,
   isFinished: boolean,
@@ -74,6 +74,7 @@ const p = prefix("pageComp.dashboard.sortable.");
 const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
 
   const t = useI18nTranslateToString();
+  const router = useRouter();
 
   // 实际的快捷入口项
   const [items, setItems] = useState<Entry []>(quickEntryArray);
@@ -170,15 +171,16 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) 
       if (!isEditable) {
         switch (item.entry?.$case) {
         case "pageLink":
-          Router.push(item.entry.pageLink.path);
+          router.push(join(publicConfig.BASE_PATH, item.entry.pageLink.path));
           break;
 
         case "shell":
-          Router.push(join("/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
+          router.push(join(publicConfig.BASE_PATH, "/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
           break;
 
         case "app":
-          Router.push(join("/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
+          router.push(
+            join(publicConfig.BASE_PATH, "/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
           break;
 
         default:
@@ -255,21 +257,21 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) 
                 }
                 {
                 // 拖拽时隐藏集群信息
-                // 非编辑状态显示集群信息
-                  getEntryClusterName(x) && ((!(activeId && activeItem) && isEditable) || !isEditable) ? (
-                    <ClusterContainer onClick={() =>
-                    {
-                      if (isEditable) {
-                        setChangeClusterOpen(true);
-                        setChangeClusterItem(x);
-                        console.log(456);
-                      }
-                      console.log(123);
-                    }}
-                    >
-                      {getEntryClusterName(x) as string}
-                    </ClusterContainer>
-                  ) :
+                // 交互式应用和shell在非编辑状态显示集群信息
+                  (x.entry?.$case === "app" || x.entry?.$case === "shell") &&
+                  ((!(activeId && activeItem) && isEditable) || !isEditable)
+                    ? (
+                      <ClusterContainer onClick={() =>
+                      {
+                        if (isEditable) {
+                          setChangeClusterOpen(true);
+                          setChangeClusterItem(x);
+                        }
+                      }}
+                      >
+                        {getEntryClusterName(x as Entry & {entry: {$case: "app" | "shell"} }) as string}
+                      </ClusterContainer>
+                    ) :
                     undefined
                 }
               </ItemContainer>

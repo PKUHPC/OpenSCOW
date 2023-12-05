@@ -14,7 +14,7 @@ import { PictureOutlined } from "@ant-design/icons";
 import { Avatar } from "antd";
 import { join } from "path";
 import React, { CSSProperties, useState } from "react";
-import { ColoredIcon } from "src/components/Icon";
+import { ColoredIcon, isSupportedIconName } from "src/components/Icon";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components"; ;
 
@@ -84,7 +84,8 @@ export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
                 ...icon ? { backgroundColor:"#fff" } : {},
               }}
               size={80}
-              icon={icon ? <ColoredIcon name={icon} color='#666' style={{ fontSize:"60px" }} />
+              icon={icon && isSupportedIconName(icon) ?
+                <ColoredIcon name={icon} color='#666' style={{ fontSize:"60px" }} />
                 : <PictureOutlined />}
             />
           )

@@ -21,8 +21,9 @@ const iconMap = {
   MacCommandOutlined: <MacCommandOutlined />,
 };
 
+export type IconName = keyof typeof iconMap;
 interface IconProps {
-  name: string;
+  name: IconName;
   style: CSSProperties;
 }
 
@@ -30,11 +31,13 @@ export const Icon = (props: IconProps) => {
   const { name } = props;
 
   // 确保图标组件接收并应用 style 属性
-  const iconElement = iconMap[name];
-  if (!iconElement) return null;
-
-  return React.cloneElement(iconElement, { style:props.style });
+  return React.cloneElement(iconMap[name], { style:props.style });
 };
+
+
+export function isSupportedIconName(iconName: string): iconName is IconName {
+  return iconName in iconMap;
+}
 
 interface WithColorProps {
   color?: string;

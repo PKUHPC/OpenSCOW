@@ -16,15 +16,14 @@ import { DashboardServiceServer, DashboardServiceService, Entry }
   from "@scow/protos/build/portal/dashboard";
 import { promises as fsPromises } from "fs";
 import path from "path";
-import { getUserQuickEntryFileName } from "src/utils/dashboard";
 
-const quickEntryPath = "/var/lib/scow/quickEntries";
+const quickEntryPath = "/var/lib/scow/portal/quickEntries";
 
 export const dashboardServiceServer = plugin((server) => {
   return server.addService<DashboardServiceServer>(DashboardServiceService, {
-    getQuickEntries:async ({ request }) => {
+    getQuickEntries:async ({ request, logger }) => {
       const { userId } = request;
-      const filePath = path.join(quickEntryPath, userId, getUserQuickEntryFileName(userId));
+      const filePath = path.join(quickEntryPath, userId, "quickEntries.json");
 
       // 读取 JSON 文件
       let jsonObject!: Entry[];
@@ -41,9 +40,10 @@ export const dashboardServiceServer = plugin((server) => {
         }
 
         // 其他错误则抛错
+        logger.info("Read file failed with %o", error);
         throw <ServiceError> {
-          code: status.UNAVAILABLE,
-          message: `read file ${getUserQuickEntryFileName(userId)} failed`,
+          code: status.INTERNAL,
+          message: `read file ${userId}'s quickEntries.json failed`,
         };
       }
 
@@ -51,11 +51,11 @@ export const dashboardServiceServer = plugin((server) => {
         quickEntries:jsonObject,
       }];
     },
-    saveQuickEntries:async ({ request }) => {
+    saveQuickEntries:async ({ request, logger }) => {
 
       const { userId, quickEntries } = request;
       const jsonContent = JSON.stringify(quickEntries);
-      const filePath = path.join(quickEntryPath, userId, getUserQuickEntryFileName(userId));
+      const filePath = path.join(quickEntryPath, userId, "quickEntries.json");
 
       // 获取文件的目录路径
       const dirPath = path.dirname(filePath);
@@ -74,8 +74,9 @@ export const dashboardServiceServer = plugin((server) => {
           ? `Error saving quick entry for user ${userId}: ${err.message}`
           : "";
 
+        logger.info("Saving file failed with %o", err);
         throw <ServiceError> {
-          code: status.UNAVAILABLE,
+          code: status.INTERNAL,
           message: errorMessage || `An error occurred while saving quick entry for user ${userId}`,
         };
       }

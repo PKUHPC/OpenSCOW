@@ -18,13 +18,15 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
+import { EntryCase, IncompleteEntryInfo } from "./AddEntryModal";
+
 export interface Props {
   open: boolean;
   onClose: () => void;
   needLoginNode: boolean;
   clusters: Cluster[];
   addItem: (item: Entry) => void;
-  entryInfo: Entry | null;
+  IncompleteEntryInfo: IncompleteEntryInfo | null;
   closeAddEntryModal: () => void;
 }
 
@@ -40,7 +42,7 @@ export const SelectClusterModal: React.FC<Props> = ({
   needLoginNode,
   clusters,
   addItem,
-  entryInfo,
+  IncompleteEntryInfo,
   closeAddEntryModal,
 }) => {
   const t = useI18nTranslateToString();
@@ -59,8 +61,10 @@ export const SelectClusterModal: React.FC<Props> = ({
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-    if (entryInfo && entryInfo.entry?.$case === "shell") {
-      addItem({ ...entryInfo,
+    if (IncompleteEntryInfo && IncompleteEntryInfo.case === EntryCase.shell) {
+      addItem({
+        id:IncompleteEntryInfo.id,
+        name:IncompleteEntryInfo.name,
         entry:{
           $case:"shell",
           shell:{
@@ -70,8 +74,10 @@ export const SelectClusterModal: React.FC<Props> = ({
           },
         } });
     }
-    else if (entryInfo && entryInfo.entry?.$case === "app") {
-      addItem({ ...entryInfo,
+    else if (IncompleteEntryInfo && IncompleteEntryInfo.case === EntryCase.app) {
+      addItem({
+        id:IncompleteEntryInfo.id,
+        name:IncompleteEntryInfo.name,
         entry:{
           $case:"app",
           app:{

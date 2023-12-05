@@ -23,6 +23,15 @@ import { styled } from "styled-components";
 import { EntryItem } from "./EntryItem";
 import { AppWithCluster, defaultEntry } from "./QuickEntry";
 
+export enum EntryCase {
+  shell,
+  app
+}
+export interface IncompleteEntryInfo {
+  id: string;
+  name: string;
+  case: EntryCase;
+}
 export interface Props {
   open: boolean;
   onClose: () => void;
@@ -38,8 +47,6 @@ const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
 `;
-
-
 
 const p = prefix("pageComp.dashboard.addEntryModal.");
 
@@ -110,8 +117,8 @@ export const AddEntryModal: React.FC<Props> = ({
   const [needLoginNode, setNeedLoginNode] = useState(false);
   // 可以创建该App的集群
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
-  // 新建快捷方式的信息
-  const [entryInfo, setEntryInfo] = useState<Entry | null>(null);
+  // 新建快捷方式的部分信息
+  const [IncompleteEntryInfo, setIncompleteEntryInfo] = useState<IncompleteEntryInfo | null>(null);
 
   // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
   useEffect(() => {
@@ -131,17 +138,10 @@ export const AddEntryModal: React.FC<Props> = ({
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
       setSelectClusterOpen(true);
-      setEntryInfo({
+      setIncompleteEntryInfo({
         id:item.id,
         name:item.name,
-        entry:{
-          $case:"shell",
-          shell:{
-            clusterId:"",
-            loginNode:"",
-            icon:"MacCommandOutlined",
-          },
-        },
+        case:EntryCase.shell,
       },
       );
     }
@@ -149,15 +149,10 @@ export const AddEntryModal: React.FC<Props> = ({
       setNeedLoginNode(false);
       setClustersToSelectedApp(apps![item.id].clusters);
       setSelectClusterOpen(true);
-      setEntryInfo({
+      setIncompleteEntryInfo({
         id:item.id,
         name:item.name,
-        entry:{
-          $case:"app",
-          app:{
-            clusterId:"",
-          },
-        },
+        case:EntryCase.app,
       },
       );
     }
@@ -220,7 +215,7 @@ export const AddEntryModal: React.FC<Props> = ({
         open={selectClusterOpen}
         onClose={() => { setSelectClusterOpen(false); }}
         needLoginNode={needLoginNode}
-        entryInfo={entryInfo}
+        IncompleteEntryInfo={IncompleteEntryInfo}
         clusters={clustersToSelectedApp}
         addItem={addItem}
         closeAddEntryModal={onClose}

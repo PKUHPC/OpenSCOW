@@ -39,7 +39,7 @@ export const getEntryIcon = (item: Entry) => {
   else if (item.entry?.$case === "shell") {
     return item.entry.shell.icon;
   }
-  return "";
+  return undefined;
 };
 
 export const entryNameMap = {
@@ -61,20 +61,21 @@ export const getEntryName = (item: Entry) => {
   return item.name;
 };
 
-export const getEntryClusterName = (item: Entry) => {
+export const getEntryClusterName = (item: Entry & {entry: {$case: "app" | "shell"} }) => {
   const clusters = publicConfig.CLUSTERS;
 
-  if (item.entry?.$case === "shell") {
-    const clusterId = item.entry.shell.clusterId;
-    return clusters.find((x) => x.id === clusterId)?.name;
-  }
+  if (item.entry) {
+    if (item.entry.$case === "shell") {
+      const clusterId = item.entry.shell.clusterId;
+      return clusters.find((x) => x.id === clusterId)?.name;
+    }
 
-  else if (item.entry?.$case === "app") {
-    const clusterId = item.entry.app.clusterId;
-    return clusters.find((x) => x.id === clusterId)?.name;
+    else if (item.entry.$case === "app") {
+      const clusterId = item.entry.app.clusterId;
+      return clusters.find((x) => x.id === clusterId)?.name;
+    }
   }
-
-  return "";
+  return undefined;
 };
 
 export const getEntryLogoPath = (item: Entry, apps: AppWithCluster) => {
@@ -85,5 +86,5 @@ export const getEntryLogoPath = (item: Entry, apps: AppWithCluster) => {
     return apps[appId].app.logoPath;
   }
 
-  return "";
+  return undefined;
 };

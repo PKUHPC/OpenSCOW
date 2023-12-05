@@ -83,9 +83,6 @@ export default route(GetQuickEntriesSchema, async (req, res) => {
 
     return { 200: { quickEntries: x.quickEntries } };
   },
-  handlegRPCError({
-    [status.UNAVAILABLE]: () => ({ 404: { code: "READ_FILE_FAILED" } } as const),
-  }),
   );
 
 });

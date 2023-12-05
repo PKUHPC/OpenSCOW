@@ -16,7 +16,7 @@ import React, { FC } from "react";
 
 import { CardItem, ItemProps } from "./CardItem";
 
-const SortableItem: FC<ItemProps> = (props) => {
+export const SortableItem: FC<ItemProps> = (props) => {
   const {
     isDragging,
     attributes,
@@ -42,5 +42,3 @@ const SortableItem: FC<ItemProps> = (props) => {
     />
   );
 };
-
-export default SortableItem;

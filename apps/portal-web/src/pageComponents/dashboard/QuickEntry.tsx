@@ -38,7 +38,7 @@ const CardsContainer = styled.div`
 `;
 
 export interface AppWithCluster {
-  [key: string]: {
+  [appId: string]: {
     app: App;
     clusters: Cluster[];
   };
