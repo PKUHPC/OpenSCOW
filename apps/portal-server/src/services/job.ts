@@ -59,8 +59,6 @@ export const jobServiceServer = plugin((server) => {
         return [{ accounts: accounts }];
       }
 
-      let unblockAccounts: string[] = [];
-      let blockedAccounts: string[] = [];
       const filteredUnblockedAccounts: string[] = [];
       const filteredBlockedAccounts: string[] = [];
       const filteredUnblockedUserAccounts: string[] = [];
@@ -69,9 +67,13 @@ export const jobServiceServer = plugin((server) => {
       const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
         try {
           const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
-          resp.blocked ? filteredBlockedAccounts.push(account) : filteredUnblockedAccounts.push(account);
+          if (resp.blocked) {
+            filteredBlockedAccounts.push(account);
+          } else {
+            filteredUnblockedAccounts.push(account);
+          }
         } catch (error) {
-          logger.error(`Error occured when query the block status of ${account}.`);
+          logger.error(`Error occured when query the block status of ${account}.`, error);
         }
       }));
 
@@ -79,17 +81,21 @@ export const jobServiceServer = plugin((server) => {
         try {
           const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
             accountName: account, userId });
-          resp.blocked ? filteredBlockedUserAccounts.push(account) : filteredUnblockedUserAccounts.push(account);
+          if (resp.blocked) {
+            filteredBlockedUserAccounts.push(account);
+          } else {
+            filteredUnblockedUserAccounts.push(account);
+          }
         } catch (error) {
-          logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
+          logger.error(`Error occured when query the block status of ${userId} in ${account}.`, error);
         }
       }));
 
-      await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
-        unblockAccounts = filteredUnblockedAccounts.filter((account) =>
-          filteredUnblockedUserAccounts.includes(account));
-        blockedAccounts = Array.from(new Set(filteredBlockedAccounts.concat(filteredBlockedUserAccounts)));
-      });
+      await Promise.allSettled([filterAccountPromise, filterUserStatusPromise]);
+
+      const unblockAccounts =
+        filteredUnblockedAccounts.filter((account) => filteredUnblockedUserAccounts.includes(account));
+      const blockedAccounts = Array.from(new Set(filteredBlockedAccounts.concat(filteredBlockedUserAccounts)));
 
       return [{ accounts:
         statusFilter === AccountStatusFilter.BLOCKED_ONLY ? blockedAccounts : unblockAccounts }];
@@ -324,45 +330,6 @@ export const jobServiceServer = plugin((server) => {
 
       return [{ jobId: reply.jobId }];
     },
-
-    //   getAvailableAccounts: async ({ request, logger }) => {
-    //     const { cluster, accounts, userId } = request;
-
-    //     const client = getAdapterClient(cluster);
-    //     if (!client) { throw clusterNotFound(cluster); }
-
-    //     let availableAccounts: string[] = [];
-    //     const filteredStatusAccounts: string[] = [];
-    //     const filteredUserStatusAccounts: string[] = [];
-
-    //     const filterAccountPromise = Promise.allSettled(accounts.map(async (account) => {
-    //       try {
-    //         const resp = await asyncClientCall(client.account, "queryAccountBlockStatus", { accountName: account });
-    //         if (!resp.blocked) {
-    //           filteredStatusAccounts.push(account); }
-    //       } catch (error) {
-    //         logger.error(`Error occured when query the block status of ${account}.`);
-    //       }
-    //     }));
-
-    //     const filterUserStatusPromise = Promise.allSettled(accounts.map(async (account) => {
-    //       try {
-    //         const resp = await asyncClientCall(client.user, "queryUserInAccountBlockStatus", {
-    //           accountName: account, userId });
-    //         if (!resp.blocked) {
-    //           filteredUserStatusAccounts.push(account); }
-    //       } catch (error) {
-    //         logger.error(`Error occured when query the block status of ${userId} in ${account}.`);
-    //       }
-    //     }));
-
-    //     await Promise.all([filterAccountPromise, filterUserStatusPromise]).then(() => {
-    //       availableAccounts = filteredStatusAccounts.filter((account) =>
-    // filteredUserStatusAccounts.includes(account));
-    //     });
-
-    //     return [ { accounts: availableAccounts } ];
-    //   },
 
   });
 
