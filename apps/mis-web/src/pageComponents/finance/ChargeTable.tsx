@@ -123,9 +123,9 @@ export const ChargeTable: React.FC<Props> = ({
   const handleExport = async (columns: string[]) => {
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
-      message.error(`导出明细过多，最多导出${MAX_EXPORT_COUNT}条，请重新选择!`);
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
     } else if (totalCount <= 0) {
-      message.error("导出为空，请重新选择！");
+      message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
         exportApi: "exportChargeRecord",
