@@ -47,11 +47,12 @@ export function getORM(): Promise<MikroORM> {
     globalObject.__CACHED_ORM_PROMISE__ = getConfig()
       .then((config) => MikroORM.init(config))
       .then(async (orm) => {
-        globalObject.__CACHED_ORM_PROMISE__ = undefined; // Remove initialization promise
-        globalObject.__CACHED_ORM__ = orm; // Cache ORM instance
         const schemaGenerator = orm.getSchemaGenerator();
         await schemaGenerator.ensureDatabase();
         await orm.getMigrator().up();
+        globalObject.__CACHED_ORM_PROMISE__ = undefined; // Remove initialization promise
+        globalObject.__CACHED_ORM__ = orm; // Cache ORM instance
+
         return orm;
       });
 

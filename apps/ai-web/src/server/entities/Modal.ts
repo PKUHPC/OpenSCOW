@@ -33,8 +33,8 @@ export class Modal {
   @Property({ comment: "algorithm name" })
     algorithmName: string;
 
-  // @OneToMany(() => "ModalVersion", (modalVersion: ModalVersion) => modalVersion.modal)
-  //   versions = new Collection<ModalVersion>(this);
+  @OneToMany(() => "ModalVersion", (modalVersion: ModalVersion) => modalVersion.modal)
+    versions = new Collection<ModalVersion>(this);
 
   @Property()
     isShared: boolean;

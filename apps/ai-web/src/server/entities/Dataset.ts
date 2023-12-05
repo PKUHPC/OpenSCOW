@@ -30,8 +30,8 @@ export class Dataset {
   @Property()
     type: string;
 
-  // @OneToMany(() => "DatasetVersion", (datasetVersion: DatasetVersion) => datasetVersion.dataset)
-  //   versions = new Collection<DatasetVersion>(this);
+  @OneToMany(() => "DatasetVersion", (datasetVersion: DatasetVersion) => datasetVersion.dataset)
+    versions = new Collection<DatasetVersion>(this);
 
   @Property()
     isShared: boolean;

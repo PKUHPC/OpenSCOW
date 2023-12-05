@@ -29,7 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     "src/**/*.ts"
-, "src/server/mikro-orm.config.js"  ],
+  ],
   "exclude": [
     "node_modules"
   ],

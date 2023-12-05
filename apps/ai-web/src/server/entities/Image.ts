@@ -13,13 +13,10 @@
 import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
-export const Source = {
-  INTERNAL: "INTERNAL",
-  EXTERNAL: "EXTERNAL",
+export enum Source {
+  INTERNAL = "INTERNAL",
+  EXTERNAL = "EXTERNAL",
 };
-
-export type Source = keyof typeof Source;
-
 
 @Entity()
 export class Image {

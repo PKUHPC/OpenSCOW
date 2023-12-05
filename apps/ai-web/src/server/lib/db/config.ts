@@ -16,11 +16,11 @@ import { EntityManager, MikroORM, Options } from "@mikro-orm/core";
 import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
 import { entities } from "src/server/entities";
 
-const ROOT = resolve("db");
+// const ROOT = resolve("db");
 
 const aiConfig = {
   db: {
-    host: "0.0.0.0",
+    host: "localhost",
     port: 3306,
     user: "root",
     dbName: "scow-ai",

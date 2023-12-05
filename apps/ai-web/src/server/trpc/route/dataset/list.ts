@@ -12,25 +12,28 @@
 
 // import { Dataset } from "src/server/entities/Dataset";
 // import { withPageAssert } from "src/server/trpc/middleware/withPageAssert";
-import { procedure } from "src/server/trpc/procedure/base";
 // import { NoteStatusFilter } from "src/server/trpc/type/common/NoteStatusFilter";
 // import { NotesPageInput } from "src/server/trpc/type/input/NotesPageInput";
 // import { NotesPageOutput } from "src/server/trpc/type/output/NotesPageOutput";
+import { Dataset } from "src/server/entities/Dataset";
+import { getORM } from "src/server/lib/db/orm";
+import { procedure } from "src/server/trpc/procedure/base";
 
 export const list = procedure
   // .use(withPageAssert)
   // .input(NotesPageInput)
   // .output(NotesPageOutput)
   .query(async ({ input, ctx }) => {
-    // const { orm } = ctx;
     // const { args } = input;
     // const { status } = input.filter;
+    // const { orm } = ctx;
+    const orm = await getORM();
 
-    // const [items, count] = await orm.em.findAndCount(Dataset, {}, {
-    //   // limit: args.limit,
-    //   // offset: args.offset,
-    //   orderBy: { createTime: "desc" },
-    // });
+    const [items, count] = await orm.em.findAndCount(Dataset, {}, {
+      // limit: args.limit,
+      // offset: args.offset,
+      orderBy: { createTime: "desc" },
+    });
 
-    return { items: [{ a:1 }], count:0 };
+    return { items, count };
   });

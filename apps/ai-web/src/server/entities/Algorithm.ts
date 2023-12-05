@@ -15,17 +15,13 @@ import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { AlgorithmVersion } from "./AlgorithmVersion";
 
-export const Framework = {
-  TENSOR_FLOW: "TENSOR_FLOW",
-  PYTORCH: "PYTORCH",
-  KERAS: "KERAS",
-  MIND_SPORE: "MIND_SPORE",
-  OTHER: "OTHER",
-} as const;
-
-
-export type Framework = keyof typeof Framework;
-
+export enum Framework {
+  TENSORFLOW = "TENSORFLOW",
+  PYTORCH = "PYTORCH",
+  KERAS = "KERAS",
+  MINDSPORE = "MINDSPORE",
+  OTHER = "OTHER",
+};
 
 @Entity()
 export class Algorithm {
@@ -41,8 +37,8 @@ export class Algorithm {
   @Property()
     framework: Framework;
 
-  // @OneToMany(() => "AlgorithmVersion", (algorithmVersion: AlgorithmVersion) => algorithmVersion.algorithm)
-  //   versions = new Collection<AlgorithmVersion>(this);
+  @OneToMany(() => "AlgorithmVersion", (algorithmVersion: AlgorithmVersion) => algorithmVersion.algorithm)
+    versions = new Collection<AlgorithmVersion>(this);
 
   @Property()
     isShared: boolean;
