@@ -22,7 +22,7 @@ message ExportAccount {
   optional string account_name = 2;
   // 为true时表明账户被冻结，false则为所有账户
   optional bool blocked = 3;
-    // 为true时表明账户欠费，false则为所有账户
+  // 为true时表明账户欠费，false则为所有账户
   optional bool debt = 4;
 }
 

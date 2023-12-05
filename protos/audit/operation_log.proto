@@ -288,7 +288,7 @@ message ExportUser {
 }
 
 message ExportAccount {
-    // 不传则是导出平台所有的账户
+  // 不传则是导出平台所有的账户
   optional string tenant_name = 1;
 }
 
