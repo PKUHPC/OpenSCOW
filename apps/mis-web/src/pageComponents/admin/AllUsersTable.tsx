@@ -159,7 +159,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
       { label: t(pCommon("createTime")), value: "createTime" },
       { label: t(p("roles")), value: "platformRoles" },
     ];
-  }, [ t, p]);
+  }, [t]);
 
 
   return (

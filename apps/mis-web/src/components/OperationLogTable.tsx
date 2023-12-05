@@ -158,7 +158,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       { label: t(p("operatorUserId")), value: "operatorUserId" },
       { label: t(p("operatorIp")), value: "operatorIp" },
     ];
-  }, [ t, p]);
+  }, [t]);
 
 
   return (
