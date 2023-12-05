@@ -72,12 +72,10 @@ export const operationLogServiceServer = plugin((server) => {
     },
 
     exportOperationLog: async (call) => {
-      const { em, request, logger } = call;
+      const { em, request } = call;
       const { count, filter } = ensureNotUndefined(request, ["filter"]);
 
       const sqlFilter = await filterOperationLogs(filter);
-
-      logger.info("exportOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
       const batchSize = 5000;
       let offset = 0;
