@@ -115,7 +115,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
-    PROTOCOL: config.PROTOCOL,
+    PROTOCOL: config.PROTOCOL || "http",
   };
 
   /**

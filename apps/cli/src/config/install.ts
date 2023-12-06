@@ -33,7 +33,7 @@ export const InstallConfigSchema = Type.Object({
   gateway: Type.Object({
     protocol: Type.String({
       description: "scow 的访问协议，将影响 callbackUrl 的 protocol",
-      default: "",
+      default: "http",
     }),
 
     uploadFileSizeLimit: Type.String({

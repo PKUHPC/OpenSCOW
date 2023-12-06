@@ -162,7 +162,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
 
-    PROTOCOL: config.PROTOCOL,
+    PROTOCOL: config.PROTOCOL || "http",
   };
 
   // query auth capabilities to set optional auth features
