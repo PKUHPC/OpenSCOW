@@ -269,7 +269,7 @@ export const jobServiceServer = plugin((server) => {
       });
 
       const reply = await asyncClientCall(client.job, "submitScriptAsJob", {
-        userId, script,
+        userId, script, scriptFileFullPath: filePath,
       }).catch((e) => {
         const ex = e as ServiceError;
         const errors = parseErrorDetails(ex.metadata);
