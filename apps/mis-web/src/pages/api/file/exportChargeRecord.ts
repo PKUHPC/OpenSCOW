@@ -15,7 +15,7 @@ import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
-import { ExportChargeRecordResponse, ExportServiceClient } from "@scow/protos/build/server/export";
+import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { getT, prefix } from "src/i18n";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -130,16 +130,6 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
     const csvStringify = getCsvStringify(headerColumns, columns);
 
     const transform = getCsvObjTransform("chargeRecords", formatChargeRecord);
-
-    let ccount = 0;
-    stream.on("data", (data: ExportChargeRecordResponse) => {
-      ccount += 1;
-      console.log("length: ", data.chargeRecords.length);
-      console.log("count: ", ccount);
-      if (data.chargeRecords.length === 0) {
-        console.log(data.chargeRecords);
-      }
-    });
 
     pipeline(
       stream,
