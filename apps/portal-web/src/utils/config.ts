@@ -54,6 +54,8 @@ export interface ServerRuntimeConfig {
     defaultHomeText: I18nStringType,
     submitJopPromptText?: I18nStringType,
   }
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
@@ -100,8 +102,6 @@ export interface PublicRuntimeConfig {
   }
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
-
-  PROTOCOL: string;
 
 }
 

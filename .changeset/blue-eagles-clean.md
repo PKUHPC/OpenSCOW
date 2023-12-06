@@ -2,6 +2,7 @@
 "@scow/portal-web": patch
 "@scow/mis-web": patch
 "@scow/config": patch
+"@scow/auth": patch
 "@scow/cli": patch
 "@scow/lib-web": patch
 ---

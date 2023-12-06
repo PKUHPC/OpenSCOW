@@ -17,9 +17,9 @@ import { join } from "path";
 export const redirectToAuthLogin = (
   req: NextApiRequest, res: NextApiResponse, protocol: string, basePath: string, authExternalUrl: string,
 ) => {
-  const url = new URL(req.url!, `${protocol}://${req.headers.host}`);
 
-  const callbackUrl = url.origin + join(basePath, "/api/auth/callback");
+  const callbackUrl = protocol === "" ? req.headers.host + join(basePath, "/api/auth/callback")
+    : new URL(req.url!, `${protocol}://${req.headers.host}`).origin + join(basePath, "/api/auth/callback");
 
   const target = joinWithUrl(authExternalUrl, `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 

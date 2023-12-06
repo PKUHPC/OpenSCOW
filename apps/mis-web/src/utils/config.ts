@@ -39,6 +39,8 @@ export interface ServerRuntimeConfig {
 
   SERVER_I18N_CONFIG_TEXTS: {
   };
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
@@ -85,7 +87,6 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
-  PROTOCOL: string;
 
 }
 

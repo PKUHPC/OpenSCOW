@@ -31,6 +31,11 @@ export const InstallConfigSchema = Type.Object({
   }, { default: {} }),
 
   gateway: Type.Object({
+    protocol: Type.String({
+      description: "scow 的访问协议，将影响 callbackUrl 的 protocol",
+      default: "",
+    }),
+
     uploadFileSizeLimit: Type.String({
       description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
       default: "1G",

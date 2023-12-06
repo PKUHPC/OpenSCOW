@@ -214,6 +214,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
       },
       ports: {},
       volumes: {
@@ -257,6 +258,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
       },
       ports: {},
       volumes: {

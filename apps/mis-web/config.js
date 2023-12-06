@@ -51,6 +51,8 @@ const specs = {
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
+
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -113,6 +115,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
+    PROTOCOL: config.PROTOCOL,
   };
 
   /**
@@ -168,8 +171,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ],
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
-
-    PROTOCOL: commonConfig.protocol || "http",
 
   };
 
