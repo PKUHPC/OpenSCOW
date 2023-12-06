@@ -50,6 +50,7 @@ export function getORM(): Promise<MikroORM> {
         const schemaGenerator = orm.getSchemaGenerator();
         await schemaGenerator.ensureDatabase();
         await orm.getMigrator().up();
+        console.log("orm.getMigrator().up()");
         globalObject.__CACHED_ORM_PROMISE__ = undefined; // Remove initialization promise
         globalObject.__CACHED_ORM__ = orm; // Cache ORM instance
 

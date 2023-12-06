@@ -2,7 +2,6 @@
   "name": "ai-web",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "files": [
     ".next",
     "public",
@@ -23,7 +22,7 @@
     "report:html": "pnpm test:compose-up && ((c8 ava && c8 report --reporter=html) ; pnpm test:compose-down)",
     "ci": "c8 ava && c8 report --reporter=json",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
-    "ormCreate": "dotenv -e env/.env.dev -- npx ts-node mikro-orm migration:create"
+    "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create"
   },
   "mikro-orm": {
     "useTsNode": true,
@@ -57,6 +56,7 @@
     "mime-types": "2.1.35",
     "next": "14.0.3",
     "next-connect": "1.0.0",
+    "nextjs-cors": "^2.1.2",
     "nookies": "2.5.2",
     "nprogress": "0.2.0",
     "protobufjs": "7.2.5",
@@ -66,6 +66,8 @@
     "simstate": "3.0.1",
     "styled-components": "6.0.7",
     "superjson": "2.2.1",
+    "swagger-ui-react": "5.10.3",
+    "trpc-openapi": "1.2.0",
     "ws": "8.13.0",
     "xterm": "5.2.1",
     "xterm-addon-fit": "0.7.0",
@@ -79,6 +81,7 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "@types/styled-components": "5.1.26",
+    "@types/swagger-ui-react": "^4.18.3",
     "@types/ws": "8.5.5",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",

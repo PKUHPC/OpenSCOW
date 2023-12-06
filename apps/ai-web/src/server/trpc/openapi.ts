@@ -10,17 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
-import { createTRPCNext } from "@trpc/next";
-import { NextPageContext } from "next";
-import type { Router } from "src/server/trpc/router";
-import Superjson from "superjson";
+import { generateOpenApiDocument } from "trpc-openapi";
 
-export const client = createTRPCProxyClient<Router>({
-  transformer: Superjson,
-  links: [
-    httpBatchLink({
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/api/trpc`,
-    }),
-  ],
+import { router } from "./router";
+
+// Generate OpenAPI schema document
+export const openApiDocument = generateOpenApiDocument(router, {
+  title: "Example CRUD API",
+  description: "OpenAPI compliant REST API built using tRPC with Next.js",
+  version: "1.0.0",
+  baseUrl: "http://localhost:3000/api",
+  docsUrl: "https://github.com/jlalmes/trpc-openapi",
+  tags: ["dataset"],
 });

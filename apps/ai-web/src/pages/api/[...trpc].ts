@@ -10,16 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "swagger-ui-react/swagger-ui.css";
+import { NextApiRequest, NextApiResponse } from "next";
+import cors from "nextjs-cors";
+import { createContext } from "src/server/trpc/context";
+import { router } from "src/server/trpc/router";
+import { createOpenApiNextHandler } from "trpc-openapi";
 
-import type { NextPage } from "next";
-import dynamic from "next/dynamic";
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  // Setup CORS
+  await cors(req, res);
 
-const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
-
-const Home: NextPage = () => {
-  // Serve Swagger UI with our OpenAPI schema
-  return <SwaggerUI url="/api/openapi.json" />;
+  // Handle incoming OpenAPI requests
+  return createOpenApiNextHandler({
+    router: router,
+    createContext,
+  })(req, res);
 };
 
-export default Home;
+export default handler;

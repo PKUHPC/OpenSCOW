@@ -16,7 +16,7 @@ import { Migration } from "@mikro-orm/migrations";
 
 export class Migration20231128072018 extends Migration {
 
-  async up(): Promise<void> {
+  async up() {
     this.addSql("create table `algorithm` (`id` int unsigned not null auto_increment primary key, `name` varchar(255) not null, `owner` varchar(255) not null, `framework` varchar(255) not null, `is_shared` tinyint(1) not null, `description` varchar(255) not null, `create_time` DATETIME(6) not null default current_timestamp(6)) default character set utf8mb4 engine = InnoDB;");
     this.addSql("alter table `algorithm` add unique `algorithm_name_unique`(`name`);");
 
@@ -45,7 +45,7 @@ export class Migration20231128072018 extends Migration {
     this.addSql("alter table `modal_version` add constraint `modal_version_modal_id_foreign` foreign key (`modal_id`) references `modal` (`id`) on update cascade;");
   }
 
-  async down(): Promise<void> {
+  async down() {
     this.addSql("alter table `algorithm_version` drop foreign key `algorithm_version_algorithm_id_foreign`;");
 
     this.addSql("alter table `dataset_version` drop foreign key `dataset_version_dataset_id_foreign`;");

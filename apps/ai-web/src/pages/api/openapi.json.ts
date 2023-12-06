@@ -10,16 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "swagger-ui-react/swagger-ui.css";
+import { NextApiRequest, NextApiResponse } from "next";
+import { openApiDocument } from "src/server/trpc/openapi";
 
-import type { NextPage } from "next";
-import dynamic from "next/dynamic";
-
-const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
-
-const Home: NextPage = () => {
-  // Serve Swagger UI with our OpenAPI schema
-  return <SwaggerUI url="/api/openapi.json" />;
+// Respond with our OpenAPI schema
+const handler = (req: NextApiRequest, res: NextApiResponse) => {
+  res.status(200).send(openApiDocument);
 };
 
-export default Home;
+export default handler;

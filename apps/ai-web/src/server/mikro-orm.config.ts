@@ -14,4 +14,5 @@ import { ormConfigs } from "src/server/lib/db/config";
 
 export default {
   ...ormConfigs,
+
 };

@@ -10,20 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { join, resolve } from "node:path";
+import { join } from "node:path";
 
-import { EntityManager, MikroORM, Options } from "@mikro-orm/core";
+import { Options } from "@mikro-orm/core";
 import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
 import { entities } from "src/server/entities";
-
-// const ROOT = resolve("db");
+import { migrations } from "src/server/migrations";
 
 const aiConfig = {
   db: {
     host: "localhost",
     port: 3306,
     user: "root",
-    dbName: "scow-ai",
+    dbName: "scow_ai",
     password: "mysqlrootpassword",
     debug: true,
   },
@@ -41,8 +40,8 @@ export const ormConfigs = {
   forceUndefined: true,
   runMigrations: true,
   migrations: {
-    path: join(distPath, "migrations"),
-    pattern: /^[\w-]+\d+\.(j|t)s$/,
+    pathTs: join(distPath, "migrations"),
+    migrationsList: migrations,
   },
   entities,
   debug: aiConfig.db.debug,
@@ -52,17 +51,3 @@ export const ormConfigs = {
 } as Options<MySqlDriver>;
 
 export const getConfig = async () => defineConfig(ormConfigs);
-// export const getConfig = async () => defineConfig({
-//   implicitTransactions: true,
-//   dbName: process.env.MIKRO_ORM_DB_NAME || undefined,
-//   host: process.env.MIKRO_ORM_HOST || undefined,
-//   port: parseInt(process.env.MIKRO_ORM_PORT || "", 10) || undefined,
-//   debug: process.env.NODE_ENV === "development",
-//   migrations: {
-//     path: join(ROOT, "migration"),
-//   },
-//   seeder: {
-//     path: join(ROOT, "seed"),
-//   },
-//   entities,
-// });

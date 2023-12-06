@@ -10,19 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { Dataset } from "src/server/entities/Dataset";
-// import { withPageAssert } from "src/server/trpc/middleware/withPageAssert";
-// import { NoteStatusFilter } from "src/server/trpc/type/common/NoteStatusFilter";
-// import { NotesPageInput } from "src/server/trpc/type/input/NotesPageInput";
-// import { NotesPageOutput } from "src/server/trpc/type/output/NotesPageOutput";
 import { Dataset } from "src/server/entities/Dataset";
 import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
+import { z } from "zod";
 
 export const list = procedure
-  // .use(withPageAssert)
-  // .input(NotesPageInput)
-  // .output(NotesPageOutput)
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/dataset/list",
+      tags: ["dataset"],
+      summary: "Read all dataset",
+    },
+  })
+  .input(z.void())
+  .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input, ctx }) => {
     // const { args } = input;
     // const { status } = input.filter;

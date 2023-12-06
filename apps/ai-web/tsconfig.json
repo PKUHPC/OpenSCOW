@@ -29,7 +29,7 @@
     "**/*.ts",
     "**/*.tsx",
     "src/**/*.ts"
-  ],
+, "src/server/migrations/Migration20231128072018.mjs"  ],
   "exclude": [
     "node_modules"
   ],
