@@ -1,5 +1,13 @@
 # @scow/audit-server
 
+## 2.1.2
+
+### Patch Changes
+
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/protos@1.0.4
+
 ## 2.1.1
 
 ### Patch Changes

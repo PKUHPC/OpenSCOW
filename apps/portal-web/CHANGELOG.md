@@ -1,5 +1,18 @@
 # @scow/portal-web
 
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- 9a47c21397: 修复文件管理跳转路径导致的控制台报错
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-web@1.2.3
+  - @scow/lib-operation-log@2.0.4
+  - @scow/protos@1.0.4
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.2
 
 ### Patch Changes
