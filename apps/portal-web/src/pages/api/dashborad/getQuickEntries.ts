@@ -18,7 +18,6 @@ import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 const PageLinkEntry = Type.Object({
   path: Type.String(),
@@ -32,6 +31,7 @@ const ShellEntry = Type.Object({
 });
 
 const AppEntry = Type.Object({
+  appId: Type.String(),
   clusterId: Type.String(),
 });
 

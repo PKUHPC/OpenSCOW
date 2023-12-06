@@ -92,7 +92,7 @@ export const AddEntryModal: React.FC<Props> = ({
 
   // 所有可创建的app
   const appInfo = useMemo(() => {
-    const displayApp: Entry[] = [];
+    const displayApp: IncompleteEntryInfo[] = [];
 
     if (apps) {
       for (const key in apps) {
@@ -100,12 +100,7 @@ export const AddEntryModal: React.FC<Props> = ({
         displayApp.push({
           id:x.app.id,
           name:x.app.name,
-          entry:{
-            $case:"app",
-            app:{
-              clusterId:"",
-            },
-          },
+          case:EntryCase.app,
         });
       }
     }
@@ -118,7 +113,7 @@ export const AddEntryModal: React.FC<Props> = ({
   // 可以创建该App的集群
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
   // 新建快捷方式的部分信息
-  const [IncompleteEntryInfo, setIncompleteEntryInfo] = useState<IncompleteEntryInfo | null>(null);
+  const [incompleteEntryInfo, setIncompleteEntryInfo] = useState<IncompleteEntryInfo | null>(null);
 
   // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
   useEffect(() => {
@@ -133,8 +128,9 @@ export const AddEntryModal: React.FC<Props> = ({
   }, [changeClusterItem]);
 
 
-  const handleClick = (item: Entry) => {
-    if (item.entry?.$case === "shell") {
+  const handleClick = (item: Entry | IncompleteEntryInfo) => {
+
+    if ((item as Entry).entry?.$case === "shell") {
       setNeedLoginNode(true);
       setClustersToSelectedApp(clusters);
       setSelectClusterOpen(true);
@@ -145,7 +141,7 @@ export const AddEntryModal: React.FC<Props> = ({
       },
       );
     }
-    else if (item.entry?.$case === "app") {
+    else if ((item as IncompleteEntryInfo).case === EntryCase.app) {
       setNeedLoginNode(false);
       setClustersToSelectedApp(apps![item.id].clusters);
       setSelectClusterOpen(true);
@@ -202,7 +198,7 @@ export const AddEntryModal: React.FC<Props> = ({
               >
                 <EntryItem
                   name={item.name}
-                  logoPath={getEntryLogoPath(item, apps)}
+                  logoPath={apps[item.id].app.logoPath}
                   style={{ padding:"10px" }}
                 />
               </div>
@@ -215,7 +211,7 @@ export const AddEntryModal: React.FC<Props> = ({
         open={selectClusterOpen}
         onClose={() => { setSelectClusterOpen(false); }}
         needLoginNode={needLoginNode}
-        IncompleteEntryInfo={IncompleteEntryInfo}
+        incompleteEntryInfo={incompleteEntryInfo}
         clusters={clustersToSelectedApp}
         addItem={addItem}
         closeAddEntryModal={onClose}

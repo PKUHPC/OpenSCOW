@@ -26,7 +26,7 @@ export interface Props {
   needLoginNode: boolean;
   clusters: Cluster[];
   addItem: (item: Entry) => void;
-  IncompleteEntryInfo: IncompleteEntryInfo | null;
+  incompleteEntryInfo: IncompleteEntryInfo | null;
   closeAddEntryModal: () => void;
 }
 
@@ -42,7 +42,7 @@ export const SelectClusterModal: React.FC<Props> = ({
   needLoginNode,
   clusters,
   addItem,
-  IncompleteEntryInfo,
+  incompleteEntryInfo,
   closeAddEntryModal,
 }) => {
   const t = useI18nTranslateToString();
@@ -61,10 +61,10 @@ export const SelectClusterModal: React.FC<Props> = ({
 
   const onFinish = async () => {
     const { cluster, loginNode } = await form.validateFields();
-    if (IncompleteEntryInfo && IncompleteEntryInfo.case === EntryCase.shell) {
+    if (incompleteEntryInfo && incompleteEntryInfo.case === EntryCase.shell) {
       addItem({
-        id:IncompleteEntryInfo.id,
-        name:IncompleteEntryInfo.name,
+        id:incompleteEntryInfo.id,
+        name:incompleteEntryInfo.name,
         entry:{
           $case:"shell",
           shell:{
@@ -74,13 +74,14 @@ export const SelectClusterModal: React.FC<Props> = ({
           },
         } });
     }
-    else if (IncompleteEntryInfo && IncompleteEntryInfo.case === EntryCase.app) {
+    else if (incompleteEntryInfo && incompleteEntryInfo.case === EntryCase.app) {
       addItem({
-        id:IncompleteEntryInfo.id,
-        name:IncompleteEntryInfo.name,
+        id:incompleteEntryInfo.id,
+        name:incompleteEntryInfo.name,
         entry:{
           $case:"app",
           app:{
+            appId:incompleteEntryInfo.id,
             clusterId:cluster,
           },
         } });

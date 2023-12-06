@@ -25,13 +25,14 @@ import {
   arrayMove,
   rectSortingStrategy,
   SortableContext } from "@dnd-kit/sortable";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Card, message } from "antd";
 import { useRouter } from "next/router";
 import { join } from "path";
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
@@ -71,9 +72,10 @@ interface Props {
 }
 const p = prefix("pageComp.dashboard.sortable.");
 
-const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
+export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
   const router = useRouter();
 
   // 实际的快捷入口项
@@ -269,7 +271,10 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) 
                         }
                       }}
                       >
-                        {getEntryClusterName(x as Entry & {entry: {$case: "app" | "shell"} }) as string}
+                        { getI18nConfigCurrentText(
+                          getEntryClusterName(x as Entry & {entry: {$case: "app" | "shell"} }),
+                          languageId)
+                        }
                       </ClusterContainer>
                     ) :
                     undefined
@@ -321,4 +326,3 @@ const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) 
   );
 };
 
-export default Sortable;

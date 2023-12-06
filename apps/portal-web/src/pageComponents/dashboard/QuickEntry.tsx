@@ -16,7 +16,7 @@ import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import Sortable from "src/pageComponents/dashboard/Sortable";
+import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
 import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
