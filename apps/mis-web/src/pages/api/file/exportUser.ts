@@ -14,8 +14,7 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-import { FileServiceClient } from "@scow/protos/build/server/file";
-import { PlatformUserInfo } from "@scow/protos/build/server/user";
+import { ExportedUser, ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
@@ -94,7 +93,7 @@ export default route(ExportUserSchema, async (req, res) => {
     return { 409: { code: "TOO_MANY_DATA" } } as const;
 
   } else {
-    const client = getClient(FileServiceClient);
+    const client = getClient(ExportServiceClient);
 
     const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
@@ -104,19 +103,14 @@ export default route(ExportUserSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
-    const stream = asyncReplyStreamCall(client, "export", {
+    const stream = asyncReplyStreamCall(client, "exportUser", {
       count,
-      exportEvent: {
-        $case: "user",
-        user: {
-          sortField: mappedSortField,
-          sortOrder: mappedSortOrder,
-          idOrName,
-          tenantName: selfTenant ? info.tenant : undefined,
-          tenantRole,
-          platformRole,
-        },
-      },
+      sortField: mappedSortField,
+      sortOrder: mappedSortOrder,
+      idOrName,
+      tenantName: selfTenant ? info.tenant : undefined,
+      tenantRole,
+      platformRole,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -146,7 +140,7 @@ export default route(ExportUserSchema, async (req, res) => {
     };
 
 
-    const formatUser = (x: PlatformUserInfo & {tenantRoles: TenantRole[]}) => {
+    const formatUser = (x: ExportedUser) => {
       return {
         userId: x.userId,
         name: x.name,
@@ -161,7 +155,7 @@ export default route(ExportUserSchema, async (req, res) => {
 
     const csvStringify = getCsvStringify(headerColumns, columns);
 
-    const transform = getCsvObjTransform(formatUser);
+    const transform = getCsvObjTransform("users", formatUser);
 
     pipeline(
       stream,

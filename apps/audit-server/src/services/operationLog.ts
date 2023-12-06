@@ -95,7 +95,7 @@ export const operationLogServiceServer = plugin((server) => {
         }
         for (const row of records) {
           await new Promise(async (resolve) => {
-            await writeAsync({ chunk: Buffer.from(JSON.stringify(row)) });
+            await writeAsync({ operationLogs: [row]});
             resolve("done");
           }).catch((e) => {
             throw <ServiceError> {

@@ -15,7 +15,7 @@ import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
-import { FileServiceClient } from "@scow/protos/build/server/file";
+import { ExportChargeRecordResponse, ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { getT, prefix } from "src/i18n";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -81,7 +81,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
   } else {
 
-    const client = getClient(FileServiceClient);
+    const client = getClient(ExportServiceClient);
 
     const filename = `charge_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
@@ -91,17 +91,12 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
-    const stream = asyncReplyStreamCall(client, "export", {
+    const stream = asyncReplyStreamCall(client, "exportChargeRecord", {
       count,
-      exportEvent: {
-        $case: "chargeRecord",
-        chargeRecord: {
-          startTime,
-          endTime,
-          type,
-          target,
-        },
-      },
+      startTime,
+      endTime,
+      type,
+      target,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -134,7 +129,17 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
     const csvStringify = getCsvStringify(headerColumns, columns);
 
-    const transform = getCsvObjTransform(formatChargeRecord);
+    const transform = getCsvObjTransform("chargeRecords", formatChargeRecord);
+
+    let ccount = 0;
+    stream.on("data", (data: ExportChargeRecordResponse) => {
+      ccount += 1;
+      console.log("length: ", data.chargeRecords.length);
+      console.log("count: ", ccount);
+      if (data.chargeRecords.length === 0) {
+        console.log(data.chargeRecords);
+      }
+    });
 
     pipeline(
       stream,

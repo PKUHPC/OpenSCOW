@@ -140,7 +140,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         columns,
         count: total,
         query: {
-          rtField: sortInfo.sortField,
+          sortField: sortInfo.sortField,
           sortOrder: sortInfo.sortOrder,
           idOrName: query.idOrName,
           platformRole: currentPlatformRole,

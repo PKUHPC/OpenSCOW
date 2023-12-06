@@ -15,7 +15,7 @@ import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { OperationResult } from "@scow/lib-operation-log";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { Account } from "@scow/protos/build/server/account";
-import { FileServiceClient } from "@scow/protos/build/server/file";
+import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
@@ -86,7 +86,7 @@ export default route(ExportAccountSchema, async (req, res) => {
     return { 409: { code: "TOO_MANY_DATA" } } as const;
 
   } else {
-    const client = getClient(FileServiceClient);
+    const client = getClient(ExportServiceClient);
 
     const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
@@ -96,17 +96,12 @@ export default route(ExportAccountSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
-    const stream = asyncReplyStreamCall(client, "export", {
+    const stream = asyncReplyStreamCall(client, "exportAccount", {
       count,
-      exportEvent: {
-        $case: "account",
-        account: {
-          accountName,
-          tenantName: isFromAdmin ? tenantName : info.tenant,
-          blocked,
-          debt,
-        },
-      },
+      accountName,
+      tenantName: isFromAdmin ? tenantName : info.tenant,
+      blocked,
+      debt,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -138,8 +133,7 @@ export default route(ExportAccountSchema, async (req, res) => {
 
     const csvStringify = getCsvStringify(headerColumns, columns);
 
-    const transform = getCsvObjTransform(formatAccount);
-
+    const transform = getCsvObjTransform("accounts", formatAccount);
     pipeline(
       stream,
       transform,

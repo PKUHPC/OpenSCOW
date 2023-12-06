@@ -15,7 +15,7 @@ import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { PaymentRecord } from "@scow/protos/build/server/charging";
-import { FileServiceClient } from "@scow/protos/build/server/file";
+import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
@@ -97,7 +97,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   } else {
 
-    const client = getClient(FileServiceClient);
+    const client = getClient(ExportServiceClient);
 
     const filename = `pay_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
@@ -107,16 +107,11 @@ export default route(ExportPayRecordSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
-    const stream = asyncReplyStreamCall(client, "export", {
+    const stream = asyncReplyStreamCall(client, "exportPayRecord", {
       count,
-      exportEvent: {
-        $case: "payRecord",
-        payRecord: {
-          startTime,
-          endTime,
-          target,
-        },
-      },
+      startTime,
+      endTime,
+      target,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -151,7 +146,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
     };
     const csvStringify = getCsvStringify(headerColumns, columns);
 
-    const transform = getCsvObjTransform(formatPayRecord);
+    const transform = getCsvObjTransform("payRecords", formatPayRecord);
 
     pipeline(
       stream,

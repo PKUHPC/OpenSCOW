@@ -38,19 +38,23 @@ export const getCsvStringify = (headerColumns: {[key in string]: string}, column
   return csvStringify;
 };
 
+type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "operationLogs";;
 
 /**
  *
  * @param formatFn 格式化grpc返回的数据成页面展示的数据格式
  * @returns 返回一个Transform对象
  */
-export const getCsvObjTransform = (formatFn: (obj: any) => any) => {
+export const getCsvObjTransform = (key: exportKey, formatFn: (obj: any) => any) => {
   return new Transform({
     objectMode: true,
-    transform(x, encoding, callback) {
+    transform(chunk, _, callback) {
       try {
-        const obj = formatFn(JSON.parse(x.chunk.toString(encoding)));
-        callback(null, obj);
+        chunk[key].forEach((obj: any) => {
+          const formattedData = formatFn(obj);
+          this.push(formattedData);
+        });
+        callback();
       } catch (error) {
         callback(error);
       }

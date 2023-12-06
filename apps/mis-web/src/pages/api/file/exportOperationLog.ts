@@ -237,7 +237,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
     const csvStringify = getCsvStringify(headerColumns, columns);
 
-    const transform = getCsvObjTransform(formatOperationLog);
+    const transform = getCsvObjTransform("operationLogs", formatOperationLog);
 
     pipeline(
       stream,

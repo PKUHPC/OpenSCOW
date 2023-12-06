@@ -528,7 +528,7 @@ message ExportOperationLogRequest {
 }
 
 message ExportOperationLogResponse {
-  bytes chunk = 1;
+  repeated OperationLog operation_logs = 1;
 }
 
 

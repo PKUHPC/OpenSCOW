@@ -36,8 +36,9 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
 
   const onOK = async () => {
     const { columns } = await form.validateFields();
-    console.log("columns: ", columns);
+
     setLoading(true);
+
     await onExport(columns).then(() => {
       onClose();
       form.resetFields();
