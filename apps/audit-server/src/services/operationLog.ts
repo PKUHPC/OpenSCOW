@@ -82,6 +82,8 @@ export const operationLogServiceServer = plugin((server) => {
 
       const { writeAsync } = createWriterExtensions(call);
 
+      type RecordFormatReturnType = ReturnType<typeof toGrpcOperationLog>;
+
       while (offset < count) {
         const limit = Math.min(batchSize, count - offset);
         const operationLogs = await em.find(OperationLog, sqlFilter, {
@@ -93,17 +95,28 @@ export const operationLogServiceServer = plugin((server) => {
         if (records.length === 0) {
           break;
         }
+
+        let data: RecordFormatReturnType[] = [];
+        // 记录传输的总数量
+        let writeTotal = 0;
+
         for (const row of records) {
-          await new Promise(async (resolve) => {
-            await writeAsync({ operationLogs: [row]});
-            resolve("done");
-          }).catch((e) => {
-            throw <ServiceError> {
-              code: status.INTERNAL,
-              message: "Error when exporting file",
-              details: e?.message,
-            };
-          });
+          data.push(row);
+          writeTotal += 1;
+          if (data.length === 200 || writeTotal === records.length) {
+            await new Promise(async (resolve) => {
+              await writeAsync({ operationLogs: data });
+              // 清空暂存
+              data = [];
+              resolve("done");
+            }).catch((e) => {
+              throw <ServiceError>{
+                code: status.INTERNAL,
+                message: "Error when exporting file",
+                details: e?.message,
+              };
+            });
+          }
         }
         offset += limit;
       }
