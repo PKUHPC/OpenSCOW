@@ -136,6 +136,10 @@
 
 # 网关配置
 # gateway:
+#   # scow 访问协议，将影响 callbackUrl 的 protocol
+#   # callbackUrl 默认访问协议为 http
+#   # protocol: "http"
+
 #   # 限制整个系统上传（请求）文件的大小。默认1G
 #   # 可接受的格式为nginx的client_max_body_size可接受的值
 #   uploadFileSizeLimit: 1G
