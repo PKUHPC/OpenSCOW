@@ -284,8 +284,8 @@ export default {
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
           submitConfirmTitle: "确认提交",
-          submitConfirmNotice: "为了保证脚本正确运行，请在脚本内提供正确的工作目录绝对路径。"
-          + "如果没有提供工作目录，则默认将脚本文件所在目录作为工作目录。",
+          submitConfirmNotice: "请确保脚本文件提供了可用的绝对路径作为工作目录，"
+          + "如未提供则默认为脚本文件所在目录",
 
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",

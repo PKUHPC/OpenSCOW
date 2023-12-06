@@ -284,9 +284,9 @@ export default {
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
           submitConfirmTitle: "Submit Confirmation",
-          submitConfirmNotice: "To ensure the script runs correctly, please provide the correct absolute path of "
-          + "the working directory within the script. If a working directory is not specified, the directory where "
-          + "the file resides will be used as the default working directory.",
+          submitConfirmNotice: "Please ensure that the script file specifies a valid absolute path "
+          + "as its working directory. If a working directory is not specified, the directory containing "
+          + "the script file will be designated as the default working directory.",
           submitConfirmContent: "Confirm submission of {} to {}?",
           submitConfirmOk: "Confirm",
           submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
