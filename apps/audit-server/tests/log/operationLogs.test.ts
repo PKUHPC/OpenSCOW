@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import {
   ExportOperationLogResponse,
+  OperationLog as OperationLogProto,
   OperationLogServiceClient,
   operationResultFromJSON,
 } from "@scow/protos/build/audit/operation_log";
@@ -85,10 +86,14 @@ const operationLog4 = new OperationLog({
 
 async function collectOperationLog(stream: AsyncIterable<ExportOperationLogResponse>) {
 
-  const operationLogs = [] as OperationLog[];
+  const operationLogs: OperationLogProto[] = [];
 
   for await (const res of stream) {
-    operationLogs.push(JSON.parse(res.chunk.toString()));
+    const a = res.operationLogs;
+    a.forEach((o) => {
+      operationLogs.push(o);
+    });
+    operationLogs.concat(res.operationLogs);
   }
 
   return operationLogs;
