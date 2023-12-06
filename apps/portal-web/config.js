@@ -90,7 +90,7 @@ const specs = {
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
 
-  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "" }),
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -162,7 +162,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
 
-    PROTOCOL: config.PROTOCOL || "http",
+    PROTOCOL: config.PROTOCOL,
   };
 
   // query auth capabilities to set optional auth features

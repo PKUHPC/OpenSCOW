@@ -39,10 +39,6 @@ export async function validateCallbackHostname(callbackUrl: string, req: Fastify
 
   try {
 
-    if (!callbackUrl.startsWith("http://") && !callbackUrl.startsWith("https://")) {
-      callbackUrl = `https://${callbackUrl}`;
-    }
-
     const callbackHostname = new URL(callbackUrl).hostname;
 
     if (callbackHostname === incomingHostname) {
