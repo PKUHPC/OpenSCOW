@@ -1,5 +1,11 @@
 # @scow/config
 
+## 1.2.1
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+
 ## 1.2.0
 
 ### Minor Changes
