@@ -93,7 +93,6 @@ async function collectOperationLog(stream: AsyncIterable<ExportOperationLogRespo
     a.forEach((o) => {
       operationLogs.push(o);
     });
-    operationLogs.concat(res.operationLogs);
   }
 
   return operationLogs;
