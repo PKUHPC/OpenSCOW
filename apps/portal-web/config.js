@@ -89,6 +89,8 @@ const specs = {
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
+
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -159,6 +161,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
       defaultHomeText:  portalConfig.homeText.defaultText,
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
+
+    PROTOCOL: config.PROTOCOL,
   };
 
   // query auth capabilities to set optional auth features
