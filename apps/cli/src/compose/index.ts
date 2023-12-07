@@ -201,7 +201,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
-        "portal_data":"var/lib/scow/portal",
+        "portal_data":"/var/lib/scow/portal",
       },
     });
 
