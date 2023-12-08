@@ -1,6 +1,6 @@
 port: 80
 basePath: /
-image: mirrors.pku.edu.cn/pkuhpc/scow/scow
+#image: mirrors.pku.edu.cn/pkuhpc/scow/scow
 imageTag: master
 portal:
   basePath: /
