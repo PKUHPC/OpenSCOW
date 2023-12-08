@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { DatabaseOutlined } from "@ant-design/icons";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";

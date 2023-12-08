@@ -59,11 +59,12 @@ export const createDataset = procedure
     scene: z.string(),
     description: z.string(),
   }))
+  .output(z.number())
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const dataset = new Dataset(input);
     await orm.em.persistAndFlush(dataset);
-    return dataset;
+    return dataset.id;
   });
 
 export const deleteDataset = procedure
@@ -72,10 +73,11 @@ export const deleteDataset = procedure
       method: "DELETE",
       path: "/dataset/delete/{id}",
       tags: ["dataset"],
-      summary: "delete a new dataset",
+      summary: "delete a dataset",
     },
   })
   .input(z.object({ id: z.number() }))
+  .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });

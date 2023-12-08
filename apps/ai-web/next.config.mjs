@@ -10,6 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
+// const withPlugins = require("next-compose-plugins");
+
+import withPlugins from "next-compose-plugins";
+
+const analyze = process.env.ANALYZE === "true";
+
+// const { buildRuntimeConfig } = require("./config.js");
+// import { buildRuntimeConfig } from "./config.js";
+
+const BASE_PATH = process.env.BASE_PATH || "/";
+
+
 export default () => {
 
   /** @type {import('next').NextConfig} */

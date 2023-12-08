@@ -22,6 +22,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 import "src/styles/globals.css";
@@ -33,6 +34,7 @@ import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+// import { Button } from "antd";
 // import { App as AntdApp } from "antd";
 import type { NextPage } from "next";
 import type { AppContext, AppProps, AppType } from "next/app";
@@ -146,7 +148,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
   // const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
   //   extra.initialLanguage));
 
-  const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
+  // const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
 
   const getLayout =
     Component.getLayout ?? ((page) => (
@@ -154,59 +156,61 @@ function MyApp({ Component, pageProps, extra }: Props) {
         footerText={""}
         versionTag={undefined}
         initialLanguage={""}
-      >{page}</BaseLayout>
+      >
+        {page}
+      </BaseLayout>
     ));
   // Use the layout defined at the page level, if available
-  // return getLayout(<Component {...pageProps} />);
-  return getLayout(
-    <>
-      <Head>
-        <meta name="format-detection" content="telephone=no" />
-        {/* <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" /> */}
-        <link
-          rel="icon"
-          type="image/x-icon"
-          // href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
-        ></link>
-        {/* <script
-          id="__CONFIG__"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.__CONFIG__ = ${
-    JSON.stringify({
-      BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
-    })};
-            `,
-          }}
-        /> */}
-      </Head>
-      <Provider initialLanguage={{
-        id: extra?.initialLanguage,
-        // definitions: languagesMap[extra.initialLanguage],
-        definitions: languagesMap["zh_cn"],
-      }}
-      >
-        {/* <StoreProvider stores={[defaultClusterStore, loginNodeStore]}> */}
-        <DarkModeProvider initial={extra?.darkModeCookieValue}>
-          {/* <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}> */}
-          <FloatButtons languageId={ extra?.initialLanguage } />
-          <GlobalStyle />
-          <FailEventHandler />
-          <TopProgressBar />
-          <BaseLayout
-            // footerText={footerText}
-            footerText={""}
-            versionTag={publicConfig.VERSION_TAG}
-            initialLanguage={extra?.initialLanguage}
-          >
-            <Component {...pageProps} />
-          </BaseLayout>
-          {/* </AntdConfigProvider> */}
-        </DarkModeProvider>
-        {/* </StoreProvider> */}
-      </Provider>
-    </>,
-  );
+  return getLayout(<Component {...pageProps} />);
+  // return getLayout(
+  //   <>
+  //     <Head>
+  //       <meta name="format-detection" content="telephone=no" />
+  //       {/* <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" /> */}
+  //       <link
+  //         rel="icon"
+  //         type="image/x-icon"
+  //         // href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
+  //       ></link>
+  //       {/* <script
+  //         id="__CONFIG__"
+  //         dangerouslySetInnerHTML={{
+  //           __html: `
+  //             window.__CONFIG__ = ${
+  //   JSON.stringify({
+  //     BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
+  //   })};
+  //           `,
+  //         }}
+  //       /> */}
+  //     </Head>
+  //     <Provider initialLanguage={{
+  //       id: extra?.initialLanguage,
+  //       // definitions: languagesMap[extra.initialLanguage],
+  //       definitions: languagesMap["zh_cn"],
+  //     }}
+  //     >
+  //       {/* <StoreProvider stores={[defaultClusterStore, loginNodeStore]}> */}
+  //       <DarkModeProvider initial={extra?.darkModeCookieValue}>
+  //         {/* <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}> */}
+  //         <FloatButtons languageId={ extra?.initialLanguage } />
+  //         {/* <GlobalStyle /> */}
+  //         <FailEventHandler />
+  //         <TopProgressBar />
+  //         <BaseLayout
+  //           // footerText={footerText}
+  //           footerText={""}
+  //           versionTag={publicConfig.VERSION_TAG}
+  //           initialLanguage={extra?.initialLanguage}
+  //         >
+  //           <Component {...pageProps} />
+  //         </BaseLayout>
+  //         {/* </AntdConfigProvider> */}
+  //       </DarkModeProvider>
+  //       {/* </StoreProvider> */}
+  //     </Provider>
+  //   </>,
+  // );
 }
 
 MyApp.getInitialProps = async (appContext: AppContext) => {
@@ -273,7 +277,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 export default trpc.withTRPC(MyApp);
 
 
-// export default MyApp;
 
 
 // import "src/styles/globals.css";
@@ -307,4 +310,4 @@ export default trpc.withTRPC(MyApp);
 
 //   return getLayout(<Component {...pageProps} />);
 // }) as AppType;
-
+// export default trpc.withTRPC(MyApp);
