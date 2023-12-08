@@ -21,19 +21,15 @@ type PostByIdOutput = RouterOutput["dataset"]["list"];
 function PostItem(props: { post: PostByIdOutput }) {
   const { post } = props;
   return (
-    <div className="flex flex-col justify-center h-full px-8 ">
+    <div className=" ">
       <Link className="text-gray-300 underline mb-4" href="/">
         Home
       </Link>
-      <h1 className="text-4xl font-bold">{post.count}</h1>
-      <em className="text-gray-400">
-        {/* Created {post.createdAt.toLocaleDateString("en-us")} */}
-      </em>
+      <h1 className=" ">{post.count}</h1>
 
-      <p className="py-4 break-all">{post.count}</p>
+      <p className="">{post.count}</p>
 
-      <h2 className="text-2xl font-semibold py-2">Raw data:</h2>
-      <pre className="bg-gray-900 p-4 rounded-xl overflow-x-scroll">
+      <pre className="">
         {JSON.stringify(post, null, 4)}
       </pre>
     </div>
