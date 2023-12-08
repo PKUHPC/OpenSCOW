@@ -28,6 +28,7 @@ export default () => {
       return config;
     },
     skipTrailingSlashRedirect: true,
+    transpilePackages: ["antd", "@ant-design/icons"],
   };
 
   return nextConfig;

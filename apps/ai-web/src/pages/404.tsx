@@ -12,10 +12,14 @@
 
 import Link from "next/link";
 import type { FC } from "react";
-import { BaseLayout } from "src/layout/BaseLayout";
+import { BaseLayout } from "src/layouts/BaseLayout";
 
 const NotFound: FC = () => (
-  <BaseLayout>
+  <BaseLayout
+    footerText={ "" }
+    versionTag="1"
+    initialLanguage=""
+  >
     <div className="w-full h-full flex flex-col justify-center items-center text-center">
       <div className="text-8xl font-bold">
         404

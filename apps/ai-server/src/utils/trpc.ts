@@ -10,12 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { router } from "src/server/trpc/def";
+// src/utils/trpc.ts
+import { initTRPC } from "@trpc/server";
 
-import { createDataset, deleteDataset, list } from "./dataset";
+export const t = initTRPC.create();
 
-export const dataset = router({
-  list,
-  createDataset,
-  deleteDataset,
-});
+// 直接导出一个已经创建的路由器实例
+export const createRouter = t.router;

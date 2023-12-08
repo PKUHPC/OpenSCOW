@@ -42,7 +42,7 @@ function PostItem(props: { post: PostByIdOutput }) {
 
 const PostViewPage: NextPageWithLayout = () => {
   const id = useRouter().query.id as string;
-  const postQuery = trpc.dataset.list.useQuery();
+  const postQuery = trpc.dataset.list.useQuery({ limit: 10, offset: 1 });
 
   if (postQuery.error) {
     return (
