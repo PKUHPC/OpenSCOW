@@ -196,6 +196,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
+        NODE_ARGS: nodeArguments ? JSON.stringify(nodeArguments) : "",
         ...serviceLogEnv,
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
@@ -204,7 +205,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
+      ...nodeArguments ? { command: "sh -c 'node $$NODE_ARGS index.js'" } : {},
     });
 
     addService("portal-web", {
