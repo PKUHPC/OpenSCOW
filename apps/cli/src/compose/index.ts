@@ -49,13 +49,13 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     LOG_PRETTY: String(config.log.pretty),
   };
 
-  const nodeArguments = config.misc?.nodeArguments;
-
   const composeSpec = {
     version: "3",
     services: {} as Record<string, ServiceSpec>,
     volumes: {} as Record<string, object>,
   };
+
+  const nodeOptions = config.misc?.nodeOptions;
 
   // service creation function
   const addService = (
@@ -66,7 +66,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: string[] | Record<string, number>,
       volumes: string [] | Record<string, string>,
       depends_on?: string[],
-      command?: string,
     },
   ) => {
 
@@ -135,6 +134,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "EXTRA": config.gateway.extra,
       "ALLOWED_SERVER_NAME": config.gateway.allowedServerName,
       "DEFAULT_SERVER_BLOCK": config.gateway.allowedServerName === "_" ? "" : defaultServerBlock,
+      ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -179,10 +179,10 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": BASE_PATH,
         "PORTAL_BASE_PATH": portalBasePath,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
   }
 
@@ -196,8 +196,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
-        NODE_ARGS: nodeArguments?.join(" ") ?? "",
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
       volumes: {
@@ -205,7 +205,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
-      ...nodeArguments ? { command: "sh -c 'node $$NODE_ARGS index.js'" } : {},
     });
 
     addService("portal-web", {
@@ -221,13 +220,13 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
         "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     addService("novnc", {
@@ -247,13 +246,13 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     addService("mis-web", {
@@ -267,12 +266,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
         "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     composeSpec.volumes["db_data"] = {};
@@ -300,11 +299,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "audit-server",
         "DB_PASSWORD": config.audit.dbPassword,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     composeSpec.volumes["audit_db_data"] = {};
