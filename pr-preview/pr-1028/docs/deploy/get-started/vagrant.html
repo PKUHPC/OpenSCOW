@@ -5,7 +5,7 @@
 <meta name="generator" content="Docusaurus v3.0.0">
 <title data-rh="true">使用 | SCOW</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://PKUHPC.github.io/SCOW/pr-preview/pr-1028/docs/deploy/get-started/vagrant"><meta data-rh="true" property="og:locale" content="zh"><meta data-rh="true" name="docusaurus_locale" content="zh"><meta data-rh="true" name="docsearch:language" content="zh"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="使用 | SCOW"><meta data-rh="true" name="description" content="本项目面向开发和测试人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。"><meta data-rh="true" property="og:description" content="本项目面向开发和测试人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。"><link data-rh="true" rel="icon" href="/SCOW/pr-preview/pr-1028/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1028/docs/deploy/get-started/vagrant"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1028/docs/deploy/get-started/vagrant" hreflang="zh"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1028/docs/deploy/get-started/vagrant" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/SCOW/pr-preview/pr-1028/blog/rss.xml" title="SCOW RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/SCOW/pr-preview/pr-1028/blog/atom.xml" title="SCOW Atom Feed"><link rel="stylesheet" href="/SCOW/pr-preview/pr-1028/assets/css/styles.d6a434be.css">
-<script src="/SCOW/pr-preview/pr-1028/assets/js/runtime~main.a4aeec4b.js" defer="defer"></script>
+<script src="/SCOW/pr-preview/pr-1028/assets/js/runtime~main.aeb072aa.js" defer="defer"></script>
 <script src="/SCOW/pr-preview/pr-1028/assets/js/main.a6bf6162.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard" data-theme="light">
@@ -18,8 +18,8 @@
 <p>部署前准备：</p>
 <ul>
 <li>下载最新Release的scow-cli，拷贝至<code>scow\scow-deployment</code>目录，并命名为<code>cli</code>;</li>
-<li>编译生成最新的适配器可执行程序(CentOS7.9)，替换<code>adapter</code>目录下的<code>scow-slurm-adapter-amd64</code>，<a href="https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91%E7%94%9F%E6%88%90%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6%E8%87%AA%E5%B7%B1%E7%BC%96%E8%AF%91%E7%94%9F%E6%88%90%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6" target="_blank" rel="noopener noreferrer">参考该文档</a>；</li>
-<li>修改配置文件<code>scow\scow-deployment\install.yaml</code>，<code>imageTag</code>修改为与<code>cli</code>匹配的版本。</li>
+<li>编译生成最新的适配器可执行程序(CentOS7.9)，替换<code>adapter</code>目录下的<code>scow-slurm-adapter-amd64</code>(默认为与SCOW<code>v1.2.3</code>匹配版本)，<a href="https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-%E4%B8%8B%E8%BD%BD%E4%BB%A3%E7%A0%81%E7%BC%96%E8%AF%91%E7%94%9F%E6%88%90%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6%E8%87%AA%E5%B7%B1%E7%BC%96%E8%AF%91%E7%94%9F%E6%88%90%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%96%87%E4%BB%B6" target="_blank" rel="noopener noreferrer">编译参考文档</a>；</li>
+<li>修改配置文件<code>scow\scow-deployment\install.yaml</code>，<code>imageTag</code>修改为与<code>cli</code>匹配的版本，例如<code>v1.2.3</code>。</li>
 </ul>
 <p>一键部署命令：</p>
 <div class="language-shell codeBlockContainer_Tu2R theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_R0PV"><pre tabindex="0" class="prism-code language-shell codeBlock_Wmom thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_y088"><span class="token-line" style="color:#393A34"><span class="token plain">vagrant up</span><br></span></code></pre><div class="buttonGroup_DwDv"><button type="button" aria-label="复制代码到剪贴板" title="复制" class="clean-btn"><span class="copyButtonIcons_Omq9" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_UpLV"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_EfNR"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
@@ -29,7 +29,7 @@
 <li>第一次部署需要从vagrant clould拉取vagrant镜像，速度会比较慢，请耐心等待。</li>
 </ul>
 </blockquote>
-<h3 class="anchor anchorWithStickyNavbar_Ndxe" id="2-集群初始化">2. 集群初始化<a href="#2-集群初始化" class="hash-link" aria-label="2. 集群初始化的直接链接" title="2. 集群初始化的直接链接">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_Ndxe" id="2-集群初始化">2. 集群初始化<a href="#2-集群初始化" class="hash-link" aria-label="2. 集群初  始化的直接链接" title="2. 集群初始化的直接链接">​</a></h3>
 <blockquote>
 <p>初始化地址：<a href="http://192.168.88.100/mis/init/" target="_blank" rel="noopener noreferrer">http://192.168.88.100/mis/init/</a>  用户名/密码：demo_admin/demo_admin</p>
 </blockquote>
