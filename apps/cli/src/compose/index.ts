@@ -204,7 +204,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     addService("portal-web", {
@@ -226,7 +226,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     addService("novnc", {
@@ -252,7 +252,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     addService("mis-web", {
@@ -271,7 +271,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     composeSpec.volumes["db_data"] = {};
@@ -303,7 +303,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "./config": "/etc/scow",
       },
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
 
     composeSpec.volumes["audit_db_data"] = {};
