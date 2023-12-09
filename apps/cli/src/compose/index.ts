@@ -196,7 +196,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
-        NODE_ARGS: nodeArguments ? JSON.stringify(nodeArguments) : "",
+        NODE_ARGS: nodeArguments?.join(" ") ?? "",
         ...serviceLogEnv,
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
