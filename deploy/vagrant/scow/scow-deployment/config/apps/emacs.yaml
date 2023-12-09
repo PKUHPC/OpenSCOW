@@ -4,7 +4,7 @@ id: emacs
 # 这个应用的名字
 name: emacs
 
-logoPath: /apps/emacs.png
+logoPath: apps/emacs.png
 
 # 指定应用类型，vnc或者web
 type: vnc

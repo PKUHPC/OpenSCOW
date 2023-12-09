@@ -4,7 +4,7 @@ id: jupyter
 # 这个应用的名字
 name: jupyter
 
-logoPath: /apps/jupyter.png
+logoPath: apps/jupyter.png
 
 # 指定应用类型为web
 type: web

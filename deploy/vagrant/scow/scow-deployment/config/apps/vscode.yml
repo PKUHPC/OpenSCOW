@@ -4,7 +4,7 @@ id: vscode
 # 这个应用的名字
 name: VSCode
 
-logoPath: /apps/vscode.png
+logoPath: apps/vscode.png
 
 # 指定应用类型为web
 type: web
