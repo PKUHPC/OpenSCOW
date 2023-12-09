@@ -182,7 +182,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
-      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
+      ...nodeArguments ? { command: `node ${nodeArguments.join(" ")} index.js'` } : {},
     });
   }
 
