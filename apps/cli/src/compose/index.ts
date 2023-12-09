@@ -49,6 +49,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     LOG_PRETTY: String(config.log.pretty),
   };
 
+  const nodeArguments = config.misc?.nodeArguments;
+
   const composeSpec = {
     version: "3",
     services: {} as Record<string, ServiceSpec>,
@@ -64,6 +66,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: string[] | Record<string, number>,
       volumes: string [] | Record<string, string>,
       depends_on?: string[],
+      command?: string,
     },
   ) => {
 
@@ -179,6 +182,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
   }
 
@@ -200,6 +204,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
 
     addService("portal-web", {
@@ -221,6 +226,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
 
     addService("novnc", {
@@ -246,6 +252,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
       },
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
 
     addService("mis-web", {
@@ -264,6 +271,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "./config": "/etc/scow",
       },
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
 
     composeSpec.volumes["db_data"] = {};
@@ -295,6 +303,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "./config": "/etc/scow",
       },
+      ...nodeArguments ? { command: `sh -c 'node ${nodeArguments} index.js'` } : {},
     });
 
     composeSpec.volumes["audit_db_data"] = {};

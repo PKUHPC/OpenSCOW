@@ -122,6 +122,11 @@ export const InstallConfigSchema = Type.Object({
       })),
     })),
   })),
+
+  misc: Type.Optional(Type.Object({
+    nodeArguments:  Type.Optional(Type.Array(Type.String(), { description: "传递给node服务的string数组" })),
+  }, { description: "多个不好分类的配置参数参数" })),
+
 }, { description: "审计系统部署选项，如果不设置，则不部署审计系统" });
 
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;
