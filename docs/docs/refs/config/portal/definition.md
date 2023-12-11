@@ -170,7 +170,7 @@ true
 
 ## submitJobDefaultPwd
 
-提交作业的默认工作目录。使用{name}代替作业名称。相对于用户的家目录
+提交作业的默认工作目录。使用\{name\}代替作业名称。相对于用户的家目录
 
 `submitJobDefaultPwd`
 

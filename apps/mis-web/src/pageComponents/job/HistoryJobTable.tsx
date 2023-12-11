@@ -13,6 +13,7 @@
 import { HttpError } from "@ddadaal/next-typed-api-routes-runtime";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
@@ -66,7 +67,7 @@ export const JobTable: React.FC<Props> = ({
 
   const rangeSearch = useRef(true);
 
-  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(undefined);
 
   const [query, setQuery] = useState<FilterForm>(() => {
@@ -288,7 +289,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         loading={isLoading}
         pagination={setPageInfo ? {
           current: pageInfo.page,
-          defaultPageSize: 10,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
           total: data?.totalCount,

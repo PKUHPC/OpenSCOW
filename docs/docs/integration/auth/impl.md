@@ -275,7 +275,7 @@ SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作�
 | ------ | ---- | -------- |
 | `204`  | 无   | 创建成功 |
 
-### POST /account/${accountName}/user
+### POST /account/$\{accountName\}/user
 
 把用户加入账户中。
 
@@ -292,7 +292,7 @@ SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作�
 | ------ | ---- | ------------------ |
 | `204`  | 无   | 把用户加入账户成功 |
 
-### DELETE /account/${accountName}/user/${userId}
+### DELETE /account/$\{accountName\}/user/$\{userId\}
 
 把用户从账户中删除。
 #### 请求

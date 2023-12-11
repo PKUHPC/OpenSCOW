@@ -11,6 +11,7 @@
  */
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { PlatformTenantsInfo } from "@scow/protos/build/server/tenant";
 import { Static } from "@sinclair/typebox";
@@ -90,7 +91,10 @@ const TenantInfoTable: React.FC<TenantInfoTableProps> = ({
       dataSource={data?.platformTenants}
       columns={columns}
       loading={isLoading}
-      pagination={false}
+      pagination={{
+        showSizeChanger: true,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
+      }}
     />
   );
 };

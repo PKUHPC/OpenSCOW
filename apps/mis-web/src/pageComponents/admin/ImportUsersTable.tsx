@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { ClusterAccountInfo, ImportUsersData, UserInAccount } from "@scow/protos/build/server/admin";
 import { App, Button, Checkbox, Drawer, Form, Select, Space, Table, Tooltip } from "antd";
@@ -161,7 +162,10 @@ export const ImportUsersTable: React.FC = () => {
           loading={isLoading}
           dataSource={data?.accounts}
           scroll={{ x:true }}
-          pagination={{ showSizeChanger: true }}
+          pagination={{
+            showSizeChanger: true,
+            defaultPageSize: DEFAULT_PAGE_SIZE,
+          }}
           rowKey="accountName"
           bordered
         >

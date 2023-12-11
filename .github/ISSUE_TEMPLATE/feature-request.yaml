@@ -1,0 +1,39 @@
+name: Feature Request
+description: 为SCOW项目提出一个增强或新功能建议 | Suggest an enhancement or new feature for the SCOW project
+title: "[Feature/Enhancement] mis: Add a feature for management of cluster resource partition"
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写此issue！ | Thanks for taking the time to fill out this issue!
+        请为您的issue命名一个好的标题，尽量在标题中注明您的issue相关的模块名称并对功能做简要描述。像这样：
+          - `[Enhancement] portal: 交互式应用列表增加排序功能` 或者
+          - `[Feature] mis: 增加集群资源分区的管理功能`
+        Please try to give your issue a good title. Try using the app module name related to your issue in the title and a brief description of the feature. Like this:
+          - `[Enhancement] portal: The interactive app list needs to have a sorting feature added` or
+          - `[Feature] mis: Add a feature for management of cluster resource partition`
+  - type: textarea
+    attributes:
+      label: 为何需要此功能 | Why is this needed
+      description: |
+        描述该功能需要解决什么。
+        A concise description of what the feature aims to solve.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 希望增加什么 | What would you like to be added
+      description: |
+        描述该功能该做什么。
+        A concise description of what the feature should do.
+    validations:
+      required: false
+  - type: textarea
+    attributes:
+      label: 此功能为谁设计？ | Who is this feature for?
+      description: |
+        添加使用该功能的用户类型信息。
+        Add information on what kind of user the feature is for.
+    validations:
+      required: false

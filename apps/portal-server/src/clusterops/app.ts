@@ -19,6 +19,7 @@ import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
+import { ApiVersion } from "@scow/utils/build/version";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
@@ -26,11 +27,12 @@ import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
-import { getAdapterClient } from "src/utils/clusters";
+import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
+import { Logger } from "ts-log";
 
 interface SessionMetadata {
   sessionId: string;
@@ -62,6 +64,27 @@ const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 const errorInfo = (reason: string) =>
   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
+
+const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
+  const client = getAdapterClient(cluster);
+  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
+  try {
+    await checkSchedulerApiVersion(client, minRequiredApiVersion);
+    // get connection info
+    // for apps running in containers, it can provide real ip and port info
+    const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
+      jobId: jobId,
+    });
+    return connectionInfo;
+  } catch (e: any) {
+    if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
+      logger.warn(e.details);
+    } else {
+      throw e;
+    }
+  }
+
+};
 
 export const appOps = (cluster: string): AppOps => {
 
@@ -314,6 +337,10 @@ export const appOps = (cluster: string): AppOps => {
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
+            // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
+            await sftpReaddir(sftp)(jobDir);
+
             if (app.type === "web") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
@@ -330,8 +357,6 @@ export const appOps = (cluster: string): AppOps => {
             // try to find the output file and try to parse the display number
               const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
               if (await sftpExists(sftp, vncSessionInfoPath)) {
-                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
-
                 const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
                 if (await sftpExists(sftp, outputFilePath)) {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
@@ -342,7 +367,16 @@ export const appOps = (cluster: string): AppOps => {
                   // ignored if displayId cannot be parsed
                   }
                 }
+
+                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+                port = port;
               }
+            }
+
+            const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+            if (connectionInfo?.response?.$case === "appConnectionInfo") {
+              host = connectionInfo.response.appConnectionInfo.host;
+              port = connectionInfo.response.appConnectionInfo.port;
             }
           }
 
@@ -394,12 +428,21 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
+        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          return {
+            appId: sessionMetadata.appId,
+            host: connectionInfo.response.appConnectionInfo.host,
+            port: connectionInfo.response.appConnectionInfo.port,
+            password: connectionInfo.response.appConnectionInfo.password,
+          };
+        }
+
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
-
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
             const ip = await getIpFromProxyGateway(cluster, HOST, logger);
@@ -412,6 +455,7 @@ export const appOps = (cluster: string): AppOps => {
             };
           }
         } else {
+
           // for vnc apps,
           // try to find the output file and try to parse the display number
           const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
@@ -445,7 +489,6 @@ export const appOps = (cluster: string): AppOps => {
                     const { password, ip } =
                       await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
                     return {
-                      code: "OK",
                       appId: sessionMetadata.appId,
                       host: ip || host,
                       port: displayIdToPort(displayId!),

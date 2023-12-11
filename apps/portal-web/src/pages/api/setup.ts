@@ -11,8 +11,8 @@
  */
 
 import { NextApiRequest } from "next";
-import { setupWssProxy } from "src/pages/api/proxy/[clusterId]/[type]/[node]/[port]/[[...path]]";
-import { setupShellServer } from "src/pages/api/shell";
+import { setupWssProxy } from "src/server/setup/proxy";
+import { setupShellServer } from "src/server/setup/shell";
 
 let setup = false;
 

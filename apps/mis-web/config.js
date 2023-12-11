@@ -13,11 +13,11 @@
 const { envConfig, str, bool } = require("@scow/lib-config");
 const { getClusterConfigs, getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
-const { getCommonConfig } = require("@scow/config/build/common");
+const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getAuditConfig } = require("@scow/config/build/audit");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD, PHASE_PRODUCTION_SERVER } = require("next/constants");
+const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } = require("next/constants");
 const { join } = require("path");
 const { getCapabilities } = require("@scow/lib-auth");
 const { readVersionFile } = require("@scow/utils/build/version");
@@ -51,6 +51,8 @@ const specs = {
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
+
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -65,7 +67,10 @@ const config = envConfig(specs, process.env);
  */
 const buildRuntimeConfig = async (phase, basePath) => {
 
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // https://github.com/vercel/next.js/issues/57927
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
+
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   // const production = phase === PHASE_PRODUCTION_SERVER;
 
@@ -94,6 +99,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const versionTag = readVersionFile()?.tag;
 
+  const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
+
+
   /**
    * @type {import ("./src/utils/config").ServerRuntimeConfig}
    */
@@ -107,6 +115,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
+    PROTOCOL: config.PROTOCOL,
   };
 
   /**
@@ -160,6 +169,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
       misConfig.changeJobPriceType,
       ...(misConfig.customChargeTypes || []),
     ],
+
+    SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
   };
 

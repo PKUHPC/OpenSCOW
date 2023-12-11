@@ -12,6 +12,7 @@
 
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Button, DatePicker, Form, Select, Spin, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useState } from "react";
@@ -49,7 +50,7 @@ export const ChargeTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
-  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: 10 });
+  const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(accountName);
   const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
 
@@ -183,7 +184,7 @@ export const ChargeTable: React.FC<Props> = ({
             showSizeChanger: true,
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
-            defaultPageSize: 10,
+            defaultPageSize: DEFAULT_PAGE_SIZE,
             total: totalResultData?.totalCount,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件

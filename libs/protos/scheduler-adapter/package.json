@@ -1,11 +1,11 @@
 {
   "name": "@scow/scheduler-adapter-protos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "build/index.js",
   "private": true,
   "scripts": {
-    "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/PKUHPC/scow-scheduler-adapter-interface.git#tag=v1.0.1",
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/PKUHPC/scow-scheduler-adapter-interface.git#tag=v1.3.0",
     "build": "rimraf build && tsc"
   },
   "files": [
@@ -13,12 +13,12 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.9.5",
+    "@grpc/grpc-js": "1.9.11",
     "long": "5.2.3",
-    "protobufjs": "7.2.4"
+    "protobufjs": "7.2.5"
   },
   "devDependencies": {
-    "ts-proto": "1.156.7"
+    "ts-proto": "1.164.0"
   },
   "keywords": [],
   "author": "",
