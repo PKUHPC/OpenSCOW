@@ -10,21 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import Image from "next/image";
+import Link from "next/link";
+import { styled } from "styled-components";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+const LogoContainer = styled.h1`
+  color: var(--ant-primary-color);
+  margin-bottom: 0;
+
+  img {
+    margin-bottom: 4px;
+  }
+`;
+
+export const Logo = () => {
+
+  return (
+    <LogoContainer>
+      <Link href="/">
+        <Image src="/logo-no-text.svg" alt="logo" width={32} height={32} />
+      </Link>
+    </LogoContainer>
+  );
 };
-
-export default handler;

@@ -10,21 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { PRIMARY_COLOR } from "src/layouts/constants";
+import { createGlobalStyle } from "styled-components";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
-};
+export const GlobalStyle = createGlobalStyle`
+  #nprogress .bar {
+    background-color: ${PRIMARY_COLOR};
+  }
 
-export default handler;
+  // HACK
+  a {
+    color: ${PRIMARY_COLOR};
+  }
+
+  .ant-picker-dropdown {
+    max-width: 100%;
+  }
+  .ant-picker-dropdown .ant-picker-panel-layout {
+    overflow-y: scroll;
+  }
+
+`;
+
+

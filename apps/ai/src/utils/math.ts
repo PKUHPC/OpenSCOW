@@ -10,21 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+export function max(op1: number, op2: number) {
+  return op1 > op2 ? op1 : op2;
+}
+export function min(op1: number, op2: number) {
+  return op1 < op2 ? op1 : op2;
+}
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
-
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
-};
-
-export default handler;
+export function compareNumber(a: number, b: number): -1 | 0 | 1 {
+  if (a === b) { return 0; }
+  if (a < b) { return -1; }
+  return 1;
+}

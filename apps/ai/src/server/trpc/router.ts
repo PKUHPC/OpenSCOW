@@ -14,10 +14,10 @@ import { trpc } from "src/server/trpc/def";
 
 import { dataset } from "./route/dataset";
 
-export const router = trpc.router({
+export const appRouter = trpc.router({
   dataset,
 });
 
-export type Router = typeof router
+export type AppRouter = typeof appRouter
 
-export type Caller = ReturnType<typeof router.createCaller>
+export type Caller = ReturnType<typeof appRouter.createCaller>

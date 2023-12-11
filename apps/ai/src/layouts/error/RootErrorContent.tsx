@@ -10,21 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+import { ErrorBoundaryContentProps } from "src/components/ErrorBoundary";
+import { BaseLayout } from "src/layouts/base/BaseLayout";
+import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+export const RootErrorContent: React.FC<ErrorBoundaryContentProps> = () => {
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+  return (
+    <BaseLayout>
+      <ServerErrorPage />
+    </BaseLayout>
+  );
 };
-
-export default handler;

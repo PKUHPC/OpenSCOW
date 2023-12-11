@@ -10,21 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { Result } from "antd";
+import { Head } from "src/utils/head";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+export const NotFoundPage = () => {
+  return (
+    <>
+      <Head title="不存在" />
+      <Result
+        status="404"
+        title={"404"}
+        subTitle={"您所请求的页面不存在。"}
+      />
+    </>
+  );
 };
-
-export default handler;

@@ -10,21 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
-
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
-
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+export const antdBreakpoints = {
+  xxs: 0,
+  xs: 480,
+  sm: 576,
+  md: 768,
+  lg: 992,
+  xl: 1200,
+  xxl: 1600,
 };
 
-export default handler;
+export type Breakpoint = keyof typeof antdBreakpoints;
+
+export const layoutConstants = {
+  paddingBreakpoint: "md" as Breakpoint,
+  menuBreakpoint: "md" as Breakpoint,
+  headerHeight: 56,
+  sidebarBreakpoint: "lg" as Breakpoint,
+  headerIconColor: "#ffffff",
+  headerIconBackgroundColor: "#1890FF",
+  headerBackgrounColor: "#001529",
+  maxWidth: 1200,
+};
+

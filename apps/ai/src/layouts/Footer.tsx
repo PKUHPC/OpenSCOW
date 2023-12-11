@@ -10,21 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { styled } from "styled-components";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+const FooterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 8px;
+  // https://v1.tailwindcss.com/docs/text-color text-gray-500
+  color: #a0aec0;
+`;
+
+interface Props {}
+
+export const Footer: React.FC<Props> = () => {
+  return (
+    <FooterContainer>
+      Copyright 2022
+    </FooterContainer>
+  );
 };
 
-export default handler;

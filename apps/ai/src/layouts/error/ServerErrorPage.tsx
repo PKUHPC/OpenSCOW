@@ -10,21 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { Result } from "antd";
+import React from "react";
+import { Head } from "src/utils/head";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+export const ServerErrorPage: React.FC = () => {
+  return (
+    <>
+      <Head title="服务器出错" />
+      <Result
+        status="500"
+        title="500"
+        subTitle="对不起，服务器出错。请刷新重试。"
+      />
+    </>
+  );
 };
-
-export default handler;

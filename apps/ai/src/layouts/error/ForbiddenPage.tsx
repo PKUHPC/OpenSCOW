@@ -10,18 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "swagger-ui-react/swagger-ui.css";
+"use client";
 
-import type { NextPage } from "next";
-import dynamic from "next/dynamic";
-const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
+import { Result } from "antd";
+import React from "react";
+import { Head } from "src/utils/head";
 
-const Home: NextPage = () => {
-  // Serve Swagger UI with our OpenAPI schema
+interface Props {
+  title?: React.ReactNode;
+  subTitle?: React.ReactNode;
+}
+
+export const ForbiddenPage: React.FC<Props> = ({
+  title = "不允许访问此页面",
+  subTitle = "系统不允许您访问此页面。",
+}) => {
   return (
-    <SwaggerUI url="/api/openapi.json" />
-  )
-  ;
+    <>
+      <Head title="不允许访问" />
+      <Result
+        status="403"
+        title={title}
+        subTitle={subTitle}
+      />
+    </>
+  );
 };
-
-export default Home;

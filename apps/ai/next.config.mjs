@@ -26,18 +26,18 @@ export default () => {
 
   /** @type {import('next').NextConfig} */
   const nextConfig = {
-    compiler: {
-      styledComponents: true,
+    experimental: {
+      appDir: true,
     },
-    // experimental: {
-    //   appDir: true,
-    // },
     webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],
         ".jsx": [".ts", ".tsx", ".js"],
       };
       return config;
+    },
+    compiler: {
+      styledComponents: true,
     },
     skipTrailingSlashRedirect: true,
     transpilePackages: ["antd", "@ant-design/icons"],

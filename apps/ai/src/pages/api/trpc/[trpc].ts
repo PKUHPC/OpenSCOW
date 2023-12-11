@@ -12,10 +12,10 @@
 
 import { createNextApiHandler } from "@trpc/server/adapters/next";
 import { createContext } from "src/server/trpc/context";
-import { router } from "src/server/trpc/router";
+import { appRouter } from "src/server/trpc/router";
 
 export default createNextApiHandler({
-  router,
+  router: appRouter,
   createContext,
   onError({ error }) {
     if (error.code === "INTERNAL_SERVER_ERROR") {

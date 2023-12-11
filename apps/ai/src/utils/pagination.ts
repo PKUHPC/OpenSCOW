@@ -10,21 +10,28 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+import { PaginationConfig } from "antd/es/pagination/Pagination";
+import { useState } from "react";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+export const usePagination = () => {
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 10,
+  });
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+  const onChange = (page: number, pageSize: number) => setPagination({
+    page, pageSize,
+  });
+
+  return {
+    pagination,
+    onChange,
+    getPaginationOptions: (total?: number) => ({
+      total,
+      pageSize: pagination.pageSize,
+      onChange,
+      current: pagination.page,
+    }) satisfies PaginationConfig,
+  } as const;
+
 };
-
-export default handler;

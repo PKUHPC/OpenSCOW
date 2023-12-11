@@ -22,21 +22,28 @@
     "incremental": true,
     // "baseUrl": "src",
     "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
   "include": [
     "next-env.d.ts",
     "env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "src/**/*.ts"
-, "src/server/migrations/Migration20231128072018.mjs"  ],
+    "src/**/*.ts",
+    "src/server/migrations/Migration20231128072018.mjs",
+    ".next/types/**/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ],
   "paths": {
     "src/*": [
       "src/*"
-    ],
+    ]
   },
   "ts-node": {
     "require": [

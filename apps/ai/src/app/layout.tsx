@@ -10,21 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+import "antd/dist/reset.css";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
+import { cookies } from "next/headers";
+import { ClientLayout } from "src/app/clientLayout";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
-};
+export default function MyApp({ children }: { children: React.ReactNode }) {
 
-export default handler;
+  const cookie = cookies();
+
+  const darkModeCookie = cookie.get("xscow-dark");
+
+  const dark = darkModeCookie ? JSON.parse(darkModeCookie.value) as DarkModeCookie : undefined;
+
+  return (
+    <ClientLayout initialDark={dark}>
+      {children}
+    </ClientLayout>
+  );
+
+
+}

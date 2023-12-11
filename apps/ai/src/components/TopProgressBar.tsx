@@ -10,62 +10,43 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { finallyEvent, prefetchEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { isServer } from "@scow/lib-web/build/utils/isServer";
-import Router from "next/router";
+"use client";
+
+import { useIsFetching } from "@tanstack/react-query";
 import NProgress from "nprogress";
+import { useEffect, useRef } from "react";
 
-NProgress.configure({ showSpinner: false });
-
-let timer: NodeJS.Timeout;
-let state: string;
-let activeRequests = 0;
 const delay = 250;
 
-function load() {
-  if (state === "loading") {
-    return;
-  }
+export function TopProgressBar() {
 
-  state = "loading";
+  const isFetching = useIsFetching();
 
-  timer = setTimeout(function() {
-    NProgress.start();
-  }, delay); // only show progress bar if it takes longer than the delay
-}
+  const on = useRef(false);
 
-function stop() {
-  if (activeRequests > 0) {
-    return;
-  }
+  const timer = useRef<NodeJS.Timeout>();
 
-  state = "stop";
+  useEffect(() => {
+    if (isFetching > 0) {
+      if (on.current) { return; }
 
-  clearTimeout(timer);
-  NProgress.done();
-}
+      on.current = true;
+      timer.current = setTimeout(function() {
+        NProgress.start();
+      }, delay); // only show progress bar if it takes longer than the delay
+    } else {
+      on.current = false;
+      clearTimeout(timer.current);
+      NProgress.done();
+    }
+  }, [isFetching]);
 
-Router.events.on("routeChangeStart", load);
-Router.events.on("routeChangeComplete", stop);
-Router.events.on("routeChangeError", stop);
+  useEffect(() => {
 
-export function incrementRequest() {
-  activeRequests++;
-  load();
-}
+    NProgress.configure({ showSpinner: false });
 
-export function decrementRequest() {
-  activeRequests--;
-  stop();
-}
+  }, []);
 
-// register HTTP request loading
-if (!isServer()) {
-  prefetchEvent.register(incrementRequest);
-  finallyEvent.register(decrementRequest);
-}
-
-export default function Dummy() {
   return null;
 }
 

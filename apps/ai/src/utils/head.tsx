@@ -10,21 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+import NextHead from "next/head";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+type Props = React.PropsWithChildren<{
+  title: string;
+}>
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+export const Head: React.FC<Props> = ({ title, children }) => {
+  return (
+    <NextHead>
+      <title>{`${title} - XSCOW`}</title>
+      {children}
+    </NextHead>
+  );
 };
-
-export default handler;

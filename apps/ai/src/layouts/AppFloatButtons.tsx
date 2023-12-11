@@ -10,21 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { NextApiRequest, NextApiResponse } from "next";
-import cors from "nextjs-cors";
-import { createContext } from "src/server/trpc/context";
-import { appRouter } from "src/server/trpc/router";
-import { createOpenApiNextHandler } from "trpc-openapi";
+"use client";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Setup CORS
-  await cors(req, res);
+import { FloatButton } from "antd";
+import { DarkModeButton } from "src/layouts/darkMode";
 
-  // Handle incoming OpenAPI requests
-  return createOpenApiNextHandler({
-    router: appRouter,
-    createContext,
-  })(req, res);
+export const AppFloatButtons = () => {
+  return (
+    <FloatButton.Group shape="circle" style={{ right: 24 }}>
+      <DarkModeButton /> <FloatButton.BackTop />
+    </FloatButton.Group>
+  );
 };
 
-export default handler;
+
