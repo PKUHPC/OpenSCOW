@@ -10,16 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { generateOpenApiDocument } from "trpc-openapi";
+"use client";
 
-import { appRouter } from "./router";
+// import SwaggerUI from "swagger-ui-react";
+import "swagger-ui-react/swagger-ui.css";
 
-// Generate OpenAPI schema document
-export const openApiDocument = generateOpenApiDocument(appRouter, {
-  title: "Example CRUD API",
-  description: "OpenAPI compliant REST API built using tRPC with Next.js",
-  version: "1.0.0",
-  baseUrl: "http://localhost:3000/api",
-  docsUrl: "https://github.com/jlalmes/trpc-openapi",
-  tags: ["dataset"],
-});
+import dynamic from "next/dynamic";
+import { LoginBg } from "src/components/LoginBg";
+import { Head } from "src/utils/head";
+const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
+
+export default function Page() {
+
+  return (
+    <LoginBg top="10">
+      <Head title="数据集"></Head>
+      <SwaggerUI url="/api/openapi.json" />
+    </LoginBg>
+  );
+}

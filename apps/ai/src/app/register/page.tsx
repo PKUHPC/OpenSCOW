@@ -13,13 +13,13 @@
 "use client";
 
 import { Button, Card, Form, Input, message, Modal, Radio, Typography } from "antd";
+import { MessageType } from "antd/es/message/interface.js";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { LoginBg } from "src/components/LoginBg.jsx";
 import { confirmPasswordFormItemProps, passwordRule, phoneRegExp, phoneRule,
   verificationCodeRule } from "src/utils/form.js";
-import { Head } from "src/utils/head"; ;
-import { MessageType } from "antd/es/message/interface.js";
+import { Head } from "src/utils/head";
 import { trpc } from "src/utils/trpc";
 import { createQueryString } from "src/utils/url.js";
 import { styled } from "styled-components";

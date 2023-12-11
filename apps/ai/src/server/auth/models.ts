@@ -10,16 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { generateOpenApiDocument } from "trpc-openapi";
+import { UserInfo } from "src/models/User";
 
-import { appRouter } from "./router";
+export interface ClientUserInfo extends UserInfo {
+  accountId: 12,
+  phone?: string,
+  email?: string,
+  createTime: string,
+  token: string;
 
-// Generate OpenAPI schema document
-export const openApiDocument = generateOpenApiDocument(appRouter, {
-  title: "Example CRUD API",
-  description: "OpenAPI compliant REST API built using tRPC with Next.js",
-  version: "1.0.0",
-  baseUrl: "http://localhost:3000/api",
-  docsUrl: "https://github.com/jlalmes/trpc-openapi",
-  tags: ["dataset"],
-});
+}
+
