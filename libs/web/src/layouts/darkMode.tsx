@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { FloatButton } from "antd";
 import { IncomingMessage } from "http";
 import dynamic from "next/dynamic";

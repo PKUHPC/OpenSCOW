@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import { Dropdown, Typography } from "antd";
 import Link from "next/link";

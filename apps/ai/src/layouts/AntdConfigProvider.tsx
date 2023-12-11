@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import "dayjs/locale/zh-cn";
 
 import { SYSTEM_VALID_LANGUAGES } from "@scow/config/build/i18n";

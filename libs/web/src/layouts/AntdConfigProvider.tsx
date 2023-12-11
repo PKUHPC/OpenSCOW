@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import "dayjs/locale/zh-cn";
 
 import { App, ConfigProvider, theme } from "antd";

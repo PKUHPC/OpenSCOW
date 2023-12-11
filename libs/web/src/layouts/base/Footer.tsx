@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { Divider } from "antd";
 import { styled } from "styled-components";
 

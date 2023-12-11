@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { Typography } from "antd";
 import { join } from "path";
 import { antdBreakpoints } from "src/layouts/base/constants";

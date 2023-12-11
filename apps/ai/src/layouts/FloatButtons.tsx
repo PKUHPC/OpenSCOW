@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { AppFloatButtons } from "@scow/lib-web/build/layouts/AppFloatButtons";
 import moon from "@scow/lib-web/icons/moon.svg";
 import sun from "@scow/lib-web/icons/sun.svg";

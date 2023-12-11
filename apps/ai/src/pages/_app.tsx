@@ -127,7 +127,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
 
   // remembers extra props from first load
   // const { current: { userInfo, primaryColor, footerText, loginNodes } } = useRef(extra);
-
+  const primaryColor = "#f00";
   // const userStore = useConstant(() => {
   //   const store = createStore(UserStore, userInfo);
   //   return store;
@@ -149,56 +149,56 @@ function MyApp({ Component, pageProps, extra }: Props) {
       </BaseLayout>
     ));
   // Use the layout defined at the page level, if available
-  return getLayout(<Component {...pageProps} />);
-  // return getLayout(
-  //   <>
-  //     <Head>
-  //       <meta name="format-detection" content="telephone=no" />
-  //       {/* <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" /> */}
-  //       <link
-  //         rel="icon"
-  //         type="image/x-icon"
-  //         // href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
-  //       ></link>
-  //       {/* <script
-  //         id="__CONFIG__"
-  //         dangerouslySetInnerHTML={{
-  //           __html: `
-  //             window.__CONFIG__ = ${
-  //   JSON.stringify({
-  //     BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
-  //   })};
-  //           `,
-  //         }}
-  //       /> */}
-  //     </Head>
-  //     <Provider initialLanguage={{
-  //       id: extra?.initialLanguage,
-  //       // definitions: languagesMap[extra.initialLanguage],
-  //       definitions: languagesMap["zh_cn"],
-  //     }}
-  //     >
-  //       {/* <StoreProvider stores={[defaultClusterStore, loginNodeStore]}> */}
-  //       <DarkModeProvider initial={extra?.darkModeCookieValue}>
-  //         {/* <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}> */}
-  //         <FloatButtons languageId={ extra?.initialLanguage } />
-  //         {/* <GlobalStyle /> */}
-  //         <FailEventHandler />
-  //         <TopProgressBar />
-  //         <BaseLayout
-  //           // footerText={footerText}
-  //           footerText={""}
-  //           versionTag={publicConfig.VERSION_TAG}
-  //           initialLanguage={extra?.initialLanguage}
-  //         >
-  //           <Component {...pageProps} />
-  //         </BaseLayout>
-  //         {/* </AntdConfigProvider> */}
-  //       </DarkModeProvider>
-  //       {/* </StoreProvider> */}
-  //     </Provider>
-  //   </>,
-  // );
+  // return getLayout(<Component {...pageProps} />);
+  return getLayout(
+    <>
+      <Head>
+        <meta name="format-detection" content="telephone=no" />
+        {/* <link href={join(publicConfig.BASE_PATH, "/manifest.json")} rel="manifest" id="manifest" /> */}
+        <link
+          rel="icon"
+          type="image/x-icon"
+          // href={join(publicConfig.BASE_PATH, "/api/icon?type=favicon")}
+        ></link>
+        {/* <script
+          id="__CONFIG__"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__CONFIG__ = ${
+    JSON.stringify({
+      BASE_PATH: publicConfig.BASE_PATH === "/" ? "" : publicConfig.BASE_PATH,
+    })};
+            `,
+          }}
+        /> */}
+      </Head>
+      <Provider initialLanguage={{
+        id: extra?.initialLanguage,
+        // definitions: languagesMap[extra.initialLanguage],
+        definitions: languagesMap["zh_cn"],
+      }}
+      >
+        {/* <StoreProvider stores={[defaultClusterStore, loginNodeStore]}> */}
+        <DarkModeProvider initial={extra?.darkModeCookieValue}>
+          {/* <AntdConfigProvider color={primaryColor} locale={ extra?.initialLanguage}> */}
+          <FloatButtons languageId={ extra?.initialLanguage } />
+          {/* <GlobalStyle /> */}
+          {/* <FailEventHandler />
+          <TopProgressBar /> */}
+          <BaseLayout
+            // footerText={footerText}
+            footerText={""}
+            versionTag={publicConfig.VERSION_TAG}
+            initialLanguage={extra?.initialLanguage}
+          >
+            <Component {...pageProps} />
+          </BaseLayout>
+          {/* </AntdConfigProvider> */}
+        </DarkModeProvider>
+        {/* </StoreProvider> */}
+      </Provider>
+    </>,
+  );
 }
 
 MyApp.getInitialProps = async (appContext: AppContext) => {

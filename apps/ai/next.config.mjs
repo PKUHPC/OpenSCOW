@@ -29,9 +29,9 @@ export default () => {
     compiler: {
       styledComponents: true,
     },
-    experimental: {
-      appDir: true,
-    },
+    // experimental: {
+    //   appDir: true,
+    // },
     webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { ClusterOutlined } from "@ant-design/icons";
 import { Space, Tooltip } from "antd";
 import React from "react";
