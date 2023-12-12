@@ -37,7 +37,7 @@ export default function Layout(
         {
           Icon: UserOutlined,
           text: "我的数据集",
-          path: "/dataset/my",
+          path: "/dataset/private",
         },
         {
           Icon: AccountBookOutlined,
@@ -55,7 +55,7 @@ export default function Layout(
         {
           Icon: UserOutlined,
           text: "我的镜像",
-          path: "/image/my",
+          path: "/image/private",
         },
         {
           Icon: AccountBookOutlined,
@@ -73,7 +73,7 @@ export default function Layout(
         {
           Icon: UserOutlined,
           text: "我的算法",
-          path: "/algorithm/my",
+          path: "/algorithm/private",
         },
         {
           Icon: AccountBookOutlined,
@@ -84,14 +84,42 @@ export default function Layout(
     },
     {
       Icon: TeamOutlined,
+      text: "作业",
+      path: "/jobs",
+      clickToPath: "/jobs/runningJobs",
+      children: [
+        {
+          Icon: UserOutlined,
+          text: "创建应用",
+          path: "/jobs/createApps",
+        },
+        {
+          Icon: AccountBookOutlined,
+          text: "训练",
+          path: "/jobs/trainJobs",
+        },
+        {
+          Icon: AccountBookOutlined,
+          text: "正在运行的作业",
+          path: "/jobs/runningJobs",
+        },
+        {
+          Icon: AccountBookOutlined,
+          text: "已完成的作业",
+          path: "/jobs/historyJobs",
+        },
+      ],
+    },
+    {
+      Icon: TeamOutlined,
       text: "模型",
-      path: "/algorithm",
+      path: "/modal",
       clickToPath: "",
       children: [
         {
           Icon: UserOutlined,
           text: "我的模型",
-          path: "/modal/my",
+          path: "/modal/private",
         },
         {
           Icon: AccountBookOutlined,

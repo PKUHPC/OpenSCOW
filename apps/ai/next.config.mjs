@@ -16,19 +16,25 @@ import withPlugins from "next-compose-plugins";
 
 const analyze = process.env.ANALYZE === "true";
 
-// const { buildRuntimeConfig } = require("./config.js");
-// import { buildRuntimeConfig } from "./config.js";
+const ConfigModule = await import("./config.js");
+const { buildRuntimeConfig } = ConfigModule;
 
 const BASE_PATH = process.env.BASE_PATH || "/";
 
 
-export default () => {
+export default async (phase) => {
+
+  const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
 
   /** @type {import('next').NextConfig} */
   const nextConfig = {
-    experimental: {
-      appDir: true,
+    ...runtimeConfig,
+    compiler: {
+      styledComponents: true,
     },
+    // experimental: {
+    //   appDir: true,
+    // },
     webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],

@@ -1,5 +1,5 @@
 {
-  "name": "ai-web",
+  "name": "@scow/ai",
   "version": "0.1.0",
   "private": true,
   "files": [
