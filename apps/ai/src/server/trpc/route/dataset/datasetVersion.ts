@@ -20,11 +20,11 @@ const paginationSchema = z.object({
   offset: z.number().min(0).optional(),
 });
 
-export const list = procedure
+export const versionList = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/datasetVersion/list{id}",
+      path: "/datasetVersion/list/{id}",
       tags: ["datasetVersion"],
       summary: "Read all datasetVersion",
     },
@@ -43,11 +43,11 @@ export const list = procedure
   });
 
 
-export const createDataset = procedure
+export const createDatasetVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/datasetVersion/create/{id}",
+      path: "/datasetVersion/create",
       tags: ["datasetVersion"],
       summary: "Create a new datasetVersion",
     },
@@ -55,7 +55,7 @@ export const createDataset = procedure
   .input(z.object({
     versionName: z.string(),
     path: z.string(),
-    versionDescription: z.string(),
+    versionDescription: z.string().optional(),
     datasetId: z.number(),
   }))
   .mutation(async ({ input }) => {
@@ -65,7 +65,7 @@ export const createDataset = procedure
     // return datasetVersion;
   });
 
-export const deleteDataset = procedure
+export const deleteDatasetVersion = procedure
   .meta({
     openapi: {
       method: "DELETE",

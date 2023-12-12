@@ -10,16 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { router } from "src/server/trpc/def";
+import { PageTitle } from "src/components/pageTitle";
 
-import { createDataset, deleteDataset, list } from "./dataset";
-import { createDatasetVersion, deleteDatasetVersion, versionList } from "./datasetVersion";
+import { DatasetListTable } from "../DatasetListTable";
 
-export const dataset = router({
-  list,
-  createDataset,
-  deleteDataset,
-  versionList,
-  createDatasetVersion,
-  deleteDatasetVersion,
-});
+export default function Page() {
+
+  return (
+    <div>
+      <PageTitle titleText="公共数据集" />
+      <DatasetListTable isPublic={true} />
+    </div>
+  );
+}

@@ -23,8 +23,8 @@ export class DatasetVersion {
   @Property()
     versionName: string;
 
-  @Property()
-    versionDescription: string;
+  @Property({ nullable: true })
+    versionDescription: string | undefined;
 
   @Property()
     path: string;
@@ -40,7 +40,7 @@ export class DatasetVersion {
 
   constructor(init: {
       versionName: string;
-      versionDescription: string;
+      versionDescription?: string;
       path: string;
       createTime?: Date;
       isShared: boolean;

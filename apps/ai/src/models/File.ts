@@ -10,16 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { router } from "src/server/trpc/def";
+export type FileType = "FILE" | "DIR";
 
-import { createDataset, deleteDataset, list } from "./dataset";
-import { createDatasetVersion, deleteDatasetVersion, versionList } from "./datasetVersion";
+export type FileInfo = {
+  name: string,
+  type: FileType,
+  mtime: string,
+  mode: number,
+  size: number,
+};
 
-export const dataset = router({
-  list,
-  createDataset,
-  deleteDataset,
-  versionList,
-  createDatasetVersion,
-  deleteDatasetVersion,
-});

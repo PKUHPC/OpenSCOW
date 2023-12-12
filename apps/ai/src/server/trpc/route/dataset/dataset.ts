@@ -15,6 +15,31 @@ import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
 
+const mockDatasets = [
+  {
+    id: 100,
+    name: "aaa",
+    owner: "demo_admin",
+    type: "Image",
+    isShared: "true",
+    scene: "Text",
+    description: "test",
+    createTime: "2023-04-15 12:30:45",
+    versions: [],
+  },
+  {
+    id: 101,
+    name: "bbb",
+    owner: "demo_admin",
+    type: "Audio",
+    isShared: "false",
+    scene: "Text",
+    description: "test",
+    createTime: "2023-04-15 12:30:45",
+    versions: [],
+  },
+];
+
 const paginationSchema = z.object({
   page: z.number().min(1).optional(),
   pageSize: z.number().min(0).optional(),
@@ -49,7 +74,8 @@ export const list = procedure
       orderBy: { createTime: "desc" },
     });
 
-    return { items, count };
+    // return { items, count };
+    return { items: mockDatasets, count: 2 };
   });
 
 
@@ -67,7 +93,7 @@ export const createDataset = procedure
     owner: z.string(),
     type: z.string(),
     scene: z.string(),
-    description: z.string(),
+    description: z.string().optional(),
   }))
   .output(z.number())
   .mutation(async ({ input }) => {

@@ -10,13 +10,39 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-// export const FilterDatesetType = {
-//   ALL: "全部",
-//   IMAGE: "图像",
-//   TEXT: "文本",
-//   VIDEO: "视频",
-//   AUDIO: "音频",
-//   OTHERS: "其他",
-// };
-export const Test = {};
+// import { inferRouterOutputs } from "@trpc/server";
+// import { AppRouter } from "src/server/trpc/router";
+
+// export type DatasetInterface = inferRouterOutputs<AppRouter>["dataset"]["list"]["items"][0];
+
+export enum DatasetType {
+  IMAGE = "IMAGE",
+  TEXT = "TEXT",
+  VIDEO = "VIDEO",
+  AUDIO = "AUDIO",
+  OTHER = "OTHER",
+}
+
+export enum SceneType {
+  CWS = "CWS",
+  DA = "DA",
+  IC = "IC",
+  OD = "OD",
+  OTHER = "OTHER",
+}
+
+export const DatasetTypeText = {
+  IMAGE: "图像",
+  TEXT: "文本",
+  VIDEO: "视频",
+  AUDIO: "音频",
+  OTHER: "其他",
+};
+
+export const SceneTypeText = {
+  CWS: "中文分词",
+  DA: "数据增强",
+  IC: "图像分类",
+  OD: "目标检测",
+  OTHER: "其他",
+};

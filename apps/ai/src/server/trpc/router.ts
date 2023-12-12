@@ -13,9 +13,11 @@
 import { trpc } from "src/server/trpc/def";
 
 import { dataset } from "./route/dataset";
+import { image } from "./route/image";
 
 export const appRouter = trpc.router({
   dataset,
+  image,
 });
 
 export type AppRouter = typeof appRouter

@@ -10,21 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-
-import { PageTitle } from "src/components/pageTitle";
-
-import { DatasetListTable } from "./DatasetListTable";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-
-  // TODD 判断isPublic
-  const isPublic = false;
-
-  return (
-    <div>
-      <PageTitle titleText={isPublic ? "公共数据集" : "我的数据集"} />
-      <DatasetListTable isPublic={false} />
-    </div>
-  );
+  redirect("/dataset/private");
 }

@@ -39,8 +39,8 @@ export class Dataset {
   @Property()
     scene: string;
 
-  @Property()
-    description: string;
+  @Property({ nullable: true })
+    description: string | undefined;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -52,7 +52,7 @@ export class Dataset {
     type: string;
     isShared?: boolean;
     scene: string;
-    description: string;
+    description?: string;
     createTime?: Date;
   }) {
 

@@ -32,12 +32,12 @@ export default function Layout(
       Icon: TeamOutlined,
       text: "数据",
       path: "/dataset",
-      clickToPath: "",
+      clickToPath: "/dataset/private",
       children: [
         {
           Icon: UserOutlined,
           text: "我的数据集",
-          path: "/dataset/my",
+          path: "/dataset/private",
         },
         {
           Icon: AccountBookOutlined,
