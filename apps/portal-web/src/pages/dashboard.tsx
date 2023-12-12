@@ -23,6 +23,8 @@ import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
+import cluster from "./api/cluster";
+
 interface Props {
 }
 
@@ -42,14 +44,17 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       const clusters = publicConfig.CLUSTERS;
 
       const rawClusterInfo =
-      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })));
-
-      return rawClusterInfo.flatMap((cluster) =>
-        cluster.clusterInfo.partitions.map((x) => ({
-          clusterName: cluster.clusterInfo.clusterName,
-          ...x,
-        })),
+      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })),
       );
+
+      return rawClusterInfo
+        .map((cluster, idx) => ({ clusterInfo:{ ...cluster.clusterInfo, clusterName:clusters[idx].name } }))
+        .flatMap((cluster) =>
+          cluster.clusterInfo.partitions.map((x) => ({
+            clusterName: cluster.clusterInfo.clusterName,
+            ...x,
+          })),
+        );
     }, []),
   });
 
