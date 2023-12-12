@@ -13,7 +13,7 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
-import { blue, green, red } from "@ant-design/colors";
+import { cyan, geekblue, red } from "@ant-design/colors";
 import { Col, Row } from "antd";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
@@ -42,9 +42,9 @@ const DoubleInfoPaneItem = styled.div`
 `;
 
 const colors = {
-  running:green[4],
-  idle:blue[4],
-  notAvailable:red[4],
+  running:cyan[6],
+  idle:geekblue[6],
+  notAvailable:red[9],
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
 export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {

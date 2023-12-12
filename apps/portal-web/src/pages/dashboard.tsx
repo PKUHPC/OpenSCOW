@@ -23,8 +23,6 @@ import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-import cluster from "./api/cluster";
-
 interface Props {
 }
 

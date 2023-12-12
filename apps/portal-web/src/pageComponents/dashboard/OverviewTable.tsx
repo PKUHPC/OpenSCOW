@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { I18nStringType } from "@scow/config/build/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
 import { styled } from "styled-components";
 
@@ -24,7 +26,7 @@ interface Props {
 
 export interface ClusterInfo extends PartitionInfo {
   id: number;
-  clusterName: string;
+  clusterName: I18nStringType;
 }
 
 interface TableProps {
@@ -70,6 +72,7 @@ const p = prefix("pageComp.dashboard.overviewTable.");
 export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [selectId, setSelectId] = useState(0);
 
@@ -92,7 +95,12 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
           };
         }}
       >
-        <Table.Column dataIndex="clusterName" width="15%" title={t(p("clusterName"))} />
+        <Table.Column
+          dataIndex="clusterName"
+          width="15%"
+          title={t(p("clusterName"))}
+          render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
+        />
         <Table.Column dataIndex="partitionName" title={t(p("partitionName"))} />
         <Table.Column dataIndex="nodeCount" title={t(p("nodeCount"))} />
         <Table.Column dataIndex="runningNodeCount" title={t(p("runningNodeCount"))} />
