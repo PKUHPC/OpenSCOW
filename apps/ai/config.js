@@ -10,39 +10,24 @@
  * See the Mulan PSL v2 for more details.
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 // @ts-check
 
-// const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
-// const { join } = require("path");
-// const { homedir } = require("os");
-// const { PHASE_DEVELOPMENT_SERVER,
-//   PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
+const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
+const { join } = require("path");
+const { homedir } = require("os");
+const { PHASE_DEVELOPMENT_SERVER,
+  PHASE_PRODUCTION_SERVER, PHASE_TEST, PHASE_PRODUCTION_BUILD } = require("next/constants");
 
-// const { readVersionFile } = require("@scow/utils/build/version");
-// const { getCapabilities } = require("@scow/lib-auth");
-// const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
-// const { getPortalConfig } = require("@scow/config/build/portal");
-// const { getClusterConfigs, getLoginNode, getSortedClusters,
-//   getSortedClusterIds } = require("@scow/config/build/cluster");
-// const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
-// const { getAuditConfig } = require("@scow/config/build/audit");
-
-import { getAuditConfig } from "@scow/config/build/audit";
-import {
-  getClusterConfigs,
-  getLoginNode,
-  getSortedClusterIds,
-  getSortedClusters,
-} from "@scow/config/build/cluster";
-import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
-import { getPortalConfig } from "@scow/config/build/portal";
-import { DEFAULT_PRIMARY_COLOR, getUiConfig } from "@scow/config/build/ui";
-import { bool, envConfig, parseKeyValue, str } from "@scow/lib-config";
-import { readVersionFile } from "@scow/utils/build/version";
-import dotenv from "dotenv";
-import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER, PHASE_TEST } from "next/constants";
-import { homedir } from "os";
-import { join } from "path";
+const { readVersionFile } = require("@scow/utils/build/version");
+const { getCapabilities } = require("@scow/lib-auth");
+const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
+const { getPortalConfig } = require("@scow/config/build/portal");
+const { getClusterConfigs, getLoginNode, getSortedClusters,
+  getSortedClusterIds } = require("@scow/config/build/cluster");
+const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
+const { getAuditConfig } = require("@scow/config/build/audit");
 
 /**
  * Get auth capabilities
@@ -113,7 +98,7 @@ const specs = {
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
 
 // This config is used to provide env doc auto gen
-export const config = { _specs: specs };
+const config = { _specs: specs };
 
 /**
  * Build system runtime config
@@ -121,7 +106,7 @@ export const config = { _specs: specs };
  * @param {string} basePath basePath of the system
  * @returns RuntimeConfig
  */
-export const buildRuntimeConfig = async (phase, basePath) => {
+const buildRuntimeConfig = async (phase, basePath) => {
 
   // https://github.com/vercel/next.js/issues/57927
   // const building = phase === PHASE_PRODUCTION_BUILD;
@@ -136,8 +121,7 @@ export const buildRuntimeConfig = async (phase, basePath) => {
   }
 
   if (dev) {
-    // require("dotenv").config({ path: "env/.env.dev" });
-    dotenv.config({ path: "env/.env.dev" });
+    require("dotenv").config({ path: "env/.env.dev" });
   }
 
   // reload config after envs are applied
@@ -250,16 +234,16 @@ export const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
 
     // HACK setup ws proxy
-    setTimeout(() => {
-      const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
-      console.log("Calling setup url to initialize proxy and shell server", url);
+    // setTimeout(() => {
+    //   const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
+    //   console.log("Calling setup url to initialize proxy and shell server", url);
 
-      fetch(url).then(async (res) => {
-        console.log("Call completed. Response: ", await res.text());
-      }).catch((e) => {
-        console.error("Error when calling proxy url to initialize ws proxy server", e);
-      });
-    });
+    //   fetch(url).then(async (res) => {
+    //     console.log("Call completed. Response: ", await res.text());
+    //   }).catch((e) => {
+    //     console.error("Error when calling proxy url to initialize ws proxy server", e);
+    //   });
+    // });
 
   }
 
@@ -269,7 +253,7 @@ export const buildRuntimeConfig = async (phase, basePath) => {
   };
 };
 
-// module.exports = {
-//   buildRuntimeConfig,
-//   config,
-// };
+module.exports = {
+  buildRuntimeConfig,
+  config,
+};
