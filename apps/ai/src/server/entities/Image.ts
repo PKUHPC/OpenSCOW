@@ -54,7 +54,7 @@ export class Image {
       tags: string;
       description: string;
       path: string;
-      isShared: boolean;
+      isShared?: boolean;
       createTime?: Date;
     }) {
 
@@ -64,7 +64,7 @@ export class Image {
     this.tags = init.tags;
     this.description = init.description;
     this.path = init.path;
-    this.isShared = init.isShared;
+    this.isShared = init.isShared || false;
 
     if (init.createTime) {
       this.createTime = init.createTime;

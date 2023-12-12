@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Dataset } from "src/server/entities/Dataset";
+import { Image, Source } from "src/server/entities/Image";
 import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
@@ -24,24 +24,24 @@ export const list = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/dataset/list",
-      tags: ["dataset"],
-      summary: "Read all dataset",
+      path: "/image/list",
+      tags: ["image"],
+      summary: "Read all images",
     },
   })
   .input(z.object({ paginationSchema, filter: z.object({
     owner: z.string().optional(),
     name: z.string().optional(),
-    type: z.string().optional(),
+    tags: z.string().optional(),
     description: z.string().optional(),
   }) }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
-    const [items, count] = await orm.em.findAndCount(Dataset, {
+    const [items, count] = await orm.em.findAndCount(Image, {
       owner: input.filter.owner || undefined,
       name: input.filter.name || undefined,
-      type: input.filter.type || undefined,
+      tags: input.filter.tags || undefined,
       description: input.filter.description || undefined,
     }, {
       limit: input.paginationSchema.page || 10, // Default limit
@@ -53,45 +53,75 @@ export const list = procedure
   });
 
 
-export const createDataset = procedure
+export const updateImage = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/dataset/create",
-      tags: ["dataset"],
-      summary: "Create a new dataset",
+      path: "/image/update/{id}",
+      tags: ["image"],
+      summary: "update a image",
     },
   })
   .input(z.object({
-    name: z.string(),
-    owner: z.string(),
-    type: z.string(),
-    scene: z.string(),
-    description: z.string(),
+    id: z.number(),
+    updates: z.object({
+      name: z.string(),
+      tags: z.string(),
+      description: z.string(),
+    }),
   }))
   .output(z.number())
   .mutation(async ({ input }) => {
     const orm = await getORM();
-    const dataset = new Dataset(input);
-    await orm.em.persistAndFlush(dataset);
-    return dataset.id;
+    const image = await orm.em.findOne(Image, { id: input.id });
+    if (!image) throw new Error("Image not found");
+    if (input.updates) {
+      Object.assign(image, input.updates);
+    }
+    await orm.em.persistAndFlush(image);
+    return image.id;
   });
 
-export const deleteDataset = procedure
+export const deleteImage = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/dataset/delete/{id}",
-      tags: ["dataset"],
-      summary: "delete a dataset",
+      path: "/image/delete/{id}",
+      tags: ["image"],
+      summary: "delete a image",
     },
   })
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input }) => {
     const orm = await getORM();
-    const dataset = await orm.em.findOne(Dataset, { id: input.id });
-    if (!dataset) throw new Error("Dataset not found");
-    await orm.em.removeAndFlush(dataset);
+    const image = await orm.em.findOne(Image, { id: input.id });
+    if (!image) throw new Error("Image not found");
+    await orm.em.removeAndFlush(image);
     return { success: true };
+  });
+
+export const createImage = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/image/create",
+      tags: ["image"],
+      summary: "Create a new iamge",
+    },
+  })
+  .input(z.object({
+    name: z.string(),
+    owner: z.string(),
+    tags: z.string(),
+    description: z.string(),
+    source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
+    path: z.string(),
+  }))
+  .output(z.number())
+  .mutation(async ({ input }) => {
+    const orm = await getORM();
+    const image = new Image(input);
+    await orm.em.persistAndFlush(image);
+    return image.id;
   });

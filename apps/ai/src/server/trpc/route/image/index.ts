@@ -10,21 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
+import { router } from "src/server/trpc/def";
 
-import { PageTitle } from "src/components/pageTitle";
+import { createImage, deleteImage, list, updateImage } from "./image";
 
-import { DatasetListTable } from "./DatasetListTable";
-
-export default function Page() {
-
-  // TODD 判断isPublic
-  const isPublic = false;
-
-  return (
-    <div>
-      <PageTitle titleText={isPublic ? "公共数据集" : "我的数据集"} />
-      <DatasetListTable isPublic={false} />
-    </div>
-  );
-}
+export const image = router({
+  list,
+  updateImage,
+  deleteImage,
+  createImage,
+});
