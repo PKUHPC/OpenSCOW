@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:d18f4d9889b217d3fab280cc52fbe1d4caa0e1d2134c6bab901a8b7393dd5f53 AS base
+FROM node:iron-alpine@sha256:d016f19a31ac259d78dc870b4c78132cf9e52e89339ff319bdd9999912818f4a AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 

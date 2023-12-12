@@ -48,6 +48,8 @@ export interface ServerRuntimeConfig {
   SERVER_I18N_CONFIG_TEXTS: {
     submitJopPromptText?: I18nStringType,
   }
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
