@@ -109,7 +109,8 @@ const config = { _specs: specs };
 const buildRuntimeConfig = async (phase, basePath) => {
 
   // https://github.com/vercel/next.js/issues/57927
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
 
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
@@ -233,16 +234,16 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Public Runtime Config", publicRuntimeConfig);
 
     // HACK setup ws proxy
-    setTimeout(() => {
-      const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
-      console.log("Calling setup url to initialize proxy and shell server", url);
+    // setTimeout(() => {
+    //   const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
+    //   console.log("Calling setup url to initialize proxy and shell server", url);
 
-      fetch(url).then(async (res) => {
-        console.log("Call completed. Response: ", await res.text());
-      }).catch((e) => {
-        console.error("Error when calling proxy url to initialize ws proxy server", e);
-      });
-    });
+    //   fetch(url).then(async (res) => {
+    //     console.log("Call completed. Response: ", await res.text());
+    //   }).catch((e) => {
+    //     console.error("Error when calling proxy url to initialize ws proxy server", e);
+    //   });
+    // });
 
   }
 

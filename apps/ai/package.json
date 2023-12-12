@@ -9,12 +9,11 @@
     "build"
   ],
   "scripts": {
-    "dev": "next dev",
+    "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "build": "next build",
+    "build:next": "cross-env BUILDING=1 next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:types": "tsc --noEmit",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
     "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create"
   },
