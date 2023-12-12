@@ -1,0 +1,8 @@
+# 创建用户、修改密码时，密码的规则。必须设置
+passwordPattern:
+  regex: ^(?=.*[a-zA-Z]).{8,}$
+  errorMessage:
+    i18n:
+      default: 必须包含字母，长度大于等于8位
+      en: Must contain letter and at least 8 characters in length.
+      zh_cn: 必须包含字母，长度大于等于8位
