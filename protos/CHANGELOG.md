@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.3.1
+
+### Patch Changes
+
+- 1a1189ad48: GetPlatformUsersCounts 新增 id_or_name 参数
+
 ## 1.3.0
 
 ### Minor Changes
