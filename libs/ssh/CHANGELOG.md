@@ -1,5 +1,12 @@
 # @scow/lib-ssh
 
+## 1.0.1
+
+### Patch Changes
+
+- f42488eb9e: 创建家目录时默认权限为 740
+- a79aa109bb: sshConnect 时，提示语过长会使得连接失败，现在捕获了这个错误并提示用户
+
 ## 1.0.0
 
 ### Major Changes

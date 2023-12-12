@@ -197,7 +197,7 @@ export const userServiceServer = plugin((server) => {
       const userAccount = await em.findOne(UserAccount, {
         user: { userId, tenant: { name: tenantName } },
         account: { accountName, tenant: { name: tenantName } },
-      });
+      }, { populate: ["user", "account"]});
 
       if (!userAccount) {
         throw <ServiceError>{
@@ -209,6 +209,33 @@ export const userServiceServer = plugin((server) => {
         throw <ServiceError>{
           code: Status.OUT_OF_RANGE,
           message: `User ${userId} is the owner of the account ${accountName}。`,
+        };
+      }
+
+      // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
+      if (userAccount.status === UserStatus.UNBLOCKED) {
+        await blockUserInAccount(userAccount, server.ext, logger);
+        await em.flush();
+      }
+
+      // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
+      const jobs = await server.ext.clusters.callOnAll(
+        logger,
+        async (client) => {
+          const fields = ["job_id", "user", "state", "account"];
+
+          return await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: [userId], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+          });
+        },
+      );
+
+      if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} has jobs running or pending and cannot remove.
+          Please wait for the job to end or end the job manually before moving out.`,
         };
       }
 
@@ -569,13 +596,23 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    getPlatformUsersCounts: async ({ em }) => {
-
-      const totalCount = await em.count(User);
+    getPlatformUsersCounts: async ({ request, em }) => {
+      const { idOrName } = request;
+      const idOrNameQuery = idOrName ? {
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+        ],
+      } : {};
+      const totalCount = await em.count(User, idOrNameQuery);
       const totalAdminCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` }, ...idOrNameQuery });
       const totalFinanceCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` }, ...idOrNameQuery });
 
       return [{
         totalCount: totalCount,

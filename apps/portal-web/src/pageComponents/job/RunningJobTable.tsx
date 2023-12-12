@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
@@ -129,7 +130,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         tableLayout="fixed"
         dataSource={data}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         rowKey={runningJobId}
         scroll={{ x: data?.length ? 1800 : true }}
       >

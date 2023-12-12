@@ -11,7 +11,7 @@
  */
 
 import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
@@ -19,7 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { Redirect } from "src/components/Redirect";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -34,13 +34,18 @@ interface ButtonProps {
   toPath: string;
 }
 
+const p = prefix("pages.files.fileTransfer.");
 
 const OperationButton: React.FC<ButtonProps> = (props) => {
+
   const languageId = useI18n().currentLanguage.id;
+  const t = useI18nTranslateToString();
   const { message, modal } = App.useApp();
+
   const {
     icon, disabled, srcCluster, dstCluster, selectedKeys, toPath,
   } = props;
+
   return (
     <Button
       icon={icon}
@@ -50,9 +55,9 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
           const srcClusterName = getI18nConfigCurrentText(srcCluster.name, languageId);
           const dstClusterName = getI18nConfigCurrentText(dstCluster.name, languageId);
           modal.confirm({
-            title: "确认开启传输?",
-            content: `确认从${srcClusterName}传输到${dstClusterName}吗?`,
-            okText: "确认",
+            title: t(p("confirmTransferTitle")),
+            content: t(p("confirmTransferContent"), [srcClusterName, dstClusterName]),
+            okText: t(p("confirmOk")),
             onOk: async () => {
               await api.checkTransferKey({ body: { fromCluster:srcCluster.id, toCluster: dstCluster.id } });
               Promise.all(selectedKeys.map(async (key) => {
@@ -63,7 +68,7 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
                   toPath: toPath,
                 } })
                   .then(() => {
-                    message.success("传输任务已经开始");
+                    message.success(t(p("transferStartInfo")));
                   });
               }));
             },
@@ -78,9 +83,7 @@ const OperationButton: React.FC<ButtonProps> = (props) => {
 
 export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
-  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
-    return <Redirect url="/dashboard" />;
-  }
+  const t = useI18nTranslateToString();
 
   const [clusterLeft, setClusterLeft] = useState<Cluster>();
   const [clusterRight, setClusterRight] = useState<Cluster>();
@@ -91,11 +94,13 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>([]);
   const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>([]);
 
-
+  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
+    return <Redirect url="/dashboard" />;
+  }
 
   return (
     <>
-      <PageTitle titleText={"跨集群文件传输"} />
+      <PageTitle titleText={t(p("transferTitle"))} />
       <Row justify="space-around" align="top">
         <Col span={11}>
           <ClusterFileTable
@@ -114,7 +119,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
           <Row justify="center">
             <OperationButton
               icon={<ArrowRightOutlined />}
-              disabled={!selectedKeysLeft || selectedKeysLeft.length === 0}
+              disabled={!clusterLeft || !clusterRight || selectedKeysLeft.length === 0}
               srcCluster={clusterLeft}
               dstCluster={clusterRight}
               selectedKeys={selectedKeysLeft}
@@ -125,7 +130,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
           <Row justify="center">
             <OperationButton
               icon={<ArrowLeftOutlined />}
-              disabled={!selectedKeysRight || selectedKeysRight.length === 0}
+              disabled={!clusterLeft || !clusterRight || selectedKeysRight.length === 0}
               srcCluster={clusterRight}
               dstCluster={clusterLeft}
               selectedKeys={selectedKeysRight}

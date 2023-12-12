@@ -28,6 +28,10 @@ export type GetPlatformUsersCountsResponse = Static<typeof GetPlatformUsersCount
 export const GetPlatformUsersCountsSchema = typeboxRouteSchema({
   method: "GET",
 
+  query: Type.Object({
+    idOrName: Type.Optional(Type.String()),
+  }),
+
   responses: {
     200: GetPlatformUsersCountsResponse,
   },
@@ -42,10 +46,12 @@ export default typeboxRoute(GetPlatformUsersCountsSchema,
     if (!info) {
       return;
     }
-
+    const { idOrName } = req.query;
     const client = getClient(UserServiceClient);
 
-    const result = await asyncClientCall(client, "getPlatformUsersCounts", {});
+    const result = await asyncClientCall(client, "getPlatformUsersCounts", {
+      idOrName,
+    });
 
     return {
       200: result,

@@ -10,22 +10,34 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, HomeOutlined, UpOutlined } from "@ant-design/icons";
+import { DatabaseOutlined, EyeInvisibleOutlined, EyeOutlined, HomeOutlined, UpOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
-import { Button, Table, Tooltip } from "antd";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { Button, Space, Table, Tooltip } from "antd";
 import { join } from "path";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SingleCrossClusterTransferSelector } from "src/pageComponents/filemanager/SingleCrossClusterTransferSelector";
 import { FileInfo } from "src/pages/api/file/list";
 import { Cluster } from "src/utils/config";
 import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";
 import { formatSize } from "src/utils/format";
+import { styled } from "styled-components";
 
 import { urlToDownload } from "./api";
 import { PathBar } from "./PathBar";
 
+const OperationBar = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 8px 4px;
+`;
+
+const p = prefix("pageComp.fileManagerComp.clusterFileTable.");
 interface Props {
   selectedCluster?: Cluster;
   setSelectedCluster: (cluster: Cluster) => void;
@@ -45,8 +57,15 @@ export const ClusterFileTable: React.FC<Props> = ({
     setSelectedKeys([]); // 每进入一个新的path，清空SelectedKeys
   };
 
+  const t = useI18nTranslateToString();
+
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState<FileInfo[]>([]);
+  const [showHiddenFile, setShowHiddenFile] = useState(false);
+
+  const onHiddenClick = () => {
+    setShowHiddenFile(!showHiddenFile);
+  };
 
   const reload = async () => {
     setLoading(true);
@@ -85,21 +104,37 @@ export const ClusterFileTable: React.FC<Props> = ({
     }
   };
 
+  const filteredFile = useMemo(() => {
+    return files.filter((file) => showHiddenFile || !file.name.startsWith("."));
+  }, [files, showHiddenFile]);
+
   return (
     <>
-      <SingleCrossClusterTransferSelector
-        value={selectedCluster}
-        onChange={async (cluster) => {
-          if (cluster) {
-            await api.getHomeDirectory({ query: { cluster: cluster.id } })
-              .then((d) => {
-                setNewPath(d.path);
-                setSelectedCluster(cluster);
-              });
-          }
-        }}
-        exclude={ excludeCluster }
-      />
+      <OperationBar>
+        <Space wrap>
+          <SingleCrossClusterTransferSelector
+            value={selectedCluster}
+            onChange={async (cluster) => {
+              if (cluster) {
+                await api.getHomeDirectory({ query: { cluster: cluster.id } })
+                  .then((d) => {
+                    setNewPath(d.path);
+                    setSelectedCluster(cluster);
+                  });
+              }
+            }}
+            exclude={ excludeCluster }
+          />
+        </Space>
+        <Space wrap>
+          <Button
+            onClick={onHiddenClick}
+            icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+          >
+            {showHiddenFile ? t(p("notShowHiddenItem")) : t(p("showHiddenItem"))}
+          </Button>
+        </Space>
+      </OperationBar>
       <TopBar>
         <Button disabled={!selectedCluster} onClick={toHome} icon={<HomeOutlined />} shape="circle" />
         <Button disabled={!selectedCluster} onClick={up} icon={<UpOutlined />} shape="circle" />
@@ -119,9 +154,12 @@ export const ClusterFileTable: React.FC<Props> = ({
         />
       </TopBar>
       <Table
-        dataSource={files}
+        dataSource={filteredFile}
         loading={loading}
-        pagination={false}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         size="small"
         rowKey={(r) => fileInfoKey(r, path)}
         scroll={{ x: true }}
@@ -159,7 +197,7 @@ export const ClusterFileTable: React.FC<Props> = ({
 
         <Table.Column<FileInfo>
           dataIndex="name"
-          title="文件名"
+          title={t(p("fileName"))}
           sorter={(a, b) => a.name.localeCompare(b.name)}
           sortDirections={["ascend", "descend"]}
           render={(_, r) => (
@@ -188,7 +226,7 @@ export const ClusterFileTable: React.FC<Props> = ({
 
         <Table.Column<FileInfo>
           dataIndex="mtime"
-          title="修改日期"
+          title={t(p("modificationDate"))}
           render={(mtime: string | undefined) => mtime ? formatDateTime(mtime) : ""}
           sorter={(a, b) => a.type.localeCompare(b.type) === 0
             ? compareDateTime(a.mtime, b.mtime) === 0
@@ -199,7 +237,7 @@ export const ClusterFileTable: React.FC<Props> = ({
 
         <Table.Column<FileInfo>
           dataIndex="size"
-          title="大小"
+          title={t(p("size"))}
           render={(size: number | undefined, file: FileInfo) => (size === undefined || file.type === "DIR")
             ? ""
             : (
@@ -218,7 +256,7 @@ export const ClusterFileTable: React.FC<Props> = ({
 
         <Table.Column<FileInfo>
           dataIndex="mode"
-          title="权限"
+          title={t(p("permission"))}
           render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
         />
 

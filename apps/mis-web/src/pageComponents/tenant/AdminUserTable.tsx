@@ -11,6 +11,7 @@
  */
 
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
@@ -140,6 +141,7 @@ export const AdminUserTable: React.FC<Props> = ({
         loading={isLoading}
         pagination={{
           showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
           current: currentPageNum,
           onChange: (page) => setCurrentPageNum(page),
         }}

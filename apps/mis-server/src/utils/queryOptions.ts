@@ -12,7 +12,7 @@
 
 import { GetAllUsersRequest_UsersSortField, SortDirection } from "@scow/protos/build/server/user";
 
-import { paginationProps } from "./orm";
+import { DEFAULT_PAGE_SIZE, paginationProps } from "./orm";
 
 // sort fields' text for mis pageComponent AllUsersTable
 export const mapUsersSortField = {
@@ -29,7 +29,7 @@ export const generateAllUsersQueryOptions = (
   sortField?: GetAllUsersRequest_UsersSortField,
   sortOrder?: SortDirection) => {
   return {
-    ...paginationProps(page, pageSize || 10),
+    ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
     orderBy: (sortField !== undefined && sortOrder !== undefined) ?
       { [mapUsersSortField[sortField]]: sortOrder === SortDirection.ASC ? "ASC" : "DESC" } : undefined,
   };

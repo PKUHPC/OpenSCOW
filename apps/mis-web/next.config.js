@@ -48,6 +48,7 @@ module.exports = async (phase) => {
       });
       return config;
     },
+    transpilePackages: ["antd", "@ant-design/icons"],
   };
 
   return withPlugins([

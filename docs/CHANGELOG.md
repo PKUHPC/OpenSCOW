@@ -1,5 +1,17 @@
 # @scow/docs
 
+## 1.1.2
+
+### Patch Changes
+
+- 969457662f: 修复 scow 存在的 web 安全漏洞
+
+## 1.1.1
+
+### Patch Changes
+
+- 22441e3515: 添加管理员使用技巧博客，增加传输节点基础环境说明
+
 ## 1.1.0
 
 ### Minor Changes

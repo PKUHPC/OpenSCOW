@@ -302,6 +302,7 @@ message GetUsersByIdsResponse {
 }
 
 message GetPlatformUsersCountsRequest {
+  optional string id_or_name = 1;
 }
 
 message GetPlatformUsersCountsResponse {

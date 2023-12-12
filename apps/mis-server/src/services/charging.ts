@@ -24,7 +24,7 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import { getChargesSearchType, getChargesTargetSearchParam } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
-import { paginationProps } from "src/utils/orm";
+import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -420,7 +420,7 @@ export const chargingServiceServer = plugin((server) => {
         ...searchType,
         ...searchParam,
       }, {
-        ...paginationProps(page, pageSize || 10),
+        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { time: QueryOrder.DESC },
       });
 

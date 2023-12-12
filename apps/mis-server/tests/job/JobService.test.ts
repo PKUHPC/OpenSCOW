@@ -140,11 +140,11 @@ it("changes job prices", async () => {
   expect(data.accountB.balance.toNumber()).toBe(prevBBalance.plus(4 - 1.6).toNumber());
 });
 
-it("returns 10 jobs if pageSize is undefined or 0", async () => {
+it("returns 50 jobs if pageSize is undefined or 0", async () => {
 
   const em = server.ext.orm.em.fork();
 
-  await em.persistAndFlush(range(1, 20).map((_) =>
+  await em.persistAndFlush(range(1, 60).map((_) =>
     mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10))));
 
   const test = async (pageSize?: number) => {
@@ -156,9 +156,9 @@ it("returns 10 jobs if pageSize is undefined or 0", async () => {
       pageSize,
     });
 
-    expect(reply.jobs).toHaveLength(10);
-    expect(moneyToNumber(reply.totalAccountPrice!)).toBe(190);
-    expect(moneyToNumber(reply.totalTenantPrice!)).toBe(380);
+    expect(reply.jobs).toHaveLength(50);
+    expect(moneyToNumber(reply.totalAccountPrice!)).toBe(590);
+    expect(moneyToNumber(reply.totalTenantPrice!)).toBe(1180);
   };
 
   await Promise.all([test(0), test()]);

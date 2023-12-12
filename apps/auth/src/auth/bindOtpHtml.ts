@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { getLanguageCookie } from "@scow/lib-server";
+import { getCurrentLanguageId } from "@scow/lib-server";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";
@@ -37,7 +38,7 @@ export async function renderBindOtpHtml(
   const hostname = getHostname(req);
 
   // 获取当前语言ID及对应的绑定OTP页面文本
-  const languageId = getLanguageCookie(req.raw);
+  const languageId = getCurrentLanguageId(req.raw, getSystemLanguageConfig(getCommonConfig().systemLanguage));
   const authTexts: AuthTextsType = languages[languageId];
 
   return rep.status(err ? 401 : 200).view("/otp/bindOtp.liquid", {

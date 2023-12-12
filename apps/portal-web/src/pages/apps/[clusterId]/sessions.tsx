@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";

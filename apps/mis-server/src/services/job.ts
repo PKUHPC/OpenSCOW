@@ -34,7 +34,7 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
-import { paginationProps } from "src/utils/orm";
+import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -75,7 +75,7 @@ export const jobServiceServer = plugin((server) => {
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
 
       const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
-        ...paginationProps(page, pageSize || 10),
+        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { timeEnd: QueryOrder.DESC },
       });
 

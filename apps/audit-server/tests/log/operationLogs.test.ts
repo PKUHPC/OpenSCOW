@@ -90,7 +90,7 @@ it("get operation logs", async () => {
 
   const resp = await asyncClientCall(client, "getOperationLogs", {
     page: 1,
-    filter: { operatorUserIds: ["testUserId"]},
+    filter: { operatorUserIds: ["testUserId"], operationDetail: "123" },
   });
 
   expect(resp.totalCount).toBe(2);

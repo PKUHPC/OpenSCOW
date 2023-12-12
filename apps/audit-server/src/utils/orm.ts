@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const paginationProps = (page?: number, pageSize: number = 10) => ({
+export const DEFAULT_PAGE_SIZE = 50;
+
+export const paginationProps = (page?: number, pageSize: number = DEFAULT_PAGE_SIZE) => ({
   offset: ((page ?? 1) - 1) * pageSize,
   limit: pageSize,
 });

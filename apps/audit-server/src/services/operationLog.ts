@@ -19,7 +19,7 @@ import {
 } from "@scow/protos/build/audit/operation_log";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { filterOperationLogs, toGrpcOperationLog } from "src/utils/operationLogs";
-import { paginationProps } from "src/utils/orm";
+import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
 export const operationLogServiceServer = plugin((server) => {
@@ -62,7 +62,7 @@ export const operationLogServiceServer = plugin((server) => {
       logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
       const [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
-        ...paginationProps(page, pageSize || 10),
+        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { operationTime: QueryOrder.DESC },
       });
 

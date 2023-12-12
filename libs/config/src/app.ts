@@ -13,7 +13,8 @@
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
+import { createI18nStringSchema } from "src/i18n";
+
 
 export const AppConnectPropsSchema = Type.Object({
   method: Type.Enum({ GET: "GET", POST: "POST" }, { description: "连接所使用的HTTP方法" }),

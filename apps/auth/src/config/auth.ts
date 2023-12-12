@@ -32,7 +32,7 @@ export enum ScowLogoType {
 }
 
 // 创建配置文件中显示文字项的配置类型
-export const createI18nStringSchema = (description: string, defaultValue?: string) => {
+export const createI18nStringSchema = ({ description, defaultValue }: {description: string, defaultValue?: string}) => {
   return Type.Union([
     Type.String(),
     Type.Object({
@@ -181,8 +181,9 @@ export const UiConfigSchema = Type.Object({
     }, { default: {} }),
     slogan: Type.Object({
       color: Type.String({ description: "默认标语文字颜色", default: "white" }),
-      title: createI18nStringSchema("默认标语标题", ""),
-      texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组", default: []}),
+      title: createI18nStringSchema({ description: "默认标语标题", defaultValue: "" }),
+      texts: Type.Array(createI18nStringSchema({ description: "默认 slogan 正文", defaultValue: "" })
+        , { description: "默认 slogan 正文数组", default: []}),
     }, { default: {} }),
     footerTextColor: Type.String({ description: "默认 footer 文字颜色", default: "white" }),
   }),
@@ -196,8 +197,9 @@ export const UiConfigSchema = Type.Object({
     })),
     slogan: Type.Optional(Type.Object({
       color: Type.String({ description: "默认标语文字颜色" }),
-      title: createI18nStringSchema("默认标语标题", ""),
-      texts: Type.Array(createI18nStringSchema(""), { description: "默认 slogan 正文数组" }),
+      title: createI18nStringSchema({ description: "默认标语标题", defaultValue: "" }),
+      texts: Type.Array(createI18nStringSchema({ description: "默认 slogan 正文", defaultValue: "" }),
+        { description: "默认 slogan 正文数组" }),
     })),
     footerTextColor: Type.Optional(Type.String({ description: "默认 footer 文字颜色" })),
   }))),

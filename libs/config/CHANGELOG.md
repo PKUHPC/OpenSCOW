@@ -1,5 +1,22 @@
 # @scow/config
 
+## 1.2.1
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+
+## 1.2.0
+
+### Minor Changes
+
+- 5d2b75ccec: 在 common.yml 中增加可选配置项 systemLanguage，指定的语言必须为系统当前合法语言["zh_cn", "en"]的枚举值，允许用户指定系统唯一语言不再进行语言切换，或允许用户指定进入 SCOW 时的默认语言
+- f577d9d1e4: 门户系统文件管理新增文件编辑功能
+
+### Patch Changes
+
+- a3d2f44af6: 门户及管理系统所有显示集群的地方按照集群中配置的优先级进行排序
+
 ## 1.1.0
 
 ### Minor Changes

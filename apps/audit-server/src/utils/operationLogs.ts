@@ -11,7 +11,6 @@
  */
 
 import { FilterQuery } from "@mikro-orm/core";
-import { OperationEvent } from "@scow/lib-operation-log";
 import {
   OperationLog,
   OperationLogFilter,
@@ -27,6 +26,7 @@ export async function filterOperationLogs(
     endTime,
     operationType,
     operationTargetAccountName,
+    operationDetail,
   }: OperationLogFilter,
 ) {
 
@@ -35,15 +35,10 @@ export async function filterOperationLogs(
     $and: [
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),
+      ...((operationType) ? [{ metaData: { $case: operationType } }] : []),
+      ...((operationTargetAccountName) ? [{ metaData: { targetAccountName: operationTargetAccountName } }] : []),
+      ...(operationDetail ? [ { metaData: { $like: `%${operationDetail}%` } }] : []),
     ],
-    ...(operationType || operationTargetAccountName ? {
-      metaData: {
-        ...((operationType) ?
-        { $case: operationType } as OperationEvent
-          : {}),
-        ...((operationTargetAccountName) ? { targetAccountName: operationTargetAccountName } : {}),
-      },
-    } : {}),
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
   return sqlFilter;

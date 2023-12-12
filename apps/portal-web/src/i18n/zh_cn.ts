@@ -31,7 +31,12 @@ export default {
       appSessions: "已创建的应用",
       createApp: "创建应用",
     },
-    file: "文件管理",
+    file: {
+      fileManager: "文件管理",
+      crossClusterFileTransfer: "文件传输",
+      clusterFileManager: "集群文件管理",
+      transferProgress: "传输进度",
+    },
   },
   // button
   button: {
@@ -186,6 +191,49 @@ export default {
       },
     },
     fileManagerComp: {
+      clusterFileTable: {
+        fileName: "文件名",
+        modificationDate: "修改日期",
+        size: "大小",
+        permission: "权限",
+        notShowHiddenItem: "不显示隐藏的项目",
+        showHiddenItem: "显示隐藏的项目",
+      },
+      singleCrossClusterTransferSelector: {
+        placeholder: "请选择集群",
+      },
+      transferInfoTable: {
+        srcCluster: "发送集群",
+        dstCluster: "接收集群",
+        file: "文件",
+        transferCount: "传输数量",
+        transferSpeed: "传输速度",
+        timeLeft: "剩余时间",
+        currentProgress: "当前进度",
+        operation: "操作",
+        confirmCancelTitle: "确认取消",
+        confirmCancelContent: "确认取消 {} -> {} 的文件 {} 的传输吗?",
+        confirmOk: "确认",
+        cancelSuccess: "取消成功",
+        cancel: "取消",
+      },
+      fileEditModal: {
+        edit: "编辑",
+        prompt: "提示",
+        save: "保存",
+        doNotSave: "不保存",
+        notSaved: "未保存",
+        notSavePrompt: "文件未保存，是否保存该文件？",
+        fileEdit: "文件编辑",
+        filePreview: "文件预览",
+        fileLoading: "文件正在加载...",
+        exitEdit: "退出编辑",
+        failedGetFile: "获取文件: {} 失败",
+        cantReadFile: "无法读取文件: {}",
+        saveFileFail: "文件保存失败: {}",
+        saveFileSuccess: "文件保存成功",
+        fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+      },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
         createSuccessMessage: "创建成功",
@@ -194,6 +242,9 @@ export default {
         fileName: "文件名",
       },
       fileManager: {
+        preview: {
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
+        },
         moveCopy: {
           copy: "复制",
           move: "移动",
@@ -221,9 +272,8 @@ export default {
           paste: "粘贴到此处",
           operationStarted: "正在{}，已完成：",
           operationNotStarted: "已选择{}{}个项",
-          hidden: "不显示",
-          notHidden: "显示",
-          hiddenItem: "隐藏的项目",
+          notShowHiddenItem: "不显示隐藏的项目",
+          showHiddenItem: "显示隐藏的项目",
           openInShell: "在终端中打开",
           createFile: "新文件",
           mkDir: "新目录",
@@ -406,6 +456,16 @@ export default {
       path: {
         subTitle: "您所请求的集群不存在",
         title: "文件管理",
+      },
+      fileTransfer: {
+        confirmTransferTitle: "确认开始传输?",
+        confirmTransferContent: "确认从 {} 传输到 {} 吗?",
+        confirmOk: "确认",
+        transferStartInfo: "传输任务已经开始",
+        transferTitle: "跨集群文件传输",
+      },
+      currentTransferInfo: {
+        checkTransfer: "文件传输进度查看",
       },
     },
     jobs: {

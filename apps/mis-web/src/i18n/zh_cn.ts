@@ -649,6 +649,7 @@ export default {
         confirmRemoveText:"确认要从账户",
         removeSuccess:"移出用户成功！",
         removerUser:"移出用户",
+        cannotRemoverUserWhoHaveRunningJobFromAccount:"用户还有作业在运行，已封锁该用户，请等待作业结束或手动结束作业后再移出",
       },
     },
   },
