@@ -1,0 +1,5 @@
+stages:
+  - name: Code
+    reviewers: ["ddadaal"]
+  - name: E2E
+    reviewers: ["lyl-available"]
