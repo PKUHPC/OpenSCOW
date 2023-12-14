@@ -10,11 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { UserInfo } from "src/models/User";
+"use client";
 
-export interface ClientUserInfo extends UserInfo {
-  identityId: string;
-  name?: string;
-  token: string;
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+interface Props {
+  href: string;
 }
 
+export const Redirect: React.FC<Props> = ({ href }) => {
+
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push(href);
+  }, []);
+
+  return null;
+};

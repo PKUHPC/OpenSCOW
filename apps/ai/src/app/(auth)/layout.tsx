@@ -12,126 +12,170 @@
 
 "use client";
 
-import { AccountBookOutlined, InfoCircleOutlined, TeamOutlined, UserOutlined } from "@ant-design/icons";
+import { AccountBookOutlined, BookOutlined, DashboardOutlined,
+  DatabaseOutlined, FileImageOutlined, FolderOutlined, Loading3QuartersOutlined,
+  LockOutlined,
+  OneToOneOutlined,
+  PlusOutlined, SaveOutlined, ShareAltOutlined, TeamOutlined, UngroupOutlined, UserOutlined } from "@ant-design/icons";
 import React from "react";
+import { useUserQuery } from "src/app/auth";
+import { Loading } from "src/components/Loading";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
-
+import { NavItemProps } from "src/layouts/base/NavItemProps";
+import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 
 export default function Layout(
   { children }:
   { children: React.ReactNode },
 ) {
 
+  const userQuery = useUserQuery();
+  // const pathname = usePathname();
+
+  if (userQuery.isLoading) {
+    return (
+      <BaseLayout>
+        <Loading />
+      </BaseLayout>
+    );
+  }
+
+  if (userQuery.isError) {
+    return (
+      <BaseLayout>
+        <ServerErrorPage />
+      </BaseLayout>
+    );
+  }
+
+  // const { defaultCluster, setDefaultCluster } = defaultClusterContext;
+
   const routes = [
     {
-      Icon: InfoCircleOutlined,
+      Icon: DashboardOutlined,
       text: "仪表盘",
       path: "/dashboard",
     },
     {
-      Icon: TeamOutlined,
+      Icon: DatabaseOutlined,
       text: "数据",
       path: "/dataset",
       clickToPath: "/dataset/private",
       children: [
         {
-          Icon: UserOutlined,
+          Icon: LockOutlined,
           text: "我的数据集",
           path: "/dataset/private",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: ShareAltOutlined,
           text: "公共数据集",
           path: "/dataset/public",
         },
       ],
     },
     {
-      Icon: TeamOutlined,
+      Icon: FileImageOutlined,
       text: "镜像",
       path: "/image",
       clickToPath: "",
       children: [
         {
-          Icon: UserOutlined,
+          Icon: LockOutlined,
           text: "我的镜像",
           path: "/image/private",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: ShareAltOutlined,
           text: "公共镜像",
           path: "/image/public",
         },
       ],
     },
     {
-      Icon: TeamOutlined,
+      Icon: UngroupOutlined,
       text: "算法",
       path: "/algorithm",
       clickToPath: "",
       children: [
         {
-          Icon: UserOutlined,
+          Icon: LockOutlined,
           text: "我的算法",
           path: "/algorithm/private",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: ShareAltOutlined,
           text: "公共算法",
           path: "/algorithm/public",
         },
       ],
     },
     {
-      Icon: TeamOutlined,
+      Icon: BookOutlined,
       text: "作业",
       path: "/jobs",
       clickToPath: "/jobs/runningJobs",
       children: [
         {
-          Icon: UserOutlined,
+          Icon: PlusOutlined,
           text: "创建应用",
           path: "/jobs/createApps",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: Loading3QuartersOutlined,
           text: "训练",
           path: "/jobs/trainJobs",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: BookOutlined,
           text: "正在运行的作业",
           path: "/jobs/runningJobs",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: SaveOutlined,
           text: "已完成的作业",
           path: "/jobs/historyJobs",
         },
       ],
     },
     {
-      Icon: TeamOutlined,
+      Icon: OneToOneOutlined,
       text: "模型",
       path: "/modal",
       clickToPath: "",
       children: [
         {
-          Icon: UserOutlined,
+          Icon: LockOutlined,
           text: "我的模型",
           path: "/modal/private",
         },
         {
-          Icon: AccountBookOutlined,
+          Icon: ShareAltOutlined,
           text: "公共模型",
           path: "/modal/public",
         },
       ],
     },
+    // ...(publicConfig.CLUSTERS.length > 0 ? [
+    // {
+    //   Icon: FolderOutlined,
+    //   text: "文件管理",
+    //   path: "/files",
+    //   clickToPath: `/files/${defaultCluster.id}/~`,
+    //   clickable: true,
+    //   children: clusters.map((cluster) => ({
+    //     Icon: FolderOutlined,
+    //     text: cluster.name,
+    //     path: `/files/${cluster.id}`,
+    //     clickToPath: prefix(`/files/${cluster.id}/~`),
+    //     handleClick: () => { setDefaultCluster(cluster); },
+    //   } as NavItemProps)),
+    // },
+  // ] : []),
   ];
 
   return (
-    <BaseLayout routes={routes}>
+    <BaseLayout routes={routes} user={userQuery.data.user}>
       {children}
     </BaseLayout>
   );

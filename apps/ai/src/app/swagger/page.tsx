@@ -16,16 +16,15 @@
 import "swagger-ui-react/swagger-ui.css";
 
 import dynamic from "next/dynamic";
-import { LoginBg } from "src/components/LoginBg";
 import { Head } from "src/utils/head";
 const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
 
 export default function Page() {
 
   return (
-    <LoginBg top="10">
+    <>
       <Head title="数据集"></Head>
       <SwaggerUI url="/api/openapi.json" />
-    </LoginBg>
+    </>
   );
 }

@@ -13,15 +13,17 @@
 "use client";
 
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import { Space } from "antd";
 import React, { Dispatch, SetStateAction } from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { Logo } from "src/layouts/base/header/Logo";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-// import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/auth/models";
 import { styled } from "styled-components";
 
+import { UserIndicator } from "./UserIndicator";
 
 interface ComponentProps {
   homepage?: boolean;
@@ -64,18 +66,22 @@ interface Props {
   setSidebarCollapsed: (collapsed: boolean) => void;
   sidebarCollapsed: boolean;
   routes?: NavItemProps[];
-  // user: ClientUserInfo | undefined;
+  logout: (() => void) | undefined;
+  user: ClientUserInfo | undefined;
+  userLinks?: UserLink[];
   pathname: string;
-  selectedResourceId?: number;
-  setSelectedResourceId?: Dispatch<SetStateAction<number>>;
+  languageId: string,
 }
 
 export const Header: React.FC<Props> = ({
   hasSidebar, routes,
-  setSidebarCollapsed, sidebarCollapsed,
-  // user,
+  setSidebarCollapsed,
+  sidebarCollapsed,
+  logout,
+  user,
   pathname,
-  selectedResourceId, setSelectedResourceId,
+  userLinks,
+  languageId,
 }) => {
 
   return (
@@ -100,10 +106,10 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
+      <IndicatorPart>
+        <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId} />
+      </IndicatorPart>
 
-      {/* <IndicatorPart>
-        <UserIndicator user={user} selectedResourceId={selectedResourceId} />
-      </IndicatorPart> */}
     </Container>
   );
 };

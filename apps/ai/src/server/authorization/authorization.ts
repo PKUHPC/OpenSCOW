@@ -11,26 +11,7 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { ClientUserInfo } from "src/server/auth/models";
-import { USE_MOCK } from "src/utils/mock.js";
-
-export const checkUserResourceId = async (userId: string, resourceId: number) => {
-
-  if (USE_MOCK) {
-    return {
-      ok: true,
-      platformId: "123",
-    };
-  }
-
-  // validate the user can operate the identity
-  // const client = getClient(PortalServiceClient);
-
-  // return await asyncUnaryCall(client, "canUseResourceIdentity", {
-  //   resourceId, userId,
-  // });
-};
-
+import { USE_MOCK } from "src/utils/mock";
 
 
 export const checkAuthorization = async () => {

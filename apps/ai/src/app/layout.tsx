@@ -12,7 +12,7 @@
 
 import "antd/dist/reset.css";
 
-import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
+import { DarkModeCookie } from "@scow/lib-web/build/layouts/darkMode";
 import { cookies } from "next/headers";
 import { ClientLayout } from "src/app/clientLayout";
 
@@ -20,7 +20,7 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
 
   const cookie = cookies();
 
-  const darkModeCookie = cookie.get("xscow-dark");
+  const darkModeCookie = cookie.get("scow-dark");
 
   const dark = darkModeCookie ? JSON.parse(darkModeCookie.value) as DarkModeCookie : undefined;
 

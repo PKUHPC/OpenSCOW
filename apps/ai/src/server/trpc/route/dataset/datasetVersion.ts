@@ -15,10 +15,6 @@ import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
 
-const paginationSchema = z.object({
-  limit: z.number().min(1).optional(),
-  offset: z.number().min(0).optional(),
-});
 
 export const versionList = procedure
   .meta({
@@ -29,13 +25,17 @@ export const versionList = procedure
       summary: "Read all datasetVersion",
     },
   })
-  .input(paginationSchema)
+  .input(z.object({
+    id: z.number(),
+    page: z.number().min(1).optional(),
+    pageSize: z.number().min(0).optional(),
+  }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
     const [items, count] = await orm.em.findAndCount(DatasetVersion, {}, {
-      limit: input.limit || 10, // Default limit
-      offset: input.offset || 0, // Default offset
+      limit: input.page || 10, // Default limit
+      offset: input.pageSize || 0, // Default offset
       orderBy: { createTime: "desc" },
     });
 
@@ -58,11 +58,12 @@ export const createDatasetVersion = procedure
     versionDescription: z.string().optional(),
     datasetId: z.number(),
   }))
+  .output(z.object({ id: z.number() }))
   .mutation(async ({ input }) => {
     const orm = await getORM();
     // const datasetVersion = new DatasetVersion(input);
     // await orm.em.persistAndFlush(datasetVersion);
-    // return datasetVersion;
+    return { id : 1 };
   });
 
 export const deleteDatasetVersion = procedure
@@ -75,10 +76,11 @@ export const deleteDatasetVersion = procedure
     },
   })
   .input(z.object({ id: z.number() }))
+  .output(z.object({ successd: z.boolean() }))
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
     if (!datasetVersion) throw new Error("DatasetVersion not found");
     await orm.em.removeAndFlush(datasetVersion);
-    return { success: true };
+    return { successd: true };
   });

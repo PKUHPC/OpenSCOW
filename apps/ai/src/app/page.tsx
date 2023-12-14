@@ -10,11 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { UserInfo } from "src/models/User";
+import { redirect } from "next/navigation";
 
-export interface ClientUserInfo extends UserInfo {
-  identityId: string;
-  name?: string;
-  token: string;
+export default function Page() {
+  redirect("/dashboard");
 }
-

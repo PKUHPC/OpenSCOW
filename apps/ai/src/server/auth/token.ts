@@ -11,9 +11,9 @@
  */
 
 import { getUser, validateToken as authValidateToken } from "@scow/lib-auth";
-import { USE_MOCK } from "src/apis/useMock";
 import { UserInfo } from "src/models/User";
 import { runtimeConfig } from "src/utils/config";
+import { USE_MOCK } from "src/utils/mock";
 
 export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 

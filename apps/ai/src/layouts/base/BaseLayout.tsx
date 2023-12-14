@@ -12,6 +12,7 @@
 
 "use client";
 
+
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { Dispatch, PropsWithChildren, SetStateAction, useMemo, useState } from "react";
@@ -20,6 +21,7 @@ import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { SideNav } from "src/layouts/base/SideNav";
 import { Footer } from "src/layouts/Footer";
+import { ClientUserInfo } from "src/server/auth/models";
 import { arrayContainsElement } from "src/utils/array";
 import { styled } from "styled-components";
 
@@ -53,13 +55,11 @@ const StyledLayout = styled(Layout)`
 
 type Props = PropsWithChildren<{
   routes?: NavItemProps[];
-  selectedResourceId?: number;
-  setSelectedResourceId?: Dispatch<SetStateAction<number>>;
+  user?: ClientUserInfo | undefined;
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
-  routes = [], children,
-  selectedResourceId = 0, setSelectedResourceId = () => {},
+  routes = [], children, user = undefined,
 }) => {
   const pathname = usePathname() ?? "";
 
@@ -82,8 +82,10 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         sidebarCollapsed={sidebarCollapsed}
         hasSidebar={hasSidebar}
         routes={routes}
-        selectedResourceId={selectedResourceId}
-        setSelectedResourceId={setSelectedResourceId}
+        user={user}
+        logout={() => {}}
+        userLinks={[]}
+        languageId="zh_cn"
       />
       <StyledLayout>
         {

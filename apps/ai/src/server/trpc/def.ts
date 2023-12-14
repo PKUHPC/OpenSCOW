@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
+import { getUserToken } from "src/server/auth/cookie";
 import Superjson from "superjson";
 import { OpenApiMeta } from "trpc-openapi";
 
@@ -23,3 +24,24 @@ export const trpc = initTRPC.context<GlobalContext>()
   });
 
 export const { middleware, procedure, router, mergeRouters } = trpc;
+
+const isAuthed = trpc.middleware(async ({ next, ctx }) => {
+
+  const token = getUserToken(ctx.req);
+
+  if (!token) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      token: token,
+    },
+  });
+});
+
+// auth procedures for logged in users only
+export const authProcedure = trpc.procedure.use(isAuthed);

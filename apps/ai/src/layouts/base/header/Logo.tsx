@@ -14,6 +14,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { join } from "path";
+import { useDarkMode } from "src/layouts/darkMode";
 import { styled } from "styled-components";
 
 const LogoContainer = styled.h1`
@@ -27,10 +29,14 @@ const LogoContainer = styled.h1`
 
 export const Logo = () => {
 
+  const basePath = "";
+  const { dark } = useDarkMode();
+  const query = new URLSearchParams({ type: "logo", preferDark: dark ? "true" : "false" }).toString();
+
   return (
     <LogoContainer>
       <Link href="/">
-        <Image src="/logo-no-text.svg" alt="logo" width={32} height={32} />
+        <img src={join(basePath, "/api/logo?" + query.toString())} alt="logo" height={40} />
       </Link>
     </LogoContainer>
   );

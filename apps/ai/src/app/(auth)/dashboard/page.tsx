@@ -10,11 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { UserInfo } from "src/models/User";
+"use client";
+import { Head } from "src/utils/head";
+import { styled } from "styled-components";
 
-export interface ClientUserInfo extends UserInfo {
-  identityId: string;
-  name?: string;
-  token: string;
+const Logo = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
+export default function Page() {
+
+  return (
+    <div>
+      <Head title={"dashboard"} />
+      <Logo>
+
+        <img
+          alt="logo"
+          src={"/api/logo?type=logo"}
+          style={{
+            objectFit: "contain",
+            maxWidth: "50%",
+          }}
+        />
+      </Logo>
+
+    </div>
+  );
 }
 

@@ -40,10 +40,6 @@ const mockDatasets = [
   },
 ];
 
-const paginationSchema = z.object({
-  page: z.number().min(1).optional(),
-  pageSize: z.number().min(0).optional(),
-});
 
 export const list = procedure
   .meta({
@@ -54,23 +50,25 @@ export const list = procedure
       summary: "Read all dataset",
     },
   })
-  .input(z.object({ paginationSchema, filter: z.object({
+  .input(z.object({
+    page: z.number().min(1).optional(),
+    pageSize: z.number().min(0).optional(),
     owner: z.string().optional(),
     name: z.string().optional(),
     type: z.string().optional(),
     description: z.string().optional(),
-  }) }))
+  }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
     const [items, count] = await orm.em.findAndCount(Dataset, {
-      owner: input.filter.owner || undefined,
-      name: input.filter.name || undefined,
-      type: input.filter.type || undefined,
-      description: input.filter.description || undefined,
+      owner: input.owner || undefined,
+      name: input.name || undefined,
+      type: input.type || undefined,
+      description: input.description || undefined,
     }, {
-      limit: input.paginationSchema.page || 10, // Default limit
-      offset: input.paginationSchema.pageSize || 0, // Default offset
+      limit: input.page || 10, // Default limit
+      offset: input.pageSize || 0, // Default offset
       orderBy: { createTime: "desc" },
     });
 

@@ -10,4 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const USE_MOCK = process.env.USE_MOCK === "true";
+export const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";

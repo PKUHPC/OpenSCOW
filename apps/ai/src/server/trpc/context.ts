@@ -20,7 +20,7 @@ export type SSRContext<R = any> = Context & {
   res: NextApiResponse<R>
 }
 
-export type GlobalContext = Context | SSRContext
+export type GlobalContext = SSRContext
 
 export function isSSRContext(
   ctx: GlobalContext,
@@ -28,6 +28,12 @@ export function isSSRContext(
   return !!((ctx as SSRContext)?.req && (ctx as SSRContext)?.res);
 }
 
+// export const createContext = (
+//   ctx: CreateNextContextOptions,
+// ): GlobalContext => isSSRContext(ctx) ? ctx : {};
+
 export const createContext = (
   ctx: CreateNextContextOptions,
-): GlobalContext => isSSRContext(ctx) ? ctx : {};
+): GlobalContext => ctx;
+
+

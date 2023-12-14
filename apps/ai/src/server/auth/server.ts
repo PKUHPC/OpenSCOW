@@ -17,12 +17,15 @@ import { deleteUserToken, getUserToken } from "src/server/auth/cookie.js";
 import { ClientUserInfo } from "src/server/auth/models.js";
 import { USE_MOCK } from "src/utils/mock.js";
 
+import { validateToken } from "./token";
+
 export const mockUserInfo: ClientUserInfo = {
   identityId: "123",
-  accountId: 12,
-  phone:"13121812324",
-  email:"123@qq.com",
-  createTime:"2023-9-6 14:19:47",
+  name:"dsds",
+  // accountId: 12,
+  // phone:"13121812324",
+  // email:"123@qq.com",
+  // createTime:"2023-9-6 14:19:47",
   token: "123",
 };
 
@@ -37,8 +40,19 @@ export async function getUserInfo(req: RequestType, res?: NextApiResponse): Prom
     return mockUserInfo;
   }
 
+  const result = await validateToken(token);
+
+
+  if (!result || !result.identityId) {
+    deleteUserToken(res);
+    return;
+  }
+
+  return { ...result, token };
+
   // const client = getClient(AuthenticationServiceClient);
 
+  // const resp = await validateToken(token);
   // const resp = await asyncUnaryCall(client, "getUserInfo", { token }).catch((e) => {
   //   if (e.code === status.UNAUTHENTICATED) {
   //     return undefined;
@@ -47,15 +61,15 @@ export async function getUserInfo(req: RequestType, res?: NextApiResponse): Prom
   //   }
   // });
 
-  const resp = { info: { ...mockUserInfo } };
-  if (!resp || !resp.info) {
-    // the token is invalid. destroy the cookie
-    if (res) {
-      deleteUserToken(res);
-    }
-    return undefined;
-  }
-  return { ...resp.info, token };
+  // const resp = { info: { ...mockUserInfo } };
+  // if (!resp || !resp.info) {
+  //   // the token is invalid. destroy the cookie
+  //   if (res) {
+  //     deleteUserToken(res);
+  //   }
+  //   return undefined;
+  // }
+  // return { ...resp.info, token };
 
 }
 
