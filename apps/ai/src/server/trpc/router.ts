@@ -13,6 +13,7 @@
 import { trpc } from "src/server/trpc/def";
 
 import { auth } from "./route/auth";
+import { config } from "./route/config";
 import { dataset } from "./route/dataset";
 import { image } from "./route/image";
 import { logo } from "./route/logo";
@@ -22,6 +23,7 @@ export const appRouter = trpc.router({
   image,
   auth,
   logo,
+  config,
 });
 
 export type AppRouter = typeof appRouter

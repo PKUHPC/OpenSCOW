@@ -12,10 +12,9 @@
 
 "use client";
 
-import { AccountBookOutlined, BookOutlined, DashboardOutlined,
+import { BookOutlined, DashboardOutlined,
   DatabaseOutlined, FileImageOutlined, FolderOutlined, Loading3QuartersOutlined,
-  LockOutlined,
-  OneToOneOutlined,
+  LockOutlined, OneToOneOutlined,
   PlusOutlined, SaveOutlined, ShareAltOutlined, TeamOutlined, UngroupOutlined, UserOutlined } from "@ant-design/icons";
 import React from "react";
 import { useUserQuery } from "src/app/auth";
@@ -23,6 +22,15 @@ import { Loading } from "src/components/Loading";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
+import { trpc } from "src/utils/trpc";
+
+import { PublicConfigContext } from "./context";
+import { defaultClusterContext } from "./defaultClusterContext";
+
+
+const useConfigQuery = () => {
+  return trpc.config.publicConfig.useQuery();
+};
 
 export default function Layout(
   { children }:
@@ -30,7 +38,7 @@ export default function Layout(
 ) {
 
   const userQuery = useUserQuery();
-  // const pathname = usePathname();
+  const configQuery = useConfigQuery();
 
   if (userQuery.isLoading) {
     return (
@@ -48,7 +56,29 @@ export default function Layout(
     );
   }
 
-  // const { defaultCluster, setDefaultCluster } = defaultClusterContext;
+  if (!userQuery.data.user) {
+    window.location.href = "/api/auth";
+    return;
+  }
+
+  if (configQuery.isLoading) {
+    return (
+      <BaseLayout user={userQuery.data.user}>
+        {children}
+      </BaseLayout>
+    );
+  }
+
+  if (configQuery.isError) {
+    return (
+      <BaseLayout>
+        <ServerErrorPage />
+      </BaseLayout>
+    );
+  }
+
+  const publicConfig = configQuery.data;
+  const { defaultCluster, setDefaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
 
   const routes = [
     {
@@ -156,27 +186,34 @@ export default function Layout(
         },
       ],
     },
-    // ...(publicConfig.CLUSTERS.length > 0 ? [
-    // {
-    //   Icon: FolderOutlined,
-    //   text: "文件管理",
-    //   path: "/files",
-    //   clickToPath: `/files/${defaultCluster.id}/~`,
-    //   clickable: true,
-    //   children: clusters.map((cluster) => ({
-    //     Icon: FolderOutlined,
-    //     text: cluster.name,
-    //     path: `/files/${cluster.id}`,
-    //     clickToPath: prefix(`/files/${cluster.id}/~`),
-    //     handleClick: () => { setDefaultCluster(cluster); },
-    //   } as NavItemProps)),
-    // },
-  // ] : []),
+    ...(publicConfig.CLUSTERS.length > 0 ? [
+      {
+        Icon: FolderOutlined,
+        text: "文件管理",
+        path: "/files",
+        clickToPath: `/files/${defaultCluster.id}/~`,
+        clickable: true,
+        children: publicConfig.CLUSTERS.map((cluster) => ({
+          Icon: FolderOutlined,
+          text: cluster.name,
+          path: `/files/${cluster.id}`,
+          clickToPath: `/files/${cluster.id}/~`,
+          handleClick: () => { setDefaultCluster(cluster); },
+        } as NavItemProps)),
+      },
+    ] : []),
   ];
 
   return (
     <BaseLayout routes={routes} user={userQuery.data.user}>
-      {children}
+      <PublicConfigContext.Provider value={{
+        user: userQuery.data.user,
+        publicConfig,
+        defaultClusterContext: defaultClusterContext(publicConfig.CLUSTERS ?? []),
+      }}
+      >
+        {children}
+      </PublicConfigContext.Provider>
     </BaseLayout>
   );
 

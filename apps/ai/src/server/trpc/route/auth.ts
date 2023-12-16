@@ -20,7 +20,6 @@ import { validateToken } from "src/server/auth/token";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { publicConfig, runtimeConfig } from "src/utils/config";
-import { parseIp } from "src/utils/parse.js";
 import { z } from "zod";
 
 export const auth = router({
