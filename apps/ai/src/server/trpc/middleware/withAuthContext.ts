@@ -11,17 +11,39 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { USE_MOCK } from "src/utils/mock";
+import { getUserToken } from "src/server/auth/cookie";
+import { validateToken } from "src/server/auth/token";
+import { middleware } from "src/server/trpc/def";
 
+/**
+ * Checks whether SSRContext is present. Throws an error if is not. Narrows GlobalContext to SSRContext type.
+ */
+export const withAuthContext = middleware(async ({ ctx, next }) => {
 
-export const checkAuthorization = async () => {
+  const token = getUserToken(ctx.req);
 
-  const resp = {};
-  if (!(resp as any).ok) {
+  if (!token) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
-      message: "Authorization check for failed.",
     });
   }
-};
 
+  const info = await validateToken(token);
+
+  if (!info) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      user: {
+        ...info,
+        token,
+      },
+    },
+  });
+
+});

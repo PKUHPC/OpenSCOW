@@ -209,6 +209,7 @@ export default function Layout(
       <PublicConfigContext.Provider value={{
         user: userQuery.data.user,
         publicConfig,
+        clusters: publicConfig.CLUSTERS,
         defaultClusterContext: defaultClusterContext(publicConfig.CLUSTERS ?? []),
       }}
       >

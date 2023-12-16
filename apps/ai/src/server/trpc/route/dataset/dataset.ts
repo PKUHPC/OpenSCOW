@@ -59,8 +59,9 @@ export const list = procedure
     description: z.string().optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
+    console.log("user", user);
     const [items, count] = await orm.em.findAndCount(Dataset, {
       owner: input.owner || undefined,
       name: input.name || undefined,
@@ -88,15 +89,14 @@ export const createDataset = procedure
   })
   .input(z.object({
     name: z.string(),
-    owner: z.string(),
     type: z.string(),
     scene: z.string(),
     description: z.string().optional(),
   }))
   .output(z.number())
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const dataset = new Dataset(input);
+    const dataset = new Dataset({ ...input, owner: user!.identityId });
     await orm.em.persistAndFlush(dataset);
     return dataset.id;
   });

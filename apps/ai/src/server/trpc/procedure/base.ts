@@ -11,9 +11,13 @@
  */
 
 import { trpc } from "src/server/trpc/def";
+import { withAuthContext } from "src/server/trpc/middleware/withAuthContext";
 import { withOrmContext } from "src/server/trpc/middleware/withOrmContext";
 
-export const procedure = trpc.procedure.use(withOrmContext);
+export const authProcedure = trpc.procedure.use(withAuthContext);
+
+export const procedure = authProcedure.use(withOrmContext);
+
 // export const procedure = trpc.procedure;
 export const baseProcedure = procedure;
 

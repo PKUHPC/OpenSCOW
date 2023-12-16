@@ -30,7 +30,6 @@ interface WithORM {
 }
 
 const globalObject = globalThis as typeof globalThis & WithORM;
-
 /**
  * Returns MikroORM instance.
  * Creates the new if one does not exists, then caches it.

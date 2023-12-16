@@ -10,15 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { withAuthContext } from "src/server/trpc/middleware/withAuthContext";
-import { withHttpContext } from "src/server/trpc/middleware/withHttpContext";
+import { USE_MOCK } from "src/utils/mock.js";
+import { z } from "zod";
 
-import { baseProcedure } from "./base";
+export async function mock<T>(actualFn: () => T, mockFn: () => T) {
+  if (USE_MOCK) {
+    // await new Promise((res) => setTimeout(res, ));
+    return mockFn();
+  } else {
+    return actualFn();
+  }
+}
 
-/**
- * Procedure builder for src/server-side usage only.
- * Adds middleware with src/server-side context check.
- */
-export const procedure = baseProcedure.use(withHttpContext);
-
-export const ssrProcedure = procedure;
+export const pagination = z.object({
+  page: z.number(),
+  pageSize: z.number().default(10),
+});

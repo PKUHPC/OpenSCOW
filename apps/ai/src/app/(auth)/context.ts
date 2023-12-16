@@ -20,6 +20,7 @@ import { Cluster } from "src/utils/config";
 
 export const PublicConfigContext = React.createContext<{
   publicConfig: PublicConfig,
+  clusters: Cluster[],
   user: ClientUserInfo;
   defaultClusterContext: {
     defaultCluster: Cluster;
