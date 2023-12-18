@@ -19,7 +19,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
-import { backToLoginUrl } from "src/utils/url.js";
 import superjson from "superjson";
 
 function getBaseUrl() {
@@ -50,7 +49,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
       onError: (error, query) => {
         const { data } = error as TRPCClientError<AppRouter>;
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          router.push(backToLoginUrl(pathname ?? ""));
+          router.push("/api/auth");
         } else if (data?.code && query?.meta?.[data?.code]) {
           const msg = query?.meta?.[data?.code] as string;
           message.error(msg);
@@ -64,7 +63,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         const { data } = error as TRPCClientError<AppRouter>;
         const { onError } = mutation.options;
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          router.push(backToLoginUrl(pathname ?? ""));
+          router.push("/api/auth");
         } else if (!onError) {
           message.error("出了一些问题，请稍后再试！");
         }

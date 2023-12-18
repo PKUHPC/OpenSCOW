@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { withAuthContext } from "src/server/trpc/middleware/withAuthContext";
 import { withHttpContext } from "src/server/trpc/middleware/withHttpContext";
 
 import { baseProcedure } from "./base";

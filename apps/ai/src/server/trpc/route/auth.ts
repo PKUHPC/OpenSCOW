@@ -18,7 +18,7 @@ import { setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
 import { router } from "src/server/trpc/def";
-import { procedure } from "src/server/trpc/procedure/base";
+import { baseProcedure, procedure } from "src/server/trpc/procedure/base";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { z } from "zod";
 
@@ -30,7 +30,7 @@ export const auth = router({
       return { user: userInfo };
     }),
 
-  callback: procedure
+  callback: baseProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -67,7 +67,7 @@ export const auth = router({
       }
     }),
 
-  login: procedure
+  login: baseProcedure
     .meta({
       openapi: {
         method: "GET",

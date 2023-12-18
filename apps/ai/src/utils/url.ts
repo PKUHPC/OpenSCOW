@@ -24,7 +24,6 @@ export const toHref = ({ pathname = "", query }: { pathname?: string, query?: Re
 };
 
 
-
 /**
  * Normalize pathname with query
  * @param pathnameWithQuery pathname possibly with query
@@ -38,22 +37,6 @@ export function normalizePathnameWithQuery(pathnameWithQuery: string) {
   const qs = qsIndex === -1 ? "" : pathnameWithQuery.slice(qsIndex);
 
   return normalize(pathname) + qs;
-}
-
-/**
- * Back to login url based on pathname
- * @param pathname pathname possibly with query
- * @returns login url
- */
-export function backToLoginUrl(pathname?: string) {
-  if (pathname?.startsWith("/admin")) {
-    return "/login/admin";
-  }
-  else if (pathname?.startsWith("/resource")) {
-    return "/login/resource";
-  } else {
-    return "login/user";
-  }
 }
 
 export const createQueryString = (name: string, value: string) => {
