@@ -43,9 +43,9 @@ const DoubleInfoPaneItem = styled.div`
 `;
 
 const colors = {
-  running:cyan[6],
-  idle:geekblue[6],
-  notAvailable:red[9],
+  running:cyan[5],
+  idle:geekblue[5],
+  notAvailable:red[8],
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
 export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
