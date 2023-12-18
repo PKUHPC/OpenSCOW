@@ -10,9 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
+  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
+import { clusterNotFound } from "src/server/utils/errors";
+import { logger } from "src/server/utils/logger";
+import { getClusterLoginNode, getClusterTransferNode, sshConnect,
+  tryGetClusterTransferNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { mock } from "./utils";
@@ -25,21 +31,20 @@ const operatorInput = z.object({
 
 export const fileRouter = router({
   getHomeDir: procedure
-    .input(z.object({ clusterId: z.string() }))
-    .query(async ({ input: { clusterId }, ctx: { req, res } }) => {
+    .input(z.object({ cluster: z.string() }))
+    .query(async ({ input: { cluster }, ctx: { user } }) => {
 
-      // return mock(
-      //   async () => {
-      //     const resp = await asyncUnaryCall(client, "getHomeDirectory", {
-      //       clusterId, resourceId,
-      //     }, { metadata: setTokenMetadata(token), options: undefined });
+      const host = getClusterLoginNode(cluster);
 
-      //     return { path: resp.path };
-      //   },
-      //   async () => {
-      //     return { path: "/test" };
-      //   },
-      // );
+      if (!host) { throw clusterNotFound(cluster); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const path = await sftpRealPath(sftp)(".");
+
+        return [{ path }];
+      });
     }),
 
 
