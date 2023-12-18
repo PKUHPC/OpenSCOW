@@ -29,25 +29,6 @@ export const PortalConfigSchema = Type.Object({
 
   apps: Type.Boolean({ description: "是否启用交互式任务功能", default: true }),
 
-  homeText: Type.Object({
-    defaultText: createI18nStringSchema({
-      description: "默认主页文本",
-      defaultValue: "Super Computing on Web",
-    }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的文本", default: {} },
-    ),
-  }),
-
-  homeTitle: Type.Object({
-    defaultText: createI18nStringSchema({ description: "默认主页标题", defaultValue: "SCOW" }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的标题", default: {} },
-    ),
-  }),
-
   submitJobPromptText:
   Type.Optional(createI18nStringSchema({
     description: "提交作业命令框中的提示语",
