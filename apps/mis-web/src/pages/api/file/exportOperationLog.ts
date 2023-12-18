@@ -19,7 +19,7 @@ import { ExportOperationLog, OperationLog } from "@scow/protos/build/audit/opera
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getT, getTArgs } from "src/i18n";
+import { getT, getTArgs, prefix } from "src/i18n";
 import { getOperationDetail, getOperationResultTexts, getOperationTypeTexts, OperationCodeMap, OperationLogQueryType,
   OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/User";
@@ -207,6 +207,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
     const t = await getT(languageId);
     const tArgs = await getTArgs(languageId);
+    const p = prefix("component.others.");
     const OperationTypeTexts = getOperationTypeTexts(t);
     const OperationResultTexts = getOperationResultTexts(t);
 
@@ -226,13 +227,13 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
     const headerColumns = {
       id: "Operation Log ID",
-      operationCode: "Operation Code",
-      operationType: "Operation Type",
-      operationDetail: "Operation Detail",
-      operationResult: "Operation Result",
-      operationTime: "Operation Time",
-      operatorUserId: "Operation User ID",
-      operatorIp: "Operation IP",
+      operationCode: t(p("operationCode")),
+      operationType: t(p("operationType")),
+      operationDetail: t(p("operationDetail")),
+      operationResult: t(p("operationResult")),
+      operationTime: t(p("operationTime")),
+      operatorUserId: t(p("operatorUserId")),
+      operatorIp: t(p("operatorIp")),
     };
 
     const csvStringify = getCsvStringify(headerColumns, columns);
