@@ -14,8 +14,9 @@ import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
 import { cyan, geekblue, red } from "@ant-design/colors";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Col, Row } from "antd";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
 interface Props {
   selectItem: ClusterInfo;
@@ -50,6 +51,7 @@ const p = prefix("pageComp.dashboard.infoPanes.");
 export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { clusterName, partitionName, nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
@@ -64,7 +66,10 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
-              title={{ title:t(p("nodeInfo")), subTitle:`${clusterName}-${partitionName}` }}
+              title={{
+                title:t(p("nodeInfo")),
+                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+              }}
               tag={{ itemName:t(p("node")), num:nodeCount }}
               paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
                 { itemName:t(p("idle")), num:idleNodeCount, color:colors.idle },
@@ -78,7 +83,10 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
             <DoubleInfoPaneItem>
               <InfoPane
                 loading={loading}
-                title={{ title:t(p("resourceInfo")), subTitle:`${clusterName}-${partitionName}` }}
+                title={{
+                  title:t(p("resourceInfo")),
+                  subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+                }}
                 tag={{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) }}
                 paneData={ [{ itemName:t(p("running")), num:runningCpuCount, color:colors.running },
                   { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
@@ -102,7 +110,9 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
-              title={{ title:t(p("job")), subTitle:`${clusterName}-${partitionName}` }}
+              title={{ title:t(p("job")),
+                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+              }}
               tag={{ itemName:t(p("job")), num:jobCount }}
               paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
                 { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
