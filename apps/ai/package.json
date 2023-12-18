@@ -5,7 +5,7 @@
   "files": [
     ".next",
     "public",
-    "next.config.js",
+    "next.config.mjs",
     "build"
   ],
   "scripts": {
@@ -28,6 +28,8 @@
     "@ant-design/cssinjs": "1.17.2",
     "@ant-design/icons": "5.2.6",
     "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
     "@grpc/grpc-js": "1.9.11",
     "@mikro-orm/cli": "5.9.4",
     "@mikro-orm/core": "5.9.4",
@@ -41,6 +43,8 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-web": "workspace:*",
     "@scow/utils": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*",
+    "@scow/lib-scheduler-adapter": "workspace:*",
     "@sinclair/typebox": "0.31.10",
     "@tanstack/react-query": "4.33.0",
     "@trpc/client": "10.44.1",
@@ -76,7 +80,7 @@
     "ws": "8.13.0",
     "xterm": "5.2.1",
     "xterm-addon-fit": "0.7.0",
-    "zod": "3.22.2"
+    "zod": "3.22.4"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
