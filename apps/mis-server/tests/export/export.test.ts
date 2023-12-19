@@ -40,63 +40,6 @@ let server: Server;
 let em: SqlEntityManager;
 let data: InitialData;
 
-async function collectUser(stream: AsyncIterable<ExportUserResponse>) {
-
-  const users: ExportedUser[] = [];
-
-  for await (const res of stream) {
-    const a = res.users;
-    a.forEach((o) => {
-      users.push(o);
-    });
-  }
-
-  return users;
-}
-
-async function collectAccount(stream: AsyncIterable<ExportAccountResponse>) {
-
-  const accounts: Account[] = [];
-
-  for await (const res of stream) {
-    const a = res.accounts;
-    a.forEach((o) => {
-      accounts.push(o);
-    });
-  }
-
-  return accounts;
-}
-
-async function collectChargeRecord(stream: AsyncIterable<ExportChargeRecordResponse>) {
-
-  const chargeRecords: ChargeRecordProto[] = [];
-
-  for await (const res of stream) {
-    const a = res.chargeRecords;
-    a.forEach((o) => {
-      chargeRecords.push(o);
-    });
-  }
-
-  return chargeRecords;
-}
-
-async function collectPayRecord(stream: AsyncIterable<ExportPayRecordResponse>) {
-
-  const payRecords: PaymentRecord[] = [];
-
-  for await (const res of stream) {
-    const a = res.payRecords;
-    a.forEach((o) => {
-      payRecords.push(o);
-    });
-  }
-
-  return payRecords;
-}
-
-
 async function collectData<T, R>(
   stream: AsyncIterable<T>,
   handler: (response: T) => R[],

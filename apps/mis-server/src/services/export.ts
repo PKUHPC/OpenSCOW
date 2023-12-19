@@ -184,7 +184,7 @@ export const exportServiceServer = plugin((server) => {
         const records = (await em.find(Account, {
           $and: [
             tenantName !== undefined ? { tenant: { name: tenantName } } : {},
-            accountName !== undefined ? { accountName } : {},
+            accountName !== undefined ? { accountName:  { $like: `%${accountName}%` } } : {},
             blocked ? { blocked } : {},
             debt ? { balance: { $lt: new Decimal(0) } } : {},
           ],
