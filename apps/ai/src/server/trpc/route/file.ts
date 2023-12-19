@@ -23,15 +23,19 @@ import { z } from "zod";
 
 import { mock } from "./utils";
 
-const operatorInput = z.object({
-  resourceId: z.number(),
-  clusterId: z.string(),
-});
 
-
-export const fileRouter = router({
+export const file = router({
   getHomeDir: procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/file/homeDir",
+        tags: ["file"],
+        summary: "获取用户家目录路径",
+      },
+    })
     .input(z.object({ cluster: z.string() }))
+    .output(z.object({ path: z.string() }))
     .query(async ({ input: { cluster }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(cluster);
@@ -43,7 +47,7 @@ export const fileRouter = router({
 
         const path = await sftpRealPath(sftp)(".");
 
-        return [{ path }];
+        return { path };
       });
     }),
 

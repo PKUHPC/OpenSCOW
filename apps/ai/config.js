@@ -132,6 +132,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const clusters = getClusterConfigs(configPath, console);
 
   Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
+  Object.keys(clusters).map((id) => {
+    if (clusters[id].hpcOnly) {
+      delete clusters[id];
+    }
+  });
 
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
@@ -164,7 +169,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
 
-    // PROTOCOL: config.PROTOCOL,
+    PROTOCOL: config.PROTOCOL,
   };
 
   // query auth capabilities to set optional auth features

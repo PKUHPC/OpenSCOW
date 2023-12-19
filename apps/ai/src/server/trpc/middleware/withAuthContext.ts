@@ -22,10 +22,6 @@ export const withAuthContext = middleware(async ({ ctx, next }) => {
 
   const token = getUserToken(ctx.req);
 
-  console.log("ctx.req111111111111111111");
-  console.log(ctx.req.headers);
-
-
   if (!token) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
