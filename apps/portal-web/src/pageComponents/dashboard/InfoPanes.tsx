@@ -11,6 +11,7 @@
  */
 
 import React from "react";
+import { DoubleInfoPane } from "src/pageComponents/dashboard/DoubleInfoPane";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
 import { cyan, geekblue, red } from "@ant-design/colors";
@@ -18,6 +19,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Col, Row } from "antd";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
+
 interface Props {
   selectItem: ClusterInfo;
   loading: boolean;
@@ -29,18 +31,16 @@ const Container = styled.div`
 
 const InfoPaneContainer = styled.div`
   min-width: 350px;
-  max-width: 500px;
 `;
 const DoubleInfoPaneContainer = styled.div`
   min-width: 700px;
-  max-width: 1000px;
-  display: flex;
   padding: 0 80px;
+  /* 当该面板是第一个元素时不需要左右的padding */
+  @media (max-width: 768px) {
+  padding: 0;
+  }
 `;
 
-const DoubleInfoPaneItem = styled.div`
-  flex: 1;
-`;
 
 const colors = {
   running:cyan[5],
@@ -62,7 +62,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
   return (
     <Container>
       <Row justify="space-between">
-        <Col xs={10} sm={8} xl={6}>
+        <Col md={8} xl={6}>
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
@@ -77,36 +77,34 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
             ></InfoPane>
           </InfoPaneContainer>
         </Col>
-
-        <Col xs={20} sm={16} xl={12}>
+        <Col md={16} xl={12}>
           <DoubleInfoPaneContainer>
-            <DoubleInfoPaneItem>
-              <InfoPane
-                loading={loading}
-                title={{
+            <DoubleInfoPane
+              loading={loading}
+              cpuInfo={{
+                title:{
                   title:t(p("resourceInfo")),
                   subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
-                }}
-                tag={{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) }}
-                paneData={ [{ itemName:t(p("running")), num:runningCpuCount, color:colors.running },
-                  { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
-                  { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable }]}
-              ></InfoPane>
-            </DoubleInfoPaneItem>
-            <DoubleInfoPaneItem>
-              <InfoPane
-                loading={loading}
-                title={{ title:"", subTitle:"" }}
-                tag={{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) }}
-                paneData={ [{ itemName:t(p("running")), num:runningGpuCount, color:colors.running },
+                },
+                tag:{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) },
+                paneData: [{
+                  itemName:t(p("running")), num:runningCpuCount, color:colors.running },
+                { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
+                { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable },
+                ]}}
+              gpuInfo={{
+                title:{ title:"", subTitle:"" },
+                tag:{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) },
+                paneData: [
+                  { itemName:t(p("running")), num:runningGpuCount, color:colors.running },
                   { itemName:t(p("idle")), num:idleGpuCount, color:colors.idle },
-                  { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable }]}
-              ></InfoPane>
-            </DoubleInfoPaneItem>
+                  { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable },
+                ]}}
+            ></DoubleInfoPane>
           </DoubleInfoPaneContainer>
         </Col>
 
-        <Col xs={10} sm={8} xl={6}>
+        <Col md={8} xl={6}>
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
