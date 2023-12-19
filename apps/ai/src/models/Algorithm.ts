@@ -10,24 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { trpc } from "src/server/trpc/def";
-
-import { algorithm } from "./route/algorithm";
-import { auth } from "./route/auth";
-import { config } from "./route/config";
-import { dataset } from "./route/dataset";
-import { image } from "./route/image";
-import { logo } from "./route/logo";
-
-export const appRouter = trpc.router({
-  dataset,
-  image,
-  auth,
-  logo,
-  config,
-  algorithm,
-});
-
-export type AppRouter = typeof appRouter
-
-export type Caller = ReturnType<typeof appRouter.createCaller>
+export const AlgorithmTypeText = {
+  TENSORFLOW: "TensorFlow",
+  PYTORCH: "PyTorch",
+  KERAS: "Keras",
+  MINDSPORE: "MindSpore",
+  OTHER: "其他",
+} as const;
