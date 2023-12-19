@@ -31,7 +31,7 @@ const LineContainer = styled.div`
   border-bottom: 1px solid #ccc;
 `;
 
-const Line: React.FC<LineProps> = ({ itemName, num, color }) => {
+export const Line: React.FC<LineProps> = ({ itemName, num, color }) => {
   return (
     <LineContainer style={{ color }}>
       <span>{itemName}</span>
@@ -40,18 +40,18 @@ const Line: React.FC<LineProps> = ({ itemName, num, color }) => {
   );
 };
 
-interface Title {
+export interface Title {
   title: string;
   subTitle: string;
 }
 
-interface Tag {
+export interface Tag {
   itemName: string;
   num: number;
   unit?: string;
 }
 
-interface PaneData {
+export interface PaneData {
   itemName: string;
   num: number;
   color: string;
@@ -67,12 +67,12 @@ const Container = styled.div`
 margin: 20px 0;
 `;
 
-const TitleContainer = styled.div`
+export const TitleContainer = styled.div`
   height: 45px;
   font-size: 16px;
   padding-bottom: 20px;
 `;
-const PieChartContainer = styled.div`
+export const PieChartContainer = styled.div`
   display: flex;
   justify-content: center;
 `;
