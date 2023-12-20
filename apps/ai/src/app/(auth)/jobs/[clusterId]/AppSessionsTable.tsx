@@ -14,7 +14,6 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Space, Table, TableColumnsType, Tooltip } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { DEFAULT_PAGE_SIZE } from "src/server/utils/orm";
 import { Cluster } from "src/utils/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
@@ -244,7 +243,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
         // scroll={{ x: filteredData?.length ? 1200 : true }}
         pagination={{
           showSizeChanger: true,
-          defaultPageSize: DEFAULT_PAGE_SIZE,
+          defaultPageSize: 50,
         }}
       />
     </>
