@@ -14,7 +14,7 @@
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { Dataset } from "src/server/entities/Dataset";
 import { getORM } from "src/server/lib/db/orm";
-import { procedure } from "src/server/trpc/procedure/base";
+import { ormProcedure, procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
 
 const mockAlgorithms = [
@@ -39,7 +39,7 @@ const mockAlgorithms = [
 ];
 
 
-export const getAlgorithms = procedure
+export const getAlgorithms = ormProcedure
   .meta({
     openapi: {
       method: "GET",
@@ -58,19 +58,22 @@ export const getAlgorithms = procedure
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     console.log("user", user);
-    // const [items, count] = await orm.em.findAndCount(Dataset, {
-    //   owner: input.owner || undefined,
-    //   name: input.name || undefined,
-    //   type: input.type || undefined,
-    //   description: input.description || undefined,
-    // }, {
-    //   limit: input.page || 10, // Default limit
-    //   offset: input.pageSize || 0, // Default offset
-    //   orderBy: { createTime: "desc" },
-    // });
+    const [items, count] = await orm.em.findAndCount(Algorithm, {
+      // owner: input.owner || undefined,
+      // name: input.name || undefined,
+      // type: input.type || undefined,
+      // description: input.description || undefined,
+    }, {
+      // limit: input.page || 1, // Default limit
+      // offset: input.pageSize || 10, // Default offset
+      orderBy: { createTime: "desc" },
+    });
 
-    // return { items, count };
-    return { items: mockAlgorithms, count: 2 };
+    return { items: items.map((i) => { return {
+      ...i,
+      versions:[],
+    }; }), count };
+    // return { items: mockAlgorithms, count: 2 };
   });
 
 
@@ -83,9 +86,12 @@ export const createAlgorithm = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    // const algorithm = new Algorithm({ ...input, owner: user!.identityId });
-    const algorithm = new Algorithm({ name:"123", framework:Framework.KERAS, owner:"wwww" });
-    await orm.em.persistAndFlush(algorithm);
+    const algorithm = new Algorithm({ ...input, owner: user!.identityId });
+    // const algorithm = new Algorithm({ name:"1233", framework:Framework.KERAS, owner:"wwww" });
+    console.log(11111);
+    await orm.em.persist(algorithm);
+    console.log(222222);
+    await orm.em.flush();
     return algorithm.id;
   });
 

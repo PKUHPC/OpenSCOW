@@ -20,5 +20,8 @@ export const authProcedure = baseProcedure.use(withAuthContext);
 
 export const procedure = authProcedure.use(withOrmContext);
 
+export const ormProcedure = baseProcedure.use(withOrmContext);
+
+
 
 

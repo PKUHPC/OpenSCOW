@@ -18,10 +18,11 @@ import { USE_MOCK } from "src/utils/mock";
 export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
-    if (!runtimeConfig.MOCK_USER_ID) {
-      throw new Error("Using mock user id but runtimeConfig.MOCK_USER_ID is not set");
-    }
-    return { identityId: runtimeConfig.MOCK_USER_ID, name: runtimeConfig.MOCK_USER_ID };
+    // if (!runtimeConfig.MOCK_USER_ID) {
+    //   throw new Error("Using mock user id but runtimeConfig.MOCK_USER_ID is not set");
+    // }
+    // return { identityId: runtimeConfig.MOCK_USER_ID, name: runtimeConfig.MOCK_USER_ID };
+    return { identityId: "demo_admin", name: "demo_admin" };
   }
 
   if (!token) { return undefined; }

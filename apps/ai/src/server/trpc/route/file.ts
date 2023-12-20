@@ -19,11 +19,9 @@ import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { logger } from "src/server/utils/logger";
-import { getClusterLoginNode, getClusterTransferNode, sshConnect,
-  tryGetClusterTransferNode } from "src/server/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
-import { mock } from "./utils";
 
 export enum FileInfo_FileType {
   FILE = 0,

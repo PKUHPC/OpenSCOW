@@ -17,7 +17,6 @@ import { TRPCError } from "@trpc/server";
 import { NodeSSH } from "node-ssh";
 import { clusters } from "src/server/config/clusters";
 import { rootKeyPair } from "src/server/config/env";
-import { scowErrorMetadata } from "src/server/utils/error";
 import { Logger } from "ts-log";
 
 import { clusterNotFound, loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "./errors";
