@@ -12,7 +12,6 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
-import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { PaymentRecord } from "@scow/protos/build/server/charging";
 import { ExportServiceClient } from "@scow/protos/build/server/export";
@@ -124,7 +123,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
         id: x.index,
         accountName: x.accountName,
         tenantName: x.tenantName,
-        time: formatDateTime(x.time ?? ""),
+        time: x.time ? new Date(x.time).toISOString() : "",
         amount: nullableMoneyToString(x.amount),
         type: x.type,
         ipAddress: x.ipAddress,

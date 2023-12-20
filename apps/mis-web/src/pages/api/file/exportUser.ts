@@ -12,7 +12,6 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
-import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ExportedUser, ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
@@ -147,7 +146,7 @@ export default route(ExportUserSchema, async (req, res) => {
         email: x.email,
         tenantName: x.tenantName,
         availableAccounts: x.availableAccounts.join(","),
-        createTime: formatDateTime(x.createTime ?? ""),
+        createTime: x.createTime ? new Date(x.createTime).toISOString() : "",
         tenantRoles: x.tenantRoles.map((x) => TenantRoleI18nTexts[x]).join(","),
         platformRoles: x.platformRoles.map((x) => PlatformRoleI18nTexts[x]).join(","),
       };

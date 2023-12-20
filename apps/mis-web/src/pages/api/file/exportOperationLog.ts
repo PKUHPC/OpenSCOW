@@ -13,7 +13,6 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
-import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ExportOperationLog, OperationLog } from "@scow/protos/build/audit/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
@@ -220,7 +219,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
         operationDetail: x.operationEvent ? getOperationDetail(x.operationEvent, t, tArgs) : "",
         operationResult: OperationResultTexts[x.operationResult],
         operatorUserId: x.operatorUserId,
-        operationTime: formatDateTime(x.operationTime ?? ""),
+        operationTime: x.operationTime ? new Date(x.operationTime).toISOString() : "",
         operatorIp: x.operatorIp,
       };
     };
