@@ -28,7 +28,7 @@ export const statisticServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(OperationLog, "o");
 
       qb
-        .select("DATE(o.operation_time) as date, COUNT(o.operator_user_id) as userCount")
+        .select("DATE(o.operation_time) as date, COUNT(DISTINCT o.operator_user_id) as userCount")
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .groupBy("DATE(o.operation_time)")
