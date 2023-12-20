@@ -12,24 +12,26 @@
 
 import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
-import { DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
+import { DatasetInterface, DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
-  owner: string;
+  isEdit: boolean;
+  editData?: Partial<DatasetInterface>
 }
 
 interface FormFields {
+  id?: number | undefined,
   name: string,
   type: DatasetType,
   scene: SceneType,
   description?: string,
 }
 
-export const AddDatasetModal: React.FC<Props> = (
-  { open, onClose, owner },
+export const CreateEditDatasetModal: React.FC<Props> = (
+  { open, onClose, isEdit, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -41,10 +43,11 @@ export const AddDatasetModal: React.FC<Props> = (
     });
   }, []);
 
-  const mutation = trpc.dataset.createDataset.useMutation({
+  const createMutation = trpc.dataset.createDataset.useMutation({
     onSuccess() {
       message.success("添加数据集成功");
       onClose();
+      // form.resetFields();
     },
     onError(e) {
       console.log(e);
@@ -61,25 +64,51 @@ export const AddDatasetModal: React.FC<Props> = (
     },
   });
 
+  const editMutation = trpc.dataset.updateDataset.useMutation({
+    onSuccess() {
+      message.success("编辑数据集成功");
+      onClose();
+    },
+    onError(e) {
+      console.log(e);
+      message.error("编辑数据集失败");
+      // if (e.data?.code === "USER_NOT_FOUND") {
+      //   message.error("用户未找到");
+      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
+      //   message.error("账户未找到");
+      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
+      //   message.error("该用户已经在账户内，无法重复添加");
+      // } else {
+      //   message.error(e.message);
+      // }
+    },
+  });
+
   const onOk = async () => {
     form.validateFields();
     const { name, type, description, scene } = await form.validateFields();
-    mutation.mutate({
+    isEdit && editData ? editMutation.mutate({
+      id: editData.id,
       name,
       type,
-      description,
       scene,
-      owner,
-    });
+      description,
+    })
+      : createMutation.mutate({
+        name,
+        type,
+        description,
+        scene,
+      });
   };
 
 
   return (
     <Modal
-      title="添加数据集"
+      title={isEdit ? "编辑数据集" : "添加数据集"}
       open={open}
       onOk={form.submit}
-      confirmLoading={mutation.isLoading}
+      confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
       onCancel={onClose}
     >
       <Form
@@ -87,6 +116,7 @@ export const AddDatasetModal: React.FC<Props> = (
         onFinish={onOk}
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
+        initialValues={editData}
       >
         <Form.Item
           label="名称"

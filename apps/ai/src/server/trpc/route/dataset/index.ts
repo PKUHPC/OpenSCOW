@@ -12,14 +12,16 @@
 
 import { router } from "src/server/trpc/def";
 
-import { createDataset, deleteDataset, list } from "./dataset";
-import { createDatasetVersion, deleteDatasetVersion, versionList } from "./datasetVersion";
+import { createDataset, deleteDataset, list, updateDataset } from "./dataset";
+import { createDatasetVersion, deleteDatasetVersion, updateDatasetVersion, versionList } from "./datasetVersion";
 
 export const dataset = router({
   list,
   createDataset,
+  updateDataset,
   deleteDataset,
   versionList,
   createDatasetVersion,
+  updateDatasetVersion,
   deleteDatasetVersion,
 });

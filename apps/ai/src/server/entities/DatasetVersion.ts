@@ -35,7 +35,7 @@ export class DatasetVersion {
   @Property()
     isShared: boolean;
 
-  @ManyToOne(() => "Dataset")
+  @ManyToOne(() => "Dataset", { onDelete: "CASCADE", wrappedReference: true })
     dataset: Ref<Dataset>;
 
   constructor(init: {
@@ -43,14 +43,14 @@ export class DatasetVersion {
       versionDescription?: string;
       path: string;
       createTime?: Date;
-      isShared: boolean;
+      isShared?: boolean;
       dataset: Dataset;
     }) {
 
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.path = init.path;
-    this.isShared = init.isShared;
+    this.isShared = init.isShared || false;
     this.dataset = toRef(init.dataset);
 
     if (init.createTime) {

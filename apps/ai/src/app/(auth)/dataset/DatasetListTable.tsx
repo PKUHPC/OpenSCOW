@@ -13,16 +13,19 @@
 "use client";
 
 import { PlusOutlined } from "@ant-design/icons";
+import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Form, Input, Select, Space, Table } from "antd";
 import NextError from "next/error";
 import { useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { DatasetTypeText } from "src/models/Dateset";
+import { DatasetTypeText, SceneTypeText } from "src/models/Dateset";
+import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
 
-import { AddDatasetModal } from "./AddDatasetModal";
-import { CreateDVersionModal } from "./CreateDVersionModal";
+import { CreateEditDatasetModal } from "./CreateEditDatasetModal";
+import { CreateEditDVersionModal } from "./CreateEditDVersionModal";
+import { DatasetVersionsModal } from "./DatasetVersionsModal";
 
 interface Props {
   isPublic: boolean;
@@ -31,14 +34,14 @@ interface Props {
 const FilterType = {
   ALL: "全部",
   ...DatasetTypeText,
-};
-type FilterTypeKeys = keyof typeof FilterType;
+} as { [key: string]: string };
+
+type FilterTypeKeys = Extract<keyof typeof FilterType, string>;
 
 interface FilterForm {
-  owner?: string | undefined,
   type?: FilterTypeKeys | undefined,
-  name?: string | undefined,
-  description?: string | undefined,
+  nameOrDesc?: string | undefined,
+  isShared?: boolean,
 }
 
 interface PageInfo {
@@ -46,17 +49,18 @@ interface PageInfo {
     pageSize?: number;
 }
 
-const AddDatasetModalButton = ModalButton(AddDatasetModal, { type: "primary", icon: <PlusOutlined /> });
-const CreateDVersionModalButton = ModalButton(CreateDVersionModal, { type: "link" });
+const CreateDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "primary", icon: <PlusOutlined /> });
+const EditDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "link" });
+const CreateEditDVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
+const DatasetVersionsModalButton = ModalButton(DatasetVersionsModal, { type: "link" });
 
 export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      owner: undefined,
-      name: undefined,
-      description: undefined,
+      nameOrDesc: undefined,
       type: undefined,
+      isShared: isPublic,
     };
   });
 
@@ -64,11 +68,12 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const { data, isFetching, error, status } = trpc.dataset.list.useQuery({
-    paginationSchema: pageInfo, filter: query,
+  console.log(3333333, query, pageInfo);
+  const { data, refetch, isFetching, error, status } = trpc.dataset.list.useQuery({
+    ...pageInfo, ...query,
   });
 
-  const { message } = App.useApp();
+  const { modal, message } = App.useApp();
 
 
   if (error) {
@@ -80,14 +85,18 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
     );
   }
 
-  if (status !== "success") {
-    message.error("找不到数据集");
-  }
+  // if (status !== "success") {
+  //   message.error("找不到数据集");
+  // }
 
-
-  const setSelectedType = (value: any) => {
-    console.log(value);
-  };
+  const deleteDatasetMutation = trpc.dataset.deleteDataset.useMutation({
+    onError: (err) => {
+      const { data } = err as TRPCClientError<AppRouter>;
+      if (data?.code === "NOT_FOUND") {
+        message.error("找不到该数据集");
+      }
+    },
+  });
 
   return (
     <div>
@@ -97,8 +106,8 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { name, description } = await form.validateFields();
-            setQuery({ ...query, name: name?.trim(), description: description?.trim() });
+            const { nameOrDesc } = await form.validateFields();
+            setQuery({ ...query, nameOrDesc: nameOrDesc?.trim() });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
@@ -106,14 +115,14 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
             <Select
               style={{ minWidth: "100px" }}
               allowClear
-              onChange={(value) => {
-                setSelectedType(value);
+              onChange={(value: FilterTypeKeys) => {
+                setQuery({ ...query, type: value === "ALL" ? undefined : value });
               }}
               placeholder="请选择数据类型"
               defaultValue={FilterType.ALL}
             >
               {Object.entries(FilterType).map(([key, value]) => (
-                <Select.Option key={key} value={value}>
+                <Select.Option key={key} value={key}>
                   {value}
                 </Select.Option>
               ))}
@@ -128,7 +137,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
         </Form>
         {!isPublic && (
           <Space>
-            <AddDatasetModalButton owner="demo_admin"> 添加 </AddDatasetModalButton>
+            <CreateDatasetModalButton isEdit={false}> 添加 </CreateDatasetModalButton>
           </Space>
         )}
       </FilterFormContainer>
@@ -138,52 +147,66 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
         loading={isFetching}
         columns={[
           { dataIndex: "name", title: "名称" },
-          { dataIndex: "type", title: "数据集类型" },
+          { dataIndex: "type", title: "数据集类型",
+            render: (_, r) => DatasetTypeText[r.type] },
           { dataIndex: "description", title: "数据集描述" },
-          { dataIndex: "scene", title: "应用场景" },
+          { dataIndex: "scene", title: "应用场景",
+            render: (_, r) => SceneTypeText[r.scene] },
           { dataIndex: "versions", title: "版本数量",
-            render: (_, r) => {
-              // return r.versions.length;
-              return 1;
-            } },
+            render: (_, r) => r.versions.length },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
-            render: (_, r) => {
-              // return r.owner;
-              return "demo_admin";
-            } } : {},
+            render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间" },
           { dataIndex: "action", title: "操作",
-            render: (_, _r) => {
+            render: (_, r) => {
               return !isPublic ?
                 (
                   <>
                     <Space split={<Divider type="vertical" />}>
-                      <CreateDVersionModalButton key='创建新版本' datasetId={1} datasetName="aaaa">
+                      <CreateEditDVersionModalButton key='创建新版本' datasetId={r.id} datasetName={r.name}>
                         创建新版本
-                      </CreateDVersionModalButton>
+                      </CreateEditDVersionModalButton>
                     </Space>
                     <Space split={<Divider type="vertical" />}>
-                      <CreateDVersionModalButton key='版本列表' datasetId={1} datasetName="aaaa">
+                      <DatasetVersionsModalButton key='版本列表' datasetId={r.id} datasetName={r.name}>
                         版本列表
-                      </CreateDVersionModalButton>
+                      </DatasetVersionsModalButton>
                     </Space>
                     <Space split={<Divider type="vertical" />}>
-                      <CreateDVersionModalButton key='编辑' datasetId={1} datasetName="aaaa">
+                      <EditDatasetModalButton isEdit={true} editData={r}>
                         编辑
-                      </CreateDVersionModalButton>
+                      </EditDatasetModalButton>
                     </Space>
                     <Space split={<Divider type="vertical" />}>
-                      <CreateDVersionModalButton key='删除' datasetId={1} datasetName="aaaa">
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          modal.confirm({
+                            title: "删除数据集",
+                            content: `是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`,
+                            onOk: () => {
+                              deleteDatasetMutation.mutate({
+                                id: r.id,
+                              }, {
+                                onSuccess() {
+                                  refetch();
+                                  message.success("删除成功");
+                                },
+                              });
+                            },
+                          });
+                        }}
+                      >
                         删除
-                      </CreateDVersionModalButton>
+                      </Button>
                     </Space>
                   </>
                 ) :
                 (
                   <Space split={<Divider type="vertical" />}>
-                    <CreateDVersionModalButton key='版本列表' datasetId={1} datasetName="aaaa">
+                    <CreateEditDVersionModalButton key='版本列表' datasetId={r.id} datasetName={r.name}>
                         版本列表
-                    </CreateDVersionModalButton>
+                    </CreateEditDVersionModalButton>
                   </Space>
                 );
             },
@@ -194,8 +217,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic }) => {
           defaultPageSize: 10,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
-          // total: data?.count,
-          total: 1,
+          total: data?.count,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         scroll={{ x: true }}

@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { inferRouterOutputs } from "@trpc/server";
-// import { AppRouter } from "src/server/trpc/router";
+import { inferRouterOutputs } from "@trpc/server";
+import { AppRouter } from "src/server/trpc/router";
 
-// export type DatasetInterface = inferRouterOutputs<AppRouter>["dataset"]["list"]["items"][0];
+export type DatasetInterface = inferRouterOutputs<AppRouter>["dataset"]["list"]["items"][0];
+export type DatasetVersionInterface = inferRouterOutputs<AppRouter>["dataset"]["versionList"]["items"][0];
 
 export enum DatasetType {
   IMAGE = "IMAGE",
@@ -31,7 +32,7 @@ export enum SceneType {
   OTHER = "OTHER",
 }
 
-export const DatasetTypeText = {
+export const DatasetTypeText: { [key: string]: string } = {
   IMAGE: "图像",
   TEXT: "文本",
   VIDEO: "视频",
@@ -39,7 +40,7 @@ export const DatasetTypeText = {
   OTHER: "其他",
 };
 
-export const SceneTypeText = {
+export const SceneTypeText: { [key: string]: string } = {
   CWS: "中文分词",
   DA: "数据增强",
   IC: "图像分类",

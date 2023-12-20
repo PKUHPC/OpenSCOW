@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Form, Input, Modal, Select } from "antd";
-import React, { useEffect } from "react";
+import { App, Form, Input, Modal } from "antd";
+import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
+import { DatasetVersionInterface } from "src/models/Dateset";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
@@ -21,6 +21,8 @@ export interface Props {
   onClose: () => void;
   datasetId: number;
   datasetName: string;
+  isEdit?: boolean;
+  editData?: Partial<DatasetVersionInterface>
 }
 
 interface FormFields {
@@ -29,13 +31,13 @@ interface FormFields {
   path: string,
 }
 
-export const CreateDVersionModal: React.FC<Props> = (
-  { open, onClose, datasetId, datasetName },
+export const CreateEditDVersionModal: React.FC<Props> = (
+  { open, onClose, datasetId, datasetName, isEdit, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const mutation = trpc.dataset.createDatasetVersion.useMutation({
+  const createMutation = trpc.dataset.createDatasetVersion.useMutation({
     onSuccess() {
       message.success("创建新版本成功");
       onClose();
@@ -55,24 +57,51 @@ export const CreateDVersionModal: React.FC<Props> = (
     },
   });
 
+  const editMutation = trpc.dataset.updateDatasetVersion.useMutation({
+    onSuccess() {
+      message.success("创建新版本成功");
+      onClose();
+    },
+    onError(e: any) {
+      console.log(e);
+      message.error("创建新版本失败");
+      // if (e.data?.code === "USER_NOT_FOUND") {
+      //   message.error("用户未找到");
+      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
+      //   message.error("账户未找到");
+      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
+      //   message.error("该用户已经在账户内，无法重复添加");
+      // } else {
+      //   message.error(e.message);
+      // }
+    },
+  });
+
   const onOk = async () => {
     form.validateFields();
     const { versionName, versionDescription, path } = await form.validateFields();
-    mutation.mutate({
+    isEdit && editData ? editMutation.mutate({
+      id: editData.id,
       versionName,
       versionDescription,
       path,
       datasetId,
-    });
+    })
+      : createMutation.mutate({
+        versionName,
+        versionDescription,
+        path,
+        datasetId,
+      });
   };
 
 
   return (
     <Modal
-      title="创建新版本"
+      title={isEdit ? "编辑新版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
-      confirmLoading={mutation.isLoading}
+      confirmLoading={createMutation.isLoading || editMutation.isLoading}
       onCancel={onClose}
     >
       <Form

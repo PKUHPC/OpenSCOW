@@ -15,11 +15,6 @@ import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
 
-const paginationSchema = z.object({
-  page: z.number().min(1).optional(),
-  pageSize: z.number().min(0).optional(),
-});
-
 export const list = procedure
   .meta({
     openapi: {
@@ -33,27 +28,39 @@ export const list = procedure
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
     owner: z.string().optional(),
-    name: z.string().optional(),
-    tags: z.string().optional(),
-    description: z.string().optional(),
+    nameOrTagOrDesc: z.string().optional(),
+    isShared: z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
+
+    const isPublicQuery = input.isShared ? {
+      isShared: true,
+      owner: { $ne: null },
+    } : { owner: user?.identityId };
+
+    const nameOrTagOrDescQuery = input.nameOrTagOrDesc ? {
+      $or: [
+        { name: { $like: `%${input.nameOrTagOrDesc}%` } },
+        { tag: { $like: `%${input.nameOrTagOrDesc}%` } },
+        { description: { $like: `%${input.nameOrTagOrDesc}%` } },
+      ],
+    } : {};
+
     const [items, count] = await orm.em.findAndCount(Image, {
-      owner: input.owner || undefined,
-      name: input.name || undefined,
-      tags: input.tags || undefined,
-      description: input.description || undefined,
+      $and: [
+        nameOrTagOrDescQuery,
+        isPublicQuery,
+      ],
     }, {
-      limit: input.page || 10, // Default limit
-      offset: input.pageSize || 0, // Default offset
+      limit: input.pageSize || undefined,
+      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
       orderBy: { createTime: "desc" },
     });
 
     return { items, count };
   });
-
 
 export const updateImage = procedure
   .meta({
@@ -109,7 +116,7 @@ export const createImage = procedure
       method: "POST",
       path: "/image/create",
       tags: ["image"],
-      summary: "Create a new iamge",
+      summary: "Create a new image",
     },
   })
   .input(z.object({

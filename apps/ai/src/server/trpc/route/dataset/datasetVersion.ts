@@ -10,36 +10,64 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
+
+const mockDatasetVersions = [
+  {
+    id: 100,
+    versionName: "version1",
+    owner: "demo_admin",
+    isShared: "true",
+    versionDescription: "test1",
+    path: "/",
+    createTime: "2023-04-15 12:30:45",
+    dataset: 100,
+  },
+  {
+    id: 101,
+    versionName: "version2",
+    owner: "demo_admin",
+    isShared: "true",
+    versionDescription: "test2",
+    path: "/",
+    createTime: "2023-04-15 12:30:45",
+    dataset: 100,
+  },
+];
+
 
 
 export const versionList = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/datasetVersion/list/{id}",
+      path: "/datasetVersion/list/{datasetId}",
       tags: ["datasetVersion"],
-      summary: "Read all datasetVersion",
+      summary: "Read all datasetVersions",
     },
   })
   .input(z.object({
-    id: z.number(),
+    datasetId: z.number(),
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
-    const [items, count] = await orm.em.findAndCount(DatasetVersion, {}, {
-      limit: input.page || 10, // Default limit
-      offset: input.pageSize || 0, // Default offset
+
+    const [items, count] = await orm.em.findAndCount(DatasetVersion, { dataset: input.datasetId }, {
+      populate: ["dataset"],
+      limit: input.page,
+      offset: input.pageSize,
       orderBy: { createTime: "desc" },
     });
 
     return { items, count };
+    // return { items: mockDatasetVersions, count: 2 };
   });
 
 
@@ -59,11 +87,39 @@ export const createDatasetVersion = procedure
     datasetId: z.number(),
   }))
   .output(z.object({ id: z.number() }))
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    // const datasetVersion = new DatasetVersion(input);
-    // await orm.em.persistAndFlush(datasetVersion);
-    return { id : 1 };
+    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
+    if (!dataset) throw new Error("DatasetVersion not found");
+    if (dataset && dataset.owner !== user?.identityId) throw new Error("DatasetVersion not accessible");
+    const datasetVersion = new DatasetVersion({ ...input, dataset: dataset });
+    await orm.em.persistAndFlush(datasetVersion);
+    return { id: datasetVersion.id };
+  });
+
+export const updateDatasetVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/datasetVersion/update/{id}",
+      tags: ["dataset"],
+      summary: "update a dataset",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    versionName: z.string(),
+    path: z.string(),
+    versionDescription: z.string().optional(),
+    datasetId: z.number(),
+  }))
+  .output(z.object({ id: z.number() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    if (!datasetVersion) throw new Error("DatasetVersion not found");
+    await orm.em.persistAndFlush(input);
+    return { id: datasetVersion.id };
   });
 
 export const deleteDatasetVersion = procedure

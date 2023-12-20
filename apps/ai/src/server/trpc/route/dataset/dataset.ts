@@ -25,7 +25,7 @@ const mockDatasets = [
     scene: "Text",
     description: "test",
     createTime: "2023-04-15 12:30:45",
-    versions: [],
+    versions: [100, 101],
   },
   {
     id: 101,
@@ -40,7 +40,6 @@ const mockDatasets = [
   },
 ];
 
-
 export const list = procedure
   .meta({
     openapi: {
@@ -54,27 +53,40 @@ export const list = procedure
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
     owner: z.string().optional(),
-    name: z.string().optional(),
+    nameOrDesc: z.string().optional(),
     type: z.string().optional(),
-    description: z.string().optional(),
+    isShared: z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    console.log("user", user);
+
+    const isPublicQuery = input.isShared ? {
+      isShared: true,
+      owner: { $ne: null },
+    } : { owner: user?.identityId };
+
+    const nameOrDescQuery = input.nameOrDesc ? {
+      $or: [
+        { name: { $like: `%${input.nameOrDesc}%` } },
+        { description: { $like: `%${input.nameOrDesc}%` } },
+      ],
+    } : {};
+
     const [items, count] = await orm.em.findAndCount(Dataset, {
-      owner: input.owner || undefined,
-      name: input.name || undefined,
-      type: input.type || undefined,
-      description: input.description || undefined,
+      $and: [
+        nameOrDescQuery,
+        isPublicQuery,
+        { type: input.type || { $ne: null } },
+      ],
     }, {
-      limit: input.page || 10, // Default limit
-      offset: input.pageSize || 0, // Default offset
+      limit: input.pageSize || undefined,
+      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+      populate: ["versions"],
       orderBy: { createTime: "desc" },
     });
 
-    // return { items, count };
-    return { items: mockDatasets, count: 2 };
+    return { items, count };
   });
 
 
@@ -101,6 +113,31 @@ export const createDataset = procedure
     return dataset.id;
   });
 
+export const updateDataset = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/dataset/update/{id}",
+      tags: ["dataset"],
+      summary: "update a dataset",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    name: z.string(),
+    type: z.string(),
+    scene: z.string(),
+    description: z.string().optional(),
+  }))
+  .output(z.number())
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const dataset = await orm.em.findOne(Dataset, { id: input.id });
+    if (!dataset) throw new Error("Dataset not found");
+    await orm.em.persistAndFlush(input);
+    return dataset.id;
+  });
+
 export const deleteDataset = procedure
   .meta({
     openapi: {
@@ -116,6 +153,13 @@ export const deleteDataset = procedure
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
     if (!dataset) throw new Error("Dataset not found");
-    await orm.em.removeAndFlush(dataset);
-    return { success: true };
+
+    try {
+      await orm.em.removeAndFlush(dataset);
+      return { success: true };
+    } catch (error) {
+      // rollback
+      console.error("Error deleting dataset:", error);
+      return { success: false };
+    }
   });
