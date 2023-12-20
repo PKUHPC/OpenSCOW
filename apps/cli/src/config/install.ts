@@ -31,6 +31,11 @@ export const InstallConfigSchema = Type.Object({
   }, { default: {} }),
 
   gateway: Type.Object({
+    protocol: Type.String({
+      description: "scow 的访问协议，将影响 callbackUrl 的 protocol",
+      default: "http",
+    }),
+
     uploadFileSizeLimit: Type.String({
       description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
       default: "1G",
@@ -117,6 +122,11 @@ export const InstallConfigSchema = Type.Object({
       })),
     })),
   })),
+
+  misc: Type.Optional(Type.Object({
+    nodeOptions:  Type.Optional(Type.String({ description: "传递给node服务的参数" })),
+  }, { description: "多个不好分类的配置参数参数" })),
+
 }, { description: "审计系统部署选项，如果不设置，则不部署审计系统" });
 
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;

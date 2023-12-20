@@ -55,6 +55,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     volumes: {} as Record<string, object>,
   };
 
+  const nodeOptions = config.misc?.nodeOptions;
+
   // service creation function
   const addService = (
     name: string,
@@ -132,6 +134,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "EXTRA": config.gateway.extra,
       "ALLOWED_SERVER_NAME": config.gateway.allowedServerName,
       "DEFAULT_SERVER_BLOCK": config.gateway.allowedServerName === "_" ? "" : defaultServerBlock,
+      ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -176,6 +179,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": BASE_PATH,
         "PORTAL_BASE_PATH": portalBasePath,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
@@ -193,6 +197,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
       volumes: {
@@ -214,6 +219,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
@@ -239,6 +246,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "/etc/hosts": "/etc/hosts",
@@ -257,6 +265,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
@@ -289,6 +299,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "audit-server",
         "DB_PASSWORD": config.audit.dbPassword,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "./config": "/etc/scow",

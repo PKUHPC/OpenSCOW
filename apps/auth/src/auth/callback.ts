@@ -38,6 +38,7 @@ export async function validateCallbackHostname(callbackUrl: string, req: Fastify
   const incomingHostname = req.hostname.split(":")[0];
 
   try {
+
     const callbackHostname = new URL(callbackUrl).hostname;
 
     if (callbackHostname === incomingHostname) {
@@ -46,8 +47,8 @@ export async function validateCallbackHostname(callbackUrl: string, req: Fastify
 
     if (!allowedCallbackHostnames.has(callbackHostname)) {
       throw new CallbackHostnameNotAllowedError();
-
     }
+
   } catch (e) {
     if (e instanceof TypeError && (e as any).code === "ERR_INVALID_URL") {
       throw new CallbackUrlNotValidError();

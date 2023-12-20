@@ -1,6 +1,6 @@
 {
   "name": "@scow/portal-web",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
@@ -24,6 +24,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://glithub.com/PKUHPC/SCOW",
   "dependencies": {
+    "@ant-design/colors": "7.0.0",
     "@ant-design/cssinjs": "1.17.2",
     "@ant-design/icons": "5.2.6",
     "@codemirror/language": "6.9.2",
@@ -63,6 +64,7 @@
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
     "react-typed-i18n": "2.3.0",
+    "recharts": "2.10.1",
     "simstate": "3.0.1",
     "styled-components": "6.1.1",
     "tslib": "2.6.2",
@@ -73,7 +75,7 @@
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
-    "@next/bundle-analyzer": "13.4.13",
+    "@next/bundle-analyzer": "14.0.3",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.1.2",
     "@types/busboy": "1.5.3",
