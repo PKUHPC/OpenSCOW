@@ -10,6 +10,32 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export default function Page() {
-  return <h1>已完成的作业</h1>;
+"use client";
+
+import { usePublicConfig } from "src/app/(auth)/context";
+import { PageTitle } from "src/components/pageTitle";
+import { NotFoundPage } from "src/layouts/error/NotFoundPage";
+
+import { AppSessionsTable } from "../AppSessionsTable";
+
+export default function Page({ params }: {params: {clusterId: string}}) {
+  const { clusterId } = params;
+
+  const { publicConfig } = usePublicConfig();
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
+
+
+  if (!cluster) {
+    return <NotFoundPage />;
+  }
+
+
+  return (
+    <>
+      <PageTitle
+        titleText="已完成的作业"
+      />
+      <AppSessionsTable cluster={cluster} status="FINISHED" />
+    </>
+  );
 }

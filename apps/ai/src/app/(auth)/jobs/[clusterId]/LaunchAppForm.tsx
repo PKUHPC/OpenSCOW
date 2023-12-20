@@ -31,7 +31,7 @@ interface Props {
   attributes: AppCustomAttribute[];
   appComment?: I18nStringType;
   clusterInfo: ClusterConfig;
-  isTraining: boolean;
+  isTraining?: boolean;
 }
 
 interface FormFields {
@@ -85,7 +85,7 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, attributes, clusterInfo, isTraining } = props;
+  const { clusterId, appName, attributes, clusterInfo, isTraining = false } = props;
 
   const router = useRouter();
 

@@ -45,7 +45,7 @@ interface Props {
   publicPath: string
   clusterId: string
   apps: AppSchema[],
-  isTraining: boolean,
+  isTraining?: boolean,
 }
 
 interface ImageErrorMap {
@@ -53,7 +53,7 @@ interface ImageErrorMap {
 }
 
 
-export const SelectAppTable: React.FC<Props> = ({ publicPath, clusterId, apps, isTraining }) => {
+export const SelectAppTable: React.FC<Props> = ({ publicPath, clusterId, apps, isTraining = false }) => {
 
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 

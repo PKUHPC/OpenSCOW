@@ -91,6 +91,8 @@ const PublicConfigSchema = z.object({
 // 类型别名
 export type PublicConfig = z.infer<typeof PublicConfigSchema>;
 
+export type Cluster = z.infer<typeof ClusterSchema>;
+
 const PartitionSchema = z.object({
   name: z.string(),
   memMb: z.number(),
