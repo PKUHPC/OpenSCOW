@@ -23,8 +23,8 @@ export class AlgorithmVersion {
   @Property()
     versionName: string;
 
-  @Property()
-    versionDescription: string;
+  @Property({ nullable: true })
+    versionDescription: string | undefined;
 
   @Property()
     path: string;

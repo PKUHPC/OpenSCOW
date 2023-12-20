@@ -43,8 +43,8 @@ export class Algorithm {
   @Property()
     isShared: boolean;
 
-  @Property()
-    description: string;
+  @Property({ nullable: true })
+    description: string | undefined;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -63,7 +63,7 @@ export class Algorithm {
     this.owner = init.owner;
     this.framework = init.framework;
     this.isShared = init.isShared || false;
-    this.description = init.description || "";
+    this.description = init.description;
 
     if (init.createTime) {
       this.createTime = init.createTime;
