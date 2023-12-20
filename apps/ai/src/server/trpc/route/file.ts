@@ -13,6 +13,8 @@
 import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
   sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
+import { join } from "path";
+import { FileInfo } from "src/models/File";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -23,6 +25,10 @@ import { z } from "zod";
 
 import { mock } from "./utils";
 
+export enum FileInfo_FileType {
+  FILE = 0,
+  DIR = 1,
+}
 
 export const file = router({
   getHomeDir: procedure
@@ -34,13 +40,13 @@ export const file = router({
         summary: "获取用户家目录路径",
       },
     })
-    .input(z.object({ cluster: z.string() }))
+    .input(z.object({ clusterId: z.string() }))
     .output(z.object({ path: z.string() }))
-    .query(async ({ input: { cluster }, ctx: { user } }) => {
+    .query(async ({ input: { clusterId }, ctx: { user } }) => {
 
-      const host = getClusterLoginNode(cluster);
+      const host = getClusterLoginNode(clusterId);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!host) { throw clusterNotFound(clusterId); }
 
       return await sshConnect(host, user!.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
@@ -52,125 +58,197 @@ export const file = router({
     }),
 
 
-  // deleteItem: procedure
-  //   .input(operatorInput.extend({ target: z.enum(["FILE", "DIR"]), path: z.string() }))
-  //   .mutation(async ({ input: { target, clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         // await asyncUnaryCall(client, target === "FILE" ? "deleteFile" : "deleteDirectory", {
-  //         //   clusterId, resourceId,
-  //         //   path,
-  //         // }, { metadata: setTokenMetadata(token), options: undefined });
-  //       },
-  //       async () => {
-  //       },
-  //     );
-  //   }),
+  deleteItem: procedure
+    .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
+    .mutation(async ({ input: { target, clusterId, path }, ctx: { user } }) => {
 
-  // copyOrMove: procedure
-  //   .input(operatorInput.extend({ op: z.enum(["copy", "move"]), fromPath: z.string(), toPath: z.string() }))
-  //   .mutation(async ({ input: { op, clusterId, resourceId, fromPath, toPath }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         await asyncUnaryCall(client, op, {
-  //           clusterId, resourceId,
-  //           fromPath, toPath,
-  //         }, { metadata: setTokenMetadata(token), options: undefined });
-  //       },
-  //       async () => {
-  //       },
-  //     ).catch(handlegRPCError({
-  //       [status.ALREADY_EXISTS]: () => {
-  //         throw new TRPCError({ code: "CONFLICT" }); },
-  //     }));
-  //   }),
+      const host = getClusterLoginNode(clusterId);
 
-  // mkdir: procedure
-  //   .input(operatorInput.extend({ path: z.string() }))
-  //   .mutation(async ({ input: { clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         await asyncUnaryCall(client, "makeDirectory", {
-  //           clusterId, resourceId,
-  //           path,
-  //         }, { metadata: setTokenMetadata(token), options: undefined }).catch(handlegRPCError({
-  //           [status.ALREADY_EXISTS]: () => { throw new TRPCError({ code: "CONFLICT" }); },
-  //         }));
-  //       },
-  //       async () => {
-  //       },
-  //     );
-  //   }),
+      if (!host) { throw clusterNotFound(clusterId); }
 
-  // createFile: procedure
-  //   .input(operatorInput.extend({ path: z.string() }))
-  //   .mutation(async ({ input: { clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         await asyncUnaryCall(client, "createFile", {
-  //           clusterId, resourceId,
-  //           path,
-  //         }, { metadata: setTokenMetadata(token), options: undefined }).catch(handlegRPCError({
-  //           [status.ALREADY_EXISTS]: () => { throw new TRPCError({ code: "CONFLICT" }); },
-  //         }));
-  //       },
-  //       async () => {
-  //       },
-  //     );
-  //   }),
+      if (target === "FILE") {
+        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
 
-  // listDirectory: procedure
-  //   .input(operatorInput.extend({ path: z.string() }))
-  //   .query(async ({ input: { clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         const resp = await asyncUnaryCall(client, "readDirectory", {
-  //           clusterId, resourceId,
-  //           path,
-  //         }, { metadata: setTokenMetadata(token), options: undefined });
-  //         return resp.results.map((x) => ({
-  //           ...x,
-  //           type: x.type === FileInfo_FileType.DIR ? "DIR" as const : "FILE" as const,
-  //         }));
-  //       },
-  //       async () => {
-  //         return [];
-  //       },
-  //     );
-  //   }),
+          const sftp = await ssh.requestSFTP();
 
-  // checkFileExist: procedure
-  //   .input(operatorInput.extend({ path: z.string() }))
-  //   .query(async ({ input: { clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         const resp = await asyncUnaryCall(client, "checkFileExist", {
-  //           clusterId, resourceId,
-  //           path,
-  //         }, { metadata: setTokenMetadata(token), options: undefined });
-  //         return { result: resp.result };
-  //       },
-  //       async () => {
-  //         return { result: true };
-  //       },
-  //     );
-  //   }),
+          await sftpUnlink(sftp)(path);
 
-  // getFileType: procedure
-  //   .input(operatorInput.extend({ path: z.string() }))
-  //   .query(async ({ input: { clusterId, resourceId, path }, ctx: { client, token } }) => {
-  //     return mock(
-  //       async () => {
-  //         const resp = await asyncUnaryCall(client, "getFileMetadata", {
-  //           clusterId, resourceId,
-  //           path,
-  //         }, { metadata: setTokenMetadata(token), options: undefined });
-  //         return { type: resp.type };
-  //       },
-  //       async () => {
-  //         return { type: "FILE" };
-  //       },
-  //     );
-  //   }),
+          return {};
+        });
+      } else {
+        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+
+          await sshRmrf(ssh, path);
+
+          return {};
+        });
+      }
+    }),
+
+  copyOrMove: procedure
+    .input(z.object({ clusterId: z.string(), op: z.enum(["copy", "move"]), fromPath: z.string(), toPath: z.string() }))
+    .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user } }) => {
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      if (op === "copy") {
+        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        // the SFTPWrapper doesn't supprt copy
+        // Use command to do it
+          const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
+
+          if (resp.code !== 0) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "cp command failed", cause:resp.stderr });
+          }
+
+          return {};
+        });
+      } else {
+
+        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+
+          const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
+          if (error) {
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "move failed", cause:error });
+          }
+
+          return {};
+        });
+      }
+    }),
+
+  mkdir: procedure
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        if (await sftpExists(sftp, path)) {
+          throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
+        }
+
+        await sftpMkdir(sftp)(path);
+
+        return {};
+      });
+    }),
+
+  createFile: procedure
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        if (await sftpExists(sftp, path)) {
+          throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
+        }
+
+        await sftpWriteFile(sftp)(path, Buffer.alloc(0));
+
+        return {};
+      });
+
+    }),
+
+  listDirectory: procedure
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(path).catch((e) => {
+          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          throw new TRPCError({ code: "PRECONDITION_FAILED", message: `${path} is not accessible` });
+        });
+
+        if (!stat || !stat.isDirectory()) {
+          throw new TRPCError({ code: "UNPROCESSABLE_CONTENT", message: `${path} is not directory or not exists` });
+        }
+
+        const files = await sftpReaddir(sftp)(path);
+        const list: FileInfo[] = [];
+
+        // 通过touch -a命令实现共享文件系统的缓存刷新
+        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
+
+        if (pureFiles.length > 0) {
+          const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
+
+          const fileSyncCmd = `touch -a ${filePaths}`;
+
+          await loggedExec(ssh, logger, false, fileSyncCmd, []);
+        }
+
+        for (const file of files) {
+
+          const isDir = file.longname.startsWith("d");
+
+          list.push({
+            type: isDir ? "DIR" : "FILE",
+            name: file.filename,
+            mtime: new Date(file.attrs.mtime * 1000).toISOString(),
+            size: file.attrs.size,
+            mode: file.attrs.mode,
+          });
+        }
+        return list.map((x) => ({
+          ...x,
+          type: x.type === "DIR" ? "DIR" as const : "FILE" as const,
+        }));
+      });
+    }),
+
+  checkFileExist: procedure
+    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        const exists = await sftpExists(sftp, path);
+        return [{ exists }];
+      });
+    }),
+
+  getFileType: procedure
+    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(path).catch((e) => {
+          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+        });
+
+        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
+      });
+    }),
+
 });
 
