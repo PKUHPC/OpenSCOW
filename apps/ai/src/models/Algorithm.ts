@@ -10,10 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
+export enum Framework {
+  TENSORFLOW = "TENSORFLOW",
+  PYTORCH = "PYTORCH",
+  KERAS = "KERAS",
+  MINDSPORE = "MINDSPORE",
+  OTHER = "OTHER",
+};
+
 export const AlgorithmTypeText = {
-  TENSORFLOW: "TensorFlow",
-  PYTORCH: "PyTorch",
-  KERAS: "Keras",
-  MINDSPORE: "MindSpore",
-  OTHER: "其他",
+  [Framework.TENSORFLOW]: "TensorFlow",
+  [Framework.PYTORCH]: "PyTorch",
+  [Framework.KERAS]: "Keras",
+  [Framework.MINDSPORE]: "MindSpore",
+  [Framework.OTHER]: "其他",
 } as const;

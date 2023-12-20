@@ -54,16 +54,16 @@ export class Algorithm {
       name: string;
       owner: string;
       framework: Framework;
-      isShared: boolean;
-      description: string;
+      isShared?: boolean;
+      description?: string;
       createTime?: Date;
     }) {
 
     this.name = init.name;
     this.owner = init.owner;
     this.framework = init.framework;
-    this.isShared = init.isShared;
-    this.description = init.description;
+    this.isShared = init.isShared || false;
+    this.description = init.description || "";
 
     if (init.createTime) {
       this.createTime = init.createTime;

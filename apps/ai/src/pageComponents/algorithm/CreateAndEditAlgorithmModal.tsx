@@ -37,9 +37,9 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const mutation = trpc.dataset.createDataset.useMutation({
+  const createAlgorithmMutation = trpc.algorithm.createAlgorithm.useMutation({
     onSuccess() {
-      message.success("添加数据集成功");
+      message.success("添加算法成功");
       onClose();
     },
     onError(e) {
@@ -54,18 +54,14 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
       // } else {
       //   message.error(e.message);
       // }
-    },
-  });
+    } });
 
   const onOk = async () => {
     form.validateFields();
     const { name, type, description } = await form.validateFields();
-    // mutation.mutate({
-    //   name,
-    //   type,
-    //   description,
-    //   scene,
-    // });
+    createAlgorithmMutation.mutate({
+      name, framework:type, description,
+    });
   };
 
 
@@ -74,7 +70,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
       title="添加算法"
       open={open}
       onOk={form.submit}
-      confirmLoading={mutation.isLoading}
+      confirmLoading={createAlgorithmMutation.isLoading}
       onCancel={onClose}
     >
       <Form

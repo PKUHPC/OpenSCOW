@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+// import { Framework } from "src/models/Algorithm";
+import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { Dataset } from "src/server/entities/Dataset";
 import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -72,27 +74,19 @@ export const getAlgorithms = procedure
   });
 
 
-export const createDataset = procedure
-  .meta({
-    openapi: {
-      method: "POST",
-      path: "/dataset/create",
-      tags: ["dataset"],
-      summary: "Create a new dataset",
-    },
-  })
+export const createAlgorithm = procedure
   .input(z.object({
     name: z.string(),
-    type: z.string(),
-    scene: z.string(),
+    framework: z.nativeEnum(Framework),
     description: z.string().optional(),
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const dataset = new Dataset({ ...input, owner: user!.identityId });
-    await orm.em.persistAndFlush(dataset);
-    return dataset.id;
+    // const algorithm = new Algorithm({ ...input, owner: user!.identityId });
+    const algorithm = new Algorithm({ name:"123", framework:Framework.KERAS, owner:"wwww" });
+    await orm.em.persistAndFlush(algorithm);
+    return algorithm.id;
   });
 
 export const deleteDataset = procedure
