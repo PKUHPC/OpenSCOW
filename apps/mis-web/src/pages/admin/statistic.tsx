@@ -41,7 +41,7 @@ const formateData = (data: Array<{ date: string, count: number }>, dateRange: [d
   }));
   const countData: {date: dayjs.Dayjs, count: number}[] = [];
   const [startDate, endDate] = dateRange;
-  const days = endDate.diff(startDate, "day");
+  const days = endDate.diff(startDate, "day") + 1;
   let curDate = startDate.clone();
   for (let i = 0; i < days; i++) {
     const v = input?.find((x) => {
@@ -84,8 +84,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getStatisticInfoFn = useCallback(async () => {
     return await api.getStatisticInfo({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -114,8 +114,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getNewUserCountFn = useCallback(async () => {
     return await api.getNewUserCount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -123,8 +123,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getActiveUserCountFn = useCallback(async () => {
     return await api.getActiveUserCount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -132,8 +132,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getTopChargeAccountFn = useCallback(async () => {
     return await api.getTopChargeAccount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -141,8 +141,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getTopPayAccountFn = useCallback(async () => {
     return await api.getTopPayAccount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -150,8 +150,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getDailyChargeFn = useCallback(async () => {
     return await api.getDailyCharge({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -159,8 +159,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getDailyPayFn = useCallback(async () => {
     return await api.getDailyPay({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -168,8 +168,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getTopSubmitJobUserFn = useCallback(async () => {
     return await api.getTopSubmitJobUser({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -177,8 +177,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -187,8 +187,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getPortalUsageCountFn = useCallback(async () => {
     return await api.getPortalUsageCount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
@@ -196,8 +196,8 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const getMisUsageCountFn = useCallback(async () => {
     return await api.getMisUsageCount({ query: {
-      startTime: query.filterTime[0].toISOString(),
-      endTime: query.filterTime[1].toISOString(),
+      startTime: query.filterTime[0].startOf("day").toISOString(),
+      endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
