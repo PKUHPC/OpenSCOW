@@ -10,25 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getHostname } from "@scow/lib-web/build/utils/getHostname";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-import { GetServerSideProps, NextPage } from "next";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
-import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
+import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { UserStore } from "src/stores/UserStore";
-import { getServerI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
-  homeText: string;
-  homeTitle: string;
 }
 
-export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
+export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
   const router = useRouter();
@@ -39,32 +37,34 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
 
   const t = useI18nTranslateToString();
 
+  const { data:clusterInfo, isLoading } = useAsync({
+    promiseFn: useCallback(async () => {
+      const clusters = publicConfig.CLUSTERS;
+
+      const rawClusterInfo =
+      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })),
+      );
+
+      return rawClusterInfo
+        .map((cluster, idx) => ({ clusterInfo:{ ...cluster.clusterInfo, clusterName:clusters[idx].name } }))
+        .flatMap((cluster) =>
+          cluster.clusterInfo.partitions.map((x) => ({
+            clusterName: cluster.clusterInfo.clusterName,
+            ...x,
+          })),
+        );
+    }, []),
+  });
+
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
+      <OverviewTable
+        isLoading={isLoading}
+        clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+      />
     </div>
   );
 });
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-
-  const hostname = getHostname(req);
-
-  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
-
-  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
-
-  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeText");
-
-  return {
-    props: {
-      homeText, homeTitle,
-    },
-  };
-};
-
 
 export default DashboardPage;

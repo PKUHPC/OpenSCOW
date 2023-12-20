@@ -412,6 +412,33 @@ export default {
         appCommentTitle: "Explanation",
       },
     },
+    dashboard:{
+      overviewTable:{
+        title:"platform overview",
+        clusterName:"clusterName",
+        partitionName:"partitionName",
+        nodeCount:"nodeCount",
+        runningNodeCount:"runningNodeCount",
+        cpuCoreCount:"cpuCoreCount",
+        gpuCoreCount:"gpuCoreCount",
+        usageRatePercentage:"usageRatePercentage",
+        partitionStatus:"partitionStatus",
+        available:"available",
+        notAvailable:"notAvailable",
+      },
+      infoPanes:{
+        nodeInfo:"nodeInfo",
+        node:"node",
+        resourceInfo:"resourceInfo",
+        core:"core",
+        running:"running",
+        idle:"idle",
+        notAvailable:"notAvailable",
+        card:"card",
+        job:"job",
+        pending:"pending",
+      },
+    },
   },
   component: {
     errorPages: {
