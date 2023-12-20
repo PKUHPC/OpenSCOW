@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
+import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Modal } from "./Modal";
 
@@ -39,7 +39,7 @@ export class ModalVersion {
     isShared: boolean;
 
   @ManyToOne(() => "Modal")
-    modal: Modal;
+    modal: Ref<Modal>;
 
   constructor(init: {
       versionName: string;
@@ -56,7 +56,7 @@ export class ModalVersion {
     this.algorithmVersion = init.algorithmVersion;
     this.path = init.path;
     this.isShared = init.isShared;
-    this.modal = init.modal;
+    this.modal = toRef(init.modal);
 
     if (init.createTime) {
       this.createTime = init.createTime;

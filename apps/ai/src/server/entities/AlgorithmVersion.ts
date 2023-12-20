@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
+import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Algorithm } from "./Algorithm";
 
@@ -36,7 +36,7 @@ export class AlgorithmVersion {
     isShared: boolean;
 
   @ManyToOne(() => "Algorithm")
-    algorithm: Algorithm;
+    algorithm: Ref<Algorithm>;
 
   constructor(init: {
       versionName: string;
@@ -51,7 +51,7 @@ export class AlgorithmVersion {
     this.versionDescription = init.versionDescription;
     this.path = init.path;
     this.isShared = init.isShared;
-    this.algorithm = init.algorithm;
+    this.algorithm = toRef(init.algorithm);
 
     if (init.createTime) {
       this.createTime = init.createTime;

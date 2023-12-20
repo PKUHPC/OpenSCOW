@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
+import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Dataset } from "./Dataset";
 
@@ -36,7 +36,7 @@ export class DatasetVersion {
     isShared: boolean;
 
   @ManyToOne(() => "Dataset")
-    dataset: Dataset;
+    dataset: Ref<Dataset>;
 
   constructor(init: {
       versionName: string;
@@ -51,7 +51,7 @@ export class DatasetVersion {
     this.versionDescription = init.versionDescription;
     this.path = init.path;
     this.isShared = init.isShared;
-    this.dataset = init.dataset;
+    this.dataset = toRef(init.dataset);
 
     if (init.createTime) {
       this.createTime = init.createTime;
