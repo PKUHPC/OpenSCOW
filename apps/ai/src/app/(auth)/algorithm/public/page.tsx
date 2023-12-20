@@ -10,6 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { PageTitle } from "src/components/pageTitle";
+import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
+
 export default function Page() {
-  return <h1>公共算法</h1>;
+
+  return (
+    <div>
+      <PageTitle titleText="公共算法" />
+      <AlgorithmTable isPublic={true} />
+    </div>
+  );
 }

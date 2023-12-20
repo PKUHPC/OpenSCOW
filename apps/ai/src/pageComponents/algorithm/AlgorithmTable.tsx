@@ -13,9 +13,8 @@
 "use client";
 
 import { PlusOutlined } from "@ant-design/icons";
-import { App, Button, Divider, Form, Input, Select, Space, Table } from "antd";
-import NextError from "next/error";
-import { useState } from "react";
+import { App, Button, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
+import { useCallback, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { AlgorithmTypeText } from "src/models/Algorithm";
@@ -56,27 +55,39 @@ const VersionListModalButton = ModalButton(VersionListModal, { type: "link" });
 
 export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
 
+  const [{ confirm }, confirmModalHolder] = Modal.useModal();
+  const { message } = App.useApp();
+
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      owner: undefined,
       nameOrDesc: undefined,
       type: undefined,
     };
   });
 
   const [form] = Form.useForm<FilterForm>();
-
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const { data, isFetching, error } = trpc.dataset.list.useQuery({
-    ...pageInfo, ...query,
-  });
-
-  const { message } = App.useApp();
+  const { data, isFetching, error } = trpc.algorithm.getAlgorithms.useQuery({ ...pageInfo, ...query });
 
   if (error) {
     message.error("找不到算法");
   }
+
+  const deleteAlgorithm = useCallback(
+    (id: number, name: string) => {
+      console.log(id);
+      confirm({
+        title: "删除算法",
+        content: `确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`,
+        onOk() {
+          message.success("删除成功");
+        },
+      });
+    },
+    [],
+  );
+
 
   return (
     <div>
@@ -128,13 +139,11 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
           { dataIndex: "description", title: "算法描述" },
           { dataIndex: "versions", title: "版本数量",
             render: (_, r) => {
-              // return r.versions.length;
-              return 1;
+              return r.versions.length;
             } },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => {
-              // return r.owner;
-              return "demo_admin";
+              return r.owner;
             } } : {},
           { dataIndex: "createTime", title: "创建时间" },
           { dataIndex: "action", title: "操作",
@@ -164,7 +173,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
                     <Button
                       type="link"
                       onClick={() => {
-
+                        deleteAlgorithm(r.id, r.name);
                       }}
                     >
                     删除
@@ -172,7 +181,11 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
                   </>
                 ) :
                 (
-                  <VersionListModalButton key='版本列表' algorithmId={1} algorithmName="aaaa">
+                  <VersionListModalButton
+                    algorithmId={r.id}
+                    algorithmName={r.name}
+                    isPublic
+                  >
                         版本列表
                   </VersionListModalButton>
                 );
@@ -190,6 +203,8 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
         } : false}
         scroll={{ x: true }}
       />
+      {/* antd中modal组件 */}
+      {confirmModalHolder}
     </div>
   );
 };

@@ -41,14 +41,14 @@ export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/algorithmVersion/list/{id}",
-      tags: ["algorithmVersion"],
-      summary: "get algorithmVersion",
+      path: "/algorithmVersions/list/{id}",
+      tags: ["algorithmVersions"],
+      summary: "get algorithmVersions",
     },
   })
   .input(z.object({
     id: z.number(),
-    limit: z.number().min(1).optional(),
+    page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
   .output(z.object({ versions: z.array(z.any()), count: z.number() }))

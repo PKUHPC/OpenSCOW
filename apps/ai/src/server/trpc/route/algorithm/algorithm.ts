@@ -20,14 +20,16 @@ const mockAlgorithms = [
     id: 100,
     name: "aaa",
     type: "TENSORFLOW",
+    owner:"aaa",
     description: "test1",
     createTime: "2023-04-15 12:30:45",
     versions: [1, 2],
   },
   {
-    id: 100,
-    name: "aaa",
+    id: 101,
+    name: "bbb",
     type: "PYTORCH",
+    owner:"bbb",
     description: "test2",
     createTime: "2023-04-19 12:30:45",
     versions: [3, 4, 5],
@@ -35,13 +37,13 @@ const mockAlgorithms = [
 ];
 
 
-export const list = procedure
+export const getAlgorithms = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/dataset/list",
-      tags: ["dataset"],
-      summary: "Read all dataset",
+      path: "/algorithms/list",
+      tags: ["algorithms"],
+      summary: "get algorithms",
     },
   })
   .input(z.object({
