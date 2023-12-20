@@ -10,6 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export default function Page() {
-  return <h1>创建应用</h1>;
-}
+import { router } from "src/server/trpc/def";
+
+import { getAppMetadata, listAvailableApps } from "./apps";
+
+export const jobsRouter = router({
+  listAvailableApps,
+  getAppMetadata,
+});

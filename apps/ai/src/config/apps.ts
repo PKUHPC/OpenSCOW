@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export default function Page() {
-  return <h1>训练</h1>;
-}
+import { getAppConfigs as libGetAppConfigs } from "@scow/config/build/app";
+// import { logger } from "src/utils/logger";
+
+export const getAppConfigs = (clusterBasePath?: string) => libGetAppConfigs(clusterBasePath);

@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { TRPCError } from "@trpc/server";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
+import { getAdapterClient } from "src/server/utils/clusters";
 import { publicConfig } from "src/utils/config";
 import { z } from "zod";
 
@@ -88,6 +91,21 @@ const PublicConfigSchema = z.object({
 // 类型别名
 export type PublicConfig = z.infer<typeof PublicConfigSchema>;
 
+const PartitionSchema = z.object({
+  name: z.string(),
+  memMb: z.number(),
+  cores: z.number(),
+  gpus: z.number(),
+  nodes: z.number(),
+  qos: z.array(z.string()),
+  comment: z.string().optional(),
+});
+
+const ClusterConfigSchema = z.object({
+  schedulerName: z.string(),
+  partitions: z.array(PartitionSchema),
+});
+
 
 export const config = router({
 
@@ -104,5 +122,29 @@ export const config = router({
     .output(PublicConfigSchema)
     .query(async ({ ctx: { req, res } }) => {
       return publicConfig;
+    }),
+
+  getClusterConfig: procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/config/cluster",
+        tags: ["config"],
+        summary: "clusterConfig",
+      },
+    })
+    .input(z.object({ clusterId: z.string() }))
+    .output(ClusterConfigSchema)
+    .query(async ({ input }) => {
+      const { clusterId } = input;
+
+      const client = getAdapterClient(clusterId);
+      if (!client) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:`cluster ${clusterId} is not found`,
+        });
+      }
+      return await asyncClientCall(client.config, "getClusterConfig", {});
     }),
 });

@@ -16,6 +16,7 @@ import { BookOutlined, DashboardOutlined,
   DatabaseOutlined, FileImageOutlined, FolderOutlined, Loading3QuartersOutlined,
   LockOutlined, OneToOneOutlined,
   PlusOutlined, SaveOutlined, ShareAltOutlined, TeamOutlined, UngroupOutlined, UserOutlined } from "@ant-design/icons";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import React from "react";
 import { useUserQuery } from "src/app/auth";
 import { Loading } from "src/components/Loading";
@@ -33,8 +34,8 @@ const useConfigQuery = () => {
 };
 
 export default function Layout(
-  { children }:
-  { children: React.ReactNode },
+  { children, props }:
+  { children: React.ReactNode, props: any },
 ) {
 
   const userQuery = useUserQuery();
@@ -146,26 +147,34 @@ export default function Layout(
       path: "/jobs",
       clickToPath: "/jobs/runningJobs",
       children: [
-        {
-          Icon: PlusOutlined,
-          text: "创建应用",
-          path: "/jobs/createApps",
-        },
-        {
-          Icon: Loading3QuartersOutlined,
-          text: "训练",
-          path: "/jobs/trainJobs",
-        },
-        {
-          Icon: BookOutlined,
-          text: "正在运行的作业",
-          path: "/jobs/runningJobs",
-        },
-        {
-          Icon: SaveOutlined,
-          text: "已完成的作业",
-          path: "/jobs/historyJobs",
-        },
+        ...publicConfig.CLUSTERS.map((cluster) => ({
+          Icon: FolderOutlined,
+          text: getI18nConfigCurrentText(cluster.name, undefined),
+          path: `/jobs/${cluster.id}`,
+          clickable: false,
+          children:[
+            {
+              Icon: PlusOutlined,
+              text: "创建应用",
+              path: `/jobs/${cluster.id}/createApps`,
+            },
+            {
+              Icon: PlusOutlined,
+              text: "训练",
+              path: `/jobs/${cluster.id}/trainJobs`,
+            },
+            {
+              Icon: BookOutlined,
+              text: "正在运行的作业",
+              path: `/jobs/${cluster.id}/runningJobs`,
+            },
+            {
+              Icon: BookOutlined,
+              text: "已完成的作业",
+              path: `/jobs/${cluster.id}/historyJobs`,
+            },
+          ],
+        })),
       ],
     },
     {

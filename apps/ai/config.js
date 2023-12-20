@@ -109,8 +109,7 @@ const config = { _specs: specs };
 const buildRuntimeConfig = async (phase, basePath) => {
 
   // https://github.com/vercel/next.js/issues/57927
-  // const building = phase === PHASE_PRODUCTION_BUILD;
-  const building = process.env.BUILDING === "1";
+  const building = phase === PHASE_PRODUCTION_BUILD;
 
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
