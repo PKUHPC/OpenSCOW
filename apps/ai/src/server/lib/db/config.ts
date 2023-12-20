@@ -30,7 +30,7 @@ const aiConfig = {
 
 const distPath = "src/server";
 
-export const ormConfigs = {
+export const ormConfigs = defineConfig({
   host: aiConfig.db.host,
   port: aiConfig.db.port,
   user: aiConfig.db.user,
@@ -38,7 +38,6 @@ export const ormConfigs = {
   password: aiConfig.db.password,
   type: "mysql",
   forceUndefined: true,
-  runMigrations: true,
   migrations: {
     pathTs: join(distPath, "migrations"),
     migrationsList: migrations,
@@ -48,6 +47,6 @@ export const ormConfigs = {
   seeder: {
     path: join(distPath, "seenders"),
   },
-} as Options<MySqlDriver>;
+});
 
-export const getConfig = async () => defineConfig(ormConfigs);
+export const getConfig = () => ormConfigs;

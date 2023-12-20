@@ -17,27 +17,6 @@ import { getORM } from "src/server/lib/db/orm";
 import { ormProcedure, procedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
 
-const mockAlgorithms = [
-  {
-    id: 100,
-    name: "aaa",
-    type: "TENSORFLOW",
-    owner:"aaa",
-    description: "test1",
-    createTime: "2023-04-15 12:30:45",
-    versions: [1, 2],
-  },
-  {
-    id: 101,
-    name: "bbb",
-    type: "PYTORCH",
-    owner:"bbb",
-    description: "test2",
-    createTime: "2023-04-19 12:30:45",
-    versions: [3, 4, 5],
-  },
-];
-
 
 export const getAlgorithms = ormProcedure
   .meta({
@@ -87,11 +66,7 @@ export const createAlgorithm = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const algorithm = new Algorithm({ ...input, owner: user!.identityId });
-    // const algorithm = new Algorithm({ name:"1233", framework:Framework.KERAS, owner:"wwww" });
-    console.log(11111);
-    await orm.em.persist(algorithm);
-    console.log(222222);
-    await orm.em.flush();
+    await orm.em.persistAndFlush(algorithm);
     return algorithm.id;
   });
 
