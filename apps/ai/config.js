@@ -229,6 +229,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
+
   };
 
   if (!building && !testenv) {

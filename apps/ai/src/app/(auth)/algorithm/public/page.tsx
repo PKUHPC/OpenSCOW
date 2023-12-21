@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { PageTitle } from "src/components/pageTitle";
+import { PageTitle } from "src/components/PageTitle";
 import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
 
 export default function Page() {

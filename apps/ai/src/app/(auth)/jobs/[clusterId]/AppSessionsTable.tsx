@@ -14,7 +14,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Space, Table, TableColumnsType, Tooltip } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/server/trpc/route/config";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 

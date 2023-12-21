@@ -10,16 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { PageTitle } from "src/components/PageTitle";
+import { styled } from "styled-components";
 
-import { DatasetListTable } from "../DatasetListTable";
-
-export default function Page() {
-
-  return (
-    <div>
-      <PageTitle titleText="公共数据集" />
-      <DatasetListTable isPublic={true} />
-    </div>
-  );
-}
+export const TableTitle = styled.div<{ justify?: string }>`
+  display: flex;
+  justify-content: ${(p) => p.justify ?? "flex-end"};
+  margin: 8px 0;
+`;

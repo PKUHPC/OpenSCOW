@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/server/trpc/route/config";
 
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";

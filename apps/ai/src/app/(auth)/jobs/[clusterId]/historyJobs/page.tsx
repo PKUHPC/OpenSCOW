@@ -13,7 +13,7 @@
 "use client";
 
 import { usePublicConfig } from "src/app/(auth)/context";
-import { PageTitle } from "src/components/pageTitle";
+import { PageTitle } from "src/components/PageTitle";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 
 import { AppSessionsTable } from "../AppSessionsTable";

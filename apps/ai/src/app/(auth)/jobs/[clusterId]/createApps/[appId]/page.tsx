@@ -14,7 +14,7 @@
 
 import { LoadingOutlined } from "@ant-design/icons";
 import { App } from "antd";
-import { PageTitle } from "src/components/pageTitle";
+import { PageTitle } from "src/components/PageTitle";
 import { trpc } from "src/utils/trpc";
 
 import { LaunchAppForm } from "../../LaunchAppForm";

@@ -10,16 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { PageTitle } from "src/components/PageTitle";
-
-import { DatasetListTable } from "../DatasetListTable";
-
-export default function Page() {
-
-  return (
-    <div>
-      <PageTitle titleText="公共数据集" />
-      <DatasetListTable isPublic={true} />
-    </div>
-  );
+export interface Cluster {
+  name: (string | {
+      i18n: {
+          default: string;
+          en?: string | undefined;
+          zh_cn?: string | undefined;
+      };
+  }) & (string | {
+      i18n: {
+          default: string;
+          en?: string | undefined;
+          zh_cn?: string | undefined;
+      };
+  } | undefined);
+  id: string;
 }

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { PageTitle } from "src/components/pageTitle";
+import { PageTitle } from "src/components/PageTitle";
 
 import { DatasetListTable } from "../DatasetListTable";
 

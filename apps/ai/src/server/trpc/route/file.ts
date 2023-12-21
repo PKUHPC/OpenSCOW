@@ -224,7 +224,7 @@ export const file = router({
       return await sshConnect(host, user!.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
         const exists = await sftpExists(sftp, path);
-        return [{ exists }];
+        return { exists };
       });
     }),
 
@@ -244,7 +244,7 @@ export const file = router({
           throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
         });
 
-        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
+        return { size: stat.size, type: stat.isDirectory() ? "dir" : "file" };
       });
     }),
 

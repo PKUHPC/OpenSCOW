@@ -103,6 +103,7 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  LOGIN_NODES: Record<string, string>;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

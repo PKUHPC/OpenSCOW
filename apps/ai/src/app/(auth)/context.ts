@@ -15,8 +15,8 @@
 
 import React, { useContext } from "react";
 import { ClientUserInfo } from "src/server/auth/models";
-import { PublicConfig } from "src/server/trpc/route/config";
-import { Cluster } from "src/utils/config";
+import { Cluster, PublicConfig } from "src/server/trpc/route/config";
+
 
 export const PublicConfigContext = React.createContext<{
   publicConfig: PublicConfig,

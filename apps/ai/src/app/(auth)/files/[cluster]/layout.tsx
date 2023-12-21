@@ -10,16 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { PageTitle } from "src/components/PageTitle";
+"use client";
 
-import { DatasetListTable } from "../DatasetListTable";
+import React, { useState } from "react";
 
-export default function Page() {
+import { Operation, OperationContext } from "./context.jsx";
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+
+  const [operation, setOperation] = useState<Operation | undefined>();
 
   return (
-    <div>
-      <PageTitle titleText="公共数据集" />
-      <DatasetListTable isPublic={true} />
-    </div>
+    <OperationContext.Provider value={{ operation, setOperation }}>
+      {children}
+    </OperationContext.Provider>
   );
+
 }

@@ -86,6 +86,7 @@ const PublicConfigSchema = z.object({
     passwordPatternMessage: I18nStringTypeSchema.optional(),
   }),
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
+  LOGIN_NODES: z.record(z.string()),
 });
 
 // 类型别名
@@ -122,7 +123,7 @@ export const config = router({
     })
     .input(z.void())
     .output(PublicConfigSchema)
-    .query(async ({ ctx: { req, res } }) => {
+    .query(async () => {
       return publicConfig;
     }),
 

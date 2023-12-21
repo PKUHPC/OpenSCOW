@@ -14,9 +14,7 @@ import { Select } from "antd";
 import { useRouter } from "next/router";
 import { setCookie } from "nookies";
 import { useEffect, useState } from "react";
-import { useStore } from "simstate";
 import { languageInfo, useI18n } from "src/i18n";
-import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { styled } from "styled-components";
 
 
