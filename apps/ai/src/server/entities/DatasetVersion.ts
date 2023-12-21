@@ -29,6 +29,9 @@ export class DatasetVersion {
   @Property()
     path: string;
 
+  @Property({ nullable: true })
+    sharedPath?: string;
+
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
 
@@ -42,6 +45,7 @@ export class DatasetVersion {
       versionName: string;
       versionDescription?: string;
       path: string;
+      sharedPath: string;
       createTime?: Date;
       isShared?: boolean;
       dataset: Dataset;
@@ -50,6 +54,7 @@ export class DatasetVersion {
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.path = init.path;
+    this.sharedPath = init.sharedPath;
     this.isShared = init.isShared || false;
     this.dataset = toRef(init.dataset);
 

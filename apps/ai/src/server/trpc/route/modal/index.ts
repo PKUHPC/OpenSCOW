@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
-export const migrations =
-[
-  Migration20231221073202,
-].map((x) => ({ name: x.name, class: x }));
+import { router } from "src/server/trpc/def";
+
+import { getModals } from "./modal";
+
+export const modal = router({
+  getModals,
+});

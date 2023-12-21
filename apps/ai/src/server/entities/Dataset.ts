@@ -42,6 +42,9 @@ export class Dataset {
   @Property({ nullable: true })
     description: string | undefined;
 
+  @Property()
+    clusterId: string;
+
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
 
@@ -53,6 +56,7 @@ export class Dataset {
     isShared?: boolean;
     scene: string;
     description?: string;
+    clusterId: string;
     createTime?: Date;
   }) {
 
@@ -62,6 +66,7 @@ export class Dataset {
     this.isShared = init.isShared || false;
     this.scene = init.scene;
     this.description = init.description;
+    this.clusterId = init.clusterId;
 
     if (init.createTime) {
       this.createTime = init.createTime;

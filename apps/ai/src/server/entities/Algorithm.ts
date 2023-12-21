@@ -44,11 +44,13 @@ export class Algorithm {
     isShared: boolean;
 
   @Property({ nullable: true })
-    description: string | undefined;
+    description?: string;
+
+  @Property()
+    clusterId: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
-
 
   constructor(init: {
       name: string;
@@ -56,6 +58,7 @@ export class Algorithm {
       framework: Framework;
       isShared?: boolean;
       description?: string;
+      clusterId: string;
       createTime?: Date;
     }) {
 
@@ -64,6 +67,7 @@ export class Algorithm {
     this.framework = init.framework;
     this.isShared = init.isShared || false;
     this.description = init.description;
+    this.clusterId = init.clusterId;
 
     if (init.createTime) {
       this.createTime = init.createTime;

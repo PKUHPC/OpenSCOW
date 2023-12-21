@@ -24,10 +24,13 @@ export class AlgorithmVersion {
     versionName: string;
 
   @Property({ nullable: true })
-    versionDescription: string | undefined;
+    versionDescription?: string;
 
   @Property()
     path: string;
+
+  @Property({ nullable: true })
+    sharedPath?: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -40,8 +43,9 @@ export class AlgorithmVersion {
 
   constructor(init: {
       versionName: string;
-      versionDescription: string;
+      versionDescription?: string;
       path: string;
+      sharedPath: string;
       isShared: boolean;
       algorithm: Algorithm;
       createTime?: Date;
@@ -50,6 +54,7 @@ export class AlgorithmVersion {
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.path = init.path;
+    this.sharedPath = init.sharedPath;
     this.isShared = init.isShared;
     this.algorithm = toRef(init.algorithm);
 

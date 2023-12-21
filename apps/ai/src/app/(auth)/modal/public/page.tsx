@@ -10,8 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
-export const migrations =
-[
-  Migration20231221073202,
-].map((x) => ({ name: x.name, class: x }));
+import { PageTitle } from "src/components/pageTitle";
+import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
+
+export default function Page() {
+
+  return (
+    <div>
+      <PageTitle titleText="公共算法" />
+      <AlgorithmTable isPublic={true} />
+    </div>
+  );
+}

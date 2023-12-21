@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
-export const migrations =
-[
-  Migration20231221073202,
-].map((x) => ({ name: x.name, class: x }));
+import { redirect } from "next/navigation";
+
+export default function Page() {
+  redirect("/algorithm/private");
+}

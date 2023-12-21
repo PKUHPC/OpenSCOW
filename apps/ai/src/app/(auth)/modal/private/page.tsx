@@ -10,8 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
-export const migrations =
-[
-  Migration20231221073202,
-].map((x) => ({ name: x.name, class: x }));
+import { PageTitle } from "src/components/pageTitle";
+import { ModalTable } from "src/pageComponents/modal/ModalTable";
+
+export default function Page() {
+
+  return (
+    <div>
+      <PageTitle titleText="我的模型" />
+      <ModalTable isPublic={false} />
+    </div>
+  );
+}

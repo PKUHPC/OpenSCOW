@@ -13,11 +13,12 @@
 "use client";
 
 import { PlusOutlined } from "@ant-design/icons";
-import { App, Button, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
+import { App, Button, Divider, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
 import { useCallback, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmTypeText } from "src/models/Algorithm";
+import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
+import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditAlgorithmModal } from "./CreateAndEditAlgorithmModal";
@@ -36,14 +37,24 @@ const FilterType = {
 type FilterTypeKeys = keyof typeof FilterType;
 
 interface FilterForm {
-  owner?: string,
-  type?: FilterTypeKeys,
+  framework?: FilterTypeKeys,
   nameOrDesc?: string,
 }
 
 interface PageInfo {
   page: number;
   pageSize?: number;
+}
+
+interface Algorithm {
+  id: number;
+  name: string;
+  owner: string;
+  framework: Framework;
+  isShared: boolean;
+  description: string;
+  createTime: string;
+  versions: number;
 }
 
 const CreateAlgorithmModalButton =
@@ -61,18 +72,84 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       nameOrDesc: undefined,
-      type: undefined,
+      framework: undefined,
     };
   });
 
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const { data, isFetching, error } = trpc.algorithm.getAlgorithms.useQuery({ ...pageInfo, ...query });
+  const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
+    { ...pageInfo,
+      framework:query.framework === "ALL" ? undefined : query.framework,
+      nameOrDesc:query.nameOrDesc,
+    });
 
   if (error) {
     message.error("找不到算法");
   }
+
+  const columns: TableColumnsType<Algorithm> = [
+    { dataIndex: "name", title: "名称" },
+    { dataIndex: "framework", title: "算法框架", render:(_: Framework) => AlgorithmTypeText[_] },
+    { dataIndex: "description", title: "算法描述" },
+    { dataIndex: "versions", title: "版本数量",
+      render: (_, r) => {
+        return r.versions;
+      } },
+    isPublic ? { dataIndex: "shareUser", title: "分享者",
+      render: (_, r) => {
+        return r.owner;
+      } } : {},
+    { dataIndex: "createTime", title: "创建时间",
+      render:(_) => formatDateTime(_),
+    },
+    { dataIndex: "action", title: "操作",
+      render: (_, r) => {
+        return !isPublic ?
+          (
+            <>
+              <CreateAndEditVersionModalButton
+                algorithmId={r.id}
+                algorithmName={r.name}
+              >
+                创建新版本
+              </CreateAndEditVersionModalButton>
+              <VersionListModalButton
+                algorithmId={r.id}
+                algorithmName={r.name}
+              >
+                版本列表
+              </VersionListModalButton>
+              <EditAlgorithmModalButton
+                algorithmName={r.name}
+                algorithmFramework={r.framework}
+                algorithmDescription={r.description}
+              >
+                编辑
+              </EditAlgorithmModalButton>
+              <Button
+                type="link"
+                onClick={() => {
+                  deleteAlgorithm(r.id, r.name);
+                }}
+              >
+                删除
+              </Button>
+            </>
+          ) :
+          (
+            <VersionListModalButton
+              algorithmId={r.id}
+              algorithmName={r.name}
+              isPublic
+            >
+              版本列表
+            </VersionListModalButton>
+          );
+      },
+    },
+  ];
 
   const deleteAlgorithm = useCallback(
     (id: number, name: string) => {
@@ -102,12 +179,12 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
-          <Form.Item label="算法框架" name="type">
+          <Form.Item label="算法框架" name="framework">
             <Select
               style={{ minWidth: "120px" }}
               allowClear
               onChange={(val: FilterTypeKeys) => {
-                setQuery({ ...query, type:val });
+                setQuery({ ...query, framework:val });
               }}
               placeholder="请选择算法框架"
               defaultValue={"ALL"}
@@ -125,7 +202,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
         </Form>
         {!isPublic && (
           <Space>
-            <CreateAlgorithmModalButton> 添加 </CreateAlgorithmModalButton>
+            <CreateAlgorithmModalButton refetch={refetch}> 添加 </CreateAlgorithmModalButton>
           </Space>
         )}
       </FilterFormContainer>
@@ -133,74 +210,15 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
         rowKey="id"
         dataSource={data?.items}
         loading={isFetching}
-        columns={[
-          { dataIndex: "name", title: "名称" },
-          { dataIndex: "type", title: "算法框架" },
-          { dataIndex: "description", title: "算法描述" },
-          { dataIndex: "versions", title: "版本数量",
-            render: (_, r) => {
-              return r.versions.length;
-            } },
-          isPublic ? { dataIndex: "shareUser", title: "分享者",
-            render: (_, r) => {
-              return r.owner;
-            } } : {},
-          { dataIndex: "createTime", title: "创建时间" },
-          { dataIndex: "action", title: "操作",
-            render: (_, r) => {
-              return !isPublic ?
-                (
-                  <>
-                    <CreateAndEditVersionModalButton
-                      algorithmId={r.id}
-                      algorithmName={r.name}
-                    >
-                        创建新版本
-                    </CreateAndEditVersionModalButton>
-                    <VersionListModalButton
-                      algorithmId={r.id}
-                      algorithmName={r.name}
-                    >
-                        版本列表
-                    </VersionListModalButton>
-                    <EditAlgorithmModalButton
-                      algorithmName={r.name}
-                      algorithmFramework={r.type}
-                      algorithmDescription={r.description}
-                    >
-                        编辑
-                    </EditAlgorithmModalButton>
-                    <Button
-                      type="link"
-                      onClick={() => {
-                        deleteAlgorithm(r.id, r.name);
-                      }}
-                    >
-                    删除
-                    </Button>
-                  </>
-                ) :
-                (
-                  <VersionListModalButton
-                    algorithmId={r.id}
-                    algorithmName={r.name}
-                    isPublic
-                  >
-                        版本列表
-                  </VersionListModalButton>
-                );
-            },
-          },
-        ]}
-        pagination={setPageInfo ? {
+        columns={columns.filter((x) => Object.keys(x).length)}
+        pagination={{
           current: pageInfo.page,
           defaultPageSize: 10,
           pageSize: pageInfo.pageSize,
           showSizeChanger: true,
-          // total: data?.count,
-          total: 1,
+          total: data?.count,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
-        } : false}
+        }}
         scroll={{ x: true }}
       />
       {/* antd中modal组件 */}
