@@ -515,6 +515,15 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "shared_path": {
+          "name": "shared_path",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
         "is_shared": {
           "name": "is_shared",
           "type": "tinyint(1)",

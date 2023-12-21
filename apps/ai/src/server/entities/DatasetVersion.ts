@@ -45,7 +45,7 @@ export class DatasetVersion {
       versionName: string;
       versionDescription?: string;
       path: string;
-      sharedPath: string;
+      sharedPath?: string;
       createTime?: Date;
       isShared?: boolean;
       dataset: Dataset;

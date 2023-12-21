@@ -10,8 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/lib/db/config";
-
+import { ormConfigs } from "src/server/config/db";
 export default {
   ...ormConfigs,
 

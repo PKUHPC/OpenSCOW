@@ -49,7 +49,7 @@ export class ModalVersion {
       versionDescription: string;
       algorithmVersion: string;
       path: string;
-      sharedPath: string;
+      sharedPath?: string;
       isShared: boolean;
       modal: Modal;
       createTime?: Date;

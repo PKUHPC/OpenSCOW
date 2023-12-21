@@ -45,7 +45,7 @@ export class AlgorithmVersion {
       versionName: string;
       versionDescription?: string;
       path: string;
-      sharedPath: string;
+      sharedPath?: string;
       isShared: boolean;
       algorithm: Algorithm;
       createTime?: Date;
