@@ -12,53 +12,38 @@
 
 "use client";
 
-import { usePublicConfig } from "src/app/(auth)/context";
+import { LoadingOutlined } from "@ant-design/icons";
+import { App } from "antd";
 import { PageTitle } from "src/components/pageTitle";
-import { NotFoundPage } from "src/layouts/error/NotFoundPage";
-import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
-import { SelectAppTable } from "../SelectAppTable";
+import { LaunchAppForm } from "../LaunchAppForm";
 
-
-const useClusterAppConfigQuery = (clusterId: string) => {
-  return trpc.jobs.listAvailableApps.useQuery({ clusterId });
-};
 
 export default function Page({ params }: {params: {clusterId: string}}) {
+
   const { clusterId } = params;
 
-  const { publicConfig } = usePublicConfig();
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
+  const { message } = App.useApp();
+  // const t = useI18nTranslateToString();
+
+  const { data: clusterInfo, isLoading: isClusterLoading } = trpc.config.getClusterConfig.useQuery({ clusterId });
 
 
-  if (!cluster) {
-    return <NotFoundPage />;
-  }
-
-  const { data, isLoading, isError } = useClusterAppConfigQuery(clusterId);
-
-  if (isLoading) {
-    return <p>loading...</p>;
-  }
-
-  if (isError) {
-    return (
-      <ServerErrorPage />
-    );
+  if (isClusterLoading || !clusterInfo) {
+    return <LoadingOutlined />;
   }
 
   return (
-    <>
-      <PageTitle
-        titleText="训练"
-      />
-      <SelectAppTable
-        publicPath={publicConfig.PUBLIC_PATH}
+    <div>
+      <PageTitle titleText="训练" />
+      <LaunchAppForm
         clusterId={clusterId}
-        apps={data?.apps || {}}
+        clusterInfo={clusterInfo}
         isTraining={true}
       />
-    </>
+    </div>
   );
 }
+
+

@@ -19,17 +19,16 @@ import { Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space } fr
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
-import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
+import { FileSelectModal } from "src/components/FileSelectModal";
 import { formatSize } from "src/utils/format";
 
 interface Props {
-  appId: string;
-  clusterId: string;
-  appName: string;
-  attributes: AppCustomAttribute[];
+  appId?: string;
+  appName?: string;
   appComment?: I18nStringType;
+  clusterId: string;
   clusterInfo: ClusterConfig;
   isTraining?: boolean;
 }
@@ -85,59 +84,13 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, attributes, clusterInfo, isTraining = false } = props;
+  const { clusterId, appName, clusterInfo, isTraining = false } = props;
 
   const router = useRouter();
 
   const [form] = Form.useForm<FormFields>();
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
-
-
-  const customFormItems = useMemo(() => attributes.map((item, index) => {
-    const rules: Rule[] = item.type === "NUMBER"
-      ? [{ type: "integer" }, { required: item.required }]
-      : [{ required: item.required }];
-
-    const placeholder = item.placeholder ?? "";
-
-    // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
-    const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
-    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
-    // if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
-    const inputItem = item.type === "NUMBER" ?
-      (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
-      : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
-        : (
-          <Select
-            options={selectOptions.map((x) => ({
-              label: getI18nConfigCurrentText(x.label, undefined), value: x.value }))}
-            placeholder={getI18nConfigCurrentText(placeholder, undefined)}
-          />
-        );
-
-    // 判断是否配置了requireGpu选项
-    if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
-      const preValue = form.getFieldValue(item.name);
-
-      if (preValue) {
-        // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
-        const optionsContained = selectOptions.find((i) => i.value === preValue);
-        if (!optionsContained) form.setFieldValue(item.name, null);
-      }
-    }
-    return (
-      <Form.Item
-        key={`${item.name}+${index}`}
-        label={getI18nConfigCurrentText(item.label, undefined) ?? undefined}
-        name={item.name}
-        rules={rules}
-        initialValue={initialValue}
-      >
-        {inputItem}
-      </Form.Item>
-    );
-  }), [attributes, currentPartitionInfo]);
 
 
   const nodeCount = Form.useWatch("nodeCount", form) as number;
@@ -175,7 +128,7 @@ export const LaunchAppForm = (props: Props) => {
 
   useEffect(() => {
     setCurrentPartitionInfo(clusterInfo?.partitions[0]);
-    form.setFieldValue("appJobName", genAppJobName(appName));
+    form.setFieldValue("appJobName", genAppJobName(appName ?? "trainJobs"));
   }, [clusterInfo]);
 
   return (
@@ -198,16 +151,18 @@ export const LaunchAppForm = (props: Props) => {
           </Form.Item>
         </Space>
       </Form.Item>
-      <Form.Item label="镜像" required>
-        <Space>
-          <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
-            <Select style={{ minWidth: 100 }} />
-          </Form.Item>
-          <Form.Item name={["algorithm", "name"]} rules={[{ required: true }]} noStyle>
-            <Select style={{ minWidth: 100 }} />
-          </Form.Item>
-        </Space>
-      </Form.Item>
+      {isTraining && (
+        <Form.Item label="镜像" required>
+          <Space>
+            <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
+              <Select style={{ minWidth: 100 }} />
+            </Form.Item>
+            <Form.Item name={["algorithm", "name"]} rules={[{ required: true }]} noStyle>
+              <Select style={{ minWidth: 100 }} />
+            </Form.Item>
+          </Space>
+        </Form.Item>
+      )}
       <Form.Item label="数据集" required>
         <Space>
           <Form.Item name={["dataset", "type"]} rules={[{ required: true }]} noStyle>
@@ -220,6 +175,21 @@ export const LaunchAppForm = (props: Props) => {
             <Select style={{ minWidth: 100 }} />
           </Form.Item>
         </Space>
+      </Form.Item>
+      <Form.Item name="workingDirectory" label="工作目录" required>
+        <Input
+          suffix={
+            (
+              <FileSelectModal
+                onSubmit={(path: string) => {
+                  form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
+                  form.validateFields(["workingDirectory"]);
+                }}
+                cluster={clusterId}
+              />
+            )
+          }
+        />
       </Form.Item>
       <Divider orientation="left" orientationMargin="0" plain>资源</Divider>
       <Form.Item
@@ -312,7 +282,6 @@ export const LaunchAppForm = (props: Props) => {
         <InputNumber min={1} step={1} addonAfter="分钟" />
       </Form.Item>
 
-      {customFormItems}
       <Row>
         {
           currentPartitionInfo?.gpus

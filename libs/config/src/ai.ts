@@ -27,7 +27,7 @@ export const AiConfigSchema = Type.Object({
     dbName: Type.String({ description: "数据库数据库名" }),
     debug: Type.Boolean({ description: "打开ORM的debug模式", default: false }),
   }),
-
+  appJobsDir: Type.String({ description: "将交互式任务的信息保存到什么位置。相对于用户的家目录", default: "scow/ai/appData" }),
 
 });
 

@@ -41,7 +41,6 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
       <PageTitle titleText={`创建${appInfo.appName}`} />
       <LaunchAppForm
         appName={appInfo.appName}
-        attributes={appInfo.attributes}
         appId={appId}
         clusterId={clusterId}
         appComment={appInfo.appComment}
