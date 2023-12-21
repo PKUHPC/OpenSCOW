@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/config/db";
-export default {
-  ...ormConfigs,
-
-};
+export enum ErrorCode {
+  ALGORITHM_NAME_ALREADY_EXIST = "algorithm_name_already_exist",
+}

@@ -18,7 +18,6 @@ import { trpc } from "src/utils/trpc";
 export interface Props {
   open: boolean;
   onClose: () => void;
-  refetch?: () => void;
   algorithmName?: string;
   algorithmFramework?: string;
   algorithmDescription?: string;
@@ -29,12 +28,11 @@ type AlgorithmType = keyof typeof AlgorithmTypeText;
 interface FormFields {
   name: string,
   type: AlgorithmType,
-  clusterId: string,
   description?: string,
 }
 
 export const CreateAndEditAlgorithmModal: React.FC<Props> = (
-  { open, onClose, refetch, algorithmName, algorithmFramework, algorithmDescription },
+  { open, onClose, algorithmName, algorithmFramework, algorithmDescription },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -42,13 +40,11 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
   const createAlgorithmMutation = trpc.algorithm.createAlgorithm.useMutation({
     onSuccess() {
       message.success("添加算法成功");
-      form.resetFields();
-      refetch && refetch();
       onClose();
     },
     onError(e) {
       console.log(e);
-      message.error("添加算法失败");
+      message.error("添加数据集失败");
       // if (e.data?.code === "USER_NOT_FOUND") {
       //   message.error("用户未找到");
       // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
@@ -61,9 +57,10 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
     } });
 
   const onOk = async () => {
-    const { name, type, description, clusterId } = await form.validateFields();
+    form.validateFields();
+    const { name, type, description } = await form.validateFields();
     createAlgorithmMutation.mutate({
-      name, framework:type, description, clusterId,
+      name, framework:type, description,
     });
   };
 
@@ -90,19 +87,6 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
           ]}
         >
           {algorithmName ?? <Input allowClear />}
-        </Form.Item>
-        <Form.Item
-          label="集群"
-          name="clusterId"
-          rules={[
-            { required: true },
-          ]}
-        >
-          <Select
-            style={{ minWidth: "120px" }}
-            options={[{ label:"集群1", value:"1" }, { label:"集群2", value:"2" }]}
-          >
-          </Select>
         </Form.Item>
         <Form.Item
           label="算法框架"

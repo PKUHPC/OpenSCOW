@@ -39,8 +39,11 @@ export class Modal {
   @Property()
     isShared: boolean;
 
+  @Property({ nullable: true })
+    description?: string;
+
   @Property()
-    description: string;
+    clusterId: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -52,7 +55,8 @@ export class Modal {
       algorithmFramework: string;
       algorithmName: string;
       isShared: boolean;
-      description: string;
+      description?: string;
+      clusterId: string;
       createTime?: Date;
     }) {
 
@@ -62,6 +66,7 @@ export class Modal {
     this.algorithmName = init.algorithmName;
     this.isShared = init.isShared;
     this.description = init.description;
+    this.clusterId = init.clusterId;
 
     if (init.createTime) {
       this.createTime = init.createTime;

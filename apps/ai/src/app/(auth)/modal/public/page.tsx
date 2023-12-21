@@ -10,8 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/config/db";
-export default {
-  ...ormConfigs,
+import { PageTitle } from "src/components/pageTitle";
+import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
 
-};
+export default function Page() {
+
+  return (
+    <div>
+      <PageTitle titleText="公共算法" />
+      <AlgorithmTable isPublic={true} />
+    </div>
+  );
+}

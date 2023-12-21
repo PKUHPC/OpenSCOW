@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/config/db";
-export default {
-  ...ormConfigs,
+import { redirect } from "next/navigation";
 
-};
+export default function Page() {
+  redirect("/algorithm/private");
+}

@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/config/db";
-export default {
-  ...ormConfigs,
+import { router } from "src/server/trpc/def";
 
-};
+import { getModals } from "./modal";
+
+export const modal = router({
+  getModals,
+});

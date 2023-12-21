@@ -32,6 +32,9 @@ export class ModalVersion {
   @Property()
     path: string;
 
+  @Property({ nullable: true })
+    sharedPath?: string;
+
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
 
@@ -46,6 +49,7 @@ export class ModalVersion {
       versionDescription: string;
       algorithmVersion: string;
       path: string;
+      sharedPath?: string;
       isShared: boolean;
       modal: Modal;
       createTime?: Date;
@@ -55,6 +59,7 @@ export class ModalVersion {
     this.versionDescription = init.versionDescription;
     this.algorithmVersion = init.algorithmVersion;
     this.path = init.path;
+    this.sharedPath = init.sharedPath;
     this.isShared = init.isShared;
     this.modal = toRef(init.modal);
 

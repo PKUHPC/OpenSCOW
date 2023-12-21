@@ -10,8 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ormConfigs } from "src/server/config/db";
-export default {
-  ...ormConfigs,
+import { PageTitle } from "src/components/pageTitle";
+import { ModalTable } from "src/pageComponents/modal/ModalTable";
 
-};
+export default function Page() {
+
+  return (
+    <div>
+      <PageTitle titleText="我的模型" />
+      <ModalTable isPublic={false} />
+    </div>
+  );
+}

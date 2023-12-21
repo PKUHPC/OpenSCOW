@@ -35,11 +35,17 @@ export class Image {
   @Property()
     tags: string;
 
+  @Property({ nullable: true })
+    description?: string;
+
   @Property()
-    description: string;
+    clusterId: string;
 
   @Property()
     path: string;
+
+  @Property({ nullable: true })
+    sharedPath?: string;
 
   @Property()
     isShared: boolean;
@@ -52,9 +58,11 @@ export class Image {
       owner: string;
       source: Source;
       tags: string;
-      description: string;
+      description?: string;
       path: string;
+      sharedPath?: string;
       isShared?: boolean;
+      clusterId: string;
       createTime?: Date;
     }) {
 
@@ -64,7 +72,9 @@ export class Image {
     this.tags = init.tags;
     this.description = init.description;
     this.path = init.path;
+    this.sharedPath = init.sharedPath;
     this.isShared = init.isShared || false;
+    this.clusterId = init.clusterId;
 
     if (init.createTime) {
       this.createTime = init.createTime;
