@@ -1,5 +1,17 @@
 # @scow/mis-server
 
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-hook@1.0.5
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+
 ## 1.2.3
 
 ### Patch Changes

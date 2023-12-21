@@ -1,5 +1,16 @@
 # @scow/mis-web
 
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes
