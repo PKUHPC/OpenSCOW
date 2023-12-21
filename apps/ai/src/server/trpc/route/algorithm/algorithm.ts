@@ -13,8 +13,8 @@
 // import { Framework } from "src/models/Algorithm";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { Dataset } from "src/server/entities/Dataset";
-import { getORM } from "src/server/lib/db/orm";
 import { ormProcedure, procedure } from "src/server/trpc/procedure/base";
+import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
 

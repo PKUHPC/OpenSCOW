@@ -11,8 +11,8 @@
  */
 
 import { Image, Source } from "src/server/entities/Image";
-import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
+import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
 export const list = procedure

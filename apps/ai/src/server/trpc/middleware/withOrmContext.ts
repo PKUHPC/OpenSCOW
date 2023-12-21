@@ -11,8 +11,8 @@
  */
 
 import { RequestContext } from "@mikro-orm/core";
-import { getORM } from "src/server/lib/db/orm";
 import { middleware } from "src/server/trpc/def";
+import { getORM } from "src/server/utils/getOrm";
 
 /**
  * Add RequestContext for MikroORM to isolate Identity Map per request.

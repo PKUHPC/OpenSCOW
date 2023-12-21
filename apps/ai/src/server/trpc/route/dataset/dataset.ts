@@ -11,8 +11,8 @@
  */
 
 import { Dataset } from "src/server/entities/Dataset";
-import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
+import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
 const mockDatasets = [

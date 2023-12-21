@@ -10,14 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import type { EntityManager } from "@mikro-orm/mysql";
-import { MikroORM } from "@mikro-orm/mysql";
-
-import { getConfig } from "./config";
-
+import { EntityManager, MikroORM } from "@mikro-orm/mysql";
+import { ormConfigs } from "src/server/config/db";
 
 let orm: MikroORM;
-
 /**
  * Returns MikroORM instance.
  * Creates the new if one does not exists, then caches it.
@@ -25,9 +21,8 @@ let orm: MikroORM;
 export async function getORM(): Promise<MikroORM> {
 
   if (orm === undefined) {
-    const config = getConfig();
 
-    orm = await MikroORM.init(config);
+    orm = await MikroORM.init(ormConfigs);
 
     const schemaGenerator = orm.getSchemaGenerator();
     await schemaGenerator.ensureDatabase();
@@ -43,3 +38,4 @@ export async function forkEntityManager(): Promise<EntityManager> {
 
   return orm.em.fork();
 }
+

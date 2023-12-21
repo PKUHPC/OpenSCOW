@@ -12,8 +12,7 @@
 
 import { join } from "node:path";
 
-import { Options } from "@mikro-orm/core";
-import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
+import { defineConfig } from "@mikro-orm/mysql";
 import { entities } from "src/server/entities";
 import { migrations } from "src/server/migrations";
 
@@ -49,4 +48,3 @@ export const ormConfigs = defineConfig({
   },
 });
 
-export const getConfig = () => ormConfigs;
