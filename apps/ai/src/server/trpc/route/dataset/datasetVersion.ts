@@ -89,10 +89,11 @@ export const createDatasetVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
-    if (!dataset) throw new TRPCError({ code: "NOT_FOUND", message: "Dataset not Found" });
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
     if (dataset && dataset.owner !== user?.identityId)
-      throw new TRPCError({ code: "NOT_FOUND", message: "DatasetVersion not Found" });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     const datasetVersion = new DatasetVersion({ ...input, dataset: dataset });
     await orm.em.persistAndFlush(datasetVersion);
@@ -120,10 +121,13 @@ export const updateDatasetVersion = procedure
     const orm = await getORM();
 
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
-    if (!dataset) throw new Error("Dataset not found");
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+
 
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
-    if (!datasetVersion) throw new Error("DatasetVersion not found");
+    if (!datasetVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
     datasetVersion.versionName = input.versionName;
     datasetVersion.path = input.path;
@@ -147,7 +151,10 @@ export const deleteDatasetVersion = procedure
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
-    if (!datasetVersion) throw new Error("DatasetVersion not found");
+
+    if (!datasetVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+
     await orm.em.removeAndFlush(datasetVersion);
     return { success: true };
   });

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TRPCError } from "@trpc/server";
 import { Dataset } from "src/server/entities/Dataset";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
@@ -67,7 +68,6 @@ export const list = procedure
   .input(z.object({
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
-    owner: z.string().optional(),
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
     isShared: z.boolean().optional(),
@@ -156,7 +156,13 @@ export const updateDataset = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
-    if (!dataset) throw new Error("Dataset not found");
+
+    if (!dataset) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Dataset ${input.id} not found`,
+      });
+    };
 
     // TODO: 判断集群是否可以连接？
     dataset.name = input.name;
@@ -182,7 +188,12 @@ export const deleteDataset = procedure
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
-    if (!dataset) throw new Error("Dataset not found");
+    if (!dataset) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Dataset ${input.id} not found`,
+      });
+    };
 
     try {
       await orm.em.removeAndFlush(dataset);

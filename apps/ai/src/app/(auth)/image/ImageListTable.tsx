@@ -132,7 +132,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "clusterId", title: "集群",
             render: (_, r) =>
               getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
-          { dataIndex: "tag", title: "标签" },
+          { dataIndex: "tags", title: "标签" },
           { dataIndex: "description", title: "镜像描述" },
           { dataIndex: "path", title: "镜像地址" },
           isPublic ? { dataIndex: "shareUser", title: "分享者",

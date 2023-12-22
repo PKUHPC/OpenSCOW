@@ -15,7 +15,9 @@ import { TRPCClientError } from "@trpc/client";
 import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { DatasetInterface, DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
+import { FileSelectModal } from "src/components/FileSelectModal";
+import { DatasetInterface } from "src/models/Dateset";
+import { Source, SourceText } from "src/models/Image";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
@@ -33,11 +35,12 @@ export interface Props {
 
 interface FormFields {
   id?: number | undefined,
-  name: string,
   cluster: Cluster,
-  type: DatasetType,
-  scene: SceneType,
+  name: string,
+  tags: string,
   description?: string,
+  source: Source,
+  path: string,
 }
 
 export const CreateEditImageModal: React.FC<Props> = (
@@ -55,64 +58,60 @@ export const CreateEditImageModal: React.FC<Props> = (
   const resetForm = () => {
     isEdit && editData ?
       form.setFieldsValue({
-        type: editData.type,
-        scene: editData.scene,
+        source: editData.source,
       }) : form.setFieldsValue({
-        type: DatasetType.IMAGE,
-        scene: SceneType.CWS,
+        source: Source.INTERNAL,
       });
   };
 
-  const createMutation = trpc.dataset.createDataset.useMutation({
+  const createMutation = trpc.image.createImage.useMutation({
     onSuccess() {
-      message.success("添加数据集成功");
+      message.success("添加镜像成功");
       onClose();
       form.resetFields();
       resetForm();
       refetch();
     },
     onError() {
-      message.error("添加数据集失败");
+      message.error("添加镜像失败");
     },
   });
 
-  const editMutation = trpc.dataset.updateDataset.useMutation({
+  const editMutation = trpc.image.updateImage.useMutation({
     onSuccess() {
-      message.success("编辑数据集成功");
+      message.success("编辑镜像成功");
       onClose();
       refetch();
     },
     onError(e) {
       const { data } = e as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("编辑数据集失败");
+        message.error("编辑镜像失败");
       }
     },
   });
 
   const onOk = async () => {
     form.validateFields();
-    const { name, type, description, scene, cluster } = await form.validateFields();
+    const { name, cluster, tags, description, source, path } = await form.validateFields();
     isEdit && editData ? editMutation.mutate({
       id: editData.id,
-      clusterId: editData.clusterId,
-      name,
-      type,
-      scene,
+      tags,
       description,
     })
       : createMutation.mutate({
         name,
         clusterId: cluster.id,
-        type,
+        tags,
         description,
-        scene,
+        source,
+        path,
       });
   };
 
   return (
     <Modal
-      title={isEdit ? "编辑数据集" : "添加数据集"}
+      title={isEdit ? "编辑镜像" : "添加镜像"}
       open={open}
       onOk={form.submit}
       confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
@@ -125,52 +124,82 @@ export const CreateEditImageModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
-        <Form.Item
-          label="名称"
-          name="name"
-          rules={[
-            { required: true },
-          ]}
-        >
-          <Input allowClear />
-        </Form.Item>
         {isEdit && editData ? (
-          <Form.Item
-            label="集群"
-          >
-            {getI18nConfigCurrentText(
-              clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+          <>
+            <Form.Item
+              label="名称"
+            >
+              {editData.name}
+            </Form.Item>
+            <Form.Item
+              label="集群"
+            >
+              {getI18nConfigCurrentText(
+                clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
               ?? editData.clusterId }
-          </Form.Item>
+            </Form.Item>
+          </>
         ) : (
-          <Form.Item
-            label="集群"
-            name="cluster"
-            rules={[
-              { required: true },
-            ]}
-          >
-            <SingleClusterSelector />
-          </Form.Item>
+          <>
+            <Form.Item
+              label="名称"
+              name="name"
+              rules={[
+                { required: true },
+              ]}
+            >
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item
+              label="集群"
+              name="cluster"
+              rules={[
+                { required: true },
+              ]}
+            >
+              <SingleClusterSelector />
+            </Form.Item>
+          </>
         )
         }
-        <Form.Item label="数据类型" name="type">
-          <Select
-            style={{ minWidth: "100px" }}
-            options={
-              Object.entries(DatasetTypeText).map(([key, value]) => ({ label:value, value:key }))}
-          />
+        <Form.Item label="镜像标签" name="tags">
+          <Input />
         </Form.Item>
-        <Form.Item label="应用场景" name="scene">
-          <Select
-            style={{ minWidth: "100px" }}
-            options={
-              Object.entries(SceneTypeText).map(([key, value]) => ({ label:value, value:key }))}
-          />
-        </Form.Item>
-        <Form.Item label="数据集描述" name="description">
+        <Form.Item label="镜像描述" name="description">
           <Input.TextArea />
         </Form.Item>
+
+        { !isEdit && (
+          <>
+            <Form.Item label="镜像来源" name="source">
+              <Select
+                style={{ minWidth: "100px" }}
+                options={
+                  Object.entries(SourceText).map(([key, value]) => ({ label:value, value:key }))}
+              />
+            </Form.Item>
+            <Form.Item
+              label="上传数据集"
+              name="path"
+              rules={[{ required: true }]}
+            >
+              <Input
+                suffix={
+                  (
+                    <FileSelectModal
+                      onSubmit={(path: string) => {
+                        form.setFields([{ name: "path", value: path, touched: true }]);
+                        form.validateFields(["path"]);
+                      }}
+                      cluster={{ id: "A", name: "a" }}
+                    />
+                  )
+                }
+              />
+            </Form.Item>
+          </>
+        ) }
+
       </Form>
     </Modal>
   );

@@ -16,7 +16,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Form, Input, Select, Space, Table } from "antd";
-import cluster from "cluster";
 import NextError from "next/error";
 import { useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";

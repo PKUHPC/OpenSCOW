@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TRPCError } from "@trpc/server";
 import { Image, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
@@ -27,7 +28,6 @@ export const list = procedure
   .input(z.object({
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
-    owner: z.string().optional(),
     nameOrTagOrDesc: z.string().optional(),
     isShared: z.boolean().optional(),
     clusterId: z.string().optional(),
@@ -44,7 +44,7 @@ export const list = procedure
     const nameOrTagOrDescQuery = input.nameOrTagOrDesc ? {
       $or: [
         { name: { $like: `%${input.nameOrTagOrDesc}%` } },
-        { tag: { $like: `%${input.nameOrTagOrDesc}%` } },
+        { tags: { $like: `%${input.nameOrTagOrDesc}%` } },
         { description: { $like: `%${input.nameOrTagOrDesc}%` } },
       ],
     } : {};
@@ -64,6 +64,41 @@ export const list = procedure
     return { items, count };
   });
 
+export const createImage = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/image/create",
+      tags: ["image"],
+      summary: "Create a new image",
+    },
+  })
+  .input(z.object({
+    name: z.string(),
+    tags: z.string(),
+    description: z.string().optional(),
+    source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
+    path: z.string(),
+    clusterId: z.string(),
+  }))
+  .output(z.number())
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    // TODO 集群判断
+    const imageNameExist = await orm.em.findOne(Image, { name:input.name });
+    if (imageNameExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Image's name ${input.name} already exist`,
+      });
+    };
+
+    const image = new Image({ ...input, owner: user!.identityId });
+    await orm.em.persistAndFlush(image);
+    return image.id;
+  });
+
+
 export const updateImage = procedure
   .meta({
     openapi: {
@@ -75,17 +110,20 @@ export const updateImage = procedure
   })
   .input(z.object({
     id: z.number(),
-    name: z.string(),
     tags: z.string(),
-    description: z.string(),
+    description: z.string().optional(),
   }))
   .output(z.number())
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
-    if (!image) throw new Error("Image not found");
+    if (!image) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Image ${input.id} not found`,
+      });
+    };
 
-    image.name = input.name;
     image.tags = input.tags;
     image.description = input.description;
 
@@ -107,36 +145,13 @@ export const deleteImage = procedure
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
-    if (!image) throw new Error("Image not found");
+
+    if (!image) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Image ${input.id} not found`,
+      });
+    }
     await orm.em.removeAndFlush(image);
     return { success: true };
-  });
-
-export const createImage = procedure
-  .meta({
-    openapi: {
-      method: "POST",
-      path: "/image/create",
-      tags: ["image"],
-      summary: "Create a new image",
-    },
-  })
-  .input(z.object({
-    name: z.string(),
-    owner: z.string(),
-    tags: z.string(),
-    description: z.string(),
-    source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
-    path: z.string(),
-    clusterId: z.string(),
-  }))
-  .output(z.number())
-  .mutation(async ({ input }) => {
-    const orm = await getORM();
-
-    // TODO 集群判断
-
-    const image = new Image(input);
-    await orm.em.persistAndFlush(image);
-    return image.id;
   });
