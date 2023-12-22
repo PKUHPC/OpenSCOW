@@ -85,6 +85,9 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  CLUSTER_MONITOR_ENABLED: boolean;
+  CLUSTER_MONITOR_GRAFANA_URL: string;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

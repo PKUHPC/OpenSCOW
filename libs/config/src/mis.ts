@@ -121,6 +121,11 @@ export const MisConfigSchema = Type.Object({
   customChargeTypes: Type.Optional(Type.Array(
     Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
+
+  clusterMonitor: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否启用集群监控功能", default: false }),
+    grafanaUrl: Type.String({ description: "Grafana 地址", default: "http://127.0.0.1:4000" }),
+  })),
 });
 
 const MIS_CONFIG_NAME = "mis";

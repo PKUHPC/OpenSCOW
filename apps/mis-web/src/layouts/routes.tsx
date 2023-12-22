@@ -11,9 +11,9 @@
  */
 
 import {
-  AccountBookOutlined, BookOutlined, CloudServerOutlined,
+  AccountBookOutlined, AlertOutlined, BookOutlined, CloudServerOutlined,
   DashboardOutlined,
-  InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  InfoOutlined, LineChartOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, MonitorOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, ProfileOutlined,
   StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
@@ -131,6 +131,24 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       },
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
+        Icon: MonitorOutlined,
+        text: t(pPlatform("clusterMonitor")),
+        path: "/admin/monitor",
+        clickable: false,
+        children: [
+          {
+            Icon: LineChartOutlined,
+            text: t(pPlatform("resourceStatus")),
+            path: "/admin/monitor/resourceStatus",
+          },
+          {
+            Icon: AlertOutlined,
+            text: t(pPlatform("alarmLog")),
+            path: "/admin/monitor/alarmLog",
+          },
+        ],
+      }] : []),
       ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{
           Icon: BookOutlined,

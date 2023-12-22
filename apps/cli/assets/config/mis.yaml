@@ -61,6 +61,12 @@ createUser:
     # 外置页面URL
     # url: http://your-create-user-page.com
 
+# 集群监控配置
+# clusterMonitor:
+#   # 是否开启，默认为 false
+#   enabled: true
+#   # 协议 + ip/域名 + 端口，默认为 http://127.0.0.1:4000
+#   grafanaUrl: "http://127.0.0.1:4000"
 
 # # 新增导航链接相关配置
 # navLinks:

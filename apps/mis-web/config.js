@@ -169,6 +169,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    CLUSTER_MONITOR_ENABLED: misConfig.clusterMonitor.enabled,
+    CLUSTER_MONITOR_GRAFANA_URL: misConfig.clusterMonitor.grafanaUrl,
+
   };
 
   if (!building) {
