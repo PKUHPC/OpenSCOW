@@ -36,7 +36,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const mutation = trpc.dataset.createDatasetVersion.useMutation({
+  const createAlgorithmVersionMutation = trpc.algorithm.createAlgorithmVersion.useMutation({
     onSuccess() {
       message.success("创建新版本成功");
       onClose();
@@ -46,25 +46,18 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
       message.error("创建新版本失败");
       // if (e.data?.code === "USER_NOT_FOUND") {
       //   message.error("用户未找到");
-      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
-      //   message.error("账户未找到");
-      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
-      //   message.error("该用户已经在账户内，无法重复添加");
-      // } else {
-      //   message.error(e.message);
-      // }
     },
   });
 
   const onOk = async () => {
     form.validateFields();
     const { versionName, versionDescription, path } = await form.validateFields();
-    // mutation.mutate({
-    //   versionName,
-    //   versionDescription,
-    //   path,
-    //   datasetId,
-    // });
+    createAlgorithmVersionMutation.mutate({
+      versionName,
+      versionDescription,
+      path:"123",
+      algorithmId,
+    });
   };
 
   return (
@@ -72,7 +65,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
       title={versionName ? "编辑版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
-      confirmLoading={mutation.isLoading}
+      confirmLoading={createAlgorithmVersionMutation.isLoading}
       onCancel={onClose}
       destroyOnClose
     >
@@ -105,7 +98,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
             <Form.Item
               label="上传文件"
               name="path"
-              rules={[{ required: true }]}
+              // rules={[{ required: true }]}
             >
               <Input
                 suffix={

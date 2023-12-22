@@ -10,15 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
+import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
 import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
 
 export default function Page() {
 
+  const { publicConfig } = usePublicConfig();
+
   return (
     <div>
       <PageTitle titleText="我的算法" />
-      <AlgorithmTable isPublic={false} />
+      <AlgorithmTable isPublic={false} clusters={publicConfig.CLUSTERS} />
     </div>
   );
 }

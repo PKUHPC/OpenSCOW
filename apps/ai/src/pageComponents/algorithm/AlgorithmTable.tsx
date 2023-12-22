@@ -13,11 +13,14 @@
 "use client";
 
 import { PlusOutlined } from "@ant-design/icons";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
 import { useCallback, useMemo, useState } from "react";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
+import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
@@ -27,6 +30,7 @@ import { VersionListModal } from "./VersionListModal";
 
 interface Props {
   isPublic: boolean;
+  clusters: Cluster[];
 }
 
 const FilterType = {
@@ -39,6 +43,7 @@ type FilterTypeKeys = keyof typeof FilterType;
 interface FilterForm {
   framework?: FilterTypeKeys,
   nameOrDesc?: string,
+  clusterId?: string,
 }
 
 interface PageInfo {
@@ -53,6 +58,7 @@ interface Algorithm {
   framework: Framework;
   isShared: boolean;
   description: string;
+  clusterId: string;
   createTime: string;
   versions: number;
 }
@@ -64,7 +70,7 @@ ModalButton(CreateAndEditAlgorithmModal, { type: "link" });
 const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 const VersionListModalButton = ModalButton(VersionListModal, { type: "link" });
 
-export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
+export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const { message } = App.useApp();
@@ -73,6 +79,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
     return {
       nameOrDesc: undefined,
       framework: undefined,
+      clusterId:undefined,
     };
   });
 
@@ -83,14 +90,41 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
     { ...pageInfo,
       framework:query.framework === "ALL" ? undefined : query.framework,
       nameOrDesc:query.nameOrDesc,
+      clusterId:query.clusterId,
     });
 
   if (error) {
     message.error("找不到算法");
   }
 
+  const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
+    onSuccess() {
+      message.success("删除算法成功");
+      refetch();
+    },
+    onError(e) {
+      console.log(e);
+      message.error("删除算法失败");
+    } });
+
+  const deleteAlgorithm = useCallback(
+    (id: number, name: string) => {
+      confirm({
+        title: "删除算法",
+        content: `确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`,
+        onOk() {
+          deleteAlgorithmMutation.mutate({ id });
+        },
+      });
+    },
+    [],
+  );
+
   const columns: TableColumnsType<Algorithm> = [
     { dataIndex: "name", title: "名称" },
+    { dataIndex: "clusterId", title: "集群",
+      render: (_, r) =>
+        getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
     { dataIndex: "framework", title: "算法框架", render:(_: Framework) => AlgorithmTypeText[_] },
     { dataIndex: "description", title: "算法描述" },
     { dataIndex: "versions", title: "版本数量",
@@ -122,6 +156,8 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
                 版本列表
               </VersionListModalButton>
               <EditAlgorithmModalButton
+                refetch={refetch}
+                clusterId={r.clusterId}
                 algorithmName={r.name}
                 algorithmFramework={r.framework}
                 algorithmDescription={r.description}
@@ -151,19 +187,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
     },
   ];
 
-  const deleteAlgorithm = useCallback(
-    (id: number, name: string) => {
-      console.log(id);
-      confirm({
-        title: "删除算法",
-        content: `确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`,
-        onOk() {
-          message.success("删除成功");
-        },
-      });
-    },
-    [],
-  );
+
 
 
   return (
@@ -179,6 +203,14 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic }) => {
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
+          <Form.Item label="集群" name="clusterId">
+            <SingleClusterSelector
+              allowClear={true}
+              onChange={(val) => {
+                setQuery({ ...query, clusterId:val.id });
+              }}
+            />
+          </Form.Item>
           <Form.Item label="算法框架" name="framework">
             <Select
               style={{ minWidth: "120px" }}

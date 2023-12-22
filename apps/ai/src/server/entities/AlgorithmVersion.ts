@@ -46,7 +46,7 @@ export class AlgorithmVersion {
       versionDescription?: string;
       path: string;
       sharedPath?: string;
-      isShared: boolean;
+      isShared?: boolean;
       algorithm: Algorithm;
       createTime?: Date;
     }) {
@@ -55,7 +55,7 @@ export class AlgorithmVersion {
     this.versionDescription = init.versionDescription;
     this.path = init.path;
     this.sharedPath = init.sharedPath;
-    this.isShared = init.isShared;
+    this.isShared = init.isShared || false;
     this.algorithm = toRef(init.algorithm);
 
     if (init.createTime) {

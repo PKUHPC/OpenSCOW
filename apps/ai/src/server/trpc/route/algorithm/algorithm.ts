@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { Framework } from "src/models/Algorithm";
 import { TRPCError } from "@trpc/server";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { Dataset } from "src/server/entities/Dataset";
@@ -34,6 +33,7 @@ export const getAlgorithms = procedure
     pageSize: z.number().min(0).optional(),
     framework: z.nativeEnum(Framework).optional(),
     nameOrDesc: z.string().optional(),
+    clusterId:z.string().optional(),
     isPublic:z.string().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
@@ -43,22 +43,26 @@ export const getAlgorithms = procedure
     framework:z.nativeEnum(Framework),
     isShared:z.boolean(),
     description:z.string(),
+    clusterId:z.string(),
     createTime:z.string(),
     versions:z.number(),
   })), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const { page, pageSize, framework, nameOrDesc, isPublic } = input;
+    const { page, pageSize, framework, nameOrDesc, clusterId, isPublic } = input;
 
     const [items, count] = await orm.em.findAndCount(Algorithm, {
-      ...isPublic ? {} :
-        { owner: user!.identityId },
-      ...framework ? { framework } : {},
-      ...nameOrDesc ?
-        { $or: [
-          { name: { $like: `%${nameOrDesc}%` } },
-          { description: { $like: `%${nameOrDesc}%` } },
-        ]} : {},
+      $and:[
+        isPublic ? { isShared:true } :
+          { owner: user!.identityId },
+        framework ? { framework } : {},
+        clusterId ? { clusterId } : {},
+        nameOrDesc ?
+          { $or: [
+            { name: { $like: `%${nameOrDesc}%` } },
+            { description: { $like: `%${nameOrDesc}%` } },
+          ]} : {},
+      ],
     },
     {
       ...page ?
@@ -68,7 +72,6 @@ export const getAlgorithms = procedure
         } : {},
       orderBy: { createTime: "desc" },
     });
-    console.log("items", items);
     return { items: items.map((x) => {
       return {
         id:x.id,
@@ -77,10 +80,10 @@ export const getAlgorithms = procedure
         framework:x.framework,
         isShared:x.isShared,
         description:x.description ?? "",
+        clusterId:x.clusterId,
         createTime:x.createTime ? x.createTime.toISOString() : "",
         versions:3,
       }; }), count };
-    // return { items: mockAlgorithms, count: 2 };
   });
 
 
@@ -95,7 +98,6 @@ export const createAlgorithm = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const { em } = await getORM();
     const algorithmExsit = await em.findOne(Algorithm, { name:input.name });
-    console.log("algorithmExsit", algorithmExsit);
     if (algorithmExsit) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -108,21 +110,40 @@ export const createAlgorithm = procedure
     return algorithm.id;
   });
 
-export const deleteDataset = procedure
-  .meta({
-    openapi: {
-      method: "DELETE",
-      path: "/dataset/delete/{id}",
-      tags: ["dataset"],
-      summary: "delete a dataset",
-    },
-  })
+export const updateAlgorithm = procedure
+  .input(z.object({
+    name: z.string(),
+    framework: z.nativeEnum(Framework),
+    description: z.string().optional(),
+  }))
+  .mutation(async ({ input:{ name, framework, description } }) => {
+    const { em } = await getORM();
+    const algorithm = await em.findOne(Algorithm, { name });
+
+    if (!algorithm) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+      });
+    }
+
+    algorithm.framework = framework;
+    algorithm.description = description;
+
+    await em.persistAndFlush(algorithm);
+    return;
+  });
+
+export const deleteAlgorithm = procedure
   .input(z.object({ id: z.number() }))
-  .output(z.object({ success: z.boolean() }))
-  .mutation(async ({ input }) => {
-    const orm = await getORM();
-    const dataset = await orm.em.findOne(Dataset, { id: input.id });
-    if (!dataset) throw new Error("Dataset not found");
-    await orm.em.removeAndFlush(dataset);
-    return { success: true };
+  .mutation(async ({ input:{ id } }) => {
+    const { em } = await getORM();
+    const algorithm = await em.findOne(Algorithm, { id });
+
+    if (!algorithm) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+      });
+    }
+    await em.removeAndFlush(algorithm);
+    return;
   });

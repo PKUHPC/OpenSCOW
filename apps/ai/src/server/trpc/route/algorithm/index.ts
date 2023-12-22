@@ -12,11 +12,17 @@
 
 import { router } from "src/server/trpc/def";
 
-import { createAlgorithm, getAlgorithms } from "./algorithm";
-import { getAlgorithmVersions } from "./algorithmVersion";
+import { createAlgorithm, deleteAlgorithm, getAlgorithms, updateAlgorithm } from "./algorithm";
+import { createAlgorithmVersion, deleteAlgorithmVersion, getAlgorithmVersions, updateAlgorithmVersion }
+  from "./algorithmVersion";
 
 export const algorithm = router({
-  getAlgorithmVersions,
   getAlgorithms,
   createAlgorithm,
+  updateAlgorithm,
+  deleteAlgorithm,
+  getAlgorithmVersions,
+  createAlgorithmVersion,
+  updateAlgorithmVersion,
+  deleteAlgorithmVersion,
 });

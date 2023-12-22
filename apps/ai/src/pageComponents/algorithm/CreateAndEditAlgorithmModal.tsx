@@ -12,13 +12,16 @@
 
 import { App, Form, Input, Modal, Select } from "antd";
 import React from "react";
+import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AlgorithmTypeText } from "src/models/Algorithm";
+import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   refetch?: () => void;
+  clusterId?: string;
   algorithmName?: string;
   algorithmFramework?: string;
   algorithmDescription?: string;
@@ -29,12 +32,12 @@ type AlgorithmType = keyof typeof AlgorithmTypeText;
 interface FormFields {
   name: string,
   type: AlgorithmType,
-  clusterId: string,
+  cluster: Cluster,
   description?: string,
 }
 
 export const CreateAndEditAlgorithmModal: React.FC<Props> = (
-  { open, onClose, refetch, algorithmName, algorithmFramework, algorithmDescription },
+  { open, onClose, refetch, clusterId, algorithmName, algorithmFramework, algorithmDescription },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -51,20 +54,34 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
       message.error("添加算法失败");
       // if (e.data?.code === "USER_NOT_FOUND") {
       //   message.error("用户未找到");
-      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
-      //   message.error("账户未找到");
-      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
-      //   message.error("该用户已经在账户内，无法重复添加");
-      // } else {
-      //   message.error(e.message);
-      // }
+    } });
+
+  const updateAlgorithmMutation = trpc.algorithm.updateAlgorithm.useMutation({
+    onSuccess() {
+      message.success("修改算法成功");
+      refetch && refetch();
+      onClose();
+    },
+    onError(e) {
+      console.log(e);
+      message.error("修改算法失败");
+      // if (e.data?.code === "USER_NOT_FOUND") {
+      //   message.error("用户未找到");
     } });
 
   const onOk = async () => {
-    const { name, type, description, clusterId } = await form.validateFields();
-    createAlgorithmMutation.mutate({
-      name, framework:type, description, clusterId,
-    });
+    const { name, type, description, cluster } = await form.validateFields();
+
+    if (algorithmName) {
+      updateAlgorithmMutation.mutate({
+        name:algorithmName, framework:type, description,
+      });
+    } else {
+      createAlgorithmMutation.mutate({
+        name, framework:type, description, clusterId:cluster.id,
+      });
+    }
+
   };
 
 
@@ -86,24 +103,24 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
           label="名称"
           name="name"
           rules={[
-            { required: true },
+            { required: !clusterId },
           ]}
         >
           {algorithmName ?? <Input allowClear />}
         </Form.Item>
-        <Form.Item
-          label="集群"
-          name="clusterId"
-          rules={[
-            { required: true },
-          ]}
-        >
-          <Select
-            style={{ minWidth: "120px" }}
-            options={[{ label:"集群1", value:"1" }, { label:"集群2", value:"2" }]}
+        {clusterId ? undefined : (
+          <Form.Item
+            label="集群"
+            name="cluster"
+            rules={[
+              { required: true },
+            ]}
+            {...clusterId ? { initialValue:clusterId } : undefined}
           >
-          </Select>
-        </Form.Item>
+            <SingleClusterSelector />
+          </Form.Item>
+        )}
+
         <Form.Item
           label="算法框架"
           name="type"

@@ -36,8 +36,8 @@ export const VersionListModal: React.FC<Props> = (
 
   const router = useRouter();
 
-  const { data, isFetching, error } = trpc.algorithm.getAlgorithmVersions.useQuery({ id:algorithmId }, {
-  });
+  const { data, isFetching, refetch, error } =
+  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId:algorithmId });
 
   if (error) {
     message.error("找不到对应的算法版本");
@@ -79,16 +79,17 @@ export const VersionListModal: React.FC<Props> = (
       onCancel={onClose}
       centered
       width={1000}
+      destroyOnClose
     >
       <Table
         rowKey="id"
-        dataSource={data?.versions}
+        dataSource={data?.items}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
         columns={[
-          { dataIndex: "name", title: "版本名称" },
-          { dataIndex: "description", title: "版本描述" },
+          { dataIndex: "versionName", title: "版本名称" },
+          { dataIndex: "versionDescription", title: "版本描述" },
           { dataIndex: "createTime", title: "创建时间" },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },

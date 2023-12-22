@@ -11,6 +11,8 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import { Algorithm } from "src/server/entities/Algorithm";
+import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
@@ -42,70 +44,115 @@ export const getAlgorithmVersions = procedure
     openapi: {
       method: "GET",
       path: "/algorithmVersions/list/{id}",
-      tags: ["algorithmVersions"],
+      tags: ["algorithmVersion"],
       summary: "get algorithmVersions",
     },
   })
   .input(z.object({
-    id: z.number(),
+    algorithmId: z.number(),
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
-  .output(z.object({ versions: z.array(z.any()), count: z.number() }))
-  .query(async ({ input }) => {
-    // const orm = await getORM();
-    // const [items, count] = await orm.em.findAndCount(DatasetVersion, {}, {
-    //   limit: input.limit || 10, // Default limit
-    //   offset: input.pageSize || 0, // Default offset
-    //   orderBy: { createTime: "desc" },
-    // });
+  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .query(async ({ input:{ algorithmId, page, pageSize } }) => {
+    const orm = await getORM();
+    const [items, count] = await orm.em.findAndCount(AlgorithmVersion, { algorithm: algorithmId }, {
+      populate: ["algorithm"],
+      ...page ?
+        {
+          offset: (page - 1) * (pageSize || 10),
+          limit: pageSize || 10,
+        } : {},
+      orderBy: { createTime: "desc" },
+    });
 
-    // return { items, count };
-    return {
-      versions:mockAlgorithmVersions,
-      count:2,
-    };
+    return { items, count };
+    // return {
+    //   versions:mockAlgorithmVersions,
+    //   count:2,
+    // };
   });
 
 
-// export const createDatasetVersion = procedure
-//   .meta({
-//     openapi: {
-//       method: "POST",
-//       path: "/datasetVersion/create",
-//       tags: ["datasetVersion"],
-//       summary: "Create a new datasetVersion",
-//     },
-//   })
-//   .input(z.object({
-//     versionName: z.string(),
-//     path: z.string(),
-//     versionDescription: z.string().optional(),
-//     datasetId: z.number(),
-//   }))
-//   .output(z.object({ id: z.number() }))
-//   .mutation(async ({ input }) => {
-//     const orm = await getORM();
-//     // const datasetVersion = new DatasetVersion(input);
-//     // await orm.em.persistAndFlush(datasetVersion);
-//     return { id : 1 };
-//   });
 
-// export const deleteDatasetVersion = procedure
-//   .meta({
-//     openapi: {
-//       method: "DELETE",
-//       path: "/datasetVersion/delete/{id}",
-//       tags: ["datasetVersion"],
-//       summary: "delete a new datasetVersion",
-//     },
-//   })
-//   .input(z.object({ id: z.number() }))
-//   .output(z.object({ successd: z.boolean() }))
-//   .mutation(async ({ input }) => {
-//     const orm = await getORM();
-//     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
-//     if (!datasetVersion) throw new Error("DatasetVersion not found");
-//     await orm.em.removeAndFlush(datasetVersion);
-//     return { successd: true };
-//   });
+export const createAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/algorithmVersion/create",
+      tags: ["algorithmVersion"],
+      summary: "Create a new algorithmVersion",
+    },
+  })
+  .input(z.object({
+    versionName: z.string(),
+    path: z.string(),
+    versionDescription: z.string().optional(),
+    algorithmId: z.number(),
+  }))
+  .output(z.object({ id: z.number() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const { em } = await getORM();
+    const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
+    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: "Algorithm not Found" });
+
+    if (algorithm && algorithm.owner !== user?.identityId)
+      throw new TRPCError({ code: "CONFLICT", message: "Algorithm is belonged to the other user" });
+
+    const algorithmVersion = new AlgorithmVersion({ ...input, algorithm: algorithm });
+    await em.persistAndFlush(algorithmVersion);
+    return { id: algorithmVersion.id };
+  });
+
+export const updateAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/algorithmVersion/update/{id}",
+      tags: ["algorithmVersion"],
+      summary: "update a algorithmVersion",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    versionName: z.string(),
+    path: z.string(),
+    versionDescription: z.string().optional(),
+    algorithmId: z.number(),
+  }))
+  .output(z.object({ id: z.number() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+
+    const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
+    if (!algorithm) throw new Error("Algorithm not found");
+
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.id });
+    if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+
+    algorithmVersion.versionName = input.versionName;
+    algorithmVersion.path = input.path;
+    algorithmVersion.versionDescription = input.versionDescription;
+
+    await orm.em.flush();
+    return { id: algorithmVersion.id };
+  });
+
+export const deleteAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "DELETE",
+      path: "/algorithmVersion/delete/{id}",
+      tags: ["algorithmVersion"],
+      summary: "delete a new algorithmVersion",
+    },
+  })
+  .input(z.object({ id: z.number() }))
+  .mutation(async ({ input }) => {
+    const orm = await getORM();
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.id });
+    if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+    await orm.em.removeAndFlush(algorithmVersion);
+    return;
+  });
+
