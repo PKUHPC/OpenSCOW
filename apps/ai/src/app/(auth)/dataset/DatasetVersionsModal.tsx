@@ -23,12 +23,13 @@ import { CreateEditDVersionModal } from "./CreateEditDVersionModal";
 export interface Props {
   open: boolean;
   onClose: () => void;
+  onRefetch: () => void;
   datasetId: number;
   datasetName: string;
 }
 
 export const DatasetVersionsModal: React.FC<Props> = (
-  { open, onClose, datasetId, datasetName },
+  { open, onClose, onRefetch, datasetId, datasetName },
 ) => {
   const { modal, message } = App.useApp();
   const CreateAndEditVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
@@ -62,7 +63,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={`版本列表:${datasetName}`}
+      title={`版本列表: ${datasetName}`}
       open={open}
       onCancel={onClose}
       centered
@@ -75,8 +76,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
         pagination={false}
         scroll={{ y:275 }}
         columns={[
-          { dataIndex: "name", title: "版本名称" },
-          { dataIndex: "description", title: "版本描述" },
+          { dataIndex: "versionName", title: "版本名称" },
+          { dataIndex: "versionDescription", title: "版本描述" },
           { dataIndex: "path", title: "路径" },
           { dataIndex: "createTime", title: "创建时间" },
           { dataIndex: "action", title: "操作",
@@ -91,6 +92,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
                       datasetName={datasetName}
                       isEdit={true}
                       editData={r}
+                      refetch={refetch}
                     >
                     编辑
                     </CreateAndEditVersionModalButton>

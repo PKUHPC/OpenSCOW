@@ -26,6 +26,7 @@ const mockDatasets = [
     description: "test",
     createTime: "2023-04-15 12:30:45",
     versions: [100, 101],
+    clusterId: "hpc01",
   },
   {
     id: 101,
@@ -37,8 +38,22 @@ const mockDatasets = [
     description: "test",
     createTime: "2023-04-15 12:30:45",
     versions: [],
+    clusterId: "hpc01",
   },
 ];
+
+// export const datasetListSchema = z.object({
+//   id: z.number(),
+//   name: z.string(),
+//   owner: z.string(),
+//   type: z.string(),
+//   isShared: z.boolean(),
+//   scene: z.string(),
+//   description: z.string().optional(),
+//   // createTime: z.,
+//   // versions: [],
+//   // clusterId: "hpc01",
+// });
 
 export const list = procedure
   .meta({
@@ -56,6 +71,7 @@ export const list = procedure
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
     isShared: z.boolean().optional(),
+    clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
@@ -77,7 +93,9 @@ export const list = procedure
       $and: [
         nameOrDescQuery,
         isPublicQuery,
-        { type: input.type || { $ne: null } },
+        { type: input.type || { $ne: null },
+          clusterId: input.clusterId,
+        },
       ],
     }, {
       limit: input.pageSize || undefined,
@@ -103,11 +121,15 @@ export const createDataset = procedure
     name: z.string(),
     type: z.string(),
     scene: z.string(),
+    clusterId: z.string(),
     description: z.string().optional(),
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
+
+    // TODO: 判断集群是否可以连接？
+
     const dataset = new Dataset({ ...input, owner: user!.identityId });
     await orm.em.persistAndFlush(dataset);
     return dataset.id;
@@ -124,6 +146,7 @@ export const updateDataset = procedure
   })
   .input(z.object({
     id: z.number(),
+    clusterId: z.string(),
     name: z.string(),
     type: z.string(),
     scene: z.string(),
@@ -134,7 +157,14 @@ export const updateDataset = procedure
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
     if (!dataset) throw new Error("Dataset not found");
-    await orm.em.persistAndFlush(input);
+
+    // TODO: 判断集群是否可以连接？
+    dataset.name = input.name;
+    dataset.type = input.type;
+    dataset.scene = input.scene;
+    dataset.description = input.description;
+
+    await orm.em.flush();
     return dataset.id;
   });
 

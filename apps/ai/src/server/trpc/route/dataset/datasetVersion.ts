@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TRPCError } from "@trpc/server";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -38,8 +39,6 @@ const mockDatasetVersions = [
     dataset: 100,
   },
 ];
-
-
 
 export const versionList = procedure
   .meta({
@@ -90,8 +89,11 @@ export const createDatasetVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
-    if (!dataset) throw new Error("DatasetVersion not found");
-    if (dataset && dataset.owner !== user?.identityId) throw new Error("DatasetVersion not accessible");
+    if (!dataset) throw new TRPCError({ code: "NOT_FOUND", message: "Dataset not Found" });
+
+    if (dataset && dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "NOT_FOUND", message: "DatasetVersion not Found" });
+
     const datasetVersion = new DatasetVersion({ ...input, dataset: dataset });
     await orm.em.persistAndFlush(datasetVersion);
     return { id: datasetVersion.id };
@@ -116,9 +118,18 @@ export const updateDatasetVersion = procedure
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
+
+    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
+    if (!dataset) throw new Error("Dataset not found");
+
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
     if (!datasetVersion) throw new Error("DatasetVersion not found");
-    await orm.em.persistAndFlush(input);
+
+    datasetVersion.versionName = input.versionName;
+    datasetVersion.path = input.path;
+    datasetVersion.versionDescription = input.versionDescription;
+
+    await orm.em.flush();
     return { id: datasetVersion.id };
   });
 
@@ -132,11 +143,11 @@ export const deleteDatasetVersion = procedure
     },
   })
   .input(z.object({ id: z.number() }))
-  .output(z.object({ successd: z.boolean() }))
+  .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
     if (!datasetVersion) throw new Error("DatasetVersion not found");
     await orm.em.removeAndFlush(datasetVersion);
-    return { successd: true };
+    return { success: true };
   });

@@ -10,21 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-
-import { usePublicConfig } from "src/app/(auth)/context";
-import { PageTitle } from "src/components/PageTitle";
-
-import { DatasetListTable } from "../DatasetListTable";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-
-  const { publicConfig } = usePublicConfig();
-
-  return (
-    <div>
-      <PageTitle titleText="我的数据集" />
-      <DatasetListTable isPublic={false} clusters={publicConfig.CLUSTERS} />
-    </div>
-  );
+  redirect("/image/private");
 }

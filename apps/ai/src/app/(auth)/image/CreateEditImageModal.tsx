@@ -40,7 +40,7 @@ interface FormFields {
   description?: string,
 }
 
-export const CreateEditDatasetModal: React.FC<Props> = (
+export const CreateEditImageModal: React.FC<Props> = (
   { open, onClose, refetch, isEdit, editData, clusters },
 ) => {
   const [form] = Form.useForm<FormFields>();

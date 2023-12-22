@@ -30,6 +30,7 @@ export const list = procedure
     owner: z.string().optional(),
     nameOrTagOrDesc: z.string().optional(),
     isShared: z.boolean().optional(),
+    clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(z.any()), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
@@ -52,6 +53,7 @@ export const list = procedure
       $and: [
         nameOrTagOrDescQuery,
         isPublicQuery,
+        { clusterId: input.clusterId },
       ],
     }, {
       limit: input.pageSize || undefined,
@@ -73,21 +75,21 @@ export const updateImage = procedure
   })
   .input(z.object({
     id: z.number(),
-    updates: z.object({
-      name: z.string(),
-      tags: z.string(),
-      description: z.string(),
-    }),
+    name: z.string(),
+    tags: z.string(),
+    description: z.string(),
   }))
   .output(z.number())
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
     if (!image) throw new Error("Image not found");
-    if (input.updates) {
-      Object.assign(image, input.updates);
-    }
-    await orm.em.persistAndFlush(image);
+
+    image.name = input.name;
+    image.tags = input.tags;
+    image.description = input.description;
+
+    await orm.em.flush();
     return image.id;
   });
 
@@ -126,10 +128,14 @@ export const createImage = procedure
     description: z.string(),
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
     path: z.string(),
+    clusterId: z.string(),
   }))
   .output(z.number())
   .mutation(async ({ input }) => {
     const orm = await getORM();
+
+    // TODO 集群判断
+
     const image = new Image(input);
     await orm.em.persistAndFlush(image);
     return image.id;

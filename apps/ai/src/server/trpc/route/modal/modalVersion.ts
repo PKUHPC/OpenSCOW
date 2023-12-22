@@ -12,8 +12,8 @@
 
 import { TRPCError } from "@trpc/server";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
-import { getORM } from "src/server/lib/db/orm";
 import { procedure } from "src/server/trpc/procedure/base";
+import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
 const mockAlgorithmVersions = [

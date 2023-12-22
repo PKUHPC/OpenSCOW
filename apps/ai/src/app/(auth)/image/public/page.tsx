@@ -12,10 +12,10 @@
 
 "use client";
 
-import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
 
-import { DatasetListTable } from "../DatasetListTable";
+import { usePublicConfig } from "../../context";
+import { ImageListTable } from "../ImageListTable";
 
 export default function Page() {
 
@@ -23,8 +23,8 @@ export default function Page() {
 
   return (
     <div>
-      <PageTitle titleText="我的数据集" />
-      <DatasetListTable isPublic={false} clusters={publicConfig.CLUSTERS} />
+      <PageTitle titleText="公共镜像" />
+      <ImageListTable isPublic={true} clusters={publicConfig.CLUSTERS} />
     </div>
   );
 }

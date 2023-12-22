@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TRPCClientError } from "@trpc/client";
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetVersionInterface } from "src/models/Dateset";
+import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
@@ -23,6 +25,7 @@ export interface Props {
   datasetName: string;
   isEdit?: boolean;
   editData?: Partial<DatasetVersionInterface>
+  refetch: () => void;
 }
 
 interface FormFields {
@@ -32,8 +35,9 @@ interface FormFields {
 }
 
 export const CreateEditDVersionModal: React.FC<Props> = (
-  { open, onClose, datasetId, datasetName, isEdit, editData },
+  { open, onClose, datasetId, datasetName, isEdit, editData, refetch },
 ) => {
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
@@ -41,39 +45,25 @@ export const CreateEditDVersionModal: React.FC<Props> = (
     onSuccess() {
       message.success("创建新版本成功");
       onClose();
+      form.resetFields();
+      refetch();
     },
-    onError(e) {
-      console.log(e);
+    onError() {
       message.error("创建新版本失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
-      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
-      //   message.error("账户未找到");
-      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
-      //   message.error("该用户已经在账户内，无法重复添加");
-      // } else {
-      //   message.error(e.message);
-      // }
     },
   });
 
   const editMutation = trpc.dataset.updateDatasetVersion.useMutation({
     onSuccess() {
-      message.success("创建新版本成功");
+      message.success("编辑版本成功");
       onClose();
+      refetch();
     },
-    onError(e: any) {
-      console.log(e);
-      message.error("创建新版本失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
-      // } else if (e.data?.code === "ACCOUNT_NOT_FOUND") {
-      //   message.error("账户未找到");
-      // } else if (e.data?.code === "UNPROCESSABLE_CONTENT") {
-      //   message.error("该用户已经在账户内，无法重复添加");
-      // } else {
-      //   message.error(e.message);
-      // }
+    onError(e) {
+      const { data } = e as TRPCClientError<AppRouter>;
+      if (data?.code === "NOT_FOUND") {
+        message.error("编辑版本失败");
+      }
     },
   });
 
@@ -85,7 +75,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
       versionName,
       versionDescription,
       path,
-      datasetId,
+      datasetId: editData.dataset.id,
     })
       : createMutation.mutate({
         versionName,
@@ -95,10 +85,9 @@ export const CreateEditDVersionModal: React.FC<Props> = (
       });
   };
 
-
   return (
     <Modal
-      title={isEdit ? "编辑新版本" : "创建新版本"}
+      title={isEdit ? "编辑版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
       confirmLoading={createMutation.isLoading || editMutation.isLoading}
@@ -109,6 +98,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
         onFinish={onOk}
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
+        initialValues={editData}
       >
         <Form.Item
           label="数据集名称"
@@ -127,21 +117,10 @@ export const CreateEditDVersionModal: React.FC<Props> = (
         <Form.Item label="版本描述" name="versionDescription">
           <Input.TextArea />
         </Form.Item>
-        {/* <Form.Item label="数据文件夹" name="path">
-          <Select
-            style={{ minWidth: "100px" }}
-          >
-            {Object.entries(DatasetTypeText).map(([key, value]) => (
-              <Select.Option key={key} value={key}>
-                {value}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item> */}
         <Form.Item
           label="数据文件夹"
           name="path"
-          // rules={[{ required: true }]}
+          rules={[{ required: true }]}
         >
           <Input
             suffix={
