@@ -9,7 +9,7 @@ title: UI扩展
 
 下图为一个UI扩展演示。演示中的UI扩展增加了一个顶级导航项，并在下面增加了两个二级导航项。
 
-- 第一个二级导航项显示了一个登录界面，其获取了SCOW的登录用户，并与SCOW的国际化和黑暗模式相同步。此导航项的图标也是由UI扩展自己提供。
+- 第一个二级导航项显示了一个登录界面，其获取了SCOW的登录用户的token，并与SCOW的国际化和黑暗模式相同步。此导航项的图标也是由UI扩展自己提供。
 - 第二个二级导航项是一个至[GitHub](http://github.com)的链接
 
 ![UI扩展演示](./extension.gif)
@@ -106,19 +106,18 @@ SCOW将会在body中传入默认情况下SCOW将会显示的导航项。下表�
 
 ## 配置SCOW使用UI扩展
 
-当您的扩展页开发并部署完成时，请在`config/portal.yaml`和/或`config/mis.yaml`中增加以下内容，以开启SCOW UI扩展。
+当您的扩展站开发并部署完成后，请在`config/portal.yaml`和/或`config/mis.yaml`中增加以下内容，以开启SCOW UI扩展。
 
 ```yaml title="config/{portal,mis}.yaml"
-
 uiExtension:
   # 您的UI扩展页部署URL
   url: http://localhost:16566/basepath
-
 ```
 
 ## 实现注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
 - 如果您的扩展站和SCOW部署地址非同源，请注意使得您的扩展站的所有路径均支持CORS访问。
+    - Next.js项目可以参考[示例项目中的`src/middleware.ts`](https://github.com/PKUHPC/scow-ui-extension-demo/blob/main/src/middleware.ts)
 
 
