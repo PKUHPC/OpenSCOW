@@ -121,6 +121,11 @@ export const MisConfigSchema = Type.Object({
   customChargeTypes: Type.Optional(Type.Array(
     Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
+
+  uiExtension: Type.Optional(Type.Object({
+    url: Type.String({ description: "UI扩展站完整URL" }),
+  })),
+
 });
 
 const MIS_CONFIG_NAME = "mis";

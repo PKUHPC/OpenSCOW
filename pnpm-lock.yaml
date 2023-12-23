@@ -1192,6 +1192,9 @@ importers:
       nookies:
         specifier: 2.5.2
         version: 2.5.2
+      react-async:
+        specifier: 10.0.1
+        version: 10.0.1(react@18.2.0)
       zod:
         specifier: 3.22.4
         version: 3.22.4
