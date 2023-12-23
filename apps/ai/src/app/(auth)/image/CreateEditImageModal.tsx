@@ -17,7 +17,7 @@ import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetInterface } from "src/models/Dateset";
-import { Source, SourceText } from "src/models/Image";
+import { ImageInterface, Source, SourceText } from "src/models/Image";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
@@ -29,7 +29,7 @@ export interface Props {
   onClose: () => void;
   refetch: () => void;
   isEdit: boolean;
-  editData?: Partial<DatasetInterface>;
+  editData?: ImageInterface;
   clusters: Cluster[];
 }
 
@@ -116,6 +116,7 @@ export const CreateEditImageModal: React.FC<Props> = (
       onOk={form.submit}
       confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
       onCancel={onClose}
+      width={800}
     >
       <Form
         form={form}
@@ -127,22 +128,22 @@ export const CreateEditImageModal: React.FC<Props> = (
         {isEdit && editData ? (
           <>
             <Form.Item
-              label="名称"
+              label="镜像名称"
             >
               {editData.name}
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               label="集群"
             >
               {getI18nConfigCurrentText(
                 clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
               ?? editData.clusterId }
-            </Form.Item>
+            </Form.Item> */}
           </>
         ) : (
           <>
             <Form.Item
-              label="名称"
+              label="镜像名称"
               name="name"
               rules={[
                 { required: true },

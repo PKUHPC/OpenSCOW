@@ -27,7 +27,7 @@ export interface Props {
   onClose: () => void;
   refetch: () => void;
   isEdit: boolean;
-  editData?: Partial<DatasetInterface>;
+  editData?: DatasetInterface;
   clusters: Cluster[];
 }
 
@@ -35,8 +35,8 @@ interface FormFields {
   id?: number | undefined,
   name: string,
   cluster: Cluster,
-  type: DatasetType,
-  scene: SceneType,
+  type: string,
+  scene: string,
   description?: string,
 }
 
@@ -93,7 +93,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
   const onOk = async () => {
     form.validateFields();
     const { name, type, description, scene, cluster } = await form.validateFields();
-    isEdit && editData ? editMutation.mutate({
+    (isEdit && editData) ? editMutation.mutate({
       id: editData.id,
       clusterId: editData.clusterId,
       name,
@@ -117,6 +117,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
       onOk={form.submit}
       confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
       onCancel={onClose}
+      width={800}
     >
       <Form
         form={form}
@@ -126,7 +127,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
         <Form.Item
-          label="名称"
+          label="数据集名称"
           name="name"
           rules={[
             { required: true },
@@ -135,13 +136,14 @@ export const CreateEditDatasetModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         {isEdit && editData ? (
-          <Form.Item
-            label="集群"
-          >
-            {getI18nConfigCurrentText(
-              clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
-              ?? editData.clusterId }
-          </Form.Item>
+          // <Form.Item
+          //   label="集群"
+          // >
+          //   {getI18nConfigCurrentText(
+          //     clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+          //     ?? editData.clusterId }
+          // </Form.Item>
+          <></>
         ) : (
           <Form.Item
             label="集群"

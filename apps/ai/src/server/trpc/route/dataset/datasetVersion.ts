@@ -17,28 +17,42 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
-const mockDatasetVersions = [
-  {
-    id: 100,
-    versionName: "version1",
-    owner: "demo_admin",
-    isShared: "true",
-    versionDescription: "test1",
-    path: "/",
-    createTime: "2023-04-15 12:30:45",
-    dataset: 100,
-  },
-  {
-    id: 101,
-    versionName: "version2",
-    owner: "demo_admin",
-    isShared: "true",
-    versionDescription: "test2",
-    path: "/",
-    createTime: "2023-04-15 12:30:45",
-    dataset: 100,
-  },
-];
+// const mockDatasetVersions = [
+//   {
+//     id: 100,
+//     versionName: "version1",
+//     owner: "demo_admin",
+//     isShared: "true",
+//     versionDescription: "test1",
+//     path: "/",
+//     createTime: "2023-04-15 12:30:45",
+//     dataset: 100,
+//   },
+//   {
+//     id: 101,
+//     versionName: "version2",
+//     owner: "demo_admin",
+//     isShared: "true",
+//     versionDescription: "test2",
+//     path: "/",
+//     createTime: "2023-04-15 12:30:45",
+//     dataset: 100,
+//   },
+// ];
+
+export const VersionListSchema = z.object({
+  id: z.number(),
+  versionName: z.string(),
+  isShared: z.boolean(),
+  versionDescription: z.string().optional(),
+  path: z.string(),
+  sharedPath: z.string().optional(),
+  createTime: z.string(),
+  datasetId: z.number(),
+  // datasetName: z.string(),
+  // datasetOwner: z.string(),
+  // clusterId: z.string(),
+});
 
 export const versionList = procedure
   .meta({
@@ -54,21 +68,29 @@ export const versionList = procedure
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
-  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .output(z.object({ items: z.array(VersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
 
     const [items, count] = await orm.em.findAndCount(DatasetVersion, { dataset: input.datasetId }, {
-      populate: ["dataset"],
       limit: input.page,
       offset: input.pageSize,
       orderBy: { createTime: "desc" },
     });
 
-    return { items, count };
+    return { items: items.map((x) => {
+      return {
+        id: x.id,
+        versionName: x.versionName,
+        versionDescription: x.versionDescription,
+        path: x.path,
+        sharedPath: x.sharedPath,
+        isShared: Boolean(x.isShared),
+        createTime: x.createTime ? x.createTime.toISOString() : "",
+        datasetId: x.dataset.id,
+      }; }), count };
     // return { items: mockDatasetVersions, count: 2 };
   });
-
 
 export const createDatasetVersion = procedure
   .meta({

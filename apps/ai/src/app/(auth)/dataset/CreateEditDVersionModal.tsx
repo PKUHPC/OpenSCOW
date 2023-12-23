@@ -24,7 +24,7 @@ export interface Props {
   datasetId: number;
   datasetName: string;
   isEdit?: boolean;
-  editData?: Partial<DatasetVersionInterface>
+  editData?: DatasetVersionInterface
   refetch: () => void;
 }
 
@@ -75,7 +75,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
       versionName,
       versionDescription,
       path,
-      datasetId: editData.dataset.id,
+      datasetId: editData.datasetId,
     })
       : createMutation.mutate({
         versionName,
@@ -92,6 +92,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
       onOk={form.submit}
       confirmLoading={createMutation.isLoading || editMutation.isLoading}
       onCancel={onClose}
+      width={800}
     >
       <Form
         form={form}

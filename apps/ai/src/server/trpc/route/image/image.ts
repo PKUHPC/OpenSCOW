@@ -16,6 +16,20 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
+export const ImageListSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  owner: z.string(),
+  source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
+  tags: z.string(),
+  description: z.string().optional(),
+  path: z.string(),
+  sharedPath: z.string().optional(),
+  isShared: z.boolean(),
+  clusterId: z.string(),
+  createTime: z.string(),
+});
+
 export const list = procedure
   .meta({
     openapi: {
@@ -32,7 +46,7 @@ export const list = procedure
     isShared: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
-  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .output(z.object({ items: z.array(ImageListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
@@ -61,7 +75,20 @@ export const list = procedure
       orderBy: { createTime: "desc" },
     });
 
-    return { items, count };
+    return { items: items.map((x) => {
+      return {
+        id: x.id,
+        name: x.name,
+        owner: x.owner,
+        source: x.source,
+        tags: x.tags,
+        description: x.description,
+        path: x.path,
+        sharedPath: x.sharedPath,
+        isShared: Boolean(x.isShared),
+        clusterId: x.clusterId,
+        createTime: x.createTime ? x.createTime.toISOString() : "",
+      }; }), count };
   });
 
 export const createImage = procedure
@@ -92,6 +119,8 @@ export const createImage = procedure
         message: `Image's name ${input.name} already exist`,
       });
     };
+
+    // TODO 上传镜像
 
     const image = new Image({ ...input, owner: user!.identityId });
     await orm.em.persistAndFlush(image);

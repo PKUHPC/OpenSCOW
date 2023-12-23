@@ -10,6 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { inferRouterOutputs } from "@trpc/server";
+import { AppRouter } from "src/server/trpc/router";
+
+export type ImageInterface = inferRouterOutputs<AppRouter>["image"]["list"]["items"][0];
+
 export const SourceText: { [key: string]: string } = {
   INTERNAL: "本地文件",
   EXTERNAL: "远程镜像",

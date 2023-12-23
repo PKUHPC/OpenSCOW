@@ -16,45 +16,45 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
-const mockDatasets = [
-  {
-    id: 100,
-    name: "aaa",
-    owner: "demo_admin",
-    type: "Image",
-    isShared: "true",
-    scene: "Text",
-    description: "test",
-    createTime: "2023-04-15 12:30:45",
-    versions: [100, 101],
-    clusterId: "hpc01",
-  },
-  {
-    id: 101,
-    name: "bbb",
-    owner: "demo_admin",
-    type: "Audio",
-    isShared: "false",
-    scene: "Text",
-    description: "test",
-    createTime: "2023-04-15 12:30:45",
-    versions: [],
-    clusterId: "hpc01",
-  },
-];
+// const mockDatasets = [
+//   {
+//     id: 100,
+//     name: "aaa",
+//     owner: "demo_admin",
+//     type: "Image",
+//     isShared: "true",
+//     scene: "Text",
+//     description: "test",
+//     createTime: "2023-04-15 12:30:45",
+//     versions: [100, 101],
+//     clusterId: "hpc01",
+//   },
+//   {
+//     id: 101,
+//     name: "bbb",
+//     owner: "demo_admin",
+//     type: "Audio",
+//     isShared: "false",
+//     scene: "Text",
+//     description: "test",
+//     createTime: "2023-04-15 12:30:45",
+//     versions: [],
+//     clusterId: "hpc01",
+//   },
+// ];
 
-// export const datasetListSchema = z.object({
-//   id: z.number(),
-//   name: z.string(),
-//   owner: z.string(),
-//   type: z.string(),
-//   isShared: z.boolean(),
-//   scene: z.string(),
-//   description: z.string().optional(),
-//   // createTime: z.,
-//   // versions: [],
-//   // clusterId: "hpc01",
-// });
+export const DatasetListSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  owner: z.string(),
+  type: z.string(),
+  isShared: z.boolean(),
+  scene: z.string(),
+  description: z.string().optional(),
+  clusterId: z.string(),
+  createTime: z.string(),
+  versionsCount: z.number(),
+});
 
 export const list = procedure
   .meta({
@@ -73,7 +73,7 @@ export const list = procedure
     isShared: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
-  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
@@ -104,7 +104,19 @@ export const list = procedure
       orderBy: { createTime: "desc" },
     });
 
-    return { items, count };
+    return { items: items.map((x) => {
+      return {
+        id: x.id,
+        name: x.name,
+        owner: x.owner,
+        type: x.type,
+        isShared: Boolean(x.isShared),
+        scene: x.scene,
+        description: x.description,
+        clusterId: x.clusterId,
+        createTime: x.createTime ? x.createTime.toISOString() : "",
+        versionsCount: x.versions.count(),
+      }; }), count };
   });
 
 

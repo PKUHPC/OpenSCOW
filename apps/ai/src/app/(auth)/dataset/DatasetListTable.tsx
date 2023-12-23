@@ -164,7 +164,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "scene", title: "应用场景",
             render: (_, r) => SceneTypeText[r.scene] },
           { dataIndex: "versions", title: "版本数量",
-            render: (_, r) => r.versions.length },
+            render: (_, r) => r.versionsCount },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间" },
