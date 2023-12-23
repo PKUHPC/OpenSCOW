@@ -38,6 +38,9 @@ export class ModalVersion {
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
 
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
+    updateTime?: Date;
+
   @Property()
     isShared: boolean;
 
@@ -53,6 +56,7 @@ export class ModalVersion {
       isShared: boolean;
       modal: Modal;
       createTime?: Date;
+      updateTime?: Date;
     }) {
 
     this.versionName = init.versionName;
@@ -65,6 +69,10 @@ export class ModalVersion {
 
     if (init.createTime) {
       this.createTime = init.createTime;
+    }
+
+    if (init.updateTime) {
+      this.updateTime = init.updateTime;
     }
   }
 }

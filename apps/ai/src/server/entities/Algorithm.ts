@@ -52,6 +52,9 @@ export class Algorithm {
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
 
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
+    updateTime?: Date;
+
   constructor(init: {
       name: string;
       owner: string;
@@ -60,6 +63,7 @@ export class Algorithm {
       description?: string;
       clusterId: string;
       createTime?: Date;
+      updateTime?: Date;
     }) {
 
     this.name = init.name;
@@ -71,6 +75,10 @@ export class Algorithm {
 
     if (init.createTime) {
       this.createTime = init.createTime;
+    }
+
+    if (init.updateTime) {
+      this.updateTime = init.updateTime;
     }
   }
 

@@ -76,6 +76,17 @@
           "length": 6,
           "default": "current_timestamp(6)",
           "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
         }
       },
       "name": "algorithm",
@@ -151,6 +162,17 @@
         },
         "create_time": {
           "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
           "type": "DATETIME(6)",
           "unsigned": false,
           "autoincrement": false,
@@ -300,6 +322,17 @@
           "length": 6,
           "default": "current_timestamp(6)",
           "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
         }
       },
       "name": "dataset",
@@ -375,6 +408,17 @@
         },
         "create_time": {
           "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
           "type": "DATETIME(6)",
           "unsigned": false,
           "autoincrement": false,
@@ -543,6 +587,17 @@
           "length": 6,
           "default": "current_timestamp(6)",
           "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
         }
       },
       "name": "image",
@@ -655,6 +710,17 @@
           "length": 6,
           "default": "current_timestamp(6)",
           "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
         }
       },
       "name": "modal",
@@ -739,6 +805,17 @@
         },
         "create_time": {
           "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "default": "current_timestamp(6)",
+          "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
           "type": "DATETIME(6)",
           "unsigned": false,
           "autoincrement": false,
