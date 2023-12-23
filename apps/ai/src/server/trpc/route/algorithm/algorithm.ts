@@ -12,7 +12,7 @@
 
 import { TRPCError } from "@trpc/server";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
-import { Dataset } from "src/server/entities/Dataset";
+import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
 import { getORM } from "src/server/utils/getOrm";
@@ -84,6 +84,7 @@ export const getAlgorithms = procedure
         createTime:x.createTime ? x.createTime.toISOString() : "",
         versions:3,
       }; }), count };
+
   });
 
 
@@ -144,6 +145,8 @@ export const deleteAlgorithm = procedure
         code: "NOT_FOUND",
       });
     }
-    await em.removeAndFlush(algorithm);
+    const algorithmVersions = await em.find(AlgorithmVersion, { algorithm });
+
+    await em.removeAndFlush([...algorithmVersions, algorithm]);
     return;
   });

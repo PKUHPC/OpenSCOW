@@ -43,7 +43,7 @@ export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/algorithmVersions/list/{id}",
+      path: "/algorithmVersions/list/{algorithmId}",
       tags: ["algorithmVersion"],
       summary: "get algorithmVersions",
     },
@@ -53,7 +53,14 @@ export const getAlgorithmVersions = procedure
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
-  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .output(z.object({ items: z.array(z.object({
+    id:z.number(),
+    versionName:z.string(),
+    versionDescription:z.string(),
+    path:z.string(),
+    isShared:z.boolean(),
+    createTime:z.string(),
+  })), count: z.number() }))
   .query(async ({ input:{ algorithmId, page, pageSize } }) => {
     const orm = await getORM();
     const [items, count] = await orm.em.findAndCount(AlgorithmVersion, { algorithm: algorithmId }, {
@@ -66,14 +73,17 @@ export const getAlgorithmVersions = procedure
       orderBy: { createTime: "desc" },
     });
 
-    return { items, count };
-    // return {
-    //   versions:mockAlgorithmVersions,
-    //   count:2,
-    // };
+    return { items:items.map((x) => {
+      return {
+        id:x.id,
+        versionName:x.versionName,
+        versionDescription:x.versionDescription ?? "",
+        isShared:x.isShared,
+        createTime:x.createTime ? x.createTime.toISOString() : "",
+        path:x.path,
+      };
+    }), count };
   });
-
-
 
 export const createAlgorithmVersion = procedure
   .meta({
@@ -99,6 +109,10 @@ export const createAlgorithmVersion = procedure
     if (algorithm && algorithm.owner !== user?.identityId)
       throw new TRPCError({ code: "CONFLICT", message: "Algorithm is belonged to the other user" });
 
+    const algorithmVersionExist = await em.findOne(AlgorithmVersion,
+      { versionName: input.versionName, algorithm });
+    if (algorithmVersionExist) throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
+
     const algorithmVersion = new AlgorithmVersion({ ...input, algorithm: algorithm });
     await em.persistAndFlush(algorithmVersion);
     return { id: algorithmVersion.id };
@@ -108,17 +122,17 @@ export const updateAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/algorithmVersion/update/{id}",
+      path: "/algorithmVersion/update/{versionId}",
       tags: ["algorithmVersion"],
       summary: "update a algorithmVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    algorithmId: z.number(),
+    versionId: z.number(),
     versionName: z.string(),
     path: z.string(),
     versionDescription: z.string().optional(),
-    algorithmId: z.number(),
   }))
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
@@ -127,8 +141,13 @@ export const updateAlgorithmVersion = procedure
     const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
     if (!algorithm) throw new Error("Algorithm not found");
 
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.id });
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.versionId });
     if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+
+    const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
+    if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
+      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
+    }
 
     algorithmVersion.versionName = input.versionName;
     algorithmVersion.path = input.path;
@@ -148,10 +167,12 @@ export const deleteAlgorithmVersion = procedure
     },
   })
   .input(z.object({ id: z.number() }))
+  .output(z.void())
   .mutation(async ({ input }) => {
     const orm = await getORM();
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.id });
     if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+
     await orm.em.removeAndFlush(algorithmVersion);
     return;
   });

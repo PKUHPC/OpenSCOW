@@ -19,9 +19,11 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   algorithmId: number;
-  algorithmName: string;
+  algorithmName: string | undefined;
   versionName?: string;
+  versionId?: number;
   versionDescription?: string;
+  refetch: () => void;
 }
 
 interface FormFields {
@@ -31,7 +33,7 @@ interface FormFields {
 }
 
 export const CreateAndEditVersionModal: React.FC<Props> = (
-  { open, onClose, algorithmId, algorithmName, versionName, versionDescription },
+  { open, onClose, algorithmId, algorithmName, versionName:versionNameProp, versionId, versionDescription, refetch },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -40,6 +42,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     onSuccess() {
       message.success("创建新版本成功");
       onClose();
+      refetch();
     },
     onError(e) {
       console.log(e);
@@ -49,20 +52,47 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     },
   });
 
+
+  const updateAlgorithmVersionMutation = trpc.algorithm.updateAlgorithmVersion.useMutation({
+    onSuccess() {
+      message.success("修改版本成功");
+      onClose();
+      refetch();
+    },
+    onError(e) {
+      console.log(e);
+      message.error("修改版本失败");
+      // if (e.data?.code === "USER_NOT_FOUND") {
+      //   message.error("用户未找到");
+    },
+  });
+
   const onOk = async () => {
     form.validateFields();
     const { versionName, versionDescription, path } = await form.validateFields();
-    createAlgorithmVersionMutation.mutate({
-      versionName,
-      versionDescription,
-      path:"123",
-      algorithmId,
-    });
+    if (versionNameProp && versionId) {
+      updateAlgorithmVersionMutation.mutate({
+        versionId,
+        versionName,
+        versionDescription,
+        path:"123",
+        algorithmId,
+      });
+    }
+    else {
+      createAlgorithmVersionMutation.mutate({
+        versionName,
+        versionDescription,
+        path:"123",
+        algorithmId,
+      });
+    }
+
   };
 
   return (
     <Modal
-      title={versionName ? "编辑版本" : "创建新版本"}
+      title={versionNameProp ? "编辑版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
       confirmLoading={createAlgorithmVersionMutation.isLoading}
@@ -86,7 +116,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
           rules={[
             { required: true },
           ]}
-          initialValue={versionName}
+          initialValue={versionNameProp}
         >
           <Input allowClear />
         </Form.Item>
@@ -94,7 +124,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
           <Input.TextArea />
         </Form.Item>
         {
-          !versionName ? (
+          !versionNameProp ? (
             <Form.Item
               label="上传文件"
               name="path"

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import { PageTitle } from "src/components/pageTitle";
 import { ModalTable } from "src/pageComponents/modal/ModalTable";
 

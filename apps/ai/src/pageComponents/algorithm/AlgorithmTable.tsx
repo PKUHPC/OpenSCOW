@@ -68,10 +68,8 @@ ModalButton(CreateAndEditAlgorithmModal, { type: "primary", icon: <PlusOutlined 
 const EditAlgorithmModalButton =
 ModalButton(CreateAndEditAlgorithmModal, { type: "link" });
 const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
-const VersionListModalButton = ModalButton(VersionListModal, { type: "link" });
 
 export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
-
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const { message } = App.useApp();
 
@@ -86,16 +84,28 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
+  const [algorithmId, setAlgorithmId] = useState(0);
+  const [algorithmName, setAlgorithmName] = useState<undefined | string>(undefined);
+  const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
+
   const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
     { ...pageInfo,
       framework:query.framework === "ALL" ? undefined : query.framework,
       nameOrDesc:query.nameOrDesc,
       clusterId:query.clusterId,
     });
-
   if (error) {
     message.error("找不到算法");
   }
+
+  const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
+  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId:algorithmId }, {
+    enabled:!!algorithmId,
+  });
+  if (versionError) {
+    message.error("找不到算法版本");
+  }
+
 
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
     onSuccess() {
@@ -144,17 +154,21 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
           (
             <>
               <CreateAndEditVersionModalButton
+                refetch={versionRefetch}
                 algorithmId={r.id}
                 algorithmName={r.name}
               >
                 创建新版本
               </CreateAndEditVersionModalButton>
-              <VersionListModalButton
-                algorithmId={r.id}
-                algorithmName={r.name}
-              >
-                版本列表
-              </VersionListModalButton>
+              <div style={{ display:"inline-block" }} onClick={() => { setAlgorithmId(r.id); console.log(r.id); }}>
+                <Button
+                  type="link"
+                  onClick={() =>
+                  { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
+                >
+                  版本列表
+                </Button>
+              </div>
               <EditAlgorithmModalButton
                 refetch={refetch}
                 clusterId={r.clusterId}
@@ -175,13 +189,13 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
             </>
           ) :
           (
-            <VersionListModalButton
-              algorithmId={r.id}
-              algorithmName={r.name}
-              isPublic
+            <Button
+              type="link"
+              onClick={() =>
+              { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
             >
               版本列表
-            </VersionListModalButton>
+            </Button>
           );
       },
     },
@@ -252,6 +266,16 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
         scroll={{ x: true }}
+      />
+      <VersionListModal
+        open={versionListModalIsOpen}
+        onClose={() => { setVersionListModalIsOpen(false); }}
+        isPublic={isPublic}
+        algorithmName={algorithmName}
+        algorithmId={algorithmId}
+        algorithmVersionData={versionData?.items ?? []}
+        isFetching={versionFetching}
+        refetch={versionRefetch}
       />
       {/* antd中modal组件 */}
       {confirmModalHolder}
