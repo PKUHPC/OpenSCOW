@@ -233,6 +233,7 @@ export default {
         saveFileFail: "文件保存失败: {}",
         saveFileSuccess: "文件保存成功",
         fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+        fileFetchAbortPrompt: "获取文件 {} 操作被终止",
       },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
