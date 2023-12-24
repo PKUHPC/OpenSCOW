@@ -37,6 +37,6 @@ export const urlToUpload = (
     clusterId,
   } satisfies UploadQuery);
 
-  return join(BASE_PATH, "/api/file/upload") + "?" + searchParams.toString();
+  return join(BASE_PATH, "/files/upload") + "?" + searchParams.toString();
 };
 

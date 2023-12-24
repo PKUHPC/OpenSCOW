@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
-  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
+import {
+  loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
+  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf,
+} from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { contentType } from "mime-types";
 import { basename, join } from "path";
@@ -95,12 +97,12 @@ export const file = router({
 
       if (op === "copy") {
         return await sshConnect(host, user!.identityId, logger, async (ssh) => {
-        // the SFTPWrapper doesn't supprt copy
-        // Use command to do it
+          // the SFTPWrapper doesn't supprt copy
+          // Use command to do it
           const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
 
           if (resp.code !== 0) {
-            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "cp command failed", cause:resp.stderr });
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "cp command failed", cause: resp.stderr });
           }
 
           return {};
@@ -112,7 +114,7 @@ export const file = router({
 
           const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
           if (error) {
-            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "move failed", cause:error });
+            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "move failed", cause: error });
           }
 
           return {};
@@ -216,7 +218,7 @@ export const file = router({
     }),
 
   checkFileExist: procedure
-    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -231,7 +233,7 @@ export const file = router({
     }),
 
   getFileType: procedure
-    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -251,7 +253,7 @@ export const file = router({
     }),
 
   getFileMetadata: procedure
-    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user, res } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -270,7 +272,7 @@ export const file = router({
       });
     }),
 
-  download:  procedure
+  download: procedure
     .meta({
       openapi: {
         method: "GET",
@@ -279,7 +281,7 @@ export const file = router({
         summary: "获取用户家目录路径",
       },
     })
-    .input(z.object({ clusterId:z.string(), path: z.string(), download: z.boolean() }))
+    .input(z.object({ clusterId: z.string(), path: z.string(), download: z.boolean() }))
     .output(z.void())
     .query(async ({ input: { clusterId, path, download }, ctx: { user, res } }) => {
 
@@ -294,38 +296,33 @@ export const file = router({
 
         const sftp = await ssh.requestSFTP();
 
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user!.identityId);
-          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
-        });
+        // const stat = await sftpStat(sftp)(path).catch((e) => {
+        //   logger.error(e, "stat %s as %s failed", path, user!.identityId);
+        //   throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+        // });
 
         const readStream = sftp.createReadStream(path, { highWaterMark: 1024 * 1024 });
 
         const filename = basename(path).replace("\"", "\\\"");
         const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
-        // res.setHeader("Content-Type", download ? getContentType(filename, "application/octet-stream") :
-        //   getContentType(filename, "text/plain; charset=utf-8"));
+        // // res.setHeader("Content-Type", download ? getContentType(filename, "application/octet-stream") :
+        // //   getContentType(filename, "text/plain; charset=utf-8"));
         res.setHeader("Content-Type", getContentType(filename, "application/octet-stream"));
 
         res.setHeader("Content-Disposition", `${download ? "attachment" : "inline"}; ${dispositionParm}`);
 
-        res.setHeader("Content-Length", String(stat.size));
+        // res.setHeader("Content-Length", String(stat.size));
 
-        try {
-          readStream.on("data", (chunk: any) => {
-            res.write(chunk);
-          });
-          readStream.on("end", () => {
-            res.end();
-          });
-          readStream.on("error", () => {
-            res.status(500).end();
-          });
-
-        } catch (e) {
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error when reading file" });
-        }
+        return new Promise<void>((resolve, reject) => {
+          readStream.pipe(res, { end: true })
+            .on("error", () => {
+              reject(new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error when reading file" }));
+            })
+            .on("end", () => {
+              resolve();
+            });
+        });
 
       });
 

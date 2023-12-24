@@ -12,7 +12,11 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { getUserInfo } from "src/server/auth/server";
-import { getAsyncIterableFor } from "src/utils/stream.js";
+import { logger } from "src/server/utils/logger";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { getAsyncIterableFor } from "src/utils/stream";
+import { pipeline, Readable } from "stream";
+import { promisify } from "util";
 import { z } from "zod";
 
 const queryZod = z.object({
@@ -22,9 +26,8 @@ const queryZod = z.object({
 
 export type UploadQuery = z.infer<typeof queryZod>;
 
-export async function POST(request: NextRequest, { params: { resourceId } }: { params: {
-  resourceId: number;
-} }) {
+
+export async function POST(request: NextRequest) {
 
   const user = await getUserInfo(request);
 
@@ -32,31 +35,66 @@ export async function POST(request: NextRequest, { params: { resourceId } }: { p
     return NextResponse.json({ code: "UNAUTHORIZED" }, { status: 401 });
   }
 
-
   const { clusterId, path } = queryZod.parse(Object.fromEntries(new URL(request.url).searchParams));
-
-  // const client = getClient(FileServiceClient);
 
   const formData = await request.formData();
 
   const uploadedFile = formData.get("file");
 
   // // File is only an interface. Blob is class
-  // if (!uploadedFile || !(uploadedFile instanceof Blob)) {
-  //   return NextResponse.json({ code: "INVALID_FILE" }, { status: 400 });
-  // }
+  if (!uploadedFile || !(uploadedFile instanceof Blob)) {
+    return NextResponse.json({ code: "INVALID_FILE" }, { status: 400 });
+  }
 
-  // const resp = await asyncRequestStreamCall(client, "upload", async ({ writeAsync }) => {
-  //   await writeAsync({ message: { $case: "info", info: {
-  //     resourceId, clusterId, path,
-  //   } } });
+  const host = getClusterLoginNode(clusterId);
 
-  //   for await (const chunk of getAsyncIterableFor(uploadedFile.stream())) {
-  //     await writeAsync({ message: { $case: "chunk", chunk } });
-  //   }
-  // }, { metadata: setTokenMetadata(user.token), options: undefined }).catch((e) => {
-  //   throw new Error("Error when writing stream", { cause: e });
-  // });
+  if (!host) { return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 }); }
 
-  // return NextResponse.json({ writtenBytes: resp.writtenBytes }, { status: 200 });
+
+  return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+    const sftp = await ssh.requestSFTP();
+
+    try {
+      const writeStream = sftp.createWriteStream(path);
+
+      // let writtenBytes = 0;
+      const pipelineAsync = promisify(pipeline);
+
+
+      const readableStream = uploadedFile.stream();
+      const nodeReadableStream = readableStreamToNodeReadable(readableStream);
+      await pipelineAsync(nodeReadableStream, writeStream);
+
+      return NextResponse.json({ message: "success" }, { status: 200 });
+
+    } catch (e: any) {
+
+    }
+  });
+
+}
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+
+function readableStreamToNodeReadable(readableStream: ReadableStream<Uint8Array>) {
+  const nodeReadable = new Readable();
+  nodeReadable._read = () => {};
+
+  const reader = readableStream.getReader();
+
+  reader.read().then(function processText({ done, value }) {
+    if (done) {
+      nodeReadable.push(null);
+      return;
+    }
+    nodeReadable.push(Buffer.from(value));
+    reader.read().then(processText);
+  });
+
+  return nodeReadable;
 }
