@@ -37,9 +37,9 @@ export async function POST(request: NextRequest, { params: { resourceId } }: { p
 
   // const client = getClient(FileServiceClient);
 
-  // const formData = await request.formData();
+  const formData = await request.formData();
 
-  // const uploadedFile = formData.get("file");
+  const uploadedFile = formData.get("file");
 
   // // File is only an interface. Blob is class
   // if (!uploadedFile || !(uploadedFile instanceof Blob)) {

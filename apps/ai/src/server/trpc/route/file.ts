@@ -13,8 +13,10 @@
 import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
   sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import { join } from "path";
+import { contentType } from "mime-types";
+import { basename, join } from "path";
 import { FileInfo } from "src/models/File";
+import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -248,5 +250,179 @@ export const file = router({
       });
     }),
 
+  getFileMetadata: procedure
+    .input(z.object({ clusterId:z.string(), path: z.string() }))
+    .query(async ({ input: { clusterId, path }, ctx: { user, res } }) => {
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(path).catch((e) => {
+          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+        });
+
+        return { size: stat.size, type: stat.isDirectory() ? "dir" : "file" };
+      });
+    }),
+
+  download:  procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/file/download",
+        tags: ["file"],
+        summary: "获取用户家目录路径",
+      },
+    })
+    .input(z.object({ clusterId:z.string(), path: z.string(), download: z.boolean() }))
+    .output(z.void())
+    .query(async ({ input: { clusterId, path, download }, ctx: { user, res } }) => {
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      const subLogger = logger.child({ user, path, clusterId });
+      subLogger.info("Download file started");
+
+      await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(path).catch((e) => {
+          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+        });
+
+        const readStream = sftp.createReadStream(path, { highWaterMark: 1024 * 1024 });
+
+        const filename = basename(path).replace("\"", "\\\"");
+        const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
+
+        // res.setHeader("Content-Type", download ? getContentType(filename, "application/octet-stream") :
+        //   getContentType(filename, "text/plain; charset=utf-8"));
+        res.setHeader("Content-Type", getContentType(filename, "application/octet-stream"));
+
+        res.setHeader("Content-Disposition", `${download ? "attachment" : "inline"}; ${dispositionParm}`);
+
+        res.setHeader("Content-Length", String(stat.size));
+
+        try {
+          readStream.on("data", (chunk: any) => {
+            res.write(chunk);
+          });
+          readStream.on("end", () => {
+            res.end();
+          });
+          readStream.on("error", () => {
+            res.status(500).end();
+          });
+
+        } catch (e) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error when reading file" });
+        }
+
+      });
+
+    }),
+
+
+  // upload:  procedure
+  //   .meta({
+  //     openapi: {
+  //       method: "POST",
+  //       path: "/file/upload",
+  //       tags: ["file"],
+  //       summary: "获取用户家目录路径",
+  //     },
+  //   })
+  //   .input(z.object({ clusterId:z.string(), path: z.string() }))
+  //   .output(z.optional(z.object({ writtenBytes: z.number() })))
+  //   .mutation(async ({ input: { clusterId, path }, ctx: { req, user } }) => {
+
+  //     const host = getClusterLoginNode(clusterId);
+
+  //     if (!host) { throw clusterNotFound(clusterId); }
+
+  //     logger.info("Upload file started");
+
+  //     const formData = await req.formData();
+
+  //     const uploadedFile = formData.get("file");
+
+  //     return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+  //       const sftp = await ssh.requestSFTP();
+
+  //       try {
+  //         const writeStream = sftp.createWriteStream(path);
+
+  //         const { writeAsync } = createWriterExtensions(writeStream);
+
+  //         let writtenBytes = 0;
+
+  //         for await (const req of call.iter()) {
+  //           if (!req.message) {
+  //             // throw new RequestError(
+  //             //   status.INVALID_ARGUMENT,
+  //             //   "Request is received but message is undefined",
+  //             // );
+  //           }
+
+  //           if (req.message.$case !== "chunk") {
+  //             // throw new RequestError(
+  //             //   status.INVALID_ARGUMENT,
+  //             //   `Expect receive chunk but received message of type ${req.message.$case}`,
+  //             // );
+  //           }
+  //           await writeAsync(req.message.chunk);
+  //           writtenBytes += req.message.chunk.length;
+  //         }
+
+  //         // ensure the data is written
+  //         // if (!writeStream.destroyed) {
+  //         //   await new Promise<void>((res, rej) => writeStream.end((e) => e ? rej(e) : res()));
+  //         // }
+  //         writeStream.end();
+  //         await once(writeStream, "close");
+
+  //         logger.info("Upload complete. Received %d bytes", writtenBytes);
+
+  //         return { writtenBytes };
+  //       } catch (e: any) {
+  //         if (e instanceof RequestError) {
+  //           throw e.toServiceError();
+  //         } else {
+  //           // throw new RequestError(
+  //           //   status.INTERNAL,
+  //           //   "Error when writing file",
+  //           //   e.message,
+  //           // ).toServiceError();
+  //         }
+
+  //       }
+  //     });
+
+  //   }),
+
 });
 
+const textFiles = ["application/x-sh"];
+
+function getContentType(filename: string, defaultValue: string) {
+  const type = contentType(basename(filename));
+
+  if (!type) {
+    return defaultValue;
+  }
+
+  if (textFiles.some((x) => type.startsWith(x))) {
+    return "text/plain; charset=utf-8";
+  }
+
+  return type;
+}

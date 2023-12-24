@@ -26,7 +26,7 @@ export const urlToDownload = (
     download: String(download) as "true" | "false",
   } satisfies DownloadQuery);
 
-  return join(BASE_PATH, "/files/download") + "?" + searchParams.toString();
+  return join(BASE_PATH, "/api/file/download") + "?" + searchParams.toString();
 };
 export const urlToUpload = (
   clusterId: string, path: string,
@@ -37,6 +37,6 @@ export const urlToUpload = (
     clusterId,
   } satisfies UploadQuery);
 
-  return join(BASE_PATH, "/files/upload") + "?" + searchParams.toString();
+  return join(BASE_PATH, "/api/file/upload") + "?" + searchParams.toString();
 };
 

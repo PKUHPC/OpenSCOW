@@ -10,10 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+// import { sftpStat } from "@scow/lib-ssh";
+// import { TRPCError } from "@trpc/server";
 import { contentType } from "mime-types";
 import { NextRequest, NextResponse } from "next/server.js";
 import { basename } from "path";
 import { getUserInfo } from "src/server/auth/server.js";
+// import { clusterNotFound } from "src/server/utils/errors";
+// import { logger } from "src/server/utils/logger";
+// import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import stream from "stream";
 import { z } from "zod";
 
@@ -65,37 +70,43 @@ export async function GET(request: NextRequest) {
   const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
 
-  try {
+  // const host = getClusterLoginNode(clusterId);
 
-    // const reply = await asyncUnaryCall(client, "getFileMetadata", {
-    //   clusterId, path, resourceId,
-    // }, { metadata: setTokenMetadata(user.token), options: undefined });
+  // if (!host) { throw clusterNotFound(clusterId); }
 
-    // const stream = asyncReplyStreamCall(client, "download", {
-    //   clusterId, path, resourceId,
-    // }, { metadata: setTokenMetadata(user.token), options: undefined });
+  // const subLogger = logger.child({ user, path, clusterId });
+  // await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
 
-    // return new NextResponse(new ReadableStream({
-    //   async pull(controller) {
-    //     for await (const chunk of stream.iter()) {
-    //       controller.enqueue(new Uint8Array(chunk.chunk));
-    //     }
-    //     controller.close();
-    //   },
-    // }), {
-    //   status: 200,
-    //   headers: download === "true" ? {
-    //     "Content-Type": getContentType(filename, "application/octet-stream"),
-    //     "Content-Disposition": `attachment; ${dispositionParm}`,
-    //     "Content-Length": String(reply.size),
-    //   } : {
-    //     "Content-Type": getContentType(filename, "text/plain; charset=utf-8"),
-    //     "Content-Disposition": `inline; ${dispositionParm}`,
-    //     "Content-Length": String(reply.size),
-    //   },
-    // });
-  } catch (e: any) {
+  //   const sftp = await ssh.requestSFTP();
 
-  }
+  //   const stat = await sftpStat(sftp)(path).catch((e) => {
+  //     logger.error(e, "stat %s as %s failed", path, user!.identityId);
+  //     throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+  //   });
+
+  //   const readStream = sftp.createReadStream(path, { highWaterMark: 1024 * 1024 });
+
+  //   return new NextResponse(new ReadableStream({
+  //     async pull(controller) {
+  //       for await (const chunk of readStream) {
+  //         controller.enqueue(new Uint8Array(chunk.chunk));
+  //       }
+  //       controller.close();
+  //     },
+  //   }), {
+  //     status: 200,
+  //     headers: download === "true" ? {
+  //       "Content-Type": getContentType(filename, "application/octet-stream"),
+  //       "Content-Disposition": `attachment; ${dispositionParm}`,
+  //       "Content-Length": String(stat.size),
+  //     } : {
+  //       "Content-Type": getContentType(filename, "text/plain; charset=utf-8"),
+  //       "Content-Disposition": `inline; ${dispositionParm}`,
+  //       "Content-Length": String(stat.size),
+  //     },
+  //   });
+
+  // });
+
 
 }

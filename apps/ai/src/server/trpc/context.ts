@@ -22,6 +22,7 @@ export type SSRContext<R = any> = Context & {
   req: NextApiRequest
   res: NextApiResponse<R>
   user?: ClientUserInfo
+  [key: string]: unknown
 }
 
 export type GlobalContext = SSRContext
