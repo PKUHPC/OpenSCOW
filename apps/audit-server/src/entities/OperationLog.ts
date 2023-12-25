@@ -11,7 +11,9 @@
  */
 
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
-import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm";
+import { OperationEvent } from "@scow/lib-operation-log";
+import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm"; ;
+
 
 export enum OperationResult {
   UNKNOWN = "UNKNOWN",
@@ -21,6 +23,7 @@ export enum OperationResult {
 
 @Entity()
 export class OperationLog {
+
   @PrimaryKey()
     id!: number;
 
@@ -37,7 +40,7 @@ export class OperationLog {
     operationResult: OperationResult;
 
   @Property({ type: "json", nullable: true })
-    metaData?: { [key: string]: any; };
+    metaData?: OperationEvent & { targetAccountName?: string };
 
   constructor(init: {
       operationLogId?: number;
@@ -45,7 +48,7 @@ export class OperationLog {
       operatorIp: string;
       operationTime?: Date;
       operationResult: OperationResult;
-      metaData: { [key: string]: any };
+      metaData: OperationEvent & { targetAccountName?: string };
     }) {
     if (init.operationLogId) {
       this.id = init.operationLogId;

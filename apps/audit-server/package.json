@@ -33,8 +33,10 @@
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
+    "@scow/lib-operation-log": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
+    "dayjs": "1.11.9",
     "pino": "8.16.2",
     "pino-pretty": "10.2.3"
   },

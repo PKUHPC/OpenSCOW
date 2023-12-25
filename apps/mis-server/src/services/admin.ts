@@ -241,5 +241,21 @@ export const adminServiceServer = plugin((server) => {
         userCount,
       }];
     },
+
+    getStatisticInfo: async ({ request, em }) => {
+      const { startTime, endTime } = request;
+
+      const totalUser = await em.count(User, {});
+      const totalAccount = await em.count(Account, {});
+      const totalTenant = await em.count(Tenant, {});
+
+      const newUser = await em.count(User, { createTime: { $gte: startTime, $lte: endTime } });
+      const newAccount = await em.count(Account, { createTime: { $gte: startTime, $lte: endTime, $ne: null } });
+      const newTenant = await em.count(Tenant, { createTime: { $gte: startTime, $lte: endTime } });
+
+      return [{
+        totalUser, totalAccount, totalTenant, newUser, newAccount, newTenant,
+      }];
+    },
   });
 });
