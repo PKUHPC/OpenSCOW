@@ -1,5 +1,17 @@
 # @scow/config
 
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+## 1.2.1
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+
 ## 1.2.0
 
 ### Minor Changes

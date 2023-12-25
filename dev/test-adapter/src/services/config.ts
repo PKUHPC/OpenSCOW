@@ -51,6 +51,8 @@ export const configServiceServer = plugin((server) => {
     getAvailablePartitions: async () => {
       return [];
     },
-
+    getClusterInfo:async () => {
+      return [];
+    },
   });
 });

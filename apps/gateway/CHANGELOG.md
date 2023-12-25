@@ -1,5 +1,9 @@
 # @scow/gateway
 
+## 1.3.0
+
+## 1.2.3
+
 ## 1.2.2
 
 ### Patch Changes

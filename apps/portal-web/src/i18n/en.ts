@@ -233,6 +233,7 @@ export default {
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
         fileSizeExceeded: "File too large (maximum {}), please download and edit",
+        fileFetchAbortPrompt: "Fetch {} operation was aborted",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
@@ -434,6 +435,31 @@ export default {
         saveFailed:"save Failed",
         saveSuccessfully:"save Succeeded",
       },
+      overviewTable:{
+        title:"platform overview",
+        clusterName:"clusterName",
+        partitionName:"partitionName",
+        nodeCount:"nodeCount",
+        runningNodeCount:"runningNodeCount",
+        cpuCoreCount:"cpuCoreCount",
+        gpuCoreCount:"gpuCoreCount",
+        usageRatePercentage:"usageRatePercentage",
+        partitionStatus:"partitionStatus",
+        available:"available",
+        notAvailable:"notAvailable",
+      },
+      infoPanes:{
+        nodeInfo:"nodeInfo",
+        node:"node",
+        resourceInfo:"resourceInfo",
+        core:"core",
+        running:"running",
+        idle:"idle",
+        notAvailable:"notAvailable",
+        card:"card",
+        job:"job",
+        pending:"pending",
+      },
     },
   },
   component: {
@@ -545,8 +571,8 @@ export default {
     _app: {
       sshError: "Unable to connect as a user to the login node. Please make sure the permissions "
       + "of your home directory are 700, 750, or 755.",
-      textExceedsLength:"There are too many welcome messages for terminal login."
-                         + "Please reduce unnecessary information output!",
+      textExceedsLength:"There are too many terminal login prompts. "
+                        + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
     },

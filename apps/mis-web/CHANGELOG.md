@@ -1,5 +1,29 @@
 # @scow/mis-web
 
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- 1a1189ad48: 管理系统 AllUserTable 恢复计数接口并且新增筛选参数
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-web@1.2.3
+  - @scow/lib-operation-log@2.0.4
+  - @scow/protos@1.0.4
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.2
 
 ### Patch Changes

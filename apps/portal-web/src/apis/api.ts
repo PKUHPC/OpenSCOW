@@ -24,6 +24,7 @@ import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApp
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import type { GetClusterRunningInfoSchema } from "src/pages/api/dashboard/getClusterInfo";
 import type { GetQuickEntriesSchema } from "src/pages/api/dashborad/getQuickEntries";
 import type { SaveQuickEntriesSchema } from "src/pages/api/dashborad/saveQuickEntries";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
@@ -76,6 +77,7 @@ export const api = {
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
   getQuickEntries: apiClient.fromTypeboxRoute<typeof GetQuickEntriesSchema>("GET", "/api/dashborad/getQuickEntries"),
   saveQuickEntries: apiClient.fromTypeboxRoute<typeof SaveQuickEntriesSchema>("POST", "/api/dashborad/saveQuickEntries"),
+  getClusterRunningInfo: apiClient.fromTypeboxRoute<typeof GetClusterRunningInfoSchema>("GET", "/api/dashboard/getClusterInfo"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
   killDesktop: apiClient.fromTypeboxRoute<typeof KillDesktopSchema>("POST", "/api/desktop/killDesktop"),
   launchDesktop: apiClient.fromTypeboxRoute<typeof LaunchDesktopSchema>("POST", "/api/desktop/launchDesktop"),
