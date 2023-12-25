@@ -11,15 +11,18 @@
  */
 
 "use client";
-import { PageTitle } from "src/components/pageTitle";
-import { ModalTable } from "src/pageComponents/modal/ModalTable";
+import { usePublicConfig } from "src/app/(auth)/context";
+import { ModalTable } from "src/app/(auth)/modal/ModalTable";
+import { PageTitle } from "src/components/PageTitle";
 
 export default function Page() {
+
+  const { publicConfig } = usePublicConfig();
 
   return (
     <div>
       <PageTitle titleText="我的模型" />
-      <ModalTable isPublic={false} />
+      <ModalTable isPublic={false} clusters={publicConfig.CLUSTERS} />
     </div>
   );
 }
