@@ -17,11 +17,4 @@ import { withOrmContext } from "src/server/trpc/middleware/withOrmContext";
 export const baseProcedure = trpc.procedure;
 
 export const authProcedure = baseProcedure.use(withAuthContext);
-
-export const procedure = authProcedure.use(withOrmContext);
-
-export const ormProcedure = baseProcedure.use(withOrmContext);
-
-
-
-
+export const procedure = baseProcedure.use(withOrmContext.unstable_pipe(withAuthContext));

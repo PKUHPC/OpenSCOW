@@ -33,10 +33,6 @@ export function isSSRContext(
   return !!((ctx as SSRContext)?.req && (ctx as SSRContext)?.res);
 }
 
-// export const createContext = (
-//   ctx: CreateNextContextOptions,
-// ): GlobalContext => isSSRContext(ctx) ? ctx : {};
-
 export const createContext = (
   ctx: CreateNextContextOptions,
 ): GlobalContext => ctx;

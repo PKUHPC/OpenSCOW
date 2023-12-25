@@ -19,7 +19,7 @@ type Props = React.PropsWithChildren<{
 export const Head: React.FC<Props> = ({ title, children }) => {
   return (
     <NextHead>
-      <title>{`${title} - XSCOW`}</title>
+      <title>{`${title} - SCOW`}</title>
       {children}
     </NextHead>
   );

@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { redirectToAuthLogin } from "@scow/lib-web/build/routes/auth/redirectToLogin";
 import { joinWithUrl } from "@scow/utils";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
@@ -80,7 +79,6 @@ export const auth = router({
     .output(z.void())
     .query(async ({ ctx: { req, res } }) => {
       console.log("req", req.headers.host);
-      const url = new URL(req.url!, `${ runtimeConfig.PROTOCOL}://${req.headers.host}`);
 
       const callbackUrl = `${ runtimeConfig.PROTOCOL || "http"}://${req.headers.host}`
        + join(publicConfig.BASE_PATH, "/api/auth/callback");

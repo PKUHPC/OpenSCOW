@@ -20,7 +20,7 @@ import { basename, join } from "path";
 import { FileInfo } from "src/models/File";
 import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
-import { procedure } from "src/server/trpc/procedure/base";
+import { authProcedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -33,7 +33,7 @@ export enum FileInfo_FileType {
 }
 
 export const file = router({
-  getHomeDir: procedure
+  getHomeDir: authProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -50,7 +50,7 @@ export const file = router({
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const path = await sftpRealPath(sftp)(".");
@@ -60,7 +60,7 @@ export const file = router({
     }),
 
 
-  deleteItem: procedure
+  deleteItem: authProcedure
     .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
     .mutation(async ({ input: { target, clusterId, path }, ctx: { user } }) => {
 
@@ -69,7 +69,7 @@ export const file = router({
       if (!host) { throw clusterNotFound(clusterId); }
 
       if (target === "FILE") {
-        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
           const sftp = await ssh.requestSFTP();
 
@@ -78,7 +78,7 @@ export const file = router({
           return {};
         });
       } else {
-        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
           await sshRmrf(ssh, path);
 
@@ -87,7 +87,7 @@ export const file = router({
       }
     }),
 
-  copyOrMove: procedure
+  copyOrMove: authProcedure
     .input(z.object({ clusterId: z.string(), op: z.enum(["copy", "move"]), fromPath: z.string(), toPath: z.string() }))
     .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user } }) => {
 
@@ -96,7 +96,7 @@ export const file = router({
       if (!host) { throw clusterNotFound(clusterId); }
 
       if (op === "copy") {
-        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
           // the SFTPWrapper doesn't supprt copy
           // Use command to do it
           const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
@@ -109,7 +109,7 @@ export const file = router({
         });
       } else {
 
-        return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
           const sftp = await ssh.requestSFTP();
 
           const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
@@ -122,14 +122,14 @@ export const file = router({
       }
     }),
 
-  mkdir: procedure
+  mkdir: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
         const sftp = await ssh.requestSFTP();
 
@@ -143,14 +143,14 @@ export const file = router({
       });
     }),
 
-  createFile: procedure
+  createFile: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
         const sftp = await ssh.requestSFTP();
 
@@ -165,18 +165,18 @@ export const file = router({
 
     }),
 
-  listDirectory: procedure
+  listDirectory: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          logger.error(e, "stat %s as %s failed", path, user.identityId);
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: `${path} is not accessible` });
         });
 
@@ -217,7 +217,7 @@ export const file = router({
       });
     }),
 
-  checkFileExist: procedure
+  checkFileExist: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
@@ -225,14 +225,14 @@ export const file = router({
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
         const exists = await sftpExists(sftp, path);
         return { exists };
       });
     }),
 
-  getFileType: procedure
+  getFileType: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
@@ -240,11 +240,11 @@ export const file = router({
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          logger.error(e, "stat %s as %s failed", path, user.identityId);
           throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
         });
 
@@ -252,7 +252,7 @@ export const file = router({
       });
     }),
 
-  getFileMetadata: procedure
+  getFileMetadata: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .query(async ({ input: { clusterId, path }, ctx: { user, res } }) => {
 
@@ -260,11 +260,11 @@ export const file = router({
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          logger.error(e, "stat %s as %s failed", path, user.identityId);
           throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
         });
 
@@ -272,7 +272,7 @@ export const file = router({
       });
     }),
 
-  download: procedure
+  download: authProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -292,12 +292,12 @@ export const file = router({
       const subLogger = logger.child({ user, path, clusterId });
       subLogger.info("Download file started");
 
-      await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
+      await sshConnect(host, user.identityId, subLogger, async (ssh) => {
 
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user!.identityId);
+          logger.error(e, "stat %s as %s failed", path, user.identityId);
           throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
         });
 

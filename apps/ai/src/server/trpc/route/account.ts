@@ -42,6 +42,6 @@ export const accountRouter = router({
           message:`cluster ${clusterId} is not found`,
         });
       }
-      return await asyncClientCall(client.account, "listAccounts", { userId: user!.identityId });
+      return await asyncClientCall(client.account, "listAccounts", { userId: user.identityId });
     }),
 });
