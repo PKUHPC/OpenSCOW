@@ -100,7 +100,7 @@ export const list = procedure
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
-      populate: ["versions"],
+      populate: ["versions", "versions.isShared"],
       orderBy: { createTime: "desc" },
     });
 
@@ -115,7 +115,7 @@ export const list = procedure
         description: x.description,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : "",
-        versionsCount: x.versions.count(),
+        versionsCount: input.isShared ? x.versions.filter((x) => x.isShared).length : x.versions.count(),
       }; }), count };
   });
 

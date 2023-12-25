@@ -26,17 +26,18 @@ export interface Props {
   onRefetch: () => void;
   datasetId: number;
   datasetName: string;
+  isShared?: boolean;
 }
 
 export const DatasetVersionsModal: React.FC<Props> = (
-  { open, onClose, onRefetch, datasetId, datasetName },
+  { open, onClose, onRefetch, datasetId, datasetName, isShared },
 ) => {
   const { modal, message } = App.useApp();
   const CreateAndEditVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
 
   const router = useRouter();
 
-  const { data, refetch, isFetching, error } = trpc.dataset.versionList.useQuery({ datasetId }, {});
+  const { data, refetch, isFetching, error } = trpc.dataset.versionList.useQuery({ datasetId, isShared }, {});
 
   if (error) {
     message.error("找不到对应的数据集版本");

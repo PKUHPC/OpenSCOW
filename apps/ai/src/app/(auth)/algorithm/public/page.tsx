@@ -11,9 +11,9 @@
  */
 
 "use client";
+import { AlgorithmTable } from "src/app/(auth)/algorithm/AlgorithmTable";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
-import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
 
 export default function Page() {
 

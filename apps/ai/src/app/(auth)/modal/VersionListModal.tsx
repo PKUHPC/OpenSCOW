@@ -14,36 +14,43 @@ import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
+
+interface algorithmVersion {
+  id: number;
+  versionName: string;
+  versionDescription: string;
+  path: string;
+  isShared: boolean;
+  createTime: string;
+}
+
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   isPublic?: boolean;
   algorithmId: number;
-  algorithmName: string;
+  algorithmName: string | undefined;
+  algorithmVersionData: algorithmVersion[];
+  isFetching: boolean;
+  refetch: () => void;
+
 }
 
 const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const VersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, algorithmId, algorithmName },
+  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
-
   const router = useRouter();
 
-  const { data, isFetching, error } = trpc.algorithm.getAlgorithmVersions.useQuery({ id:algorithmId }, {
-  });
-
-  if (error) {
-    message.error("找不到对应的算法版本");
-  }
-
-  const changeAlgorithmVersion = useCallback(
+  const shareAlgorithmVersion = useCallback(
     (id: number, name: string, shareStatus: boolean) => {
       console.log(id);
       const text = shareStatus ? "取消" : "";
@@ -58,14 +65,23 @@ export const VersionListModal: React.FC<Props> = (
     [],
   );
 
+  const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
+    onSuccess() {
+      message.success("删除算法版本成功");
+      refetch();
+    },
+    onError(e) {
+      console.log(e);
+      message.error("删除算法版本失败");
+    } });
+
   const deleteAlgorithmVersion = useCallback(
     (id: number, name: string) => {
-      console.log(id);
       confirm({
         title: "删除算法版本",
-        content: `确认删除算法版本${name}？如该算法已分享，则分享的算法版本也会被删除。`,
+        content: `确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`,
         onOk() {
-          message.success("删除成功");
+          deleteAlgorithmVersionMutation.mutate({ id });
         },
       });
     },
@@ -82,14 +98,14 @@ export const VersionListModal: React.FC<Props> = (
     >
       <Table
         rowKey="id"
-        dataSource={data?.versions}
+        dataSource={algorithmVersionData}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
         columns={[
-          { dataIndex: "name", title: "版本名称" },
-          { dataIndex: "description", title: "版本描述" },
-          { dataIndex: "createTime", title: "创建时间" },
+          { dataIndex: "versionName", title: "版本名称" },
+          { dataIndex: "versionDescription", title: "版本描述" },
+          { dataIndex: "createTime", title: "创建时间", render:(_) => formatDateTime(_) },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
@@ -105,11 +121,12 @@ export const VersionListModal: React.FC<Props> = (
                 (
                   <>
                     <CreateAndEditVersionModalButton
-                      key="edit"
-                      algorithmId={r.id}
-                      algorithmName={r.name}
-                      versionName={r.name}
-                      versionDescription={r.description}
+                      algorithmId={algorithmId}
+                      algorithmName={algorithmName}
+                      versionId={r.id}
+                      versionName={r.versionName}
+                      versionDescription={r.versionDescription}
+                      refetch={refetch}
                     >
                     编辑
                     </CreateAndEditVersionModalButton>
@@ -126,7 +143,7 @@ export const VersionListModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
-                        changeAlgorithmVersion(r.id, r.name, r.isShared);
+                        shareAlgorithmVersion(r.id, r.versionName, r.isShared);
                       }}
                     >
                       {r.isShared ? "取消分享" : "分享"}
@@ -134,7 +151,7 @@ export const VersionListModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
-                        deleteAlgorithmVersion(r.id, r.name);
+                        deleteAlgorithmVersion(r.id, r.versionName);
                       }}
                     >
                     删除

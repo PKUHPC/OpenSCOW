@@ -93,6 +93,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
       framework:query.framework === "ALL" ? undefined : query.framework,
       nameOrDesc:query.nameOrDesc,
       clusterId:query.clusterId,
+      isPublic,
     });
   if (error) {
     message.error("找不到算法");

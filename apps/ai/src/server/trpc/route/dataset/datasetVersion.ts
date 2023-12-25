@@ -65,6 +65,7 @@ export const versionList = procedure
   })
   .input(z.object({
     datasetId: z.number(),
+    isShared: z.boolean().optional(),
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
   }))
@@ -72,11 +73,13 @@ export const versionList = procedure
   .query(async ({ input }) => {
     const orm = await getORM();
 
-    const [items, count] = await orm.em.findAndCount(DatasetVersion, { dataset: input.datasetId }, {
-      limit: input.page,
-      offset: input.pageSize,
-      orderBy: { createTime: "desc" },
-    });
+    const [items, count] = await orm.em.findAndCount(DatasetVersion,
+      { dataset: input.datasetId, isShared: input.isShared || { $ne: null } },
+      {
+        limit: input.pageSize || undefined,
+        offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+        orderBy: { createTime: "desc" },
+      });
 
     return { items: items.map((x) => {
       return {

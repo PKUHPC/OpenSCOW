@@ -10,15 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ModalTable } from "src/app/(auth)/modal/ModalTable";
 import { PageTitle } from "src/components/PageTitle";
-import { AlgorithmTable } from "src/pageComponents/algorithm/AlgorithmTable";
 
 export default function Page() {
 
   return (
     <div>
       <PageTitle titleText="公共算法" />
-      <AlgorithmTable isPublic={true} />
+      <ModalTable isPublic={true} />
     </div>
   );
 }
