@@ -148,6 +148,7 @@ export default {
     route: {
       common: {
         operationLog: "Operation Log",
+        statistic: "Statistic",
       },
       navLinkText: "Portal",
       dashboard: "Dashboard",
@@ -280,6 +281,9 @@ export default {
         notImport: "Not imported",
         userList: "User List",
         addWhitelist: "Add all accounts to the whitelist.",
+      },
+      statisticCard: {
+        total: "Total ",
       },
       tenantChargeForm: {
         loadType: "Loading used types...",
@@ -907,6 +911,34 @@ export default {
         accountChargeRecords: {
           title: "Account Consumption Records",
         },
+      },
+      statistic: {
+        dataOverview: "Data Overview",
+        dateRange: "Date Range",
+        user: "User",
+        account: "Account",
+        tenant: "Tenant",
+        job: "Job",
+        charge: "Charge",
+        userCount: "User Count",
+        newUserCount: "New User Count",
+        activeUserCount: "Active User Count",
+        chargeOrPayAmount: "Charge/Pay Amount",
+        topTenChargedAccount: "Top 10 Charged Account",
+        chargeAmount: "Charge Amount",
+        topTenPayAccount: "Top 10 Pay Account",
+        payAmount: "Pay Amount",
+        topTenSubmitJobUser: "Top 10 Submit Job User",
+        newJobCount: "New Job Count",
+        systemFeatureUsageCount: "System Feature Usage Count",
+        portalFeatureUsageCount: "Portal Feature Usage Count",
+        misFeatureUsageCount: "MIS Feature Usage Count",
+        jobCount: "Job Count",
+        usageCount:"count",
+        userName: "User Name",
+        accountName: "Account Name",
+        amount: "Amount",
+        yuan: "yuan",
       },
     },
     accounts: {

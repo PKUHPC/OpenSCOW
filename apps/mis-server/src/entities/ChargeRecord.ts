@@ -18,6 +18,7 @@ import { DecimalType } from "src/utils/decimal";
 
 @Entity()
 @Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type"] })
+@Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class ChargeRecord {
   @PrimaryKey()
     id!: number;

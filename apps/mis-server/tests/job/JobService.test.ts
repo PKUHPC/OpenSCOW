@@ -16,6 +16,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { JobInfo } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
@@ -47,7 +48,7 @@ afterEach(async () => {
 
 const mockOriginalJobData = (
   ua: UserAccount,
-  tenantPrice: Decimal, accountPrice: Decimal,
+  tenantPrice: Decimal, accountPrice: Decimal, submitTime?: Date,
 ) => new JobInfo({ cluster: "pkuhpc", ...{
   "jobId": 5119061,
   "account": ua.account.getProperty("accountName"),
@@ -57,8 +58,8 @@ const mockOriginalJobData = (
   "name": "CoW",
   "state": "COMPLETED",
   "workingDirectory": "",
-  "submitTime": "2020-04-23T22:23:00.000Z",
-  "startTime": "2020-04-23T22:25:12.000Z",
+  "submitTime": submitTime ? submitTime.toISOString() : "2020-04-23T22:23:00.000Z",
+  "startTime": submitTime ? submitTime.toISOString() : "2020-04-23T22:25:12.000Z",
   "endTime": "2020-04-23T23:18:02.000Z",
   "gpusAlloc": 0,
   "cpusReq": 32,
@@ -69,7 +70,7 @@ const mockOriginalJobData = (
   "nodesAlloc": 1,
   "timeLimitMinutes": 7200,
   "elapsedSeconds": 3170,
-  "timeWait": 132,
+  "timeWait": submitTime ? 0 : 132,
   "qos": "normal",
   "recordTime": new Date("2020-04-23T23:49:50.000Z"),
 } }, data.tenant.name, {
@@ -193,7 +194,7 @@ it("returns jobs starting from start_bi_job_index", async () => {
 
 });
 
-it("returns 0 job if Accout not exist or is not in scope of permissions", async () => {
+it("returns 0 job if Account not exist or is not in scope of permissions", async () => {
   const em = server.ext.orm.em.fork();
 
   await em.persistAndFlush(range(1, 20).map((_) =>
@@ -216,4 +217,73 @@ it("returns 0 job if Accout not exist or is not in scope of permissions", async 
     test({ tenantName: data.tenant.name, userId: "a", accountName: "hpcb", clusters: []}),
   ]);
 
+});
+
+it("get Top Submit Job Users correctly", async () => {
+  const em = server.ext.orm.em.fork();
+
+  const today = dayjs();
+
+  const userAJobs = range(0, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.toDate()));
+  const userBJobs = range(0, 30).map((_) =>
+    mockOriginalJobData(data.uaBB, new Decimal(20), new Decimal(10), today.toDate()));
+  const userCJobs = range(0, 40).map((_) =>
+    mockOriginalJobData(data.uaCC, new Decimal(20), new Decimal(10), today.toDate()));
+  await em.persistAndFlush([...userAJobs, ...userBJobs, ...userCJobs]);
+
+  const client = createClient();
+  const reply = await asyncClientCall(client, "getTopSubmitJobUsers", {
+    startTime: today.startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+  });
+
+  expect(reply.results).toMatchObject([
+    { userId: data.userC.userId, count: 40 },
+    { userId: data.userB.userId, count: 30 },
+    { userId: data.userA.userId, count: 20 },
+  ]);
+
+});
+
+it("get new job count correctly", async () => {
+
+  const today = dayjs();
+
+  console.log(today.toISOString());
+  const todayJobs = range(0, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.toDate()));
+  const yesterdayJobs = range(0, 30).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.clone().subtract(1, "day").toDate()));
+  const twoDayBeforeJobs = range(0, 15).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.clone().subtract(2, "day").toDate()));
+  const threeDayBeforeJobs = range(0, 1).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.clone().subtract(3, "day").toDate()));
+  await em.persistAndFlush([...todayJobs, ...yesterdayJobs, ...twoDayBeforeJobs, ...threeDayBeforeJobs]);
+
+  const client = createClient();
+  const reply = await asyncClientCall(client, "getNewJobCount", {
+    startTime: today.clone().subtract(3, "day").startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+  });
+
+  expect(reply.results).toMatchObject([
+    {
+      date: today.startOf("day").toISOString(),
+      count: 20,
+    },
+    {
+      date: today.clone().subtract(1, "day").startOf("day").toISOString(),
+      count: 30,
+    },
+    {
+      date: today.clone().subtract(2, "day").startOf("day").toISOString(),
+      count: 15,
+    },
+    {
+      date: today.clone().subtract(3, "day").startOf("day").toISOString(),
+      count: 1,
+    },
+
+  ]);
 });

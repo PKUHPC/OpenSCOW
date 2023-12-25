@@ -148,6 +148,7 @@ export default {
     route: {
       common:{
         operationLog:"操作日志",
+        statistic: "平台数据统计",
       },
       navLinkText: "门户",
       dashboard: "仪表盘",
@@ -280,6 +281,9 @@ export default {
         notImport:"未导入",
         userList:"用户列表",
         addWhitelist:"将所有账户加入白名单",
+      },
+      statisticCard: {
+        total: "总",
       },
       tenantChargeForm:{
         loadType:"正在加载使用过的类型……",
@@ -863,6 +867,7 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
+
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
@@ -905,6 +910,34 @@ export default {
         accountChargeRecords: {
           title: "账户消费记录",
         },
+      },
+      statistic: {
+        dataOverview: "数据总览",
+        dateRange: "日期筛选",
+        user: "用户",
+        account: "账户",
+        tenant: "租户",
+        job: "作业",
+        charge: "消费",
+        userCount: "用户数量",
+        newUserCount: "新增用户数",
+        activeUserCount: "活跃用户数",
+        chargeOrPayAmount: "消费/充值金额",
+        topTenChargedAccount: "消费账户Top10",
+        chargeAmount: "消费金额",
+        topTenPayAccount: "充值账户Top10",
+        payAmount: "充值金额",
+        topTenSubmitJobUser: "作业提交用户Top10",
+        newJobCount: "新增作业数",
+        systemFeatureUsageCount: "系统使用量",
+        portalFeatureUsageCount: "门户系统使用功能次数",
+        misFeatureUsageCount: "管理系统使用功能次数",
+        jobCount: "作业数",
+        usageCount:"次数",
+        userName: "用户名",
+        accountName: "账户名",
+        amount: "金额",
+        yuan: "元",
       },
     },
     accounts: {

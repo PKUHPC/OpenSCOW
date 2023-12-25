@@ -17,12 +17,15 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { range } from "src/utils/array";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -513,4 +516,55 @@ it("change an inexistent user email", async () => {
   }).catch((e) => e);
 
   expect(reply.code).toBe(Status.NOT_FOUND);
+});
+
+it("get new user count", async () => {
+
+  const em = server.ext.orm.em.fork();
+  const today = dayjs();
+  const yesterday = today.clone().subtract(1, "day");
+  const twoDaysBefore = today.clone().subtract(2, "day");
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+
+  const todayNewUsers = range(0, 30).map((i) => new User({
+    name: `user0${i}`,
+    userId: `user0${i}`,
+    email: `user0${i}@gmail.com`,
+    tenant,
+    createTime: today.toDate(),
+  }));
+
+  const yesterdayNewUsers = range(0, 20).map((i) => new User({
+    name: `user1${i}`,
+    userId: `user1${i}`,
+    email: `user1${i}@gmail.com`,
+    tenant,
+    createTime: yesterday.toDate(),
+  }));
+
+  const twoDaysBeforeNewUsers = range(0, 10).map((i) => new User({
+    name: `user2${i}`,
+    userId: `user2${i}`,
+    email: `user2${i}@gmail.com`,
+    tenant,
+    createTime: twoDaysBefore.toDate(),
+  }));
+
+  await em.persistAndFlush([
+    ...todayNewUsers,
+    ...yesterdayNewUsers,
+    ...twoDaysBeforeNewUsers,
+  ]);
+
+  const info = await asyncClientCall(client, "getNewUserCount", {
+    startTime: twoDaysBefore.startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+  });
+
+  expect(info.results).toMatchObject([
+    { date: today.startOf("day").toISOString(), count: 30 },
+    { date: yesterday.startOf("day").toISOString(), count: 20 },
+    { date: twoDaysBefore.startOf("day").toISOString(), count: 10 },
+  ]);
+
 });
