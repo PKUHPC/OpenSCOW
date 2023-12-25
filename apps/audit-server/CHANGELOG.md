@@ -1,5 +1,14 @@
 # @scow/audit-server
 
+## 2.1.3
+
+### Patch Changes
+
+- 484c70aeef: 修复操作日志模糊搜索和操作类型及操作账户共同筛选报错
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/protos@1.0.5
+
 ## 2.1.2
 
 ### Patch Changes
