@@ -16,8 +16,8 @@ import { useRouter } from "next/navigation";
 import { join } from "path";
 import { useEffect } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
+import { FileManager } from "src/app/(auth)/files/FileManager";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
-import { FileManager } from "src/pageComponents/file/FileManager";
 import { Head } from "src/utils/head";
 import { trpc } from "src/utils/trpc";
 

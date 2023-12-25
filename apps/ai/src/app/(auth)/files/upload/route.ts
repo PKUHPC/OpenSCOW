@@ -14,7 +14,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserInfo } from "src/server/auth/server";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
-import { getAsyncIterableFor } from "src/utils/stream";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import { z } from "zod";
@@ -57,9 +56,7 @@ export async function POST(request: NextRequest) {
     try {
       const writeStream = sftp.createWriteStream(path);
 
-      // let writtenBytes = 0;
       const pipelineAsync = promisify(pipeline);
-
 
       const readableStream = uploadedFile.stream();
       const nodeReadableStream = readableStreamToNodeReadable(readableStream);

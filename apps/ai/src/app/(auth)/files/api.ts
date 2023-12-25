@@ -11,7 +11,6 @@
  */
 
 import { join } from "path";
-import { DownloadQuery } from "src/app/(auth)/files/download/route";
 import { UploadQuery } from "src/app/(auth)/files/upload/route";
 // import { BASE_PATH } from "src/utils/config";
 const BASE_PATH = "/";
@@ -24,7 +23,7 @@ export const urlToDownload = (
     path: path,
     clusterId,
     download: String(download) as "true" | "false",
-  } satisfies DownloadQuery);
+  });
 
   return join(BASE_PATH, "/api/file/download") + "?" + searchParams.toString();
 };

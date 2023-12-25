@@ -22,8 +22,6 @@
   },
   "devDependencies": {
     "@bufbuild/buf": "1.28.1",
-    "@bufbuild/protoc-gen-connect-es": "0.13.0",
-    "@bufbuild/protoc-gen-es": "1.4.2",
     "@changesets/cli": "2.26.2",
     "@commitlint/config-conventional": "18.4.2",
     "@ddadaal/eslint-config": "1.9.0",
