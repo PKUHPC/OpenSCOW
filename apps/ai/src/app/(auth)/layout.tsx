@@ -22,6 +22,7 @@ import { useUserQuery } from "src/app/auth";
 import { Loading } from "src/components/Loading";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
+import { NotAuthorizedPage } from "src/layouts/error/NotAuthorizedPage";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
@@ -34,8 +35,8 @@ const useConfigQuery = () => {
 };
 
 export default function Layout(
-  { children, props }:
-  { children: React.ReactNode, props: any },
+  { children }:
+  { children: React.ReactNode },
 ) {
 
   const userQuery = useUserQuery();
@@ -49,17 +50,12 @@ export default function Layout(
     );
   }
 
-  if (userQuery.isError) {
+  if (userQuery.isError || !userQuery.data.user) {
     return (
       <BaseLayout>
-        <ServerErrorPage />
+        <NotAuthorizedPage />
       </BaseLayout>
     );
-  }
-
-  if (!userQuery.data.user) {
-    window.location.href = "/api/auth";
-    return;
   }
 
   if (configQuery.isLoading) {

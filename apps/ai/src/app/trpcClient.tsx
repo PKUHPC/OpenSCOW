@@ -15,11 +15,15 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client";
 import { message } from "antd";
+import { Console } from "console";
 import { usePathname, useRouter } from "next/navigation";
+import { join } from "path";
 import { useState } from "react";
 import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
 import superjson from "superjson";
+const BASE_PATH = process.env.BASE_PATH || "/";
+
 
 function getBaseUrl() {
   if (typeof window !== "undefined")
@@ -37,7 +41,6 @@ function getBaseUrl() {
 
 export function ClientProvider(props: { children: React.ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
 
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
@@ -48,8 +51,9 @@ export function ClientProvider(props: { children: React.ReactNode }) {
     queryCache: new QueryCache({
       onError: (error, query) => {
         const { data } = error as TRPCClientError<AppRouter>;
+
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          router.push("/api/auth");
+          window.location.href = join(BASE_PATH, "/api/auth");
         } else if (data?.code && query?.meta?.[data?.code]) {
           const msg = query?.meta?.[data?.code] as string;
           message.error(msg);
@@ -63,7 +67,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         const { data } = error as TRPCClientError<AppRouter>;
         const { onError } = mutation.options;
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          router.push("/api/auth");
+          window.location.href = join(BASE_PATH, "/api/auth");
         } else if (!onError) {
           message.error("出了一些问题，请稍后再试！");
         }

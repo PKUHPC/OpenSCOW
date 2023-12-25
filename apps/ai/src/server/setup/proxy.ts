@@ -88,7 +88,7 @@ export const setupWssProxy = (server: http.Server) => {
     const user = await getUserInfo(req)
       .then((u) => {
         if (!u) {
-          writeError("401 Unauthorized", "");
+          writeError("401 UNAUTHORIZED", "");
           return undefined;
         } else {
           return u;

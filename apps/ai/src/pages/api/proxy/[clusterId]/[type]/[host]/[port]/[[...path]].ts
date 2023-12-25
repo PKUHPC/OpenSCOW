@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await getUserInfo(req)
     .then((u) => {
       if (!u) {
-        res.status(401).send("Unauthorized");
+        res.status(401).send("UNAUTHORIZED");
         return undefined;
       } else {
         return u;
