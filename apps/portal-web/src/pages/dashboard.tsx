@@ -60,11 +60,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
+      <QuickEntry></QuickEntry>
       <OverviewTable
         isLoading={isLoading}
         clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
       />
-      <QuickEntry></QuickEntry>
     </div>
   );
 });

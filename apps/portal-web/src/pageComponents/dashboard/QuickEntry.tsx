@@ -25,6 +25,8 @@ const ContentContainer = styled.div`
   background-color: #fff;
   padding: 20px;
   padding-right: 0;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: 20px;
 `;
 
 const TitleContainer = styled.div`
@@ -98,8 +100,6 @@ const p = prefix("pageComp.dashboard.quickEntry.");
 
 export const QuickEntry: React.FC<Props> = () => {
   const t = useI18nTranslateToString();
-
-
 
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
