@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Form, Modal, Select } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/config";
 
@@ -39,10 +40,11 @@ export const ChangeClusterModal: React.FC<Props> = ({
   editItem,
 }) => {
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormInfo>();
 
-  const clustersOptions = clusters.map((x) => ({ value:x.id, label:x.name }));
+  const clustersOptions = clusters.map((x) => ({ value:x.id, label:getI18nConfigCurrentText(x.name, languageId) }));
   const { loginNodes } = useStore(LoginNodeStore);
   const [loginNodesOptions, setLoginNodesOptions] = useState<{}[]>([]);
 
