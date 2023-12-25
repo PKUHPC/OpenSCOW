@@ -219,7 +219,12 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 ) :
                 (
                   <Space split={<Divider type="vertical" />}>
-                    <DatasetVersionsModalButton datasetId={r.id} datasetName={r.name} onRefetch={refetch}>
+                    <DatasetVersionsModalButton
+                      datasetId={r.id}
+                      datasetName={r.name}
+                      isShared={true}
+                      onRefetch={refetch}
+                    >
                         版本列表
                     </DatasetVersionsModalButton>
                   </Space>
