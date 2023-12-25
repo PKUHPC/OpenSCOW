@@ -23,11 +23,11 @@ export class ModalVersion {
   @Property()
     versionName: string;
 
-  @Property()
-    versionDescription: string;
+  @Property({ nullable: true })
+    versionDescription?: string;
 
-  @Property()
-    algorithmVersion: string;
+  @Property({ nullable: true })
+    algorithmVersion?: string;
 
   @Property()
     path: string;
@@ -49,8 +49,8 @@ export class ModalVersion {
 
   constructor(init: {
       versionName: string;
-      versionDescription: string;
-      algorithmVersion: string;
+      versionDescription?: string;
+      algorithmVersion?: string;
       path: string;
       sharedPath?: string;
       isShared: boolean;
