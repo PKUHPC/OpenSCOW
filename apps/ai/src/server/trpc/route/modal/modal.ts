@@ -34,7 +34,7 @@ export const list = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/modal",
+      path: "/modals",
       tags: ["modal"],
       summary: "list modals",
     },
@@ -62,12 +62,14 @@ export const list = procedure
       ],
     } : {};
 
+    const clusterQuery = input.clusterId ? {
+      clusterId: input.clusterId,
+    } : {};
+
     const [items, count] = await orm.em.findAndCount(Modal, {
-      $and: [
-        nameOrDescQuery,
-        isPublicQuery,
-        { clusterId: input.clusterId },
-      ],
+      ...isPublicQuery,
+      ...nameOrDescQuery,
+      ...clusterQuery,
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
@@ -94,7 +96,7 @@ export const createModal = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/modal",
+      path: "/modals",
       tags: ["modal"],
       summary: "Create a new modal",
     },
@@ -121,7 +123,7 @@ export const updateModal = procedure
   .meta({
     openapi: {
       method: "PUT",
-      path: "/modal/{id}",
+      path: "/modals/{id}",
       tags: ["modal"],
       summary: "update a modal",
     },
@@ -137,7 +139,15 @@ export const updateModal = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modal = await orm.em.findOne(Modal, { id: input.id, owner: user!.identityId });
+    const modal = await orm.em.findOne(Modal, { id: input.id });
+
+    if (!modal) {
+      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.id} not found` });
+    }
+
+    if (modal.owner !== user!.identityId) {
+      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
+    }
 
     if (!modal) {
       throw new TRPCError({
@@ -160,7 +170,7 @@ export const deleteModal = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/modal/{id}",
+      path: "/modals/{id}",
       tags: ["modal"],
       summary: "delete a modal",
     },
@@ -169,13 +179,15 @@ export const deleteModal = procedure
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modal = await orm.em.findOne(Modal, { id: input.id, owner: user!.identityId });
+    const modal = await orm.em.findOne(Modal, { id: input.id });
+
     if (!modal) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Modal ${input.id} not found`,
-      });
-    };
+      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.id} not found` });
+    }
+
+    if (modal.owner !== user!.identityId) {
+      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
+    }
 
     try {
       await orm.em.removeAndFlush(modal);
