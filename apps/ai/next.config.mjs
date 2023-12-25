@@ -10,11 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// const withPlugins = require("next-compose-plugins");
-
-import withPlugins from "next-compose-plugins";
-
-const analyze = process.env.ANALYZE === "true";
+import os from "os";
 
 const ConfigModule = await import("./config.js");
 const { buildRuntimeConfig } = ConfigModule;
@@ -40,6 +36,18 @@ export default async (phase) => {
         ".js": [".ts", ".tsx", ".js"],
         ".jsx": [".ts", ".tsx", ".js"],
       };
+      config.module.rules.push({
+        test: /\.node$/,
+        use: [
+          {
+            loader: "nextjs-node-loader",
+            options: {
+              flags: os.constants.dlopen.RTLD_NOW,
+              outputPath: config.output.path,
+            },
+          },
+        ],
+      });
       return config;
     },
     compiler: {
