@@ -34,7 +34,7 @@ export const getAlgorithms = procedure
     framework: z.nativeEnum(Framework).optional(),
     nameOrDesc: z.string().optional(),
     clusterId:z.string().optional(),
-    isPublic:z.string().optional(),
+    isPublic:z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
     id:z.number(),

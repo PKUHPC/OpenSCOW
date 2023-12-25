@@ -13,7 +13,6 @@
 import { TRPCError } from "@trpc/server";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
-import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
@@ -52,6 +51,7 @@ export const getAlgorithmVersions = procedure
     algorithmId: z.number(),
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
+    isPublic:z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
     id:z.number(),
