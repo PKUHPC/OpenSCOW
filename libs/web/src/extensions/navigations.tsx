@@ -20,8 +20,10 @@ export const BaseNavItem = z.object({
   path: z.string({ description: "目标路径。如果是外部链接，需要以 http:// 或 https:// 开头。如果是SCOW的路径，无需加base path" }),
   clickToPath: z.string().optional(),
   text: z.string(),
-  iconSrc: z.string().optional(),
-  iconAlt: z.string().optional(),
+  icon: z.optional(z.object({
+    src: z.string(),
+    alt: z.string().optional(),
+  })),
   openInNewPage: z.boolean().optional(),
 });
 
@@ -80,8 +82,8 @@ export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]):
       clickToPath: item.clickToPath,
       text: item.text,
       openInNewPage: item.openInNewPage,
-      Icon: (item.iconSrc
-        ? <NavIcon src={item.iconSrc} alt={item.iconAlt} />
+      Icon: (item.icon
+        ? <NavIcon src={item.icon.src} alt={item.icon.alt} />
         : originalItemsMap.get(item.path)?.Icon
       ) ?? LinkOutlined,
       handleClick: originalItemsMap.get(item.path)?.handleClick,

@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { joinWithUrl } from "@scow/utils";
 import { AnyZodObject, z } from "zod";
-
 
 export interface ExtensionRoute<
   TQuery extends Record<string, string | undefined>,
@@ -45,7 +45,7 @@ export const callExtensionRoute = async <
   extensionUrl: string,
 ): Promise<Partial<{ [code in keyof TResponses & number]: z.infer<TResponses[code]> }>> => {
 
-  let url = extensionUrl + route.path;
+  let url = joinWithUrl(extensionUrl, "api", route.path);
 
   const search = new URLSearchParams();
 

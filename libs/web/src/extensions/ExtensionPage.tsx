@@ -62,7 +62,7 @@ export const ExtensionPage: React.FC<Props> = ({ user, uiExtensionStoreConfig, c
 
   query.set("scowLangId", currentLanguageId);
 
-  const url = joinWithUrl(uiExtensionStoreConfig.url, ...pathParts)
+  const url = joinWithUrl(uiExtensionStoreConfig.url, "extensions", ...pathParts)
     + "?" + query.toString();
 
   return (
