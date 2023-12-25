@@ -27,11 +27,11 @@ export class Modal {
   @Property()
     owner: string;
 
-  @Property({ comment: "algorithm algorithmFramework" })
-    algorithmFramework: string;
+  @Property({ comment: "algorithm algorithmFramework", nullable: true })
+    algorithmFramework?: string;
 
-  @Property({ comment: "algorithm name" })
-    algorithmName: string;
+  @Property({ comment: "algorithm name", nullable: true })
+    algorithmName?: string;
 
   @OneToMany(() => "ModalVersion", (modalVersion: ModalVersion) => modalVersion.modal)
     versions = new Collection<ModalVersion>(this);
@@ -54,8 +54,8 @@ export class Modal {
   constructor(init: {
       name: string;
       owner: string;
-      algorithmFramework: string;
-      algorithmName: string;
+      algorithmFramework?: string;
+      algorithmName?: string;
       isShared: boolean;
       description?: string;
       clusterId: string;

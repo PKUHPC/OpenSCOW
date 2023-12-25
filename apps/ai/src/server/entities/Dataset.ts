@@ -40,7 +40,7 @@ export class Dataset {
     scene: string;
 
   @Property({ nullable: true })
-    description: string | undefined;
+    description?: string;
 
   @Property()
     clusterId: string;

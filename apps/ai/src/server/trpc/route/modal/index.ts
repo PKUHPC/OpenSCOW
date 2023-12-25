@@ -12,8 +12,11 @@
 
 import { router } from "src/server/trpc/def";
 
-import { getModals } from "./modal";
+import { createModal, deleteModal, list, updateModal } from "./modal";
 
 export const modal = router({
-  getModals,
+  list,
+  createModal,
+  updateModal,
+  deleteModal,
 });

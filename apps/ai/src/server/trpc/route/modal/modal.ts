@@ -11,56 +11,179 @@
  */
 
 // import { Framework } from "src/models/Algorithm";
-import { Algorithm, Framework } from "src/server/entities/Algorithm";
-import { Dataset } from "src/server/entities/Dataset";
+import { TRPCError } from "@trpc/server";
+import { Modal } from "src/server/entities/Modal";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
 
-const mockModals = [
-  {
-    id: 100,
-    name: "aaa",
-    description: "test1",
-    algorithmName:"algorithmName",
-    algorithmFramwork:"algorithmFramwork",
-    owner:"aaa",
-    createTime: "2023-04-15 12:30:45",
-    versions: [1, 2],
-  },
-  {
-    id: 101,
-    name: "bbb",
-    description: "test2",
-    algorithmName:"algorithmName2",
-    algorithmFramwork:"algorithmFramwork2",
-    owner:"bbb",
-    createTime: "2023-04-15 12:30:45",
-    versions: [1],
-  },
-];
+export const ModalListSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.union([z.string(), z.undefined()]),
+  algorithmName: z.string().optional(),
+  algorithmFramework: z.string().optional(),
+  isShared: z.boolean(),
+  versionsCount: z.number(),
+  owner: z.string(),
+  clusterId: z.string(),
+  createTime: z.string(),
+});
 
-export const getModals = procedure
+export const list = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/modal",
+      tags: ["modal"],
+      summary: "list modals",
+    },
+  })
   .input(z.object({
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
-    nameOrDescription: z.string().optional(),
+    nameOrDesc: z.string().optional(),
+    isShared: z.boolean().optional(),
+    clusterId: z.string().optional(),
   }))
-  .output(z.object({ items: z.array(z.any()), count: z.number() }))
+  .output(z.object({ items: z.array(ModalListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    console.log("user", user);
-    // const [items, count] = await orm.em.findAndCount(Dataset, {
-    //   owner: input.owner || undefined,
-    //   name: input.name || undefined,
-    //   type: input.type || undefined,
-    //   description: input.description || undefined,
-    // }, {
-    //   limit: input.page || 10, // Default limit
-    //   offset: input.pageSize || 0, // Default offset
-    //   orderBy: { createTime: "desc" },
-    // });
 
-    // return { items, count };
-    return { items: mockModals, count: 2 };
+    const isPublicQuery = input.isShared ? {
+      isShared: true,
+      owner: { $ne: null },
+    } : { owner: user?.identityId };
+
+    const nameOrDescQuery = input.nameOrDesc ? {
+      $or: [
+        { name: { $like: `%${input.nameOrDesc}%` } },
+        { description: { $like: `%${input.nameOrDesc}%` } },
+      ],
+    } : {};
+
+    const [items, count] = await orm.em.findAndCount(Modal, {
+      $and: [
+        nameOrDescQuery,
+        isPublicQuery,
+        { clusterId: input.clusterId },
+      ],
+    }, {
+      limit: input.pageSize || undefined,
+      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+      populate: ["versions"],
+      orderBy: { createTime: "desc" },
+    });
+
+    return { items: items.map((x) => {
+      return {
+        id: x.id,
+        name: x.name,
+        description: x.description,
+        algorithmName: x.algorithmName,
+        algorithmFramework: x.algorithmFramework,
+        isShared: Boolean(x.isShared),
+        versionsCount: x.versions.count(),
+        owner: x.owner,
+        clusterId: x.clusterId,
+        createTime: x.createTime ? x.createTime.toISOString() : "",
+      }; }), count };
   });
+
+export const createModal = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/modal",
+      tags: ["modal"],
+      summary: "Create a new modal",
+    },
+  })
+  .input(z.object({
+    name: z.string(),
+    algorithmName: z.string().optional(),
+    algorithmFramework: z.string().optional(),
+    description: z.string().optional(),
+    clusterId: z.string(),
+  }))
+  .output(z.number())
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+
+    // TODO: 判断集群是否可以连接？
+
+    const modal = new Modal({ ...input, owner: user!.identityId, isShared: false });
+    await orm.em.persistAndFlush(modal);
+    return modal.id;
+  });
+
+export const updateModal = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/modal/{id}",
+      tags: ["modal"],
+      summary: "update a modal",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    clusterId: z.string(),
+    name: z.string(),
+    algorithmName: z.string().optional(),
+    algorithmFramework: z.string().optional(),
+    description: z.string().optional(),
+  }))
+  .output(z.number())
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const modal = await orm.em.findOne(Modal, { id: input.id, owner: user!.identityId });
+
+    if (!modal) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Dataset ${input.id} not found`,
+      });
+    };
+
+    // TODO: 判断集群是否可以连接？
+    modal.name = input.name;
+    modal.algorithmName = input.algorithmName;
+    modal.algorithmFramework = input.algorithmFramework;
+    modal.description = input.description;
+
+    await orm.em.flush();
+    return modal.id;
+  });
+
+export const deleteModal = procedure
+  .meta({
+    openapi: {
+      method: "DELETE",
+      path: "/modal/{id}",
+      tags: ["modal"],
+      summary: "delete a modal",
+    },
+  })
+  .input(z.object({ id: z.number() }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const modal = await orm.em.findOne(Modal, { id: input.id, owner: user!.identityId });
+    if (!modal) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Modal ${input.id} not found`,
+      });
+    };
+
+    try {
+      await orm.em.removeAndFlush(modal);
+      return { success: true };
+    } catch (error) {
+      // rollback
+      console.error("Error deleting dataset:", error);
+      return { success: false };
+    }
+  });
+

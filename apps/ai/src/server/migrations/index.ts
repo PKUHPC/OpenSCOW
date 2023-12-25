@@ -13,10 +13,12 @@
 import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
 import { Migration20231221083225 } from "src/server/migrations/Migration20231221083225";
 import { Migration20231223072956 } from "./Migration20231223072956";
+import { Migration20231225062131 } from "./Migration20231225062131";
 
 export const migrations =
 [
   Migration20231221073202,
   Migration20231221083225,
-  Migration20231223072956
+  Migration20231223072956,
+  Migration20231225062131
 ].map((x) => ({ name: x.name, class: x }));

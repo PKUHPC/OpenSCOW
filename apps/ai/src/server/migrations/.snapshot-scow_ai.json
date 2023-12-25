@@ -659,7 +659,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "comment": "algorithm algorithmFramework",
           "mappedType": "string"
         },
@@ -669,7 +669,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "comment": "algorithm name",
           "mappedType": "string"
         },
