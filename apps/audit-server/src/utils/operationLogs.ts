@@ -11,7 +11,6 @@
  */
 
 import { FilterQuery } from "@mikro-orm/core";
-import { OperationEvent } from "@scow/lib-operation-log";
 import {
   CreateOperationLogRequest,
   OperationLog,
