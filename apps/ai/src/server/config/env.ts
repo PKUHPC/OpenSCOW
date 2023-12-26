@@ -33,4 +33,7 @@ export const config = envConfig({
 });
 
 const building = process.env.BUILDING === "1";
-export const rootKeyPair = building ? "" : getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
+export const rootKeyPair = building ? {
+  publicKey: "",
+  privateKey: "",
+} : getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
