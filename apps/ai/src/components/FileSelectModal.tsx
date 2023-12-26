@@ -11,20 +11,24 @@
  */
 
 import { DatabaseOutlined, FolderAddOutlined } from "@ant-design/icons";
-import { Button, Modal } from "antd";
+import { Button, Modal, Space, Tree } from "antd";
+import type { DataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useCallback, useRef, useState } from "react";
+import React, { Key, useCallback, useEffect, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileInfo } from "src/models/File";
+import { Cluster } from "src/utils/config";
+import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
 import { FileTable } from "./FileTable";
 import { MkdirModal } from "./mkdirModal";
 import { PathBar } from "./PathBar";
 
+const { DirectoryTree } = Tree;
 
 const ModalContainer = styled.div`
   display: flex;
@@ -43,10 +47,54 @@ const TopBar = styled(FilterFormContainer)`
 `;
 
 interface Props {
-  // TODO
-  cluster: any,
+  cluster?: Cluster,
   onSubmit: (path: string) => void;
 }
+
+interface DirContent {
+  type: string;
+  name: string;
+  mtime: string;
+  size: number;
+  mode: number;
+};
+
+function convertToDirTree(data: DirContent[], targetKey: string): DataNode[] {
+
+  const sortedData = data.sort((a, b) => {
+    if (a.type === "DIR" && b.type !== "DIR") {
+      return -1;
+    } else if (a.type !== "DIR" && b.type === "DIR") {
+      return 1;
+    }
+    return 0;
+  });
+
+  // 转换为 treeData 格式
+  return sortedData.map((item) => ({
+    title: item.name,
+    key: join(targetKey, item.name),
+    isLeaf: item.type === "FILE",
+  }));
+}
+
+function updateTreeData(treeData: DataNode[], targetKey: string, newChildren: DirContent[]): DataNode[] {
+  return treeData.map((node) => {
+    // 如果找到了目标节点（即当前目录）
+    if (node.key === targetKey) {
+      // 将新内容转换为 DataNode[] 并设置为 children
+      const childrenNodes = convertToDirTree(newChildren, targetKey);
+      return { ...node, children: childrenNodes };
+    }
+
+    // 如果当前节点有子节点，递归地更新它们
+    if (node.children) {
+      return { ...node, children: updateTreeData(node.children, targetKey, newChildren) };
+    }
+
+    return node;
+  });
+};
 
 // 处理path的特殊情况,比如为空或者不以"/"开头
 const formatPath = (path: string) => {
@@ -63,33 +111,45 @@ const formatPath = (path: string) => {
 export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const [visible, setVisible] = useState(false);
-  const [path, setPath] = useState<string>("/");
+  const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+  const [dirTree, setDirTree] = useState<DataNode[]>([]);
 
   const prevPathRef = useRef<string>(path);
 
-  // const fileFilter = (files: FileInfo[]): FileInfo[] => {
-  //   return files.filter(
-  //     (file) => file.type === "DIR" && !file.name.startsWith("."));
-  // };
+  trpc.file.getHomeDir.useQuery({ clusterId: cluster ? cluster.id : "" }, {
+    enabled: !!cluster && path === "~",
+    onSuccess(data) {
+      setPath(data.path);
+    },
+  });
 
-  // const listFilePromiseFn = useCallback(async () => {
-  //   return visible
-  //     ? await api.listFile({ query: { cluster: cluster.id, path: join("/", path) } })
-  //     : { items: []};
-  // }, [path, cluster, visible]);
+  const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
+    clusterId: cluster ? cluster.id : "",
+    path,
+  }, {
+    enabled: !!cluster,
+  });
 
-  // const { data, isLoading: isFileLoading, reload } = useAsync({
-  //   promiseFn: listFilePromiseFn,
-  //   onResolve(_) {
-  //     prevPathRef.current = path;
-  //   },
-  //   onReject(_) {
-  //     if (prevPathRef.current !== path) {
-  //       setPath(prevPathRef.current);
-  //     }
-  //   },
-  // });
+  useEffect(() => {
+    if (visible) {
+      refetch();
+    }
+  }, [visible]);
+
+  useEffect(() => {
+    if (!curDirContent) return;
+
+    if (dirTree.length === 0) {
+      setDirTree(convertToDirTree(curDirContent, path));
+    } else {
+      setDirTree(updateTreeData(dirTree, path, curDirContent));
+    }
+  }, [curDirContent]);
+
+  const onLoadDir = async ({ key }: any) => {
+    setPath(key);
+  };
 
   const closeModal = () => {
     setVisible(false);
@@ -118,14 +178,14 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
     <>
       <Button size="small" onClick={() => { setVisible(true); }}><FolderAddOutlined /></Button>
       <Modal
-        width={600}
+        width={1000}
         open={visible}
         onCancel={() => { closeModal(); }}
         title="选择文件"
         footer={[
           <MkdirButton
             key="new"
-            cluster={cluster.id}
+            cluster={cluster?.id ?? ""}
             path={join("/", path)}
             //
             reload={() => {}}
@@ -165,31 +225,40 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
               }
             />
           </TopBar>
-          <FileTable
-            style={{ width: "100%" }}
-            // files={data?.items || []}
-            files={[]}
-            // filesFilter={fileFilter}
-            fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
-            hiddenColumns={["size", "mode"]}
-            // loading={isLoading}
-            pagination={false}
-            rowKey={(r: FileInfo): React.Key => join(path, r.name)}
-            onRow={(r) => ({
-              onClick: () => {
-                setSelectedKeys([join(path, r.name)]);
-              },
-              onDoubleClick: () => {
-                setPath(join(path, r.name));
-              },
-            })}
-            rowSelection={{
-              type: "radio",
-              selectedRowKeys: selectedKeys,
-              onChange: setSelectedKeys,
-            }}
-            scroll={{ x: true, y: 500 }}
-          />
+          <Space style={{ alignItems: "flex-start" }}>
+            <DirectoryTree
+              style={{ width: 240, height: 541, overflow: "auto",
+                border: "1px solid #e0e0e0", borderRadius: "5px" }}
+              showLine
+              loadData={onLoadDir}
+              treeData={dirTree}
+            />
+            <div style={{ border: "1px solid #e0e0e0", borderRadius: "5px" }}>
+              <FileTable
+                files={curDirContent || []}
+                loading={isDirContentLoading}
+                fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
+                hiddenColumns={["mtime", "mode", "action"]}
+                pagination={false}
+                rowKey={(r: FileInfo): React.Key => join(path, r.name)}
+                onRow={(r) => ({
+                  onClick: () => {
+                    setSelectedKeys([join(path, r.name)]);
+                  },
+                  onDoubleClick: () => {
+                    setPath(join(path, r.name));
+                  },
+                })}
+                rowSelection={{
+                  type: "radio",
+                  selectedRowKeys: selectedKeys,
+                  onChange: setSelectedKeys,
+                }}
+                scroll={{ x: true, y: 500 }}
+              />
+            </div>
+
+          </Space>
         </ModalContainer>
       </Modal>
     </>

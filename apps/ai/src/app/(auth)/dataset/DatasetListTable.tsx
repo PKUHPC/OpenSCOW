@@ -17,7 +17,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Form, Input, Select, Space, Table } from "antd";
 import NextError from "next/error";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -100,6 +100,10 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     },
   });
 
+  const getCurrentCluster = useCallback((clusterId: string) => {
+    return clusters.find((c) => c.id === clusterId);
+  }, [clusters]);
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -157,7 +161,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "name", title: "名称" },
           { dataIndex: "clusterId", title: "集群",
             render: (_, r) =>
-              getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
+              getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
           { dataIndex: "type", title: "数据集类型",
             render: (_, r) => DatasetTypeText[r.type] },
           { dataIndex: "description", title: "数据集描述" },
@@ -178,6 +182,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                         datasetId={r.id}
                         datasetName={r.name}
                         refetch={refetch}
+                        cluster={getCurrentCluster(r.clusterId)}
                       >
                         创建新版本
                       </CreateEditDVersionModalButton>

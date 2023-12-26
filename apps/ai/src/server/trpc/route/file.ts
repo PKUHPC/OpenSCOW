@@ -26,11 +26,15 @@ import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
+const FileType = z.union([z.literal("FILE"), z.literal("DIR")]);
 
-export enum FileInfo_FileType {
-  FILE = 0,
-  DIR = 1,
-}
+export const ListDirectorySchema = z.object({
+  type: FileType,
+  name: z.string(),
+  mtime: z.string(),
+  size: z.number(),
+  mode: z.number(),
+});
 
 export const file = router({
   getHomeDir: authProcedure
@@ -167,6 +171,7 @@ export const file = router({
 
   listDirectory: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .output(z.array(ListDirectorySchema))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 

@@ -10,12 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetVersionInterface } from "src/models/Dateset";
 import { AppRouter } from "src/server/trpc/router";
+import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
@@ -24,7 +26,8 @@ export interface Props {
   datasetId: number;
   datasetName: string;
   isEdit?: boolean;
-  editData?: DatasetVersionInterface
+  editData?: DatasetVersionInterface;
+  cluster?: Cluster;
   refetch: () => void;
 }
 
@@ -35,7 +38,7 @@ interface FormFields {
 }
 
 export const CreateEditDVersionModal: React.FC<Props> = (
-  { open, onClose, datasetId, datasetName, isEdit, editData, refetch },
+  { open, onClose, datasetId, datasetName, isEdit, editData, cluster, refetch },
 ) => {
 
   const [form] = Form.useForm<FormFields>();
@@ -106,6 +109,11 @@ export const CreateEditDVersionModal: React.FC<Props> = (
           {datasetName}
         </Form.Item>
         <Form.Item
+          label="集群"
+        >
+          {getI18nConfigCurrentText(cluster?.name, undefined)}
+        </Form.Item>
+        <Form.Item
           label="版本名称"
           name="versionName"
           rules={[
@@ -130,7 +138,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
                     form.setFields([{ name: "path", value: path, touched: true }]);
                     form.validateFields(["path"]);
                   }}
-                  cluster={{ id: "A", name: "a" }}
+                  cluster={cluster}
                 />
               )
             }
