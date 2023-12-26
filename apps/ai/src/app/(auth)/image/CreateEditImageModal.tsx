@@ -192,7 +192,7 @@ export const CreateEditImageModal: React.FC<Props> = (
                         form.setFields([{ name: "sourcePath", value: path, touched: true }]);
                         form.validateFields(["sourcePath"]);
                       }}
-                      cluster={"A"}
+                      clusterId={"A"}
                     />
                   )
                 }
