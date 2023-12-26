@@ -19,6 +19,7 @@ import { validateToken } from "src/server/auth/token";
 import { router } from "src/server/trpc/def";
 import { baseProcedure, procedure } from "src/server/trpc/procedure/base";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
 export const auth = router({
@@ -57,7 +58,7 @@ export const auth = router({
         //   };
         //   await callLog(logInfo, OperationResult.SUCCESS);
         // }
-        res.redirect(publicConfig.BASE_PATH);
+        res.redirect(BASE_PATH);
       } else {
         throw new TRPCError({
           message: "Token has expired",
@@ -81,7 +82,7 @@ export const auth = router({
       console.log("req", req.headers.host);
 
       const callbackUrl = `${ runtimeConfig.PROTOCOL || "http"}://${req.headers.host}`
-       + join(publicConfig.BASE_PATH, "/api/auth/callback");
+       + join(BASE_PATH, "/api/auth/callback");
 
       const target = joinWithUrl(runtimeConfig.AUTH_EXTERNAL_URL,
         `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);

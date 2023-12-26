@@ -12,21 +12,17 @@
 
 import { IncomingMessage } from "http";
 import { NextApiRequest, NextApiResponse, NextPageContext } from "next";
-import { NextRequest } from "next/server.js";
-import { deleteUserToken, getUserToken } from "src/server/auth/cookie.js";
-import { ClientUserInfo } from "src/server/auth/models.js";
-import { USE_MOCK } from "src/utils/mock.js";
+import { NextRequest } from "next/server";
+import { deleteUserToken, getUserToken } from "src/server/auth/cookie";
+import { ClientUserInfo } from "src/server/auth/models";
+import { USE_MOCK } from "src/utils/processEnv";
 
 import { validateToken } from "./token";
 
 export const mockUserInfo: ClientUserInfo = {
-  identityId: "123",
-  name:"dsds",
-  // accountId: 12,
-  // phone:"13121812324",
-  // email:"123@qq.com",
-  // createTime:"2023-9-6 14:19:47",
-  token: "123",
+  identityId: "demo_admin",
+  name:"mock-user",
+  token: "demo_admin",
 };
 
 type RequestType = IncomingMessage | NextApiRequest | NextRequest | NextPageContext["req"];

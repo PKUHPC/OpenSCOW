@@ -77,8 +77,6 @@ const specs = {
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
-  SERVER_URL: str({ desc: "门户后端的路径", default: "portal-server:5000" }),
-
   MOCK_USER_ID: str({ desc: "开发和测试的时候所使用的user id", default: undefined }),
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
@@ -155,7 +153,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
-    SERVER_URL: config.SERVER_URL,
     // HOME_TEXTS: portalConfig.homeText.hostnameMap,
     // HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
@@ -238,18 +235,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
-
-    // HACK setup ws proxy
-    // setTimeout(() => {
-    //   const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
-    //   console.log("Calling setup url to initialize proxy and shell server", url);
-
-    //   fetch(url).then(async (res) => {
-    //     console.log("Call completed. Response: ", await res.text());
-    //   }).catch((e) => {
-    //     console.error("Error when calling proxy url to initialize ws proxy server", e);
-    //   });
-    // });
 
   }
 

@@ -10,18 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { USE_MOCK } from "src/utils/processEnv";
-import { z } from "zod";
+import { runComposeCommand } from "src/compose/cmd";
+import { getInstallConfig } from "src/config/install";
 
-export async function mock<T>(actualFn: () => T, mockFn: () => T) {
-  if (USE_MOCK) {
-    return mockFn();
-  } else {
-    return actualFn();
-  }
+interface Options {
+  configPath: string;
 }
 
-export const pagination = z.object({
-  page: z.number(),
-  pageSize: z.number().default(10),
-});
+export const enterAiDb = async (options: Options) => {
+
+  const config = getInstallConfig(options.configPath);
+
+  if (!config.ai) {
+    throw new Error("ai is not deployed. db is not deployed");
+  }
+
+  runComposeCommand(config, ["exec", "ai-db", "mysql", "-uroot", `-p'${config.ai.dbPassword}'`]);
+};

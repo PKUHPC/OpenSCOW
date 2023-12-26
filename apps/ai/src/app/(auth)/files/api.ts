@@ -12,8 +12,7 @@
 
 import { join } from "path";
 import { UploadQuery } from "src/app/(auth)/files/upload/route";
-// import { BASE_PATH } from "src/utils/config";
-const BASE_PATH = "/";
+import { BASE_PATH } from "src/utils/processEnv";
 
 export const urlToDownload = (
   clusterId: string, path: string, download: boolean,

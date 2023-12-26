@@ -15,6 +15,7 @@ import http from "http";
 import httpProxy from "http-proxy";
 import { join } from "path";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { BASE_PATH } from "src/utils/processEnv";
 
 import { getUserInfo } from "../auth/server";
 
@@ -28,7 +29,7 @@ export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): htt
 
   const normalizedUrl = normalizePathnameWithQuery(url);
 
-  const basePath = publicConfig.BASE_PATH;
+  const basePath = BASE_PATH;
 
   // skip base path
   const relativePath = urlIncludesBasePath
@@ -79,7 +80,7 @@ export const setupWssProxy = (server: http.Server) => {
 
     const url = normalizePathnameWithQuery(req.url!);
 
-    if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/proxy"))) { return; }
+    if (!url.startsWith(join(BASE_PATH, "/api/proxy"))) { return; }
 
     const writeError = (statusLine: string, msg: string) => {
       socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);

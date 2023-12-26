@@ -37,8 +37,6 @@ export interface ServerRuntimeConfig {
 
   LOGIN_NODES: Record<string, string>;
 
-  SERVER_URL: string;
-
   // HOME_TEXTS: {[hostname: string]: string };
 
   // HOME_TITLES: {[hostname: string]: string };

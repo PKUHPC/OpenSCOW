@@ -16,16 +16,7 @@ import { defineConfig } from "@mikro-orm/mysql";
 import { entities } from "src/server/entities";
 import { migrations } from "src/server/migrations";
 
-const aiConfig = {
-  db: {
-    host: "localhost",
-    port: 3306,
-    user: "root",
-    dbName: "scow_ai",
-    password: "mysqlrootpassword",
-    debug: true,
-  },
-};
+import { aiConfig } from "./ai";
 
 const distPath = "src/server";
 

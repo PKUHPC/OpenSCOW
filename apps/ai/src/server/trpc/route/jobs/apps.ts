@@ -26,6 +26,7 @@ import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { publicConfig } from "src/utils/config";
+import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
 export enum JobType {
@@ -175,7 +176,7 @@ export const createAppSession = procedure
     const apps = getClusterAppConfigs(clusterId);
     const app = apps[appId];
 
-    const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy", clusterId);
+    const proxyBasePath = join(BASE_PATH, "/api/proxy", clusterId);
     if (!app) {
       throw new TRPCError({
         code: "NOT_FOUND",

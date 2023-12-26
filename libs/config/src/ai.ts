@@ -17,8 +17,6 @@ import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 export const AiConfigSchema = Type.Object({
 
-  url: Type.String({ description: "Ai Server的URL, 默认为ai-server:5000", default: "ai-server:5000" }),
-
   db: Type.Object({
     host: Type.String({ description: "数据库地址" }),
     port: Type.Integer({ description: "数据库端口" }),

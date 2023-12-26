@@ -13,16 +13,14 @@
 import { getUser, validateToken as authValidateToken } from "@scow/lib-auth";
 import { UserInfo } from "src/models/User";
 import { runtimeConfig } from "src/utils/config";
-import { USE_MOCK } from "src/utils/mock";
+import { USE_MOCK } from "src/utils/processEnv";
+
+import { mockUserInfo } from "./server";
 
 export async function validateToken(token: string | undefined): Promise<UserInfo | undefined> {
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
-    // if (!runtimeConfig.MOCK_USER_ID) {
-    //   throw new Error("Using mock user id but runtimeConfig.MOCK_USER_ID is not set");
-    // }
-    // return { identityId: runtimeConfig.MOCK_USER_ID, name: runtimeConfig.MOCK_USER_ID };
-    return { identityId: "demo_admin", name: "demo_admin" };
+    return mockUserInfo;
   }
 
   if (!token) { return undefined; }

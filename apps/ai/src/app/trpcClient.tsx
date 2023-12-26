@@ -15,15 +15,12 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client";
 import { message } from "antd";
-import { Console } from "console";
-import { usePathname, useRouter } from "next/navigation";
 import { join } from "path";
 import { useState } from "react";
 import { AppRouter } from "src/server/trpc/router";
+import { BASE_PATH } from "src/utils/processEnv";
 import { trpc } from "src/utils/trpc";
 import superjson from "superjson";
-const BASE_PATH = process.env.BASE_PATH || "/";
-
 
 function getBaseUrl() {
   if (typeof window !== "undefined")
@@ -40,7 +37,6 @@ function getBaseUrl() {
 }
 
 export function ClientProvider(props: { children: React.ReactNode }) {
-  const router = useRouter();
 
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
