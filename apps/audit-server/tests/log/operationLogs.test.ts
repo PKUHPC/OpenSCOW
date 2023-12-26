@@ -200,19 +200,19 @@ it("create operation log with targetAccountName", async () => {
   });
 
   expect(operationLogs[0].metaData?.$case).toEqual("exportOperationLog");
-  expect(operationLogs[0].metaData?.exportOperationLog)
+  expect(operationLogs[0].metaData?.[operationLogs[0].metaData?.$case])
     .toEqual(exportOperationLog.operationEvent.exportOperationLog);
   expect(operationLogs[0].metaData?.targetAccountName)
     .toEqual(exportOperationLog.operationEvent.exportOperationLog.source.account.accountName);
 
   expect(operationLogs[1].metaData?.$case).toEqual("exportPayRecord");
-  expect(operationLogs[1].metaData?.exportPayRecord)
+  expect(operationLogs[1].metaData?.[operationLogs[1].metaData?.$case])
     .toEqual(exportPayRecordLog.operationEvent.exportPayRecord);
   expect(operationLogs[1].metaData?.targetAccountName)
     .toEqual(exportPayRecordLog.operationEvent.exportPayRecord.target.accountOfTenant.accountName);
 
   expect(operationLogs[2].metaData?.$case).toEqual("exportChargeRecord");
-  expect(operationLogs[2].metaData?.exportChargeRecord)
+  expect(operationLogs[2].metaData?.[operationLogs[2].metaData?.$case])
     .toEqual(exportChargeRecordLog.operationEvent.exportChargeRecord);
   expect(operationLogs[2].metaData?.targetAccountName)
     .toEqual(exportChargeRecordLog.operationEvent.exportChargeRecord.target.accountOfTenant.accountName);
