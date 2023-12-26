@@ -71,12 +71,6 @@ export async function POST(request: NextRequest) {
 
 }
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 
 function readableStreamToNodeReadable(readableStream: ReadableStream<Uint8Array>) {
   const nodeReadable = new Readable();

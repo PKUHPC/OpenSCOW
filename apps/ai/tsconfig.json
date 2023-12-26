@@ -34,7 +34,6 @@
     "**/*.ts",
     "**/*.tsx",
     "src/**/*.ts",
-    "src/server/migrations/Migration20231128072018.mjs",
     ".next/types/**/*.ts"
   ],
   "exclude": [

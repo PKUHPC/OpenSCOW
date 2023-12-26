@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- node --watch --loader ts-paths-esm-loader server/index.ts",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
-    "build": "next build",
+    "build": "npm run build:next",
     "build:next": "cross-env BUILDING=1 next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "serve": "node build/server/index.js",

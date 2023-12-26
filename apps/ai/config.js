@@ -109,7 +109,7 @@ const config = { _specs: specs };
 const buildRuntimeConfig = async (phase, basePath) => {
 
   // https://github.com/vercel/next.js/issues/57927
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
 
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
@@ -156,15 +156,15 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
-    HOME_TEXTS: portalConfig.homeText.hostnameMap,
-    HOME_TITLES: portalConfig.homeTitle.hostnameMap,
+    // HOME_TEXTS: portalConfig.homeText.hostnameMap,
+    // HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
 
     SERVER_I18N_CONFIG_TEXTS: {
-      defaultHomeTitle: portalConfig.homeTitle.defaultText,
-      defaultHomeText:  portalConfig.homeText.defaultText,
+      // defaultHomeTitle: portalConfig.homeTitle.defaultText,
+      // defaultHomeText:  portalConfig.homeText.defaultText,
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
 

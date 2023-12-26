@@ -166,7 +166,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 clusterId={r.clusterId}
                 algorithmName={r.name}
                 algorithmFramework={r.framework}
-                algorithmDescription={r.description}
+                // algorithmDescription={r.description}
               >
                 编辑
               </EditModalModalButton>

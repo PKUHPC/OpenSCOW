@@ -12,9 +12,9 @@
 
 import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
 import { Migration20231221083225 } from "src/server/migrations/Migration20231221083225";
-import { Migration20231223072956 } from "./Migration20231223072956";
-import { Migration20231225062131 } from "./Migration20231225062131";
-import { Migration20231225081243 } from "./Migration20231225081243";
+import { Migration20231223072956 } from "src/server/migrations/Migration20231223072956";
+import { Migration20231225062131 } from "src/server/migrations/Migration20231225062131";
+import { Migration20231225081243 } from "src/server/migrations/Migration20231225081243";
 
 export const migrations =
 [

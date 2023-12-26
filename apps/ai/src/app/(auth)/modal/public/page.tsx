@@ -18,7 +18,7 @@ export default function Page() {
   return (
     <div>
       <PageTitle titleText="公共算法" />
-      <ModalTable isPublic={true} />
+      <ModalTable isPublic={true} clusters={[]} />
     </div>
   );
 }
