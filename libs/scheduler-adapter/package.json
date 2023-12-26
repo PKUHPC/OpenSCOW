@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-scheduler-adapter",
-  "version": "1.1.1",
+  "version": "1.1.3",
   "description": "",
   "main": "build/index.js",
   "private": true,

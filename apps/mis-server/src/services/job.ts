@@ -31,6 +31,7 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -374,6 +375,58 @@ export const jobServiceServer = plugin((server) => {
         }
       }
 
+    },
+
+    getTopSubmitJobUsers: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      qb
+        .select("j.user as userId, COUNT(*) as count")
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("j.user")
+        .orderBy({ "COUNT(*)": QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {userId: string, count: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    getNewJobCount: async ({ request, em }) => {
+      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      qb
+        .select("DATE(j.time_submit) as date, COUNT(*) as count")
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("DATE(j.time_submit)")
+        .orderBy({ "DATE(j.time_submit)": QueryOrder.DESC });
+
+      const results: {date: string, count: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    getJobTotalCount: async ({ em }) => {
+      const count = await em.count(JobInfoEntity, {});
+      return [{ count }];
     },
 
     cancelJob: async ({ request, logger }) => {

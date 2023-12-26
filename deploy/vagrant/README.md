@@ -17,6 +17,12 @@
 
 ## 使用
 
+### 部署前准备
+
+- 下载最新Release的scow-cli，拷贝至`scow\scow-deployment`目录，并命名为`cli`;
+- 编译生成最新的适配器可执行程序(CentOS7.9)，替换`adapter`目录下的`scow-slurm-adapter-amd64`(默认为与SCOW`v1.2.3`匹配版本)，[编译参考文档](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-下载代码编译生成二进制文件自己编译生成二进制文件)；
+- 修改配置文件`scow\scow-deployment\install.yaml`，`imageTag`修改为与`cli`匹配的版本，例如`v1.2.3`。
+
 ### 集群一键部署命令
 
 ```shell

@@ -370,6 +370,19 @@ message ChangeEmailResponse {
 }
 
 
+message GetNewUserCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetNewUserCountResponse {
+  message DailyUserCount {
+    google.protobuf.Timestamp date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyUserCount results = 1;
+}
+
 
 service UserService {
 
@@ -414,4 +427,6 @@ service UserService {
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
   rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
+
+  rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
 }

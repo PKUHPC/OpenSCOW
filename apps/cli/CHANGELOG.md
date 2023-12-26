@@ -1,5 +1,24 @@
 # @scow/cli
 
+## 1.3.0
+
+### Minor Changes
+
+- 2302a4639e: install.yaml 文件增加 mis.nodeOptions 参数，可传递给所有 node 服务参数，如“--max-old-space-size=8192”
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+
 ## 1.2.2
 
 ### Patch Changes
