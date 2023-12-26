@@ -58,6 +58,7 @@ export const getAlgorithmVersions = procedure
     versionName:z.string(),
     versionDescription:z.string(),
     path:z.string(),
+    privatePath: z.string(),
     isShared:z.boolean(),
     createTime:z.string(),
   })), count: z.number() }))
@@ -81,6 +82,7 @@ export const getAlgorithmVersions = procedure
         isShared:x.isShared,
         createTime:x.createTime ? x.createTime.toISOString() : "",
         path:x.path,
+        privatePath: x.privatePath,
       };
     }), count };
   });
@@ -113,7 +115,7 @@ export const createAlgorithmVersion = procedure
       { versionName: input.versionName, algorithm });
     if (algorithmVersionExist) throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
 
-    const algorithmVersion = new AlgorithmVersion({ ...input, algorithm: algorithm });
+    const algorithmVersion = new AlgorithmVersion({ ...input, privatePath: input.path, algorithm: algorithm });
     await em.persistAndFlush(algorithmVersion);
     return { id: algorithmVersion.id };
   });
@@ -131,7 +133,6 @@ export const updateAlgorithmVersion = procedure
     algorithmId: z.number(),
     versionId: z.number(),
     versionName: z.string(),
-    path: z.string(),
     versionDescription: z.string().optional(),
   }))
   .output(z.object({ id: z.number() }))
@@ -150,7 +151,6 @@ export const updateAlgorithmVersion = procedure
     }
 
     algorithmVersion.versionName = input.versionName;
-    algorithmVersion.path = input.path;
     algorithmVersion.versionDescription = input.versionDescription;
 
     await orm.em.flush();

@@ -46,7 +46,7 @@ export const VersionListSchema = z.object({
   isShared: z.boolean(),
   versionDescription: z.string().optional(),
   path: z.string(),
-  sharedPath: z.string().optional(),
+  privatePath: z.string(),
   createTime: z.string(),
   datasetId: z.number(),
   // datasetName: z.string(),
@@ -86,8 +86,8 @@ export const versionList = procedure
         id: x.id,
         versionName: x.versionName,
         versionDescription: x.versionDescription,
+        privatePath: x.privatePath,
         path: x.path,
-        sharedPath: x.sharedPath,
         isShared: Boolean(x.isShared),
         createTime: x.createTime ? x.createTime.toISOString() : "",
         datasetId: x.dataset.id,
@@ -120,7 +120,7 @@ export const createDatasetVersion = procedure
     if (dataset && dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    const datasetVersion = new DatasetVersion({ ...input, dataset: dataset });
+    const datasetVersion = new DatasetVersion({ ...input, privatePath: input.path, dataset: dataset });
     await orm.em.persistAndFlush(datasetVersion);
     return { id: datasetVersion.id };
   });
@@ -137,7 +137,6 @@ export const updateDatasetVersion = procedure
   .input(z.object({
     id: z.number(),
     versionName: z.string(),
-    path: z.string(),
     versionDescription: z.string().optional(),
     datasetId: z.number(),
   }))
@@ -155,7 +154,6 @@ export const updateDatasetVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
     datasetVersion.versionName = input.versionName;
-    datasetVersion.path = input.path;
     datasetVersion.versionDescription = input.versionDescription;
 
     await orm.em.flush();

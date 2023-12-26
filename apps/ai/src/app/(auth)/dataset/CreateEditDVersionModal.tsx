@@ -74,7 +74,6 @@ export const CreateEditDVersionModal: React.FC<Props> = (
       id: editData.id,
       versionName,
       versionDescription,
-      path,
       datasetId: editData.datasetId,
     })
       : createMutation.mutate({

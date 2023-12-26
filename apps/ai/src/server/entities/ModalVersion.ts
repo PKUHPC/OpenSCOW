@@ -30,10 +30,11 @@ export class ModalVersion {
     algorithmVersion?: string;
 
   @Property()
-    path: string;
+    privatePath: string;
 
-  @Property({ nullable: true })
-    sharedPath?: string;
+  // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
+  @Property()
+    path: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -52,7 +53,7 @@ export class ModalVersion {
       versionDescription?: string;
       algorithmVersion?: string;
       path: string;
-      sharedPath?: string;
+      privatePath: string;
       isShared: boolean;
       modal: Modal;
       createTime?: Date;
@@ -63,7 +64,7 @@ export class ModalVersion {
     this.versionDescription = init.versionDescription;
     this.algorithmVersion = init.algorithmVersion;
     this.path = init.path;
-    this.sharedPath = init.sharedPath;
+    this.privatePath = init.privatePath;
     this.isShared = init.isShared;
     this.modal = toRef(init.modal);
 

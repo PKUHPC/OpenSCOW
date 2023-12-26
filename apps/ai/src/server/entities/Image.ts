@@ -41,11 +41,13 @@ export class Image {
   @Property()
     clusterId: string;
 
+  // 这里是上传镜像时的源文件path
+  @Property()
+    sourcePath: string;
+
+  // 这里是提交作业时可以使用的真实镜像path，每次上传镜像一定对应一个真实的镜像path
   @Property()
     path: string;
-
-  @Property({ nullable: true })
-    sharedPath?: string;
 
   @Property()
     isShared: boolean;
@@ -63,7 +65,7 @@ export class Image {
       tags: string;
       description?: string;
       path: string;
-      sharedPath?: string;
+      sourcePath: string;
       isShared?: boolean;
       clusterId: string;
       createTime?: Date;
@@ -76,7 +78,7 @@ export class Image {
     this.tags = init.tags;
     this.description = init.description;
     this.path = init.path;
-    this.sharedPath = init.sharedPath;
+    this.sourcePath = init.sourcePath;
     this.isShared = init.isShared || false;
     this.clusterId = init.clusterId;
 

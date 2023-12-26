@@ -75,7 +75,6 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         versionId,
         versionName,
         versionDescription,
-        path:"123",
         algorithmId,
       });
     }

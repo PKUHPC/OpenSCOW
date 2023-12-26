@@ -27,10 +27,11 @@ export class DatasetVersion {
     versionDescription: string | undefined;
 
   @Property()
-    path: string;
+    privatePath: string;
 
-  @Property({ nullable: true })
-    sharedPath?: string;
+  // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
+  @Property()
+    path: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -48,7 +49,7 @@ export class DatasetVersion {
       versionName: string;
       versionDescription?: string;
       path: string;
-      sharedPath?: string;
+      privatePath: string;
       createTime?: Date;
       isShared?: boolean;
       dataset: Dataset;
@@ -58,7 +59,7 @@ export class DatasetVersion {
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.path = init.path;
-    this.sharedPath = init.sharedPath;
+    this.privatePath = init.privatePath;
     this.isShared = init.isShared || false;
     this.dataset = toRef(init.dataset);
 

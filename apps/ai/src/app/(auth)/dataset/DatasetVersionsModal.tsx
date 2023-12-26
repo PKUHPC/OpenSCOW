@@ -103,7 +103,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
-                        router.push(r.path);
+                        router.push(r.privatePath);
                       }}
                     >
                       查看文件

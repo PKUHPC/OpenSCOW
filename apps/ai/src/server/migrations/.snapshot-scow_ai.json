@@ -142,8 +142,8 @@
           "nullable": true,
           "mappedType": "string"
         },
-        "path": {
-          "name": "path",
+        "private_path": {
+          "name": "private_path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -151,13 +151,13 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "shared_path": {
-          "name": "shared_path",
+        "path": {
+          "name": "path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "mappedType": "string"
         },
         "create_time": {
@@ -388,8 +388,8 @@
           "nullable": true,
           "mappedType": "string"
         },
-        "path": {
-          "name": "path",
+        "private_path": {
+          "name": "private_path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -397,13 +397,13 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "shared_path": {
-          "name": "shared_path",
+        "path": {
+          "name": "path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "mappedType": "string"
         },
         "create_time": {
@@ -550,8 +550,8 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "path": {
-          "name": "path",
+        "source_path": {
+          "name": "source_path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -559,13 +559,13 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "shared_path": {
-          "name": "shared_path",
+        "path": {
+          "name": "path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "mappedType": "string"
         },
         "is_shared": {
@@ -785,8 +785,8 @@
           "nullable": true,
           "mappedType": "string"
         },
-        "path": {
-          "name": "path",
+        "private_path": {
+          "name": "private_path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -794,13 +794,13 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "shared_path": {
-          "name": "shared_path",
+        "path": {
+          "name": "path",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "mappedType": "string"
         },
         "create_time": {

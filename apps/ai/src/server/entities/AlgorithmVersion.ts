@@ -27,10 +27,11 @@ export class AlgorithmVersion {
     versionDescription?: string;
 
   @Property()
-    path: string;
+    privatePath: string;
 
-  @Property({ nullable: true })
-    sharedPath?: string;
+  // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
+  @Property()
+    path: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime?: Date;
@@ -48,7 +49,7 @@ export class AlgorithmVersion {
       versionName: string;
       versionDescription?: string;
       path: string;
-      sharedPath?: string;
+      privatePath: string;
       isShared?: boolean;
       algorithm: Algorithm;
       createTime?: Date;
@@ -58,7 +59,7 @@ export class AlgorithmVersion {
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.path = init.path;
-    this.sharedPath = init.sharedPath;
+    this.privatePath = init.privatePath;
     this.isShared = init.isShared || false;
     this.algorithm = toRef(init.algorithm);
 

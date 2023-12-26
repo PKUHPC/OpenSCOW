@@ -24,7 +24,7 @@ export const VersionListSchema = z.object({
   isShared: z.boolean(),
   versionDescription: z.string().optional(),
   path: z.string(),
-  sharedPath: z.string().optional(),
+  privatePath: z.string(),
   createTime: z.string(),
 });
 
@@ -62,7 +62,7 @@ export const versionList = procedure
         versionName: x.versionName,
         versionDescription: x.versionDescription,
         path: x.path,
-        sharedPath: x.sharedPath,
+        privatePath: x.privatePath,
         isShared: Boolean(x.isShared),
         createTime: x.createTime ? x.createTime.toISOString() : "",
       }; }), count };
@@ -96,7 +96,7 @@ export const createModalVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
     }
 
-    const modalVersion = new ModalVersion({ ...input, modal: modal, isShared: false });
+    const modalVersion = new ModalVersion({ ...input, privatePath: input.path, modal: modal, isShared: false });
     await orm.em.persistAndFlush(modalVersion);
     return { id: modalVersion.id };
   });
@@ -113,7 +113,6 @@ export const updateModalVersion = procedure
   .input(z.object({
     id: z.number(),
     versionName: z.string(),
-    path: z.string(),
     versionDescription: z.string().optional(),
     algorithmVersion: z.string().optional(),
     modalId: z.number(),
@@ -138,7 +137,6 @@ export const updateModalVersion = procedure
     modalVersion.versionName = input.versionName;
     modalVersion.versionDescription = input.versionDescription;
     modalVersion.algorithmVersion = input.algorithmVersion,
-    modalVersion.path = input.path;
 
     await orm.em.flush();
     return { id: modalVersion.id };

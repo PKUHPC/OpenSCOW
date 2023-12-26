@@ -24,7 +24,7 @@ export const ImageListSchema = z.object({
   tags: z.string(),
   description: z.string().optional(),
   path: z.string(),
-  sharedPath: z.string().optional(),
+  sourcePath: z.string(),
   isShared: z.boolean(),
   clusterId: z.string(),
   createTime: z.string(),
@@ -84,7 +84,7 @@ export const list = procedure
         tags: x.tags,
         description: x.description,
         path: x.path,
-        sharedPath: x.sharedPath,
+        sourcePath: x.sourcePath,
         isShared: Boolean(x.isShared),
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : "",
@@ -105,7 +105,7 @@ export const createImage = procedure
     tags: z.string(),
     description: z.string().optional(),
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
-    path: z.string(),
+    sourcePath: z.string(),
     clusterId: z.string(),
   }))
   .output(z.number())
@@ -121,8 +121,9 @@ export const createImage = procedure
     };
 
     // TODO 上传镜像
+    const imageRealPath = "test-harbor";
 
-    const image = new Image({ ...input, owner: user!.identityId });
+    const image = new Image({ ...input, path: imageRealPath, owner: user!.identityId });
     await orm.em.persistAndFlush(image);
     return image.id;
   });

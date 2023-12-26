@@ -40,7 +40,7 @@ interface FormFields {
   tags: string,
   description?: string,
   source: Source,
-  path: string,
+  sourcePath: string,
 }
 
 export const CreateEditImageModal: React.FC<Props> = (
@@ -93,7 +93,7 @@ export const CreateEditImageModal: React.FC<Props> = (
 
   const onOk = async () => {
     form.validateFields();
-    const { name, cluster, tags, description, source, path } = await form.validateFields();
+    const { name, cluster, tags, description, source, sourcePath } = await form.validateFields();
     isEdit && editData ? editMutation.mutate({
       id: editData.id,
       tags,
@@ -105,7 +105,7 @@ export const CreateEditImageModal: React.FC<Props> = (
         tags,
         description,
         source,
-        path,
+        sourcePath,
       });
   };
 
@@ -181,7 +181,7 @@ export const CreateEditImageModal: React.FC<Props> = (
             </Form.Item>
             <Form.Item
               label="上传数据集"
-              name="path"
+              name="sourcePath"
               rules={[{ required: true }]}
             >
               <Input
@@ -189,8 +189,8 @@ export const CreateEditImageModal: React.FC<Props> = (
                   (
                     <FileSelectModal
                       onSubmit={(path: string) => {
-                        form.setFields([{ name: "path", value: path, touched: true }]);
-                        form.validateFields(["path"]);
+                        form.setFields([{ name: "sourcePath", value: path, touched: true }]);
+                        form.validateFields(["sourcePath"]);
                       }}
                       cluster={{ id: "A", name: "a" }}
                     />
