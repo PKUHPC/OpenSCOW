@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { Cluster } from "src/utils/config";
 import { formatSize } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
 
@@ -308,7 +309,7 @@ export const LaunchAppForm = (props: Props) => {
                     form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                     form.validateFields(["workingDirectory"]);
                   }}
-                  cluster={clusterId}
+                  cluster={{ id:"a", name:"sss" }}
                 />
               )
             }

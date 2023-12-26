@@ -66,7 +66,7 @@ type FileInfoKey = React.Key;
 
 type FileInfo = inferRouterOutputs<AppRouter>["file"]["listDirectory"][0];
 
-const fileInfoKey = (f: FileInfo, path: string): FileInfoKey => join(path, f.name);
+const fileInfoKey = (f: FileInfo, path: string): string => join(path, f.name);
 
 interface PromiseSettledResult {
   status: string;

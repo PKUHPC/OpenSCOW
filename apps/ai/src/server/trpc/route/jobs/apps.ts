@@ -25,7 +25,6 @@ import { getAdapterClient } from "src/server/utils/clusters";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
-import { publicConfig } from "src/utils/config";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 

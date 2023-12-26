@@ -13,9 +13,8 @@
 "use client";
 import React, { Dispatch, SetStateAction, useContext } from "react";
 import { FileInfo } from "src/models/File";
-import { FileInfo_FileType } from "src/server/trpc/route/file";
+import { FileType } from "src/server/trpc/route/file";
 
-export type FileType = keyof typeof FileInfo_FileType;
 export type TableFileInfo = Omit<FileInfo, "type"> & { type: FileType };
 
 export interface Operation {
