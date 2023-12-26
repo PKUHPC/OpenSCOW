@@ -45,6 +45,7 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
         clusterId={clusterId}
         appComment={appInfo.appComment}
         clusterInfo={clusterInfo}
+        appImage={appInfo.appImage}
       />
     </div>
   );

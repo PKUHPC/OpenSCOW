@@ -11,27 +11,69 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { sftpWriteFile } from "@scow/lib-ssh";
+import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
+import { getUserHomedir, sftpWriteFile } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
+import { quote } from "shell-quote";
 import { aiConfig } from "src/server/config/ai";
+import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
+import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { getClusterAppConfigs } from "src/server/utils/app";
+import { generateRandomPassword, getClusterAppConfigs, sha1WithSalt } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
+import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { publicConfig } from "src/utils/config";
 import { z } from "zod";
+
+export enum JobType {
+  APP = "app",
+  TRAIN = "train",
+}
 
 interface SessionMetadata {
   sessionId: string;
   jobId: number;
   appId: string;
   submitTime: string;
+  image: string;
 }
 
 const SESSION_METADATA_NAME = "session.json";
 
 const SERVER_SESSION_INFO = "server_session_info.json";
+
+const getEnvVariables = (env: Record<string, string>) =>
+  Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
+
+
+const getEntryScript = (appId: string, runtimeVariables: string, sessionInfo: string, workingDirectory?: string) => {
+  if (appId === "jupter") {
+    const inputVariables = "export PORT=$1\nexport HOST=$2\nexport SVCPORT=$3\n";
+
+    const baseUrl = "${PROXY_BASE_PATH}/${HOST}/${SVCPORT}/";
+    const rootDir = workingDirectory;
+
+    // 生成随机密码
+    const password = generateRandomPassword(12);
+
+    const passwordVariable = `export PASSWORD=${password}\n`;
+    // 定义盐值
+    const salt = "123";
+    // 获取哈希值
+    const passwordSha1 = sha1WithSalt(password, salt);
+    const hashedPassword = `sha1:${salt}:${passwordSha1}`;
+    const script = `start-notebook.py --ServerApp.ip='0.0.0.0' --ServerApp.port=\${PORT} \
+--ServerApp.port_retries=0 --PasswordIdentityProvider.hashed_password='${hashedPassword}' \
+--ServerApp.open_browser=False --ServerApp.base_url='${baseUrl}' --ServerApp.allow_origin='*' \
+--ServerApp.disable_check_xsrf=True --ServerApp.root_dir='${rootDir}'`;
+
+    return "#!/bin/bash\n" + passwordVariable + runtimeVariables + sessionInfo + inputVariables + script;
+  }
+  throw new Error(`App ${appId} is not supported`);
+};
 
 export const appSchema = z.object({ id: z.string(), name: z.string(), logoPath: z.string().optional() });
 
@@ -87,6 +129,10 @@ export const getAppMetadata = procedure
   .input(z.object({ clusterId: z.string(), appId: z.string() }))
   .output(z.object({
     appName: z.string(),
+    appImage: z.object({
+      name: z.string(),
+      tag: z.string(),
+    }),
     appComment: I18nStringSchema.optional(),
   }))
   .query(async ({ input }) => {
@@ -102,7 +148,7 @@ export const getAppMetadata = procedure
 
     const comment = app.appComment ?? "";
 
-    return { appName: app.name, appComment: comment };
+    return { appName: app.name, appImage: app.image, appComment: comment };
   });
 
 export const createAppSession = procedure
@@ -110,9 +156,9 @@ export const createAppSession = procedure
     clusterId: z.string(),
     appId: z.string(),
     appJobName: z.string(),
-    algorithm: z.string(),
+    algorithm: z.number(),
     image: z.string(),
-    dataset: z.string().optional(),
+    dataset: z.number().optional(),
     account: z.string(),
     partition: z.string().optional(),
     qos: z.string().optional(),
@@ -121,117 +167,114 @@ export const createAppSession = procedure
     gpuCount: z.number().optional(),
     memory: z.string().optional(),
     maxTime: z.number(),
-    customAttributes: z.record(z.string(), z.string()),
-    proxyBasePath: z.string(),
+    workingDirectory: z.string(),
   })).mutation(async ({ input, ctx: { user } }) => {
-    const { clusterId, appId, appJobName, algorithm,
-      image, dataset, account, partition, qos, coreCount, nodeCount, gpuCount, memory,
-      maxTime, customAttributes, proxyBasePath } = input;
+    const { clusterId, appId, appJobName, algorithm, image,
+      dataset, account, partition, qos, coreCount, nodeCount, gpuCount, memory,
+      maxTime, workingDirectory } = input;
     const apps = getClusterAppConfigs(clusterId);
     const app = apps[appId];
 
+    const proxyBasePath = join(publicConfig.BASE_PATH, "/api/proxy", clusterId);
     if (!app) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: `app id ${appId} is not found`,
       });
     }
-    const attributesConfig = app.attributes;
-    attributesConfig?.forEach((attribute) => {
-      if (attribute.required && !(attribute.name in customAttributes) && attribute.name !== "sbatchOptions") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `custom form attribute ${attribute.name} is required but not found`,
-        });
-      }
 
-      switch (attribute.type) {
-      case "number":
-        if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `
-              custom form attribute ${attribute.name} should be of type number,
-              but of type ${typeof customAttributes[attribute.name]}`,
-          });
-        }
-        break;
+    const orm = await getORM();
 
-      case "text":
-        break;
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
 
-      case "select":
-        // check the option selected by user is in select attributes as the config defined
-        if (customAttributes[attribute.name]
-          && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `
-              the option value of ${attribute.name} selected by user should be
-              one of select attributes as the ${appId} config defined,
-              but is ${customAttributes[attribute.name]}`,
-          });
-        }
-        break;
+    if (!algorithmVersion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `algorithm version id ${algorithm} is not found`,
+      });
+    }
 
-      default:
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message:`
-          the custom form attributes type in ${appId} config should be one of number, text or select,
-          but the type of ${attribute.name} is ${attribute.type}`,
-        });
-      }
-    });
+    const datasetVesion = await orm.em.findOne(DatasetVersion, { id: dataset });
+
+    if (!datasetVesion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `dataset version id ${dataset} is not found`,
+      });
+    }
 
     const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
-    const workingDirectory = join(aiConfig.appJobsDir, appJobName);
 
     const host = getClusterLoginNode(clusterId);
 
     if (!host) { throw new Error(`Cluster ${clusterId} has no login node`); }
     const userId = user!.identityId;
-    return await sshConnect(host, userId, logger, async (ssh) => { {
+    return await sshConnect(host, userId, logger, async (ssh) => {
 
-      // make sure workingDirectory exists.
-      await ssh.mkdir(workingDirectory);
+
+      const homeDir = await getUserHomedir(ssh, userId, logger);
+
+      const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
+
+      // make sure appJobsDirectory exists.
+      await ssh.mkdir(appJobsDirectory);
       const sftp = await ssh.requestSFTP();
+      const remoteEntryPath = join(homeDir, appJobsDirectory, "entry.sh");
 
-
-      const client = getAdapterClient(clusterId);
-      const reply = await asyncClientCall(client.job, "submitJob", {
-        userId,
-        jobName: appJobName,
-        // algorithm,
-        // image,
-        // dataset,
-        account,
-        partition: partition!,
-        qos,
-        coreCount,
-        nodeCount,
-        gpuCount: gpuCount ?? 0,
-        memoryMb,
-        timeLimitMinutes: maxTime,
-        workingDirectory,
-        script: "",
-        extraOptions: [],
-        // proxyBasePath,
-      }).catch((e) => {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "submit job failed",
+      if (app.type === "web") {
+        const runtimeVariables = getEnvVariables({
+          PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
+          SERVER_SESSION_INFO,
         });
-      });
+        let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
+        for (const key in app.web!.connect.formData) {
+          const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
+          for (const i in texts) {
+            customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
+          }
+        }
+        const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
 
-      const metadata: SessionMetadata = {
-        jobId: reply.jobId,
-        sessionId: appJobName,
-        submitTime: new Date().toISOString(),
-        appId,
-      };
-      await sftpWriteFile(sftp)(join(workingDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
-    } });
+        const entryScript = getEntryScript(appId, runtimeVariables, sessionInfo, join(homeDir, workingDirectory));
+
+        await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
+
+        const client = getAdapterClient(clusterId);
+        const reply = await asyncClientCall(client.job, "submitJob", {
+          userId,
+          jobName: appJobName,
+          // algorithm: algorithmVersion.path,
+          // image,
+          // dataset: datasetVesion.path,
+          account,
+          partition: partition!,
+          qos,
+          coreCount,
+          nodeCount,
+          gpuCount: gpuCount ?? 0,
+          memoryMb,
+          timeLimitMinutes: maxTime,
+          workingDirectory: appJobsDirectory,
+          script: remoteEntryPath,
+          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
+          extraOptions: [JobType.APP, appId],
+        }).catch((e) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "submit job failed",
+          });
+        });
+
+        const metadata: SessionMetadata = {
+          jobId: reply.jobId,
+          sessionId: appJobName,
+          submitTime: new Date().toISOString(),
+          appId,
+          image: image,
+        };
+        await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+      }
+    });
 
   });

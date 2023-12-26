@@ -81,7 +81,8 @@
     "ws": "8.13.0",
     "xterm": "5.2.1",
     "xterm-addon-fit": "0.7.0",
-    "zod": "3.22.4"
+    "zod": "3.22.4",
+    "shell-quote": "1.8.1"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
@@ -100,6 +101,7 @@
     "@types/swagger-ui-react": "4.18.3",
     "@types/url-join": "4.0.3",
     "@types/ws": "8.5.9",
+    "@types/shell-quote": "1.7.4",
     "fs-extra": "11.1.1",
     "jest-environment-jsdom": "29.7.0",
     "nextjs-node-loader": "1.1.5-alpha.0",
