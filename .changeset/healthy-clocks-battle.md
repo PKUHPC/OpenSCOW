@@ -1,5 +1,4 @@
 ---
-"@scow/scheduler-adapter-protos": patch
 "@scow/portal-server": patch
 "@scow/portal-web": patch
 ---
