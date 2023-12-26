@@ -138,7 +138,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
                     form.setFields([{ name: "path", value: path, touched: true }]);
                     form.validateFields(["path"]);
                   }}
-                  cluster={cluster}
+                  clusterId={cluster?.id}
                 />
               )
             }

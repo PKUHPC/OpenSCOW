@@ -309,7 +309,7 @@ export const LaunchAppForm = (props: Props) => {
                     form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                     form.validateFields(["workingDirectory"]);
                   }}
-                  cluster={{ id:"a", name:"sss" }}
+                  clusterId={clusterId}
                 />
               )
             }

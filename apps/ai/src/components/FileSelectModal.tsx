@@ -47,7 +47,7 @@ const TopBar = styled(FilterFormContainer)`
 `;
 
 interface Props {
-  cluster?: Cluster,
+  clusterId?: string,
   onSubmit: (path: string) => void;
 }
 
@@ -108,7 +108,7 @@ const formatPath = (path: string) => {
 };
 
 
-export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
+export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
 
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("~");
@@ -117,18 +117,18 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const prevPathRef = useRef<string>(path);
 
-  trpc.file.getHomeDir.useQuery({ clusterId: cluster ? cluster.id : "" }, {
-    enabled: !!cluster && path === "~",
+  trpc.file.getHomeDir.useQuery({ clusterId: clusterId ?? "" }, {
+    enabled: !!clusterId && path === "~",
     onSuccess(data) {
       setPath(data.path);
     },
   });
 
   const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
-    clusterId: cluster ? cluster.id : "",
+    clusterId: clusterId ?? "",
     path,
   }, {
-    enabled: !!cluster,
+    enabled: !!clusterId,
   });
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
         footer={[
           <MkdirButton
             key="new"
-            cluster={cluster?.id ?? ""}
+            cluster={clusterId ?? ""}
             path={join("/", path)}
             //
             reload={() => {}}
