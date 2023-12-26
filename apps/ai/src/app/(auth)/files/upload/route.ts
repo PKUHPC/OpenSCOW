@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   if (!host) { return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 }); }
 
 
-  return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+  return await sshConnect(host, user.identityId, logger, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
     try {

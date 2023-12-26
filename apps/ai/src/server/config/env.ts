@@ -32,4 +32,5 @@ export const config = envConfig({
   DOWNLOAD_CHUNK_SIZE: num({ desc: "trpc下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
 });
 
-export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
+const building = process.env.BUILDING === "1";
+export const rootKeyPair = building ? "" : getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
