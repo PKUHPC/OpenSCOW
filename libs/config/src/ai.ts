@@ -27,6 +27,21 @@ export const AiConfigSchema = Type.Object({
   }),
   appJobsDir: Type.String({ description: "将交互式任务的信息保存到什么位置。相对于用户的家目录", default: "scow/ai/appData" }),
 
+  navLinks: Type.Optional(Type.Array(
+    Type.Object({
+      text: Type.String({ description: "一级导航名称" }),
+      url: Type.Optional(Type.String({ description: "一级导航链接" })),
+      openInNewPage: Type.Optional(Type.Boolean({ description:"一级导航是否默认在新页面打开", default: false })),
+      iconPath: Type.Optional(Type.String({ description: "一级导航链接显示图标路径" })),
+      children: Type.Optional(Type.Array(Type.Object({
+        text: Type.String({ description: "二级导航名称" }),
+        url: Type.String({ description: "二级导航链接" }),
+        openInNewPage: Type.Optional(Type.Boolean({ description:"二级导航是否默认在新页面打开", default: false })),
+        iconPath: Type.Optional(Type.String({ description: "二级导航链接显示图标路径" })),
+      }))),
+    }),
+  )),
+
 });
 
 const AUDIT_CONFIG_NAME = "ai";
