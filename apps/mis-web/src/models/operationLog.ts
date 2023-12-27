@@ -11,6 +11,7 @@
  */
 
 import { OperationEvent, OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
+import { ExportChargeRecord, ExportOperationLog, ExportPayRecord } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
@@ -77,6 +78,11 @@ export const OperationType: OperationTypeEnum = {
   createTenant: "createTenant",
   tenantPay: "tenantPay",
   submitFileItemAsJob: "submitFileItemAsJob",
+  exportUser: "exportUser",
+  exportAccount: "exportAccount",
+  exportChargeRecord: "exportChargeRecord",
+  exportPayRecord: "exportPayRecord",
+  exportOperationLog: "exportOperationLog",
 };
 
 export const OperationLog = Type.Object({
@@ -165,6 +171,11 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     createTenant: t(pTypes("createTenant")),
     tenantPay: t(pTypes("tenantPay")),
     submitFileItemAsJob: t(pTypes("submitFileItemAsJob")),
+    exportUser: t(pTypes("exportUser")),
+    exportAccount: t(pTypes("exportAccount")),
+    exportChargeRecord: t(pTypes("exportChargeRecord")),
+    exportPayRecord: t(pTypes("exportPayRecord")),
+    exportOperationLog: t(pTypes("exportOperationLog")),
   };
 
 };
@@ -220,6 +231,11 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   setPlatformBilling: "040206",
   createTenant: "040301",
   tenantPay: "040302",
+  exportUser: "040303",
+  exportAccount: "040304",
+  exportChargeRecord: "040305",
+  exportPayRecord: "040306",
+  exportOperationLog: "040307",
 };
 
 type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
@@ -368,10 +384,104 @@ export const getOperationDetail = (
         [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
     case "submitFileItemAsJob":
       return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
+    case "exportUser":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportUser"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
+    case "exportAccount":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportAccount"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
+    case "exportChargeRecord":
+      return getExportChargeRecordDetail(operationEvent[logEvent], t);
+    case "exportPayRecord":
+      return getExportPayRecordDetail(operationEvent[logEvent], t);
+    case "exportOperationLog":
+      return getExportOperationLogDetail(operationEvent[logEvent], t);
     default:
       return "-";
     }
   } catch (e) {
     return "-";
   }
+};
+
+const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: OperationTextsTransType) => {
+  const exportChargeTarget = exportChargeRecord.target;
+  if (!exportChargeTarget) {
+    return "-";
+  }
+  const exportChargeCase = exportChargeTarget.$case;
+  switch (exportChargeCase) {
+  case "accountOfTenant":
+    const accountOfTenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportAccountChargeRecordOfTenant"),
+      [accountOfTenant.tenantName, accountOfTenant.accountName]);
+  case "accountsOfTenant":
+    const accountsOfTenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportAccountsChargeRecordOfTenant"),
+      [accountsOfTenant.tenantName]);
+  case "accountsOfAllTenants":
+    return t(pDetails("exportAccountChargeRecordOfAdmin"));
+  case "tenant":
+    const tenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportTenantChargeRecord"), [tenant.tenantName]);
+  case "allTenants":
+    return t(pDetails("exportTenantsChargeRecordOfAdmin"));
+  default:
+    return "-";
+  }
+};
+
+const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: OperationTextsTransType) => {
+
+  const exportPayTarget = exportPayRecord.target;
+  if (!exportPayTarget) {
+    return "-";
+  }
+  const exportPayCase = exportPayTarget.$case;
+  switch (exportPayCase) {
+  case "accountOfTenant":
+    const accountOfTenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportAccountPayRecordOfTenant"),
+      [accountOfTenant.tenantName, accountOfTenant.accountName]);
+  case "accountsOfTenant":
+    const accountsOfTenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportAccountsPayRecordOfTenant"),
+      [accountsOfTenant.tenantName]);
+  case "tenant":
+    const tenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportTenantPayRecord"), [tenant.tenantName]);
+  case "allTenants":
+    return t(pDetails("exportTenantsPayRecordOfAdmin"));
+  default:
+    return "-";
+  }
+};
+
+const getExportOperationLogDetail = (exportOperationLog: ExportOperationLog, t: OperationTextsTransType) => {
+  const exportOperationLogSource = exportOperationLog.source;
+  if (!exportOperationLogSource) {
+    return "-";
+  }
+  const sourceCase = exportOperationLogSource.$case;
+  switch (sourceCase) {
+  case "user":
+    const user = exportOperationLogSource.user;
+    return t(pDetails("exportOperationLogFromUser"),
+      [user.userId]);
+  case "account":
+    const account = exportOperationLogSource.account;
+    return t(pDetails("exportOperationLogFromAccount"),
+      [account.accountName]);
+  case "tenant":
+    const tenant = exportOperationLogSource.tenant;
+    return t(pDetails("exportOperationLogFromTenant"),
+      [tenant.tenantName]);
+  case "admin":
+    return t(pDetails("exportOperationLogFromAdmin"));
+  default:
+    return "-";
+  }
+
 };

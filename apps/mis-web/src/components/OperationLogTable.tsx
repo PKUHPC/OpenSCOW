@@ -13,9 +13,9 @@
 import { OperationType } from "@scow/lib-operation-log/build/index";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, DatePicker, Form, Input, Select, Table } from "antd";
+import { App, Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -26,6 +26,8 @@ import {
   getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
   OperationResult } from "src/models/operationLog";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
 
 interface FilterForm {
@@ -61,6 +63,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const OperationResultTexts = getOperationResultTexts(t);
   const OperationTypeTexts = getOperationTypeTexts(t);
+
+  const { message } = App.useApp();
 
   const [ query, setQuery ] = useState<FilterForm>(() => {
     return {
@@ -115,6 +119,48 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     });
   };
 
+
+  const handleExport = async (columns: string[]) => {
+    const total = data?.totalCount ?? 0;
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        exportApi: "exportOperationLog",
+        columns,
+        count: total,
+        query: {
+          type: queryType,
+          operatorUserIds: getOperatorUserIds().join(","),
+          operationType: query.operationType,
+          operationResult: query.operationResult,
+          startTime: query.operationTime?.[0].toISOString(),
+          endTime: query.operationTime?.[1].toISOString(),
+          operationTargetAccountName: accountName,
+          operationDetail: query.operationDetail,
+          page: pageInfo.page,
+          pageSize: pageInfo.pageSize,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label:  t(p("operationCode")), value: "operationCode" },
+      { label: t(p("operationType")), value: "operationType" },
+      { label: t(p("operationDetail")), value: "operationDetail" },
+      { label: t(p("operationResult")), value: "operationResult" },
+      { label: t(p("operationTime")), value: "operationTime" },
+      { label: t(p("operatorUserId")), value: "operatorUserId" },
+      { label: t(p("operatorIp")), value: "operatorIp" },
+    ];
+  }, [t]);
+
+
   return (
     <div>
       <FilterFormContainer>
@@ -165,6 +211,14 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
       </FilterFormContainer>

@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
+import { status } from "@grpc/grpc-js";
 import { QueryOrder } from "@mikro-orm/core";
 import {
   OperationLogServiceServer,
@@ -18,7 +20,7 @@ import {
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
-import { filterOperationLogs, toGrpcOperationLog } from "src/utils/operationLogs";
+import { filterOperationLogs, getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
@@ -37,10 +39,7 @@ export const operationLogServiceServer = plugin((server) => {
       if (!operationEvent) {
         return [];
       }
-      const operationType = operationEvent?.$case;
-      const targetAccountName: string | undefined = (operationEvent && operationType)
-        ? operationEvent[operationType].accountName
-        : undefined;
+      const targetAccountName = getTargetAccountName(operationEvent);
 
       const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
 
@@ -72,6 +71,57 @@ export const operationLogServiceServer = plugin((server) => {
         results: res,
         totalCount: count,
       }];
+    },
+
+    exportOperationLog: async (call) => {
+      const { em, request } = call;
+      const { count, filter } = ensureNotUndefined(request, ["filter"]);
+
+      const sqlFilter = await filterOperationLogs(filter);
+
+      const batchSize = 5000;
+      let offset = 0;
+
+      const { writeAsync } = createWriterExtensions(call);
+
+      type RecordFormatReturnType = ReturnType<typeof toGrpcOperationLog>;
+
+      while (offset < count) {
+        const limit = Math.min(batchSize, count - offset);
+        const operationLogs = await em.find(OperationLog, sqlFilter, {
+          orderBy: { operationTime: QueryOrder.DESC },
+        });
+
+        const records = operationLogs.map(toGrpcOperationLog);
+
+        if (records.length === 0) {
+          break;
+        }
+
+        let data: RecordFormatReturnType[] = [];
+        // 记录传输的总数量
+        let writeTotal = 0;
+
+        for (const row of records) {
+          data.push(row);
+          writeTotal += 1;
+          if (data.length === 200 || writeTotal === records.length) {
+            await new Promise(async (resolve) => {
+              await writeAsync({ operationLogs: data });
+              // 清空暂存
+              data = [];
+              resolve("done");
+            }).catch((e) => {
+              throw <ServiceError>{
+                code: status.INTERNAL,
+                message: "Error when exporting file",
+                details: e?.message,
+              };
+            });
+          }
+        }
+        offset += limit;
+      }
     },
 
   });
