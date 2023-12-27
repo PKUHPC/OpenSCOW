@@ -562,8 +562,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   const fullPath = join(path, i.name);
                   modal.confirm({
                     title: t(p("tableInfo.submitConfirmTitle")),
-                    content: t(p("tableInfo.submitConfirmContent"),
-                      [i.name, getI18nConfigCurrentText(cluster.name, languageId)]),
+                    content: (
+                      <>
+                        <p>{t(p("tableInfo.submitConfirmNotice"))}</p>
+                        <p>
+                          {t(p("tableInfo.submitConfirmContent"),
+                            [i.name, getI18nConfigCurrentText(cluster.name, languageId)])}
+                        </p>
+                      </>
+                    ),
                     okText: t(p("tableInfo.submitConfirmOk")),
                     onOk: async () => {
                       await api.submitFileAsJob({
