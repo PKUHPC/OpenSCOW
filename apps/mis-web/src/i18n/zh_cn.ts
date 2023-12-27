@@ -104,6 +104,9 @@ export default {
       hour: "小时",
       day: "天",
     },
+    export: "导出",
+    exportMaxDataErrorMsg: "导出明细过多，最多导出{}条，请重新选择!",
+    exportNoDataErrorMsg: "导出为空，请重新选择",
   },
   dashboard: {
     title: "仪表盘",
@@ -148,6 +151,7 @@ export default {
     route: {
       common:{
         operationLog:"操作日志",
+        statistic: "平台数据统计",
       },
       navLinkText: "门户",
       dashboard: "仪表盘",
@@ -281,6 +285,9 @@ export default {
         userList:"用户列表",
         addWhitelist:"将所有账户加入白名单",
       },
+      statisticCard: {
+        total: "总",
+      },
       tenantChargeForm:{
         loadType:"正在加载使用过的类型……",
         charging:"充值中……",
@@ -289,6 +296,11 @@ export default {
       },
     },
     commonComponent:{
+      exportFileModal: {
+        title: "导出数据",
+        subTitle: "请选择需要导出的字段",
+        errorMsg: "请至少选择一项进行导出",
+      },
       paymentTable:{
         total:"总数",
         sum:"合计",
@@ -646,6 +658,7 @@ export default {
         removeSuccess:"移出用户成功！",
         removerUser:"移出用户",
         cannotRemoverUserWhoHaveRunningJobFromAccount:"用户还有作业在运行，已封锁该用户，请等待作业结束或手动结束作业后再移出",
+
       },
     },
   },
@@ -863,7 +876,9 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
+
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
+
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -905,6 +920,34 @@ export default {
         accountChargeRecords: {
           title: "账户消费记录",
         },
+      },
+      statistic: {
+        dataOverview: "数据总览",
+        dateRange: "日期筛选",
+        user: "用户",
+        account: "账户",
+        tenant: "租户",
+        job: "作业",
+        charge: "消费",
+        userCount: "用户数量",
+        newUserCount: "新增用户数",
+        activeUserCount: "活跃用户数",
+        chargeOrPayAmount: "消费/充值金额",
+        topTenChargedAccount: "消费账户Top10",
+        chargeAmount: "消费金额",
+        topTenPayAccount: "充值账户Top10",
+        payAmount: "充值金额",
+        topTenSubmitJobUser: "作业提交用户Top10",
+        newJobCount: "新增作业数",
+        systemFeatureUsageCount: "系统使用量",
+        portalFeatureUsageCount: "门户系统使用功能次数",
+        misFeatureUsageCount: "管理系统使用功能次数",
+        jobCount: "作业数",
+        usageCount:"次数",
+        userName: "用户名",
+        accountName: "账户名",
+        amount: "金额",
+        yuan: "元",
       },
     },
     accounts: {
@@ -990,6 +1033,11 @@ export default {
       createTenant: "创建租户",
       tenantPay: "租户充值",
       submitFileItemAsJob: "提交脚本",
+      exportUser: "导出用户列表",
+      exportAccount: "导出账户列表",
+      exportChargeRecord: "导出消费记录",
+      exportPayRecord: "导出充值记录",
+      exportOperationLog: "导出操作日志",
     },
     operationDetails: {
       login: "用户登录",
@@ -1043,6 +1091,23 @@ export default {
       tenantPay: "为租户{}充值{}元",
       setPlatformBilling: "设置平台的计费项{}价格为{}元",
       submitFileItemAsJob: "集群：{}，提交脚本：{}",
+      tenantExportUser: "导出租户{}内的用户列表",
+      adminExportUser: "导出平台的用户列表",
+      tenantExportAccount: "导出租户{}内的账户列表",
+      adminExportAccount: "导出平台的账户列表",
+      exportAccountChargeRecordOfTenant: "导出租户{}内账户{}的消费记录",
+      exportAccountsChargeRecordOfTenant: "导出租户{}内所有账户的消费记录",
+      exportAccountChargeRecordOfAdmin: "导出平台所有账户的消费记录",
+      exportTenantChargeRecord: "导出租户{}的消费记录",
+      exportTenantsChargeRecordOfAdmin: "导出平台所有租户的消费记录",
+      exportAccountPayRecordOfTenant: "导出租户{}内账户{}的充值记录",
+      exportAccountsPayRecordOfTenant: "导出租户{}内所有账户的充值记录",
+      exportTenantPayRecord: "导出租户{}的消费记录",
+      exportTenantsPayRecordOfAdmin: "导出平台所有租户的充值记录",
+      exportOperationLogFromUser: "导出用户{}的操作日志",
+      exportOperationLogFromAccount: "导出账户{}的操作日志",
+      exportOperationLogFromTenant: "导出租户{}的操作日志",
+      exportOperationLogFromAdmin: "导出平台的操作日志",
     },
   },
   userRoles: {

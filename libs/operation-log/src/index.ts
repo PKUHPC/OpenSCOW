@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { ChannelCredentials } from "@grpc/grpc-js";
+import { asyncReplyStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { ChannelCredentials, ClientReadableStream } from "@grpc/grpc-js";
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import {
   CreateOperationLogRequest,
+  ExportOperationLogRequest,
+  ExportOperationLogResponse,
   GetOperationLogsRequest,
   GetOperationLogsResponse,
   OperationLogServiceClient,
@@ -56,6 +58,15 @@ export const createOperationLogClient = (
       }
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
+    },
+    exportLog: async (request: ExportOperationLogRequest): Promise<ClientReadableStream<ExportOperationLogResponse>> =>
+    {
+      if (!client) {
+        logger.debug("Attempt to export Log with %o", request);
+        return Promise.reject(new Error("Client is not initialized"));
+      }
+
+      return asyncReplyStreamCall(client, "exportOperationLog", request);
     },
     callLog: async <TName extends OperationEvent["$case"]>({
       operatorUserId,
