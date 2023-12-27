@@ -145,7 +145,7 @@ const generateNodesAboutSchedulerAdapterInterfaceVersion = () => {
     content += `- ${change.content}\n`;
   }
 
-  return content + "\n\n";
+  return content;
 };
 
 const scowApiVersion = readPackageJson("protos/package.json").version;
