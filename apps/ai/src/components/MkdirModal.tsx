@@ -10,64 +10,66 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
+
 import { App, Form, Input, Modal } from "antd";
 import { join } from "path";
-import { useState } from "react";
+import { trpc } from "src/utils/trpc";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  reload: () => void;
-  cluster: string;
+  reload: (() => void) | ((dirName: string) => Promise<void>);
+  clusterId: string;
   path: string;
 }
 
 interface FormProps {
-  newFileName: string;
+  newDirName: string;
 }
 
-export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
-
+export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
   const { message } = App.useApp();
-
   const [form] = Form.useForm<FormProps>();
-  const [loading, setLoading] = useState(false);
 
-  // const t = useI18nTranslateToString();
+  const mutation = trpc.file.mkdir.useMutation({
+    onSuccess: () => {
+      message.success("创建成功");
+      reload(form.getFieldValue("newDirName"));
+      onClose();
+      form.resetFields();
+    },
+    onError: (e) => {
+      if (e.data?.code === "CONFLICT") {
+        message.error("已存在同名目录");
+      }
+    },
+  });
 
-  // const onSubmit = async () => {
-  //   const { newFileName } = await form.validateFields();
-  //   setLoading(true);
-  //   await api.mkdir({ body: { cluster, path: join(path, newFileName) } })
-  //     .httpError(409, () => { message.error(t(p("existedErrorMessage"))); })
-  //     .then(() => {
-  //       message.success(t(p("successMessage")));
-  //       reload();
-  //       onClose();
-  //       form.resetFields();
-  //     })
-  //     .finally(() => setLoading(false));
-  // };
+  const onSubmit = async () => {
+    const { newDirName } = await form.validateFields();
+
+    mutation.mutate({
+      path: join(path, newDirName), clusterId,
+    });
+  };
 
   return (
     <Modal
       open={open}
-      title={"新建文件夹"}
+      title="创建目录"
       okText={"确认"}
-      cancelText={"取消"}
+      cancelText="取消"
       onCancel={onClose}
-      confirmLoading={loading}
+      confirmLoading={mutation.isLoading}
       destroyOnClose
       onOk={form.submit}
     >
-      <Form
-        form={form}
-        // </Modal>onFinish={onSubmit}
-      >
-        <Form.Item label={"要创建的目录的目录"}>
+      <Form form={form} onFinish={onSubmit}>
+        <Form.Item label="要创建的目录的目录">
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label={"目录名"} name="newFileName" rules={[{ required: true }]}>
+        <Form.Item<FormProps> label="目录名" name="newDirName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

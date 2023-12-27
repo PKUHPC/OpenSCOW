@@ -10,23 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, FolderAddOutlined } from "@ant-design/icons";
+import { DatabaseOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Modal, Space, Tree } from "antd";
 import type { DataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useCallback, useEffect, useRef, useState } from "react";
-import { useAsync } from "react-async";
+import React, { Key, useEffect, useRef, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileInfo } from "src/models/File";
-import { Cluster } from "src/utils/config";
+import { getExtension } from "src/utils/file";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
 import { FileTable } from "./FileTable";
-import { MkdirModal } from "./mkdirModal";
+import { MkdirModal } from "./MkdirModal";
 import { PathBar } from "./PathBar";
+import { UploadModal } from "./UploadModal";
 
 const { DirectoryTree } = Tree;
 
@@ -47,7 +47,8 @@ const TopBar = styled(FilterFormContainer)`
 `;
 
 interface Props {
-  clusterId?: string,
+  clusterId: string,
+  allowedExtensions?: string[]
   onSubmit: (path: string) => void;
 }
 
@@ -78,8 +79,13 @@ function convertToDirTree(data: DirContent[], targetKey: string): DataNode[] {
   }));
 }
 
-function updateTreeData(treeData: DataNode[], targetKey: string, newChildren: DirContent[]): DataNode[] {
+function updateTreeData(treeData: DataNode[], homeDir: string,
+  targetKey: string, newChildren: DirContent[]): DataNode[] {
+  if (targetKey === homeDir) {
+    return convertToDirTree(newChildren, homeDir);
+  };
   return treeData.map((node) => {
+    console.log(123123, targetKey);
     // 如果找到了目标节点（即当前目录）
     if (node.key === targetKey) {
       // 将新内容转换为 DataNode[] 并设置为 children
@@ -89,7 +95,7 @@ function updateTreeData(treeData: DataNode[], targetKey: string, newChildren: Di
 
     // 如果当前节点有子节点，递归地更新它们
     if (node.children) {
-      return { ...node, children: updateTreeData(node.children, targetKey, newChildren) };
+      return { ...node, children: updateTreeData(node.children, homeDir, targetKey, newChildren) };
     }
 
     return node;
@@ -108,16 +114,17 @@ const formatPath = (path: string) => {
 };
 
 
-export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
+export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedExtensions, onSubmit }) => {
 
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+  const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const [dirTree, setDirTree] = useState<DataNode[]>([]);
 
   const prevPathRef = useRef<string>(path);
 
-  trpc.file.getHomeDir.useQuery({ clusterId: clusterId ?? "" }, {
+  const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
     enabled: !!clusterId && path === "~",
     onSuccess(data) {
       setPath(data.path);
@@ -125,17 +132,22 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
   });
 
   const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
-    clusterId: clusterId ?? "",
+    clusterId: clusterId,
     path,
   }, {
-    enabled: !!clusterId,
+    enabled: !!clusterId && path !== "~",
   });
 
   useEffect(() => {
-    if (visible) {
+    if (visible && path !== "~") {
       refetch();
     }
   }, [visible]);
+
+  useEffect(() => {
+    if (path === "~" || path === homeDir?.path) return;
+    !expandedKeys.includes(path) && setExpandedKeys([...expandedKeys, path]);
+  }, [path]);
 
   useEffect(() => {
     if (!curDirContent) return;
@@ -143,9 +155,14 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
     if (dirTree.length === 0) {
       setDirTree(convertToDirTree(curDirContent, path));
     } else {
-      setDirTree(updateTreeData(dirTree, path, curDirContent));
+      setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent));
     }
   }, [curDirContent]);
+
+  const onDirExpand = (expandDirs: Key[]) => {
+    const newExpandedKeys = Array.from(new Set(expandDirs));
+    setExpandedKeys(newExpandedKeys);
+  };
 
   const onLoadDir = async ({ key }: any) => {
     setPath(key);
@@ -153,7 +170,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
 
   const closeModal = () => {
     setVisible(false);
-    setPath("/");
+    setPath("~");
     setSelectedKeys([]);
   };
 
@@ -166,13 +183,13 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
   const onClickLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, clickPath: string) => {
     e.preventDefault();
     e.stopPropagation();
-    setPath(clickPath);
+    setPath(formatPath(clickPath));
     setSelectedKeys([]);
   };
 
-  // const isLoading = isFileLoading;
-
-  // const t = useI18nTranslateToString();
+  const checkFileSelectability = (fileInfo: FileInfo) => {
+    return fileInfo.type !== "DIR" && !allowedExtensions?.includes(getExtension(fileInfo.name));
+  };
 
   return (
     <>
@@ -183,28 +200,44 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
         onCancel={() => { closeModal(); }}
         title="选择文件"
         footer={[
-          <MkdirButton
-            key="new"
-            cluster={clusterId ?? ""}
-            path={join("/", path)}
-            //
-            reload={() => {}}
-          >
-            新建文件夹
-          </MkdirButton>,
-          <Button key="cancel" onClick={() => { closeModal(); }}>取消</Button>,
-          <Button key="ok" type="primary" onClick={onOkClick}>确认</Button>,
+          <div key="footer" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
+            <div key="left">
+              <UploadFileButton
+                path={path}
+                clusterId={clusterId}
+                reload={async () => {
+                  await refetch();
+                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
+                }}
+              >
+                上传文件
+              </UploadFileButton>
+              <MkdirButton
+                key="new"
+                clusterId={clusterId}
+                path={join("/", path)}
+                reload={async (dirName: string) => {
+                  await refetch();
+                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", join(path, dirName), curDirContent ?? []));
+                }}
+              >
+                新建文件夹
+              </MkdirButton>
+            </div>
+            <div key="right">
+              <Button key="cancel" onClick={() => { closeModal(); }}>取消</Button>
+              <Button key="ok" type="primary" onClick={onOkClick}>确认</Button>
+            </div>
+          </div>,
         ]}
       >
         <ModalContainer>
           <TopBar>
             <PathBar
               path={formatPath(path)}
-              // loading={isLoading}
-              loading={false}
+              loading={isDirContentLoading}
               onPathChange={(curPath) => {
-                // curPath === path ? reload() : setPath(join("/", curPath));
-                curPath === path ? undefined : setPath(join("/", curPath));
+                curPath === path ? undefined : setPath(curPath);
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0
@@ -230,7 +263,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
               style={{ width: 240, height: 541, overflow: "auto",
                 border: "1px solid #e0e0e0", borderRadius: "5px" }}
               showLine
+              selectedKeys={[path]}
+              expandedKeys={expandedKeys}
               loadData={onLoadDir}
+              onExpand={onDirExpand}
               treeData={dirTree}
             />
             <div style={{ border: "1px solid #e0e0e0", borderRadius: "5px" }}>
@@ -243,16 +279,21 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
                 rowKey={(r: FileInfo): React.Key => join(path, r.name)}
                 onRow={(r) => ({
                   onClick: () => {
-                    setSelectedKeys([join(path, r.name)]);
+                    checkFileSelectability(r) && setSelectedKeys([join(path, r.name)]);
                   },
                   onDoubleClick: () => {
-                    setPath(join(path, r.name));
+                    if (r.type === "DIR") {
+                      setPath(join(path, r.name));
+                    }
                   },
                 })}
                 rowSelection={{
                   type: "radio",
                   selectedRowKeys: selectedKeys,
                   onChange: setSelectedKeys,
+                  getCheckboxProps: (r) => ({
+                    disabled: !checkFileSelectability(r),
+                  }),
                 }}
                 scroll={{ x: true, y: 500 }}
               />
@@ -266,3 +307,4 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, onSubmit }) => {
 };
 
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
+const UploadFileButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });

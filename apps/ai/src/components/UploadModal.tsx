@@ -16,16 +16,15 @@ import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
 import { useState } from "react";
-import { Cluster } from "src/server/trpc/route/config";
 import { trpc } from "src/utils/trpc.js";
 
-import { urlToUpload } from "./api";
+import { urlToUpload } from "../app/(auth)/files/api";
 
 interface Props {
   open: boolean;
   onClose: () => void;
   reload: () => void;
-  cluster: Cluster;
+  clusterId: string;
   path: string;
 }
 
@@ -37,7 +36,7 @@ enum FileType {
   DIR = "dir"
 }
 
-export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
+export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
 
   const { message, modal } = App.useApp();
 
@@ -53,11 +52,11 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const deleteFileMutation = trpc.file.deleteItem.useMutation();
 
   const { refetch: checkFileExist } = trpc.file.checkFileExist.useQuery({
-    clusterId: cluster.id, path: checkExistFilePath },
+    clusterId: clusterId, path: checkExistFilePath },
   { enabled: false });
 
   const { refetch: getFileType } = trpc.file.getFileType.useQuery({
-    clusterId: cluster.id, path: getTypeFilePath },
+    clusterId: clusterId, path: getTypeFilePath },
   { enabled: false });
 
   return (
@@ -82,7 +81,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       <Upload.Dragger
         name="file"
         multiple
-        action={async (file) => urlToUpload(cluster.id, join(path, file.name))}
+        action={async (file) => urlToUpload(clusterId, join(path, file.name))}
         withCredentials
         showUploadList={{
           removeIcon: (file) => {
@@ -127,7 +126,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
                   if (fileType.data?.type) {
                     await deleteFileMutation.mutateAsync({
                       target: fileType.data.type === FileType.DIR ? "DIR" : "FILE",
-                      clusterId: cluster.id,
+                      clusterId: clusterId,
                       path: join(path, file.name),
                     }).then(() => resolve(file));
                   }

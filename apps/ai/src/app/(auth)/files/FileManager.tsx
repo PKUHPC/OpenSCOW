@@ -23,9 +23,11 @@ import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useOperation } from "src/app/(auth)/files/[cluster]/context";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { MkdirModal } from "src/components/MkdirModal";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
+import { UploadModal } from "src/components/UploadModal";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
@@ -34,10 +36,8 @@ import { styled } from "styled-components";
 import { urlToDownload } from "./api";
 import { CreateFileModal } from "./CreateFileModal";
 import { FileTable } from "./FileTable.jsx";
-import { MkdirModal } from "./MkdirModal";
 import { PathBar } from "./PathBar";
 import { RenameModal } from "./RenameModal";
-import { UploadModal } from "./UploadModal";
 
 interface Props {
   cluster: Cluster;
@@ -299,7 +299,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
       <OperationBar>
         <Space wrap>
           <UploadButton
-            cluster={cluster}
+            clusterId={cluster.id}
             path={path}
             reload={reload}
           >
@@ -381,9 +381,9 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             新文件
           </CreateFileButton>
           <MkdirButton
-            cluster={cluster}
+            clusterId={cluster.id}
             path={path}
-            reload={reload}
+            reload={() => reload()}
           >
             新目录
           </MkdirButton>
