@@ -1,5 +1,17 @@
 # @scow/grpc-api
 
+## 1.4.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+## 1.3.1
+
+### Patch Changes
+
+- 1a1189ad48: GetPlatformUsersCounts 新增 id_or_name 参数
+
 ## 1.3.0
 
 ### Minor Changes

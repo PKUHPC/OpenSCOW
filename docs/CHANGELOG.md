@@ -1,5 +1,15 @@
 # @scow/docs
 
+## 1.2.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- f03e821342: vagrant 部署方式优化,文档网站修改
+
 ## 1.1.2
 
 ### Patch Changes

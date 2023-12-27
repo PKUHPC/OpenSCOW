@@ -128,6 +128,17 @@
       "name": "charge_record",
       "indexes": [
         {
+          "keyName": "static_info",
+          "columnNames": [
+            "time",
+            "account_name",
+            "amount"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "query_info",
           "columnNames": [
             "time",
@@ -729,6 +740,72 @@
       "name": "pay_record",
       "indexes": [
         {
+          "keyName": "static_info",
+          "columnNames": [
+            "time",
+            "account_name",
+            "amount"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "query_key": {
+          "name": "query_key",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "query_result": {
+          "name": "query_result",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "json"
+        },
+        "timestamp": {
+          "name": "timestamp",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 0,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "query_cache",
+      "indexes": [
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -1040,6 +1117,16 @@
           "scale": 4,
           "default": "0.0000",
           "mappedType": "decimal"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "account",

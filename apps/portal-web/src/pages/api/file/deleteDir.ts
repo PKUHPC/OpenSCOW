@@ -33,6 +33,7 @@ export const DeleteDirSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+    500: Type.Object({ code: Type.Literal("CANT_DELETE") }),
   },
 });
 
@@ -52,7 +53,7 @@ export default route(DeleteDirSchema, async (req, res) => {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.deleteDirectory,
-    operationTypePayload:{
+    operationTypePayload: {
       clusterId: cluster, path,
     },
   };
@@ -64,8 +65,10 @@ export default route(DeleteDirSchema, async (req, res) => {
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
+    [status.INTERNAL]: () => ({ 500: { code: "CANT_DELETE" as const } }),
   },
   async () => await callLog(logInfo, OperationResult.FAIL),
   ));
+
 
 });

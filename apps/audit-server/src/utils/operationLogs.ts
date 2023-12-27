@@ -11,6 +11,7 @@
  */
 
 import { FilterQuery } from "@mikro-orm/core";
+import { OperationEvent } from "@scow/lib-operation-log";
 import {
   OperationLog,
   OperationLogFilter,
@@ -35,15 +36,10 @@ export async function filterOperationLogs(
     $and: [
       ...(startTime ? [{ operationTime: { $gte: startTime } }] : []),
       ...(endTime ? [{ operationTime: { $lte: endTime } }] : []),
+      ...((operationType) ? [{ metaData: { $case: operationType } as OperationEvent }] : []),
+      ...((operationTargetAccountName) ? [{ metaData: { targetAccountName: operationTargetAccountName } }] : []),
+      ...(operationDetail ? [ { metaData: { $like: `%${operationDetail}%` } }] : []),
     ],
-    ...(operationType || operationTargetAccountName || operationDetail ? {
-      metaData: {
-        ...((operationType) ? { $case: operationType } : {}),
-        ...((operationTargetAccountName) ? { targetAccountName: operationTargetAccountName } : {}),
-        ...operationDetail ? { $like: `%${operationDetail}%` } : {},
-      },
-
-    } : {}),
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
   return sqlFilter;
@@ -57,15 +53,7 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
     operatorIp: x.operatorIp,
     operationTime: x.operationTime?.toISOString(),
     operationResult: operationResultFromJSON(x.operationResult),
+    operationEvent: (x.metaData),
   };
-  if (x.metaData && x.metaData.$case) {
-    // @ts-ignore
-    grpcOperationLog.operationEvent = {
-      $case: x.metaData.$case,
-      [x.metaData.$case]: x.metaData[x.metaData.$case],
-    };
-
-  }
-
   return grpcOperationLog;
 }

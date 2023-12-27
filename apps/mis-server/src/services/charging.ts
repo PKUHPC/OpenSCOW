@@ -13,7 +13,7 @@
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder } from "@mikro-orm/core";
-import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
@@ -21,6 +21,7 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { queryWithCache } from "src/utils/cache";
 import { getChargesSearchType, getChargesTargetSearchParam } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -280,6 +281,121 @@ export const chargingServiceServer = plugin((server) => {
       }];
     },
 
+    getTopChargeAccount: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(ChargeRecord, "cr");
+      qb
+        .select("cr.accountName")
+        .addSelect(["SUM(cr.amount) as `totalAmount`"])
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("accountName")
+        .orderBy({ "SUM(cr.amount)": QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_top_charge_account", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+
+      return [
+        {
+          results: results.map((x) => ({
+            accountName: x.accountName,
+            chargedAmount: numberToMoney(x.totalAmount),
+          })),
+        },
+      ];
+    },
+
+    getDailyCharge: async ({ request, em }) => {
+
+      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(ChargeRecord, "cr");
+
+      qb
+        .select("DATE(cr.time) as date, SUM(cr.amount) as totalAmount")
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("DATE(cr.time)")
+        .orderBy({ "DATE(cr.time)": QueryOrder.DESC });
+
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
+        queryQb: qb,
+      });
+
+      return [{
+        results: records.map((record) => ({
+          date: new Date(record.date).toISOString(),
+          amount: numberToMoney(record.totalAmount),
+        })),
+      }];
+    },
+
+    getTopPayAccount: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(PayRecord, "p");
+      qb
+        .select("p.accountName")
+        .addSelect(["SUM(p.amount) as `totalAmount`"])
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("accountName")
+        .orderBy({ "SUM(p.amount)": QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_top_pay_account", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+
+      return [
+        {
+          results: results.map((x) => ({
+            accountName: x.accountName,
+            payAmount: numberToMoney(x.totalAmount),
+          })),
+        },
+      ];
+    },
+
+    getDailyPay: async ({ request, em }) => {
+
+      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(PayRecord, "pr");
+
+      qb
+        .select("DATE(pr.time) as date, SUM(pr.amount) as totalAmount")
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("DATE(pr.time)")
+        .orderBy({ "DATE(pr.time)": QueryOrder.DESC });
+
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
+        queryQb: qb,
+      });
+
+      return [{
+        results: records.map((record) => ({
+          date: new Date(record.date).toISOString(),
+          amount: numberToMoney(record.totalAmount),
+        })),
+      }];
+    },
 
     /**
        *

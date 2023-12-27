@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:5ffaaf1eed5668f16f2d59130993b6b4e91263ea73d7556e44faa341d7d1c78a AS base
+FROM node:iron-alpine@sha256:e96618520c7db4c3e082648678ab72a49b73367b9a1e7884cf75ac30a198e454 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -41,7 +41,7 @@ COPY protos ./protos
 
 RUN pnpm build
 
-FROM nginx:alpine@sha256:db353d0f0c479c91bd15e01fc68ed0f33d9c4c52f3415e63332c3d0bf7a4bb77 as runner
+FROM nginx:alpine@sha256:a59278fd22a9d411121e190b8cec8aa57b306aa3332459197777583beb728f59 as runner
 
 COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/

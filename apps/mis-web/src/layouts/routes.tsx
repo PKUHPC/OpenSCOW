@@ -48,13 +48,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
         text: t(pPlatform("info")),
         path: "/admin/info",
       },
-      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
-        Icon: MoneyCollectOutlined,
-        text: t(pPlatform("jobBillingTable")),
-        path: "/admin/jobBilling",
-      }] : [])
-      ,
+
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          text: t(pPlatform("jobBillingTable")),
+          path: "/admin/jobBilling",
+        },
         {
           Icon: CloudServerOutlined,
           text: t(pPlatform("tenantsManagement")),
@@ -154,6 +154,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           Icon: BookOutlined,
           text: t("layouts.route.common.operationLog"),
           path: "/admin/operationLogs",
+        }] : []),
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: LineChartOutlined,
+          text: t("layouts.route.common.statistic"),
+          path: "/admin/statistic",
         }] : []),
     ],
   },
