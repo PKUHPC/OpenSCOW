@@ -7,7 +7,7 @@ title: 集群监控功能（可选）
 
 配置该功能可以让管理员在管理系统中查看集群信息和告警日志，需要配置 Prometheus、Grafana、Alertmanager、alertsnitch、MySQL 安装
 
-# 一、环境准备
+## 一、环境准备
 
 本监控方案通过 docker-compose 安装，需要安装 docker 和 docker-compose：
 
@@ -39,7 +39,7 @@ systemctl enable docker
 **docker run hello-world
 ```
 
-1. 安装 docker-compose
+2. 安装 docker-compose
 
 ```bash
 **# **下载安装**
@@ -52,7 +52,7 @@ mv docker-compose-linux-x86_64 /usr/local/bin/docker-compose
 **docker-compose --version
 ```
 
-1. 创建持久化配置目录
+3. 创建持久化配置目录
 
 ```bash
 # 创建存放配置的目录
@@ -68,7 +68,7 @@ mkdir -p /root/monitor/prometheus
 mkdir -p /root/monitor/prometheus/rules
 ```
 
-# 二、创建配置文件
+## 二、创建配置文件
 
 :::note
 
@@ -857,9 +857,9 @@ Alerts Resolved:
 {{ end }}
 ```
 
-# 三、启动服务
+## 三、启动服务
 
-## 编辑集群监控的 docker compose 配置文件
+### 编辑集群监控的 docker compose 配置文件
 
 `/root/monitor/monitor.yaml`
 
@@ -931,7 +931,7 @@ volumes:
   alert_db_data: {}
 ```
 
-## 启动集群监控服务相关容器
+### 启动集群监控服务相关容器
 
 启动后 alertsnitch 容器会不断重启，需要完成初始化 alert-db 步骤后再重启整个集群监控服务
 
@@ -940,9 +940,9 @@ cd /root/monitor
 docker-compose -f monitor.yaml up -d
 ```
 
-## 初始化 alert-db
+### 初始化 alert-db
 
-### 编辑 `/root/monitor/bootstrap.sql`
+#### 编辑 `/root/monitor/bootstrap.sql`
 
 ```sql
 DROP PROCEDURE IF EXISTS bootstrap;
@@ -1044,7 +1044,7 @@ CREATE TABLE `AlertAnnotation` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ```
 
-### 编辑 `/root/monitor/fingerprint.sql`
+#### 编辑 `/root/monitor/fingerprint.sql`
 
 ```sql
 # db.d/mysql/0.1.0-fingerprint.sql
@@ -1054,7 +1054,7 @@ ALTER TABLE Alert
 UPDATE `Model`  SET `version`="0.1.0";
 ```
 
-### 初始化
+#### 初始化
 
 ```bash
 # 将上两步的 sql 文件分别拷贝到 alert-db 容器
@@ -1078,7 +1078,7 @@ source bootstrap.sql
 source fingerprint.sql
 ```
 
-## 重启集群监控服务
+### 重启集群监控服务
 
 退出 alert-db 容器，然后重启服务
 
@@ -1088,11 +1088,11 @@ docker-compose -f monitor.yaml restart
 docker ps
 ```
 
-# 四、启动 exporter 服务
+## 四、启动 exporter 服务
 
 以下操作均在 slurm 管理节点上进行
 
-## 安装 golang
+### 安装 golang
 
 ```bash
 # 下载go语言安装包，安装gocd download/
@@ -1117,7 +1117,7 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go env -w GO111MODULE=on
 ```
 
-## 编译安装 exporter
+### 编译安装 exporter
 
 ```bash
 # 下载代码
@@ -1136,7 +1136,7 @@ systemctl status prometheus-slurm-exporter.service
 systemctl enable prometheus-slurm-exporter.service
 ```
 
-# 五、SCOW 配置开启集群监控功能
+## 五、SCOW 配置开启集群监控功能
 
 在 `mis.yaml` 文件中增加如下配置
 
