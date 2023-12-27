@@ -12,8 +12,10 @@
 
 import { TRPCError } from "@trpc/server";
 import { Dataset } from "src/server/entities/Dataset";
+import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { unShareFile } from "src/server/utils/share";
 import { z } from "zod";
 
 // const mockDatasets = [
@@ -197,18 +199,32 @@ export const deleteDataset = procedure
   })
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
-    if (!dataset) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Dataset ${input.id} not found`,
-      });
-    };
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.id} not found` });
+
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
+
+    const datasetVersions = await orm.em.find(DatasetVersion, { dataset });
+
+    console.log("【datasetVersions】", datasetVersions);
 
     try {
-      await orm.em.removeAndFlush(dataset);
+
+      const sharedVersions = datasetVersions.filter((v) => v.isShared);
+      console.log("【sharedV】", sharedVersions);
+      // 删除所有已分享的版本创建的硬链接
+      await Promise.all(sharedVersions.map(async (v) => {
+        await unShareFile(dataset.clusterId, v.path, v.privatePath, user);
+      })).catch((e) => {
+        console.log(5555555, e);
+      });
+
+      await orm.em.removeAndFlush([...datasetVersions, dataset]);
+
       return { success: true };
     } catch (error) {
       // rollback

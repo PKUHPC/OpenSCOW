@@ -11,10 +11,14 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import { randomUUID } from "crypto";
+import path from "path";
+import { SharedTargetPath } from "src/models/File";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { shareFile, unShareFile } from "src/server/utils/share";
 import { z } from "zod";
 
 // const mockDatasetVersions = [
@@ -169,15 +173,132 @@ export const deleteDatasetVersion = procedure
       summary: "delete a new datasetVersion",
     },
   })
-  .input(z.object({ id: z.number() }))
+  .input(z.object({
+    id: z.number(),
+    datasetId: z.number(),
+  }))
   .output(z.object({ success: z.boolean() }))
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
 
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
+    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId },
+      { populate: ["versions", "versions.isShared"]});
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+
+    // 如果是已分享的数据集版本，则删除分享时创建的硬链接
+    if (datasetVersion.isShared) {
+      await unShareFile(dataset.clusterId, datasetVersion.path, datasetVersion.privatePath, user);
+    }
+
+    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
+    orm.em.persist(dataset);
+
     await orm.em.removeAndFlush(datasetVersion);
+    await orm.em.flush();
+    return { success: true };
+  });
+
+export const shareDatasetVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/datasetVersion/share/{id}",
+      tags: ["datasetVersion"],
+      summary: "share a datasetVersion",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    datasetId: z.number(),
+    sourceFilePath: z.string(),
+  }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    if (!datasetVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+
+    if (datasetVersion.isShared)
+      throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already shared" });
+
+    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+
+    // 定义分享后目标硬链接文件的绝对路径
+    const targetFileName = `${dataset.name}-${datasetVersion.versionName}-${user!.identityId}-${randomUUID()}`;
+    const targetPath = path.join(SharedTargetPath.Dataset, targetFileName);
+
+    datasetVersion.isShared = true;
+    datasetVersion.path = targetPath;
+    if (!dataset.isShared) { dataset.isShared = true; };
+
+    orm.em.persist(dataset);
+    orm.em.persist(datasetVersion);
+
+    await shareFile(
+      dataset.clusterId,
+      input.sourceFilePath,
+      targetPath,
+      user,
+    );
+
+    await orm.em.flush();
+    return { success: true };
+  });
+
+export const unShareDatasetVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/datasetVersion/unShare/{id}",
+      tags: ["datasetVersion"],
+      summary: "unshare a datasetVersion",
+    },
+  })
+  .input(z.object({
+    id: z.number(),
+    datasetId: z.number(),
+  }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    if (!datasetVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+
+    if (!datasetVersion.isShared)
+      throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already unShared" });
+
+    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId }, {
+      populate: ["versions", "versions.isShared"],
+    });
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+
+    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
+    datasetVersion.isShared = false;
+
+    orm.em.persist(dataset);
+    orm.em.persist(datasetVersion);
+
+    await unShareFile(dataset.clusterId, datasetVersion.path, datasetVersion.privatePath, user);
+
+    await orm.em.flush();
     return { success: true };
   });

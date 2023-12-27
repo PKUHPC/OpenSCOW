@@ -125,26 +125,33 @@ export const CreateEditDVersionModal: React.FC<Props> = (
         <Form.Item label="版本描述" name="versionDescription">
           <Input.TextArea />
         </Form.Item>
-        <Form.Item
-          label="数据文件夹"
-          name="path"
-          rules={[{ required: true }]}
-        >
-          <Input
-            suffix={
-              (
-                <FileSelectModal
-                  allowedFileType={["DIR"]}
-                  onSubmit={(path: string) => {
-                    form.setFields([{ name: "path", value: path, touched: true }]);
-                    form.validateFields(["path"]);
-                  }}
-                  clusterId={cluster?.id ?? ""}
+        {
+          !isEdit && (
+            <>
+              <Form.Item
+                label="数据文件夹"
+                name="path"
+                rules={[{ required: true }]}
+              >
+                <Input
+                  suffix={
+                    (
+                      <FileSelectModal
+                        allowedFileType={["DIR"]}
+                        onSubmit={(path: string) => {
+                          form.setFields([{ name: "path", value: path, touched: true }]);
+                          form.validateFields(["path"]);
+                        }}
+                        clusterId={cluster?.id ?? ""}
+                      />
+                    )
+                  }
                 />
-              )
-            }
-          />
-        </Form.Item>
+              </Form.Item>
+            </>
+          )
+        }
+
       </Form>
     </Modal>
   );
