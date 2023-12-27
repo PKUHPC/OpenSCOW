@@ -14,6 +14,7 @@ import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
@@ -29,7 +30,6 @@ interface algorithmVersion {
   createTime: string;
 }
 
-
 export interface Props {
   open: boolean;
   onClose: () => void;
@@ -39,13 +39,13 @@ export interface Props {
   algorithmVersionData: algorithmVersion[];
   isFetching: boolean;
   refetch: () => void;
-
+  cluster?: Cluster;
 }
 
-const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const VersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch },
+  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
@@ -121,16 +121,19 @@ export const VersionListModal: React.FC<Props> = (
               ) :
                 (
                   <>
-                    <CreateAndEditVersionModalButton
+                    <EditVersionModalButton
                       algorithmId={algorithmId}
                       algorithmName={algorithmName}
-                      versionId={r.id}
-                      versionName={r.versionName}
-                      versionDescription={r.versionDescription}
                       refetch={refetch}
+                      cluster={cluster}
+                      editData={{
+                        versionId:r.id,
+                        versionName:r.versionName,
+                        versionDescription:r.versionDescription,
+                      }}
                     >
                     编辑
-                    </CreateAndEditVersionModalButton>
+                    </EditVersionModalButton>
 
                     <Button
                       type="link"

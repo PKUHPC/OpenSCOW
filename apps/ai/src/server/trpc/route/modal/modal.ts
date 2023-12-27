@@ -13,6 +13,7 @@
 // import { Framework } from "src/models/Algorithm";
 import { TRPCError } from "@trpc/server";
 import { Modal } from "src/server/entities/Modal";
+import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { z } from "zod";
@@ -130,7 +131,6 @@ export const updateModal = procedure
   })
   .input(z.object({
     id: z.number(),
-    clusterId: z.string(),
     name: z.string(),
     algorithmName: z.string().optional(),
     algorithmFramework: z.string().optional(),
@@ -188,9 +188,9 @@ export const deleteModal = procedure
     if (modal.owner !== user!.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
     }
-
+    const modalVersions = await orm.em.find(ModalVersion, { modal });
     try {
-      await orm.em.removeAndFlush(modal);
+      await orm.em.removeAndFlush([...modalVersions, modal]);
       return { success: true };
     } catch (error) {
       // rollback

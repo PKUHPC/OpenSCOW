@@ -10,40 +10,49 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { FileType } from "src/server/trpc/route/file";
+import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
 
+interface EditProps {
+  versionId: number;
+  versionName: string;
+  versionDescription?: string;
+  algorithmVersion?: string;
+}
 export interface Props {
   open: boolean;
   onClose: () => void;
-  algorithmId: number;
-  algorithmName: string | undefined;
-  versionName?: string;
-  versionId?: number;
-  versionDescription?: string;
   refetch: () => void;
+  modalId: number;
+  cluster?: Cluster;
+  modalName?: string;
+  editData?: EditProps;
 }
 
 interface FormFields {
   versionName: string,
   versionDescription?: string,
+  algorithmVersion?: string,
   path: string,
 }
 
 export const CreateAndEditVersionModal: React.FC<Props> = (
-  { open, onClose, algorithmId, algorithmName, versionName:versionNameProp, versionId, versionDescription, refetch },
+  { open, onClose, modalId, cluster, modalName, refetch, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const createAlgorithmVersionMutation = trpc.algorithm.createAlgorithmVersion.useMutation({
+  const createModalVersionMutation = trpc.modal.createModalVersion.useMutation({
     onSuccess() {
       message.success("创建新版本成功");
       onClose();
       refetch();
+      form.resetFields();
     },
     onError(e) {
       console.log(e);
@@ -54,7 +63,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
   });
 
 
-  const updateAlgorithmVersionMutation = trpc.algorithm.updateAlgorithmVersion.useMutation({
+  const updateModalVersionMutation = trpc.modal.updateModalVersion.useMutation({
     onSuccess() {
       message.success("修改版本成功");
       onClose();
@@ -70,21 +79,23 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
 
   const onOk = async () => {
     form.validateFields();
-    const { versionName, versionDescription, path } = await form.validateFields();
-    if (versionNameProp && versionId) {
-      updateAlgorithmVersionMutation.mutate({
-        versionId,
+    const { versionName, versionDescription, algorithmVersion, path } = await form.validateFields();
+    if (editData?.versionName && editData.versionId) {
+      updateModalVersionMutation.mutate({
+        id:editData.versionId,
         versionName,
         versionDescription,
-        algorithmId,
+        algorithmVersion,
+        modalId,
       });
     }
     else {
-      createAlgorithmVersionMutation.mutate({
+      createModalVersionMutation.mutate({
         versionName,
         versionDescription,
+        algorithmVersion,
         path:"123",
-        algorithmId,
+        modalId,
       });
     }
 
@@ -92,10 +103,10 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={versionNameProp ? "编辑版本" : "创建新版本"}
+      title={editData?.versionName ? "编辑版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
-      confirmLoading={createAlgorithmVersionMutation.isLoading}
+      confirmLoading={createModalVersionMutation.isLoading || updateModalVersionMutation.isLoading}
       onCancel={onClose}
       destroyOnClose
     >
@@ -106,9 +117,14 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
       >
         <Form.Item
-          label="算法名称"
+          label="模型名称"
         >
-          {algorithmName}
+          {modalName}
+        </Form.Item>
+        <Form.Item
+          label="集群"
+        >
+          {getI18nConfigCurrentText(cluster?.name, undefined)}
         </Form.Item>
         <Form.Item
           label="版本名称"
@@ -116,15 +132,18 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
           rules={[
             { required: true },
           ]}
-          initialValue={versionNameProp}
+          initialValue={editData?.versionName}
         >
-          <Input allowClear />
+          <Input />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription" initialValue={versionDescription}>
+        <Form.Item label="版本描述" name="versionDescription" initialValue={editData?.versionDescription}>
+          <Input.TextArea />
+        </Form.Item>
+        <Form.Item label="算法版本" name="algorithmVersion" initialValue={editData?.algorithmVersion}>
           <Input.TextArea />
         </Form.Item>
         {
-          !versionNameProp ? (
+          !editData?.versionId ? (
             <Form.Item
               label="上传文件"
               name="path"
@@ -139,7 +158,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
                         form.setFields([{ name: "path", value: path, touched: true }]);
                         form.validateFields(["path"]);
                       }}
-                      clusterId={"A"}
+                      clusterId={cluster?.id ?? ""}
                     />
                   )
                 }

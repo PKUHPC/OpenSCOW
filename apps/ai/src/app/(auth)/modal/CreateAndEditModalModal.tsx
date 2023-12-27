@@ -10,21 +10,26 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
 
-export interface Props {
-  open: boolean;
-  onClose: () => void;
-  refetch?: () => void;
-  clusterId?: string;
-  modalName?: string;
+interface EditProps {
+  cluster?: Cluster;
+  modalId: number;
+  modalName: string;
   algorithmName?: string;
   algorithmFramework?: string;
   modalDescription?: string;
+}
+export interface Props {
+  open: boolean;
+  onClose: () => void;
+  refetch: () => void;
+  editData?: EditProps;
 }
 
 interface FormFields {
@@ -36,60 +41,69 @@ interface FormFields {
 }
 
 export const CreateAndEditModalModal: React.FC<Props> = (
-  { open, onClose, refetch, clusterId, algorithmName, algorithmFramework, modalDescription },
+  { open, onClose, refetch, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const createAlgorithmMutation = trpc.algorithm.createAlgorithm.useMutation({
+  const createModalMutation = trpc.modal.createModal.useMutation({
     onSuccess() {
-      message.success("添加算法成功");
+      message.success("添加模型成功");
       form.resetFields();
-      refetch && refetch();
+      refetch();
       onClose();
     },
     onError(e) {
       console.log(e);
-      message.error("添加算法失败");
+      message.error("添加模型失败");
       // if (e.data?.code === "USER_NOT_FOUND") {
       //   message.error("用户未找到");
     } });
 
-  const updateAlgorithmMutation = trpc.algorithm.updateAlgorithm.useMutation({
+  const updateModalMutation = trpc.modal.updateModal.useMutation({
     onSuccess() {
-      message.success("修改算法成功");
-      refetch && refetch();
+      message.success("修改模型成功");
+      refetch();
       onClose();
     },
     onError(e) {
       console.log(e);
-      message.error("修改算法失败");
+      message.error("修改模型失败");
       // if (e.data?.code === "USER_NOT_FOUND") {
       //   message.error("用户未找到");
     } });
 
   const onOk = async () => {
-    const { modalName, cluster, algorithmName, algorithmFramework, modalDescription } = await form.validateFields();
+    const { modalName:formModalName, cluster, algorithmName:formAlgorithmName,
+      algorithmFramework:formAlgorithmFramework, modalDescription:formModalDescription } =
+    await form.validateFields();
 
-    // if (algorithmName) {
-    //   updateAlgorithmMutation.mutate({
-    //     name:algorithmName, framework:type, description,
-    //   });
-    // } else {
-    //   createAlgorithmMutation.mutate({
-    //     name, framework:type, description, clusterId:cluster.id,
-    //   });
-    // }
+    if (editData?.modalId) {
+      updateModalMutation.mutate({
+        id:editData.modalId,
+        name:formModalName,
+        algorithmName:formAlgorithmName,
+        algorithmFramework:formAlgorithmFramework,
+        description:formModalDescription,
+      });
+    } else {
+      createModalMutation.mutate({
+        name:formModalName,
+        algorithmName:formAlgorithmName,
+        algorithmFramework:formAlgorithmFramework,
+        description:formModalDescription,
+        clusterId:cluster.id,
+      });
+    }
 
   };
 
-
   return (
     <Modal
-      title="添加模型"
+      title={editData?.modalName ? "修改模型" : "添加模型"}
       open={open}
       onOk={form.submit}
-      confirmLoading={createAlgorithmMutation.isLoading}
+      confirmLoading={createModalMutation.isLoading}
       onCancel={onClose}
     >
       <Form
@@ -102,19 +116,26 @@ export const CreateAndEditModalModal: React.FC<Props> = (
           label="名称"
           name="modalName"
           rules={[
-            { required: !clusterId },
+            { required: true },
           ]}
+          initialValue={editData?.modalName}
+
         >
-          {algorithmName ?? <Input allowClear />}
+          <Input />
         </Form.Item>
-        {clusterId ? undefined : (
+        {editData?.cluster ? (
+          <Form.Item
+            label="集群"
+          >
+            {getI18nConfigCurrentText(editData?.cluster?.name, undefined)}
+          </Form.Item>
+        ) : (
           <Form.Item
             label="集群"
             name="cluster"
             rules={[
               { required: true },
             ]}
-            {...clusterId ? { initialValue:clusterId } : undefined}
           >
             <SingleClusterSelector />
           </Form.Item>
@@ -122,21 +143,21 @@ export const CreateAndEditModalModal: React.FC<Props> = (
         <Form.Item
           label="算法名称"
           name="algorithmName"
-          {...algorithmName ? { initialValue:algorithmName } : undefined}
+          initialValue={editData?.algorithmName}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="算法框架"
           name="algorithmFramework"
-          {...algorithmFramework ? { initialValue:algorithmFramework } : undefined}
+          initialValue={editData?.algorithmFramework}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="模型描述"
           name="modalDescription"
-          {...modalDescription ? { initialValue:modalDescription } : undefined}
+          initialValue={editData?.modalDescription}
         >
           <Input.TextArea />
         </Form.Item>

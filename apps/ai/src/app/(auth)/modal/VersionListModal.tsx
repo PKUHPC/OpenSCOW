@@ -14,38 +14,39 @@ import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
-interface algorithmVersion {
+interface modalVersion {
   id: number;
   versionName: string;
-  versionDescription: string;
+  versionDescription?: string;
+  algorithmVersion?: string;
   path: string;
   privatePath: string;
   isShared: boolean;
   createTime: string;
 }
 
-
 export interface Props {
   open: boolean;
   onClose: () => void;
   isPublic?: boolean;
-  algorithmId: number;
-  algorithmName: string | undefined;
-  algorithmVersionData: algorithmVersion[];
+  modalId: number;
+  modalName: string | undefined;
+  modalVersionData: modalVersion[];
   isFetching: boolean;
   refetch: () => void;
-
+  cluster?: Cluster;
 }
 
-const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const VersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch },
+  { open, onClose, isPublic, modalId, modalName, modalVersionData, isFetching, refetch, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
@@ -66,32 +67,32 @@ export const VersionListModal: React.FC<Props> = (
     [],
   );
 
-  const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
+  const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
     onSuccess() {
-      message.success("删除算法版本成功");
+      message.success("删除模型版本成功");
       refetch();
     },
     onError(e) {
       console.log(e);
-      message.error("删除算法版本失败");
+      message.error("删除模型版本失败");
     } });
 
-  const deleteAlgorithmVersion = useCallback(
+  const deleteModalVersion = useCallback(
     (id: number, name: string) => {
       confirm({
-        title: "删除算法版本",
-        content: `确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`,
+        title: "删除模型版本",
+        content: `确认删除模型版本${name}？如该模型版本已分享，则分享的模型版本也会被删除。`,
         onOk() {
-          deleteAlgorithmVersionMutation.mutate({ id });
+          deleteModalVersionMutation.mutate({ id, modalId });
         },
       });
     },
-    [],
+    [modalId],
   );
 
   return (
     <Modal
-      title={`版本列表:${algorithmName}`}
+      title={`版本列表:${modalName}`}
       open={open}
       onCancel={onClose}
       centered
@@ -99,13 +100,14 @@ export const VersionListModal: React.FC<Props> = (
     >
       <Table
         rowKey="id"
-        dataSource={algorithmVersionData}
+        dataSource={modalVersionData}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
         columns={[
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
+          { dataIndex: "algorithmVersion", title: "算法版本" },
           { dataIndex: "createTime", title: "创建时间", render:(_) => formatDateTime(_) },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },
@@ -121,16 +123,21 @@ export const VersionListModal: React.FC<Props> = (
               ) :
                 (
                   <>
-                    <CreateAndEditVersionModalButton
-                      algorithmId={algorithmId}
-                      algorithmName={algorithmName}
-                      versionId={r.id}
-                      versionName={r.versionName}
-                      versionDescription={r.versionDescription}
+                    <EditVersionModalButton
+                      modalId={modalId}
+                      modalName={modalName}
+                      cluster={cluster}
                       refetch={refetch}
+                      editData={{
+                        versionId:r.id,
+                        versionName:r.versionName,
+                        versionDescription:r.versionDescription,
+                        algorithmVersion:r.algorithmVersion,
+                      }}
+
                     >
                     编辑
-                    </CreateAndEditVersionModalButton>
+                    </EditVersionModalButton>
 
                     <Button
                       type="link"
@@ -152,7 +159,7 @@ export const VersionListModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
-                        deleteAlgorithmVersion(r.id, r.versionName);
+                        deleteModalVersion(r.id, r.versionName);
                       }}
                     >
                     删除

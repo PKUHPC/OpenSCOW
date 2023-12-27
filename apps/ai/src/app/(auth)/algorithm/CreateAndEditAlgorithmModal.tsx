@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Form, Input, Modal, Select } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -17,15 +18,17 @@ import { AlgorithmTypeText } from "src/models/Algorithm";
 import { Cluster } from "src/utils/config";
 import { trpc } from "src/utils/trpc";
 
+interface EditProps {
+  cluster?: Cluster;
+  algorithmName: string;
+  algorithmFramework: string;
+  algorithmDescription: string;
+}
 export interface Props {
   open: boolean;
   onClose: () => void;
-  refetch?: () => void;
-  clusterId?: string;
-  algorithmName?: string;
-  algorithmFramework?: string;
-  algorithmDescription?: string;
-
+  refetch: () => void;
+  editData?: EditProps;
 }
 type AlgorithmType = keyof typeof AlgorithmTypeText;
 
@@ -37,7 +40,7 @@ interface FormFields {
 }
 
 export const CreateAndEditAlgorithmModal: React.FC<Props> = (
-  { open, onClose, refetch, clusterId, algorithmName, algorithmFramework, algorithmDescription },
+  { open, onClose, refetch, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -46,7 +49,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
     onSuccess() {
       message.success("添加算法成功");
       form.resetFields();
-      refetch && refetch();
+      refetch();
       onClose();
     },
     onError(e) {
@@ -59,7 +62,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
   const updateAlgorithmMutation = trpc.algorithm.updateAlgorithm.useMutation({
     onSuccess() {
       message.success("修改算法成功");
-      refetch && refetch();
+      refetch();
       onClose();
     },
     onError(e) {
@@ -72,9 +75,9 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
   const onOk = async () => {
     const { name, type, description, cluster } = await form.validateFields();
 
-    if (algorithmName) {
+    if (editData?.algorithmName) {
       updateAlgorithmMutation.mutate({
-        name:algorithmName, framework:type, description,
+        name:editData.algorithmName, framework:type, description,
       });
     } else {
       createAlgorithmMutation.mutate({
@@ -87,10 +90,10 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
 
   return (
     <Modal
-      title="添加算法"
+      title={editData?.algorithmName ? "修改算法" : "添加算法"}
       open={open}
       onOk={form.submit}
-      confirmLoading={createAlgorithmMutation.isLoading}
+      confirmLoading={createAlgorithmMutation.isLoading || updateAlgorithmMutation.isLoading}
       onCancel={onClose}
     >
       <Form
@@ -103,19 +106,25 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
           label="名称"
           name="name"
           rules={[
-            { required: !clusterId },
+            { required: !editData?.algorithmName },
           ]}
+          initialValue={editData?.algorithmName}
         >
-          {algorithmName ?? <Input allowClear />}
+          <Input />
         </Form.Item>
-        {clusterId ? undefined : (
+        {editData?.cluster ? (
+          <Form.Item
+            label="集群"
+          >
+            {getI18nConfigCurrentText(editData?.cluster?.name, undefined)}
+          </Form.Item>
+        ) : (
           <Form.Item
             label="集群"
             name="cluster"
             rules={[
               { required: true },
             ]}
-            {...clusterId ? { initialValue:clusterId } : undefined}
           >
             <SingleClusterSelector />
           </Form.Item>
@@ -127,7 +136,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
           rules={[
             { required: true },
           ]}
-          {...algorithmFramework ? { initialValue:algorithmFramework } : undefined}
+          initialValue={editData?.algorithmFramework}
         >
           <Select
             style={{ minWidth: "120px" }}
@@ -139,7 +148,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
         <Form.Item
           label="算法描述"
           name="description"
-          {...algorithmDescription ? { initialValue:algorithmDescription } : undefined}
+          initialValue={editData?.algorithmDescription}
         >
           <Input.TextArea />
         </Form.Item>

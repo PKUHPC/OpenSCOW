@@ -10,15 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
+import { usePublicConfig } from "src/app/(auth)/context";
 import { ModalTable } from "src/app/(auth)/modal/ModalTable";
 import { PageTitle } from "src/components/PageTitle";
 
 export default function Page() {
+  const { publicConfig } = usePublicConfig();
 
   return (
     <div>
       <PageTitle titleText="公共算法" />
-      <ModalTable isPublic={true} clusters={[]} />
+      <ModalTable isPublic={true} clusters={publicConfig.CLUSTERS} />
     </div>
   );
 }

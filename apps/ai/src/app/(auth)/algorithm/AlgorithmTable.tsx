@@ -67,7 +67,7 @@ const CreateAlgorithmModalButton =
 ModalButton(CreateAndEditAlgorithmModal, { type: "primary", icon: <PlusOutlined /> });
 const EditAlgorithmModalButton =
 ModalButton(CreateAndEditAlgorithmModal, { type: "link" });
-const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const CreateVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
@@ -86,6 +86,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
   const [algorithmId, setAlgorithmId] = useState(0);
   const [algorithmName, setAlgorithmName] = useState<undefined | string>(undefined);
+  const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
   const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
@@ -131,11 +132,15 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
     [],
   );
 
+  const getCurrentCluster = useCallback((clusterId: string) => {
+    return clusters.find((c) => c.id === clusterId);
+  }, [clusters]);
+
   const columns: TableColumnsType<Algorithm> = [
     { dataIndex: "name", title: "名称" },
     { dataIndex: "clusterId", title: "集群",
       render: (_, r) =>
-        getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
+        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
     { dataIndex: "framework", title: "算法框架", render:(_: Framework) => AlgorithmTypeText[_] },
     { dataIndex: "description", title: "算法描述" },
     { dataIndex: "versions", title: "版本数量",
@@ -154,28 +159,30 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         return !isPublic ?
           (
             <>
-              <CreateAndEditVersionModalButton
-                refetch={versionRefetch}
+              <CreateVersionModalButton
+                refetch={ () => { refetch(); setAlgorithmId(0); }}
                 algorithmId={r.id}
                 algorithmName={r.name}
+                cluster={getCurrentCluster(r.clusterId)}
               >
                 创建新版本
-              </CreateAndEditVersionModalButton>
-              <div style={{ display:"inline-block" }} onClick={() => { setAlgorithmId(r.id); console.log(r.id); }}>
-                <Button
-                  type="link"
-                  onClick={() =>
-                  { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
-                >
+              </CreateVersionModalButton>
+              <Button
+                type="link"
+                onClick={() =>
+                { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
+                  setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
+              >
                   版本列表
-                </Button>
-              </div>
+              </Button>
               <EditAlgorithmModalButton
                 refetch={refetch}
-                clusterId={r.clusterId}
-                algorithmName={r.name}
-                algorithmFramework={r.framework}
-                algorithmDescription={r.description}
+                editData={{
+                  cluster:getCurrentCluster(r.clusterId),
+                  algorithmName:r.name,
+                  algorithmFramework:r.framework,
+                  algorithmDescription:r.description,
+                }}
               >
                 编辑
               </EditAlgorithmModalButton>
@@ -193,7 +200,8 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
             <Button
               type="link"
               onClick={() =>
-              { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
+              { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
+                setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
             >
               版本列表
             </Button>
@@ -277,6 +285,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         algorithmVersionData={versionData?.items ?? []}
         isFetching={versionFetching}
         refetch={versionRefetch}
+        cluster={cluster}
       />
       {/* antd中modal组件 */}
       {confirmModalHolder}

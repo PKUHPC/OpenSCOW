@@ -19,7 +19,6 @@ import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -43,23 +42,24 @@ interface PageInfo {
   pageSize?: number;
 }
 
-interface Algorithm {
+interface ModalProps {
   id: number;
   name: string;
   owner: string;
-  framework: Framework;
+  algorithmName?: string;
+  algorithmFramework?: string;
   isShared: boolean;
-  description: string;
+  description?: string;
   clusterId: string;
   createTime: string;
-  versions: number;
+  versionsCount: number;
 }
 
 const CreateModalModalButton =
 ModalButton(CreateAndEditModalModal, { type: "primary", icon: <PlusOutlined /> });
 const EditModalModalButton =
 ModalButton(CreateAndEditModalModal, { type: "link" });
-const CreateAndEditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const CreateVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
@@ -76,67 +76,67 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const [algorithmId, setAlgorithmId] = useState(0);
-  const [algorithmName, setAlgorithmName] = useState<undefined | string>(undefined);
+  const [modalId, setModalId] = useState(0);
+  const [modalName, setModalName] = useState<undefined | string>(undefined);
+  const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
-  const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
+  const { data, isFetching, refetch, error } = trpc.modal.list.useQuery(
     { ...pageInfo,
       nameOrDesc:query.nameOrDesc,
       clusterId:query.clusterId,
-      isPublic,
+      isShared:isPublic,
     });
   if (error) {
-    message.error("找不到算法");
+    message.error("找不到模型");
   }
 
   const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
-  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId:algorithmId }, {
-    enabled:!!algorithmId,
+  trpc.modal.versionList.useQuery({ modalId }, {
+    enabled:!!modalId,
   });
   if (versionError) {
-    message.error("找不到算法版本");
+    message.error("找不到模型版本");
   }
 
 
-  const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
+  const deleteModalMutation = trpc.modal.deleteModal.useMutation({
     onSuccess() {
-      message.success("删除算法成功");
+      message.success("删除模型成功");
       refetch();
     },
     onError(e) {
       console.log(e);
-      message.error("删除算法失败");
+      message.error("删除模型失败");
     } });
 
   const deleteAlgorithm = useCallback(
-    (id: number, name: string) => {
+    async (id: number, name: string) => {
       confirm({
-        title: "删除算法",
-        content: `确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`,
+        title: "删除模型",
+        content: `确认删除模型${name}？如该模型已分享，则分享的模型也会被删除。`,
         onOk() {
-          deleteAlgorithmMutation.mutate({ id });
+          deleteModalMutation.mutate({ id });
         },
       });
     },
     [],
   );
 
-  const columns: TableColumnsType<Algorithm> = [
+  const getCurrentCluster = useCallback((clusterId: string) => {
+    return clusters.find((c) => c.id === clusterId);
+  }, [clusters]);
+
+  const columns: TableColumnsType<ModalProps> = [
     { dataIndex: "name", title: "名称" },
     { dataIndex: "clusterId", title: "集群",
       render: (_, r) =>
-        getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
+        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
     { dataIndex: "description", title: "模型描述" },
-    { dataIndex: "framework", title: "算法框架", render:(_: Framework) => AlgorithmTypeText[_] },
-    { dataIndex: "versions", title: "版本数量",
-      render: (_, r) => {
-        return r.versions;
-      } },
-    isPublic ? { dataIndex: "shareUser", title: "分享者",
-      render: (_, r) => {
-        return r.owner;
-      } } : {},
+    { dataIndex: "algorithmName", title: "算法名称" },
+    { dataIndex: "algorithmFramework", title: "算法框架" },
+    { dataIndex: "versionsCount", title: "版本数量" },
+    isPublic ? { dataIndex: "owner", title: "分享者" } : {},
     { dataIndex: "createTime", title: "创建时间",
       render:(_) => formatDateTime(_),
     },
@@ -145,28 +145,32 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
         return !isPublic ?
           (
             <>
-              <CreateAndEditVersionModalButton
-                refetch={versionRefetch}
-                algorithmId={r.id}
-                algorithmName={r.name}
+              <CreateVersionModalButton
+                refetch={() => { refetch(); setModalId(0); } }
+                modalId={r.id}
+                modalName={r.name}
+                cluster={getCurrentCluster(r.clusterId)}
               >
                 创建新版本
-              </CreateAndEditVersionModalButton>
-              <div style={{ display:"inline-block" }} onClick={() => { setAlgorithmId(r.id); console.log(r.id); }}>
-                <Button
-                  type="link"
-                  onClick={() =>
-                  { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
-                >
+              </CreateVersionModalButton>
+              <Button
+                type="link"
+                onClick={() =>
+                { setVersionListModalIsOpen(true); setModalId(r.id);
+                  setModalName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
+              >
                   版本列表
-                </Button>
-              </div>
+              </Button>
               <EditModalModalButton
                 refetch={refetch}
-                clusterId={r.clusterId}
-                algorithmName={r.name}
-                algorithmFramework={r.framework}
-                // algorithmDescription={r.description}
+                editData={{
+                  cluster:getCurrentCluster(r.clusterId),
+                  modalId:r.id,
+                  modalName:r.name,
+                  algorithmName:r.algorithmName,
+                  algorithmFramework:r.algorithmFramework,
+                  modalDescription:r.description,
+                }}
               >
                 编辑
               </EditModalModalButton>
@@ -184,7 +188,8 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
             <Button
               type="link"
               onClick={() =>
-              { setVersionListModalIsOpen(true); setAlgorithmId(r.id); setAlgorithmName(r.name); }}
+              { setVersionListModalIsOpen(true); setModalId(r.id);
+                setModalName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
             >
               版本列表
             </Button>
@@ -246,11 +251,12 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
         open={versionListModalIsOpen}
         onClose={() => { setVersionListModalIsOpen(false); }}
         isPublic={isPublic}
-        algorithmName={algorithmName}
-        algorithmId={algorithmId}
-        algorithmVersionData={versionData?.items ?? []}
+        modalName={modalName}
+        modalId={modalId}
+        modalVersionData={versionData?.items ?? []}
         isFetching={versionFetching}
         refetch={versionRefetch}
+        cluster={cluster}
       />
       {/* antd中modal组件 */}
       {confirmModalHolder}

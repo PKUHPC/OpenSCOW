@@ -70,8 +70,10 @@ export const getAlgorithms = procedure
           offset: (page - 1) * (pageSize || 10),
           limit: pageSize || 10,
         } : {},
+      populate: ["versions", "versions.isShared"],
       orderBy: { createTime: "desc" },
     });
+
     return { items: items.map((x) => {
       return {
         id:x.id,
@@ -82,7 +84,7 @@ export const getAlgorithms = procedure
         description:x.description ?? "",
         clusterId:x.clusterId,
         createTime:x.createTime ? x.createTime.toISOString() : "",
-        versions:3,
+        versions: isPublic ? x.versions.filter((x) => x.isShared).length : x.versions.count(),
       }; }), count };
 
   });
