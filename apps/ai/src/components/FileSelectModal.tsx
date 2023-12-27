@@ -12,7 +12,7 @@
 
 import { DatabaseOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, Modal, Space, Tree } from "antd";
-import type { DataNode } from "antd/es/tree";
+import type { DataNode, EventDataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
 import React, { Key, useEffect, useState } from "react";
@@ -159,9 +159,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     }
   }, [curDirContent]);
 
-  const onDirExpand = (expandDirs: Key[]) => {
+  const onDirExpand = (expandDirs: Key[], { node }: { node: EventDataNode<DataNode>}) => {
     const newExpandedKeys = Array.from(new Set(expandDirs));
     setExpandedKeys(newExpandedKeys);
+    !node.isLeaf && setPath(node.key.toString());
   };
 
   const onLoadDir = async ({ key }: any) => {
