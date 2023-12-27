@@ -11,13 +11,15 @@
  */
 
 import { FilterQuery } from "@mikro-orm/core";
-import { OperationEvent } from "@scow/lib-operation-log";
 import {
+  CreateOperationLogRequest,
   OperationLog,
   OperationLogFilter,
   operationResultFromJSON, operationResultToJSON } from "@scow/protos/build/audit/operation_log";
 import { OperationLog as OperationLogEntity } from "src/entities/OperationLog";
 
+
+export type OperationEvent = CreateOperationLogRequest["operationEvent"];
 
 export async function filterOperationLogs(
   {
@@ -57,3 +59,31 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
   };
   return grpcOperationLog;
 }
+
+/**
+ * @param operationEvent
+ * @returns targetAccountName
+ * @description
+ * 如果是导出消费记录或者导出充值记录且target是accountOfTenant，返回accountName
+ * 如果是导出操作日志且source是account，返回accountName
+ */
+export const getTargetAccountName = (operationEvent: OperationEvent): string | undefined => {
+  const operationType = operationEvent?.$case;
+  if (operationType === "exportChargeRecord" || operationType === "exportPayRecord") {
+    switch (operationEvent[operationType].target.$case) {
+    case "accountOfTenant" :
+      return operationEvent[operationType].target.accountOfTenant.accountName;
+    default:
+      return;
+    }
+  } else if (operationType === "exportOperationLog") {
+    const source = operationEvent[operationType].source;
+    if (source && source.$case === "account") {
+      return source.account.accountName;
+    }
+  } else {
+    return (operationEvent && operationType)
+      ? operationEvent[operationType].accountName
+      : undefined;
+  }
+};

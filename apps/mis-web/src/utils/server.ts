@@ -12,7 +12,9 @@
 
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { contentType } from "mime-types";
 import { NextApiRequest } from "next";
+import { basename } from "path";
 
 type ValueOf<T> = T[keyof T];
 
@@ -46,3 +48,13 @@ export const parseIp = (req: NextApiRequest): string | undefined => {
   return forwardedFor ?? req.socket?.remoteAddress;
 };
 
+
+export function getContentType(filename: string, defaultValue: string) {
+  const type = contentType(basename(filename));
+
+  if (!type) {
+    return defaultValue;
+  }
+
+  return type;
+}
