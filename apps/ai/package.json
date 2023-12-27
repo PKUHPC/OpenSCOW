@@ -14,7 +14,7 @@
     "build": "npm run build:next",
     "build:next": "cross-env BUILDING=1 next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
-    "serve": "node build/server/index.js",
+    "serve": "next start",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
     "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create"
   },
