@@ -11,10 +11,10 @@
   "scripts": {
     "dev": "dotenv -e env/.env.dev -- node --watch --loader ts-paths-esm-loader server/index.ts",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
+    "serve": "next start",
     "build": "npm run build:next",
     "build:next": "cross-env BUILDING=1 next build",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
-    "serve": "next start",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
     "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create"
   },
@@ -28,7 +28,6 @@
   "dependencies": {
     "@ant-design/cssinjs": "1.17.2",
     "@ant-design/icons": "5.2.6",
-    "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@grpc/grpc-js": "1.9.11",
@@ -85,7 +84,6 @@
     "shell-quote": "1.8.1"
   },
   "devDependencies": {
-    "@ddadaal/next-typed-api-routes-cli": "0.9.1",
     "@next/bundle-analyzer": "14.0.3",
     "@testing-library/jest-dom": "6.1.4",
     "@testing-library/react": "14.1.2",

@@ -133,9 +133,6 @@ importers:
       '@ant-design/icons':
         specifier: 5.2.6
         version: 5.2.6(react-dom@18.2.0)(react@18.2.0)
-      '@ddadaal/next-typed-api-routes-runtime':
-        specifier: 0.8.2
-        version: 0.8.2(@sinclair/typebox@0.31.10)(next@14.0.3)(zod@3.22.4)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
         version: 0.17.7(@grpc/grpc-js@1.9.11)
@@ -299,9 +296,6 @@ importers:
         specifier: 3.22.4
         version: 3.22.4
     devDependencies:
-      '@ddadaal/next-typed-api-routes-cli':
-        specifier: 0.9.1
-        version: 0.9.1
       '@next/bundle-analyzer':
         specifier: 14.0.3
         version: 14.0.3
@@ -3770,23 +3764,6 @@ packages:
       typescript: 4.9.5
       yargs: 17.7.2
     dev: true
-
-  /@ddadaal/next-typed-api-routes-runtime@0.8.2(@sinclair/typebox@0.31.10)(next@14.0.3)(zod@3.22.4):
-    resolution: {integrity: sha512-Z0NQqVvrj//1TvLGDezJv+xDIYNo06PdNK15PU3r6MIqiIcDZ5TRlna9d8xeY7cBUKyjrXV6o3DHH5kALG+2LA==}
-    peerDependencies:
-      '@sinclair/typebox': '>=0.28.13'
-      next: '>=11.x'
-      zod: '>=3.21.4'
-    dependencies:
-      '@sinclair/typebox': 0.31.10
-      ajv: 8.12.0
-      ajv-formats: 2.1.1(ajv@8.12.0)
-      ajv-formats-draft2019: 1.6.1(ajv@8.12.0)
-      fast-json-stringify: 5.8.0
-      next: 14.0.3(patch_hash=u3guk2b2qg64nbffn3mmconeve)(@babel/core@7.23.3)(react-dom@18.2.0)(react@18.2.0)
-      tslib: 2.6.1
-      zod: 3.22.4
-    dev: false
 
   /@ddadaal/next-typed-api-routes-runtime@0.8.2(@sinclair/typebox@0.31.26)(next@14.0.3)(zod@3.22.4):
     resolution: {integrity: sha512-Z0NQqVvrj//1TvLGDezJv+xDIYNo06PdNK15PU3r6MIqiIcDZ5TRlna9d8xeY7cBUKyjrXV6o3DHH5kALG+2LA==}
