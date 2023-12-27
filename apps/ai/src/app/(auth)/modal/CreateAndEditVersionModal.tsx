@@ -13,6 +13,7 @@
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { FileType } from "src/server/trpc/route/file";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
@@ -133,6 +134,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
                 suffix={
                   (
                     <FileSelectModal
+                      allowedFileType={["FILE"]}
                       onSubmit={(path: string) => {
                         form.setFields([{ name: "path", value: path, touched: true }]);
                         form.validateFields(["path"]);

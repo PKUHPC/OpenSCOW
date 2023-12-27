@@ -188,6 +188,7 @@ export const CreateEditImageModal: React.FC<Props> = (
                 suffix={
                   (
                     <FileSelectModal
+                      allowedFileType={["FILE"]}
                       onSubmit={(path: string) => {
                         form.setFields([{ name: "sourcePath", value: path, touched: true }]);
                         form.validateFields(["sourcePath"]);

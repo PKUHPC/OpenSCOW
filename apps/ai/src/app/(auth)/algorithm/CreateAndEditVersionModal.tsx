@@ -133,6 +133,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
                 suffix={
                   (
                     <FileSelectModal
+                      allowedFileType={["FILE"]}
                       onSubmit={(path: string) => {
                         form.setFields([{ name: "path", value: path, touched: true }]);
                         form.validateFields(["path"]);

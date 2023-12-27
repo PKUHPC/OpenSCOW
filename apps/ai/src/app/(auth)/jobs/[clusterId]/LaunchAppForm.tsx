@@ -305,6 +305,7 @@ export const LaunchAppForm = (props: Props) => {
             suffix={
               (
                 <FileSelectModal
+                  allowedFileType={["FILE"]}
                   onSubmit={(path: string) => {
                     form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                     form.validateFields(["workingDirectory"]);

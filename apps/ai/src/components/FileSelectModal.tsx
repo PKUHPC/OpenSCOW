@@ -15,10 +15,11 @@ import { Button, Modal, Space, Tree } from "antd";
 import type { DataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useEffect, useRef, useState } from "react";
+import React, { Key, useEffect, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileInfo } from "src/models/File";
+import { FileType } from "src/server/trpc/route/file";
 import { getExtension } from "src/utils/file";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
@@ -49,6 +50,7 @@ const TopBar = styled(FilterFormContainer)`
 interface Props {
   clusterId: string,
   allowedExtensions?: string[]
+  allowedFileType: FileType[],
   onSubmit: (path: string) => void;
 }
 
@@ -114,15 +116,13 @@ const formatPath = (path: string) => {
 };
 
 
-export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedExtensions, onSubmit }) => {
+export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
 
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const [dirTree, setDirTree] = useState<DataNode[]>([]);
-
-  const prevPathRef = useRef<string>(path);
 
   const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
     enabled: !!clusterId && path === "~",
@@ -175,8 +175,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedExtensions,
   };
 
   const onOkClick = () => {
-    const submitPath = selectedKeys.length > 0 ? selectedKeys[0].toString() : path;
-    onSubmit(submitPath);
+    if (selectedKeys.length > 0) {
+      const selectedFilePath = selectedKeys[0].toString();
+      onSubmit(selectedFilePath);
+    }
     closeModal();
   };
 
@@ -188,7 +190,8 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedExtensions,
   };
 
   const checkFileSelectability = (fileInfo: FileInfo) => {
-    return fileInfo.type !== "DIR" && !allowedExtensions?.includes(getExtension(fileInfo.name));
+    return allowedFileType.includes(fileInfo.type)
+      && (allowedExtensions === undefined || allowedExtensions?.includes(getExtension(fileInfo.name)));
   };
 
   return (

@@ -134,6 +134,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
             suffix={
               (
                 <FileSelectModal
+                  allowedFileType={["DIR"]}
                   onSubmit={(path: string) => {
                     form.setFields([{ name: "path", value: path, touched: true }]);
                     form.validateFields(["path"]);
