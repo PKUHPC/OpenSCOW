@@ -60,6 +60,8 @@ export const OperationType: OperationTypeEnum = {
   addAccountToWhitelist: "addAccountToWhitelist",
   removeAccountFromWhitelist: "removeAccountFromWhitelist",
   accountPay: "accountPay",
+  blockAccount: "blockAccount",
+  unblockAccount: "unblockAccount",
   importUsers: "importUsers",
   setPlatformAdmin: "setPlatformAdmin",
   unsetPlatformAdmin: "unsetPlatformAdmin",
@@ -69,7 +71,11 @@ export const OperationType: OperationTypeEnum = {
   setPlatformBilling: "setPlatformBilling",
   createTenant: "createTenant",
   tenantPay: "tenantPay",
-  blockAccount: "blockAccount",
-  unblockAccount: "unblockAccount",
   submitFileItemAsJob: "submitFileItemAsJob",
+  exportUser: "exportUser",
+  exportAccount: "exportAccount",
+  exportChargeRecord: "exportChargeRecord",
+  exportPayRecord: "exportPayRecord",
+  exportOperationLog: "exportOperationLog",
 };
+
