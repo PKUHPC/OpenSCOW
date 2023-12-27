@@ -14,13 +14,14 @@
 
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space, Spin } from "antd";
+import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
-import { FileSelectModal } from "src/components/FileSelectModal";
-import { Cluster } from "src/utils/config";
+import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
 import { formatSize } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
 
@@ -31,18 +32,18 @@ interface Props {
     name: string;
     tag: string;
   };
+  attributes: AppCustomAttribute[];
   appComment?: I18nStringType;
   clusterId: string;
   clusterInfo: ClusterConfig;
   isTraining?: boolean;
 }
 
-interface FormFields {
+interface FixedFormFields {
   appJobName: string;
-  algorithm: any;
+  algorithm: { name: number, version: number };
   image: any;
-  dataset: any;
-  workingDirectory: string;
+  dataset: { name: number, version: number };
   partition: string | undefined;
   qos: string | undefined;
   nodeCount: number;
@@ -51,6 +52,11 @@ interface FormFields {
   account: string;
   maxTime: number;
 }
+
+interface CustomFormFileds {
+  customeFields: {[key: string]: number | string | undefined};
+}
+type FormFields = CustomFormFileds & FixedFormFields;
 
 interface ClusterConfig {
   partitions: Partition[];
@@ -88,7 +94,7 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, clusterInfo, isTraining = false, appId, appImage } = props;
+  const { clusterId, appName, clusterInfo, isTraining = false, appId, appImage, attributes } = props;
 
   const { message } = App.useApp();
 
@@ -114,7 +120,7 @@ export const LaunchAppForm = (props: Props) => {
   }, { enabled: selectedDataset !== undefined });
 
   const datasetOptions = useMemo(() => {
-    return datasets?.items.map((x) => ({ label: x.name, value: x.id }));
+    return datasets?.items.map((x) => ({ label: `${x.name}(${x.owner})`, value: x.id }));
   }, [datasets]);
 
   const datasetVersionOptions = useMemo(() => {
@@ -172,6 +178,51 @@ export const LaunchAppForm = (props: Props) => {
 
   };
 
+  const customFormItems = useMemo(() => attributes.map((item, index) => {
+    const rules: Rule[] = item.type === "NUMBER"
+      ? [{ type: "integer" }, { required: item.required }]
+      : [{ required: item.required }];
+
+    const placeholder = item.placeholder ?? "";
+
+    // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+    const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
+    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
+    if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
+    const inputItem = item.type === "NUMBER" ?
+      (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
+      : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
+        : (
+          <Select
+            options={selectOptions.map((x) => ({
+              label: getI18nConfigCurrentText(x.label, undefined), value: x.value }))}
+            placeholder={getI18nConfigCurrentText(placeholder, undefined)}
+          />
+        );
+
+    // 判断是否配置了requireGpu选项
+    if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
+      const preValue = form.getFieldValue(item.name);
+
+      if (preValue) {
+        // 切换分区后看之前的版本是否还存在，若不存在，则选择版本的select的值置空
+        const optionsContained = selectOptions.find((i) => i.value === preValue);
+        if (!optionsContained) form.setFieldValue(item.name, null);
+      }
+    }
+    return (
+      <Form.Item
+        key={`${item.name}+${index}`}
+        label={getI18nConfigCurrentText(item.label, undefined) ?? undefined}
+        name={["customeFields", item.name]}
+        rules={rules}
+        initialValue={initialValue}
+      >
+        {inputItem}
+      </Form.Item>
+    );
+  }), [attributes, currentPartitionInfo]);
+
   useEffect(() => {
     setCurrentPartitionInfo(clusterInfo?.partitions[0]);
     form.setFieldsValue({
@@ -198,22 +249,30 @@ export const LaunchAppForm = (props: Props) => {
       initialValues={{
         ... initialValues,
       }}
-      onFinish={(values) => {
+      onFinish={async () => {
+        const values = await form.validateFields();
+        const {
+          appJobName, algorithm, dataset, account, partition, qos, nodeCount, coreCount, gpuCount, maxTime } = values;
+        const customFormKeyValue: CustomFormFileds = { customeFields: {} };
+        attributes.forEach((customFormAttribute) => {
+          const customFormKey = customFormAttribute.name;
+          customFormKeyValue.customeFields[customFormKey] = values.customeFields[customFormKey];
+        });
         createAppSessionMutation.mutate({
           clusterId,
           appId: appId!,
-          appJobName: values.appJobName,
-          algorithm: values.algorithm.version,
+          appJobName,
+          algorithm: algorithm.version,
           image: `${appImage!.name}:${appImage!.tag}`,
-          dataset: values.dataset.version,
-          account: values.account,
-          partition: values.partition,
-          qos: values.qos,
-          nodeCount: values.nodeCount,
-          coreCount: values.coreCount,
-          gpuCount: values.gpuCount,
-          maxTime: values.maxTime,
-          workingDirectory: values.workingDirectory,
+          dataset: dataset.version,
+          account: account,
+          partition: partition,
+          qos: qos,
+          nodeCount: nodeCount,
+          coreCount: coreCount,
+          gpuCount: gpuCount,
+          maxTime: maxTime,
+          customAttributes: customFormKeyValue.customeFields,
         });
       }}
     >
@@ -299,22 +358,6 @@ export const LaunchAppForm = (props: Props) => {
               <Select style={{ minWidth: 100 }} options={datasetVersionOptions} />
             </Form.Item>
           </Space>
-        </Form.Item>
-        <Form.Item name="workingDirectory" label="工作目录" required>
-          <Input
-            suffix={
-              (
-                <FileSelectModal
-                  allowedFileType={["FILE"]}
-                  onSubmit={(path: string) => {
-                    form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
-                    form.validateFields(["workingDirectory"]);
-                  }}
-                  clusterId={clusterId}
-                />
-              )
-            }
-          />
         </Form.Item>
         <Divider orientation="left" orientationMargin="0" plain>资源</Divider>
         <Form.Item
@@ -406,7 +449,7 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
           <InputNumber min={1} step={1} addonAfter="分钟" />
         </Form.Item>
-
+        {customFormItems}
         <Row>
           {
             currentPartitionInfo?.gpus

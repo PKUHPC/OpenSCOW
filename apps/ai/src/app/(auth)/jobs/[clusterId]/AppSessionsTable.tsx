@@ -10,13 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
+
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Space, Table, TableColumnsType, Tooltip } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { Cluster } from "src/server/trpc/route/config";
+import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
+import { trpc } from "src/utils/trpc";
 
 interface FilterForm {
   appJobName: string | undefined
@@ -36,23 +40,6 @@ export function compareState(a: string, b: string): -1 | 0 | 1 {
   return 1;
 }
 
-
-export interface AppSession {
-  sessionId: string;
-  jobId: number;
-  submitTime?: string | undefined;
-  appId: string;
-  /** Undefined: apps[app.id]？.name is not found */
-  appName?: string | undefined;
-  state: string;
-  dataPath: string;
-  runningTime: string;
-  timeLimit: string;
-  reason?: string | undefined;
-  host?: string | undefined;
-  port?: number | undefined;
-}
-
 export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const unfinished = status === "UNFINISHED";
@@ -65,7 +52,11 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
   const [checked, setChecked] = useState(true);
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
-  const columns: TableColumnsType<AppSession> = [
+  const { data, refetch, isLoading, isFetching } = trpc.jobs.listAppSessions.useQuery({
+    clusterId: cluster.id, isRunning: true,
+  });
+
+  const columns: TableColumnsType<any> = [
     {
       title: "作业名",
       dataIndex: "sessionId",
@@ -182,7 +173,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
 
   const reloadTable = useCallback(() => {
-    // reload();
+    refetch();
     setConnectivityRefreshToken((f) => !f);
   }, [setConnectivityRefreshToken]);
 
@@ -218,7 +209,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           </Form.Item>
           <Form.Item>
             <Space>
-              {/* <Button loading={isLoading} onClick={reload}>"刷新"</Button> */}
+              <Button loading={isLoading} onClick={() => refetch()}>刷新</Button>
               <Button>刷新</Button>
             </Space>
           </Form.Item>
@@ -236,7 +227,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       </FilterFormContainer>
       <Table
         tableLayout="fixed"
-        dataSource={[]}
+        dataSource={data?.sessions || []}
         columns={columns}
         rowKey={(record) => record.sessionId}
         // loading={!filteredData && isLoading}

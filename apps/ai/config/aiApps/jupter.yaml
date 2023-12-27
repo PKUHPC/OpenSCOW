@@ -1,4 +1,4 @@
-# 这个应用的ID
+ # 这个应用的ID
 id: jupyter
 
 # 这个应用的名字
@@ -16,6 +16,14 @@ image:
 type: web
 # Web应用的配置
 web:
+  # 准备脚本
+  beforeScript: |
+    export PASSWORD=$(get_password 12)
+    export SALT=123
+    export PASSWORD_SHA1="$(echo -n "${PASSWORD}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
+  # 运行任务的脚本。可以使用准备脚本定义的
+  script: |
+    jupyter-lab --ServerApp.ip='0.0.0.0' --ServerApp.port=${PORT} --ServerApp.port_retries=0 --PasswordIdentityProvider.hashed_password=u'sha1:${SALT}:${PASSWORD_SHA1}' --ServerApp.open_browser=False --ServerApp.base_url="${PROXY_BASE_PATH}/${HOST}/${SVCPORT}/" --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.root_dir="${workingDir}"
   proxyType: absolute
   # 如何连接应用
   connect:
@@ -23,3 +31,10 @@ web:
     path: /login
     formData:
       password: "{{ PASSWORD }}"
+
+attributes:
+  - type: text
+    name: workingDir
+    label: 指定jupter工作目录
+    required: true
+    placeholder: "相对于用户家目录"

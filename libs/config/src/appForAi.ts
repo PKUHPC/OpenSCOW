@@ -36,6 +36,8 @@ export const WebAppConfigSchema = Type.Object({
       { relative: "relative", absolute: "absolute" },
       { description: "proxy 类型", default: "relative" },
     ),
+  beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
+  script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
   connect: AppConnectPropsSchema,
 });
 
@@ -51,6 +53,24 @@ export const AppConfigSchema = Type.Object({
   }),
   type: Type.Enum(AppType, { description: "应用类型" }),
   web: Type.Optional(WebAppConfigSchema),
+  attributes: Type.Optional(Type.Array(
+    Type.Object({
+      type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
+      label: createI18nStringSchema({ description: "表单标签" }),
+      name: Type.String({ description: "表单字段名" }),
+      required: Type.Boolean({ description: "是必填项", default: true }),
+      defaultValue: Type.Optional(Type.Union([Type.String(), Type.Number()])),
+      placeholder: Type.Optional(createI18nStringSchema({ description: "输入提示信息" })),
+      select: Type.Optional(
+        Type.Array(
+          Type.Object({
+            value: Type.String({ description: "表单选项key，编程中使用" }),
+            label: createI18nStringSchema({ description: "表单选项展示给用户的文本" }),
+            requireGpu: Type.Optional(Type.Boolean({ description: "表单选项是否只在分区为gpu时展示" })),
+          }), { description:"表单选项" },
+        )),
+    }),
+  )),
   appComment: Type.Optional(createI18nStringSchema({ description: "应用说明文字" })),
 
 });

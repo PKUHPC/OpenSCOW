@@ -43,6 +43,7 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
         appName={appInfo.appName}
         appId={appId}
         clusterId={clusterId}
+        attributes={appInfo.attributes}
         appComment={appInfo.appComment}
         clusterInfo={clusterInfo}
         appImage={appInfo.appImage}

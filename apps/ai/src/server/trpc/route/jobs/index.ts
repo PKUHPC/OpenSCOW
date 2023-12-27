@@ -12,10 +12,11 @@
 
 import { router } from "src/server/trpc/def";
 
-import { createAppSession, getAppMetadata, listAvailableApps } from "./apps";
+import { createAppSession, getAppMetadata, listAppSessions, listAvailableApps } from "./apps";
 
 export const jobsRouter = router({
   listAvailableApps,
   getAppMetadata,
   createAppSession,
+  listAppSessions,
 });

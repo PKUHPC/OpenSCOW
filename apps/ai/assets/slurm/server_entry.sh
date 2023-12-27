@@ -1,6 +1,4 @@
-function get_port {
-  echo $(python -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
-}
+#!/bin/bash
 
 # $1: the length of password
 function get_password {
@@ -8,8 +6,6 @@ function get_password {
   echo $password
 }
 
-export HOST=$(hostname)
-
-source before.sh
-
-bash -l script.sh
+export PORT=$1
+export HOST=$2
+export SVCPORT=$3
