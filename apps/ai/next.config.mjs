@@ -12,19 +12,19 @@
 
 import os from "os";
 
-const ConfigModule = await import("./config.js");
-const { buildRuntimeConfig } = ConfigModule;
+// const ConfigModule = await import("./config.js");
+// const { buildRuntimeConfig } = ConfigModule;
 
-const BASE_PATH = process.env.BASE_PATH || "/";
+// const BASE_PATH = process.env.BASE_PATH || "/";
 
 
 export default async (phase) => {
 
-  const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
+  // const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
 
   /** @type {import('next').NextConfig} */
   const nextConfig = {
-    ...runtimeConfig,
+    // ...runtimeConfig,
     compiler: {
       styledComponents: true,
     },

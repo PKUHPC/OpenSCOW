@@ -14,10 +14,9 @@ import { normalizePathnameWithQuery } from "@scow/utils";
 import http from "http";
 import httpProxy from "http-proxy";
 import { join } from "path";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { getUserInfo } from "src/server/auth/server";
+import { clusters } from "src/server/trpc/route/config";
 import { BASE_PATH } from "src/utils/processEnv";
-
-import { getUserInfo } from "../auth/server";
 
 /**
  * Parse proxy target
@@ -40,7 +39,7 @@ export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): htt
 
   const [_empty, _api, _proxy, clusterId, type, node, port, ...path] = relativePath.split("/");
 
-  if (!runtimeConfig.CLUSTERS_CONFIG[clusterId]) {
+  if (!clusters[clusterId]) {
     return new Error("Invalid clusterId");
   }
 

@@ -18,9 +18,10 @@ import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
 import { router } from "src/server/trpc/def";
 import { baseProcedure, procedure } from "src/server/trpc/procedure/base";
-import { publicConfig, runtimeConfig } from "src/utils/config";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
+
+import { envConfig } from "./config";
 
 export const auth = router({
 
@@ -81,10 +82,10 @@ export const auth = router({
     .query(async ({ ctx: { req, res } }) => {
       console.log("req", req.headers.host);
 
-      const callbackUrl = `${ runtimeConfig.PROTOCOL || "http"}://${req.headers.host}`
+      const callbackUrl = `${ envConfig.PROTOCOL || "http"}://${req.headers.host}`
        + join(BASE_PATH, "/api/auth/callback");
 
-      const target = joinWithUrl(runtimeConfig.AUTH_EXTERNAL_URL,
+      const target = joinWithUrl(envConfig.AUTH_EXTERNAL_URL,
         `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
       res.redirect(target);
