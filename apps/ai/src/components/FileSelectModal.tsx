@@ -173,6 +173,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     setVisible(false);
     setPath("~");
     setSelectedKeys([]);
+    setExpandedKeys([]);
   };
 
   const onOkClick = () => {
