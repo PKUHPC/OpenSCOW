@@ -285,6 +285,9 @@ export default {
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
           submitConfirmTitle: "确认提交",
+          submitConfirmNotice: "请确保脚本文件提供了可用的绝对路径作为工作目录，"
+          + "如未提供则默认为脚本文件所在目录",
+
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功！您的新作业ID为：{}",
