@@ -45,7 +45,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   checkPathFormat("mis.basePath", MIS_PATH);
 
   const AI_PATH = config.ai?.basePath || "/ai";
-  checkPathFormat("AI.basePath", AI_PATH);
+  checkPathFormat("ai.basePath", AI_PATH);
 
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
