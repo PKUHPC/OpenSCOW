@@ -38,6 +38,7 @@ export default function Page({ params }: {params: {clusterId: string}}) {
     <div>
       <PageTitle titleText="训练" />
       <LaunchAppForm
+        attributes={[]}
         clusterId={clusterId}
         clusterInfo={clusterInfo}
         isTraining={true}
