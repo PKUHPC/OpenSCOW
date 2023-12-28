@@ -130,9 +130,6 @@ export const InstallConfigSchema = Type.Object({
 
     portMappings: Type.Optional(Type.Object({
       db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
-      aiServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
-        description: "AI服务映射出来的端口",
-      })),
     })),
   })),
 

@@ -31,6 +31,7 @@ export default async (phase) => {
     // experimental: {
     //   appDir: true,
     // },
+    basePath:"/ai",
     webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],

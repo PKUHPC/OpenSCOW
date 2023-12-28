@@ -108,3 +108,15 @@ it("deploy audit", async () => {
   expect(composeConfig.services["mis-web"].environment).toContain("AUDIT_DEPLOYED=true");
   expect(composeConfig.services["portal-web"].environment).toContain("AUDIT_DEPLOYED=true");
 });
+
+
+it("deploy ai", async () => {
+  const config = getInstallConfig(configPath);
+  config.ai = { basePath: "/ai", dbPassword: "must!chang3this", mysqlImage: "" };
+  config.portal = { basePath: "/", novncClientImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+
+  const composeConfig = createComposeSpec(config);
+
+  expect(composeConfig.services["mis-web"].environment).toContain("AI_URL=/ai");
+});
