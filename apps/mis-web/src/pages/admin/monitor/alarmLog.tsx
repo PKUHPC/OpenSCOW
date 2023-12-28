@@ -89,6 +89,7 @@ export const AlarmLogPage: NextPage = requireAuth((u) =>
         type: res.type,
       });
       reload();
+      reloadCount();
     });
   }, []);
 
@@ -111,7 +112,8 @@ export const AlarmLogPage: NextPage = requireAuth((u) =>
 
   const { data, isLoading, reload } = useAsync({ promiseFn: getAlarmLogs });
   const { isLoading: isAlarmDbIdLoading } = useAsync({ promiseFn: getAlarmDbId });
-  const { data: alarmLogsCount, isLoading: isAlarmCountLoading } = useAsync({ promiseFn: getAlarmLogsCount });
+  const { data: alarmLogsCount, reload: reloadCount, isLoading: isAlarmCountLoading }
+    = useAsync({ promiseFn: getAlarmLogsCount });
 
   return (
     <div>
@@ -149,7 +151,7 @@ export const AlarmLogPage: NextPage = requireAuth((u) =>
               allowClear={false}
             />
           </Form.Item>
-          <Form.Item initialValue="" name="status" label={t(p("status"))}>
+          <Form.Item name="status" label={t(p("status"))}>
             <Select
               placeholder={t(p("status"))}
               options={[
@@ -166,7 +168,7 @@ export const AlarmLogPage: NextPage = requireAuth((u) =>
           <Form.Item>
             <Button
               loading={isAlarmDbIdLoading || isLoading || isAlarmCountLoading}
-              onClick={reload}
+              onClick={() => { reload(); reloadCount(); }}
             >{t(p("refresh"))}</Button>
           </Form.Item>
         </Form>

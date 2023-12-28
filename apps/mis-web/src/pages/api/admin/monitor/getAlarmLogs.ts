@@ -71,6 +71,7 @@ const GetAlarmLogsResponse = Type.Array(Type.Object({
 
 type GetAlarmLogsResponse = Static<typeof GetAlarmLogsResponse>;
 
+export const DEFAULT_GRAFANA_URL = "http://127.0.0.1:4000";
 
 const transformGrafanaData = (grafanaData: GrafanaApiResponse): TransformedRow[] => {
   const frames = grafanaData.results.A.frames;
@@ -130,8 +131,9 @@ export default /* #__PURE__*/route(GetAlarmLogsSchema, async (req, res) => {
   if (!info) { return; }
 
   const querySql =
-    "SELECT t2.* FROM (SELECT fingerprint, MAX(ID) AS tid FROM Alert GROUP BY fingerprint) AS t1"
-    + " LEFT JOIN ("
+    "SELECT t2.*, COUNT(t2.) FROM"
+    + " (SELECT fingerprint, MAX(ID) AS tid, startsAt FROM Alert GROUP BY startsAt, fingerprint) AS t1"
+    + " INNER JOIN ("
       + " SELECT a.ID AS id, a.fingerprint, a.status,"
       + " a.startsAt, a.endsAt, aa.value AS description, al.Value AS severity"
       + " FROM Alert AS a"
@@ -162,7 +164,7 @@ export default /* #__PURE__*/route(GetAlarmLogsSchema, async (req, res) => {
     }],
   };
 
-  return await fetch(join(publicConfig.CLUSTER_MONITOR_GRAFANA_URL, "/api/ds/query"), {
+  return await fetch(join(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL, "/api/ds/query"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

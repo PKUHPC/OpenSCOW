@@ -11,6 +11,7 @@
  */
 
 import { PlatformRole } from "@scow/protos/build/server/user";
+import { joinWithUrl } from "@scow/utils";
 import httpProxy from "http-proxy";
 import { NextApiRequest, NextApiResponse } from "next";
 import { authenticate } from "src/auth/server";
@@ -43,8 +44,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   if (!info) { return; }
 
-  const target = publicConfig.CLUSTER_MONITOR_GRAFANA_URL
-    + req.url!.replace("/api/admin/monitor/getResourceStatus", "");
+  const target = joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? "",
+    req.url!.replace("/api/admin/monitor/getResourceStatus", ""));
 
   proxy.web(req, res, {
     target, xfwd: true,

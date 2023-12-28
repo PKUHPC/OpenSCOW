@@ -131,7 +131,7 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       },
-      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) && publicConfig.CLUSTER_MONITOR.enabled ? [{
         Icon: MonitorOutlined,
         text: t(pPlatform("clusterMonitor")),
         path: "/admin/monitor",

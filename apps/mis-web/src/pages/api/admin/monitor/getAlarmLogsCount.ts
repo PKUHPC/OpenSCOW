@@ -19,6 +19,8 @@ import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
+import { DEFAULT_GRAFANA_URL } from "./getAlarmLogs";
+
 interface GrafanaApiResponse {
   results: {
     [key: string]: {
@@ -107,13 +109,20 @@ export default /* #__PURE__*/route(GetAlarmLogsCountSchema, async (req, res) => 
 
   if (!info) { return; }
 
-  const countSql = "SELECT COUNT(DISTINCT a.fingerprint) AS totalCount"
-    + " FROM Alert AS a"
-    + " LEFT JOIN AlertAnnotation AS aa ON a.ID = aa.AlertID AND aa.Annotation = 'description'"
-    + " LEFT JOIN AlertLabel al ON a.ID = al.AlertID AND al.Label = 'severity'"
-    + ` WHERE a.startsAt BETWEEN '${dayjs(req.query.from).format("YYYY-MM-DD HH:mm:ss")}'`
-        + ` AND '${dayjs(req.query.to).format("YYYY-MM-DD HH:mm:ss")}'`
-        + (req.query.status !== "" ? ` AND a.status = '${req.query.status}'` : "");
+  const countSql =
+    "SELECT COUNT(t2.id) AS totalCount FROM"
+      + " (SELECT fingerprint, MAX(ID) AS tid, startsAt FROM Alert GROUP BY startsAt, fingerprint) AS t1"
+      + " INNER JOIN ("
+        + " SELECT a.ID AS id, a.fingerprint, a.status,"
+        + " a.startsAt, a.endsAt, aa.value AS description, al.Value AS severity"
+        + " FROM Alert AS a"
+        + " LEFT JOIN AlertAnnotation AS aa ON a.ID = aa.AlertID"
+        + " LEFT JOIN AlertLabel al ON a.ID = al.AlertID"
+        + " WHERE aa.Annotation = 'description' AND al.Label = 'severity'"
+          + ` AND a.startsAt BETWEEN '${dayjs(req.query.from).format("YYYY-MM-DD HH:mm:ss")}'`
+            + ` AND '${dayjs(req.query.to).format("YYYY-MM-DD HH:mm:ss")}'`
+          + (req.query.status !== "" ? ` AND a.status = '${req.query.status}'` : "")
+      + " ) AS t2 ON t1.tid = t2.id;";
 
   const queryData = {
     from: req.query.from.toString(),
@@ -132,7 +141,7 @@ export default /* #__PURE__*/route(GetAlarmLogsCountSchema, async (req, res) => 
     }],
   };
 
-  return await fetch(join(publicConfig.CLUSTER_MONITOR_GRAFANA_URL, "/api/ds/query"), {
+  return await fetch(join(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL, "/api/ds/query"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

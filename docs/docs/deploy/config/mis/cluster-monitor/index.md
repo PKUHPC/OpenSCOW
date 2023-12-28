@@ -5,7 +5,13 @@ title: 集群监控功能（可选）
 
 # 集群监控功能（可选）
 
-配置该功能可以让管理员在管理系统中查看集群信息和告警日志，需要配置 Prometheus、Grafana、Alertmanager、alertsnitch、MySQL 安装
+配置该功能可以让管理员在管理系统中查看集群资源信息和告警日志，需要配置 Prometheus、Grafana、Alertmanager、alertsnitch、MySQL 安装
+
+**集群资源信息**
+![集群资源信息](./resourceStatus.png)
+
+**告警日志**
+![告警日志](./alarmLog.png)
 
 ## 一、环境准备
 
