@@ -328,9 +328,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   if (config.ai) {
     addService("ai", {
       image: scowImage,
-      ports: config.ai.portMappings?.aiServer
-        ? { [config.ai.portMappings.aiServer]: 5000 }
-        : {},
+      ports: {},
       environment: {
         "SCOW_LAUNCH_APP": "ai",
         "BASE_PATH": join(BASE_PATH, AI_PATH),
@@ -358,7 +356,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     addService("ai-db", {
       image: config.ai.mysqlImage,
       volumes: {
-        "audit_db_data": "/var/lib/mysql",
+        "ai_db_data": "/var/lib/mysql",
       },
       environment: {
         "MYSQL_ROOT_PASSWORD": config.ai.dbPassword,
