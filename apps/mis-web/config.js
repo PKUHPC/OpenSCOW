@@ -172,6 +172,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    UI_EXTENSION: misConfig.uiExtension,
+
   };
 
   if (!building) {
