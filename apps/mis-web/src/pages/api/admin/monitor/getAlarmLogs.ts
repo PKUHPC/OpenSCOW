@@ -131,7 +131,7 @@ export default /* #__PURE__*/route(GetAlarmLogsSchema, async (req, res) => {
   if (!info) { return; }
 
   const querySql =
-    "SELECT t2.*, COUNT(t2.) FROM"
+    "SELECT t2.* FROM"
     + " (SELECT fingerprint, MAX(ID) AS tid, startsAt FROM Alert GROUP BY startsAt, fingerprint) AS t1"
     + " INNER JOIN ("
       + " SELECT a.ID AS id, a.fingerprint, a.status,"
