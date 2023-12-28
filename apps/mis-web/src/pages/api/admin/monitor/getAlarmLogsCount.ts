@@ -19,7 +19,7 @@ import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-import { DEFAULT_GRAFANA_URL } from "./getAlarmLogs";
+import { DEFAULT_GRAFANA_URL } from "./getAlarmDbId";
 
 interface GrafanaApiResponse {
   results: {

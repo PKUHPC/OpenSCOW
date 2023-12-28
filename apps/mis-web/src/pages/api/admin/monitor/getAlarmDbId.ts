@@ -18,6 +18,8 @@ import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
+export const DEFAULT_GRAFANA_URL = "http://127.0.0.1:4000";
+
 const GetAlarmDbIdResponse = Type.Object({
   id: Type.Number(),
   uid: Type.String(),
@@ -55,7 +57,7 @@ export default /* #__PURE__*/route(GetAlarmDbIdSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  return await fetch(join(publicConfig.CLUSTER_MONITOR_GRAFANA_URL, "/api/datasources"), {
+  return await fetch(join(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL, "/api/datasources"), {
     method: "GET",
   })
     .then((response) => response.json())

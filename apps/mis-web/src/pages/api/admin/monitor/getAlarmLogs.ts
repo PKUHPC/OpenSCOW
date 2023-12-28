@@ -19,6 +19,8 @@ import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
+import { DEFAULT_GRAFANA_URL } from "./getAlarmDbId";
+
 interface GrafanaApiResponse {
   results: {
     [key: string]: {
@@ -70,8 +72,6 @@ const GetAlarmLogsResponse = Type.Array(Type.Object({
 }));
 
 type GetAlarmLogsResponse = Static<typeof GetAlarmLogsResponse>;
-
-export const DEFAULT_GRAFANA_URL = "http://127.0.0.1:4000";
 
 const transformGrafanaData = (grafanaData: GrafanaApiResponse): TransformedRow[] => {
   const frames = grafanaData.results.A.frames;
