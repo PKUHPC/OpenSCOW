@@ -203,6 +203,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
+    composeSpec.volumes["portal_data"] = {};
+
     addService("portal-server", {
       image: scowImage,
       environment: {
@@ -216,6 +218,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
+        "portal_data":"/var/lib/scow/portal",
       },
     });
 
