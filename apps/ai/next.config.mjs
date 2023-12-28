@@ -32,7 +32,7 @@ export default async () => {
     // },
     basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
-    webpack: (config) => {
+    webpack: (config, { webpack }) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],
         ".jsx": [".ts", ".tsx", ".js"],
@@ -50,7 +50,7 @@ export default async () => {
         ],
       });
       config.plugins.forEach((i) => {
-        if (i instanceof options.webpack.DefinePlugin) {
+        if (i instanceof webpack.DefinePlugin) {
           if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
             i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
               "(typeof window === \"undefined\" ? global : window).__CONFIG__?.NEXT_PUBLIC_BASE_PATH";
