@@ -31,6 +31,17 @@ export function ClientLayout(props: { children: React.ReactNode, initialDark?: D
       <head>
         <meta name="format-detection" content="telephone=no" />
         <link href="/manifest.json" rel="manifest" id="manifest" />
+        <script
+          id="__CONFIG__"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.__CONFIG__ = ${
+    JSON.stringify({
+      BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH === "/" ? "" : process.env.NEXT_PUBLIC_BASE_PATH,
+    })};
+            `,
+          }}
+        />
       </head>
       <StyledComponentsRegistry>
         <AntdStyleRegistry>

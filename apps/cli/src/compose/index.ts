@@ -331,7 +331,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: {},
       environment: {
         "SCOW_LAUNCH_APP": "ai",
-        "BASE_PATH": join(BASE_PATH, AI_PATH),
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
         "DB_PASSWORD": config.ai.dbPassword,

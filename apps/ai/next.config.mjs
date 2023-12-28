@@ -15,10 +15,9 @@ import os from "os";
 // const ConfigModule = await import("./config.js");
 // const { buildRuntimeConfig } = ConfigModule;
 
-// const BASE_PATH = process.env.BASE_PATH || "/";
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/";
 
-
-export default async (phase) => {
+export default async () => {
 
   // const runtimeConfig = await buildRuntimeConfig(phase, BASE_PATH);
 
@@ -31,7 +30,8 @@ export default async (phase) => {
     // experimental: {
     //   appDir: true,
     // },
-    basePath:"/ai",
+    basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
+    assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],
@@ -48,6 +48,14 @@ export default async (phase) => {
             },
           },
         ],
+      });
+      config.plugins.forEach((i) => {
+        if (i instanceof options.webpack.DefinePlugin) {
+          if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
+            i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
+              "(typeof window === \"undefined\" ? global : window).__CONFIG__?.NEXT_PUBLIC_BASE_PATH";
+          }
+        }
       });
       return config;
     },
