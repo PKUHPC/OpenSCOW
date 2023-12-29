@@ -145,7 +145,7 @@ export const VersionListModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
-                        router.push(r.privatePath);
+                        router.push(`/files/${cluster?.id}${r.privatePath}`);
                       }}
                     >
                     查看文件

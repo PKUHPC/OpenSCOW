@@ -119,6 +119,14 @@ export const createDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
+    const nameExist = await orm.em.findOne(Dataset, { name:input.versionName, owner: user!.identityId });
+    if (nameExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `DatasetVersion name ${input.versionName} duplicated`,
+      });
+    }
+
     if (dataset && dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
@@ -156,6 +164,14 @@ export const updateDatasetVersion = procedure
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+
+    const nameExist = await orm.em.findOne(Dataset, { name:input.versionName, owner: user!.identityId });
+    if (nameExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `DatasetVersion name ${input.versionName} duplicated`,
+      });
+    }
 
     datasetVersion.versionName = input.versionName;
     datasetVersion.versionDescription = input.versionDescription;
@@ -205,12 +221,10 @@ export const deleteDatasetVersion = procedure
         clusterId: dataset.clusterId,
         sharedPath: datasetVersion.path,
         user,
-        sharedTarget: SHARED_TARGET.DATASET,
       });
     }
 
     dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
-    orm.em.persist(dataset);
 
     await orm.em.removeAndFlush(datasetVersion);
     await orm.em.flush();
@@ -254,13 +268,6 @@ export const shareDatasetVersion = procedure
     const targetSubName = `${datasetVersion.versionName}`;
     const targetPath = path.join(SHARED_DIR, SHARED_TARGET.DATASET, targetName, targetSubName);
 
-    datasetVersion.isShared = true;
-    datasetVersion.path = targetPath;
-    if (!dataset.isShared) { dataset.isShared = true; };
-
-    orm.em.persist(dataset);
-    orm.em.persist(datasetVersion);
-
     await checkSharePermission({
       clusterId: dataset.clusterId,
       checkedSourcePath: datasetVersion.privatePath,
@@ -276,6 +283,10 @@ export const shareDatasetVersion = procedure
       targetSubName,
       // input.fileType,
     });
+
+    datasetVersion.isShared = true;
+    datasetVersion.path = targetPath;
+    if (!dataset.isShared) { dataset.isShared = true; };
 
     await orm.em.flush();
     return { success: true };
@@ -313,12 +324,6 @@ export const unShareDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
-    datasetVersion.isShared = false;
-
-    orm.em.persist(dataset);
-    orm.em.persist(datasetVersion);
-
     await checkSharePermission({
       clusterId: dataset.clusterId,
       checkedSourcePath: datasetVersion.privatePath,
@@ -330,8 +335,11 @@ export const unShareDatasetVersion = procedure
       sharedPath: dataset.versions.filter((v) => (v.isShared)).length > 1 ?
         datasetVersion.path : path.dirname(datasetVersion.path),
       user,
-      sharedTarget: SHARED_TARGET.DATASET,
     });
+
+    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
+    datasetVersion.isShared = false;
+    datasetVersion.path = datasetVersion.privatePath;
 
     await orm.em.flush();
     return { success: true };

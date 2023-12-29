@@ -187,6 +187,14 @@ export const updateDataset = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
 
+    const nameExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    if (nameExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Dataset name ${input.name} duplicated`,
+      });
+    }
+
     dataset.name = input.name;
     dataset.type = input.type;
     dataset.scene = input.scene;
@@ -238,7 +246,6 @@ export const deleteDataset = procedure
         clusterId: dataset.clusterId,
         sharedPath: sharedDatasetPath,
         user,
-        sharedTarget: SHARED_TARGET.DATASET,
       }).catch((e) => {
         console.error("Error deleting dataVersions of dataset:", e);
       });

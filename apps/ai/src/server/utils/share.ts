@@ -155,12 +155,10 @@ export async function unShareFileOrDir({
   clusterId,
   sharedPath,
   user,
-  sharedTarget,
 }: {
   clusterId: string,
   sharedPath: string,
   user: ClientUserInfo,
-  sharedTarget: SHARED_TARGET,
 }): Promise<void> {
 
   const host = getClusterLoginNode(clusterId);

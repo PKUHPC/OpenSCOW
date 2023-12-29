@@ -38,7 +38,7 @@ interface FormFields {
   path: string,
 }
 
-export const CreateEditDVersionModal: React.FC<Props> = (
+export const CreateEditDSVersionModal: React.FC<Props> = (
   { open, onClose, datasetId, datasetName, isEdit, editData, cluster, refetch },
 ) => {
 

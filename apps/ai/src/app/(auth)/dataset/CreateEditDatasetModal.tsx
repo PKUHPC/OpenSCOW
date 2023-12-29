@@ -138,14 +138,13 @@ export const CreateEditDatasetModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         {isEdit && editData ? (
-          // <Form.Item
-          //   label="集群"
-          // >
-          //   {getI18nConfigCurrentText(
-          //     clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
-          //     ?? editData.clusterId }
-          // </Form.Item>
-          <></>
+          <Form.Item
+            label="集群"
+          >
+            {getI18nConfigCurrentText(
+              clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+                      ?? editData.clusterId }
+          </Form.Item>
         ) : (
           <Form.Item
             label="集群"
@@ -158,14 +157,14 @@ export const CreateEditDatasetModal: React.FC<Props> = (
           </Form.Item>
         )
         }
-        <Form.Item label="数据类型" name="type">
+        <Form.Item label="数据类型" name="type" required={true}>
           <Select
             style={{ minWidth: "100px" }}
             options={
               Object.entries(DatasetTypeText).map(([key, value]) => ({ label:value, value:key }))}
           />
         </Form.Item>
-        <Form.Item label="应用场景" name="scene">
+        <Form.Item label="应用场景" name="scene" required={true}>
           <Select
             style={{ minWidth: "100px" }}
             options={

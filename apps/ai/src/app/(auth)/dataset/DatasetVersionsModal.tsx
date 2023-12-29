@@ -12,16 +12,17 @@
 
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Modal, Space, Table } from "antd";
+import cluster from "cluster";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { DatasetVersionInterface } from "src/models/Dateset";
-import { FileType } from "src/server/trpc/route/file";
 import { AppRouter } from "src/server/trpc/router";
+import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
-import { CreateEditDVersionModal } from "./CreateEditDVersionModal";
+import { CreateEditDSVersionModal } from "./CreateEditDSVersionModal";
 
 export interface Props {
   open: boolean;
@@ -31,14 +32,14 @@ export interface Props {
   datasetName: string;
   datasetVersions: DatasetVersionInterface[];
   isPublic?: boolean;
-  clusterId: string;
+  cluster: Cluster | undefined;
 }
 
 export const DatasetVersionsModal: React.FC<Props> = (
-  { open, onClose, onRefetch, isFetching, datasetName, isPublic, clusterId, datasetVersions },
+  { open, onClose, onRefetch, isFetching, datasetName, isPublic, cluster, datasetVersions },
 ) => {
   const { modal, message } = App.useApp();
-  const CreateAndEditVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
+  const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
   const router = useRouter();
 
@@ -96,8 +97,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
         columns={[
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
-          { dataIndex: "privatePath", title: "路径",
-            render: (_, r) => isPublic ? r.path : r.privatePath },
+          isPublic ? {} : { dataIndex: "privatePath", title: "路径" },
           { dataIndex: "createTime", title: "创建时间",
             render: (_, r) => formatDateTime(r.createTime) },
           { dataIndex: "action", title: "操作",
@@ -106,23 +106,24 @@ export const DatasetVersionsModal: React.FC<Props> = (
               return !isPublic ? (
                 <>
                   <Space split={<Divider type="vertical" />}>
-                    <CreateAndEditVersionModalButton
+                    <CreateEditVersionModalButton
                       key="edit"
                       datasetId={r.datasetId}
                       datasetName={datasetName}
+                      cluster={cluster}
                       isEdit={true}
                       editData={r}
                       refetch={onRefetch}
                     >
                     编辑
-                    </CreateAndEditVersionModalButton>
+                    </CreateEditVersionModalButton>
                   </Space>
 
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
                       onClick={() => {
-                        router.push(r.privatePath);
+                        router.push(`/files/${cluster?.id}${r.privatePath}`);
                       }}
                     >
                       查看文件
@@ -220,7 +221,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
                           await new Promise<void>((resolve) => {
                             copyMutation.mutate({
                               op: "copy",
-                              clusterId: clusterId,
+                              clusterId: cluster?.id ?? "",
                               fromPath: r.path,
                               //  todo 选择存储路径
                               toPath: "/data/home/demo_admin/sharing/aaaa",

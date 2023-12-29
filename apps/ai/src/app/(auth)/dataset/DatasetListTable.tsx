@@ -28,7 +28,7 @@ import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
 import { CreateEditDatasetModal } from "./CreateEditDatasetModal";
-import { CreateEditDVersionModal } from "./CreateEditDVersionModal";
+import { CreateEditDSVersionModal } from "./CreateEditDSVersionModal";
 import { DatasetVersionsModal } from "./DatasetVersionsModal";
 
 
@@ -59,7 +59,7 @@ interface PageInfo {
 
 const CreateDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "primary", icon: <PlusOutlined /> });
 const EditDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "link" });
-const CreateEditDVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
+const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
 export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
@@ -195,7 +195,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 (
                   <>
                     <Space split={<Divider type="vertical" />}>
-                      <CreateEditDVersionModalButton
+                      <CreateEditVersionModalButton
                         datasetId={r.id}
                         datasetName={r.name}
                         cluster={getCurrentCluster(r.clusterId)}
@@ -206,7 +206,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
                       >
                         创建新版本
-                      </CreateEditDVersionModalButton>
+                      </CreateEditVersionModalButton>
                     </Space>
                     <Space split={<Divider type="vertical" />}>
                       <Button
@@ -291,7 +291,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
         onClose={() => { setVersionListModalIsOpen(false); }}
         isPublic={isPublic}
         datasetName={datasetName}
-        clusterId={clusterId}
+        cluster={getCurrentCluster(clusterId)}
         datasetVersions={versionData?.items ?? []}
         isFetching={versionFetching}
         onRefetch={versionRefetch}
