@@ -32,6 +32,7 @@ import { CreateEditDVersionModal } from "./CreateEditDVersionModal";
 import { DatasetVersionsModal } from "./DatasetVersionsModal";
 
 
+
 interface Props {
   isPublic: boolean;
   clusters: Cluster[];
@@ -96,7 +97,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     isFetching: versionFetching,
     refetch: versionRefetch,
     error: versionError }
-    = trpc.dataset.versionList.useQuery({ datasetId: datasetId }, {
+    = trpc.dataset.versionList.useQuery({ datasetId: datasetId, isShared: isPublic }, {
       enabled:!!datasetId,
     });
   if (versionError) {
@@ -232,21 +233,22 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                           confirm({
                             title: "删除数据集",
                             content: `是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`,
-                            onOk:async () => {
+                            onOk: async () => {
                               await new Promise<void>((resolve) => {
                                 deleteDatasetMutation.mutate({
                                   id: r.id,
                                 }, {
                                   onSuccess() {
                                     refetch();
-                                    message.success("删除成功");
                                     resolve();
+                                    message.success("删除成功");
                                   },
                                   onError() {
                                     resolve();
                                   },
                                 });
                               });
+
                             },
                           });
                         }}

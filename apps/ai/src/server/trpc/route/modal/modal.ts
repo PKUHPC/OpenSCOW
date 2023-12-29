@@ -112,7 +112,12 @@ export const createModal = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-
+    const modalExist = await orm.em.findOne(Modal, { name:input.name, owner: user!.identityId });
+    if (modalExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+      });
+    }
     // TODO: 判断集群是否可以连接？
 
     const modal = new Modal({ ...input, owner: user!.identityId, isShared: false });

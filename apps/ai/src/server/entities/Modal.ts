@@ -21,7 +21,7 @@ export class Modal {
   @PrimaryKey()
     id!: number;
 
-  @Property({ unique: true })
+  @Property()
     name: string;
 
   @Property()

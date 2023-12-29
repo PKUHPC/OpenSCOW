@@ -23,7 +23,7 @@ export class Image {
   @PrimaryKey()
     id!: number;
 
-  @Property({ unique: true })
+  @Property()
     name: string;
 
   @Property()
