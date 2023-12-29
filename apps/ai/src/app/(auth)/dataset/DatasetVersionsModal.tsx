@@ -11,9 +11,9 @@
  */
 
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Divider, Modal, Space, Table } from "antd";
+import { App, Button, Checkbox, Divider, Modal, Space, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { DatasetVersionInterface } from "src/models/Dateset";
 import { AppRouter } from "src/server/trpc/router";
@@ -39,6 +39,12 @@ export const DatasetVersionsModal: React.FC<Props> = (
 ) => {
   const { modal, message } = App.useApp();
   const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
+  const [ deleteSourceFile, setDeleteSourceFile ] = useState(false);
+  const deleteSourceFileRef = useRef(deleteSourceFile);
+
+  useEffect(() => {
+    deleteSourceFileRef.current = deleteSourceFile;
+  }, [deleteSourceFile]);
 
   const router = useRouter();
 
@@ -85,6 +91,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
       }
     },
   });
+
+  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   return (
     <Modal
@@ -190,24 +198,44 @@ export const DatasetVersionsModal: React.FC<Props> = (
                       onClick={() => {
                         modal.confirm({
                           title: "删除数据集版本",
-                          content: `是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`,
+                          content: (
+                            <>
+                              <p>{`是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`}</p>
+                              <Checkbox
+                                onChange={(e) => setDeleteSourceFile(e.target.checked)}
+                              >
+                                同时删除源文件
+                              </Checkbox>
+                            </>
+                          ),
                           onOk: async () => {
-                            await new Promise<void>((resolve) => {
-                              deleteMutation.mutate({
+                            deleteSourceFileRef.current ?
+                              await Promise.all([
+                                deleteMutation.mutateAsync({
+                                  id: r.id,
+                                  datasetId: r.datasetId,
+                                }),
+                                new Promise((resolve) => {
+                                  setTimeout(() => {
+                                    deleteSourceFileMutation.mutateAsync({
+                                      target: "DIR",
+                                      clusterId: cluster?.id ?? "",
+                                      path: r.privatePath,
+                                    }).then(resolve);
+                                  }, 2000);
+                                }),
+
+                              ]).then(() => {
+                                message.success("删除成功");
+                                onRefetch();
+                              }) :
+                              await deleteMutation.mutateAsync({
                                 id: r.id,
                                 datasetId: r.datasetId,
-                              }, {
-                                onSuccess() {
-                                  onRefetch();
-                                  resolve();
-                                  message.success("删除成功");
-                                },
-                                onError() {
-                                  resolve();
-                                },
+                              }).then(() => {
+                                message.success("删除成功");
+                                onRefetch();
                               });
-                            });
-
                           },
                         });
                       }}
