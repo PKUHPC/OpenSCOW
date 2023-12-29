@@ -28,7 +28,7 @@ export class Algorithm {
   @PrimaryKey()
     id!: number;
 
-  @Property({ unique: true })
+  @Property()
     name: string;
 
   @Property()

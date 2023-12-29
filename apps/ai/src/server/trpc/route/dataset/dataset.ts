@@ -142,6 +142,12 @@ export const createDataset = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
+    const dateSetExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    if (dateSetExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+      });
+    }
     // TODO: 判断集群是否可以连接？
 
     const dataset = new Dataset({ ...input, owner: user!.identityId });

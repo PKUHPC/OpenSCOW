@@ -92,15 +92,6 @@
       "name": "algorithm",
       "indexes": [
         {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "algorithm_name_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -337,15 +328,6 @@
       },
       "name": "dataset",
       "indexes": [
-        {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "dataset_name_unique",
-          "primary": false,
-          "unique": true
-        },
         {
           "keyName": "PRIMARY",
           "columnNames": [
@@ -603,15 +585,6 @@
       "name": "image",
       "indexes": [
         {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "image_name_unique",
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -725,15 +698,6 @@
       },
       "name": "modal",
       "indexes": [
-        {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "modal_name_unique",
-          "primary": false,
-          "unique": true
-        },
         {
           "keyName": "PRIMARY",
           "columnNames": [

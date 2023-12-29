@@ -100,8 +100,8 @@ export const createAlgorithm = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const { em } = await getORM();
-    const algorithmExsit = await em.findOne(Algorithm, { name:input.name });
-    if (algorithmExsit) {
+    const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user!.identityId });
+    if (algorithmExist) {
       throw new TRPCError({
         code: "CONFLICT",
         message: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
