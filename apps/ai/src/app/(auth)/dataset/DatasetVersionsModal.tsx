@@ -179,15 +179,21 @@ export const DatasetVersionsModal: React.FC<Props> = (
                         modal.confirm({
                           title: "删除数据集版本",
                           content: `是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`,
-                          onOk: () => {
-                            deleteMutation.mutate({
-                              id: r.id,
-                              datasetId: r.datasetId,
-                            }, {
-                              onSuccess() {
-                                reload();
-                                message.success("删除成功");
-                              },
+                          onOk:async () => {
+                            await new Promise<void>((resolve) => {
+                              deleteMutation.mutate({
+                                id: r.id,
+                                datasetId: r.datasetId,
+                              }, {
+                                onSuccess() {
+                                  reload();
+                                  message.success("删除成功");
+                                  resolve();
+                                },
+                                onError() {
+                                  resolve();
+                                },
+                              });
                             });
                           },
                         });

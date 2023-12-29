@@ -18,6 +18,7 @@ import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetVersionInterface } from "src/models/Dateset";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
@@ -118,6 +119,7 @@ export const CreateEditDVersionModal: React.FC<Props> = (
           name="versionName"
           rules={[
             { required: true },
+            { validator:validateNoChinese },
           ]}
         >
           <Input allowClear />

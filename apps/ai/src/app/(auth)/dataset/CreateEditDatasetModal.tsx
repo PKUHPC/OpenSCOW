@@ -18,6 +18,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DatasetInterface, DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
@@ -131,6 +132,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
           name="name"
           rules={[
             { required: true },
+            { validator:validateNoChinese },
           ]}
         >
           <Input allowClear />

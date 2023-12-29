@@ -20,6 +20,7 @@ import { DatasetInterface } from "src/models/Dateset";
 import { ImageInterface, Source, SourceText } from "src/models/Image";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
@@ -147,6 +148,7 @@ export const CreateEditImageModal: React.FC<Props> = (
               name="name"
               rules={[
                 { required: true },
+                { validator:validateNoChinese },
               ]}
             >
               <Input allowClear />

@@ -232,14 +232,20 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                           confirm({
                             title: "删除数据集",
                             content: `是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`,
-                            onOk: () => {
-                              deleteDatasetMutation.mutate({
-                                id: r.id,
-                              }, {
-                                onSuccess() {
-                                  refetch();
-                                  message.success("删除成功");
-                                },
+                            onOk:async () => {
+                              await new Promise<void>((resolve) => {
+                                deleteDatasetMutation.mutate({
+                                  id: r.id,
+                                }, {
+                                  onSuccess() {
+                                    refetch();
+                                    message.success("删除成功");
+                                    resolve();
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                });
                               });
                             },
                           });

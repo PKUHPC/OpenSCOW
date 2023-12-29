@@ -16,6 +16,7 @@ import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { AlgorithmTypeText } from "src/models/Algorithm";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 interface EditProps {
@@ -106,7 +107,8 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
           label="名称"
           name="name"
           rules={[
-            { required: !editData?.algorithmName },
+            { required: true },
+            { validator:validateNoChinese },
           ]}
           initialValue={editData?.algorithmName}
         >

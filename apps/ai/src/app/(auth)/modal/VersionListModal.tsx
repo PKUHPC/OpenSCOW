@@ -68,10 +68,6 @@ export const VersionListModal: React.FC<Props> = (
   );
 
   const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
-    onSuccess() {
-      message.success("删除模型版本成功");
-      refetch();
-    },
     onError(e) {
       console.log(e);
       message.error("删除模型版本失败");
@@ -82,8 +78,19 @@ export const VersionListModal: React.FC<Props> = (
       confirm({
         title: "删除模型版本",
         content: `确认删除模型版本${name}？如该模型版本已分享，则分享的模型版本也会被删除。`,
-        onOk() {
-          deleteModalVersionMutation.mutate({ id, modalId });
+        onOk:async () => {
+          await new Promise<void>((resolve) => {
+            deleteModalVersionMutation.mutate({ id, modalId }, {
+              onSuccess() {
+                message.success("删除模型版本成功");
+                refetch();
+                resolve();
+              },
+              onError() {
+                resolve();
+              },
+            });
+          });
         },
       });
     },

@@ -67,10 +67,6 @@ export const VersionListModal: React.FC<Props> = (
   );
 
   const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
-    onSuccess() {
-      message.success("删除算法版本成功");
-      refetch();
-    },
     onError(e) {
       console.log(e);
       message.error("删除算法版本失败");
@@ -81,8 +77,19 @@ export const VersionListModal: React.FC<Props> = (
       confirm({
         title: "删除算法版本",
         content: `确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`,
-        onOk() {
-          deleteAlgorithmVersionMutation.mutate({ id });
+        onOk:async () => {
+          await new Promise<void>((resolve) => {
+            deleteAlgorithmVersionMutation.mutate({ id }, {
+              onSuccess() {
+                message.success("删除算法版本成功");
+                refetch();
+                resolve();
+              },
+              onError() {
+                resolve();
+              },
+            });
+          });
         },
       });
     },

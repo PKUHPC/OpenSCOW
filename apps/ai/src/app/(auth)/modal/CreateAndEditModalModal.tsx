@@ -15,6 +15,7 @@ import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 interface EditProps {
@@ -117,9 +118,9 @@ export const CreateAndEditModalModal: React.FC<Props> = (
           name="modalName"
           rules={[
             { required: true },
+            { validator:validateNoChinese },
           ]}
           initialValue={editData?.modalName}
-
         >
           <Input />
         </Form.Item>

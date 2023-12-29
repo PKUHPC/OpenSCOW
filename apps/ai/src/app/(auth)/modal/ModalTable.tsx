@@ -101,22 +101,31 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
 
   const deleteModalMutation = trpc.modal.deleteModal.useMutation({
-    onSuccess() {
-      message.success("删除模型成功");
-      refetch();
-    },
     onError(e) {
       console.log(e);
       message.error("删除模型失败");
-    } });
+    },
+  });
 
-  const deleteAlgorithm = useCallback(
+
+  const deleteModal = useCallback(
     async (id: number, name: string) => {
       confirm({
         title: "删除模型",
         content: `确认删除模型${name}？如该模型已分享，则分享的模型也会被删除。`,
-        onOk() {
-          deleteModalMutation.mutate({ id });
+        onOk:async () => {
+          await new Promise<void>((resolve) => {
+            deleteModalMutation.mutate({ id }, {
+              onSuccess() {
+                message.success("删除模型成功");
+                refetch();
+                resolve();
+              },
+              onError() {
+                resolve();
+              },
+            });
+          });
         },
       });
     },
@@ -177,7 +186,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
               <Button
                 type="link"
                 onClick={() => {
-                  deleteAlgorithm(r.id, r.name);
+                  deleteModal(r.id, r.name);
                 }}
               >
                 删除

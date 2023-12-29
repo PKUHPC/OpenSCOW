@@ -14,8 +14,8 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { FileType } from "src/server/trpc/route/file";
 import { Cluster } from "src/utils/config";
+import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 interface EditProps {
@@ -94,7 +94,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         versionName,
         versionDescription,
         algorithmVersion,
-        path:"123",
+        path,
         modalId,
       });
     }
@@ -131,6 +131,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
           name="versionName"
           rules={[
             { required: true },
+            { validator:validateNoChinese },
           ]}
           initialValue={editData?.versionName}
         >
@@ -145,15 +146,15 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         {
           !editData?.versionId ? (
             <Form.Item
-              label="上传文件"
+              label="上传模型"
               name="path"
-              // rules={[{ required: true }]}
+              rules={[{ required: true }]}
             >
               <Input
                 suffix={
                   (
                     <FileSelectModal
-                      allowedFileType={["FILE"]}
+                      allowedFileType={["DIR"]}
                       onSubmit={(path: string) => {
                         form.setFields([{ name: "path", value: path, touched: true }]);
                         form.validateFields(["path"]);

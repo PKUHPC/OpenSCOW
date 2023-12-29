@@ -110,12 +110,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
 
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
-    onSuccess() {
-      message.success("删除算法成功");
-      refetch();
-    },
     onError(e) {
-      console.log(e);
       message.error("删除算法失败");
     } });
 
@@ -124,8 +119,19 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
       confirm({
         title: "删除算法",
         content: `确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`,
-        onOk() {
-          deleteAlgorithmMutation.mutate({ id });
+        onOk:async () => {
+          await new Promise<void>((resolve) => {
+            deleteAlgorithmMutation.mutate({ id }, {
+              onSuccess() {
+                message.success("删除算法成功");
+                refetch();
+                resolve();
+              },
+              onError() {
+                resolve();
+              },
+            });
+          });
         },
       });
     },
