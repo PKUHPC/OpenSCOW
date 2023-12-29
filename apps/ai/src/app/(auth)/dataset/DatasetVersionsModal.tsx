@@ -12,7 +12,6 @@
 
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Modal, Space, Table } from "antd";
-import cluster from "cluster";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { ModalButton } from "src/components/ModalLink";
@@ -48,6 +47,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限分享此数据集版本");
+      } else {
+        message.error("分享数据集版本失败");
       }
     },
   });
@@ -57,6 +58,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限取消分享此数据集版本");
+      } else {
+        message.error("取消分享数据集版本失败");
       }
     },
   });
@@ -66,6 +69,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "CONFLICT") {
         message.error("存在相同的文件");
+      } else {
+        message.error("复制文件失败");
       }
     },
   });
@@ -75,6 +80,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
         message.error("找不到该数据集版本");
+      } else {
+        message.error("删除数据集版本失败");
       }
     },
   });

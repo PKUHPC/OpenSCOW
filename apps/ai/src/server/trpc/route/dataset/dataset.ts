@@ -16,7 +16,7 @@ import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, SHARED_TARGET, unShareFileOrDir } from "src/server/utils/share";
+import { checkSharePermission, unShareFileOrDir } from "src/server/utils/share";
 import { z } from "zod";
 
 // const mockDatasets = [
@@ -187,7 +187,11 @@ export const updateDataset = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
 
-    const nameExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    const nameExist = await orm.em.findOne(Dataset, {
+      name:input.name,
+      owner: user!.identityId,
+      id: { $ne: input.id },
+    });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",

@@ -86,6 +86,8 @@ export const CreateEditDatasetModal: React.FC<Props> = (
     onError(e) {
       const { data } = e as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
+        message.error("无法找到数据集");
+      } else {
         message.error("编辑数据集失败");
       }
     },

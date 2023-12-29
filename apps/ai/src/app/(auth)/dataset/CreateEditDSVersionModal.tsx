@@ -66,7 +66,9 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
     onError(e) {
       const { data } = e as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("编辑版本失败");
+        message.error("无法找到数据集版本");
+      } else {
+        message.success("编辑版本失败");
       }
     },
   });

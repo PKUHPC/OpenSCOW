@@ -119,7 +119,7 @@ export const createDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
-    const nameExist = await orm.em.findOne(Dataset, { name:input.versionName, owner: user!.identityId });
+    const nameExist = await orm.em.findOne(DatasetVersion, { versionName: input.versionName, dataset: dataset });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -165,7 +165,11 @@ export const updateDatasetVersion = procedure
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
-    const nameExist = await orm.em.findOne(Dataset, { name:input.versionName, owner: user!.identityId });
+    const nameExist = await orm.em.findOne(DatasetVersion,
+      { versionName: input.versionName,
+        dataset: dataset,
+        id: { $ne: input.id },
+      });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",

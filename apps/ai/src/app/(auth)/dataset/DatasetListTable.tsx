@@ -110,6 +110,8 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
         message.error("找不到数据集");
+      } else {
+        message.error("删除数据集失败");
       }
     },
   });
