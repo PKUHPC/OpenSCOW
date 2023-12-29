@@ -36,6 +36,10 @@ function getBaseUrl() {
   return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
 }
 
+function getBasePath() {
+  return process.env.NEXT_PUBLIC_BASE_PATH || "";
+}
+
 export function ClientProvider(props: { children: React.ReactNode }) {
 
   const [queryClient] = useState(() => new QueryClient({
@@ -77,7 +81,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
           enabled: () => process.env.NODE_ENV === "development",
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}${BASE_PATH}/api/trpc`,
+          url: `${getBaseUrl()}${getBasePath()}/api/trpc`,
         }),
       ],
       transformer: superjson,
