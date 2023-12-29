@@ -77,7 +77,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
           enabled: () => process.env.NODE_ENV === "development",
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}/api/trpc`,
+          url: `${getBaseUrl()}${BASE_PATH}/api/trpc`,
         }),
       ],
       transformer: superjson,
