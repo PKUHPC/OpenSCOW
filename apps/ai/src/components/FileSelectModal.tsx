@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, Modal, Space, Tree } from "antd";
+import { DatabaseOutlined, ExpandOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, message, Modal, Space, Tree } from "antd";
 import type { DataNode, EventDataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
@@ -20,10 +20,11 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileInfo } from "src/models/File";
 import { FileType } from "src/server/trpc/route/file";
-import { getExtension } from "src/utils/file";
+import { getExtension, isDecompressibleFile } from "src/utils/file";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
+import { CompressionModal } from "./DecompressionModal";
 import { FileTable } from "./FileTable";
 import { MkdirModal } from "./MkdirModal";
 import { PathBar } from "./PathBar";
@@ -87,7 +88,6 @@ function updateTreeData(treeData: DataNode[], homeDir: string,
     return convertToDirTree(newChildren, homeDir);
   };
   return treeData.map((node) => {
-    console.log(123123, targetKey);
     // 如果找到了目标节点（即当前目录）
     if (node.key === targetKey) {
       // 将新内容转换为 DataNode[] 并设置为 children
@@ -118,11 +118,16 @@ const formatPath = (path: string) => {
 
 export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
 
+
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
+  const [selectedFileInfo, setSelectedFileInfo] = useState<FileInfo | undefined>(undefined);
   const [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
   const [dirTree, setDirTree] = useState<DataNode[]>([]);
+
+  const CompressionModalButton = ModalButton(CompressionModal, { icon: <ExpandOutlined />,
+    disabled: selectedKeys.length === 0 || !isDecompressibleFile(selectedKeys[0].toString()) });
 
   const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
     enabled: !!clusterId && path === "~",
@@ -144,10 +149,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     }
   }, [visible]);
 
-  useEffect(() => {
-    if (path === "~" || path === homeDir?.path) return;
-    !expandedKeys.includes(path) && setExpandedKeys([...expandedKeys, path]);
-  }, [path]);
+  // useEffect(() => {
+  //   if (path === "~" || path === homeDir?.path) return;
+  //   !expandedKeys.includes(path) && setExpandedKeys([...expandedKeys, path]);
+  // }, [path]);
 
   useEffect(() => {
     if (!curDirContent) return;
@@ -159,8 +164,17 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     }
   }, [curDirContent]);
 
-  const onDirExpand = (expandDirs: Key[], { node }: { node: EventDataNode<DataNode>}) => {
-    const newExpandedKeys = Array.from(new Set(expandDirs));
+  const onDirExpand = (expandDirs: Key[],
+    { node, expanded }: { node: EventDataNode<DataNode>, expanded: boolean }) => {
+    const expandDirSet = new Set(expandDirs);
+    if (!expanded) {
+      node.children?.forEach((children) => {
+        if (expandDirSet.has(children.key)) {
+          expandDirSet.delete(children.key);
+        }
+      });
+    }
+    const newExpandedKeys = Array.from(expandDirSet);
     setExpandedKeys(newExpandedKeys);
     !node.isLeaf && setPath(node.key.toString());
   };
@@ -174,9 +188,14 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     setPath("~");
     setSelectedKeys([]);
     setExpandedKeys([]);
+    setDirTree([]);
   };
 
   const onOkClick = () => {
+    if (!selectedFileInfo || !checkFileSelectability(selectedFileInfo)) {
+      message.info("不能选择文件，请选择文件夹");
+      return;
+    }
     if (selectedKeys.length > 0) {
       const selectedFilePath = selectedKeys[0].toString();
       onSubmit(selectedFilePath);
@@ -193,7 +212,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
 
   const checkFileSelectability = (fileInfo: FileInfo) => {
     return allowedFileType.includes(fileInfo.type)
-      && (allowedExtensions === undefined || allowedExtensions?.includes(getExtension(fileInfo.name)));
+      && (allowedExtensions === undefined || allowedExtensions.includes(getExtension(fileInfo.name)));
   };
 
   return (
@@ -228,6 +247,16 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               >
                 新建文件夹
               </MkdirButton>
+              <CompressionModalButton
+                clusterId={clusterId}
+                path={selectedKeys[0]?.toString()}
+                reload={async () => {
+                  await refetch();
+                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
+                }}
+              >
+                解压文件
+              </CompressionModalButton>
             </div>
             <div key="right">
               <Button key="cancel" onClick={() => { closeModal(); }}>取消</Button>
@@ -274,9 +303,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               onExpand={onDirExpand}
               treeData={dirTree}
             />
-            <div style={{ border: "1px solid #e0e0e0", borderRadius: "5px" }}>
+            <div style={{ width: "700px", border: "1px solid #e0e0e0", borderRadius: "5px" }}>
               <FileTable
                 files={curDirContent || []}
+                filesFilter={(files) => files.filter((file) => !file.name.startsWith("."))}
                 loading={isDirContentLoading}
                 fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
                 hiddenColumns={["mtime", "mode", "action"]}
@@ -284,7 +314,8 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                 rowKey={(r: FileInfo): React.Key => join(path, r.name)}
                 onRow={(r) => ({
                   onClick: () => {
-                    checkFileSelectability(r) && setSelectedKeys([join(path, r.name)]);
+                    setSelectedKeys([join(path, r.name)]);
+                    setSelectedFileInfo(r);
                   },
                   onDoubleClick: () => {
                     if (r.type === "DIR") {
@@ -296,9 +327,9 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                   type: "radio",
                   selectedRowKeys: selectedKeys,
                   onChange: setSelectedKeys,
-                  getCheckboxProps: (r) => ({
-                    disabled: !checkFileSelectability(r),
-                  }),
+                  // getCheckboxProps: (r) => ({
+                  //   disabled: !checkFileSelectability(r),
+                  // }),
                 }}
                 scroll={{ x: true, y: 500 }}
               />
@@ -313,3 +344,4 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
 
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadFileButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
+
