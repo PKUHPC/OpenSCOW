@@ -11,8 +11,9 @@
  */
 
 import { normalizePathnameWithQuery } from "@scow/utils";
-import http from "http";
+import { IncomingMessage } from "http";
 import httpProxy from "http-proxy";
+import { NextApiRequest } from "next";
 import { join } from "path";
 import { getUserInfo } from "src/server/auth/server";
 import { clusters } from "src/server/trpc/route/config";
@@ -24,7 +25,7 @@ import { BASE_PATH } from "src/utils/processEnv";
  * @param urlIncludesBasePath whether url.req includes base path already
  * @returns Parsed proxy targe
  */
-export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): httpProxy.ProxyTarget | Error {
+export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | Error {
 
   const normalizedUrl = normalizePathnameWithQuery(url);
 
@@ -48,7 +49,7 @@ export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): htt
   // const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
   // const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].loginNodes.map((x) => getLoginNode(x).address);
 
-  // if node is login node, not proxy to proxy gateway node
+  // // if node is login node, not proxy to proxy gateway node
   // if (proxyGateway && !loginNodes.includes(node)) {
   //   // proxy to proxy gateway node
   //   return `${proxyGateway.url}${fullUri}`;
@@ -74,12 +75,15 @@ export const proxy = httpProxy.createServer();
  *
  * 所以系统启动后，需要手动触发一次到本地址的HTTP请求，以便注册upgrade事件的监听器
  */
-export const setupWssProxy = (server: http.Server) => {
-  server.on("upgrade", async (req, socket, head) => {
+export const setupWssProxy = (req: NextApiRequest) => {
+  (req.socket as any).server.on("upgrade", async (req: IncomingMessage,
+    socket: { end: (arg0: string) => void; }, head: any) => {
 
     const url = normalizePathnameWithQuery(req.url!);
 
-    if (!url.startsWith(join(BASE_PATH, "/api/proxy"))) { return; }
+    if (!url.startsWith(join(BASE_PATH, "/api/proxy"))) {
+      return;
+    }
 
     const writeError = (statusLine: string, msg: string) => {
       socket.end(`HTTP/1.1 ${statusLine}\r\n${msg}`);
@@ -98,7 +102,6 @@ export const setupWssProxy = (server: http.Server) => {
         writeError("500 Internal Server Error", "Error when authenticating request");
         return undefined;
       });
-
     if (!user) {
       return;
     }

@@ -9,7 +9,7 @@
     "build"
   ],
   "scripts": {
-    "dev": "dotenv -e env/.env.dev -- node --watch --loader ts-paths-esm-loader server/index.ts",
+    "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "next start",
     "build": "npm run build:next",
