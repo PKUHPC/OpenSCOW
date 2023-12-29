@@ -11,11 +11,12 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import path from "path";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { unShareFile } from "src/server/utils/share";
+import { checkSharePermission, SHARED_TARGET, unShareFileOrDir } from "src/server/utils/share";
 import { z } from "zod";
 
 // const mockDatasets = [
@@ -148,7 +149,6 @@ export const createDataset = procedure
         code: "CONFLICT",
       });
     }
-    // TODO: 判断集群是否可以连接？
 
     const dataset = new Dataset({ ...input, owner: user!.identityId });
     await orm.em.persistAndFlush(dataset);
@@ -184,7 +184,9 @@ export const updateDataset = procedure
       });
     };
 
-    // TODO: 判断集群是否可以连接？
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
+
     dataset.name = input.name;
     dataset.type = input.type;
     dataset.scene = input.scene;
@@ -216,17 +218,29 @@ export const deleteDataset = procedure
 
     const datasetVersions = await orm.em.find(DatasetVersion, { dataset });
 
-    console.log("【datasetVersions】", datasetVersions);
-
     try {
-
       const sharedVersions = datasetVersions.filter((v) => v.isShared);
-      console.log("【sharedV】", sharedVersions);
-      // 删除所有已分享的版本创建的硬链接
+
+      // 删除所有已分享的版本
+      let sharedDatasetPath: string = "";
       await Promise.all(sharedVersions.map(async (v) => {
-        await unShareFile(dataset.clusterId, v.path, v.privatePath, user);
-      })).catch((e) => {
-        console.log(5555555, e);
+        sharedDatasetPath = path.dirname(v.path);
+        await checkSharePermission({
+          clusterId: dataset.clusterId,
+          checkedSourcePath: v.privatePath,
+          user,
+          checkedTargetPath: v.path,
+        });
+      }));
+
+      // 删除整个分享的dataset路径
+      await unShareFileOrDir({
+        clusterId: dataset.clusterId,
+        sharedPath: sharedDatasetPath,
+        user,
+        sharedTarget: SHARED_TARGET.DATASET,
+      }).catch((e) => {
+        console.error("Error deleting dataVersions of dataset:", e);
       });
 
       await orm.em.removeAndFlush([...datasetVersions, dataset]);

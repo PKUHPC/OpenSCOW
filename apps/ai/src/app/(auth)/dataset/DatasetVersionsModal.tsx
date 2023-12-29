@@ -13,9 +13,10 @@
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Divider, Modal, Space, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { DatasetVersionInterface } from "src/models/Dateset";
+import { FileType } from "src/server/trpc/route/file";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -38,7 +39,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
 ) => {
   const { modal, message } = App.useApp();
   const CreateAndEditVersionModalButton = ModalButton(CreateEditDVersionModal, { type: "link" });
-  const [loading, setLoading] = useState(false);
 
   const router = useRouter();
 
@@ -78,11 +78,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
     },
   });
 
-  const reload = () => {
-    setLoading(false);
-    onRefetch();
-  };
-
   return (
     <Modal
       title={`版本列表: ${datasetName}`}
@@ -101,7 +96,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
         columns={[
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
-          { dataIndex: "privatePath", title: "路径" },
+          { dataIndex: "privatePath", title: "路径",
+            render: (_, r) => isPublic ? r.path : r.privatePath },
           { dataIndex: "createTime", title: "创建时间",
             render: (_, r) => formatDateTime(r.createTime) },
           { dataIndex: "action", title: "操作",
@@ -137,33 +133,43 @@ export const DatasetVersionsModal: React.FC<Props> = (
 
                     <Button
                       type="link"
-                      // loading={loading}
                       onClick={() => {
-                        setLoading(true);
                         modal.confirm({
                           title: "分享数据集版本",
                           content: `确认${r.isShared ? "取消分享" : "分享"}数据集版本 ${r.versionName}?`,
                           onOk: async () => {
-                            r.isShared ?
-                              unShareMutation.mutate({
-                                id: r.id,
-                                datasetId: r.datasetId,
-                              }, {
-                                onSuccess() {
-                                  reload();
-                                  message.success("取消分享成功");
-                                },
-                              }) :
-                              shareMutation.mutate({
-                                id: r.id,
-                                datasetId: r.datasetId,
-                                sourceFilePath: r.path,
-                              }, {
-                                onSuccess() {
-                                  reload();
-                                  message.success("分享成功");
-                                },
-                              });
+                            await new Promise<void>((resolve) => {
+                              r.isShared ?
+                                unShareMutation.mutate({
+                                  id: r.id,
+                                  datasetId: r.datasetId,
+                                }, {
+                                  onSuccess() {
+                                    onRefetch();
+                                    resolve();
+                                    message.success("取消分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                }) :
+                                shareMutation.mutate({
+                                  id: r.id,
+                                  datasetId: r.datasetId,
+                                  sourceFilePath: r.path,
+                                // fileType: "DIR",
+                                }, {
+                                  onSuccess() {
+                                    onRefetch();
+                                    resolve();
+                                    message.success("分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                });
+                            });
+
                           },
                         });
                       }}
@@ -173,28 +179,27 @@ export const DatasetVersionsModal: React.FC<Props> = (
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
-                      // loading={loading}
                       onClick={() => {
-                        // setLoading(true);
                         modal.confirm({
                           title: "删除数据集版本",
                           content: `是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`,
-                          onOk:async () => {
+                          onOk: async () => {
                             await new Promise<void>((resolve) => {
                               deleteMutation.mutate({
                                 id: r.id,
                                 datasetId: r.datasetId,
                               }, {
                                 onSuccess() {
-                                  reload();
-                                  message.success("删除成功");
+                                  onRefetch();
                                   resolve();
+                                  message.success("删除成功");
                                 },
                                 onError() {
                                   resolve();
                                 },
                               });
                             });
+
                           },
                         });
                       }}
@@ -207,24 +212,28 @@ export const DatasetVersionsModal: React.FC<Props> = (
                 <Space split={<Divider type="vertical" />}>
                   <Button
                     type="link"
-                    loading={loading}
                     onClick={() => {
-                      // setLoading(true);
                       modal.confirm({
                         title: "TODO: 选择路径",
-                        onOk: () => {
+                        onOk: async () => {
                           // todo 选择存储路径
-                          copyMutation.mutate({
-                            op: "copy",
-                            clusterId: clusterId,
-                            fromPath: r.path,
-                            //  todo 选择存储路径
-                            toPath: "/test",
-                          }, {
-                            onSuccess() {
-                              // reload();
-                              message.success("复制成功");
-                            },
+                          await new Promise<void>((resolve) => {
+                            copyMutation.mutate({
+                              op: "copy",
+                              clusterId: clusterId,
+                              fromPath: r.path,
+                              //  todo 选择存储路径
+                              toPath: "/data/home/demo_admin/sharing/aaaa",
+                            }, {
+                              onSuccess() {
+                                onRefetch();
+                                resolve();
+                                message.success("复制成功");
+                              },
+                              onError() {
+                                resolve();
+                              },
+                            });
                           });
                         },
                       });

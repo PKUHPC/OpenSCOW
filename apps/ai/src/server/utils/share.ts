@@ -10,69 +10,137 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpChmod, sftpExists, sftpStat, sftpUnlink, sshConnect as libConnect } from "@scow/lib-ssh";
+import { sftpExists, sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import { dirname } from "path";
+import path from "path";
 
 import { ClientUserInfo } from "../auth/models";
 import { rootKeyPair } from "../config/env";
+import { FileType } from "../trpc/route/file";
 import { clusterNotFound } from "./errors";
 import { logger } from "./logger";
 import { getClusterLoginNode, sshConnect } from "./ssh";
 
 
-/**
- * create hardLink for shareFile
- */
-export async function shareFile(
+
+export const SHARED_DIR = "/data/.shared";
+
+// 分享文件的公共路径前缀
+export enum SHARED_TARGET {
+  DATASET = "/dataset",
+  ALGORITHM = "/algorithm",
+  MODAL = "/modal",
+};
+
+export async function checkSharePermission({
+  clusterId,
+  checkedSourcePath,
+  user,
+  checkedTargetPath,
+}: {
   clusterId: string,
-  sourceFilePath: string,
-  targetPath: string,
+  checkedSourcePath: string,
   user: ClientUserInfo,
-): Promise<void> {
+  checkedTargetPath?: string,
+}): Promise<void> {
+  const host = getClusterLoginNode(clusterId);
+
+  if (!host) { throw clusterNotFound(clusterId); }
+
+  const subLogger = logger.child({ user, checkedSourcePath, clusterId });
+  subLogger.info("Check share permission started");
+
+  await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
+    const sftp = await ssh.requestSFTP();
+    // 判断是否为拥有者
+    await sftpStat(sftp)(checkedSourcePath).catch((e) => {
+      logger.error(e, "stat %s as %s failed", checkedSourcePath, user!.identityId);
+      throw new TRPCError({ code: "FORBIDDEN", message: `${checkedSourcePath} is not accessible` });
+    });
+
+    // 分享时判断源文件是否存在
+    if (!checkedTargetPath) {
+      const sourceFileExists = await sftpExists(sftp, checkedSourcePath);
+      if (!sourceFileExists) {
+        throw new TRPCError({ code: "NOT_FOUND", message: `${checkedSourcePath} is not found` });
+      }
+    }
+
+    // 取消分享时判断已分享文件是否存在
+    if (checkedTargetPath) {
+      await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+        const targetFileExists = await sftpExists(sftp, checkedTargetPath);
+        if (!targetFileExists) {
+          throw new TRPCError({ code: "NOT_FOUND", message: `${checkedTargetPath} is not found` });
+        }
+      });
+    }
+
+  });
+}
+
+/**
+ * create new File or Dir for share
+ */
+export async function shareFileOrDir(
+  {
+    clusterId,
+    sourceFilePath,
+    user,
+    sharedTarget,
+    targetName,
+    targetSubName,
+    // fileType: FileType,
+  }: {
+    clusterId: string,
+    sourceFilePath: string,
+    user: ClientUserInfo,
+    sharedTarget: SHARED_TARGET,
+    targetName: string,
+    targetSubName: string,
+    // fileType: FileType,
+  }): Promise<void> {
 
   const host = getClusterLoginNode(clusterId);
 
   if (!host) { throw clusterNotFound(clusterId); }
 
   const subLogger = logger.child({ user, sourceFilePath, clusterId });
-  subLogger.info("Share file started");
+  subLogger.info("Share file or directory started");
+
+  const targetDirectory = path.join(SHARED_DIR, sharedTarget);
+  const targetTopDir = path.join(targetDirectory, targetName);
+  const targetFullDir = path.join(targetDirectory, targetName, targetSubName);
 
   try {
-    await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
-      const sftp = await ssh.requestSFTP();
-      // 判断是否为拥有者
-      await sftpStat(sftp)(sourceFilePath).catch((e) => {
-        logger.error(e, "stat %s as %s failed", sourceFilePath, user!.identityId);
-        throw new TRPCError({ code: "FORBIDDEN", message: `${sourceFilePath} is not accessible` });
-      });
-
-      const sourceFileExists = await sftpExists(sftp, sourceFilePath);
-      if (!sourceFileExists) {
-        throw new TRPCError({ code: "NOT_FOUND", message: `${sourceFilePath} is not found` });
-      }
-    });
 
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
-      const targetDirectory = dirname(targetPath);
-      // 判断目标路径是否存在，如果不存在则创建
-      const dirExists = await sftpExists(sftp, targetDirectory);
-      if (!dirExists) {
-        await ssh.mkdir(targetDirectory);
-        await sftpChmod(sftp)(targetDirectory, "555");
+
+      // 判断共享目录是否存在
+      if (!await sftpExists(sftp, targetDirectory)) {
+        await ssh.exec("mkdir", ["-p", targetDirectory], { stream: "both" });
+        await ssh.exec("chmod", ["-R", "555", SHARED_DIR], { stream: "both" });
       }
 
-      await ssh.execCommand(`ln ${sourceFilePath} ${targetPath}`);
-      await sftpChmod(sftp)(targetPath, "555");
+      // 判断目标路径是否存在，如果不存在则创建
+      const dirExists = await sftpExists(sftp, targetFullDir);
+      if (!dirExists) {
+        await ssh.exec("mkdir", ["-p", targetFullDir], { stream: "both" });
+      }
+
+      // 复制并从顶层目录递归修改文件夹权限
+      await ssh.execCommand(`nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`);
+
     });
   } catch (err) {
     // rollback
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
-      const linkExists = await sftpExists(sftp, targetPath);
-      if (linkExists) {
-        await sftpUnlink(sftp)(targetPath);
+      const pathExists = await sftpExists(sftp, targetFullDir);
+      if (pathExists) {
+        await sshRmrf(ssh, targetTopDir);
       }
     });
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "share file failed", cause: err });
@@ -83,12 +151,17 @@ export async function shareFile(
 /**
  * delete hardLink for unshareFile
  */
-export async function unShareFile(
+export async function unShareFileOrDir({
+  clusterId,
+  sharedPath,
+  user,
+  sharedTarget,
+}: {
   clusterId: string,
-  path: string,
-  privatePath: string,
+  sharedPath: string,
   user: ClientUserInfo,
-): Promise<void> {
+  sharedTarget: SHARED_TARGET,
+}): Promise<void> {
 
   const host = getClusterLoginNode(clusterId);
 
@@ -97,34 +170,11 @@ export async function unShareFile(
   const subLogger = logger.child({ user, path, clusterId });
   subLogger.info("Unshare file started");
 
-
-  await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-    // 判断是否为拥有者
-    await sftpStat(sftp)(privatePath).catch((e) => {
-      logger.error(e, "stat %s as %s failed", privatePath, user!.identityId);
-      throw new TRPCError({ code: "FORBIDDEN", message: `${privatePath} is not accessible` });
-    });
-
-    // 判断是否可以访问已分享文件地址
-    await sftpStat(sftp)(path).catch((e) => {
-      logger.error(e, "stat %s as %s failed", path, user!.identityId);
-      throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
-    });
-
-    const sharedFileExists = await sftpExists(sftp, path);
-    if (!sharedFileExists) {
-      throw new TRPCError({ code: "NOT_FOUND", message: `${path} is not found` });
-    }
-  });
-
   // 以root权限删除
   await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-    const sftp = await ssh.requestSFTP();
-    await sftpUnlink(sftp)(path);
+    await sshRmrf(ssh, sharedPath);
   }).catch((err) => {
     throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "unShare file failed", cause: err });
   });
 
 }
-

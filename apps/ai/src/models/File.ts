@@ -19,11 +19,3 @@ export type FileInfo = {
   mode: number,
   size: number,
 };
-
-
-// 分享文件的公共路径前缀
-export enum SharedTargetPath {
-  Dataset = "/data/sharedDataset/",
-  Algorithm = "/data/sharedAlgorithm/",
-  Modal = "/data/sharedModal/",
-};

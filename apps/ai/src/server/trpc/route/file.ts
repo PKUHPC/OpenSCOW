@@ -26,7 +26,7 @@ import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
-const FileType = z.union([z.literal("FILE"), z.literal("DIR")]);
+export const FileType = z.union([z.literal("FILE"), z.literal("DIR")]);
 export type FileType = z.infer<typeof FileType>;
 
 export const ListDirectorySchema = z.object({

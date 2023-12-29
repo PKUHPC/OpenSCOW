@@ -11,15 +11,16 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { randomUUID } from "crypto";
 import path from "path";
-import { SharedTargetPath } from "src/models/File";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { shareFile, unShareFile } from "src/server/utils/share";
+import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
+  shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
 import { z } from "zod";
+
+import { FileType } from "../file";
 
 // const mockDatasetVersions = [
 //   {
@@ -53,9 +54,6 @@ export const VersionListSchema = z.object({
   privatePath: z.string(),
   createTime: z.string(),
   datasetId: z.number(),
-  // datasetName: z.string(),
-  // datasetOwner: z.string(),
-  // clusterId: z.string(),
 });
 
 export const versionList = procedure
@@ -152,6 +150,8 @@ export const updateDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
+    if (dataset.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
 
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
     if (!datasetVersion)
@@ -193,9 +193,20 @@ export const deleteDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    // 如果是已分享的数据集版本，则删除分享时创建的硬链接
+    // 如果是已分享的数据集版本，则删除分享
     if (datasetVersion.isShared) {
-      await unShareFile(dataset.clusterId, datasetVersion.path, datasetVersion.privatePath, user);
+      await checkSharePermission({
+        clusterId: dataset.clusterId,
+        checkedSourcePath: datasetVersion.privatePath,
+        user,
+        checkedTargetPath: datasetVersion.path,
+      });
+      await unShareFileOrDir({
+        clusterId: dataset.clusterId,
+        sharedPath: datasetVersion.path,
+        user,
+        sharedTarget: SHARED_TARGET.DATASET,
+      });
     }
 
     dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
@@ -219,6 +230,7 @@ export const shareDatasetVersion = procedure
     id: z.number(),
     datasetId: z.number(),
     sourceFilePath: z.string(),
+    // fileType: FileType,
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
@@ -237,9 +249,10 @@ export const shareDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    // 定义分享后目标硬链接文件的绝对路径
-    const targetFileName = `${dataset.name}-${datasetVersion.versionName}-${user!.identityId}-${randomUUID()}`;
-    const targetPath = path.join(SharedTargetPath.Dataset, targetFileName);
+    // 定义分享后目标存储的绝对路径
+    const targetName = `${dataset.name}-${user!.identityId}`;
+    const targetSubName = `${datasetVersion.versionName}`;
+    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.DATASET, targetName, targetSubName);
 
     datasetVersion.isShared = true;
     datasetVersion.path = targetPath;
@@ -248,12 +261,21 @@ export const shareDatasetVersion = procedure
     orm.em.persist(dataset);
     orm.em.persist(datasetVersion);
 
-    await shareFile(
-      dataset.clusterId,
-      input.sourceFilePath,
-      targetPath,
+    await checkSharePermission({
+      clusterId: dataset.clusterId,
+      checkedSourcePath: datasetVersion.privatePath,
       user,
-    );
+    });
+
+    await shareFileOrDir({
+      clusterId: dataset.clusterId,
+      sourceFilePath: input.sourceFilePath,
+      user,
+      sharedTarget: SHARED_TARGET.DATASET,
+      targetName,
+      targetSubName,
+      // input.fileType,
+    });
 
     await orm.em.flush();
     return { success: true };
@@ -297,7 +319,19 @@ export const unShareDatasetVersion = procedure
     orm.em.persist(dataset);
     orm.em.persist(datasetVersion);
 
-    await unShareFile(dataset.clusterId, datasetVersion.path, datasetVersion.privatePath, user);
+    await checkSharePermission({
+      clusterId: dataset.clusterId,
+      checkedSourcePath: datasetVersion.privatePath,
+      user,
+      checkedTargetPath: datasetVersion.path,
+    });
+    await unShareFileOrDir({
+      clusterId: dataset.clusterId,
+      sharedPath: dataset.versions.filter((v) => (v.isShared)).length > 1 ?
+        datasetVersion.path : path.dirname(datasetVersion.path),
+      user,
+      sharedTarget: SHARED_TARGET.DATASET,
+    });
 
     await orm.em.flush();
     return { success: true };
