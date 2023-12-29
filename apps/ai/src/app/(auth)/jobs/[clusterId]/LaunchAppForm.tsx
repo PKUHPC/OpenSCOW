@@ -45,7 +45,6 @@ interface FixedFormFields {
   image: any;
   dataset: { name: number, version: number };
   partition: string | undefined;
-  qos: string | undefined;
   nodeCount: number;
   coreCount: number;
   gpuCount: number | undefined;
@@ -69,7 +68,6 @@ interface Partition {
   cores: number;
   gpus: number;
   nodes: number;
-  qos?: string[];
   comment?: string;
 }
 
@@ -109,13 +107,13 @@ export const LaunchAppForm = (props: Props) => {
 
   const selectedDataset = Form.useWatch(["dataset", "name"], form);
 
-  const selectAlgorithm = Form.useWatch(["algorithm", "name"], form);
+  const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
 
-  const { data: datasets } = trpc.dataset.list.useQuery({
+  const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
     isShared: isPublicDataset, clusterId,
   });
 
-  const { data: datasetVersions } = trpc.dataset.versionList.useQuery({
+  const { data: datasetVersions, isLoading: isDatasetVersionsLoading } = trpc.dataset.versionList.useQuery({
     datasetId: selectedDataset, isShared: isPublicDataset,
   }, { enabled: selectedDataset !== undefined });
 
@@ -127,15 +125,15 @@ export const LaunchAppForm = (props: Props) => {
     return datasetVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
   }, [datasetVersions]);
 
-  const { data: algorithms } = trpc.algorithm.getAlgorithms.useQuery(
+  const { data: algorithms, isLoading: isAlgorithmLoading } = trpc.algorithm.getAlgorithms.useQuery(
     {
       clusterId,
       isPublic: isPublicAlgorithm,
     });
 
-  const { data:algorithmVersions } =
-  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectAlgorithm, isPublic: isPublicAlgorithm }, {
-    enabled: selectAlgorithm !== undefined });
+  const { data:algorithmVersions, isLoading: isAlgorithmVersionsLoading } =
+  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectedAlgorithm, isPublic: isPublicAlgorithm }, {
+    enabled: selectedAlgorithm !== undefined });
 
 
   const algorithmOptions = useMemo(() => {
@@ -168,7 +166,6 @@ export const LaunchAppForm = (props: Props) => {
     const partitionInfo = clusterInfo
       ? clusterInfo.partitions.find((x) => x.name === partition)
       : undefined;
-    form.setFieldValue("qos", partitionInfo?.qos?.[0]);
     if (!!partitionInfo?.gpus) {
       form.setFieldValue("gpuCount", 1);
     } else {
@@ -227,7 +224,6 @@ export const LaunchAppForm = (props: Props) => {
     setCurrentPartitionInfo(clusterInfo?.partitions[0]);
     form.setFieldsValue({
       partition: clusterInfo?.partitions[0].name,
-      qos: clusterInfo?.partitions[0].qos?.[0],
       appJobName: genAppJobName(appName ?? "trainJobs"),
     });
   }, [clusterInfo]);
@@ -252,7 +248,7 @@ export const LaunchAppForm = (props: Props) => {
       onFinish={async () => {
         const values = await form.validateFields();
         const {
-          appJobName, algorithm, dataset, account, partition, qos, nodeCount, coreCount, gpuCount, maxTime } = values;
+          appJobName, algorithm, dataset, account, partition, nodeCount, coreCount, gpuCount, maxTime } = values;
         const customFormKeyValue: CustomFormFileds = { customeFields: {} };
         attributes.forEach((customFormAttribute) => {
           const customFormKey = customFormAttribute.name;
@@ -267,7 +263,6 @@ export const LaunchAppForm = (props: Props) => {
           dataset: dataset.version,
           account: account,
           partition: partition,
-          qos: qos,
           nodeCount: nodeCount,
           coreCount: coreCount,
           gpuCount: gpuCount,
@@ -303,10 +298,14 @@ export const LaunchAppForm = (props: Props) => {
               />
             </Form.Item>
             <Form.Item name={["algorithm", "name"]} rules={[{ required: true }]} noStyle>
-              <Select style={{ minWidth: 100 }} options={algorithmOptions} />
+              <Select style={{ minWidth: 100 }} loading={isAlgorithmLoading} options={algorithmOptions} />
             </Form.Item>
             <Form.Item name={["algorithm", "version"]} rules={[{ required: true }]} noStyle>
-              <Select style={{ minWidth: 100 }} options={algorithmVersionOptions} />
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isAlgorithmVersionsLoading && selectedAlgorithm !== undefined}
+                options={algorithmVersionOptions}
+              />
             </Form.Item>
           </Space>
         </Form.Item>
@@ -327,6 +326,7 @@ export const LaunchAppForm = (props: Props) => {
             <Form.Item name={["dataset", "type"]} rules={[{ required: true }]} noStyle>
               <Select
                 style={{ minWidth: 120 }}
+                loading={isDatasetsLoading}
                 onChange={() => {
                   form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
                 }}
@@ -355,7 +355,11 @@ export const LaunchAppForm = (props: Props) => {
               />
             </Form.Item>
             <Form.Item name={["dataset", "version"]} rules={[{ required: true }]} noStyle>
-              <Select style={{ minWidth: 100 }} options={datasetVersionOptions} />
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isDatasetVersionsLoading && selectedDataset !== undefined}
+                options={datasetVersionOptions}
+              />
             </Form.Item>
           </Space>
         </Form.Item>
@@ -369,7 +373,7 @@ export const LaunchAppForm = (props: Props) => {
         </Form.Item>
 
         <Form.Item
-          label="分区"
+          label="队列"
           name="partition"
           rules={[{ required: true }]}
         >
@@ -381,13 +385,6 @@ export const LaunchAppForm = (props: Props) => {
             }
             onChange={handlePartitionChange}
           />
-        </Form.Item>
-        <Form.Item
-          label="qos"
-          name="qos"
-          rules={[{ required: true }]}
-        >
-          <Select />
         </Form.Item>
         <Form.Item
           label="节点数"

@@ -41,21 +41,25 @@ export enum JobType {
   TRAIN = "train",
 }
 
-export interface AppSession {
-  sessionId: string;
-  jobId: number;
-  submitTime: string;
-  jobType: JobType;
-  appId: string;
-  appName: string | undefined;
-  state: string;
-  dataPath: string;
-  runningTime: string;
-  timeLimit: string;
-  reason?: string;
-  host: string | undefined;
-  port: number | undefined;
-}
+const JobTypeSchema = z.nativeEnum(JobType);
+
+const AppSessionSchema = z.object({
+  sessionId: z.string(),
+  jobId: z.number(),
+  submitTime: z.string(),
+  jobType: JobTypeSchema,
+  appId: z.string(),
+  appName: z.string().optional(),
+  state: z.string(),
+  dataPath: z.string(),
+  runningTime: z.string(),
+  timeLimit: z.string(),
+  reason: z.string().optional(),
+  host: z.string().optional(),
+  port: z.number().optional(),
+});
+
+export type AppSession = z.infer<typeof AppSessionSchema>;
 
 // All keys are strings except PORT
 interface ServerSessionInfoData {
@@ -420,12 +424,7 @@ export const createAppSession = procedure
 export const listAppSessions =
   procedure
     .input(z.object({ clusterId: z.string(), isRunning: z.boolean() }))
-    .output(z.object({ sessions: z.array(z.object({
-      sessionId: z.string(),
-      appId: z.string(),
-      submitTime: z.string(),
-      jobId: z.number(),
-    })) }))
+    .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
       const { clusterId, isRunning } = input;
       const userId = user.identityId;
@@ -532,7 +531,6 @@ export const listAppSessions =
         }));
 
         const runningStates = ["RUNNING", "PENDING"];
-
         return { sessions: sessions.filter((session) => isRunning
           ? runningStates.includes(session.state)
           : !runningStates.includes(session.state)) };

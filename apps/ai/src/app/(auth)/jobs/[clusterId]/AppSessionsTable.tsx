@@ -14,7 +14,7 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Button, Checkbox, Form, Input, Space, Table, TableColumnsType, Tooltip } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
@@ -53,10 +53,10 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
   const { data, refetch, isLoading, isFetching } = trpc.jobs.listAppSessions.useQuery({
-    clusterId: cluster.id, isRunning: true,
+    clusterId: cluster.id, isRunning: unfinished,
   });
 
-  const columns: TableColumnsType<any> = [
+  const columns: TableColumnsType<AppSession> = [
     {
       title: "作业名",
       dataIndex: "sessionId",
@@ -178,13 +178,23 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
   }, [setConnectivityRefreshToken]);
 
   useEffect(() => {
-    if (checked) {
+    if (checked && unfinished) {
       const interval = setInterval(() => {
         reloadTable();
       }, 10000);
       return () => clearInterval(interval);
     }
-  }, [checked]);
+  }, [checked, unfinished]);
+
+  const filteredData = useMemo(() => {
+    if (!data) { return []; }
+    return data.sessions.filter((x) => {
+      if (query.appJobName) {
+        return x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase());
+      }
+      return true;
+    });
+  }, [data]);
 
   return (
     <>
@@ -210,7 +220,6 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           <Form.Item>
             <Space>
               <Button loading={isLoading} onClick={() => refetch()}>刷新</Button>
-              <Button>刷新</Button>
             </Space>
           </Form.Item>
           {unfinished && (
@@ -227,11 +236,11 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       </FilterFormContainer>
       <Table
         tableLayout="fixed"
-        dataSource={data?.sessions || []}
+        dataSource={filteredData}
         columns={columns}
         rowKey={(record) => record.sessionId}
-        // loading={!filteredData && isLoading}
-        // scroll={{ x: filteredData?.length ? 1200 : true }}
+        loading={!filteredData && isLoading && isFetching}
+        scroll={{ x: filteredData?.length ? 1200 : true }}
         pagination={{
           showSizeChanger: true,
           defaultPageSize: 50,
