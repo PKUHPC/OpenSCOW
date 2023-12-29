@@ -37,7 +37,7 @@ function getBaseUrl() {
 }
 
 function getBasePath() {
-  return process.env.NEXT_PUBLIC_BASE_PATH || "";
+  return process.env.NEXT_PUBLIC_BASE_PATH === "/" ? "" : process.env.NEXT_PUBLIC_BASE_PATH;
 }
 
 export function ClientProvider(props: { children: React.ReactNode }) {
