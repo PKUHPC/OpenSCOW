@@ -32,8 +32,7 @@ export default async () => {
     experimental: {
       appDir: true,
     },
-    // basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
-    basePath: "/ai",
+    basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack: (config, { webpack }) => {
       config.resolve.extensionAlias = {

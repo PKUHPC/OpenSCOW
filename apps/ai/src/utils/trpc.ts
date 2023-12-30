@@ -12,7 +12,6 @@
 
 // import { httpBatchLink, loggerLink } from "@trpc/client";
 // import { createTRPCNext } from "@trpc/next";
-// // import { createTRPCReact } from "@trpc/react-query";
 // import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
 // import { NextPageContext } from "next";
 // // ℹ️ Type-only import:
@@ -141,18 +140,21 @@
 // export type RouterInput = inferRouterInputs<Router>;
 // export type RouterOutput = inferRouterOutputs<Router>;
 
+// url: `${getBasePath()}/api/trpc`,
+
+// unstable_overrides: {
+//   useMutation: {
+//     async onSuccess(opts) {
+//       await opts.originalFn();
+//       await opts.queryClient.invalidateQueries();
+//     },
+//   },
+// },
 
 import { createTRPCReact } from "@trpc/react-query";
 import type { AppRouter } from "src/server/trpc/router";
 
 export const trpc = createTRPCReact<AppRouter>({
-  // unstable_overrides: {
-  //   useMutation: {
-  //     async onSuccess(opts) {
-  //       await opts.originalFn();
-  //       await opts.queryClient.invalidateQueries();
-  //     },
-  //   },
-  // },
+
 
 });

@@ -13,7 +13,7 @@
 "use client";
 
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink, httpLink, loggerLink, TRPCClientError } from "@trpc/client";
+import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client";
 import { message } from "antd";
 import { join } from "path";
 import { useState } from "react";
@@ -37,6 +37,7 @@ function getBaseUrl() {
 }
 
 function getBasePath() {
+  console.log("getBasePath", process.env.NEXT_PUBLIC_BASE_PATH);
   return [null, undefined, "/"].includes(process.env.NEXT_PUBLIC_BASE_PATH) ? "" : process.env.NEXT_PUBLIC_BASE_PATH;
 }
 
@@ -74,6 +75,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
       },
     }),
   }));
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [
@@ -82,9 +84,6 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         }),
         httpBatchLink({
           url: `${getBaseUrl()}${getBasePath()}/api/trpc`,
-        }),
-        httpLink({
-          url: `${getBasePath()}/api/trpc`,
         }),
       ],
       transformer: superjson,
