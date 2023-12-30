@@ -37,8 +37,8 @@ function getBaseUrl() {
 }
 
 function getBasePath() {
-  console.log("getBasePath", process.env.NEXT_PUBLIC_BASE_PATH);
-  return [null, undefined, "/"].includes(process.env.NEXT_PUBLIC_BASE_PATH) ? "" : process.env.NEXT_PUBLIC_BASE_PATH;
+  console.log("getBasePath", BASE_PATH);
+  return [null, undefined, "/"].includes(BASE_PATH) ? "" : BASE_PATH;
 }
 
 export function ClientProvider(props: { children: React.ReactNode }) {

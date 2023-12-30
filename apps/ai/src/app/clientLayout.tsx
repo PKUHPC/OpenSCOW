@@ -22,6 +22,7 @@ import { RootErrorContent } from "src/layouts/error/RootErrorContent";
 import { GlobalStyle } from "src/layouts/globalStyle";
 import { AntdStyleRegistry } from "src/layouts/styleRegistry/AntdRegistry.jsx";
 import StyledComponentsRegistry from "src/layouts/styleRegistry/StyledComponentsRegistry.jsx";
+import { BASE_PATH } from "src/utils/processEnv";
 
 export function ClientLayout(props: { children: React.ReactNode, initialDark?: DarkModeCookie }) {
   const pathname = usePathname();
@@ -37,7 +38,7 @@ export function ClientLayout(props: { children: React.ReactNode, initialDark?: D
             __html: `
               window.__CONFIG__ = ${
     JSON.stringify({
-      BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH === "/" ? "" : process.env.NEXT_PUBLIC_BASE_PATH,
+      BASE_PATH: BASE_PATH === "/" ? "" : BASE_PATH,
     })};
             `,
           }}

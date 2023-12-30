@@ -173,6 +173,3 @@ export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
 
   return getI18nConfigCurrentText(value as any, languageId);
 };
-
-
-export const BASE_PATH = process.env.BASE_PATH || "/";

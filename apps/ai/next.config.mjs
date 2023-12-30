@@ -55,7 +55,7 @@ export default async () => {
         if (i instanceof webpack.DefinePlugin) {
           if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
             i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
-              "(typeof window === \"undefined\" ? global : window).__CONFIG__?.NEXT_PUBLIC_BASE_PATH";
+              "(typeof window === \"undefined\" ? global : window).__CONFIG__?.BASE_PATH";
           }
         }
       });
