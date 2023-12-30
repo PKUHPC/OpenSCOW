@@ -16,6 +16,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { join } from "path";
 import { useDarkMode } from "src/layouts/darkMode";
+import { BASE_PATH } from "src/utils/processEnv";
 import { styled } from "styled-components";
 
 const LogoContainer = styled.h1`
@@ -29,14 +30,13 @@ const LogoContainer = styled.h1`
 
 export const Logo = () => {
 
-  const basePath = "";
   const { dark } = useDarkMode();
   const query = new URLSearchParams({ type: "logo", preferDark: dark ? "true" : "false" }).toString();
 
   return (
     <LogoContainer>
       <Link href="/">
-        <img src={join(basePath, "/api/logo?" + query.toString())} alt="logo" height={40} />
+        <img src={join(BASE_PATH, "/api/logo?" + query.toString())} alt="logo" height={40} />
       </Link>
     </LogoContainer>
   );

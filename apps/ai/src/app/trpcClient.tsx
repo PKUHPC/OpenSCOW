@@ -13,7 +13,7 @@
 "use client";
 
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client";
+import { httpBatchLink, httpLink, loggerLink, TRPCClientError } from "@trpc/client";
 import { message } from "antd";
 import { join } from "path";
 import { useState } from "react";
@@ -82,6 +82,9 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         }),
         httpBatchLink({
           url: `${getBaseUrl()}${getBasePath()}/api/trpc`,
+        }),
+        httpLink({
+          url: `${getBasePath()}/api/trpc`,
         }),
       ],
       transformer: superjson,
