@@ -39,5 +39,5 @@ const options = {
 
 replaceInFile.sync(options);
 
-// Run pnpm serve:next
-execSync("pnpm serve:next", { stdio: "inherit" });
+// Run serve:next
+execSync("npm run serve:next", { stdio: "inherit" });
