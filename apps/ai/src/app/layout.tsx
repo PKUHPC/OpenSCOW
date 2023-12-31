@@ -14,7 +14,9 @@ import "antd/dist/reset.css";
 
 import { DarkModeCookie } from "@scow/lib-web/build/layouts/darkMode";
 import { cookies } from "next/headers";
+import { join } from "path";
 import { ClientLayout } from "src/app/clientLayout";
+import { BASE_PATH } from "src/utils/processEnv";
 
 export default function MyApp({ children }: { children: React.ReactNode }) {
 
@@ -25,10 +27,15 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
   const dark = darkModeCookie ? JSON.parse(darkModeCookie.value) as DarkModeCookie : undefined;
 
   return (
-    <ClientLayout initialDark={dark}>
-      {children}
-    </ClientLayout>
+    <html>
+      <head>
+        <meta name="format-detection" content="telephone=no" />
+        <link href={join(BASE_PATH, "manifest.json")} rel="manifest" id="manifest" />
+      </head>
+      <ClientLayout initialDark={dark}>
+        {children}
+      </ClientLayout>
+    </html>
   );
-
 
 }

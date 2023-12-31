@@ -22,45 +22,28 @@ import { RootErrorContent } from "src/layouts/error/RootErrorContent";
 import { GlobalStyle } from "src/layouts/globalStyle";
 import { AntdStyleRegistry } from "src/layouts/styleRegistry/AntdRegistry.jsx";
 import StyledComponentsRegistry from "src/layouts/styleRegistry/StyledComponentsRegistry.jsx";
-import { BASE_PATH } from "src/utils/processEnv";
 
 export function ClientLayout(props: { children: React.ReactNode, initialDark?: DarkModeCookie }) {
   const pathname = usePathname();
 
   return (
-    <html>
-      <head>
-        <meta name="format-detection" content="telephone=no" />
-        <link href="/manifest.json" rel="manifest" id="manifest" />
-        <script
-          id="__CONFIG__"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.__CONFIG__ = ${
-    JSON.stringify({
-      BASE_PATH: BASE_PATH === "/" ? "" : BASE_PATH,
-    })};
-            `,
-          }}
-        />
-      </head>
-      <StyledComponentsRegistry>
-        <AntdStyleRegistry>
-          <GlobalStyle />
-          <body>
-            <ClientProvider>
-              <DarkModeProvider initial={props.initialDark}>
-                <AntdConfigProvider>
-                  <TopProgressBar />
-                  <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
-                    {props.children}
-                  </ErrorBoundary>
-                </AntdConfigProvider>
-              </DarkModeProvider>
-            </ClientProvider>
-          </body>
-        </AntdStyleRegistry>
-      </StyledComponentsRegistry>
-    </html>
+
+    <StyledComponentsRegistry>
+      <AntdStyleRegistry>
+        <GlobalStyle />
+        <body>
+          <ClientProvider>
+            <DarkModeProvider initial={props.initialDark}>
+              <AntdConfigProvider>
+                <TopProgressBar />
+                <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
+                  {props.children}
+                </ErrorBoundary>
+              </AntdConfigProvider>
+            </DarkModeProvider>
+          </ClientProvider>
+        </body>
+      </AntdStyleRegistry>
+    </StyledComponentsRegistry>
   );
 }

@@ -23,6 +23,7 @@ export default async () => {
   global.__CONFIG__ = {
     BASE_PATH,
   };
+
   /** @type {import('next').NextConfig} */
   const nextConfig = {
     // ...runtimeConfig,
@@ -51,14 +52,14 @@ export default async () => {
           },
         ],
       });
-      config.plugins.forEach((i) => {
-        if (i instanceof webpack.DefinePlugin) {
-          if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
-            i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
-              "(typeof window === \"undefined\" ? global : window).__CONFIG__?.BASE_PATH";
-          }
-        }
-      });
+      // config.plugins.forEach((i) => {
+      //   if (i instanceof webpack.DefinePlugin) {
+      //     if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {
+      //       i.definitions["process.env.__NEXT_ROUTER_BASEPATH"] =
+      //         "(typeof window === \"undefined\" ? global : window).__CONFIG__?.BASE_PATH";
+      //     }
+      //   }
+      // });
       return config;
     },
     compiler: {
