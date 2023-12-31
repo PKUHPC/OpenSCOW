@@ -6,12 +6,13 @@
     ".next",
     "public",
     "next.config.mjs",
-    "build"
+    "build",
+    "start.mjs"
   ],
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
-    "serve": "./launch.sh",
+    "serve": "node start.mjs",
     "serve:next": "next start",
     "build": "npm run build:next",
     "build:next": "cross-env BUILDING=1 NEXT_PUBLIC_BASE_PATH=/@BASE_PATH@ next build",
@@ -83,7 +84,8 @@
     "xterm": "5.2.1",
     "xterm-addon-fit": "0.7.0",
     "zod": "3.22.4",
-    "shell-quote": "1.8.1"
+    "shell-quote": "1.8.1",
+    "replace-in-file": "7.1.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "14.0.3",

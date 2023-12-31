@@ -37,7 +37,6 @@ function getBaseUrl() {
 }
 
 function getBasePath() {
-  console.log("getBasePath", BASE_PATH);
   return [null, undefined, "/"].includes(BASE_PATH) ? "" : BASE_PATH;
 }
 
