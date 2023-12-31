@@ -16,7 +16,9 @@
 import "swagger-ui-react/swagger-ui.css";
 
 import dynamic from "next/dynamic";
+import { join } from "path";
 import { Head } from "src/utils/head";
+import { BASE_PATH } from "src/utils/processEnv";
 const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
 
 export default function Page() {
@@ -24,7 +26,7 @@ export default function Page() {
   return (
     <>
       <Head title="数据集"></Head>
-      <SwaggerUI url="/api/openapi.json" />
+      <SwaggerUI url={join(BASE_PATH, "/api/openapi.json")} />
     </>
   );
 }

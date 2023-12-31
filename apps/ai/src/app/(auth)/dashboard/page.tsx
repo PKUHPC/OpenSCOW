@@ -11,7 +11,9 @@
  */
 
 "use client";
+import { join } from "path";
 import { Head } from "src/utils/head";
+import { BASE_PATH } from "src/utils/processEnv";
 import { styled } from "styled-components";
 
 const Logo = styled.div`
@@ -30,7 +32,7 @@ export default function Page() {
 
         <img
           alt="logo"
-          src={"/api/logo?type=logo"}
+          src={join(BASE_PATH, "/api/logo?type=logo")}
           style={{
             objectFit: "contain",
             maxWidth: "50%",
