@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import "reflect-metadata";
+
 import { join } from "node:path";
 
 import { defineConfig } from "@mikro-orm/mysql";
