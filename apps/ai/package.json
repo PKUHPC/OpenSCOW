@@ -9,6 +9,7 @@
     "build",
     "assets",
     "tsconfig.json",
+    "tsconfig.server.json",
     "start.mjs"
   ],
   "scripts": {
