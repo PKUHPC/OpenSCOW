@@ -268,9 +268,6 @@ importers:
       react-typed-i18n:
         specifier: 2.3.0
         version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.2.0)
-      reflect-metadata:
-        specifier: 0.2.1
-        version: 0.2.1
       replace-in-file:
         specifier: 7.1.0
         version: 7.1.0
@@ -18824,10 +18821,6 @@ packages:
 
   /reflect-metadata@0.1.13:
     resolution: {integrity: sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==}
-    dev: false
-
-  /reflect-metadata@0.2.1:
-    resolution: {integrity: sha512-i5lLI6iw9AU3Uu4szRNPPEkomnkjRTaVt9hy/bn5g/oSzekBSMeLZblcjP74AW0vBabqERLLIrz+gR8QYR54Tw==}
     dev: false
 
   /refractor@3.6.0:

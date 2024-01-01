@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, Entity, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
+import { Collection, EntitySchema } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { AlgorithmVersion } from "./AlgorithmVersion";
@@ -23,37 +23,24 @@ export enum Framework {
   OTHER = "OTHER",
 };
 
-@Entity()
 export class Algorithm {
-  @PrimaryKey()
-    id!: number;
+  id!: number;
 
-  @Property()
-    name: string;
+  name: string;
 
-  @Property()
-    owner: string;
+  owner: string;
 
-  @Property()
-    framework: Framework;
+  framework: Framework;
 
-  @OneToMany(() => "AlgorithmVersion", (algorithmVersion: AlgorithmVersion) => algorithmVersion.algorithm)
-    versions = new Collection<AlgorithmVersion>(this);
+  versions = new Collection<AlgorithmVersion>(this);
 
-  @Property()
-    isShared: boolean;
+  isShared: boolean;
 
-  @Property({ nullable: true })
-    description?: string;
+  description?: string;
+  clusterId: string;
 
-  @Property()
-    clusterId: string;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
+  createTime?: Date;
+  updateTime?: Date;
 
   constructor(init: {
       name: string;
@@ -83,3 +70,19 @@ export class Algorithm {
   }
 
 }
+
+export const algorithmEntitySchema = new EntitySchema<Algorithm>({
+  class: Algorithm,
+  properties: {
+    id: { type: "number", primary: true },
+    owner: { type: "string" },
+    name: { type: "string" },
+    framework: { enum: true, items: () => Framework },
+    versions: { reference: "1:m", entity: () => "AlgorithmVersion", mappedBy: "algorithm" },
+    isShared: { type: "boolean" },
+    description: { type: "string", nullable: true },
+    clusterId: { type: "string" },
+    createTime: { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP },
+    updateTime: { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() },
+  },
+});
