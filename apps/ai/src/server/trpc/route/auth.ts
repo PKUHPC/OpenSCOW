@@ -17,7 +17,7 @@ import { setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
 import { router } from "src/server/trpc/def";
-import { baseProcedure, procedure } from "src/server/trpc/procedure/base";
+import { authProcedure, baseProcedure } from "src/server/trpc/procedure/base";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
@@ -25,7 +25,7 @@ import { envConfig } from "./config";
 
 export const auth = router({
 
-  getUserInfo: procedure
+  getUserInfo: authProcedure
     .query(async ({ ctx: { req, res } }) => {
       const userInfo = await getUserInfo(req, res);
       return { user: userInfo };

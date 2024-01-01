@@ -21,7 +21,7 @@ import { join } from "path";
 import { aiConfig } from "src/server/config/ai";
 import { commonConfig } from "src/server/config/common";
 import { router } from "src/server/trpc/def";
-import { procedure } from "src/server/trpc/procedure/base";
+import { authProcedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { BASE_PATH, USE_MOCK } from "src/utils/processEnv";
 import { z } from "zod";
@@ -153,7 +153,7 @@ const ClusterConfigSchema = z.object({
 
 export const config = router({
 
-  publicConfig: procedure
+  publicConfig: authProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -203,7 +203,7 @@ export const config = router({
       };
     }),
 
-  getClusterConfig: procedure
+  getClusterConfig: authProcedure
     .meta({
       openapi: {
         method: "GET",
