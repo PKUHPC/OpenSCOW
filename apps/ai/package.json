@@ -7,6 +7,7 @@
     "public",
     "next.config.mjs",
     "build",
+    "assets",
     "start.mjs"
   ],
   "scripts": {
