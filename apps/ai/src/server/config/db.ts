@@ -14,6 +14,7 @@ import "reflect-metadata";
 
 import { join } from "node:path";
 
+import { ReflectMetadataProvider } from "@mikro-orm/core";
 import { defineConfig } from "@mikro-orm/mysql";
 import { entities } from "src/server/entities";
 import { migrations } from "src/server/migrations";
@@ -34,6 +35,7 @@ export const ormConfigs = defineConfig({
     pathTs: join(distPath, "migrations"),
     migrationsList: migrations,
   },
+  metadataProvider: ReflectMetadataProvider,
   entities,
   debug: aiConfig.db.debug,
   seeder: {
