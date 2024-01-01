@@ -110,7 +110,7 @@ const UserLinkSchema = z.object({
 });
 
 const PublicConfigSchema = z.object({
-  ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
+  // ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
   CLUSTERS: z.array(ClusterSchema),
   CLUSTER_SORTED_ID_LIST: z.array(z.string()),
@@ -166,12 +166,12 @@ export const config = router({
     .output(PublicConfigSchema)
     .query(async () => {
 
-      const capabilities = await getCapabilities(envConfig.AUTH_EXTERNAL_URL);
+      // const capabilities = await getCapabilities(envConfig.AUTH_EXTERNAL_URL);
       const versionTag = readVersionFile()?.tag;
       const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
       return {
-        ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
+        // ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
         MIS_URL: envConfig.MIS_URL,
 
