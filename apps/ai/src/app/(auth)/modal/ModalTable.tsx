@@ -92,7 +92,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }
 
   const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
-  trpc.modal.versionList.useQuery({ modalId }, {
+  trpc.modal.versionList.useQuery({ modalId, isShared:isPublic }, {
     enabled:!!modalId,
   });
   if (versionError) {

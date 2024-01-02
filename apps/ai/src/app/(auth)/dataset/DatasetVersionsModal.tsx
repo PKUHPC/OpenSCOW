@@ -39,12 +39,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
 ) => {
   const { modal, message } = App.useApp();
   const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
-  const [ deleteSourceFile, setDeleteSourceFile ] = useState(false);
-  const deleteSourceFileRef = useRef(deleteSourceFile);
-
-  useEffect(() => {
-    deleteSourceFileRef.current = deleteSourceFile;
-  }, [deleteSourceFile]);
+  const deleteSourceFileRef = useRef(false);
 
   const router = useRouter();
 
@@ -196,13 +191,14 @@ export const DatasetVersionsModal: React.FC<Props> = (
                     <Button
                       type="link"
                       onClick={() => {
+                        deleteSourceFileRef.current = false;
                         modal.confirm({
                           title: "删除数据集版本",
                           content: (
                             <>
                               <p>{`是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`}</p>
                               <Checkbox
-                                onChange={(e) => setDeleteSourceFile(e.target.checked)}
+                                onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
                               >
                                 同时删除源文件
                               </Checkbox>
@@ -210,25 +206,22 @@ export const DatasetVersionsModal: React.FC<Props> = (
                           ),
                           onOk: async () => {
                             deleteSourceFileRef.current ?
-                              await Promise.all([
-                                deleteMutation.mutateAsync({
-                                  id: r.id,
-                                  datasetId: r.datasetId,
-                                }),
-                                new Promise((resolve) => {
-                                  setTimeout(() => {
-                                    deleteSourceFileMutation.mutateAsync({
-                                      target: "DIR",
-                                      clusterId: cluster?.id ?? "",
-                                      path: r.privatePath,
-                                    }).then(resolve);
-                                  }, 2000);
-                                }),
-
-                              ]).then(() => {
-                                message.success("删除成功");
-                                onRefetch();
-                              }) :
+                              await deleteMutation.mutateAsync({
+                                id: r.id,
+                                datasetId: r.datasetId,
+                              })
+                                .then(() => {
+                                  deleteSourceFileMutation.mutateAsync({
+                                    target: "DIR",
+                                    clusterId: cluster?.id ?? "",
+                                    path: r.privatePath,
+                                  });
+                                })
+                                .then(() => {
+                                  message.success("删除成功");
+                                  onRefetch();
+                                })
+                              :
                               await deleteMutation.mutateAsync({
                                 id: r.id,
                                 datasetId: r.datasetId,

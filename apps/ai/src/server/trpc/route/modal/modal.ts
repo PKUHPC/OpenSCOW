@@ -146,6 +146,13 @@ export const updateModal = procedure
     const orm = await getORM();
     const modal = await orm.em.findOne(Modal, { id: input.id });
 
+    const modalExist = await orm.em.findOne(Modal, { name:input.name });
+    if (modalExist !== modal) {
+      throw new TRPCError({
+        code: "CONFLICT",
+      });
+    }
+
     if (!modal) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.id} not found` });
     }

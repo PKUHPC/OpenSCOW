@@ -10,10 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20240102091246 } from "./Migration20240102091246";
-
-
-export const migrations =
-[
-  Migration20240102091246
-].map((x) => ({ name: x.name, class: x }));
+export enum ShareStatus {
+  UNSHARED = "UNSHARED",
+  SHARED = "SHARED",
+  SHARING = "SHARING",
+  UNSHARING = "UNSHARING",
+};

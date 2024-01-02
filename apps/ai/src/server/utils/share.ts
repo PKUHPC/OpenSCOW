@@ -80,6 +80,7 @@ export async function checkSharePermission({
   });
 }
 
+type callback = () => void;
 /**
  * create new File or Dir for share
  */
@@ -100,8 +101,7 @@ export async function shareFileOrDir(
     targetName: string,
     targetSubName: string,
     // fileType: FileType,
-  }): Promise<void> {
-
+  }, successCallback?: callback, failureCallback?: callback): Promise<void> {
   const host = getClusterLoginNode(clusterId);
 
   if (!host) { throw clusterNotFound(clusterId); }
@@ -132,7 +132,7 @@ export async function shareFileOrDir(
 
       // 复制并从顶层目录递归修改文件夹权限
       await ssh.execCommand(`nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`);
-
+      successCallback && successCallback();
     });
   } catch (err) {
     // rollback
@@ -143,7 +143,9 @@ export async function shareFileOrDir(
         await sshRmrf(ssh, targetTopDir);
       }
     });
-    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "share file failed", cause: err });
+
+    logger.info("share file failed", err);
+    failureCallback && failureCallback();
   }
 
 }
@@ -159,7 +161,7 @@ export async function unShareFileOrDir({
   clusterId: string,
   sharedPath: string,
   user: ClientUserInfo,
-}): Promise<void> {
+}, successCallback?: callback, failureCallback?: callback): Promise<void> {
 
   const host = getClusterLoginNode(clusterId);
 
@@ -171,8 +173,10 @@ export async function unShareFileOrDir({
   // 以root权限删除
   await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
     await sshRmrf(ssh, sharedPath);
+    successCallback && successCallback();
   }).catch((err) => {
-    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "unShare file failed", cause: err });
+    logger.info("unShare file failed", err);
+    failureCallback && failureCallback();
   });
 
 }

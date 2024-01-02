@@ -13,7 +13,8 @@
 import { router } from "src/server/trpc/def";
 
 import { createModal, deleteModal, list, updateModal } from "./modal";
-import { createModalVersion, deleteModalVersion, updateModalVersion, versionList } from "./modalVersion";
+import { createModalVersion, deleteModalVersion, shareModalVersion, unShareModalVersion,
+  updateModalVersion, versionList } from "./modalVersion";
 
 export const modal = router({
   list,
@@ -24,4 +25,6 @@ export const modal = router({
   deleteModalVersion,
   updateModalVersion,
   versionList,
+  shareModalVersion,
+  unShareModalVersion,
 });

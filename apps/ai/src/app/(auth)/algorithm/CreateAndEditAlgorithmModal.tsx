@@ -22,6 +22,7 @@ import { trpc } from "src/utils/trpc";
 interface EditProps {
   cluster?: Cluster;
   algorithmName: string;
+  algorithmId: number;
   algorithmFramework: string;
   algorithmDescription: string;
 }
@@ -78,7 +79,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
 
     if (editData?.algorithmName) {
       updateAlgorithmMutation.mutate({
-        name:editData.algorithmName, framework:type, description,
+        id:editData.algorithmId, name:editData.algorithmName, framework:type, description,
       });
     } else {
       createAlgorithmMutation.mutate({

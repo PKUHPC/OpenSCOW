@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TRPCClientError } from "@trpc/client";
 import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -66,6 +68,24 @@ export const VersionListModal: React.FC<Props> = (
     },
     [],
   );
+
+  const shareMutation = trpc.modal.shareModalVersion.useMutation({
+    onError: (err) => {
+      const { data } = err as TRPCClientError<AppRouter>;
+      if (data?.code === "FORBIDDEN") {
+        message.error("没有权限分享此版本");
+      }
+    },
+  });
+
+  const unShareMutation = trpc.modal.unShareModalVersion.useMutation({
+    onError: (err) => {
+      const { data } = err as TRPCClientError<AppRouter>;
+      if (data?.code === "FORBIDDEN") {
+        message.error("没有权限取消分享此版本");
+      }
+    },
+  });
 
   const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
     onError(e) {
@@ -157,8 +177,47 @@ export const VersionListModal: React.FC<Props> = (
 
                     <Button
                       type="link"
+                      // onClick={() => {
+                      //   shareAlgorithmVersion(r.id, r.versionName, r.isShared);
+                      // }}
                       onClick={() => {
-                        shareAlgorithmVersion(r.id, r.versionName, r.isShared);
+                        confirm({
+                          title: "分享算法版本",
+                          content: `确认${r.isShared ? "取消分享" : "分享"}算法版本 ${r.versionName}?`,
+                          onOk: async () => {
+                            await new Promise<void>((resolve) => {
+                              r.isShared ?
+                                unShareMutation.mutate({
+                                  versionId: r.id,
+                                  modalId,
+                                }, {
+                                  onSuccess() {
+                                    refetch();
+                                    resolve();
+                                    message.success("取消分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                }) :
+                                shareMutation.mutate({
+                                  versionId: r.id,
+                                  modalId,
+                                  sourceFilePath: r.path,
+                                }, {
+                                  onSuccess() {
+                                    refetch();
+                                    resolve();
+                                    message.success("分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                });
+                            });
+
+                          },
+                        });
                       }}
                     >
                       {r.isShared ? "取消分享" : "分享"}

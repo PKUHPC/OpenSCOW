@@ -13,7 +13,8 @@
 import { router } from "src/server/trpc/def";
 
 import { createAlgorithm, deleteAlgorithm, getAlgorithms, updateAlgorithm } from "./algorithm";
-import { createAlgorithmVersion, deleteAlgorithmVersion, getAlgorithmVersions, updateAlgorithmVersion }
+import { createAlgorithmVersion, deleteAlgorithmVersion, getAlgorithmVersions, shareAlgorithmVersion,
+  unShareAlgorithmVersion, updateAlgorithmVersion }
   from "./algorithmVersion";
 
 export const algorithm = router({
@@ -25,4 +26,6 @@ export const algorithm = router({
   createAlgorithmVersion,
   updateAlgorithmVersion,
   deleteAlgorithmVersion,
+  shareAlgorithmVersion,
+  unShareAlgorithmVersion,
 });

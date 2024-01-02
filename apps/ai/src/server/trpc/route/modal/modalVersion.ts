@@ -11,10 +11,13 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import path from "path";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+  from "src/server/utils/share";
 import { z } from "zod";
 
 export const VersionListSchema = z.object({
@@ -176,4 +179,120 @@ export const deleteModalVersion = procedure
 
     await orm.em.removeAndFlush(modalVersion);
     return { success: true };
+  });
+
+
+export const shareModalVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/modalVersion/share/{versionId}",
+      tags: ["modalVersion"],
+      summary: "share a modalVersion",
+    },
+  })
+  .input(z.object({
+    modalId: z.number(),
+    versionId: z.number(),
+    sourceFilePath: z.string(),
+  }))
+  .output(z.void())
+  .mutation(async ({ input:{ modalId, versionId, sourceFilePath }, ctx: { user } }) => {
+    const orm = await getORM();
+    const modalVersion = await orm.em.findOne(ModalVersion, { id: versionId });
+    if (!modalVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${modalId} not found` });
+
+    if (modalVersion.isShared)
+      throw new TRPCError({ code: "CONFLICT", message: "ModalVersion is already shared" });
+
+    const modal = await orm.em.findOne(Modal, { id: modalId });
+    if (!modal)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${modalId} not found` });
+
+    if (modal.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${modalId}  not accessible` });
+
+    await checkSharePermission({
+      clusterId: modal.clusterId,
+      checkedSourcePath: modalVersion.privatePath,
+      user,
+    });
+
+    // 定义分享后目标存储的绝对路径
+    const targetName = `${modal.name}-${user!.identityId}`;
+    const targetSubName = `${modalVersion.versionName}`;
+    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.MODAL, targetName, targetSubName);
+
+    modalVersion.isShared = true;
+    modalVersion.path = targetPath;
+    if (!modal.isShared) { modal.isShared = true; };
+
+    orm.em.persist([modal, modalVersion]);
+    await orm.em.flush();
+
+    await shareFileOrDir({
+      clusterId: modal.clusterId,
+      sourceFilePath,
+      user,
+      sharedTarget: SHARED_TARGET.MODAL,
+      targetName,
+      targetSubName,
+    });
+
+    return;
+  });
+
+export const unShareModalVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/modalVersion/unShare/{versionId}",
+      tags: ["modalVersion"],
+      summary: "unshare a modalVersion",
+    },
+  })
+  .input(z.object({
+    versionId: z.number(),
+    modalId: z.number(),
+  }))
+  .output(z.void())
+  .mutation(async ({ input:{ versionId, modalId }, ctx: { user } }) => {
+    const orm = await getORM();
+    const modalVersion = await orm.em.findOne(ModalVersion, { id: versionId });
+    if (!modalVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${versionId} not found` });
+
+    if (!modalVersion.isShared)
+      throw new TRPCError({ code: "CONFLICT", message: "ModalVersion is already unShared" });
+
+    const modal = await orm.em.findOne(Modal, { id: modalId }, {
+      populate: ["versions", "versions.isShared"],
+    });
+    if (!modal)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${modalId} not found` });
+
+    if (modal.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${modalId} not accessible` });
+
+    await checkSharePermission({
+      clusterId: modal.clusterId,
+      checkedSourcePath: modalVersion.privatePath,
+      user,
+      checkedTargetPath: modalVersion.path,
+    });
+
+    modal.isShared = modal.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
+    modalVersion.isShared = false;
+
+    orm.em.persist([modal, modalVersion]);
+    await orm.em.flush();
+    await unShareFileOrDir({
+      clusterId: modal.clusterId,
+      sharedPath: modal.versions.filter((v) => (v.isShared)).length > 1 ?
+        modalVersion.path : path.dirname(modalVersion.path),
+      user,
+    });
+
+    return;
   });

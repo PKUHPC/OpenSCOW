@@ -10,10 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20240102091246 } from "./Migration20240102091246";
+import { ShareStatus } from "src/models/common";
 
+export const getShareStatusText = (status: ShareStatus) => {
+  switch (status) {
 
-export const migrations =
-[
-  Migration20240102091246
-].map((x) => ({ name: x.name, class: x }));
+  case ShareStatus.SHARED:
+    return "取消分享";
+
+  case ShareStatus.UNSHARING:
+    return "取消分享中";
+
+  case ShareStatus.SHARING:
+    return "分享中";
+
+  default:
+    return "分享";
+  }
+};

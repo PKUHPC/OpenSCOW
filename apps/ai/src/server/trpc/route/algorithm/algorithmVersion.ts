@@ -11,10 +11,13 @@
  */
 
 import { TRPCError } from "@trpc/server";
+import path from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
-import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
+import { AlgorithmVersion, ShareStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+  from "src/server/utils/share";
 import { z } from "zod";
 
 const mockAlgorithmVersions = [
@@ -59,27 +62,32 @@ export const getAlgorithmVersions = procedure
     versionDescription:z.string(),
     path:z.string(),
     privatePath: z.string(),
-    isShared:z.boolean(),
+    sharedStatus:z.nativeEnum(ShareStatus),
     createTime:z.string(),
   })), count: z.number() }))
-  .query(async ({ input:{ algorithmId, page, pageSize } }) => {
+  .query(async ({ input:{ algorithmId, page, pageSize, isPublic } }) => {
     const orm = await getORM();
-    const [items, count] = await orm.em.findAndCount(AlgorithmVersion, { algorithm: algorithmId }, {
-      populate: ["algorithm"],
-      ...page ?
-        {
-          offset: (page - 1) * (pageSize || 10),
-          limit: pageSize || 10,
-        } : {},
-      orderBy: { createTime: "desc" },
-    });
+    const [items, count] = await orm.em.findAndCount(AlgorithmVersion,
+      {
+        algorithm: algorithmId,
+        sharedStatus:isPublic ? ShareStatus.SHARED : { $ne: null },
+      },
+      {
+        populate: ["algorithm"],
+        ...page ?
+          {
+            offset: (page - 1) * (pageSize || 10),
+            limit: pageSize || 10,
+          } : {},
+        orderBy: { createTime: "desc" },
+      });
 
     return { items:items.map((x) => {
       return {
         id:x.id,
         versionName:x.versionName,
         versionDescription:x.versionDescription ?? "",
-        isShared:x.isShared,
+        sharedStatus:x.sharedStatus,
         createTime:x.createTime ? x.createTime.toISOString() : "",
         path:x.path,
         privatePath: x.privatePath,
@@ -113,7 +121,7 @@ export const createAlgorithmVersion = procedure
 
     const algorithmVersionExist = await em.findOne(AlgorithmVersion,
       { versionName: input.versionName, algorithm });
-    if (algorithmVersionExist) throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
+    if (algorithmVersionExist) throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion already exist" });
 
     const algorithmVersion = new AlgorithmVersion({ ...input, privatePath: input.path, algorithm: algorithm });
     await em.persistAndFlush(algorithmVersion);
@@ -123,7 +131,7 @@ export const createAlgorithmVersion = procedure
 export const updateAlgorithmVersion = procedure
   .meta({
     openapi: {
-      method: "POST",
+      method: "PUT",
       path: "/algorithmVersion/update/{versionId}",
       tags: ["algorithmVersion"],
       summary: "update a algorithmVersion",
@@ -166,14 +174,178 @@ export const deleteAlgorithmVersion = procedure
       summary: "delete a new algorithmVersion",
     },
   })
-  .input(z.object({ id: z.number() }))
+  .input(z.object({ id: z.number(), algorithmId:z.number() }))
   .output(z.void())
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input:{ id, algorithmId }, ctx: { user } }) => {
     const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.id });
-    if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id });
+    if (!algorithmVersion) throw new Error(`AlgorithmVersion${id} not found`);
 
-    await orm.em.removeAndFlush(algorithmVersion);
+    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId },
+      { populate: ["versions", "versions.sharedStatus"]});
+    if (!algorithm)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+
+    if (algorithm.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId} not accessible` });
+
+    // 如果是已分享的数据集版本，则删除分享
+    if (algorithmVersion.sharedStatus === ShareStatus.SHARED) {
+      await checkSharePermission({
+        clusterId: algorithm.clusterId,
+        checkedSourcePath: algorithmVersion.privatePath,
+        user,
+        checkedTargetPath: algorithmVersion.path,
+      });
+      await unShareFileOrDir({
+        clusterId: algorithm.clusterId,
+        sharedPath: algorithmVersion.path,
+        user,
+      });
+    }
+
+    algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === ShareStatus.SHARED)).length > 0
+      ? true : false;
+
+    orm.em.remove(algorithmVersion);
+    orm.em.persist(algorithm);
+    await orm.em.flush();
+    return;
+  });
+
+export const shareAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/algorithmVersion/share/{versionId}",
+      tags: ["algorithmVersion"],
+      summary: "share a algorithmVersion",
+    },
+  })
+  .input(z.object({
+    algorithmId: z.number(),
+    versionId: z.number(),
+    sourceFilePath: z.string(),
+  }))
+  .output(z.void())
+  .mutation(async ({ input:{ algorithmId, versionId, sourceFilePath }, ctx: { user } }) => {
+    const orm = await getORM();
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
+    if (!algorithmVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion ${algorithmId} not found` });
+
+    if (algorithmVersion.sharedStatus === ShareStatus.SHARED)
+      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion is already shared" });
+
+    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId });
+    if (!algorithm)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+
+    if (algorithm.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId}  not accessible` });
+
+    await checkSharePermission({
+      clusterId: algorithm.clusterId,
+      checkedSourcePath: algorithmVersion.privatePath,
+      user,
+    });
+
+    // 定义分享后目标存储的绝对路径
+    const targetName = `${algorithm.name}-${user!.identityId}`;
+    const targetSubName = `${algorithmVersion.versionName}`;
+    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.ALGORITHM, targetName, targetSubName);
+
+    algorithmVersion.sharedStatus = ShareStatus.SHARING;
+    orm.em.persist([algorithmVersion]);
+    await orm.em.flush();
+
+    const successCallback = async () => {
+      algorithmVersion.sharedStatus = ShareStatus.SHARED;
+      algorithmVersion.path = targetPath;
+      if (!algorithm.isShared) { algorithm.isShared = true; };
+      await orm.em.persistAndFlush([algorithmVersion, algorithm]);
+    };
+
+    const failureCallback = async () => {
+      algorithmVersion.sharedStatus = ShareStatus.UNSHARED;
+      await orm.em.persistAndFlush([algorithmVersion]);
+    };
+
+    shareFileOrDir({
+      clusterId: algorithm.clusterId,
+      sourceFilePath,
+      user,
+      sharedTarget: SHARED_TARGET.ALGORITHM,
+      targetName,
+      targetSubName,
+    }, successCallback, failureCallback);
+
+    return;
+  });
+
+export const unShareAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/algorithmVersion/unShare/{versionId}",
+      tags: ["algorithmVersion"],
+      summary: "unshare a algorithmVersion",
+    },
+  })
+  .input(z.object({
+    versionId: z.number(),
+    algorithmId: z.number(),
+  }))
+  .output(z.void())
+  .mutation(async ({ input:{ versionId, algorithmId }, ctx: { user } }) => {
+    const orm = await getORM();
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
+    if (!algorithmVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion ${versionId} not found` });
+
+    if (algorithmVersion.sharedStatus === ShareStatus.UNSHARED)
+      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion is already unShared" });
+
+    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId }, {
+      populate: ["versions", "versions.sharedStatus"],
+    });
+    if (!algorithm)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+
+    if (algorithm.owner !== user?.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId} not accessible` });
+
+    await checkSharePermission({
+      clusterId: algorithm.clusterId,
+      checkedSourcePath: algorithmVersion.privatePath,
+      user,
+      checkedTargetPath: algorithmVersion.path,
+    });
+
+    algorithmVersion.sharedStatus = ShareStatus.UNSHARING;
+    orm.em.persist([algorithmVersion]);
+    await orm.em.flush();
+
+    const successCallback = async () => {
+      algorithmVersion.sharedStatus = ShareStatus.UNSHARED;
+      algorithmVersion.path = algorithmVersion.privatePath;
+      algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === ShareStatus.SHARED)).length > 0
+        ? true : false;
+      await orm.em.persistAndFlush([algorithmVersion, algorithm]);
+    };
+
+    const failureCallback = async () => {
+      algorithmVersion.sharedStatus = ShareStatus.SHARED;
+      await orm.em.persistAndFlush([algorithmVersion]);
+    };
+
+    unShareFileOrDir({
+      clusterId: algorithm.clusterId,
+      sharedPath: algorithm.versions.filter((v) => (v.sharedStatus === ShareStatus.SHARED)).length > 0 ?
+        algorithmVersion.path : path.dirname(algorithmVersion.path),
+      user,
+    }, successCallback, failureCallback);
+
     return;
   });
 

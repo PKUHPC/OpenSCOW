@@ -180,14 +180,14 @@
           "default": "current_timestamp(6)",
           "mappedType": "datetime"
         },
-        "is_shared": {
-          "name": "is_shared",
-          "type": "tinyint(1)",
+        "shared_status": {
+          "name": "shared_status",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "boolean"
+          "mappedType": "string"
         },
         "algorithm_id": {
           "name": "algorithm_id",

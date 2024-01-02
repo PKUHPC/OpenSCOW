@@ -15,8 +15,8 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
-import { useCallback, useState } from "react";
+import { App, Button, Checkbox, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
+import { useCallback, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -85,6 +85,9 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [datasetName, setDatasetName] = useState<string>("");
   const [clusterId, setClusterId] = useState<string>("");
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
+
+  const deleteSourceFileRef = useRef(false);
+  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
     ...pageInfo, ...query, clusterId: query.cluster?.id,
@@ -186,7 +189,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "scene", title: "应用场景",
             render: (_, r) => SceneTypeText[r.scene] },
           { dataIndex: "versions", title: "版本数量",
-            render: (_, r) => r.versionsCount },
+            render: (_, r) => r.versions.length },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间",
@@ -232,25 +235,37 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                       <Button
                         type="link"
                         onClick={() => {
+                          deleteSourceFileRef.current = false;
                           confirm({
                             title: "删除数据集",
-                            content: `是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`,
+                            content: (
+                              <>
+                                <p>{`是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`}</p>
+                                <Checkbox
+                                  onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
+                                >
+                                  同时删除源文件
+                                </Checkbox>
+                              </>
+                            ),
                             onOk: async () => {
-                              await new Promise<void>((resolve) => {
-                                deleteDatasetMutation.mutate({
-                                  id: r.id,
-                                }, {
-                                  onSuccess() {
-                                    refetch();
-                                    resolve();
-                                    message.success("删除成功");
-                                  },
-                                  onError() {
-                                    resolve();
-                                  },
+                              await deleteDatasetMutation.mutateAsync({
+                                id: r.id,
+                              })
+                                .then(async () => {
+                                  deleteSourceFileRef.current &&
+                                  await Promise.all(r.versions.map((x) => {
+                                    deleteSourceFileMutation.mutateAsync({
+                                      target: "DIR",
+                                      clusterId,
+                                      path:x,
+                                    });
+                                  }));
+                                })
+                                .then(() => {
+                                  refetch();
+                                  message.success("删除成功");
                                 });
-                              });
-
                             },
                           });
                         }}

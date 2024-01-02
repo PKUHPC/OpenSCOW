@@ -14,6 +14,12 @@ import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Algorithm } from "./Algorithm";
+export enum ShareStatus {
+  UNSHARED = "UNSHARED",
+  SHARED = "SHARED",
+  SHARING = "SHARING",
+  UNSHARING = "UNSHARING",
+};
 
 export class AlgorithmVersion {
   id!: number;
@@ -26,7 +32,7 @@ export class AlgorithmVersion {
 
   createTime?: Date;
   updateTime?: Date;
-  isShared: boolean;
+  sharedStatus: ShareStatus;
   algorithm!: Ref<Algorithm>;
 
   constructor(init: {
@@ -34,7 +40,7 @@ export class AlgorithmVersion {
     versionDescription?: string;
     privatePath: string;
     path: string;
-    isShared?: boolean;
+    sharedStatus?: ShareStatus;
     algorithm: Algorithm;
     createTime?: Date;
     updateTime?: Date;
@@ -44,7 +50,7 @@ export class AlgorithmVersion {
     this.versionDescription = init.versionDescription;
     this.privatePath = init.privatePath;
     this.path = init.path;
-    this.isShared = init.isShared ?? false;
+    this.sharedStatus = init.sharedStatus ?? ShareStatus.UNSHARED;
     this.algorithm = toRef(init.algorithm);
 
     if (init.createTime) {
@@ -72,5 +78,5 @@ algorithmVersionEntitySchema.addProperty("createTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
 algorithmVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
-algorithmVersionEntitySchema.addProperty("isShared", Boolean);
+algorithmVersionEntitySchema.addProperty("sharedStatus", String);
 algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", { entity: () => Algorithm });

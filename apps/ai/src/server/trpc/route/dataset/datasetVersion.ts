@@ -228,9 +228,10 @@ export const deleteDatasetVersion = procedure
       });
     }
 
-    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
+    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 0 ? true : false;
 
-    await orm.em.removeAndFlush(datasetVersion);
+    orm.em.remove(datasetVersion);
+    orm.em.persist(dataset);
     await orm.em.flush();
     return { success: true };
   });

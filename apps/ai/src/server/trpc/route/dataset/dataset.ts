@@ -56,7 +56,7 @@ export const DatasetListSchema = z.object({
   description: z.string().optional(),
   clusterId: z.string(),
   createTime: z.string(),
-  versionsCount: z.number(),
+  versions: z.array(z.string()),
 });
 
 export const list = procedure
@@ -103,7 +103,7 @@ export const list = procedure
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
-      populate: ["versions", "versions.isShared"],
+      populate: ["versions", "versions.isShared", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -118,7 +118,8 @@ export const list = procedure
         description: x.description,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : "",
-        versionsCount: input.isShared ? x.versions.filter((x) => x.isShared).length : x.versions.count(),
+        versions: input.isShared ? x.versions.filter((x) => x.isShared).map((y) => y.privatePath) :
+          x.versions.map((y) => y.privatePath),
       }; }), count };
   });
 

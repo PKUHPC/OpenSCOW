@@ -10,10 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Button, Modal, Table } from "antd";
+import { TRPCClientError } from "@trpc/client";
+import { App, Button, Checkbox, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useCallback } from "react";
+import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { ShareStatus } from "src/models/common";
+import { AppRouter } from "src/server/trpc/router";
+import { getShareStatusText } from "src/utils/common";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -26,7 +30,7 @@ interface algorithmVersion {
   versionDescription: string;
   path: string;
   privatePath: string;
-  isShared: boolean;
+  sharedStatus: ShareStatus;
   createTime: string;
 }
 
@@ -51,20 +55,26 @@ export const VersionListModal: React.FC<Props> = (
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
 
-  const shareAlgorithmVersion = useCallback(
-    (id: number, name: string, shareStatus: boolean) => {
-      console.log(id);
-      const text = shareStatus ? "取消" : "";
-      confirm({
-        title: `${text}分享算法版本`,
-        content: `确认${text}分享算法版本${name}`,
-        onOk() {
-          message.success(`${text}分享算法版本成功`);
-        },
-      });
+  const deleteSourceFileRef = useRef(false);
+  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
+
+  const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
+    onError: (err) => {
+      const { data } = err as TRPCClientError<AppRouter>;
+      if (data?.code === "FORBIDDEN") {
+        message.error("没有权限分享此版本");
+      }
     },
-    [],
-  );
+  });
+
+  const unShareMutation = trpc.algorithm.unShareAlgorithmVersion.useMutation({
+    onError: (err) => {
+      const { data } = err as TRPCClientError<AppRouter>;
+      if (data?.code === "FORBIDDEN") {
+        message.error("没有权限取消分享此版本");
+      }
+    },
+  });
 
   const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
     onError(e) {
@@ -73,27 +83,37 @@ export const VersionListModal: React.FC<Props> = (
     } });
 
   const deleteAlgorithmVersion = useCallback(
-    (id: number, name: string) => {
+    (id: number, name: string, path: string) => {
+      deleteSourceFileRef.current = false;
       confirm({
         title: "删除算法版本",
-        content: `确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`,
+        content: (
+          <>
+            <p>{`确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`}</p>
+            <Checkbox
+              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
+            >
+              同时删除源文件
+            </Checkbox>
+          </>
+        ),
         onOk:async () => {
-          await new Promise<void>((resolve) => {
-            deleteAlgorithmVersionMutation.mutate({ id }, {
-              onSuccess() {
-                message.success("删除算法版本成功");
-                refetch();
-                resolve();
-              },
-              onError() {
-                resolve();
-              },
+          await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId })
+            .then(() => {
+              deleteSourceFileRef.current && deleteSourceFileMutation.mutateAsync({
+                target: "DIR",
+                clusterId: cluster?.id ?? "",
+                path,
+              });
+            })
+            .then(() => {
+              message.success("删除算法版本成功");
+              refetch();
             });
-          });
         },
       });
     },
-    [],
+    [algorithmId, cluster],
   );
 
   return (
@@ -153,16 +173,56 @@ export const VersionListModal: React.FC<Props> = (
 
                     <Button
                       type="link"
+                      disabled={r.sharedStatus === ShareStatus.SHARING || r.sharedStatus === ShareStatus.UNSHARING}
                       onClick={() => {
-                        shareAlgorithmVersion(r.id, r.versionName, r.isShared);
+                        confirm({
+                          title: "分享算法版本",
+                          content: `确认${getShareStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
+                          onOk: async () => {
+                            await new Promise<void>((resolve) => {
+                              if (r.sharedStatus === ShareStatus.SHARED) {
+                                unShareMutation.mutate({
+                                  versionId: r.id,
+                                  algorithmId,
+                                }, {
+                                  onSuccess() {
+                                    refetch();
+                                    resolve();
+                                    message.success("取消分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                });
+                              }
+                              else {
+                                shareMutation.mutate({
+                                  versionId: r.id,
+                                  algorithmId,
+                                  sourceFilePath: r.path,
+                                }, {
+                                  onSuccess() {
+                                    refetch();
+                                    resolve();
+                                    message.success("分享成功");
+                                  },
+                                  onError() {
+                                    resolve();
+                                  },
+                                });
+                              }
+                            });
+
+                          },
+                        });
                       }}
                     >
-                      {r.isShared ? "取消分享" : "分享"}
+                      {getShareStatusText(r.sharedStatus)}
                     </Button>
                     <Button
                       type="link"
                       onClick={() => {
-                        deleteAlgorithmVersion(r.id, r.versionName);
+                        deleteAlgorithmVersion(r.id, r.versionName, r.privatePath);
                       }}
                     >
                     删除
