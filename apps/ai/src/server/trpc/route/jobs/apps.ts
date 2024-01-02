@@ -12,10 +12,10 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getUserHomedir, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { DetailedError } from "@scow/rich-error-model";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { ApiVersion } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
@@ -27,13 +27,14 @@ import { aiConfig } from "src/server/config/ai";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { generateRandomPassword, getClusterAppConfigs, sha1WithSalt } from "src/server/utils/app";
+import { getClusterAppConfigs } from "src/server/utils/app";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clusters";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { isPortReachable } from "src/utils/isPortReachables";
 import { BASE_PATH } from "src/utils/processEnv";
-import { z } from "zod";
+import { number, string, z } from "zod";
 
 
 export enum JobType {
@@ -340,8 +341,10 @@ export const createAppSession = procedure
     const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
     const host = getClusterLoginNode(clusterId);
-
-    if (!host) { throw new Error(`Cluster ${clusterId} has no login node`); }
+    if (!host) { throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Cluster ${clusterId} has no login node` });
+    }
     const userId = user!.identityId;
     return await sshConnect(host, userId, logger, async (ssh) => {
 
@@ -430,7 +433,10 @@ export const listAppSessions =
       const userId = user.identityId;
       const host = getClusterLoginNode(clusterId);
 
-      if (!host) { throw new Error(`Cluster ${clusterId} has no login node`); }
+      if (!host) { throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Cluster ${clusterId} has no login node` });
+      }
 
       const apps = getClusterAppConfigs(clusterId);
 
@@ -536,3 +542,160 @@ export const listAppSessions =
           : !runningStates.includes(session.state)) };
       });
     });
+
+
+const TIMEOUT_MS = 3000;
+
+export const checkAppConnectivity =
+procedure.input(z.object({
+  host: z.string(),
+  port: z.number(),
+})).output(z.object({
+  ok: z.boolean(),
+})).query(
+  async ({ input }) => {
+
+    const { port, host } = input;
+
+    const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+
+    return { ok: reachable };
+  },
+
+);
+
+
+const AppConnectPropsSchema = z.object({
+  method: z.string(),
+  path: z.string(),
+  query: z.record(z.string()).optional(),
+  formData: z.record(z.string()).optional(),
+});
+
+const ConnectToAppResponseSchema = z.intersection(
+  z.object({
+    host: z.string(),
+    port: z.number(),
+    password: z.string(),
+  }),
+  z.union([
+    z.object({
+      type: z.literal("web"),
+      connect: AppConnectPropsSchema,
+      proxyType: z.union([
+        z.literal("relative"),
+        z.literal("absolute"),
+      ]),
+      customFormData: z.record(z.string()).optional(),
+    }),
+    z.object({ type: z.literal("vnc") }),
+  ]),
+);
+
+export const connectToApp =
+procedure
+  .input(z.object({
+    cluster: z.string(),
+    sessionId: z.string(),
+  }))
+  .output(ConnectToAppResponseSchema)
+  .mutation(async ({ input, ctx: { user } }) => {
+
+    const { cluster, sessionId } = input;
+    const userId = user.identityId;
+    const host = getClusterLoginNode(cluster);
+    if (!host) { throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Cluster ${cluster} has no login node` });
+    }
+    const apps = getClusterAppConfigs(cluster);
+
+    const reply = await sshConnect(host, "root", logger, async (ssh) => {
+      const sftp = await ssh.requestSFTP();
+
+      const userHomeDir = await getUserHomedir(ssh, userId, logger);
+      const jobDir = join(userHomeDir, aiConfig.appJobsDir, sessionId);
+
+      if (!await sftpExists(sftp, jobDir)) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `session id ${sessionId} is not found`,
+        });
+      }
+
+      const metadataPath = join(jobDir, SESSION_METADATA_NAME);
+      const content = await sftpReadFile(sftp)(metadataPath);
+      const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
+
+      // const app = apps[sessionMetadata.appId];
+
+      const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+      if (connectionInfo?.response?.$case === "appConnectionInfo") {
+        const { host, port, password } = connectionInfo.response.appConnectionInfo;
+        return {
+          appId: sessionMetadata.appId,
+          host: host,
+          port: port,
+          password: password,
+        };
+      }
+
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `session id ${sessionId} cannot be connected.`,
+      });
+    });
+
+
+    const app = apps[reply.appId];
+
+    if (!app) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `app id ${reply.appId} is not found`,
+      });
+    }
+
+    switch (app.type) {
+    case AppType.web:
+      return {
+        host: reply.host,
+        port: reply.port,
+        password: reply.password,
+        type: "web",
+        connect : {
+          method:app.web!.connect.method,
+          query: app.web!.connect.query ?? {},
+          formData: app.web!.connect.formData ?? {},
+          path: app.web!.connect.path,
+        },
+        proxyType: app.web!.proxyType === "absolute"
+          ? "absolute"
+          : "relative",
+      };
+    default:
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Unknown app type ${app.type} of app id ${reply.appId}`,
+      });
+    }
+
+  });
+
+
+export const cancelJob =
+procedure.input(z.object({
+  cluster: z.string(),
+  jobId: z.number(),
+})).mutation(async ({ input, ctx: { user } }) => {
+
+  const { cluster, jobId } = input;
+
+  const userId = user.identityId;
+  const client = getAdapterClient(cluster);
+  await asyncClientCall(client.job, "cancelJob", {
+    userId,
+    jobId,
+  });
+  return {};
+});

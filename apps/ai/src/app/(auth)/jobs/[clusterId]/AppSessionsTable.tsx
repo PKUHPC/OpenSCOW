@@ -13,7 +13,9 @@
 "use client";
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { Button, Checkbox, Form, Input, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
+import { useRouter } from "next/router";
+import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { Cluster } from "src/server/trpc/route/config";
@@ -21,6 +23,8 @@ import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 import { trpc } from "src/utils/trpc";
+
+import { ConnectTopAppLink } from "./ConnectToAppLink";
 
 interface FilterForm {
   appJobName: string | undefined
@@ -42,6 +46,9 @@ export function compareState(a: string, b: string): -1 | 0 | 1 {
 
 export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
+  const router = useRouter();
+  const { message } = App.useApp();
+
   const unfinished = status === "UNFINISHED";
 
   const [query, setQuery] = useState<FilterForm>(() => {
@@ -54,6 +61,15 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const { data, refetch, isLoading, isFetching } = trpc.jobs.listAppSessions.useQuery({
     clusterId: cluster.id, isRunning: unfinished,
+  });
+
+  const cancelJobMutation = trpc.jobs.cancelJob.useMutation({
+    onError:(e) => {
+      message.error(`操作失败: ${e.message}`);
+    },
+    onSuccess: () => {
+      refetch();
+    },
   });
 
   const columns: TableColumnsType<AppSession> = [
@@ -113,61 +129,59 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       key: "action",
       fixed:"right",
       width: "10%",
-      // render: (_, record) => (
-      // <Space>
-      //   {
-      //     (record.state === "RUNNING") ? (
-      //       <>
-      //         <ConnectTopAppLink
-      //           session={record}
-      //           cluster={cluster}
-      //           refreshToken={connectivityRefreshToken}
-      //         />
-      //         <Popconfirm
-      //           title={t(p("table.popFinishConfirmTitle"))}
-      //           onConfirm={async () =>
-      //             api.cancelJob({ query: {
-      //               cluster: cluster.id,
-      //               jobId: record.jobId,
-      //             } })
-      //               .then(() => {
-      //                 message.success(t(p("table.popFinishConfirmMessage")));
-      //                 reload();
-      //               })
-      //           }
-      //         >
-      //           <a>{t("button.finishButton")}</a>
-      //         </Popconfirm>
-      //       </>
-      //     ) : undefined
-      //   }
-      //   {
-      //     (record.state === "PENDING" || record.state === "SUSPENDED") ? (
-      //       <Popconfirm
-      //         title={t(p("table.popCancelConfirmTitle"))}
-      //         onConfirm={async () =>
-      //           api.cancelJob({ query: {
-      //             cluster: cluster.id,
-      //             jobId: record.jobId,
-      //           } })
-      //             .then(() => {
-      //               message.success(t(p("table.popCancelConfirmMessage")));
-      //               reload();
-      //             })
-      //         }
-      //       >
-      //         <a>{t("button.cancelButton")}</a>
-      //       </Popconfirm>
-      //     ) : undefined
-      //   }
-      //   <a onClick={() => {
-      //     router.push(join("/files", cluster.id, record.dataPath));
-      //   }}
-      //   >
-      //     {t(p("table.linkToPath"))}
-      //   </a>
-      // </Space>
-      // ),
+      render: (_, record) => (
+        <Space>
+          {
+            (record.state === "RUNNING") ? (
+              <>
+                <ConnectTopAppLink
+                  session={record}
+                  cluster={cluster.id}
+                  refreshToken={connectivityRefreshToken}
+                />
+                <Popconfirm
+                  title="确定结束这个任务吗"
+                  onConfirm={
+                    async () => {
+                      await cancelJobMutation.mutateAsync({
+                        cluster: cluster.id,
+                        jobId: record.jobId,
+                      });
+                      message.success("任务结束请求已经提交");
+                    }
+                  }
+                >
+                  <a>结束</a>
+                </Popconfirm>
+              </>
+            ) : undefined
+          }
+          {
+            (record.state === "PENDING" || record.state === "SUSPENDED") ? (
+              <Popconfirm
+                title="确定取消这个任务吗"
+                onConfirm={
+                  async () => {
+                    await cancelJobMutation.mutateAsync({
+                      cluster: cluster.id,
+                      jobId: record.jobId,
+                    });
+                    message.success("任务取消请求已经提交");
+                  }
+                }
+              >
+                <a>取消</a>
+              </Popconfirm>
+            ) : undefined
+          }
+          <a onClick={() => {
+            router.push(join("/files", cluster.id, record.dataPath));
+          }}
+          >
+            进入目录
+          </a>
+        </Space>
+      ),
     },
   ];
 
