@@ -169,7 +169,8 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               refetch={refetch}
               isEdit={false}
               clusters={clusters}
-            > 添加
+            >
+              添加
             </CreateDatasetModalButton>
           </Space>
         )}

@@ -118,7 +118,6 @@ const formatPath = (path: string) => {
 
 export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
 
-
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
@@ -148,11 +147,6 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
       refetch();
     }
   }, [visible]);
-
-  // useEffect(() => {
-  //   if (path === "~" || path === homeDir?.path) return;
-  //   !expandedKeys.includes(path) && setExpandedKeys([...expandedKeys, path]);
-  // }, [path]);
 
   useEffect(() => {
     if (!curDirContent) return;
