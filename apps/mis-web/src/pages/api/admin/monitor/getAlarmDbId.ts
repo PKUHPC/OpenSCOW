@@ -16,9 +16,8 @@ import { join } from "path";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
+import { DEFAULT_GRAFANA_URL } from "src/utils/constants";
 import { route } from "src/utils/route";
-
-export const DEFAULT_GRAFANA_URL = "http://127.0.0.1:4000";
 
 const GetAlarmDbIdResponse = Type.Object({
   id: Type.Number(),

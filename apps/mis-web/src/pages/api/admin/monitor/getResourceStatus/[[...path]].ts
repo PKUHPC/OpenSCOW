@@ -16,6 +16,7 @@ import httpProxy from "http-proxy";
 import { NextApiRequest, NextApiResponse } from "next";
 import { authenticate } from "src/auth/server";
 import { publicConfig } from "src/utils/config";
+import { DEFAULT_GRAFANA_URL } from "src/utils/constants";
 
 const proxy = httpProxy.createProxyServer({
   changeOrigin: true,
@@ -40,12 +41,23 @@ const auth = authenticate((info) =>
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 
+  if (!publicConfig.CLUSTER_MONITOR.resourceStatus.enabled) {
+    return res.status(404).send("Resource status is not enabled");
+  }
+
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const target = joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? "",
-    req.url!.replace("/api/admin/monitor/getResourceStatus", ""));
+  const { path, ...rest } = req.query;
+
+  const grafanaPath = path ? (Array.isArray(path) ? path.join("/") : path) : "/";
+
+  const queryString = new URLSearchParams(rest as Record<string, string>).toString();
+  const urlWithQuery = queryString ? `?${queryString}` : "";
+
+  const grafanaUrl = publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL;
+  const target = joinWithUrl(grafanaUrl, grafanaPath) + urlWithQuery;
 
   proxy.web(req, res, {
     target, xfwd: true,

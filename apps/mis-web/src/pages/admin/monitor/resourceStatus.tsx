@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { joinWithUrl } from "@scow/utils";
 import { Typography } from "antd";
 import { NextPage } from "next";
 import path from "path";
@@ -18,6 +19,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { antdBreakpoints } from "src/styles/constants";
 import { publicConfig } from "src/utils/config";
+import { DEFAULT_GRAFANA_URL } from "src/utils/constants";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -49,15 +51,20 @@ export const ResourceStatusPage: NextPage = requireAuth(
 
   const t = useI18nTranslateToString();
 
-  const grafanaUrl = path.join(publicConfig.BASE_PATH,
-    "/api/admin/monitor/getResourceStatus", "/d/shZOtO4Sk/job-scheduler?orgId=1");
+  const normalGrafanaUrl = joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL,
+    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}/job-scheduler?orgId=1`);
+  const proxyGrafanaUrl = path.join(publicConfig.BASE_PATH, "/api/admin/monitor/getResourceStatus",
+    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}/job-scheduler?orgId=1`);
 
   return (
     <>
       <Container>
         <Head title={t(p("resourceStatus"))} />
         <TitleText>{t(p("resourceStatus"))}</TitleText>
-        <iframe width="100%" height="760px" src={grafanaUrl}></iframe>
+        { publicConfig.CLUSTER_MONITOR.resourceStatus.proxy
+          ? <iframe width="100%" height="760px" src={proxyGrafanaUrl}></iframe>
+          : <iframe width="100%" height="760px" src={normalGrafanaUrl}></iframe>
+        }
       </Container>
     </>
 

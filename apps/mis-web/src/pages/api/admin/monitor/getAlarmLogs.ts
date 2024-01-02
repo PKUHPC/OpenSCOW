@@ -17,9 +17,8 @@ import { join } from "path";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { publicConfig } from "src/utils/config";
+import { DEFAULT_GRAFANA_URL } from "src/utils/constants";
 import { route } from "src/utils/route";
-
-import { DEFAULT_GRAFANA_URL } from "./getAlarmDbId";
 
 interface GrafanaApiResponse {
   results: {
