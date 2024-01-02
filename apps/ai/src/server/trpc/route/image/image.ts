@@ -26,7 +26,7 @@ export const ImageListSchema = z.object({
   path: z.string(),
   sourcePath: z.string(),
   isShared: z.boolean(),
-  clusterId: z.string(),
+  clusterId: z.string().optional(),
   createTime: z.string(),
 });
 
