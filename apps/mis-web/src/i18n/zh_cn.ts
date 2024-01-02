@@ -178,6 +178,9 @@ export default {
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
         accountList: "账户列表",
+        clusterMonitor: "集群监控",
+        resourceStatus: "资源状态",
+        alarmLog: "告警日志",
       },
       tenantManagement: {
         firstNav: "租户管理",
@@ -241,6 +244,17 @@ export default {
       },
     },
     admin:{
+      allAlarmLogsTable: {
+        firing: "触发中",
+        resolved: "已解决",
+        serialNumber: "序号",
+        fingerPrint: "指纹",
+        status: "状态",
+        alarmLevel: "告警级别",
+        description: "描述",
+        firingTime: "触发时间",
+        resolvedTime: "处理时间",
+      },
       allTenantsTable:{
         tenantName:"租户名称",
         accountCount:"账户数量",
@@ -834,6 +848,22 @@ export default {
       unableReinitialize: "系统已经初始化完成，无法重新初始化！",
     },
     admin: {
+      monitor: {
+        alarmLog: {
+          alarmLog: "告警日志",
+          firingTime: "触发时间",
+          firingTimePrompt: "告警的触发时间",
+          status: "状态",
+          selectAll: "全选",
+          firing: "触发中",
+          resolved: "已解决",
+          search: "搜索",
+          refresh: "刷新",
+        },
+        resourceStatus: {
+          resourceStatus: "资源状态",
+        },
+      },
       operationLogs: {
         platformOperationLog: "平台操作日志",
       },

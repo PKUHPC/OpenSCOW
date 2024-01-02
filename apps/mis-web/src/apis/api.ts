@@ -40,6 +40,9 @@ import type { GetTopChargeAccountSchema } from "src/pages/api/admin/getTopCharge
 import type { GetTopPayAccountSchema } from "src/pages/api/admin/getTopPayAccount";
 import type { GetTopSubmitJobUserSchema } from "src/pages/api/admin/getTopSubmitJobUser";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
+import type { GetAlarmDbIdSchema } from "src/pages/api/admin/monitor/getAlarmDbId";
+import type { GetAlarmLogsSchema } from "src/pages/api/admin/monitor/getAlarmLogs";
+import type { GetAlarmLogsCountSchema } from "src/pages/api/admin/monitor/getAlarmLogsCount";
 import type { QueryStorageQuotaSchema } from "src/pages/api/admin/queryStorageQuota";
 import type { SetPlatformRoleSchema } from "src/pages/api/admin/setPlatformRole";
 import type { SetTenantRoleSchema } from "src/pages/api/admin/setTenantRole";
@@ -101,7 +104,6 @@ import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAc
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin"; ;
 
 export const api = {
-  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   changeJobPrice: apiClient.fromTypeboxRoute<typeof ChangeJobPriceSchema>("PATCH", "/api/admin/changeJobPrice"),
   changePasswordAsPlatformAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsPlatformAdminSchema>("PATCH", "/api/admin/changePassword"),
   changeStorageQuota: apiClient.fromTypeboxRoute<typeof ChangeStorageQuotaSchema>("PUT", "/api/admin/changeStorage"),
@@ -117,6 +119,9 @@ export const api = {
   getPlatformUsersCounts: apiClient.fromTypeboxRoute<typeof GetPlatformUsersCountsSchema>("GET", "/api/admin/getPlatformUsersCounts"),
   getTenantUsers: apiClient.fromTypeboxRoute<typeof GetTenantUsersSchema>("GET", "/api/admin/getTenantUsers"),
   importUsers: apiClient.fromTypeboxRoute<typeof ImportUsersSchema>("POST", "/api/admin/importUsers"),
+  getAlarmDbId: apiClient.fromTypeboxRoute<typeof GetAlarmDbIdSchema>("GET", "/api/admin/monitor/getAlarmDbId"),
+  getAlarmLogs: apiClient.fromTypeboxRoute<typeof GetAlarmLogsSchema>("GET", "/api/admin/monitor/getAlarmLogs"),
+  getAlarmLogsCount: apiClient.fromTypeboxRoute<typeof GetAlarmLogsCountSchema>("GET", "/api/admin/monitor/getAlarmLogsCount"),
   queryStorageQuota: apiClient.fromTypeboxRoute<typeof QueryStorageQuotaSchema>("GET", "/api/admin/queryStorageQuota"),
   setPlatformRole: apiClient.fromTypeboxRoute<typeof SetPlatformRoleSchema>("PUT", "/api/admin/setPlatformRole"),
   setTenantRole: apiClient.fromTypeboxRoute<typeof SetTenantRoleSchema>("PUT", "/api/admin/setTenantRole"),
@@ -152,6 +157,7 @@ export const api = {
   unsetInitAdmin: apiClient.fromTypeboxRoute<typeof UnsetInitAdminSchema>("DELETE", "/api/init/unsetInitAdmin"),
   userExists: apiClient.fromTypeboxRoute<typeof UserExistsSchema>("POST", "/api/init/userExists"),
   addBillingItem: apiClient.fromTypeboxRoute<typeof AddBillingItemSchema>("POST", "/api/job/addBillingItem"),
+  cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   changeJobTimeLimit: apiClient.fromTypeboxRoute<typeof ChangeJobTimeLimitSchema>("PATCH", "/api/job/changeJobTimeLimit"),
   getAvailableBillingTable: apiClient.fromTypeboxRoute<typeof GetAvailableBillingTableSchema>("GET", "/api/job/getAvailableBillingTable"),
   getBillingItems: apiClient.fromTypeboxRoute<typeof GetBillingItemsSchema>("GET", "/api/job/getBillingItems"),

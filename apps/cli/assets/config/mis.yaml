@@ -61,6 +61,22 @@ createUser:
     # 外置页面URL
     # url: http://your-create-user-page.com
 
+# # 集群监控配置
+# clusterMonitor:
+#   # 协议 + ip/域名 + 端口，默认为 http://127.0.0.1:4000
+#   grafanaUrl: "http://172.16.20.125:4000"
+#   # 资源状态相关配置
+#   resourceStatus:
+#     # 是否开启资源状态，默认不开启
+#     enabled: false
+#     # 是否使用代理的方式
+#     proxy: false
+#     # 默认面板 id,默认设置为 shZOtO4Sk
+#     dashboardUid: "shZOtO4Sk"
+#   # 告警日志配置
+#   alarmLogs:
+#     # 是否开启告警日志，默认不开启
+#     enabled: false
 
 # # 新增导航链接相关配置
 # navLinks:
