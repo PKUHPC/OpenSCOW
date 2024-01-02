@@ -58,7 +58,8 @@
     "typescript": "5.2.2",
     "http-proxy": "1.18.1",
     "@ant-design/cssinjs": "1.17.2",
-    "react-typed-i18n": "2.3.0"
+    "react-typed-i18n": "2.3.0",
+    "csv-stringify": "6.4.4"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

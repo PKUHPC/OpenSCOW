@@ -11,6 +11,7 @@
  */
 
 import { DatabaseOutlined } from "@ant-design/icons";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren } from "react";
@@ -44,6 +45,8 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
   );
 
+  const uiExtensionStore = useStore(UiExtensionStore);
+
   const logout = () => {
     removeDefaultCluster();
     userStore.logout();
@@ -59,6 +62,8 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
       languageId={languageId}
+      extension={uiExtensionStore.config}
+      from="portal"
       headerRightContent={(
         <>
           <JumpToAnotherLink

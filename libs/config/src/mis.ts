@@ -126,6 +126,11 @@ export const MisConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "是否启用集群监控功能", default: false }),
     grafanaUrl: Type.String({ description: "Grafana 地址", default: "http://127.0.0.1:4000" }),
   })),
+  
+  uiExtension: Type.Optional(Type.Object({
+    url: Type.String({ description: "UI扩展站完整URL" }),
+  })),
+
 });
 
 const MIS_CONFIG_NAME = "mis";

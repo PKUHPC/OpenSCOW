@@ -92,6 +92,7 @@ export interface PublicRuntimeConfig {
     grafanaUrl: string | undefined,
   },
 
+  UI_EXTENSION?: { url: string; }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

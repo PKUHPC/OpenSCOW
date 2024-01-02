@@ -176,6 +176,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
       enabled: misConfig.clusterMonitor?.enabled,
       grafanaUrl: misConfig.clusterMonitor?.grafanaUrl,
     },
+    
+    UI_EXTENSION: misConfig.uiExtension,
+
   };
 
   if (!building) {

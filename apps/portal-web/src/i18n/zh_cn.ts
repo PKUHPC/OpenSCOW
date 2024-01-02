@@ -285,6 +285,9 @@ export default {
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
           submitConfirmTitle: "确认提交",
+          submitConfirmNotice: "请确保脚本文件提供了可用的绝对路径作为工作目录，"
+          + "如未提供则默认为脚本文件所在目录",
+
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功！您的新作业ID为：{}",
@@ -438,6 +441,27 @@ export default {
         card:"卡",
         job:"作业",
         pending:"排队中",
+      },
+      addEntryModal:{
+        addQuickEntry:"添加快捷方式",
+        cancel:"取消",
+      },
+      changeClusterModal:{
+        selectCluster:"选择集群",
+        cluster:"集群",
+        loginNode:"登录节点",
+      },
+      quickEntry:{
+        quickEntry:"快捷入口",
+        finish:"完成",
+        cancel:"取消",
+        edit:"编辑",
+      },
+      sortable:{
+        alreadyExist:"已存在该快捷方式",
+        exceedMaxSize:"最多只能添加10个快捷方式",
+        saveFailed:"保存失败",
+        saveSuccessfully:"保存成功",
       },
     },
   },

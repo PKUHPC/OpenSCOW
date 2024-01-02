@@ -14,6 +14,7 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
@@ -114,6 +115,8 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
+
   return (
     <>
       <Head>
@@ -141,7 +144,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, defaultClusterStore]}>
+        <StoreProvider stores={[userStore, defaultClusterStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />
