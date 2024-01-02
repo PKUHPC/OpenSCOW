@@ -13,7 +13,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ClientProvider } from "src/app/trpcClient";
+import { ServerClientProvider } from "src/app/trpcClient.server";
 import { ErrorBoundary } from "src/components/ErrorBoundary";
 import { TopProgressBar } from "src/components/TopProgressBar";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -32,16 +32,14 @@ export function ClientLayout(props: { children: React.ReactNode, initialDark?: D
       <AntdStyleRegistry>
         <GlobalStyle />
         <body>
-          <ClientProvider>
-            <DarkModeProvider initial={props.initialDark}>
-              <AntdConfigProvider>
-                <TopProgressBar />
-                <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
-                  {props.children}
-                </ErrorBoundary>
-              </AntdConfigProvider>
-            </DarkModeProvider>
-          </ClientProvider>
+          <DarkModeProvider initial={props.initialDark}>
+            <AntdConfigProvider>
+              <TopProgressBar />
+              <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
+                {props.children}
+              </ErrorBoundary>
+            </AntdConfigProvider>
+          </DarkModeProvider>
         </body>
       </AntdStyleRegistry>
     </StyledComponentsRegistry>

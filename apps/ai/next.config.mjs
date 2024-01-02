@@ -12,7 +12,6 @@
 
 import os from "os";
 
-
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "/";
 
 export default async () => {
@@ -27,11 +26,11 @@ export default async () => {
       styledComponents: true,
     },
     experimental: {
-      appDir: true,
+      serverMinification: false,
     },
     basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
-    webpack: (config, { webpack }) => {
+    webpack: (config) => {
       config.resolve.extensionAlias = {
         ".js": [".ts", ".tsx", ".js"],
         ".jsx": [".ts", ".tsx", ".js"],
@@ -48,6 +47,7 @@ export default async () => {
           },
         ],
       });
+
       // config.plugins.forEach((i) => {
       //   if (i instanceof webpack.DefinePlugin) {
       //     if (i.definitions["process.env.__NEXT_ROUTER_BASEPATH"]) {

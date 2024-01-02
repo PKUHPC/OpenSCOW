@@ -12,11 +12,10 @@
 
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { join } from "path";
 import { useDarkMode } from "src/layouts/darkMode";
-import { BASE_PATH } from "src/utils/processEnv";
+import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
 const LogoContainer = styled.h1`
@@ -33,10 +32,16 @@ export const Logo = () => {
   const { dark } = useDarkMode();
   const query = new URLSearchParams({ type: "logo", preferDark: dark ? "true" : "false" }).toString();
 
+  const { data } = trpc.config.publicConfig.useQuery();
+
   return (
     <LogoContainer>
       <Link href="/">
-        <img src={join(BASE_PATH, "/api/logo?" + query.toString())} alt="logo" height={40} />
+        {
+          data ? (
+            <img src={join(data.BASE_PATH, "/api/logo?" + query.toString())} alt="logo" height={40} />
+          ) : <span>SCOW AI</span>
+        }
       </Link>
     </LogoContainer>
   );

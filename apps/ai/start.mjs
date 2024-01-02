@@ -40,4 +40,7 @@ const options = {
 replaceInFile.sync(options);
 
 // Run serve:next
-execSync("npm run serve:next", { stdio: "inherit" });
+execSync("npm run serve:next", { stdio: "inherit", env: {
+  ...process.env,
+  NEXT_PUBLIC_RUNTIME_BASE_PATH: BASE_PATH,
+} });

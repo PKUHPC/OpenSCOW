@@ -16,6 +16,7 @@ import { DarkModeCookie } from "@scow/lib-web/build/layouts/darkMode";
 import { cookies } from "next/headers";
 import { join } from "path";
 import { ClientLayout } from "src/app/clientLayout";
+import { ServerClientProvider } from "src/app/trpcClient.server";
 import { BASE_PATH } from "src/utils/processEnv";
 
 export default function MyApp({ children }: { children: React.ReactNode }) {
@@ -32,9 +33,11 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
         <meta name="format-detection" content="telephone=no" />
         <link href={join(BASE_PATH, "manifest.json")} rel="manifest" id="manifest" />
       </head>
-      <ClientLayout initialDark={dark}>
-        {children}
-      </ClientLayout>
+      <ServerClientProvider>
+        <ClientLayout initialDark={dark}>
+          {children}
+        </ClientLayout>
+      </ServerClientProvider>
     </html>
   );
 

@@ -12,35 +12,17 @@
 
 "use client";
 
+import { joinWithUrl } from "@scow/utils";
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { httpBatchLink, loggerLink, TRPCClientError } from "@trpc/client";
 import { message } from "antd";
 import { join } from "path";
 import { useState } from "react";
 import { AppRouter } from "src/server/trpc/router";
-import { BASE_PATH } from "src/utils/processEnv";
 import { trpc } from "src/utils/trpc";
 import superjson from "superjson";
 
-function getBaseUrl() {
-  if (typeof window !== "undefined")
-    // browser should use relative path
-    return "";
-  if (process.env.VERCEL_URL)
-    // reference for vercel.com
-    return `https://${process.env.VERCEL_URL}`;
-  if (process.env.RENDER_INTERNAL_HOSTNAME)
-    // reference for render.com
-    return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
-  // assume localhost
-  return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
-}
-
-function getBasePath() {
-  return [null, undefined, "/"].includes(BASE_PATH) ? "" : BASE_PATH;
-}
-
-export function ClientProvider(props: { children: React.ReactNode }) {
+export function ClientProvider(props: { baseUrl: string; basePath: string; children: React.ReactNode }) {
 
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
@@ -53,7 +35,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         const { data } = error as TRPCClientError<AppRouter>;
 
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          window.location.href = join(BASE_PATH, "/api/auth");
+          window.location.href = join(props.basePath, "/api/auth");
         } else if (data?.code && query?.meta?.[data?.code]) {
           const msg = query?.meta?.[data?.code] as string;
           message.error(msg);
@@ -67,7 +49,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         const { data } = error as TRPCClientError<AppRouter>;
         const { onError } = mutation.options;
         if (data?.code && data?.code === "UNAUTHORIZED") {
-          window.location.href = join(BASE_PATH, "/api/auth");
+          window.location.href = join(props.basePath, "/api/auth");
         } else if (!onError) {
           message.error("出了一些问题，请稍后再试！");
         }
@@ -82,7 +64,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
           enabled: () => process.env.NODE_ENV === "development",
         }),
         httpBatchLink({
-          url: `${getBaseUrl()}${getBasePath()}/api/trpc`,
+          url: joinWithUrl(props.baseUrl, props.basePath, "/api/trpc"),
         }),
       ],
       transformer: superjson,
