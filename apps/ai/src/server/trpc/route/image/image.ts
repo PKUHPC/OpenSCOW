@@ -43,14 +43,14 @@ export const list = procedure
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
     nameOrTagOrDesc: z.string().optional(),
-    isShared: z.boolean().optional(),
+    isPublic: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(ImageListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const isPublicQuery = input.isShared ? {
+    const isPublicQuery = input.isPublic ? {
       isShared: true,
       owner: { $ne: null },
     } : { owner: user?.identityId };
@@ -67,7 +67,7 @@ export const list = procedure
       $and: [
         nameOrTagOrDescQuery,
         isPublicQuery,
-        { clusterId: input.clusterId },
+        { clusterId: input.clusterId ? input.clusterId : { $ne: null } },
       ],
     }, {
       limit: input.pageSize || undefined,
@@ -106,17 +106,18 @@ export const createImage = procedure
     description: z.string().optional(),
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
     sourcePath: z.string(),
-    clusterId: z.string(),
+    clusterId: z.string().optional(),
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    // TODO 集群判断
-    const imageNameExist = await orm.em.findOne(Image, { name:input.name });
-    if (imageNameExist) {
+
+    const imageNameTagExist = await orm.em.findOne(Image,
+      { name: input.name, tags: input.tags, owner: user.identityId });
+    if (imageNameTagExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.name} already exist`,
+        message: `Image's name ${input.name} with tags ${input.tags} already exist`,
       });
     };
 
@@ -140,11 +141,12 @@ export const updateImage = procedure
   })
   .input(z.object({
     id: z.number(),
+    name: z.string(),
     tags: z.string(),
     description: z.string().optional(),
   }))
   .output(z.number())
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
     if (!image) {
@@ -154,6 +156,23 @@ export const updateImage = procedure
       });
     };
 
+    if (image.owner !== user.identityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `Image ${input.id} not accessible`,
+      });
+    }
+
+    const imageNameTagExist = await orm.em.findOne(Image,
+      { name: input.name, tags: input.tags, owner: user.identityId, id: { $ne: input.id } });
+    if (imageNameTagExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Image's name ${input.name} with tags ${input.tags} already exist`,
+      });
+    };
+
+    image.name = input.name;
     image.tags = input.tags;
     image.description = input.description;
 
@@ -172,7 +191,7 @@ export const deleteImage = procedure
   })
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
 
@@ -182,6 +201,101 @@ export const deleteImage = procedure
         message: `Image ${input.id} not found`,
       });
     }
+
+    if (image.owner !== user.identityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `Image ${input.id} not accessible`,
+      });
+    }
+
+    // TODO: 删除habor镜像
     await orm.em.removeAndFlush(image);
     return { success: true };
   });
+
+export const shareOrUnshareImage = procedure
+  .meta({
+    openapi: {
+      method: "PUT",
+      path: "/image/share/{id}",
+      tags: ["image"],
+      summary: "share a image",
+    },
+  })
+  .input(z.object({ id: z.number(), share: z.boolean() }))
+  .output(z.object({}))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const image = await orm.em.findOne(Image, { id: input.id });
+
+    if (!image) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Image ${input.id} not found`,
+      });
+    };
+
+    if (image.owner !== user.identityId) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `Image ${input.id} not accessible`,
+      });
+    }
+
+    image.isShared = input.share;
+
+    await orm.em.persistAndFlush(image);
+    return {};
+  });
+
+
+export const copyImage = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/image/copy/{id}",
+      tags: ["image"],
+      summary: "copy a image",
+    },
+  })
+  .input(z.object({ copiedId: z.number(), newName: z.string(), newTags: z.string() }))
+  .output(z.number())
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+    const sharedImage = await orm.em.findOne(Image, { id: input.copiedId, isShared: true });
+
+    if (!sharedImage) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Shared Image ${input.copiedId} not found`,
+      });
+    };
+
+    const imageNameTagsExist = await orm.em.findOne(Image,
+      { name:input.newName, tags: input.newTags, owner: user.identityId });
+    if (imageNameTagsExist) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Image's name ${input.newName} with tags ${input.newTags} already exist`,
+      });
+    };
+
+    // TODO 拉取分享镜像，上传新的镜像
+    const imageRealPath = "test-harbor";
+
+    const image = new Image({
+      name: input.newName,
+      tags: input.newTags,
+      owner: user.identityId,
+      source: Source.EXTERNAL,
+      sourcePath: sharedImage.path,
+      path: imageRealPath,
+      description: sharedImage.description,
+      clusterId: "",
+    });
+    await orm.em.persistAndFlush(image);
+
+    return image.id;
+  });
+

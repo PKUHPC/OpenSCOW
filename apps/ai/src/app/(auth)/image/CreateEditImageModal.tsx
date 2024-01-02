@@ -16,7 +16,6 @@ import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { DatasetInterface } from "src/models/Dateset";
 import { ImageInterface, Source, SourceText } from "src/models/Image";
 import { AppRouter } from "src/server/trpc/router";
 import { Cluster } from "src/utils/config";
@@ -36,7 +35,7 @@ export interface Props {
 
 interface FormFields {
   id?: number | undefined,
-  cluster: Cluster,
+  cluster: Cluster | undefined,
   name: string,
   tags: string,
   description?: string,
@@ -65,6 +64,9 @@ export const CreateEditImageModal: React.FC<Props> = (
       });
   };
 
+  const cluster = Form.useWatch("cluster", form);
+  const source = Form.useWatch("source", form);
+
   const createMutation = trpc.image.createImage.useMutation({
     onSuccess() {
       message.success("添加镜像成功");
@@ -87,6 +89,8 @@ export const CreateEditImageModal: React.FC<Props> = (
     onError(e) {
       const { data } = e as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
+        message.error("镜像不存在");
+      } else {
         message.error("编辑镜像失败");
       }
     },
@@ -97,12 +101,13 @@ export const CreateEditImageModal: React.FC<Props> = (
     const { name, cluster, tags, description, source, sourcePath } = await form.validateFields();
     isEdit && editData ? editMutation.mutate({
       id: editData.id,
+      name,
       tags,
       description,
     })
       : createMutation.mutate({
         name,
-        clusterId: cluster.id,
+        clusterId: source === Source.INTERNAL ? cluster?.id : undefined,
         tags,
         description,
         source,
@@ -126,46 +131,58 @@ export const CreateEditImageModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
-        {isEdit && editData ? (
-          <>
-            <Form.Item
-              label="镜像名称"
-            >
-              {editData.name}
-            </Form.Item>
-            {/* <Form.Item
-              label="集群"
-            >
-              {getI18nConfigCurrentText(
-                clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
-              ?? editData.clusterId }
-            </Form.Item> */}
-          </>
+        <Form.Item
+          label="镜像名称"
+          name="name"
+          rules={[
+            { required: true },
+            { validator:validateNoChinese },
+          ]}
+        >
+          <Input allowClear />
+        </Form.Item>
+        { (isEdit && editData) ? (
+          editData.source === Source.INTERNAL && (
+            <>
+              <Form.Item
+                label="镜像来源"
+              >
+                {SourceText[editData.source]}
+              </Form.Item>
+              <Form.Item
+                label="集群"
+              >
+                {getI18nConfigCurrentText(
+                  clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+                    ?? editData.clusterId }
+              </Form.Item>
+            </>
+          )
+
         ) : (
-          <>
-            <Form.Item
-              label="镜像名称"
-              name="name"
-              rules={[
-                { required: true },
-                { validator:validateNoChinese },
-              ]}
-            >
-              <Input allowClear />
-            </Form.Item>
-            <Form.Item
-              label="集群"
-              name="cluster"
-              rules={[
-                { required: true },
-              ]}
-            >
-              <SingleClusterSelector />
-            </Form.Item>
-          </>
+          source === Source.INTERNAL && (
+            <>
+              <Form.Item
+                label="集群"
+                name="cluster"
+                rules={[
+                  { required: true },
+                ]}
+              >
+                <SingleClusterSelector />
+              </Form.Item>
+            </>
+          )
         )
         }
-        <Form.Item label="镜像标签" name="tags">
+        <Form.Item
+          label="镜像标签"
+          name="tags"
+          rules={[
+            { required: true },
+            { validator:validateNoChinese },
+          ]}
+        >
           <Input />
         </Form.Item>
         <Form.Item label="镜像描述" name="description">
@@ -174,7 +191,13 @@ export const CreateEditImageModal: React.FC<Props> = (
 
         { !isEdit && (
           <>
-            <Form.Item label="镜像来源" name="source">
+            <Form.Item
+              label="镜像来源"
+              name="source"
+              rules={[
+                { required: true },
+              ]}
+            >
               <Select
                 style={{ minWidth: "100px" }}
                 options={
@@ -182,12 +205,12 @@ export const CreateEditImageModal: React.FC<Props> = (
               />
             </Form.Item>
             <Form.Item
-              label="上传数据集"
+              label="上传镜像"
               name="sourcePath"
               rules={[{ required: true }]}
             >
               <Input
-                suffix={
+                suffix={ source === Source.INTERNAL ?
                   (
                     <FileSelectModal
                       allowedFileType={["FILE"]}
@@ -195,10 +218,11 @@ export const CreateEditImageModal: React.FC<Props> = (
                         form.setFields([{ name: "sourcePath", value: path, touched: true }]);
                         form.validateFields(["sourcePath"]);
                       }}
-                      clusterId={"A"}
+                      clusterId={cluster?.id ?? ""}
                     />
-                  )
+                  ) : undefined
                 }
+                placeholder={source === Source.INTERNAL ? "请选择路径" : "请输入远程镜像地址"}
               />
             </Form.Item>
           </>
