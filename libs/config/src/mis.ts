@@ -122,6 +122,18 @@ export const MisConfigSchema = Type.Object({
     Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
 
+  clusterMonitor: Type.Optional(Type.Object({
+    grafanaUrl: Type.String({ description: "Grafana 地址", default: "http://127.0.0.1:4000" }),
+    resourceStatus: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否开启资源状态，默认为 false", default: false }),
+      proxy: Type.Boolean({ description: "是否通过代理方式嵌入 grafana，默认为 false", default: false }),
+      dashboardUid: Type.String({ description: "默认展示的 grafana 面板 id", default: "shZOtO4Sk" }),
+    })),
+    alarmLogs: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否启用告警日志功能", default: false }),
+    })),
+  }, { description: "集群监控相关功能配置" })),
+
   uiExtension: Type.Optional(Type.Object({
     url: Type.String({ description: "UI扩展站完整URL" }),
   })),

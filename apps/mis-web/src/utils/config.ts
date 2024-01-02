@@ -87,6 +87,16 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  CLUSTER_MONITOR: {
+    grafanaUrl: string | undefined,
+    resourceStatus: {
+      enabled: boolean | undefined,
+      proxy: boolean | undefined,
+      dashboardUid: string | undefined,
+    },
+    alarmLogs: { enabled: boolean | undefined }
+  },
+
   UI_EXTENSION?: { url: string; }
 }
 

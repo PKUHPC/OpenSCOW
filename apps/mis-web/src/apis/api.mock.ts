@@ -454,6 +454,23 @@ export const mockApi: MockApi<typeof api> = {
     operationTime: "2020-04-23T23:49:50.000Z",
     operationEvent: { $case: "login", login: {} },
   }], totalCount: 1 }),
+
+  getAlarmDbId: async () => ({
+    id: 13,
+    uid: "kfcfkxq4",
+    name: "alertdb",
+    type: "mysql",
+  }),
+  getAlarmLogs: async () => ({ results: [{
+    id: 13,
+    status: "resolved",
+    severity: "Warning",
+    fingerprint: "38cc18aad8e553f6",
+    description: "hpc01 partition: normal - CPU usage above 80% (current value: 1)",
+    startsAt: 1702886670000,
+    endsAt: 1702889670000,
+  }]}),
+  getAlarmLogsCount: async () => ({ totalCount: 1 }),
 };
 
 export const MOCK_USER_INFO = {
