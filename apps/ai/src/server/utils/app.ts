@@ -12,7 +12,6 @@
 
 import { AppConfigSchema } from "@scow/config/build/appForAi";
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
-import { createHash, randomBytes } from "crypto";
 import { join } from "path";
 import { getAiAppConfigs } from "src/config/apps"; ;
 
@@ -36,22 +35,3 @@ export const getClusterAppConfigs = (cluster: string) => {
   return apps;
 
 };
-
-export function generateRandomPassword(length: number) {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  const charactersLength = characters.length;
-  const bytes = randomBytes(length);
-
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(bytes[i] % charactersLength);
-  }
-
-  return result;
-}
-
-export function sha1WithSalt(password: string, salt: string) {
-  const hash = createHash("sha1");
-  hash.update(password + salt);
-  return hash.digest("hex");
-}
