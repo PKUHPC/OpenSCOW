@@ -10,11 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, EntitySchema } from "@mikro-orm/core";
+import { Collection, Entity, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { AlgorithmVersion } from "./AlgorithmVersion";
-
 export enum Framework {
   TENSORFLOW = "TENSORFLOW",
   PYTORCH = "PYTORCH",
@@ -23,24 +22,37 @@ export enum Framework {
   OTHER = "OTHER",
 };
 
+@Entity()
 export class Algorithm {
-  id!: number;
+  @PrimaryKey()
+    id!: number;
 
-  name: string;
+  @Property()
+    name: string;
 
-  owner: string;
+  @Property()
+    owner: string;
 
-  framework: Framework;
+  @Property()
+    framework: Framework;
 
-  versions = new Collection<AlgorithmVersion>(this);
+  @OneToMany(() => "AlgorithmVersion", (algorithmVersion: AlgorithmVersion) => algorithmVersion.algorithm)
+    versions = new Collection<AlgorithmVersion>(this);
 
-  isShared: boolean;
+  @Property()
+    isShared: boolean;
 
-  description?: string;
-  clusterId: string;
+  @Property({ nullable: true })
+    description?: string;
 
-  createTime?: Date;
-  updateTime?: Date;
+  @Property()
+    clusterId: string;
+
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
+    createTime?: Date;
+
+  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
+    updateTime?: Date;
 
   constructor(init: {
       name: string;
@@ -52,37 +64,18 @@ export class Algorithm {
       createTime?: Date;
       updateTime?: Date;
     }) {
-
     this.name = init.name;
     this.owner = init.owner;
     this.framework = init.framework;
     this.isShared = init.isShared || false;
     this.description = init.description;
     this.clusterId = init.clusterId;
-
     if (init.createTime) {
       this.createTime = init.createTime;
     }
-
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
   }
 
 }
-
-export const algorithmEntitySchema = new EntitySchema<Algorithm>({
-  class: Algorithm,
-  properties: {
-    id: { type: "number", primary: true },
-    owner: { type: "string" },
-    name: { type: "string" },
-    framework: { enum: true, items: () => Framework },
-    versions: { reference: "1:m", entity: () => "AlgorithmVersion", mappedBy: "algorithm" },
-    isShared: { type: "boolean" },
-    description: { type: "string", nullable: true },
-    clusterId: { type: "string" },
-    createTime: { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP },
-    updateTime: { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() },
-  },
-});

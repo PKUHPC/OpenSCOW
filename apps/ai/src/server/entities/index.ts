@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Algorithm, algorithmEntitySchema } from "src/server/entities/Algorithm";
+import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
@@ -20,11 +20,11 @@ import { ModalVersion } from "src/server/entities/ModalVersion";
 
 
 export const entities = [
-  algorithmEntitySchema,
-  // algorithmVersionEntitySchema,
-  // datasetEntitySchema,
-  // datasetVersionEntitySchema,
-  // imageEntitySchema,
-  // modalEntitySchema,
-  // modalVersionEntitySchema,
+  Algorithm,
+  AlgorithmVersion,
+  Dataset,
+  DatasetVersion,
+  Image,
+  Modal,
+  ModalVersion,
 ];
