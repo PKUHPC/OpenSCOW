@@ -10,59 +10,35 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, Entity, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
+import { Collection, EntitySchema } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { ModalVersion } from "./ModalVersion";
 
-
-@Entity()
 export class Modal {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    name: string;
-
-  @Property()
-    owner: string;
-
-  @Property({ comment: "algorithm algorithmFramework", nullable: true })
-    algorithmFramework?: string;
-
-  @Property({ comment: "algorithm name", nullable: true })
-    algorithmName?: string;
-
-  @OneToMany(() => "ModalVersion", (modalVersion: ModalVersion) => modalVersion.modal)
-    versions = new Collection<ModalVersion>(this);
-
-  @Property()
-    isShared: boolean;
-
-  @Property({ nullable: true })
-    description?: string;
-
-  @Property()
-    clusterId: string;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
+  id!: number;
+  name: string;
+  owner: string;
+  algorithmFramework?: string;
+  algorithmName?: string;
+  versions = new Collection<ModalVersion>(this);
+  isShared: boolean;
+  description?: string;
+  clusterId: string;
+  createTime?: Date;
+  updateTime?: Date;
 
   constructor(init: {
-      name: string;
-      owner: string;
-      algorithmFramework?: string;
-      algorithmName?: string;
-      isShared: boolean;
-      description?: string;
-      clusterId: string;
-      createTime?: Date;
-      updateTime?: Date;
-    }) {
-
+    name: string;
+    owner: string;
+    algorithmFramework?: string;
+    algorithmName?: string;
+    isShared: boolean;
+    description?: string;
+    clusterId: string;
+    createTime?: Date;
+    updateTime?: Date;
+  }) {
     this.name = init.name;
     this.owner = init.owner;
     this.algorithmFramework = init.algorithmFramework;
@@ -78,6 +54,33 @@ export class Modal {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
-  }
 
+  }
 }
+
+export const modalEntitySchema = new EntitySchema({
+  class: Modal,
+});
+
+modalEntitySchema.addPrimaryKey("id", Number);
+modalEntitySchema.addProperty("name", String);
+modalEntitySchema.addProperty("owner", String);
+
+modalEntitySchema.addProperty("algorithmFramework", String, {
+  comment: "algorithm algorithmFramework", nullable: true });
+
+modalEntitySchema.addProperty("algorithmName", String, {
+  comment: "algorithm name", nullable: true });
+
+modalEntitySchema.addOneToMany("versions", "ModalVersion", {
+  entity: () => "ModalVersion", mappedBy: (mv) => mv.modal });
+
+modalEntitySchema.addProperty("isShared", Boolean);
+modalEntitySchema.addProperty("description", String, { nullable: true });
+modalEntitySchema.addProperty("clusterId", String);
+
+modalEntitySchema.addProperty("createTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+
+modalEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });

@@ -32,12 +32,19 @@
         },
         "framework": {
           "name": "framework",
-          "type": "varchar(255)",
+          "type": "enum('TENSORFLOW','PYTORCH','KERAS','MINDSPORE','OTHER')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "enumItems": [
+            "TENSORFLOW",
+            "PYTORCH",
+            "KERAS",
+            "MINDSPORE",
+            "OTHER"
+          ],
+          "mappedType": "enum"
         },
         "is_shared": {
           "name": "is_shared",
@@ -498,12 +505,16 @@
         },
         "source": {
           "name": "source",
-          "type": "varchar(255)",
+          "type": "enum('INTERNAL','EXTERNAL')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "enumItems": [
+            "INTERNAL",
+            "EXTERNAL"
+          ],
+          "mappedType": "enum"
         },
         "tags": {
           "name": "tags",
@@ -529,7 +540,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "string"
         },
         "source_path": {

@@ -10,57 +10,41 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { EntitySchema, type Ref, ReferenceType } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Dataset } from "./Dataset";
 
-@Entity()
 export class DatasetVersion {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    versionName: string;
-
-  @Property({ nullable: true })
-    versionDescription: string | undefined;
-
-  @Property()
-    privatePath: string;
+  id!: number;
+  versionName: string;
+  versionDescription?: string;
+  privatePath: string;
 
   // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
-  @Property()
-    path: string;
+  path: string;
 
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
-
-  @Property()
-    isShared: boolean;
-
-  @ManyToOne(() => "Dataset", { onDelete: "CASCADE", wrappedReference: true })
-    dataset: Ref<Dataset>;
+  createTime?: Date;
+  updateTime?: Date;
+  isShared: boolean;
+  dataset!: Ref<Dataset>;
 
   constructor(init: {
-      versionName: string;
-      versionDescription?: string;
-      path: string;
-      privatePath: string;
-      createTime?: Date;
-      isShared?: boolean;
-      dataset: Dataset;
-      updateTime?: Date;
-    }) {
+    versionName: string;
+    versionDescription?: string;
+    privatePath: string;
+    path: string;
+    createTime?: Date;
+    isShared?: boolean;
+    dataset: Dataset;
+    updateTime?: Date;
+  }) {
 
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
-    this.path = init.path;
     this.privatePath = init.privatePath;
-    this.isShared = init.isShared || false;
+    this.path = init.path;
+    this.isShared = init.isShared ?? false;
     this.dataset = toRef(init.dataset);
 
     if (init.createTime) {
@@ -70,5 +54,23 @@ export class DatasetVersion {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
+
   }
 }
+
+export const datasetVersionEntitySchema = new EntitySchema({
+  class: DatasetVersion,
+});
+
+datasetVersionEntitySchema.addPrimaryKey("id", Number);
+datasetVersionEntitySchema.addProperty("versionName", String);
+datasetVersionEntitySchema.addProperty("versionDescription", String, { nullable: true });
+datasetVersionEntitySchema.addProperty("privatePath", String);
+datasetVersionEntitySchema.addProperty("path", String);
+datasetVersionEntitySchema.addProperty("createTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+datasetVersionEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
+datasetVersionEntitySchema.addProperty("isShared", Boolean);
+datasetVersionEntitySchema.addManyToOne("dataset", "Dataset", {
+  entity: () => Dataset, onDelete: "CASCADE", wrappedReference: true });

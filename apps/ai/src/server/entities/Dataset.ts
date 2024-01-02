@@ -10,46 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, Entity, OneToMany, PrimaryKey, Property } from "@mikro-orm/core";
+import { Collection, EntitySchema } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { DatasetVersion } from "./DatasetVersion";
 
-
-@Entity()
 export class Dataset {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    name: string;
-
-  @Property()
-    owner: string;
-
-  @Property()
-    type: string;
-
-  @OneToMany(() => "DatasetVersion", (datasetVersion: DatasetVersion) => datasetVersion.dataset)
-    versions = new Collection<DatasetVersion>(this);
-
-  @Property()
-    isShared: boolean;
-
-  @Property()
-    scene: string;
-
-  @Property({ nullable: true })
-    description?: string;
-
-  @Property()
-    clusterId: string;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
+  id!: number;
+  name: string;
+  owner: string;
+  type: string;
+  versions = new Collection<DatasetVersion>(this);
+  isShared: boolean;
+  scene: string;
+  description?: string;
+  clusterId: string;
+  createTime?: Date;
+  updateTime?: Date;
 
   constructor(init: {
     name: string;
@@ -66,7 +43,7 @@ export class Dataset {
     this.name = init.name;
     this.owner = init.owner;
     this.type = init.type;
-    this.isShared = init.isShared || false;
+    this.isShared = init.isShared ?? false;
     this.scene = init.scene;
     this.description = init.description;
     this.clusterId = init.clusterId;
@@ -78,7 +55,24 @@ export class Dataset {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
-  }
 
+  }
 }
 
+export const datasetEntitySchema = new EntitySchema({
+  class: Dataset,
+});
+
+datasetEntitySchema.addPrimaryKey("id", Number);
+datasetEntitySchema.addProperty("name", String);
+datasetEntitySchema.addProperty("owner", String);
+datasetEntitySchema.addProperty("type", String);
+datasetEntitySchema.addOneToMany("versions", "DatasetVersion", {
+  entity: () => "DatasetVersion", mappedBy: (dv) => dv.dataset });
+datasetEntitySchema.addProperty("isShared", Boolean);
+datasetEntitySchema.addProperty("scene", String);
+datasetEntitySchema.addProperty("description", String, { nullable: true });
+datasetEntitySchema.addProperty("clusterId", String);
+datasetEntitySchema.addProperty("createTime", Date, { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+datasetEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { EntitySchema } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 export enum Source {
@@ -18,60 +18,38 @@ export enum Source {
   EXTERNAL = "EXTERNAL",
 };
 
-@Entity()
 export class Image {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    name: string;
-
-  @Property()
-    owner: string;
-
-  @Property()
-    source: Source;
-
-  @Property()
-    tags: string;
-
-  @Property({ nullable: true })
-    description?: string;
-
-  @Property()
-    clusterId: string;
+  id!: number;
+  name: string;
+  owner: string;
+  source: Source;
+  tags: string;
+  description?: string;
+  clusterId?: string;
 
   // 这里是上传镜像时的源文件path
-  @Property()
-    sourcePath: string;
+  sourcePath: string;
 
   // 这里是提交作业时可以使用的真实镜像path，每次上传镜像一定对应一个真实的镜像path
-  @Property()
-    path: string;
+  path: string;
 
-  @Property()
-    isShared: boolean;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
+  isShared: boolean;
+  createTime?: Date;
+  updateTime?: Date;
 
   constructor(init: {
-      name: string;
-      owner: string;
-      source: Source;
-      tags: string;
-      description?: string;
-      path: string;
-      sourcePath: string;
-      isShared?: boolean;
-      clusterId: string;
-      createTime?: Date;
-      updateTime?: Date;
-    }) {
-
+    name: string;
+    owner: string;
+    source: Source;
+    tags: string;
+    description?: string;
+    path: string;
+    sourcePath: string;
+    isShared?: boolean;
+    clusterId?: string;
+    createTime?: Date;
+    updateTime?: Date;
+  }) {
     this.name = init.name;
     this.owner = init.owner;
     this.source = init.source;
@@ -79,7 +57,7 @@ export class Image {
     this.description = init.description;
     this.path = init.path;
     this.sourcePath = init.sourcePath;
-    this.isShared = init.isShared || false;
+    this.isShared = init.isShared ?? false;
     this.clusterId = init.clusterId;
 
     if (init.createTime) {
@@ -89,5 +67,24 @@ export class Image {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
+
   }
 }
+
+export const imageEntitySchema = new EntitySchema({
+  class: Image,
+});
+
+imageEntitySchema.addPrimaryKey("id", Number);
+imageEntitySchema.addProperty("name", String);
+imageEntitySchema.addProperty("owner", String);
+imageEntitySchema.addEnum("source", String, { items: () => Source });
+imageEntitySchema.addProperty("tags", String);
+imageEntitySchema.addProperty("description", String, { nullable: true });
+imageEntitySchema.addProperty("clusterId", String, { nullable: true });
+imageEntitySchema.addProperty("sourcePath", String);
+imageEntitySchema.addProperty("path", String);
+imageEntitySchema.addProperty("isShared", Boolean);
+imageEntitySchema.addProperty("createTime", Date, { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+imageEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });

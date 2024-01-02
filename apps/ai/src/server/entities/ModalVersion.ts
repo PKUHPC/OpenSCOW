@@ -10,56 +10,37 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { EntitySchema, type Ref, ReferenceType } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Modal } from "./Modal";
 
-@Entity()
 export class ModalVersion {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    versionName: string;
-
-  @Property({ nullable: true })
-    versionDescription?: string;
-
-  @Property({ nullable: true })
-    algorithmVersion?: string;
-
-  @Property()
-    privatePath: string;
+  id!: number;
+  versionName: string;
+  versionDescription?: string;
+  algorithmVersion?: string;
+  privatePath: string;
 
   // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
-  @Property()
-    path: string;
+  path: string;
 
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
-
-  @Property()
-    isShared: boolean;
-
-  @ManyToOne(() => "Modal")
-    modal: Ref<Modal>;
+  createTime?: Date;
+  updateTime?: Date;
+  isShared: boolean;
+  modal!: Ref<Modal>;
 
   constructor(init: {
-      versionName: string;
-      versionDescription?: string;
-      algorithmVersion?: string;
-      path: string;
-      privatePath: string;
-      isShared: boolean;
-      modal: Modal;
-      createTime?: Date;
-      updateTime?: Date;
-    }) {
-
+    versionName: string;
+    versionDescription?: string;
+    algorithmVersion?: string;
+    path: string;
+    privatePath: string;
+    isShared: boolean;
+    modal: Modal;
+    createTime?: Date;
+    updateTime?: Date;
+  }) {
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
     this.algorithmVersion = init.algorithmVersion;
@@ -75,5 +56,25 @@ export class ModalVersion {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
+
   }
 }
+
+export const modalVersionEntitySchema = new EntitySchema({
+  class: ModalVersion,
+});
+
+modalVersionEntitySchema.addPrimaryKey("id", Number);
+modalVersionEntitySchema.addProperty("versionName", String);
+modalVersionEntitySchema.addProperty("versionDescription", String, { nullable: true });
+modalVersionEntitySchema.addProperty("algorithmVersion", String, { nullable: true });
+modalVersionEntitySchema.addProperty("privatePath", String);
+modalVersionEntitySchema.addProperty("path", String);
+
+modalVersionEntitySchema.addProperty("createTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+
+modalVersionEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
+modalVersionEntitySchema.addProperty("isShared", Boolean);
+modalVersionEntitySchema.addManyToOne("modal", "Modal", { entity: () => Modal });

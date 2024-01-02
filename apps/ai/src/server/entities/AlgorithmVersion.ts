@@ -10,57 +10,41 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property, type Ref } from "@mikro-orm/core";
+import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Algorithm } from "./Algorithm";
 
-@Entity()
 export class AlgorithmVersion {
-  @PrimaryKey()
-    id!: number;
-
-  @Property()
-    versionName: string;
-
-  @Property({ nullable: true })
-    versionDescription?: string;
-
-  @Property()
-    privatePath: string;
+  id!: number;
+  versionName: string;
+  versionDescription?: string;
+  privatePath: string;
 
   // 这里是提交作业时可以使用的path，当没有被分享时，path=privatePath
-  @Property()
-    path: string;
+  path: string;
 
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime?: Date;
-
-  @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() })
-    updateTime?: Date;
-
-  @Property()
-    isShared: boolean;
-
-  @ManyToOne(() => "Algorithm")
-    algorithm: Ref<Algorithm>;
+  createTime?: Date;
+  updateTime?: Date;
+  isShared: boolean;
+  algorithm!: Ref<Algorithm>;
 
   constructor(init: {
-      versionName: string;
-      versionDescription?: string;
-      path: string;
-      privatePath: string;
-      isShared?: boolean;
-      algorithm: Algorithm;
-      createTime?: Date;
-      updateTime?: Date;
-    }) {
+    versionName: string;
+    versionDescription?: string;
+    privatePath: string;
+    path: string;
+    isShared?: boolean;
+    algorithm: Algorithm;
+    createTime?: Date;
+    updateTime?: Date;
+  }) {
 
     this.versionName = init.versionName;
     this.versionDescription = init.versionDescription;
-    this.path = init.path;
     this.privatePath = init.privatePath;
-    this.isShared = init.isShared || false;
+    this.path = init.path;
+    this.isShared = init.isShared ?? false;
     this.algorithm = toRef(init.algorithm);
 
     if (init.createTime) {
@@ -70,5 +54,23 @@ export class AlgorithmVersion {
     if (init.updateTime) {
       this.updateTime = init.updateTime;
     }
+
   }
+
 }
+
+export const algorithmVersionEntitySchema = new EntitySchema({
+  class: AlgorithmVersion,
+});
+
+algorithmVersionEntitySchema.addPrimaryKey("id", Number);
+algorithmVersionEntitySchema.addProperty("versionName", String);
+algorithmVersionEntitySchema.addProperty("versionDescription", String, { nullable: true });
+algorithmVersionEntitySchema.addProperty("privatePath", String);
+algorithmVersionEntitySchema.addProperty("path", String);
+algorithmVersionEntitySchema.addProperty("createTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
+algorithmVersionEntitySchema.addProperty("updateTime", Date, {
+  columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
+algorithmVersionEntitySchema.addProperty("isShared", Boolean);
+algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", { entity: () => Algorithm });

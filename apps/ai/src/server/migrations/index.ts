@@ -10,21 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20231221073202 } from "src/server/migrations/Migration20231221073202";
-import { Migration20231221083225 } from "src/server/migrations/Migration20231221083225";
-import { Migration20231223072956 } from "./Migration20231223072956";
-import { Migration20231225062131 } from "./Migration20231225062131";
-import { Migration20231225081243 } from "./Migration20231225081243";
-import { Migration20231226031805 } from "./Migration20231226031805";
-import { Migration20231229033421 } from "./Migration20231229033421";
+import { Migration20240102071402 } from "src/server/migrations/Migration20240102071402";
 
 export const migrations =
 [
-  Migration20231221073202,
-  Migration20231221083225,
-  Migration20231223072956,
-  Migration20231225062131,
-  Migration20231225081243,
-  Migration20231226031805,
-  Migration20231229033421
+  Migration20240102071402
 ].map((x) => ({ name: x.name, class: x }));
