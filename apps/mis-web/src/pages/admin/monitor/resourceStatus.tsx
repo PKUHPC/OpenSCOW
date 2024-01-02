@@ -52,9 +52,9 @@ export const ResourceStatusPage: NextPage = requireAuth(
   const t = useI18nTranslateToString();
 
   const normalGrafanaUrl = joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL,
-    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}/job-scheduler?orgId=1`);
+    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}`);
   const proxyGrafanaUrl = path.join(publicConfig.BASE_PATH, "/api/admin/monitor/getResourceStatus",
-    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}/job-scheduler?orgId=1`);
+    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}`);
 
   return (
     <>
