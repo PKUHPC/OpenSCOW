@@ -181,13 +181,18 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     setVisible(false);
     setPath("~");
     setSelectedKeys([]);
+    setSelectedFileInfo(undefined);
     setExpandedKeys([]);
     setDirTree([]);
   };
 
   const onOkClick = () => {
-    if (!selectedFileInfo || !checkFileSelectability(selectedFileInfo)) {
-      message.info("不能选择文件，请选择文件夹");
+    if (!selectedFileInfo) {
+      message.info("请选择文件或文件夹");
+      return;
+    }
+    if (!checkFileSelectability(selectedFileInfo)) {
+      message.info("当前文件或文件夹不可选取");
       return;
     }
     if (selectedKeys.length > 0) {
@@ -202,6 +207,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     e.stopPropagation();
     setPath(formatPath(clickPath));
     setSelectedKeys([]);
+    setSelectedFileInfo(undefined);
   };
 
   const checkFileSelectability = (fileInfo: FileInfo) => {
@@ -320,10 +326,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                 rowSelection={{
                   type: "radio",
                   selectedRowKeys: selectedKeys,
-                  onChange: setSelectedKeys,
-                  // getCheckboxProps: (r) => ({
-                  //   disabled: !checkFileSelectability(r),
-                  // }),
+                  onChange: (key, record) => {
+                    setSelectedKeys(key);
+                    setSelectedFileInfo(record[0]);
+                  },
                 }}
                 scroll={{ x: true, y: 500 }}
               />
