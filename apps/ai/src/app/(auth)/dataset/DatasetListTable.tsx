@@ -306,7 +306,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       />
       <DatasetVersionsModal
         open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); }}
+        onClose={() => { setVersionListModalIsOpen(false); setDatasetId(0); }}
         isPublic={isPublic}
         datasetName={datasetName}
         cluster={getCurrentCluster(clusterId)}

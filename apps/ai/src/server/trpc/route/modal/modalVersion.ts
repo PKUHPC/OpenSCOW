@@ -196,13 +196,13 @@ export const deleteModalVersion = procedure
         sharedPath: modalVersion.path,
         user,
       });
+
+      modal.isShared = modal.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
+        ? true : false;
+      orm.em.persist(modal);
     }
 
-    modal.isShared = modal.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
-      ? true : false;
-
     orm.em.remove(modalVersion);
-    orm.em.persist(modal);
     await orm.em.flush();
     return { success: true };
   });

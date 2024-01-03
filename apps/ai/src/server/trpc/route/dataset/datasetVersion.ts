@@ -12,6 +12,7 @@
 
 import { TRPCError } from "@trpc/server";
 import path from "path";
+import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -48,7 +49,7 @@ import { FileType } from "../file";
 export const VersionListSchema = z.object({
   id: z.number(),
   versionName: z.string(),
-  isShared: z.boolean(),
+  sharedStatus: z.nativeEnum(SharedStatus),
   versionDescription: z.string().optional(),
   path: z.string(),
   privatePath: z.string(),
@@ -76,7 +77,10 @@ export const versionList = procedure
     const orm = await getORM();
 
     const [items, count] = await orm.em.findAndCount(DatasetVersion,
-      { dataset: input.datasetId, isShared: input.isShared || { $ne: null } },
+      {
+        dataset: input.datasetId,
+        ...input.isShared ? { sharedStatus:SharedStatus.SHARED } : {},
+      },
       {
         limit: input.pageSize || undefined,
         offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
@@ -90,7 +94,7 @@ export const versionList = procedure
         versionDescription: x.versionDescription,
         privatePath: x.privatePath,
         path: x.path,
-        isShared: Boolean(x.isShared),
+        sharedStatus: x.sharedStatus,
         createTime: x.createTime ? x.createTime.toISOString() : "",
         datasetId: x.dataset.id,
       }; }), count };
@@ -206,7 +210,7 @@ export const deleteDatasetVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId },
-      { populate: ["versions", "versions.isShared"]});
+      { populate: ["versions", "versions.sharedStatus"]});
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
@@ -214,7 +218,7 @@ export const deleteDatasetVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     // 如果是已分享的数据集版本，则删除分享
-    if (datasetVersion.isShared) {
+    if (datasetVersion.sharedStatus === SharedStatus.SHARED) {
       await checkSharePermission({
         clusterId: dataset.clusterId,
         checkedSourcePath: datasetVersion.privatePath,
@@ -226,12 +230,15 @@ export const deleteDatasetVersion = procedure
         sharedPath: datasetVersion.path,
         user,
       });
+
+      dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
+        ? true : false;
+      orm.em.persist(dataset);
     }
 
-    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 0 ? true : false;
+
 
     orm.em.remove(datasetVersion);
-    orm.em.persist(dataset);
     await orm.em.flush();
     return { success: true };
   });
@@ -258,7 +265,7 @@ export const shareDatasetVersion = procedure
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
-    if (datasetVersion.isShared)
+    if (datasetVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already shared" });
 
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
@@ -268,30 +275,41 @@ export const shareDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    // 定义分享后目标存储的绝对路径
-    const targetName = `${dataset.name}-${user!.identityId}`;
-    const targetSubName = `${datasetVersion.versionName}`;
-    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.DATASET, targetName, targetSubName);
-
     await checkSharePermission({
       clusterId: dataset.clusterId,
       checkedSourcePath: datasetVersion.privatePath,
       user,
     });
 
-    await shareFileOrDir({
+    // 定义分享后目标存储的绝对路径
+    const targetName = `${dataset.name}-${user!.identityId}`;
+    const targetSubName = `${datasetVersion.versionName}`;
+    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.DATASET, targetName, targetSubName);
+
+    datasetVersion.sharedStatus = SharedStatus.SHARING;
+    orm.em.persist([datasetVersion]);
+    await orm.em.flush();
+
+    const successCallback = async () => {
+      datasetVersion.sharedStatus = SharedStatus.SHARED;
+      datasetVersion.path = targetPath;
+      if (!dataset.isShared) { dataset.isShared = true; };
+      await orm.em.persistAndFlush([datasetVersion, dataset]);
+    };
+
+    const failureCallback = async () => {
+      datasetVersion.sharedStatus = SharedStatus.UNSHARED;
+      await orm.em.persistAndFlush([datasetVersion]);
+    };
+
+    shareFileOrDir({
       clusterId: dataset.clusterId,
       sourceFilePath: input.sourceFilePath,
       user,
       sharedTarget: SHARED_TARGET.DATASET,
       targetName,
       targetSubName,
-      // input.fileType,
-    });
-
-    datasetVersion.isShared = true;
-    datasetVersion.path = targetPath;
-    if (!dataset.isShared) { dataset.isShared = true; };
+    }, successCallback, failureCallback);
 
     await orm.em.flush();
     return { success: true };
@@ -317,11 +335,11 @@ export const unShareDatasetVersion = procedure
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
 
-    if (!datasetVersion.isShared)
+    if (datasetVersion.sharedStatus === SharedStatus.UNSHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already unShared" });
 
     const dataset = await orm.em.findOne(Dataset, { id: input.datasetId }, {
-      populate: ["versions", "versions.isShared"],
+      populate: ["versions", "versions.sharedStatus"],
     });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
@@ -335,16 +353,30 @@ export const unShareDatasetVersion = procedure
       user,
       checkedTargetPath: datasetVersion.path,
     });
-    await unShareFileOrDir({
+
+    datasetVersion.sharedStatus = SharedStatus.UNSHARING;
+    orm.em.persist([datasetVersion]);
+    await orm.em.flush();
+
+    const successCallback = async () => {
+      datasetVersion.sharedStatus = SharedStatus.UNSHARED;
+      datasetVersion.path = datasetVersion.privatePath;
+      dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
+        ? true : false;
+      await orm.em.persistAndFlush([datasetVersion, dataset]);
+    };
+
+    const failureCallback = async () => {
+      datasetVersion.sharedStatus = SharedStatus.SHARED;
+      await orm.em.persistAndFlush([datasetVersion]);
+    };
+
+    unShareFileOrDir({
       clusterId: dataset.clusterId,
-      sharedPath: dataset.versions.filter((v) => (v.isShared)).length > 1 ?
+      sharedPath: dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
         datasetVersion.path : path.dirname(datasetVersion.path),
       user,
-    });
-
-    dataset.isShared = dataset.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
-    datasetVersion.isShared = false;
-    datasetVersion.path = datasetVersion.privatePath;
+    }, successCallback, failureCallback);
 
     await orm.em.flush();
     return { success: true };

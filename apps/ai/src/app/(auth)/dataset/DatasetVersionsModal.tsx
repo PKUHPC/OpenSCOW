@@ -13,10 +13,12 @@
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Checkbox, Divider, Modal, Space, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { SharedStatus } from "src/models/common";
 import { DatasetVersionInterface } from "src/models/Dateset";
 import { AppRouter } from "src/server/trpc/router";
+import { getSharedStatusText } from "src/utils/common";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -44,6 +46,10 @@ export const DatasetVersionsModal: React.FC<Props> = (
   const router = useRouter();
 
   const shareMutation = trpc.dataset.shareDatasetVersion.useMutation({
+    onSuccess() {
+      onRefetch();
+      message.success("分享成功");
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
@@ -55,6 +61,10 @@ export const DatasetVersionsModal: React.FC<Props> = (
   });
 
   const unShareMutation = trpc.dataset.unShareDatasetVersion.useMutation({
+    onSuccess() {
+      onRefetch();
+      message.success("取消分享成功");
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
@@ -139,51 +149,30 @@ export const DatasetVersionsModal: React.FC<Props> = (
                       查看文件
                     </Button>
                   </Space>
-
                   <Space split={<Divider type="vertical" />}>
-
                     <Button
                       type="link"
+                      disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
                         modal.confirm({
                           title: "分享数据集版本",
-                          content: `确认${r.isShared ? "取消分享" : "分享"}数据集版本 ${r.versionName}?`,
+                          content: `确认${getSharedStatusText(r.sharedStatus)}数据集版本 ${r.versionName}?`,
                           onOk: async () => {
-                            await new Promise<void>((resolve) => {
-                              r.isShared ?
-                                unShareMutation.mutate({
-                                  id: r.id,
-                                  datasetId: r.datasetId,
-                                }, {
-                                  onSuccess() {
-                                    onRefetch();
-                                    resolve();
-                                    message.success("取消分享成功");
-                                  },
-                                  onError() {
-                                    resolve();
-                                  },
-                                }) :
-                                shareMutation.mutate({
-                                  id: r.id,
-                                  datasetId: r.datasetId,
-                                  sourceFilePath: r.path,
-                                }, {
-                                  onSuccess() {
-                                    onRefetch();
-                                    resolve();
-                                    message.success("分享成功");
-                                  },
-                                  onError() {
-                                    resolve();
-                                  },
-                                });
-                            });
-
+                            r.sharedStatus === SharedStatus.SHARED ?
+                              await unShareMutation.mutateAsync({
+                                id: r.id,
+                                datasetId: r.datasetId,
+                              })
+                              :
+                              await shareMutation.mutateAsync({
+                                id: r.id,
+                                datasetId: r.datasetId,
+                                sourceFilePath: r.path,
+                              });
                           },
                         });
                       }}
-                    >{r.isShared ? "取消分享" : "分享"}</Button>
+                    >{getSharedStatusText(r.sharedStatus)}</Button>
                   </Space>
 
                   <Space split={<Divider type="vertical" />}>

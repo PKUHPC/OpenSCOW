@@ -12,6 +12,7 @@
 
 import { TRPCError } from "@trpc/server";
 import path from "path";
+import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -103,7 +104,7 @@ export const list = procedure
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
-      populate: ["versions", "versions.isShared", "versions.privatePath"],
+      populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -118,7 +119,8 @@ export const list = procedure
         description: x.description,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : "",
-        versions: input.isShared ? x.versions.filter((x) => x.isShared).map((y) => y.privatePath) :
+        versions: input.isShared ?
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path) :
           x.versions.map((y) => y.privatePath),
       }; }), count };
   });
@@ -232,7 +234,7 @@ export const deleteDataset = procedure
     const datasetVersions = await orm.em.find(DatasetVersion, { dataset });
 
     try {
-      const sharedVersions = datasetVersions.filter((v) => v.isShared);
+      const sharedVersions = datasetVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
       // 删除所有已分享的版本
       let sharedDatasetPath: string = "";

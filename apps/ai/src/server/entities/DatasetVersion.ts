@@ -10,9 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { EntitySchema, type Ref, ReferenceType } from "@mikro-orm/core";
+import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
+import { SharedStatus } from "./AlgorithmVersion";
 import { Dataset } from "./Dataset";
 
 export class DatasetVersion {
@@ -26,7 +27,7 @@ export class DatasetVersion {
 
   createTime?: Date;
   updateTime?: Date;
-  isShared: boolean;
+  sharedStatus: SharedStatus;
   dataset!: Ref<Dataset>;
 
   constructor(init: {
@@ -35,7 +36,7 @@ export class DatasetVersion {
     privatePath: string;
     path: string;
     createTime?: Date;
-    isShared?: boolean;
+    sharedStatus?: SharedStatus;
     dataset: Dataset;
     updateTime?: Date;
   }) {
@@ -44,7 +45,7 @@ export class DatasetVersion {
     this.versionDescription = init.versionDescription;
     this.privatePath = init.privatePath;
     this.path = init.path;
-    this.isShared = init.isShared ?? false;
+    this.sharedStatus = init.sharedStatus || SharedStatus.UNSHARED;
     this.dataset = toRef(init.dataset);
 
     if (init.createTime) {
@@ -71,6 +72,6 @@ datasetVersionEntitySchema.addProperty("createTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
 datasetVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
-datasetVersionEntitySchema.addProperty("isShared", Boolean);
+datasetVersionEntitySchema.addProperty("sharedStatus", String);
 datasetVersionEntitySchema.addManyToOne("dataset", "Dataset", {
   entity: () => Dataset, onDelete: "CASCADE", wrappedReference: true });

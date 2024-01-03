@@ -202,13 +202,13 @@ export const deleteAlgorithmVersion = procedure
         sharedPath: algorithmVersion.path,
         user,
       });
+
+      algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
+        ? true : false;
+      await orm.em.flush();
     }
 
-    algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
-      ? true : false;
-
     orm.em.remove(algorithmVersion);
-    orm.em.persist(algorithm);
     await orm.em.flush();
     return;
   });

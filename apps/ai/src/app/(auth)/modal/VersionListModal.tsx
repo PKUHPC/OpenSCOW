@@ -122,7 +122,7 @@ export const VersionListModal: React.FC<Props> = (
         },
       });
     },
-    [modalId, deleteSourceFileRef],
+    [modalId],
   );
 
   return (
