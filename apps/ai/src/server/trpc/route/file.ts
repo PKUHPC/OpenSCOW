@@ -334,6 +334,57 @@ export const file = router({
 
     }),
 
+  decompression: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/file/unzip",
+        tags: ["file"],
+        summary: "解压文件",
+      },
+    })
+    .input(z.object({ clusterId: z.string(), filePath: z.string(), decompressionPath: z.string() }))
+    .output(z.void())
+    .mutation(async ({ input: { clusterId, filePath, decompressionPath }, ctx: { user } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      const getDecompressionCommand = () => {
+        if (filePath.endsWith(".tar")) {
+          return `tar -xf ${filePath} -C ${decompressionPath}`;
+        } else if (filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz")) {
+          return `tar -xzf ${filePath} -C ${decompressionPath}`;
+        } else if (filePath.endsWith(".zip")) {
+          // TODO: 解压文件中文乱码，暂时指定为 gbk 编码
+          return `unzip -O gbk ${filePath} -d ${decompressionPath}`;
+        } else {
+          throw new TRPCError({ code: "BAD_REQUEST", message: `${filePath} is an unknown file type` });
+        }
+      };
+
+      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+        const sftp = await ssh.requestSFTP();
+
+        const stat = await sftpStat(sftp)(filePath).catch((e) => {
+          logger.error(e, "stat %s as %s failed", filePath, user.identityId);
+          throw new TRPCError({ code: "FORBIDDEN", message: `${filePath} is not accessible` });
+        });
+
+        if (stat.isDirectory()) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: `${filePath} is a directory` });
+        }
+
+        const decompressionCommand = getDecompressionCommand();
+
+        const result = await ssh.execCommand(decompressionCommand);
+        if (result.code !== 0) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR",
+            message: `Failed to execute decompression command: ${result.stderr}` });
+        }
+      });
+    }),
+
 });
 
 const textFiles = ["application/x-sh"];

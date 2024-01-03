@@ -13,6 +13,7 @@
 import { EntitySchema, type Ref, ReferenceType } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
+import { SharedStatus } from "./AlgorithmVersion";
 import { Modal } from "./Modal";
 
 export class ModalVersion {
@@ -27,7 +28,7 @@ export class ModalVersion {
 
   createTime?: Date;
   updateTime?: Date;
-  isShared: boolean;
+  sharedStatus: SharedStatus;
   modal!: Ref<Modal>;
 
   constructor(init: {
@@ -36,7 +37,7 @@ export class ModalVersion {
     algorithmVersion?: string;
     path: string;
     privatePath: string;
-    isShared: boolean;
+    sharedStatus?: SharedStatus;
     modal: Modal;
     createTime?: Date;
     updateTime?: Date;
@@ -46,7 +47,7 @@ export class ModalVersion {
     this.algorithmVersion = init.algorithmVersion;
     this.path = init.path;
     this.privatePath = init.privatePath;
-    this.isShared = init.isShared;
+    this.sharedStatus = init.sharedStatus || SharedStatus.UNSHARED;
     this.modal = toRef(init.modal);
 
     if (init.createTime) {
@@ -76,5 +77,5 @@ modalVersionEntitySchema.addProperty("createTime", Date, {
 
 modalVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
-modalVersionEntitySchema.addProperty("isShared", Boolean);
+modalVersionEntitySchema.addProperty("sharedStatus", String);
 modalVersionEntitySchema.addManyToOne("modal", "Modal", { entity: () => Modal });

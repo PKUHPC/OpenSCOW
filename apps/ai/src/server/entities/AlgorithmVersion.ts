@@ -14,7 +14,7 @@ import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Algorithm } from "./Algorithm";
-export enum ShareStatus {
+export enum SharedStatus {
   UNSHARED = "UNSHARED",
   SHARED = "SHARED",
   SHARING = "SHARING",
@@ -32,7 +32,7 @@ export class AlgorithmVersion {
 
   createTime?: Date;
   updateTime?: Date;
-  sharedStatus: ShareStatus;
+  sharedStatus: SharedStatus;
   algorithm!: Ref<Algorithm>;
 
   constructor(init: {
@@ -40,7 +40,7 @@ export class AlgorithmVersion {
     versionDescription?: string;
     privatePath: string;
     path: string;
-    sharedStatus?: ShareStatus;
+    sharedStatus?: SharedStatus;
     algorithm: Algorithm;
     createTime?: Date;
     updateTime?: Date;
@@ -50,7 +50,7 @@ export class AlgorithmVersion {
     this.versionDescription = init.versionDescription;
     this.privatePath = init.privatePath;
     this.path = init.path;
-    this.sharedStatus = init.sharedStatus ?? ShareStatus.UNSHARED;
+    this.sharedStatus = init.sharedStatus ?? SharedStatus.UNSHARED;
     this.algorithm = toRef(init.algorithm);
 
     if (init.createTime) {

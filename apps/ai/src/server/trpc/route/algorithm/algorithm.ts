@@ -13,7 +13,7 @@
 import { TRPCError } from "@trpc/server";
 import path from "path";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
-import { AlgorithmVersion, ShareStatus } from "src/server/entities/AlgorithmVersion";
+import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
 import { getORM } from "src/server/utils/getOrm";
@@ -86,7 +86,8 @@ export const getAlgorithms = procedure
         description:x.description ?? "",
         clusterId:x.clusterId,
         createTime:x.createTime ? x.createTime.toISOString() : "",
-        versions: isPublic ? x.versions.filter((x) => (x.sharedStatus === ShareStatus.SHARED)).map((y) => y.privatePath)
+        versions: isPublic ?
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path)
           : x.versions.map((y) => y.privatePath),
       }; }), count };
 
@@ -169,7 +170,7 @@ export const deleteAlgorithm = procedure
 
     const algorithmVersions = await em.find(AlgorithmVersion, { algorithm });
 
-    const sharedVersions = algorithmVersions.filter((v) => (v.sharedStatus === ShareStatus.SHARED));
+    const sharedVersions = algorithmVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
     // 删除所有已分享的版本
     let sharedDatasetPath: string = "";

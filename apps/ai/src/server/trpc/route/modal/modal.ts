@@ -12,10 +12,13 @@
 
 // import { Framework } from "src/models/Algorithm";
 import { TRPCError } from "@trpc/server";
+import path from "path";
+import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { checkSharePermission, unShareFileOrDir } from "src/server/utils/share";
 import { z } from "zod";
 
 export const ModalListSchema = z.object({
@@ -25,7 +28,7 @@ export const ModalListSchema = z.object({
   algorithmName: z.string().optional(),
   algorithmFramework: z.string().optional(),
   isShared: z.boolean(),
-  versionsCount: z.number(),
+  versions: z.array(z.string()),
   owner: z.string(),
   clusterId: z.string(),
   createTime: z.string(),
@@ -53,7 +56,6 @@ export const list = procedure
 
     const isPublicQuery = input.isShared ? {
       isShared: true,
-      owner: { $ne: null },
     } : { owner: user?.identityId };
 
     const nameOrDescQuery = input.nameOrDesc ? {
@@ -74,7 +76,7 @@ export const list = procedure
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
-      populate: ["versions"],
+      populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -86,7 +88,9 @@ export const list = procedure
         algorithmName: x.algorithmName,
         algorithmFramework: x.algorithmFramework,
         isShared: Boolean(x.isShared),
-        versionsCount: x.versions.count(),
+        versions: input.isShared ?
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path)
+          : x.versions.map((y) => y.privatePath),
         owner: x.owner,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : "",
@@ -201,13 +205,30 @@ export const deleteModal = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
     }
     const modalVersions = await orm.em.find(ModalVersion, { modal });
-    try {
-      await orm.em.removeAndFlush([...modalVersions, modal]);
-      return { success: true };
-    } catch (error) {
-      // rollback
-      console.error("Error deleting dataset:", error);
-      return { success: false };
-    }
+
+    const sharedVersions = modalVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
+
+    // 删除所有已分享的版本
+    let sharedDatasetPath: string = "";
+    await Promise.all(sharedVersions.map(async (v) => {
+      sharedDatasetPath = path.dirname(v.path);
+      await checkSharePermission({
+        clusterId: modal.clusterId,
+        checkedSourcePath: v.privatePath,
+        user,
+        checkedTargetPath: v.path,
+      });
+    }));
+
+    // 删除整个分享的dataset路径
+    await unShareFileOrDir({
+      clusterId: modal.clusterId,
+      sharedPath: sharedDatasetPath,
+      user,
+    });
+
+    await orm.em.removeAndFlush([...modalVersions, modal]);
+
+    return { success: false };
   });
 

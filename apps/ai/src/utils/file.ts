@@ -10,8 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+const decompressibleExtensions = [".zip", ".tar", ".tar.gz", ".tgz"];
+
 export function getExtension(filename: string) {
   const parts = filename.split(".");
   const extension = parts.pop();
   return extension ? extension.toLowerCase() : "";
+}
+
+export function isDecompressibleFile(filename: string) {
+  return decompressibleExtensions.some((extension) => filename.endsWith(extension));
 }

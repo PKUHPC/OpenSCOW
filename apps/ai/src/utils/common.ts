@@ -10,18 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ShareStatus } from "src/models/common";
+import { SharedStatus } from "src/models/common";
 
-export const getShareStatusText = (status: ShareStatus) => {
+export const getSharedStatusText = (status: SharedStatus) => {
   switch (status) {
 
-  case ShareStatus.SHARED:
+  case SharedStatus.SHARED:
     return "取消分享";
 
-  case ShareStatus.UNSHARING:
+  case SharedStatus.UNSHARING:
     return "取消分享中";
 
-  case ShareStatus.SHARING:
+  case SharedStatus.SHARING:
     return "分享中";
 
   default:

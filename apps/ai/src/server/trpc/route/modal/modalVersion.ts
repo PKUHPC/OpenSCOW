@@ -12,6 +12,7 @@
 
 import { TRPCError } from "@trpc/server";
 import path from "path";
+import { SharedStatus } from "src/models/common";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -24,7 +25,7 @@ export const VersionListSchema = z.object({
   id: z.number(),
   modalId: z.number(),
   versionName: z.string(),
-  isShared: z.boolean(),
+  sharedStatus: z.nativeEnum(SharedStatus),
   versionDescription: z.string().optional(),
   algorithmVersion: z.string().optional(),
   path: z.string(),
@@ -52,7 +53,10 @@ export const versionList = procedure
     const orm = await getORM();
 
     const [items, count] = await orm.em.findAndCount(ModalVersion,
-      { modal: { id: input.modalId }, isShared: input.isShared || { $ne: null } },
+      {
+        modal: { id: input.modalId },
+        ...input.isShared ? { sharedStatus:SharedStatus.SHARED } : {},
+      },
       {
         limit: input.pageSize || undefined,
         offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
@@ -68,7 +72,7 @@ export const versionList = procedure
         algorithmVersion:x.algorithmVersion,
         path: x.path,
         privatePath: x.privatePath,
-        isShared: Boolean(x.isShared),
+        sharedStatus: x.sharedStatus,
         createTime: x.createTime ? x.createTime.toISOString() : "",
       }; }), count };
   });
@@ -101,7 +105,7 @@ export const createModalVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
     }
 
-    const modalVersion = new ModalVersion({ ...input, privatePath: input.path, modal: modal, isShared: false });
+    const modalVersion = new ModalVersion({ ...input, privatePath: input.path, modal: modal });
     await orm.em.persistAndFlush(modalVersion);
     return { id: modalVersion.id };
   });
@@ -163,7 +167,14 @@ export const deleteModalVersion = procedure
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modal = await orm.em.findOne(Modal, { id: input.modalId });
+
+    const modalVersion = await orm.em.findOne(ModalVersion, { id: input.id });
+
+    if (!modalVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${input.id} not found` });
+
+    const modal = await orm.em.findOne(Modal, { id: input.modalId },
+      { populate: ["versions", "versions.sharedStatus"]});
     if (!modal) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.modalId} not found` });
     }
@@ -172,12 +183,27 @@ export const deleteModalVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
     }
 
-    const modalVersion = await orm.em.findOne(ModalVersion, { id: input.id });
+    // 如果是已分享的数据集版本，则删除分享
+    if (modalVersion.sharedStatus === SharedStatus.SHARED) {
+      await checkSharePermission({
+        clusterId: modal.clusterId,
+        checkedSourcePath: modalVersion.privatePath,
+        user,
+        checkedTargetPath: modalVersion.path,
+      });
+      await unShareFileOrDir({
+        clusterId: modal.clusterId,
+        sharedPath: modalVersion.path,
+        user,
+      });
 
-    if (!modalVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${input.id} not found` });
+      modal.isShared = modal.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
+        ? true : false;
+      orm.em.persist(modal);
+    }
 
-    await orm.em.removeAndFlush(modalVersion);
+    orm.em.remove(modalVersion);
+    await orm.em.flush();
     return { success: true };
   });
 
@@ -203,7 +229,7 @@ export const shareModalVersion = procedure
     if (!modalVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${modalId} not found` });
 
-    if (modalVersion.isShared)
+    if (modalVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "ModalVersion is already shared" });
 
     const modal = await orm.em.findOne(Modal, { id: modalId });
@@ -224,21 +250,30 @@ export const shareModalVersion = procedure
     const targetSubName = `${modalVersion.versionName}`;
     const targetPath = path.join(SHARED_DIR, SHARED_TARGET.MODAL, targetName, targetSubName);
 
-    modalVersion.isShared = true;
-    modalVersion.path = targetPath;
-    if (!modal.isShared) { modal.isShared = true; };
-
-    orm.em.persist([modal, modalVersion]);
+    modalVersion.sharedStatus = SharedStatus.SHARING;
+    orm.em.persist([modalVersion]);
     await orm.em.flush();
 
-    await shareFileOrDir({
+    const successCallback = async () => {
+      modalVersion.sharedStatus = SharedStatus.SHARED;
+      modalVersion.path = targetPath;
+      if (!modal.isShared) { modal.isShared = true; };
+      await orm.em.persistAndFlush([modalVersion, modal]);
+    };
+
+    const failureCallback = async () => {
+      modalVersion.sharedStatus = SharedStatus.UNSHARED;
+      await orm.em.persistAndFlush([modalVersion]);
+    };
+
+    shareFileOrDir({
       clusterId: modal.clusterId,
       sourceFilePath,
       user,
       sharedTarget: SHARED_TARGET.MODAL,
       targetName,
       targetSubName,
-    });
+    }, successCallback, failureCallback);
 
     return;
   });
@@ -263,11 +298,11 @@ export const unShareModalVersion = procedure
     if (!modalVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${versionId} not found` });
 
-    if (!modalVersion.isShared)
+    if (modalVersion.sharedStatus === SharedStatus.UNSHARED)
       throw new TRPCError({ code: "CONFLICT", message: "ModalVersion is already unShared" });
 
     const modal = await orm.em.findOne(Modal, { id: modalId }, {
-      populate: ["versions", "versions.isShared"],
+      populate: ["versions", "versions.sharedStatus"],
     });
     if (!modal)
       throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${modalId} not found` });
@@ -282,17 +317,29 @@ export const unShareModalVersion = procedure
       checkedTargetPath: modalVersion.path,
     });
 
-    modal.isShared = modal.versions.filter((v) => (v.isShared)).length > 1 ? true : false;
-    modalVersion.isShared = false;
-
-    orm.em.persist([modal, modalVersion]);
+    modalVersion.sharedStatus = SharedStatus.UNSHARING;
+    orm.em.persist([modalVersion]);
     await orm.em.flush();
-    await unShareFileOrDir({
+
+    const successCallback = async () => {
+      modalVersion.sharedStatus = SharedStatus.UNSHARED;
+      modalVersion.path = modalVersion.privatePath;
+      modal.isShared = modal.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
+        ? true : false;
+      await orm.em.persistAndFlush([modalVersion, modal]);
+    };
+
+    const failureCallback = async () => {
+      modalVersion.sharedStatus = SharedStatus.SHARED;
+      await orm.em.persistAndFlush([modalVersion]);
+    };
+
+    unShareFileOrDir({
       clusterId: modal.clusterId,
-      sharedPath: modal.versions.filter((v) => (v.isShared)).length > 1 ?
+      sharedPath: modal.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
         modalVersion.path : path.dirname(modalVersion.path),
       user,
-    });
+    }, successCallback, failureCallback);
 
     return;
   });

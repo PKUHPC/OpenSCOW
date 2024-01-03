@@ -169,7 +169,8 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               refetch={refetch}
               isEdit={false}
               clusters={clusters}
-            > 添加
+            >
+              添加
             </CreateDatasetModalButton>
           </Space>
         )}
@@ -305,7 +306,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       />
       <DatasetVersionsModal
         open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); }}
+        onClose={() => { setVersionListModalIsOpen(false); setDatasetId(0); }}
         isPublic={isPublic}
         datasetName={datasetName}
         cluster={getCurrentCluster(clusterId)}

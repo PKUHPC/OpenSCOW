@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export enum ShareStatus {
+export enum SharedStatus {
   UNSHARED = "UNSHARED",
   SHARED = "SHARED",
   SHARING = "SHARING",
