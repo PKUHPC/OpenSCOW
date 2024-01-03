@@ -15,9 +15,9 @@ import { App, Button, Checkbox, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
-import { ShareStatus } from "src/models/common";
+import { SharedStatus } from "src/models/common";
 import { AppRouter } from "src/server/trpc/router";
-import { getShareStatusText } from "src/utils/common";
+import { getSharedStatusText } from "src/utils/common";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -30,7 +30,7 @@ interface algorithmVersion {
   versionDescription: string;
   path: string;
   privatePath: string;
-  sharedStatus: ShareStatus;
+  sharedStatus: SharedStatus;
   createTime: string;
 }
 
@@ -59,6 +59,10 @@ export const VersionListModal: React.FC<Props> = (
   const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
+    onSuccess() {
+      refetch();
+      message.success("分享成功");
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
@@ -68,7 +72,11 @@ export const VersionListModal: React.FC<Props> = (
   });
 
   const unShareMutation = trpc.algorithm.unShareAlgorithmVersion.useMutation({
-    onError: (err) => {
+    onSuccess() {
+      refetch();
+      message.success("取消分享成功");
+    },
+    onError(err) {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限取消分享此版本");
@@ -170,54 +178,29 @@ export const VersionListModal: React.FC<Props> = (
                     >
                     查看文件
                     </Button>
-
                     <Button
                       type="link"
-                      disabled={r.sharedStatus === ShareStatus.SHARING || r.sharedStatus === ShareStatus.UNSHARING}
+                      disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
                         confirm({
                           title: "分享算法版本",
-                          content: `确认${getShareStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
+                          content: `确认${getSharedStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
                           onOk: async () => {
-                            await new Promise<void>((resolve) => {
-                              if (r.sharedStatus === ShareStatus.SHARED) {
-                                unShareMutation.mutate({
-                                  versionId: r.id,
-                                  algorithmId,
-                                }, {
-                                  onSuccess() {
-                                    refetch();
-                                    resolve();
-                                    message.success("取消分享成功");
-                                  },
-                                  onError() {
-                                    resolve();
-                                  },
-                                });
-                              }
-                              else {
-                                shareMutation.mutate({
-                                  versionId: r.id,
-                                  algorithmId,
-                                  sourceFilePath: r.path,
-                                }, {
-                                  onSuccess() {
-                                    refetch();
-                                    resolve();
-                                    message.success("分享成功");
-                                  },
-                                  onError() {
-                                    resolve();
-                                  },
-                                });
-                              }
-                            });
-
+                            r.sharedStatus === SharedStatus.SHARED ?
+                              await unShareMutation.mutateAsync({
+                                versionId: r.id,
+                                algorithmId,
+                              })
+                              :
+                              await shareMutation.mutateAsync({
+                                versionId: r.id,
+                                algorithmId,
+                                sourceFilePath: r.path });
                           },
                         });
                       }}
                     >
-                      {getShareStatusText(r.sharedStatus)}
+                      {getSharedStatusText(r.sharedStatus)}
                     </Button>
                     <Button
                       type="link"

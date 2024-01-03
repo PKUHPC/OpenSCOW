@@ -14,8 +14,8 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
-import { useCallback, useState } from "react";
+import { App, Button, Checkbox, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
+import { useCallback, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -52,7 +52,7 @@ interface ModalProps {
   description?: string;
   clusterId: string;
   createTime: string;
-  versionsCount: number;
+  versions: string[];
 }
 
 const CreateModalModalButton =
@@ -80,6 +80,9 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [modalName, setModalName] = useState<undefined | string>(undefined);
   const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
+
+  const deleteSourceFileRef = useRef(false);
+  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   const { data, isFetching, refetch, error } = trpc.modal.list.useQuery(
     { ...pageInfo,
@@ -109,23 +112,36 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
 
   const deleteModal = useCallback(
-    async (id: number, name: string) => {
+    async (id: number, name: string, paths: string[], clusterId: string) => {
+      deleteSourceFileRef.current = false;
       confirm({
         title: "删除模型",
-        content: `确认删除模型${name}？如该模型已分享，则分享的模型也会被删除。`,
+        content: (
+          <>
+            <p>{`确认删除模型${name}？如该模型已分享，则分享的模型也会被删除。`}</p>
+            <Checkbox
+              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
+            >
+              同时删除源文件
+            </Checkbox>
+          </>
+        ),
         onOk:async () => {
-          await new Promise<void>((resolve) => {
-            deleteModalMutation.mutate({ id }, {
-              onSuccess() {
-                message.success("删除模型成功");
-                refetch();
-                resolve();
-              },
-              onError() {
-                resolve();
-              },
+          await deleteModalMutation.mutateAsync({ id })
+            .then(async () => {
+              deleteSourceFileRef.current &&
+              await Promise.all(paths.map((x) => {
+                deleteSourceFileMutation.mutateAsync({
+                  target: "DIR",
+                  clusterId,
+                  path:x,
+                });
+              }));
+            })
+            .then(() => {
+              message.success("删除算法成功");
+              refetch();
             });
-          });
         },
       });
     },
@@ -144,7 +160,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { dataIndex: "description", title: "模型描述" },
     { dataIndex: "algorithmName", title: "算法名称" },
     { dataIndex: "algorithmFramework", title: "算法框架" },
-    { dataIndex: "versionsCount", title: "版本数量" },
+    { dataIndex: "versions", title: "版本数量", render:(_) => _.length },
     isPublic ? { dataIndex: "owner", title: "分享者" } : {},
     { dataIndex: "createTime", title: "创建时间",
       render:(_) => formatDateTime(_),
@@ -186,7 +202,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
               <Button
                 type="link"
                 onClick={() => {
-                  deleteModal(r.id, r.name);
+                  deleteModal(r.id, r.name, r.versions, r.clusterId);
                 }}
               >
                 删除
@@ -258,7 +274,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
       />
       <VersionListModal
         open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); }}
+        onClose={() => { setVersionListModalIsOpen(false); setModalId(0); }}
         isPublic={isPublic}
         modalName={modalName}
         modalId={modalId}

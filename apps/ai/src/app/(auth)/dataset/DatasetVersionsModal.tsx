@@ -168,7 +168,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
                                   id: r.id,
                                   datasetId: r.datasetId,
                                   sourceFilePath: r.path,
-                                // fileType: "DIR",
                                 }, {
                                   onSuccess() {
                                     onRefetch();
