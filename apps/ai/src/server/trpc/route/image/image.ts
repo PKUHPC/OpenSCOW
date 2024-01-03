@@ -21,7 +21,7 @@ export const ImageListSchema = z.object({
   name: z.string(),
   owner: z.string(),
   source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
-  tags: z.string(),
+  tag: z.string(),
   description: z.string().optional(),
   path: z.string(),
   sourcePath: z.string(),
@@ -58,7 +58,7 @@ export const list = procedure
     const nameOrTagOrDescQuery = input.nameOrTagOrDesc ? {
       $or: [
         { name: { $like: `%${input.nameOrTagOrDesc}%` } },
-        { tags: { $like: `%${input.nameOrTagOrDesc}%` } },
+        { tag: { $like: `%${input.nameOrTagOrDesc}%` } },
         { description: { $like: `%${input.nameOrTagOrDesc}%` } },
       ],
     } : {};
@@ -81,7 +81,7 @@ export const list = procedure
         name: x.name,
         owner: x.owner,
         source: x.source,
-        tags: x.tags,
+        tag: x.tag,
         description: x.description,
         path: x.path,
         sourcePath: x.sourcePath,
@@ -102,7 +102,7 @@ export const createImage = procedure
   })
   .input(z.object({
     name: z.string(),
-    tags: z.string(),
+    tag: z.string(),
     description: z.string().optional(),
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
     sourcePath: z.string(),
@@ -113,11 +113,11 @@ export const createImage = procedure
     const orm = await getORM();
 
     const imageNameTagExist = await orm.em.findOne(Image,
-      { name: input.name, tags: input.tags, owner: user.identityId });
+      { name: input.name, tag: input.tag, owner: user.identityId });
     if (imageNameTagExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.name} with tags ${input.tags} already exist`,
+        message: `Image's name ${input.name} with tag ${input.tag} already exist`,
       });
     };
 
@@ -142,7 +142,7 @@ export const updateImage = procedure
   .input(z.object({
     id: z.number(),
     name: z.string(),
-    tags: z.string(),
+    tag: z.string(),
     description: z.string().optional(),
   }))
   .output(z.number())
@@ -164,16 +164,16 @@ export const updateImage = procedure
     }
 
     const imageNameTagExist = await orm.em.findOne(Image,
-      { name: input.name, tags: input.tags, owner: user.identityId, id: { $ne: input.id } });
+      { name: input.name, tag: input.tag, owner: user.identityId, id: { $ne: input.id } });
     if (imageNameTagExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.name} with tags ${input.tags} already exist`,
+        message: `Image's name ${input.name} with tags ${input.tag} already exist`,
       });
     };
 
     image.name = input.name;
-    image.tags = input.tags;
+    image.tag = input.tag;
     image.description = input.description;
 
     await orm.em.flush();
@@ -259,7 +259,7 @@ export const copyImage = procedure
       summary: "copy a image",
     },
   })
-  .input(z.object({ copiedId: z.number(), newName: z.string(), newTags: z.string() }))
+  .input(z.object({ copiedId: z.number(), newName: z.string(), newTag: z.string() }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
@@ -273,11 +273,11 @@ export const copyImage = procedure
     };
 
     const imageNameTagsExist = await orm.em.findOne(Image,
-      { name:input.newName, tags: input.newTags, owner: user.identityId });
+      { name:input.newName, tag: input.newTag, owner: user.identityId });
     if (imageNameTagsExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.newName} with tags ${input.newTags} already exist`,
+        message: `Image's name ${input.newName} with tag ${input.newTag} already exist`,
       });
     };
 
@@ -286,7 +286,7 @@ export const copyImage = procedure
 
     const image = new Image({
       name: input.newName,
-      tags: input.newTags,
+      tag: input.newTag,
       owner: user.identityId,
       source: Source.EXTERNAL,
       sourcePath: sharedImage.path,

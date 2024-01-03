@@ -23,7 +23,7 @@ export class Image {
   name: string;
   owner: string;
   source: Source;
-  tags: string;
+  tag: string;
   description?: string;
   clusterId?: string;
 
@@ -41,7 +41,7 @@ export class Image {
     name: string;
     owner: string;
     source: Source;
-    tags: string;
+    tag: string;
     description?: string;
     path: string;
     sourcePath: string;
@@ -53,7 +53,7 @@ export class Image {
     this.name = init.name;
     this.owner = init.owner;
     this.source = init.source;
-    this.tags = init.tags;
+    this.tag = init.tag;
     this.description = init.description;
     this.path = init.path;
     this.sourcePath = init.sourcePath;
@@ -79,7 +79,7 @@ imageEntitySchema.addPrimaryKey("id", Number);
 imageEntitySchema.addProperty("name", String);
 imageEntitySchema.addProperty("owner", String);
 imageEntitySchema.addEnum("source", String, { items: () => Source });
-imageEntitySchema.addProperty("tags", String);
+imageEntitySchema.addProperty("tag", String);
 imageEntitySchema.addProperty("description", String, { nullable: true });
 imageEntitySchema.addProperty("clusterId", String, { nullable: true });
 imageEntitySchema.addProperty("sourcePath", String);

@@ -516,8 +516,8 @@
           ],
           "mappedType": "enum"
         },
-        "tags": {
-          "name": "tags",
+        "tag": {
+          "name": "tag",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,

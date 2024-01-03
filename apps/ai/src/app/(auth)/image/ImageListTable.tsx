@@ -154,7 +154,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "clusterId", title: "集群",
             render: (_, r) =>
               getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
-          { dataIndex: "tags", title: "标签" },
+          { dataIndex: "tag", title: "标签" },
           { dataIndex: "source", title: "镜像来源",
             render: (_, r) => SourceText[r.source] },
           { dataIndex: "description", title: "镜像描述" },
@@ -176,7 +176,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
                           modal.confirm({
                             title: `${shareOrUnshareStr}镜像`,
-                            content: `确认${shareOrUnshareStr}镜像${r.name}${r.tags}？`,
+                            content: `确认${shareOrUnshareStr}镜像${r.name}${r.tag}？`,
                             onOk: async () => {
                               await shareOrUnshareMutation.mutateAsync({
                                 id: r.id,
@@ -222,7 +222,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                             title: "删除镜像",
                             content: (
                               <>
-                                <p>{`是否确认删除镜像${r.name}标签${r.tags}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
+                                <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
 
                                 {r.source === Source.INTERNAL && (
                                   <Checkbox
@@ -270,7 +270,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                       refetch={refetch}
                       copiedId={r.id}
                       copiedName={r.name}
-                      copiedTags={r.tags}
+                      copiedTag={r.tag}
                     >
                       复制
                     </CopyImageModalButton>

@@ -22,23 +22,23 @@ export interface Props {
   refetch: () => void;
   copiedId: number;
   copiedName: string;
-  copiedTags: string;
+  copiedTag: string;
 }
 
 interface FormFields {
   newName: string,
-  newTags: string,
+  newTag: string,
 }
 
 export const CopyImageModal: React.FC<Props> = (
-  { open, onClose, refetch, copiedId, copiedName, copiedTags },
+  { open, onClose, refetch, copiedId, copiedName, copiedTag },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const initialValues = {
     newName: copiedName,
-    newTags: copiedTags,
+    newTags: copiedTag,
   };
 
   const copyMutation = trpc.image.copyImage.useMutation({
@@ -55,11 +55,11 @@ export const CopyImageModal: React.FC<Props> = (
 
   const onOk = async () => {
     form.validateFields();
-    const { newName, newTags } = await form.validateFields();
+    const { newName, newTag } = await form.validateFields();
     copyMutation.mutate({
       copiedId,
       newName,
-      newTags,
+      newTag,
     });
   };
 
@@ -91,7 +91,7 @@ export const CopyImageModal: React.FC<Props> = (
         </Form.Item>
         <Form.Item
           label="镜像标签"
-          name="newTags"
+          name="newTag"
           rules={[
             { required: true },
             { validator:validateNoChinese },

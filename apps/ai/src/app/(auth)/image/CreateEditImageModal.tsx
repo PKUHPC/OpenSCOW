@@ -37,7 +37,7 @@ interface FormFields {
   id?: number | undefined,
   cluster: Cluster | undefined,
   name: string,
-  tags: string,
+  tag: string,
   description?: string,
   source: Source,
   sourcePath: string,
@@ -98,17 +98,17 @@ export const CreateEditImageModal: React.FC<Props> = (
 
   const onOk = async () => {
     form.validateFields();
-    const { name, cluster, tags, description, source, sourcePath } = await form.validateFields();
+    const { name, cluster, tag, description, source, sourcePath } = await form.validateFields();
     isEdit && editData ? editMutation.mutate({
       id: editData.id,
       name,
-      tags,
+      tag,
       description,
     })
       : createMutation.mutate({
         name,
         clusterId: source === Source.INTERNAL ? cluster?.id : undefined,
-        tags,
+        tag,
         description,
         source,
         sourcePath,
@@ -177,7 +177,7 @@ export const CreateEditImageModal: React.FC<Props> = (
         }
         <Form.Item
           label="镜像标签"
-          name="tags"
+          name="tag"
           rules={[
             { required: true },
             { validator:validateNoChinese },
