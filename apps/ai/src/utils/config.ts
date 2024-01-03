@@ -56,99 +56,99 @@ export interface ServerRuntimeConfig {
   PROTOCOL: string;
 }
 
-export interface PublicRuntimeConfig {
-  ENABLE_CHANGE_PASSWORD: boolean | undefined;
+// export interface PublicRuntimeConfig {
+//   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
-  ENABLE_SHELL: boolean;
+//   ENABLE_SHELL: boolean;
 
-  ENABLE_LOGIN_DESKTOP: boolean;
+//   ENABLE_LOGIN_DESKTOP: boolean;
 
-  ENABLE_JOB_MANAGEMENT: boolean;
+//   ENABLE_JOB_MANAGEMENT: boolean;
 
-  ENABLE_APPS: boolean;
+//   ENABLE_APPS: boolean;
 
-  MIS_URL: string | undefined;
+//   MIS_URL: string | undefined;
 
-  CLUSTERS: Cluster[];
+//   CLUSTERS: Cluster[];
 
-  CLUSTER_SORTED_ID_LIST: string[];
+//   CLUSTER_SORTED_ID_LIST: string[];
 
-  NOVNC_CLIENT_URL: string;
+//   NOVNC_CLIENT_URL: string;
 
-  PASSWORD_PATTERN: string | undefined;
+//   PASSWORD_PATTERN: string | undefined;
 
-  BASE_PATH: string;
-  // 上传（请求）文件的大小限制
-  CLIENT_MAX_BODY_SIZE: string;
+//   BASE_PATH: string;
+//   // 上传（请求）文件的大小限制
+//   CLIENT_MAX_BODY_SIZE: string;
 
-  FILE_EDIT_SIZE: string | undefined;
+//   FILE_EDIT_SIZE: string | undefined;
 
-  FILE_PREVIEW_SIZE: string | undefined;
+//   FILE_PREVIEW_SIZE: string | undefined;
 
-  PUBLIC_PATH: string;
+//   PUBLIC_PATH: string;
 
-  NAV_LINKS?: NavLink[];
+//   NAV_LINKS?: NavLink[];
 
-  USER_LINKS?: UserLink[];
+//   USER_LINKS?: UserLink[];
 
-  VERSION_TAG: string | undefined;
+//   VERSION_TAG: string | undefined;
 
-  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
+//   CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
 
-  RUNTIME_I18N_CONFIG_TEXTS: {
-    passwordPatternMessage: I18nStringType | undefined,
-  }
+//   RUNTIME_I18N_CONFIG_TEXTS: {
+//     passwordPatternMessage: I18nStringType | undefined,
+//   }
 
-  SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
+//   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
-  LOGIN_NODES: Record<string, string>;
-}
+//   LOGIN_NODES: Record<string, string>;
+// }
 
-export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
-export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
+// export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
+// export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
 export type Cluster = { id: string; name: I18nStringType; }
-export type NavLink = {
-  text: string;
-  url?: string;
-  openInNewPage?: boolean;
-  iconPath?: string;
-  children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
-}
+// export type NavLink = {
+//   text: string;
+//   url?: string;
+//   openInNewPage?: boolean;
+//   iconPath?: string;
+//   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
+// }
 
-export const getLoginDesktopEnabled = (cluster: string): boolean => {
+// export const getLoginDesktopEnabled = (cluster: string): boolean => {
 
-  const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
+//   const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
 
-  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+//   const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
 
-  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
-};
+//   return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
+// };
 
 export type LoginNode = { name: string, address: string }
 
-export const getClusterName = (clusterId: string, languageId: string) => {
-  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
-   || clusterId;
-};
+// export const getClusterName = (clusterId: string, languageId: string) => {
+//  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
+//    || clusterId;
+// };
 
-type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
+// type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串
-export const getServerI18nConfigText = <TKey extends ServerI18nConfigKeys>(
-  languageId: string,
-  key: TKey,
-) => {
-  return getI18nText(runtimeConfig.SERVER_I18N_CONFIG_TEXTS, key, languageId);
-};
+// export const getServerI18nConfigText = <TKey extends ServerI18nConfigKeys>(
+//   languageId: string,
+//   key: TKey,
+// ) => {
+//   return getI18nText(runtimeConfig.SERVER_I18N_CONFIG_TEXTS, key, languageId);
+// };
 
-type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
-// 获取RuntimeConfig中相关字符串配置的对应语言的字符串
-export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>(
-  languageId: string,
-  key: TKey,
-) => {
-  return getI18nText(publicConfig.RUNTIME_I18N_CONFIG_TEXTS, key, languageId);
-};
+// type RuntimeI18nConfigKeys = keyof typeof publicConfig.RUNTIME_I18N_CONFIG_TEXTS;
+// // 获取RuntimeConfig中相关字符串配置的对应语言的字符串
+// export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>(
+//   languageId: string,
+//   key: TKey,
+// ) => {
+//   return getI18nText(publicConfig.RUNTIME_I18N_CONFIG_TEXTS, key, languageId);
+// };
 
 
 /**

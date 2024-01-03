@@ -12,13 +12,14 @@
 
 "use client";
 
+// import { Cluster } from "src/utils/config";
+import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Select } from "antd";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { defaultClusterContext } from "src/app/(auth)/defaultClusterContext";
-import { useI18n, useI18nTranslateToString } from "src/i18n";
-import { Cluster } from "src/utils/config";
 
+export type Cluster = { id: string; name: I18nStringType; }
 
 interface Props {
   value?: Cluster[];

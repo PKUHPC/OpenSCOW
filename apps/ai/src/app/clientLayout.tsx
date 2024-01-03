@@ -13,7 +13,6 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ServerClientProvider } from "src/app/trpcClient.server";
 import { ErrorBoundary } from "src/components/ErrorBoundary";
 import { TopProgressBar } from "src/components/TopProgressBar";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";

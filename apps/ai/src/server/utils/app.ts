@@ -13,7 +13,7 @@
 import { AppConfigSchema } from "@scow/config/build/appForAi";
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import { join } from "path";
-import { getAiAppConfigs } from "src/config/apps"; ;
+import { getAiAppConfigs } from "src/server/config/apps"; ;
 
 
 export const getClusterAppConfigs = (cluster: string) => {

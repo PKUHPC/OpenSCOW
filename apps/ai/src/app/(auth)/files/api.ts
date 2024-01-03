@@ -12,10 +12,9 @@
 
 import { join } from "path";
 import { UploadQuery } from "src/app/(auth)/files/upload/route";
-import { BASE_PATH } from "src/utils/processEnv";
 
 export const urlToDownload = (
-  clusterId: string, path: string, download: boolean,
+  clusterId: string, path: string, download: boolean, basePath: string,
 ): string => {
 
   const searchParams = new URLSearchParams({
@@ -24,10 +23,10 @@ export const urlToDownload = (
     download: String(download) as "true" | "false",
   });
 
-  return join(BASE_PATH, "/api/file/download") + "?" + searchParams.toString();
+  return join(basePath, "/api/file/download") + "?" + searchParams.toString();
 };
 export const urlToUpload = (
-  clusterId: string, path: string,
+  clusterId: string, path: string, basePath: string,
 ): string => {
 
   const searchParams = new URLSearchParams({
@@ -35,6 +34,6 @@ export const urlToUpload = (
     clusterId,
   } satisfies UploadQuery);
 
-  return join(BASE_PATH, "/files/upload") + "?" + searchParams.toString();
+  return join(basePath, "/files/upload") + "?" + searchParams.toString();
 };
 

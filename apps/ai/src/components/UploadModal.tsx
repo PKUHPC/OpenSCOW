@@ -16,6 +16,7 @@ import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
 import { useState } from "react";
+import { usePublicConfig } from "src/app/(auth)/context";
 import { trpc } from "src/utils/trpc.js";
 
 import { urlToUpload } from "../app/(auth)/files/api";
@@ -39,7 +40,7 @@ enum FileType {
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
 
   const { message, modal } = App.useApp();
-
+  const { publicConfig } = usePublicConfig();
   const [ checkExistFilePath, setCheckExistFilePath ] = useState<string>("");
   const [ getTypeFilePath, setGetTypeFilePath ] = useState<string>("");
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
@@ -81,7 +82,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       <Upload.Dragger
         name="file"
         multiple
-        action={async (file) => urlToUpload(clusterId, join(path, file.name))}
+        action={async (file) => urlToUpload(clusterId, join(path, file.name), publicConfig.BASE_PATH)}
         withCredentials
         showUploadList={{
           removeIcon: (file) => {

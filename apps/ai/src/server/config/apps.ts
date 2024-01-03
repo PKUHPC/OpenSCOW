@@ -10,6 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getAppConfigs as libGetAppConfigs } from "@scow/config/build/app";
+import { getAiAppConfigs as libGetAiAppConfigs } from "@scow/config/build/appForAi";
 
-export const getAppConfigs = (clusterBasePath?: string) => libGetAppConfigs(clusterBasePath);
+export const getAiAppConfigs = (clusterBasePath?: string) => libGetAiAppConfigs(clusterBasePath);

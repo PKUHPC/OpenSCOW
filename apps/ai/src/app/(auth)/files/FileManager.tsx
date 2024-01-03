@@ -21,6 +21,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
+import { usePublicConfig } from "src/app/(auth)/context";
 import { useOperation } from "src/app/(auth)/files/[cluster]/context";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { MkdirModal } from "src/components/MkdirModal";
@@ -82,6 +83,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
 
   const { message, modal } = App.useApp();
   const router = useRouter();
+  const { publicConfig } = usePublicConfig();
 
   const prevPathRef = useRef<string>(path);
 
@@ -406,7 +408,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             if (r.type === "DIR") {
               router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
-              const href = urlToDownload(cluster.id, join(path, r.name), false);
+              const href = urlToDownload(cluster.id, join(path, r.name), false, publicConfig.BASE_PATH);
               openPreviewLink(href);
             }
           },
@@ -418,7 +420,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             </Link>
           ) : (
             <a onClick={() => {
-              const href = urlToDownload(cluster.id, join(path, r.name), false);
+              const href = urlToDownload(cluster.id, join(path, r.name), false, publicConfig.BASE_PATH);
               openPreviewLink(href);
             }}
             >
@@ -430,7 +432,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
           <Space>
             {
               i.type === "FILE" ? (
-                <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
+                <a href={urlToDownload(cluster.id, join(path, i.name), true, publicConfig.BASE_PATH)}>
                   下载
                 </a>
               ) : undefined

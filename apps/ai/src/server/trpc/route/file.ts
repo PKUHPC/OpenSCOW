@@ -282,12 +282,12 @@ export const file = router({
     .meta({
       openapi: {
         method: "GET",
-        path: "/file/download",
+        path: "/files/download",
         tags: ["file"],
         summary: "获取用户家目录路径",
       },
     })
-    .input(z.object({ clusterId: z.string(), path: z.string(), download: z.boolean() }))
+    .input(z.object({ clusterId: z.string(), path: z.string(), download: z.string() }))
     .output(z.void())
     .query(async ({ input: { clusterId, path, download }, ctx: { user, res } }) => {
 
@@ -312,11 +312,11 @@ export const file = router({
         const filename = basename(path).replace("\"", "\\\"");
         const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
-        const contentType = download ? getContentType(filename, "application/octet-stream") :
+        const contentType = download === "true" ? getContentType(filename, "application/octet-stream") :
           getContentType(filename, "text/plain; charset=utf-8");
         res.setHeader("Content-Type", contentType);
 
-        res.setHeader("Content-Disposition", `${download ? "attachment" : "inline"}; ${dispositionParm}`);
+        res.setHeader("Content-Disposition", `${download === "true" ? "attachment" : "inline"}; ${dispositionParm}`);
 
         res.setHeader("Content-Length", String(stat.size));
 
