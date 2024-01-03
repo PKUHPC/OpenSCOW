@@ -65,7 +65,7 @@ export function ClientProvider(props: { baseUrl: string; basePath: string; child
         }),
         httpBatchLink({
           url: typeof window === "undefined" ? joinWithUrl(props.baseUrl, props.basePath, "/api/trpc")
-            : join(props.basePath, "/api/auth"),
+            : join(props.basePath, "/api/trpc"),
         }),
       ],
       transformer: superjson,
