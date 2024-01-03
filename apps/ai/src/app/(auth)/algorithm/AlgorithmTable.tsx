@@ -19,7 +19,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
+import { AlgorithmInterface, AlgorithmTypeText, Framework } from "src/models/Algorithm";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -49,18 +49,6 @@ interface FilterForm {
 interface PageInfo {
   page: number;
   pageSize?: number;
-}
-
-interface Algorithm {
-  id: number;
-  name: string;
-  owner: string;
-  framework: Framework;
-  isShared: boolean;
-  description: string;
-  clusterId: string;
-  createTime: string;
-  versions: string[];
 }
 
 const CreateAlgorithmModalButton =
@@ -151,14 +139,14 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         },
       });
     },
-    [cluster],
+    [],
   );
 
   const getCurrentCluster = useCallback((clusterId: string) => {
     return clusters.find((c) => c.id === clusterId);
   }, [clusters]);
 
-  const columns: TableColumnsType<Algorithm> = [
+  const columns: TableColumnsType<AlgorithmInterface> = [
     { dataIndex: "name", title: "名称" },
     { dataIndex: "clusterId", title: "集群",
       render: (_, r) =>
@@ -232,9 +220,6 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
       },
     },
   ];
-
-
-
 
   return (
     <div>

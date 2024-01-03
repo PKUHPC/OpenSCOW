@@ -119,6 +119,45 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     },
   });
 
+  const deleteDataset = useCallback(
+    (id: number, name: string, paths: string[], clusterId: string) => {
+      deleteSourceFileRef.current = false;
+      confirm({
+        title: "删除数据集",
+        content: (
+          <>
+            <p>{`是否确认删除数据集${name}？如该数据集已分享，则分享的数据集也会被删除。`}</p>
+            <Checkbox
+              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
+            >
+              同时删除源文件
+            </Checkbox>
+          </>
+        ),
+        onOk: async () => {
+          await deleteDatasetMutation.mutateAsync({
+            id,
+          })
+            .then(async () => {
+              deleteSourceFileRef.current &&
+                await Promise.all(paths.map((x) => {
+                  deleteSourceFileMutation.mutateAsync({
+                    target: "DIR",
+                    clusterId,
+                    path:x,
+                  });
+                }));
+            })
+            .then(() => {
+              refetch();
+              message.success("删除成功");
+            });
+        },
+      });
+    },
+    [],
+  );
+
   const getCurrentCluster = useCallback((clusterId: string) => {
     return clusters.find((c) => c.id === clusterId);
   }, [clusters]);
@@ -236,39 +275,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                       <Button
                         type="link"
                         onClick={() => {
-                          deleteSourceFileRef.current = false;
-                          confirm({
-                            title: "删除数据集",
-                            content: (
-                              <>
-                                <p>{`是否确认删除数据集${r.name}？如该数据集已分享，则分享的数据集也会被删除。`}</p>
-                                <Checkbox
-                                  onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-                                >
-                                  同时删除源文件
-                                </Checkbox>
-                              </>
-                            ),
-                            onOk: async () => {
-                              await deleteDatasetMutation.mutateAsync({
-                                id: r.id,
-                              })
-                                .then(async () => {
-                                  deleteSourceFileRef.current &&
-                                  await Promise.all(r.versions.map((x) => {
-                                    deleteSourceFileMutation.mutateAsync({
-                                      target: "DIR",
-                                      clusterId,
-                                      path:x,
-                                    });
-                                  }));
-                                })
-                                .then(() => {
-                                  refetch();
-                                  message.success("删除成功");
-                                });
-                            },
-                          });
+                          deleteDataset(r.id, r.name, r.versions, r.clusterId);
                         }}
                       >
                         删除

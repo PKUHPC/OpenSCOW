@@ -13,21 +13,6 @@
 import { inferRouterOutputs } from "@trpc/server";
 import { AppRouter } from "src/server/trpc/router";
 
-export type AlgorithmInterface = inferRouterOutputs<AppRouter>["algorithm"]["getAlgorithms"]["items"][0];
-export type AlgorithmVersionInterface = inferRouterOutputs<AppRouter>["algorithm"]["getAlgorithmVersions"]["items"][0];
+export type ModalInterface = inferRouterOutputs<AppRouter>["modal"]["list"]["items"][0];
+export type ModalVersionInterface = inferRouterOutputs<AppRouter>["modal"]["versionList"]["items"][0];
 
-export enum Framework {
-  TENSORFLOW = "TENSORFLOW",
-  PYTORCH = "PYTORCH",
-  KERAS = "KERAS",
-  MINDSPORE = "MINDSPORE",
-  OTHER = "OTHER",
-};
-
-export const AlgorithmTypeText = {
-  [Framework.TENSORFLOW]: "TensorFlow",
-  [Framework.PYTORCH]: "PyTorch",
-  [Framework.KERAS]: "Keras",
-  [Framework.MINDSPORE]: "MindSpore",
-  [Framework.OTHER]: "其他",
-} as const;

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
+import { ModalVersionInterface } from "src/models/Modal";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { Cluster } from "src/utils/config";
@@ -24,24 +25,13 @@ import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
-interface modalVersion {
-  id: number;
-  versionName: string;
-  versionDescription?: string;
-  algorithmVersion?: string;
-  path: string;
-  privatePath: string;
-  sharedStatus: SharedStatus;
-  createTime: string;
-}
-
 export interface Props {
   open: boolean;
   onClose: () => void;
   isPublic?: boolean;
   modalId: number;
   modalName: string | undefined;
-  modalVersionData: modalVersion[];
+  modalVersionData: ModalVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
   cluster?: Cluster;
@@ -182,7 +172,6 @@ export const VersionListModal: React.FC<Props> = (
                     >
                     查看文件
                     </Button>
-
                     <Button
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}

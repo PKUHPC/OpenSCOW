@@ -15,6 +15,7 @@ import { App, Button, Checkbox, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { AlgorithmVersionInterface } from "src/models/Algorithm";
 import { SharedStatus } from "src/models/common";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
@@ -24,15 +25,6 @@ import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
-interface algorithmVersion {
-  id: number;
-  versionName: string;
-  versionDescription: string;
-  path: string;
-  privatePath: string;
-  sharedStatus: SharedStatus;
-  createTime: string;
-}
 
 export interface Props {
   open: boolean;
@@ -40,7 +32,7 @@ export interface Props {
   isPublic?: boolean;
   algorithmId: number;
   algorithmName: string | undefined;
-  algorithmVersionData: algorithmVersion[];
+  algorithmVersionData: AlgorithmVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
   cluster?: Cluster;

@@ -19,6 +19,7 @@ import { useCallback, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { ModalInterface } from "src/models/Modal";
 import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -40,19 +41,6 @@ interface FilterForm {
 interface PageInfo {
   page: number;
   pageSize?: number;
-}
-
-interface ModalProps {
-  id: number;
-  name: string;
-  owner: string;
-  algorithmName?: string;
-  algorithmFramework?: string;
-  isShared: boolean;
-  description?: string;
-  clusterId: string;
-  createTime: string;
-  versions: string[];
 }
 
 const CreateModalModalButton =
@@ -152,7 +140,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     return clusters.find((c) => c.id === clusterId);
   }, [clusters]);
 
-  const columns: TableColumnsType<ModalProps> = [
+  const columns: TableColumnsType<ModalInterface> = [
     { dataIndex: "name", title: "名称" },
     { dataIndex: "clusterId", title: "集群",
       render: (_, r) =>

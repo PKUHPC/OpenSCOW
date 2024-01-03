@@ -13,7 +13,7 @@
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Checkbox, Divider, Modal, Space, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
 import { DatasetVersionInterface } from "src/models/Dateset";
@@ -97,6 +97,52 @@ export const DatasetVersionsModal: React.FC<Props> = (
     },
   });
 
+  const deleteDatasetVersion = useCallback(
+    (id: number, datasetId: number, name: string, path: string) => {
+      deleteSourceFileRef.current = false;
+      modal.confirm({
+        title: "删除数据集版本",
+        content: (
+          <>
+            <p>{`是否确认删除数据集${datasetName}版本${name}？如该数据集版本已分享，则分享的数据集版本也会被删除。`}</p>
+            <Checkbox
+              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
+            >
+              同时删除源文件
+            </Checkbox>
+          </>
+        ),
+        onOk: async () => {
+          deleteSourceFileRef.current ?
+            await deleteMutation.mutateAsync({
+              id,
+              datasetId,
+            })
+              .then(() => {
+                deleteSourceFileMutation.mutateAsync({
+                  target: "DIR",
+                  clusterId: cluster?.id ?? "",
+                  path,
+                });
+              })
+              .then(() => {
+                message.success("删除成功");
+                onRefetch();
+              })
+            :
+            await deleteMutation.mutateAsync({
+              id,
+              datasetId,
+            }).then(() => {
+              message.success("删除成功");
+              onRefetch();
+            });
+        },
+      });
+    },
+    [datasetName, cluster],
+  );
+
   const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   return (
@@ -138,7 +184,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
                     编辑
                     </CreateEditVersionModalButton>
                   </Space>
-
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
@@ -174,54 +219,14 @@ export const DatasetVersionsModal: React.FC<Props> = (
                       }}
                     >{getSharedStatusText(r.sharedStatus)}</Button>
                   </Space>
-
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
                       onClick={() => {
-                        deleteSourceFileRef.current = false;
-                        modal.confirm({
-                          title: "删除数据集版本",
-                          content: (
-                            <>
-                              <p>{`是否确认删除数据集${datasetName}版本${r.versionName}？如该数据集版本已分享，则分享的数据集版本也会被删除。`}</p>
-                              <Checkbox
-                                onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-                              >
-                                同时删除源文件
-                              </Checkbox>
-                            </>
-                          ),
-                          onOk: async () => {
-                            deleteSourceFileRef.current ?
-                              await deleteMutation.mutateAsync({
-                                id: r.id,
-                                datasetId: r.datasetId,
-                              })
-                                .then(() => {
-                                  deleteSourceFileMutation.mutateAsync({
-                                    target: "DIR",
-                                    clusterId: cluster?.id ?? "",
-                                    path: r.privatePath,
-                                  });
-                                })
-                                .then(() => {
-                                  message.success("删除成功");
-                                  onRefetch();
-                                })
-                              :
-                              await deleteMutation.mutateAsync({
-                                id: r.id,
-                                datasetId: r.datasetId,
-                              }).then(() => {
-                                message.success("删除成功");
-                                onRefetch();
-                              });
-                          },
-                        });
+                        deleteDatasetVersion(r.id, r.datasetId, r.versionName, r.privatePath);
                       }}
                     >
-                        删除
+                      删除
                     </Button>
                   </Space>
                 </>
