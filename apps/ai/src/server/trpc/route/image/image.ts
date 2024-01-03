@@ -254,7 +254,7 @@ export const copyImage = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/image/copy/{id}",
+      path: "/image/copy/{copiedId}",
       tags: ["image"],
       summary: "copy a image",
     },
