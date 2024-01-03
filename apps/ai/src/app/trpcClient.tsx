@@ -64,7 +64,8 @@ export function ClientProvider(props: { baseUrl: string; basePath: string; child
           enabled: () => process.env.NODE_ENV === "development",
         }),
         httpBatchLink({
-          url: joinWithUrl(props.baseUrl, props.basePath, "/api/trpc"),
+          url: typeof window === "undefined" ? joinWithUrl(props.baseUrl, props.basePath, "/api/trpc")
+            : join(props.basePath, "/api/auth"),
         }),
       ],
       transformer: superjson,
