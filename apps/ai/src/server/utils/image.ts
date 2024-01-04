@@ -10,18 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-type test = () => void;
-
 const LOADED_IMAGE_REGEX = "Loaded image: ([\\w./-]+(?::[\\w.-]+)?)";
 
 export const loadedImageRegex = new RegExp(LOADED_IMAGE_REGEX);
 
 export function getHarborImageName(
-  { registryPath, userId, imageName, imageTag }:
-  { registryPath: string,
+  { url, project, userId, imageName, imageTag }:
+  { url: string,
+    project: string,
     userId: string,
     imageName: string,
     imageTag: string,
   }): string {
-  return `${registryPath}/${userId}/${imageName}:${imageTag}`;
+  return `${url}/${project}/${userId}/${imageName}:${imageTag}`;
 };

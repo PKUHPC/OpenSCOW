@@ -110,9 +110,10 @@ const UserLinkSchema = z.object({
 });
 
 const HarborConfigSchema = z.object({
-  registryUrl: z.string(),
-  loginUser: z.string(),
-  loginPassword: z.string(),
+  url: z.string(),
+  project: z.string(),
+  user: z.string(),
+  password: z.string(),
 });
 
 const PublicConfigSchema = z.object({
