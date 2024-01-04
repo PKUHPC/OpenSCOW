@@ -10,8 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists, sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
+import { getSortedClusterIds } from "@scow/config/build/cluster";
+import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
+import { aiConfig } from "src/server/config/ai";
 import { rootKeyPair } from "src/server/config/env";
 import { Image, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -22,6 +24,8 @@ import { logger } from "src/server/utils/logger";
 import { checkSharePermission } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
+
+import { clusters } from "../config";
 
 export const ImageListSchema = z.object({
   id: z.number(),
@@ -74,7 +78,7 @@ export const list = procedure
       $and: [
         nameOrTagOrDescQuery,
         isPublicQuery,
-        { clusterId: input.clusterId ? input.clusterId : { $ne: null } },
+        input.clusterId ? { clusterId: input.clusterId } : {},
       ],
     }, {
       limit: input.pageSize || undefined,
@@ -115,123 +119,117 @@ export const createImage = procedure
     sourcePath: z.string(),
     clusterId: z.string().optional(),
   }))
-  .output(z.number())
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-
+    const { name, tag, source, sourcePath } = input;
     const imageNameTagExist = await orm.em.findOne(Image,
-      { name: input.name, tag: input.tag, owner: user.identityId });
+      { name, tag, owner: user.identityId });
     if (imageNameTagExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.name} with tag ${input.tag} already exist`,
+        message: `Image's name ${name} with tag ${tag} already exist`,
       });
     };
 
     const NotTarError = new TRPCError({
       code: "UNPROCESSABLE_CONTENT",
-      message: `Image ${input.name}:${input.tag} create failed: image is not a tar file`,
+      message: `Image ${name}:${tag} create failed: image is not a tar file`,
     });
 
-    const DockerCmdError = (stderrMessage: string) => {
-      return new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Image ${input.name}:${input.tag} create failed: ${stderrMessage}`,
+    const NoClusterError = new TRPCError({
+      code: "NOT_FOUND",
+      message: `Image ${name}:${tag} create failed: there is no available cluster`,
+    });
+
+    const NoLocalImageError = new TRPCError({
+      code: "NOT_FOUND",
+      message: `Image ${name}:${tag} create failed: localImage not found`,
+    });
+
+    // 获取加载镜像的集群节点，如果是远程镜像则使用列表第一个集群作为本地处理镜像的节点
+    const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
+
+    const targetImage = getHarborImageName({
+      url: aiConfig.harborConfig.url,
+      project: aiConfig.harborConfig.project,
+      userId: user.identityId,
+      imageName: name,
+      imageTag: tag,
+    });
+
+    if (!processClusterId) { throw NoClusterError; }
+
+    const host = getClusterLoginNode(processClusterId);
+    if (!host) { throw clusterNotFound(processClusterId); };
+
+    // 本地镜像检查源文件拥有者权限
+    if (input.source === Source.INTERNAL) {
+      // 判断文件权限
+      await checkSharePermission({
+        clusterId: processClusterId,
+        checkedSourcePath: sourcePath,
+        user: user,
       });
-    };
+    }
+
+    let localImage: string | undefined = undefined;
+    await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+
+      // 本地镜像时docker加载镜像
+      if (source === Source.INTERNAL) {
+        if (sourcePath.endsWith(".tar")) {
+          // 加载tar文件镜像
+          const dockerLoadCmd = `docker load -i ${sourcePath}`;
+          const loadedResp = await loggedExec(ssh, logger, true, dockerLoadCmd, []);
+          const match = loadedResp.stdout.match(loadedImageRegex);
+
+          if (match && match.length > 1) {
+            localImage = match[1];
+          };
+        } else {
+          throw NotTarError;
+        }
+        // 远程镜像需先拉取到本地
+      } else {
+
+        const dockerPullCmd = `docker pull ${sourcePath}`;
+        const pulledResp = await loggedExec(ssh, logger, true, dockerPullCmd, []);
+        if (pulledResp) {
+          localImage = sourcePath;
+        }
+
+      };
+
+      if (localImage === undefined) { throw NoLocalImageError; }
+
+      const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
+      await loggedExec(ssh, logger, true, dockerTagCmd, []);
+
+      const loginHarborCmd =
+            `docker login -u ${aiConfig.harborConfig.user}
+            -p ${aiConfig.harborConfig.password} ${aiConfig.harborConfig.url}`;
+      await loggedExec(ssh, logger, true, loginHarborCmd, []);
+
+      const dockerPushCmd = `docker push ${localImage} ${targetImage}`;
+      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async (resp) => {
+
+        // 删除本地镜像
+        const dockerRmiCmd = `docker rmi ${localImage}`;
+        try {
+          loggedExec(ssh, logger, false, dockerRmiCmd, []);
+        } catch (e) {
+          logger.error(`${localImage} rmi failed`, e);
+        };
+
+        // 更新数据库
+        const image = new Image({ ...input, path: targetImage, owner: user!.identityId });
+        await orm.em.persistAndFlush(image);
+        return image.id;
+      });
 
 
-    // let imageRealPath: string | undefined = undefined;
-
-    // // 获取加载镜像的集群节点，如果是远程镜像则使用列表第一个集群作为本地处理镜像的节点
-    // const clusterId = input.source === Source.INTERNAL ? input.clusterId : publicConfig.CLUSTERS[0].id;
-
-    // const subLogger = logger.child({ user, input.sourcePath, clusterId });
-    // subLogger.info("Create image started");
-
-
-    // // 本地镜像获取
-    // if (input.source === Source.INTERNAL && input.clusterId) {
-
-    //   const host = getClusterLoginNode(input.clusterId);
-    //   if (!host) { throw clusterNotFound(input.clusterId); }
-
-    //   // 判断文件权限
-    //   await checkSharePermission({
-    //     clusterId: input.clusterId,
-    //     checkedSourcePath: input.sourcePath,
-    //     user: user,
-    //   });
-
-
-    //   await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-
-    //     if (input.sourcePath.endsWith(".zip")) {
-
-
-
-    //     } else if (input.sourcePath.endsWith(".tar")) {
-
-
-    //       // 加载tar文件镜像
-    //       await ssh.exec("docker", ["load", "-i", input.sourcePath ], { stream: "both" }).then((resp) => {
-
-    //         if (resp.stderr) {
-    //           throw new TRPCError({
-    //             code: "INTERNAL_SERVER_ERROR",
-    //             message: `Image ${input.name}:${input.tag} create failed: ${resp.stderr}`,
-    //           });
-    //         }
-
-    //         const match = resp.stdout.match(loadedImageRegex);
-
-    //         if (match && match.length > 1) {
-    //           const loadedImage = match[1];
-    //           const targetImage = getHarborImageName({
-    //             registryPath: publicConfig.HARBOR_CONFIG.registryUrl,
-    //             userId: user.identityId,
-    //             imageName: input.name,
-    //             imageTag: input.tag,
-    //           });
-    //           // 制作上传镜像标签
-    //           await ssh.exec("docker", ["tag", loadedImage, targetImage ], { stream: "both" });
-    //           // 登录harbor
-    //           await ssh.exec("docker", ["-u", publicConfig.HARBOR_CONFIG.loginUser,
-    // "-p", publicConfig.HARBOR_CONFIG.loginPassword], { stream: "both" });
-    //           // 上传镜像
-    //           await ssh.exec("docker push", ["push", targetImage], { stream: "both" }).then((resp) => {
-    //             if (resp.stderr) {
-    //               throw DockerCmdError(resp.stderr);
-    //             } else {
-    //               // 删除本地加载的镜像
-    //               await ssh.exec("docker", ["rmi", loadedImage]);
-    //               imageRealPath = targetImage;
-    //             }
-    //           });
-
-    //         }
-    //       });
-
-    //     } else if (input.sourcePath.endsWith(".gz")) {
-
-    //     } else {
-    //       throw NotTarError;
-    //     }
-
-
-    //   });
-
-    // }
-
-    // if (imageRealPath) {
-    //   const image = new Image({ ...input, path: imageRealPath, owner: user!.identityId });
-    //   await orm.em.persistAndFlush(image);
-    //   return image.id;
-    // }
-    const imageRealPath = "todoHarborTestPath";
-    const image = new Image({ ...input, path: imageRealPath, owner: user!.identityId });
-    await orm.em.persistAndFlush(image);
-    return image.id;
+    });
 
   });
 
@@ -390,5 +388,3 @@ export const copyImage = procedure
 
     return image.id;
   });
-
-

@@ -8,6 +8,7 @@ db:
 url: localhost:5007
 
 harborConfig:
-  registryUrl: http://10.129.227.64/harbor/projects/2/repositories/test/
-  loginUser: admin
-  loginPassword: icode@2023CS
+  url: http://10.129.227.64/
+  project: test
+  user: admin
+  password: icode@2023CS

@@ -43,9 +43,10 @@ export const AiConfigSchema = Type.Object({
   )),
 
   harborConfig: Type.Object({
-    registryUrl: Type.String({ description: "镜像存储用的Harbor仓库地址" }),
-    loginUser: Type.String({ description: "Harbor仓库地址登录时使用的用户名" }),
-    loginPassword: Type.String({ description: "Harbor仓库地址登录时使用的登录密码" }),
+    url: Type.String({ description: "镜像存储用的Harbor仓库地址" }),
+    project: Type.String({ description: "镜像存储用的Harbor仓库地址下项目名,会作为镜像存储的上级路径" }),
+    user: Type.String({ description: "Harbor仓库地址登录时使用的用户名" }),
+    password: Type.String({ description: "Harbor仓库地址登录时使用的登录密码" }),
   }),
 
 });
