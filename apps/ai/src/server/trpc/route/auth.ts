@@ -16,12 +16,12 @@ import { join } from "path";
 import { setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
+import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure, baseProcedure } from "src/server/trpc/procedure/base";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
-import { envConfig } from "./config";
 
 export const auth = router({
 
@@ -82,12 +82,24 @@ export const auth = router({
     .query(async ({ ctx: { req, res } }) => {
       console.log("req", req.headers.host);
 
-      const callbackUrl = `${ envConfig.PROTOCOL || "http"}://${req.headers.host}`
+      const callbackUrl = `${ config.PROTOCOL || "http"}://${req.headers.host}`
        + join(BASE_PATH, "/api/auth/callback");
 
-      const target = joinWithUrl(envConfig.AUTH_EXTERNAL_URL,
+      const target = joinWithUrl(config.AUTH_EXTERNAL_URL,
         `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
       res.redirect(target);
+    }),
+
+  checkPassword: authProcedure
+    .input(z.object({
+      oldPassword:z.string(),
+      newPassword:z.string(),
+    }))
+    .output(z.object({
+      success: z.boolean(),
+    }))
+    .query(async ({ ctx: { req, res } }) => {
+      return { success: true };
     }),
 });

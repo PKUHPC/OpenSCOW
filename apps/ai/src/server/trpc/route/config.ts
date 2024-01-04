@@ -14,48 +14,20 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { getClusterConfigs, getLoginNode, getSortedClusterIds, getSortedClusters } from "@scow/config/build/cluster";
 import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
 import { getCapabilities } from "@scow/lib-auth";
-import { bool, envConfig as parseEnvConfig, parseKeyValue, str } from "@scow/lib-config";
+import { parseKeyValue } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
 import { aiConfig } from "src/server/config/ai";
 import { commonConfig } from "src/server/config/common";
+import { config as envConfig } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
-import { BASE_PATH, USE_MOCK } from "src/utils/processEnv";
 import { z } from "zod";
 
-const specs = {
 
-  BASE_PATH: str({ desc: "本服务路径", default: "/" }),
-
-  AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径", default: "/auth" }),
-
-  AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
-
-  LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
-
-  // SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
-  // SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
-
-  MOCK_USER_ID: str({ desc: "开发和测试的时候所使用的user id", default: undefined }),
-
-  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
-  MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
-
-  CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
-
-  PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
-
-  AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
-
-  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
-};
-
-export const envConfig = parseEnvConfig(specs, process.env);
-
-const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
+const configPath = envConfig.NEXT_PUBLIC_USE_MOCK === "1" ? join(__dirname, "config") : undefined;
 const clustersInit = getClusterConfigs(configPath, console);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
 Object.keys(clustersInit).map((id) => {
@@ -116,7 +88,7 @@ const HarborConfigSchema = z.object({
 });
 
 const PublicConfigSchema = z.object({
-  // ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
+  ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
   CLUSTERS: z.array(ClusterSchema),
   CLUSTER_SORTED_ID_LIST: z.array(z.string()),
@@ -141,6 +113,9 @@ const PublicConfigSchema = z.object({
 export type PublicConfig = z.infer<typeof PublicConfigSchema>;
 
 export type Cluster = z.infer<typeof ClusterSchema>;
+
+export type NavLink = z.infer<typeof NavLinkSchema>;
+
 
 const PartitionSchema = z.object({
   name: z.string(),
@@ -173,12 +148,12 @@ export const config = router({
     .output(PublicConfigSchema)
     .query(async () => {
 
-      // const capabilities = await getCapabilities(envConfig.AUTH_EXTERNAL_URL);
+      const capabilities = await getCapabilities(envConfig.AUTH_INTERNAL_URL);
       const versionTag = readVersionFile()?.tag;
       const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
       return {
-        // ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
+        ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
         MIS_URL: envConfig.MIS_URL,
 
@@ -188,7 +163,7 @@ export const config = router({
 
         PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
 
-        BASE_PATH,
+        BASE_PATH: envConfig.NEXT_PUBLIC_RUNTIME_BASE_PATH,
         // 上传（请求）文件的大小限制
         CLIENT_MAX_BODY_SIZE: envConfig.CLIENT_MAX_BODY_SIZE,
 

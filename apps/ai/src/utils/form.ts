@@ -12,6 +12,9 @@
 
 import { RuleObject } from "antd/lib/form/index.js";
 
+
+export { confirmPasswordFormItemProps, getEmailRule } from "@scow/lib-web/build/utils/form";
+
 export const noWhiteSpaceRule = {
   type: "string" as const,
   required: true,
