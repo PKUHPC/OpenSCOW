@@ -109,6 +109,12 @@ const UserLinkSchema = z.object({
   openInNewPage: z.boolean().optional(),
 });
 
+const HarborConfigSchema = z.object({
+  registryUrl: z.string(),
+  loginUser: z.string(),
+  loginPassword: z.string(),
+});
+
 const PublicConfigSchema = z.object({
   // ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
@@ -128,6 +134,7 @@ const PublicConfigSchema = z.object({
   }),
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
+  HARBOR_CONFIG: HarborConfigSchema,
 });
 
 // 类型别名
@@ -200,6 +207,8 @@ export const config = router({
         SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
         LOGIN_NODES: parseKeyValue(envConfig.LOGIN_NODES),
+
+        HARBOR_CONFIG: aiConfig.harborConfig,
       };
     }),
 

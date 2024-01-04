@@ -131,7 +131,9 @@ export async function shareFileOrDir(
       }
 
       // 复制并从顶层目录递归修改文件夹权限
-      await ssh.execCommand(`nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`);
+      const result =
+        await ssh.execCommand(`nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`);
+      console.log("【ssh.execCommand】", result);
       successCallback && successCallback();
     });
   } catch (err) {

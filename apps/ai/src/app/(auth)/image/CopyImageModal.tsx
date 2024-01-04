@@ -12,7 +12,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
-import { validateNoChinese } from "src/utils/form";
+import { imageNameValidation, imageTagValidation } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 
@@ -84,7 +84,7 @@ export const CopyImageModal: React.FC<Props> = (
           name="newName"
           rules={[
             { required: true },
-            { validator:validateNoChinese },
+            { validator: imageNameValidation },
           ]}
         >
           <Input allowClear />
@@ -94,7 +94,7 @@ export const CopyImageModal: React.FC<Props> = (
           name="newTag"
           rules={[
             { required: true },
-            { validator:validateNoChinese },
+            { validator: imageTagValidation },
           ]}
         >
           <Input />

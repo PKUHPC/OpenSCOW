@@ -6,3 +6,8 @@ db:
   dbName: scow_ai
 
 url: localhost:5007
+
+harborConfig:
+  registryUrl: http://10.129.227.64/harbor/projects/2/repositories/test/
+  loginUser: admin
+  loginPassword: icode@2023CS

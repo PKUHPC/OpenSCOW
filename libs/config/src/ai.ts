@@ -42,11 +42,19 @@ export const AiConfigSchema = Type.Object({
     }),
   )),
 
+  harborConfig: Type.Object({
+    registryUrl: Type.String({ description: "镜像存储用的Harbor仓库地址" }),
+    loginUser: Type.String({ description: "Harbor仓库地址登录时使用的用户名" }),
+    loginPassword: Type.String({ description: "Harbor仓库地址登录时使用的登录密码" }),
+  }),
+
 });
 
 const AUDIT_CONFIG_NAME = "ai";
 
 export type AiConfigSchema = Static<typeof AiConfigSchema>;
+
+export type HarborConfig = AiConfigSchema["harborConfig"];
 
 export const getAiConfig: GetConfigFn<AiConfigSchema> = (baseConfigPath) => {
   const config =

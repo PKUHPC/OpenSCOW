@@ -19,7 +19,7 @@ import { FileSelectModal } from "src/components/FileSelectModal";
 import { ImageInterface, Source, SourceText } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { validateNoChinese } from "src/utils/form";
+import { imageNameValidation, imageTagValidation } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
@@ -101,8 +101,6 @@ export const CreateEditImageModal: React.FC<Props> = (
     const { name, cluster, tag, description, source, sourcePath } = await form.validateFields();
     isEdit && editData ? editMutation.mutate({
       id: editData.id,
-      name,
-      tag,
       description,
     })
       : createMutation.mutate({
@@ -131,36 +129,76 @@ export const CreateEditImageModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
-        <Form.Item
+        {/* <Form.Item
           label="镜像名称"
           name="name"
           rules={[
             { required: true },
-            { validator:validateNoChinese },
+            { validator: imageNameValidation },
           ]}
         >
           <Input allowClear />
-        </Form.Item>
+        </Form.Item> */}
         { (isEdit && editData) ? (
-          editData.source === Source.INTERNAL && (
-            <>
-              <Form.Item
-                label="镜像来源"
-              >
-                {SourceText[editData.source]}
-              </Form.Item>
-              <Form.Item
-                label="集群"
-              >
-                {getI18nConfigCurrentText(
-                  clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+          <>
+            <Form.Item
+              label="镜像名称"
+              name="name"
+            >
+              {editData.name}
+            </Form.Item>
+            <Form.Item
+              label="镜像标签"
+              name="tag"
+              rules={[
+                { required: true },
+                { validator: imageTagValidation },
+              ]}
+            >
+              {editData.tag}
+            </Form.Item>
+
+            editData.source === Source.INTERNAL && (
+            <Form.Item
+              label="镜像来源"
+            >
+              {SourceText[editData.source]}
+            </Form.Item>
+            <Form.Item
+              label="集群"
+            >
+              {getI18nConfigCurrentText(
+                clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
                     ?? editData.clusterId }
-              </Form.Item>
-            </>
-          )
+            </Form.Item>
+            )
+
+          </>
 
         ) : (
-          source === Source.INTERNAL && (
+          <>
+            <Form.Item
+              label="镜像名称"
+              name="name"
+              rules={[
+                { required: true },
+                { validator: imageNameValidation },
+              ]}
+            >
+              <Input allowClear />
+            </Form.Item>
+            <Form.Item
+              label="镜像标签"
+              name="tag"
+              rules={[
+                { required: true },
+                { validator: imageTagValidation },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+
+            source === Source.INTERNAL && (
             <>
               <Form.Item
                 label="集群"
@@ -173,18 +211,20 @@ export const CreateEditImageModal: React.FC<Props> = (
               </Form.Item>
             </>
           )
+
+          </>
         )
         }
-        <Form.Item
+        {/* <Form.Item
           label="镜像标签"
           name="tag"
           rules={[
             { required: true },
-            { validator:validateNoChinese },
+            { validator: imageTagValidation },
           ]}
         >
           <Input />
-        </Form.Item>
+        </Form.Item>*/}
         <Form.Item label="镜像描述" name="description">
           <Input.TextArea />
         </Form.Item>
