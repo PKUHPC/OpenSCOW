@@ -42,7 +42,7 @@ export default function Page() {
               }}
             />
           </Logo>
-        ) : <span>SCOW AI</span>
+        ) : undefined
       }
     </div>
   );

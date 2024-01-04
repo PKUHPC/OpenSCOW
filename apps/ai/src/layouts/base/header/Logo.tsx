@@ -40,7 +40,7 @@ export const Logo = () => {
         {
           data ? (
             <img src={join(data.BASE_PATH, "/api/logo?" + query.toString())} alt="logo" height={40} />
-          ) : <span>SCOW AI</span>
+          ) : undefined
         }
       </Link>
     </LogoContainer>

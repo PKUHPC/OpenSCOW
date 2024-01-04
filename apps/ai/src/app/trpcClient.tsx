@@ -22,12 +22,27 @@ import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
 import superjson from "superjson";
 
+const MAX_RETRIES = 3;
+
 export function ClientProvider(props: { baseUrl: string; basePath: string; children: React.ReactNode }) {
 
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
+        retry(failureCount, error) {
+          const { data } = error as TRPCClientError<AppRouter>;
+          if (data?.code && data?.code === "UNAUTHORIZED") {
+            window.location.href = join(props.basePath, "/api/auth");
+            return false;
+          }
+
+          if (failureCount >= MAX_RETRIES) {
+            return false;
+          }
+
+          return true;
+        },
       },
     },
     queryCache: new QueryCache({
