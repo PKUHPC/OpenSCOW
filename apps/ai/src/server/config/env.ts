@@ -51,6 +51,8 @@ const specs = {
   DB_PASSWORD: str({ desc: "管理系统数据库密码，将会覆写配置文件", default: undefined }),
 
   NEXT_PUBLIC_USE_MOCK: str({ desc: "是否使用MOCK", default: "0" }),
+
+  DOWNLOAD_CHUNK_SIZE: num({ desc: "下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
 };
 
 export const config = envConfig(specs);
