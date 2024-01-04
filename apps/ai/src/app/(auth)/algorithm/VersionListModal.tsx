@@ -23,6 +23,7 @@ import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
+import { CopyPublicAlgorithmModal } from "./CopyPublicAlgorithmModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
 
@@ -39,6 +40,7 @@ export interface Props {
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const CopyPublicAlgorithmModalButton = ModalButton(CopyPublicAlgorithmModal, { type: "link" });
 
 export const VersionListModal: React.FC<Props> = (
   { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch, cluster },
@@ -138,13 +140,15 @@ export const VersionListModal: React.FC<Props> = (
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
-                <Button
-                  type="link"
-                  onClick={() => {
-                  }}
+                <CopyPublicAlgorithmModalButton
+                  data={r}
+                  algorithmId={algorithmId}
+                  algorithmName={algorithmName}
+                  algorithmVersionId={r.id}
+                  cluster={cluster}
                 >
-                    复制
-                </Button>
+                  复制
+                </CopyPublicAlgorithmModalButton>
               ) :
                 (
                   <>

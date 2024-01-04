@@ -15,9 +15,14 @@ import path from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { chmod } from "src/server/utils/chmod";
+import { copyFile } from "src/server/utils/copyFile";
+import { deleteDir } from "src/server/utils/deleteItem";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 const mockAlgorithmVersions = [
@@ -349,3 +354,85 @@ export const unShareAlgorithmVersion = procedure
     return;
   });
 
+export const copyPublicAlgorithmVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/algorithm/{algorithmId}/version/{algorithmVersionId}/copy",
+      tags: ["algorithmVersion"],
+      summary: "copy a public algorithm version",
+    },
+  })
+  .input(z.object({
+    algorithmId: z.number(),
+    algorithmVersionId: z.number(),
+    algorithmName: z.string(),
+    versionName: z.string(),
+    versionDescription: z.string(),
+    path: z.string(),
+  }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+
+    // 1. 检查算法版本是否为公开版本
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion,
+      { id: input.algorithmVersionId, sharedStatus: SharedStatus.SHARED },
+      { populate: ["algorithm"]});
+
+    if (!algorithmVersion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Algorithm Version ${input.algorithmVersionId} does not exist or is not public`,
+      });
+    }
+    // 2. 检查该用户是否已有同名算法
+    const algorithm = await orm.em.findOne(Algorithm, { name: input.algorithmName, owner: user.identityId });
+    if (algorithm) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `An algorithm with the same name as ${input.algorithmName} already exists`,
+      });
+    }
+
+    // 3. 写入数据
+    const newAlgorithm = new Algorithm({
+      name: input.algorithmName,
+      owner: user.identityId,
+      framework: algorithmVersion.algorithm.$.framework,
+      description: algorithmVersion.algorithm.$.description,
+      clusterId: algorithmVersion.algorithm.$.clusterId,
+    });
+
+    const newAlgorithmVersion = new AlgorithmVersion({
+      versionName: input.versionName,
+      versionDescription: input.versionDescription,
+      path: input.path,
+      privatePath: input.path,
+      algorithm: newAlgorithm,
+    });
+
+    const host = getClusterLoginNode(algorithmVersion.algorithm.$.clusterId);
+
+    if (!host) { throw clusterNotFound(algorithmVersion.algorithm.$.clusterId); }
+
+    // TODO：判断有无同名文件夹
+
+    try {
+      await copyFile({ host, userIdentityId: user.identityId,
+        fromPath: algorithmVersion.path, toPath: input.path });
+      // 递归修改文件权限和拥有者
+      await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
+      await orm.em.persistAndFlush([newAlgorithm, newAlgorithmVersion]);
+    } catch (err) {
+      // 回滚
+      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
+      console.log(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Copy Error",
+      });
+    }
+
+    return { success: true };
+  });

@@ -424,9 +424,9 @@ export const copyPublicDatasetVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/datasetVersion/copy/{datasetVersionId}",
+      path: "/dataset/{datasetId}/version/{datasetVersionId}/copy",
       tags: ["datasetVersion"],
-      summary: "copy a public dataset",
+      summary: "copy a public dataset version",
     },
   })
   .input(z.object({
