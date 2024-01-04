@@ -21,7 +21,6 @@ import { getHarborImageName, loadedImageRegex } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { checkSharePermission } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
-import { publicConfig } from "src/utils/config";
 import { z } from "zod";
 
 export const ImageListSchema = z.object({
