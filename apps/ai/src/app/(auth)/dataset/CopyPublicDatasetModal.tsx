@@ -16,7 +16,7 @@ import React, { useEffect } from "react";
 import { useUser } from "src/app/auth";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetVersionInterface } from "src/models/Dateset";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
