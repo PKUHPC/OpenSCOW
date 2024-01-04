@@ -38,7 +38,7 @@ export const CopyImageModal: React.FC<Props> = (
 
   const initialValues = {
     newName: copiedName,
-    newTags: copiedTag,
+    newTag: copiedTag,
   };
 
   const copyMutation = trpc.image.copyImage.useMutation({

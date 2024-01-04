@@ -129,16 +129,6 @@ export const CreateEditImageModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
-        {/* <Form.Item
-          label="镜像名称"
-          name="name"
-          rules={[
-            { required: true },
-            { validator: imageNameValidation },
-          ]}
-        >
-          <Input allowClear />
-        </Form.Item> */}
         { (isEdit && editData) ? (
           <>
             <Form.Item
@@ -150,28 +140,26 @@ export const CreateEditImageModal: React.FC<Props> = (
             <Form.Item
               label="镜像标签"
               name="tag"
-              rules={[
-                { required: true },
-                { validator: imageTagValidation },
-              ]}
             >
               {editData.tag}
             </Form.Item>
-
-            editData.source === Source.INTERNAL && (
             <Form.Item
               label="镜像来源"
             >
               {SourceText[editData.source]}
             </Form.Item>
-            <Form.Item
-              label="集群"
-            >
-              {getI18nConfigCurrentText(
-                clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
-                    ?? editData.clusterId }
-            </Form.Item>
-            )
+            { editData.source === Source.INTERNAL && (
+              <>
+                <Form.Item
+                  label="集群"
+                >
+                  {getI18nConfigCurrentText(
+                    clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+                      ?? editData.clusterId }
+                </Form.Item>
+              </>
+
+            )}
 
           </>
 
@@ -197,34 +185,26 @@ export const CreateEditImageModal: React.FC<Props> = (
             >
               <Input />
             </Form.Item>
+            {
+              source === Source.INTERNAL && (
+                <>
+                  <Form.Item
+                    label="集群"
+                    name="cluster"
+                    rules={[
+                      { required: true },
+                    ]}
+                  >
+                    <SingleClusterSelector />
+                  </Form.Item>
+                </>
+              )
+            }
 
-            source === Source.INTERNAL && (
-            <>
-              <Form.Item
-                label="集群"
-                name="cluster"
-                rules={[
-                  { required: true },
-                ]}
-              >
-                <SingleClusterSelector />
-              </Form.Item>
-            </>
-          )
 
           </>
         )
         }
-        {/* <Form.Item
-          label="镜像标签"
-          name="tag"
-          rules={[
-            { required: true },
-            { validator: imageTagValidation },
-          ]}
-        >
-          <Input />
-        </Form.Item>*/}
         <Form.Item label="镜像描述" name="description">
           <Input.TextArea />
         </Form.Item>

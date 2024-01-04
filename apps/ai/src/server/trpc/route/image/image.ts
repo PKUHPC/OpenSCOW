@@ -207,12 +207,12 @@ export const createImage = procedure
       await loggedExec(ssh, logger, true, dockerTagCmd, []);
 
       const loginHarborCmd =
-            `docker login -u ${aiConfig.harborConfig.user}
-            -p ${aiConfig.harborConfig.password} ${aiConfig.harborConfig.url}`;
+            `docker login ${aiConfig.harborConfig.url} -u ${aiConfig.harborConfig.user} \
+            -p ${aiConfig.harborConfig.password}`;
       await loggedExec(ssh, logger, true, loginHarborCmd, []);
 
-      const dockerPushCmd = `docker push ${localImage} ${targetImage}`;
-      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async (resp) => {
+      const dockerPushCmd = `docker push ${targetImage}`;
+      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async () => {
 
         // 删除本地镜像
         const dockerRmiCmd = `docker rmi ${localImage}`;
@@ -299,7 +299,7 @@ export const deleteImage = procedure
       });
     }
 
-    // TODO: 删除habor镜像
+    // TODO: 删除harbor镜像
     await orm.em.removeAndFlush(image);
     return { success: true };
   });
@@ -350,41 +350,96 @@ export const copyImage = procedure
     },
   })
   .input(z.object({ copiedId: z.number(), newName: z.string(), newTag: z.string() }))
-  .output(z.number())
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
+
     const orm = await getORM();
-    const sharedImage = await orm.em.findOne(Image, { id: input.copiedId, isShared: true });
+
+    const { copiedId, newName, newTag } = input;
+
+    const sharedImage = await orm.em.findOne(Image, { id: copiedId, isShared: true });
 
     if (!sharedImage) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Shared Image ${input.copiedId} not found`,
+        message: `Shared Image ${copiedId} not found`,
       });
     };
 
     const imageNameTagsExist = await orm.em.findOne(Image,
-      { name:input.newName, tag: input.newTag, owner: user.identityId });
+      { name: newName, tag: newTag, owner: user.identityId });
     if (imageNameTagsExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Image's name ${input.newName} with tag ${input.newTag} already exist`,
+        message: `Image's name ${newName} with tag ${newTag} already exist`,
       });
     };
 
-    // TODO 拉取分享镜像，上传新的镜像
-    const imageRealPath = "test-harbor";
-
-    const image = new Image({
-      name: input.newName,
-      tag: input.newTag,
-      owner: user.identityId,
-      source: Source.EXTERNAL,
-      sourcePath: sharedImage.path,
-      path: imageRealPath,
-      description: sharedImage.description,
-      clusterId: "",
+    const NoClusterError = new TRPCError({
+      code: "NOT_FOUND",
+      message: `Image ${newName}:${newTag} create failed: there is no available cluster`,
     });
-    await orm.em.persistAndFlush(image);
 
-    return image.id;
+    const NoLocalImageError = new TRPCError({
+      code: "NOT_FOUND",
+      message: `Image ${newName}:${newTag} create failed: localImage not found`,
+    });
+
+    const processClusterId = getSortedClusterIds(clusters)[0];
+    if (!processClusterId) { throw NoClusterError; }
+
+    const host = getClusterLoginNode(processClusterId);
+    if (!host) { throw clusterNotFound(processClusterId); };
+
+    await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+      // 拉取远程镜像
+      const dockerPullCmd = `docker pull ${sharedImage.path}`;
+      const pulledResp = await loggedExec(ssh, logger, true, dockerPullCmd, []);
+
+      const localImage = pulledResp ? sharedImage.path : undefined;
+      if (!localImage) { throw NoLocalImageError; }
+
+      const targetImage = getHarborImageName({
+        url: aiConfig.harborConfig.url,
+        project: aiConfig.harborConfig.project,
+        userId: user.identityId,
+        imageName: newName,
+        imageTag: newTag,
+      });
+
+      // 制作镜像上传
+      const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
+      await loggedExec(ssh, logger, true, dockerTagCmd, []);
+
+      const loginHarborCmd =
+            `docker login ${aiConfig.harborConfig.url} -u ${aiConfig.harborConfig.user} \
+            -p ${aiConfig.harborConfig.password}`;
+      await loggedExec(ssh, logger, true, loginHarborCmd, []);
+
+      const dockerPushCmd = `docker push ${targetImage}`;
+      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async () => {
+
+        // 删除本地镜像
+        const dockerRmiCmd = `docker rmi ${localImage}`;
+        try {
+          loggedExec(ssh, logger, false, dockerRmiCmd, []);
+        } catch (e) {
+          logger.error(`${localImage} rmi failed`, e);
+        };
+
+        const image = new Image({
+          name: input.newName,
+          tag: input.newTag,
+          owner: user.identityId,
+          source: Source.EXTERNAL,
+          sourcePath: sharedImage.path,
+          path: targetImage,
+          description: sharedImage.description,
+        });
+        await orm.em.persistAndFlush(image);
+
+        return image.id;
+
+      });
+    });
   });
