@@ -22,8 +22,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { Source, SourceText } from "src/models/Image";
+import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 

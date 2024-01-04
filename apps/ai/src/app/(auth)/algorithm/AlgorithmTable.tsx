@@ -20,7 +20,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { AlgorithmInterface, AlgorithmTypeText, Framework } from "src/models/Algorithm";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 

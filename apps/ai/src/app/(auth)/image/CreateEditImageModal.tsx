@@ -17,8 +17,8 @@ import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { ImageInterface, Source, SourceText } from "src/models/Image";
+import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { Cluster } from "src/utils/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 

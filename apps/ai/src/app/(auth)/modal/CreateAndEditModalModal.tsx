@@ -14,7 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 

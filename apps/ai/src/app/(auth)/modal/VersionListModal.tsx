@@ -17,9 +17,9 @@ import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
 import { ModalVersionInterface } from "src/models/Modal";
+import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
-import { Cluster } from "src/utils/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 

@@ -16,8 +16,8 @@ import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { DatasetVersionInterface } from "src/models/Dateset";
+import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { Cluster } from "src/utils/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 

@@ -13,9 +13,8 @@
 "use client";
 
 import { BookOutlined, DashboardOutlined,
-  DatabaseOutlined, FileImageOutlined, FolderOutlined, Loading3QuartersOutlined,
-  LockOutlined, OneToOneOutlined,
-  PlusOutlined, SaveOutlined, ShareAltOutlined, TeamOutlined, UngroupOutlined, UserOutlined } from "@ant-design/icons";
+  DatabaseOutlined, FileImageOutlined, FolderOutlined, LockOutlined, OneToOneOutlined,
+  PlusOutlined, ShareAltOutlined, UngroupOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import React from "react";
 import { useUserQuery } from "src/app/auth";
@@ -141,7 +140,7 @@ export default function Layout(
       Icon: BookOutlined,
       text: "作业",
       path: "/jobs",
-      clickToPath: "/jobs/runningJobs",
+      clickToPath: "",
       children: [
         ...publicConfig.CLUSTERS.map((cluster) => ({
           Icon: FolderOutlined,
