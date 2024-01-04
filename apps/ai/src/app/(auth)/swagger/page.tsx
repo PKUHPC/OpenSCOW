@@ -12,20 +12,21 @@
 
 "use client";
 
-// import SwaggerUI from "swagger-ui-react";
 import "swagger-ui-react/swagger-ui.css";
 
 import dynamic from "next/dynamic";
 import { join } from "path";
 import { Head } from "src/utils/head";
-import { BASE_PATH } from "src/utils/processEnv";
+
+import { usePublicConfig } from "../context";
 const SwaggerUI = dynamic(() => import("swagger-ui-react"), { ssr: false });
 
 export default function Page() {
 
+  const { publicConfig: { BASE_PATH } } = usePublicConfig();
   return (
     <>
-      <Head title="数据集"></Head>
+      <Head title="SCOW AI API"></Head>
       <SwaggerUI url={join(BASE_PATH, "/api/openapi.json")} />
     </>
   );

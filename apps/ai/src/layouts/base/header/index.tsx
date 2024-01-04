@@ -15,7 +15,7 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import { Space } from "antd";
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { Logo } from "src/layouts/base/header/Logo";

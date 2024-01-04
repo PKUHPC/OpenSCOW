@@ -24,10 +24,11 @@ import { config as envConfig } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
+import { USE_MOCK } from "src/utils/processEnv";
 import { z } from "zod";
 
 
-const configPath = envConfig.NEXT_PUBLIC_USE_MOCK === "1" ? join(__dirname, "config") : undefined;
+const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
 const clustersInit = getClusterConfigs(configPath, console);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
 Object.keys(clustersInit).map((id) => {

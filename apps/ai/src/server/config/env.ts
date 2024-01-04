@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { bool, envConfig, host, num, port, str } from "@scow/lib-config";
+import { bool, envConfig, num, str } from "@scow/lib-config";
 import { getKeyPair } from "@scow/lib-ssh";
 import { homedir } from "os";
 import { join } from "path";
@@ -36,8 +36,10 @@ const specs = {
 
   MOCK_USER_ID: str({ desc: "开发和测试的时候所使用的user id", default: undefined }),
 
-  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
+  PORTAL_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
+  PORTAL_URL: str({ desc: "如果部署了HPC门户系统，HPC门户系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署HPC门户系统", default: "" }),
 
+  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
@@ -49,8 +51,6 @@ const specs = {
   PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 
   DB_PASSWORD: str({ desc: "管理系统数据库密码，将会覆写配置文件", default: undefined }),
-
-  NEXT_PUBLIC_USE_MOCK: str({ desc: "是否使用MOCK", default: "0" }),
 
   DOWNLOAD_CHUNK_SIZE: num({ desc: "下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
 };
