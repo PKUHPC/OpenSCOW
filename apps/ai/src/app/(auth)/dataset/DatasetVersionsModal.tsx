@@ -23,6 +23,7 @@ import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
+import { CopyPublicDatasetModal } from "./CopyPublicDatasetModal";
 import { CreateEditDSVersionModal } from "./CreateEditDSVersionModal";
 
 export interface Props {
@@ -232,37 +233,16 @@ export const DatasetVersionsModal: React.FC<Props> = (
                 </>
               ) : (
                 <Space split={<Divider type="vertical" />}>
-                  <Button
-                    type="link"
-                    onClick={() => {
-                      modal.confirm({
-                        title: "TODO: 选择路径",
-                        onOk: async () => {
-                          // todo 选择存储路径
-                          await new Promise<void>((resolve) => {
-                            copyMutation.mutate({
-                              op: "copy",
-                              clusterId: cluster?.id ?? "",
-                              fromPath: r.path,
-                              //  todo 选择存储路径
-                              toPath: "/data/home/demo_admin/sharing/aaaa",
-                            }, {
-                              onSuccess() {
-                                onRefetch();
-                                resolve();
-                                message.success("复制成功");
-                              },
-                              onError() {
-                                resolve();
-                              },
-                            });
-                          });
-                        },
-                      });
-                    }}
+                  <CopyPublicDatasetModalButton
+                    datasetId={r.datasetId}
+                    datasetName={datasetName}
+                    datasetVersionId={r.id}
+                    cluster={cluster}
+                    data={r}
+                    refetch={onRefetch}
                   >
                     复制
-                  </Button>
+                  </CopyPublicDatasetModalButton>
                 </Space>
               );
 
@@ -273,3 +253,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
     </Modal>
   );
 };
+
+const CopyPublicDatasetModalButton = ModalButton(CopyPublicDatasetModal, { type: "link" });
+

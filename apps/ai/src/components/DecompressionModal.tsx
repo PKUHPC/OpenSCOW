@@ -34,7 +34,7 @@ export const CompressionModal: React.FC<Props> = ({ open, onClose, path, reload,
 
   const mutation = trpc.file.decompression.useMutation({
     onSuccess: () => {
-      message.success("创建成功");
+      message.success("解压成功");
       reload(form.getFieldValue("newDirName"));
       onClose();
       form.resetFields();

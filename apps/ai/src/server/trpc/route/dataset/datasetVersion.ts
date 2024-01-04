@@ -16,12 +16,15 @@ import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { chmod } from "src/server/utils/chmod";
+import { copyFile } from "src/server/utils/copyFile";
+import { deleteDir } from "src/server/utils/deleteItem";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
-
-import { FileType } from "../file";
 
 // const mockDatasetVersions = [
 //   {
@@ -381,3 +384,88 @@ export const unShareDatasetVersion = procedure
     await orm.em.flush();
     return { success: true };
   });
+
+export const copyPublicDatasetVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/datasetVersion/copy/{datasetVersionId}",
+      tags: ["datasetVersion"],
+      summary: "copy a public dataset",
+    },
+  })
+  .input(z.object({
+    datasetId: z.number(),
+    datasetVersionId: z.number(),
+    datasetName: z.string(),
+    versionName: z.string(),
+    versionDescription: z.string(),
+    path: z.string(),
+  }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+
+    // 1. 检查数据集版本是否为公开版本
+    const datasetVersion = await orm.em.findOne(DatasetVersion,
+      { id: input.datasetVersionId, sharedStatus: SharedStatus.SHARED },
+      { populate: ["dataset"]});
+
+    if (!datasetVersion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Dataset Version ${input.datasetVersionId} does not exist or is not public`,
+      });
+    }
+    // 2. 检查该用户是否已有同名数据集
+    const dataset = await orm.em.findOne(Dataset, { name: input.datasetName, owner: user.identityId });
+    if (dataset) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `A dataset with the same name as ${input.datasetName} already exists`,
+      });
+    }
+
+    // 3. 写入数据
+    const newDataset = new Dataset({
+      name: input.datasetName,
+      owner: user.identityId,
+      type: datasetVersion.dataset.$.type,
+      scene: datasetVersion.dataset.$.scene,
+      description: datasetVersion.dataset.$.description,
+      clusterId: datasetVersion.dataset.$.clusterId,
+    });
+
+    const newDatasetVersion = new DatasetVersion({
+      versionName: input.versionName,
+      versionDescription: input.versionDescription,
+      path: input.path,
+      privatePath: input.path,
+      dataset: newDataset,
+    });
+
+    const host = getClusterLoginNode(datasetVersion.dataset.$.clusterId);
+
+    if (!host) { throw clusterNotFound(datasetVersion.dataset.$.clusterId); }
+
+    // TODO：判断有无同名文件夹
+
+    try {
+      await copyFile({ host, userIdentityId: user.identityId,
+        fromPath: datasetVersion.path, toPath: input.path });
+      // 递归修改文件权限和拥有者
+      await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
+      await orm.em.persistAndFlush([newDataset, newDatasetVersion]);
+    } catch (err) {
+      // 回滚
+      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
+      console.log(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Copy Error",
+      });
+    }
+
+    return { success: true };
+  });
+

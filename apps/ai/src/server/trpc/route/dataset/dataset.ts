@@ -146,8 +146,8 @@ export const createDataset = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const dateSetExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
-    if (dateSetExist) {
+    const datesetExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    if (datesetExist) {
       throw new TRPCError({
         code: "CONFLICT",
       });
