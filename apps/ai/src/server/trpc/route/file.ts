@@ -282,7 +282,7 @@ export const file = router({
     .meta({
       openapi: {
         method: "GET",
-        path: "/files/download",
+        path: "/file/download",
         tags: ["file"],
         summary: "获取用户家目录路径",
       },
