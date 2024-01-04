@@ -16,6 +16,7 @@
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { Dispatch, PropsWithChildren, SetStateAction, useMemo, useState } from "react";
+import { useLogout } from "src/app/auth";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
@@ -23,7 +24,7 @@ import { SideNav } from "src/layouts/base/SideNav";
 import { Footer } from "src/layouts/Footer";
 import { ClientUserInfo } from "src/server/auth/models";
 import { arrayContainsElement } from "src/utils/array";
-import { styled } from "styled-components";
+import { styled } from "styled-components"; ;
 
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
@@ -83,7 +84,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         hasSidebar={hasSidebar}
         routes={routes}
         user={user}
-        logout={() => {}}
+        logout={useLogout()}
         userLinks={[]}
         languageId="zh_cn"
       />

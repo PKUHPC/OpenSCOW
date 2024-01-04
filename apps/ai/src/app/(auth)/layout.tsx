@@ -21,7 +21,6 @@ import { useUserQuery } from "src/app/auth";
 import { Loading } from "src/components/Loading";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { NotAuthorizedPage } from "src/layouts/error/NotAuthorizedPage";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
@@ -50,11 +49,7 @@ export default function Layout(
   }
 
   if (userQuery.isError || !userQuery.data.user) {
-    return (
-      <BaseLayout>
-        <NotAuthorizedPage />
-      </BaseLayout>
-    );
+    return;
   }
 
   if (configQuery.isLoading) {
