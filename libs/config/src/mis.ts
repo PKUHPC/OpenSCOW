@@ -34,6 +34,8 @@ export const MisConfigSchema = Type.Object({
 
   portalUrl: Type.Optional(Type.String({ description: "如果部署了门户系统，设置门户系统的部署URL或者pathname" })),
 
+  aiUrl: Type.Optional(Type.String({ description: "AI系统的部署URL或者路径" })),
+
   predefinedChargingTypes: Type.Array(Type.String(), { description: "预定义的充值类型", default: []}),
 
   accountNamePattern: Type.Optional(Type.Object({

@@ -63,6 +63,8 @@ export interface PublicRuntimeConfig {
 
   PORTAL_URL: string | undefined;
 
+  AI_URL: string | undefined;
+
   PUBLIC_PATH: string;
 
   NAV_LINKS?: NavLink[];

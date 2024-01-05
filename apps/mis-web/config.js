@@ -146,6 +146,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
 
+    AI_URL: config.AI_DEPLOYED ? (config.AI_URL || misConfig.aiUrl || "") : undefined,
+
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
 
     BASE_PATH: basePath,
