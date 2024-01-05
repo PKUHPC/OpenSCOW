@@ -14,13 +14,14 @@ import { getSortedClusterIds } from "@scow/config/build/cluster";
 import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
-import { rootKeyPair } from "src/server/config/env";
+import { config, rootKeyPair } from "src/server/config/env";
 import { Image, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { getHarborImageName, loadedImageRegex } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
+import { loginToHarbor } from "src/server/utils/loginHarbor";
 import { checkSharePermission } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -299,7 +300,72 @@ export const deleteImage = procedure
       });
     }
 
-    // TODO: 删除harbor镜像
+
+
+    // 获取harrbor中的reference以删除镜像
+    const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+    + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}/artifacts`;
+    const getReferenceRes = await fetch(getReferenceUrl, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+        // "X-Harbor-CSRF-Token": csrfToken,
+      },
+    });
+
+    if (!getReferenceRes.ok) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get image reference: " + getReferenceRes.statusText,
+      });
+    }
+
+    // 登录harbor获取token
+    const csrfToken = await loginToHarbor();
+
+    if (!csrfToken) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Login to harbor failed! Please contact the administrator! ",
+      });
+    }
+
+    const referenceRes = await getReferenceRes.json();
+
+    console.log("reference:", referenceRes);
+
+    let reference = "";
+    for (const item of referenceRes) {
+      if (item.tag.find((i: { name: string }) => i.name === image.tag)) {
+        reference = item.digest;
+      }
+    }
+
+    if (!reference) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to find image tag in harbor ! Please contact the administrator! ",
+      });
+    }
+
+    const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+    + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}`
+    + `/artifacts/${reference}/tags/${image.tag}`;
+    const deleteRes = await fetch(deleteUrl, {
+      method: "DELETE",
+      headers: {
+        "content-type": "application/json",
+        "X-Harbor-CSRF-Token": csrfToken,
+      },
+    });
+
+    if (!deleteRes.ok) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to delete image tag: " + deleteRes.statusText,
+      });
+    }
+
     await orm.em.removeAndFlush(image);
     return { success: true };
   });

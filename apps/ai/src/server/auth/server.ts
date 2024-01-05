@@ -46,26 +46,5 @@ export async function getUserInfo(req: RequestType, res?: NextApiResponse): Prom
 
   return { ...result, token };
 
-  // const client = getClient(AuthenticationServiceClient);
-
-  // const resp = await validateToken(token);
-  // const resp = await asyncUnaryCall(client, "getUserInfo", { token }).catch((e) => {
-  //   if (e.code === status.UNAUTHENTICATED) {
-  //     return undefined;
-  //   } else {
-  //     throw e;
-  //   }
-  // });
-
-  // const resp = { info: { ...mockUserInfo } };
-  // if (!resp || !resp.info) {
-  //   // the token is invalid. destroy the cookie
-  //   if (res) {
-  //     deleteUserToken(res);
-  //   }
-  //   return undefined;
-  // }
-  // return { ...resp.info, token };
-
 }
 
