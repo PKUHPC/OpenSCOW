@@ -19,6 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
+import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -59,6 +60,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
+      <QuickEntry></QuickEntry>
       <OverviewTable
         isLoading={isLoading}
         clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}

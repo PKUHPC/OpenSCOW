@@ -179,6 +179,9 @@ export default {
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Job Information Synchronization",
         accountList: "Account List",
+        clusterMonitor: "Cluster Monitor",
+        resourceStatus: "Resrouce Status",
+        alarmLog: "Alarm Log",
       },
       tenantManagement: {
         firstNav: "Tenant Management",
@@ -242,6 +245,17 @@ export default {
       },
     },
     admin: {
+      allAlarmLogsTable: {
+        firing: "Triggering",
+        resolved: "Resolved",
+        serialNumber: "Serial Number",
+        fingerPrint: "Finger Print",
+        status: "Status",
+        alarmLevel: "Alarm Level",
+        description: "Description",
+        firingTime: "Trigger Time",
+        resolvedTime: "Resolved Time",
+      },
       allTenantsTable: {
         tenantName: "Tenant Name",
         accountCount: "Account Count",
@@ -835,6 +849,22 @@ export default {
       unableReinitialize: "The system has already been initialized and cannot be reinitialized!",
     },
     admin: {
+      monitor: {
+        alarmLog: {
+          alarmLog: "Alarm Log",
+          firingTime: "Trigger Time",
+          firingTimePrompt: "Trigger time of the alarm",
+          status: "Status",
+          selectAll: "Select All",
+          firing: "Triggering",
+          resolved: "Resolved",
+          search: "Search",
+          refresh: "Refresh",
+        },
+        resourceStatus: {
+          resourceStatus: "Resource Status",
+        },
+      },
       operationLogs: {
         platformOperationLog: "Platform Operation Log",
       },

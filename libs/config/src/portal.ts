@@ -77,6 +77,9 @@ export const PortalConfigSchema = Type.Object({
     }),
   )),
 
+  uiExtension: Type.Optional(Type.Object({
+    url: Type.String({ description: "UI扩展站完整URL" }),
+  })),
 
 });
 
