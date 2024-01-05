@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "Management System",
+    linkTextMis: "Management System",
+    linkTextAI: "SCOW AI",
   },
   // routes
   routes: {

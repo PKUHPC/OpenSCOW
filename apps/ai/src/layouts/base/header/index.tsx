@@ -71,6 +71,7 @@ interface Props {
   userLinks?: UserLink[];
   pathname: string;
   languageId: string,
+  right?: React.ReactNode;
 }
 
 export const Header: React.FC<Props> = ({
@@ -82,6 +83,7 @@ export const Header: React.FC<Props> = ({
   pathname,
   userLinks,
   languageId,
+  right,
 }) => {
 
   return (
@@ -106,6 +108,7 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
+      {right}
       <IndicatorPart>
         <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId} />
       </IndicatorPart>

@@ -12,11 +12,12 @@
 
 "use client";
 
-
+import { DatabaseOutlined, DesktopOutlined } from "@ant-design/icons";
 import React from "react";
 import { useUserQuery } from "src/app/auth";
 import { Loading } from "src/components/Loading";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
+import { JumpToAnotherLink } from "src/layouts/base/header/Components";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
@@ -72,7 +73,33 @@ export default function Layout(
 
 
   return (
-    <BaseLayout routes={routes} user={userQuery.data.user}>
+    <BaseLayout
+      routes={routes}
+      user={userQuery.data.user}
+      headerRightContent={(
+        <>
+          <JumpToAnotherLink
+            user={userQuery.data.user}
+            icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.MIS_URL}
+            // linkText={t("baseLayout.linkTextMis")}
+            linkText="管理系统"
+          />
+          <JumpToAnotherLink
+            user={userQuery.data.user}
+            icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.PORTAL_URL}
+            // linkText={t("baseLayout.linkTextAI")}
+            linkText="门户"
+          />
+          {/* {
+            systemLanguageConfig.isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={initialLanguage} />
+            ) : undefined
+          } */}
+        </>
+      )}
+    >
       <PublicConfigContext.Provider value={{
         user: userQuery.data.user,
         publicConfig,

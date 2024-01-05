@@ -92,6 +92,7 @@ const HarborConfigSchema = z.object({
 const PublicConfigSchema = z.object({
   ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
+  PORTAL_URL: z.string().optional(),
   CLUSTERS: z.array(ClusterSchema),
   CLUSTER_SORTED_ID_LIST: z.array(z.string()),
   PASSWORD_PATTERN: z.string().optional(),
@@ -158,6 +159,8 @@ export const config = router({
         ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
         MIS_URL: envConfig.MIS_URL,
+
+        PORTAL_URL: envConfig.PORTAL_URL,
 
         CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
 

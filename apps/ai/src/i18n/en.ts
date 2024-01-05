@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "Management System",
+    linkTextMis: "Management System",
+    linkTextPortal: "PORTAL",
   },
   // routes
   routes: {

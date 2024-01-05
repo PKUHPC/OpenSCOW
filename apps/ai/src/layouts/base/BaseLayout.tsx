@@ -12,7 +12,6 @@
 
 "use client";
 
-
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { PropsWithChildren, useMemo, useState } from "react";
@@ -24,7 +23,7 @@ import { SideNav } from "src/layouts/base/SideNav";
 import { Footer } from "src/layouts/Footer";
 import { ClientUserInfo } from "src/server/auth/models";
 import { arrayContainsElement } from "src/utils/array";
-import { styled } from "styled-components"; ;
+import { styled } from "styled-components";
 
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
@@ -57,10 +56,11 @@ const StyledLayout = styled(Layout)`
 type Props = PropsWithChildren<{
   routes?: NavItemProps[];
   user?: ClientUserInfo | undefined;
+  headerRightContent?: React.ReactNode;
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
-  routes = [], children, user = undefined,
+  routes = [], children, user = undefined, headerRightContent,
 }) => {
   const pathname = usePathname() ?? "";
 
@@ -87,6 +87,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         logout={useLogout()}
         userLinks={[]}
         languageId="zh_cn"
+        right={headerRightContent}
       />
       <StyledLayout>
         {

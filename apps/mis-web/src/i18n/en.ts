@@ -153,7 +153,8 @@ export default {
         operationLog: "Operation Log",
         statistic: "Statistic",
       },
-      navLinkText: "Portal",
+      navLinkTextPortal: "Portal",
+      navLinkTextAI: "SCOW AI",
       dashboard: "Dashboard",
       user: {
         firstNav: "User Space",

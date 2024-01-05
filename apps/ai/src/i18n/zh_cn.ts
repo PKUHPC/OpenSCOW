@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "管理系统",
+    linkTextMis: "管理系统",
+    linkTextPortal: "门户",
   },
   // routes
   routes: {
