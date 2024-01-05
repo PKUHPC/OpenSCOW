@@ -12,4 +12,5 @@
 
 export enum ErrorCode {
   ALGORITHM_NAME_ALREADY_EXIST = "algorithm_name_already_exist",
+  OLD_PASSWORD_IS_WRONG = "old_password_is_wrong"
 }

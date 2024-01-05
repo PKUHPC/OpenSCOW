@@ -14,10 +14,12 @@ import { App, Form, Input, Modal } from "antd";
 import React, { useState } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { confirmPasswordFormItemProps } from "src/utils/form";
+import { trpc } from "src/utils/trpc";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
+  identityId: string;
 }
 
 interface FormInfo {
@@ -25,43 +27,38 @@ interface FormInfo {
   newPassword: string;
 }
 
-
 export const ChangePasswordModal: React.FC<Props> = ({
   open,
   onClose,
+  identityId,
 }) => {
 
   const { publicConfig } = usePublicConfig();
   const [form] = Form.useForm<FormInfo>();
   const { message } = App.useApp();
 
-  const [loading, setLoading] = useState(false);
+  const changePasswordMutation = trpc.auth.changePassword.useMutation({
+    onSuccess() {
+      message.success("修改密码成功");
+      form.resetFields();
+      onClose();
+    },
+    onError(e) {
+      if (e.data?.code === "BAD_REQUEST") {
+        message.error(`修改密码失败:${e.message}`);
+      }
+      else if (e.data?.code === "CONFLICT") {
+        message.error("原密码错误");
+      }
+      else {
+        message.error("修改密码失败");
+      }
+    },
+  });
 
   const onFinish = async () => {
     const { oldPassword, newPassword } = await form.validateFields();
-    setLoading(true);
-    // api.checkPassword({ query: { password: oldPassword } })
-    //   .then((result) => {
-    //     if (result.success) {
-    //       return api.changePassword({ body: { newPassword } })
-    //         .httpError(400, (e) => {
-    //           if (e.code === "PASSWORD_NOT_VALID") {
-    //             message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-    //           };
-    //           throw e;
-    //         })
-    //         .then(() => {
-    //           form.resetFields();
-    //           message.success(t(p("successMessage")));
-    //         });
-    //     }
-    //     else {
-    //       message.error(t(p("errorMessage")));
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
+    changePasswordMutation.mutate({ identityId, oldPassword, newPassword });
   };
 
   return (
@@ -69,7 +66,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
       title="修改密码"
       open={open}
       onOk={form.submit}
-      confirmLoading={loading}
+      confirmLoading={changePasswordMutation.isLoading}
       onCancel={onClose}
       destroyOnClose
     >

@@ -53,12 +53,9 @@ const TitleText = styled(Typography.Title)`
 
 const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link" });
 
-
-
 export default function Page() {
 
   const { publicConfig, user } = usePublicConfig();
-
 
   return (
     <Container>
@@ -94,7 +91,7 @@ export default function Page() {
               >
                 <Descriptions.Item label="登录密码">
                   <span style={{ width:"200px" }}>********</span>
-                  <ChangePasswordModalButton>
+                  <ChangePasswordModalButton identityId={user.identityId}>
                     修改密码
                   </ChangePasswordModalButton>
                 </Descriptions.Item>

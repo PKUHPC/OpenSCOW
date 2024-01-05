@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { changePassword, checkPassword } from "@scow/lib-auth";
 import { joinWithUrl } from "@scow/utils";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
@@ -19,9 +20,9 @@ import { validateToken } from "src/server/auth/token";
 import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure, baseProcedure } from "src/server/trpc/procedure/base";
+import { ErrorCode } from "src/server/utils/errorCode";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
-
 
 export const auth = router({
 
@@ -91,15 +92,39 @@ export const auth = router({
       res.redirect(target);
     }),
 
-  checkPassword: authProcedure
+  changePassword: authProcedure
     .input(z.object({
+      identityId:z.string(),
       oldPassword:z.string(),
       newPassword:z.string(),
+
     }))
-    .output(z.object({
-      success: z.boolean(),
-    }))
-    .query(async ({ ctx: { req, res } }) => {
-      return { success: true };
+    .mutation(async ({ input:{ identityId, oldPassword, newPassword } }) => {
+      const checkRes = await checkPassword(config.AUTH_INTERNAL_URL, {
+        identityId,
+        password: oldPassword,
+      }, console);
+
+      if (!checkRes || !checkRes.success) {
+        throw new TRPCError({
+          message: ErrorCode.OLD_PASSWORD_IS_WRONG,
+          code: "CONFLICT",
+        });
+      }
+
+      const changeRes = await changePassword(config.AUTH_INTERNAL_URL, {
+        identityId,
+        newPassword,
+      }, console)
+        .catch((e) => e.status);
+
+      if (changeRes) {
+        throw new TRPCError({
+          message: changeRes,
+          code: "BAD_REQUEST",
+        });
+      }
+
+      return;
     }),
 });
