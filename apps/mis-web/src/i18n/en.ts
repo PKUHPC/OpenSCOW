@@ -223,6 +223,7 @@ export default {
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
+        ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
         comment: "Comment",
         status: "Status",
