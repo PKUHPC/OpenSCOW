@@ -57,21 +57,24 @@ export const list = procedure
     nameOrTagOrDesc: z.string().optional(),
     isPublic: z.boolean().optional(),
     clusterId: z.string().optional(),
+    withExternal: z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(ImageListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
+
+    const { clusterId, isPublic, nameOrTagOrDesc, withExternal, pageSize, page } = input;
     const orm = await getORM();
 
-    const isPublicQuery = input.isPublic ? {
+    const isPublicQuery = isPublic ? {
       isShared: true,
       owner: { $ne: null },
     } : { owner: user?.identityId };
 
-    const nameOrTagOrDescQuery = input.nameOrTagOrDesc ? {
+    const nameOrTagOrDescQuery = nameOrTagOrDesc ? {
       $or: [
-        { name: { $like: `%${input.nameOrTagOrDesc}%` } },
-        { tag: { $like: `%${input.nameOrTagOrDesc}%` } },
-        { description: { $like: `%${input.nameOrTagOrDesc}%` } },
+        { name: { $like: `%${nameOrTagOrDesc}%` } },
+        { tag: { $like: `%${nameOrTagOrDesc}%` } },
+        { description: { $like: `%${nameOrTagOrDesc}%` } },
       ],
     } : {};
 
@@ -79,11 +82,11 @@ export const list = procedure
       $and: [
         nameOrTagOrDescQuery,
         isPublicQuery,
-        input.clusterId ? { clusterId: input.clusterId } : {},
+        input.clusterId ? (withExternal ? { $or: [{ clusterId }, { clusterId: { $eq: null } }]} : { clusterId }) : {},
       ],
     }, {
-      limit: input.pageSize || undefined,
-      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+      limit: pageSize || undefined,
+      offset: page && pageSize ? ((page ?? 1) - 1) * pageSize : undefined,
       orderBy: { createTime: "desc" },
     });
 

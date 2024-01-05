@@ -13,7 +13,6 @@
 "use client";
 
 import { LoadingOutlined } from "@ant-design/icons";
-import { App } from "antd";
 import { PageTitle } from "src/components/PageTitle";
 import { trpc } from "src/utils/trpc";
 
@@ -23,9 +22,6 @@ import { LaunchAppForm } from "../LaunchAppForm";
 export default function Page({ params }: {params: {clusterId: string}}) {
 
   const { clusterId } = params;
-
-  const { message } = App.useApp();
-  // const t = useI18nTranslateToString();
 
   const { data: clusterInfo, isLoading: isClusterLoading } = trpc.config.getClusterConfig.useQuery({ clusterId });
 

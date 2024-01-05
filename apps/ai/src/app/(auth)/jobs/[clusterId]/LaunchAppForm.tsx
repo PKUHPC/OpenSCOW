@@ -42,14 +42,15 @@ interface Props {
 interface FixedFormFields {
   appJobName: string;
   algorithm: { name: number, version: number };
-  image: any;
+  image: { name: number };
   dataset: { name: number, version: number };
   partition: string | undefined;
-  nodeCount: number;
   coreCount: number;
   gpuCount: number | undefined;
   account: string;
   maxTime: number;
+  command?: string;
+  runVariables?: { key: string, value: string }[];
 }
 
 interface CustomFormFileds {
@@ -78,7 +79,6 @@ const genAppJobName = (appName: string): string => {
 };
 
 const initialValues = {
-  nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
   maxTime: 60,
@@ -104,10 +104,12 @@ export const LaunchAppForm = (props: Props) => {
 
   const isPublicDataset = Form.useWatch(["dataset", "type"], form) === "public";
   const isPublicAlgorithm = Form.useWatch(["algorithm", "type"], form) === "public";
+  const isPublicImage = Form.useWatch(["image", "type"], form) === "public";
 
   const selectedDataset = Form.useWatch(["dataset", "name"], form);
 
   const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
+
 
   const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
     isShared: isPublicDataset, clusterId,
@@ -144,7 +146,20 @@ export const LaunchAppForm = (props: Props) => {
     return algorithmVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
   }, [algorithmVersions]);
 
-  const nodeCount = Form.useWatch("nodeCount", form) as number;
+  const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
+    isPublic: isPublicImage,
+    clusterId,
+    withExternal: true,
+  });
+
+  const imageOptions = useMemo(() => {
+    return images?.items.map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
+  }, [images]);
+
+
+  // const nodeCount = Form.useWatch("nodeCount", form) as number;
+  // 暂时写死为1
+  const nodeCount = 1;
 
   const coreCount = Form.useWatch("coreCount", form) as number;
 
@@ -236,8 +251,18 @@ export const LaunchAppForm = (props: Props) => {
     onError(e) {
       message.error(`创建失败: ${e.message}`);
     },
-  },
-  );
+  });
+
+  const trainJobMutation = trpc.jobs.trainJob.useMutation({
+    onSuccess() {
+      message.success("提交训练成功");
+      router.push(`/jobs/${clusterId}/runningJobs`);
+    },
+    onError(e) {
+      message.error(`提交训练失败: ${e.message}`);
+    },
+  });
+
 
   return (
     <Form
@@ -246,33 +271,59 @@ export const LaunchAppForm = (props: Props) => {
         ... initialValues,
       }}
       onFinish={async () => {
+
         const values = await form.validateFields();
-        const {
-          appJobName, algorithm, dataset, account, partition, nodeCount, coreCount, gpuCount, maxTime } = values;
-        const customFormKeyValue: CustomFormFileds = { customeFields: {} };
-        attributes.forEach((customFormAttribute) => {
-          const customFormKey = customFormAttribute.name;
-          customFormKeyValue.customeFields[customFormKey] = values.customeFields[customFormKey];
-        });
-        createAppSessionMutation.mutate({
-          clusterId,
-          appId: appId!,
-          appJobName,
-          algorithm: algorithm.version,
-          image: `${appImage!.name}:${appImage!.tag}`,
-          dataset: dataset.version,
-          account: account,
-          partition: partition,
-          nodeCount: nodeCount,
-          coreCount: coreCount,
-          gpuCount: gpuCount,
-          maxTime: maxTime,
-          customAttributes: customFormKeyValue.customeFields,
-        });
-      }}
+        if (isTraining) {
+          console.log("values.runVariables: ", values.runVariables);
+          await trainJobMutation.mutateAsync({
+            clusterId,
+            trainJobName: values.appJobName,
+            algorithm: values.algorithm.version,
+            imageId: values.image.name,
+            dataset: values.dataset.version,
+            account: values.account,
+            partition: values.partition,
+            nodeCount: 1,
+            coreCount: values.coreCount,
+            gpuCount: values.gpuCount,
+            maxTime: values.maxTime,
+            memory: memorySize,
+            command: values.command || "",
+            runVariables: [],
+          });
+        } else {
+          const {
+            appJobName, algorithm, dataset, account, partition, coreCount, gpuCount, maxTime } = values;
+          const customFormKeyValue: CustomFormFileds = { customeFields: {} };
+          attributes.forEach((customFormAttribute) => {
+            const customFormKey = customFormAttribute.name;
+            customFormKeyValue.customeFields[customFormKey] = values.customeFields[customFormKey];
+          });
+          createAppSessionMutation.mutate({
+            clusterId,
+            appId: appId!,
+            appJobName,
+            algorithm: algorithm.version,
+            image: {
+              name: appImage?.name || "",
+              tag: appImage?.tag,
+            },
+            dataset: dataset.version,
+            account: account,
+            partition: partition,
+            nodeCount: 1,
+            coreCount: coreCount,
+            gpuCount: gpuCount,
+            maxTime: maxTime,
+            memory: memorySize,
+            customAttributes: customFormKeyValue.customeFields,
+          });
+        } }
+      }
+
     >
       <Spin spinning={createAppSessionMutation.isLoading} tip="loading">
-        <Form.Item name="appJobName" label="应用名称" rules={[{ required: true }, { max: 50 }]}>
+        <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
         <Form.Item label="算法" required>
@@ -313,10 +364,24 @@ export const LaunchAppForm = (props: Props) => {
           <Form.Item label="镜像" required>
             <Space>
               <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
-                <Select style={{ minWidth: 100 }} />
+                <Select
+                  style={{ minWidth: 100 }}
+                  options={
+                    [
+                      {
+                        value: "private",
+                        label: "我的镜像",
+                      },
+                      {
+                        value: "public",
+                        label: "公共镜像",
+                      },
+                    ]
+                  }
+                />
               </Form.Item>
               <Form.Item name={["image", "name"]} rules={[{ required: true }]} noStyle>
-                <Select style={{ minWidth: 100 }} />
+                <Select style={{ minWidth: 100 }} loading={isImagesLoading} options={imageOptions} />
               </Form.Item>
             </Space>
           </Form.Item>
@@ -386,7 +451,7 @@ export const LaunchAppForm = (props: Props) => {
             onChange={handlePartitionChange}
           />
         </Form.Item>
-        <Form.Item
+        {/* <Form.Item
           label="节点数"
           name="nodeCount"
           dependencies={["partition"]}
@@ -401,37 +466,37 @@ export const LaunchAppForm = (props: Props) => {
             max={currentPartitionInfo?.nodes}
             {...inputNumberFloorConfig}
           />
-        </Form.Item>
+        </Form.Item> */}
         {
           currentPartitionInfo?.gpus ? (
             <Form.Item
-              label="单节点GPU卡数"
+              label="GPU卡数"
               name="gpuCount"
               dependencies={["partition"]}
               rules={[
                 {
                   required: true,
                   type: "integer",
-                  max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
+                  max: currentPartitionInfo?.gpus,
                 },
               ]}
             >
               <InputNumber
                 min={1}
-                max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
+                max={currentPartitionInfo?.gpus}
                 {...inputNumberFloorConfig}
               />
             </Form.Item>
           ) : (
             <Form.Item
-              label="单节点CPU核心数"
+              label="CPU核心数"
               name="coreCount"
               dependencies={["partition"]}
               rules={[
                 { required: true,
                   type: "integer",
                   max: currentPartitionInfo ?
-                    currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined },
+                    currentPartitionInfo.cores : undefined },
               ]}
             >
               <InputNumber
@@ -453,7 +518,6 @@ export const LaunchAppForm = (props: Props) => {
               ?
               (
                 <Col span={12} sm={6}>
-                  {/* <Form.Item label={t(p("totalGpuCount"))}> */}
                   <Form.Item label="总GPU数">
                     {nodeCount * gpuCount}
                   </Form.Item>
@@ -480,8 +544,8 @@ export const LaunchAppForm = (props: Props) => {
               </Form.Item>
               <Form.Item label="运行参数">
                 <Form.List
-                  name="keyValues"
-                  initialValue={[{ key: "", value: "" }]} // 初始化一个空的键值对
+                  name="runVariables"
+                  initialValue={[{ key: "", value: "" }]}
                 >
                   {(fields, { add, remove }) => (
                     <>
@@ -490,7 +554,6 @@ export const LaunchAppForm = (props: Props) => {
                           <Form.Item
                             {...restField}
                             name={[name, "key"]}
-                            rules={[{ required: true, message: "请输入键" }]}
                           >
                             <Input placeholder="键" />
                           </Form.Item>
@@ -498,7 +561,6 @@ export const LaunchAppForm = (props: Props) => {
                           <Form.Item
                             {...restField}
                             name={[name, "value"]}
-                            rules={[{ required: true, message: "请输入值" }]}
                           >
                             <Input placeholder="值" />
                           </Form.Item>

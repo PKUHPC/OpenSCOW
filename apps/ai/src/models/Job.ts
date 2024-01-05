@@ -10,28 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { router } from "src/server/trpc/def";
+export enum JobType {
+  APP = "app",
+  TRAIN = "train",
+}
 
-import {
-  cancelJob,
-  checkAppConnectivity,
-  connectToApp,
-  createAppSession,
-  getAppMetadata,
-  listAppSessions,
-  listAvailableApps,
-  saveImage,
-  trainJob,
-} from "./apps";
-
-export const jobsRouter = router({
-  listAvailableApps,
-  getAppMetadata,
-  createAppSession,
-  listAppSessions,
-  checkAppConnectivity,
-  connectToApp,
-  cancelJob,
-  saveImage,
-  trainJob,
-});

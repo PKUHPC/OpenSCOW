@@ -15,7 +15,15 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { getUserHomedir, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
+import {
+  getUserHomedir,
+  loggedExec,
+  sftpExists,
+  sftpReaddir,
+  sftpReadFile,
+  sftpRealPath,
+  sftpWriteFile,
+} from "@scow/lib-ssh";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { ApiVersion } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
@@ -23,9 +31,11 @@ import fs from "fs";
 import { join } from "path";
 import { Logger } from "pino";
 import { quote } from "shell-quote";
+import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
+import { Image as ImageEntity, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getClusterAppConfigs } from "src/server/utils/app";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clusters";
@@ -34,13 +44,14 @@ import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { isPortReachable } from "src/utils/isPortReachables";
 import { BASE_PATH } from "src/utils/processEnv";
-import { number, string, z } from "zod";
+import { z } from "zod";
 
+const ImageSchema = z.object({
+  name: z.string(),
+  tag: z.string().optional(),
+});
 
-export enum JobType {
-  APP = "app",
-  TRAIN = "train",
-}
+export type Image = z.infer<typeof ImageSchema>
 
 const JobTypeSchema = z.nativeEnum(JobType);
 
@@ -49,7 +60,8 @@ const AppSessionSchema = z.object({
   jobId: z.number(),
   submitTime: z.string(),
   jobType: JobTypeSchema,
-  appId: z.string(),
+  image: ImageSchema,
+  appId: z.string().optional(),
   appName: z.string().optional(),
   state: z.string(),
   dataPath: z.string(),
@@ -73,9 +85,9 @@ interface ServerSessionInfoData {
 interface SessionMetadata {
   sessionId: string;
   jobId: number;
-  appId: string;
+  appId?: string;
   submitTime: string;
-  image: string;
+  image: Image;
   jobType: JobType
 }
 
@@ -83,7 +95,7 @@ const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { e
 
 const SESSION_METADATA_NAME = "session.json";
 
-const SERVER_SESSION_INFO = "server_session_info.json";
+const SERVER_SESSION_INFO = "/tmp/server_session_info.json";
 
 const getEnvVariables = (env: Record<string, string>) =>
   Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
@@ -245,20 +257,19 @@ export const createAppSession = procedure
     appId: z.string(),
     appJobName: z.string(),
     algorithm: z.number(),
-    image: z.string(),
+    image: ImageSchema,
     dataset: z.number().optional(),
     account: z.string(),
     partition: z.string().optional(),
-    qos: z.string().optional(),
     coreCount: z.number(),
     nodeCount: z.number(),
     gpuCount: z.number().optional(),
-    memory: z.string().optional(),
+    memory: z.number().optional(),
     maxTime: z.number(),
     customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
   })).mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image,
-      dataset, account, partition, qos, coreCount, nodeCount, gpuCount, memory,
+      dataset, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, customAttributes } = input;
     const apps = getClusterAppConfigs(clusterId);
     const app = apps[appId];
@@ -272,24 +283,21 @@ export const createAppSession = procedure
     }
     const attributesConfig = app.attributes;
     attributesConfig?.forEach((attribute) => {
-      if (attribute.required && !(attribute.name in customAttributes) && attribute.name !== "sbatchOptions") {
-        // throw new DetailedError({
-        //   code: Status.INVALID_ARGUMENT,
-        //   message: `custom form attribute ${attribute.name} is required but not found`,
-        //   details: [errorInfo("INVALID ARGUMENT")],
-        // });
+      if (attribute.required && !(attribute.name in customAttributes)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `custom form attribute ${attribute.name} is required but not found`,
+        });
       }
 
       switch (attribute.type) {
       case "number":
         if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-          // throw new DetailedError({
-          //   code: Status.INVALID_ARGUMENT,
-          //   message: `
-          //     custom form attribute ${attribute.name} should be of type number,
-          //     but of type ${typeof customAttributes[attribute.name]}`,
-          //   details: [errorInfo("INVALID ARGUMENT")],
-          // });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `custom form attribute ${
+              attribute.name} should be of type number, but of type ${typeof customAttributes[attribute.name]}`,
+          });
         }
         break;
 
@@ -300,14 +308,13 @@ export const createAppSession = procedure
         // check the option selected by user is in select attributes as the config defined
         if (customAttributes[attribute.name]
           && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-          // throw new DetailedError({
-          //   code: Status.INVALID_ARGUMENT,
-          //   message: `
-          //     the option value of ${attribute.name} selected by user should be
-          //     one of select attributes as the ${appId} config defined,
-          //     but is ${customAttributes[attribute.name]}`,
-          //   details: [errorInfo("INVALID ARGUMENT")],
-          // });
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `
+              the option value of ${attribute.name} selected by user should be
+              one of select attributes as the ${appId} config defined,
+              but is ${customAttributes[attribute.name]}`,
+          });
         }
         break;
 
@@ -337,8 +344,6 @@ export const createAppSession = procedure
         message: `dataset version id ${dataset} is not found`,
       });
     }
-
-    const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
     const host = getClusterLoginNode(clusterId);
     if (!host) { throw new TRPCError({
@@ -383,35 +388,33 @@ export const createAppSession = procedure
         const entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
-        // const client = getAdapterClient(clusterId);
-        // const reply = await asyncClientCall(client.job, "submitJob", {
-        //   userId,
-        //   jobName: appJobName,
-        //   // algorithm: algorithmVersion.path,
-        //   // image,
-        //   // dataset: datasetVesion.path,
-        //   account,
-        //   partition: partition!,
-        //   qos,
-        //   coreCount,
-        //   nodeCount,
-        //   gpuCount: gpuCount ?? 0,
-        //   memoryMb,
-        //   timeLimitMinutes: maxTime,
-        //   workingDirectory: appJobsDirectory,
-        //   script: remoteEntryPath,
-        //   // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
-        //   extraOptions: [JobType.APP, appId],
-        // }).catch((e) => {
-        //   throw new TRPCError({
-        //     code: "INTERNAL_SERVER_ERROR",
-        //     message: "submit job failed",
-        //   });
-        // });
+        const client = getAdapterClient(clusterId);
+        const reply = await asyncClientCall(client.job, "submitJob", {
+          userId,
+          jobName: appJobName,
+          image: `${image.name}:${image.tag || "latest"}`,
+          algorithm: algorithmVersion.path,
+          dataset: datasetVesion.path,
+          account,
+          partition: partition!,
+          coreCount,
+          nodeCount,
+          gpuCount: gpuCount ?? 0,
+          memoryMb: memory,
+          timeLimitMinutes: maxTime,
+          workingDirectory: appJobsDirectory,
+          script: remoteEntryPath,
+          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
+          extraOptions: [JobType.APP, "web"],
+        }).catch((e) => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "submit job failed",
+          });
+        });
 
         const metadata: SessionMetadata = {
-          // jobId: reply.jobId,
-          jobId: 123,
+          jobId: reply.jobId,
           sessionId: appJobName,
           submitTime: new Date().toISOString(),
           appId,
@@ -419,10 +422,218 @@ export const createAppSession = procedure
           jobType: JobType.APP,
         };
         await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+
+        return { jobId: reply.jobId };
       }
     });
 
   });
+
+export const saveImage =
+  procedure
+    .input(z.object({
+      clusterId: z.string(),
+      jobId: z.number(),
+      imageName: z.string(),
+      imageTag: z.string(),
+      imageDesc: z.string().optional(),
+    })).mutation(
+      async ({ input, ctx: { user } }) => {
+        const userId = user.identityId;
+        const { clusterId, jobId, imageName, imageTag, imageDesc } = input;
+
+        // 检查镜像在数据库中是否重复
+        const orm = await getORM();
+        const existImage = await orm.em.findOne(ImageEntity, { owner: userId, name: imageName, tag: imageTag });
+        if (existImage) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `Image with name: ${imageName} and tag: ${imageTag} of user: ${userId} already exsits.`,
+          });
+        }
+        // 根据jobId获取该应用运行在集群的节点和对应的containerId
+        const client = getAdapterClient(clusterId);
+
+        const { node, containerId } = await asyncClientCall(client.job, "getRunningJobNodeInfo", {
+          jobId,
+        });
+        const formateContainerId = containerId.replace("docker://", "");
+        const { url, project, user: harborUser, password } = aiConfig.harborConfig;
+        // 连接到该节点
+        return await sshConnect(node, "root", logger, async (ssh) => {
+          try {
+            const harborImageUrl = `${url}/${project}/${userId}/${imageName}:${imageTag}`;
+            const localImageUrl = `${userId}/${imageName}:${imageTag}`;
+
+            // 检查该容器是否存在
+            const resp = await loggedExec(ssh, logger, true, `docker  ps --no-trunc | grep ${formateContainerId}`, []);
+            if (!resp.stdout) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: `Can not find the container: ${formateContainerId} in node ${node}`,
+              });
+            }
+            // 用新名字commit镜像
+            await loggedExec(ssh, logger, true,
+              `docker commit ${formateContainerId} ${userId}/${imageName}:${imageTag}`, []);
+
+            // docker login harbor
+            await loggedExec(ssh, logger, true,
+              `docker login  ${url} -u ${harborUser} -p ${password}`, []);
+
+            // docker tag
+            await loggedExec(ssh, logger, true, `docker tag ${localImageUrl} ${harborImageUrl}`, []);
+
+            // push 镜像至harbor
+            await loggedExec(ssh, logger, true,
+              `docker push ${harborImageUrl}`, []);
+
+            // 清除本地镜像
+            await loggedExec(ssh, logger, true,
+              `docker rmi ${harborImageUrl}`, []);
+            await loggedExec(ssh, logger, true,
+              `docker rmi ${localImageUrl}`, []);
+
+            // 数据库添加image
+
+            const newImage = new ImageEntity({
+              name: imageName,
+              tag: imageTag,
+              description: imageDesc,
+              path: harborImageUrl,
+              owner: userId,
+              source: Source.EXTERNAL,
+              sourcePath: harborImageUrl,
+            });
+            await orm.em.persistAndFlush(newImage);
+          } catch (e: any) {
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: `Save image failed, ${e?.message}`,
+            });
+          }
+        });
+      },
+    );
+
+export const trainJob =
+procedure
+  .input(z.object({
+    clusterId: z.string(),
+    trainJobName: z.string(),
+    algorithm: z.number(),
+    imageId: z.number(),
+    dataset: z.number().optional(),
+    account: z.string(),
+    partition: z.string().optional(),
+    coreCount: z.number(),
+    nodeCount: z.number(),
+    gpuCount: z.number().optional(),
+    memory: z.number().optional(),
+    maxTime: z.number(),
+    command: z.string(),
+    runVariables: z.array(z.object({ key: z.string(), value: z.string() })),
+  }))
+  .output(z.object({
+    jobId: z.number(),
+  })).mutation(
+    async ({ input, ctx: { user } }) => {
+
+      const { clusterId, trainJobName, algorithm, imageId, dataset, account, partition,
+        coreCount, nodeCount, gpuCount, memory, maxTime, command, runVariables } = input;
+      const userId = user.identityId;
+
+      const host = getClusterLoginNode(clusterId);
+      if (!host) { throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Cluster ${clusterId} has no login node` });
+      }
+
+      const orm = await getORM();
+
+      const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
+
+      if (!algorithmVersion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `algorithm version id ${algorithm} is not found`,
+        });
+      }
+
+      const datasetVesion = await orm.em.findOne(DatasetVersion, { id: dataset });
+
+      if (!datasetVesion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `dataset version id ${dataset} is not found`,
+        });
+      }
+
+      const image = await orm.em.findOne(ImageEntity, { id: imageId });
+
+      if (!image) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `image id ${imageId} is not found`,
+        });
+      }
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+
+        const homeDir = await getUserHomedir(ssh, userId, logger);
+
+        const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
+
+        // make sure trainJobsDirectory exists.
+        await ssh.mkdir(trainJobsDirectory);
+        const sftp = await ssh.requestSFTP();
+        const remoteEntryPath = join(homeDir, trainJobsDirectory, "entry.sh");
+
+        const entryScript = command + " " + runVariables.map((x) => `${x.key}=${x.value}`).join(" ");
+        await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
+
+        const client = getAdapterClient(clusterId);
+        const reply = await asyncClientCall(client.job, "submitJob", {
+          userId,
+          jobName: trainJobName,
+          algorithm: algorithmVersion.path,
+          image: image.path,
+          dataset: datasetVesion.path,
+          account,
+          partition: partition!,
+          coreCount,
+          nodeCount,
+          gpuCount: gpuCount ?? 0,
+          memoryMb: Number(memory),
+          timeLimitMinutes: maxTime,
+          workingDirectory: trainJobsDirectory,
+          script: remoteEntryPath,
+          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
+          extraOptions: [JobType.TRAIN],
+        }).catch(() => {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Submit train job failed",
+          });
+        });
+
+        const metadata: SessionMetadata = {
+          jobId: reply.jobId,
+          sessionId: trainJobName,
+          submitTime: new Date().toISOString(),
+          image: {
+            name: image.name,
+            tag: image.tag,
+          },
+          jobType: JobType.TRAIN,
+        };
+        await sftpWriteFile(sftp)(join(trainJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+        return { jobId: reply.jobId };
+
+      });
+
+    },
+  );
 
 export const listAppSessions =
   procedure
@@ -452,7 +663,6 @@ export const listAppSessions =
           },
         }).then((resp) => resp.jobs);
 
-
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;
           return prev;
@@ -477,38 +687,42 @@ export const listAppSessions =
           const content = await sftpReadFile(sftp)(metadataPath);
           const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-          const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
+          // 如果是训练，不需要连接信息
 
-          const app = apps[sessionMetadata.appId];
+          const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
 
-          // judge whether the app is ready
-          if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+          if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
+            const app = apps[sessionMetadata.appId];
+
+            // judge whether the app is ready
+            if (runningJobInfo && runningJobInfo.state === "RUNNING") {
             // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
             // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
-            await sftpReaddir(sftp)(jobDir);
+              await sftpReaddir(sftp)(jobDir);
 
-            if (app.type === "web") {
-            // for server apps,
-            // try to read the SESSION_INFO file to get port and password
-              const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-              if (await sftpExists(sftp, infoFilePath)) {
-                const content = await sftpReadFile(sftp)(infoFilePath);
-                const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+              if (app.type === "web") {
+                // for server apps,
+                // try to read the SESSION_INFO file to get port and password
+                const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
+                if (await sftpExists(sftp, infoFilePath)) {
+                  const content = await sftpReadFile(sftp)(infoFilePath);
+                  const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
 
-                host = serverSessionInfo.HOST;
-                port = serverSessionInfo.PORT;
-              }
-            } else {
+                  host = serverSessionInfo.HOST;
+                  port = serverSessionInfo.PORT;
+                }
+              } else {
               // TODO: if vnc apps
-            }
+              }
 
-            const connectionInfo = await getAppConnectionInfoFromAdapter(clusterId, sessionMetadata.jobId, logger);
-            if (connectionInfo?.response?.$case === "appConnectionInfo") {
-              host = connectionInfo.response.appConnectionInfo.host;
-              port = connectionInfo.response.appConnectionInfo.port;
+              const connectionInfo = await getAppConnectionInfoFromAdapter(clusterId, sessionMetadata.jobId, logger);
+              if (connectionInfo?.response?.$case === "appConnectionInfo") {
+                host = connectionInfo.response.appConnectionInfo.host;
+                port = connectionInfo.response.appConnectionInfo.port;
+              }
             }
           }
 
@@ -520,10 +734,11 @@ export const listAppSessions =
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
-            appName: apps[sessionMetadata.appId]?.name,
+            appName: sessionMetadata?.appId ? apps[sessionMetadata?.appId]?.name : undefined,
             sessionId: sessionMetadata.sessionId,
             submitTime: sessionMetadata.submitTime,
             jobType: sessionMetadata.jobType,
+            image: sessionMetadata.image,
             state: runningJobInfo?.state ?? "ENDED",
             dataPath: await sftpRealPath(sftp)(jobDir),
             runningTime: runningJobInfo?.elapsedSeconds !== undefined
@@ -627,25 +842,24 @@ procedure
       const content = await sftpReadFile(sftp)(metadataPath);
       const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-      // const app = apps[sessionMetadata.appId];
-
-      const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
-      if (connectionInfo?.response?.$case === "appConnectionInfo") {
-        const { host, port, password } = connectionInfo.response.appConnectionInfo;
-        return {
-          appId: sessionMetadata.appId,
-          host: host,
-          port: port,
-          password: password,
-        };
+      if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
+        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          const { host, port, password } = connectionInfo.response.appConnectionInfo;
+          return {
+            appId: sessionMetadata.appId,
+            host: host,
+            port: port,
+            password: password,
+          };
+        }
       }
-
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: `session id ${sessionId} cannot be connected.`,
       });
-    });
 
+    });
 
     const app = apps[reply.appId];
 

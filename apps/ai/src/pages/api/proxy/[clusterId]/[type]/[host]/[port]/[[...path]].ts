@@ -15,7 +15,6 @@ import { getUserInfo } from "src/server/auth/server";
 import { parseProxyTarget, proxy } from "src/server/setup/proxy";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-
   const user = await getUserInfo(req)
     .then((u) => {
       if (!u) {
@@ -34,8 +33,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   // req.url of next.js removes base path
   const target = parseProxyTarget(req.url!, false);
 
-  console.log("target: ", target);
-
   if (target instanceof Error) {
     res.status(400).send(target.message);
     return;
@@ -50,12 +47,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       res.status(500).send(err);
     }
   });
-
-
 };
 
 export const config = {
   api: {
+    externalResolver: true,
     bodyParser: false,
   },
 };

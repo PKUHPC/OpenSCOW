@@ -14,17 +14,21 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { ModalButton } from "src/components/ModalLink";
+import { JobType } from "src/models/Job";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
-import { compareDateTime, formatDateTime } from "src/utils/datetime";
+import { calculateAppRemainingTime, compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
 import { trpc } from "src/utils/trpc";
 
 import { ConnectTopAppLink } from "./ConnectToAppLink";
+import { SaveImageModal } from "./SaveImageModal";
+
 
 interface FilterForm {
   appJobName: string | undefined
@@ -43,6 +47,8 @@ export function compareState(a: string, b: string): -1 | 0 | 1 {
   if (a === endState) { return -1; }
   return 1;
 }
+
+const SaveImageModalButton = ModalButton(SaveImageModal, { type: "link" });
 
 export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
@@ -74,16 +80,27 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const columns: TableColumnsType<AppSession> = [
     {
+      title: "作业ID",
+      dataIndex: "jobId",
+      width: "8%",
+      sorter: (a, b) => compareNumber(a.jobId, b.jobId),
+    },
+    {
       title: "作业名",
       dataIndex: "sessionId",
       width: "25%",
       ellipsis: true,
     },
     {
-      title: "作业ID",
-      dataIndex: "jobId",
-      width: "8%",
-      sorter: (a, b) => compareNumber(a.jobId, b.jobId),
+      title: "类型",
+      dataIndex: "jobType",
+      width: "10%",
+      render: (_, record) => {
+        if (record.jobType === JobType.APP) {
+          return "应用";
+        }
+        return "训练";
+      },
     },
     {
       title: "应用",
@@ -134,11 +151,13 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           {
             (record.state === "RUNNING") ? (
               <>
-                <ConnectTopAppLink
-                  session={record}
-                  cluster={cluster.id}
-                  refreshToken={connectivityRefreshToken}
-                />
+                {record.jobType === JobType.APP && (
+                  <ConnectTopAppLink
+                    session={record}
+                    cluster={cluster.id}
+                    refreshToken={connectivityRefreshToken}
+                  />
+                )}
                 <Popconfirm
                   title="确定结束这个任务吗"
                   onConfirm={
@@ -174,6 +193,15 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
               </Popconfirm>
             ) : undefined
           }
+          {
+            (record.state === "RUNNING" && record.jobType === JobType.APP) ? (
+              <SaveImageModalButton
+                reload={refetch}
+                appSession={record}
+                clusterId={cluster.id}
+              >保存镜像</SaveImageModalButton>
+            ) : undefined
+          }
           <a onClick={() => {
             router.push(join("/files", cluster.id, record.dataPath));
           }}
@@ -207,7 +235,11 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
         return x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase());
       }
       return true;
-    });
+    }).map((x) => ({
+      ...x,
+      remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
+        x.state === "PENDING" ? "" : x.timeLimit,
+    }));
   }, [data]);
 
   return (
@@ -253,7 +285,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
         dataSource={filteredData}
         columns={columns}
         rowKey={(record) => record.sessionId}
-        loading={!filteredData && isLoading && isFetching}
+        loading={isLoading || isFetching}
         scroll={{ x: filteredData?.length ? 1200 : true }}
         pagination={{
           showSizeChanger: true,
