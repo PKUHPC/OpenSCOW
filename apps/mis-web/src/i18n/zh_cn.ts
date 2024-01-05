@@ -223,6 +223,7 @@ export default {
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",
+        ownerIdOrName: "拥有者ID或姓名",
         tenant:"租户",
         comment:"备注",
         status:"状态",
