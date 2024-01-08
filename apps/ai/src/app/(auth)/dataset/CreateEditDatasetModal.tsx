@@ -97,7 +97,6 @@ export const CreateEditDatasetModal: React.FC<Props> = (
     const { name, type, description, scene, cluster } = await form.validateFields();
     (isEdit && editData) ? editMutation.mutate({
       id: editData.id,
-      clusterId: editData.clusterId,
       name,
       type,
       scene,

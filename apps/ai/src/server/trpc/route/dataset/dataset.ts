@@ -11,13 +11,15 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, unShareFileOrDir } from "src/server/utils/share";
+import { logger } from "src/server/utils/logger";
+import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
+  unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
 // const mockDatasets = [
@@ -169,7 +171,6 @@ export const updateDataset = procedure
   })
   .input(z.object({
     id: z.number(),
-    clusterId: z.string(),
     name: z.string(),
     type: z.string(),
     scene: z.string(),
@@ -178,36 +179,76 @@ export const updateDataset = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const dataset = await orm.em.findOne(Dataset, { id: input.id });
+
+    const { id, name, type, scene, description } = input;
+
+    const dataset = await orm.em.findOne(Dataset, { id });
 
     if (!dataset) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Dataset ${input.id} not found`,
+        message: `Dataset ${id} not found`,
       });
     };
 
-    if (dataset.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
+    if (dataset.owner !== user.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${id} not accessible` });
 
     const nameExist = await orm.em.findOne(Dataset, {
-      name:input.name,
-      owner: user!.identityId,
+      name,
+      owner: user.identityId,
       id: { $ne: input.id },
     });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `Dataset name ${input.name} duplicated`,
+        message: `Dataset name ${name} duplicated`,
       });
     }
 
-    dataset.name = input.name;
-    dataset.type = input.type;
-    dataset.scene = input.scene;
-    dataset.description = input.description;
+    // 如果是已分享的数据集且名称发生变化，则变更共享路径下的此数据集名称为新名称
+    const oldPath = join(SHARED_DIR, SHARED_TARGET.DATASET, `${dataset.name}-${user!.identityId}`);
 
-    await orm.em.flush();
+    if (dataset.isShared && name !== dataset.name) {
+      await updateSharedName({
+        target: SHARED_TARGET.DATASET,
+        user: user,
+        clusterId: dataset.clusterId,
+        newName: name,
+        isVersionName: false,
+        oldPath,
+      });
+
+      // 更新已分享的版本的共享文件夹地址
+      const newPathDir = join(SHARED_DIR, SHARED_TARGET.DATASET, `${name}-${user!.identityId}`);
+      const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
+      sharedVersions.map((v) => {
+        v.path = join(newPathDir, v.versionName);
+      });
+
+    }
+
+    dataset.name = name;
+    dataset.type = type;
+    dataset.scene = scene;
+    dataset.description = description;
+
+    await orm.em.flush().catch(async (e) => {
+      if (dataset.isShared && name !== dataset.name) {
+        logger.info("Rollback update shared name of %s", name);
+        await updateSharedName({
+          target: SHARED_TARGET.DATASET,
+          user: user,
+          clusterId: dataset.clusterId,
+          newName: name,
+          isVersionName: false,
+          oldPath,
+          needRollback: true,
+        });
+      }
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Update Dataset ${id} failed: ${e}` });
+    });
+
     return dataset.id;
   });
 

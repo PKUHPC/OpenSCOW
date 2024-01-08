@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists, sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
+import { loggedExec, sftpExists, sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 
 import { ClientUserInfo } from "../auth/models";
 import { rootKeyPair } from "../config/env";
@@ -83,6 +83,13 @@ export async function checkSharePermission({
 type callback = () => void;
 /**
  * create new File or Dir for share
+ * @param clusterId 分享目录所在集群
+ * @param sourceFilePath 分享源绝对路径
+ * @param user 操作用户
+ * @param sharedTarget 分享的类别目录：数据集，算法，模型
+ * @param targetName 分享的目标名称：数据集，算法，模型的名称
+ * @param targetSubName 分享的目标子级名称：数据集版本，算法版本，模型版本的名称
+ *
  */
 export async function shareFileOrDir(
   {
@@ -120,20 +127,25 @@ export async function shareFileOrDir(
 
       // 判断共享目录是否存在
       if (!await sftpExists(sftp, targetDirectory)) {
-        await ssh.exec("mkdir", ["-p", targetDirectory], { stream: "both" });
-        await ssh.exec("chmod", ["-R", "555", SHARED_DIR], { stream: "both" });
+
+        const mkdirCmd = `mkdir -p ${targetDirectory}`;
+        const chmodCmd = `chmod -R 555 ${SHARED_DIR}`;
+        await loggedExec(ssh, logger, false, mkdirCmd, []);
+        await loggedExec(ssh, logger, false, chmodCmd, []);
+
       }
 
       // 判断目标路径是否存在，如果不存在则创建
       const dirExists = await sftpExists(sftp, targetFullDir);
       if (!dirExists) {
-        await ssh.exec("mkdir", ["-p", targetFullDir], { stream: "both" });
+        const mkdirFullDirCmd = `mkdir -p ${targetFullDir}`;
+        await loggedExec(ssh, logger, false, mkdirFullDirCmd, []);
       }
 
       // 复制并从顶层目录递归修改文件夹权限
-      const result =
-        await ssh.execCommand(`nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`);
-      console.log("【ssh.execCommand】", result);
+      const cpAndChmodCmd = `nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`;
+      await loggedExec(ssh, logger, false, cpAndChmodCmd, []);
+
       successCallback && successCallback();
     });
   } catch (err) {
@@ -182,3 +194,73 @@ export async function unShareFileOrDir({
   });
 
 }
+
+/**
+ *
+ * @param target 数据集、算法、模型的分享类别目录
+ * @param user 操作用户
+ * @param clusterId 分享目录所在集群
+ * @param newName 变更后的名称
+ * @param isVersionName 是否为版本名称
+ * @param oldPath 如果变更名称为版本名称时，为分享目录的绝对路径；如果变更名称不是版本名称时则为版本名称的上级目录，如分享的数据集目录
+ *
+ */
+export async function updateSharedName({
+  target,
+  user,
+  clusterId,
+  newName,
+  isVersionName,
+  oldPath,
+  needRollback,
+}: {
+  target: SHARED_TARGET,
+  user: ClientUserInfo,
+  clusterId: string,
+  newName: string,
+  isVersionName: boolean,
+  oldPath: string,
+  needRollback?: boolean;
+}): Promise<void> {
+
+  const host = getClusterLoginNode(clusterId);
+
+  if (!host) { throw clusterNotFound(clusterId); }
+
+  const subLogger = logger.child({ user, path, clusterId });
+  subLogger.info("Update shared file name started");
+
+  // 以root权限更新目标文件夹名称
+  await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+
+    if (!needRollback) {
+      const sftp = await ssh.requestSFTP();
+
+      // 判断共享目录是否存在
+      if (!await sftpExists(sftp, oldPath)) {
+        throw new TRPCError({ code: "NOT_FOUND", message: `${oldPath} is not found` });
+      }
+    }
+
+    const targetDir = path.join(SHARED_DIR, target);
+
+    // 更新各版本列表名称时
+    if (isVersionName) {
+      const targetDir = dirname(oldPath);
+      const newFullTargetPath = join(targetDir, newName);
+
+      const renameTargetSubCmd = needRollback ?
+        `mv ${newFullTargetPath} ${oldPath}` : `mv ${oldPath} ${newFullTargetPath}`;
+      await loggedExec(ssh, logger, true, renameTargetSubCmd, []);
+    // 更新各主表名称时
+    } else {
+      const targetPath = join(targetDir, newName);
+
+      const renameTargetCmd = needRollback ?
+        `mv ${targetPath} ${oldPath}` : `mv ${oldPath} ${targetPath}`;
+      await loggedExec(ssh, logger, true, renameTargetCmd, []);
+    };
+  });
+
+};
+

@@ -11,7 +11,7 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
@@ -21,8 +21,9 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
+import { logger } from "src/server/utils/logger";
 import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
-  shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
+  shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
@@ -161,21 +162,23 @@ export const updateDatasetVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
+    const { id, versionName, versionDescription, datasetId } = input;
+
+    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
     if (!dataset)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${id} not accessible` });
 
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
 
     const nameExist = await orm.em.findOne(DatasetVersion,
-      { versionName: input.versionName,
-        dataset: dataset,
-        id: { $ne: input.id },
+      { versionName,
+        dataset,
+        id: { $ne: id },
       });
     if (nameExist) {
       throw new TRPCError({
@@ -184,10 +187,42 @@ export const updateDatasetVersion = procedure
       });
     }
 
-    datasetVersion.versionName = input.versionName;
-    datasetVersion.versionDescription = input.versionDescription;
+    const needUpdateSharedPath = datasetVersion.sharedStatus === SharedStatus.SHARED
+      && versionName !== datasetVersion.versionName;
+    if (needUpdateSharedPath) {
+      await updateSharedName({
+        target: SHARED_TARGET.DATASET,
+        user: user,
+        clusterId: dataset.clusterId,
+        newName: versionName,
+        isVersionName: true,
+        oldPath: datasetVersion.path,
+      });
 
-    await orm.em.flush();
+      const dir = dirname(datasetVersion.path);
+      const newPath = join(dir, versionName);
+      datasetVersion.path = newPath;
+    }
+
+    datasetVersion.versionName = versionName;
+    datasetVersion.versionDescription = versionDescription;
+
+    await orm.em.flush().catch(async (e) => {
+      if (needUpdateSharedPath) {
+        logger.info("Rollback update shared name of %s", versionName);
+        await updateSharedName({
+          target: SHARED_TARGET.DATASET,
+          user: user,
+          clusterId: dataset.clusterId,
+          newName: versionName,
+          isVersionName: false,
+          oldPath: datasetVersion.path,
+          needRollback: true,
+        });
+      }
+      throw e;
+    });
+
     return { id: datasetVersion.id };
   });
 
