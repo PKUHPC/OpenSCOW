@@ -12,13 +12,13 @@
 
 // import { Framework } from "src/models/Algorithm";
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, unShareFileOrDir } from "src/server/utils/share";
+import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
 export const ModalListSchema = z.object({
@@ -147,9 +147,12 @@ export const updateModal = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modal = await orm.em.findOne(Modal, { id: input.id });
 
-    const modalExist = await orm.em.findOne(Modal, { name:input.name });
+    const { id, name, algorithmName, algorithmFramework, description } = input;
+
+    const modal = await orm.em.findOne(Modal, { id });
+
+    const modalExist = await orm.em.findOne(Modal, { name });
     if (modalExist !== modal) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -164,10 +167,34 @@ export const updateModal = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
     }
 
-    modal.name = input.name;
-    modal.algorithmName = input.algorithmName;
-    modal.algorithmFramework = input.algorithmFramework;
-    modal.description = input.description;
+    // 如果是已分享的模型且名称发生变化，则变更共享路径下的此模型名称为新名称
+    // let oldPath: string;
+    if (modal.isShared && name !== modal.name) {
+
+      const sharedVersions = await orm.em.find(ModalVersion, { modal, sharedStatus: SharedStatus.SHARED });
+      const oldPath = dirname(sharedVersions[0].path);
+      await updateSharedName({
+        target: SHARED_TARGET.MODAL,
+        user: user,
+        clusterId: modal.clusterId,
+        newName: `${name}-${user!.identityId}`,
+        isVersionName: false,
+        oldPath,
+      });
+
+      // 更新已分享的版本的共享文件夹地址
+      const topDir = dirname(oldPath);
+      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
+
+      sharedVersions.map((v) => {
+        v.path = join(newPathDir, v.versionName);
+      });
+    }
+
+    modal.name = name;
+    modal.algorithmName = algorithmName;
+    modal.algorithmFramework = algorithmFramework;
+    modal.description = description;
 
     await orm.em.flush();
     return modal.id;

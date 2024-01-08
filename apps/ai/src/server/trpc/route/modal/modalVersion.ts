@@ -11,7 +11,7 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
@@ -21,7 +21,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
   from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -139,27 +139,46 @@ export const updateModalVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const modal = await orm.em.findOne(Modal, { id: input.modalId });
+    const { id, versionName, versionDescription, algorithmVersion, modalId } = input;
+
+    const modal = await orm.em.findOne(Modal, { id: modalId });
     if (!modal) {
-      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.modalId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${modalId} not found` });
     }
 
     if (modal.owner !== user!.identityId) {
-      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${modalId} not accessible` });
     }
 
-    const modalVersion = await orm.em.findOne(ModalVersion, { id: input.id });
+    const modalVersion = await orm.em.findOne(ModalVersion, { id });
     if (!modalVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${id} not found` });
 
-    const modalVersionExist = await orm.em.findOne(ModalVersion, { versionName: input.versionName });
+    const modalVersionExist = await orm.em.findOne(ModalVersion, { versionName });
     if (modalVersionExist && modalVersionExist !== modalVersion) {
       throw new TRPCError({ code: "CONFLICT", message: "ModalVersion alreay exist" });
     }
 
-    modalVersion.versionName = input.versionName;
-    modalVersion.versionDescription = input.versionDescription;
-    modalVersion.algorithmVersion = input.algorithmVersion,
+    const needUpdateSharedPath = modalVersion.sharedStatus === SharedStatus.SHARED
+    && versionName !== modalVersion.versionName;
+    if (needUpdateSharedPath) {
+      await updateSharedName({
+        target: SHARED_TARGET.MODAL,
+        user: user,
+        clusterId: modal.clusterId,
+        newName: versionName,
+        isVersionName: true,
+        oldPath: modalVersion.path,
+      });
+
+      const dir = dirname(modalVersion.path);
+      const newPath = join(dir, input.versionName);
+      modalVersion.path = newPath;
+    }
+
+    modalVersion.versionName = versionName;
+    modalVersion.versionDescription = versionDescription;
+    modalVersion.algorithmVersion = algorithmVersion,
 
     await orm.em.flush();
     return { id: modalVersion.id };

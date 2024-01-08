@@ -86,7 +86,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
 
     if (editData?.algorithmName) {
       updateAlgorithmMutation.mutate({
-        id:editData.algorithmId, name:editData.algorithmName, framework:type, description,
+        id:editData.algorithmId, name, framework:type, description,
       });
     } else {
       createAlgorithmMutation.mutate({

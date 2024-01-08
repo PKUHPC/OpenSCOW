@@ -11,13 +11,13 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, unShareFileOrDir } from "src/server/utils/share";
+import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
 
@@ -135,7 +135,7 @@ export const updateAlgorithm = procedure
     }
 
     const algorithmExist = await em.findOne(Algorithm, { name });
-    if (algorithmExist !== algorithm) {
+    if (algorithmExist && algorithmExist !== algorithm) {
       throw new TRPCError({
         code: "CONFLICT",
         message: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
@@ -145,11 +145,35 @@ export const updateAlgorithm = procedure
     if (algorithm.owner !== user!.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${id} not accessible` });
 
+    // 如果是已分享的算法且名称发生变化，则变更共享路径下的此算法名称为新名称
+    // let oldPath: string;
+    if (algorithm.isShared && name !== algorithm.name) {
+
+      const sharedVersions = await em.find(AlgorithmVersion, { algorithm, sharedStatus: SharedStatus.SHARED });
+      const oldPath = dirname(sharedVersions[0].path);
+      await updateSharedName({
+        target: SHARED_TARGET.ALGORITHM,
+        user: user,
+        clusterId: algorithm.clusterId,
+        newName: `${name}-${user!.identityId}`,
+        isVersionName: false,
+        oldPath,
+      });
+
+      // 更新已分享的版本的共享文件夹地址
+      const topDir = dirname(oldPath);
+      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
+
+      sharedVersions.map((v) => {
+        v.path = join(newPathDir, v.versionName);
+      });
+    }
+
     algorithm.framework = framework;
     algorithm.name = name;
     algorithm.description = description;
 
-    await em.persistAndFlush(algorithm);
+    await em.flush();
     return;
   });
 

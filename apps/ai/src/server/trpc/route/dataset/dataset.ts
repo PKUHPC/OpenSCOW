@@ -207,17 +207,16 @@ export const updateDataset = procedure
     }
 
     // 如果是已分享的数据集且名称发生变化，则变更共享路径下的此数据集名称为新名称
-    // const oldPath = join(SHARED_DIR, SHARED_TARGET.DATASET, `${dataset.name}-${user!.identityId}`);
     let oldPath: string;
     if (dataset.isShared && name !== dataset.name) {
 
       const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
-      const oldPath = dirname(sharedVersions[0].path);
+      oldPath = dirname(sharedVersions[0].path);
       await updateSharedName({
         target: SHARED_TARGET.DATASET,
         user: user,
         clusterId: dataset.clusterId,
-        newName: name,
+        newName: `${name}-${user!.identityId}`,
         isVersionName: false,
         oldPath,
       });

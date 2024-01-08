@@ -11,7 +11,7 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path from "path";
+import path, { dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -20,7 +20,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
   from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -161,6 +161,23 @@ export const updateAlgorithmVersion = procedure
     const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
       throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
+    }
+
+    const needUpdateSharedPath = algorithmVersion.sharedStatus === SharedStatus.SHARED
+    && input.versionName !== algorithmVersion.versionName;
+    if (needUpdateSharedPath) {
+      await updateSharedName({
+        target: SHARED_TARGET.ALGORITHM,
+        user: user,
+        clusterId: algorithm.clusterId,
+        newName: input.versionName,
+        isVersionName: true,
+        oldPath: algorithmVersion.path,
+      });
+
+      const dir = dirname(algorithmVersion.path);
+      const newPath = join(dir, input.versionName);
+      algorithmVersion.path = newPath;
     }
 
     algorithmVersion.versionName = input.versionName;
