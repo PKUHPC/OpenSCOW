@@ -23,6 +23,7 @@ import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
+import { CopyPublicModalModal } from "./CopyPublicModalModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
 export interface Props {
@@ -38,6 +39,7 @@ export interface Props {
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
+const CopyPublicModalModalButton = ModalButton(CopyPublicModalModal, { type: "link" });
 
 export const VersionListModal: React.FC<Props> = (
   { open, onClose, isPublic, modalId, modalName, modalVersionData, isFetching, refetch, cluster },
@@ -138,13 +140,15 @@ export const VersionListModal: React.FC<Props> = (
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
-                <Button
-                  type="link"
-                  onClick={() => {
-                  }}
+                <CopyPublicModalModalButton
+                  modalId={modalId}
+                  modalName={modalName}
+                  modalVersionId={r.id}
+                  data={r}
+                  cluster={cluster}
                 >
-                    复制
-                </Button>
+                  复制
+                </CopyPublicModalModalButton>
               ) :
                 (
                   <>

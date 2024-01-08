@@ -79,4 +79,5 @@ algorithmVersionEntitySchema.addProperty("createTime", Date, {
 algorithmVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 algorithmVersionEntitySchema.addProperty("sharedStatus", String);
-algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", { entity: () => Algorithm });
+algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", {
+  entity: () => Algorithm, onDelete: "CASCADE", wrappedReference: true });

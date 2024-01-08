@@ -13,99 +13,96 @@
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
-import { useUser } from "src/app/auth";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { DatasetVersionInterface } from "src/models/Dateset";
+import { AlgorithmVersionInterface } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
   open: boolean;
-  onClose: () => void;
-  datasetId: number;
-  datasetName: string;
-  datasetVersionId: number;
-  data: DatasetVersionInterface;
+  data: AlgorithmVersionInterface;
+  algorithmId: number;
+  algorithmVersionId: number;
+  algorithmName: string | undefined;
   cluster?: Cluster;
+  onClose: () => void;
 }
 
 interface FormFields {
+  targetAlgorithmName: string;
   versionName: string,
   versionDescription?: string,
-  targetPath: string,
-  targetDatasetName: string;
+  path: string,
 }
 
-export const CopyPublicDatasetModal: React.FC<Props> = (
-  { open, onClose, data, datasetId, datasetName, cluster },
+export const CopyPublicAlgorithmModal: React.FC<Props> = (
+  { open, onClose, algorithmId, algorithmVersionId, algorithmName, cluster, data },
 ) => {
-
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
-  const user = useUser();
 
-  const copyMutation = trpc.dataset.copyPublicDatasetVersion.useMutation({
+  const copyMutation = trpc.algorithm.copyPublicAlgorithmVersion.useMutation({
     onSuccess() {
-      message.success("复制数据集成功");
+      message.success("复制算法成功");
       onClose();
-      form.resetFields();
     },
     onError(err) {
       if (err.data?.code === "CONFLICT") {
         form.setFields([
           {
             name: "targetDatasetName",
-            errors: ["目标数据集名称已存在"],
+            errors: ["目标算法名称已存在"],
           },
         ]);
       }
 
-      message.error("复制数据集失败");
+      message.error("复制算法失败");
     },
   });
 
+
   const onOk = async () => {
-    const { targetPath, targetDatasetName, versionName, versionDescription } = await form.validateFields();
+    const { targetAlgorithmName, versionName, versionDescription, path } = await form.validateFields();
     copyMutation.mutate({
-      datasetId,
-      datasetName: targetDatasetName,
-      path: targetPath,
-      datasetVersionId: data.id,
+      algorithmId,
+      algorithmVersionId,
+      algorithmName: targetAlgorithmName,
       versionName,
       versionDescription: versionDescription ?? "",
+      path,
     });
+
   };
 
   return (
     <Modal
-      title={"复制数据集"}
+      title={"复制算法"}
       open={open}
       onOk={form.submit}
       confirmLoading={copyMutation.isLoading}
       onCancel={onClose}
       width={800}
+      destroyOnClose
     >
       <Form
         form={form}
         onFinish={onOk}
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
-        initialValues={data}
       >
         <Form.Item
-          label="源数据集名称"
+          label="源算法名称"
         >
-          {datasetName}
+          {algorithmName}
         </Form.Item>
         <Form.Item
-          label="目标数据集名称"
-          name="targetDatasetName"
+          label="目标算法名称"
+          name="targetAlgorithmName"
           rules={[
             { required: true },
             { validator: validateNoChinese },
           ]}
-          initialValue={`${user.name}/${datasetName}`}
         >
           <Input allowClear />
         </Form.Item>
@@ -119,17 +116,18 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
           name="versionName"
           rules={[
             { required: true },
-            { validator:validateNoChinese },
+            { validator: validateNoChinese },
           ]}
+          initialValue={data?.versionName}
         >
           <Input allowClear />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription">
+        <Form.Item label="版本描述" name="versionDescription" initialValue={data?.versionDescription}>
           <Input.TextArea />
         </Form.Item>
         <Form.Item
           label="复制目标地址"
-          name="targetPath"
+          name="path"
           rules={[{ required: true }]}
         >
           <Input
@@ -138,8 +136,8 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
                 <FileSelectModal
                   allowedFileType={["DIR"]}
                   onSubmit={(path: string) => {
-                    form.setFields([{ name: "targetPath", value: path, touched: true }]);
-                    form.validateFields(["targetPath"]);
+                    form.setFields([{ name: "path", value: path, touched: true }]);
+                    form.validateFields(["path"]);
                   }}
                   clusterId={cluster?.id ?? ""}
                 />

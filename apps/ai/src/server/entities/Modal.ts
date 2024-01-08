@@ -22,7 +22,7 @@ export class Modal {
   algorithmFramework?: string;
   algorithmName?: string;
   versions = new Collection<ModalVersion>(this);
-  isShared: boolean;
+  isShared?: boolean;
   description?: string;
   clusterId: string;
   createTime?: Date;
@@ -33,7 +33,7 @@ export class Modal {
     owner: string;
     algorithmFramework?: string;
     algorithmName?: string;
-    isShared: boolean;
+    isShared?: boolean;
     description?: string;
     clusterId: string;
     createTime?: Date;
@@ -43,7 +43,7 @@ export class Modal {
     this.owner = init.owner;
     this.algorithmFramework = init.algorithmFramework;
     this.algorithmName = init.algorithmName;
-    this.isShared = init.isShared;
+    this.isShared = init.isShared ?? false;
     this.description = init.description;
     this.clusterId = init.clusterId;
 

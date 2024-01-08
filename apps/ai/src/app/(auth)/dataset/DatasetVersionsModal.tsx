@@ -76,17 +76,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
     },
   });
 
-  const copyMutation = trpc.file.copyOrMove.useMutation({
-    onError: (err) => {
-      const { data } = err as TRPCClientError<AppRouter>;
-      if (data?.code === "CONFLICT") {
-        message.error("存在相同的文件");
-      } else {
-        message.error("复制文件失败");
-      }
-    },
-  });
-
   const deleteMutation = trpc.dataset.deleteDatasetVersion.useMutation({
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
@@ -239,7 +228,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
                     datasetVersionId={r.id}
                     cluster={cluster}
                     data={r}
-                    refetch={onRefetch}
                   >
                     复制
                   </CopyPublicDatasetModalButton>

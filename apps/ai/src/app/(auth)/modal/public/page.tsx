@@ -20,7 +20,7 @@ export default function Page() {
 
   return (
     <div>
-      <PageTitle titleText="公共算法" />
+      <PageTitle titleText="公共模型" />
       <ModalTable isPublic={true} clusters={publicConfig.CLUSTERS} />
     </div>
   );

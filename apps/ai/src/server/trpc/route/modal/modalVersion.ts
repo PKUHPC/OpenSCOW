@@ -16,9 +16,14 @@ import { SharedStatus } from "src/models/common";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { chmod } from "src/server/utils/chmod";
+import { copyFile } from "src/server/utils/copyFile";
+import { deleteDir } from "src/server/utils/deleteItem";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 export const VersionListSchema = z.object({
@@ -342,4 +347,88 @@ export const unShareModalVersion = procedure
     }, successCallback, failureCallback);
 
     return;
+  });
+
+export const copyPublicModalVersion = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/modal/{modalId}/version/{modalVersionId}/copy",
+      tags: ["modalVersion"],
+      summary: "copy a public modal version",
+    },
+  })
+  .input(z.object({
+    modalId: z.number(),
+    modalVersionId: z.number(),
+    modalName: z.string(),
+    versionName: z.string(),
+    versionDescription: z.string(),
+    path: z.string(),
+  }))
+  .output(z.object({ success: z.boolean() }))
+  .mutation(async ({ input, ctx: { user } }) => {
+    const orm = await getORM();
+
+    // 1. 检查模型版本是否为公开版本
+    const modalVersion = await orm.em.findOne(ModalVersion,
+      { id: input.modalVersionId, sharedStatus: SharedStatus.SHARED },
+      { populate: ["modal"]});
+
+    if (!modalVersion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Modal Version ${input.modalVersionId} does not exist or is not public`,
+      });
+    }
+    // 2. 检查该用户是否已有同名模型
+    const modal = await orm.em.findOne(Modal, { name: input.modalName, owner: user.identityId });
+    if (modal) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `A modal with the same name as ${input.modalName} already exists`,
+      });
+    }
+
+    // 3. 写入数据
+    const newModal = new Modal({
+      name: input.modalName,
+      owner: user.identityId,
+      algorithmFramework: modalVersion.modal.$.algorithmFramework,
+      algorithmName: modalVersion.modal.$.algorithmName,
+      description: modalVersion.modal.$.description,
+      clusterId: modalVersion.modal.$.clusterId,
+    });
+
+    const newModalVersion = new ModalVersion({
+      versionName: input.versionName,
+      versionDescription: input.versionDescription,
+      path: input.path,
+      privatePath: input.path,
+      modal: newModal,
+    });
+
+    const host = getClusterLoginNode(modalVersion.modal.$.clusterId);
+
+    if (!host) { throw clusterNotFound(modalVersion.modal.$.clusterId); }
+
+    // TODO：判断有无同名文件夹
+
+    try {
+      await copyFile({ host, userIdentityId: user.identityId,
+        fromPath: modalVersion.path, toPath: input.path });
+      // 递归修改文件权限和拥有者
+      await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
+      await orm.em.persistAndFlush([newModal, newModalVersion]);
+    } catch (err) {
+      // 回滚
+      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
+      console.log(err);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Copy Error",
+      });
+    }
+
+    return { success: true };
   });

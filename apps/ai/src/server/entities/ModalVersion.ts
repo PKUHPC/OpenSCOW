@@ -78,4 +78,5 @@ modalVersionEntitySchema.addProperty("createTime", Date, {
 modalVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 modalVersionEntitySchema.addProperty("sharedStatus", String);
-modalVersionEntitySchema.addManyToOne("modal", "Modal", { entity: () => Modal });
+modalVersionEntitySchema.addManyToOne("modal", "Modal", {
+  entity: () => Modal, onDelete: "CASCADE", wrappedReference: true });
