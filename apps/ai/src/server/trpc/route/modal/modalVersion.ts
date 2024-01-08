@@ -21,7 +21,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -253,7 +253,7 @@ export const shareModalVersion = procedure
     if (modal.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${modalId}  not accessible` });
 
-    await checkSharePermission({
+    const homeTopDir = await checkSharePermission({
       clusterId: modal.clusterId,
       checkedSourcePath: modalVersion.privatePath,
       user,
@@ -262,15 +262,15 @@ export const shareModalVersion = procedure
     // 定义分享后目标存储的绝对路径
     const targetName = `${modal.name}-${user!.identityId}`;
     const targetSubName = `${modalVersion.versionName}`;
-    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.MODAL, targetName, targetSubName);
+    // const targetPath = path.join(SHARED_DIR, SHARED_TARGET.MODAL, targetName, targetSubName);
 
     modalVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([modalVersion]);
     await orm.em.flush();
 
-    const successCallback = async () => {
+    const successCallback = async (targetFullPath: string) => {
       modalVersion.sharedStatus = SharedStatus.SHARED;
-      modalVersion.path = targetPath;
+      modalVersion.path = targetFullPath;
       if (!modal.isShared) { modal.isShared = true; };
       await orm.em.persistAndFlush([modalVersion, modal]);
     };
@@ -287,6 +287,7 @@ export const shareModalVersion = procedure
       sharedTarget: SHARED_TARGET.MODAL,
       targetName,
       targetSubName,
+      homeTopDir,
     }, successCallback, failureCallback);
 
     return;

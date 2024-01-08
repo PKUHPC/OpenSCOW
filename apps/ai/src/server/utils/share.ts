@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { loggedExec, sftpExists, sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
+import { getUserHomedir, loggedExec, sftpExists,
+  sftpStat, sshConnect as libConnect, sshRmrf } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 
@@ -21,9 +22,7 @@ import { clusterNotFound } from "./errors";
 import { logger } from "./logger";
 import { getClusterLoginNode, sshConnect } from "./ssh";
 
-
-
-export const SHARED_DIR = "/data/.shared";
+export const SHARED_DIR = "/.shared";
 
 // 分享文件的公共路径前缀
 export enum SHARED_TARGET {
@@ -42,7 +41,7 @@ export async function checkSharePermission({
   checkedSourcePath: string,
   user: ClientUserInfo,
   checkedTargetPath?: string,
-}): Promise<void> {
+}): Promise<string> {
   const host = getClusterLoginNode(clusterId);
 
   if (!host) { throw clusterNotFound(clusterId); }
@@ -50,20 +49,24 @@ export async function checkSharePermission({
   const subLogger = logger.child({ user, checkedSourcePath, clusterId });
   subLogger.info("Check share permission started");
 
-  await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
+
+  return await sshConnect(host, user!.identityId, subLogger, async (ssh) => {
     const sftp = await ssh.requestSFTP();
+
+    const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
+    // 后退到用户家目录/home/{userId}的上级
+    const homeTopDir = dirname(dirname(userHomeDir));
+
     // 判断是否为拥有者
     await sftpStat(sftp)(checkedSourcePath).catch((e) => {
       logger.error(e, "stat %s as %s failed", checkedSourcePath, user!.identityId);
       throw new TRPCError({ code: "FORBIDDEN", message: `${checkedSourcePath} is not accessible` });
     });
 
+    const sourceFileExists = await sftpExists(sftp, checkedSourcePath);
     // 分享时判断源文件是否存在
-    if (!checkedTargetPath) {
-      const sourceFileExists = await sftpExists(sftp, checkedSourcePath);
-      if (!sourceFileExists) {
-        throw new TRPCError({ code: "NOT_FOUND", message: `${checkedSourcePath} is not found` });
-      }
+    if (!checkedTargetPath && !sourceFileExists) {
+      throw new TRPCError({ code: "NOT_FOUND", message: `${checkedSourcePath} is not found` });
     }
 
     // 取消分享时判断已分享文件是否存在
@@ -77,10 +80,13 @@ export async function checkSharePermission({
       });
     }
 
+    return homeTopDir;
   });
 }
 
+type shareOkCallback = (fullPath: string) => void;
 type callback = () => void;
+
 /**
  * create new File or Dir for share
  * @param clusterId 分享目录所在集群
@@ -89,7 +95,7 @@ type callback = () => void;
  * @param sharedTarget 分享的类别目录：数据集，算法，模型
  * @param targetName 分享的目标名称：数据集，算法，模型的名称
  * @param targetSubName 分享的目标子级名称：数据集版本，算法版本，模型版本的名称
- *
+ * @param homeTopDir 用户家目录/home/{userId}的上级目录
  */
 export async function shareFileOrDir(
   {
@@ -99,6 +105,7 @@ export async function shareFileOrDir(
     sharedTarget,
     targetName,
     targetSubName,
+    homeTopDir,
     // fileType: FileType,
   }: {
     clusterId: string,
@@ -107,8 +114,9 @@ export async function shareFileOrDir(
     sharedTarget: SHARED_TARGET,
     targetName: string,
     targetSubName: string,
+    homeTopDir: string,
     // fileType: FileType,
-  }, successCallback?: callback, failureCallback?: callback): Promise<void> {
+  }, successCallback?: shareOkCallback, failureCallback?: callback): Promise<void> {
   const host = getClusterLoginNode(clusterId);
 
   if (!host) { throw clusterNotFound(clusterId); }
@@ -116,14 +124,13 @@ export async function shareFileOrDir(
   const subLogger = logger.child({ user, sourceFilePath, clusterId });
   subLogger.info("Share file or directory started");
 
-  const targetDirectory = path.join(SHARED_DIR, sharedTarget);
-  const targetTopDir = path.join(targetDirectory, targetName);
-  const targetFullDir = path.join(targetDirectory, targetName, targetSubName);
-
   try {
 
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
+      const targetDirectory = path.join(homeTopDir, SHARED_DIR, sharedTarget);
+      const targetTopDir = path.join(targetDirectory, targetName);
+      const targetFullDir = path.join(targetDirectory, targetName, targetSubName);
 
       // 判断共享目录是否存在
       if (!await sftpExists(sftp, targetDirectory)) {
@@ -132,7 +139,6 @@ export async function shareFileOrDir(
         const chmodCmd = `chmod -R 555 ${SHARED_DIR}`;
         await loggedExec(ssh, logger, false, mkdirCmd, []);
         await loggedExec(ssh, logger, false, chmodCmd, []);
-
       }
 
       // 判断目标路径是否存在，如果不存在则创建
@@ -146,18 +152,10 @@ export async function shareFileOrDir(
       const cpAndChmodCmd = `nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`;
       await loggedExec(ssh, logger, false, cpAndChmodCmd, []);
 
-      successCallback && successCallback();
+      successCallback && successCallback(targetFullDir);
+
     });
   } catch (err) {
-    // rollback
-    await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-      const sftp = await ssh.requestSFTP();
-      const pathExists = await sftpExists(sftp, targetFullDir);
-      if (pathExists) {
-        await sshRmrf(ssh, targetTopDir);
-      }
-    });
-
     logger.info("share file failed", err);
     failureCallback && failureCallback();
   }
@@ -230,19 +228,23 @@ export async function updateSharedName({
   const subLogger = logger.child({ user, path, clusterId });
   subLogger.info("Update shared file name started");
 
+  // 获取用户家目录的上级目录
+  const userHomeDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
+    return getUserHomedir(ssh, user.identityId, logger);
+  });
+  const homeTopDir = dirname(dirname(userHomeDir));
+
   // 以root权限更新目标文件夹名称
   await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
 
+    const sftp = await ssh.requestSFTP();
     if (!needRollback) {
-      const sftp = await ssh.requestSFTP();
-
       // 判断共享目录是否存在
       if (!await sftpExists(sftp, oldPath)) {
         throw new TRPCError({ code: "NOT_FOUND", message: `${oldPath} is not found` });
       }
     }
-
-    const targetDir = path.join(SHARED_DIR, target);
+    const targetDir = path.join(homeTopDir, SHARED_DIR, target);
 
     // 更新各版本列表名称时
     if (isVersionName) {

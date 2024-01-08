@@ -20,7 +20,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
-import { checkSharePermission, SHARED_DIR, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
+import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -249,7 +249,7 @@ export const shareAlgorithmVersion = procedure
     if (algorithm.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId}  not accessible` });
 
-    await checkSharePermission({
+    const homeTopDir = await checkSharePermission({
       clusterId: algorithm.clusterId,
       checkedSourcePath: algorithmVersion.privatePath,
       user,
@@ -258,15 +258,14 @@ export const shareAlgorithmVersion = procedure
     // 定义分享后目标存储的绝对路径
     const targetName = `${algorithm.name}-${user!.identityId}`;
     const targetSubName = `${algorithmVersion.versionName}`;
-    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.ALGORITHM, targetName, targetSubName);
 
     algorithmVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([algorithmVersion]);
     await orm.em.flush();
 
-    const successCallback = async () => {
+    const successCallback = async (targetFullPath: string) => {
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
-      algorithmVersion.path = targetPath;
+      algorithmVersion.path = targetFullPath;
       if (!algorithm.isShared) { algorithm.isShared = true; };
       await orm.em.persistAndFlush([algorithmVersion, algorithm]);
     };
@@ -283,6 +282,7 @@ export const shareAlgorithmVersion = procedure
       sharedTarget: SHARED_TARGET.ALGORITHM,
       targetName,
       targetSubName,
+      homeTopDir,
     }, successCallback, failureCallback);
 
     return;

@@ -22,7 +22,7 @@ import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
-import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
+import { checkSharePermission, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -312,7 +312,7 @@ export const shareDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    await checkSharePermission({
+    const homeTopDir = await checkSharePermission({
       clusterId: dataset.clusterId,
       checkedSourcePath: datasetVersion.privatePath,
       user,
@@ -321,15 +321,14 @@ export const shareDatasetVersion = procedure
     // 定义分享后目标存储的绝对路径
     const targetName = `${dataset.name}-${user!.identityId}`;
     const targetSubName = `${datasetVersion.versionName}`;
-    const targetPath = path.join(SHARED_DIR, SHARED_TARGET.DATASET, targetName, targetSubName);
 
     datasetVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([datasetVersion]);
     await orm.em.flush();
 
-    const successCallback = async () => {
+    const successCallback = async (targetFullPath: string) => {
       datasetVersion.sharedStatus = SharedStatus.SHARED;
-      datasetVersion.path = targetPath;
+      datasetVersion.path = targetFullPath;
       if (!dataset.isShared) { dataset.isShared = true; };
       await orm.em.persistAndFlush([datasetVersion, dataset]);
     };
@@ -346,6 +345,7 @@ export const shareDatasetVersion = procedure
       sharedTarget: SHARED_TARGET.DATASET,
       targetName,
       targetSubName,
+      homeTopDir,
     }, successCallback, failureCallback);
 
     await orm.em.flush();

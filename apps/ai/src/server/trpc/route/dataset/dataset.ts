@@ -11,14 +11,14 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path, { join } from "path";
+import path, { dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
-import { checkSharePermission, SHARED_DIR, SHARED_TARGET,
+import { checkSharePermission, SHARED_TARGET,
   unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
@@ -207,9 +207,12 @@ export const updateDataset = procedure
     }
 
     // 如果是已分享的数据集且名称发生变化，则变更共享路径下的此数据集名称为新名称
-    const oldPath = join(SHARED_DIR, SHARED_TARGET.DATASET, `${dataset.name}-${user!.identityId}`);
-
+    // const oldPath = join(SHARED_DIR, SHARED_TARGET.DATASET, `${dataset.name}-${user!.identityId}`);
+    let oldPath: string;
     if (dataset.isShared && name !== dataset.name) {
+
+      const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
+      const oldPath = dirname(sharedVersions[0].path);
       await updateSharedName({
         target: SHARED_TARGET.DATASET,
         user: user,
@@ -220,8 +223,9 @@ export const updateDataset = procedure
       });
 
       // 更新已分享的版本的共享文件夹地址
-      const newPathDir = join(SHARED_DIR, SHARED_TARGET.DATASET, `${name}-${user!.identityId}`);
-      const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
+      const topDir = dirname(oldPath);
+      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
+
       sharedVersions.map((v) => {
         v.path = join(newPathDir, v.versionName);
       });
