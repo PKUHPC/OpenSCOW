@@ -4,7 +4,7 @@ id: jupyter
 # 这个应用的名字
 name: jupyter
 
-logoPath: /apps/Jupyter.svg
+# logoPath: /apps/Jupyter.svg
 
 image:
   # 镜像名称
@@ -35,6 +35,6 @@ web:
 attributes:
   - type: text
     name: workingDir
-    label: 指定jupter工作目录
+    label: 指定jupyter工作目录
     required: true
     placeholder: "相对于用户家目录"

@@ -24,6 +24,7 @@ import {
   sftpRealPath,
   sftpWriteFile,
 } from "@scow/lib-ssh";
+// import { ErrorInfo } from "@scow/rich-error-model";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { ApiVersion } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
@@ -42,7 +43,7 @@ import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clu
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
-import { isPortReachable } from "src/utils/isPortReachables";
+import { isPortReachable } from "src/utils/isPortReachable";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
@@ -74,7 +75,6 @@ const AppSessionSchema = z.object({
 
 export type AppSession = z.infer<typeof AppSessionSchema>;
 
-// All keys are strings except PORT
 interface ServerSessionInfoData {
   [key: string]: string | number;
   HOST: string;
@@ -91,15 +91,15 @@ interface SessionMetadata {
   jobType: JobType
 }
 
-const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
+const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
 
 const SESSION_METADATA_NAME = "session.json";
 
+// 适配器将该文件写在了/tmp目录下
 const SERVER_SESSION_INFO = "/tmp/server_session_info.json";
 
 const getEnvVariables = (env: Record<string, string>) =>
   Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
-
 
 // const errorInfo = (reason: string) =>
 //   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
@@ -336,9 +336,9 @@ export const createAppSession = procedure
       });
     }
 
-    const datasetVesion = await orm.em.findOne(DatasetVersion, { id: dataset });
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
 
-    if (!datasetVesion) {
+    if (!datasetVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",
         message: `dataset version id ${dataset} is not found`,
@@ -364,7 +364,17 @@ export const createAppSession = procedure
 
       let customAttributesExport: string = "";
       for (const key in customAttributes) {
+        // 特殊处理jupyter的workingDir
+        if (key === "workingDir") {
+          const workingDir = join(homeDir, customAttributes[key]?.toString() ?? "");
+          await ssh.mkdir(workingDir);
+          const quotedWorkingDir = quote([workingDir]);
+          const envItem = `export ${key}=${quotedWorkingDir}`;
+          customAttributesExport = customAttributesExport + envItem + "\n";
+          continue;
+        }
         const quotedAttribute = quote([customAttributes[key]?.toString() ?? ""]);
+
         const envItem = `export ${key}=${quotedAttribute}`;
         customAttributesExport = customAttributesExport + envItem + "\n";
       }
@@ -374,6 +384,7 @@ export const createAppSession = procedure
           PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
           SERVER_SESSION_INFO,
         });
+        // SVCPORT 是k8s集群中service的端口, 由适配器提供
         let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$SVCPORT`;
         for (const key in app.web!.connect.formData) {
           const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
@@ -386,6 +397,8 @@ export const createAppSession = procedure
         const beforeScript = runtimeVariables + customAttributesExport + app.web!.beforeScript + sessionInfo;
         const webScript = app.web!.script;
         const entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
+
+        // 将entry.sh写入后将路径传给适配器后启动容器
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
         const client = getAdapterClient(clusterId);
@@ -394,7 +407,7 @@ export const createAppSession = procedure
           jobName: appJobName,
           image: `${image.name}:${image.tag || "latest"}`,
           algorithm: algorithmVersion.path,
-          dataset: datasetVesion.path,
+          dataset: datasetVersion.path,
           account,
           partition: partition!,
           coreCount,
@@ -448,7 +461,7 @@ export const saveImage =
         if (existImage) {
           throw new TRPCError({
             code: "CONFLICT",
-            message: `Image with name: ${imageName} and tag: ${imageTag} of user: ${userId} already exsits.`,
+            message: `Image with name: ${imageName} and tag: ${imageTag} of user: ${userId} already exists.`,
           });
         }
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
@@ -560,9 +573,9 @@ procedure
         });
       }
 
-      const datasetVesion = await orm.em.findOne(DatasetVersion, { id: dataset });
+      const datasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
 
-      if (!datasetVesion) {
+      if (!datasetVersion) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `dataset version id ${dataset} is not found`,
@@ -598,7 +611,7 @@ procedure
           jobName: trainJobName,
           algorithm: algorithmVersion.path,
           image: image.path,
-          dataset: datasetVesion.path,
+          dataset: datasetVersion.path,
           account,
           partition: partition!,
           coreCount,
