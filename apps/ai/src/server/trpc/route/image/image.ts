@@ -340,31 +340,35 @@ export const deleteImage = procedure
     }
 
     // 登录harbor获取token
-    const csrfToken = await loginToHarbor();
+    // const csrfToken = await loginToHarbor();
 
-    if (!csrfToken) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Login to harbor failed! Please contact the administrator! ",
-      });
-    }
+    // if (!csrfToken) {
+    //   throw new TRPCError({
+    //     code: "INTERNAL_SERVER_ERROR",
+    //     message: "Login to harbor failed! Please contact the administrator! ",
+    //   });
+    // }
 
 
     const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}`
     + `/artifacts/${reference}/tags/${image.tag}`;
+    const base64Credentials = Buffer.from(`${aiConfig.harborConfig.user}:`
+    + `${aiConfig.harborConfig.password}`).toString("base64");
+
     const deleteRes = await fetch(deleteUrl, {
       method: "DELETE",
       headers: {
         "content-type": "application/json",
-        "X-Harbor-CSRF-Token": csrfToken,
+        "Accept": "application/json",
+        "Authorization": `Basic ${base64Credentials}`,
       },
     });
 
     if (!deleteRes.ok) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete image tag: " + deleteRes.statusText,
+        message: "Failed to delete image tag: " + deleteRes.text,
       });
     }
 
