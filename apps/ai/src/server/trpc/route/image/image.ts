@@ -303,7 +303,15 @@ export const deleteImage = procedure
       });
     }
 
+    // 登录harbor获取token
+    const csrfToken = await loginToHarbor();
 
+    if (!csrfToken) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Login to harbor failed! Please contact the administrator! ",
+      });
+    }
 
     // 获取harrbor中的reference以删除镜像
     const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
@@ -312,24 +320,15 @@ export const deleteImage = procedure
       method: "GET",
       headers: {
         "content-type": "application/json",
-        // "X-Harbor-CSRF-Token": csrfToken,
+        "X-Harbor-CSRF-Token": csrfToken,
       },
     });
 
+    console.log("getReferenceUrl:", getReferenceUrl);
     if (!getReferenceRes.ok) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to get image reference: " + getReferenceRes.statusText,
-      });
-    }
-
-    // 登录harbor获取token
-    const csrfToken = await loginToHarbor();
-
-    if (!csrfToken) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Login to harbor failed! Please contact the administrator! ",
       });
     }
 
