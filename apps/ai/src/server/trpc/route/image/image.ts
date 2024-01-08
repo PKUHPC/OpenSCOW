@@ -315,9 +315,10 @@ export const deleteImage = procedure
 
     console.log("getReferenceUrl:", getReferenceUrl);
     if (!getReferenceRes.ok) {
+      const errorBody = await getReferenceRes.json();
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get image reference: " + getReferenceRes.text,
+        message: "Failed to get image reference: " + errorBody.message,
       });
     }
 
@@ -366,9 +367,10 @@ export const deleteImage = procedure
     });
 
     if (!deleteRes.ok) {
+      const errorBody = await deleteRes.json();
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete image tag: " + deleteRes.text,
+        message: "Failed to delete image tag: " + errorBody.message,
       });
     }
 
