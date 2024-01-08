@@ -13,7 +13,6 @@
 "use client";
 
 import { LoadingOutlined } from "@ant-design/icons";
-import { App } from "antd";
 import { PageTitle } from "src/components/PageTitle";
 import { trpc } from "src/utils/trpc";
 
@@ -24,7 +23,6 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
 
   const { appId, clusterId } = params;
 
-  const { message } = App.useApp();
   // const t = useI18nTranslateToString();
 
   const { data: appInfo, isLoading: isAppLoading } = trpc.jobs.getAppMetadata.useQuery({ clusterId, appId });

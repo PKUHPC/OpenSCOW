@@ -53,10 +53,10 @@ interface FixedFormFields {
   runVariables?: { key: string, value: string }[];
 }
 
-interface CustomFormFileds {
-  customeFields: {[key: string]: number | string | undefined};
+interface CustomFormFields {
+  customFields: {[key: string]: number | string | undefined};
 }
-type FormFields = CustomFormFileds & FixedFormFields;
+type FormFields = CustomFormFields & FixedFormFields;
 
 interface ClusterConfig {
   partitions: Partition[];
@@ -226,7 +226,7 @@ export const LaunchAppForm = (props: Props) => {
       <Form.Item
         key={`${item.name}+${index}`}
         label={getI18nConfigCurrentText(item.label, undefined) ?? undefined}
-        name={["customeFields", item.name]}
+        name={["customFields", item.name]}
         rules={rules}
         initialValue={initialValue}
       >
@@ -294,10 +294,10 @@ export const LaunchAppForm = (props: Props) => {
         } else {
           const {
             appJobName, algorithm, dataset, account, partition, coreCount, gpuCount, maxTime } = values;
-          const customFormKeyValue: CustomFormFileds = { customeFields: {} };
+          const customFormKeyValue: CustomFormFields = { customFields: {} };
           attributes.forEach((customFormAttribute) => {
             const customFormKey = customFormAttribute.name;
-            customFormKeyValue.customeFields[customFormKey] = values.customeFields[customFormKey];
+            customFormKeyValue.customFields[customFormKey] = values.customFields[customFormKey];
           });
           createAppSessionMutation.mutate({
             clusterId,
@@ -316,7 +316,7 @@ export const LaunchAppForm = (props: Props) => {
             gpuCount: gpuCount,
             maxTime: maxTime,
             memory: memorySize,
-            customAttributes: customFormKeyValue.customeFields,
+            customAttributes: customFormKeyValue.customFields,
           });
         } }
       }

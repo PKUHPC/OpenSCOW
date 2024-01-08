@@ -13,7 +13,7 @@
 "use client";
 
 import { PictureOutlined } from "@ant-design/icons";
-import { Avatar, Card, Col, Result, Row, Spin, Tooltip } from "antd";
+import { Avatar, Card, Col, Result, Row, Tooltip } from "antd";
 import Link from "next/link";
 import { join } from "path";
 import { useState } from "react";
