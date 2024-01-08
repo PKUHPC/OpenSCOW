@@ -14,20 +14,41 @@ import { aiConfig } from "src/server/config/ai";
 import { config } from "src/server/config/env";
 
 
-export async function loginToHarbor(csrfToken: string) {
-  const url = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/c/login`;
-  console.log("loginToHarbor url", url);
-  const response = await fetch(url, {
+async function getCsrfToken() {
+  const logoutUrl = `${config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/c/log_out`;
+  const response = await fetch(logoutUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko)" +
+       "Chrome/113.0.0.0 Mobile Safari/537.36",
+    },
+  });
+
+  const csrfToken = response.headers.get("X-Harbor-Csrf-Token") || "";
+  const cookies = response.headers.get("set-cookie") || "";
+
+  return { csrfToken, cookies };
+}
+
+export async function loginToHarbor() {
+  const { csrfToken, cookies } = await getCsrfToken();
+  const loginUrl = `${config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/c/login`;
+
+  const response = await fetch(loginUrl, {
     method: "POST",
     headers: {
-      "content-type": "application/json",
+      "Content-Type": "application/json",
+      "Cookie": cookies,
       "X-Harbor-CSRF-Token": csrfToken,
+      "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko)" +
+       "Chrome/113.0.0.0 Mobile Safari/537.36",
     },
     body: JSON.stringify({ principal: aiConfig.harborConfig.user, password: aiConfig.harborConfig.password }),
   });
 
   if (!response.ok) {
-    throw new Error("Login to harbor failed: " + response.statusText);
+    throw new Error("Login to harbor failed: " + response.text);
   }
 
   return response.headers.get("x-harbor-csrf-token");

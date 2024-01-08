@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
@@ -85,18 +84,14 @@ export async function sshConnect<T>(
     if (e instanceof SshConnectError) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        // details: e.message,
         message: e.message,
-        // metadata: scowErrorMetadata(SSH_ERROR_CODE, typeof e.cause === "string" ? { cause:e.cause } : undefined),
       });
     }
 
     if (e instanceof SftpError) {
       throw new TRPCError({
         code: "BAD_REQUEST",
-        // details: e.message,
         message: e.message,
-        // metadata: scowErrorMetadata(SFTP_ERROR_CODE),
       });
     }
 

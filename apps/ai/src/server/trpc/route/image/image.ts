@@ -321,18 +321,6 @@ export const deleteImage = procedure
       });
     }
 
-    // 登录harbor获取token
-    const initCsrfToken = getReferenceRes.headers.get("x-harbor-csrf-token") || "";
-    const csrfToken = await loginToHarbor(initCsrfToken);
-
-    if (!csrfToken) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Login to harbor failed! Please contact the administrator! ",
-      });
-    }
-
-
     const referenceRes = await getReferenceRes.json();
 
     console.log("reference:", referenceRes);
@@ -348,6 +336,16 @@ export const deleteImage = procedure
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to find image tag in harbor ! Please contact the administrator! ",
+      });
+    }
+
+    // 登录harbor获取token
+    const csrfToken = await loginToHarbor();
+
+    if (!csrfToken) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Login to harbor failed! Please contact the administrator! ",
       });
     }
 
