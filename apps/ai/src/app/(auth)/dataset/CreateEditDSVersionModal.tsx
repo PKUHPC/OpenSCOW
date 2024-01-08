@@ -52,7 +52,11 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
       form.resetFields();
       refetch();
     },
-    onError() {
+    onError(e) {
+      if (e.data?.code === "CONFLICT") {
+        message.error("版本名称已存在");
+        return;
+      }
       message.error("创建新版本失败");
     },
   });
@@ -64,12 +68,16 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
       refetch();
     },
     onError(e) {
-      const { data } = e as TRPCClientError<AppRouter>;
-      if (data?.code === "NOT_FOUND") {
-        message.error("无法找到数据集版本");
-      } else {
-        message.success("编辑版本失败");
+      if (e.data?.code === "CONFLICT") {
+        message.error("版本名称已存在");
+        return;
       }
+      else if (e.data?.code === "NOT_FOUND") {
+        message.error("无法找到数据集或数据集版本");
+        return;
+      }
+
+      message.success("编辑版本失败");
     },
   });
 

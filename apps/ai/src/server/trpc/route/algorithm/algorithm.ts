@@ -128,17 +128,17 @@ export const updateAlgorithm = procedure
     const { em } = await getORM();
     const algorithm = await em.findOne(Algorithm, { id });
 
+    if (!algorithm) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+      });
+    }
+
     const algorithmExist = await em.findOne(Algorithm, { name });
     if (algorithmExist !== algorithm) {
       throw new TRPCError({
         code: "CONFLICT",
         message: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
-      });
-    }
-
-    if (!algorithm) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
       });
     }
 

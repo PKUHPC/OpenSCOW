@@ -153,10 +153,10 @@ export const updateAlgorithmVersion = procedure
     const orm = await getORM();
 
     const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
-    if (!algorithm) throw new Error("Algorithm not found");
+    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: "Algorithm not found" });
 
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.versionId });
-    if (!algorithmVersion) throw new Error("AlgorithmVersion not found");
+    if (!algorithmVersion) throw new TRPCError({ code: "NOT_FOUND", message: "AlgorithmVersion not found" });
 
     const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {

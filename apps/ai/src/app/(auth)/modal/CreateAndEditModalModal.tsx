@@ -55,10 +55,11 @@ export const CreateAndEditModalModal: React.FC<Props> = (
       onClose();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("模型名称已存在");
+        return;
+      }
       message.error("添加模型失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
     } });
 
   const updateModalMutation = trpc.modal.updateModal.useMutation({
@@ -68,10 +69,15 @@ export const CreateAndEditModalModal: React.FC<Props> = (
       onClose();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("模型名称已存在");
+        return;
+      }
+      else if (e.data?.code === "NOT_FOUND") {
+        message.error("模型未找到");
+        return;
+      }
       message.error("修改模型失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
     } });
 
   const onOk = async () => {

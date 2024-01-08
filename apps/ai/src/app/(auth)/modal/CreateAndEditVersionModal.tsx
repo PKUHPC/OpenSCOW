@@ -55,10 +55,12 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
       form.resetFields();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("版本名称已存在");
+        return;
+      }
+
       message.error("创建新版本失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
     },
   });
 
@@ -70,10 +72,16 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
       refetch();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("版本名称已存在");
+        return;
+      }
+      else if (e.data?.code === "NOT_FOUND") {
+        message.error("模型或模型版本未找到");
+        return;
+      }
+
       message.error("修改版本失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
     },
   });
 
@@ -98,7 +106,6 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         modalId,
       });
     }
-
   };
 
   return (

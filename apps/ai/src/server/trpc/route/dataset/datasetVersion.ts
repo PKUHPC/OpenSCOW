@@ -102,7 +102,6 @@ export const versionList = procedure
         createTime: x.createTime ? x.createTime.toISOString() : "",
         datasetId: x.dataset.id,
       }; }), count };
-    // return { items: mockDatasetVersions, count: 2 };
   });
 
 export const createDatasetVersion = procedure

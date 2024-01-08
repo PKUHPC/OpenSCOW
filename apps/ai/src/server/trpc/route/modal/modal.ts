@@ -122,7 +122,6 @@ export const createModal = procedure
         code: "CONFLICT",
       });
     }
-    // TODO: 判断集群是否可以连接？
 
     const modal = new Modal({ ...input, owner: user!.identityId, isShared: false });
     await orm.em.persistAndFlush(modal);
@@ -165,14 +164,6 @@ export const updateModal = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
     }
 
-    if (!modal) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Dataset ${input.id} not found`,
-      });
-    };
-
-    // TODO: 判断集群是否可以连接？
     modal.name = input.name;
     modal.algorithmName = input.algorithmName;
     modal.algorithmFramework = input.algorithmFramework;

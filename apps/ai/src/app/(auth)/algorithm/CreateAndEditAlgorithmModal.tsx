@@ -55,10 +55,12 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
       onClose();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("算法名称已存在");
+        return;
+      }
       message.error("添加算法失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
+
     } });
 
   const updateAlgorithmMutation = trpc.algorithm.updateAlgorithm.useMutation({
@@ -68,10 +70,15 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
       onClose();
     },
     onError(e) {
-      console.log(e);
+      if (e.data?.code === "CONFLICT") {
+        message.error("算法名称已存在");
+        return;
+      }
+      else if (e.data?.code === "NOT_FOUND") {
+        message.error("算法未找到");
+        return;
+      }
       message.error("修改算法失败");
-      // if (e.data?.code === "USER_NOT_FOUND") {
-      //   message.error("用户未找到");
     } });
 
   const onOk = async () => {
@@ -86,9 +93,7 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
         name, framework:type, description, clusterId:cluster.id,
       });
     }
-
   };
-
 
   return (
     <Modal

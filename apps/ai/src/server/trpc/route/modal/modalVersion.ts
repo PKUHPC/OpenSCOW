@@ -110,6 +110,10 @@ export const createModalVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
     }
 
+    const modalVersionExist = await orm.em.findOne(ModalVersion,
+      { versionName: input.versionName, modal });
+    if (modalVersionExist) throw new TRPCError({ code: "CONFLICT", message: "ModalVersionExist already exist" });
+
     const modalVersion = new ModalVersion({ ...input, privatePath: input.path, modal: modal });
     await orm.em.persistAndFlush(modalVersion);
     return { id: modalVersion.id };
@@ -147,6 +151,11 @@ export const updateModalVersion = procedure
     const modalVersion = await orm.em.findOne(ModalVersion, { id: input.id });
     if (!modalVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModalVersion ${input.id} not found` });
+
+    const modalVersionExist = await orm.em.findOne(ModalVersion, { versionName: input.versionName });
+    if (modalVersionExist && modalVersionExist !== modalVersion) {
+      throw new TRPCError({ code: "CONFLICT", message: "ModalVersion alreay exist" });
+    }
 
     modalVersion.versionName = input.versionName;
     modalVersion.versionDescription = input.versionDescription;
