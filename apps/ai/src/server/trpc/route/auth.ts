@@ -52,6 +52,7 @@ export const auth = router({
       if (info) {
         // set token cache
         setUserTokenCookie(token, res);
+        // 接入audit后，需调用
         // if (fromAuth) {
         //   const logInfo = {
         //     operatorUserId: info.identityId,

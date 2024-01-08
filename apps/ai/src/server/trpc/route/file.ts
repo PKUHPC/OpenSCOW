@@ -242,7 +242,7 @@ export const file = router({
 
   getFileMetadata: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
-    .query(async ({ input: { clusterId, path }, ctx: { user, res } }) => {
+    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
 

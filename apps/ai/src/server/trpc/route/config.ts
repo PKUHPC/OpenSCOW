@@ -31,6 +31,8 @@ import { z } from "zod";
 const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
 const clustersInit = getClusterConfigs(configPath, console);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
+
+// 根据hpcOnly，去掉仅在portal展示的集群
 Object.keys(clustersInit).map((id) => {
   if (clustersInit[id].hpcOnly) {
     delete clustersInit[id];

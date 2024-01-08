@@ -327,7 +327,7 @@ export const deleteImage = procedure
 
     let reference = "";
     for (const item of referenceRes) {
-      if (item.tag.find((i: { name: string }) => i.name === image.tag)) {
+      if (item.tags.find((i: { name: string }) => i.name === image.tag)) {
         reference = item.digest;
       }
     }
