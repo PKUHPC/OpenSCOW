@@ -14,12 +14,15 @@ import { aiConfig } from "src/server/config/ai";
 import { config } from "src/server/config/env";
 
 
-export async function loginToHarbor() {
+export async function loginToHarbor(csrfToken: string) {
   const url = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/c/login`;
   console.log("loginToHarbor url", url);
   const response = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "X-Harbor-CSRF-Token": csrfToken,
+    },
     body: JSON.stringify({ principal: aiConfig.harborConfig.user, password: aiConfig.harborConfig.password }),
   });
 

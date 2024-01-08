@@ -303,8 +303,27 @@ export const deleteImage = procedure
       });
     }
 
+    // 获取harrbor中的reference以删除镜像
+    const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+    + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}/artifacts`;
+    const getReferenceRes = await fetch(getReferenceUrl, {
+      method: "GET",
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    console.log("getReferenceUrl:", getReferenceUrl);
+    if (!getReferenceRes.ok) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to get image reference: " + getReferenceRes.text,
+      });
+    }
+
     // 登录harbor获取token
-    const csrfToken = await loginToHarbor();
+    const initCsrfToken = getReferenceRes.headers.get("x-harbor-csrf-token") || "";
+    const csrfToken = await loginToHarbor(initCsrfToken);
 
     if (!csrfToken) {
       throw new TRPCError({
@@ -313,24 +332,6 @@ export const deleteImage = procedure
       });
     }
 
-    // 获取harrbor中的reference以删除镜像
-    const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
-    + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}/artifacts`;
-    const getReferenceRes = await fetch(getReferenceUrl, {
-      method: "GET",
-      headers: {
-        "content-type": "application/json",
-        "X-Harbor-CSRF-Token": csrfToken,
-      },
-    });
-
-    console.log("getReferenceUrl:", getReferenceUrl);
-    if (!getReferenceRes.ok) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get image reference: " + getReferenceRes.statusText,
-      });
-    }
 
     const referenceRes = await getReferenceRes.json();
 
@@ -349,6 +350,7 @@ export const deleteImage = procedure
         message: "Failed to find image tag in harbor ! Please contact the administrator! ",
       });
     }
+
 
     const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}`
