@@ -151,7 +151,7 @@ export const userRoutes: (
         Icon: FolderOutlined,
         text: "文件管理",
         path: "/files",
-        clickToPath: `/files/${defaultCluster.id}`,
+        clickToPath: `/files/${defaultCluster.id}/~`,
         children: publicConfig.CLUSTERS.map((cluster) => ({
           Icon: FolderOutlined,
           text: cluster.name,

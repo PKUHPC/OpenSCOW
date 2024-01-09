@@ -101,7 +101,7 @@ export const file = router({
 
           const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
           if (error) {
-            throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "move failed", cause: error });
+            throw new TRPCError({ code: "CONFLICT", message: "Rename or move failed. " + error });
           }
 
           return {};

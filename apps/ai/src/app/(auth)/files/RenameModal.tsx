@@ -40,6 +40,13 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       onClose();
       form.resetFields();
     },
+    onError: (e) => {
+      if (e.data?.code === "CONFLICT") {
+        message.error("重命名失败，存在相同的目录或文件");
+      } else {
+        message.error("重命名失败");
+      }
+    },
   });
 
   const onSubmit = async () => {
