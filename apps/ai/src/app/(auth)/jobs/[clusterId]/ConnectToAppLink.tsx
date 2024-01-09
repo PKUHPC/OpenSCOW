@@ -18,8 +18,9 @@ import { join } from "path";
 import { useEffect } from "react";
 import { DisabledA } from "src/components/DisabledA";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
-import { BASE_PATH } from "src/utils/processEnv";
 import { trpc } from "src/utils/trpc";
+
+import { usePublicConfig } from "../../context";
 
 export interface Props {
   session: AppSession;
@@ -30,7 +31,7 @@ export interface Props {
 export const ConnectTopAppLink: React.FC<Props> = ({
   session, cluster, refreshToken,
 }) => {
-
+  const { publicConfig: { BASE_PATH } } = usePublicConfig();
   const { message } = App.useApp();
 
   const { data, refetch } = trpc.jobs.checkAppConnectivity.useQuery({ host: session.host!, port: session.port! }, {
