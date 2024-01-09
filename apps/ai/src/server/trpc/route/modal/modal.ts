@@ -153,7 +153,7 @@ export const updateModal = procedure
     const modal = await orm.em.findOne(Modal, { id });
 
     const modalExist = await orm.em.findOne(Modal, { name });
-    if (modalExist !== modal) {
+    if (modalExist && modalExist !== modal) {
       throw new TRPCError({
         code: "CONFLICT",
       });
@@ -168,7 +168,6 @@ export const updateModal = procedure
     }
 
     // 如果是已分享的模型且名称发生变化，则变更共享路径下的此模型名称为新名称
-    // let oldPath: string;
     if (modal.isShared && name !== modal.name) {
 
       const sharedVersions = await orm.em.find(ModalVersion, { modal, sharedStatus: SharedStatus.SHARED });
