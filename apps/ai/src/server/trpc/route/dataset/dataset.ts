@@ -22,33 +22,6 @@ import { checkSharePermission, SHARED_TARGET,
   unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
-// const mockDatasets = [
-//   {
-//     id: 100,
-//     name: "aaa",
-//     owner: "demo_admin",
-//     type: "Image",
-//     isShared: "true",
-//     scene: "Text",
-//     description: "test",
-//     createTime: "2023-04-15 12:30:45",
-//     versions: [100, 101],
-//     clusterId: "hpc01",
-//   },
-//   {
-//     id: 101,
-//     name: "bbb",
-//     owner: "demo_admin",
-//     type: "Audio",
-//     isShared: "false",
-//     scene: "Text",
-//     description: "test",
-//     createTime: "2023-04-15 12:30:45",
-//     versions: [],
-//     clusterId: "hpc01",
-//   },
-// ];
-
 export const DatasetListSchema = z.object({
   id: z.number(),
   name: z.string(),

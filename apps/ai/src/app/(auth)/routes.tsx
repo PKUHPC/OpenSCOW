@@ -26,7 +26,8 @@ export const userRoutes: (
   user: ClientUserInfo | undefined,
   publicConfig: PublicConfig,
   setDefaultCluster: (cluster: Cluster) => void,
-) => NavItemProps[] = (user, publicConfig, setDefaultCluster) => {
+  defaultCluster: Cluster,
+) => NavItemProps[] = (user, publicConfig, setDefaultCluster, defaultCluster) => {
 
   if (!user) { return []; }
 
@@ -35,6 +36,7 @@ export const userRoutes: (
       Icon: DashboardOutlined,
       text: "仪表盘",
       path: "/dashboard",
+      clickToPath: "/dashboard",
     },
     {
       Icon: DatabaseOutlined,
@@ -58,7 +60,7 @@ export const userRoutes: (
       Icon: FileImageOutlined,
       text: "镜像",
       path: "/image",
-      clickToPath: "",
+      clickToPath: "/image/private",
       children: [
         {
           Icon: LockOutlined,
@@ -76,7 +78,7 @@ export const userRoutes: (
       Icon: UngroupOutlined,
       text: "算法",
       path: "/algorithm",
-      clickToPath: "",
+      clickToPath: "/algorithm/private",
       children: [
         {
           Icon: LockOutlined,
@@ -94,7 +96,7 @@ export const userRoutes: (
       Icon: BookOutlined,
       text: "作业",
       path: "/jobs",
-      clickToPath: "",
+      clickToPath: `/jobs/${defaultCluster.id}/createApps`,
       children: [
         ...publicConfig.CLUSTERS.map((cluster) => ({
           Icon: FolderOutlined,
@@ -130,7 +132,7 @@ export const userRoutes: (
       Icon: OneToOneOutlined,
       text: "模型",
       path: "/modal",
-      clickToPath: "",
+      clickToPath: "/modal/private",
       children: [
         {
           Icon: LockOutlined,
@@ -149,7 +151,7 @@ export const userRoutes: (
         Icon: FolderOutlined,
         text: "文件管理",
         path: "/files",
-        clickToPath: "",
+        clickToPath: `/files/${defaultCluster.id}`,
         children: publicConfig.CLUSTERS.map((cluster) => ({
           Icon: FolderOutlined,
           text: cluster.name,

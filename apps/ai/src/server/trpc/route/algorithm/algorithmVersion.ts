@@ -25,27 +25,6 @@ import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, 
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
-const mockAlgorithmVersions = [
-  {
-    id: 100,
-    name: "aaa",
-    owner: "demo_admin1",
-    isShared: true,
-    description: "test1",
-    createTime: "2023-04-15 12:30:45",
-    path:"",
-  },
-  {
-    id: 101,
-    name: "bbb",
-    owner: "demo_admin2",
-    isShared: false,
-    description: "test2",
-    createTime: "2023-04-15 12:22:45",
-    path:"",
-  },
-];
-
 export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
@@ -160,7 +139,7 @@ export const updateAlgorithmVersion = procedure
 
     const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
-      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion alreay exist" });
+      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion already exist" });
     }
 
     const needUpdateSharedPath = algorithmVersion.sharedStatus === SharedStatus.SHARED
