@@ -106,21 +106,23 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-  const isPublicDataset = Form.useWatch(["dataset", "type"], form) === AccessiblityType.PUBLIC;
-  const isPublicAlgorithm = Form.useWatch(["algorithm", "type"], form) === AccessiblityType.PUBLIC;
-  const isPublicImage = Form.useWatch(["image", "type"], form) === AccessiblityType.PUBLIC;
-
+  const datasetType = Form.useWatch(["dataset", "type"], form);
+  const isDatasetPublic = datasetType !== undefined ? datasetType === AccessiblityType.PUBLIC : datasetType;
+  const algorithmType = Form.useWatch(["algorithm", "type"], form);
+  const isAlgorithmPublic = algorithmType !== undefined ? algorithmType === AccessiblityType.PUBLIC : algorithmType;
+  const imageType = Form.useWatch(["image", "type"], form);
+  const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
   const selectedDataset = Form.useWatch(["dataset", "name"], form);
 
   const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
 
 
   const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
-    isShared: isPublicDataset, clusterId,
+    isShared: isDatasetPublic, clusterId,
   });
 
   const { data: datasetVersions, isLoading: isDatasetVersionsLoading } = trpc.dataset.versionList.useQuery({
-    datasetId: selectedDataset, isShared: isPublicDataset,
+    datasetId: selectedDataset, isShared: isDatasetPublic,
   }, { enabled: selectedDataset !== undefined });
 
   const datasetOptions = useMemo(() => {
@@ -134,11 +136,11 @@ export const LaunchAppForm = (props: Props) => {
   const { data: algorithms, isLoading: isAlgorithmLoading } = trpc.algorithm.getAlgorithms.useQuery(
     {
       clusterId,
-      isPublic: isPublicAlgorithm,
+      isPublic: isAlgorithmPublic,
     });
 
   const { data:algorithmVersions, isLoading: isAlgorithmVersionsLoading } =
-  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectedAlgorithm, isPublic: isPublicAlgorithm }, {
+  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectedAlgorithm, isPublic: isAlgorithmPublic }, {
     enabled: selectedAlgorithm !== undefined });
 
 
@@ -151,7 +153,7 @@ export const LaunchAppForm = (props: Props) => {
   }, [algorithmVersions]);
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
-    isPublic: isPublicImage,
+    isPublic: isImagePublic,
     clusterId,
     withExternal: true,
   });
