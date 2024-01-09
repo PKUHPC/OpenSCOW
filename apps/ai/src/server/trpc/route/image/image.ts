@@ -350,27 +350,28 @@ export const deleteImage = procedure
     //   });
     // }
 
-
     const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}/${image.name}`
     + `/artifacts/${reference}/tags/${image.tag}`;
-    const base64Credentials = Buffer.from(`${aiConfig.harborConfig.user}:`
-    + `${aiConfig.harborConfig.password}`).toString("base64");
 
+    const authInfo = Buffer.from(`${aiConfig.harborConfig.user}:${aiConfig.harborConfig.password}`).toString("base64");
+
+    console.log("deleteUrl", deleteUrl);
     const deleteRes = await fetch(deleteUrl, {
       method: "DELETE",
       headers: {
         "content-type": "application/json",
         "Accept": "application/json",
-        "Authorization": `Basic ${base64Credentials}`,
+        "Authorization": `Basic ${authInfo}`,
       },
     });
 
     if (!deleteRes.ok) {
       const errorBody = await deleteRes.json();
+      console.log("deleteRes", errorBody);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete image tag: " + errorBody.message,
+        message: "Failed to delete image tag: " + errorBody,
       });
     }
 
