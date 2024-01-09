@@ -67,9 +67,9 @@ export default function Layout(
   }
 
   const publicConfig = configQuery.data;
-  const { setDefaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
+  const { setDefaultCluster, defaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
 
-  const routes = userRoutes(userQuery.data.user, publicConfig, setDefaultCluster);
+  const routes = userRoutes(userQuery.data.user, publicConfig, setDefaultCluster, defaultCluster);
 
 
   return (
