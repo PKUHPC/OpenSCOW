@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space } from "antd";
 import React from "react";

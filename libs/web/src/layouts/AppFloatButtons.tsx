@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
 import { FloatButton } from "antd";
 import { DarkModeButton, DarkModeButtonProps } from "src/layouts/darkMode";
 

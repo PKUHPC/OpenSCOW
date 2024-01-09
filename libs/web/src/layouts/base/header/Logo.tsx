@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
 import Link from "next/link";
 import { join } from "path";
 import { useDarkMode } from "src/layouts/darkMode";

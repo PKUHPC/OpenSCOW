@@ -88,6 +88,8 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
         message.error("找不到镜像");
+      } else if (data?.code === "INTERNAL_SERVER_ERROR") {
+        message.error(err.message);
       } else {
         message.error("删除镜像失败");
       }

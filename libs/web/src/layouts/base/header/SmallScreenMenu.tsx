@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
 import { MenuOutlined } from "@ant-design/icons";
 import { arrayContainsElement } from "@scow/utils";
 import { Button, Dropdown } from "antd";

@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-
 import { styled } from "styled-components";
 
 interface Props {

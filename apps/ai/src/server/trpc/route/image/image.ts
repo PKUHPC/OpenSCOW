@@ -21,7 +21,6 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { getHarborImageName, loadedImageRegex } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
-import { loginToHarbor } from "src/server/utils/loginHarbor";
 import { checkSharePermission } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -313,11 +312,11 @@ export const deleteImage = procedure
       },
     });
 
-    console.log("getReferenceUrl:", getReferenceUrl);
     if (!getReferenceRes.ok) {
       const errorBody = await getReferenceRes.json();
       // 来自harbor的错误信息
       const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+      logger.error("Failed to get image reference url %s", getReferenceUrl);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to get image reference: " + errorMessage,
@@ -326,7 +325,6 @@ export const deleteImage = procedure
 
     const referenceRes = await getReferenceRes.json();
 
-    console.log("reference:", referenceRes);
 
     let reference = "";
     for (const item of referenceRes) {
@@ -342,23 +340,12 @@ export const deleteImage = procedure
       });
     }
 
-    // 登录harbor获取token
-    // const csrfToken = await loginToHarbor();
-
-    // if (!csrfToken) {
-    //   throw new TRPCError({
-    //     code: "INTERNAL_SERVER_ERROR",
-    //     message: "Login to harbor failed! Please contact the administrator! ",
-    //   });
-    // }
-
     const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
     + `/artifacts/${reference}/tags/${image.tag}`;
 
     const authInfo = Buffer.from(`${aiConfig.harborConfig.user}:${aiConfig.harborConfig.password}`).toString("base64");
 
-    console.log("deleteUrl", deleteUrl);
     const deleteRes = await fetch(deleteUrl, {
       method: "DELETE",
       headers: {
@@ -372,6 +359,7 @@ export const deleteImage = procedure
       const errorBody = await deleteRes.json();
       // 来自harbor的错误信息
       const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+      logger.error("Failed to delete image tag url %s", deleteUrl);
       console.log("deleteRes", errorBody);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
