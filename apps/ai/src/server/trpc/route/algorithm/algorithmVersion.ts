@@ -142,6 +142,14 @@ export const updateAlgorithmVersion = procedure
       throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion already exist" });
     }
 
+    if (algorithmVersion.sharedStatus === SharedStatus.SHARING ||
+      algorithmVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of algorithmVersion ${input.versionId} exists`,
+      });
+    }
+
     const needUpdateSharedPath = algorithmVersion.sharedStatus === SharedStatus.SHARED
     && input.versionName !== algorithmVersion.versionName;
     if (needUpdateSharedPath) {

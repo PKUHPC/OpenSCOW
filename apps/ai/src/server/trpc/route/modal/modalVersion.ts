@@ -159,6 +159,14 @@ export const updateModalVersion = procedure
       throw new TRPCError({ code: "CONFLICT", message: "ModalVersion alreay exist" });
     }
 
+    if (modalVersion.sharedStatus === SharedStatus.SHARING ||
+      modalVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of modalVersion ${id} exists`,
+      });
+    }
+
     const needUpdateSharedPath = modalVersion.sharedStatus === SharedStatus.SHARED
     && versionName !== modalVersion.versionName;
     if (needUpdateSharedPath) {

@@ -145,8 +145,21 @@ export const updateAlgorithm = procedure
     if (algorithm.owner !== user!.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${id} not accessible` });
 
+
+    const changingVersions = await em.find(AlgorithmVersion, { algorithm,
+      $or: [
+        { sharedStatus: SharedStatus.SHARING },
+        { sharedStatus: SharedStatus.UNSHARING },
+      ]},
+    );
+    if (changingVersions.length > 0) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of algorithm ${id} exists`,
+      });
+    }
+
     // 如果是已分享的算法且名称发生变化，则变更共享路径下的此算法名称为新名称
-    // let oldPath: string;
     if (algorithm.isShared && name !== algorithm.name) {
 
       const sharedVersions = await em.find(AlgorithmVersion, { algorithm, sharedStatus: SharedStatus.SHARED });

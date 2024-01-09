@@ -179,12 +179,24 @@ export const updateDataset = procedure
       });
     }
 
+    const changingVersions = await orm.em.find(DatasetVersion, { dataset,
+      $or: [
+        { sharedStatus: SharedStatus.SHARING },
+        { sharedStatus: SharedStatus.UNSHARING },
+      ]},
+    );
+    if (changingVersions.length > 0) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of dataset ${id} exists`,
+      });
+    }
+
     // 如果是已分享的数据集且名称发生变化，则变更共享路径下的此数据集名称为新名称
-    let oldPath: string;
     if (dataset.isShared && name !== dataset.name) {
 
       const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
-      oldPath = dirname(sharedVersions[0].path);
+      const oldPath = dirname(sharedVersions[0].path);
       await updateSharedName({
         target: SHARED_TARGET.DATASET,
         user: user,
@@ -209,21 +221,7 @@ export const updateDataset = procedure
     dataset.scene = scene;
     dataset.description = description;
 
-    await orm.em.flush().catch(async (e) => {
-      if (dataset.isShared && name !== dataset.name) {
-        logger.info("Rollback update shared name of %s", name);
-        await updateSharedName({
-          target: SHARED_TARGET.DATASET,
-          user: user,
-          clusterId: dataset.clusterId,
-          newName: name,
-          isVersionName: false,
-          oldPath,
-          needRollback: true,
-        });
-      }
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Update Dataset ${id} failed: ${e}` });
-    });
+    await orm.em.flush();
 
     return dataset.id;
   });

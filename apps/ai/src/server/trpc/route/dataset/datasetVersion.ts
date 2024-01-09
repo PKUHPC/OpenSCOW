@@ -186,6 +186,14 @@ export const updateDatasetVersion = procedure
       });
     }
 
+    if (datasetVersion.sharedStatus === SharedStatus.SHARING ||
+      datasetVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of datasetVersion ${id} exists`,
+      });
+    }
+
     const needUpdateSharedPath = datasetVersion.sharedStatus === SharedStatus.SHARED
       && versionName !== datasetVersion.versionName;
     if (needUpdateSharedPath) {

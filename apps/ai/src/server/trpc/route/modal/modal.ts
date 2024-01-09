@@ -167,6 +167,19 @@ export const updateModal = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
     }
 
+    const changingVersions = await orm.em.find(ModalVersion, { modal,
+      $or: [
+        { sharedStatus: SharedStatus.SHARING },
+        { sharedStatus: SharedStatus.UNSHARING },
+      ]},
+    );
+    if (changingVersions.length > 0) {
+      throw new TRPCError({
+        code: "PRECONDITION_FAILED",
+        message: `Unfinished processing of modal ${input.id} exists`,
+      });
+    }
+
     // 如果是已分享的模型且名称发生变化，则变更共享路径下的此模型名称为新名称
     if (modal.isShared && name !== modal.name) {
 
