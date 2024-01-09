@@ -57,6 +57,12 @@ export const CreateAndEditModalModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("模型名称已存在");
+        form.setFields([
+          {
+            name: "modalName",
+            errors: ["模型名称已存在"],
+          },
+        ]);
         return;
       }
       message.error("添加模型失败");
@@ -71,6 +77,12 @@ export const CreateAndEditModalModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("模型名称已存在");
+        form.setFields([
+          {
+            name: "modalName",
+            errors: ["模型名称已存在"],
+          },
+        ]);
         return;
       }
       else if (e.data?.code === "NOT_FOUND") {

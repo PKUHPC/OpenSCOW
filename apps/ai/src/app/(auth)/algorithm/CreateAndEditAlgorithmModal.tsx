@@ -57,6 +57,12 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("算法名称已存在");
+        form.setFields([
+          {
+            name: "name",
+            errors: ["算法名称已存在"],
+          },
+        ]);
         return;
       }
       message.error("添加算法失败");
@@ -72,6 +78,12 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("算法名称已存在");
+        form.setFields([
+          {
+            name: "name",
+            errors: ["算法名称已存在"],
+          },
+        ]);
         return;
       }
       else if (e.data?.code === "NOT_FOUND") {

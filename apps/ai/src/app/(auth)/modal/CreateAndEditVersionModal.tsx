@@ -57,6 +57,12 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("版本名称已存在");
+        form.setFields([
+          {
+            name: "versionName",
+            errors: ["版本名称已存在"],
+          },
+        ]);
         return;
       }
 
@@ -74,6 +80,12 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("版本名称已存在");
+        form.setFields([
+          {
+            name: "versionName",
+            errors: ["版本名称已存在"],
+          },
+        ]);
         return;
       }
       else if (e.data?.code === "NOT_FOUND") {
