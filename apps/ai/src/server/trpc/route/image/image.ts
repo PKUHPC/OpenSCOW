@@ -136,21 +136,6 @@ export const createImage = procedure
       });
     };
 
-    const NotTarError = new TRPCError({
-      code: "UNPROCESSABLE_CONTENT",
-      message: `Image ${name}:${tag} create failed: image is not a tar file`,
-    });
-
-    const NoClusterError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${name}:${tag} create failed: there is no available cluster`,
-    });
-
-    const NoLocalImageError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${name}:${tag} create failed: localImage not found`,
-    });
-
     // 获取加载镜像的集群节点，如果是远程镜像则使用列表第一个集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
@@ -162,7 +147,12 @@ export const createImage = procedure
       imageTag: tag,
     });
 
-    if (!processClusterId) { throw NoClusterError; }
+    if (!processClusterId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Image ${name}:${tag} create failed: there is no available cluster`,
+      });
+    }
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
@@ -192,7 +182,10 @@ export const createImage = procedure
             localImage = match[1];
           };
         } else {
-          throw NotTarError;
+          throw new TRPCError({
+            code: "UNPROCESSABLE_CONTENT",
+            message: `Image ${name}:${tag} create failed: image is not a tar file`,
+          });
         }
         // 远程镜像需先拉取到本地
       } else {
@@ -205,7 +198,12 @@ export const createImage = procedure
 
       };
 
-      if (localImage === undefined) { throw NoLocalImageError; }
+      if (localImage === undefined) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Image ${name}:${tag} create failed: localImage not found`,
+        });
+      }
 
       const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
       await loggedExec(ssh, logger, true, dockerTagCmd, []);

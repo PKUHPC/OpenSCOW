@@ -75,7 +75,17 @@ export const CreateEditImageModal: React.FC<Props> = (
       resetForm();
       refetch();
     },
-    onError() {
+    onError(err) {
+      if (err.data?.code === "UNPROCESSABLE_CONTENT") {
+        message.error("镜像文件不是 tar 文件");
+        form.setFields([
+          {
+            name: "sourcePath",
+            errors: ["请选择 tar 文件作为镜像"],
+          },
+        ]);
+        return;
+      }
       message.error("添加镜像失败");
     },
   });

@@ -11,13 +11,11 @@
  */
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { TRPCClientError } from "@trpc/client";
 import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DatasetInterface, DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
-import { AppRouter } from "src/server/trpc/router";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
@@ -75,9 +73,14 @@ export const CreateEditDatasetModal: React.FC<Props> = (
     onError(e) {
       if (e.data?.code === "CONFLICT") {
         message.error("数据集名称已存在");
+        form.setFields([
+          {
+            name: "name",
+            errors: ["数据集名称已存在"],
+          },
+        ]);
         return;
       }
-
       message.error("添加数据集失败");
     },
   });
@@ -90,7 +93,13 @@ export const CreateEditDatasetModal: React.FC<Props> = (
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("算法名称已存在");
+        message.error("数据集名称已存在");
+        form.setFields([
+          {
+            name: "name",
+            errors: ["数据集名称已存在"],
+          },
+        ]);
         return;
       }
       else if (e.data?.code === "NOT_FOUND") {
