@@ -32,7 +32,7 @@ interface Props {
     name: string;
     tag: string;
   };
-  attributes: AppCustomAttribute[];
+  attributes?: AppCustomAttribute[];
   appComment?: I18nStringType;
   clusterId: string;
   clusterInfo: ClusterConfig;
@@ -72,7 +72,6 @@ interface Partition {
   comment?: string;
 }
 
-
 // 生成默认应用名称，命名规则为"当前应用名-年月日-时分秒"
 const genAppJobName = (appName: string): string => {
   return `${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
@@ -92,7 +91,7 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, clusterInfo, isTraining = false, appId, appImage, attributes } = props;
+  const { clusterId, appName, clusterInfo, isTraining = false, appId, appImage, attributes = []} = props;
 
   const { message } = App.useApp();
 
@@ -140,7 +139,7 @@ export const LaunchAppForm = (props: Props) => {
 
   const algorithmOptions = useMemo(() => {
     return algorithms?.items.map((x) => ({ label: x.name, value: x.id }));
-  }, [datasets]);
+  }, [algorithms]);
 
   const algorithmVersionOptions = useMemo(() => {
     return algorithmVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
