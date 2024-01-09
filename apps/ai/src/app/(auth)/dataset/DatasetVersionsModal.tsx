@@ -37,6 +37,8 @@ export interface Props {
   cluster: Cluster | undefined;
 }
 
+const CopyPublicDatasetModalButton = ModalButton(CopyPublicDatasetModal, { type: "link" });
+
 export const DatasetVersionsModal: React.FC<Props> = (
   { open, onClose, onRefetch, isFetching, datasetName, isPublic, cluster, datasetVersions },
 ) => {
@@ -49,7 +51,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
   const shareMutation = trpc.dataset.shareDatasetVersion.useMutation({
     onSuccess() {
       onRefetch();
-      message.success("分享成功");
+      message.success("提交分享请求");
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
@@ -64,7 +66,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
   const unShareMutation = trpc.dataset.unShareDatasetVersion.useMutation({
     onSuccess() {
       onRefetch();
-      message.success("取消分享成功");
+      message.success("提交取消分享请求");
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
@@ -158,7 +160,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
             render: (_, r) => formatDateTime(r.createTime) },
           { dataIndex: "action", title: "操作",
             render: (_, r) => {
-
               return !isPublic ? (
                 <>
                   <Space split={<Divider type="vertical" />}>
@@ -233,7 +234,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
                   </CopyPublicDatasetModalButton>
                 </Space>
               );
-
             },
           },
         ]}
@@ -242,5 +242,4 @@ export const DatasetVersionsModal: React.FC<Props> = (
   );
 };
 
-const CopyPublicDatasetModalButton = ModalButton(CopyPublicDatasetModal, { type: "link" });
 

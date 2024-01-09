@@ -118,7 +118,6 @@ export const CreateAndEditModalModal: React.FC<Props> = (
         clusterId:cluster.id,
       });
     }
-
   };
 
   return (

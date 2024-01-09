@@ -14,7 +14,7 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Checkbox, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
+import { App, Button, Checkbox, Form, Input, Modal, Space, Table, TableColumnsType } from "antd";
 import { useCallback, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -90,14 +90,12 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     message.error("找不到模型版本");
   }
 
-
   const deleteModalMutation = trpc.modal.deleteModal.useMutation({
     onError(e) {
       console.log(e);
       message.error("删除模型失败");
     },
   });
-
 
   const deleteModal = useCallback(
     async (id: number, name: string, paths: string[], clusterId: string) => {

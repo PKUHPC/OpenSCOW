@@ -61,6 +61,7 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
         ]);
         return;
       }
+
       message.error("创建新版本失败");
     },
   });
@@ -80,18 +81,16 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
             errors: ["版本名称已存在"],
           },
         ]);
-        return;
       }
       if (e.data?.code === "NOT_FOUND") {
         message.error("无法找到数据集或数据集版本");
-        return;
       }
-      if (e.data?.code === "PRECONDITION_FAILED") {
+      else if (e.data?.code === "PRECONDITION_FAILED") {
         message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
-        return;
       }
-
-      message.error("编辑版本失败");
+      else {
+        message.success("编辑版本失败");
+      }
     },
   });
 
@@ -177,7 +176,6 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
             </>
           )
         }
-
       </Form>
     </Modal>
   );

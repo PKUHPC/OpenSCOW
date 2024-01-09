@@ -55,32 +55,37 @@ export const VersionListModal: React.FC<Props> = (
   const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("分享成功");
+      message.success("提交分享请求");
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限分享此版本");
+        return;
       }
+
+      message.error("分享失败");
     },
   });
 
   const unShareMutation = trpc.algorithm.unShareAlgorithmVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("取消分享成功");
+      message.success("提交取消分享");
     },
     onError(err) {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限取消分享此版本");
+        return;
       }
+
+      message.error("取消分享失败");
     },
   });
 
   const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
-    onError(e) {
-      console.log(e);
+    onError() {
       message.error("删除算法版本失败");
     } });
 

@@ -98,14 +98,17 @@ export const createAlgorithmVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const { em } = await getORM();
     const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
-    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: "Algorithm not Found" });
+    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not Found` });
 
     if (algorithm && algorithm.owner !== user?.identityId)
-      throw new TRPCError({ code: "CONFLICT", message: "Algorithm is belonged to the other user" });
+      throw new TRPCError({ code: "CONFLICT",
+        message: `Algorithm id:${input.algorithmId} is belonged to the other user`,
+      });
 
     const algorithmVersionExist = await em.findOne(AlgorithmVersion,
       { versionName: input.versionName, algorithm });
-    if (algorithmVersionExist) throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion already exist" });
+    if (algorithmVersionExist)
+      throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
 
     const algorithmVersion = new AlgorithmVersion({ ...input, privatePath: input.path, algorithm: algorithm });
     await em.persistAndFlush(algorithmVersion);
@@ -132,14 +135,15 @@ export const updateAlgorithmVersion = procedure
     const orm = await getORM();
 
     const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
-    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: "Algorithm not found" });
+    if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not found` });
 
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.versionId });
-    if (!algorithmVersion) throw new TRPCError({ code: "NOT_FOUND", message: "AlgorithmVersion not found" });
+    if (!algorithmVersion)
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.versionId} not found` });
 
     const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
-      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion already exist" });
+      throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
     }
 
     if (algorithmVersion.sharedStatus === SharedStatus.SHARING ||
@@ -188,15 +192,15 @@ export const deleteAlgorithmVersion = procedure
   .mutation(async ({ input:{ id, algorithmId }, ctx: { user } }) => {
     const orm = await getORM();
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id });
-    if (!algorithmVersion) throw new Error(`AlgorithmVersion${id} not found`);
+    if (!algorithmVersion) throw new Error(`AlgorithmVersion id:${id} not found`);
 
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId },
-      { populate: ["versions", "versions.sharedStatus"]});
+      { populate: ["versions.sharedStatus"]});
     if (!algorithm)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
     if (algorithm.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} not accessible` });
 
     // 如果是已分享的数据集版本，则删除分享
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED) {
@@ -241,17 +245,17 @@ export const shareAlgorithmVersion = procedure
     const orm = await getORM();
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
     if (!algorithmVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion ${algorithmId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
 
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED)
-      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion is already shared" });
+      throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion id:${algorithmId} is already shared` });
 
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId });
     if (!algorithm)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
     if (algorithm.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId}  not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId}  not accessible` });
 
     const homeTopDir = await checkSharePermission({
       clusterId: algorithm.clusterId,
@@ -310,19 +314,19 @@ export const unShareAlgorithmVersion = procedure
     const orm = await getORM();
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
     if (!algorithmVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion ${versionId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${versionId} not found` });
 
     if (algorithmVersion.sharedStatus === SharedStatus.UNSHARED)
-      throw new TRPCError({ code: "CONFLICT", message: "AlgorithmVersion is already unShared" });
+      throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion id:${versionId} is already unShared` });
 
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId }, {
-      populate: ["versions", "versions.sharedStatus"],
+      populate: ["versions.sharedStatus"],
     });
     if (!algorithm)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm ${algorithmId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
     if (algorithm.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${algorithmId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} not accessible` });
 
     await checkSharePermission({
       clusterId: algorithm.clusterId,

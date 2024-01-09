@@ -14,8 +14,8 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Checkbox, Divider, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { App, Button, Checkbox, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
+import { useCallback, useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -101,7 +101,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
 
 
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
-    onError(e) {
+    onError() {
       message.error("删除算法失败");
     } });
 
@@ -183,7 +183,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
                   setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
               >
-                  版本列表
+                版本列表
               </Button>
               <EditAlgorithmModalButton
                 refetch={refetch}
@@ -212,7 +212,9 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
               type="link"
               onClick={() =>
               { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
-                setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
+                setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId));
+              }
+              }
             >
               版本列表
             </Button>
@@ -252,7 +254,8 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
               placeholder="请选择算法框架"
               defaultValue={"ALL"}
               options={
-                Object.entries(FilterType).map(([key, value]) => ({ label:value, value:key }))}
+                Object.entries(FilterType).map(([key, value]) => ({ label:value, value:key }))
+              }
             >
             </Select>
           </Form.Item>

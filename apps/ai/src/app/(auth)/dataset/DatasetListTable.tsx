@@ -294,7 +294,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                         setClusterId(r.clusterId);
                       }}
                     >
-                        版本列表
+                      版本列表
                     </Button>
                   </Space>
                 );

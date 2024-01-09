@@ -75,7 +75,6 @@ export const CopyPublicModalModal: React.FC<Props> = (
       versionDescription: versionDescription ?? "",
       path,
     });
-
   };
 
   return (

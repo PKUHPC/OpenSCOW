@@ -100,18 +100,18 @@ export const CreateEditDatasetModal: React.FC<Props> = (
             errors: ["数据集名称已存在"],
           },
         ]);
-        return;
       }
       if (e.data?.code === "NOT_FOUND") {
         message.error("无法找到数据集");
-        return;
+      }
+      else {
+        message.error("编辑数据集失败");
       }
       if (e.data?.code === "PRECONDITION_FAILED") {
         message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
         return;
       }
 
-      message.error("编辑数据集失败");
     },
   });
 

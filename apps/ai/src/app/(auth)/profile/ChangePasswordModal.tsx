@@ -11,7 +11,7 @@
  */
 
 import { App, Form, Input, Modal } from "antd";
-import React, { useState } from "react";
+import React from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { confirmPasswordFormItemProps } from "src/utils/form";
 import { trpc } from "src/utils/trpc";

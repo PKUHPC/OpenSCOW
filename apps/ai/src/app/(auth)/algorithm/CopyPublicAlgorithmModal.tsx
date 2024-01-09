@@ -49,18 +49,19 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
     },
     onError(err) {
       if (err.data?.code === "CONFLICT") {
+        message.error("目标算法名称已存在");
         form.setFields([
           {
             name: "targetDatasetName",
             errors: ["目标算法名称已存在"],
           },
         ]);
+        return;
       }
 
       message.error("复制算法失败");
     },
   });
-
 
   const onOk = async () => {
     const { targetAlgorithmName, versionName, versionDescription, path } = await form.validateFields();
@@ -72,7 +73,6 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
       versionDescription: versionDescription ?? "",
       path,
     });
-
   };
 
   return (

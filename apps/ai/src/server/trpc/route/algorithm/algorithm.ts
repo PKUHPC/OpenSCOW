@@ -72,7 +72,7 @@ export const getAlgorithms = procedure
           offset: (page - 1) * (pageSize || 10),
           limit: pageSize || 10,
         } : {},
-      populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
+      populate: ["versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -108,7 +108,8 @@ export const createAlgorithm = procedure
     if (algorithmExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
+        message: `Algorithm name ${input.name} already exist`,
+        cause:ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
       });
     }
 
@@ -138,7 +139,8 @@ export const updateAlgorithm = procedure
     if (algorithmExist && algorithmExist !== algorithm) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
+        message: `Algorithm name ${name} already exist`,
+        cause: ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
       });
     }
 

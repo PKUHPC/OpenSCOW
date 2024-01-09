@@ -82,17 +82,16 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
             errors: ["版本名称已存在"],
           },
         ]);
-        return;
       }
-      if (e.data?.code === "NOT_FOUND") {
+      else if (e.data?.code === "NOT_FOUND") {
         message.error("算法或算法版本未找到");
-        return;
       }
-      if (e.data?.code === "PRECONDITION_FAILED") {
+      else if (e.data?.code === "PRECONDITION_FAILED") {
         message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
-        return;
       }
-      message.error("修改版本失败");
+      else {
+        message.error("修改版本失败");
+      }
     },
   });
 
@@ -115,7 +114,6 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         algorithmId,
       });
     }
-
   };
 
   return (
@@ -181,7 +179,6 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
             </Form.Item>
           ) : undefined
         }
-
       </Form>
     </Modal>
   );

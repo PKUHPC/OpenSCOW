@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { EntitySchema, type Ref, ReferenceType } from "@mikro-orm/core";
+import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { SharedStatus } from "./AlgorithmVersion";

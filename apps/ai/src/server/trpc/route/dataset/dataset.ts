@@ -79,7 +79,7 @@ export const list = procedure
     }, {
       limit: input.pageSize || undefined,
       offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
-      populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
+      populate: ["versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -125,6 +125,7 @@ export const createDataset = procedure
     if (datesetExist) {
       throw new TRPCError({
         code: "CONFLICT",
+        message: `Dataset name ${input.name} already exist`,
       });
     }
 
