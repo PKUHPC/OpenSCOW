@@ -1,0 +1,12 @@
+# 集群显示名称
+displayName: hpc01
+
+ # 各个登录节点的IP或者域名，服务节点必须可访问
+loginNodes:
+  - name: login01
+    address: login01
+  - name: login02
+    address: login02
+
+# 适配器地址(ip地址:端口号)
+adapterUrl: "localhost:8999"
