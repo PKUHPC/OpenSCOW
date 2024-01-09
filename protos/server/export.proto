@@ -1,0 +1,110 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow.server;
+
+import "server/charging.proto";
+import "server/user.proto";
+import "server/account.proto";
+import "google/protobuf/timestamp.proto";
+
+message ExportAccountRequest {
+  uint32 count = 1;
+  optional string tenant_name = 2;
+  optional string account_name = 3;
+  // 为true时表明账户被冻结，false则为所有账户
+  optional bool blocked = 4;
+  // 为true时表明账户欠费，false则为所有账户
+  optional bool debt = 5;
+}
+
+message ExportAccountResponse {
+  repeated Account accounts = 1;
+}
+
+message ExportedUser {
+  string user_id = 1;
+  string name = 2;
+  string email = 3;
+  repeated string available_accounts = 4;
+  string tenant_name = 5;
+  google.protobuf.Timestamp create_time = 6;
+  repeated TenantRole tenant_roles = 7;
+  repeated PlatformRole platform_roles = 8;
+}
+
+message ExportUserRequest {
+  uint32 count = 1;
+  optional string tenant_name = 2;
+  optional GetAllUsersRequest.UsersSortField sort_field = 3;
+  optional SortDirection sort_order = 4;
+  optional string id_or_name = 5;
+  optional PlatformRole platform_role = 6;
+  optional TenantRole tenant_role = 7;
+}
+
+message ExportUserResponse {
+  repeated ExportedUser users = 1;
+}
+
+message ExportChargeRecordRequest {
+  uint32 count = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+  optional string type = 4;
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+    AccountOfTenantTarget account_of_tenant = 5;
+    // 返回这个租户（tenantName）下所有账户的消费记录
+    AccountsOfTenantTarget accounts_of_tenant = 6;
+    // 返回所有租户下所有账户的消费记录
+    AccountsOfAllTenantsTarget accounts_of_all_tenants = 7;
+    // 返回这个租户（tenantName）的租户消费记录
+    TenantTarget tenant = 8;
+    // 返回所有租户的租户消费记录
+    AllTenantsTarget all_tenants = 9;
+  }
+}
+
+message ExportChargeRecordResponse {
+  repeated ChargeRecord charge_records = 1;
+}
+
+message ExportPayRecordRequest {
+  uint32 count = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+    AccountOfTenantTarget account_of_tenant = 4;
+    // 返回这个租户（tenantName）下所有账户的充值记录
+    AccountsOfTenantTarget accounts_of_tenant = 5;
+    // 返回这个租户（tenantName）的充值记录
+    TenantTarget tenant = 6;
+    // 返回所有租户充值记录
+    AllTenantsTarget all_tenants = 7;
+  }
+}
+
+message ExportPayRecordResponse {
+  repeated PaymentRecord pay_records = 1;
+}
+
+service ExportService {
+  rpc ExportAccount(ExportAccountRequest) returns (stream ExportAccountResponse);
+  rpc ExportUser(ExportUserRequest) returns (stream ExportUserResponse);
+  rpc ExportChargeRecord(ExportChargeRecordRequest) returns (stream ExportChargeRecordResponse);
+  rpc ExportPayRecord(ExportPayRecordRequest) returns (stream ExportPayRecordResponse);
+}

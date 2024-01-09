@@ -13,14 +13,16 @@
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, DatePicker, Form, Select, Spin, Table } from "antd";
+import { App, Button, DatePicker, Form, Select, Spin, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { SearchType } from "src/models/User";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 
@@ -47,13 +49,13 @@ const pCommon = prefix("common.");
 
 export const ChargeTable: React.FC<Props> = ({
   accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
-
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(accountName);
   const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
 
+  const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
     name: string | undefined,
@@ -116,9 +118,51 @@ export const ChargeTable: React.FC<Props> = ({
     promiseFn: totalResultPromiseFn,
   });
 
+
+
+  const handleExport = async (columns: string[]) => {
+    const totalCount = totalResultData?.totalCount ?? 0;
+    if (totalCount > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (totalCount <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        exportApi: "exportChargeRecord",
+        columns,
+        count: totalCount,
+        query: {
+          startTime: query.time[0].clone().startOf("day").toISOString(),
+          endTime: query.time[1].clone().endOf("day").toISOString(),
+          accountName: query.name,
+          type: query.type,
+          searchType: searchType,
+          isPlatformRecords: !!isPlatformRecords,
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("time")), value: "time" },
+      { label: t(p("amount")), value: "amount" },
+      { label: t(pCommon("type")), value: "type" },
+      { label: t(pCommon("comment")), value: "comment" },
+    ];
+    const account = showAccountName ? [
+      { label: t(pCommon("account")), value: "accountName" },
+    ] : [];
+    const tenant = showTenantName ? [
+      { label: t(pCommon("tenant")), value: "tenantName" },
+    ] : [];
+    return [...account, ...tenant, ...common];
+  }, [showAccountName, showTenantName, t]);
+
+
   return (
     <div>
-      <Spin spinning={isRecordsLoading || isTotalResultLoading}>
+      <Spin spinning={isRecordsLoading || isTotalResultLoading }>
         <FilterFormContainer>
           <Form<FilterForm>
             layout="inline"
@@ -174,6 +218,14 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item>
               <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+            </Form.Item>
+            <Form.Item>
+              <ExportFileModaLButton
+                options={exportOptions}
+                onExport={handleExport}
+              >
+                {t(pCommon("export"))}
+              </ExportFileModaLButton>
             </Form.Item>
           </Form>
         </FilterFormContainer>

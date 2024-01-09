@@ -104,6 +104,9 @@ export default {
       hour: "HOUR",
       day: "DAY",
     },
+    export: "Export",
+    exportMaxDataErrorMsg: "Too many details to export, up to {} can be exported, please reselect!",
+    exportNoDataErrorMsg: "Export is empty, please reselect",
   },
   dashboard: {
     title: "Dashboard",
@@ -148,6 +151,7 @@ export default {
     route: {
       common: {
         operationLog: "Operation Log",
+        statistic: "Statistic",
       },
       navLinkText: "Portal",
       dashboard: "Dashboard",
@@ -174,6 +178,9 @@ export default {
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Job Information Synchronization",
         accountList: "Account List",
+        clusterMonitor: "Cluster Monitor",
+        resourceStatus: "Resrouce Status",
+        alarmLog: "Alarm Log",
       },
       tenantManagement: {
         firstNav: "Tenant Management",
@@ -216,6 +223,7 @@ export default {
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
+        ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
         comment: "Comment",
         status: "Status",
@@ -227,7 +235,7 @@ export default {
         unblockConfirmContent: "Do you wish to unblock account {} within tenant {}?",
         unblockSuccess: "Account unblocking successful!",
         unblockFail: "Account unblocking failed!",
-        unblockError: "Account ${r.accountName} has insufficient balance. "
+        unblockError: "Account {} has insufficient balance. "
         + "You can add it to the whitelist or unblock by adding funds.",
         unblock: "Unblock",
         blockConfirmTitle: "Confirm Account Block?",
@@ -237,6 +245,17 @@ export default {
       },
     },
     admin: {
+      allAlarmLogsTable: {
+        firing: "Triggering",
+        resolved: "Resolved",
+        serialNumber: "Serial Number",
+        fingerPrint: "Finger Print",
+        status: "Status",
+        alarmLevel: "Alarm Level",
+        description: "Description",
+        firingTime: "Trigger Time",
+        resolvedTime: "Resolved Time",
+      },
       allTenantsTable: {
         tenantName: "Tenant Name",
         accountCount: "Account Count",
@@ -281,6 +300,9 @@ export default {
         userList: "User List",
         addWhitelist: "Add all accounts to the whitelist.",
       },
+      statisticCard: {
+        total: "Total ",
+      },
       tenantChargeForm: {
         loadType: "Loading used types...",
         charging: "Charging...",
@@ -289,6 +311,11 @@ export default {
       },
     },
     commonComponent: {
+      exportFileModal: {
+        title: "Export Data",
+        subTitle: "Select the fields to export",
+        errorMsg: "Please select one field at least!",
+      },
       paymentTable: {
         total: "Total",
         sum: "Sum",
@@ -822,6 +849,22 @@ export default {
       unableReinitialize: "The system has already been initialized and cannot be reinitialized!",
     },
     admin: {
+      monitor: {
+        alarmLog: {
+          alarmLog: "Alarm Log",
+          firingTime: "Trigger Time",
+          firingTimePrompt: "Trigger time of the alarm",
+          status: "Status",
+          selectAll: "Select All",
+          firing: "Triggering",
+          resolved: "Resolved",
+          search: "Search",
+          refresh: "Refresh",
+        },
+        resourceStatus: {
+          resourceStatus: "Resource Status",
+        },
+      },
       operationLogs: {
         platformOperationLog: "Platform Operation Log",
       },
@@ -908,6 +951,34 @@ export default {
           title: "Account Consumption Records",
         },
       },
+      statistic: {
+        dataOverview: "Data Overview",
+        dateRange: "Date Range",
+        user: "User",
+        account: "Account",
+        tenant: "Tenant",
+        job: "Job",
+        charge: "Charge",
+        userCount: "User Count",
+        newUserCount: "New User Count",
+        activeUserCount: "Active User Count",
+        chargeOrPayAmount: "Charge/Pay Amount",
+        topTenChargedAccount: "Top 10 Charged Account",
+        chargeAmount: "Charge Amount",
+        topTenPayAccount: "Top 10 Pay Account",
+        payAmount: "Pay Amount",
+        topTenSubmitJobUser: "Top 10 Submit Job User",
+        newJobCount: "New Job Count",
+        systemFeatureUsageCount: "System Feature Usage Count",
+        portalFeatureUsageCount: "Portal Feature Usage Count",
+        misFeatureUsageCount: "MIS Feature Usage Count",
+        jobCount: "Job Count",
+        usageCount:"count",
+        userName: "User Name",
+        accountName: "Account Name",
+        amount: "Amount",
+        yuan: "yuan",
+      },
     },
     accounts: {
       accountName: {
@@ -992,6 +1063,11 @@ export default {
       createTenant: "Create Tenant",
       tenantPay: "Tenant Recharge",
       submitFileItemAsJob: "Script Submission",
+      exportUser: "Export User",
+      exportAccount: "Export Account",
+      exportChargeRecord: "Export Charge Record",
+      exportPayRecord: "Export Payment Record",
+      exportOperationLog: "Export Operation Log",
     },
     operationDetails: {
       login: "User Login",
@@ -1045,6 +1121,23 @@ export default {
       tenantPay: "Recharge tenant {} by {} yuan",
       setPlatformBilling: "Set platform billing item {} price to {} yuan",
       submitFileItemAsJob: "Cluster: {}, Submit Script: {}",
+      tenantExportUser: "Export User List of Tenant {}",
+      adminExportUser: "Export User List of Platform",
+      tenantExportAccount: "Export Account List of Tenant {}",
+      adminExportAccount: "Export Account List of Platform",
+      exportAccountChargeRecordOfTenant: "Export Charge Record of Account {} in Tenant {}",
+      exportAccountsChargeRecordOfTenant: "Export Charge Record of All Accounts in Tenant {}",
+      exportAccountChargeRecordOfAdmin: "Export Charge Record of All Accounts in Platform",
+      exportTenantChargeRecord: "Export Charge Record of Tenant {}",
+      exportTenantsChargeRecordOfAdmin: "Export Charge Record of All Tenants in Platform",
+      exportAccountPayRecordOfTenant: "Export Payment Record of Account {} in Tenant {}",
+      exportAccountsPayRecordOfTenant: "Export Payment Record of All Accounts in Tenant {}",
+      exportTenantPayRecord: "Export Payment Record of Tenant {}",
+      exportTenantsPayRecordOfAdmin:"Export Payment Record of All Tenants in Platform",
+      exportOperationLogFromUser: "Export Operation Log of User {}",
+      exportOperationLogFromAccount: "Export Operation Log of Account {}",
+      exportOperationLogFromTenant: "Export Operation Log of Tenant {}",
+      exportOperationLogFromAdmin: "Export Operation Log of Platform",
     },
   },
   userRoles: {

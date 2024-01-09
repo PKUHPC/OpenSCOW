@@ -61,15 +61,19 @@ export const GetPaymentsSchema = typeboxRouteSchema({
   },
 });
 
-export const getPaymentRecordTarget = (searchType: SearchType, user: UserInfo, accountName: string | undefined) => {
+export const getPaymentRecordTarget = (searchType: SearchType, user: UserInfo, targetName: string | undefined) => {
   switch (searchType) {
+  case SearchType.tenant:
+    return targetName
+      ? { $case:"tenant" as const, tenant:{ tenantName:targetName } }
+      : { $case:"allTenants" as const, allTenants:{ } };
   case SearchType.selfTenant:
     return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
   case SearchType.selfAccount:
-    return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:accountName! } };
+    return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
   case SearchType.account:
-    return accountName
-      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:accountName } }
+    return targetName
+      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } }
       : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
   default:
     break;

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -18,6 +18,7 @@ import { DecimalType } from "src/utils/decimal";
 import { DATETIME_TYPE } from "src/utils/orm";
 
 @Entity()
+@Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class PayRecord {
   @PrimaryKey()
     id!: number;

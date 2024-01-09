@@ -1,5 +1,11 @@
 # @scow/lib-operation-log
 
+## 2.0.5
+
+### Patch Changes
+
+- @scow/protos@1.0.5
+
 ## 2.0.4
 
 ### Patch Changes

@@ -233,6 +233,7 @@ export default {
         saveFileFail: "File save failed: {}",
         saveFileSuccess: "File saved successfully",
         fileSizeExceeded: "File too large (maximum {}), please download and edit",
+        fileFetchAbortPrompt: "Fetch {} operation was aborted",
       },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
@@ -284,6 +285,9 @@ export default {
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
           submitConfirmTitle: "Submit Confirmation",
+          submitConfirmNotice: "Please ensure that the script file specifies a valid absolute path "
+          + "as its working directory. If a working directory is not specified, the directory containing "
+          + "the script file will be designated as the default working directory.",
           submitConfirmContent: "Confirm submission of {} to {}?",
           submitConfirmOk: "Confirm",
           submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
@@ -412,6 +416,54 @@ export default {
         appCommentTitle: "Explanation",
       },
     },
+    dashboard:{
+      addEntryModal:{
+        addQuickEntry:"addQuickEntry",
+        cancel:"cancel",
+      },
+      changeClusterModal:{
+        selectCluster:"selectCluster",
+        cluster:"cluster",
+        loginNode:"loginNode",
+      },
+      quickEntry:{
+        quickEntry:"quickEntry",
+        finish:"finish",
+        cancel:"cancel",
+        edit:"edit",
+      },
+      sortable:{
+        alreadyExist:"The quickEntry already exists",
+        exceedMaxSize:"Up to 10 quickEntries can be added",
+        saveFailed:"save Failed",
+        saveSuccessfully:"save Succeeded",
+      },
+      overviewTable:{
+        title:"platform overview",
+        clusterName:"clusterName",
+        partitionName:"partitionName",
+        nodeCount:"nodeCount",
+        runningNodeCount:"runningNodeCount",
+        cpuCoreCount:"cpuCoreCount",
+        gpuCoreCount:"gpuCoreCount",
+        usageRatePercentage:"usageRatePercentage",
+        partitionStatus:"partitionStatus",
+        available:"available",
+        notAvailable:"notAvailable",
+      },
+      infoPanes:{
+        nodeInfo:"nodeInfo",
+        node:"node",
+        resourceInfo:"resourceInfo",
+        core:"core",
+        running:"running",
+        idle:"idle",
+        notAvailable:"notAvailable",
+        card:"card",
+        job:"job",
+        pending:"pending",
+      },
+    },
   },
   component: {
     errorPages: {
@@ -522,8 +574,8 @@ export default {
     _app: {
       sshError: "Unable to connect as a user to the login node. Please make sure the permissions "
       + "of your home directory are 700, 750, or 755.",
-      textExceedsLength:"There are too many welcome messages for terminal login."
-                         + "Please reduce unnecessary information output!",
+      textExceedsLength:"There are too many terminal login prompts. "
+                        + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
     },

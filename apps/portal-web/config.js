@@ -150,15 +150,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
-    HOME_TEXTS: portalConfig.homeText.hostnameMap,
-    HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
 
     SERVER_I18N_CONFIG_TEXTS: {
-      defaultHomeTitle: portalConfig.homeTitle.defaultText,
-      defaultHomeText:  portalConfig.homeText.defaultText,
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
 
@@ -223,6 +219,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    UI_EXTENSION: portalConfig.uiExtension,
   };
 
   if (!building && !testenv) {

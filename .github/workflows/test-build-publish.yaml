@@ -107,13 +107,13 @@ jobs:
         run: pnpm build "--filter=@scow/cli"
 
       - name: Archive scow-cli-x64
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scow-cli-x64
           path: apps/cli/exe/cli-x64
 
       - name: Archive scow-cli-arm64
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: scow-cli-arm64
           path: apps/cli/exe/cli-arm64
@@ -189,13 +189,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download cli-x64
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: scow-cli-x64
           path: release/scow-cli
 
       - name: Download cli-arm64
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: scow-cli-arm64
           path: release/scow-cli

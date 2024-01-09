@@ -22,6 +22,8 @@ import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
@@ -35,6 +37,7 @@ interface Props {
 
 interface FilterForm {
   accountName: string | undefined;
+  ownerIdOrName: string | undefined;
 }
 
 const filteredStatuses = {
@@ -63,15 +66,18 @@ export const AccountTable: React.FC<Props> = ({
 
   const [query, setQuery] = useState<FilterForm>({
     accountName: undefined,
+    ownerIdOrName: undefined,
   });
 
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
-    !query.accountName || x.accountName.includes(query.accountName)
+    (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
   )) : undefined, [data, query]);
 
   const usersStatusCount = useMemo(() => {
@@ -94,6 +100,48 @@ export const AccountTable: React.FC<Props> = ({
     setCurrentSortInfo({ field: null, order: null });
   };
 
+  const handleExport = async (columns: string[]) => {
+
+    const total = filteredData?.length || 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+
+      window.location.href = urlToExport({
+        exportApi: "exportAccount",
+        columns,
+        count: total,
+        query: {
+          accountName: query.accountName,
+          blocked: rangeSearchStatus === "BLOCKED",
+          debt: rangeSearchStatus === "DEBT",
+          isFromAdmin: showedTab === "PLATFORM",
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("accountName")), value: "accountName" },
+      { label: t(p("owner")), value: "owner" },
+      { label: t(pCommon("userCount")), value: "userCount" },
+    ];
+
+    const tenant = showedTab === "PLATFORM" ? [
+      { label: t(p("tenant")), value: "tenantName" },
+    ] : [];
+    const remaining = [
+      { label: t(pCommon("balance")), value: "balance" },
+      { label:  t(p("status")), value: "blocked" },
+      { label: t(p("comment")), value: "comment" },
+    ];
+    return [...common, ...tenant, ...remaining];
+  }, [showedTab, t]);
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -110,8 +158,19 @@ export const AccountTable: React.FC<Props> = ({
           <Form.Item label={t(p("account"))} name="accountName">
             <Input />
           </Form.Item>
+          <Form.Item label={t(p("ownerIdOrName"))} name="ownerIdOrName">
+            <Input />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
