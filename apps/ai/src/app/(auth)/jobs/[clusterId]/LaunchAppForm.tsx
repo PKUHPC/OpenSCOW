@@ -72,6 +72,11 @@ interface Partition {
   comment?: string;
 }
 
+enum AccessiblityType {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+}
+
 // 生成默认应用名称，命名规则为"当前应用名-年月日-时分秒"
 const genAppJobName = (appName: string): string => {
   return `${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
@@ -101,9 +106,9 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-  const isPublicDataset = Form.useWatch(["dataset", "type"], form) === "public";
-  const isPublicAlgorithm = Form.useWatch(["algorithm", "type"], form) === "public";
-  const isPublicImage = Form.useWatch(["image", "type"], form) === "public";
+  const isPublicDataset = Form.useWatch(["dataset", "type"], form) === AccessiblityType.PUBLIC;
+  const isPublicAlgorithm = Form.useWatch(["algorithm", "type"], form) === AccessiblityType.PUBLIC;
+  const isPublicImage = Form.useWatch(["image", "type"], form) === AccessiblityType.PUBLIC;
 
   const selectedDataset = Form.useWatch(["dataset", "name"], form);
 
@@ -155,8 +160,6 @@ export const LaunchAppForm = (props: Props) => {
     return images?.items.map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
   }, [images]);
 
-
-  // const nodeCount = Form.useWatch("nodeCount", form) as number;
   // 暂时写死为1
   const nodeCount = 1;
 
@@ -221,6 +224,7 @@ export const LaunchAppForm = (props: Props) => {
         if (!optionsContained) form.setFieldValue(item.name, null);
       }
     }
+
     return (
       <Form.Item
         key={`${item.name}+${index}`}
@@ -273,7 +277,6 @@ export const LaunchAppForm = (props: Props) => {
 
         const values = await form.validateFields();
         if (isTraining) {
-          console.log("values.runVariables: ", values.runVariables);
           await trainJobMutation.mutateAsync({
             clusterId,
             trainJobName: values.appJobName,
@@ -282,22 +285,25 @@ export const LaunchAppForm = (props: Props) => {
             dataset: values.dataset.version,
             account: values.account,
             partition: values.partition,
-            nodeCount: 1,
+            nodeCount: nodeCount,
             coreCount: values.coreCount,
             gpuCount: values.gpuCount,
             maxTime: values.maxTime,
             memory: memorySize,
             command: values.command || "",
+            // TODO: 暂时不知道如何使用?
             runVariables: [],
           });
         } else {
           const {
             appJobName, algorithm, dataset, account, partition, coreCount, gpuCount, maxTime } = values;
+
           const customFormKeyValue: CustomFormFields = { customFields: {} };
           attributes.forEach((customFormAttribute) => {
             const customFormKey = customFormAttribute.name;
             customFormKeyValue.customFields[customFormKey] = values.customFields[customFormKey];
           });
+
           createAppSessionMutation.mutate({
             clusterId,
             appId: appId!,
@@ -310,7 +316,7 @@ export const LaunchAppForm = (props: Props) => {
             dataset: dataset.version,
             account: account,
             partition: partition,
-            nodeCount: 1,
+            nodeCount: nodeCount,
             coreCount: coreCount,
             gpuCount: gpuCount,
             maxTime: maxTime,
@@ -321,7 +327,7 @@ export const LaunchAppForm = (props: Props) => {
       }
 
     >
-      <Spin spinning={createAppSessionMutation.isLoading} tip="loading">
+      <Spin spinning={createAppSessionMutation.isLoading || trainJobMutation.isLoading} tip="loading">
         <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
@@ -336,11 +342,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: "private",
+                      value: AccessiblityType.PRIVATE,
                       label: "我的算法",
                     },
                     {
-                      value: "public",
+                      value:  AccessiblityType.PUBLIC,
                       label: "公共算法",
                     },
                   ]
@@ -368,11 +374,11 @@ export const LaunchAppForm = (props: Props) => {
                   options={
                     [
                       {
-                        value: "private",
+                        value: AccessiblityType.PRIVATE,
                         label: "我的镜像",
                       },
                       {
-                        value: "public",
+                        value:  AccessiblityType.PUBLIC,
                         label: "公共镜像",
                       },
                     ]
@@ -397,11 +403,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: "private",
+                      value: AccessiblityType.PRIVATE,
                       label: "我的数据集",
                     },
                     {
-                      value: "public",
+                      value: AccessiblityType.PUBLIC,
                       label: "公共数据集",
                     },
 

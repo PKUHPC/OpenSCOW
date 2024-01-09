@@ -49,7 +49,7 @@ export const SaveImageModal: React.FC<Props> = (
   });
 
   const handleFinish = async () => {
-    form.validateFields();
+
     const { name, tag, description } = await form.validateFields();
 
     await saveImageMutation.mutateAsync({

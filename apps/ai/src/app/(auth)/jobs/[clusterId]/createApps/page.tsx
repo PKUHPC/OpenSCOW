@@ -53,7 +53,7 @@ export default function Page({ params }: {params: {clusterId: string}}) {
       <PageTitle
         titleText="创建应用"
       />
-      <SelectAppTable publicPath={publicConfig.PUBLIC_PATH} clusterId={clusterId} apps={data?.apps || {}} />
+      <SelectAppTable publicPath={publicConfig.PUBLIC_PATH} clusterId={clusterId} apps={data?.apps || []} />
     </>
   );
 }

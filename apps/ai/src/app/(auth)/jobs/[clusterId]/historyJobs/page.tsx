@@ -16,7 +16,7 @@ import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 
-import { AppSessionsTable } from "../AppSessionsTable";
+import { AppSessionsTable, AppTableStatus } from "../AppSessionsTable";
 
 export default function Page({ params }: {params: {clusterId: string}}) {
   const { clusterId } = params;
@@ -29,13 +29,12 @@ export default function Page({ params }: {params: {clusterId: string}}) {
     return <NotFoundPage />;
   }
 
-
   return (
     <>
       <PageTitle
         titleText="已完成的作业"
       />
-      <AppSessionsTable cluster={cluster} status="FINISHED" />
+      <AppSessionsTable cluster={cluster} status={AppTableStatus.FINISHED} />
     </>
   );
 }

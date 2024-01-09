@@ -23,8 +23,6 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
 
   const { appId, clusterId } = params;
 
-  // const t = useI18nTranslateToString();
-
   const { data: appInfo, isLoading: isAppLoading } = trpc.jobs.getAppMetadata.useQuery({ clusterId, appId });
 
   const { data: clusterInfo, isLoading: isClusterLoading } = trpc.config.getClusterConfig.useQuery({ clusterId });

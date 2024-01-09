@@ -14,27 +14,33 @@
 
 import { LoadingOutlined } from "@ant-design/icons";
 import { PageTitle } from "src/components/PageTitle";
+import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
 import { LaunchAppForm } from "../LaunchAppForm";
-
 
 export default function Page({ params }: {params: {clusterId: string}}) {
 
   const { clusterId } = params;
 
-  const { data: clusterInfo, isLoading: isClusterLoading } = trpc.config.getClusterConfig.useQuery({ clusterId });
+  const { data: clusterInfo, isLoading: isClusterLoading, isError } =
+  trpc.config.getClusterConfig.useQuery({ clusterId });
 
 
   if (isClusterLoading || !clusterInfo) {
     return <LoadingOutlined />;
   }
 
+  if (isError) {
+    return (
+      <ServerErrorPage />
+    );
+  }
+
   return (
     <div>
       <PageTitle titleText="训练" />
       <LaunchAppForm
-        attributes={[]}
         clusterId={clusterId}
         clusterInfo={clusterInfo}
         isTraining={true}

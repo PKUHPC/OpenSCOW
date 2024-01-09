@@ -29,12 +29,14 @@ import { trpc } from "src/utils/trpc";
 import { ConnectTopAppLink } from "./ConnectToAppLink";
 import { SaveImageModal } from "./SaveImageModal";
 
-
 interface FilterForm {
   appJobName: string | undefined
  }
 
-type AppTableStatus = "UNFINISHED" | "FINISHED"
+export enum AppTableStatus {
+  UNFINISHED = "UNFINISHED",
+  FINISHED = "FINISHED"
+}
 
 interface Props {
   cluster: Cluster
@@ -55,7 +57,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
   const router = useRouter();
   const { message } = App.useApp();
 
-  const unfinished = status === "UNFINISHED";
+  const unfinished = status === AppTableStatus.UNFINISHED;
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return { appJobName: undefined };
