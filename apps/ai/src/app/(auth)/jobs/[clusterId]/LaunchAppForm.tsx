@@ -118,7 +118,7 @@ export const LaunchAppForm = (props: Props) => {
 
   const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
     isShared: isDatasetPublic, clusterId,
-  });
+  }, { enabled: isDatasetPublic !== undefined });
 
   const { data: datasetVersions, isLoading: isDatasetVersionsLoading } = trpc.dataset.versionList.useQuery({
     datasetId: selectedDataset, isShared: isDatasetPublic,
@@ -136,7 +136,7 @@ export const LaunchAppForm = (props: Props) => {
     {
       clusterId,
       isPublic: isAlgorithmPublic,
-    });
+    }, { enabled: isAlgorithmPublic !== undefined });
 
   const { data:algorithmVersions, isLoading: isAlgorithmVersionsLoading } =
   trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectedAlgorithm, isPublic: isAlgorithmPublic }, {
@@ -155,6 +155,8 @@ export const LaunchAppForm = (props: Props) => {
     isPublic: isImagePublic,
     clusterId,
     withExternal: true,
+  }, {
+    enabled: isImagePublic !== undefined && isTraining,
   });
 
   const imageOptions = useMemo(() => {
@@ -210,6 +212,7 @@ export const LaunchAppForm = (props: Props) => {
     if (item.name === "workingDir") {
       inputItem = (
         <Input
+          placeholder={getI18nConfigCurrentText(placeholder, undefined)}
           suffix={
             (
               <FileSelectModal
@@ -356,40 +359,6 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="算法" required>
-          <Space>
-            <Form.Item name={["algorithm", "type"]} rules={[{ required: true }]} noStyle>
-              <Select
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
-                }}
-                options={
-                  [
-                    {
-                      value: AccessiblityType.PRIVATE,
-                      label: "我的算法",
-                    },
-                    {
-                      value:  AccessiblityType.PUBLIC,
-                      label: "公共算法",
-                    },
-                  ]
-                }
-              />
-            </Form.Item>
-            <Form.Item name={["algorithm", "name"]} rules={[{ required: true }]} noStyle>
-              <Select style={{ minWidth: 100 }} loading={isAlgorithmLoading} options={algorithmOptions} />
-            </Form.Item>
-            <Form.Item name={["algorithm", "version"]} rules={[{ required: true }]} noStyle>
-              <Select
-                style={{ minWidth: 100 }}
-                loading={isAlgorithmVersionsLoading && selectedAlgorithm !== undefined}
-                options={algorithmVersionOptions}
-              />
-            </Form.Item>
-          </Space>
-        </Form.Item>
         {isTraining && (
           <Form.Item label="镜像" required>
             <Space>
@@ -411,17 +380,58 @@ export const LaunchAppForm = (props: Props) => {
                 />
               </Form.Item>
               <Form.Item name={["image", "name"]} rules={[{ required: true }]} noStyle>
-                <Select style={{ minWidth: 100 }} loading={isImagesLoading} options={imageOptions} />
+                <Select
+                  style={{ minWidth: 100 }}
+                  loading={isImagesLoading && isImagePublic !== undefined}
+                  options={imageOptions}
+                />
               </Form.Item>
             </Space>
           </Form.Item>
         )}
-        <Form.Item label="数据集" required>
+        <Form.Item label="算法">
           <Space>
-            <Form.Item name={["dataset", "type"]} rules={[{ required: true }]} noStyle>
+            <Form.Item name={["algorithm", "type"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                onChange={() => {
+                  form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
+                }}
+                options={
+                  [
+                    {
+                      value: AccessiblityType.PRIVATE,
+                      label: "我的算法",
+                    },
+                    {
+                      value:  AccessiblityType.PUBLIC,
+                      label: "公共算法",
+                    },
+                  ]
+                }
+              />
+            </Form.Item>
+            <Form.Item name={["algorithm", "name"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isAlgorithmLoading && isAlgorithmPublic !== undefined}
+                options={algorithmOptions}
+              />
+            </Form.Item>
+            <Form.Item name={["algorithm", "version"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isAlgorithmVersionsLoading && selectedAlgorithm !== undefined}
+                options={algorithmVersionOptions}
+              />
+            </Form.Item>
+          </Space>
+        </Form.Item>
+        <Form.Item label="数据集">
+          <Space>
+            <Form.Item name={["dataset", "type"]} noStyle>
               <Select
                 style={{ minWidth: 120 }}
-                loading={isDatasetsLoading}
                 onChange={() => {
                   form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
                 }}
@@ -440,16 +450,17 @@ export const LaunchAppForm = (props: Props) => {
                 }
               />
             </Form.Item>
-            <Form.Item name={["dataset", "name"]} rules={[{ required: true }]} noStyle>
+            <Form.Item name={["dataset", "name"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
+                loading={isDatasetsLoading && isDatasetPublic !== undefined}
                 onChange={() => {
                   form.setFieldValue(["dataset", "version"], undefined);
                 }}
                 options={datasetOptions}
               />
             </Form.Item>
-            <Form.Item name={["dataset", "version"]} rules={[{ required: true }]} noStyle>
+            <Form.Item name={["dataset", "version"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
                 loading={isDatasetVersionsLoading && selectedDataset !== undefined}

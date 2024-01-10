@@ -37,4 +37,4 @@ attributes:
     name: workingDir
     label: 指定jupyter工作目录
     required: true
-    placeholder: "相对于用户家目录"
+    placeholder: "请填写绝对路径"

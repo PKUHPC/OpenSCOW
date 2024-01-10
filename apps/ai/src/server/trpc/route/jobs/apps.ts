@@ -253,7 +253,7 @@ export const createAppSession = procedure
     clusterId: z.string(),
     appId: z.string(),
     appJobName: z.string(),
-    algorithm: z.number(),
+    algorithm: z.number().optional(),
     image: ImageSchema,
     dataset: z.number().optional(),
     account: z.string(),
@@ -324,22 +324,30 @@ export const createAppSession = procedure
 
     const orm = await getORM();
 
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
+    let algorithmVersion: AlgorithmVersion | undefined;
+    if (algorithm !== undefined) {
+      const selectAlgorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
 
-    if (!algorithmVersion) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `algorithm version id ${algorithm} is not found`,
-      });
+      if (!selectAlgorithmVersion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `algorithm version id ${algorithm} is not found`,
+        });
+      }
+      algorithmVersion = selectAlgorithmVersion;
     }
 
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
+    let datasetVersion: DatasetVersion | undefined;
+    if (dataset !== undefined) {
+      const selectDatasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
 
-    if (!datasetVersion) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `dataset version id ${dataset} is not found`,
-      });
+      if (!selectDatasetVersion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `dataset version id ${dataset} is not found`,
+        });
+      }
+      datasetVersion = selectDatasetVersion;
     }
 
     const host = getClusterLoginNode(clusterId);
@@ -395,8 +403,8 @@ export const createAppSession = procedure
           userId,
           jobName: appJobName,
           image: `${image.name}:${image.tag || "latest"}`,
-          algorithm: algorithmVersion.path,
-          dataset: datasetVersion.path,
+          algorithm: algorithmVersion?.path,
+          dataset: datasetVersion?.path,
           account,
           partition: partition!,
           coreCount,
@@ -527,7 +535,7 @@ procedure
   .input(z.object({
     clusterId: z.string(),
     trainJobName: z.string(),
-    algorithm: z.number(),
+    algorithm: z.number().optional(),
     imageId: z.number(),
     dataset: z.number().optional(),
     account: z.string(),
@@ -556,23 +564,32 @@ procedure
 
       const orm = await getORM();
 
-      const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
+      let algorithmVersion: AlgorithmVersion | undefined;
+      if (algorithm !== undefined) {
+        const selectAlgorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
 
-      if (!algorithmVersion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `algorithm version id ${algorithm} is not found`,
-        });
+        if (!selectAlgorithmVersion) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `algorithm version id ${algorithm} is not found`,
+          });
+        }
+        algorithmVersion = selectAlgorithmVersion;
       }
 
-      const datasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
+      let datasetVersion: DatasetVersion | undefined;
+      if (dataset !== undefined) {
+        const selectDatasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
 
-      if (!datasetVersion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `dataset version id ${dataset} is not found`,
-        });
+        if (!selectDatasetVersion) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `dataset version id ${dataset} is not found`,
+          });
+        }
+        datasetVersion = selectDatasetVersion;
       }
+
 
       const image = await orm.em.findOne(ImageEntity, { id: imageId });
 
@@ -601,9 +618,9 @@ procedure
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: trainJobName,
-          algorithm: algorithmVersion.path,
+          algorithm: algorithmVersion?.path,
           image: image.path,
-          dataset: datasetVersion.path,
+          dataset: datasetVersion?.path,
           account,
           partition: partition!,
           coreCount,
