@@ -262,6 +262,14 @@ export const deleteDatasetVersion = procedure
     if (dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
+    // 正在分享中或取消分享中的版本，不可删除
+    if (datasetVersion.sharedStatus === SharedStatus.SHARING
+      || datasetVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError(
+        { code: "PRECONDITION_FAILED",
+          message: `DatasetVersion (id:${input.id}) is currently being shared or unshared` });
+    }
+
     // 如果是已分享的数据集版本，则删除分享
     if (datasetVersion.sharedStatus === SharedStatus.SHARED) {
       await checkSharePermission({
@@ -280,8 +288,6 @@ export const deleteDatasetVersion = procedure
         ? true : false;
       orm.em.persist(dataset);
     }
-
-
 
     orm.em.remove(datasetVersion);
     await orm.em.flush();

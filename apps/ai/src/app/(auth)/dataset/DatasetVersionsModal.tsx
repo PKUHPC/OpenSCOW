@@ -213,6 +213,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
+                      disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
                         deleteDatasetVersion(r.id, r.datasetId, r.versionName, r.privatePath);
                       }}

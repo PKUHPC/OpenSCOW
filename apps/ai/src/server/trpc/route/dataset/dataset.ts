@@ -249,6 +249,15 @@ export const deleteDataset = procedure
 
     const datasetVersions = await orm.em.find(DatasetVersion, { dataset });
 
+    const sharingVersions = datasetVersions.filter(
+      (v) => (v.sharedStatus === SharedStatus.SHARING || v.sharedStatus === SharedStatus.UNSHARING));
+
+    // 有正在分享中或取消分享中的版本，则不可删除
+    if (sharingVersions.length > 0) {
+      throw new TRPCError(
+        { code: "PRECONDITION_FAILED", message: "There is an dataset version being shared or unshared" });
+    }
+
     try {
       const sharedVersions = datasetVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 

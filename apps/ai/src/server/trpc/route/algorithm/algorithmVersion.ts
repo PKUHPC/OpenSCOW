@@ -197,10 +197,17 @@ export const deleteAlgorithmVersion = procedure
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId },
       { populate: ["versions.sharedStatus"]});
     if (!algorithm)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} is not found` });
 
     if (algorithm.owner !== user?.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} is not accessible` });
+
+    // 正在分享中或取消分享中的版本，不可删除
+    if (algorithmVersion.sharedStatus === SharedStatus.SHARING
+      || algorithmVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError(
+        { code: "PRECONDITION_FAILED", message: `AlgorithmVersion (id:${id}) is currently being shared or unshared` });
+    }
 
     // 如果是已分享的数据集版本，则删除分享
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED) {

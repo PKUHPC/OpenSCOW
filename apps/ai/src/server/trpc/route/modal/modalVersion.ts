@@ -224,6 +224,14 @@ export const deleteModalVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.modalId} not accessible` });
     }
 
+    // 正在分享中或取消分享中的版本，不可删除
+    if (modalVersion.sharedStatus === SharedStatus.SHARING
+      || modalVersion.sharedStatus === SharedStatus.UNSHARING) {
+      throw new TRPCError(
+        { code: "PRECONDITION_FAILED",
+          message: `ModalVersion (id:${input.id}) is currently being shared or unshared` });
+    }
+
     // 如果是已分享的数据集版本，则删除分享
     if (modalVersion.sharedStatus === SharedStatus.SHARED) {
       await checkSharePermission({

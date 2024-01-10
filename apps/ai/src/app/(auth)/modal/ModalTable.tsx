@@ -26,7 +26,7 @@ import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditModalModal } from "./CreateAndEditModalModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
-import { VersionListModal } from "./VersionListModal";
+import { ModalVersionListModal } from "./ModalVersionListModal";
 
 interface Props {
   isPublic: boolean;
@@ -258,7 +258,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
         }}
         scroll={{ x: true }}
       />
-      <VersionListModal
+      <ModalVersionListModal
         open={versionListModalIsOpen}
         onClose={() => { setVersionListModalIsOpen(false); setModalId(0); }}
         isPublic={isPublic}

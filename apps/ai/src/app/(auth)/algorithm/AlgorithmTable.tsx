@@ -24,9 +24,9 @@ import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
+import { AlgorithmVersionListModal } from "./AlgorithmVersionListModal";
 import { CreateAndEditAlgorithmModal } from "./CreateAndEditAlgorithmModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
-import { VersionListModal } from "./VersionListModal";
 
 interface Props {
   isPublic: boolean;
@@ -287,7 +287,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         }}
         scroll={{ x: true }}
       />
-      <VersionListModal
+      <AlgorithmVersionListModal
         open={versionListModalIsOpen}
         onClose={() => { setVersionListModalIsOpen(false); setAlgorithmId(0); }}
         isPublic={isPublic}

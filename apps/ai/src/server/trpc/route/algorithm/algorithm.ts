@@ -209,6 +209,15 @@ export const deleteAlgorithm = procedure
 
     const algorithmVersions = await em.find(AlgorithmVersion, { algorithm });
 
+    const sharingVersions = algorithmVersions.filter(
+      (v) => (v.sharedStatus === SharedStatus.SHARING || v.sharedStatus === SharedStatus.UNSHARING));
+
+    // 有正在分享中或取消分享中的版本，则不可删除
+    if (sharingVersions.length > 0) {
+      throw new TRPCError(
+        { code: "PRECONDITION_FAILED", message: "There is an algorithm version being shared or unshared" });
+    }
+
     const sharedVersions = algorithmVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
     // 删除所有已分享的版本

@@ -15,35 +15,34 @@ import { App, Button, Checkbox, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useRef } from "react";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmVersionInterface } from "src/models/Algorithm";
 import { SharedStatus } from "src/models/common";
+import { ModalVersionInterface } from "src/models/Modal";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
-import { CopyPublicAlgorithmModal } from "./CopyPublicAlgorithmModal";
+import { CopyPublicModalModal } from "./CopyPublicModalModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
-
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   isPublic?: boolean;
-  algorithmId: number;
-  algorithmName: string | undefined;
-  algorithmVersionData: AlgorithmVersionInterface[];
+  modalId: number;
+  modalName: string | undefined;
+  modalVersionData: ModalVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
   cluster?: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
-const CopyPublicAlgorithmModalButton = ModalButton(CopyPublicAlgorithmModal, { type: "link" });
+const CopyPublicModalModalButton = ModalButton(CopyPublicModalModal, { type: "link" });
 
-export const VersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch, cluster },
+export const ModalVersionListModal: React.FC<Props> = (
+  { open, onClose, isPublic, modalId, modalName, modalVersionData, isFetching, refetch, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
@@ -52,7 +51,7 @@ export const VersionListModal: React.FC<Props> = (
   const deleteSourceFileRef = useRef(false);
   const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
-  const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
+  const shareMutation = trpc.modal.shareModalVersion.useMutation({
     onSuccess() {
       refetch();
       message.success("提交分享请求");
@@ -68,12 +67,12 @@ export const VersionListModal: React.FC<Props> = (
     },
   });
 
-  const unShareMutation = trpc.algorithm.unShareAlgorithmVersion.useMutation({
+  const unShareMutation = trpc.modal.unShareModalVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交取消分享");
+      message.success("提交取消分享请求");
     },
-    onError(err) {
+    onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
         message.error("没有权限取消分享此版本");
@@ -84,19 +83,20 @@ export const VersionListModal: React.FC<Props> = (
     },
   });
 
-  const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
-    onError() {
-      message.error("删除算法版本失败");
+  const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
+    onError(e) {
+      console.log(e);
+      message.error("删除模型版本失败");
     } });
 
-  const deleteAlgorithmVersion = useCallback(
+  const deleteModalVersion = useCallback(
     (id: number, name: string, path: string) => {
       deleteSourceFileRef.current = false;
       confirm({
-        title: "删除算法版本",
+        title: "删除模型版本",
         content: (
           <>
-            <p>{`确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`}</p>
+            <p>{`确认删除模型版本${name}？如该模型版本已分享，则分享的模型版本也会被删除。`}</p>
             <Checkbox
               onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
             >
@@ -105,7 +105,7 @@ export const VersionListModal: React.FC<Props> = (
           </>
         ),
         onOk:async () => {
-          await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId })
+          await deleteModalVersionMutation.mutateAsync({ id, modalId })
             .then(() => {
               deleteSourceFileRef.current && deleteSourceFileMutation.mutateAsync({
                 target: "DIR",
@@ -120,12 +120,12 @@ export const VersionListModal: React.FC<Props> = (
         },
       });
     },
-    [algorithmId, cluster],
+    [modalId],
   );
 
   return (
     <Modal
-      title={`版本列表:${algorithmName}`}
+      title={`版本列表:${modalName}`}
       open={open}
       onCancel={onClose}
       centered
@@ -133,40 +133,43 @@ export const VersionListModal: React.FC<Props> = (
     >
       <Table
         rowKey="id"
-        dataSource={algorithmVersionData}
+        dataSource={modalVersionData}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
         columns={[
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
+          { dataIndex: "algorithmVersion", title: "算法版本" },
           { dataIndex: "createTime", title: "创建时间", render:(_) => formatDateTime(_) },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
-                <CopyPublicAlgorithmModalButton
+                <CopyPublicModalModalButton
+                  modalId={modalId}
+                  modalName={modalName}
+                  modalVersionId={r.id}
                   data={r}
-                  algorithmId={algorithmId}
-                  algorithmName={algorithmName}
-                  algorithmVersionId={r.id}
                   cluster={cluster}
                 >
                   复制
-                </CopyPublicAlgorithmModalButton>
+                </CopyPublicModalModalButton>
               ) :
                 (
                   <>
                     <EditVersionModalButton
-                      algorithmId={algorithmId}
-                      algorithmName={algorithmName}
-                      refetch={refetch}
+                      modalId={modalId}
+                      modalName={modalName}
                       cluster={cluster}
+                      refetch={refetch}
                       editData={{
                         versionId:r.id,
                         versionName:r.versionName,
                         versionDescription:r.versionDescription,
+                        algorithmVersion:r.algorithmVersion,
                       }}
+
                     >
                     编辑
                     </EditVersionModalButton>
@@ -190,12 +193,12 @@ export const VersionListModal: React.FC<Props> = (
                             r.sharedStatus === SharedStatus.SHARED ?
                               await unShareMutation.mutateAsync({
                                 versionId: r.id,
-                                algorithmId,
+                                modalId,
                               })
                               :
                               await shareMutation.mutateAsync({
                                 versionId: r.id,
-                                algorithmId,
+                                modalId,
                                 sourceFilePath: r.path });
                           },
                         });
@@ -205,8 +208,9 @@ export const VersionListModal: React.FC<Props> = (
                     </Button>
                     <Button
                       type="link"
+                      disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
-                        deleteAlgorithmVersion(r.id, r.versionName, r.privatePath);
+                        deleteModalVersion(r.id, r.versionName, r.privatePath);
                       }}
                     >
                     删除
