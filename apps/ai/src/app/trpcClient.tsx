@@ -61,10 +61,16 @@ export function ClientProvider(props: { baseUrl: string; basePath: string; child
     }),
     mutationCache: new MutationCache({
       onError: (error, variables, context, mutation) => {
-        const { data } = error as TRPCClientError<AppRouter>;
+        const { data, message: errMessage } = error as TRPCClientError<AppRouter>;
         const { onError } = mutation.options;
         if (data?.code && data?.code === "UNAUTHORIZED") {
           window.location.href = join(props.basePath, "/api/auth");
+        } else if (data?.path?.startsWith("file") && data?.code === "PRECONDITION_FAILED"
+         && errMessage.startsWith("SSH_ERROR:")) {
+          message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755，或您是否有权限在此执行操作");
+        } else if (data?.path?.startsWith("file") && data?.code === "BAD_REQUEST"
+        && errMessage.startsWith("SFTP_ERROR:")) {
+          message.error(errMessage || "SFTP操作失败，请确认您是否有操作的权限");
         } else if (!onError) {
           message.error("出了一些问题，请稍后再试！");
         }

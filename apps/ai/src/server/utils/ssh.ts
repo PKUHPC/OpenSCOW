@@ -82,16 +82,17 @@ export async function sshConnect<T>(
   return libConnect(address, username, rootKeyPair, logger, run).catch((e) => {
 
     if (e instanceof SshConnectError) {
+      logger.error(e);
       throw new TRPCError({
-        code: "NOT_FOUND",
-        message: e.message,
+        code: "PRECONDITION_FAILED",
+        message: "SSH_ERROR: " + e.message,
       });
     }
 
     if (e instanceof SftpError) {
       throw new TRPCError({
         code: "BAD_REQUEST",
-        message: e.message,
+        message:  "SFTP_ERROR: " + e.message,
       });
     }
 
