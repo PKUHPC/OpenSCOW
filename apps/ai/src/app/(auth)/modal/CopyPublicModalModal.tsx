@@ -136,6 +136,7 @@ export const CopyPublicModalModal: React.FC<Props> = (
           rules={[{ required: true }]}
         >
           <Input
+            disabled={true}
             suffix={
               (
                 <FileSelectModal

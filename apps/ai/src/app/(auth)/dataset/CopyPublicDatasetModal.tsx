@@ -133,6 +133,7 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
           rules={[{ required: true }]}
         >
           <Input
+            disabled={true}
             suffix={
               (
                 <FileSelectModal
