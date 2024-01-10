@@ -12,7 +12,6 @@
 
 "use client";
 
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space, Spin } from "antd";
@@ -21,6 +20,7 @@ import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
+import { FileSelectModal } from "src/components/FileSelectModal";
 import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
 import { formatSize } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
@@ -50,7 +50,6 @@ interface FixedFormFields {
   account: string;
   maxTime: number;
   command?: string;
-  runVariables?: { key: string, value: string }[];
 }
 
 interface CustomFormFields {
@@ -204,17 +203,43 @@ export const LaunchAppForm = (props: Props) => {
     // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
     const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
     const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
-    if (item.type === "SELECT") console.log(item.defaultValue, selectOptions[0].value);
-    const inputItem = item.type === "NUMBER" ?
-      (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
-      : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
-        : (
-          <Select
-            options={selectOptions.map((x) => ({
-              label: getI18nConfigCurrentText(x.label, undefined), value: x.value }))}
-            placeholder={getI18nConfigCurrentText(placeholder, undefined)}
-          />
-        );
+
+    let inputItem: JSX.Element;
+
+    // 特殊处理某些应用的工作目录需要使用文件选择器
+    if (item.name === "workingDir") {
+      inputItem = (
+        <Input
+          suffix={
+            (
+              <FileSelectModal
+                allowedFileType={["DIR"]}
+                onSubmit={(path: string) => {
+                  form.setFieldsValue({
+                    customFields: {
+                      [item.name]: path,
+                    },
+                  });
+                  form.validateFields([["customFields", item.name]]);
+                }}
+                clusterId={clusterId ?? ""}
+              />
+            )
+          }
+        />
+      );
+    } else {
+      inputItem = item.type === "NUMBER" ?
+        (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
+        : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
+          : (
+            <Select
+              options={selectOptions.map((x) => ({
+                label: getI18nConfigCurrentText(x.label, undefined), value: x.value }))}
+              placeholder={getI18nConfigCurrentText(placeholder, undefined)}
+            />
+          );
+    }
 
     // 判断是否配置了requireGpu选项
     if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
@@ -293,8 +318,6 @@ export const LaunchAppForm = (props: Props) => {
             maxTime: values.maxTime,
             memory: memorySize,
             command: values.command || "",
-            // TODO: 暂时不知道如何使用?
-            runVariables: [],
           });
         } else {
           const {
@@ -548,40 +571,6 @@ export const LaunchAppForm = (props: Props) => {
               <Divider orientation="left" orientationMargin="0" plain>运行设置</Divider>
               <Form.Item label="运行命令" name="command" rules={[{ required: true }]}>
                 <Input.TextArea minLength={3} />
-              </Form.Item>
-              <Form.Item label="运行参数">
-                <Form.List
-                  name="runVariables"
-                  initialValue={[{ key: "", value: "" }]}
-                >
-                  {(fields, { add, remove }) => (
-                    <>
-                      {fields.map(({ key, name, ...restField }, index) => (
-                        <Space key={key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
-                          <Form.Item
-                            {...restField}
-                            name={[name, "key"]}
-                          >
-                            <Input placeholder="键" />
-                          </Form.Item>
-                          <span style={{ lineHeight: "32px" }}>=</span>
-                          <Form.Item
-                            {...restField}
-                            name={[name, "value"]}
-                          >
-                            <Input placeholder="值" />
-                          </Form.Item>
-                          {fields.length > 1 ? (
-                            <MinusCircleOutlined onClick={() => remove(name)} />
-                          ) : null}
-                          {index === fields.length - 1 ? (
-                            <PlusOutlined onClick={() => add()} />
-                          ) : null}
-                        </Space>
-                      ))}
-                    </>
-                  )}
-                </Form.List>
               </Form.Item>
             </>
           ) : null

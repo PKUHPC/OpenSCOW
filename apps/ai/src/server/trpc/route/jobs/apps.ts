@@ -11,6 +11,7 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
@@ -24,7 +25,6 @@ import {
   sftpRealPath,
   sftpWriteFile,
 } from "@scow/lib-ssh";
-// import { ErrorInfo } from "@scow/rich-error-model";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { ApiVersion } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
@@ -100,9 +100,6 @@ const SERVER_SESSION_INFO = "/tmp/server_session_info.json";
 
 const getEnvVariables = (env: Record<string, string>) =>
   Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
-
-// const errorInfo = (reason: string) =>
-//   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
 
 const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
   const client = getAdapterClient(cluster);
@@ -364,15 +361,7 @@ export const createAppSession = procedure
 
       let customAttributesExport: string = "";
       for (const key in customAttributes) {
-        // 特殊处理jupyter的workingDir
-        if (key === "workingDir") {
-          const workingDir = join(homeDir, customAttributes[key]?.toString() ?? "");
-          await ssh.mkdir(workingDir);
-          const quotedWorkingDir = quote([workingDir]);
-          const envItem = `export ${key}=${quotedWorkingDir}`;
-          customAttributesExport = customAttributesExport + envItem + "\n";
-          continue;
-        }
+
         const quotedAttribute = quote([customAttributes[key]?.toString() ?? ""]);
 
         const envItem = `export ${key}=${quotedAttribute}`;
@@ -420,9 +409,11 @@ export const createAppSession = procedure
           // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
           extraOptions: [JobType.APP, "web"],
         }).catch((e) => {
+          const ex = e as ServiceError;
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "submit job failed",
+            message: `submit job failed, ${ex.message}`,
+            cause: ex.details,
           });
         });
 
@@ -519,10 +510,12 @@ export const saveImage =
               sourcePath: harborImageUrl,
             });
             await orm.em.persistAndFlush(newImage);
-          } catch (e: any) {
+          } catch (e) {
+            const ex = e as ServiceError;
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
-              message: `Save image failed, ${e?.message}`,
+              message: `Save image failed, ${ex.message}`,
+              cause: ex.details,
             });
           }
         });
@@ -545,7 +538,6 @@ procedure
     memory: z.number().optional(),
     maxTime: z.number(),
     command: z.string(),
-    runVariables: z.array(z.object({ key: z.string(), value: z.string() })),
   }))
   .output(z.object({
     jobId: z.number(),
@@ -553,7 +545,7 @@ procedure
     async ({ input, ctx: { user } }) => {
 
       const { clusterId, trainJobName, algorithm, imageId, dataset, account, partition,
-        coreCount, nodeCount, gpuCount, memory, maxTime, command, runVariables } = input;
+        coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
       const host = getClusterLoginNode(clusterId);
@@ -602,7 +594,7 @@ procedure
         const sftp = await ssh.requestSFTP();
         const remoteEntryPath = join(homeDir, trainJobsDirectory, "entry.sh");
 
-        const entryScript = command + " " + runVariables.map((x) => `${x.key}=${x.value}`).join(" ");
+        const entryScript = command;
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
         const client = getAdapterClient(clusterId);
@@ -623,10 +615,12 @@ procedure
           script: remoteEntryPath,
           // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
           extraOptions: [JobType.TRAIN],
-        }).catch(() => {
+        }).catch((e) => {
+          const ex = e as ServiceError;
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: "Submit train job failed",
+            message: `Submit train job failed, ${ex.message}`,
+            cause: ex.details,
           });
         });
 
