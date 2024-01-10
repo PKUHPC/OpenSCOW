@@ -50,6 +50,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
   const createModalVersionMutation = trpc.modal.createModalVersion.useMutation({
     onSuccess() {
       message.success("创建新版本成功");
+      form.resetFields();
       onClose();
       refetch();
       form.resetFields();

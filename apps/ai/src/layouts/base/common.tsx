@@ -12,14 +12,19 @@
 
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { arrayContainsElement } from "src/utils/array";
+
+export const EXTERNAL_URL_PREFIX = ["http://", "https://"];
 
 export function createMenuItems(
   routes: NavItemProps[],
   parentClickable: boolean,
 ) {
+
+  const router = useRouter();
 
   function createMenuItem(route: NavItemProps): ItemType {
     if (arrayContainsElement(route.children)) {
@@ -27,20 +32,19 @@ export function createMenuItems(
         icon: <route.Icon />,
         key: route.path,
         title: route.text,
-        label: (
-          (route.clickable ?? parentClickable) ? (
-            <Link
-              href={route.clickToPath ?? route.path}
-              target={route.openInNewPage ? "_blank" : undefined}
-              style={{ color: "unset" }}
-            >
-              {route.text}
-            </Link>
-          ) : route.text
-        ),
-        onTitleClick:() => {
-          route.handleClick?.();
-        },
+        label: route.text,
+        onTitleClick:(route.clickable ?? parentClickable)
+          ? () => {
+            const target = route.clickToPath ?? route.path;
+            route.handleClick?.();
+            if (route.openInNewPage) {
+              window.open(target);
+            } else {
+              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
+                ? window.location.href = target : router.push(target);
+            }
+          }
+          : undefined,
         children: createMenuItems(route.children, parentClickable),
       } as ItemType;
     }
