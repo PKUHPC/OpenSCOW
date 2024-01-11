@@ -99,7 +99,7 @@ export const mockApi: MockApi<typeof api> = {
   ]}),
   saveQuickEntries:null,
   getClusterInfo: null,
-  getClusterRunningInfo:null,
+  getClustersRunningInfo:null,
   listAvailableTransferClusters: null,
 
   checkAppConnectivity: async () => ({
