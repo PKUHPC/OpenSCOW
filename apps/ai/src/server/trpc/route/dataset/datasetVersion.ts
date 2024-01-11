@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
@@ -24,7 +25,7 @@ import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { checkSharePermission, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
-import { getClusterLoginNode } from "src/server/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
 // const mockDatasetVersions = [
@@ -136,6 +137,19 @@ export const createDatasetVersion = procedure
 
     if (dataset && dataset.owner !== user?.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+
+    // 检查目录是否存在
+    const host = getClusterLoginNode(dataset.clusterId);
+
+    if (!host) { throw clusterNotFound(dataset.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      const sftp = await ssh.requestSFTP();
+
+      if (!(await sftpExists(sftp, input.path))) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: `${input.path} does not exists` });
+      }
+    });
 
     const datasetVersion = new DatasetVersion({ ...input, privatePath: input.path, dataset: dataset });
     await orm.em.persistAndFlush(datasetVersion);

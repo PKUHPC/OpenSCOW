@@ -63,10 +63,9 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
             errors: ["算法名称已存在"],
           },
         ]);
-        return;
+      } else {
+        message.error("添加算法失败，请联系管理员");
       }
-      message.error("添加算法失败");
-
     } });
 
   const updateAlgorithmMutation = trpc.algorithm.updateAlgorithm.useMutation({
@@ -84,14 +83,11 @@ export const CreateAndEditAlgorithmModal: React.FC<Props> = (
             errors: ["算法名称已存在"],
           },
         ]);
-      }
-      else if (e.data?.code === "NOT_FOUND") {
+      } else if (e.data?.code === "NOT_FOUND") {
         message.error("算法未找到");
-      }
-      else if (e.data?.code === "PRECONDITION_FAILED") {
+      } else if (e.data?.code === "PRECONDITION_FAILED") {
         message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
-      }
-      else {
+      } else {
         message.error("修改算法失败");
       }
     } });

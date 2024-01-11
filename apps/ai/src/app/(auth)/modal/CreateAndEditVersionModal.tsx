@@ -64,10 +64,17 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
             errors: ["版本名称已存在"],
           },
         ]);
-        return;
+      } else if (e.data?.code === "BAD_REQUEST") {
+        message.error("所选文件夹路径不存在");
+        form.setFields([
+          {
+            name: "path",
+            errors: ["所选文件夹路径不存在"],
+          },
+        ]);
+      } else {
+        message.error("创建新版本失败");
       }
-
-      message.error("创建新版本失败");
     },
   });
 

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
@@ -21,9 +22,10 @@ import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
+import { logger } from "src/server/utils/logger";
 import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
   from "src/server/utils/share";
-import { getClusterLoginNode } from "src/server/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
 export const getAlgorithmVersions = procedure
@@ -110,6 +112,19 @@ export const createAlgorithmVersion = procedure
       { versionName: input.versionName, algorithm });
     if (algorithmVersionExist)
       throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
+
+    // 检查目录是否存在
+    const host = getClusterLoginNode(algorithm.clusterId);
+
+    if (!host) { throw clusterNotFound(algorithm.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      const sftp = await ssh.requestSFTP();
+
+      if (!(await sftpExists(sftp, input.path))) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: `${input.path} does not exists` });
+      }
+    });
 
     const algorithmVersion = new AlgorithmVersion({ ...input, privatePath: input.path, algorithm: algorithm });
     await em.persistAndFlush(algorithmVersion);

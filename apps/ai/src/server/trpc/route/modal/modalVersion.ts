@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
@@ -19,12 +20,12 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFile } from "src/server/utils/checkFilePermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
-import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
+import { logger } from "src/server/utils/logger";
 import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
   from "src/server/utils/share";
-import { getClusterLoginNode } from "src/server/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
 export const VersionListSchema = z.object({
@@ -114,6 +115,19 @@ export const createModalVersion = procedure
     const modalVersionExist = await orm.em.findOne(ModalVersion,
       { versionName: input.versionName, modal });
     if (modalVersionExist) throw new TRPCError({ code: "CONFLICT", message: "ModalVersionExist already exist" });
+
+    // 检查目录是否存在
+    const host = getClusterLoginNode(modal.clusterId);
+
+    if (!host) { throw clusterNotFound(modal.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      const sftp = await ssh.requestSFTP();
+
+      if (!(await sftpExists(sftp, input.path))) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: `${input.path} does not exists` });
+      }
+    });
 
     const modalVersion = new ModalVersion({ ...input, privatePath: input.path, modal: modal });
     await orm.em.persistAndFlush(modalVersion);
