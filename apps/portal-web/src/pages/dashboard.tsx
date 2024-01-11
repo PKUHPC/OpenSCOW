@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { message } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -42,15 +43,16 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
     promiseFn: useCallback(async () => {
       const clusters = publicConfig.CLUSTERS;
 
-      const rawClusterInfo =
-      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })),
-      );
+      const { clustersInfo, failedClusters } =
+      await api.getClustersRunningInfo({ query: { clusters:clusters.map((x) => x.id) } });
 
-      return rawClusterInfo
-        .map((cluster, idx) => ({ clusterInfo:{ ...cluster.clusterInfo, clusterName:clusters[idx].name } }))
+      if (failedClusters.length) {
+        message.error(`以下集群信息获取失败:（${failedClusters.map((x) => clusters.find((y) => y.id === x)?.name).join("、")}）`);
+      }
+      return clustersInfo
         .flatMap((cluster) =>
-          cluster.clusterInfo.partitions.map((x) => ({
-            clusterName: cluster.clusterInfo.clusterName,
+          cluster.partitions.map((x) => ({
+            clusterName: cluster.clusterName,
             ...x,
           })),
         );

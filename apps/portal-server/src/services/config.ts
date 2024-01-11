@@ -15,7 +15,9 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
+import { GetClusterInfoResponse } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { ApiVersion } from "@scow/utils/build/version";
+import pino from "pino";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -34,22 +36,54 @@ export const staticConfigServiceServer = plugin((server) => {
   });
 });
 
+const getClusterInfo = async (cluster: string, logger: pino.Logger<pino.LoggerOptions>) => {
+  const client = getAdapterClient(cluster);
+  if (!client) {
+    logger.error(clusterNotFound(cluster));
+    throw cluster;
+  }
+
+  // 当前接口要求的最低调度器接口版本
+  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
+  // 检验调度器的API版本是否符合要求，不符合要求报错
+  await checkSchedulerApiVersion(client, minRequiredApiVersion);
+
+  const reply = await asyncClientCall(client.config, "getClusterInfo", {});
+
+  return reply;
+};
 export const runtimeConfigServiceServer = plugin((server) => {
   return server.addService<runTimeConfigServiceServer>(runTimeConfigServiceService, {
-    getClusterInfo: async ({ request }) => {
-      const { cluster } = request;
+    getClustersInfo: async ({ request, logger }) => {
+      const { clusters } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
+      const ClustersInfoPromises = clusters.map((x) => getClusterInfo(x, logger));
+      const ClustersInfoResults = await Promise.allSettled(ClustersInfoPromises);
 
-      // 当前接口要求的最低调度器接口版本
-      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
-      // 检验调度器的API版本是否符合要求，不符合要求报错
-      await checkSchedulerApiVersion(client, minRequiredApiVersion);
+      // 处理成功的结果
+      const successfulResults = ClustersInfoResults
+        .filter((result): result is PromiseFulfilledResult<GetClusterInfoResponse> => result.status === "fulfilled")
+        .map((result) => result.value);
 
-      const reply = await asyncClientCall(client.config, "getClusterInfo", {});
+      // 收集失败原因
+      const rejectedResults = ClustersInfoResults
+        .filter((result): result is PromiseRejectedResult =>
+          result.status === "rejected",
+        )
+        .map((result) => result.reason);
 
-      return [reply];
+      logger.error(rejectedResults);
+
+      const failedClusters: Array<string> = [];
+      // 收集失败集群
+      ClustersInfoResults.forEach((x, idx) => {
+        if (x.status === "rejected") failedClusters.push(clusters[idx]);
+      });
+
+      return [{
+        clustersInfo:successfulResults,
+        failedClusters,
+      }];
     },
   });
 });

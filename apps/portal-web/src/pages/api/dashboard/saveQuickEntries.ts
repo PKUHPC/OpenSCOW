@@ -12,7 +12,6 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { DashboardServiceClient } from "@scow/protos/build/portal/dashboard";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
