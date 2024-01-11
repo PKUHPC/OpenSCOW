@@ -63,14 +63,6 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-    getRunningJobNodeInfo: async () => {
-      return [{
-        node: "node1",
-        containerId: "docker://container1",
-      }];
-    },
-
-
   });
 
 });
