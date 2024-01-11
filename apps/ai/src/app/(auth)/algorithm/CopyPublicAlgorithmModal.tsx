@@ -48,7 +48,8 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
       onClose();
     },
     onError(err) {
-      if (err.data?.code === "CONFLICT") {
+      const errCode = err.data?.code;
+      if (errCode === "CONFLICT") {
         message.error("目标算法名称已存在");
         form.setFields([
           {
@@ -59,7 +60,8 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
         return;
       }
 
-      message.error("复制算法失败");
+      message.error(err.message);
+
     },
   });
 

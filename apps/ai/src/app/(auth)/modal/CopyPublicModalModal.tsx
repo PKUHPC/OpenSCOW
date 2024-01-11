@@ -56,9 +56,10 @@ export const CopyPublicModalModal: React.FC<Props> = (
             errors: ["目标模型名称已存在"],
           },
         ]);
+        return;
       }
 
-      message.error("复制模型失败");
+      message.error(err.message);
     },
   });
 
