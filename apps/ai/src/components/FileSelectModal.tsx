@@ -223,6 +223,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
         open={visible}
         onCancel={() => { closeModal(); }}
         title="选择文件"
+        centered
         footer={[
           <div key="footer" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
             <div key="left">
@@ -292,7 +293,9 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               }
             />
           </TopBar>
-          <Space style={{ alignItems: "flex-start" }}>
+          <div style={{ display: "flex", flexDirection: "row",
+            width: "100%", alignItems: "flex-start" }}
+          >
             <DirectoryTree
               style={{ width: 240, height: 541, overflow: "auto",
                 border: "1px solid #e0e0e0", borderRadius: "5px" }}
@@ -303,8 +306,11 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               onExpand={onDirExpand}
               treeData={dirTree}
             />
-            <div style={{ width: "700px", border: "1px solid #e0e0e0", borderRadius: "5px" }}>
+            <div style={{ width: "100%", overflowX: "auto", marginLeft: "6px",
+              display: "flex", flex: 1, border: "1px solid #e0e0e0", borderRadius: "5px" }}
+            >
               <FileTable
+                style={{ flex: 1, overflowX: "auto" }}
                 files={curDirContent || []}
                 filesFilter={(files) => files.filter((file) => !file.name.startsWith("."))}
                 loading={isDirContentLoading}
@@ -335,7 +341,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               />
             </div>
 
-          </Space>
+          </div>
         </ModalContainer>
       </Modal>
     </>
