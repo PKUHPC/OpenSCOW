@@ -16,9 +16,9 @@ import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkCopyFile } from "src/server/utils/checkFilePermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
-import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
@@ -474,7 +474,15 @@ export const copyPublicDatasetVersion = procedure
       });
     }
 
-    // 3. 写入数据
+    // 3. 检查用户是否可以将源文件复制到目标文件
+    const host = getClusterLoginNode(datasetVersion.dataset.$.clusterId);
+
+    if (!host) { throw clusterNotFound(datasetVersion.dataset.$.clusterId); }
+
+    await checkCopyFile({ host, userIdentityId: user.identityId,
+      toPath: input.path, fileName: path.basename(datasetVersion.path) });
+
+    // 4. 写入数据
     const newDataset = new Dataset({
       name: input.datasetName,
       owner: user.identityId,
@@ -492,12 +500,6 @@ export const copyPublicDatasetVersion = procedure
       dataset: newDataset,
     });
 
-    const host = getClusterLoginNode(datasetVersion.dataset.$.clusterId);
-
-    if (!host) { throw clusterNotFound(datasetVersion.dataset.$.clusterId); }
-
-    // TODO：判断有无同名文件夹
-
     try {
       await copyFile({ host, userIdentityId: user.identityId,
         fromPath: datasetVersion.path, toPath: input.path });
@@ -505,9 +507,6 @@ export const copyPublicDatasetVersion = procedure
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
       await orm.em.persistAndFlush([newDataset, newDatasetVersion]);
     } catch (err) {
-      // 回滚
-      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
-      console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Copy Error",

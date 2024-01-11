@@ -16,6 +16,7 @@ import { SharedStatus } from "src/models/common";
 import { Modal } from "src/server/entities/Modal";
 import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkCopyFile } from "src/server/utils/checkFilePermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
@@ -435,6 +436,14 @@ export const copyPublicModalVersion = procedure
       });
     }
 
+    // 3. 检查用户是否能将源模型拷贝至目标目录
+    const host = getClusterLoginNode(modalVersion.modal.$.clusterId);
+
+    if (!host) { throw clusterNotFound(modalVersion.modal.$.clusterId); }
+
+    await checkCopyFile({ host, userIdentityId: user.identityId,
+      toPath: input.path, fileName: path.basename(modalVersion.path) });
+
     // 3. 写入数据
     const newModal = new Modal({
       name: input.modalName,
@@ -453,12 +462,6 @@ export const copyPublicModalVersion = procedure
       modal: newModal,
     });
 
-    const host = getClusterLoginNode(modalVersion.modal.$.clusterId);
-
-    if (!host) { throw clusterNotFound(modalVersion.modal.$.clusterId); }
-
-    // TODO：判断有无同名文件夹
-
     try {
       await copyFile({ host, userIdentityId: user.identityId,
         fromPath: modalVersion.path, toPath: input.path });
@@ -466,8 +469,6 @@ export const copyPublicModalVersion = procedure
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
       await orm.em.persistAndFlush([newModal, newModalVersion]);
     } catch (err) {
-      // 回滚
-      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

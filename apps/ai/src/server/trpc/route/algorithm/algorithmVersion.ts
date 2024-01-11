@@ -15,6 +15,7 @@ import path, { dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkCopyFile } from "src/server/utils/checkFilePermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { deleteDir } from "src/server/utils/deleteItem";
@@ -410,7 +411,15 @@ export const copyPublicAlgorithmVersion = procedure
       });
     }
 
-    // 3. 写入数据
+    // 3. 检查用户是否可以将源算法拷贝至目标目录
+    const host = getClusterLoginNode(algorithmVersion.algorithm.$.clusterId);
+
+    if (!host) { throw clusterNotFound(algorithmVersion.algorithm.$.clusterId); }
+
+    await checkCopyFile({ host, userIdentityId: user.identityId,
+      toPath: input.path, fileName: path.basename(algorithmVersion.path) });
+
+    // 4. 写入数据
     const newAlgorithm = new Algorithm({
       name: input.algorithmName,
       owner: user.identityId,
@@ -427,12 +436,6 @@ export const copyPublicAlgorithmVersion = procedure
       algorithm: newAlgorithm,
     });
 
-    const host = getClusterLoginNode(algorithmVersion.algorithm.$.clusterId);
-
-    if (!host) { throw clusterNotFound(algorithmVersion.algorithm.$.clusterId); }
-
-    // TODO：判断有无同名文件夹
-
     try {
       await copyFile({ host, userIdentityId: user.identityId,
         fromPath: algorithmVersion.path, toPath: input.path });
@@ -440,8 +443,6 @@ export const copyPublicAlgorithmVersion = procedure
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
       await orm.em.persistAndFlush([newAlgorithm, newAlgorithmVersion]);
     } catch (err) {
-      // 回滚
-      await deleteDir({ host, userIdentityId: "root", dirPath: input.path });
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
