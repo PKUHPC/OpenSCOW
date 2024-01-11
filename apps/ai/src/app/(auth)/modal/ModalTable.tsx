@@ -91,8 +91,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }
 
   const deleteModalMutation = trpc.modal.deleteModal.useMutation({
-    onError(e) {
-      console.log(e);
+    onError() {
       message.error("删除模型失败");
     },
   });

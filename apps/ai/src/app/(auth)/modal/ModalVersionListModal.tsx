@@ -84,8 +84,7 @@ export const ModalVersionListModal: React.FC<Props> = (
   });
 
   const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
-    onError(e) {
-      console.log(e);
+    onError() {
       message.error("删除模型版本失败");
     } });
 
