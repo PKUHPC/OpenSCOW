@@ -15,7 +15,6 @@
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { PropsWithChildren, useMemo, useState } from "react";
-import { useLogout } from "src/app/auth";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
@@ -23,6 +22,7 @@ import { SideNav } from "src/layouts/base/SideNav";
 import { Footer } from "src/layouts/Footer";
 import { ClientUserInfo } from "src/server/auth/models";
 import { arrayContainsElement } from "src/utils/array";
+import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
 // import logo from "src/assets/logo-no-text.svg";
@@ -75,6 +75,8 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const hasSidebar = arrayContainsElement(sidebarRoutes);
 
+  const useLogoutMutation = trpc.auth.logout.useMutation();
+
   return (
     <Root>
       <Header
@@ -84,7 +86,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         hasSidebar={hasSidebar}
         routes={routes}
         user={user}
-        logout={useLogout()}
+        logout={() => { useLogoutMutation.mutateAsync().then(() => { location.reload(); }); }}
         userLinks={[]}
         languageId="zh_cn"
         right={headerRightContent}

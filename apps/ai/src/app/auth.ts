@@ -22,6 +22,10 @@ export const useUserQuery = () => {
   });
 };
 
+export const useLogoutMutation = () => {
+  return trpc.auth.logout.useMutation();
+};
+
 export const useOptionalUser = () => {
   const context = useUserQuery().data?.user;
   return context;
@@ -32,15 +36,4 @@ export const useUser = () => {
   const user = useOptionalUser();
   if (!user) { throw new Error("not logged in"); }
   return user;
-};
-
-export const useLogout = () => {
-  const query = useUserQuery();
-
-  return () => {
-    deleteUserToken();
-    query.refetch();
-
-  };
-
 };

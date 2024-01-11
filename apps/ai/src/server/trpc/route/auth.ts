@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { changePassword, checkPassword } from "@scow/lib-auth";
+import { changePassword, checkPassword, deleteToken } from "@scow/lib-auth";
 import { joinWithUrl } from "@scow/utils";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
-import { setUserTokenCookie } from "src/server/auth/cookie";
+import { deleteUserToken, getUserToken, setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
 import { config } from "src/server/config/env";
@@ -82,7 +82,6 @@ export const auth = router({
     .input(z.void())
     .output(z.void())
     .query(async ({ ctx: { req, res } }) => {
-      console.log("req", req.headers.host);
 
       const callbackUrl = `${ config.PROTOCOL || "http"}://${req.headers.host}`
        + join(BASE_PATH, "/api/auth/callback");
@@ -91,6 +90,17 @@ export const auth = router({
         `public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
 
       res.redirect(target);
+    }),
+
+  logout: authProcedure
+    .input(z.void())
+    .output(z.void())
+    .mutation(async ({ ctx: { req, res } }) => {
+
+      const token = getUserToken(req) || "";
+      await deleteToken(token, config.AUTH_INTERNAL_URL);
+      deleteUserToken(res);
+
     }),
 
   changePassword: authProcedure
