@@ -59,9 +59,10 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
             errors: ["目标数据集名称已存在"],
           },
         ]);
+        return;
       }
 
-      message.error("复制数据集失败");
+      message.error(err.message);
     },
   });
 
