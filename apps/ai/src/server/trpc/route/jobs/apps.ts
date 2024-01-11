@@ -256,6 +256,7 @@ export const createAppSession = procedure
     algorithm: z.number().optional(),
     image: ImageSchema,
     dataset: z.number().optional(),
+    mountPoint: z.string().optional(),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -266,7 +267,7 @@ export const createAppSession = procedure
     customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
   })).mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image,
-      dataset, account, partition, coreCount, nodeCount, gpuCount, memory,
+      dataset, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, customAttributes } = input;
     const apps = getClusterAppConfigs(clusterId);
     const app = apps[appId];
@@ -405,6 +406,7 @@ export const createAppSession = procedure
           image: `${image.name}:${image.tag || "latest"}`,
           algorithm: algorithmVersion?.path,
           dataset: datasetVersion?.path,
+          mountPoint,
           account,
           partition: partition!,
           coreCount,
@@ -466,7 +468,7 @@ export const saveImage =
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
         const client = getAdapterClient(clusterId);
 
-        const { node, containerId } = await asyncClientCall(client.job, "getRunningJobNodeInfo", {
+        const { node, containerId } = await asyncClientCall(client.app, "getRunningJobNodeInfo", {
           jobId,
         });
         const formateContainerId = containerId.replace("docker://", "");
@@ -538,6 +540,7 @@ procedure
     algorithm: z.number().optional(),
     imageId: z.number(),
     dataset: z.number().optional(),
+    mountPoint: z.string().optional(),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -552,7 +555,7 @@ procedure
   })).mutation(
     async ({ input, ctx: { user } }) => {
 
-      const { clusterId, trainJobName, algorithm, imageId, dataset, account, partition,
+      const { clusterId, trainJobName, algorithm, imageId, dataset, mountPoint, account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
@@ -621,6 +624,7 @@ procedure
           algorithm: algorithmVersion?.path,
           image: image.path,
           dataset: datasetVersion?.path,
+          mountPoint,
           account,
           partition: partition!,
           coreCount,
@@ -711,13 +715,13 @@ export const listAppSessions =
           const content = await sftpReadFile(sftp)(metadataPath);
           const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-          // 如果是训练，不需要连接信息
 
           const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
 
+          // 如果是训练，不需要连接信息
           if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
             const app = apps[sessionMetadata.appId];
 

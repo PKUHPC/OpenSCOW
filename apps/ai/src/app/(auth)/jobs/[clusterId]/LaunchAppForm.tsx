@@ -44,6 +44,7 @@ interface FixedFormFields {
   algorithm: { name: number, version: number };
   image: { name: number };
   dataset: { name: number, version: number };
+  mountPoint: string | undefined;
   partition: string | undefined;
   coreCount: number;
   gpuCount: number | undefined;
@@ -313,6 +314,7 @@ export const LaunchAppForm = (props: Props) => {
             algorithm: values.algorithm.version,
             imageId: values.image.name,
             dataset: values.dataset.version,
+            mountPoint: values.mountPoint,
             account: values.account,
             partition: values.partition,
             nodeCount: nodeCount,
@@ -324,7 +326,7 @@ export const LaunchAppForm = (props: Props) => {
           });
         } else {
           const {
-            appJobName, algorithm, dataset, account, partition, coreCount, gpuCount, maxTime } = values;
+            appJobName, algorithm, dataset, mountPoint, account, partition, coreCount, gpuCount, maxTime } = values;
 
           const customFormKeyValue: CustomFormFields = { customFields: {} };
           attributes.forEach((customFormAttribute) => {
@@ -342,6 +344,7 @@ export const LaunchAppForm = (props: Props) => {
               tag: appImage?.tag,
             },
             dataset: dataset.version,
+            mountPoint,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
@@ -468,6 +471,23 @@ export const LaunchAppForm = (props: Props) => {
               />
             </Form.Item>
           </Space>
+        </Form.Item>
+        <Form.Item label="挂载点" name="mountPoint">
+          <Input
+            placeholder="选择挂载点"
+            suffix={
+              (
+                <FileSelectModal
+                  allowedFileType={["DIR"]}
+                  onSubmit={(path: string) => {
+                    form.setFieldValue("mountPoint", path);
+                    form.validateFields(["mountPoint"]);
+                  }}
+                  clusterId={clusterId ?? ""}
+                />
+              )
+            }
+          />
         </Form.Item>
         <Divider orientation="left" orientationMargin="0" plain>资源</Divider>
         <Form.Item
