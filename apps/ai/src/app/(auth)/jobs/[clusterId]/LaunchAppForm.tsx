@@ -44,6 +44,7 @@ interface FixedFormFields {
   algorithm: { name: number, version: number };
   image: { name: number };
   dataset: { name: number, version: number };
+  model: { name: number, version: number };
   mountPoint: string | undefined;
   partition: string | undefined;
   coreCount: number;
@@ -106,16 +107,9 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
+  const selectedDataset = Form.useWatch(["dataset", "name"], form);
   const datasetType = Form.useWatch(["dataset", "type"], form);
   const isDatasetPublic = datasetType !== undefined ? datasetType === AccessiblityType.PUBLIC : datasetType;
-  const algorithmType = Form.useWatch(["algorithm", "type"], form);
-  const isAlgorithmPublic = algorithmType !== undefined ? algorithmType === AccessiblityType.PUBLIC : algorithmType;
-  const imageType = Form.useWatch(["image", "type"], form);
-  const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
-  const selectedDataset = Form.useWatch(["dataset", "name"], form);
-
-  const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
-
 
   const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
     isShared: isDatasetPublic, clusterId,
@@ -132,6 +126,10 @@ export const LaunchAppForm = (props: Props) => {
   const datasetVersionOptions = useMemo(() => {
     return datasetVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
   }, [datasetVersions]);
+
+  const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
+  const algorithmType = Form.useWatch(["algorithm", "type"], form);
+  const isAlgorithmPublic = algorithmType !== undefined ? algorithmType === AccessiblityType.PUBLIC : algorithmType;
 
   const { data: algorithms, isLoading: isAlgorithmLoading } = trpc.algorithm.getAlgorithms.useQuery(
     {
@@ -151,6 +149,30 @@ export const LaunchAppForm = (props: Props) => {
   const algorithmVersionOptions = useMemo(() => {
     return algorithmVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
   }, [algorithmVersions]);
+
+
+  const selectedModel = Form.useWatch(["model", "name"], form);
+  const modelType = Form.useWatch(["model", "type"], form);
+  const isModelPublic = modelType !== undefined ? modelType === AccessiblityType.PUBLIC : modelType;
+
+  const { data: models, isLoading: isModelsLoading } = trpc.modal.list.useQuery({
+    isShared: isModelPublic, clusterId,
+  }, { enabled: isModelPublic !== undefined });
+
+  const { data: modelVersions, isLoading: isModelVersionsLoading } = trpc.modal.versionList.useQuery({
+    modalId: selectedModel, isShared: isModelPublic,
+  }, { enabled: selectedModel !== undefined });
+
+  const modelOptions = useMemo(() => {
+    return models?.items.map((x) => ({ label: `${x.name}(${x.owner})`, value: x.id }));
+  }, [models]);
+
+  const modelVersionOptions = useMemo(() => {
+    return modelVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
+  }, [modelVersions]);
+
+  const imageType = Form.useWatch(["image", "type"], form);
+  const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
     isPublic: isImagePublic,
@@ -306,32 +328,33 @@ export const LaunchAppForm = (props: Props) => {
       }}
       onFinish={async () => {
 
-        const values = await form.validateFields();
+        const { appJobName, algorithm, dataset, image, model,
+          mountPoint, account, partition, coreCount,
+          gpuCount, maxTime, command, customFields } = await form.validateFields();
         if (isTraining) {
           await trainJobMutation.mutateAsync({
             clusterId,
-            trainJobName: values.appJobName,
-            algorithm: values.algorithm.version,
-            imageId: values.image.name,
-            dataset: values.dataset.version,
-            mountPoint: values.mountPoint,
-            account: values.account,
-            partition: values.partition,
+            trainJobName: appJobName,
+            algorithm: algorithm.version,
+            imageId: image.name,
+            dataset: dataset.version,
+            model: model.version,
+            mountPoint: mountPoint,
+            account: account,
+            partition: partition,
             nodeCount: nodeCount,
-            coreCount: values.coreCount,
-            gpuCount: values.gpuCount,
-            maxTime: values.maxTime,
+            coreCount: coreCount,
+            gpuCount: gpuCount,
+            maxTime: maxTime,
             memory: memorySize,
-            command: values.command || "",
+            command: command || "",
           });
         } else {
-          const {
-            appJobName, algorithm, dataset, mountPoint, account, partition, coreCount, gpuCount, maxTime } = values;
 
           const customFormKeyValue: CustomFormFields = { customFields: {} };
           attributes.forEach((customFormAttribute) => {
             const customFormKey = customFormAttribute.name;
-            customFormKeyValue.customFields[customFormKey] = values.customFields[customFormKey];
+            customFormKeyValue.customFields[customFormKey] = customFields[customFormKey];
           });
 
           createAppSessionMutation.mutate({
@@ -344,6 +367,7 @@ export const LaunchAppForm = (props: Props) => {
               tag: appImage?.tag,
             },
             dataset: dataset.version,
+            model: model.version,
             mountPoint,
             account: account,
             partition: partition,
@@ -468,6 +492,44 @@ export const LaunchAppForm = (props: Props) => {
                 style={{ minWidth: 100 }}
                 loading={isDatasetVersionsLoading && selectedDataset !== undefined}
                 options={datasetVersionOptions}
+              />
+            </Form.Item>
+          </Space>
+        </Form.Item>
+        <Form.Item label="模型">
+          <Space>
+            <Form.Item name={["model", "type"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                onChange={() => {
+                  form.setFieldsValue({ model: { name: undefined, version: undefined } });
+                }}
+                options={
+                  [
+                    {
+                      value: AccessiblityType.PRIVATE,
+                      label: "我的模型",
+                    },
+                    {
+                      value:  AccessiblityType.PUBLIC,
+                      label: "公共模型",
+                    },
+                  ]
+                }
+              />
+            </Form.Item>
+            <Form.Item name={["model", "name"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isModelsLoading && isModelPublic !== undefined}
+                options={modelOptions}
+              />
+            </Form.Item>
+            <Form.Item name={["model", "version"]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                loading={isModelVersionsLoading && selectedModel !== undefined}
+                options={modelVersionOptions}
               />
             </Form.Item>
           </Space>

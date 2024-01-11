@@ -37,6 +37,7 @@ import { aiConfig } from "src/server/config/ai";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { Image as ImageEntity, Source } from "src/server/entities/Image";
+import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getClusterAppConfigs } from "src/server/utils/app";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clusters";
@@ -256,6 +257,7 @@ export const createAppSession = procedure
     algorithm: z.number().optional(),
     image: ImageSchema,
     dataset: z.number().optional(),
+    model: z.number().optional(),
     mountPoint: z.string().optional(),
     account: z.string(),
     partition: z.string().optional(),
@@ -267,7 +269,7 @@ export const createAppSession = procedure
     customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
   })).mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image,
-      dataset, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
+      dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, customAttributes } = input;
     const apps = getClusterAppConfigs(clusterId);
     const app = apps[appId];
@@ -351,6 +353,19 @@ export const createAppSession = procedure
       datasetVersion = selectDatasetVersion;
     }
 
+    let modelVersion: ModalVersion | undefined;
+    if (model !== undefined) {
+      const selectedModelVersion = await orm.em.findOne(ModalVersion, { id: model });
+      if (!selectedModelVersion) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `model version id ${model} is not found`,
+        });
+      }
+      modelVersion = selectedModelVersion;
+    }
+
+
     const host = getClusterLoginNode(clusterId);
     if (!host) { throw new TRPCError({
       code: "NOT_FOUND",
@@ -406,6 +421,7 @@ export const createAppSession = procedure
           image: `${image.name}:${image.tag || "latest"}`,
           algorithm: algorithmVersion?.path,
           dataset: datasetVersion?.path,
+          model: modelVersion?.path,
           mountPoint,
           account,
           partition: partition!,
@@ -540,6 +556,7 @@ procedure
     algorithm: z.number().optional(),
     imageId: z.number(),
     dataset: z.number().optional(),
+    model: z.number().optional(),
     mountPoint: z.string().optional(),
     account: z.string(),
     partition: z.string().optional(),
@@ -555,7 +572,7 @@ procedure
   })).mutation(
     async ({ input, ctx: { user } }) => {
 
-      const { clusterId, trainJobName, algorithm, imageId, dataset, mountPoint, account, partition,
+      const { clusterId, trainJobName, algorithm, imageId, dataset, model, mountPoint, account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
@@ -593,6 +610,18 @@ procedure
         datasetVersion = selectDatasetVersion;
       }
 
+      let modelVersion: ModalVersion | undefined;
+      if (model !== undefined) {
+        const selectedModelVersion = await orm.em.findOne(ModalVersion, { id: model });
+        if (!selectedModelVersion) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: `model version id ${model} is not found`,
+          });
+        }
+        modelVersion = selectedModelVersion;
+      }
+
 
       const image = await orm.em.findOne(ImageEntity, { id: imageId });
 
@@ -624,6 +653,7 @@ procedure
           algorithm: algorithmVersion?.path,
           image: image.path,
           dataset: datasetVersion?.path,
+          model: modelVersion?.path,
           mountPoint,
           account,
           partition: partition!,
