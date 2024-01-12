@@ -140,7 +140,7 @@ export const LaunchAppForm = (props: Props) => {
   useDataVersionOptions<AlgorithmVersionInterface>(
     form,
     "algorithm",
-    trpc.dataset.versionList.useQuery,
+    trpc.algorithm.getAlgorithmVersions.useQuery,
     (x) => ({ label: x.versionName, value: x.id }),
   );
 
