@@ -34,12 +34,9 @@ import { Logger } from "pino";
 import { quote } from "shell-quote";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
-import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
-import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { Image as ImageEntity, Source } from "src/server/entities/Image";
-import { ModalVersion } from "src/server/entities/ModalVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { getClusterAppConfigs } from "src/server/utils/app";
+import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
 import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clusters";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
@@ -212,14 +209,9 @@ export const getAppMetadata = procedure
   }))
   .query(async ({ input }) => {
     const { clusterId, appId } = input;
+
     const apps = getClusterAppConfigs(clusterId);
-    const app = apps[appId];
-    if (!app) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `app id ${appId} is not found`,
-      });
-    }
+    const app = checkAppExist(apps, appId);
 
     const attributes: AppCustomAttribute[] = [];
 
@@ -271,8 +263,9 @@ export const createAppSession = procedure
     const { clusterId, appId, appJobName, algorithm, image,
       dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, customAttributes } = input;
+
     const apps = getClusterAppConfigs(clusterId);
-    const app = apps[appId];
+    const app = checkAppExist(apps, appId);
 
     const proxyBasePath = join(BASE_PATH, "/api/proxy", clusterId);
     if (!app) {
@@ -327,43 +320,16 @@ export const createAppSession = procedure
 
     const orm = await getORM();
 
-    let algorithmVersion: AlgorithmVersion | undefined;
-    if (algorithm !== undefined) {
-      const selectAlgorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
-
-      if (!selectAlgorithmVersion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `algorithm version id ${algorithm} is not found`,
-        });
-      }
-      algorithmVersion = selectAlgorithmVersion;
-    }
-
-    let datasetVersion: DatasetVersion | undefined;
-    if (dataset !== undefined) {
-      const selectDatasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
-
-      if (!selectDatasetVersion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `dataset version id ${dataset} is not found`,
-        });
-      }
-      datasetVersion = selectDatasetVersion;
-    }
-
-    let modelVersion: ModalVersion | undefined;
-    if (model !== undefined) {
-      const selectedModelVersion = await orm.em.findOne(ModalVersion, { id: model });
-      if (!selectedModelVersion) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `model version id ${model} is not found`,
-        });
-      }
-      modelVersion = selectedModelVersion;
-    }
+    const {
+      datasetVersion,
+      algorithmVersion,
+      modelVersion,
+    } = await checkCreateAppEntity({
+      orm,
+      dataset,
+      algorithm,
+      model,
+    });
 
 
     const host = getClusterLoginNode(clusterId);
@@ -583,54 +549,18 @@ procedure
       }
 
       const orm = await getORM();
-
-      let algorithmVersion: AlgorithmVersion | undefined;
-      if (algorithm !== undefined) {
-        const selectAlgorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
-
-        if (!selectAlgorithmVersion) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `algorithm version id ${algorithm} is not found`,
-          });
-        }
-        algorithmVersion = selectAlgorithmVersion;
-      }
-
-      let datasetVersion: DatasetVersion | undefined;
-      if (dataset !== undefined) {
-        const selectDatasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
-
-        if (!selectDatasetVersion) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `dataset version id ${dataset} is not found`,
-          });
-        }
-        datasetVersion = selectDatasetVersion;
-      }
-
-      let modelVersion: ModalVersion | undefined;
-      if (model !== undefined) {
-        const selectedModelVersion = await orm.em.findOne(ModalVersion, { id: model });
-        if (!selectedModelVersion) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: `model version id ${model} is not found`,
-          });
-        }
-        modelVersion = selectedModelVersion;
-      }
-
-
-      const image = await orm.em.findOne(ImageEntity, { id: imageId });
-
-      if (!image) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `image id ${imageId} is not found`,
-        });
-      }
+      const {
+        datasetVersion,
+        algorithmVersion,
+        modelVersion,
+        image,
+      } = await checkCreateAppEntity({
+        orm,
+        dataset,
+        algorithm,
+        image: imageId,
+        model,
+      });
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
@@ -651,7 +581,7 @@ procedure
           userId,
           jobName: trainJobName,
           algorithm: algorithmVersion?.path,
-          image: image.path,
+          image: image!.path,
           dataset: datasetVersion?.path,
           model: modelVersion?.path,
           mountPoint,
@@ -680,8 +610,8 @@ procedure
           sessionId: trainJobName,
           submitTime: new Date().toISOString(),
           image: {
-            name: image.name,
-            tag: image.tag,
+            name: image!.name,
+            tag: image!.tag,
           },
           jobType: JobType.TRAIN,
         };
@@ -753,7 +683,8 @@ export const listAppSessions =
 
           // 如果是训练，不需要连接信息
           if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
-            const app = apps[sessionMetadata.appId];
+
+            const app = checkAppExist(apps, sessionMetadata.appId);
 
             // judge whether the app is ready
             if (runningJobInfo && runningJobInfo.state === "RUNNING") {
