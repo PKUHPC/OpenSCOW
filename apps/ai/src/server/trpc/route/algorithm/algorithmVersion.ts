@@ -19,7 +19,6 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFile } from "src/server/utils/checkFilePermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
-import { deleteDir } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";

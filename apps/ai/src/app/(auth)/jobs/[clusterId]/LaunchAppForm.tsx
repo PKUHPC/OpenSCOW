@@ -21,9 +21,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
+import { DatasetInterface, DatasetVersionInterface } from "src/models/Dateset";
+import { ModalInterface, ModalVersionInterface } from "src/models/Modal";
 import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
 import { formatSize } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
+
+import { useDataOptions, useDataVersionOptions } from "./hooks";
 
 interface Props {
   appId?: string;
@@ -73,7 +78,7 @@ interface Partition {
   comment?: string;
 }
 
-enum AccessiblityType {
+export enum AccessiblityType {
   PUBLIC = "PUBLIC",
   PRIVATE = "PRIVATE",
 }
@@ -107,69 +112,53 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-  const selectedDataset = Form.useWatch(["dataset", "name"], form);
-  const datasetType = Form.useWatch(["dataset", "type"], form);
-  const isDatasetPublic = datasetType !== undefined ? datasetType === AccessiblityType.PUBLIC : datasetType;
+  const { dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading } = useDataOptions<DatasetInterface>(
+    form,
+    "dataset",
+    trpc.dataset.list.useQuery,
+    clusterId,
+    (dataset) => ({ label: `${dataset.name}(${dataset.owner})`, value: dataset.id }),
+  );
 
-  const { data: datasets, isLoading: isDatasetsLoading } = trpc.dataset.list.useQuery({
-    isShared: isDatasetPublic, clusterId,
-  }, { enabled: isDatasetPublic !== undefined });
+  const { dataVersionOptions: datasetVersionOptions, isDataVersionsLoading: isDatasetVersionsLoading } =
+  useDataVersionOptions<DatasetVersionInterface>(
+    form,
+    "dataset",
+    trpc.dataset.versionList.useQuery,
+    (x) => ({ label: x.versionName, value: x.id }),
+  );
 
-  const { data: datasetVersions, isLoading: isDatasetVersionsLoading } = trpc.dataset.versionList.useQuery({
-    datasetId: selectedDataset, isShared: isDatasetPublic,
-  }, { enabled: selectedDataset !== undefined });
+  const { dataOptions: algorithmOptions, isDataLoading:  isAlgorithmLoading } = useDataOptions<AlgorithmInterface>(
+    form,
+    "algorithm",
+    trpc.algorithm.getAlgorithms.useQuery,
+    clusterId,
+    (x) => ({ label: x.name, value: x.id }),
+  );
 
-  const datasetOptions = useMemo(() => {
-    return datasets?.items.map((x) => ({ label: `${x.name}(${x.owner})`, value: x.id }));
-  }, [datasets]);
+  const { dataVersionOptions: algorithmVersionOptions, isDataVersionsLoading: isAlgorithmVersionsLoading } =
+  useDataVersionOptions<AlgorithmVersionInterface>(
+    form,
+    "algorithm",
+    trpc.dataset.versionList.useQuery,
+    (x) => ({ label: x.versionName, value: x.id }),
+  );
 
-  const datasetVersionOptions = useMemo(() => {
-    return datasetVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
-  }, [datasetVersions]);
+  const { dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModalInterface>(
+    form,
+    "model",
+    trpc.modal.list.useQuery,
+    clusterId,
+    (x) => ({ label: `${x.name}(${x.owner})`, value: x.id }),
+  );
 
-  const selectedAlgorithm = Form.useWatch(["algorithm", "name"], form);
-  const algorithmType = Form.useWatch(["algorithm", "type"], form);
-  const isAlgorithmPublic = algorithmType !== undefined ? algorithmType === AccessiblityType.PUBLIC : algorithmType;
-
-  const { data: algorithms, isLoading: isAlgorithmLoading } = trpc.algorithm.getAlgorithms.useQuery(
-    {
-      clusterId,
-      isPublic: isAlgorithmPublic,
-    }, { enabled: isAlgorithmPublic !== undefined });
-
-  const { data:algorithmVersions, isLoading: isAlgorithmVersionsLoading } =
-  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId: selectedAlgorithm, isPublic: isAlgorithmPublic }, {
-    enabled: selectedAlgorithm !== undefined });
-
-
-  const algorithmOptions = useMemo(() => {
-    return algorithms?.items.map((x) => ({ label: x.name, value: x.id }));
-  }, [algorithms]);
-
-  const algorithmVersionOptions = useMemo(() => {
-    return algorithmVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
-  }, [algorithmVersions]);
-
-
-  const selectedModel = Form.useWatch(["model", "name"], form);
-  const modelType = Form.useWatch(["model", "type"], form);
-  const isModelPublic = modelType !== undefined ? modelType === AccessiblityType.PUBLIC : modelType;
-
-  const { data: models, isLoading: isModelsLoading } = trpc.modal.list.useQuery({
-    isShared: isModelPublic, clusterId,
-  }, { enabled: isModelPublic !== undefined });
-
-  const { data: modelVersions, isLoading: isModelVersionsLoading } = trpc.modal.versionList.useQuery({
-    modalId: selectedModel, isShared: isModelPublic,
-  }, { enabled: selectedModel !== undefined });
-
-  const modelOptions = useMemo(() => {
-    return models?.items.map((x) => ({ label: `${x.name}(${x.owner})`, value: x.id }));
-  }, [models]);
-
-  const modelVersionOptions = useMemo(() => {
-    return modelVersions?.items.map((x) => ({ label: x.versionName, value: x.id }));
-  }, [modelVersions]);
+  const { dataVersionOptions: modelVersionOptions, isDataVersionsLoading: isModelVersionsLoading } =
+  useDataVersionOptions<ModalVersionInterface>(
+    form,
+    "model",
+    trpc.modal.versionList.useQuery,
+    (x) => ({ label: x.versionName, value: x.id }),
+  );
 
   const imageType = Form.useWatch(["image", "type"], form);
   const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
@@ -441,14 +430,14 @@ export const LaunchAppForm = (props: Props) => {
             <Form.Item name={["algorithm", "name"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isAlgorithmLoading && isAlgorithmPublic !== undefined}
+                loading={isAlgorithmLoading}
                 options={algorithmOptions}
               />
             </Form.Item>
             <Form.Item name={["algorithm", "version"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isAlgorithmVersionsLoading && selectedAlgorithm !== undefined}
+                loading={isAlgorithmVersionsLoading}
                 options={algorithmVersionOptions}
               />
             </Form.Item>
@@ -480,7 +469,7 @@ export const LaunchAppForm = (props: Props) => {
             <Form.Item name={["dataset", "name"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isDatasetsLoading && isDatasetPublic !== undefined}
+                loading={isDatasetsLoading}
                 onChange={() => {
                   form.setFieldValue(["dataset", "version"], undefined);
                 }}
@@ -490,7 +479,7 @@ export const LaunchAppForm = (props: Props) => {
             <Form.Item name={["dataset", "version"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isDatasetVersionsLoading && selectedDataset !== undefined}
+                loading={isDatasetVersionsLoading}
                 options={datasetVersionOptions}
               />
             </Form.Item>
@@ -521,14 +510,14 @@ export const LaunchAppForm = (props: Props) => {
             <Form.Item name={["model", "name"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isModelsLoading && isModelPublic !== undefined}
+                loading={isModelsLoading }
                 options={modelOptions}
               />
             </Form.Item>
             <Form.Item name={["model", "version"]} noStyle>
               <Select
                 style={{ minWidth: 100 }}
-                loading={isModelVersionsLoading && selectedModel !== undefined}
+                loading={isModelVersionsLoading}
                 options={modelVersionOptions}
               />
             </Form.Item>

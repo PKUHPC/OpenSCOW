@@ -11,7 +11,7 @@
  */
 
 import { DatabaseOutlined, ExpandOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, message, Modal, Space, Tree } from "antd";
+import { Button, message, Modal, Tree } from "antd";
 import type { DataNode, EventDataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
