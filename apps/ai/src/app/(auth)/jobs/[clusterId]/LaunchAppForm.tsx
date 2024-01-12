@@ -23,7 +23,7 @@ import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
 import { DatasetInterface, DatasetVersionInterface } from "src/models/Dateset";
-import { ModalInterface, ModalVersionInterface } from "src/models/Modal";
+import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
 import { formatSize } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
@@ -144,19 +144,19 @@ export const LaunchAppForm = (props: Props) => {
     (x) => ({ label: x.versionName, value: x.id }),
   );
 
-  const { dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModalInterface>(
+  const { dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModelInterface>(
     form,
     "model",
-    trpc.modal.list.useQuery,
+    trpc.model.list.useQuery,
     clusterId,
     (x) => ({ label: `${x.name}(${x.owner})`, value: x.id }),
   );
 
   const { dataVersionOptions: modelVersionOptions, isDataVersionsLoading: isModelVersionsLoading } =
-  useDataVersionOptions<ModalVersionInterface>(
+  useDataVersionOptions<ModelVersionInterface>(
     form,
     "model",
-    trpc.modal.versionList.useQuery,
+    trpc.model.versionList.useQuery,
     (x) => ({ label: x.versionName, value: x.id }),
   );
 

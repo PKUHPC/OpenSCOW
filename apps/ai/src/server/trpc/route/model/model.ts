@@ -14,14 +14,14 @@
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
-import { Modal } from "src/server/entities/Modal";
-import { ModalVersion } from "src/server/entities/ModalVersion";
+import { Model } from "src/server/entities/Model";
+import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
-export const ModalListSchema = z.object({
+export const ModelListSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.union([z.string(), z.undefined()]),
@@ -38,9 +38,9 @@ export const list = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/modals",
-      tags: ["modal"],
-      summary: "list modals",
+      path: "/models",
+      tags: ["model"],
+      summary: "list models",
     },
   })
   .input(z.object({
@@ -50,7 +50,7 @@ export const list = procedure
     isShared: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
-  .output(z.object({ items: z.array(ModalListSchema), count: z.number() }))
+  .output(z.object({ items: z.array(ModelListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
@@ -69,7 +69,7 @@ export const list = procedure
       clusterId: input.clusterId,
     } : {};
 
-    const [items, count] = await orm.em.findAndCount(Modal, {
+    const [items, count] = await orm.em.findAndCount(Model, {
       ...isPublicQuery,
       ...nameOrDescQuery,
       ...clusterQuery,
@@ -97,13 +97,13 @@ export const list = procedure
       }; }), count };
   });
 
-export const createModal = procedure
+export const createModel = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/modals",
-      tags: ["modal"],
-      summary: "Create a new modal",
+      path: "/models",
+      tags: ["model"],
+      summary: "Create a new model",
     },
   })
   .input(z.object({
@@ -116,25 +116,25 @@ export const createModal = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modalExist = await orm.em.findOne(Modal, { name:input.name, owner: user!.identityId });
-    if (modalExist) {
+    const modelExist = await orm.em.findOne(Model, { name:input.name, owner: user!.identityId });
+    if (modelExist) {
       throw new TRPCError({
         code: "CONFLICT",
       });
     }
 
-    const modal = new Modal({ ...input, owner: user!.identityId, isShared: false });
-    await orm.em.persistAndFlush(modal);
-    return modal.id;
+    const model = new Model({ ...input, owner: user!.identityId, isShared: false });
+    await orm.em.persistAndFlush(model);
+    return model.id;
   });
 
-export const updateModal = procedure
+export const updateModel = procedure
   .meta({
     openapi: {
       method: "PUT",
-      path: "/modals/{id}",
-      tags: ["modal"],
-      summary: "update a modal",
+      path: "/models/{id}",
+      tags: ["model"],
+      summary: "update a model",
     },
   })
   .input(z.object({
@@ -150,24 +150,24 @@ export const updateModal = procedure
 
     const { id, name, algorithmName, algorithmFramework, description } = input;
 
-    const modal = await orm.em.findOne(Modal, { id });
+    const model = await orm.em.findOne(Model, { id });
 
-    const modalExist = await orm.em.findOne(Modal, { name });
-    if (modalExist && modalExist !== modal) {
+    const modelExist = await orm.em.findOne(Model, { name });
+    if (modelExist && modelExist !== model) {
       throw new TRPCError({
         code: "CONFLICT",
       });
     }
 
-    if (!modal) {
-      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.id} not found` });
+    if (!model) {
+      throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.id} not found` });
     }
 
-    if (modal.owner !== user!.identityId) {
-      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
+    if (model.owner !== user!.identityId) {
+      throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
 
-    const changingVersions = await orm.em.find(ModalVersion, { modal,
+    const changingVersions = await orm.em.find(ModelVersion, { model,
       $or: [
         { sharedStatus: SharedStatus.SHARING },
         { sharedStatus: SharedStatus.UNSHARING },
@@ -176,19 +176,19 @@ export const updateModal = procedure
     if (changingVersions.length > 0) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: `Unfinished processing of modal ${input.id} exists`,
+        message: `Unfinished processing of model ${input.id} exists`,
       });
     }
 
     // 如果是已分享的模型且名称发生变化，则变更共享路径下的此模型名称为新名称
-    if (modal.isShared && name !== modal.name) {
+    if (model.isShared && name !== model.name) {
 
-      const sharedVersions = await orm.em.find(ModalVersion, { modal, sharedStatus: SharedStatus.SHARED });
+      const sharedVersions = await orm.em.find(ModelVersion, { model, sharedStatus: SharedStatus.SHARED });
       const oldPath = dirname(sharedVersions[0].path);
       await updateSharedName({
-        target: SHARED_TARGET.MODAL,
+        target: SHARED_TARGET.MODEL,
         user: user,
-        clusterId: modal.clusterId,
+        clusterId: model.clusterId,
         newName: `${name}-${user!.identityId}`,
         isVersionName: false,
         oldPath,
@@ -203,40 +203,40 @@ export const updateModal = procedure
       });
     }
 
-    modal.name = name;
-    modal.algorithmName = algorithmName;
-    modal.algorithmFramework = algorithmFramework;
-    modal.description = description;
+    model.name = name;
+    model.algorithmName = algorithmName;
+    model.algorithmFramework = algorithmFramework;
+    model.description = description;
 
     await orm.em.flush();
-    return modal.id;
+    return model.id;
   });
 
-export const deleteModal = procedure
+export const deleteModel = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/modals/{id}",
-      tags: ["modal"],
-      summary: "delete a modal",
+      path: "/models/{id}",
+      tags: ["model"],
+      summary: "delete a model",
     },
   })
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const modal = await orm.em.findOne(Modal, { id: input.id });
+    const model = await orm.em.findOne(Model, { id: input.id });
 
-    if (!modal) {
-      throw new TRPCError({ code: "NOT_FOUND", message: `Modal ${input.id} not found` });
+    if (!model) {
+      throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.id} not found` });
     }
 
-    if (modal.owner !== user!.identityId) {
-      throw new TRPCError({ code: "FORBIDDEN", message: `Modal ${input.id} not accessible` });
+    if (model.owner !== user!.identityId) {
+      throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
-    const modalVersions = await orm.em.find(ModalVersion, { modal });
+    const modelVersions = await orm.em.find(ModelVersion, { model });
 
-    const sharingVersions = modalVersions.filter(
+    const sharingVersions = modelVersions.filter(
       (v) => (v.sharedStatus === SharedStatus.SHARING || v.sharedStatus === SharedStatus.UNSHARING));
 
     // 有正在分享中或取消分享中的版本，则不可删除
@@ -245,14 +245,14 @@ export const deleteModal = procedure
         { code: "PRECONDITION_FAILED", message: "There is an algorithm version being shared or unshared" });
     }
 
-    const sharedVersions = modalVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
+    const sharedVersions = modelVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
     // 删除所有已分享的版本
     let sharedDatasetPath: string = "";
     await Promise.all(sharedVersions.map(async (v) => {
       sharedDatasetPath = path.dirname(v.path);
       await checkSharePermission({
-        clusterId: modal.clusterId,
+        clusterId: model.clusterId,
         checkedSourcePath: v.privatePath,
         user,
         checkedTargetPath: v.path,
@@ -261,12 +261,12 @@ export const deleteModal = procedure
 
     // 删除整个分享的dataset路径
     await unShareFileOrDir({
-      clusterId: modal.clusterId,
+      clusterId: model.clusterId,
       sharedPath: sharedDatasetPath,
       user,
     });
 
-    await orm.em.removeAndFlush([...modalVersions, modal]);
+    await orm.em.removeAndFlush([...modelVersions, model]);
 
     return { success: false };
   });

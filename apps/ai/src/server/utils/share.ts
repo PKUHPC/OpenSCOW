@@ -28,7 +28,7 @@ export const SHARED_DIR = "/.shared";
 export enum SHARED_TARGET {
   DATASET = "/dataset",
   ALGORITHM = "/algorithm",
-  MODAL = "/modal",
+  MODEL = "/model",
 };
 
 export async function checkSharePermission({

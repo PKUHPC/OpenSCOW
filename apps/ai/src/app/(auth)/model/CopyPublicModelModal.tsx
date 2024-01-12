@@ -14,18 +14,18 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { ModalVersionInterface } from "src/models/Modal";
+import { ModelVersionInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 export interface Props {
   open: boolean;
-  modalId: number;
-  modalVersionId: number;
+  modelId: number;
+  modelVersionId: number;
   cluster?: Cluster;
-  modalName?: string;
-  data: ModalVersionInterface;
+  modelName?: string;
+  data: ModelVersionInterface;
   onClose: () => void;
 }
 
@@ -37,12 +37,12 @@ interface FormFields {
 }
 
 export const CopyPublicModalModal: React.FC<Props> = (
-  { open, onClose, modalId, modalVersionId, cluster, modalName, data },
+  { open, onClose, modelId, modelVersionId, cluster, modelName, data },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const copyMutation = trpc.modal.copyPublicModalVersion.useMutation({
+  const copyMutation = trpc.model.copyPublicModelVersion.useMutation({
     onSuccess() {
       message.success("复制模型成功");
       onClose();
@@ -69,9 +69,9 @@ export const CopyPublicModalModal: React.FC<Props> = (
   const onOk = async () => {
     const { targetModalName, versionName, versionDescription, path } = await form.validateFields();
     copyMutation.mutate({
-      modalId,
-      modalVersionId,
-      modalName: targetModalName,
+      modelId,
+      modelVersionId,
+      modelName: targetModalName,
       versionName,
       versionDescription: versionDescription ?? "",
       path,
@@ -97,7 +97,7 @@ export const CopyPublicModalModal: React.FC<Props> = (
         <Form.Item
           label="源模型名称"
         >
-          {modalName}
+          {modelName}
         </Form.Item>
         <Form.Item
           label="目标模型名称"

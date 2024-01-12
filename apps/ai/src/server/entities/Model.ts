@@ -13,15 +13,15 @@
 import { Collection, EntitySchema } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
-import { ModalVersion } from "./ModalVersion";
+import { ModelVersion } from "./ModelVersion";
 
-export class Modal {
+export class Model {
   id!: number;
   name: string;
   owner: string;
   algorithmFramework?: string;
   algorithmName?: string;
-  versions = new Collection<ModalVersion>(this);
+  versions = new Collection<ModelVersion>(this);
   isShared?: boolean;
   description?: string;
   clusterId: string;
@@ -58,29 +58,29 @@ export class Modal {
   }
 }
 
-export const modalEntitySchema = new EntitySchema({
-  class: Modal,
+export const modelEntitySchema = new EntitySchema({
+  class: Model,
 });
 
-modalEntitySchema.addPrimaryKey("id", Number);
-modalEntitySchema.addProperty("name", String);
-modalEntitySchema.addProperty("owner", String);
+modelEntitySchema.addPrimaryKey("id", Number);
+modelEntitySchema.addProperty("name", String);
+modelEntitySchema.addProperty("owner", String);
 
-modalEntitySchema.addProperty("algorithmFramework", String, {
+modelEntitySchema.addProperty("algorithmFramework", String, {
   comment: "algorithm algorithmFramework", nullable: true });
 
-modalEntitySchema.addProperty("algorithmName", String, {
+modelEntitySchema.addProperty("algorithmName", String, {
   comment: "algorithm name", nullable: true });
 
-modalEntitySchema.addOneToMany("versions", "ModalVersion", {
-  entity: () => "ModalVersion", mappedBy: (mv) => mv.modal });
+modelEntitySchema.addOneToMany("versions", "ModelVersion", {
+  entity: () => "ModelVersion", mappedBy: (mv) => mv.model });
 
-modalEntitySchema.addProperty("isShared", Boolean);
-modalEntitySchema.addProperty("description", String, { nullable: true });
-modalEntitySchema.addProperty("clusterId", String);
+modelEntitySchema.addProperty("isShared", Boolean);
+modelEntitySchema.addProperty("description", String, { nullable: true });
+modelEntitySchema.addProperty("clusterId", String);
 
-modalEntitySchema.addProperty("createTime", Date, {
+modelEntitySchema.addProperty("createTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
 
-modalEntitySchema.addProperty("updateTime", Date, {
+modelEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });

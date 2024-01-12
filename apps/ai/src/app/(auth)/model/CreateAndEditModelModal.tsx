@@ -20,8 +20,8 @@ import { trpc } from "src/utils/trpc";
 
 interface EditProps {
   cluster?: Cluster;
-  modalId: number;
-  modalName: string;
+  modelId: number;
+  modelName: string;
   algorithmName?: string;
   algorithmFramework?: string;
   modalDescription?: string;
@@ -34,7 +34,7 @@ export interface Props {
 }
 
 interface FormFields {
-  modalName: string,
+  modelName: string,
   cluster: Cluster,
   algorithmName: string,
   algorithmFramework: string,
@@ -47,7 +47,7 @@ export const CreateAndEditModalModal: React.FC<Props> = (
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const createModalMutation = trpc.modal.createModal.useMutation({
+  const createModelMutation = trpc.model.createModel.useMutation({
     onSuccess() {
       message.success("添加模型成功");
       form.resetFields();
@@ -59,7 +59,7 @@ export const CreateAndEditModalModal: React.FC<Props> = (
         message.error("模型名称已存在");
         form.setFields([
           {
-            name: "modalName",
+            name: "modelName",
             errors: ["模型名称已存在"],
           },
         ]);
@@ -68,7 +68,7 @@ export const CreateAndEditModalModal: React.FC<Props> = (
       message.error("添加模型失败");
     } });
 
-  const updateModalMutation = trpc.modal.updateModal.useMutation({
+  const updateModelMutation = trpc.model.updateModel.useMutation({
     onSuccess() {
       message.success("修改模型成功");
       refetch();
@@ -79,7 +79,7 @@ export const CreateAndEditModalModal: React.FC<Props> = (
         message.error("模型名称已存在");
         form.setFields([
           {
-            name: "modalName",
+            name: "modelName",
             errors: ["模型名称已存在"],
           },
         ]);
@@ -97,20 +97,20 @@ export const CreateAndEditModalModal: React.FC<Props> = (
     } });
 
   const onOk = async () => {
-    const { modalName:formModalName, cluster, algorithmName:formAlgorithmName,
+    const { modelName:formModalName, cluster, algorithmName:formAlgorithmName,
       algorithmFramework:formAlgorithmFramework, modalDescription:formModalDescription } =
     await form.validateFields();
 
-    if (editData?.modalId) {
-      updateModalMutation.mutate({
-        id:editData.modalId,
+    if (editData?.modelId) {
+      updateModelMutation.mutate({
+        id:editData.modelId,
         name:formModalName,
         algorithmName:formAlgorithmName,
         algorithmFramework:formAlgorithmFramework,
         description:formModalDescription,
       });
     } else {
-      createModalMutation.mutate({
+      createModelMutation.mutate({
         name:formModalName,
         algorithmName:formAlgorithmName,
         algorithmFramework:formAlgorithmFramework,
@@ -122,10 +122,10 @@ export const CreateAndEditModalModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={editData?.modalName ? "修改模型" : "添加模型"}
+      title={editData?.modelName ? "修改模型" : "添加模型"}
       open={open}
       onOk={form.submit}
-      confirmLoading={createModalMutation.isLoading}
+      confirmLoading={createModelMutation.isLoading}
       onCancel={onClose}
     >
       <Form
@@ -136,12 +136,12 @@ export const CreateAndEditModalModal: React.FC<Props> = (
       >
         <Form.Item
           label="名称"
-          name="modalName"
+          name="modelName"
           rules={[
             { required: true },
             { validator:validateNoChinese },
           ]}
-          initialValue={editData?.modalName}
+          initialValue={editData?.modelName}
         >
           <Input />
         </Form.Item>

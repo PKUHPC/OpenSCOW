@@ -232,6 +232,7 @@
             "id"
           ],
           "referencedTableName": "algorithm",
+          "deleteRule": "CASCADE",
           "updateRule": "cascade"
         }
       }
@@ -707,7 +708,7 @@
           "mappedType": "datetime"
         }
       },
-      "name": "modal",
+      "name": "model",
       "indexes": [
         {
           "keyName": "PRIMARY",
@@ -809,8 +810,8 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "modal_id": {
-          "name": "modal_id",
+        "model_id": {
+          "name": "model_id",
           "type": "int",
           "unsigned": true,
           "autoincrement": false,
@@ -819,14 +820,14 @@
           "mappedType": "integer"
         }
       },
-      "name": "modal_version",
+      "name": "model_version",
       "indexes": [
         {
           "columnNames": [
-            "modal_id"
+            "model_id"
           ],
           "composite": false,
-          "keyName": "modal_version_modal_id_index",
+          "keyName": "model_version_model_id_index",
           "primary": false,
           "unique": false
         },
@@ -842,16 +843,17 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "modal_version_modal_id_foreign": {
-          "constraintName": "modal_version_modal_id_foreign",
+        "model_version_model_id_foreign": {
+          "constraintName": "model_version_model_id_foreign",
           "columnNames": [
-            "modal_id"
+            "model_id"
           ],
-          "localTableName": "modal_version",
+          "localTableName": "model_version",
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "modal",
+          "referencedTableName": "model",
+          "deleteRule": "CASCADE",
           "updateRule": "cascade"
         }
       }

@@ -19,7 +19,7 @@ import { getAiAppConfigs } from "src/server/config/apps";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { Image } from "src/server/entities/Image";
-import { ModalVersion } from "src/server/entities/ModalVersion";
+import { ModelVersion } from "src/server/entities/ModelVersion";
 
 
 export const getClusterAppConfigs = (cluster: string) => {
@@ -84,9 +84,9 @@ export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, mod
     datasetVersion = selectDatasetVersion;
   }
 
-  let modelVersion: ModalVersion | undefined;
+  let modelVersion: ModelVersion | undefined;
   if (model !== undefined) {
-    const selectedModelVersion = await orm.em.findOne(ModalVersion, { id: model });
+    const selectedModelVersion = await orm.em.findOne(ModelVersion, { id: model });
     if (!selectedModelVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",

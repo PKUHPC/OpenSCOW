@@ -131,18 +131,18 @@ export const userRoutes: (
     {
       Icon: OneToOneOutlined,
       text: "模型",
-      path: "/modal",
-      clickToPath: "/modal/private",
+      path: "/model",
+      clickToPath: "/model/private",
       children: [
         {
           Icon: LockOutlined,
           text: "我的模型",
-          path: "/modal/private",
+          path: "/model/private",
         },
         {
           Icon: ShareAltOutlined,
           text: "公共模型",
-          path: "/modal/public",
+          path: "/model/public",
         },
       ],
     },

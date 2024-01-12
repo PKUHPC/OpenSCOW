@@ -16,41 +16,39 @@ import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
-import { ModalVersionInterface } from "src/models/Modal";
+import { ModelVersionInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
-import { CopyPublicModalModal } from "./CopyPublicModalModal";
+import { CopyPublicModalModal } from "./CopyPublicModelModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
 export interface Props {
   open: boolean;
   onClose: () => void;
   isPublic?: boolean;
-  modalId: number;
-  modalName: string | undefined;
-  modalVersionData: ModalVersionInterface[];
+  modelId: number;
+  modelName: string | undefined;
+  modelVersionData: ModelVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
-  cluster: Cluster;
+  cluster?: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 const CopyPublicModalModalButton = ModalButton(CopyPublicModalModal, { type: "link" });
 
-export const ModalVersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, modalId, modalName, modalVersionData, isFetching, refetch, cluster },
+export const ModelVersionListModal: React.FC<Props> = (
+  { open, onClose, isPublic, modelId, modelName, modelVersionData, isFetching, refetch, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
 
-  const checkFileExist = trpc.file.checkFileExist.useMutation();
-
-  const shareMutation = trpc.modal.shareModalVersion.useMutation({
+  const shareMutation = trpc.model.shareModelVersion.useMutation({
     onSuccess() {
       refetch();
       message.success("提交分享请求");
@@ -66,7 +64,7 @@ export const ModalVersionListModal: React.FC<Props> = (
     },
   });
 
-  const unShareMutation = trpc.modal.unShareModalVersion.useMutation({
+  const unShareMutation = trpc.model.unShareModelVersion.useMutation({
     onSuccess() {
       refetch();
       message.success("提交取消分享请求");
@@ -82,7 +80,7 @@ export const ModalVersionListModal: React.FC<Props> = (
     },
   });
 
-  const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
+  const deleteModelVersionMutation = trpc.model.deleteModelVersion.useMutation({
     onSuccess() {
       message.success("删除算法版本成功");
       refetch();
@@ -91,22 +89,21 @@ export const ModalVersionListModal: React.FC<Props> = (
       message.error("删除模型版本失败");
     } });
 
-  const deleteModalVersion = useCallback(
-    (id: number, isConfirmed?: boolean) => {
+  const deleteModelVersion = useCallback(
+    (id: number) => {
       confirm({
-        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除模型版本",
+        title: "删除模型版本",
         onOk:async () => {
-          await deleteModalVersionMutation.mutateAsync({ id, modalId });
+          await deleteModelVersionMutation.mutateAsync({ id, modelId });
         },
       });
     },
-    [modalId],
+    [modelId],
   );
-
 
   return (
     <Modal
-      title={`版本列表:${modalName}`}
+      title={`版本列表:${modelName}`}
       open={open}
       onCancel={onClose}
       centered
@@ -114,7 +111,7 @@ export const ModalVersionListModal: React.FC<Props> = (
     >
       <Table
         rowKey="id"
-        dataSource={modalVersionData}
+        dataSource={modelVersionData}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
@@ -128,9 +125,9 @@ export const ModalVersionListModal: React.FC<Props> = (
             render: (_, r) => {
               return isPublic ? (
                 <CopyPublicModalModalButton
-                  modalId={modalId}
-                  modalName={modalName}
-                  modalVersionId={r.id}
+                  modelId={modelId}
+                  modelName={modelName}
+                  modelVersionId={r.id}
                   data={r}
                   cluster={cluster}
                 >
@@ -140,8 +137,8 @@ export const ModalVersionListModal: React.FC<Props> = (
                 (
                   <>
                     <EditVersionModalButton
-                      modalId={modalId}
-                      modalName={modalName}
+                      modelId={modelId}
+                      modelName={modelName}
                       cluster={cluster}
                       refetch={refetch}
                       editData={{
@@ -154,17 +151,11 @@ export const ModalVersionListModal: React.FC<Props> = (
                     >
                     编辑
                     </EditVersionModalButton>
+
                     <Button
                       type="link"
-                      onClick={async () => {
-                        const checkExistRes =
-                        await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
-
-                        if (checkExistRes?.exists) {
-                          router.push(`/files/${cluster.id}${r.privatePath}`);
-                        } else {
-                          deleteModalVersion(r.id, true);
-                        }
+                      onClick={() => {
+                        router.push(`/files/${cluster?.id}${r.privatePath}`);
                       }}
                     >
                     查看文件
@@ -180,12 +171,12 @@ export const ModalVersionListModal: React.FC<Props> = (
                             r.sharedStatus === SharedStatus.SHARED ?
                               await unShareMutation.mutateAsync({
                                 versionId: r.id,
-                                modalId,
+                                modelId,
                               })
                               :
                               await shareMutation.mutateAsync({
                                 versionId: r.id,
-                                modalId,
+                                modelId,
                                 sourceFilePath: r.path });
                           },
                         });
@@ -197,7 +188,7 @@ export const ModalVersionListModal: React.FC<Props> = (
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
-                        deleteModalVersion(r.id);
+                        deleteModelVersion(r.id);
                       }}
                     >
                     删除

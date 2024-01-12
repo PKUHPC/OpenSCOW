@@ -28,9 +28,9 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   refetch: () => void;
-  modalId: number;
+  modelId: number;
   cluster?: Cluster;
-  modalName?: string;
+  modelName?: string;
   editData?: EditProps;
 }
 
@@ -42,12 +42,12 @@ interface FormFields {
 }
 
 export const CreateAndEditVersionModal: React.FC<Props> = (
-  { open, onClose, modalId, cluster, modalName, refetch, editData },
+  { open, onClose, modelId, cluster, modelName, refetch, editData },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const createModalVersionMutation = trpc.modal.createModalVersion.useMutation({
+  const createModelVersionMutation = trpc.model.createModelVersion.useMutation({
     onSuccess() {
       message.success("创建新版本成功");
       form.resetFields();
@@ -79,7 +79,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
   });
 
 
-  const updateModalVersionMutation = trpc.modal.updateModalVersion.useMutation({
+  const updateModelVersionMutation = trpc.model.updateModelVersion.useMutation({
     onSuccess() {
       message.success("修改版本成功");
       onClose();
@@ -111,21 +111,21 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     form.validateFields();
     const { versionName, versionDescription, algorithmVersion, path } = await form.validateFields();
     if (editData?.versionName && editData.versionId) {
-      updateModalVersionMutation.mutate({
+      updateModelVersionMutation.mutate({
         id:editData.versionId,
         versionName,
         versionDescription,
         algorithmVersion,
-        modalId,
+        modelId,
       });
     }
     else {
-      createModalVersionMutation.mutate({
+      createModelVersionMutation.mutate({
         versionName,
         versionDescription,
         algorithmVersion,
         path,
-        modalId,
+        modelId,
       });
     }
   };
@@ -135,7 +135,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
       title={editData?.versionName ? "编辑版本" : "创建新版本"}
       open={open}
       onOk={form.submit}
-      confirmLoading={createModalVersionMutation.isLoading || updateModalVersionMutation.isLoading}
+      confirmLoading={createModelVersionMutation.isLoading || updateModelVersionMutation.isLoading}
       onCancel={onClose}
       destroyOnClose
     >
@@ -148,7 +148,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         <Form.Item
           label="模型名称"
         >
-          {modalName}
+          {modelName}
         </Form.Item>
         <Form.Item
           label="集群"

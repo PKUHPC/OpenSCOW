@@ -14,9 +14,9 @@ import { EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { SharedStatus } from "./AlgorithmVersion";
-import { Modal } from "./Modal";
+import { Model } from "./Model";
 
-export class ModalVersion {
+export class ModelVersion {
   id!: number;
   versionName: string;
   versionDescription?: string;
@@ -29,7 +29,7 @@ export class ModalVersion {
   createTime?: Date;
   updateTime?: Date;
   sharedStatus: SharedStatus;
-  modal!: Ref<Modal>;
+  model!: Ref<Model>;
 
   constructor(init: {
     versionName: string;
@@ -38,7 +38,7 @@ export class ModalVersion {
     path: string;
     privatePath: string;
     sharedStatus?: SharedStatus;
-    modal: Modal;
+    model: Model;
     createTime?: Date;
     updateTime?: Date;
   }) {
@@ -48,7 +48,7 @@ export class ModalVersion {
     this.path = init.path;
     this.privatePath = init.privatePath;
     this.sharedStatus = init.sharedStatus || SharedStatus.UNSHARED;
-    this.modal = toRef(init.modal);
+    this.model = toRef(init.model);
 
     if (init.createTime) {
       this.createTime = init.createTime;
@@ -61,22 +61,22 @@ export class ModalVersion {
   }
 }
 
-export const modalVersionEntitySchema = new EntitySchema({
-  class: ModalVersion,
+export const modelVersionEntitySchema = new EntitySchema({
+  class: ModelVersion,
 });
 
-modalVersionEntitySchema.addPrimaryKey("id", Number);
-modalVersionEntitySchema.addProperty("versionName", String);
-modalVersionEntitySchema.addProperty("versionDescription", String, { nullable: true });
-modalVersionEntitySchema.addProperty("algorithmVersion", String, { nullable: true });
-modalVersionEntitySchema.addProperty("privatePath", String);
-modalVersionEntitySchema.addProperty("path", String);
+modelVersionEntitySchema.addPrimaryKey("id", Number);
+modelVersionEntitySchema.addProperty("versionName", String);
+modelVersionEntitySchema.addProperty("versionDescription", String, { nullable: true });
+modelVersionEntitySchema.addProperty("algorithmVersion", String, { nullable: true });
+modelVersionEntitySchema.addProperty("privatePath", String);
+modelVersionEntitySchema.addProperty("path", String);
 
-modalVersionEntitySchema.addProperty("createTime", Date, {
+modelVersionEntitySchema.addProperty("createTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
 
-modalVersionEntitySchema.addProperty("updateTime", Date, {
+modelVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
-modalVersionEntitySchema.addProperty("sharedStatus", String);
-modalVersionEntitySchema.addManyToOne("modal", "Modal", {
-  entity: () => Modal, onDelete: "CASCADE", wrappedReference: true });
+modelVersionEntitySchema.addProperty("sharedStatus", String);
+modelVersionEntitySchema.addManyToOne("model", "Model", {
+  entity: () => Model, onDelete: "CASCADE", wrappedReference: true });

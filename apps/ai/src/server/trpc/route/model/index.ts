@@ -10,19 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-import { usePublicConfig } from "src/app/(auth)/context";
-import { ModalTable } from "src/app/(auth)/modal/ModalTable";
-import { PageTitle } from "src/components/PageTitle";
+import { router } from "src/server/trpc/def";
 
-export default function Page() {
+import { createModel, deleteModel, list, updateModel } from "./model";
+import { copyPublicModelVersion, createModelVersion, deleteModelVersion, shareModelVersion,
+  unShareModelVersion, updateModelVersion, versionList } from "./modelVersion";
 
-  const { publicConfig } = usePublicConfig();
-
-  return (
-    <div>
-      <PageTitle titleText="我的模型" />
-      <ModalTable isPublic={false} clusters={publicConfig.CLUSTERS} />
-    </div>
-  );
-}
+export const model = router({
+  list,
+  createModel,
+  updateModel,
+  deleteModel,
+  copyPublicModelVersion,
+  createModelVersion,
+  deleteModelVersion,
+  updateModelVersion,
+  versionList,
+  shareModelVersion,
+  unShareModelVersion,
+});

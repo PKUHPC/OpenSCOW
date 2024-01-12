@@ -4,3 +4,9 @@ db:
   user: root
   password: mysqlrootpassword
   dbName: scow_ai
+
+harborConfig:
+  url: 10.129.227.64
+  project: test
+  user: admin
+  password: icode@2023CS

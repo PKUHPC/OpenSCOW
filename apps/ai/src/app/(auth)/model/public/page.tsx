@@ -12,7 +12,7 @@
 
 "use client";
 import { usePublicConfig } from "src/app/(auth)/context";
-import { ModalTable } from "src/app/(auth)/modal/ModalTable";
+import { ModalTable } from "src/app/(auth)/model/ModelTable";
 import { PageTitle } from "src/components/PageTitle";
 
 export default function Page() {

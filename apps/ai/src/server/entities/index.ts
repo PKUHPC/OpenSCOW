@@ -15,8 +15,8 @@ import { algorithmVersionEntitySchema } from "src/server/entities/AlgorithmVersi
 import { datasetEntitySchema } from "src/server/entities/Dataset";
 import { datasetVersionEntitySchema } from "src/server/entities/DatasetVersion";
 import { imageEntitySchema } from "src/server/entities/Image";
-import { modalEntitySchema } from "src/server/entities/Modal";
-import { modalVersionEntitySchema } from "src/server/entities/ModalVersion";
+import { modelEntitySchema } from "src/server/entities/Model";
+import { modelVersionEntitySchema } from "src/server/entities/ModelVersion";
 
 
 export const entities = [
@@ -25,6 +25,6 @@ export const entities = [
   datasetEntitySchema,
   datasetVersionEntitySchema,
   imageEntitySchema,
-  modalEntitySchema,
-  modalVersionEntitySchema,
+  modelEntitySchema,
+  modelVersionEntitySchema,
 ];

@@ -21,7 +21,7 @@ import { file } from "./route/file";
 import { image } from "./route/image";
 import { jobsRouter } from "./route/jobs";
 import { logo } from "./route/logo";
-import { modal } from "./route/modal";
+import { model } from "./route/model";
 
 export const appRouter = trpc.router({
   dataset,
@@ -30,7 +30,7 @@ export const appRouter = trpc.router({
   logo,
   config,
   algorithm,
-  modal,
+  model,
   file,
   account: accountRouter,
   jobs: jobsRouter,
