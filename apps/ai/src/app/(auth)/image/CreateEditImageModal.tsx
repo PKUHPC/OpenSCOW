@@ -235,11 +235,12 @@ export const CreateEditImageModal: React.FC<Props> = (
               />
             </Form.Item>
             <Form.Item
-              label="上传镜像"
+              label={source === Source.INTERNAL ? "选择镜像" : "镜像地址" }
               name="sourcePath"
               rules={[{ required: true }]}
             >
               <Input
+                disabled={source === Source.INTERNAL}
                 suffix={ source === Source.INTERNAL ?
                   (
                     <FileSelectModal
@@ -252,7 +253,7 @@ export const CreateEditImageModal: React.FC<Props> = (
                     />
                   ) : undefined
                 }
-                placeholder={source === Source.INTERNAL ? "请选择路径" : "请输入远程镜像地址"}
+                placeholder={source === Source.INTERNAL ? "请选择镜像文件" : "请输入远程镜像地址"}
               />
             </Form.Item>
           </>

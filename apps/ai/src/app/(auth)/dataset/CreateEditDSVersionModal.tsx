@@ -158,7 +158,7 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
           !isEdit && (
             <>
               <Form.Item
-                label="数据文件夹"
+                label="选择数据集"
                 name="path"
                 rules={[{ required: true }]}
               >

@@ -168,7 +168,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         {
           !editData?.versionName ? (
             <Form.Item
-              label="上传算法"
+              label="选择算法"
               name="path"
               rules={[{ required: true }]}
             >

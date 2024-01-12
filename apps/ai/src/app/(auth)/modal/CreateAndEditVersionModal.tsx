@@ -175,7 +175,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         {
           !editData?.versionId ? (
             <Form.Item
-              label="上传模型"
+              label="选择模型"
               name="path"
               rules={[{ required: true }]}
             >
