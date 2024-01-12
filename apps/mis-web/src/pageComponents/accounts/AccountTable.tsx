@@ -37,6 +37,7 @@ interface Props {
 
 interface FilterForm {
   accountName: string | undefined;
+  ownerIdOrName: string | undefined;
 }
 
 const filteredStatuses = {
@@ -65,15 +66,18 @@ export const AccountTable: React.FC<Props> = ({
 
   const [query, setQuery] = useState<FilterForm>({
     accountName: undefined,
+    ownerIdOrName: undefined,
   });
 
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
-    !query.accountName || x.accountName.includes(query.accountName)
+    (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
   )) : undefined, [data, query]);
 
   const usersStatusCount = useMemo(() => {
@@ -152,6 +156,9 @@ export const AccountTable: React.FC<Props> = ({
           }}
         >
           <Form.Item label={t(p("account"))} name="accountName">
+            <Input />
+          </Form.Item>
+          <Form.Item label={t(p("ownerIdOrName"))} name="ownerIdOrName">
             <Input />
           </Form.Item>
           <Form.Item>

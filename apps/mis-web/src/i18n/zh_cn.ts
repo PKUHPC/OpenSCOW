@@ -223,6 +223,7 @@ export default {
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",
+        ownerIdOrName: "拥有者ID或姓名",
         tenant:"租户",
         comment:"备注",
         status:"状态",
@@ -234,7 +235,7 @@ export default {
         unblockConfirmContent: "确认要在租户{}中解除账户{}的封锁？",
         unblockSuccess: "解封账户成功！",
         unblockFail: "解封账户失败！",
-        unblockError: "账户${r.accountName}余额不足，您可以将其加入白名单或充值解封",
+        unblockError: "账户{}余额不足，您可以将其加入白名单或充值解封",
 
         unblock: "解除封锁",
         blockConfirmTitle: "确认封锁账户？",

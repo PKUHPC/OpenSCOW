@@ -223,6 +223,7 @@ export default {
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
+        ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
         comment: "Comment",
         status: "Status",
@@ -234,7 +235,7 @@ export default {
         unblockConfirmContent: "Do you wish to unblock account {} within tenant {}?",
         unblockSuccess: "Account unblocking successful!",
         unblockFail: "Account unblocking failed!",
-        unblockError: "Account ${r.accountName} has insufficient balance. "
+        unblockError: "Account {} has insufficient balance. "
         + "You can add it to the whitelist or unblock by adding funds.",
         unblock: "Unblock",
         blockConfirmTitle: "Confirm Account Block?",
