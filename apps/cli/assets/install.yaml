@@ -69,7 +69,7 @@
 #       url: http://custom-url:port
 
 #     # 容器相关配置
-#     imageConfig:
+#     image:
 #       # 自定义认证系统镜像名。必填
 #       # imageName: my-custom-auth:v1.0
 
@@ -82,7 +82,7 @@
 #       # volumes:
 #       #   - "./myfile:/etc/myfile"
 
-#     # 兼容老版本
+#     # 兼容老版本,image 在老版本中为字符串
 #     # 定义认证系统镜像名。必填
 #     # image: my-custom-auth:v1.0
 

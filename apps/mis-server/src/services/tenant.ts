@@ -17,8 +17,7 @@ import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
-import { config } from "src/config/env";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -138,7 +137,7 @@ export const tenantServiceServer = plugin((server) => {
             };
           });
         // call auth
-        const createdInAuth = await createUser(config.AUTH_URL || misConfig.authUrl,
+        const createdInAuth = await createUser(authUrl,
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
           logger)
           .then(async () => {

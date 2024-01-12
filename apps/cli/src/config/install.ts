@@ -103,14 +103,16 @@ export const InstallConfigSchema = Type.Object({
       external: Type.Optional(Type.Object({
         url: Type.String({ description: "认证系统的 URL" }),
       })),
-      imageConfig: Type.Optional(Type.Object({
-        imageName: Type.String({ description: "认证系统镜像名" }),
-        ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
-        volumes: Type.Optional(Type.Array(Type.String(), {
-          description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
-        })),
-      }, { description: "认证系统镜像" })),
-      image: Type.Optional(Type.String({ description: "兼容旧版本认证系统镜像名配置" })),
+      image: Type.Union([
+        Type.Optional(Type.Object({
+          imageName: Type.String({ description: "认证系统镜像名" }),
+          ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+          volumes: Type.Optional(Type.Array(Type.String(), {
+            description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
+          })),
+        }, { description: "认证系统镜像" })),
+        Type.Optional(Type.String({ description: "兼容旧版本认证系统镜像名配置" })),
+      ]),
       ports: Type.Optional(Type.Array(Type.String(), { description: "兼容旧版本端口映射配置" })),
       volumes: Type.Optional(Type.Array(Type.String(), {
         description: "兼容旧版本，更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",

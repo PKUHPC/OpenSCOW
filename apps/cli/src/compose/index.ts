@@ -165,19 +165,24 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   }
 
   if (config.auth.custom?.type === AuthCustomType.image) {
-    const volumes = config.auth.custom.imageConfig?.volumes || config.auth.custom.volumes;
+    const volumes = typeof config.auth.custom.image === "string" ?
+      config.auth.custom.volumes : config.auth.custom.image?.volumes;
     for (const key in volumes) {
       authVolumes[key] = volumes[key];
     }
 
-    const image = config.auth.custom.imageConfig?.imageName || config.auth.custom.image;
+    const image = typeof config.auth.custom.image === "string" ?
+      config.auth.custom.image : config.auth.custom.image?.imageName;
     if (image === undefined) {
       throw new Error("Invalid config: must have /auth/custom/image or /auth/custom/imageConfig/imageName");
     }
 
+    const ports = typeof config.auth.custom.image === "string" ?
+      config.auth.custom.ports : config.auth.custom.image?.ports;
+
     addService("auth", {
       image,
-      ports: (config.auth.custom.imageConfig?.ports || config.auth.custom.ports) ?? {},
+      ports: ports ?? {},
       environment: config.auth.custom.environment ?? {},
       volumes: authVolumes,
     });

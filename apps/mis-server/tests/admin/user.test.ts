@@ -19,8 +19,7 @@ import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
-import { config } from "src/config/env";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -73,7 +72,7 @@ it("creates user", async () => {
 
   expect(createUser).toHaveBeenNthCalledWith(
     1,
-    config.AUTH_URL || misConfig.authUrl,
+    authUrl,
     {
       identityId: userId,
       id: user.id,

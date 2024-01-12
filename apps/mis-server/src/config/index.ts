@@ -10,14 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
-import { getCapabilities } from "@scow/lib-auth";
-import { authUrl } from "src/config";
+import { config } from "./env";
+import { misConfig } from "./mis";
 
-export const authServicePlugin = plugin(async (f) => {
-
-  const capabilities = await getCapabilities(authUrl);
-
-  f.addExtension("capabilities", capabilities);
-
-});
+export const authUrl = config.AUTH_URL || misConfig.authUrl;
