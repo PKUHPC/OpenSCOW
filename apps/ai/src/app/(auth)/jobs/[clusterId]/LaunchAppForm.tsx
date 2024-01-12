@@ -339,10 +339,13 @@ export const LaunchAppForm = (props: Props) => {
             command: command || "",
           });
         } else {
-
+          let workingDirectory: string | undefined;
           const customFormKeyValue: CustomFormFields = { customFields: {} };
           attributes.forEach((customFormAttribute) => {
             const customFormKey = customFormAttribute.name;
+            if (customFormKey === "workingDir") {
+              workingDirectory = customFields[customFormKey]?.toString();
+            }
             customFormKeyValue.customFields[customFormKey] = customFields[customFormKey];
           });
 
@@ -365,6 +368,7 @@ export const LaunchAppForm = (props: Props) => {
             gpuCount: gpuCount,
             maxTime: maxTime,
             memory: memorySize,
+            workingDirectory,
             customAttributes: customFormKeyValue.customFields,
           });
         } }

@@ -258,11 +258,12 @@ export const createAppSession = procedure
     gpuCount: z.number().optional(),
     memory: z.number().optional(),
     maxTime: z.number(),
+    workingDirectory: z.string().optional(),
     customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
   })).mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image,
       dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
-      maxTime, customAttributes } = input;
+      maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
@@ -396,7 +397,8 @@ export const createAppSession = procedure
           gpuCount: gpuCount ?? 0,
           memoryMb: memory,
           timeLimitMinutes: maxTime,
-          workingDirectory: appJobsDirectory,
+          // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
+          workingDirectory: workingDirectory ?? appJobsDirectory,
           script: remoteEntryPath,
           // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
           extraOptions: [JobType.APP, "web"],
