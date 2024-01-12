@@ -11,9 +11,9 @@
  */
 
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Modal, Table } from "antd";
+import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
 import { ModalVersionInterface } from "src/models/Modal";
@@ -48,9 +48,6 @@ export const ModalVersionListModal: React.FC<Props> = (
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
 
-  const deleteSourceFileRef = useRef(false);
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
-
   const shareMutation = trpc.modal.shareModalVersion.useMutation({
     onSuccess() {
       refetch();
@@ -84,38 +81,20 @@ export const ModalVersionListModal: React.FC<Props> = (
   });
 
   const deleteModalVersionMutation = trpc.modal.deleteModalVersion.useMutation({
+    onSuccess() {
+      message.success("删除算法版本成功");
+      refetch();
+    },
     onError() {
       message.error("删除模型版本失败");
     } });
 
   const deleteModalVersion = useCallback(
-    (id: number, name: string, path: string) => {
-      deleteSourceFileRef.current = false;
+    (id: number) => {
       confirm({
         title: "删除模型版本",
-        content: (
-          <>
-            <p>{`确认删除模型版本${name}？如该模型版本已分享，则分享的模型版本也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk:async () => {
-          await deleteModalVersionMutation.mutateAsync({ id, modalId })
-            .then(() => {
-              deleteSourceFileRef.current && deleteSourceFileMutation.mutateAsync({
-                target: "DIR",
-                clusterId: cluster?.id ?? "",
-                path,
-              });
-            })
-            .then(() => {
-              message.success("删除算法版本成功");
-              refetch();
-            });
+          await deleteModalVersionMutation.mutateAsync({ id, modalId });
         },
       });
     },
@@ -209,7 +188,7 @@ export const ModalVersionListModal: React.FC<Props> = (
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
-                        deleteModalVersion(r.id, r.versionName, r.privatePath);
+                        deleteModalVersion(r.id);
                       }}
                     >
                     删除

@@ -15,8 +15,8 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
-import { useCallback, useRef, useState } from "react";
+import { App, Button, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
+import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -86,9 +86,6 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [clusterId, setClusterId] = useState<string>("");
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
-  const deleteSourceFileRef = useRef(false);
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
-
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
     ...pageInfo, ...query, clusterId: query.cluster?.id,
   });
@@ -107,8 +104,11 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     message.error("找不到数据集版本");
   }
 
-
   const deleteDatasetMutation = trpc.dataset.deleteDataset.useMutation({
+    onSuccess() {
+      refetch();
+      message.success("删除成功");
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
@@ -120,38 +120,11 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   });
 
   const deleteDataset = useCallback(
-    (id: number, name: string, paths: string[], clusterId: string) => {
-      deleteSourceFileRef.current = false;
+    (id: number) => {
       confirm({
         title: "删除数据集",
-        content: (
-          <>
-            <p>{`是否确认删除数据集${name}？如该数据集已分享，则分享的数据集也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk: async () => {
-          await deleteDatasetMutation.mutateAsync({
-            id,
-          })
-            .then(async () => {
-              deleteSourceFileRef.current &&
-                await Promise.all(paths.map((x) => {
-                  deleteSourceFileMutation.mutateAsync({
-                    target: "DIR",
-                    clusterId,
-                    path:x,
-                  });
-                }));
-            })
-            .then(() => {
-              refetch();
-              message.success("删除成功");
-            });
+          await deleteDatasetMutation.mutateAsync({ id });
         },
       });
     },
@@ -275,7 +248,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                       <Button
                         type="link"
                         onClick={() => {
-                          deleteDataset(r.id, r.name, r.versions, r.clusterId);
+                          deleteDataset(r.id);
                         }}
                       >
                         删除

@@ -14,8 +14,8 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Checkbox, Form, Input, Modal, Space, Table, TableColumnsType } from "antd";
-import { useCallback, useRef, useState } from "react";
+import { App, Button, Form, Input, Modal, Space, Table, TableColumnsType } from "antd";
+import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -69,9 +69,6 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
-  const deleteSourceFileRef = useRef(false);
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
-
   const { data, isFetching, refetch, error } = trpc.modal.list.useQuery(
     { ...pageInfo,
       nameOrDesc:query.nameOrDesc,
@@ -91,42 +88,21 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }
 
   const deleteModalMutation = trpc.modal.deleteModal.useMutation({
+    onSuccess() {
+      message.success("删除算法成功");
+      refetch();
+    },
     onError() {
       message.error("删除模型失败");
     },
   });
 
   const deleteModal = useCallback(
-    async (id: number, name: string, paths: string[], clusterId: string) => {
-      deleteSourceFileRef.current = false;
+    async (id: number) => {
       confirm({
         title: "删除模型",
-        content: (
-          <>
-            <p>{`确认删除模型${name}？如该模型已分享，则分享的模型也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk:async () => {
-          await deleteModalMutation.mutateAsync({ id })
-            .then(async () => {
-              deleteSourceFileRef.current &&
-              await Promise.all(paths.map((x) => {
-                deleteSourceFileMutation.mutateAsync({
-                  target: "DIR",
-                  clusterId,
-                  path:x,
-                });
-              }));
-            })
-            .then(() => {
-              message.success("删除算法成功");
-              refetch();
-            });
+          await deleteModalMutation.mutateAsync({ id });
         },
       });
     },
@@ -187,7 +163,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
               <Button
                 type="link"
                 onClick={() => {
-                  deleteModal(r.id, r.name, r.versions, r.clusterId);
+                  deleteModal(r.id);
                 }}
               >
                 删除

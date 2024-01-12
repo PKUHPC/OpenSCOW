@@ -14,8 +14,8 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Checkbox, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
-import { useCallback, useRef, useState } from "react";
+import { App, Button, Form, Input, Modal, Select, Space, Table, TableColumnsType } from "antd";
+import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
@@ -76,9 +76,6 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [algorithmName, setAlgorithmName] = useState<undefined | string>(undefined);
   const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
-  const deleteSourceFileRef = useRef(false);
-
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
     { ...pageInfo,
@@ -99,43 +96,21 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
     message.error("找不到算法版本");
   }
 
-
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
+    onSuccess() {
+      message.success("删除算法成功");
+      refetch();
+    },
     onError() {
       message.error("删除算法失败");
     } });
 
   const deleteAlgorithm = useCallback(
-    (id: number, name: string, paths: string[], clusterId: string) => {
-      deleteSourceFileRef.current = false;
+    (id: number) => {
       confirm({
         title: "删除算法",
-        content: (
-          <>
-            <p>{`确认删除算法${name}？如该算法已分享，则分享的算法也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk:async () => {
-          await deleteAlgorithmMutation.mutateAsync({ id })
-            .then(async () => {
-              deleteSourceFileRef.current &&
-              await Promise.all(paths.map((x) => {
-                deleteSourceFileMutation.mutateAsync({
-                  target: "DIR",
-                  clusterId,
-                  path:x,
-                });
-              }));
-            })
-            .then(() => {
-              message.success("删除算法成功");
-              refetch();
-            });
+          await deleteAlgorithmMutation.mutateAsync({ id });
         },
       });
     },
@@ -200,7 +175,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
               <Button
                 type="link"
                 onClick={() => {
-                  deleteAlgorithm(r.id, r.name, r.versions, r.clusterId);
+                  deleteAlgorithm(r.id);
                 }}
               >
                 删除

@@ -11,9 +11,9 @@
  */
 
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Modal, Table } from "antd";
+import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { AlgorithmVersionInterface } from "src/models/Algorithm";
 import { SharedStatus } from "src/models/common";
@@ -49,9 +49,6 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
 
-  const deleteSourceFileRef = useRef(false);
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
-
   const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
     onSuccess() {
       refetch();
@@ -85,42 +82,24 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
   });
 
   const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
+    onSuccess() {
+      message.success("删除算法版本成功");
+      refetch();
+    },
     onError() {
       message.error("删除算法版本失败");
     } });
 
   const deleteAlgorithmVersion = useCallback(
-    (id: number, name: string, path: string) => {
-      deleteSourceFileRef.current = false;
+    (id: number) => {
       confirm({
         title: "删除算法版本",
-        content: (
-          <>
-            <p>{`确认删除算法版本${name}？如该算法版本已分享，则分享的算法版本也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk:async () => {
-          await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId })
-            .then(() => {
-              deleteSourceFileRef.current && deleteSourceFileMutation.mutateAsync({
-                target: "DIR",
-                clusterId: cluster?.id ?? "",
-                path,
-              });
-            })
-            .then(() => {
-              message.success("删除算法版本成功");
-              refetch();
-            });
+          await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId });
         },
       });
     },
-    [algorithmId, cluster],
+    [algorithmId],
   );
 
   return (
@@ -207,7 +186,7 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
-                        deleteAlgorithmVersion(r.id, r.versionName, r.privatePath);
+                        deleteAlgorithmVersion(r.id);
                       }}
                     >
                     删除

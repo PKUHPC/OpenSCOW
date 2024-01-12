@@ -11,9 +11,9 @@
  */
 
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Divider, Modal, Space, Table } from "antd";
+import { App, Button, Divider, Modal, Space, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useCallback, useRef } from "react";
+import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
 import { DatasetVersionInterface } from "src/models/Dateset";
@@ -44,7 +44,6 @@ export const DatasetVersionsModal: React.FC<Props> = (
 ) => {
   const { modal, message } = App.useApp();
   const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
-  const deleteSourceFileRef = useRef(false);
 
   const router = useRouter();
 
@@ -79,6 +78,10 @@ export const DatasetVersionsModal: React.FC<Props> = (
   });
 
   const deleteMutation = trpc.dataset.deleteDatasetVersion.useMutation({
+    onSuccess() {
+      message.success("删除成功");
+      onRefetch();
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
@@ -90,52 +93,19 @@ export const DatasetVersionsModal: React.FC<Props> = (
   });
 
   const deleteDatasetVersion = useCallback(
-    (id: number, datasetId: number, name: string, path: string) => {
-      deleteSourceFileRef.current = false;
+    (id: number, datasetId: number) => {
       modal.confirm({
         title: "删除数据集版本",
-        content: (
-          <>
-            <p>{`是否确认删除数据集${datasetName}版本${name}？如该数据集版本已分享，则分享的数据集版本也会被删除。`}</p>
-            <Checkbox
-              onChange={(e) => { deleteSourceFileRef.current = e.target.checked; } }
-            >
-              同时删除源文件
-            </Checkbox>
-          </>
-        ),
         onOk: async () => {
-          deleteSourceFileRef.current ?
-            await deleteMutation.mutateAsync({
-              id,
-              datasetId,
-            })
-              .then(() => {
-                deleteSourceFileMutation.mutateAsync({
-                  target: "DIR",
-                  clusterId: cluster?.id ?? "",
-                  path,
-                });
-              })
-              .then(() => {
-                message.success("删除成功");
-                onRefetch();
-              })
-            :
-            await deleteMutation.mutateAsync({
-              id,
-              datasetId,
-            }).then(() => {
-              message.success("删除成功");
-              onRefetch();
-            });
+          await deleteMutation.mutateAsync({
+            id,
+            datasetId,
+          });
         },
       });
     },
-    [datasetName, cluster],
+    [],
   );
-
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   return (
     <Modal
@@ -215,7 +185,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
-                        deleteDatasetVersion(r.id, r.datasetId, r.versionName, r.privatePath);
+                        deleteDatasetVersion(r.id, r.datasetId);
                       }}
                     >
                       删除
