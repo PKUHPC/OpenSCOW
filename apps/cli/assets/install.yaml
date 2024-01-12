@@ -86,11 +86,11 @@
 #     # 定义认证系统镜像名。必填
 #     # image: my-custom-auth:v1.0
 
-#     # 端口映射。可选
+#     # 兼容老版本, 端口映射。可选
 #     # ports:
 #     #   - "5000:5000"
 
-#     # 更多挂载卷。可选
+#     # 兼容老版本, 更多挂载卷。可选
 #     # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
 #     # volumes:
 #     #   - "./myfile:/etc/myfile"
