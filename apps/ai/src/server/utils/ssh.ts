@@ -18,7 +18,7 @@ import { clusters } from "src/server/config/clusters";
 import { rootKeyPair } from "src/server/config/env";
 import { Logger } from "ts-log";
 
-import { clusterNotFound, loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "./errors";
+import { clusterNotFound, loginNodeNotFound } from "./errors";
 
 interface NodeNetInfo {
   address: string,
@@ -31,47 +31,6 @@ export function getClusterLoginNode(cluster: string): string | undefined {
   return loginNode?.address;
 }
 
-export function getClusterTransferNode(cluster: string): NodeNetInfo {
-  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
-  if (!enabled) {
-    throw transferNotEnabled(cluster);
-  }
-  else if (!transferNode) {
-    throw transferNodeNotFound(cluster);
-  }
-  // 解析为host, port
-  const [host, port] = transferNode.indexOf(":") > 0 ?
-    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
-    [transferNode, 22];
-  const address = `${host}:${port}`;
-  return {
-    address: address,
-    host: host,
-    port: port,
-  };
-}
-
-export function tryGetClusterTransferNode(cluster: string): NodeNetInfo | undefined {
-  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
-  if (!enabled) {
-    return undefined;
-  }
-  else if (!transferNode) {
-    return undefined;
-  }
-  // 解析为host, port
-  const [host, port] = transferNode.indexOf(":") > 0 ?
-    [transferNode.split(":")[0], parseInt(transferNode.split(":")[1])] :
-    [transferNode, 22];
-  const address = `${host}:${port}`;
-  return {
-    address: address,
-    host: host,
-    port: port,
-  };
-}
 
 export const SSH_ERROR_CODE = "SSH_ERROR";
 export const SFTP_ERROR_CODE = "SFTP_ERROR";

@@ -10,27 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ServiceError } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
+import { TRPCError } from "@trpc/server";
 
 export const clusterNotFound = (cluster: string) => {
-  return <ServiceError> { code: Status.NOT_FOUND, message: `cluster ${cluster} is not found` };
-};
-
-export const jobNotFound = (jobId: number) => {
-  return <ServiceError> { code: Status.NOT_FOUND, message: `job id ${jobId} is not found` };
+  return <TRPCError> { code: "NOT_FOUND", message: `cluster ${cluster} is not found` };
 };
 
 export const loginNodeNotFound = (loginNode: string) => {
-  return <ServiceError>{ code: Status.NOT_FOUND, message: `login node ${loginNode} is not found` };
-};
-
-export const transferNotEnabled = (cluster: string) => {
-  return <ServiceError> {
-    code: Status.INTERNAL, message: `the transmission function is not enabled for the cluster ${cluster}`,
-  };
-};
-
-export const transferNodeNotFound = (cluster: string) => {
-  return <ServiceError> { code: Status.NOT_FOUND, message: `transfer node of cluster ${cluster} is not found` };
+  return <TRPCError>{ code: "NOT_FOUND", message: `login node ${loginNode} is not found` };
 };
