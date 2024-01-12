@@ -262,17 +262,22 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         }}
         scroll={{ x: true }}
       />
-      <AlgorithmVersionListModal
-        open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); setAlgorithmId(0); }}
-        isPublic={isPublic}
-        algorithmName={algorithmName}
-        algorithmId={algorithmId}
-        algorithmVersionData={versionData?.items ?? []}
-        isFetching={versionFetching}
-        refetch={versionRefetch}
-        cluster={cluster}
-      />
+      {
+        cluster ? (
+          <AlgorithmVersionListModal
+            open={versionListModalIsOpen}
+            onClose={() => { setVersionListModalIsOpen(false); setAlgorithmId(0); }}
+            isPublic={isPublic}
+            algorithmName={algorithmName}
+            algorithmId={algorithmId}
+            algorithmVersionData={versionData?.items ?? []}
+            isFetching={versionFetching}
+            refetch={versionRefetch}
+            cluster={cluster}
+          />
+        ) : undefined
+      }
+
       {/* antd中modal组件 */}
       {confirmModalHolder}
     </div>

@@ -34,7 +34,7 @@ export interface Props {
   datasetName: string;
   datasetVersions: DatasetVersionInterface[];
   isPublic?: boolean;
-  cluster: Cluster | undefined;
+  cluster: Cluster;
 }
 
 const CopyPublicDatasetModalButton = ModalButton(CopyPublicDatasetModal, { type: "link" });
@@ -46,6 +46,8 @@ export const DatasetVersionsModal: React.FC<Props> = (
   const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
   const router = useRouter();
+
+  const checkFileExist = trpc.file.checkFileExist.useMutation();
 
   const shareMutation = trpc.dataset.shareDatasetVersion.useMutation({
     onSuccess() {
@@ -93,9 +95,9 @@ export const DatasetVersionsModal: React.FC<Props> = (
   });
 
   const deleteDatasetVersion = useCallback(
-    (id: number, datasetId: number) => {
+    (id: number, datasetId: number, isConfirmed?: boolean) => {
       modal.confirm({
-        title: "删除数据集版本",
+        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除数据集版本",
         onOk: async () => {
           await deleteMutation.mutateAsync({
             id,
@@ -148,8 +150,15 @@ export const DatasetVersionsModal: React.FC<Props> = (
                   <Space split={<Divider type="vertical" />}>
                     <Button
                       type="link"
-                      onClick={() => {
-                        router.push(`/files/${cluster?.id}${r.privatePath}`);
+                      onClick={async () => {
+                        const checkExistRes =
+                        await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
+
+                        if (checkExistRes?.exists) {
+                          router.push(`/files/${cluster.id}${r.privatePath}`);
+                        } else {
+                          deleteDatasetVersion(r.id, r.datasetId, true);
+                        }
                       }}
                     >
                       查看文件

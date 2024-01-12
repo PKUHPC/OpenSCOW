@@ -211,7 +211,7 @@ export const file = router({
 
   checkFileExist: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
-    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
 
@@ -226,7 +226,7 @@ export const file = router({
 
   getFileType: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
-    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
 

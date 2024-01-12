@@ -233,17 +233,21 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
         }}
         scroll={{ x: true }}
       />
-      <ModalVersionListModal
-        open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); setModalId(0); }}
-        isPublic={isPublic}
-        modalName={modalName}
-        modalId={modalId}
-        modalVersionData={versionData?.items ?? []}
-        isFetching={versionFetching}
-        refetch={versionRefetch}
-        cluster={cluster}
-      />
+      {
+        cluster ? (
+          <ModalVersionListModal
+            open={versionListModalIsOpen}
+            onClose={() => { setVersionListModalIsOpen(false); setModalId(0); }}
+            isPublic={isPublic}
+            modalName={modalName}
+            modalId={modalId}
+            modalVersionData={versionData?.items ?? []}
+            isFetching={versionFetching}
+            refetch={versionRefetch}
+            cluster={cluster}
+          />
+        ) : undefined
+      }
       {/* antd中modal组件 */}
       {confirmModalHolder}
     </div>

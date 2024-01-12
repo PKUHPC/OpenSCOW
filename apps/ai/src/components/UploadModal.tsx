@@ -41,8 +41,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const { message, modal } = App.useApp();
   const { publicConfig } = usePublicConfig();
-  const [ checkExistFilePath, setCheckExistFilePath ] = useState<string>("");
-  const [ getTypeFilePath, setGetTypeFilePath ] = useState<string>("");
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
 
   const onModalClose = () => {
@@ -52,13 +50,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const deleteFileMutation = trpc.file.deleteItem.useMutation();
 
-  const { refetch: checkFileExist } = trpc.file.checkFileExist.useQuery({
-    clusterId: clusterId, path: checkExistFilePath },
-  { enabled: false });
-
-  const { refetch: getFileType } = trpc.file.getFileType.useQuery({
-    clusterId: clusterId, path: getTypeFilePath },
-  { enabled: false });
+  const checkFileExist = trpc.file.checkFileExist.useMutation();
+  const getFileType = trpc.file.getFileType.useMutation();
 
   return (
     <Modal
@@ -112,21 +105,19 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
 
           return new Promise(async (resolve, reject) => {
-            setCheckExistFilePath(join(path, file.name));
-            const exists = await checkFileExist();
+            const checkExistRes = await checkFileExist.mutateAsync({ path:join(path, file.name), clusterId });
 
-            if (exists.data?.exists) {
+            if (checkExistRes.exists) {
               modal.confirm({
                 title: "文件已存在",
                 content: `文件: ${file.name}已存在，是否覆盖？`,
                 okText: "确认",
                 onOk: async () => {
-                  setGetTypeFilePath(join(path, file.name));
-                  const fileType = await getFileType();
+                  const fileType = await getFileType.mutateAsync({ path:join(path, file.name), clusterId });
 
-                  if (fileType.data?.type) {
+                  if (fileType.type) {
                     await deleteFileMutation.mutateAsync({
-                      target: fileType.data.type === FileType.DIR ? "DIR" : "FILE",
+                      target: fileType.type === FileType.DIR ? "DIR" : "FILE",
                       clusterId: clusterId,
                       path: join(path, file.name),
                     }).then(() => resolve(file));

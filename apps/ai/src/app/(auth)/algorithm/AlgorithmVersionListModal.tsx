@@ -36,7 +36,7 @@ export interface Props {
   algorithmVersionData: AlgorithmVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
-  cluster?: Cluster;
+  cluster: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
@@ -48,6 +48,8 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
+
+  const checkFileExist = trpc.file.checkFileExist.useMutation();
 
   const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
     onSuccess() {
@@ -91,9 +93,9 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
     } });
 
   const deleteAlgorithmVersion = useCallback(
-    (id: number) => {
+    (id: number, isConfirmed?: boolean) => {
       confirm({
-        title: "删除算法版本",
+        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除算法版本",
         onOk:async () => {
           await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId });
         },
@@ -149,11 +151,17 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
                     >
                     编辑
                     </EditVersionModalButton>
-
                     <Button
                       type="link"
-                      onClick={() => {
-                        router.push(`/files/${cluster?.id}${r.privatePath}`);
+                      onClick={async () => {
+                        const checkExistRes =
+                        await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
+
+                        if (checkExistRes?.exists) {
+                          router.push(`/files/${cluster.id}${r.privatePath}`);
+                        } else {
+                          deleteAlgorithmVersion(r.id, true);
+                        }
                       }}
                     >
                     查看文件

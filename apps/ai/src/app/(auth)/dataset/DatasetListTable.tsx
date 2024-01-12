@@ -31,8 +31,6 @@ import { CreateEditDatasetModal } from "./CreateEditDatasetModal";
 import { CreateEditDSVersionModal } from "./CreateEditDSVersionModal";
 import { DatasetVersionsModal } from "./DatasetVersionsModal";
 
-
-
 interface Props {
   isPublic: boolean;
   clusters: Cluster[];
@@ -284,16 +282,18 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
         } : false}
         scroll={{ x: true }}
       />
-      <DatasetVersionsModal
-        open={versionListModalIsOpen}
-        onClose={() => { setVersionListModalIsOpen(false); setDatasetId(0); }}
-        isPublic={isPublic}
-        datasetName={datasetName}
-        cluster={getCurrentCluster(clusterId)}
-        datasetVersions={versionData?.items ?? []}
-        isFetching={versionFetching}
-        onRefetch={versionRefetch}
-      />
+      {getCurrentCluster(clusterId) ? (
+        <DatasetVersionsModal
+          open={versionListModalIsOpen}
+          onClose={() => { setVersionListModalIsOpen(false); setDatasetId(0); }}
+          isPublic={isPublic}
+          datasetName={datasetName}
+          cluster={getCurrentCluster(clusterId)!}
+          datasetVersions={versionData?.items ?? []}
+          isFetching={versionFetching}
+          onRefetch={versionRefetch}
+        />
+      ) : undefined}
       {/* antd中modal组件 */}
       {confirmModalHolder}
     </div>

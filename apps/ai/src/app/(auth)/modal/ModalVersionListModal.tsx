@@ -35,7 +35,7 @@ export interface Props {
   modalVersionData: ModalVersionInterface[];
   isFetching: boolean;
   refetch: () => void;
-  cluster?: Cluster;
+  cluster: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
@@ -47,6 +47,8 @@ export const ModalVersionListModal: React.FC<Props> = (
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
+
+  const checkFileExist = trpc.file.checkFileExist.useMutation();
 
   const shareMutation = trpc.modal.shareModalVersion.useMutation({
     onSuccess() {
@@ -90,9 +92,9 @@ export const ModalVersionListModal: React.FC<Props> = (
     } });
 
   const deleteModalVersion = useCallback(
-    (id: number) => {
+    (id: number, isConfirmed?: boolean) => {
       confirm({
-        title: "删除模型版本",
+        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除模型版本",
         onOk:async () => {
           await deleteModalVersionMutation.mutateAsync({ id, modalId });
         },
@@ -100,6 +102,7 @@ export const ModalVersionListModal: React.FC<Props> = (
     },
     [modalId],
   );
+
 
   return (
     <Modal
@@ -151,11 +154,17 @@ export const ModalVersionListModal: React.FC<Props> = (
                     >
                     编辑
                     </EditVersionModalButton>
-
                     <Button
                       type="link"
-                      onClick={() => {
-                        router.push(`/files/${cluster?.id}${r.privatePath}`);
+                      onClick={async () => {
+                        const checkExistRes =
+                        await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
+
+                        if (checkExistRes?.exists) {
+                          router.push(`/files/${cluster.id}${r.privatePath}`);
+                        } else {
+                          deleteModalVersion(r.id, true);
+                        }
                       }}
                     >
                     查看文件
