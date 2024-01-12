@@ -10,8 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export const countStringNumber = (str: string, char: string): number => {
-  const regex = new RegExp(char, "g"); // 创建匹配的正则表达式对象
-  const matches = str.match(regex);
-  return matches ? matches.length : 0; // 返回匹配到的结果数组长度或者 0
+/**
+ * 统计一个字符串在另一个字符串中出现的次数
+ * @param {string} str 源字符串
+ * @param {string} substring 子字符串
+ */
+export const countSubstringOccurrences = (str: string, substring: string): number => {
+  if (substring === "") {
+    return 0;
+  }
+  return str.split(substring).length - 1;
 };
+

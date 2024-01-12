@@ -37,7 +37,7 @@ import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
-import { countStringNumber } from "src/utils/countStringNumber";
+import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
@@ -174,7 +174,7 @@ export const userServiceServer = plugin((server) => {
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
         // 除此以外，都抛出异常
-        if (countStringNumber(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
           throw e;
         }
       });
@@ -250,7 +250,7 @@ export const userServiceServer = plugin((server) => {
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
         // 除此以外，都抛出异常
-        if (countStringNumber(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
           throw e;
         }
       });
