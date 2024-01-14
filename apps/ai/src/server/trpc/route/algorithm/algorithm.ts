@@ -17,6 +17,7 @@ import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVer
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
 import { getORM } from "src/server/utils/getOrm";
+import paginationSchema from "src/server/utils/paginationSchema ";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
@@ -32,9 +33,7 @@ export const getAlgorithms = procedure
     },
   })
   .input(z.object({
-    // page和pageSize用得多就可以提出去，定义一次其他地方都用
-    page: z.number().min(1).optional(),
-    pageSize: z.number().min(0).optional(),
+    ...paginationSchema.shape,
     framework: z.nativeEnum(Framework).optional(),
     nameOrDesc: z.string().optional(),
     clusterId:z.string().optional(),

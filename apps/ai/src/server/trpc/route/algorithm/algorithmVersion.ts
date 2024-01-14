@@ -22,6 +22,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import paginationSchema from "src/server/utils/paginationSchema ";
 import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
   from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -39,9 +40,8 @@ export const getAlgorithmVersions = procedure
     },
   })
   .input(z.object({
+    ...paginationSchema.shape,
     algorithmId: z.number(),
-    page: z.number().min(1).optional(),
-    pageSize: z.number().min(0).optional(),
     isPublic:z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.object({

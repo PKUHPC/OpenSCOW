@@ -18,6 +18,7 @@ import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import paginationSchema from "src/server/utils/paginationSchema ";
 import { checkSharePermission, SHARED_TARGET,
   unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
@@ -46,8 +47,7 @@ export const list = procedure
     },
   })
   .input(z.object({
-    page: z.number().min(1).optional(),
-    pageSize: z.number().min(0).optional(),
+    ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
     isShared: z.boolean().optional(),

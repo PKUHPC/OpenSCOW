@@ -23,6 +23,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import paginationSchema from "src/server/utils/paginationSchema ";
 import { checkSharePermission, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -73,10 +74,9 @@ export const versionList = procedure
     },
   })
   .input(z.object({
+    ...paginationSchema.shape,
     datasetId: z.number(),
     isShared: z.boolean().optional(),
-    page: z.number().min(1).optional(),
-    pageSize: z.number().min(0).optional(),
   }))
   .output(z.object({ items: z.array(VersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
