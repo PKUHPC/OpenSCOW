@@ -18,6 +18,7 @@ import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
+import { paginationProps } from "src/server/utils/orm";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
@@ -56,6 +57,8 @@ export const list = procedure
 
     const isPublicQuery = input.isShared ? {
       isShared: true,
+      // 一定不是undefined的就不用加?了
+      // 全项目查找user?，看看是不是之前没改的
     } : { owner: user?.identityId };
 
     const nameOrDescQuery = input.nameOrDesc ? {
@@ -74,8 +77,9 @@ export const list = procedure
       ...nameOrDescQuery,
       ...clusterQuery,
     }, {
-      limit: input.pageSize || undefined,
-      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+      // limit和offset怎么算有paginationProps
+      // 从列表中获取**必须**默认有分页，否则可能获取到全部数据，对数据库和网络压力太大
+      ...paginationProps(input.page, input.pageSize),
       populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
@@ -93,6 +97,8 @@ export const list = procedure
           : x.versions.map((y) => y.privatePath),
         owner: x.owner,
         clusterId: x.clusterId,
+        // 区分undefined和可字符串，可能为空的，把createTime这个属性标识为undefined
+        // 全项目查找空字符串，看看是不是又把""当作undefined在用
         createTime: x.createTime ? x.createTime.toISOString() : "",
       }; }), count };
   });
@@ -109,8 +115,11 @@ export const createModel = procedure
   .input(z.object({
     name: z.string(),
     algorithmName: z.string().optional(),
+    // algorithmFramework是否在API层应该有取值限制？
+    // 最好在数据库层也限制一下
     algorithmFramework: z.string().optional(),
     description: z.string().optional(),
+    // clusterId验证一下是否存在
     clusterId: z.string(),
   }))
   .output(z.number())
@@ -249,7 +258,12 @@ export const deleteModel = procedure
 
     // 删除所有已分享的版本
     let sharedDatasetPath: string = "";
+
     await Promise.all(sharedVersions.map(async (v) => {
+      // 在并行Promise.all中修改同一个外部变量？？
+      // 如果各个sharedVersions的v.path不一样，那sharedDataPath最后究竟是哪个的值？
+      // 如果是一样的，那这样写仍然不清晰，不如直接在外面先随便取一个v.path先赋值好
+      // js中要尽量减少可修改的共享变量（let）
       sharedDatasetPath = path.dirname(v.path);
       await checkSharePermission({
         clusterId: model.clusterId,

@@ -31,6 +31,8 @@ export enum SHARED_TARGET {
   MODEL = "/model",
 };
 
+// 这个函数名字叫check，看起来是检查权限，但是实际上却返回了用户家目录的上级目录
+// 给返回值写个注释，或者直接不要给返回值
 export async function checkSharePermission({
   clusterId,
   checkedSourcePath,

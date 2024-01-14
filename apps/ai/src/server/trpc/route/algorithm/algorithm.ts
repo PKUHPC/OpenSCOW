@@ -25,12 +25,14 @@ export const getAlgorithms = procedure
   .meta({
     openapi: {
       method: "GET",
+      // 一般来说，获取所有algorithm的API都是GET /algorithms
       path: "/algorithms/list",
       tags: ["algorithms"],
       summary: "get algorithms",
     },
   })
   .input(z.object({
+    // page和pageSize用得多就可以提出去，定义一次其他地方都用
     page: z.number().min(1).optional(),
     pageSize: z.number().min(0).optional(),
     framework: z.nativeEnum(Framework).optional(),
@@ -95,6 +97,7 @@ export const getAlgorithms = procedure
 
 
 export const createAlgorithm = procedure
+  // 这个API没有写openapi
   .input(z.object({
     name: z.string(),
     framework: z.nativeEnum(Framework),
@@ -109,6 +112,9 @@ export const createAlgorithm = procedure
       throw new TRPCError({
         code: "CONFLICT",
         message: `Algorithm name ${input.name} already exist`,
+        // cause一般传造成这个错误的子错误，以获取调用栈信息
+        // https://trpc.io/docs/server/error-handling#throwing-errors
+        // 这里传这个错误码没有意义吧？前端并不能获取到这个信息，直接删掉就好
         cause:ErrorCode.ALGORITHM_NAME_ALREADY_EXIST,
       });
     }
@@ -119,6 +125,7 @@ export const createAlgorithm = procedure
   });
 
 export const updateAlgorithm = procedure
+  // 这个API没有写openapi
   .input(z.object({
     id:z.number(),
     name: z.string(),
@@ -132,6 +139,7 @@ export const updateAlgorithm = procedure
     if (!algorithm) {
       throw new TRPCError({
         code: "NOT_FOUND",
+        // error都要写message
       });
     }
 

@@ -77,6 +77,7 @@ export const AppConfigSchema = Type.Object({
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;
 
+// 这个配置文件放在ai/apps/下
 export const APP_CONFIG_BASE_PATH = "aiApps";
 
 export const getAiAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (baseConfigPath, logger) => {

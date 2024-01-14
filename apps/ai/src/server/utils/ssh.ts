@@ -31,7 +31,6 @@ export function getClusterLoginNode(cluster: string): string | undefined {
   return loginNode?.address;
 }
 
-
 export const SSH_ERROR_CODE = "SSH_ERROR";
 export const SFTP_ERROR_CODE = "SFTP_ERROR";
 

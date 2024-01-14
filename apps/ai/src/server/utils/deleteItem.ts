@@ -27,7 +27,7 @@ interface DeleteDirProps {
   dirPath: string;
 }
 
-
+// 这个为什么在utils里？除了对应的path里还有哪里用到了吗？不是通用的函数不要放在utils下
 export const deleteFile = async ({ host, userIdentityId, filePath }: DeleteFileProps) => {
   await sshConnect(host, userIdentityId, logger, async (ssh) => {
 

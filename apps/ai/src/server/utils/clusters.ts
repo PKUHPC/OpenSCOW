@@ -28,6 +28,7 @@ export const getAdapterClient = (cluster: string) => {
   return adapterClientForClusters[cluster];
 };
 
+// 试试提取到libs/server下
 /**
  * 判断当前集群下的调度器API版本对比传入的接口是否已过时
  * @param client

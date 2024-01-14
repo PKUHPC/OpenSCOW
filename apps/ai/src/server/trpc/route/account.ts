@@ -23,11 +23,13 @@ export const accountRouter = router({
     .meta({
       openapi: {
         method: "GET",
+        // GET /accounts
         path: "/account",
         tags: ["account"],
         summary: "List all accounts",
       },
     })
+    // 这种可能会有大量数据的API，都要增加page和pageSize参数，以便分页
     .input(z.object({ clusterId: z.optional(z.string()) }))
     .output(z.object({ accounts: z.array(z.string()) }))
     .query(async ({ input, ctx: { user } }) => {

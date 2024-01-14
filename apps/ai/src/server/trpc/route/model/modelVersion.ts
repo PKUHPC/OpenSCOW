@@ -43,6 +43,7 @@ export const VersionListSchema = z.object({
 export const versionList = procedure
   .meta({
     openapi: {
+      // 这些API定义就很好
       method: "GET",
       path: "/models/{modelId}/versions",
       tags: ["modelVersions"],
@@ -138,6 +139,7 @@ export const updateModelVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
+      // id -> versionId，更明确
       path: "/model/{modelId}/versions/{id}",
       tags: ["modelVersion"],
       summary: "update a modelVersion",
@@ -275,6 +277,8 @@ export const deleteModelVersion = procedure
 export const shareModelVersion = procedure
   .meta({
     openapi: {
+      // POST /models/{modelId}/versions/{versionId}/share
+      // 和其他的类似的API统一
       method: "PUT",
       path: "/modelVersion/share/{versionId}",
       tags: ["modelVersion"],
@@ -346,6 +350,8 @@ export const shareModelVersion = procedure
 export const unShareModelVersion = procedure
   .meta({
     openapi: {
+      // DELETE /models/{modelId}/versions/{versionId}/share
+      // 和其他的类似的API统一
       method: "PUT",
       path: "/modelVersion/unShare/{versionId}",
       tags: ["modelVersion"],
@@ -413,6 +419,7 @@ export const copyPublicModelVersion = procedure
   .meta({
     openapi: {
       method: "POST",
+      // /models/{modelId}/versions/{versionId}/copy
       path: "/model/{modelId}/version/{modelVersionId}/copy",
       tags: ["modelVersion"],
       summary: "copy a public model version",

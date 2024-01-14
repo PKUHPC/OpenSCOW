@@ -39,10 +39,14 @@ export const ListDirectorySchema = z.object({
   mode: z.number(),
 });
 
+// 这些文件操作的API如果按照restful的设计风格，应该把path设置在url中，而不是body中
+// 但是HTTP的URL不区分大小写，但是linux的路径区分
+// 所以还是直接放在body中吧，也不用按照restful的设计风格了
 export const file = router({
   getHomeDir: authProcedure
     .meta({
       openapi: {
+        // GET /file/homeDir
         method: "GET",
         path: "/file/homeDir",
         tags: ["file"],
@@ -66,6 +70,7 @@ export const file = router({
       });
     }),
 
+  // POST /file/delete
 
   deleteItem: authProcedure
     .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
@@ -82,6 +87,7 @@ export const file = router({
       }
     }),
 
+  // POST /file/copyOrMove
   copyOrMove: authProcedure
     .input(z.object({ clusterId: z.string(), op: z.enum(["copy", "move"]), fromPath: z.string(), toPath: z.string() }))
     .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user } }) => {
@@ -113,6 +119,7 @@ export const file = router({
       }
     }),
 
+  // POST /file/mkdir
   mkdir: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
@@ -134,6 +141,8 @@ export const file = router({
       });
     }),
 
+  // POST /file/createFile
+  // 下面以此类推，POST /file/方法名
   createFile: authProcedure
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {

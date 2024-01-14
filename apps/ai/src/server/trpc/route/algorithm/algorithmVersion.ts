@@ -31,6 +31,8 @@ export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
       method: "GET",
+      // algorithmVersion是algorithm的子资源，所以可以写成
+      // GET /algorithm/{algorithmId}/versions
       path: "/algorithmVersions/list/{algorithmId}",
       tags: ["algorithmVersion"],
       summary: "get algorithmVersions",
@@ -85,6 +87,8 @@ export const createAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "POST",
+      // algorithmVersion是algorithm的子资源，所以可以写成
+      // POST /algorithm/{algorithmId}/versions
       path: "/algorithmVersion/create",
       tags: ["algorithmVersion"],
       summary: "Create a new algorithmVersion",
@@ -252,6 +256,8 @@ export const shareAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
+      // algorithmVersion是algorithm的子资源，share也可以考虑为algorithmVersion的子资源
+      // PUT /algorithm/{algorithmId}/versions/{algorithmVersionId}/share
       path: "/algorithmVersion/share/{versionId}",
       tags: ["algorithmVersion"],
       summary: "share a algorithmVersion",
@@ -321,6 +327,8 @@ export const shareAlgorithmVersion = procedure
 export const unShareAlgorithmVersion = procedure
   .meta({
     openapi: {
+      // algorithmVersion是algorithm的子资源，share也可以考虑为algorithmVersion的子资源
+      // DELETE /algorithm/{algorithmId}/versions/{algorithmVersionId}/share
       method: "PUT",
       path: "/algorithmVersion/unShare/{versionId}",
       tags: ["algorithmVersion"],
@@ -374,6 +382,7 @@ export const unShareAlgorithmVersion = procedure
       await orm.em.persistAndFlush([algorithmVersion]);
     };
 
+    // 不await？
     unShareFileOrDir({
       clusterId: algorithm.clusterId,
       sharedPath: algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
@@ -388,6 +397,7 @@ export const copyPublicAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "POST",
+      // 这个URL就还不错，资源类型algorithm和version都要用复数
       path: "/algorithm/{algorithmId}/version/{algorithmVersionId}/copy",
       tags: ["algorithmVersion"],
       summary: "copy a public algorithm version",

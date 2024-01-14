@@ -89,6 +89,7 @@ interface SessionMetadata {
   jobType: JobType
 }
 
+// 这些逻辑和portal-server是一样的吧？看看能不能抽象到libs/server下
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
 
 const SESSION_METADATA_NAME = "session.json";
@@ -170,6 +171,7 @@ export type AttributeType = z.infer<typeof AttributeTypeSchema>;
 export const listAvailableApps = procedure
   .meta({
     openapi: {
+      // GET /apps
       method: "GET",
       path: "/jobs/listAvailableApps",
       tags: ["jobs"],
@@ -191,6 +193,7 @@ export const listAvailableApps = procedure
 export const getAppMetadata = procedure
   .meta({
     openapi: {
+      // GET /apps/{appId}
       method: "GET",
       path: "/jobs/getAppMetadata",
       tags: ["jobs"],
@@ -242,6 +245,8 @@ export const getAppMetadata = procedure
   });
 
 export const createAppSession = procedure
+  // openAPI定义？
+  // POST /appSessions
   .input(z.object({
     clusterId: z.string(),
     appId: z.string(),
@@ -319,6 +324,8 @@ export const createAppSession = procedure
       }
     });
 
+    // 业务代码中不要用getOrm，而是用forkEntityManager直接拿新的EM来做
+    // 这样可以避免在一个EM中同时做多个事务
     const orm = await getORM();
 
     const {
@@ -427,6 +434,8 @@ export const createAppSession = procedure
 
   });
 
+
+// POST /jobs/{jobId}/saveImage
 export const saveImage =
   procedure
     .input(z.object({
@@ -516,6 +525,8 @@ export const saveImage =
       },
     );
 
+// 这个是新建一个job？
+// POST /jobs
 export const trainJob =
 procedure
   .input(z.object({
@@ -625,8 +636,10 @@ procedure
     },
   );
 
+// GET /appSessions
 export const listAppSessions =
   procedure
+  // GET列表的请求都要有分页
     .input(z.object({ clusterId: z.string(), isRunning: z.boolean() }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
@@ -752,6 +765,9 @@ export const listAppSessions =
 
 const TIMEOUT_MS = 3000;
 
+// 不要直接让用户检查某个host和port，可能会泄露信息
+// 用户关心的只是一个appSessions能不能连上，所以就只让用户提供sessionId，服务器去自己取获取host和port
+// GET /appSessions/{sessionId}/checkConnectivity
 export const checkAppConnectivity =
 procedure.input(z.object({
   host: z.string(),
@@ -798,6 +814,7 @@ const ConnectToAppResponseSchema = z.intersection(
   ]),
 );
 
+// POST /appSessions/{sessionId}/connect
 export const connectToApp =
 procedure
   .input(z.object({
@@ -888,6 +905,7 @@ procedure
   });
 
 
+// DELETE /jobs/{jobId}
 export const cancelJob =
 procedure.input(z.object({
   cluster: z.string(),

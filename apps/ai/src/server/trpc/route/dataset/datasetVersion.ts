@@ -65,6 +65,7 @@ export const VersionListSchema = z.object({
 export const versionList = procedure
   .meta({
     openapi: {
+      // GET /datasets/{datasetId}/versions
       method: "GET",
       path: "/datasetVersion/list/{datasetId}",
       tags: ["datasetVersion"],
@@ -108,6 +109,7 @@ export const versionList = procedure
 export const createDatasetVersion = procedure
   .meta({
     openapi: {
+      // POST /datasets{datasetId}/versions
       method: "POST",
       path: "/datasetVersion/create",
       tags: ["datasetVersion"],
@@ -159,6 +161,7 @@ export const createDatasetVersion = procedure
 export const updateDatasetVersion = procedure
   .meta({
     openapi: {
+      // PUT /datasets/{datasetId}/versions/{datasetVersionId}
       method: "POST",
       path: "/datasetVersion/update/{id}",
       tags: ["dataset"],
@@ -250,6 +253,7 @@ export const updateDatasetVersion = procedure
 export const deleteDatasetVersion = procedure
   .meta({
     openapi: {
+      // DELETE /datasets/{datasetId}/versions/{datasetVersionId}
       method: "DELETE",
       path: "/datasetVersion/delete/{id}",
       tags: ["datasetVersion"],
@@ -311,6 +315,7 @@ export const deleteDatasetVersion = procedure
 export const shareDatasetVersion = procedure
   .meta({
     openapi: {
+      // POST /datasets/{datasetId}/versions/{datasetVersionId}/share
       method: "PUT",
       path: "/datasetVersion/share/{id}",
       tags: ["datasetVersion"],
@@ -383,6 +388,7 @@ export const shareDatasetVersion = procedure
 export const unShareDatasetVersion = procedure
   .meta({
     openapi: {
+      // DELETE /datasets/{datasetId}/versions/{datasetVersionId}/share
       method: "PUT",
       path: "/datasetVersion/unShare/{id}",
       tags: ["datasetVersion"],
@@ -450,6 +456,7 @@ export const unShareDatasetVersion = procedure
 export const copyPublicDatasetVersion = procedure
   .meta({
     openapi: {
+      // POST /datasets/{datasetId}/versions/{datasetVersionId}/copy
       method: "POST",
       path: "/dataset/{datasetId}/version/{datasetVersionId}/copy",
       tags: ["datasetVersion"],

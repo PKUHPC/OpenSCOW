@@ -39,6 +39,7 @@ export const list = procedure
   .meta({
     openapi: {
       method: "GET",
+      // GET /datasets
       path: "/dataset/list",
       tags: ["dataset"],
       summary: "Read all dataset",
@@ -105,6 +106,7 @@ export const createDataset = procedure
   .meta({
     openapi: {
       method: "POST",
+      // POST /datasets
       path: "/dataset/create",
       tags: ["dataset"],
       summary: "Create a new dataset",
@@ -231,6 +233,7 @@ export const deleteDataset = procedure
   .meta({
     openapi: {
       method: "DELETE",
+      // DELETE /datasets/{id}
       path: "/dataset/delete/{id}",
       tags: ["dataset"],
       summary: "delete a dataset",

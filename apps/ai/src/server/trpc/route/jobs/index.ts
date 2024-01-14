@@ -24,6 +24,8 @@ import {
   trainJob,
 } from "./apps";
 
+// 按我的理解，这里分为app和job两种类型的操作？
+// 可以把app/appSessions相关的和job相关的分成两个文件写
 export const jobsRouter = router({
   listAvailableApps,
   getAppMetadata,

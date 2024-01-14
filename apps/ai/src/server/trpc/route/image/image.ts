@@ -11,7 +11,7 @@
  */
 
 import { getSortedClusterIds } from "@scow/config/build/cluster";
-import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
+import { constructCommand, loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
 import { config, rootKeyPair } from "src/server/config/env";
@@ -135,20 +135,36 @@ export const createImage = procedure
       });
     };
 
-    const NotTarError = new TRPCError({
-      code: "UNPROCESSABLE_CONTENT",
-      message: `Image ${name}:${tag} create failed: image is not a tar file`,
-    });
+    // error的调用栈信息会在创建error的时候确定
+    // 预先创建error的话，会造成stacktrace不正确
+    // 解决：定义类型，然后在throw的时候再创建error
+    class NotTarError extends TRPCError {
+      constructor(name: string, tag: string) {
+        super({
+          code: "UNPROCESSABLE_CONTENT",
+          message: `Image ${name}:${tag} create failed: image is not a tar file`,
+        });
+      }
+    };
 
-    const NoClusterError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${name}:${tag} create failed: there is no available cluster`,
-    });
+    class NoClusterError extends TRPCError {
+      constructor(name: string, tag: string) {
+        super({
+          code: "NOT_FOUND",
+          message: `Image ${name}:${tag} create failed: there is no available cluster`,
+        });
+      }
+    };
 
-    const NoLocalImageError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${name}:${tag} create failed: localImage not found`,
-    });
+    class NoLocalImageError extends TRPCError {
+
+      constructor(name: string, tag: string) {
+        super({
+          code: "NOT_FOUND",
+          message: `Image ${name}:${tag} create failed: localImage not found`,
+        });
+      }
+    }
 
     // 获取加载镜像的集群节点，如果是远程镜像则使用列表第一个集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
@@ -161,7 +177,7 @@ export const createImage = procedure
       imageTag: tag,
     });
 
-    if (!processClusterId) { throw NoClusterError; }
+    if (!processClusterId) { throw new NoClusterError(name, tag); }
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
@@ -183,15 +199,17 @@ export const createImage = procedure
       if (source === Source.INTERNAL) {
         if (sourcePath.endsWith(".tar")) {
           // 加载tar文件镜像
-          const dockerLoadCmd = `docker load -i ${sourcePath}`;
-          const loadedResp = await loggedExec(ssh, logger, true, dockerLoadCmd, []);
+
+          // 有参数的命令调用，程序本身（docker）为第四个参数，参数为第五个参数，这样能保证命令能正确地加上引号
+          // 其他地方照着改，查找所有loggedExec的地方，基本都有问题
+          const loadedResp = await loggedExec(ssh, logger, true, "docker", ["load", "-i", sourcePath]);
           const match = loadedResp.stdout.match(loadedImageRegex);
 
           if (match && match.length > 1) {
             localImage = match[1];
           };
         } else {
-          throw NotTarError;
+          throw new NotTarError(name, tag);
         }
         // 远程镜像需先拉取到本地
       } else {
@@ -204,7 +222,7 @@ export const createImage = procedure
 
       };
 
-      if (localImage === undefined) { throw NoLocalImageError; }
+      if (localImage === undefined) { throw new NoLocalImageError(name, tag); }
 
       const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
       await loggedExec(ssh, logger, true, dockerTagCmd, []);
