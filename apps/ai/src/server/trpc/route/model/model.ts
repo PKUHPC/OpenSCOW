@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-// import { Framework } from "src/models/Algorithm";
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
@@ -33,7 +32,7 @@ export const ModelListSchema = z.object({
   versions: z.array(z.string()),
   owner: z.string(),
   clusterId: z.string(),
-  createTime: z.string(),
+  createTime: z.string().optional(),
 });
 
 export const list = procedure
@@ -57,9 +56,7 @@ export const list = procedure
 
     const isPublicQuery = input.isShared ? {
       isShared: true,
-      // 一定不是undefined的就不用加?了
-      // 全项目查找user?，看看是不是之前没改的
-    } : { owner: user?.identityId };
+    } : { owner: user.identityId };
 
     const nameOrDescQuery = input.nameOrDesc ? {
       $or: [
@@ -77,10 +74,8 @@ export const list = procedure
       ...nameOrDescQuery,
       ...clusterQuery,
     }, {
-      // limit和offset怎么算有paginationProps
-      // 从列表中获取**必须**默认有分页，否则可能获取到全部数据，对数据库和网络压力太大
       ...paginationProps(input.page, input.pageSize),
-      populate: ["versions", "versions.sharedStatus", "versions.privatePath"],
+      populate: ["versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
 
@@ -97,9 +92,7 @@ export const list = procedure
           : x.versions.map((y) => y.privatePath),
         owner: x.owner,
         clusterId: x.clusterId,
-        // 区分undefined和可字符串，可能为空的，把createTime这个属性标识为undefined
-        // 全项目查找空字符串，看看是不是又把""当作undefined在用
-        createTime: x.createTime ? x.createTime.toISOString() : "",
+        createTime: x.createTime ? x.createTime.toISOString() : undefined,
       }; }), count };
   });
 

@@ -31,7 +31,7 @@ export const DatasetListSchema = z.object({
   scene: z.string(),
   description: z.string().optional(),
   clusterId: z.string(),
-  createTime: z.string(),
+  createTime: z.string().optional(),
   versions: z.array(z.string()),
 });
 
@@ -59,7 +59,7 @@ export const list = procedure
     const isPublicQuery = input.isShared ? {
       isShared: true,
       owner: { $ne: null },
-    } : { owner: user?.identityId };
+    } : { owner: user.identityId };
 
     const nameOrDescQuery = input.nameOrDesc ? {
       $or: [
@@ -93,7 +93,7 @@ export const list = procedure
         scene: x.scene,
         description: x.description,
         clusterId: x.clusterId,
-        createTime: x.createTime ? x.createTime.toISOString() : "",
+        createTime: x.createTime ? x.createTime.toISOString() : undefined,
         versions: input.isShared ?
           x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path) :
           x.versions.map((y) => y.privatePath),
@@ -246,7 +246,7 @@ export const deleteDataset = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.id} not found` });
 
-    if (dataset.owner !== user?.identityId)
+    if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
 
     const datasetVersions = await orm.em.find(DatasetVersion, { dataset });

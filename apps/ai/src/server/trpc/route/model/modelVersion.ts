@@ -38,7 +38,7 @@ export const VersionListSchema = z.object({
   algorithmVersion: z.string().optional(),
   path: z.string(),
   privatePath: z.string(),
-  createTime: z.string(),
+  createTime: z.string().optional(),
 });
 
 export const versionList = procedure
@@ -81,7 +81,7 @@ export const versionList = procedure
         path: x.path,
         privatePath: x.privatePath,
         sharedStatus: x.sharedStatus,
-        createTime: x.createTime ? x.createTime.toISOString() : "",
+        createTime: x.createTime ? x.createTime.toISOString() : undefined,
       }; }), count };
   });
 
@@ -304,7 +304,7 @@ export const shareModelVersion = procedure
     if (!model)
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
 
-    if (model.owner !== user?.identityId)
+    if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId}  not accessible` });
 
     const homeTopDir = await checkSharePermission({
@@ -378,7 +378,7 @@ export const unShareModelVersion = procedure
     if (!model)
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
 
-    if (model.owner !== user?.identityId)
+    if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
 
     await checkSharePermission({

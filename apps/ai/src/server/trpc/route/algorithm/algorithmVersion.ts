@@ -47,11 +47,11 @@ export const getAlgorithmVersions = procedure
   .output(z.object({ items: z.array(z.object({
     id:z.number(),
     versionName:z.string(),
-    versionDescription:z.string(),
+    versionDescription:z.string().optional(),
     path:z.string(),
     privatePath: z.string(),
     sharedStatus:z.nativeEnum(SharedStatus),
-    createTime:z.string(),
+    createTime:z.string().optional(),
   })), count: z.number() }))
   .query(async ({ input:{ algorithmId, page, pageSize, isPublic } }) => {
     const orm = await getORM();
@@ -74,9 +74,9 @@ export const getAlgorithmVersions = procedure
       return {
         id:x.id,
         versionName:x.versionName,
-        versionDescription:x.versionDescription ?? "",
+        versionDescription:x.versionDescription,
         sharedStatus:x.sharedStatus,
-        createTime:x.createTime ? x.createTime.toISOString() : "",
+        createTime:x.createTime ? x.createTime.toISOString() : undefined,
         path:x.path,
         privatePath: x.privatePath,
       };
@@ -106,7 +106,7 @@ export const createAlgorithmVersion = procedure
     const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
     if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not Found` });
 
-    if (algorithm && algorithm.owner !== user?.identityId)
+    if (algorithm && algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "CONFLICT",
         message: `Algorithm id:${input.algorithmId} is belonged to the other user`,
       });
@@ -218,7 +218,7 @@ export const deleteAlgorithmVersion = procedure
     if (!algorithm)
       throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} is not found` });
 
-    if (algorithm.owner !== user?.identityId)
+    if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} is not accessible` });
 
     // 正在分享中或取消分享中的版本，不可删除
@@ -282,7 +282,7 @@ export const shareAlgorithmVersion = procedure
     if (!algorithm)
       throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
-    if (algorithm.owner !== user?.identityId)
+    if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId}  not accessible` });
 
     const homeTopDir = await checkSharePermission({
@@ -355,7 +355,7 @@ export const unShareAlgorithmVersion = procedure
     if (!algorithm)
       throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
-    if (algorithm.owner !== user?.identityId)
+    if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} not accessible` });
 
     await checkSharePermission({

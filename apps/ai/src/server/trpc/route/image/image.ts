@@ -39,7 +39,7 @@ export const ImageListSchema = z.object({
   sourcePath: z.string(),
   isShared: z.boolean(),
   clusterId: z.string().optional(),
-  createTime: z.string(),
+  createTime: z.string().optional(),
 });
 
 export const list = procedure
@@ -67,7 +67,7 @@ export const list = procedure
     const isPublicQuery = isPublic ? {
       isShared: true,
       owner: { $ne: null },
-    } : { owner: user?.identityId };
+    } : { owner: user.identityId };
 
     const nameOrTagOrDescQuery = nameOrTagOrDesc ? {
       $or: [
@@ -101,7 +101,7 @@ export const list = procedure
         sourcePath: x.sourcePath,
         isShared: Boolean(x.isShared),
         clusterId: x.clusterId,
-        createTime: x.createTime ? x.createTime.toISOString() : "",
+        createTime: x.createTime ? x.createTime.toISOString() : undefined,
       }; }), count };
   });
 

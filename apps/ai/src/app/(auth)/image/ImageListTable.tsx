@@ -164,7 +164,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间",
-            render: (_, r) => formatDateTime(r.createTime) },
+            render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
           { dataIndex: "action", title: "操作",
             render: (_, r) => {
               const shareOrUnshareStr = r.isShared ? "取消分享" : "分享";

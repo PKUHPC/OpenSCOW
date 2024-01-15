@@ -24,7 +24,7 @@ interface EditProps {
   algorithmName: string;
   algorithmId: number;
   algorithmFramework: string;
-  algorithmDescription: string;
+  algorithmDescription?: string;
 }
 export interface Props {
   open: boolean;

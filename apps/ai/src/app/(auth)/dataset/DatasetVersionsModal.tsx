@@ -129,7 +129,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
           { dataIndex: "versionDescription", title: "版本描述" },
           isPublic ? {} : { dataIndex: "privatePath", title: "路径" },
           { dataIndex: "createTime", title: "创建时间",
-            render: (_, r) => formatDateTime(r.createTime) },
+            render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
           { dataIndex: "action", title: "操作",
             render: (_, r) => {
               return !isPublic ? (

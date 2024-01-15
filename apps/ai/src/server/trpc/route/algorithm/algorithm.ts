@@ -45,9 +45,9 @@ export const getAlgorithms = procedure
     owner:z.string(),
     framework:z.nativeEnum(Framework),
     isShared:z.boolean(),
-    description:z.string(),
+    description:z.string().optional(),
     clusterId:z.string(),
-    createTime:z.string(),
+    createTime:z.string().optional(),
     versions:z.array(z.string()),
   })), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
@@ -84,9 +84,9 @@ export const getAlgorithms = procedure
         owner:x.owner,
         framework:x.framework,
         isShared:x.isShared,
-        description:x.description ?? "",
+        description:x.description,
         clusterId:x.clusterId,
-        createTime:x.createTime ? x.createTime.toISOString() : "",
+        createTime:x.createTime ? x.createTime.toISOString() : undefined,
         versions: isPublic ?
           x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path)
           : x.versions.map((y) => y.privatePath),
@@ -211,7 +211,7 @@ export const deleteAlgorithm = procedure
       });
     }
 
-    if (algorithm.owner !== user?.identityId)
+    if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${id} not accessible` });
 
     const algorithmVersions = await em.find(AlgorithmVersion, { algorithm });

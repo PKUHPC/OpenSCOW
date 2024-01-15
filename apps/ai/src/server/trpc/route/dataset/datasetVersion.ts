@@ -59,7 +59,7 @@ export const VersionListSchema = z.object({
   versionDescription: z.string().optional(),
   path: z.string(),
   privatePath: z.string(),
-  createTime: z.string(),
+  createTime: z.string().optional(),
   datasetId: z.number(),
 });
 
@@ -101,7 +101,7 @@ export const versionList = procedure
         privatePath: x.privatePath,
         path: x.path,
         sharedStatus: x.sharedStatus,
-        createTime: x.createTime ? x.createTime.toISOString() : "",
+        createTime: x.createTime ? x.createTime.toISOString() : undefined,
         datasetId: x.dataset.id,
       }; }), count };
   });
@@ -137,7 +137,7 @@ export const createDatasetVersion = procedure
       });
     }
 
-    if (dataset && dataset.owner !== user?.identityId)
+    if (dataset && dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     // 检查目录是否存在
@@ -184,7 +184,7 @@ export const updateDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
-    if (dataset.owner !== user?.identityId)
+    if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${id} not accessible` });
 
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
@@ -277,7 +277,7 @@ export const deleteDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
-    if (dataset.owner !== user?.identityId)
+    if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     // 正在分享中或取消分享中的版本，不可删除
@@ -342,7 +342,7 @@ export const shareDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
-    if (dataset.owner !== user?.identityId)
+    if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     const homeTopDir = await checkSharePermission({
@@ -415,7 +415,7 @@ export const unShareDatasetVersion = procedure
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
 
-    if (dataset.owner !== user?.identityId)
+    if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
     await checkSharePermission({
