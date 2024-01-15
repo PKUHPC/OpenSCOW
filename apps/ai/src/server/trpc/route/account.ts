@@ -11,11 +11,11 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { TRPCError } from "@trpc/server";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
-import paginationSchema from "src/server/utils/paginationSchema ";
+import { clusterNotFound } from "src/server/utils/errors";
+import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { z } from "zod";
 
 export const accountRouter = router({
@@ -41,30 +41,15 @@ export const accountRouter = router({
       }
       const client = getAdapterClient(clusterId);
       if (!client) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message:`cluster ${clusterId} is not found`,
-        });
+        throw clusterNotFound(clusterId);
       }
       const { accounts } = await asyncClientCall(client.account, "listAccounts", { userId: user.identityId });
 
-      if (page === undefined || pageSize === undefined) {
+      const { paginatedItems: paginatedAccounts, totalCount } = paginate(
+        accounts, page, pageSize,
+      );
 
-        return { accounts: accounts, count: accounts.length };
-
-      } else {
-
-        const startIndex = (page - 1) * pageSize;
-        const endIndex = startIndex + pageSize;
-        // 检查 startIndex 是否超出数据总量
-        if (startIndex >= accounts.length) {
-          return { accounts: [], count: accounts.length };
-        }
-
-        const paginatedAccounts = accounts.slice(startIndex, Math.min(endIndex, accounts.length));
-
-        return { accounts: paginatedAccounts, count: accounts.length };
-      }
+      return { accounts: paginatedAccounts, count: totalCount };
 
     }),
 });

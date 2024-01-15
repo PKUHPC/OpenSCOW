@@ -19,7 +19,7 @@ import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
-import paginationSchema from "src/server/utils/paginationSchema ";
+import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 

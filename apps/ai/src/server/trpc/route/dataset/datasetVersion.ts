@@ -23,7 +23,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
-import paginationSchema from "src/server/utils/paginationSchema ";
+import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";

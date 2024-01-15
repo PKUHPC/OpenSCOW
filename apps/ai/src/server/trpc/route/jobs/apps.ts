@@ -39,8 +39,10 @@ import { Image as ImageEntity, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
+import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { isPortReachable } from "src/utils/isPortReachable";
 import { BASE_PATH } from "src/utils/processEnv";
@@ -172,10 +174,9 @@ export type AttributeType = z.infer<typeof AttributeTypeSchema>;
 export const listAvailableApps = procedure
   .meta({
     openapi: {
-      // GET /apps
       method: "GET",
-      path: "/jobs/listAvailableApps",
-      tags: ["jobs"],
+      path: "/apps",
+      tags: ["app"],
       summary: "List all Available Apps",
     },
   })
@@ -340,11 +341,11 @@ export const createAppSession = procedure
 
 
     const host = getClusterLoginNode(clusterId);
-    if (!host) { throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `Cluster ${clusterId} has no login node` });
+    if (!host) {
+      throw clusterNotFound(clusterId);
     }
-    const userId = user!.identityId;
+
+    const userId = user.identityId;
     return await sshConnect(host, userId, logger, async (ssh) => {
 
       const homeDir = await getUserHomedir(ssh, userId, logger);
@@ -553,9 +554,8 @@ procedure
       const userId = user.identityId;
 
       const host = getClusterLoginNode(clusterId);
-      if (!host) { throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Cluster ${clusterId} has no login node` });
+      if (!host) {
+        throw clusterNotFound(clusterId);
       }
 
       const em = await forkEntityManager();
@@ -636,17 +636,18 @@ procedure
 // GET /appSessions
 export const listAppSessions =
   procedure
-  // GET列表的请求都要有分页
-    .input(z.object({ clusterId: z.string(), isRunning: z.boolean() }))
+    .input(z.object({ clusterId: z.string(), isRunning: z.boolean(), ...paginationSchema.shape }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
-      const { clusterId, isRunning } = input;
+
+      const { clusterId, isRunning, page, pageSize } = input;
+
       const userId = user.identityId;
+
       const host = getClusterLoginNode(clusterId);
 
-      if (!host) { throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Cluster ${clusterId} has no login node` });
+      if (!host) {
+        throw clusterNotFound(clusterId);
       }
 
       const apps = getClusterAppConfigs(clusterId);
@@ -751,11 +752,18 @@ export const listAppSessions =
           });
 
         }));
-
         const runningStates = ["RUNNING", "PENDING"];
-        return { sessions: sessions.filter((session) => isRunning
+
+        const filteredSessions = sessions.filter((session) => isRunning
           ? runningStates.includes(session.state)
-          : !runningStates.includes(session.state)) };
+          : !runningStates.includes(session.state))
+          .sort((a, b) => b.submitTime.localeCompare(a.submitTime)); ;
+
+        const { paginatedItems: paginatedSessions, totalCount } = paginate(
+          filteredSessions, page, pageSize,
+        );
+
+        return { sessions: paginatedSessions, count: totalCount };
       });
     });
 
@@ -823,11 +831,12 @@ procedure
 
     const { cluster, sessionId } = input;
     const userId = user.identityId;
+
     const host = getClusterLoginNode(cluster);
-    if (!host) { throw new TRPCError({
-      code: "NOT_FOUND",
-      message: `Cluster ${cluster} has no login node` });
+    if (!host) {
+      throw clusterNotFound(cluster);
     }
+
     const apps = getClusterAppConfigs(cluster);
 
     const reply = await sshConnect(host, "root", logger, async (ssh) => {

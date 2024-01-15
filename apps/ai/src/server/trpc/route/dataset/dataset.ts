@@ -17,8 +17,7 @@ import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getORM } from "src/server/utils/getOrm";
-import { logger } from "src/server/utils/logger";
-import paginationSchema from "src/server/utils/paginationSchema ";
+import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET,
   unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";

@@ -17,7 +17,7 @@ import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVer
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
 import { getORM } from "src/server/utils/getOrm";
-import paginationSchema from "src/server/utils/paginationSchema ";
+import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
