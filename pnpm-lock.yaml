@@ -1426,12 +1426,21 @@ importers:
       '@scow/rich-error-model':
         specifier: workspace:*
         version: link:../rich-error-model
+      '@scow/scheduler-adapter-protos':
+        specifier: workspace:*
+        version: link:../protos/scheduler-adapter
       '@scow/utils':
         specifier: workspace:*
         version: link:../utils
       nookies:
         specifier: 2.5.2
         version: 2.5.2
+      shell-quote:
+        specifier: 1.8.1
+        version: 1.8.1
+      ts-log:
+        specifier: 2.2.5
+        version: 2.2.5
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
@@ -1442,6 +1451,9 @@ importers:
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
+      '@types/shell-quote':
+        specifier: 1.7.4
+        version: 1.7.4
 
   libs/ssh:
     dependencies:

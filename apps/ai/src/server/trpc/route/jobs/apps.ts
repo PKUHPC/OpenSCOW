@@ -12,11 +12,10 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
-import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
+import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server/build/app";
 import {
   getUserHomedir,
   loggedExec,
@@ -27,11 +26,9 @@ import {
   sftpWriteFile,
 } from "@scow/lib-ssh";
 import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { ApiVersion } from "@scow/utils/build/version";
 import { TRPCError } from "@trpc/server";
 import fs from "fs";
 import { join } from "path";
-import { Logger } from "pino";
 import { quote } from "shell-quote";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
@@ -92,37 +89,12 @@ interface SessionMetadata {
   jobType: JobType
 }
 
-// 这些逻辑和portal-server是一样的吧？看看能不能抽象到libs/server下
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
 
 const SESSION_METADATA_NAME = "session.json";
 
 // 适配器将该文件写在了/tmp目录下
 const SERVER_SESSION_INFO = "/tmp/server_session_info.json";
-
-const getEnvVariables = (env: Record<string, string>) =>
-  Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
-
-const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
-  const client = getAdapterClient(cluster);
-  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
-  try {
-    await checkSchedulerApiVersion(client, minRequiredApiVersion);
-    // get connection info
-    // for apps running in containers, it can provide real ip and port info
-    const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
-      jobId: jobId,
-    });
-    return connectionInfo;
-  } catch (e: any) {
-    if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-      logger.warn(e.details);
-    } else {
-      throw e;
-    }
-  }
-
-};
 
 export const appSchema = z.object({ id: z.string(), name: z.string(), logoPath: z.string().optional() });
 
@@ -276,12 +248,7 @@ export const createAppSession = procedure
     const app = checkAppExist(apps, appId);
 
     const proxyBasePath = join(BASE_PATH, "/api/proxy", clusterId);
-    if (!app) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `app id ${appId} is not found`,
-      });
-    }
+
     const attributesConfig = app.attributes;
     attributesConfig?.forEach((attribute) => {
       if (attribute.required && !(attribute.name in customAttributes)) {
@@ -320,9 +287,11 @@ export const createAppSession = procedure
         break;
 
       default:
-        throw new Error(`
-        the custom form attributes type in ${appId} config should be one of number, text or select,
-        but the type of ${attribute.name} is ${attribute.type}`);
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: `the custom form attributes type in ${appId} config should be one of number, text or select,
+          but the type of ${attribute.name} is ${attribute.type}`,
+        });
       }
     });
 
@@ -719,8 +688,8 @@ export const listAppSessions =
               } else {
               // TODO: if vnc apps
               }
-
-              const connectionInfo = await getAppConnectionInfoFromAdapter(clusterId, sessionMetadata.jobId, logger);
+              const client = getAdapterClient(clusterId);
+              const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
               if (connectionInfo?.response?.$case === "appConnectionInfo") {
                 host = connectionInfo.response.appConnectionInfo.host;
                 port = connectionInfo.response.appConnectionInfo.port;
@@ -791,7 +760,6 @@ procedure.input(z.object({
 
 );
 
-
 const AppConnectPropsSchema = z.object({
   method: z.string(),
   path: z.string(),
@@ -857,7 +825,8 @@ procedure
       const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
       if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
-        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        const client = getAdapterClient(cluster);
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           const { host, port, password } = connectionInfo.response.appConnectionInfo;
           return {

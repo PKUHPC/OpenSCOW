@@ -15,12 +15,11 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
+import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server/build/app";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { ApiVersion } from "@scow/utils/build/version";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
@@ -33,7 +32,6 @@ import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
-import { Logger } from "ts-log";
 
 interface SessionMetadata {
   sessionId: string;
@@ -65,27 +63,6 @@ const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 const errorInfo = (reason: string) =>
   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
-
-const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
-  const client = getAdapterClient(cluster);
-  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
-  try {
-    await checkSchedulerApiVersion(client, minRequiredApiVersion);
-    // get connection info
-    // for apps running in containers, it can provide real ip and port info
-    const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
-      jobId: jobId,
-    });
-    return connectionInfo;
-  } catch (e: any) {
-    if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-      logger.warn(e.details);
-    } else {
-      throw e;
-    }
-  }
-
-};
 
 export const appOps = (cluster: string): AppOps => {
 
@@ -132,9 +109,6 @@ export const appOps = (cluster: string): AppOps => {
         await ssh.mkdir(lastSubmissionDirectory);
 
         const sftp = await ssh.requestSFTP();
-
-        const getEnvVariables = (env: Record<string, string>) =>
-          Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
 
         const submitAndWriteMetadata = async (request: SubmitJobRequest) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
@@ -373,8 +347,8 @@ export const appOps = (cluster: string): AppOps => {
                 port = port;
               }
             }
-
-            const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+            const client = getAdapterClient(cluster);
+            const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
             if (connectionInfo?.response?.$case === "appConnectionInfo") {
               host = connectionInfo.response.appConnectionInfo.host;
               port = connectionInfo.response.appConnectionInfo.port;
@@ -429,7 +403,8 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
-        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        const client = getAdapterClient(cluster);
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           return {
             appId: sessionMetadata.appId,

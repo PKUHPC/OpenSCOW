@@ -23,12 +23,16 @@
     "@scow/config": "workspace:*",
     "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@scow/rich-error-model": "workspace:*"
+    "@scow/rich-error-model": "workspace:*",
+    "@scow/scheduler-adapter-protos": "workspace:*",
+    "shell-quote": "1.8.1",
+    "ts-log": "2.2.5"
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-server": "0.19.5",
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@scow/protos": "workspace:*"
+    "@scow/protos": "workspace:*",
+    "@types/shell-quote": "1.7.4"
   },
   "volta": {
     "extends": "../../package.json"
