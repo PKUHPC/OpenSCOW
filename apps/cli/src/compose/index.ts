@@ -164,11 +164,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   // 是否配置自定义认证系统
   if (config.auth.custom) {
-
     // 未配置 type，则为旧版本自定义认证系统配置
     if (config.auth.custom.type === undefined) {
-      logger.info("The current configuration of the custom authentication system is outdated, "
-        + "please read the relevant configuration documentation and update it.");
+      if (config.auth.custom.image === undefined) {
+        throw new Error("Invalid config: auth/custom/image is required");
+      }
 
       for (const key in config.auth.custom.volumes) {
         authVolumes[key] = config.auth.custom.volumes[key];
@@ -178,6 +178,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         throw new Error("Invalid config: " +
           "auth/custom/image in the old version of the custom authentication system configuration is a string");
       }
+
+      logger.info("The current configuration of the custom authentication system is outdated, "
+        + "please read the relevant configuration documentation and update it.");
 
       addService("auth", {
         image: config.auth.custom.image,
@@ -189,6 +192,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
       // 镜像类型的自定义认证系统
       if (config.auth.custom.type === AuthCustomType.image) {
+        if (config.auth.custom.image === undefined) {
+          throw new Error("Invalid config: auth/custom/image is required");
+        }
 
         if (typeof config.auth.custom.image === "string") {
           throw new Error("Invalid config: auth/custom/image is an object, but it is passed as a string");
