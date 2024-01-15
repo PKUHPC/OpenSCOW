@@ -11,14 +11,16 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import { basename, dirname, join } from "path";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { ErrorCode } from "src/server/utils/errorCode";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
+import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusterExist } from "../utils";
@@ -161,10 +163,10 @@ export const updateAlgorithm = procedure
       });
     }
 
-    if (algorithm.owner !== user!.identityId)
+    if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${id} not accessible` });
 
-
+    // 存在正在分享或正在取消分享的算法版本，则不可更新名称
     const changingVersions = await em.find(AlgorithmVersion, { algorithm,
       $or: [
         { sharedStatus: SharedStatus.SHARING },
@@ -182,22 +184,21 @@ export const updateAlgorithm = procedure
     if (algorithm.isShared && name !== algorithm.name) {
 
       const sharedVersions = await em.find(AlgorithmVersion, { algorithm, sharedStatus: SharedStatus.SHARED });
-      const oldPath = dirname(sharedVersions[0].path);
-      await updateSharedName({
-        target: SHARED_TARGET.ALGORITHM,
-        user: user,
+      const oldPath = dirname(dirname(sharedVersions[0].path));
+
+      // 获取更新后的当前算法的共享路径名称
+      const newAlgorithmSharedPath = await getUpdatedSharedPath({
         clusterId: algorithm.clusterId,
-        newName: `${name}-${user!.identityId}`,
-        isVersionName: false,
+        newName: name,
         oldPath,
       });
 
       // 更新已分享的版本的共享文件夹地址
-      const topDir = dirname(oldPath);
-      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
-
       sharedVersions.map((v) => {
-        v.path = join(newPathDir, v.versionName);
+        const baseFolderName = basename(v.path);
+        const newPath = join(newAlgorithmSharedPath, v.versionName, baseFolderName);
+
+        v.path = newPath;
       });
     }
 
@@ -232,28 +233,21 @@ export const deleteAlgorithm = procedure
     // 有正在分享中或取消分享中的版本，则不可删除
     if (sharingVersions.length > 0) {
       throw new TRPCError(
-        { code: "PRECONDITION_FAILED", message: "There is an algorithm version being shared or unshared" });
+        { code: "PRECONDITION_FAILED",
+          message: `There is an algorithm version being shared or unshared of algorithm ${id}` });
     }
 
     const sharedVersions = algorithmVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
-    // 删除所有已分享的版本
-    let sharedDatasetPath: string = "";
-    await Promise.all(sharedVersions.map(async (v) => {
-      sharedDatasetPath = path.dirname(v.path);
-      await checkSharePermission({
-        clusterId: algorithm.clusterId,
-        checkedSourcePath: v.privatePath,
-        user,
-        checkedTargetPath: v.path,
-      });
-    }));
+    // 获取此算法的共享的算法绝对路径
+    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
-    // 删除整个分享的dataset路径
+    const host = getClusterLoginNode(algorithm.clusterId);
+    if (!host) { throw clusterNotFound(algorithm.clusterId); }
+
     await unShareFileOrDir({
-      clusterId: algorithm.clusterId,
+      host,
       sharedPath: sharedDatasetPath,
-      user,
     });
 
     await em.removeAndFlush([...algorithmVersions, algorithm]);

@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists } from "@scow/lib-ssh";
+import { getUserHomedir, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import path, { basename, dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
@@ -24,7 +24,7 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
+import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
@@ -184,18 +184,18 @@ export const updateModelVersion = procedure
 
     const needUpdateSharedPath = modelVersion.sharedStatus === SharedStatus.SHARED
     && versionName !== modelVersion.versionName;
+
+    // 更新已分享目录下的版本路径名称
     if (needUpdateSharedPath) {
-      await updateSharedName({
-        target: SHARED_TARGET.MODEL,
-        user: user,
+      // 获取更新后的已分享版本路径
+      const newVersionSharedPath = await getUpdatedSharedPath({
         clusterId: model.clusterId,
         newName: versionName,
-        isVersionName: true,
-        oldPath: modelVersion.path,
+        oldPath: dirname(modelVersion.path),
       });
 
-      const dir = dirname(modelVersion.path);
-      const newPath = join(dir, input.versionName);
+      const baseFolderName = basename(modelVersion.path);
+      const newPath = join(newVersionSharedPath, baseFolderName);
       modelVersion.path = newPath;
     }
 
@@ -247,19 +247,35 @@ export const deleteModelVersion = procedure
           message: `ModelVersion (id:${input.versionId}) is currently being shared or unshared` });
     }
 
-    // 如果是已分享的数据集版本，则删除分享
+    // 如果是已分享的模型版本，则删除分享
     if (modelVersion.sharedStatus === SharedStatus.SHARED) {
-      await checkSharePermission({
-        clusterId: model.clusterId,
-        checkedSourcePath: modelVersion.privatePath,
-        user,
-        checkedTargetPath: modelVersion.path,
-      });
-      await unShareFileOrDir({
-        clusterId: model.clusterId,
-        sharedPath: modelVersion.path,
-        user,
-      });
+
+      try {
+        const host = getClusterLoginNode(model.clusterId);
+        if (!host) { throw clusterNotFound(model.clusterId); }
+
+        await sshConnect(host, user.identityId, logger, async (ssh) => {
+          await checkSharePermission({
+            ssh,
+            sourcePath: modelVersion.privatePath,
+            userId: user.identityId,
+          });
+        });
+
+        const pathToUnshare
+        = model.versions.filter((v) => (v.id !== input.versionId && v.sharedStatus === SharedStatus.SHARED))
+          .length > 0 ?
+          // 除了此版本以外仍有其他已分享的版本则取消分享当前版本
+          dirname(modelVersion.path)
+          // 除了此版本以外没有其他已分享的版本则取消分享整个模型
+          : dirname(dirname(modelVersion.path));
+        await unShareFileOrDir({
+          host,
+          sharedPath: pathToUnshare,
+        });
+      } catch (e) {
+        logger.error(`ssh failure occured when unshare modelVersion ${input.versionId} of model ${input.modelId}`, e);
+      }
 
       model.isShared = model.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
@@ -305,24 +321,26 @@ export const shareModelVersion = procedure
     if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId}  not accessible` });
 
-    const homeTopDir = await checkSharePermission({
-      clusterId: model.clusterId,
-      checkedSourcePath: modelVersion.privatePath,
-      user,
-    });
 
-    // 定义分享后目标存储的绝对路径
-    const targetName = `${model.name}-${user!.identityId}`;
-    const targetSubName = `${modelVersion.versionName}`;
-    // const targetPath = path.join(SHARED_DIR, SHARED_TARGET.MODAL, targetName, targetSubName);
+    const host = getClusterLoginNode(model.clusterId);
+    if (!host) { throw clusterNotFound(model.clusterId); }
+
+    const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
+      // 确认是否具有分享权限
+      await checkSharePermission({ ssh, sourcePath: sourceFilePath, userId: user.identityId });
+      // 获取分享路径的上级路径
+      const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
+      return dirname(dirname(userHomeDir));
+    });
 
     modelVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([modelVersion]);
     await orm.em.flush();
 
     const successCallback = async (targetFullPath: string) => {
+      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       modelVersion.sharedStatus = SharedStatus.SHARED;
-      modelVersion.path = targetFullPath;
+      modelVersion.path = versionPath;
       if (!model.isShared) { model.isShared = true; };
       await orm.em.persistAndFlush([modelVersion, model]);
     };
@@ -335,10 +353,10 @@ export const shareModelVersion = procedure
     shareFileOrDir({
       clusterId: model.clusterId,
       sourceFilePath,
-      user,
+      userId: user.identityId,
       sharedTarget: SHARED_TARGET.MODEL,
-      targetName,
-      targetSubName,
+      targetName: model.name,
+      targetSubName: modelVersion.versionName,
       homeTopDir,
     }, successCallback, failureCallback);
 
@@ -379,11 +397,15 @@ export const unShareModelVersion = procedure
     if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
 
-    await checkSharePermission({
-      clusterId: model.clusterId,
-      checkedSourcePath: modelVersion.privatePath,
-      user,
-      checkedTargetPath: modelVersion.path,
+    const host = getClusterLoginNode(model.clusterId);
+    if (!host) { throw clusterNotFound(model.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      await checkSharePermission({
+        ssh,
+        sourcePath: modelVersion.privatePath,
+        userId: user.identityId,
+      });
     });
 
     modelVersion.sharedStatus = SharedStatus.UNSHARING;
@@ -404,10 +426,12 @@ export const unShareModelVersion = procedure
     };
 
     unShareFileOrDir({
-      clusterId: model.clusterId,
+      host,
       sharedPath: model.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
-        modelVersion.path : path.dirname(modelVersion.path),
-      user,
+        // 如果还有其他的已分享版本则只取消此版本的分享
+        dirname(modelVersion.path)
+        // 如果没有其他的已分享版本则取消整个算法的分享
+        : dirname(dirname(modelVersion.path)),
     }, successCallback, failureCallback);
 
     return;

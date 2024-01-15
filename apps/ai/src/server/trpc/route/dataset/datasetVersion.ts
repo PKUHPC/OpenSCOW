@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists } from "@scow/lib-ssh";
+import { getUserHomedir, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import path, { basename, dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
@@ -24,8 +24,8 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET,
-  shareFileOrDir, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
+import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
+  shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
@@ -213,39 +213,25 @@ export const updateDatasetVersion = procedure
 
     const needUpdateSharedPath = datasetVersion.sharedStatus === SharedStatus.SHARED
       && versionName !== datasetVersion.versionName;
+
+    // 更新已分享目录下的版本路径名称
     if (needUpdateSharedPath) {
-      await updateSharedName({
-        target: SHARED_TARGET.DATASET,
-        user: user,
+      // 获取更新后的已分享版本路径
+      const newVersionSharedPath = await getUpdatedSharedPath({
         clusterId: dataset.clusterId,
         newName: versionName,
-        isVersionName: true,
-        oldPath: datasetVersion.path,
+        oldPath: dirname(datasetVersion.path),
       });
 
-      const dir = dirname(datasetVersion.path);
-      const newPath = join(dir, versionName);
-      datasetVersion.path = newPath;
+      const baseFolderName = basename(datasetVersion.path);
+
+      datasetVersion.path = join(newVersionSharedPath, baseFolderName);
     }
 
     datasetVersion.versionName = versionName;
     datasetVersion.versionDescription = versionDescription;
 
-    await orm.em.flush().catch(async (e) => {
-      if (needUpdateSharedPath) {
-        logger.info("Rollback update shared name of %s", versionName);
-        await updateSharedName({
-          target: SHARED_TARGET.DATASET,
-          user: user,
-          clusterId: dataset.clusterId,
-          newName: versionName,
-          isVersionName: false,
-          oldPath: datasetVersion.path,
-          needRollback: true,
-        });
-      }
-      throw e;
-    });
+    await orm.em.flush();
 
     return { id: datasetVersion.id };
   });
@@ -264,43 +250,60 @@ export const deleteDatasetVersion = procedure
     id: z.number(),
     datasetId: z.number(),
   }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    const { id, datasetId } = input;
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
 
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
 
-    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId },
+    const dataset = await orm.em.findOne(Dataset, { id: datasetId },
       { populate: ["versions", "versions.sharedStatus"]});
     if (!dataset)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
 
     // 正在分享中或取消分享中的版本，不可删除
     if (datasetVersion.sharedStatus === SharedStatus.SHARING
       || datasetVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError(
         { code: "PRECONDITION_FAILED",
-          message: `DatasetVersion (id:${input.id}) is currently being shared or unshared` });
+          message: `DatasetVersion (id:${id}) is currently being shared or unshared` });
     }
 
     // 如果是已分享的数据集版本，则删除分享
     if (datasetVersion.sharedStatus === SharedStatus.SHARED) {
-      await checkSharePermission({
-        clusterId: dataset.clusterId,
-        checkedSourcePath: datasetVersion.privatePath,
-        user,
-        checkedTargetPath: datasetVersion.path,
-      });
-      await unShareFileOrDir({
-        clusterId: dataset.clusterId,
-        sharedPath: datasetVersion.path,
-        user,
-      });
+
+      try {
+        const host = getClusterLoginNode(dataset.clusterId);
+        if (!host) { throw clusterNotFound(dataset.clusterId); }
+
+        await sshConnect(host, user.identityId, logger, async (ssh) => {
+          await checkSharePermission({
+            ssh,
+            sourcePath: datasetVersion.privatePath,
+            userId: user.identityId,
+          });
+        });
+        const pathToUnshare
+        = dataset.versions.filter((v) => (v.id !== id && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
+          // 除了此版本以外仍有其他已分享的版本则取消分享当前版本
+          dirname(datasetVersion.path)
+          // 除了此版本以外没有其他已分享的版本则取消分享整个数据集
+          : dirname(dirname(datasetVersion.path));
+
+        await unShareFileOrDir({
+          host,
+          sharedPath: pathToUnshare,
+        });
+
+      } catch (e) {
+        logger.error(`ssh failure occured when unshare datasetVersion ${id} of dataset ${datasetId} `, e);
+      }
 
       dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
@@ -309,7 +312,7 @@ export const deleteDatasetVersion = procedure
 
     orm.em.remove(datasetVersion);
     await orm.em.flush();
-    return { success: true };
+    return;
   });
 
 export const shareDatasetVersion = procedure
@@ -328,32 +331,35 @@ export const shareDatasetVersion = procedure
     sourceFilePath: z.string(),
     // fileType: FileType,
   }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    const { id, datasetId, sourceFilePath } = input;
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
 
     if (datasetVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already shared" });
 
-    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
+    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
     if (!dataset)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
 
-    const homeTopDir = await checkSharePermission({
-      clusterId: dataset.clusterId,
-      checkedSourcePath: datasetVersion.privatePath,
-      user,
+
+    const host = getClusterLoginNode(dataset.clusterId);
+    if (!host) { throw clusterNotFound(dataset.clusterId); }
+
+    const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
+      // 确认是否具有分享权限
+      await checkSharePermission({ ssh, sourcePath: sourceFilePath, userId: user.identityId });
+      // 获取分享路径的上级路径
+      const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
+      return dirname(dirname(userHomeDir));
     });
-
-    // 定义分享后目标存储的绝对路径
-    const targetName = `${dataset.name}-${user!.identityId}`;
-    const targetSubName = `${datasetVersion.versionName}`;
 
     datasetVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([datasetVersion]);
@@ -361,7 +367,8 @@ export const shareDatasetVersion = procedure
 
     const successCallback = async (targetFullPath: string) => {
       datasetVersion.sharedStatus = SharedStatus.SHARED;
-      datasetVersion.path = targetFullPath;
+      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
+      datasetVersion.path = versionPath;
       if (!dataset.isShared) { dataset.isShared = true; };
       await orm.em.persistAndFlush([datasetVersion, dataset]);
     };
@@ -373,16 +380,16 @@ export const shareDatasetVersion = procedure
 
     shareFileOrDir({
       clusterId: dataset.clusterId,
-      sourceFilePath: input.sourceFilePath,
-      user,
+      sourceFilePath: sourceFilePath,
+      userId: user.identityId,
       sharedTarget: SHARED_TARGET.DATASET,
-      targetName,
-      targetSubName,
+      targetName: dataset.name,
+      targetSubName: datasetVersion.versionName,
       homeTopDir,
     }, successCallback, failureCallback);
 
     await orm.em.flush();
-    return { success: true };
+    return;
   });
 
 export const unShareDatasetVersion = procedure
@@ -399,7 +406,7 @@ export const unShareDatasetVersion = procedure
     id: z.number(),
     datasetId: z.number(),
   }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
@@ -418,11 +425,15 @@ export const unShareDatasetVersion = procedure
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
 
-    await checkSharePermission({
-      clusterId: dataset.clusterId,
-      checkedSourcePath: datasetVersion.privatePath,
-      user,
-      checkedTargetPath: datasetVersion.path,
+    const host = getClusterLoginNode(dataset.clusterId);
+    if (!host) { throw clusterNotFound(dataset.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      await checkSharePermission({
+        ssh,
+        sourcePath: datasetVersion.privatePath,
+        userId: user.identityId,
+      });
     });
 
     datasetVersion.sharedStatus = SharedStatus.UNSHARING;
@@ -443,14 +454,16 @@ export const unShareDatasetVersion = procedure
     };
 
     unShareFileOrDir({
-      clusterId: dataset.clusterId,
+      host,
       sharedPath: dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
-        datasetVersion.path : path.dirname(datasetVersion.path),
-      user,
+        // 如果还有其他的已分享版本则只取消此版本的分享
+        dirname(datasetVersion.path)
+        // 如果没有其他的已分享版本则取消整个数据集的分享
+        : dirname(dirname(datasetVersion.path)),
     }, successCallback, failureCallback);
 
     await orm.em.flush();
-    return { success: true };
+    return;
   });
 
 export const copyPublicDatasetVersion = procedure

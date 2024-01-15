@@ -11,16 +11,18 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import { basename, dirname, join } from "path";
 import { Framework } from "src/models/Algorithm";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
+import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusterExist } from "../utils";
@@ -124,7 +126,7 @@ export const createModel = procedure
       });
     }
     const orm = await getORM();
-    const modelExist = await orm.em.findOne(Model, { name:input.name, owner: user!.identityId });
+    const modelExist = await orm.em.findOne(Model, { name:input.name, owner: user.identityId });
     if (modelExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -132,7 +134,7 @@ export const createModel = procedure
       });
     }
 
-    const model = new Model({ ...input, owner: user!.identityId, isShared: false });
+    const model = new Model({ ...input, owner: user.identityId, isShared: false });
     await orm.em.persistAndFlush(model);
     return model.id;
   });
@@ -172,7 +174,7 @@ export const updateModel = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.id} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
 
@@ -185,7 +187,7 @@ export const updateModel = procedure
     if (changingVersions.length > 0) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: `Unfinished processing of model ${input.id} exists`,
+        message: `Unfinished processing of model ${id} exists`,
       });
     }
 
@@ -193,22 +195,19 @@ export const updateModel = procedure
     if (model.isShared && name !== model.name) {
 
       const sharedVersions = await orm.em.find(ModelVersion, { model, sharedStatus: SharedStatus.SHARED });
-      const oldPath = dirname(sharedVersions[0].path);
-      await updateSharedName({
-        target: SHARED_TARGET.MODEL,
-        user: user,
+      const oldPath = dirname(dirname(sharedVersions[0].path));
+      // 获取更新后的当前模型的共享路径名称
+      const newModelSharedPath = await getUpdatedSharedPath({
         clusterId: model.clusterId,
-        newName: `${name}-${user!.identityId}`,
-        isVersionName: false,
+        newName: name,
         oldPath,
       });
 
       // 更新已分享的版本的共享文件夹地址
-      const topDir = dirname(oldPath);
-      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
-
       sharedVersions.map((v) => {
-        v.path = join(newPathDir, v.versionName);
+        const baseFolderName = basename(v.path);
+        const newPath = join(newModelSharedPath, v.versionName, baseFolderName);
+        v.path = newPath;
       });
     }
 
@@ -240,7 +239,7 @@ export const deleteModel = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.id} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
     const modelVersions = await orm.em.find(ModelVersion, { model });
@@ -251,34 +250,24 @@ export const deleteModel = procedure
     // 有正在分享中或取消分享中的版本，则不可删除
     if (sharingVersions.length > 0) {
       throw new TRPCError(
-        { code: "PRECONDITION_FAILED", message: "There is an algorithm version being shared or unshared" });
+        { code: "PRECONDITION_FAILED",
+          message: `There is a model version being shared or unshared of model ${input.id}` });
     }
 
     const sharedVersions = modelVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
-    // 删除所有已分享的版本
-    let sharedDatasetPath: string = "";
+    // 获取此模型的共享的算法绝对路径
+    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
-    await Promise.all(sharedVersions.map(async (v) => {
-      // 在并行Promise.all中修改同一个外部变量？？
-      // 如果各个sharedVersions的v.path不一样，那sharedDataPath最后究竟是哪个的值？
-      // 如果是一样的，那这样写仍然不清晰，不如直接在外面先随便取一个v.path先赋值好
-      // js中要尽量减少可修改的共享变量（let）
-      sharedDatasetPath = path.dirname(v.path);
-      await checkSharePermission({
-        clusterId: model.clusterId,
-        checkedSourcePath: v.privatePath,
-        user,
-        checkedTargetPath: v.path,
-      });
-    }));
 
-    // 删除整个分享的dataset路径
+    const host = getClusterLoginNode(model.clusterId);
+    if (!host) { throw clusterNotFound(model.clusterId); }
+
     await unShareFileOrDir({
-      clusterId: model.clusterId,
+      host,
       sharedPath: sharedDatasetPath,
-      user,
     });
+
 
     await orm.em.removeAndFlush([...modelVersions, model]);
 

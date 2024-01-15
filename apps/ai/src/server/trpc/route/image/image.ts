@@ -11,7 +11,7 @@
  */
 
 import { getSortedClusterIds } from "@scow/config/build/cluster";
-import { constructCommand, loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
+import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
 import { config, rootKeyPair } from "src/server/config/env";
@@ -23,7 +23,7 @@ import { getHarborImageName, loadedImageRegex } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission } from "src/server/utils/share";
-import { getClusterLoginNode } from "src/server/utils/ssh";
+import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusters } from "../config";
@@ -192,11 +192,8 @@ export const createImage = procedure
 
     // 本地镜像检查源文件拥有者权限
     if (input.source === Source.INTERNAL) {
-      // 判断文件权限
-      await checkSharePermission({
-        clusterId: processClusterId,
-        checkedSourcePath: sourcePath,
-        user: user,
+      await sshConnect(host, user.identityId, logger, async (ssh) => {
+        await checkSharePermission({ ssh, sourcePath: sourcePath, userId: user.identityId });
       });
     }
 
@@ -252,7 +249,7 @@ export const createImage = procedure
         };
 
         // 更新数据库
-        const image = new Image({ ...input, path: targetImage, owner: user!.identityId });
+        const image = new Image({ ...input, path: targetImage, owner: user.identityId });
         await orm.em.persistAndFlush(image);
         return image.id;
       });
@@ -407,7 +404,7 @@ export const shareOrUnshareImage = procedure
     },
   })
   .input(z.object({ id: z.number(), share: z.boolean() }))
-  .output(z.object({}))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
@@ -429,7 +426,7 @@ export const shareOrUnshareImage = procedure
     image.isShared = input.share;
 
     await orm.em.persistAndFlush(image);
-    return {};
+    return;
   });
 
 

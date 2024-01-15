@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists } from "@scow/lib-ssh";
+import { getUserHomedir, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import path, { basename, dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
@@ -23,8 +23,8 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET, shareFileOrDir, unShareFileOrDir, updateSharedName }
-  from "src/server/utils/share";
+import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
+  shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
@@ -156,6 +156,9 @@ export const updateAlgorithmVersion = procedure
     const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
     if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not found` });
 
+    if (algorithm.owner !== user.identityId)
+      throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${input.algorithmId} not accessible` });
+
     const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.versionId });
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.versionId} not found` });
@@ -175,19 +178,19 @@ export const updateAlgorithmVersion = procedure
 
     const needUpdateSharedPath = algorithmVersion.sharedStatus === SharedStatus.SHARED
     && input.versionName !== algorithmVersion.versionName;
+
+    // 更新已分享目录下的版本路径名称
     if (needUpdateSharedPath) {
-      await updateSharedName({
-        target: SHARED_TARGET.ALGORITHM,
-        user: user,
+      // 获取更新后的已分享版本路径
+      const newVersionSharedPath = await getUpdatedSharedPath({
         clusterId: algorithm.clusterId,
         newName: input.versionName,
-        isVersionName: true,
-        oldPath: algorithmVersion.path,
+        oldPath: dirname(algorithmVersion.path),
       });
 
-      const dir = dirname(algorithmVersion.path);
-      const newPath = join(dir, input.versionName);
-      algorithmVersion.path = newPath;
+      const baseFolderName = basename(algorithmVersion.path);
+
+      algorithmVersion.path = join(newVersionSharedPath, baseFolderName);
     }
 
     algorithmVersion.versionName = input.versionName;
@@ -230,17 +233,33 @@ export const deleteAlgorithmVersion = procedure
 
     // 如果是已分享的数据集版本，则删除分享
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED) {
-      await checkSharePermission({
-        clusterId: algorithm.clusterId,
-        checkedSourcePath: algorithmVersion.privatePath,
-        user,
-        checkedTargetPath: algorithmVersion.path,
-      });
-      await unShareFileOrDir({
-        clusterId: algorithm.clusterId,
-        sharedPath: algorithmVersion.path,
-        user,
-      });
+
+      try {
+        const host = getClusterLoginNode(algorithm.clusterId);
+        if (!host) { throw clusterNotFound(algorithm.clusterId); }
+
+        await sshConnect(host, user.identityId, logger, async (ssh) => {
+          await checkSharePermission({
+            ssh,
+            sourcePath: algorithmVersion.privatePath,
+            userId: user.identityId,
+          });
+        });
+
+        const pathToUnshare
+        = algorithm.versions.filter((v) => (v.id !== id && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
+          // 除了此版本以外仍有其他已分享的版本则取消分享当前版本
+          dirname(algorithmVersion.path)
+          // 除了此版本以外没有其他已分享的版本则取消分享整个算法
+          : dirname(dirname(algorithmVersion.path));
+        await unShareFileOrDir({
+          host,
+          sharedPath: pathToUnshare,
+        });
+      } catch (e) {
+        logger.error(`ssh failure occured when unshare algorithmVersion ${id} of algorithm ${algorithmId}`, e);
+      }
+
 
       algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
@@ -285,23 +304,25 @@ export const shareAlgorithmVersion = procedure
     if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId}  not accessible` });
 
-    const homeTopDir = await checkSharePermission({
-      clusterId: algorithm.clusterId,
-      checkedSourcePath: algorithmVersion.privatePath,
-      user,
-    });
+    const host = getClusterLoginNode(algorithm.clusterId);
+    if (!host) { throw clusterNotFound(algorithm.clusterId); }
 
-    // 定义分享后目标存储的绝对路径
-    const targetName = `${algorithm.name}-${user!.identityId}`;
-    const targetSubName = `${algorithmVersion.versionName}`;
+    const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
+      // 确认是否具有分享权限
+      await checkSharePermission({ ssh, sourcePath: sourceFilePath, userId: user.identityId });
+      // 获取分享路径的上级路径
+      const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
+      return dirname(dirname(userHomeDir));
+    });
 
     algorithmVersion.sharedStatus = SharedStatus.SHARING;
     orm.em.persist([algorithmVersion]);
     await orm.em.flush();
 
     const successCallback = async (targetFullPath: string) => {
+      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
-      algorithmVersion.path = targetFullPath;
+      algorithmVersion.path = versionPath;
       if (!algorithm.isShared) { algorithm.isShared = true; };
       await orm.em.persistAndFlush([algorithmVersion, algorithm]);
     };
@@ -314,10 +335,10 @@ export const shareAlgorithmVersion = procedure
     shareFileOrDir({
       clusterId: algorithm.clusterId,
       sourceFilePath,
-      user,
+      userId: user.identityId,
       sharedTarget: SHARED_TARGET.ALGORITHM,
-      targetName,
-      targetSubName,
+      targetName: algorithm.name,
+      targetSubName: algorithmVersion.versionName,
       homeTopDir,
     }, successCallback, failureCallback);
 
@@ -358,11 +379,15 @@ export const unShareAlgorithmVersion = procedure
     if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId} not accessible` });
 
-    await checkSharePermission({
-      clusterId: algorithm.clusterId,
-      checkedSourcePath: algorithmVersion.privatePath,
-      user,
-      checkedTargetPath: algorithmVersion.path,
+    const host = getClusterLoginNode(algorithm.clusterId);
+    if (!host) { throw clusterNotFound(algorithm.clusterId); }
+
+    await sshConnect(host, user.identityId, logger, async (ssh) => {
+      await checkSharePermission({
+        ssh,
+        sourcePath: algorithmVersion.privatePath,
+        userId: user.identityId,
+      });
     });
 
     algorithmVersion.sharedStatus = SharedStatus.UNSHARING;
@@ -384,10 +409,12 @@ export const unShareAlgorithmVersion = procedure
 
     // 不await？
     unShareFileOrDir({
-      clusterId: algorithm.clusterId,
+      host,
       sharedPath: algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
-        algorithmVersion.path : path.dirname(algorithmVersion.path),
-      user,
+        // 如果还有其他的已分享版本则只取消此版本的分享
+        dirname(algorithmVersion.path)
+        // 如果没有其他的已分享版本则取消整个算法的分享
+        : dirname(dirname(algorithmVersion.path)),
     }, successCallback, failureCallback);
 
     return;

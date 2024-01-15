@@ -11,15 +11,16 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import path, { dirname, join } from "path";
+import { basename, dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
+import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { paginationSchema } from "src/server/utils/pagination";
-import { checkSharePermission, SHARED_TARGET,
-  unShareFileOrDir, updateSharedName } from "src/server/utils/share";
+import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusterExist } from "../utils";
@@ -191,6 +192,7 @@ export const updateDataset = procedure
       });
     }
 
+    // 存在正在分享或正在取消分享的数据集版本，则不可更新名称
     const changingVersions = await orm.em.find(DatasetVersion, { dataset,
       $or: [
         { sharedStatus: SharedStatus.SHARING },
@@ -208,22 +210,21 @@ export const updateDataset = procedure
     if (dataset.isShared && name !== dataset.name) {
 
       const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
-      const oldPath = dirname(sharedVersions[0].path);
-      await updateSharedName({
-        target: SHARED_TARGET.DATASET,
-        user: user,
+      const oldPath = dirname(dirname(sharedVersions[0].path));
+
+      // 获取更新后的当前算法的共享路径名称
+      const newDatasetSharedPath = await getUpdatedSharedPath({
         clusterId: dataset.clusterId,
-        newName: `${name}-${user!.identityId}`,
-        isVersionName: false,
+        newName: name,
         oldPath,
       });
 
       // 更新已分享的版本的共享文件夹地址
-      const topDir = dirname(oldPath);
-      const newPathDir = join(topDir, `${name}-${user!.identityId}`);
-
       sharedVersions.map((v) => {
-        v.path = join(newPathDir, v.versionName);
+        const baseFolderName = basename(v.path);
+        const newPath = join(newDatasetSharedPath, v.versionName, baseFolderName);
+
+        v.path = newPath;
       });
 
     }
@@ -249,7 +250,7 @@ export const deleteDataset = procedure
     },
   })
   .input(z.object({ id: z.number() }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const dataset = await orm.em.findOne(Dataset, { id: input.id });
@@ -267,39 +268,26 @@ export const deleteDataset = procedure
     // 有正在分享中或取消分享中的版本，则不可删除
     if (sharingVersions.length > 0) {
       throw new TRPCError(
-        { code: "PRECONDITION_FAILED", message: "There is an dataset version being shared or unshared" });
+        { code: "PRECONDITION_FAILED",
+          message: `There is an dataset version  being shared or unshared of dataset ${input.id}` });
     }
 
-    try {
-      const sharedVersions = datasetVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
+    const sharedVersions = datasetVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
-      // 删除所有已分享的版本
-      let sharedDatasetPath: string = "";
-      await Promise.all(sharedVersions.map(async (v) => {
-        sharedDatasetPath = path.dirname(v.path);
-        await checkSharePermission({
-          clusterId: dataset.clusterId,
-          checkedSourcePath: v.privatePath,
-          user,
-          checkedTargetPath: v.path,
-        });
-      }));
+    // 获取此数据集的共享的数据集绝对路径
+    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
-      // 删除整个分享的dataset路径
-      await unShareFileOrDir({
-        clusterId: dataset.clusterId,
-        sharedPath: sharedDatasetPath,
-        user,
-      }).catch((e) => {
-        console.error("Error deleting dataVersions of dataset:", e);
-      });
+    const host = getClusterLoginNode(dataset.clusterId);
+    if (!host) { throw clusterNotFound(dataset.clusterId); }
 
-      await orm.em.removeAndFlush([...datasetVersions, dataset]);
+    await unShareFileOrDir({
+      host,
+      sharedPath: sharedDatasetPath,
+    }).catch((e) => {
+      console.error("Error deleting dataVersions of dataset:", e);
+    });
 
-      return { success: true };
-    } catch (error) {
-      // rollback
-      console.error("Error deleting dataset:", error);
-      return { success: false };
-    }
+    await orm.em.removeAndFlush([...datasetVersions, dataset]);
+
+    return;
   });
