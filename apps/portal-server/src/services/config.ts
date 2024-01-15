@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
+import { checkSchedulerApiVersion } from "@scow/lib-server/build/scheduleAdapter";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
