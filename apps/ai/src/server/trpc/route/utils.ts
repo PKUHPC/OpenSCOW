@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getSortedClusters } from "@scow/config/build/cluster";
 import { USE_MOCK } from "src/utils/processEnv";
 import { z } from "zod";
+
+import { clusters } from "./config";
 
 export async function mock<T>(actualFn: () => T, mockFn: () => T) {
   if (USE_MOCK) {
@@ -25,3 +28,7 @@ export const pagination = z.object({
   page: z.number(),
   pageSize: z.number().default(10),
 });
+
+export function clusterExist(clusterId: string) {
+  return !!getSortedClusters(clusters).find((cluster) => cluster.id === clusterId);
+}

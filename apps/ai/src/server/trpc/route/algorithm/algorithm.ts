@@ -21,6 +21,8 @@ import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
+import { clusterExist } from "../utils";
+
 
 export const getAlgorithms = procedure
   .meta({
@@ -105,6 +107,14 @@ export const createAlgorithm = procedure
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
+
+    if (!clusterExist(input.clusterId)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Cluster id ${input.clusterId} does not exist.`,
+      });
+    }
+
     const { em } = await getORM();
     const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user!.identityId });
     if (algorithmExist) {

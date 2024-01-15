@@ -23,6 +23,8 @@ import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, SHARED_TARGET, unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
+import { clusterExist } from "../utils";
+
 export const ModelListSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -111,16 +113,22 @@ export const createModel = procedure
     algorithmName: z.string().optional(),
     algorithmFramework: z.nativeEnum(Framework).optional(),
     description: z.string().optional(),
-    // clusterId验证一下是否存在
     clusterId: z.string(),
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
+    if (!clusterExist(input.clusterId)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Cluster id ${input.clusterId} does not exist.`,
+      });
+    }
     const orm = await getORM();
     const modelExist = await orm.em.findOne(Model, { name:input.name, owner: user!.identityId });
     if (modelExist) {
       throw new TRPCError({
         code: "CONFLICT",
+        message: `The current model name ${input.name} already exists`,
       });
     }
 

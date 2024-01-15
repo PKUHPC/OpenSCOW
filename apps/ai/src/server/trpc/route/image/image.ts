@@ -27,6 +27,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusters } from "../config";
+import { clusterExist } from "../utils";
 
 export const ImageListSchema = z.object({
   id: z.number(),
@@ -124,6 +125,13 @@ export const createImage = procedure
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
+
+    if (input.clusterId && !clusterExist(input.clusterId)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Cluster id ${input.clusterId} does not exist.`,
+      });
+    }
     const orm = await getORM();
     const { name, tag, source, sourcePath } = input;
     const imageNameTagExist = await orm.em.findOne(Image,

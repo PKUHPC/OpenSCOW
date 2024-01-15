@@ -44,7 +44,6 @@ export const VersionListSchema = z.object({
 export const versionList = procedure
   .meta({
     openapi: {
-      // 这些API定义就很好
       method: "GET",
       path: "/models/{modelId}/versions",
       tags: ["modelVersions"],
@@ -139,14 +138,13 @@ export const updateModelVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
-      // id -> versionId，更明确
-      path: "/model/{modelId}/versions/{id}",
+      path: "/model/{modelId}/versions/{versionId}",
       tags: ["modelVersion"],
       summary: "update a modelVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    versionId: z.number(),
     versionName: z.string(),
     versionDescription: z.string().optional(),
     algorithmVersion: z.string().optional(),
@@ -156,7 +154,7 @@ export const updateModelVersion = procedure
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const { id, versionName, versionDescription, algorithmVersion, modelId } = input;
+    const { versionId, versionName, versionDescription, algorithmVersion, modelId } = input;
 
     const model = await orm.em.findOne(Model, { id: modelId });
     if (!model) {
@@ -167,9 +165,9 @@ export const updateModelVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
     }
 
-    const modelVersion = await orm.em.findOne(ModelVersion, { id });
+    const modelVersion = await orm.em.findOne(ModelVersion, { id: versionId });
     if (!modelVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
 
     const modelVersionExist = await orm.em.findOne(ModelVersion, { versionName });
     if (modelVersionExist && modelVersionExist !== modelVersion) {
@@ -180,7 +178,7 @@ export const updateModelVersion = procedure
       modelVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: `Unfinished processing of modelVersion ${id} exists`,
+        message: `Unfinished processing of modelVersion ${versionId} exists`,
       });
     }
 
@@ -213,23 +211,23 @@ export const deleteModelVersion = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/models/{modelId}/versions/{id}",
+      path: "/models/{modelId}/versions/{versionId}",
       tags: ["modelVersion"],
       summary: "delete a new modelVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    versionId: z.number(),
     modelId: z.number(),
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const modelVersion = await orm.em.findOne(ModelVersion, { id: input.id });
+    const modelVersion = await orm.em.findOne(ModelVersion, { id: input.versionId });
 
     if (!modelVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${input.versionId} not found` });
 
     const model = await orm.em.findOne(Model, { id: input.modelId },
       { populate: ["versions", "versions.sharedStatus"]});
@@ -246,7 +244,7 @@ export const deleteModelVersion = procedure
       || modelVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError(
         { code: "PRECONDITION_FAILED",
-          message: `ModelVersion (id:${input.id}) is currently being shared or unshared` });
+          message: `ModelVersion (id:${input.versionId}) is currently being shared or unshared` });
     }
 
     // 如果是已分享的数据集版本，则删除分享
@@ -419,15 +417,14 @@ export const copyPublicModelVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      // /models/{modelId}/versions/{versionId}/copy
-      path: "/model/{modelId}/version/{modelVersionId}/copy",
+      path: "/model/{modelId}/versions/{versionId}/copy",
       tags: ["modelVersion"],
       summary: "copy a public model version",
     },
   })
   .input(z.object({
     modelId: z.number(),
-    modelVersionId: z.number(),
+    versionId: z.number(),
     modelName: z.string(),
     versionName: z.string(),
     versionDescription: z.string(),
@@ -439,13 +436,13 @@ export const copyPublicModelVersion = procedure
 
     // 1. 检查模型版本是否为公开版本
     const modelVersion = await orm.em.findOne(ModelVersion,
-      { id: input.modelVersionId, sharedStatus: SharedStatus.SHARED },
+      { id: input.versionId, sharedStatus: SharedStatus.SHARED },
       { populate: ["model"]});
 
     if (!modelVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Model Version ${input.modelVersionId} does not exist or is not public`,
+        message: `Model Version ${input.versionId} does not exist or is not public`,
       });
     }
     // 2. 检查该用户是否已有同名模型

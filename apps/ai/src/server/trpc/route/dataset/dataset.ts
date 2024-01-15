@@ -22,6 +22,8 @@ import { checkSharePermission, SHARED_TARGET,
   unShareFileOrDir, updateSharedName } from "src/server/utils/share";
 import { z } from "zod";
 
+import { clusterExist } from "../utils";
+
 export const DatasetListSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -120,6 +122,14 @@ export const createDataset = procedure
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
+
+    if (!clusterExist(input.clusterId)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Cluster id ${input.clusterId} does not exist.`,
+      });
+    }
+
     const orm = await getORM();
 
     const datesetExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
