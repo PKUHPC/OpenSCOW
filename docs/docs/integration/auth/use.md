@@ -38,6 +38,7 @@ auth:
       # volumes:
       #   - "./myfile:/etc/myfile"
 
+    # 下列 image、ports、volumes 配置为老版本的配置，已过时，未来将会删除
     # 兼容老版本,image 在老版本中为字符串
     # 定义认证系统镜像名。必填
     # image: my-custom-auth:v1.0
