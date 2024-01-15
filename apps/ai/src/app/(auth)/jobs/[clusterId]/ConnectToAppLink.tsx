@@ -34,8 +34,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   const { publicConfig: { BASE_PATH } } = usePublicConfig();
   const { message } = App.useApp();
 
-  const { data, refetch } = trpc.jobs.checkAppConnectivity.useQuery({ host: session.host!, port: session.port! }, {
-    enabled: !!session.host && !!session.port,
+  const { data, refetch } = trpc.jobs.checkAppConnectivity.useQuery({ clusterId: cluster, jobId: session.jobId }, {
+    enabled: !!session.jobId,
   });
 
   const connectMutation = trpc.jobs.connectToApp.useMutation(

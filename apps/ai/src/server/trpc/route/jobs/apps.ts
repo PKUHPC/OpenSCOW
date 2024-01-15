@@ -223,11 +223,9 @@ export const createAppSession = procedure
       method: "POST",
       path: "/appSessions",
       tags: ["app"],
-      summary: "Create APP Sessions",
+      summary: "Create APP Session",
     },
   })
-  // openAPI定义？
-  // POST /appSessions
   .input(z.object({
     clusterId: z.string(),
     appId: z.string(),
@@ -411,9 +409,16 @@ export const createAppSession = procedure
   });
 
 
-// POST /jobs/{jobId}/saveImage
 export const saveImage =
   procedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/apps/{jobId}/saveImage",
+        tags: ["app"],
+        summary: "Save Image From App Session",
+      },
+    })
     .input(z.object({
       clusterId: z.string(),
       jobId: z.number(),
@@ -499,9 +504,16 @@ export const saveImage =
       },
     );
 
-// POST /jobs
 export const trainJob =
 procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/jobs",
+      tags: ["app"],
+      summary: "Submit A Train Job",
+    },
+  })
   .input(z.object({
     clusterId: z.string(),
     trainJobName: z.string(),
@@ -608,9 +620,16 @@ procedure
     },
   );
 
-// GET /appSessions
 export const listAppSessions =
   procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/appSessions",
+        tags: ["appSessions"],
+        summary: "List APP Sessions",
+      },
+    })
     .input(z.object({ clusterId: z.string(), isRunning: z.boolean(), ...paginationSchema.shape }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
@@ -745,26 +764,40 @@ export const listAppSessions =
 
 const TIMEOUT_MS = 3000;
 
-// 不要直接让用户检查某个host和port，可能会泄露信息
-// 用户关心的只是一个appSessions能不能连上，所以就只让用户提供sessionId，服务器去自己取获取host和port
-// GET /appSessions/{sessionId}/checkConnectivity
 export const checkAppConnectivity =
-procedure.input(z.object({
-  host: z.string(),
-  port: z.number(),
-})).output(z.object({
-  ok: z.boolean(),
-})).query(
-  async ({ input }) => {
+procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/appSessions/{jobId}/checkConnectivity",
+      tags: ["appSessions"],
+      summary: "List App Sessions",
+    },
+  })
+  .input(z.object({
+    clusterId: z.string(),
+    jobId: z.number(),
+  })).output(z.object({
+    ok: z.boolean(),
+  })).query(
+    async ({ input }) => {
 
-    const { port, host } = input;
+      const { jobId, clusterId } = input;
 
-    const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+      const client = getAdapterClient(clusterId);
+      const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
 
-    return { ok: reachable };
-  },
+      if (connectionInfo?.response?.$case === "appConnectionInfo") {
+        const host = connectionInfo.response.appConnectionInfo.host;
+        const port = connectionInfo.response.appConnectionInfo.port;
+        const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+        return { ok: reachable };
+      } else {
+        return { ok: false };
+      }
+    },
 
-);
+  );
 
 const AppConnectPropsSchema = z.object({
   method: z.string(),
@@ -793,9 +826,16 @@ const ConnectToAppResponseSchema = z.intersection(
   ]),
 );
 
-// POST /appSessions/{sessionId}/connect
 export const connectToApp =
 procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/appSessions/{sessionId}/connect",
+      tags: ["appSessions"],
+      summary: "Connect to APP Session",
+    },
+  })
   .input(z.object({
     cluster: z.string(),
     sessionId: z.string(),
@@ -886,20 +926,28 @@ procedure
   });
 
 
-// DELETE /jobs/{jobId}
 export const cancelJob =
-procedure.input(z.object({
-  cluster: z.string(),
-  jobId: z.number(),
-})).mutation(async ({ input, ctx: { user } }) => {
+procedure
+  .meta({
+    openapi: {
+      method: "DELETE",
+      path: "/jobs/{jobId}",
+      tags: ["jobs"],
+      summary: "Cancel Train Job or App Session",
+    },
+  })
+  .input(z.object({
+    cluster: z.string(),
+    jobId: z.number(),
+  })).mutation(async ({ input, ctx: { user } }) => {
 
-  const { cluster, jobId } = input;
+    const { cluster, jobId } = input;
 
-  const userId = user.identityId;
-  const client = getAdapterClient(cluster);
-  await asyncClientCall(client.job, "cancelJob", {
-    userId,
-    jobId,
+    const userId = user.identityId;
+    const client = getAdapterClient(cluster);
+    await asyncClientCall(client.job, "cancelJob", {
+      userId,
+      jobId,
+    });
+    return {};
   });
-  return {};
-});
