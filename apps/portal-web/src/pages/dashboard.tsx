@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { message } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -53,7 +52,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
               clusterName:  clusters.find((y) => y.id === cluster.clusterName)?.name,
               ...x,
               cpuUsage:x.runningCpuCount / x.cpuCoreCount,
-              gpuUsage:x.gpuCoreCount ? x.runningGpuCount / x.gpuCoreCount : 0,
+              ...x.gpuCoreCount ? { gpuUsage:x.runningGpuCount / x.gpuCoreCount } : {},
             })),
           ),
         failedClusters:failedClusters.map((x) => ({ clusterName:clusters.find((y) => y.id === x)?.name })),

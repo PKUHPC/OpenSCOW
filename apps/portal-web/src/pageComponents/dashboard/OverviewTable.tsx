@@ -89,11 +89,13 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
         loading={isLoading}
         pagination={false}
         scroll={{ y:275 }}
-        rowClassName={(_, index) => (index === selectId ? "rowBgColor" : "")}
+        rowClassName={(TableProps) => (TableProps.id === selectId ? "rowBgColor" : "")}
         onRow={(r) => {
           return {
             onClick() {
-              r.id && setSelectId(r.id);
+              if (r.id !== undefined) {
+                setSelectId(r.id);
+              }
             },
           };
         }}
@@ -102,51 +104,51 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
           dataIndex="clusterName"
           width="15%"
           title={t(p("clusterName"))}
-          sorter={(a, b) =>
+          sorter={(a, b, sortOrder) =>
             compareWithUndefined(getI18nConfigCurrentText(a.clusterName, languageId),
-              getI18nConfigCurrentText(b.clusterName, languageId))}
+              getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
           render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
         />
         <Table.Column<TableProps>
           dataIndex="partitionName"
           title={t(p("partitionName"))}
-          sorter={(a, b) => compareWithUndefined(a.partitionName, b.partitionName)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.partitionName, b.partitionName, sortOrder)}
           render={(partitionName) => partitionName ?? "-"}
         />
         <Table.Column<TableProps>
           dataIndex="nodeCount"
           title={t(p("nodeCount"))}
-          sorter={(a, b) => compareWithUndefined(a.nodeCount, b.nodeCount)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.nodeCount, b.nodeCount, sortOrder)}
           render={(nodeCount) => nodeCount ?? "-"}
         />
         <Table.Column<TableProps>
           dataIndex="usageRatePercentage"
           title={t(p("usageRatePercentage"))}
-          sorter={(a, b) => compareWithUndefined(a.usageRatePercentage, b.usageRatePercentage)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.usageRatePercentage, b.usageRatePercentage, sortOrder)}
           render={(usageRatePercentage) => usageRatePercentage !== undefined ? usageRatePercentage + "%" : "-"}
         />
         <Table.Column<TableProps>
           dataIndex="cpuUsage"
           title={t(p("cpuUsage"))}
-          sorter={(a, b) => compareWithUndefined(a.cpuUsage, b.cpuUsage)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.cpuUsage, b.cpuUsage, sortOrder)}
           render={(cpuUsage) => cpuUsage !== undefined ? cpuUsage + "%" : "-"}
         />
         <Table.Column<TableProps>
           dataIndex="gpuUsage"
           title={t(p("gpuUsage"))}
-          sorter={(a, b) => compareWithUndefined(a.gpuUsage, b.gpuUsage) }
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.gpuUsage, b.gpuUsage, sortOrder) }
           render={(gpuUsage) => gpuUsage !== undefined ? gpuUsage + "%" : "-" }
         />
         <Table.Column<TableProps>
           dataIndex="pendingJobCount"
           title={t(p("pendingJobCount"))}
-          sorter={(a, b) => compareWithUndefined(a.pendingJobCount, b.pendingJobCount)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.pendingJobCount, b.pendingJobCount, sortOrder)}
           render={(pendingJobCount) => pendingJobCount ?? "-" }
         />
         <Table.Column<TableProps>
           dataIndex="partitionStatus"
           title={t(p("partitionStatus"))}
-          sorter={(a, b) => compareWithUndefined(a.partitionStatus, b.partitionStatus)}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.partitionStatus, b.partitionStatus, sortOrder)}
           render={(partitionStatus) => partitionStatus === 0 ?
             <Tag color="red">{t(p("notAvailable"))}</Tag> : <Tag color="green">{t(p("available"))}</Tag>
           }
