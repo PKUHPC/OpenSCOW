@@ -13,7 +13,8 @@
 import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
-import { InstallConfigSchema } from "src/config/install";
+import { AuthCustomType, InstallConfigSchema } from "src/config/install";
+import { logger } from "src/log";
 
 const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
@@ -158,17 +159,64 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     "~/.ssh": "/root/.ssh",
   };
 
-  if (config.auth.custom) {
-    for (const key in config.auth.custom.volumes) {
-      authVolumes[key] = config.auth.custom.volumes[key];
-    }
+  const authUrl = config.auth.custom?.type === AuthCustomType.external
+    ? config.auth.custom.external?.url : "http://auth:5000";
 
-    addService("auth", {
-      image: config.auth.custom.image,
-      ports: config.auth.custom.ports ?? {},
-      environment: config.auth.custom.environment ?? {},
-      volumes: authVolumes,
-    });
+  // 是否配置自定义认证系统
+  if (config.auth.custom) {
+    // 未配置 type，则为旧版本自定义认证系统配置
+    if (config.auth.custom.type === undefined) {
+      if (config.auth.custom.image === undefined) {
+        throw new Error("Invalid config: auth/custom/image is required");
+      }
+
+      for (const key in config.auth.custom.volumes) {
+        authVolumes[key] = config.auth.custom.volumes[key];
+      }
+
+      if (typeof config.auth.custom.image === "object" && config.auth.custom.image !== null) {
+        throw new Error("Invalid config: " +
+          "auth/custom/image in the old version of the custom authentication system configuration is a string");
+      }
+
+      logger.info("The current configuration of the custom authentication system is outdated, "
+        + "please read the relevant configuration documentation and update it.");
+
+      addService("auth", {
+        image: config.auth.custom.image,
+        ports: config.auth.custom.ports ?? {},
+        environment: config.auth.custom.environment ?? {},
+        volumes: authVolumes,
+      });
+    } else { // 新版自定义认证系统配置
+
+      // 镜像类型的自定义认证系统
+      if (config.auth.custom.type === AuthCustomType.image) {
+        if (config.auth.custom.image === undefined) {
+          throw new Error("Invalid config: auth/custom/image is required");
+        }
+
+        if (typeof config.auth.custom.image === "string") {
+          throw new Error("Invalid config: auth/custom/image is an object, but it is passed as a string");
+        }
+        const image = config.auth.custom.image.imageName;
+
+        for (const key in config.auth.custom.image.volumes) {
+          authVolumes[key] = config.auth.custom.image.volumes[key];
+        }
+
+        addService("auth", {
+          image,
+          ports: config.auth.custom.image.ports ?? {},
+          environment: config.auth.custom.environment ?? {},
+          volumes: authVolumes,
+        });
+      } else if (config.auth.custom.type === AuthCustomType.external) {
+        if (authUrl === undefined) {
+          throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
+        }
+      }
+    }
   } else {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
@@ -217,7 +265,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": portalBasePath,
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
-        "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
@@ -248,6 +297,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
+        AUTH_URL: config.auth.custom?.external?.url ?? "",
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
@@ -265,7 +315,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
-        "AUTH_EXTERNAL_URL": join(BASE_PATH, "/auth"),
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
         "PROTOCOL": config.gateway.protocol,
@@ -273,6 +324,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
       ports: {},
       volumes: {
+        "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
     });
@@ -305,6 +357,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
+        "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
       },
     });
