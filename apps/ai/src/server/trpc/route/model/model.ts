@@ -12,6 +12,7 @@
 
 import { TRPCError } from "@trpc/server";
 import path, { dirname, join } from "path";
+import { Framework } from "src/models/Algorithm";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
@@ -27,7 +28,7 @@ export const ModelListSchema = z.object({
   name: z.string(),
   description: z.union([z.string(), z.undefined()]),
   algorithmName: z.string().optional(),
-  algorithmFramework: z.string().optional(),
+  algorithmFramework: z.nativeEnum(Framework).optional(),
   isShared: z.boolean(),
   versions: z.array(z.string()),
   owner: z.string(),
@@ -108,9 +109,7 @@ export const createModel = procedure
   .input(z.object({
     name: z.string(),
     algorithmName: z.string().optional(),
-    // algorithmFramework是否在API层应该有取值限制？
-    // 最好在数据库层也限制一下
-    algorithmFramework: z.string().optional(),
+    algorithmFramework: z.nativeEnum(Framework).optional(),
     description: z.string().optional(),
     // clusterId验证一下是否存在
     clusterId: z.string(),
@@ -143,7 +142,7 @@ export const updateModel = procedure
     id: z.number(),
     name: z.string(),
     algorithmName: z.string().optional(),
-    algorithmFramework: z.string().optional(),
+    algorithmFramework: z.nativeEnum(Framework).optional(),
     description: z.string().optional(),
   }))
   .output(z.number())

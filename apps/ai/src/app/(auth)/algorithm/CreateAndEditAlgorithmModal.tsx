@@ -14,7 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal, Select } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { AlgorithmTypeText } from "src/models/Algorithm";
+import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
@@ -23,7 +23,7 @@ interface EditProps {
   cluster?: Cluster;
   algorithmName: string;
   algorithmId: number;
-  algorithmFramework: string;
+  algorithmFramework: Framework;
   algorithmDescription?: string;
 }
 export interface Props {

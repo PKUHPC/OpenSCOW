@@ -11,6 +11,7 @@
  */
 
 import { Collection, EntitySchema } from "@mikro-orm/core";
+import { Framework } from "src/models/Algorithm";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/server/utils/orm";
 
 import { ModelVersion } from "./ModelVersion";
@@ -19,7 +20,7 @@ export class Model {
   id!: number;
   name: string;
   owner: string;
-  algorithmFramework?: string;
+  algorithmFramework?: Framework;
   algorithmName?: string;
   versions = new Collection<ModelVersion>(this);
   isShared?: boolean;
@@ -31,7 +32,7 @@ export class Model {
   constructor(init: {
     name: string;
     owner: string;
-    algorithmFramework?: string;
+    algorithmFramework?: Framework;
     algorithmName?: string;
     isShared?: boolean;
     description?: string;
