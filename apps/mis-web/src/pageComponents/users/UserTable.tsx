@@ -218,6 +218,13 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
+                      .httpError(400, (e) => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      })
                       .httpError(409, () => {
                         message.destroy("removeUser");
                         message.error({
