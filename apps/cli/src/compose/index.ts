@@ -14,6 +14,7 @@ import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
 import { AuthCustomType, InstallConfigSchema } from "src/config/install";
+import { logger } from "src/log";
 
 const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
@@ -160,33 +161,57 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   const authUrl = config.auth.custom?.type === AuthCustomType.external
     ? config.auth.custom.external?.url : "http://auth:5000";
-  if (authUrl === undefined) {
-    throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
-  }
 
-  if (config.auth.custom?.type === AuthCustomType.image) {
-    const volumes = typeof config.auth.custom.image === "string" ?
-      config.auth.custom.volumes : config.auth.custom.image?.volumes;
-    for (const key in volumes) {
-      authVolumes[key] = volumes[key];
+  // 是否配置自定义认证系统
+  if (config.auth.custom) {
+
+    // 未配置 type，则为旧版本自定义认证系统配置
+    if (config.auth.custom.type === undefined) {
+      logger.info("The current configuration of the custom authentication system is outdated, "
+        + "please read the relevant configuration documentation and update it.");
+
+      for (const key in config.auth.custom.volumes) {
+        authVolumes[key] = config.auth.custom.volumes[key];
+      }
+
+      if (typeof config.auth.custom.image === "object" && config.auth.custom.image !== null) {
+        throw new Error("Invalid config: " +
+          "auth/custom/image in the old version of the custom authentication system configuration is a string");
+      }
+
+      addService("auth", {
+        image: config.auth.custom.image,
+        ports: config.auth.custom.ports ?? {},
+        environment: config.auth.custom.environment ?? {},
+        volumes: authVolumes,
+      });
+    } else { // 新版自定义认证系统配置
+
+      // 镜像类型的自定义认证系统
+      if (config.auth.custom.type === AuthCustomType.image) {
+
+        if (typeof config.auth.custom.image === "string") {
+          throw new Error("Invalid config: auth/custom/image is an object, but it is passed as a string");
+        }
+        const image = config.auth.custom.image.imageName;
+
+        for (const key in config.auth.custom.image.volumes) {
+          authVolumes[key] = config.auth.custom.image.volumes[key];
+        }
+
+        addService("auth", {
+          image,
+          ports: config.auth.custom.image.ports ?? {},
+          environment: config.auth.custom.environment ?? {},
+          volumes: authVolumes,
+        });
+      } else if (config.auth.custom.type === AuthCustomType.external) {
+        if (authUrl === undefined) {
+          throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
+        }
+      }
     }
-
-    const image = typeof config.auth.custom.image === "string" ?
-      config.auth.custom.image : config.auth.custom.image?.imageName;
-    if (image === undefined) {
-      throw new Error("Invalid config: must have /auth/custom/image or /auth/custom/imageConfig/imageName");
-    }
-
-    const ports = typeof config.auth.custom.image === "string" ?
-      config.auth.custom.ports : config.auth.custom.image?.ports;
-
-    addService("auth", {
-      image,
-      ports: ports ?? {},
-      environment: config.auth.custom.environment ?? {},
-      volumes: authVolumes,
-    });
-  } else if (config.auth.custom === undefined || config.auth.custom.type !== AuthCustomType.external) {
+  } else {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
     addService("auth", {
