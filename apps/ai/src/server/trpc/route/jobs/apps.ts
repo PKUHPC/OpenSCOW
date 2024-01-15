@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server/build/app";
+import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
   loggedExec,
@@ -167,10 +167,9 @@ export const listAvailableApps = procedure
 export const getAppMetadata = procedure
   .meta({
     openapi: {
-      // GET /apps/{appId}
       method: "GET",
-      path: "/jobs/getAppMetadata",
-      tags: ["jobs"],
+      path: "/apps/{appId}",
+      tags: ["app"],
       summary: "Get App Metadata",
     },
   })
@@ -219,6 +218,14 @@ export const getAppMetadata = procedure
   });
 
 export const createAppSession = procedure
+  .meta({
+    openapi: {
+      method: "POST",
+      path: "/appSessions",
+      tags: ["app"],
+      summary: "Create APP Sessions",
+    },
+  })
   // openAPI定义？
   // POST /appSessions
   .input(z.object({
@@ -492,7 +499,6 @@ export const saveImage =
       },
     );
 
-// 这个是新建一个job？
 // POST /jobs
 export const trainJob =
 procedure
