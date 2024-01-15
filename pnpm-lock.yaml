@@ -172,6 +172,9 @@ importers:
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../../libs/scheduler-adapter
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
@@ -1417,6 +1420,15 @@ importers:
       '@scow/config':
         specifier: workspace:*
         version: link:../config
+      '@scow/lib-scheduler-adapter':
+        specifier: workspace:*
+        version: link:../scheduler-adapter
+      '@scow/rich-error-model':
+        specifier: workspace:*
+        version: link:../rich-error-model
+      '@scow/utils':
+        specifier: workspace:*
+        version: link:../utils
       nookies:
         specifier: 2.5.2
         version: 2.5.2

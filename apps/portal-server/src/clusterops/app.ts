@@ -15,6 +15,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
+import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
@@ -27,7 +28,7 @@ import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
+import { getAdapterClient } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,

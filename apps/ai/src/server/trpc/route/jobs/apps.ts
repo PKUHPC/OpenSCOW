@@ -16,6 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
+import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
 import {
   getUserHomedir,
   loggedExec,
@@ -37,8 +38,8 @@ import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/server/utils/clusters";
-import { getORM } from "src/server/utils/getOrm";
+import { getAdapterClient } from "src/server/utils/clusters";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { isPortReachable } from "src/utils/isPortReachable";
@@ -324,16 +325,14 @@ export const createAppSession = procedure
       }
     });
 
-    // 业务代码中不要用getOrm，而是用forkEntityManager直接拿新的EM来做
-    // 这样可以避免在一个EM中同时做多个事务
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const {
       datasetVersion,
       algorithmVersion,
       modelVersion,
     } = await checkCreateAppEntity({
-      orm,
+      em,
       dataset,
       algorithm,
       model,
@@ -450,8 +449,8 @@ export const saveImage =
         const { clusterId, jobId, imageName, imageTag, imageDesc } = input;
 
         // 检查镜像在数据库中是否重复
-        const orm = await getORM();
-        const existImage = await orm.em.findOne(ImageEntity, { owner: userId, name: imageName, tag: imageTag });
+        const em = await forkEntityManager();
+        const existImage = await em.findOne(ImageEntity, { owner: userId, name: imageName, tag: imageTag });
         if (existImage) {
           throw new TRPCError({
             code: "CONFLICT",
@@ -473,7 +472,9 @@ export const saveImage =
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // 检查该容器是否存在
-            const resp = await loggedExec(ssh, logger, true, `docker  ps --no-trunc | grep ${formateContainerId}`, []);
+            const resp = await loggedExec(ssh, logger, true, "docker",
+              ["ps", "--no-trunc", "|", "grep", formateContainerId]);
+
             if (!resp.stdout) {
               throw new TRPCError({
                 code: "NOT_FOUND",
@@ -481,25 +482,21 @@ export const saveImage =
               });
             }
             // 用新名字commit镜像
-            await loggedExec(ssh, logger, true,
-              `docker commit ${formateContainerId} ${userId}/${imageName}:${imageTag}`, []);
+            await loggedExec(ssh, logger, true, "docker",
+              ["commit", formateContainerId, `${userId}/${imageName}:${imageTag}`]);
 
             // docker login harbor
-            await loggedExec(ssh, logger, true,
-              `docker login  ${url} -u ${harborUser} -p ${password}`, []);
+            await loggedExec(ssh, logger, true, "docker", ["login", url, "-u", harborUser, "-p", password]);
 
             // docker tag
-            await loggedExec(ssh, logger, true, `docker tag ${localImageUrl} ${harborImageUrl}`, []);
+            await loggedExec(ssh, logger, true, "docker", ["tag", localImageUrl, harborImageUrl]);
 
             // push 镜像至harbor
-            await loggedExec(ssh, logger, true,
-              `docker push ${harborImageUrl}`, []);
+            await loggedExec(ssh, logger, true, "docker", ["push", harborImageUrl]);
 
             // 清除本地镜像
-            await loggedExec(ssh, logger, true,
-              `docker rmi ${harborImageUrl}`, []);
-            await loggedExec(ssh, logger, true,
-              `docker rmi ${localImageUrl}`, []);
+            await loggedExec(ssh, logger, true, "docker", ["rmi", harborImageUrl]);
+            await loggedExec(ssh, logger, true, "docker", ["rmi", localImageUrl]);
 
             // 数据库添加image
 
@@ -512,7 +509,7 @@ export const saveImage =
               source: Source.EXTERNAL,
               sourcePath: harborImageUrl,
             });
-            await orm.em.persistAndFlush(newImage);
+            await em.persistAndFlush(newImage);
           } catch (e) {
             const ex = e as ServiceError;
             throw new TRPCError({
@@ -561,14 +558,14 @@ procedure
         message: `Cluster ${clusterId} has no login node` });
       }
 
-      const orm = await getORM();
+      const em = await forkEntityManager();
       const {
         datasetVersion,
         algorithmVersion,
         modelVersion,
         image,
       } = await checkCreateAppEntity({
-        orm,
+        em,
         dataset,
         algorithm,
         image: imageId,

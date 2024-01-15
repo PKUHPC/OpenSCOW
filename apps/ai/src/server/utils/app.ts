@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MikroORM } from "@mikro-orm/mysql";
+import { EntityManager } from "@mikro-orm/mysql";
 import { AppConfigSchema } from "@scow/config/build/appForAi";
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
 import { TRPCError } from "@trpc/server";
@@ -51,8 +51,8 @@ export const getClusterAppConfigs = (cluster: string) => {
  * @returns datasetVersion, algorithmVersion, modelVersion, image
  * @throws TRPCError if dataset, algorithm, image, model is not found
  */
-export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, model }: {
-  orm: MikroORM
+export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, model }: {
+  em: EntityManager
   dataset: number | undefined,
   algorithm: number | undefined,
   image?: number,
@@ -60,7 +60,7 @@ export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, mod
 }) => {
   let algorithmVersion: AlgorithmVersion | undefined;
   if (algorithm !== undefined) {
-    const selectAlgorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithm });
+    const selectAlgorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithm });
 
     if (!selectAlgorithmVersion) {
       throw new TRPCError({
@@ -73,7 +73,7 @@ export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, mod
 
   let datasetVersion: DatasetVersion | undefined;
   if (dataset !== undefined) {
-    const selectDatasetVersion = await orm.em.findOne(DatasetVersion, { id: dataset });
+    const selectDatasetVersion = await em.findOne(DatasetVersion, { id: dataset });
 
     if (!selectDatasetVersion) {
       throw new TRPCError({
@@ -86,7 +86,7 @@ export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, mod
 
   let modelVersion: ModelVersion | undefined;
   if (model !== undefined) {
-    const selectedModelVersion = await orm.em.findOne(ModelVersion, { id: model });
+    const selectedModelVersion = await em.findOne(ModelVersion, { id: model });
     if (!selectedModelVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -98,7 +98,7 @@ export const checkCreateAppEntity = async ({ orm, dataset, algorithm, image, mod
 
   let imageOutput: Image | undefined;
   if (image !== undefined) {
-    const existImage = await orm.em.findOne(Image, { id: image });
+    const existImage = await em.findOne(Image, { id: image });
 
     if (!existImage) {
       throw new TRPCError({

@@ -15,6 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { checkSchedulerApiVersion } from "@scow/lib-server/build/app";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -22,7 +23,7 @@ import { ApiVersion } from "@scow/utils/build/version";
 import path from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
+import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
