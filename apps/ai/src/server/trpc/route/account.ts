@@ -15,6 +15,7 @@ import { TRPCError } from "@trpc/server";
 import { router } from "src/server/trpc/def";
 import { procedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
+import paginationSchema from "src/server/utils/paginationSchema ";
 import { z } from "zod";
 
 export const accountRouter = router({
@@ -23,19 +24,20 @@ export const accountRouter = router({
     .meta({
       openapi: {
         method: "GET",
-        // GET /accounts
-        path: "/account",
+        path: "/accounts",
         tags: ["account"],
         summary: "List all accounts",
       },
     })
-    // 这种可能会有大量数据的API，都要增加page和pageSize参数，以便分页
-    .input(z.object({ clusterId: z.optional(z.string()) }))
-    .output(z.object({ accounts: z.array(z.string()) }))
+    .input(z.object({
+      clusterId: z.optional(z.string()),
+      ...paginationSchema.shape,
+    }))
+    .output(z.object({ accounts: z.array(z.string()), count: z.number() }))
     .query(async ({ input, ctx: { user } }) => {
-      const { clusterId } = input;
+      const { clusterId, page, pageSize } = input;
       if (!clusterId) {
-        return { accounts: []};
+        return { accounts: [], count: 0 };
       }
       const client = getAdapterClient(clusterId);
       if (!client) {
@@ -44,6 +46,25 @@ export const accountRouter = router({
           message:`cluster ${clusterId} is not found`,
         });
       }
-      return await asyncClientCall(client.account, "listAccounts", { userId: user.identityId });
+      const { accounts } = await asyncClientCall(client.account, "listAccounts", { userId: user.identityId });
+
+      if (page === undefined || pageSize === undefined) {
+
+        return { accounts: accounts, count: accounts.length };
+
+      } else {
+
+        const startIndex = (page - 1) * pageSize;
+        const endIndex = startIndex + pageSize;
+        // 检查 startIndex 是否超出数据总量
+        if (startIndex >= accounts.length) {
+          return { accounts: [], count: accounts.length };
+        }
+
+        const paginatedAccounts = accounts.slice(startIndex, Math.min(endIndex, accounts.length));
+
+        return { accounts: paginatedAccounts, count: accounts.length };
+      }
+
     }),
 });

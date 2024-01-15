@@ -13,7 +13,7 @@
 "use client";
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { App, Button, Input, Select, Tooltip } from "antd";
+import { Button, Input, Select, Tooltip } from "antd";
 import { useEffect } from "react";
 import { trpc } from "src/utils/trpc";
 
@@ -24,7 +24,6 @@ interface Props {
 }
 
 export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) => {
-  const { message } = App.useApp();
 
   const { data, isLoading, refetch } = trpc.account.listAccounts.useQuery({ clusterId: cluster });
 
@@ -40,7 +39,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   return (
     <Input.Group compact>
       <Select
-        // loading={isLoading}
+        loading={isLoading}
         options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
         placeholder="请选择账户"
         value={value}
