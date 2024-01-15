@@ -13,7 +13,7 @@
 import { statSync } from "fs";
 import { join } from "path";
 import { createComposeSpec } from "src/compose";
-import { getInstallConfig } from "src/config/install";
+import { AuthCustomType, getInstallConfig } from "src/config/install";
 import { configPath, createInstallYaml, testBaseFolder } from "tests/utils";
 
 it("creates log dir for fluentd", async () => {
@@ -61,6 +61,7 @@ describe("sets custom auth environment", () => {
     const configPath = await createInstallYaml({
       auth: {
         custom: {
+          type: AuthCustomType.image,
           image: {
             imageName: "",
           },
@@ -81,6 +82,7 @@ describe("sets custom auth environment", () => {
     const configPath = await createInstallYaml({
       auth: {
         custom: {
+          type: AuthCustomType.image,
           image: {
             imageName: "",
           },
