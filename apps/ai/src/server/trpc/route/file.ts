@@ -12,7 +12,7 @@
 
 import {
   loggedExec, sftpExists, sftpMkdir, sftpReaddir,
-  sftpRealPath, sftpRename, sftpStat, sftpWriteFile,
+  sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf,
 } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { contentType } from "mime-types";
@@ -22,7 +22,6 @@ import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
 import { copyFile } from "src/server/utils/copyFile";
-import { deleteDir, deleteFile } from "src/server/utils/deleteItem";
 import { clusterNotFound } from "src/server/utils/errors";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -81,9 +80,21 @@ export const file = router({
       if (!host) { throw clusterNotFound(clusterId); }
 
       if (target === "FILE") {
-        return await deleteFile({ host, userIdentityId: user.identityId, filePath: path });
+        return await await sshConnect(host, user.identityId, logger, async (ssh) => {
+
+          const sftp = await ssh.requestSFTP();
+
+          await sftpUnlink(sftp)(path);
+
+          return {};
+        });
       } else {
-        return await deleteDir({ host, userIdentityId: user.identityId, dirPath: path });
+        return await await sshConnect(host, user.identityId, logger, async (ssh) => {
+
+          await sshRmrf(ssh, path);
+
+          return {};
+        });
       }
     }),
 
