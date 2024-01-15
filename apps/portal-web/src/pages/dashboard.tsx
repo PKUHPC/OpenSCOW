@@ -39,23 +39,25 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  const { data:clusterInfo, isLoading } = useAsync({
+  const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       const clusters = publicConfig.CLUSTERS;
 
       const { clustersInfo, failedClusters } =
       await api.getClustersRunningInfo({ query: { clusters:clusters.map((x) => x.id) } });
 
-      if (failedClusters.length) {
-        message.error(`以下集群信息获取失败:（${failedClusters.map((x) => clusters.find((y) => y.id === x)?.name).join("、")}）`);
-      }
-      return clustersInfo
-        .flatMap((cluster) =>
-          cluster.partitions.map((x) => ({
-            clusterName: cluster.clusterName,
-            ...x,
-          })),
-        );
+      return {
+        clustersInfo:clustersInfo
+          .flatMap((cluster) =>
+            cluster.partitions.map((x) => ({
+              clusterName:  clusters.find((y) => y.id === cluster.clusterName)?.name,
+              ...x,
+              cpuUsage:x.runningCpuCount / x.cpuCoreCount,
+              gpuUsage:x.gpuCoreCount ? x.runningGpuCount / x.gpuCoreCount : 0,
+            })),
+          ),
+        failedClusters:failedClusters.map((x) => ({ clusterName:clusters.find((y) => y.id === x)?.name })),
+      };
     }, []),
   });
 
@@ -65,7 +67,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       <QuickEntry></QuickEntry>
       <OverviewTable
         isLoading={isLoading}
-        clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        failedClusters={data?.failedClusters ?? []}
       />
     </div>
   );
