@@ -10,8 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@grpc/grpc-js";
 import { getSortedClusterIds } from "@scow/config/build/cluster";
-import { loggedExec, sshConnect as libConnect } from "@scow/lib-ssh";
+import { sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
 import { config, rootKeyPair } from "src/server/config/env";
@@ -19,7 +20,7 @@ import { Image, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
-import { getHarborImageName, loadedImageRegex } from "src/server/utils/image";
+import { createHarborImageUrl, getLoadedImage, getPulledImage, pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission } from "src/server/utils/share";
@@ -28,6 +29,33 @@ import { z } from "zod";
 
 import { clusters } from "../config";
 import { clusterExist } from "../utils";
+
+class NotTarError extends TRPCError {
+  constructor(name: string, tag: string) {
+    super({
+      code: "UNPROCESSABLE_CONTENT",
+      message: `Image ${name}:${tag} create failed: image is not a tar file`,
+    });
+  }
+};
+
+class NoClusterError extends TRPCError {
+  constructor(name: string, tag: string) {
+    super({
+      code: "NOT_FOUND",
+      message: `Image ${name}:${tag} create failed: there is no available cluster`,
+    });
+  }
+};
+
+class NoLocalImageError extends TRPCError {
+  constructor(name: string, tag: string) {
+    super({
+      code: "NOT_FOUND",
+      message: `Image ${name}:${tag} create failed: localImage not found`,
+    });
+  }
+}
 
 export const ImageListSchema = z.object({
   id: z.number(),
@@ -143,44 +171,15 @@ export const createImage = procedure
       });
     };
 
-    // error的调用栈信息会在创建error的时候确定
-    // 预先创建error的话，会造成stacktrace不正确
-    // 解决：定义类型，然后在throw的时候再创建error
-    class NotTarError extends TRPCError {
-      constructor(name: string, tag: string) {
-        super({
-          code: "UNPROCESSABLE_CONTENT",
-          message: `Image ${name}:${tag} create failed: image is not a tar file`,
-        });
-      }
-    };
-
-    class NoClusterError extends TRPCError {
-      constructor(name: string, tag: string) {
-        super({
-          code: "NOT_FOUND",
-          message: `Image ${name}:${tag} create failed: there is no available cluster`,
-        });
-      }
-    };
-
-    class NoLocalImageError extends TRPCError {
-
-      constructor(name: string, tag: string) {
-        super({
-          code: "NOT_FOUND",
-          message: `Image ${name}:${tag} create failed: localImage not found`,
-        });
-      }
-    }
-
-    // 获取加载镜像的集群节点，如果是远程镜像则使用列表第一个集群作为本地处理镜像的节点
+    // 获取加载镜像的集群节点，如果是远程镜像则使用优先级最高的集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
-    const targetImage = getHarborImageName({
-      url: aiConfig.harborConfig.url,
-      project: aiConfig.harborConfig.project,
-      userId: user.identityId,
+    const { url, project, user: harborUser, password } = aiConfig.harborConfig;
+
+    const harborImageUrl = createHarborImageUrl({
+      url,
+      project,
+      userId: harborUser,
       imageName: name,
       imageTag: tag,
     });
@@ -193,68 +192,46 @@ export const createImage = procedure
     // 本地镜像检查源文件拥有者权限
     if (input.source === Source.INTERNAL) {
       await sshConnect(host, user.identityId, logger, async (ssh) => {
-        await checkSharePermission({ ssh, sourcePath: sourcePath, userId: user.identityId });
+        await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
       });
     }
 
-    let localImage: string | undefined = undefined;
+    let localImageUrl: string | undefined = undefined;
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
 
-      // 本地镜像时docker加载镜像
       if (source === Source.INTERNAL) {
-        if (sourcePath.endsWith(".tar")) {
-          // 加载tar文件镜像
-
-          // 有参数的命令调用，程序本身（docker）为第四个参数，参数为第五个参数，这样能保证命令能正确地加上引号
-          // 其他地方照着改，查找所有loggedExec的地方，基本都有问题
-          const loadedResp = await loggedExec(ssh, logger, true, "docker", ["load", "-i", sourcePath]);
-          const match = loadedResp.stdout.match(loadedImageRegex);
-
-          if (match && match.length > 1) {
-            localImage = match[1];
-          };
-        } else {
-          throw new NotTarError(name, tag);
-        }
-        // 远程镜像需先拉取到本地
+        if (!sourcePath.endsWith(".tar")) throw new NotTarError(name, tag);
+        // 本地镜像时docker加载镜像
+        localImageUrl = await getLoadedImage({ ssh, logger, sourcePath });
       } else {
-
-        const dockerPullCmd = `docker pull ${sourcePath}`;
-        const pulledResp = await loggedExec(ssh, logger, true, dockerPullCmd, []);
-        if (pulledResp) {
-          localImage = sourcePath;
-        }
-
+        // 远程镜像需先拉取到本地
+        localImageUrl = await getPulledImage({ ssh, logger, sourcePath });
       };
 
-      if (localImage === undefined) { throw new NoLocalImageError(name, tag); }
+      if (localImageUrl === undefined) { throw new NoLocalImageError(name, tag); }
 
-      const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
-      await loggedExec(ssh, logger, true, dockerTagCmd, []);
-
-      const loginHarborCmd =
-            `docker login ${aiConfig.harborConfig.url} -u ${aiConfig.harborConfig.user} \
-            -p ${aiConfig.harborConfig.password}`;
-      await loggedExec(ssh, logger, true, loginHarborCmd, []);
-
-      const dockerPushCmd = `docker push ${targetImage}`;
-      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async () => {
-
-        // 删除本地镜像
-        const dockerRmiCmd = `docker rmi ${localImage}`;
-        try {
-          loggedExec(ssh, logger, false, dockerRmiCmd, []);
-        } catch (e) {
-          logger.error(`${localImage} rmi failed`, e);
-        };
-
-        // 更新数据库
-        const image = new Image({ ...input, path: targetImage, owner: user.identityId });
-        await orm.em.persistAndFlush(image);
-        return image.id;
+      // 制作镜像，上传至harbor
+      await pushImageToHarbor({
+        ssh,
+        logger,
+        localImageUrl,
+        harborImageUrl,
+        harborUrl: url,
+        harborUser,
+        password,
       });
 
+      // 更新数据库
+      const image = new Image({ ...input, path: harborImageUrl, owner: user.identityId });
+      await orm.em.persistAndFlush(image);
+      return image.id;
 
+    }).catch((e) => {
+      const ex = e as ServiceError;
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Create image failed, ${ex.message}`,
+      });
     });
 
   });
@@ -465,71 +442,56 @@ export const copyImage = procedure
       });
     };
 
-    const NoClusterError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${newName}:${newTag} create failed: there is no available cluster`,
-    });
-
-    const NoLocalImageError = new TRPCError({
-      code: "NOT_FOUND",
-      message: `Image ${newName}:${newTag} create failed: localImage not found`,
-    });
-
     const processClusterId = getSortedClusterIds(clusters)[0];
-    if (!processClusterId) { throw NoClusterError; }
+    if (!processClusterId) { throw new NoClusterError(newName, newTag); }
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
+    const { url, project, user: harborUser, password } = aiConfig.harborConfig;
+
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       // 拉取远程镜像
-      const dockerPullCmd = `docker pull ${sharedImage.path}`;
-      const pulledResp = await loggedExec(ssh, logger, true, dockerPullCmd, []);
+      const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path });
+      if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
 
-      const localImage = pulledResp ? sharedImage.path : undefined;
-      if (!localImage) { throw NoLocalImageError; }
-
-      const targetImage = getHarborImageName({
-        url: aiConfig.harborConfig.url,
-        project: aiConfig.harborConfig.project,
-        userId: user.identityId,
+      const harborImageUrl = createHarborImageUrl({
+        url,
+        project,
+        userId: harborUser,
         imageName: newName,
         imageTag: newTag,
       });
 
       // 制作镜像上传
-      const dockerTagCmd = `docker tag ${localImage} ${targetImage}`;
-      await loggedExec(ssh, logger, true, dockerTagCmd, []);
+      await pushImageToHarbor({
+        ssh,
+        logger,
+        localImageUrl,
+        harborImageUrl,
+        harborUrl: url,
+        harborUser,
+        password,
+      });
 
-      const loginHarborCmd =
-            `docker login ${aiConfig.harborConfig.url} -u ${aiConfig.harborConfig.user} \
-            -p ${aiConfig.harborConfig.password}`;
-      await loggedExec(ssh, logger, true, loginHarborCmd, []);
+      const image = new Image({
+        name: input.newName,
+        tag: input.newTag,
+        owner: user.identityId,
+        source: Source.EXTERNAL,
+        sourcePath: sharedImage.path,
+        path: harborImageUrl,
+        description: sharedImage.description,
+      });
+      await orm.em.persistAndFlush(image);
 
-      const dockerPushCmd = `docker push ${targetImage}`;
-      await loggedExec(ssh, logger, true, dockerPushCmd, []).then(async () => {
+      return image.id;
 
-        // 删除本地镜像
-        const dockerRmiCmd = `docker rmi ${localImage}`;
-        try {
-          loggedExec(ssh, logger, false, dockerRmiCmd, []);
-        } catch (e) {
-          logger.error(`${localImage} rmi failed`, e);
-        };
-
-        const image = new Image({
-          name: input.newName,
-          tag: input.newTag,
-          owner: user.identityId,
-          source: Source.EXTERNAL,
-          sourcePath: sharedImage.path,
-          path: targetImage,
-          description: sharedImage.description,
-        });
-        await orm.em.persistAndFlush(image);
-
-        return image.id;
-
+    }).catch((e) => {
+      const ex = e as ServiceError;
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Copy shared image failed, ${ex.message}`,
       });
     });
   });

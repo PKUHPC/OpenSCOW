@@ -18,7 +18,6 @@ import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
-  loggedExec,
   sftpExists,
   sftpReaddir,
   sftpReadFile,
@@ -38,6 +37,7 @@ import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/s
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
+import { checkContainerExists, saveImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -454,8 +454,7 @@ export const saveImage =
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // 检查该容器是否存在
-            const resp = await loggedExec(ssh, logger, true, "docker",
-              ["ps", "--no-trunc", "|", "grep", formateContainerId]);
+            const resp = await checkContainerExists({ ssh, logger, formateContainerId });
 
             if (!resp.stdout) {
               throw new TRPCError({
@@ -463,22 +462,21 @@ export const saveImage =
                 message: `Can not find the container: ${formateContainerId} in node ${node}`,
               });
             }
+
             // 用新名字commit镜像
-            await loggedExec(ssh, logger, true, "docker",
-              ["commit", formateContainerId, `${userId}/${imageName}:${imageTag}`]);
-
-            // docker login harbor
-            await loggedExec(ssh, logger, true, "docker", ["login", url, "-u", harborUser, "-p", password]);
-
-            // docker tag
-            await loggedExec(ssh, logger, true, "docker", ["tag", localImageUrl, harborImageUrl]);
-
-            // push 镜像至harbor
-            await loggedExec(ssh, logger, true, "docker", ["push", harborImageUrl]);
-
-            // 清除本地镜像
-            await loggedExec(ssh, logger, true, "docker", ["rmi", harborImageUrl]);
-            await loggedExec(ssh, logger, true, "docker", ["rmi", localImageUrl]);
+            const committedImageUrl = `${userId}/${imageName}:${imageTag}`;
+            // 保存镜像至harbor
+            await saveImageToHarbor({
+              ssh,
+              logger,
+              formateContainerId,
+              committedImageUrl,
+              localImageUrl,
+              harborImageUrl,
+              harborUrl: url,
+              harborUser,
+              password,
+            });
 
             // 数据库添加image
 

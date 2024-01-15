@@ -11,12 +11,12 @@
  */
 
 import {
-  loggedExec, sftpExists, sftpMkdir, sftpReaddir,
+  sftpExists, sftpMkdir, sftpReaddir,
   sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf,
 } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { contentType } from "mime-types";
-import { basename, join } from "path";
+import { basename } from "path";
 import { FileInfo } from "src/models/File";
 import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
@@ -198,17 +198,6 @@ export const file = router({
 
         const files = await sftpReaddir(sftp)(path);
         const list: FileInfo[] = [];
-
-        // 通过touch -a命令实现共享文件系统的缓存刷新
-        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
-
-        if (pureFiles.length > 0) {
-          const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
-
-          const fileSyncCmd = `touch -a ${filePaths}`;
-
-          await loggedExec(ssh, logger, false, fileSyncCmd, []);
-        }
 
         for (const file of files) {
 

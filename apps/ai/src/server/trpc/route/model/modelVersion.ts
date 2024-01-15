@@ -257,6 +257,7 @@ export const deleteModelVersion = procedure
         await sshConnect(host, user.identityId, logger, async (ssh) => {
           await checkSharePermission({
             ssh,
+            logger,
             sourcePath: modelVersion.privatePath,
             userId: user.identityId,
           });
@@ -327,7 +328,7 @@ export const shareModelVersion = procedure
 
     const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
       // 确认是否具有分享权限
-      await checkSharePermission({ ssh, sourcePath: sourceFilePath, userId: user.identityId });
+      await checkSharePermission({ ssh, logger, sourcePath: sourceFilePath, userId: user.identityId });
       // 获取分享路径的上级路径
       const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
       return dirname(dirname(userHomeDir));
@@ -403,6 +404,7 @@ export const unShareModelVersion = procedure
     await sshConnect(host, user.identityId, logger, async (ssh) => {
       await checkSharePermission({
         ssh,
+        logger,
         sourcePath: modelVersion.privatePath,
         userId: user.identityId,
       });

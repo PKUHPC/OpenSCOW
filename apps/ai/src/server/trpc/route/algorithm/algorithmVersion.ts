@@ -241,6 +241,7 @@ export const deleteAlgorithmVersion = procedure
         await sshConnect(host, user.identityId, logger, async (ssh) => {
           await checkSharePermission({
             ssh,
+            logger,
             sourcePath: algorithmVersion.privatePath,
             userId: user.identityId,
           });
@@ -309,7 +310,7 @@ export const shareAlgorithmVersion = procedure
 
     const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
       // 确认是否具有分享权限
-      await checkSharePermission({ ssh, sourcePath: sourceFilePath, userId: user.identityId });
+      await checkSharePermission({ ssh, logger, sourcePath: sourceFilePath, userId: user.identityId });
       // 获取分享路径的上级路径
       const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
       return dirname(dirname(userHomeDir));
@@ -385,6 +386,7 @@ export const unShareAlgorithmVersion = procedure
     await sshConnect(host, user.identityId, logger, async (ssh) => {
       await checkSharePermission({
         ssh,
+        logger,
         sourcePath: algorithmVersion.privatePath,
         userId: user.identityId,
       });

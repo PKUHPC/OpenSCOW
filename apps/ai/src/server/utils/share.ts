@@ -15,6 +15,7 @@ import { loggedExec, sftpExists,
 import { TRPCError } from "@trpc/server";
 import { NodeSSH } from "node-ssh";
 import path, { dirname, join } from "path";
+import { Logger } from "ts-log";
 
 import { rootKeyPair } from "../config/env";
 import { clusterNotFound } from "./errors";
@@ -33,10 +34,12 @@ export enum SHARED_TARGET {
 // 检查当前用户否具有分享权限
 export async function checkSharePermission({
   ssh,
+  logger,
   sourcePath,
   userId,
 }: {
   ssh: NodeSSH,
+  logger: Logger,
   sourcePath: string,
   userId: string,
 }): Promise<void> {
