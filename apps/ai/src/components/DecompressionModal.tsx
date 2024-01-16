@@ -13,7 +13,6 @@
 "use client";
 
 import { App, Form, Modal } from "antd";
-import { join } from "path";
 import { trpc } from "src/utils/trpc";
 
 interface Props {
