@@ -16,9 +16,9 @@ import { SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { GetAppConnectionInfoResponse } from "@scow/scheduler-adapter-protos/build/protos/app";
 import { ApiVersion } from "@scow/utils/build/version";
 import { quote } from "shell-quote";
-import { checkSchedulerApiVersion } from "src/scheduleAdapter";
 import { Logger } from "ts-log";
 
+import { checkSchedulerApiVersion } from "./scheduleAdapter";
 
 export const getAppConnectionInfoFromAdapter = async (
   client: SchedulerAdapterClient,
