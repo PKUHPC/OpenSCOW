@@ -12,8 +12,7 @@
 
 import type { CreateNextContextOptions } from "@trpc/server/adapters/next";
 import type { NextApiRequest, NextApiResponse } from "next";
-
-import { ClientUserInfo } from "../auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 
 
 export type Context = object
