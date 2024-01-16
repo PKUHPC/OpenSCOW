@@ -11,23 +11,22 @@
  */
 
 import { loggedExec } from "@scow/lib-ssh";
-import { NodeSSH, SSHExecCommandResponse } from "node-ssh";
+import { TRPCError } from "@trpc/server";
+import { NodeSSH } from "node-ssh";
 import { Logger } from "ts-log";
+
+import { aiConfig } from "../config/ai";
 
 const LOADED_IMAGE_REGEX = "Loaded image: ([\\w./-]+(?::[\\w.-]+)?)";
 
 export const loadedImageRegex = new RegExp(LOADED_IMAGE_REGEX);
 
+const { url: harborUrl, project, user: harborUser, password } = aiConfig.harborConfig;
+
 // 创建要上传到harbor的镜像地址
-export function createHarborImageUrl(
-  { url, project, userId, imageName, imageTag }:
-  { url: string,
-    project: string,
-    userId: string,
-    imageName: string,
-    imageTag: string,
-  }): string {
-  return `${url}/${project}/${userId}/${imageName}:${imageTag}`;
+export function createHarborImageUrl(imageName: string, imageTag: string): string {
+
+  return `${harborUrl}/${project}/${harborUser}/${imageName}:${imageTag}`;
 };
 
 
@@ -76,72 +75,12 @@ export async function pushImageToHarbor({
   logger,
   localImageUrl,
   harborImageUrl,
-  harborUrl,
-  harborUser,
-  password,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   localImageUrl: string,
   harborImageUrl: string,
-  harborUrl: string,
-  harborUser: string,
-  password: string,
 }): Promise<void> {
-
-  await loggedExec(ssh, logger, true, "docker", ["tag", localImageUrl, harborImageUrl]);
-  await loggedExec(ssh, logger, true, "docker", [ "login", harborUrl, "-u", harborUser, "-p", password ]);
-  await loggedExec(ssh, logger, true, "docker", ["push", harborImageUrl]);
-
-  // 删除本地镜像
-  try {
-    loggedExec(ssh, logger, false, "docker", ["rmi", localImageUrl]);
-  } catch (e) {
-    logger.error(`${localImageUrl} rmi failed`, e);
-  };
-}
-
-// 检查保存镜像的容器是否存在
-export async function checkContainerExists({
-  ssh,
-  logger,
-  formateContainerId,
-}: {
-  ssh: NodeSSH,
-  logger: Logger,
-  formateContainerId: string,
-}): Promise<SSHExecCommandResponse> {
-
-  return await loggedExec(ssh, logger, true, "docker",
-    ["ps", "--no-trunc", "|", "grep", formateContainerId]);
-}
-
-// 保存镜像
-export async function saveImageToHarbor({
-  ssh,
-  logger,
-  formateContainerId,
-  committedImageUrl,
-  localImageUrl,
-  harborImageUrl,
-  harborUrl,
-  harborUser,
-  password,
-}: {
-  ssh: NodeSSH,
-  logger: Logger,
-  formateContainerId: string,
-  committedImageUrl: string,
-  localImageUrl: string,
-  harborImageUrl: string,
-  harborUrl: string,
-  harborUser: string,
-  password: string,
-}): Promise<void> {
-
-  // 用新名字commit镜像
-  await loggedExec(ssh, logger, true, "docker",
-    ["commit", formateContainerId, committedImageUrl]);
 
   // docker login harbor
   await loggedExec(ssh, logger, true, "docker", ["login", harborUrl, "-u", harborUser, "-p", password]);
@@ -155,4 +94,33 @@ export async function saveImageToHarbor({
   // 清除本地镜像
   await loggedExec(ssh, logger, true, "docker", ["rmi", harborImageUrl]);
   await loggedExec(ssh, logger, true, "docker", ["rmi", localImageUrl]);
+}
+
+// commit制作本地镜像
+export async function commitContainerImage({
+  node,
+  ssh,
+  logger,
+  formateContainerId,
+  localImageUrl,
+}: {
+  node: string,
+  ssh: NodeSSH,
+  logger: Logger,
+  formateContainerId: string,
+  localImageUrl: string,
+}): Promise<void> {
+
+  const resp = await loggedExec(ssh, logger, true, "docker",
+    ["ps", "--no-trunc", "|", "grep", formateContainerId]);
+  if (!resp.stdout) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Can not find the container: ${formateContainerId} in node ${node}`,
+    });
+  }
+
+  // commit镜像
+  await loggedExec(ssh, logger, true, "docker",
+    ["commit", formateContainerId, localImageUrl]);
 }

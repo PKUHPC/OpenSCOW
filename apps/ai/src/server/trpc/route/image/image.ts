@@ -174,15 +174,7 @@ export const createImage = procedure
     // 获取加载镜像的集群节点，如果是远程镜像则使用优先级最高的集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
-    const { url, project, user: harborUser, password } = aiConfig.harborConfig;
-
-    const harborImageUrl = createHarborImageUrl({
-      url,
-      project,
-      userId: harborUser,
-      imageName: name,
-      imageTag: tag,
-    });
+    const harborImageUrl = createHarborImageUrl(name, tag);
 
     if (!processClusterId) { throw new NoClusterError(name, tag); }
 
@@ -216,9 +208,6 @@ export const createImage = procedure
         logger,
         localImageUrl,
         harborImageUrl,
-        harborUrl: url,
-        harborUser,
-        password,
       });
 
       // 更新数据库
@@ -448,20 +437,12 @@ export const copyImage = procedure
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    const { url, project, user: harborUser, password } = aiConfig.harborConfig;
-
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       // 拉取远程镜像
       const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path });
       if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
 
-      const harborImageUrl = createHarborImageUrl({
-        url,
-        project,
-        userId: harborUser,
-        imageName: newName,
-        imageTag: newTag,
-      });
+      const harborImageUrl = createHarborImageUrl(newName, newTag);
 
       // 制作镜像上传
       await pushImageToHarbor({
@@ -469,9 +450,6 @@ export const copyImage = procedure
         logger,
         localImageUrl,
         harborImageUrl,
-        harborUrl: url,
-        harborUser,
-        password,
       });
 
       const image = new Image({

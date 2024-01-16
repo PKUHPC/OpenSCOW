@@ -37,7 +37,7 @@ import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/s
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
-import { checkContainerExists, saveImageToHarbor } from "src/server/utils/image";
+import { commitContainerImage, createHarborImageUrl, pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -457,36 +457,22 @@ export const saveImage =
           jobId,
         });
         const formateContainerId = containerId.replace("docker://", "");
-        const { url, project, user: harborUser, password } = aiConfig.harborConfig;
+
         // 连接到该节点
         return await sshConnect(node, "root", logger, async (ssh) => {
           try {
-            const harborImageUrl = `${url}/${project}/${userId}/${imageName}:${imageTag}`;
+            const harborImageUrl = createHarborImageUrl(imageName, imageTag);
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
-            // 检查该容器是否存在
-            const resp = await checkContainerExists({ ssh, logger, formateContainerId });
+            // commit镜像
+            await commitContainerImage({ node, ssh, logger, formateContainerId, localImageUrl });
 
-            if (!resp.stdout) {
-              throw new TRPCError({
-                code: "NOT_FOUND",
-                message: `Can not find the container: ${formateContainerId} in node ${node}`,
-              });
-            }
-
-            // 用新名字commit镜像
-            const committedImageUrl = `${userId}/${imageName}:${imageTag}`;
             // 保存镜像至harbor
-            await saveImageToHarbor({
+            await pushImageToHarbor({
               ssh,
               logger,
-              formateContainerId,
-              committedImageUrl,
               localImageUrl,
               harborImageUrl,
-              harborUrl: url,
-              harborUser,
-              password,
             });
 
             // 数据库添加image
