@@ -24,9 +24,30 @@ import { ErrorCode } from "src/server/utils/errorCode";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
+
+const ClientUserInfoSchema = z.optional(z.object({
+  identityId: z.string(),
+  name: z.optional(z.string()),
+  token: z.string(),
+}));
+
+export type ClientUserInfo = z.infer<typeof ClientUserInfoSchema>;
+
 export const auth = router({
 
   getUserInfo: authProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/auth/userInfo",
+        tags: ["auth"],
+        summary: "获取用户信息及token",
+      },
+    })
+    .input(z.void())
+    .output(z.object({
+      user: ClientUserInfoSchema,
+    }))
     .query(async ({ ctx: { req, res } }) => {
       const userInfo = await getUserInfo(req, res);
       return { user: userInfo };
@@ -43,24 +64,15 @@ export const auth = router({
     })
     .input(z.object({
       token:z.string(),
-      fromAuth:z.boolean(),
+      // fromAuth:z.boolean(),  //后续与audit集成时需使用
     }))
     .output(z.void())
     .query(async ({ ctx: { res }, input }) => {
-      const { token, fromAuth } = input;
+      const { token } = input;
       const info = await validateToken(token);
       if (info) {
         // set token cache
         setUserTokenCookie(token, res);
-        // 接入audit后，需调用
-        // if (fromAuth) {
-        //   const logInfo = {
-        //     operatorUserId: info.identityId,
-        //     operatorIp: parseIp(req) ?? "",
-        //     operationTypeName: OperationType.login,
-        //   };
-        //   await callLog(logInfo, OperationResult.SUCCESS);
-        // }
         res.redirect(BASE_PATH);
       } else {
         throw new TRPCError({
@@ -93,6 +105,14 @@ export const auth = router({
     }),
 
   logout: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/auth/logout",
+        tags: ["auth"],
+        summary: "登录",
+      },
+    })
     .input(z.void())
     .output(z.void())
     .mutation(async ({ ctx: { req, res } }) => {
@@ -104,12 +124,20 @@ export const auth = router({
     }),
 
   changePassword: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/auth/changePassword",
+        tags: ["auth"],
+        summary: "更改密码",
+      },
+    })
     .input(z.object({
       identityId:z.string(),
       oldPassword:z.string(),
       newPassword:z.string(),
-
     }))
+    .output(z.void())
     .mutation(async ({ input:{ identityId, oldPassword, newPassword } }) => {
       const checkRes = await checkPassword(config.AUTH_INTERNAL_URL, {
         identityId,

@@ -69,10 +69,18 @@ export const file = router({
       });
     }),
 
-  // POST /file/delete
 
   deleteItem: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/file/delete",
+        tags: ["file"],
+        summary: "删除指定的文件或目录",
+      },
+    })
     .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
+    .output(z.void())
     .mutation(async ({ input: { target, clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -86,21 +94,35 @@ export const file = router({
 
           await sftpUnlink(sftp)(path);
 
-          return {};
+          return;
         });
       } else {
         return await await sshConnect(host, user.identityId, logger, async (ssh) => {
 
           await sshRmrf(ssh, path);
 
-          return {};
+          return;
         });
       }
     }),
 
-  // POST /file/copyOrMove
+
   copyOrMove: authProcedure
-    .input(z.object({ clusterId: z.string(), op: z.enum(["copy", "move"]), fromPath: z.string(), toPath: z.string() }))
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/file/copyOrMove",
+        tags: ["file"],
+        summary: "复制或移动文件",
+      },
+    })
+    .input(z.object({
+      clusterId: z.string(),
+      op: z.enum(["copy", "move"]),
+      fromPath: z.string(),
+      toPath: z.string(),
+    }))
+    .output(z.void())
     .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -125,14 +147,22 @@ export const file = router({
             throw new TRPCError({ code: "CONFLICT", message: "Rename or move failed. " + error });
           }
 
-          return {};
+          return;
         });
       }
     }),
 
-  // POST /file/mkdir
   mkdir: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/file/mkdir",
+        tags: ["file"],
+        summary: "创建新目录",
+      },
+    })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .output(z.void())
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
@@ -148,14 +178,21 @@ export const file = router({
 
         await sftpMkdir(sftp)(path);
 
-        return {};
+        return;
       });
     }),
 
-  // POST /file/createFile
-  // 下面以此类推，POST /file/方法名
   createFile: authProcedure
+    .meta({
+      openapi: {
+        method: "POST",
+        path: "/file/createFile",
+        tags: ["file"],
+        summary: "创建新文件",
+      },
+    })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .output(z.void())
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
@@ -171,12 +208,20 @@ export const file = router({
 
         await sftpWriteFile(sftp)(path, Buffer.alloc(0));
 
-        return {};
+        return;
       });
 
     }),
 
   listDirectory: authProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/file/listDirectory",
+        tags: ["file"],
+        summary: "列出目录内容",
+      },
+    })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.array(ListDirectorySchema))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
@@ -219,7 +264,18 @@ export const file = router({
     }),
 
   checkFileExist: authProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/file/checkExist",
+        tags: ["file"],
+        summary: "检查文件是否存在",
+      },
+    })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .output(z.object({
+      exists: z.boolean(),
+    }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
@@ -234,28 +290,20 @@ export const file = router({
     }),
 
   getFileType: authProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/file/fileType",
+        tags: ["file"],
+        summary: "获取文件类型",
+      },
+    })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
+    .output(z.object({
+      size: z.number(),
+      type: z.string(),
+    }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
-
-      const host = getClusterLoginNode(clusterId);
-
-      if (!host) { throw clusterNotFound(clusterId); }
-
-      return await sshConnect(host, user.identityId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, user.identityId);
-          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
-        });
-
-        return { size: stat.size, type: stat.isDirectory() ? "dir" : "file" };
-      });
-    }),
-
-  getFileMetadata: authProcedure
-    .input(z.object({ clusterId: z.string(), path: z.string() }))
-    .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
       const host = getClusterLoginNode(clusterId);
 

@@ -20,7 +20,7 @@ import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { SideNav } from "src/layouts/base/SideNav";
 import { Footer } from "src/layouts/Footer";
-import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { arrayContainsElement } from "src/utils/array";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";

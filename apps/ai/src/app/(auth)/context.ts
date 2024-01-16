@@ -14,7 +14,7 @@
 
 
 import React, { useContext } from "react";
-import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { Cluster, PublicConfig } from "src/server/trpc/route/config";
 
 

@@ -20,7 +20,7 @@ import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { Logo } from "src/layouts/base/header/Logo";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { styled } from "styled-components";
 
 import { UserIndicator } from "./UserIndicator";

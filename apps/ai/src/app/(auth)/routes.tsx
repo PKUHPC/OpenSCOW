@@ -19,7 +19,7 @@ import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
-import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { Cluster, NavLink, PublicConfig } from "src/server/trpc/route/config";
 
 export const userRoutes: (

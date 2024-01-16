@@ -14,7 +14,7 @@ import { IncomingMessage } from "http";
 import { NextApiRequest, NextApiResponse, NextPageContext } from "next";
 import { NextRequest } from "next/server";
 import { deleteUserToken, getUserToken } from "src/server/auth/cookie";
-import { ClientUserInfo } from "src/server/auth/models";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { USE_MOCK } from "src/utils/processEnv";
 
 import { validateToken } from "./token";
