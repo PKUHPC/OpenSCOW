@@ -25,11 +25,11 @@ import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
 
-const ClientUserInfoSchema = z.optional(z.object({
+const ClientUserInfoSchema = z.object({
   identityId: z.string(),
   name: z.optional(z.string()),
   token: z.string(),
-}));
+});
 
 export type ClientUserInfo = z.infer<typeof ClientUserInfoSchema>;
 
@@ -50,6 +50,12 @@ export const auth = router({
     }))
     .query(async ({ ctx: { req, res } }) => {
       const userInfo = await getUserInfo(req, res);
+      if (!userInfo) {
+        throw new TRPCError({
+          message: "User is UNAUTHORIZED",
+          code: "UNAUTHORIZED",
+        });
+      }
       return { user: userInfo };
     }),
 
