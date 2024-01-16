@@ -1,0 +1,13 @@
+port: 80
+basePath: /
+imageTag: master
+portal: {}
+mis:
+  dbPassword: must!chang3this
+log:
+  fluentd:
+    logDir: /var/log/fluentd
+auth: {}
+audit: {}
+gateway:
+  proxyReadTimeout: 36000s

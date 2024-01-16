@@ -18,14 +18,24 @@ import { logger } from "src/log";
 
 interface Options {
   outputPath: string;
+  // 是否展示所有配置项
+  full: boolean
 }
 
+const initAllAssets = [
+  join(__dirname, "../../assets/init-full/install.yaml"),
+  join(__dirname, "../../assets/init-full/config"),
+  join(__dirname, "../../assets/init-full/fluent"),
+  join(__dirname, "../../assets/init-full/plugins"),
+  join(__dirname, "../../assets/init-full/public"),
+];
+
 const initAssets = [
-  join(__dirname, "../../assets/install.yaml"),
-  join(__dirname, "../../assets/config"),
-  join(__dirname, "../../assets/fluent"),
-  join(__dirname, "../../assets/plugins"),
-  join(__dirname, "../../assets/public"),
+  join(__dirname, "../../assets/init/install.yaml"),
+  join(__dirname, "../../assets/init/config"),
+  join(__dirname, "../../assets/init/fluent"),
+  join(__dirname, "../../assets/init/plugins"),
+  join(__dirname, "../../assets/init/public"),
 ];
 
 // fs.promise.cp throws error for config dir
@@ -68,7 +78,9 @@ export const init = async (options: Options) => {
 
   logger.info("Output path is %s. ", fullPath);
 
-  for (const asset of initAssets) {
+  const assets = options.full ? initAllAssets : initAssets;
+
+  for (const asset of assets) {
     await copyWithWarning(asset, fullPath);
   }
 

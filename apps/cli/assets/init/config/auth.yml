@@ -1,0 +1,62 @@
+# 指定使用认证类型为LDAP
+authType: ldap
+
+tokenTimeoutSeconds: 36000
+
+ldap:
+  url: ldap://LDAP服务器地址
+  bindDN: cn=Manager,ou=hpc,o=pku
+  bindPassword: "admin"
+  searchBase: "ou=hpc,o=pku"
+  userFilter: "(uid=*)"
+
+  attrs:
+    uid: uid
+    name: cn
+    mail: mail
+
+  addUser:
+    userBase: "ou=People,ou=hpc,o=pku"
+    homeDir: /data/home/{{ userId }}
+    userIdDnKey: uid
+    groupStrategy: newGroupPerUser
+
+    newGroupPerUser:
+      groupBase: "ou=Group,ou=hpc,o=pku"
+      groupIdDnKey: cn
+
+# auth 界面 ui 配置
+ui:
+  default:
+    backgroundImagePath: "./assets/background.png"
+    backgroundFallbackColor: "#9a0000"
+    logoType: "dark"
+
+    slogan:
+      color: "white"
+      title:
+        i18n:
+          default: "开源算力中心门户和管理平台"
+          en: "Open-source Compute Center Portal and Management Platform"
+          zh_cn: "开源算力中心门户和管理平台"
+      texts:
+        - i18n:
+            default: "图形化界面，使用方便"
+            en: "Graphical user interface, user-friendly"
+            zh_cn: "图形化界面，使用方便"
+        - i18n:
+            default: "功能丰富，管理简单"
+            en: "Feature-rich, easy management"
+            zh_cn: "功能丰富，管理简单"
+        - i18n:
+            default: "一体化部署，开箱即用"
+            en: "Integrated deployment, ready to use out of the box"
+            zh_cn: "一体化部署，开箱即用"
+        - i18n:
+            default: "标准化平台，支持算力融合"
+            en: "Standardized platform, supporting compute integration"
+            zh_cn: "标准化平台，支持算力融合"
+        - i18n:
+            default: "开源中立，独立自主"
+            en: "Open-source neutrality, independent and autonomous"
+            zh_cn: "开源中立，独立自主"

@@ -78,6 +78,12 @@ yargs(hideBin(process.argv))
         description: "output path",
         default: ".",
       },
+      full: {
+        alias: "f",
+        type: "boolean",
+        description: "Extract full config files",
+        default: false,
+      },
     });
   }, (argv) => {
     init(argv);

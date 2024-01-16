@@ -32,7 +32,7 @@ export const config = envConfig({
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 
-  AUTH_INTERNAL_URL: str({ desc: "认证服务内部地址", default: "http://auth:5000" }),
+  AUTH_URL: str({ desc: "认证服务地址", default: "http://auth:5000" }),
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
 
