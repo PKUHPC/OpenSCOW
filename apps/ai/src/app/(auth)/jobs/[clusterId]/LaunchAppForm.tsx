@@ -413,6 +413,7 @@ export const LaunchAppForm = (props: Props) => {
           <Space>
             <Form.Item name={["algorithm", "type"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 onChange={() => {
                   form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
@@ -433,6 +434,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["algorithm", "name"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isAlgorithmLoading}
                 options={algorithmOptions}
@@ -440,6 +442,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["algorithm", "version"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isAlgorithmVersionsLoading}
                 options={algorithmVersionOptions}
@@ -451,6 +454,7 @@ export const LaunchAppForm = (props: Props) => {
           <Space>
             <Form.Item name={["dataset", "type"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 120 }}
                 onChange={() => {
                   form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
@@ -472,6 +476,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["dataset", "name"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isDatasetsLoading}
                 onChange={() => {
@@ -482,6 +487,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["dataset", "version"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isDatasetVersionsLoading}
                 options={datasetVersionOptions}
@@ -493,6 +499,7 @@ export const LaunchAppForm = (props: Props) => {
           <Space>
             <Form.Item name={["model", "type"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 onChange={() => {
                   form.setFieldsValue({ model: { name: undefined, version: undefined } });
@@ -513,6 +520,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["model", "name"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isModelsLoading }
                 options={modelOptions}
@@ -520,6 +528,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
             <Form.Item name={["model", "version"]} noStyle>
               <Select
+                allowClear
                 style={{ minWidth: 100 }}
                 loading={isModelVersionsLoading}
                 options={modelVersionOptions}

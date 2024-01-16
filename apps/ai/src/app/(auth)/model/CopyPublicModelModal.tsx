@@ -70,7 +70,7 @@ export const CopyPublicModalModal: React.FC<Props> = (
     const { targetModalName, versionName, versionDescription, path } = await form.validateFields();
     copyMutation.mutate({
       modelId,
-      modelVersionId,
+      versionId: modelVersionId,
       modelName: targetModalName,
       versionName,
       versionDescription: versionDescription ?? "",

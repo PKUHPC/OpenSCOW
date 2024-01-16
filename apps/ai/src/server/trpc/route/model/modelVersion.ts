@@ -450,7 +450,7 @@ export const copyPublicModelVersion = procedure
   })
   .input(z.object({
     modelId: z.number(),
-    modelVersionId: z.number(),
+    versionId: z.number(),
     modelName: z.string(),
     versionName: z.string(),
     versionDescription: z.string(),
@@ -462,13 +462,13 @@ export const copyPublicModelVersion = procedure
 
     // 1. 检查模型版本是否为公开版本
     const modelVersion = await orm.em.findOne(ModelVersion,
-      { id: input.modelVersionId, sharedStatus: SharedStatus.SHARED },
+      { id: input.versionId, sharedStatus: SharedStatus.SHARED },
       { populate: ["model"]});
 
     if (!modelVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Model Version ${input.modelVersionId} does not exist or is not public`,
+        message: `Model Version ${input.versionId} does not exist or is not public`,
       });
     }
     // 2. 检查该用户是否已有同名模型
