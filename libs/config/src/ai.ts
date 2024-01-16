@@ -52,7 +52,7 @@ export const AiConfigSchema = Type.Object({
 });
 
 // AI相关的配置文件放在ai下，这个配置可以作为ai/config.yaml
-const AUDIT_CONFIG_NAME = "ai";
+const AT_CONFIG_NAME = "ai/config";
 
 export type AiConfigSchema = Static<typeof AiConfigSchema>;
 
@@ -60,7 +60,7 @@ export type HarborConfig = AiConfigSchema["harborConfig"];
 
 export const getAiConfig: GetConfigFn<AiConfigSchema> = (baseConfigPath) => {
   const config =
-    getConfigFromFile(AiConfigSchema, AUDIT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+    getConfigFromFile(AiConfigSchema, AT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
   return config;
 

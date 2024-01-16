@@ -244,7 +244,11 @@ export const createAppSession = procedure
     maxTime: z.number(),
     workingDirectory: z.string().optional(),
     customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
-  })).mutation(async ({ input, ctx: { user } }) => {
+  }))
+  .output(z.object({
+    jobId: z.number(),
+  }))
+  .mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image,
       dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
@@ -387,8 +391,7 @@ export const createAppSession = procedure
           const ex = e as ServiceError;
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: `submit job failed, ${ex.message}`,
-            cause: ex.details,
+            message: `submit job failed, ${ex.details}`,
           });
         });
 
@@ -403,6 +406,12 @@ export const createAppSession = procedure
         await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
 
         return { jobId: reply.jobId };
+      } else {
+        // TODO: if vnc apps
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Unknown app type ${app.type} of app id ${appId}`,
+        });
       }
     });
 
@@ -425,7 +434,9 @@ export const saveImage =
       imageName: z.string(),
       imageTag: z.string(),
       imageDesc: z.string().optional(),
-    })).mutation(
+    }))
+    .output(z.void())
+    .mutation(
       async ({ input, ctx: { user } }) => {
         const userId = user.identityId;
         const { clusterId, jobId, imageName, imageTag, imageDesc } = input;
@@ -495,7 +506,6 @@ export const saveImage =
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
               message: `Save image failed, ${ex.message}`,
-              cause: ex.details,
             });
           }
         });

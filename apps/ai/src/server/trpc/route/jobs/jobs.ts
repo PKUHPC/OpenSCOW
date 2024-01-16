@@ -140,8 +140,7 @@ procedure
           const ex = e as ServiceError;
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: `Submit train job failed, ${ex.message}`,
-            cause: ex.details,
+            message: `Submit train job failed, ${ex.details}`,
           });
         });
 
@@ -176,7 +175,9 @@ procedure
   .input(z.object({
     cluster: z.string(),
     jobId: z.number(),
-  })).mutation(async ({ input, ctx: { user } }) => {
+  }))
+  .output(z.void())
+  .mutation(async ({ input, ctx: { user } }) => {
 
     const { cluster, jobId } = input;
 
@@ -186,5 +187,4 @@ procedure
       userId,
       jobId,
     });
-    return {};
   });
