@@ -67,8 +67,7 @@ export function useDataVersionOptions<T>(
   const queryInput = dataType === "algorithm" ? { isPublic : isItemPublic } : { isShared : isItemPublic };
 
   const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
-    // TODO fix modal to model after entity changes
-    [`${dataType === "model" ? "modal" : dataType}Id`]: selectedItem, ...queryInput,
+    [`${dataType}Id`]: selectedItem, ...queryInput,
   }, { enabled: selectedItem !== undefined });
 
   const dataVersionOptions = useMemo(() => {
