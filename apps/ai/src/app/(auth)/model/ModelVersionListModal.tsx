@@ -92,11 +92,11 @@ export const ModelVersionListModal: React.FC<Props> = (
     } });
 
   const deleteModelVersion = useCallback(
-    (id: number, isConfirmed?: boolean) => {
+    (versionId: number, isConfirmed?: boolean) => {
       confirm({
         title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除模型版本",
         onOk:async () => {
-          await deleteModelVersionMutation.mutateAsync({ id, modelId });
+          await deleteModelVersionMutation.mutateAsync({ versionId, modelId });
         },
       });
     },
