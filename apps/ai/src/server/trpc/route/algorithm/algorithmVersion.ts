@@ -87,7 +87,7 @@ export const createAlgorithmVersion = procedure
       method: "POST",
       path: "/algorithms/{algorithmId}/versions",
       tags: ["algorithmVersion"],
-      summary: "Create a new algorithmVersion",
+      summary: "create a new algorithmVersion",
     },
   })
   .input(z.object({
@@ -134,14 +134,14 @@ export const updateAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
-      path: "/algorithmVersions/update/{versionId}",
+      path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}",
       tags: ["algorithmVersion"],
       summary: "update a algorithmVersion",
     },
   })
   .input(z.object({
     algorithmId: z.number(),
-    versionId: z.number(),
+    algorithmVersionId: z.number(),
     versionName: z.string(),
     versionDescription: z.string().optional(),
   }))
@@ -155,9 +155,9 @@ export const updateAlgorithmVersion = procedure
     if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${input.algorithmId} not accessible` });
 
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.versionId });
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.algorithmVersionId });
     if (!algorithmVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.versionId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.algorithmVersionId} not found` });
 
     const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
@@ -168,7 +168,7 @@ export const updateAlgorithmVersion = procedure
       algorithmVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: `Unfinished processing of algorithmVersion ${input.versionId} exists`,
+        message: `Unfinished processing of algorithmVersion ${input.algorithmVersionId} exists`,
       });
     }
 
@@ -200,17 +200,17 @@ export const deleteAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/algorithmVersions/delete/{id}",
+      path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}",
       tags: ["algorithmVersion"],
       summary: "delete a new algorithmVersion",
     },
   })
-  .input(z.object({ id: z.number(), algorithmId:z.number() }))
+  .input(z.object({ algorithmVersionId: z.number(), algorithmId:z.number() }))
   .output(z.void())
-  .mutation(async ({ input:{ id, algorithmId }, ctx: { user } }) => {
+  .mutation(async ({ input:{ algorithmVersionId, algorithmId }, ctx: { user } }) => {
     const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id });
-    if (!algorithmVersion) throw new Error(`AlgorithmVersion id:${id} not found`);
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id:algorithmVersionId });
+    if (!algorithmVersion) throw new Error(`AlgorithmVersion id:${algorithmVersionId} not found`);
 
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId },
       { populate: ["versions.sharedStatus"]});
@@ -224,7 +224,8 @@ export const deleteAlgorithmVersion = procedure
     if (algorithmVersion.sharedStatus === SharedStatus.SHARING
       || algorithmVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError(
-        { code: "PRECONDITION_FAILED", message: `AlgorithmVersion (id:${id}) is currently being shared or unshared` });
+        { code: "PRECONDITION_FAILED",
+          message: `AlgorithmVersion (id:${algorithmVersionId}) is currently being shared or unshared` });
     }
 
     // 如果是已分享的数据集版本，则删除分享
@@ -244,7 +245,8 @@ export const deleteAlgorithmVersion = procedure
         });
 
         const pathToUnshare
-        = algorithm.versions.filter((v) => (v.id !== id && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
+        = algorithm.versions.filter((v) =>
+          (v.id !== algorithmVersionId && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
           // 除了此版本以外仍有其他已分享的版本则取消分享当前版本
           dirname(algorithmVersion.path)
           // 除了此版本以外没有其他已分享的版本则取消分享整个算法
@@ -254,7 +256,8 @@ export const deleteAlgorithmVersion = procedure
           sharedPath: pathToUnshare,
         });
       } catch (e) {
-        logger.error(`ssh failure occurred when unshare algorithmVersion ${id} of algorithm ${algorithmId}`, e);
+        logger.error(`ssh failure occurred when unshare
+        algorithmVersion ${algorithmVersionId} of algorithm ${algorithmId}`, e);
       }
 
 

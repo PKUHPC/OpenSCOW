@@ -110,7 +110,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     const { versionName, versionDescription, path } = await form.validateFields();
     if (editData?.versionName && editData.versionId) {
       updateAlgorithmVersionMutation.mutate({
-        versionId:editData.versionId,
+        algorithmVersionId:editData.versionId,
         versionName,
         versionDescription,
         algorithmId,

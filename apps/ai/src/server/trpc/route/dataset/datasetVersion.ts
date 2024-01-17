@@ -220,7 +220,7 @@ export const deleteDatasetVersion = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/datasets/{datasetId}/versions/delete/{datasetVersionId}",
+      path: "/datasets/{datasetId}/versions/{datasetVersionId}",
       tags: ["datasetVersion"],
       summary: "delete a new datasetVersion",
     },

@@ -97,7 +97,7 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
       confirm({
         title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除算法版本",
         onOk:async () => {
-          await deleteAlgorithmVersionMutation.mutateAsync({ id, algorithmId });
+          await deleteAlgorithmVersionMutation.mutateAsync({ algorithmVersionId:id, algorithmId });
         },
       });
     },

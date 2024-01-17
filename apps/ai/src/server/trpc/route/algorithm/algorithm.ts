@@ -103,7 +103,7 @@ export const createAlgorithm = procedure
       method: "POST",
       path: "/algorithms",
       tags: ["algorithm"],
-      summary: "Create a new algorithms",
+      summary: "create a new algorithms",
     },
   })
   .input(z.object({
@@ -219,7 +219,16 @@ export const updateAlgorithm = procedure
   });
 
 export const deleteAlgorithm = procedure
+  .meta({
+    openapi: {
+      method: "DELETE",
+      path: "/algorithms/{id}",
+      tags: ["algorithm"],
+      summary: "delete a algorithm",
+    },
+  })
   .input(z.object({ id: z.number() }))
+  .output(z.void())
   .mutation(async ({ input:{ id }, ctx:{ user } }) => {
     const { em } = await getORM();
     const algorithm = await em.findOne(Algorithm, { id });
