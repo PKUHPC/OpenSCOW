@@ -151,6 +151,7 @@ export const updateAlgorithm = procedure
     framework: z.nativeEnum(Framework),
     description: z.string().optional(),
   }))
+  .output(z.void())
   .mutation(async ({ input:{ name, framework, description, id }, ctx: { user } }) => {
     const { em } = await getORM();
     const algorithm = await em.findOne(Algorithm, { id });
