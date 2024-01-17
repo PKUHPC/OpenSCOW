@@ -105,7 +105,7 @@ export const chargingServiceServer = plugin((server) => {
 
     charge: async ({ request, em, logger }) => {
 
-      const { accountName, type, amount, comment, tenantName } = ensureNotUndefined(request, ["amount"]);
+      const { accountName, type, amount, comment, tenantName, userId } = ensureNotUndefined(request, ["amount"]);
 
       const reply = await em.transactional(async (em) => {
         const target = accountName !== undefined
@@ -134,6 +134,7 @@ export const chargingServiceServer = plugin((server) => {
           comment,
           target,
           type,
+          userId,
         }, em, logger, server.ext);
       });
 

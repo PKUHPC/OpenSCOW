@@ -176,6 +176,7 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newAccountPrice.minus(x.accountPrice),
+                userId: x.user,
               }, em, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({

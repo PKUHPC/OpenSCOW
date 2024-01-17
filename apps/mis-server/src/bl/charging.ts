@@ -85,13 +85,14 @@ type ChargeRequest = {
   amount: Decimal;
   comment: string;
   type: string;
+  userId?: string;
 };
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
-  const { target, amount, comment, type } = request;
+  const { target, amount, comment, type, userId } = request;
 
   const record = new ChargeRecord({
     time: new Date(),
@@ -99,6 +100,7 @@ export async function charge(
     target,
     comment,
     amount,
+    userId,
   });
 
   em.persist(record);

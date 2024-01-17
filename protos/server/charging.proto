@@ -49,6 +49,7 @@ message ChargeRequest {
   common.Money amount = 3;
   string type = 4;
   string comment = 5;
+  optional string user_id = 6;
 }
 
 message ChargeResponse {

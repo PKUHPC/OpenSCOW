@@ -15,9 +15,10 @@ import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { DecimalType } from "src/utils/decimal";
+import { type AnyJson } from "src/utils/types";
 
 @Entity()
-@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type"] })
+@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type", "userId"] })
 @Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class ChargeRecord {
   @PrimaryKey()
@@ -32,6 +33,9 @@ export class ChargeRecord {
   @Property({ nullable: true })
     accountName?: string;
 
+  @Property({ nullable: true })
+    userId?: string;
+
   @Property()
     type: string;
 
@@ -41,13 +45,18 @@ export class ChargeRecord {
   @Property()
     comment: string;
 
+  @Property({ type: "json", nullable: true })
+    metadata?: AnyJson;
+
   constructor(init: {
     id?: number;
     time: Date,
     type: string;
     target: Tenant | Account;
+    userId?: string;
     comment: string;
     amount: Decimal,
+    metadata?: AnyJson,
   }) {
     if (init.id) {
       this.id = init.id;
@@ -60,8 +69,10 @@ export class ChargeRecord {
       this.tenantName = init.target.tenant.getProperty("name");
       this.accountName = init.target.accountName;
     }
+    this.userId = init.userId;
     this.comment = init.comment;
     this.amount = init.amount;
+    this.metadata = init.metadata;
   }
 
 }

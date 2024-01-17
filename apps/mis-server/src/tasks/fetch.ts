@@ -136,6 +136,7 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account,
+            userId: pricedJob.user,
           }, em, logger, clusterPlugin);
 
           // charge tenant

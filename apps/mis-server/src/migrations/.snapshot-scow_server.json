@@ -95,6 +95,15 @@
           "nullable": true,
           "mappedType": "string"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
         "type": {
           "name": "type",
           "type": "varchar(255)",
@@ -123,6 +132,15 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "charge_record",
@@ -144,7 +162,8 @@
             "time",
             "tenant_name",
             "account_name",
-            "type"
+            "type",
+            "user_id"
           ],
           "composite": true,
           "primary": false,
@@ -631,7 +650,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -668,7 +687,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         },
         "tenant_name": {
@@ -799,7 +818,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -893,8 +912,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
-          "default": "current_timestamp(0)",
+          "length": 6,
+          "default": "current_timestamp(6)",
           "mappedType": "datetime"
         }
       },
@@ -998,7 +1017,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -1125,7 +1144,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -1251,8 +1270,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
-          "default": "current_timestamp(0)",
+          "length": 6,
+          "default": "current_timestamp(6)",
           "mappedType": "datetime"
         },
         "tenant_roles": {
