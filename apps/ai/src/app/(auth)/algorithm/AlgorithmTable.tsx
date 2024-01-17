@@ -24,7 +24,7 @@ import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
-import { AlgorithmVersionListModal } from "./AlgorithmVersionListModal";
+import { AlgorithmVersionList } from "./AlgorithmVersionList";
 import { CreateAndEditAlgorithmModal } from "./CreateAndEditAlgorithmModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
@@ -72,11 +72,6 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const [algorithmId, setAlgorithmId] = useState(0);
-  const [algorithmName, setAlgorithmName] = useState<undefined | string>(undefined);
-  const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
-  const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
-
   const { data, isFetching, refetch, error } = trpc.algorithm.getAlgorithms.useQuery(
     { ...pageInfo,
       framework:query.framework === "ALL" ? undefined : query.framework,
@@ -86,14 +81,6 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
     });
   if (error) {
     message.error("找不到算法");
-  }
-
-  const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
-  trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId:algorithmId, isPublic }, {
-    enabled:!!algorithmId,
-  });
-  if (versionError) {
-    message.error("找不到算法版本");
   }
 
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
@@ -139,63 +126,42 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { dataIndex: "createTime", title: "创建时间",
       render:(createTime) => formatDateTime(createTime),
     },
-    { dataIndex: "action", title: "操作",
-      render: (_, r) => {
-        return !isPublic ?
-          (
-            <>
-              <CreateVersionModalButton
-                refetch={ () => { refetch(); setAlgorithmId(0); }}
-                algorithmId={r.id}
-                algorithmName={r.name}
-                cluster={getCurrentCluster(r.clusterId)}
-              >
-                创建新版本
-              </CreateVersionModalButton>
-              <Button
-                type="link"
-                onClick={() =>
-                { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
-                  setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
-              >
-                版本列表
-              </Button>
-              <EditAlgorithmModalButton
-                refetch={refetch}
-                editData={{
-                  cluster:getCurrentCluster(r.clusterId),
-                  algorithmName:r.name,
-                  algorithmId:r.id,
-                  algorithmFramework:r.framework,
-                  algorithmDescription:r.description,
-                }}
-              >
-                编辑
-              </EditAlgorithmModalButton>
-              <Button
-                type="link"
-                onClick={() => {
-                  deleteAlgorithm(r.id);
-                }}
-              >
-                删除
-              </Button>
-            </>
-          ) :
-          (
+    ...!isPublic ? [{ dataIndex: "action", title: "操作",
+      render: (_: any, r: AlgorithmInterface) => {
+        return (
+          <>
+            <CreateVersionModalButton
+              refetch={ () => { refetch(); }}
+              algorithmId={r.id}
+              algorithmName={r.name}
+              cluster={getCurrentCluster(r.clusterId)}
+            >
+              创建新版本
+            </CreateVersionModalButton>
+            <EditAlgorithmModalButton
+              refetch={refetch}
+              editData={{
+                cluster:getCurrentCluster(r.clusterId),
+                algorithmName:r.name,
+                algorithmId:r.id,
+                algorithmFramework:r.framework,
+                algorithmDescription:r.description,
+              }}
+            >
+              编辑
+            </EditAlgorithmModalButton>
             <Button
               type="link"
-              onClick={() =>
-              { setVersionListModalIsOpen(true); setAlgorithmId(r.id);
-                setAlgorithmName(r.name); setCluster(getCurrentCluster(r.clusterId));
-              }
-              }
+              onClick={() => {
+                deleteAlgorithm(r.id);
+              }}
             >
-              版本列表
+              删除
             </Button>
-          );
+          </>
+        );
       },
-    },
+    }] : [],
   ];
 
   return (
@@ -260,24 +226,22 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
           total: data?.count,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
+        expandable={{
+          expandedRowRender: (record) => {
+            const cluster = getCurrentCluster(record.clusterId);
+            return cluster && (
+              <AlgorithmVersionList
+                isPublic={record.isShared}
+                algorithms={data?.items ?? []}
+                algorithmName={record.name}
+                algorithmId={record.id}
+                cluster={cluster}
+              ></AlgorithmVersionList>
+            );
+          },
+        }}
         scroll={{ x: true }}
       />
-      {
-        cluster ? (
-          <AlgorithmVersionListModal
-            open={versionListModalIsOpen}
-            onClose={() => { setVersionListModalIsOpen(false); setAlgorithmId(0); }}
-            isPublic={isPublic}
-            algorithmName={algorithmName}
-            algorithmId={algorithmId}
-            algorithmVersionData={versionData?.items ?? []}
-            isFetching={versionFetching}
-            refetch={versionRefetch}
-            cluster={cluster}
-          />
-        ) : undefined
-      }
-
       {/* antd中modal组件 */}
       {confirmModalHolder}
     </div>

@@ -13,9 +13,9 @@
 import { TRPCClientError } from "@trpc/client";
 import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmVersionInterface } from "src/models/Algorithm";
+import { AlgorithmInterface } from "src/models/Algorithm";
 import { SharedStatus } from "src/models/common";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
@@ -28,26 +28,32 @@ import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
 
 export interface Props {
-  open: boolean;
-  onClose: () => void;
   isPublic?: boolean;
+  algorithms: AlgorithmInterface[];
   algorithmId: number;
   algorithmName: string | undefined;
-  algorithmVersionData: AlgorithmVersionInterface[];
-  isFetching: boolean;
-  refetch: () => void;
   cluster: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 const CopyPublicAlgorithmModalButton = ModalButton(CopyPublicAlgorithmModal, { type: "link" });
 
-export const AlgorithmVersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, algorithmId, algorithmName, algorithmVersionData, isFetching, refetch, cluster },
+export const AlgorithmVersionList: React.FC<Props> = (
+  { isPublic, algorithms, algorithmId, algorithmName, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
+
+  const { data: versionData, isFetching, refetch, error: versionError } =
+    trpc.algorithm.getAlgorithmVersions.useQuery({ algorithmId:algorithmId, isPublic });
+  if (versionError) {
+    message.error("找不到算法版本");
+  }
+
+  useEffect(() => {
+    refetch();
+  }, [algorithms]);
 
   const checkFileExist = trpc.file.checkFileExist.useMutation();
 
@@ -97,7 +103,7 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
       confirm({
         title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除算法版本",
         onOk:async () => {
-          await deleteAlgorithmVersionMutation.mutateAsync({ algorithmVersionId:id, algorithmId });
+          await deleteAlgorithmVersionMutation.mutateAsync({ algorithmVersionId: id, algorithmId });
         },
       });
     },
@@ -105,17 +111,10 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
   );
 
   return (
-    <Modal
-      title={`版本列表:${algorithmName}`}
-      open={open}
-      onCancel={onClose}
-      centered
-      width={1000}
-      footer={false}
-    >
+    <>
       <Table
         rowKey="id"
-        dataSource={algorithmVersionData}
+        dataSource={versionData?.items ?? []}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
@@ -209,6 +208,6 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
       />
       {/* antd中modal组件 */}
       {confirmModalHolder}
-    </Modal>
+    </>
   );
 };

@@ -36,7 +36,7 @@ interface FormFields {
   path: string,
 }
 
-export const CopyPublicModalModal: React.FC<Props> = (
+export const CopyPublicModelModal: React.FC<Props> = (
   { open, onClose, modelId, modelVersionId, cluster, modelName, data },
 ) => {
   const [form] = Form.useForm<FormFields>();

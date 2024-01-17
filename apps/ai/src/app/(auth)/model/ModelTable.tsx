@@ -26,7 +26,7 @@ import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditModalModal } from "./CreateAndEditModelModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
-import { ModelVersionListModal } from "./ModelVersionListModal";
+import { ModelVersionList } from "./ModelVersionList";
 
 interface Props {
   isPublic: boolean;
@@ -64,11 +64,6 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const [modelId, setModalId] = useState(0);
-  const [modelName, setModalName] = useState<undefined | string>(undefined);
-  const [cluster, setCluster] = useState<undefined | Cluster>(undefined);
-  const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
-
   const { data, isFetching, refetch, error } = trpc.model.list.useQuery(
     { ...pageInfo,
       nameOrDesc:query.nameOrDesc,
@@ -77,14 +72,6 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     });
   if (error) {
     message.error("找不到模型");
-  }
-
-  const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
-  trpc.model.versionList.useQuery({ modelId, isPublic }, {
-    enabled:!!modelId,
-  });
-  if (versionError) {
-    message.error("找不到模型版本");
   }
 
   const deleteModelMutation = trpc.model.deleteModel.useMutation({
@@ -126,62 +113,43 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { dataIndex: "createTime", title: "创建时间",
       render:(createTime) => formatDateTime(createTime),
     },
-    { dataIndex: "action", title: "操作",
-      render: (_, r) => {
-        return !isPublic ?
-          (
-            <>
-              <CreateVersionModalButton
-                refetch={() => { refetch(); setModalId(0); } }
-                modelId={r.id}
-                modelName={r.name}
-                cluster={getCurrentCluster(r.clusterId)}
-              >
-                创建新版本
-              </CreateVersionModalButton>
-              <Button
-                type="link"
-                onClick={() =>
-                { setVersionListModalIsOpen(true); setModalId(r.id);
-                  setModalName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
-              >
-                  版本列表
-              </Button>
-              <EditModalModalButton
-                refetch={refetch}
-                editData={{
-                  cluster:getCurrentCluster(r.clusterId),
-                  modelId:r.id,
-                  modelName:r.name,
-                  algorithmName:r.algorithmName,
-                  algorithmFramework:r.algorithmFramework,
-                  modalDescription:r.description,
-                }}
-              >
-                编辑
-              </EditModalModalButton>
-              <Button
-                type="link"
-                onClick={() => {
-                  deleteModel(r.id);
-                }}
-              >
-                删除
-              </Button>
-            </>
-          ) :
-          (
+    ...!isPublic ? [{ dataIndex: "action", title: "操作",
+      render: (_: any, r: ModelInterface) => {
+        return (
+          <>
+            <CreateVersionModalButton
+              refetch={() => { refetch(); } }
+              modelId={r.id}
+              modelName={r.name}
+              cluster={getCurrentCluster(r.clusterId)}
+            >
+              创建新版本
+            </CreateVersionModalButton>
+            <EditModalModalButton
+              refetch={refetch}
+              editData={{
+                cluster:getCurrentCluster(r.clusterId),
+                modelId:r.id,
+                modelName:r.name,
+                algorithmName:r.algorithmName,
+                algorithmFramework:r.algorithmFramework,
+                modalDescription:r.description,
+              }}
+            >
+              编辑
+            </EditModalModalButton>
             <Button
               type="link"
-              onClick={() =>
-              { setVersionListModalIsOpen(true); setModalId(r.id);
-                setModalName(r.name); setCluster(getCurrentCluster(r.clusterId)); }}
+              onClick={() => {
+                deleteModel(r.id);
+              }}
             >
-              版本列表
+              删除
             </Button>
-          );
+          </>
+        );
       },
-    },
+    }] : [],
   ];
 
   return (
@@ -231,23 +199,23 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
           total: data?.count,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
+        expandable={{
+          expandedRowRender: (record) => {
+            const cluster = getCurrentCluster(record.clusterId);
+            return cluster && (
+              <ModelVersionList
+                isPublic={record.isShared}
+                models={data?.items ?? []}
+                modelId={record.id}
+                modelName={record.name}
+                cluster={cluster}
+              ></ModelVersionList>
+            );
+          },
+        }}
         scroll={{ x: true }}
       />
-      {
-        cluster ? (
-          <ModelVersionListModal
-            open={versionListModalIsOpen}
-            onClose={() => { setVersionListModalIsOpen(false); setModalId(0); }}
-            isPublic={isPublic}
-            modelName={modelName}
-            modelId={modelId}
-            modelVersionData={versionData?.items ?? []}
-            isFetching={versionFetching}
-            refetch={versionRefetch}
-            cluster={cluster}
-          />
-        ) : undefined
-      }
+
 
       {/* antd中modal组件 */}
       {confirmModalHolder}

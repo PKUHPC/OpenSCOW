@@ -16,37 +16,39 @@ import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
-import { ModelVersionInterface } from "src/models/Model";
+import { ModelInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
 
-import { CopyPublicModalModal } from "./CopyPublicModelModal";
+import { CopyPublicModelModal } from "./CopyPublicModelModal";
 import { CreateAndEditVersionModal } from "./CreateAndEditVersionModal";
 
 export interface Props {
-  open: boolean;
-  onClose: () => void;
   isPublic?: boolean;
+  models: ModelInterface[];
   modelId: number;
-  modelName: string | undefined;
-  modelVersionData: ModelVersionInterface[];
-  isFetching: boolean;
-  refetch: () => void;
+  modelName: string;
   cluster: Cluster;
 }
 
 const EditVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
-const CopyPublicModalModalButton = ModalButton(CopyPublicModalModal, { type: "link" });
+const CopyPublicModelModalButton = ModalButton(CopyPublicModelModal, { type: "link" });
 
-export const ModelVersionListModal: React.FC<Props> = (
-  { open, onClose, isPublic, modelId, modelName, modelVersionData, isFetching, refetch, cluster },
+export const ModelVersionList: React.FC<Props> = (
+  { isPublic, modelId, modelName, cluster },
 ) => {
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
+
+  const { data: versionData, isFetching, refetch, error: versionError } =
+    trpc.model.versionList.useQuery({ modelId, isPublic });
+  if (versionError) {
+    message.error("找不到模型版本");
+  }
 
   const checkFileExist = trpc.file.checkFileExist.useMutation();
 
@@ -62,7 +64,7 @@ export const ModelVersionListModal: React.FC<Props> = (
         return;
       }
 
-      message.error("分享失败");
+      message.error(err.message);
     },
   });
 
@@ -104,17 +106,10 @@ export const ModelVersionListModal: React.FC<Props> = (
   );
 
   return (
-    <Modal
-      title={`版本列表:${modelName}`}
-      open={open}
-      onCancel={onClose}
-      centered
-      width={1000}
-      footer={false}
-    >
+    <>
       <Table
         rowKey="id"
-        dataSource={modelVersionData}
+        dataSource={versionData?.items ?? []}
         loading={isFetching}
         pagination={false}
         scroll={{ y:275 }}
@@ -127,7 +122,7 @@ export const ModelVersionListModal: React.FC<Props> = (
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
-                <CopyPublicModalModalButton
+                <CopyPublicModelModalButton
                   modelId={modelId}
                   modelName={modelName}
                   modelVersionId={r.id}
@@ -135,7 +130,7 @@ export const ModelVersionListModal: React.FC<Props> = (
                   cluster={cluster}
                 >
                   复制
-                </CopyPublicModalModalButton>
+                </CopyPublicModelModalButton>
               ) :
                 (
                   <>
@@ -212,6 +207,7 @@ export const ModelVersionListModal: React.FC<Props> = (
       />
       {/* antd中modal组件 */}
       {confirmModalHolder}
-    </Modal>
+    </>
+
   );
 };

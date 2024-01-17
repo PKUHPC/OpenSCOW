@@ -15,13 +15,14 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Divider, Form, Input, Modal, Select, Space, Table } from "antd";
+import { App, Button, Form, Input, Modal, Select, Space, Table } from "antd";
 import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { DatasetTypeText, SceneTypeText } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
+import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
 import { trpc } from "src/utils/trpc";
@@ -29,7 +30,7 @@ import { trpc } from "src/utils/trpc";
 import { defaultClusterContext } from "../defaultClusterContext";
 import { CreateEditDatasetModal } from "./CreateEditDatasetModal";
 import { CreateEditDSVersionModal } from "./CreateEditDSVersionModal";
-import { DatasetVersionsModal } from "./DatasetVersionsModal";
+import { DatasetVersionList } from "./DatasetVersionList";
 
 interface Props {
   isPublic: boolean;
@@ -77,27 +78,11 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [form] = Form.useForm<FilterForm>();
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
-  const [datasetId, setDatasetId] = useState<number>(0);
-  const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
-  const [clusterId, setClusterId] = useState<string | undefined>(undefined);
-  const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
-
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
     ...pageInfo, ...query, clusterId: query.cluster?.id, isPublic,
   });
   if (error) {
     message.error("找不到数据集");
-  }
-
-  const { data: versionData,
-    isFetching: versionFetching,
-    refetch: versionRefetch,
-    error: versionError }
-    = trpc.dataset.versionList.useQuery({ datasetId, isPublic }, {
-      enabled:!!datasetId,
-    });
-  if (versionError) {
-    message.error("找不到数据集版本");
   }
 
   const deleteDatasetMutation = trpc.dataset.deleteDataset.useMutation({
@@ -144,7 +129,6 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
             const { nameOrDesc } = await form.validateFields();
             setQuery({ ...query, nameOrDesc: nameOrDesc?.trim() });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
-            setDatasetId(0);
             refetch();
           }}
         >
@@ -206,72 +190,35 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
             render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间",
             render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
-          { dataIndex: "action", title: "操作",
-            render: (_, r) => {
-              return !isPublic ?
-                (
-                  <>
-                    <Space split={<Divider type="vertical" />}>
-                      <CreateEditVersionModalButton
-                        datasetId={r.id}
-                        datasetName={r.name}
-                        cluster={getCurrentCluster(r.clusterId)}
-                        refetch={() => {
-                          refetch();
-                          setDatasetId(0);
-                        }}
-
-                      >
-                        创建新版本
-                      </CreateEditVersionModalButton>
-                    </Space>
-                    <Space split={<Divider type="vertical" />}>
-                      <Button
-                        type="link"
-                        onClick={() =>
-                        { setVersionListModalIsOpen(true);
-                          setDatasetId(r.id);
-                          setDatasetName(r.name);
-                          setClusterId(r.clusterId);
-                        }}
-                      >
-                        版本列表
-                      </Button>
-                    </Space>
-                    <Space split={<Divider type="vertical" />}>
-                      <EditDatasetModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
-                        编辑
-                      </EditDatasetModalButton>
-                    </Space>
-                    <Space split={<Divider type="vertical" />}>
-                      <Button
-                        type="link"
-                        onClick={() => {
-                          deleteDataset(r.id);
-                        }}
-                      >
-                        删除
-                      </Button>
-                    </Space>
-                  </>
-                ) :
-                (
-                  <Space split={<Divider type="vertical" />}>
-                    <Button
-                      type="link"
-                      onClick={() =>
-                      { setVersionListModalIsOpen(true);
-                        setDatasetId(r.id);
-                        setDatasetName(r.name);
-                        setClusterId(r.clusterId);
-                      }}
-                    >
-                      版本列表
-                    </Button>
-                  </Space>
-                );
+          ...!isPublic ? [{ dataIndex: "action", title: "操作",
+            render: (_: any, r: DatasetInterface) => {
+              return (
+                <>
+                  <CreateEditVersionModalButton
+                    datasetId={r.id}
+                    datasetName={r.name}
+                    cluster={getCurrentCluster(r.clusterId)}
+                    refetch={() => {
+                      refetch();
+                    }}
+                  >
+                    创建新版本
+                  </CreateEditVersionModalButton>
+                  <EditDatasetModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
+                    编辑
+                  </EditDatasetModalButton>
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      deleteDataset(r.id);
+                    }}
+                  >
+                    删除
+                  </Button>
+                </>
+              );
             },
-          },
+          }] : [],
         ]}
         pagination={setPageInfo ? {
           current: pageInfo.page,
@@ -281,20 +228,22 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           total: data?.count,
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
+        expandable={{
+          expandedRowRender: (record) => {
+            const cluster = getCurrentCluster(record.clusterId);
+            return cluster && (
+              <DatasetVersionList
+                isPublic={record.isShared}
+                datasets={data?.items ?? []}
+                datasetId={record.id}
+                datasetName={record.name}
+                cluster={cluster}
+              ></DatasetVersionList>
+            );
+          },
+        }}
         scroll={{ x: true }}
       />
-      {getCurrentCluster(clusterId) ? (
-        <DatasetVersionsModal
-          open={versionListModalIsOpen}
-          onClose={() => { setVersionListModalIsOpen(false); setDatasetId(0); }}
-          isPublic={isPublic}
-          datasetName={datasetName}
-          cluster={getCurrentCluster(clusterId)!}
-          datasetVersions={versionData?.items ?? []}
-          isFetching={versionFetching}
-          onRefetch={versionRefetch}
-        />
-      ) : undefined}
       {/* antd中modal组件 */}
       {confirmModalHolder}
     </div>
