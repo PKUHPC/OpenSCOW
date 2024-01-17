@@ -134,7 +134,7 @@ export const LaunchAppForm = (props: Props) => {
     "algorithm",
     trpc.algorithm.getAlgorithms.useQuery,
     clusterId,
-    (x) => ({ label: x.name, value: x.id }),
+    (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
   );
 
   const { dataVersionOptions: algorithmVersionOptions, isDataVersionsLoading: isAlgorithmVersionsLoading } =
@@ -437,6 +437,9 @@ export const LaunchAppForm = (props: Props) => {
               <Select
                 allowClear
                 style={{ minWidth: 100 }}
+                onChange={() => {
+                  form.setFieldValue(["algorithm", "version"], undefined);
+                }}
                 loading={isAlgorithmLoading}
                 options={algorithmOptions}
               />
@@ -523,6 +526,9 @@ export const LaunchAppForm = (props: Props) => {
               <Select
                 allowClear
                 style={{ minWidth: 100 }}
+                onChange={() => {
+                  form.setFieldValue(["model", "version"], undefined);
+                }}
                 loading={isModelsLoading }
                 options={modelOptions}
               />
