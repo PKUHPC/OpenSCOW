@@ -24,6 +24,7 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { checkCreateAppEntity } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
+import { isParentOrSameFolder } from "src/server/utils/file";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -105,6 +106,13 @@ procedure
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
+
+        if (!isParentOrSameFolder(homeDir, mountPoint)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "mountPoint should be in homeDir",
+          });
+        }
 
         const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
 

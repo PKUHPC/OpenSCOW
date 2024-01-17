@@ -36,6 +36,7 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
+import { isParentOrSameFolder } from "src/server/utils/file";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { commitContainerImage, createHarborImageUrl, pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
@@ -110,8 +111,6 @@ const I18nStringSchema = z.union([
     }),
   }),
 ]);
-
-export type I18nStringType = z.infer<typeof AttributeTypeSchema>;
 
 const SelectOptionSchema = z.object({
   value: z.string(),
@@ -327,6 +326,14 @@ export const createAppSession = procedure
     return await sshConnect(host, userId, logger, async (ssh) => {
 
       const homeDir = await getUserHomedir(ssh, userId, logger);
+
+      // 工作目录和挂载点必须在用户的homeDir下
+      if (!isParentOrSameFolder(homeDir, workingDirectory) || !isParentOrSameFolder(homeDir, mountPoint)) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "workingDirectory and mountPoint should be in homeDir",
+        });
+      }
 
       const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
 

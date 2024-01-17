@@ -88,7 +88,7 @@ export const file = router({
       if (!host) { throw clusterNotFound(clusterId); }
 
       if (target === "FILE") {
-        return await await sshConnect(host, user.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
           const sftp = await ssh.requestSFTP();
 
@@ -97,7 +97,7 @@ export const file = router({
           return;
         });
       } else {
-        return await await sshConnect(host, user.identityId, logger, async (ssh) => {
+        return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
           await sshRmrf(ssh, path);
 
