@@ -32,9 +32,7 @@ export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
       method: "GET",
-      // algorithmVersion是algorithm的子资源，所以可以写成
-      // GET /algorithm/{algorithmId}/versions
-      path: "/algorithmVersions/list/{algorithmId}",
+      path: "/algorithms/{algorithmId}/versions",
       tags: ["algorithmVersion"],
       summary: "get algorithmVersions",
     },
@@ -87,9 +85,7 @@ export const createAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      // algorithmVersion是algorithm的子资源，所以可以写成
-      // POST /algorithm/{algorithmId}/versions
-      path: "/algorithmVersion/create",
+      path: "/algorithms/{algorithmId}/versions",
       tags: ["algorithmVersion"],
       summary: "Create a new algorithmVersion",
     },
@@ -138,7 +134,7 @@ export const updateAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
-      path: "/algorithmVersion/update/{versionId}",
+      path: "/algorithmVersions/update/{versionId}",
       tags: ["algorithmVersion"],
       summary: "update a algorithmVersion",
     },
@@ -204,7 +200,7 @@ export const deleteAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/algorithmVersion/delete/{id}",
+      path: "/algorithmVersions/delete/{id}",
       tags: ["algorithmVersion"],
       summary: "delete a new algorithmVersion",
     },
@@ -258,7 +254,7 @@ export const deleteAlgorithmVersion = procedure
           sharedPath: pathToUnshare,
         });
       } catch (e) {
-        logger.error(`ssh failure occured when unshare algorithmVersion ${id} of algorithm ${algorithmId}`, e);
+        logger.error(`ssh failure occurred when unshare algorithmVersion ${id} of algorithm ${algorithmId}`, e);
       }
 
 
@@ -276,22 +272,20 @@ export const shareAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "PUT",
-      // algorithmVersion是algorithm的子资源，share也可以考虑为algorithmVersion的子资源
-      // PUT /algorithm/{algorithmId}/versions/{algorithmVersionId}/share
-      path: "/algorithmVersion/share/{versionId}",
+      path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}/share",
       tags: ["algorithmVersion"],
       summary: "share a algorithmVersion",
     },
   })
   .input(z.object({
     algorithmId: z.number(),
-    versionId: z.number(),
+    algorithmVersionId: z.number(),
     sourceFilePath: z.string(),
   }))
   .output(z.void())
-  .mutation(async ({ input:{ algorithmId, versionId, sourceFilePath }, ctx: { user } }) => {
+  .mutation(async ({ input:{ algorithmId, algorithmVersionId, sourceFilePath }, ctx: { user } }) => {
     const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithmVersionId });
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
 
@@ -349,27 +343,28 @@ export const shareAlgorithmVersion = procedure
 export const unShareAlgorithmVersion = procedure
   .meta({
     openapi: {
-      // algorithmVersion是algorithm的子资源，share也可以考虑为algorithmVersion的子资源
-      // DELETE /algorithm/{algorithmId}/versions/{algorithmVersionId}/share
       method: "PUT",
-      path: "/algorithmVersion/unShare/{versionId}",
+      path: "/algorithm/{algorithmId}/versions/{algorithmVersionId}/share",
       tags: ["algorithmVersion"],
       summary: "unshare a algorithmVersion",
     },
   })
   .input(z.object({
-    versionId: z.number(),
+    algorithmVersionId: z.number(),
     algorithmId: z.number(),
   }))
   .output(z.void())
-  .mutation(async ({ input:{ versionId, algorithmId }, ctx: { user } }) => {
+  .mutation(async ({ input:{ algorithmVersionId, algorithmId }, ctx: { user } }) => {
     const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: versionId });
+    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithmVersionId });
     if (!algorithmVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${versionId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmVersionId} not found` });
 
     if (algorithmVersion.sharedStatus === SharedStatus.UNSHARED)
-      throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion id:${versionId} is already unShared` });
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `AlgorithmVersion id:${algorithmVersionId} is already unShared`,
+      });
 
     const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId }, {
       populate: ["versions.sharedStatus"],
@@ -409,7 +404,6 @@ export const unShareAlgorithmVersion = procedure
       await orm.em.persistAndFlush([algorithmVersion]);
     };
 
-    // 不await？
     unShareFileOrDir({
       host,
       sharedPath: algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
@@ -426,8 +420,7 @@ export const copyPublicAlgorithmVersion = procedure
   .meta({
     openapi: {
       method: "POST",
-      // 这个URL就还不错，资源类型algorithm和version都要用复数
-      path: "/algorithm/{algorithmId}/version/{algorithmVersionId}/copy",
+      path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}/copy",
       tags: ["algorithmVersion"],
       summary: "copy a public algorithm version",
     },

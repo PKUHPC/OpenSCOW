@@ -176,12 +176,12 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
                           onOk: async () => {
                             r.sharedStatus === SharedStatus.SHARED ?
                               await unShareMutation.mutateAsync({
-                                versionId: r.id,
+                                algorithmVersionId: r.id,
                                 algorithmId,
                               })
                               :
                               await shareMutation.mutateAsync({
-                                versionId: r.id,
+                                algorithmVersionId: r.id,
                                 algorithmId,
                                 sourceFilePath: r.path });
                           },
