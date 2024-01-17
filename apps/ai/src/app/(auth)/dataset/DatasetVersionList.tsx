@@ -11,7 +11,7 @@
  */
 
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Divider, Space, Table } from "antd";
+import { App, Button, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
 import { ModalButton } from "src/components/ModalLink";
@@ -133,85 +133,75 @@ export const DatasetVersionList: React.FC<Props> = (
           render: (_, r) => {
             return !isPublic ? (
               <>
-                <Space split={<Divider type="vertical" />}>
-                  <CreateEditVersionModalButton
-                    key="edit"
-                    datasetId={r.datasetId}
-                    datasetName={datasetName}
-                    cluster={cluster}
-                    isEdit={true}
-                    editData={r}
-                    refetch={refetch}
-                  >
-                  编辑
-                  </CreateEditVersionModalButton>
-                </Space>
-                <Space split={<Divider type="vertical" />}>
-                  <Button
-                    type="link"
-                    onClick={async () => {
-                      const checkExistRes =
-                      await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
-
-                      if (checkExistRes?.exists) {
-                        router.push(`/files/${cluster.id}${r.privatePath}`);
-                      } else {
-                        deleteDatasetVersion(r.id, r.datasetId, true);
-                      }
-                    }}
-                  >
-                    查看文件
-                  </Button>
-                </Space>
-                <Space split={<Divider type="vertical" />}>
-                  <Button
-                    type="link"
-                    disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
-                    onClick={() => {
-                      modal.confirm({
-                        title: "分享数据集版本",
-                        content: `确认${getSharedStatusText(r.sharedStatus)}数据集版本 ${r.versionName}?`,
-                        onOk: async () => {
-                          r.sharedStatus === SharedStatus.SHARED ?
-                            await unShareMutation.mutateAsync({
-                              datasetVersionId: r.id,
-                              datasetId: r.datasetId,
-                            })
-                            :
-                            await shareMutation.mutateAsync({
-                              datasetVersionId: r.id,
-                              datasetId: r.datasetId,
-                              sourceFilePath: r.path,
-                            });
-                        },
-                      });
-                    }}
-                  >{getSharedStatusText(r.sharedStatus)}</Button>
-                </Space>
-                <Space split={<Divider type="vertical" />}>
-                  <Button
-                    type="link"
-                    disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
-                    onClick={() => {
-                      deleteDatasetVersion(r.id, r.datasetId);
-                    }}
-                  >
-                    删除
-                  </Button>
-                </Space>
-              </>
-            ) : (
-              <Space split={<Divider type="vertical" />}>
-                <CopyPublicDatasetModalButton
+                <CreateEditVersionModalButton
+                  key="edit"
                   datasetId={r.datasetId}
                   datasetName={datasetName}
-                  datasetVersionId={r.id}
                   cluster={cluster}
-                  data={r}
+                  isEdit={true}
+                  editData={r}
+                  refetch={refetch}
                 >
-                  复制
-                </CopyPublicDatasetModalButton>
-              </Space>
+                编辑
+                </CreateEditVersionModalButton>
+                <Button
+                  type="link"
+                  onClick={async () => {
+                    const checkExistRes =
+                    await checkFileExist.mutateAsync({ clusterId:cluster.id, path:r.privatePath });
+
+                    if (checkExistRes?.exists) {
+                      router.push(`/files/${cluster.id}${r.privatePath}`);
+                    } else {
+                      deleteDatasetVersion(r.id, r.datasetId, true);
+                    }
+                  }}
+                >
+                  查看文件
+                </Button>
+                <Button
+                  type="link"
+                  disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
+                  onClick={() => {
+                    modal.confirm({
+                      title: "分享数据集版本",
+                      content: `确认${getSharedStatusText(r.sharedStatus)}数据集版本 ${r.versionName}?`,
+                      onOk: async () => {
+                        r.sharedStatus === SharedStatus.SHARED ?
+                          await unShareMutation.mutateAsync({
+                            datasetVersionId: r.id,
+                            datasetId: r.datasetId,
+                          })
+                          :
+                          await shareMutation.mutateAsync({
+                            datasetVersionId: r.id,
+                            datasetId: r.datasetId,
+                            sourceFilePath: r.path,
+                          });
+                      },
+                    });
+                  }}
+                >{getSharedStatusText(r.sharedStatus)}</Button>
+                <Button
+                  type="link"
+                  disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
+                  onClick={() => {
+                    deleteDatasetVersion(r.id, r.datasetId);
+                  }}
+                >
+                  删除
+                </Button>
+              </>
+            ) : (
+              <CopyPublicDatasetModalButton
+                datasetId={r.datasetId}
+                datasetName={datasetName}
+                datasetVersionId={r.id}
+                cluster={cluster}
+                data={r}
+              >
+                复制
+              </CopyPublicDatasetModalButton>
             );
           },
         },

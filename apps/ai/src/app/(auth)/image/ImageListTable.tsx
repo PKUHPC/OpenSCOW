@@ -15,7 +15,7 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Divider, Form, Input, Space, Table } from "antd";
+import { App, Button, Checkbox, Form, Input, Space, Table } from "antd";
 import NextError from "next/error";
 import { useRef, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
@@ -171,112 +171,104 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               return !isPublic ?
                 (
                   <>
-                    <Space split={<Divider type="vertical" />}>
-                      <Button
-                        type="link"
-                        onClick={() => {
+                    <Button
+                      type="link"
+                      onClick={() => {
 
-                          modal.confirm({
-                            title: `${shareOrUnshareStr}镜像`,
-                            content: `确认${shareOrUnshareStr}镜像${r.name}${r.tag}？`,
-                            onOk: async () => {
-                              await shareOrUnshareMutation.mutateAsync({
-                                id: r.id,
-                                share: !r.isShared,
-                              }, {
-                                onSuccess() {
-                                  refetch();
-                                  message.success(`${shareOrUnshareStr}镜像成功`);
-                                },
-                              });
-                            },
-                          });
-                        }}
-                      >
-                        {shareOrUnshareStr}
-                      </Button>
-                    </Space>
+                        modal.confirm({
+                          title: `${shareOrUnshareStr}镜像`,
+                          content: `确认${shareOrUnshareStr}镜像${r.name}${r.tag}？`,
+                          onOk: async () => {
+                            await shareOrUnshareMutation.mutateAsync({
+                              id: r.id,
+                              share: !r.isShared,
+                            }, {
+                              onSuccess() {
+                                refetch();
+                                message.success(`${shareOrUnshareStr}镜像成功`);
+                              },
+                            });
+                          },
+                        });
+                      }}
+                    >
+                      {shareOrUnshareStr}
+                    </Button>
 
                     {/* { r.source === Source.INTERNAL && (
-                      <Space split={<Divider type="vertical" />}>
-                        <Button
-                          type="link"
-                          onClick={() => {
-                            router.push(`/files/${r.clusterId}${r.sourcePath}`);
-                          }}
-                        >
-                    查看文件
-                        </Button>
-                      </Space>
-                    )} */}
-
-                    <Space split={<Divider type="vertical" />}>
-                      <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
-                        编辑
-                      </EditImageModalButton>
-                    </Space>
                     <Space split={<Divider type="vertical" />}>
                       <Button
                         type="link"
                         onClick={() => {
-                          deleteSourceFileRef.current = false;
-                          modal.confirm({
-                            title: "删除镜像",
-                            content: (
-                              <>
-                                <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
+                          router.push(`/files/${r.clusterId}${r.sourcePath}`);
+                        }}
+                      >
+                  查看文件
+                      </Button>
+                    </Space>
+                  )} */}
 
-                                {r.source === Source.INTERNAL && (
-                                  <Checkbox
-                                    onChange={(e) => (deleteSourceFileRef.current = e.target.checked)}
-                                  >
-                                    同时删除源文件
-                                  </Checkbox>
-                                )}
+                    <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
+                      编辑
+                    </EditImageModalButton>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        deleteSourceFileRef.current = false;
+                        modal.confirm({
+                          title: "删除镜像",
+                          content: (
+                            <>
+                              <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
 
-                              </>
-                            ),
-                            onOk: async () => {
-                              deleteSourceFileRef.current ?
+                              {r.source === Source.INTERNAL && (
+                                <Checkbox
+                                  onChange={(e) => (deleteSourceFileRef.current = e.target.checked)}
+                                >
+                                  同时删除源文件
+                                </Checkbox>
+                              )}
 
-                                await deleteImageMutation.mutateAsync({
-                                  id: r.id,
-                                }).then(async () => {
-                                  await deleteSourceFileMutation.mutateAsync({
-                                    target: "FILE",
-                                    clusterId: cluster?.id ?? "",
-                                    path: r.sourcePath,
-                                  }).then(() => {
-                                    message.success("删除成功");
-                                    refetch();
-                                  });
-                                }) :
-                                await deleteImageMutation.mutateAsync({
-                                  id: r.id,
+                            </>
+                          ),
+                          onOk: async () => {
+                            deleteSourceFileRef.current ?
+
+                              await deleteImageMutation.mutateAsync({
+                                id: r.id,
+                              }).then(async () => {
+                                await deleteSourceFileMutation.mutateAsync({
+                                  target: "FILE",
+                                  clusterId: cluster?.id ?? "",
+                                  path: r.sourcePath,
                                 }).then(() => {
                                   message.success("删除成功");
                                   refetch();
                                 });
-                            },
-                          });
-                        }}
-                      >
-                        删除
-                      </Button>
-                    </Space>
+                              }) :
+                              await deleteImageMutation.mutateAsync({
+                                id: r.id,
+                              }).then(() => {
+                                message.success("删除成功");
+                                refetch();
+                              });
+                          },
+                        });
+                      }}
+                    >
+                      删除
+                    </Button>
                   </>
                 ) :
                 (
-                  <Space split={<Divider type="vertical" />}>
-                    <CopyImageModalButton
-                      refetch={refetch}
-                      copiedId={r.id}
-                      copiedName={r.name}
-                      copiedTag={r.tag}
-                    >
-                      复制
-                    </CopyImageModalButton>
-                  </Space>
+                  <CopyImageModalButton
+                    refetch={refetch}
+                    copiedId={r.id}
+                    copiedName={r.name}
+                    copiedTag={r.tag}
+                  >
+                    复制
+                  </CopyImageModalButton>
                 );
             },
           },
