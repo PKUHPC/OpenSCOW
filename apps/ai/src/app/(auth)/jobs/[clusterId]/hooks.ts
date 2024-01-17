@@ -38,10 +38,8 @@ export function useDataOptions<T>(
   const itemType = Form.useWatch(typePath, form);
   const isItemPublic = itemType !== undefined ? itemType === AccessiblityType.PUBLIC : itemType;
 
-  const queryInput = dataType === "algorithm" ? { isPublic : isItemPublic } : { isShared : isItemPublic };
-
   const { data: items, isLoading: isDataLoading } = queryHook({
-    ...queryInput, clusterId,
+    isPublic : isItemPublic, clusterId,
   }, { enabled: isItemPublic !== undefined });
 
   const dataOptions = useMemo(() => {
@@ -63,10 +61,8 @@ export function useDataVersionOptions<T>(
   const itemType = Form.useWatch(typePath, form);
   const isItemPublic = itemType !== undefined ? itemType === AccessiblityType.PUBLIC : itemType;
 
-  const queryInput = dataType === "algorithm" ? { isPublic : isItemPublic } : { isShared : isItemPublic };
-
   const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
-    [`${dataType}Id`]: selectedItem, ...queryInput,
+    [`${dataType}Id`]: selectedItem, isPublic : isItemPublic,
   }, { enabled: selectedItem !== undefined });
 
   const dataVersionOptions = useMemo(() => {

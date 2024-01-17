@@ -54,16 +54,16 @@ export const list = procedure
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
-    isShared: z.boolean().optional(),
+    isPublic: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const { page, pageSize, nameOrDesc, type, isShared, clusterId } = input;
+    const { page, pageSize, nameOrDesc, type, isPublic, clusterId } = input;
 
-    const isPublicQuery = isShared ? {
+    const isPublicQuery = isPublic ? {
       isShared: true,
       owner: { $ne: null },
     } : { owner: user.identityId };
@@ -100,7 +100,7 @@ export const list = procedure
         description: x.description,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,
-        versions: input.isShared ?
+        versions: isPublic ?
           x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path) :
           x.versions.map((y) => y.privatePath),
       }; }), count };

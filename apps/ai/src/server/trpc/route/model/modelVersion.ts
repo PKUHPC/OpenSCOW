@@ -53,7 +53,7 @@ export const versionList = procedure
   .input(z.object({
     ...paginationSchema.shape,
     modelId: z.number(),
-    isShared: z.boolean().optional(),
+    isPublic: z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(VersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
@@ -62,7 +62,7 @@ export const versionList = procedure
     const [items, count] = await orm.em.findAndCount(ModelVersion,
       {
         model: { id: input.modelId },
-        ...input.isShared ? { sharedStatus:SharedStatus.SHARED } : {},
+        ...input.isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
       },
       {
         limit: input.pageSize || undefined,

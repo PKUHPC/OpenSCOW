@@ -47,7 +47,6 @@ interface FilterForm {
   cluster?: Cluster | undefined,
   type?: FilterTypeKeys | undefined,
   nameOrDesc?: string | undefined,
-  isShared?: boolean,
 }
 
 interface PageInfo {
@@ -72,7 +71,6 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       cluster: defaultCluster,
       nameOrDesc: undefined,
       type: undefined,
-      isShared: isPublic,
     };
   });
 
@@ -85,7 +83,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
-    ...pageInfo, ...query, clusterId: query.cluster?.id,
+    ...pageInfo, ...query, clusterId: query.cluster?.id, isPublic,
   });
   if (error) {
     message.error("找不到数据集");
@@ -95,7 +93,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     isFetching: versionFetching,
     refetch: versionRefetch,
     error: versionError }
-    = trpc.dataset.versionList.useQuery({ datasetId: datasetId, isShared: isPublic }, {
+    = trpc.dataset.versionList.useQuery({ datasetId, isPublic }, {
       enabled:!!datasetId,
     });
   if (versionError) {

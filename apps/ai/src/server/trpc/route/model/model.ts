@@ -52,14 +52,14 @@ export const list = procedure
   .input(z.object({
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
-    isShared: z.boolean().optional(),
+    isPublic: z.boolean().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(ModelListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const isPublicQuery = input.isShared ? {
+    const isPublicQuery = input.isPublic ? {
       isShared: true,
     } : { owner: user.identityId };
 
@@ -92,7 +92,7 @@ export const list = procedure
         algorithmName: x.algorithmName,
         algorithmFramework: x.algorithmFramework,
         isShared: Boolean(x.isShared),
-        versions: input.isShared ?
+        versions: input.isPublic ?
           x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path)
           : x.versions.map((y) => y.privatePath),
         owner: x.owner,

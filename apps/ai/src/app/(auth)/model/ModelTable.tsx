@@ -73,14 +73,14 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { ...pageInfo,
       nameOrDesc:query.nameOrDesc,
       clusterId:query.clusterId,
-      isShared:isPublic,
+      isPublic,
     });
   if (error) {
     message.error("找不到模型");
   }
 
   const { data:versionData, isFetching:versionFetching, refetch:versionRefetch, error:versionError } =
-  trpc.model.versionList.useQuery({ modelId, isShared:isPublic }, {
+  trpc.model.versionList.useQuery({ modelId, isPublic }, {
     enabled:!!modelId,
   });
   if (versionError) {

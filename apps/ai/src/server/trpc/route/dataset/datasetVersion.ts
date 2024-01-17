@@ -55,18 +55,18 @@ export const versionList = procedure
   .input(z.object({
     ...paginationSchema.shape,
     datasetId: z.number(),
-    isShared: z.boolean().optional(),
+    isPublic: z.boolean().optional(),
   }))
   .output(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
 
-    const { page, pageSize, datasetId, isShared } = input;
+    const { page, pageSize, datasetId, isPublic } = input;
 
     const [items, count] = await orm.em.findAndCount(DatasetVersion,
       {
         dataset: datasetId,
-        ...isShared ? { sharedStatus:SharedStatus.SHARED } : {},
+        ...isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
       },
       {
         ...paginationProps(page, pageSize),
