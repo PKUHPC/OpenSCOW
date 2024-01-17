@@ -48,17 +48,16 @@ export const ClusterInfo = Type.Object({
 
 export type ClusterInfo = Static<typeof ClusterInfo>;
 
-export const GetClustersRunningInfoSchema = typeboxRouteSchema({
+export const GetClusterRunningInfoSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
-    clusters: Type.Array(Type.String()),
+    clusterId: Type.String(),
   }),
 
   responses: {
     200: Type.Object({
-      clustersInfo:Type.Array(ClusterInfo),
-      failedClusters:Type.Array(Type.String()),
+      clusterInfo: ClusterInfo,
     }),
 
     403: Type.Null(),
@@ -67,20 +66,20 @@ export const GetClustersRunningInfoSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(GetClustersRunningInfoSchema, async (req, res) => {
+export default route(GetClusterRunningInfoSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { clusters } = req.query;
+  const { clusterId } = req.query;
 
   const client = getClient(ConfigServiceClient);
 
-  const { clustersInfo, failedClusters } = await asyncUnaryCall(client, "getClustersInfo", {
-    clusters,
+  const reply = await asyncUnaryCall(client, "getClusterInfo", {
+    cluster:clusterId,
   });
 
-  return { 200: { clustersInfo, failedClusters } };
+  return { 200: { clusterInfo: reply } };
 
 });

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -27,6 +28,10 @@ import { Head } from "src/utils/head";
 interface Props {
 }
 
+interface FulfilledResult {
+  clusterInfo: {clusterName: string, partitions: PartitionInfo[]}
+}
+
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
@@ -42,21 +47,43 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
     promiseFn: useCallback(async () => {
       const clusters = publicConfig.CLUSTERS;
 
-      const { clustersInfo, failedClusters } =
-      await api.getClustersRunningInfo({ query: { clusters:clusters.map((x) => x.id) } });
+      const rawClusterInfoPromises = clusters.map((x) =>
+        api.getClusterRunningInfo({ query: { clusterId: x.id } }),
+      );
+
+      const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+      // 处理成功的结果
+      const successfulResults = rawClusterInfoResults
+        .filter(
+          (result): result is PromiseFulfilledResult<FulfilledResult> =>
+            result.status === "fulfilled")
+        .map((result) => result.value);
+
+      console.log("successfulResults", successfulResults);
+      // 处理失败的结果
+      const failedClusters = clusters.filter((x) =>
+        !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+      // 处理成功的结果
+      const clustersInfo = successfulResults
+        .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
+          clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
+        .flatMap((cluster) =>
+          cluster.clusterInfo.partitions.map((x) => ({
+            clusterName: cluster.clusterInfo.clusterName,
+            ...x,
+            cpuUsage:x.runningCpuCount / x.cpuCoreCount,
+            // 有些分区没有gpu就为空，前端显示'-'
+            ...x.gpuCoreCount ? { gpuUsage:x.runningGpuCount / x.gpuCoreCount } : {},
+          })),
+        );
 
       return {
-        clustersInfo:clustersInfo
-          .flatMap((cluster) =>
-            cluster.partitions.map((x) => ({
-              clusterName:  clusters.find((y) => y.id === cluster.clusterName)?.name,
-              ...x,
-              cpuUsage:x.runningCpuCount / x.cpuCoreCount,
-              ...x.gpuCoreCount ? { gpuUsage:x.runningGpuCount / x.gpuCoreCount } : {},
-            })),
-          ),
-        failedClusters:failedClusters.map((x) => ({ clusterName:clusters.find((y) => y.id === x)?.name })),
+        clustersInfo,
+        failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
       };
+
     }, []),
   });
 
