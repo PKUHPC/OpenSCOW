@@ -259,7 +259,7 @@ export const getOperationDetail = (
     case "logout":
       return t(pDetails("logout"));
     case "submitJob":
-      return t(pDetails("submitJob"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
+      return t(pDetails("submitJob"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId || "-"]);
     case "endJob":
       return t(pDetails("endJob"), [operationEvent[logEvent].jobId]);
     case "addJobTemplate":

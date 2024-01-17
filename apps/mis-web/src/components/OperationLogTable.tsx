@@ -29,6 +29,11 @@ import {
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
+import { styled } from "styled-components";
+
+const WordBreakText = styled.div`
+  word-wrap: break-word;
+  word-break: break-all;`;
 
 interface FilterForm {
   operatorUserId?: string;
@@ -203,7 +208,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               <Input style={{ width: 150 }} />
             </Form.Item>
           )}
-          <Form.Item label="操作内容" name="operationDetail">
+          <Form.Item label={t(p("operationDetail"))} name="operationDetail">
             <Input style={{ width: 150 }} />
           </Form.Item>
           <Form.Item label={t(p("operationTime"))} name="operationTime">
@@ -247,6 +252,10 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         <Table.Column
           dataIndex="operationDetail"
           title={t(p("operationDetail"))}
+          width="30%"
+          render={(operationDetail) => (
+            <WordBreakText>{operationDetail}</WordBreakText>
+          )}
         />
         <Table.Column<OperationLog>
           dataIndex="operationResult"
@@ -263,7 +272,13 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           title={t(p("operatorUserId"))}
           render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
         />
-        <Table.Column<OperationLog> dataIndex="operatorIp" title={t(p("operatorIp"))} />
+        <Table.Column<OperationLog>
+          dataIndex="operatorIp"
+          title={t(p("operatorIp"))}
+          render={(operatorIp) => (
+            <WordBreakText>{operatorIp}</WordBreakText>
+          )}
+        />
       </Table>
     </div>
   );
