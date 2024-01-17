@@ -75,24 +75,6 @@ export const userRoutes: (
       ],
     },
     {
-      Icon: UngroupOutlined,
-      text: "算法",
-      path: "/algorithm",
-      clickToPath: "/algorithm/private",
-      children: [
-        {
-          Icon: LockOutlined,
-          text: "我的算法",
-          path: "/algorithm/private",
-        },
-        {
-          Icon: ShareAltOutlined,
-          text: "公共算法",
-          path: "/algorithm/public",
-        },
-      ],
-    },
-    {
       Icon: BookOutlined,
       text: "作业",
       path: "/jobs",
@@ -126,6 +108,24 @@ export const userRoutes: (
             },
           ],
         })),
+      ],
+    },
+    {
+      Icon: UngroupOutlined,
+      text: "算法",
+      path: "/algorithm",
+      clickToPath: "/algorithm/private",
+      children: [
+        {
+          Icon: LockOutlined,
+          text: "我的算法",
+          path: "/algorithm/private",
+        },
+        {
+          Icon: ShareAltOutlined,
+          text: "公共算法",
+          path: "/algorithm/public",
+        },
       ],
     },
     {
