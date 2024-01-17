@@ -23,7 +23,6 @@ interface Option {
 
 type DataType = "dataset" | "algorithm" | "model"
 
-// trpc 钩子函数的类型
 interface QueryHookFunction<TQueryFnData = any, TError = any, TData = any> {
   (args: TQueryFnData, options?: any): UseQueryResult<TData, TError>;
 }
