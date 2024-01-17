@@ -60,12 +60,12 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             result.status === "fulfilled")
         .map((result) => result.value);
 
-      console.log("successfulResults", successfulResults);
+
       // 处理失败的结果
       const failedClusters = clusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
-      // 处理成功的结果
+
       const clustersInfo = successfulResults
         .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
           clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
