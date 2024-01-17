@@ -57,7 +57,7 @@ export const CopyImageModal: React.FC<Props> = (
     form.validateFields();
     const { newName, newTag } = await form.validateFields();
     copyMutation.mutate({
-      copiedId,
+      id: copiedId,
       newName,
       newTag,
     });

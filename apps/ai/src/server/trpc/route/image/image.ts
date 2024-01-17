@@ -22,9 +22,10 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { createHarborImageUrl, getLoadedImage, getPulledImage, pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission } from "src/server/utils/share";
-import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusters } from "../config";
@@ -75,7 +76,7 @@ export const list = procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/image/list",
+      path: "/images",
       tags: ["image"],
       summary: "Read all images",
     },
@@ -113,8 +114,7 @@ export const list = procedure
         input.clusterId ? (withExternal ? { $or: [{ clusterId }, { clusterId: { $eq: null } }]} : { clusterId }) : {},
       ],
     }, {
-      limit: pageSize || undefined,
-      offset: page && pageSize ? ((page ?? 1) - 1) * pageSize : undefined,
+      ...paginationProps(page, pageSize),
       orderBy: { createTime: "desc" },
     });
 
@@ -138,7 +138,7 @@ export const createImage = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/image/create",
+      path: "/images",
       tags: ["image"],
       summary: "Create a new image",
     },
@@ -181,17 +181,13 @@ export const createImage = procedure
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    // 本地镜像检查源文件拥有者权限
-    if (input.source === Source.INTERNAL) {
-      await sshConnect(host, user.identityId, logger, async (ssh) => {
-        await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
-      });
-    }
-
     let localImageUrl: string | undefined = undefined;
     await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
 
       if (source === Source.INTERNAL) {
+        // 本地镜像检查源文件拥有者权限
+        await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
+        // 检查是否为tar文件
         if (!sourcePath.endsWith(".tar")) throw new NotTarError(name, tag);
         // 本地镜像时docker加载镜像
         localImageUrl = await getLoadedImage({ ssh, logger, sourcePath });
@@ -229,8 +225,8 @@ export const createImage = procedure
 export const updateImage = procedure
   .meta({
     openapi: {
-      method: "POST",
-      path: "/image/update/{id}",
+      method: "PUT",
+      path: "/images/{id}",
       tags: ["image"],
       summary: "update a image",
     },
@@ -266,13 +262,13 @@ export const deleteImage = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      path: "/image/delete/{id}",
+      path: "/images/{id}",
       tags: ["image"],
       summary: "delete a image",
     },
   })
   .input(z.object({ id: z.number() }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
     const image = await orm.em.findOne(Image, { id: input.id });
@@ -357,14 +353,14 @@ export const deleteImage = procedure
     }
 
     await orm.em.removeAndFlush(image);
-    return { success: true };
+    return;
   });
 
 export const shareOrUnshareImage = procedure
   .meta({
     openapi: {
       method: "PUT",
-      path: "/image/share/{id}",
+      path: "/images/{id}/share",
       tags: ["image"],
       summary: "share a image",
     },
@@ -400,25 +396,25 @@ export const copyImage = procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/image/copy/{copiedId}",
+      path: "/images/{id}/copy",
       tags: ["image"],
       summary: "copy a image",
     },
   })
-  .input(z.object({ copiedId: z.number(), newName: z.string(), newTag: z.string() }))
-  .output(z.void())
+  .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string() }))
+  .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
 
     const orm = await getORM();
 
-    const { copiedId, newName, newTag } = input;
+    const { id, newName, newTag } = input;
 
-    const sharedImage = await orm.em.findOne(Image, { id: copiedId, isShared: true });
+    const sharedImage = await orm.em.findOne(Image, { id, isShared: true });
 
     if (!sharedImage) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: `Shared Image ${copiedId} not found`,
+        message: `Shared Image ${id} not found`,
       });
     };
 
@@ -437,7 +433,7 @@ export const copyImage = procedure
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+    return await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       // 拉取远程镜像
       const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path });
       if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
