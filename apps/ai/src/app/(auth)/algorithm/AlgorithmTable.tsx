@@ -126,7 +126,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { dataIndex: "clusterId", title: "集群",
       render: (_, r) =>
         getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
-    { dataIndex: "framework", title: "算法框架", render:(_: Framework) => AlgorithmTypeText[_] },
+    { dataIndex: "framework", title: "算法框架", render:(framework: Framework) => AlgorithmTypeText[framework] },
     { dataIndex: "description", title: "算法描述" },
     { dataIndex: "versions", title: "版本数量",
       render: (_, r) => {
@@ -137,7 +137,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
         return r.owner;
       } } : {},
     { dataIndex: "createTime", title: "创建时间",
-      render:(_) => formatDateTime(_),
+      render:(createTime) => formatDateTime(createTime),
     },
     { dataIndex: "action", title: "操作",
       render: (_, r) => {

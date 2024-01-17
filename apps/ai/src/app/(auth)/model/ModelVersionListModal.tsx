@@ -121,7 +121,7 @@ export const ModelVersionListModal: React.FC<Props> = (
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
           { dataIndex: "algorithmVersion", title: "算法版本" },
-          { dataIndex: "createTime", title: "创建时间", render:(_) => formatDateTime(_) },
+          { dataIndex: "createTime", title: "创建时间", render:(createTime) => formatDateTime(createTime) },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {

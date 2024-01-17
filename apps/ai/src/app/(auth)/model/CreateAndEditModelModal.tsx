@@ -11,10 +11,10 @@
  */
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Form, Input, Modal } from "antd";
+import { App, Form, Input, Modal, Select } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { Framework } from "src/models/Algorithm";
+import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
@@ -175,7 +175,12 @@ export const CreateAndEditModalModal: React.FC<Props> = (
           name="algorithmFramework"
           initialValue={editData?.algorithmFramework}
         >
-          <Input />
+          <Select
+            style={{ minWidth: "120px" }}
+            options={
+              Object.entries(AlgorithmTypeText).map(([key, value]) => ({ label:value, value:key }))}
+          >
+          </Select>
         </Form.Item>
         <Form.Item
           label="模型描述"

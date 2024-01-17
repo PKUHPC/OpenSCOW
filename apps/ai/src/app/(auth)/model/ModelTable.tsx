@@ -121,10 +121,10 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { dataIndex: "description", title: "模型描述" },
     { dataIndex: "algorithmName", title: "算法名称" },
     { dataIndex: "algorithmFramework", title: "算法框架" },
-    { dataIndex: "versions", title: "版本数量", render:(_) => _.length },
+    { dataIndex: "versions", title: "版本数量", render:(versions) => versions.length },
     isPublic ? { dataIndex: "owner", title: "分享者" } : {},
     { dataIndex: "createTime", title: "创建时间",
-      render:(_) => formatDateTime(_),
+      render:(createTime) => formatDateTime(createTime),
     },
     { dataIndex: "action", title: "操作",
       render: (_, r) => {

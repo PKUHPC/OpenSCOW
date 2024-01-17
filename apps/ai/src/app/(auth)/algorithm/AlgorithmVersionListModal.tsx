@@ -121,7 +121,7 @@ export const AlgorithmVersionListModal: React.FC<Props> = (
         columns={[
           { dataIndex: "versionName", title: "版本名称" },
           { dataIndex: "versionDescription", title: "版本描述" },
-          { dataIndex: "createTime", title: "创建时间", render:(_) => formatDateTime(_) },
+          { dataIndex: "createTime", title: "创建时间", render:(createTime) => formatDateTime(createTime) },
           { dataIndex: "action", title: "操作",
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
