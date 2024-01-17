@@ -110,6 +110,7 @@ export const ModelVersionListModal: React.FC<Props> = (
       onCancel={onClose}
       centered
       width={1000}
+      footer={false}
     >
       <Table
         rowKey="id"

@@ -159,7 +159,8 @@ export const updateAlgorithmVersion = procedure
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.algorithmVersionId} not found` });
 
-    const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion, { versionName: input.versionName });
+    const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion,
+      { versionName: input.versionName, algorithm });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
       throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
     }
