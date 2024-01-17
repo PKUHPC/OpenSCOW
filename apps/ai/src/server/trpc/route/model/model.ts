@@ -256,18 +256,19 @@ export const deleteModel = procedure
 
     const sharedVersions = modelVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
-    // 获取此模型的共享的算法绝对路径
-    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
+    // 获取此模型的共享的模型绝对路径
+    if (sharedVersions.length > 0) {
+      const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
 
-    const host = getClusterLoginNode(model.clusterId);
-    if (!host) { throw clusterNotFound(model.clusterId); }
+      const host = getClusterLoginNode(model.clusterId);
+      if (!host) { throw clusterNotFound(model.clusterId); }
 
-    await unShareFileOrDir({
-      host,
-      sharedPath: sharedDatasetPath,
-    });
-
+      await unShareFileOrDir({
+        host,
+        sharedPath: sharedDatasetPath,
+      });
+    }
 
     await orm.em.removeAndFlush([...modelVersions, model]);
 

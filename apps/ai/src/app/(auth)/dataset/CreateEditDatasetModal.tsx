@@ -14,8 +14,9 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { DatasetInterface, DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
+import { DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
+import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 

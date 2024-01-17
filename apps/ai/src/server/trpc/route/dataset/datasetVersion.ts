@@ -23,36 +23,14 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
-// const mockDatasetVersions = [
-//   {
-//     id: 100,
-//     versionName: "version1",
-//     owner: "demo_admin",
-//     isShared: "true",
-//     versionDescription: "test1",
-//     path: "/",
-//     createTime: "2023-04-15 12:30:45",
-//     dataset: 100,
-//   },
-//   {
-//     id: 101,
-//     versionName: "version2",
-//     owner: "demo_admin",
-//     isShared: "true",
-//     versionDescription: "test2",
-//     path: "/",
-//     createTime: "2023-04-15 12:30:45",
-//     dataset: 100,
-//   },
-// ];
-
-export const VersionListSchema = z.object({
+export const DatasetVersionListSchema = z.object({
   id: z.number(),
   versionName: z.string(),
   sharedStatus: z.nativeEnum(SharedStatus),
@@ -63,12 +41,13 @@ export const VersionListSchema = z.object({
   datasetId: z.number(),
 });
 
+export type DatasetVersionInterface = z.infer<typeof DatasetVersionListSchema>;
+
 export const versionList = procedure
   .meta({
     openapi: {
-      // GET /datasets/{datasetId}/versions
       method: "GET",
-      path: "/datasetVersion/list/{datasetId}",
+      path: "/datasets/{datasetId}/versions",
       tags: ["datasetVersion"],
       summary: "Read all datasetVersions",
     },
@@ -78,18 +57,19 @@ export const versionList = procedure
     datasetId: z.number(),
     isShared: z.boolean().optional(),
   }))
-  .output(z.object({ items: z.array(VersionListSchema), count: z.number() }))
+  .output(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
     const orm = await getORM();
 
+    const { page, pageSize, datasetId, isShared } = input;
+
     const [items, count] = await orm.em.findAndCount(DatasetVersion,
       {
-        dataset: input.datasetId,
-        ...input.isShared ? { sharedStatus:SharedStatus.SHARED } : {},
+        dataset: datasetId,
+        ...isShared ? { sharedStatus:SharedStatus.SHARED } : {},
       },
       {
-        limit: input.pageSize || undefined,
-        offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+        ...paginationProps(page, pageSize),
         orderBy: { createTime: "desc" },
       });
 
@@ -109,9 +89,8 @@ export const versionList = procedure
 export const createDatasetVersion = procedure
   .meta({
     openapi: {
-      // POST /datasets{datasetId}/versions
       method: "POST",
-      path: "/datasetVersion/create",
+      path: "/datasets/{datasetId}/versions",
       tags: ["datasetVersion"],
       summary: "Create a new datasetVersion",
     },
@@ -122,23 +101,25 @@ export const createDatasetVersion = procedure
     versionDescription: z.string().optional(),
     datasetId: z.number(),
   }))
-  .output(z.object({ id: z.number() }))
+  .output(z.object({ datasetVersionId: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId });
-    if (!dataset)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+    const { versionName, path, datasetId } = input;
 
-    const nameExist = await orm.em.findOne(DatasetVersion, { versionName: input.versionName, dataset: dataset });
+    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
+    if (!dataset)
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
+
+    const nameExist = await orm.em.findOne(DatasetVersion, { versionName: versionName, dataset: dataset });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `DatasetVersion name ${input.versionName} duplicated`,
+        message: `DatasetVersion name ${versionName} duplicated`,
       });
     }
 
     if (dataset && dataset.owner !== user.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
 
     // 检查目录是否存在
     const host = getClusterLoginNode(dataset.clusterId);
@@ -148,58 +129,57 @@ export const createDatasetVersion = procedure
     await sshConnect(host, user.identityId, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
 
-      if (!(await sftpExists(sftp, input.path))) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: `${input.path} does not exists` });
+      if (!(await sftpExists(sftp, path))) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: `${path} does not exists` });
       }
     });
 
-    const datasetVersion = new DatasetVersion({ ...input, privatePath: input.path, dataset: dataset });
+    const datasetVersion = new DatasetVersion({ ...input, privatePath: path, dataset: dataset });
     await orm.em.persistAndFlush(datasetVersion);
-    return { id: datasetVersion.id };
+    return { datasetVersionId: datasetVersion.id };
   });
 
 export const updateDatasetVersion = procedure
   .meta({
     openapi: {
-      // PUT /datasets/{datasetId}/versions/{datasetVersionId}
-      method: "POST",
-      path: "/datasetVersion/update/{id}",
+      method: "PUT",
+      path: "/datasets/{datasetId}/versions/{datasetVersionId}",
       tags: ["dataset"],
       summary: "update a dataset",
     },
   })
   .input(z.object({
-    id: z.number(),
+    datasetVersionId: z.number(),
     versionName: z.string(),
     versionDescription: z.string().optional(),
     datasetId: z.number(),
   }))
-  .output(z.object({ id: z.number() }))
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const { id, versionName, versionDescription, datasetId } = input;
+    const { datasetVersionId, versionName, versionDescription, datasetId } = input;
 
     const dataset = await orm.em.findOne(Dataset, { id: datasetId });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${id} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetVersionId} not accessible` });
 
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     const nameExist = await orm.em.findOne(DatasetVersion,
       { versionName,
         dataset,
-        id: { $ne: id },
+        id: { $ne: datasetVersionId },
       });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",
-        message: `DatasetVersion name ${input.versionName} duplicated`,
+        message: `DatasetVersion name ${versionName} duplicated`,
       });
     }
 
@@ -207,7 +187,7 @@ export const updateDatasetVersion = procedure
       datasetVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError({
         code: "PRECONDITION_FAILED",
-        message: `Unfinished processing of datasetVersion ${id} exists`,
+        message: `Unfinished processing of datasetVersion ${datasetVersionId} exists`,
       });
     }
 
@@ -233,31 +213,30 @@ export const updateDatasetVersion = procedure
 
     await orm.em.flush();
 
-    return { id: datasetVersion.id };
+    return;
   });
 
 export const deleteDatasetVersion = procedure
   .meta({
     openapi: {
-      // DELETE /datasets/{datasetId}/versions/{datasetVersionId}
       method: "DELETE",
-      path: "/datasetVersion/delete/{id}",
+      path: "/datasets/{datasetId}/versions/delete/{datasetVersionId}",
       tags: ["datasetVersion"],
       summary: "delete a new datasetVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    datasetVersionId: z.number(),
     datasetId: z.number(),
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const { id, datasetId } = input;
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
+    const { datasetVersionId, datasetId } = input;
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
 
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     const dataset = await orm.em.findOne(Dataset, { id: datasetId },
       { populate: ["versions", "versions.sharedStatus"]});
@@ -272,7 +251,7 @@ export const deleteDatasetVersion = procedure
       || datasetVersion.sharedStatus === SharedStatus.UNSHARING) {
       throw new TRPCError(
         { code: "PRECONDITION_FAILED",
-          message: `DatasetVersion (id:${id}) is currently being shared or unshared` });
+          message: `DatasetVersion (id:${datasetVersionId}) is currently being shared or unshared` });
     }
 
     // 如果是已分享的数据集版本，则删除分享
@@ -291,7 +270,8 @@ export const deleteDatasetVersion = procedure
           });
         });
         const pathToUnshare
-        = dataset.versions.filter((v) => (v.id !== id && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
+        = dataset.versions.filter((v) =>
+          (v.id !== datasetVersionId && v.sharedStatus === SharedStatus.SHARED)).length > 0 ?
           // 除了此版本以外仍有其他已分享的版本则取消分享当前版本
           dirname(datasetVersion.path)
           // 除了此版本以外没有其他已分享的版本则取消分享整个数据集
@@ -303,7 +283,7 @@ export const deleteDatasetVersion = procedure
         });
 
       } catch (e) {
-        logger.error(`ssh failure occured when unshare datasetVersion ${id} of dataset ${datasetId} `, e);
+        logger.error(`ssh failure occured when unshare datasetVersion ${datasetVersionId} of dataset ${datasetId} `, e);
       }
 
       dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
@@ -319,26 +299,24 @@ export const deleteDatasetVersion = procedure
 export const shareDatasetVersion = procedure
   .meta({
     openapi: {
-      // POST /datasets/{datasetId}/versions/{datasetVersionId}/share
-      method: "PUT",
-      path: "/datasetVersion/share/{id}",
+      method: "POST",
+      path: "/datasets/{datasetId}/versions/{datasetVersionId}/share",
       tags: ["datasetVersion"],
       summary: "share a datasetVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    datasetVersionId: z.number(),
     datasetId: z.number(),
     sourceFilePath: z.string(),
-    // fileType: FileType,
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const { id, datasetId, sourceFilePath } = input;
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: id });
+    const { datasetVersionId, datasetId, sourceFilePath } = input;
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     if (datasetVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already shared" });
@@ -396,35 +374,35 @@ export const shareDatasetVersion = procedure
 export const unShareDatasetVersion = procedure
   .meta({
     openapi: {
-      // DELETE /datasets/{datasetId}/versions/{datasetVersionId}/share
-      method: "PUT",
-      path: "/datasetVersion/unShare/{id}",
+      method: "DELETE",
+      path: "/datasets/{datasetId}/versions/{datasetVersionId}/share",
       tags: ["datasetVersion"],
       summary: "unshare a datasetVersion",
     },
   })
   .input(z.object({
-    id: z.number(),
+    datasetVersionId: z.number(),
     datasetId: z.number(),
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: input.id });
+    const { datasetVersionId, datasetId } = input;
+    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
-      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${input.id} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     if (datasetVersion.sharedStatus === SharedStatus.UNSHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already unShared" });
 
-    const dataset = await orm.em.findOne(Dataset, { id: input.datasetId }, {
+    const dataset = await orm.em.findOne(Dataset, { id: datasetId }, {
       populate: ["versions", "versions.sharedStatus"],
     });
     if (!dataset)
-      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.datasetId} not found` });
+      throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user.identityId)
-      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.datasetId} not accessible` });
+      throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
 
     const host = getClusterLoginNode(dataset.clusterId);
     if (!host) { throw clusterNotFound(dataset.clusterId); }
@@ -471,9 +449,8 @@ export const unShareDatasetVersion = procedure
 export const copyPublicDatasetVersion = procedure
   .meta({
     openapi: {
-      // POST /datasets/{datasetId}/versions/{datasetVersionId}/copy
       method: "POST",
-      path: "/dataset/{datasetId}/version/{datasetVersionId}/copy",
+      path: "/datasets/{datasetId}/versions/{datasetVersionId}/copy",
       tags: ["datasetVersion"],
       summary: "copy a public dataset version",
     },

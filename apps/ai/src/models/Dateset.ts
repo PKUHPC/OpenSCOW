@@ -10,12 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { inferRouterOutputs } from "@trpc/server";
-import { AppRouter } from "src/server/trpc/router";
-
-export type DatasetInterface = inferRouterOutputs<AppRouter>["dataset"]["list"]["items"][0];
-export type DatasetVersionInterface = inferRouterOutputs<AppRouter>["dataset"]["versionList"]["items"][0];
-
 export enum DatasetType {
   IMAGE = "IMAGE",
   TEXT = "TEXT",

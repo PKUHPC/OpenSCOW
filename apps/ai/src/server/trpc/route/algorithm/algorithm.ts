@@ -15,7 +15,6 @@ import { basename, dirname, join } from "path";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { ErrorCode } from "src/server/utils/errorCode";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { paginationSchema } from "src/server/utils/pagination";
@@ -249,15 +248,17 @@ export const deleteAlgorithm = procedure
     const sharedVersions = algorithmVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
     // 获取此算法的共享的算法绝对路径
-    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
+    if (sharedVersions.length > 0) {
+      const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
-    const host = getClusterLoginNode(algorithm.clusterId);
-    if (!host) { throw clusterNotFound(algorithm.clusterId); }
+      const host = getClusterLoginNode(algorithm.clusterId);
+      if (!host) { throw clusterNotFound(algorithm.clusterId); }
 
-    await unShareFileOrDir({
-      host,
-      sharedPath: sharedDatasetPath,
-    });
+      await unShareFileOrDir({
+        host,
+        sharedPath: sharedDatasetPath,
+      });
+    }
 
     await em.removeAndFlush([...algorithmVersions, algorithm]);
 

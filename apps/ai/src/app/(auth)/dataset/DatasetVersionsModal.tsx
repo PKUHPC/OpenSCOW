@@ -16,8 +16,8 @@ import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { SharedStatus } from "src/models/common";
-import { DatasetVersionInterface } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
+import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
@@ -100,7 +100,7 @@ export const DatasetVersionsModal: React.FC<Props> = (
         title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除数据集版本",
         onOk: async () => {
           await deleteMutation.mutateAsync({
-            id,
+            datasetVersionId: id,
             datasetId,
           });
         },
@@ -175,12 +175,12 @@ export const DatasetVersionsModal: React.FC<Props> = (
                           onOk: async () => {
                             r.sharedStatus === SharedStatus.SHARED ?
                               await unShareMutation.mutateAsync({
-                                id: r.id,
+                                datasetVersionId: r.id,
                                 datasetId: r.datasetId,
                               })
                               :
                               await shareMutation.mutateAsync({
-                                id: r.id,
+                                datasetVersionId: r.id,
                                 datasetId: r.datasetId,
                                 sourceFilePath: r.path,
                               });

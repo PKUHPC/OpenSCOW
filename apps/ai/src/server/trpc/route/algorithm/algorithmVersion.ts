@@ -271,7 +271,7 @@ export const deleteAlgorithmVersion = procedure
 export const shareAlgorithmVersion = procedure
   .meta({
     openapi: {
-      method: "PUT",
+      method: "POST",
       path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}/share",
       tags: ["algorithmVersion"],
       summary: "share a algorithmVersion",
@@ -343,8 +343,8 @@ export const shareAlgorithmVersion = procedure
 export const unShareAlgorithmVersion = procedure
   .meta({
     openapi: {
-      method: "PUT",
-      path: "/algorithm/{algorithmId}/versions/{algorithmVersionId}/share",
+      method: "DELETE",
+      path: "/algorithms/{algorithmId}/versions/{algorithmVersionId}/share",
       tags: ["algorithmVersion"],
       summary: "unshare a algorithmVersion",
     },

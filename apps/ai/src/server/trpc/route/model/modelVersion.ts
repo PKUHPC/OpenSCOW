@@ -292,10 +292,8 @@ export const deleteModelVersion = procedure
 export const shareModelVersion = procedure
   .meta({
     openapi: {
-      // POST /models/{modelId}/versions/{versionId}/share
-      // 和其他的类似的API统一
-      method: "PUT",
-      path: "/modelVersion/share/{versionId}",
+      method: "POST",
+      path: "/models/{modelId}/versions/{versionId}/share",
       tags: ["modelVersion"],
       summary: "share a modelVersion",
     },
@@ -367,10 +365,8 @@ export const shareModelVersion = procedure
 export const unShareModelVersion = procedure
   .meta({
     openapi: {
-      // DELETE /models/{modelId}/versions/{versionId}/share
-      // 和其他的类似的API统一
-      method: "PUT",
-      path: "/modelVersion/unShare/{versionId}",
+      method: "DELETE",
+      path: "/models/{modelId}/versions/{versionId}/share",
       tags: ["modelVersion"],
       summary: "unshare a modelVersion",
     },

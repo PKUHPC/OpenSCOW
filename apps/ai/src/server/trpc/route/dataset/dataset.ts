@@ -18,6 +18,7 @@ import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
@@ -38,12 +39,13 @@ export const DatasetListSchema = z.object({
   versions: z.array(z.string()),
 });
 
+export type DatasetInterface = z.infer<typeof DatasetListSchema>;
+
 export const list = procedure
   .meta({
     openapi: {
       method: "GET",
-      // GET /datasets
-      path: "/dataset/list",
+      path: "/datasets",
       tags: ["dataset"],
       summary: "Read all dataset",
     },
@@ -59,15 +61,17 @@ export const list = procedure
   .query(async ({ input, ctx: { user } }) => {
     const orm = await getORM();
 
-    const isPublicQuery = input.isShared ? {
+    const { page, pageSize, nameOrDesc, type, isShared, clusterId } = input;
+
+    const isPublicQuery = isShared ? {
       isShared: true,
       owner: { $ne: null },
     } : { owner: user.identityId };
 
-    const nameOrDescQuery = input.nameOrDesc ? {
+    const nameOrDescQuery = nameOrDesc ? {
       $or: [
-        { name: { $like: `%${input.nameOrDesc}%` } },
-        { description: { $like: `%${input.nameOrDesc}%` } },
+        { name: { $like: `%${nameOrDesc}%` } },
+        { description: { $like: `%${nameOrDesc}%` } },
       ],
     } : {};
 
@@ -75,13 +79,12 @@ export const list = procedure
       $and: [
         nameOrDescQuery,
         isPublicQuery,
-        { type: input.type || { $ne: null },
-          clusterId: input.clusterId,
+        { type: type || { $ne: null },
+          clusterId: clusterId,
         },
       ],
     }, {
-      limit: input.pageSize || undefined,
-      offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+      ...paginationProps(page, pageSize),
       populate: ["versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });
@@ -108,8 +111,7 @@ export const createDataset = procedure
   .meta({
     openapi: {
       method: "POST",
-      // POST /datasets
-      path: "/dataset/create",
+      path: "/datasets",
       tags: ["dataset"],
       summary: "Create a new dataset",
     },
@@ -149,8 +151,8 @@ export const createDataset = procedure
 export const updateDataset = procedure
   .meta({
     openapi: {
-      method: "POST",
-      path: "/dataset/update/{id}",
+      method: "PUT",
+      path: "/datasets/{id}",
       tags: ["dataset"],
       summary: "update a dataset",
     },
@@ -212,7 +214,7 @@ export const updateDataset = procedure
       const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
       const oldPath = dirname(dirname(sharedVersions[0].path));
 
-      // 获取更新后的当前算法的共享路径名称
+      // 获取更新后的当前数据集的共享路径名称
       const newDatasetSharedPath = await getUpdatedSharedPath({
         clusterId: dataset.clusterId,
         newName: name,
@@ -243,8 +245,7 @@ export const deleteDataset = procedure
   .meta({
     openapi: {
       method: "DELETE",
-      // DELETE /datasets/{id}
-      path: "/dataset/delete/{id}",
+      path: "/datasets/{id}",
       tags: ["dataset"],
       summary: "delete a dataset",
     },
@@ -275,17 +276,19 @@ export const deleteDataset = procedure
     const sharedVersions = datasetVersions.filter((v) => (v.sharedStatus === SharedStatus.SHARED));
 
     // 获取此数据集的共享的数据集绝对路径
-    const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
+    if (sharedVersions.length > 0) {
+      const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
 
-    const host = getClusterLoginNode(dataset.clusterId);
-    if (!host) { throw clusterNotFound(dataset.clusterId); }
+      const host = getClusterLoginNode(dataset.clusterId);
+      if (!host) { throw clusterNotFound(dataset.clusterId); }
 
-    await unShareFileOrDir({
-      host,
-      sharedPath: sharedDatasetPath,
-    }).catch((e) => {
-      console.error("Error deleting dataVersions of dataset:", e);
-    });
+      await unShareFileOrDir({
+        host,
+        sharedPath: sharedDatasetPath,
+      }).catch((e) => {
+        console.error("Error deleting dataVersions of dataset:", e);
+      });
+    }
 
     await orm.em.removeAndFlush([...datasetVersions, dataset]);
 
