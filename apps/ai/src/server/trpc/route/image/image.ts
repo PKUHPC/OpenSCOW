@@ -151,7 +151,7 @@ export const createImage = procedure
     sourcePath: z.string(),
     clusterId: z.string().optional(),
   }))
-  .output(z.void())
+  .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
 
     if (input.clusterId && !clusterExist(input.clusterId)) {
@@ -181,9 +181,9 @@ export const createImage = procedure
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    let localImageUrl: string | undefined = undefined;
-    await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+    return await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
 
+      let localImageUrl: string | undefined = undefined;
       if (source === Source.INTERNAL) {
         // 本地镜像检查源文件拥有者权限
         await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
@@ -204,19 +204,20 @@ export const createImage = procedure
         logger,
         localImageUrl,
         harborImageUrl,
+      }).catch((e) => {
+        const ex = e as ServiceError;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Create image failed, ${ex.message}`,
+        });
       });
 
       // 更新数据库
       const image = new Image({ ...input, path: harborImageUrl, owner: user.identityId });
       await orm.em.persistAndFlush(image);
+
       return image.id;
 
-    }).catch((e) => {
-      const ex = e as ServiceError;
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Create image failed, ${ex.message}`,
-      });
     });
 
   });
@@ -446,7 +447,13 @@ export const copyImage = procedure
         logger,
         localImageUrl,
         harborImageUrl,
-      });
+      }).catch((e) => {
+        const ex = e as ServiceError;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `Copy shared image failed, ${ex.message}`,
+        });
+      }); ;
 
       const image = new Image({
         name: input.newName,
@@ -461,11 +468,5 @@ export const copyImage = procedure
 
       return image.id;
 
-    }).catch((e) => {
-      const ex = e as ServiceError;
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: `Copy shared image failed, ${ex.message}`,
-      });
     });
   });
