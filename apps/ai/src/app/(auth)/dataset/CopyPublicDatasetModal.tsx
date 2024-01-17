@@ -24,7 +24,7 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   datasetId: number;
-  datasetName: string;
+  datasetName: string | undefined;
   datasetVersionId: number;
   data: DatasetVersionInterface;
   cluster?: Cluster;

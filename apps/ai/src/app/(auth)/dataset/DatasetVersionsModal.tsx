@@ -31,7 +31,7 @@ export interface Props {
   onClose: () => void;
   onRefetch: () => void;
   isFetching: boolean;
-  datasetName: string;
+  datasetName: string | undefined;
   datasetVersions: DatasetVersionInterface[];
   isPublic?: boolean;
   cluster: Cluster;

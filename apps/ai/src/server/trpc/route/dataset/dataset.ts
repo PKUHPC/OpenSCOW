@@ -79,8 +79,8 @@ export const list = procedure
       $and: [
         nameOrDescQuery,
         isPublicQuery,
-        { type: type || { $ne: null },
-          clusterId: clusterId,
+        { ...type ? { type } : {},
+          ...clusterId ? { clusterId } : {},
         },
       ],
     }, {

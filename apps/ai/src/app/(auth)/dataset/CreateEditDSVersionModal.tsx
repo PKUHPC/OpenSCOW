@@ -23,7 +23,7 @@ export interface Props {
   open: boolean;
   onClose: () => void;
   datasetId: number;
-  datasetName: string;
+  datasetName: string | undefined;
   isEdit?: boolean;
   editData?: DatasetVersionInterface;
   cluster?: Cluster;

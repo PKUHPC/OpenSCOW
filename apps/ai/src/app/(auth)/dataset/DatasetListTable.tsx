@@ -78,8 +78,8 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
   const [datasetId, setDatasetId] = useState<number>(0);
-  const [datasetName, setDatasetName] = useState<string>("");
-  const [clusterId, setClusterId] = useState<string>("");
+  const [datasetName, setDatasetName] = useState<string | undefined>(undefined);
+  const [clusterId, setClusterId] = useState<string | undefined>(undefined);
   const [versionListModalIsOpen, setVersionListModalIsOpen] = useState(false);
 
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
@@ -127,8 +127,10 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     [],
   );
 
-  const getCurrentCluster = useCallback((clusterId: string) => {
-    return clusters.find((c) => c.id === clusterId);
+  const getCurrentCluster = useCallback((clusterId: string | undefined) => {
+    if (clusterId) {
+      return clusters.find((c) => c.id === clusterId);
+    }
   }, [clusters]);
 
   return (
@@ -149,6 +151,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           <Form.Item label="集群" name="cluster">
             <SingleClusterSelector
               allowClear={true}
+              onChange={(value) => { setQuery({ ...query, cluster: value }); }}
             />
           </Form.Item>
           <Form.Item label="数据类型" name="type">
