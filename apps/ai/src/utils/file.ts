@@ -30,8 +30,7 @@ export function isDecompressibleFile(filename: string) {
  * @param childFolderPath 子文件夹路径。
  * @returns true 如果 childFolderPath 是 potentialParentFolderPath 的子路径或本身。
  */
-export function isParentOrSameFolder(potentialParentFolderPath: string, childFolderPath: string | undefined): boolean {
-  if (!childFolderPath) return false;
+export function isParentOrSameFolder(potentialParentFolderPath: string, childFolderPath: string): boolean {
   const normalizedParentPath = resolve(potentialParentFolderPath);
   const normalizedChildPath = resolve(childFolderPath);
 

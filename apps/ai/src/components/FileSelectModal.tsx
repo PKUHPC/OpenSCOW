@@ -130,7 +130,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     disabled: selectedKeys.length === 0 || !isDecompressibleFile(selectedKeys[0].toString()) });
 
   const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
-    enabled: !!clusterId && path === "~",
+    enabled: !!clusterId && path === "~" && visible,
     onSuccess(data) {
       setPrevPath(data.path);
       setPath(data.path);
@@ -140,7 +140,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
     clusterId: clusterId,
     path,
-  }, { enabled: false });
+  }, { enabled: !!clusterId && path !== "~" });
 
   useEffect(() => {
     if (!homeDir?.path || path === "~") return;
@@ -148,13 +148,8 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     if (!isParentOrSameFolder(homeDir.path, path)) {
       message.info("仅可在家目录下操作");
       setPath(prevPath);
-      return;
     }
-
-    if (visible) {
-      refetch();
-    }
-  }, [homeDir, path, visible]);
+  }, [homeDir, path]);
 
   useEffect(() => {
     if (!curDirContent) return;
