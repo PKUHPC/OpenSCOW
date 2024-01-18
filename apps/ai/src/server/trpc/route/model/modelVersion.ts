@@ -21,7 +21,7 @@ import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/che
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
@@ -58,9 +58,9 @@ export const versionList = procedure
   }))
   .output(z.object({ items: z.array(VersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
-    const [items, count] = await orm.em.findAndCount(ModelVersion,
+    const [items, count] = await em.findAndCount(ModelVersion,
       {
         model: { id: input.modelId },
         ...input.isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
@@ -102,8 +102,8 @@ export const createModelVersion = procedure
   }))
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const model = await orm.em.findOne(Model, { id: input.modelId });
+    const em = await forkEntityManager();
+    const model = await em.findOne(Model, { id: input.modelId });
     if (!model) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
     }
@@ -112,7 +112,7 @@ export const createModelVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.modelId} not accessible` });
     }
 
-    const modelVersionExist = await orm.em.findOne(ModelVersion,
+    const modelVersionExist = await em.findOne(ModelVersion,
       { versionName: input.versionName, model });
     if (modelVersionExist) throw new TRPCError({ code: "CONFLICT", message: "ModelVersionExist already exist" });
 
@@ -130,7 +130,7 @@ export const createModelVersion = procedure
     });
 
     const modelVersion = new ModelVersion({ ...input, privatePath: input.path, model: model });
-    await orm.em.persistAndFlush(modelVersion);
+    await em.persistAndFlush(modelVersion);
     return { id: modelVersion.id };
   });
 
@@ -152,11 +152,11 @@ export const updateModelVersion = procedure
   }))
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { versionId, versionName, versionDescription, algorithmVersion, modelId } = input;
 
-    const model = await orm.em.findOne(Model, { id: modelId });
+    const model = await em.findOne(Model, { id: modelId });
     if (!model) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
     }
@@ -165,11 +165,11 @@ export const updateModelVersion = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
     }
 
-    const modelVersion = await orm.em.findOne(ModelVersion, { id: versionId });
+    const modelVersion = await em.findOne(ModelVersion, { id: versionId });
     if (!modelVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
 
-    const modelVersionExist = await orm.em.findOne(ModelVersion, { versionName });
+    const modelVersionExist = await em.findOne(ModelVersion, { versionName });
     if (modelVersionExist && modelVersionExist !== modelVersion) {
       throw new TRPCError({ code: "CONFLICT", message: "ModelVersion alreay exist" });
     }
@@ -203,7 +203,7 @@ export const updateModelVersion = procedure
     modelVersion.versionDescription = versionDescription;
     modelVersion.algorithmVersion = algorithmVersion,
 
-    await orm.em.flush();
+    await em.flush();
     return { id: modelVersion.id };
   });
 
@@ -222,14 +222,14 @@ export const deleteModelVersion = procedure
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
-    const modelVersion = await orm.em.findOne(ModelVersion, { id: input.versionId });
+    const modelVersion = await em.findOne(ModelVersion, { id: input.versionId });
 
     if (!modelVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${input.versionId} not found` });
 
-    const model = await orm.em.findOne(Model, { id: input.modelId },
+    const model = await em.findOne(Model, { id: input.modelId },
       { populate: ["versions", "versions.sharedStatus"]});
     if (!model) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
@@ -280,11 +280,11 @@ export const deleteModelVersion = procedure
 
       model.isShared = model.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
-      orm.em.persist(model);
+      em.persist(model);
     }
 
-    orm.em.remove(modelVersion);
-    await orm.em.flush();
+    em.remove(modelVersion);
+    await em.flush();
     return { success: true };
   });
 
@@ -305,15 +305,15 @@ export const shareModelVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input:{ modelId, versionId, sourceFilePath }, ctx: { user } }) => {
-    const orm = await getORM();
-    const modelVersion = await orm.em.findOne(ModelVersion, { id: versionId });
+    const em = await forkEntityManager();
+    const modelVersion = await em.findOne(ModelVersion, { id: versionId });
     if (!modelVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${modelId} not found` });
 
     if (modelVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "ModelVersion is already shared" });
 
-    const model = await orm.em.findOne(Model, { id: modelId });
+    const model = await em.findOne(Model, { id: modelId });
     if (!model)
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
 
@@ -333,20 +333,20 @@ export const shareModelVersion = procedure
     });
 
     modelVersion.sharedStatus = SharedStatus.SHARING;
-    orm.em.persist([modelVersion]);
-    await orm.em.flush();
+    em.persist([modelVersion]);
+    await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       modelVersion.sharedStatus = SharedStatus.SHARED;
       modelVersion.path = versionPath;
       if (!model.isShared) { model.isShared = true; };
-      await orm.em.persistAndFlush([modelVersion, model]);
+      await em.persistAndFlush([modelVersion, model]);
     };
 
     const failureCallback = async () => {
       modelVersion.sharedStatus = SharedStatus.UNSHARED;
-      await orm.em.persistAndFlush([modelVersion]);
+      await em.persistAndFlush([modelVersion]);
     };
 
     shareFileOrDir({
@@ -377,15 +377,15 @@ export const unShareModelVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input:{ versionId, modelId }, ctx: { user } }) => {
-    const orm = await getORM();
-    const modelVersion = await orm.em.findOne(ModelVersion, { id: versionId });
+    const em = await forkEntityManager();
+    const modelVersion = await em.findOne(ModelVersion, { id: versionId });
     if (!modelVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
 
     if (modelVersion.sharedStatus === SharedStatus.UNSHARED)
       throw new TRPCError({ code: "CONFLICT", message: "ModelVersion is already unShared" });
 
-    const model = await orm.em.findOne(Model, { id: modelId }, {
+    const model = await em.findOne(Model, { id: modelId }, {
       populate: ["versions", "versions.sharedStatus"],
     });
     if (!model)
@@ -407,20 +407,20 @@ export const unShareModelVersion = procedure
     });
 
     modelVersion.sharedStatus = SharedStatus.UNSHARING;
-    orm.em.persist([modelVersion]);
-    await orm.em.flush();
+    em.persist([modelVersion]);
+    await em.flush();
 
     const successCallback = async () => {
       modelVersion.sharedStatus = SharedStatus.UNSHARED;
       modelVersion.path = modelVersion.privatePath;
       model.isShared = model.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
-      await orm.em.persistAndFlush([modelVersion, model]);
+      await em.persistAndFlush([modelVersion, model]);
     };
 
     const failureCallback = async () => {
       modelVersion.sharedStatus = SharedStatus.SHARED;
-      await orm.em.persistAndFlush([modelVersion]);
+      await em.persistAndFlush([modelVersion]);
     };
 
     unShareFileOrDir({
@@ -454,10 +454,10 @@ export const copyPublicModelVersion = procedure
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     // 1. 检查模型版本是否为公开版本
-    const modelVersion = await orm.em.findOne(ModelVersion,
+    const modelVersion = await em.findOne(ModelVersion,
       { id: input.versionId, sharedStatus: SharedStatus.SHARED },
       { populate: ["model"]});
 
@@ -468,7 +468,7 @@ export const copyPublicModelVersion = procedure
       });
     }
     // 2. 检查该用户是否已有同名模型
-    const model = await orm.em.findOne(Model, { name: input.modelName, owner: user.identityId });
+    const model = await em.findOne(Model, { name: input.modelName, owner: user.identityId });
     if (model) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -509,7 +509,7 @@ export const copyPublicModelVersion = procedure
         fromPath: modelVersion.path, toPath: input.path });
       // 递归修改文件权限和拥有者
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
-      await orm.em.persistAndFlush([newModel, newModelVersion]);
+      await em.persistAndFlush([newModel, newModelVersion]);
     } catch (err) {
       console.log(err);
       throw new TRPCError({

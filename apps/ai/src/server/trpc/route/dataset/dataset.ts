@@ -17,7 +17,7 @@ import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
@@ -59,7 +59,7 @@ export const list = procedure
   }))
   .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { page, pageSize, nameOrDesc, type, isPublic, clusterId } = input;
 
@@ -75,7 +75,7 @@ export const list = procedure
       ],
     } : {};
 
-    const [items, count] = await orm.em.findAndCount(Dataset, {
+    const [items, count] = await em.findAndCount(Dataset, {
       $and: [
         nameOrDescQuery,
         isPublicQuery,
@@ -133,9 +133,9 @@ export const createDataset = procedure
       });
     }
 
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
-    const datesetExist = await orm.em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    const datesetExist = await em.findOne(Dataset, { name:input.name, owner: user!.identityId });
     if (datesetExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -144,7 +144,7 @@ export const createDataset = procedure
     }
 
     const dataset = new Dataset({ ...input, owner: user!.identityId });
-    await orm.em.persistAndFlush(dataset);
+    await em.persistAndFlush(dataset);
     return dataset.id;
   });
 
@@ -166,11 +166,11 @@ export const updateDataset = procedure
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { id, name, type, scene, description } = input;
 
-    const dataset = await orm.em.findOne(Dataset, { id });
+    const dataset = await em.findOne(Dataset, { id });
 
     if (!dataset) {
       throw new TRPCError({
@@ -182,7 +182,7 @@ export const updateDataset = procedure
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${id} not accessible` });
 
-    const nameExist = await orm.em.findOne(Dataset, {
+    const nameExist = await em.findOne(Dataset, {
       name,
       owner: user.identityId,
       id: { $ne: input.id },
@@ -195,7 +195,7 @@ export const updateDataset = procedure
     }
 
     // 存在正在分享或正在取消分享的数据集版本，则不可更新名称
-    const changingVersions = await orm.em.find(DatasetVersion, { dataset,
+    const changingVersions = await em.find(DatasetVersion, { dataset,
       $or: [
         { sharedStatus: SharedStatus.SHARING },
         { sharedStatus: SharedStatus.UNSHARING },
@@ -211,7 +211,7 @@ export const updateDataset = procedure
     // 如果是已分享的数据集且名称发生变化，则变更共享路径下的此数据集名称为新名称
     if (dataset.isShared && name !== dataset.name) {
 
-      const sharedVersions = await orm.em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
+      const sharedVersions = await em.find(DatasetVersion, { dataset, sharedStatus: SharedStatus.SHARED });
       const oldPath = dirname(dirname(sharedVersions[0].path));
 
       // 获取更新后的当前数据集的共享路径名称
@@ -236,7 +236,7 @@ export const updateDataset = procedure
     dataset.scene = scene;
     dataset.description = description;
 
-    await orm.em.flush();
+    await em.flush();
 
     return dataset.id;
   });
@@ -253,15 +253,15 @@ export const deleteDataset = procedure
   .input(z.object({ id: z.number() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const dataset = await orm.em.findOne(Dataset, { id: input.id });
+    const em = await forkEntityManager();
+    const dataset = await em.findOne(Dataset, { id: input.id });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${input.id} not found` });
 
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${input.id} not accessible` });
 
-    const datasetVersions = await orm.em.find(DatasetVersion, { dataset });
+    const datasetVersions = await em.find(DatasetVersion, { dataset });
 
     const sharingVersions = datasetVersions.filter(
       (v) => (v.sharedStatus === SharedStatus.SHARING || v.sharedStatus === SharedStatus.UNSHARING));
@@ -290,7 +290,7 @@ export const deleteDataset = procedure
       });
     }
 
-    await orm.em.removeAndFlush([...datasetVersions, dataset]);
+    await em.removeAndFlush([...datasetVersions, dataset]);
 
     return;
   });

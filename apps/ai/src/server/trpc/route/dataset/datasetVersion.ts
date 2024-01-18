@@ -21,7 +21,7 @@ import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/che
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
@@ -59,11 +59,11 @@ export const versionList = procedure
   }))
   .output(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { page, pageSize, datasetId, isPublic } = input;
 
-    const [items, count] = await orm.em.findAndCount(DatasetVersion,
+    const [items, count] = await em.findAndCount(DatasetVersion,
       {
         dataset: datasetId,
         ...isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
@@ -103,14 +103,14 @@ export const createDatasetVersion = procedure
   }))
   .output(z.object({ datasetVersionId: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { versionName, path, datasetId } = input;
 
-    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
+    const dataset = await em.findOne(Dataset, { id: datasetId });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
-    const nameExist = await orm.em.findOne(DatasetVersion, { versionName: versionName, dataset: dataset });
+    const nameExist = await em.findOne(DatasetVersion, { versionName: versionName, dataset: dataset });
     if (nameExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -137,7 +137,7 @@ export const createDatasetVersion = procedure
     });
 
     const datasetVersion = new DatasetVersion({ ...input, privatePath: path, dataset: dataset });
-    await orm.em.persistAndFlush(datasetVersion);
+    await em.persistAndFlush(datasetVersion);
     return { datasetVersionId: datasetVersion.id };
   });
 
@@ -158,22 +158,22 @@ export const updateDatasetVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { datasetVersionId, versionName, versionDescription, datasetId } = input;
 
-    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
+    const dataset = await em.findOne(Dataset, { id: datasetId });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetVersionId} not accessible` });
 
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
+    const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
-    const nameExist = await orm.em.findOne(DatasetVersion,
+    const nameExist = await em.findOne(DatasetVersion,
       { versionName,
         dataset,
         id: { $ne: datasetVersionId },
@@ -213,7 +213,7 @@ export const updateDatasetVersion = procedure
     datasetVersion.versionName = versionName;
     datasetVersion.versionDescription = versionDescription;
 
-    await orm.em.flush();
+    await em.flush();
 
     return;
   });
@@ -233,14 +233,14 @@ export const deleteDatasetVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { datasetVersionId, datasetId } = input;
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
+    const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
 
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
-    const dataset = await orm.em.findOne(Dataset, { id: datasetId },
+    const dataset = await em.findOne(Dataset, { id: datasetId },
       { populate: ["versions", "versions.sharedStatus"]});
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
@@ -290,11 +290,11 @@ export const deleteDatasetVersion = procedure
 
       dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
-      orm.em.persist(dataset);
+      em.persist(dataset);
     }
 
-    orm.em.remove(datasetVersion);
-    await orm.em.flush();
+    em.remove(datasetVersion);
+    await em.flush();
     return;
   });
 
@@ -314,16 +314,16 @@ export const shareDatasetVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { datasetVersionId, datasetId, sourceFilePath } = input;
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
+    const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     if (datasetVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already shared" });
 
-    const dataset = await orm.em.findOne(Dataset, { id: datasetId });
+    const dataset = await em.findOne(Dataset, { id: datasetId });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
@@ -343,20 +343,20 @@ export const shareDatasetVersion = procedure
     });
 
     datasetVersion.sharedStatus = SharedStatus.SHARING;
-    orm.em.persist([datasetVersion]);
-    await orm.em.flush();
+    em.persist([datasetVersion]);
+    await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
       datasetVersion.sharedStatus = SharedStatus.SHARED;
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       datasetVersion.path = versionPath;
       if (!dataset.isShared) { dataset.isShared = true; };
-      await orm.em.persistAndFlush([datasetVersion, dataset]);
+      await em.persistAndFlush([datasetVersion, dataset]);
     };
 
     const failureCallback = async () => {
       datasetVersion.sharedStatus = SharedStatus.UNSHARED;
-      await orm.em.persistAndFlush([datasetVersion]);
+      await em.persistAndFlush([datasetVersion]);
     };
 
     shareFileOrDir({
@@ -369,7 +369,7 @@ export const shareDatasetVersion = procedure
       homeTopDir,
     }, successCallback, failureCallback);
 
-    await orm.em.flush();
+    await em.flush();
     return;
   });
 
@@ -388,16 +388,16 @@ export const unShareDatasetVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { datasetVersionId, datasetId } = input;
-    const datasetVersion = await orm.em.findOne(DatasetVersion, { id: datasetVersionId });
+    const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
 
     if (datasetVersion.sharedStatus === SharedStatus.UNSHARED)
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already unShared" });
 
-    const dataset = await orm.em.findOne(Dataset, { id: datasetId }, {
+    const dataset = await em.findOne(Dataset, { id: datasetId }, {
       populate: ["versions", "versions.sharedStatus"],
     });
     if (!dataset)
@@ -419,20 +419,20 @@ export const unShareDatasetVersion = procedure
     });
 
     datasetVersion.sharedStatus = SharedStatus.UNSHARING;
-    orm.em.persist([datasetVersion]);
-    await orm.em.flush();
+    em.persist([datasetVersion]);
+    await em.flush();
 
     const successCallback = async () => {
       datasetVersion.sharedStatus = SharedStatus.UNSHARED;
       datasetVersion.path = datasetVersion.privatePath;
       dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
-      await orm.em.persistAndFlush([datasetVersion, dataset]);
+      await em.persistAndFlush([datasetVersion, dataset]);
     };
 
     const failureCallback = async () => {
       datasetVersion.sharedStatus = SharedStatus.SHARED;
-      await orm.em.persistAndFlush([datasetVersion]);
+      await em.persistAndFlush([datasetVersion]);
     };
 
     unShareFileOrDir({
@@ -444,7 +444,7 @@ export const unShareDatasetVersion = procedure
         : dirname(dirname(datasetVersion.path)),
     }, successCallback, failureCallback);
 
-    await orm.em.flush();
+    await em.flush();
     return;
   });
 
@@ -467,10 +467,10 @@ export const copyPublicDatasetVersion = procedure
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     // 1. 检查数据集版本是否为公开版本
-    const datasetVersion = await orm.em.findOne(DatasetVersion,
+    const datasetVersion = await em.findOne(DatasetVersion,
       { id: input.datasetVersionId, sharedStatus: SharedStatus.SHARED },
       { populate: ["dataset"]});
 
@@ -481,7 +481,7 @@ export const copyPublicDatasetVersion = procedure
       });
     }
     // 2. 检查该用户是否已有同名数据集
-    const dataset = await orm.em.findOne(Dataset, { name: input.datasetName, owner: user.identityId });
+    const dataset = await em.findOne(Dataset, { name: input.datasetName, owner: user.identityId });
     if (dataset) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -520,7 +520,7 @@ export const copyPublicDatasetVersion = procedure
         fromPath: datasetVersion.path, toPath: input.path });
       // 递归修改文件权限和拥有者
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
-      await orm.em.persistAndFlush([newDataset, newDatasetVersion]);
+      await em.persistAndFlush([newDataset, newDatasetVersion]);
     } catch (err) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",

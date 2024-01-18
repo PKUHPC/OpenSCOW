@@ -20,7 +20,7 @@ import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/che
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
@@ -53,8 +53,8 @@ export const getAlgorithmVersions = procedure
     createTime:z.string().optional(),
   })), count: z.number() }))
   .query(async ({ input:{ algorithmId, page, pageSize, isPublic } }) => {
-    const orm = await getORM();
-    const [items, count] = await orm.em.findAndCount(AlgorithmVersion,
+    const em = await forkEntityManager();
+    const [items, count] = await em.findAndCount(AlgorithmVersion,
       {
         algorithm: algorithmId,
         ...isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
@@ -95,7 +95,7 @@ export const createAlgorithmVersion = procedure
   }))
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const { em } = await getORM();
+    const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
     if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not Found` });
 
@@ -146,19 +146,19 @@ export const updateAlgorithmVersion = procedure
   }))
   .output(z.object({ id: z.number() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
-    const algorithm = await orm.em.findOne(Algorithm, { id: input.algorithmId });
+    const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
     if (!algorithm) throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${input.algorithmId} not found` });
 
     if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm ${input.algorithmId} not accessible` });
 
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: input.algorithmVersionId });
+    const algorithmVersion = await em.findOne(AlgorithmVersion, { id: input.algorithmVersionId });
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${input.algorithmVersionId} not found` });
 
-    const algorithmVersionExist = await orm.em.findOne(AlgorithmVersion,
+    const algorithmVersionExist = await em.findOne(AlgorithmVersion,
       { versionName: input.versionName, algorithm });
     if (algorithmVersionExist && algorithmVersionExist !== algorithmVersion) {
       throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
@@ -192,7 +192,7 @@ export const updateAlgorithmVersion = procedure
     algorithmVersion.versionName = input.versionName;
     algorithmVersion.versionDescription = input.versionDescription;
 
-    await orm.em.flush();
+    await em.flush();
     return { id: algorithmVersion.id };
   });
 
@@ -208,11 +208,11 @@ export const deleteAlgorithmVersion = procedure
   .input(z.object({ algorithmVersionId: z.number(), algorithmId:z.number() }))
   .output(z.void())
   .mutation(async ({ input:{ algorithmVersionId, algorithmId }, ctx: { user } }) => {
-    const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id:algorithmVersionId });
+    const em = await forkEntityManager();
+    const algorithmVersion = await em.findOne(AlgorithmVersion, { id:algorithmVersionId });
     if (!algorithmVersion) throw new Error(`AlgorithmVersion id:${algorithmVersionId} not found`);
 
-    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId },
+    const algorithm = await em.findOne(Algorithm, { id: algorithmId },
       { populate: ["versions.sharedStatus"]});
     if (!algorithm)
       throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} is not found` });
@@ -263,11 +263,11 @@ export const deleteAlgorithmVersion = procedure
 
       algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 1
         ? true : false;
-      await orm.em.flush();
+      await em.flush();
     }
 
-    orm.em.remove(algorithmVersion);
-    await orm.em.flush();
+    em.remove(algorithmVersion);
+    await em.flush();
     return;
   });
 
@@ -287,15 +287,15 @@ export const shareAlgorithmVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input:{ algorithmId, algorithmVersionId, sourceFilePath }, ctx: { user } }) => {
-    const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+    const em = await forkEntityManager();
+    const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
 
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED)
       throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion id:${algorithmId} is already shared` });
 
-    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId });
+    const algorithm = await em.findOne(Algorithm, { id: algorithmId });
     if (!algorithm)
       throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
@@ -314,20 +314,20 @@ export const shareAlgorithmVersion = procedure
     });
 
     algorithmVersion.sharedStatus = SharedStatus.SHARING;
-    orm.em.persist([algorithmVersion]);
-    await orm.em.flush();
+    em.persist([algorithmVersion]);
+    await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
       algorithmVersion.path = versionPath;
       if (!algorithm.isShared) { algorithm.isShared = true; };
-      await orm.em.persistAndFlush([algorithmVersion, algorithm]);
+      await em.persistAndFlush([algorithmVersion, algorithm]);
     };
 
     const failureCallback = async () => {
       algorithmVersion.sharedStatus = SharedStatus.UNSHARED;
-      await orm.em.persistAndFlush([algorithmVersion]);
+      await em.persistAndFlush([algorithmVersion]);
     };
 
     shareFileOrDir({
@@ -358,8 +358,8 @@ export const unShareAlgorithmVersion = procedure
   }))
   .output(z.void())
   .mutation(async ({ input:{ algorithmVersionId, algorithmId }, ctx: { user } }) => {
-    const orm = await getORM();
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+    const em = await forkEntityManager();
+    const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
     if (!algorithmVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmVersionId} not found` });
 
@@ -369,7 +369,7 @@ export const unShareAlgorithmVersion = procedure
         message: `AlgorithmVersion id:${algorithmVersionId} is already unShared`,
       });
 
-    const algorithm = await orm.em.findOne(Algorithm, { id: algorithmId }, {
+    const algorithm = await em.findOne(Algorithm, { id: algorithmId }, {
       populate: ["versions.sharedStatus"],
     });
     if (!algorithm)
@@ -391,20 +391,20 @@ export const unShareAlgorithmVersion = procedure
     });
 
     algorithmVersion.sharedStatus = SharedStatus.UNSHARING;
-    orm.em.persist([algorithmVersion]);
-    await orm.em.flush();
+    em.persist([algorithmVersion]);
+    await em.flush();
 
     const successCallback = async () => {
       algorithmVersion.sharedStatus = SharedStatus.UNSHARED;
       algorithmVersion.path = algorithmVersion.privatePath;
       algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
-      await orm.em.persistAndFlush([algorithmVersion, algorithm]);
+      await em.persistAndFlush([algorithmVersion, algorithm]);
     };
 
     const failureCallback = async () => {
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
-      await orm.em.persistAndFlush([algorithmVersion]);
+      await em.persistAndFlush([algorithmVersion]);
     };
 
     unShareFileOrDir({
@@ -438,10 +438,10 @@ export const copyPublicAlgorithmVersion = procedure
   }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     // 1. 检查算法版本是否为公开版本
-    const algorithmVersion = await orm.em.findOne(AlgorithmVersion,
+    const algorithmVersion = await em.findOne(AlgorithmVersion,
       { id: input.algorithmVersionId, sharedStatus: SharedStatus.SHARED },
       { populate: ["algorithm"]});
 
@@ -452,7 +452,7 @@ export const copyPublicAlgorithmVersion = procedure
       });
     }
     // 2. 检查该用户是否已有同名算法
-    const algorithm = await orm.em.findOne(Algorithm, { name: input.algorithmName, owner: user.identityId });
+    const algorithm = await em.findOne(Algorithm, { name: input.algorithmName, owner: user.identityId });
     if (algorithm) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -490,7 +490,7 @@ export const copyPublicAlgorithmVersion = procedure
         fromPath: algorithmVersion.path, toPath: input.path });
       // 递归修改文件权限和拥有者
       await chmod({ host, userIdentityId: "root", permission: "750", path: input.path });
-      await orm.em.persistAndFlush([newAlgorithm, newAlgorithmVersion]);
+      await em.persistAndFlush([newAlgorithm, newAlgorithmVersion]);
     } catch (err) {
       console.log(err);
       throw new TRPCError({

@@ -18,7 +18,7 @@ import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
@@ -57,7 +57,7 @@ export const list = procedure
   }))
   .output(z.object({ items: z.array(ModelListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const isPublicQuery = input.isPublic ? {
       isShared: true,
@@ -74,7 +74,7 @@ export const list = procedure
       clusterId: input.clusterId,
     } : {};
 
-    const [items, count] = await orm.em.findAndCount(Model, {
+    const [items, count] = await em.findAndCount(Model, {
       ...isPublicQuery,
       ...nameOrDescQuery,
       ...clusterQuery,
@@ -125,8 +125,8 @@ export const createModel = procedure
         message: `Cluster id ${input.clusterId} does not exist.`,
       });
     }
-    const orm = await getORM();
-    const modelExist = await orm.em.findOne(Model, { name:input.name, owner: user.identityId });
+    const em = await forkEntityManager();
+    const modelExist = await em.findOne(Model, { name:input.name, owner: user.identityId });
     if (modelExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -135,7 +135,7 @@ export const createModel = procedure
     }
 
     const model = new Model({ ...input, owner: user.identityId, isShared: false });
-    await orm.em.persistAndFlush(model);
+    await em.persistAndFlush(model);
     return model.id;
   });
 
@@ -157,13 +157,13 @@ export const updateModel = procedure
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { id, name, algorithmName, algorithmFramework, description } = input;
 
-    const model = await orm.em.findOne(Model, { id });
+    const model = await em.findOne(Model, { id });
 
-    const modelExist = await orm.em.findOne(Model, { name });
+    const modelExist = await em.findOne(Model, { name });
     if (modelExist && modelExist !== model) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -178,7 +178,7 @@ export const updateModel = procedure
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
 
-    const changingVersions = await orm.em.find(ModelVersion, { model,
+    const changingVersions = await em.find(ModelVersion, { model,
       $or: [
         { sharedStatus: SharedStatus.SHARING },
         { sharedStatus: SharedStatus.UNSHARING },
@@ -194,7 +194,7 @@ export const updateModel = procedure
     // 如果是已分享的模型且名称发生变化，则变更共享路径下的此模型名称为新名称
     if (model.isShared && name !== model.name) {
 
-      const sharedVersions = await orm.em.find(ModelVersion, { model, sharedStatus: SharedStatus.SHARED });
+      const sharedVersions = await em.find(ModelVersion, { model, sharedStatus: SharedStatus.SHARED });
       const oldPath = dirname(dirname(sharedVersions[0].path));
       // 获取更新后的当前模型的共享路径名称
       const newModelSharedPath = await getUpdatedSharedPath({
@@ -216,7 +216,7 @@ export const updateModel = procedure
     model.algorithmFramework = algorithmFramework;
     model.description = description;
 
-    await orm.em.flush();
+    await em.flush();
     return model.id;
   });
 
@@ -232,8 +232,8 @@ export const deleteModel = procedure
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const model = await orm.em.findOne(Model, { id: input.id });
+    const em = await forkEntityManager();
+    const model = await em.findOne(Model, { id: input.id });
 
     if (!model) {
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.id} not found` });
@@ -242,7 +242,7 @@ export const deleteModel = procedure
     if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.id} not accessible` });
     }
-    const modelVersions = await orm.em.find(ModelVersion, { model });
+    const modelVersions = await em.find(ModelVersion, { model });
 
     const sharingVersions = modelVersions.filter(
       (v) => (v.sharedStatus === SharedStatus.SHARING || v.sharedStatus === SharedStatus.UNSHARING));
@@ -270,7 +270,7 @@ export const deleteModel = procedure
       });
     }
 
-    await orm.em.removeAndFlush([...modelVersions, model]);
+    await em.removeAndFlush([...modelVersions, model]);
 
     return { success: false };
   });

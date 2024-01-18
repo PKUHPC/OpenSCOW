@@ -16,7 +16,7 @@ import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
@@ -54,10 +54,10 @@ export const getAlgorithms = procedure
     versions:z.array(z.string()),
   })), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { page, pageSize, framework, nameOrDesc, clusterId, isPublic } = input;
 
-    const [items, count] = await orm.em.findAndCount(Algorithm, {
+    const [items, count] = await em.findAndCount(Algorithm, {
       $and:[
         isPublic ? { isShared:true } :
           { owner: user!.identityId },
@@ -119,7 +119,7 @@ export const createAlgorithm = procedure
       });
     }
 
-    const { em } = await getORM();
+    const em = await forkEntityManager();
     const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user!.identityId });
     if (algorithmExist) {
       throw new TRPCError({
@@ -150,7 +150,7 @@ export const updateAlgorithm = procedure
   }))
   .output(z.void())
   .mutation(async ({ input:{ name, framework, description, id }, ctx: { user } }) => {
-    const { em } = await getORM();
+    const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id });
 
     if (!algorithm) {
@@ -227,7 +227,7 @@ export const deleteAlgorithm = procedure
   .input(z.object({ id: z.number() }))
   .output(z.void())
   .mutation(async ({ input:{ id }, ctx:{ user } }) => {
-    const { em } = await getORM();
+    const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id });
 
     if (!algorithm) {

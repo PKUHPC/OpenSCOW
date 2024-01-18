@@ -19,7 +19,7 @@ import { config, rootKeyPair } from "src/server/config/env";
 import { Image, Source } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
-import { getORM } from "src/server/utils/getOrm";
+import { forkEntityManager } from "src/server/utils/getOrm";
 import { createHarborImageUrl, getLoadedImage, getPulledImage, pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginationProps } from "src/server/utils/orm";
@@ -92,7 +92,7 @@ export const list = procedure
   .query(async ({ input, ctx: { user } }) => {
 
     const { clusterId, isPublic, nameOrTagOrDesc, withExternal, pageSize, page } = input;
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const isPublicQuery = isPublic ? {
       isShared: true,
@@ -107,7 +107,7 @@ export const list = procedure
       ],
     } : {};
 
-    const [items, count] = await orm.em.findAndCount(Image, {
+    const [items, count] = await em.findAndCount(Image, {
       $and: [
         nameOrTagOrDescQuery,
         isPublicQuery,
@@ -160,9 +160,9 @@ export const createImage = procedure
         message: `Cluster id ${input.clusterId} does not exist.`,
       });
     }
-    const orm = await getORM();
+    const em = await forkEntityManager();
     const { name, tag, source, sourcePath } = input;
-    const imageNameTagExist = await orm.em.findOne(Image,
+    const imageNameTagExist = await em.findOne(Image,
       { name, tag, owner: user.identityId });
     if (imageNameTagExist) {
       throw new TRPCError({
@@ -214,7 +214,7 @@ export const createImage = procedure
 
       // 更新数据库
       const image = new Image({ ...input, path: harborImageUrl, owner: user.identityId });
-      await orm.em.persistAndFlush(image);
+      await em.persistAndFlush(image);
 
       return image.id;
 
@@ -238,8 +238,8 @@ export const updateImage = procedure
   }))
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const image = await orm.em.findOne(Image, { id: input.id });
+    const em = await forkEntityManager();
+    const image = await em.findOne(Image, { id: input.id });
     if (!image) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -255,7 +255,7 @@ export const updateImage = procedure
     }
     image.description = input.description;
 
-    await orm.em.flush();
+    await em.flush();
     return image.id;
   });
 
@@ -271,8 +271,8 @@ export const deleteImage = procedure
   .input(z.object({ id: z.number() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const image = await orm.em.findOne(Image, { id: input.id });
+    const em = await forkEntityManager();
+    const image = await em.findOne(Image, { id: input.id });
 
     if (!image) {
       throw new TRPCError({
@@ -353,7 +353,7 @@ export const deleteImage = procedure
       });
     }
 
-    await orm.em.removeAndFlush(image);
+    await em.removeAndFlush(image);
     return;
   });
 
@@ -369,8 +369,8 @@ export const shareOrUnshareImage = procedure
   .input(z.object({ id: z.number(), share: z.boolean() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
-    const orm = await getORM();
-    const image = await orm.em.findOne(Image, { id: input.id });
+    const em = await forkEntityManager();
+    const image = await em.findOne(Image, { id: input.id });
 
     if (!image) {
       throw new TRPCError({
@@ -388,7 +388,7 @@ export const shareOrUnshareImage = procedure
 
     image.isShared = input.share;
 
-    await orm.em.persistAndFlush(image);
+    await em.persistAndFlush(image);
     return;
   });
 
@@ -406,11 +406,11 @@ export const copyImage = procedure
   .output(z.number())
   .mutation(async ({ input, ctx: { user } }) => {
 
-    const orm = await getORM();
+    const em = await forkEntityManager();
 
     const { id, newName, newTag } = input;
 
-    const sharedImage = await orm.em.findOne(Image, { id, isShared: true });
+    const sharedImage = await em.findOne(Image, { id, isShared: true });
 
     if (!sharedImage) {
       throw new TRPCError({
@@ -419,7 +419,7 @@ export const copyImage = procedure
       });
     };
 
-    const imageNameTagsExist = await orm.em.findOne(Image,
+    const imageNameTagsExist = await em.findOne(Image,
       { name: newName, tag: newTag, owner: user.identityId });
     if (imageNameTagsExist) {
       throw new TRPCError({
@@ -464,7 +464,7 @@ export const copyImage = procedure
         path: harborImageUrl,
         description: sharedImage.description,
       });
-      await orm.em.persistAndFlush(image);
+      await em.persistAndFlush(image);
 
       return image.id;
 
