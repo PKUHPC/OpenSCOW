@@ -69,8 +69,13 @@ export default function Layout(
   const publicConfig = configQuery.data;
   const { setDefaultCluster, defaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
 
-  const routes = userRoutes(userQuery.data.user, publicConfig, setDefaultCluster, defaultCluster);
+  const host = (typeof window === "undefined") ? "" : location.host;
+  const hostname = host?.includes(":") ? host?.split(":")[0] : host;
+  const footerConfig = publicConfig.UI_CONFIG.footer;
+  const footerText = (hostname && footerConfig?.hostnameMap?.[hostname])
+    ?? footerConfig?.defaultText ?? "";
 
+  const routes = userRoutes(userQuery.data.user, publicConfig, setDefaultCluster, defaultCluster);
 
   return (
     <BaseLayout
@@ -99,6 +104,8 @@ export default function Layout(
           } */}
         </>
       )}
+      versionTag={publicConfig.VERSION_TAG}
+      footerText={footerText}
     >
       <PublicConfigContext.Provider value={{
         user: userQuery.data.user,

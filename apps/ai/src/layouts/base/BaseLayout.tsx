@@ -12,6 +12,7 @@
 
 "use client";
 
+import { Footer } from "@scow/lib-web/build/layouts/base/Footer";
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { PropsWithChildren, useMemo, useState } from "react";
@@ -19,7 +20,6 @@ import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { SideNav } from "src/layouts/base/SideNav";
-import { Footer } from "src/layouts/Footer";
 import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { arrayContainsElement } from "src/utils/array";
 import { trpc } from "src/utils/trpc";
@@ -57,11 +57,14 @@ type Props = PropsWithChildren<{
   routes?: NavItemProps[];
   user?: ClientUserInfo | undefined;
   headerRightContent?: React.ReactNode;
+  footerText?: string;
+  versionTag?: string | undefined;
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
-  routes = [], children, user = undefined, headerRightContent,
+  routes = [], children, user = undefined, headerRightContent, versionTag, footerText,
 }) => {
+
   const pathname = usePathname() ?? "";
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -106,7 +109,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
           <Content>
             {children}
           </Content>
-          <Footer />
+          <Footer text={footerText ?? ""} versionTag={versionTag} />
         </ContentPart>
       </StyledLayout>
     </Root>

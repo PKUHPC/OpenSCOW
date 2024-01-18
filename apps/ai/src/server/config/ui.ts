@@ -10,28 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
+import { getUiConfig } from "@scow/config/build/ui";
 
-import { PRIMARY_COLOR } from "src/layouts/constants";
-import { createGlobalStyle } from "styled-components";
-
-export const GlobalStyle = createGlobalStyle`
-  #nprogress .bar {
-    background-color: ${PRIMARY_COLOR};
-  }
-
-  // HACK
-  a {
-    color: ${PRIMARY_COLOR};
-  }
-
-  .ant-picker-dropdown {
-    max-width: 100%;
-  }
-  .ant-picker-dropdown .ant-picker-panel-layout {
-    overflow-y: scroll;
-  }
-
-`;
-
-
+export const uiConfig = getUiConfig();

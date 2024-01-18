@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { getClusterConfigs, getLoginNode, getSortedClusterIds, getSortedClusters } from "@scow/config/build/cluster";
 import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
+import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { getCapabilities } from "@scow/lib-auth";
 import { parseKeyValue } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
@@ -21,6 +22,7 @@ import { join } from "path";
 import { aiConfig } from "src/server/config/ai";
 import { commonConfig } from "src/server/config/common";
 import { config as envConfig } from "src/server/config/env";
+import { uiConfig } from "src/server/config/ui";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
@@ -91,6 +93,17 @@ const HarborConfigSchema = z.object({
   password: z.string(),
 });
 
+const UiConfigSchema = z.object({
+  footer: z.object({
+    defaultText: z.string().optional(),
+    hostnameMap: z.record(z.string(), z.string()).optional(),
+  }).optional(),
+  primaryColor: z.object({
+    defaultColor: z.string().default(DEFAULT_PRIMARY_COLOR),
+    hostnameMap: z.record(z.string(), z.string()).optional(),
+  }).optional(),
+});
+
 const PublicConfigSchema = z.object({
   ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
@@ -112,6 +125,7 @@ const PublicConfigSchema = z.object({
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
   HARBOR_CONFIG: HarborConfigSchema,
+  UI_CONFIG: UiConfigSchema,
 });
 
 // 类型别名
@@ -191,6 +205,8 @@ export const config = router({
         LOGIN_NODES: parseKeyValue(envConfig.LOGIN_NODES),
 
         HARBOR_CONFIG: aiConfig.harborConfig,
+
+        UI_CONFIG: uiConfig,
       };
     }),
 

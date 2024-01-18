@@ -12,27 +12,31 @@
 
 "use client";
 
+import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "src/components/ErrorBoundary";
 import { TopProgressBar } from "src/components/TopProgressBar";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider } from "src/layouts/darkMode";
 import { RootErrorContent } from "src/layouts/error/RootErrorContent";
-import { GlobalStyle } from "src/layouts/globalStyle";
 import { AntdStyleRegistry } from "src/layouts/styleRegistry/AntdRegistry.jsx";
 import StyledComponentsRegistry from "src/layouts/styleRegistry/StyledComponentsRegistry.jsx";
 
-export function ClientLayout(props: { children: React.ReactNode, initialDark?: DarkModeCookie }) {
+export function ClientLayout(props: {
+  children: React.ReactNode,
+  initialDark?: DarkModeCookie,
+  color: string,
+}) {
   const pathname = usePathname();
 
   return (
 
     <StyledComponentsRegistry>
       <AntdStyleRegistry>
-        <GlobalStyle />
         <body>
           <DarkModeProvider initial={props.initialDark}>
-            <AntdConfigProvider>
+            <AntdConfigProvider color={props.color}>
+              <GlobalStyle />
               <TopProgressBar />
               <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
                 {props.children}

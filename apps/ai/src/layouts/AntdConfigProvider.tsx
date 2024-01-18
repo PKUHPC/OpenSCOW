@@ -18,13 +18,12 @@ import { App, ConfigProvider, theme } from "antd";
 import zhCNlocale from "antd/locale/zh_CN";
 import React, { } from "react";
 import { AppFloatButtons } from "src/layouts/AppFloatButtons";
-import { PRIMARY_COLOR } from "src/layouts/constants";
 import { useDarkMode } from "src/layouts/darkMode";
 import { ThemeProvider } from "styled-components";
 
 
 type Props = React.PropsWithChildren<{
-  // color: string;
+  color: string;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
@@ -37,17 +36,17 @@ const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const AntdConfigProvider: React.FC<Props> = ({ children }) => {
+export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
 
   const { dark } = useDarkMode();
 
   return (
     <ConfigProvider
       locale={zhCNlocale}
-      theme={{ token: { colorPrimary: PRIMARY_COLOR, colorInfo: PRIMARY_COLOR },
+      theme={{ token: { colorPrimary: color, colorInfo: color },
         algorithm: dark ? theme.darkAlgorithm : undefined }}
     >
-      <StyledComponentsThemeProvider>
+      <StyledComponentsThemeProvider color={color}>
         <App>
           <AppFloatButtons />
           {children}
