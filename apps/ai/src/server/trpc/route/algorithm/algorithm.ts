@@ -17,6 +17,7 @@ import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVer
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
@@ -70,11 +71,7 @@ export const getAlgorithms = procedure
       ],
     },
     {
-      ...page ?
-        {
-          offset: (page - 1) * (pageSize || 10),
-          limit: pageSize || 10,
-        } : {},
+      ...paginationProps(page, pageSize),
       populate: ["versions.sharedStatus", "versions.privatePath"],
       orderBy: { createTime: "desc" },
     });

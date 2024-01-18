@@ -22,6 +22,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
@@ -60,11 +61,7 @@ export const getAlgorithmVersions = procedure
       },
       {
         populate: ["algorithm"],
-        ...page ?
-          {
-            offset: (page - 1) * (pageSize || 10),
-            limit: pageSize || 10,
-          } : {},
+        ...paginationProps(page, pageSize),
         orderBy: { createTime: "desc" },
       });
 

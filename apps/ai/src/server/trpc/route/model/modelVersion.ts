@@ -23,6 +23,7 @@ import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { getORM } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
+import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
@@ -65,8 +66,7 @@ export const versionList = procedure
         ...input.isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
       },
       {
-        limit: input.pageSize || undefined,
-        offset: input.page && input.pageSize ? ((input.page ?? 1) - 1) * input.pageSize : undefined,
+        ...paginationProps(input.pageSize, input.pageSize),
         orderBy: { createTime: "desc" },
       });
 
