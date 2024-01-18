@@ -265,6 +265,7 @@ export const chargingServiceServer = plugin((server) => {
           index: x.id,
           time: x.time.toISOString(),
           type: x.type,
+          userId: x.userId,
         })),
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
       }];

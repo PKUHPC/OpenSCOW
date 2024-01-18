@@ -65,6 +65,7 @@ message ChargeRecord {
   string type = 5;
   common.Money amount = 6;
   string comment = 7;
+  optional string user_id = 8;
 }
 
 // 充值记录及消费记录请求target
