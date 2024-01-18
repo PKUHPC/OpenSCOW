@@ -20,7 +20,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { FileInfo } from "src/models/File";
 import { FileType } from "src/server/trpc/route/file";
-import { getExtension, isDecompressibleFile } from "src/utils/file";
+import { getExtension, isDecompressibleFile, isParentOrSameFolder } from "src/utils/file";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
@@ -105,7 +105,7 @@ function updateTreeData(treeData: DataNode[], homeDir: string,
 };
 
 // 处理path的特殊情况,比如为空或者不以"/"开头
-const formatPath = (path: string | undefined) => {
+const formatPath = (path: string) => {
   if (path === "" || path === undefined) {
     return "/";
   }
@@ -143,16 +143,15 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   }, { enabled: false });
 
   useEffect(() => {
-    const basePath = formatPath(homeDir?.path);
-    const testPath = formatPath(path);
+    if (!homeDir?.path || path === "~") return;
 
-    if (!testPath.startsWith(basePath)) {
+    if (!isParentOrSameFolder(homeDir.path, path)) {
       message.info("仅可在家目录下操作");
       setPath(prevPath);
       return;
     }
 
-    if (visible && path !== "~") {
+    if (visible) {
       refetch();
     }
   }, [homeDir, path, visible]);
