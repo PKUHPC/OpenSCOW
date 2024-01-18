@@ -11,6 +11,7 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
+import { SortOrder } from "antd/lib/table/interface";
 import { useI18nTranslateToString } from "src/i18n";
 import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
 
@@ -83,4 +84,25 @@ export const getEntryLogoPath = (item: Entry, apps: AppWithCluster) => {
   }
 
   return undefined;
+};
+
+export const compareWithUndefined = <T extends number | string | undefined>
+  (a: T, b: T, sortOrder?: SortOrder): number => {
+  if (a === undefined && b === undefined) {
+    // 两者均为 undefined，视为相等
+    return 0;
+  }
+  else if (a === undefined) {
+    // a 为 undefined，b 不为 undefined，将 a 排在后面
+    return sortOrder === "ascend" || !sortOrder ? 1 : -1;
+  }
+  else if (b === undefined) {
+    // b 为 undefined，a 不为 undefined，将 b 排在后面
+    return sortOrder === "ascend" || !sortOrder ? -1 : 1;
+  }
+
+  // 都不为 undefined 时，正常比较
+  return typeof a === "number" && typeof b === "number" ? a - b :
+    typeof a === "string" && typeof b === "string" ? a.localeCompare(b) :
+      0;
 };

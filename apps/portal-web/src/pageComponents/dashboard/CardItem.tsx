@@ -11,7 +11,7 @@
  */
 
 import { Card } from "antd";
-import React, { CSSProperties, forwardRef, HTMLAttributes } from "react";
+import { CSSProperties, forwardRef, HTMLAttributes } from "react";
 import { Cluster } from "src/utils/config";
 import { styled } from "styled-components";
 
