@@ -17,7 +17,7 @@ import { SharedStatus } from "src/models/common";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCopyFile } from "src/server/utils/checkFilePermission";
+import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -481,7 +481,9 @@ export const copyPublicModelVersion = procedure
 
     if (!host) { throw clusterNotFound(modelVersion.model.$.clusterId); }
 
-    await checkCopyFile({ host, userIdentityId: user.identityId,
+    await checkCreateResourcePath({ host, userIdentityId: user.identityId, toPath: input.path });
+
+    await checkCopyFilePath({ host, userIdentityId: user.identityId,
       toPath: input.path, fileName: path.basename(modelVersion.path) });
 
     // 3. 写入数据

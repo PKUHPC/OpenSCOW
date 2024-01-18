@@ -102,7 +102,7 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
       }
       else {
-        message.error("修改版本失败");
+        message.error(e.message);
       }
     },
   });

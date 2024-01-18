@@ -68,7 +68,7 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
           },
         ]);
       } else {
-        message.error("创建新版本失败");
+        message.error(e.message);
       }
     },
   });

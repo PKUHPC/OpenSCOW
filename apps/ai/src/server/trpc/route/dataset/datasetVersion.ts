@@ -17,7 +17,7 @@ import { SharedStatus } from "src/models/common";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCopyFile } from "src/server/utils/checkFilePermission";
+import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -125,6 +125,8 @@ export const createDatasetVersion = procedure
     const host = getClusterLoginNode(dataset.clusterId);
 
     if (!host) { throw clusterNotFound(dataset.clusterId); }
+
+    await checkCreateResourcePath({ host, userIdentityId: user.identityId, toPath: input.path });
 
     await sshConnect(host, user.identityId, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
@@ -492,7 +494,7 @@ export const copyPublicDatasetVersion = procedure
 
     if (!host) { throw clusterNotFound(datasetVersion.dataset.$.clusterId); }
 
-    await checkCopyFile({ host, userIdentityId: user.identityId,
+    await checkCopyFilePath({ host, userIdentityId: user.identityId,
       toPath: input.path, fileName: path.basename(datasetVersion.path) });
 
     // 4. 写入数据

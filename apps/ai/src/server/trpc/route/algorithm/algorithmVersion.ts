@@ -16,7 +16,7 @@ import path, { basename, dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCopyFile } from "src/server/utils/checkFilePermission";
+import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -116,6 +116,8 @@ export const createAlgorithmVersion = procedure
     const host = getClusterLoginNode(algorithm.clusterId);
 
     if (!host) { throw clusterNotFound(algorithm.clusterId); }
+
+    await checkCreateResourcePath({ host, userIdentityId: user.identityId, toPath: input.path });
 
     await sshConnect(host, user.identityId, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
@@ -466,7 +468,7 @@ export const copyPublicAlgorithmVersion = procedure
 
     if (!host) { throw clusterNotFound(algorithmVersion.algorithm.$.clusterId); }
 
-    await checkCopyFile({ host, userIdentityId: user.identityId,
+    await checkCopyFilePath({ host, userIdentityId: user.identityId,
       toPath: input.path, fileName: path.basename(algorithmVersion.path) });
 
     // 4. 写入数据
