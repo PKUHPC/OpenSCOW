@@ -231,7 +231,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
             const cluster = getCurrentCluster(record.clusterId);
             return cluster && (
               <AlgorithmVersionList
-                isPublic={record.isShared}
+                isPublic={isPublic}
                 algorithms={data?.items ?? []}
                 algorithmName={record.name}
                 algorithmId={record.id}

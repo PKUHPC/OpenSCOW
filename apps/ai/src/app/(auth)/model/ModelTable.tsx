@@ -204,7 +204,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
             const cluster = getCurrentCluster(record.clusterId);
             return cluster && (
               <ModelVersionList
-                isPublic={record.isShared}
+                isPublic={isPublic}
                 models={data?.items ?? []}
                 modelId={record.id}
                 modelName={record.name}

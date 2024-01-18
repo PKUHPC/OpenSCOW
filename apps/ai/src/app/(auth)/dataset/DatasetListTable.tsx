@@ -233,7 +233,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
             const cluster = getCurrentCluster(record.clusterId);
             return cluster && (
               <DatasetVersionList
-                isPublic={record.isShared}
+                isPublic={isPublic}
                 datasets={data?.items ?? []}
                 datasetId={record.id}
                 datasetName={record.name}
