@@ -12,7 +12,7 @@
 
 import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { getCurrentLanguageId } from "@scow/lib-server";
+import { getCurrentLanguageId } from "@scow/lib-server/build/systemLanguage";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { config, FAVICON_URL } from "src/config/env";

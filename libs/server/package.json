@@ -18,8 +18,6 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.5",
-    "@ddadaal/tsgrpc-server": "0.19.5",
-    "@ddadaal/tsgrpc-client": "0.17.7",
     "@grpc/grpc-js": "1.9.11",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*",
@@ -31,6 +29,8 @@
     "ts-log": "2.2.5"
   },
   "devDependencies": {
+    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
     "@scow/protos": "workspace:*",
     "@types/shell-quote": "1.7.4"
   },
