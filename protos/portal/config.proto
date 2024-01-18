@@ -53,6 +53,5 @@ message GetClusterInfoResponse {
 }
 
 service ConfigService {
-  // GetClusterInfo中不包含获取失败的集群的信息。
   rpc GetClusterInfo(GetClusterInfoRequest) returns (GetClusterInfoResponse);
 }
