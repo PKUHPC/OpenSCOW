@@ -337,14 +337,31 @@ export const shareModelVersion = procedure
     await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
+      const em = await forkEntityManager();
+
+      const modelVersion = await em.findOne(ModelVersion, { id: versionId });
+      if (!modelVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${modelId} not found` });
+
+      const model = await em.findOne(Model, { id: modelId });
+      if (!model)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
+
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       modelVersion.sharedStatus = SharedStatus.SHARED;
       modelVersion.path = versionPath;
       if (!model.isShared) { model.isShared = true; };
+
       await em.persistAndFlush([modelVersion, model]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const modelVersion = await em.findOne(ModelVersion, { id: versionId });
+      if (!modelVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${modelId} not found` });
+
       modelVersion.sharedStatus = SharedStatus.UNSHARED;
       await em.persistAndFlush([modelVersion]);
     };
@@ -386,7 +403,7 @@ export const unShareModelVersion = procedure
       throw new TRPCError({ code: "CONFLICT", message: "ModelVersion is already unShared" });
 
     const model = await em.findOne(Model, { id: modelId }, {
-      populate: ["versions", "versions.sharedStatus"],
+      populate: ["versions.sharedStatus"],
     });
     if (!model)
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
@@ -411,15 +428,34 @@ export const unShareModelVersion = procedure
     await em.flush();
 
     const successCallback = async () => {
+      const em = await forkEntityManager();
+
+      const modelVersion = await em.findOne(ModelVersion, { id: versionId });
+      if (!modelVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
+
+      const model = await em.findOne(Model, { id: modelId }, {
+        populate: ["versions.sharedStatus"],
+      });
+      if (!model)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
+
       modelVersion.sharedStatus = SharedStatus.UNSHARED;
       modelVersion.path = modelVersion.privatePath;
       model.isShared = model.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
+
       await em.persistAndFlush([modelVersion, model]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const modelVersion = await em.findOne(ModelVersion, { id: versionId });
+      if (!modelVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
       modelVersion.sharedStatus = SharedStatus.SHARED;
+
       await em.persistAndFlush([modelVersion]);
     };
 

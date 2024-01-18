@@ -347,14 +347,31 @@ export const shareDatasetVersion = procedure
     await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
-      datasetVersion.sharedStatus = SharedStatus.SHARED;
+      const em = await forkEntityManager();
+
+      const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
+      if (!datasetVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
+
+      const dataset = await em.findOne(Dataset, { id: datasetId });
+      if (!dataset)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
+
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
+      datasetVersion.sharedStatus = SharedStatus.SHARED;
       datasetVersion.path = versionPath;
       if (!dataset.isShared) { dataset.isShared = true; };
+
       await em.persistAndFlush([datasetVersion, dataset]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
+      if (!datasetVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
+
       datasetVersion.sharedStatus = SharedStatus.UNSHARED;
       await em.persistAndFlush([datasetVersion]);
     };
@@ -398,7 +415,7 @@ export const unShareDatasetVersion = procedure
       throw new TRPCError({ code: "CONFLICT", message: "DatasetVersion is already unShared" });
 
     const dataset = await em.findOne(Dataset, { id: datasetId }, {
-      populate: ["versions", "versions.sharedStatus"],
+      populate: ["versions.sharedStatus"],
     });
     if (!dataset)
       throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
@@ -423,14 +440,33 @@ export const unShareDatasetVersion = procedure
     await em.flush();
 
     const successCallback = async () => {
+      const em = await forkEntityManager();
+
+      const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
+      if (!datasetVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
+
+      const dataset = await em.findOne(Dataset, { id: datasetId }, {
+        populate: ["versions.sharedStatus"],
+      });
+      if (!dataset)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
+
       datasetVersion.sharedStatus = SharedStatus.UNSHARED;
       datasetVersion.path = datasetVersion.privatePath;
       dataset.isShared = dataset.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
+
       await em.persistAndFlush([datasetVersion, dataset]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
+      if (!datasetVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
+
       datasetVersion.sharedStatus = SharedStatus.SHARED;
       await em.persistAndFlush([datasetVersion]);
     };

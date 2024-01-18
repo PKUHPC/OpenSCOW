@@ -318,14 +318,31 @@ export const shareAlgorithmVersion = procedure
     await em.flush();
 
     const successCallback = async (targetFullPath: string) => {
+      const em = await forkEntityManager();
+
+      const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+      if (!algorithmVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
+
+      const algorithm = await em.findOne(Algorithm, { id: algorithmId });
+      if (!algorithm)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
+
       const versionPath = join(targetFullPath, path.basename(sourceFilePath));
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
       algorithmVersion.path = versionPath;
       if (!algorithm.isShared) { algorithm.isShared = true; };
+
       await em.persistAndFlush([algorithmVersion, algorithm]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+      if (!algorithmVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
+
       algorithmVersion.sharedStatus = SharedStatus.UNSHARED;
       await em.persistAndFlush([algorithmVersion]);
     };
@@ -395,14 +412,33 @@ export const unShareAlgorithmVersion = procedure
     await em.flush();
 
     const successCallback = async () => {
+      const em = await forkEntityManager();
+
+      const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+      if (!algorithmVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
+
+      const algorithm = await em.findOne(Algorithm, { id: algorithmId }, {
+        populate: ["versions.sharedStatus"],
+      });
+      if (!algorithm)
+        throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
+
       algorithmVersion.sharedStatus = SharedStatus.UNSHARED;
       algorithmVersion.path = algorithmVersion.privatePath;
       algorithm.isShared = algorithm.versions.filter((v) => (v.sharedStatus === SharedStatus.SHARED)).length > 0
         ? true : false;
+
       await em.persistAndFlush([algorithmVersion, algorithm]);
     };
 
     const failureCallback = async () => {
+      const em = await forkEntityManager();
+
+      const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
+      if (!algorithmVersion)
+        throw new TRPCError({ code: "NOT_FOUND", message: `AlgorithmVersion id:${algorithmId} not found` });
+
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
       await em.persistAndFlush([algorithmVersion]);
     };
