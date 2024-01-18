@@ -37,6 +37,7 @@ export const WebAppConfigSchema = Type.Object({
       { description: "proxy 类型", default: "relative" },
     ),
   beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
+  startCommand: Type.String({ description: "指明运行任务的脚本中的启动命令，用户在创建应用页面可以在脚本中替换该命令" }),
   script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
   connect: AppConnectPropsSchema,
 });
@@ -77,7 +78,6 @@ export const AppConfigSchema = Type.Object({
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;
 
-// 这个配置文件放在ai/apps/下
 export const APP_CONFIG_BASE_PATH = "ai/apps";
 
 export const getAiAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (baseConfigPath, logger) => {

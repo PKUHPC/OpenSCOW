@@ -49,6 +49,7 @@ interface FixedFormFields {
   appJobName: string;
   algorithm: { name: number, version: number };
   image: { name: number };
+  startCommand?: string;
   dataset: { name: number, version: number };
   model: { name: number, version: number };
   mountPoint: string | undefined;
@@ -162,6 +163,8 @@ export const LaunchAppForm = (props: Props) => {
   );
 
   const imageType = Form.useWatch(["image", "type"], form);
+  const selectedImage = Form.useWatch(["image", "name"], form);
+
   const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
@@ -169,7 +172,7 @@ export const LaunchAppForm = (props: Props) => {
     clusterId,
     withExternal: true,
   }, {
-    enabled: isImagePublic !== undefined && isTraining,
+    enabled: isImagePublic !== undefined,
   });
 
   const imageOptions = useMemo(() => {
@@ -318,7 +321,7 @@ export const LaunchAppForm = (props: Props) => {
       }}
       onFinish={async () => {
 
-        const { appJobName, algorithm, dataset, image, model,
+        const { appJobName, algorithm, dataset, image, startCommand, model,
           mountPoint, account, partition, coreCount,
           gpuCount, maxTime, command, customFields } = await form.validateFields();
         if (isTraining) {
@@ -355,10 +358,8 @@ export const LaunchAppForm = (props: Props) => {
             appId: appId!,
             appJobName,
             algorithm: algorithm.version,
-            image: {
-              name: appImage?.name || "",
-              tag: appImage?.tag,
-            },
+            image: image.name,
+            startCommand,
             dataset: dataset.version,
             model: model.version,
             mountPoint,
@@ -380,36 +381,52 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
-        {isTraining && (
-          <Form.Item label="镜像" required>
-            <Space>
-              <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
-                <Select
-                  style={{ minWidth: 100 }}
-                  options={
-                    [
-                      {
-                        value: AccessiblityType.PRIVATE,
-                        label: "我的镜像",
-                      },
-                      {
-                        value:  AccessiblityType.PUBLIC,
-                        label: "公共镜像",
-                      },
-                    ]
-                  }
-                />
-              </Form.Item>
-              <Form.Item name={["image", "name"]} rules={[{ required: true }]} noStyle>
-                <Select
-                  style={{ minWidth: 100 }}
-                  loading={isImagesLoading && isImagePublic !== undefined}
-                  options={imageOptions}
-                />
-              </Form.Item>
-            </Space>
+        <Form.Item label="镜像" required={isTraining}>
+          <Space>
+            <Form.Item name={["image", "type"]} rules={[{ required: isTraining }]} noStyle>
+              <Select
+                allowClear
+                style={{ minWidth: 100 }}
+                onChange={() => {
+                  form.setFieldsValue({ image: { name: undefined } });
+                }}
+                options={
+                  [
+                    {
+                      value: AccessiblityType.PRIVATE,
+                      label: "我的镜像",
+                    },
+                    {
+                      value:  AccessiblityType.PUBLIC,
+                      label: "公共镜像",
+                    },
+                  ]
+                }
+              />
+            </Form.Item>
+            <Form.Item name={["image", "name"]} rules={[{ required: isTraining }]} noStyle>
+              <Select
+                style={{ minWidth: 100 }}
+                allowClear
+                onChange={() => {
+                  form.setFieldValue("startCommand", undefined);
+                }}
+                loading={isImagesLoading && isImagePublic !== undefined}
+                options={imageOptions}
+              />
+            </Form.Item>
+          </Space>
+        </Form.Item>
+        {(selectedImage && !isTraining) ? (
+          <Form.Item
+            label="启动命令"
+            name="startCommand"
+            rules={[{ required: selectedImage !== undefined }]}
+            dependencies={["image", "name"]}
+          >
+            <Input placeholder="运行镜像里程序的启动命令" />
           </Form.Item>
-        )}
+        ) : null }
         <Form.Item label="算法">
           <Space>
             <Form.Item name={["algorithm", "type"]} noStyle>

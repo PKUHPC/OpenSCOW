@@ -12,7 +12,7 @@
 
 import { getCommonConfig, getSystemLanguageConfig } from "@scow/config/build/common";
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
-import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-server/build/systemLanguage";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-server";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { join } from "path";
 import { createCaptcha } from "src/auth/captcha";

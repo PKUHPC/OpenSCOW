@@ -230,7 +230,8 @@ export const createAppSession = procedure
     appId: z.string(),
     appJobName: z.string(),
     algorithm: z.number().optional(),
-    image: ImageSchema,
+    image: z.number().optional(),
+    startCommand: z.string().optional(),
     dataset: z.number().optional(),
     model: z.number().optional(),
     mountPoint: z.string().optional(),
@@ -248,7 +249,7 @@ export const createAppSession = procedure
     jobId: z.number(),
   }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const { clusterId, appId, appJobName, algorithm, image,
+    const { clusterId, appId, appJobName, algorithm, image, startCommand,
       dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
@@ -306,11 +307,13 @@ export const createAppSession = procedure
     const em = await forkEntityManager();
 
     const {
+      image: existImage,
       datasetVersion,
       algorithmVersion,
       modelVersion,
     } = await checkCreateAppEntity({
       em,
+      image,
       dataset,
       algorithm,
       model,
@@ -367,7 +370,8 @@ export const createAppSession = procedure
         const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
 
         const beforeScript = runtimeVariables + customAttributesExport + app.web!.beforeScript + sessionInfo;
-        const webScript = app.web!.script;
+        // 用户如果传了自定义的启动命令，则根据配置文件去替换默认的启动命令
+        const webScript = startCommand ? app.web!.script.replace(app.web!.startCommand, startCommand) : app.web!.script;
         const entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
 
         // 将entry.sh写入后将路径传给适配器后启动容器
@@ -377,7 +381,7 @@ export const createAppSession = procedure
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: appJobName,
-          image: `${image.name}:${image.tag || "latest"}`,
+          image: existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`,
           algorithm: algorithmVersion?.path,
           dataset: datasetVersion?.path,
           model: modelVersion?.path,
@@ -407,7 +411,7 @@ export const createAppSession = procedure
           sessionId: appJobName,
           submitTime: new Date().toISOString(),
           appId,
-          image: image,
+          image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
           jobType: JobType.APP,
         };
         await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));

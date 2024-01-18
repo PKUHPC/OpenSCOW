@@ -55,7 +55,7 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
   em: EntityManager
   dataset: number | undefined,
   algorithm: number | undefined,
-  image?: number,
+  image: number | undefined,
   model: number | undefined
 }) => {
   let algorithmVersion: AlgorithmVersion | undefined;
