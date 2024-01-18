@@ -109,7 +109,9 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
           message.error(t(p("notExist")));
         }
         else if (code === "USER_NOT_FOUND") {
-          if (useBuiltinCreateUser()) {
+          if (!publicConfig.CREATE_USER_CONFIG.misConfig.enableAccountAdminUserCreation) {
+            message.error(t(p("createFirst")));
+          } else if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {

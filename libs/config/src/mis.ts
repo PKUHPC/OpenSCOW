@@ -44,6 +44,11 @@ export const MisConfigSchema = Type.Object({
   createUser: Type.Object({
     enabled: Type.Boolean({ description: "是否启用用户从SCOW中创建用户", default: true }),
 
+    enableAccountAdminUserCreation: Type.Boolean({
+      description: "是否允许账户管理员创建用户",
+      default: true,
+    }),
+
     type: Type.Union([Type.Literal("builtin"), Type.Literal("external")], {
       description: "用户创建方式", default: "builtin",
     }),
