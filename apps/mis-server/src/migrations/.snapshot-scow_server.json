@@ -146,6 +146,51 @@
       "name": "charge_record",
       "indexes": [
         {
+          "columnNames": [
+            "time"
+          ],
+          "composite": false,
+          "keyName": "time",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tenant_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_tenant_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "account_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_account_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "charge_record_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "type"
+          ],
+          "composite": false,
+          "keyName": "charge_record_type_index",
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "static_info",
           "columnNames": [
             "time",
@@ -162,8 +207,7 @@
             "time",
             "tenant_name",
             "account_name",
-            "type",
-            "user_id"
+            "type"
           ],
           "composite": true,
           "primary": false,

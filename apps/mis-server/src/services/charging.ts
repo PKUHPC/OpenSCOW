@@ -422,6 +422,7 @@ export const chargingServiceServer = plugin((server) => {
           index: x.id,
           time: x.time.toISOString(),
           type: x.type,
+          userId: x.userId,
         })),
       }];
     },

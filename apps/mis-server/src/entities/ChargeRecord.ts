@@ -18,24 +18,29 @@ import { DecimalType } from "src/utils/decimal";
 import { type AnyJson } from "src/utils/types";
 
 @Entity()
-@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type", "userId"] })
+@Index({ name: "query_info", properties: ["time", "tenantName", "accountName", "type"] })
 @Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class ChargeRecord {
   @PrimaryKey()
     id!: number;
 
+  @Index({ name: "time" })
   @Property()
     time: Date;
 
+  @Index()
   @Property()
     tenantName: string;
 
+  @Index()
   @Property({ nullable: true })
     accountName?: string;
 
+  @Index()
   @Property({ nullable: true })
     userId?: string;
 
+  @Index()
   @Property()
     type: string;
 
