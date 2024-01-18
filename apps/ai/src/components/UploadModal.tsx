@@ -29,9 +29,6 @@ interface Props {
   path: string;
 }
 
-// 请求文件大小限制
-const CLIENT_MAX_BODY_SIZE = "1G";
-
 enum FileType {
   FILE = "file",
   DIR = "dir"
@@ -70,7 +67,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         文件将会上传到：<strong>{path}</strong>。同名文件将会被覆盖。
       </p>
       <p>
-        单个上传文件大小最大为：<strong>{CLIENT_MAX_BODY_SIZE}</strong>。
+        单个上传文件大小最大为：<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>。
       </p>
       <Upload.Dragger
         name="file"
@@ -97,10 +94,10 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
         }}
         beforeUpload={(file) => {
-          const fileMaxSize = parseInt(CLIENT_MAX_BODY_SIZE.slice(0, -1)) * (1024 ** 3);
+          const fileMaxSize = parseInt(publicConfig.CLIENT_MAX_BODY_SIZE.slice(0, -1)) * (1024 ** 3);
 
           if (file.size > fileMaxSize) {
-            message.error(`${file.name}上传失败,文件大小超过${CLIENT_MAX_BODY_SIZE}`);
+            message.error(`${file.name}上传失败,文件大小超过${publicConfig.CLIENT_MAX_BODY_SIZE}`);
             return Upload.LIST_IGNORE;
           }
 
