@@ -105,8 +105,8 @@ function updateTreeData(treeData: DataNode[], homeDir: string,
 };
 
 // 处理path的特殊情况,比如为空或者不以"/"开头
-const formatPath = (path: string) => {
-  if (path === "") {
+const formatPath = (path: string | undefined) => {
+  if (path === "" || path === undefined) {
     return "/";
   }
   if (!path.startsWith("/")) {
@@ -119,6 +119,7 @@ const formatPath = (path: string) => {
 export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
 
   const [visible, setVisible] = useState(false);
+  const [prevPath, setPrevPath] = useState<string>("~");
   const [path, setPath] = useState<string>("~");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
   const [selectedFileInfo, setSelectedFileInfo] = useState<FileInfo | undefined>(undefined);
@@ -131,6 +132,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
     enabled: !!clusterId && path === "~",
     onSuccess(data) {
+      setPrevPath(data.path);
       setPath(data.path);
     },
   });
@@ -138,15 +140,22 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
     clusterId: clusterId,
     path,
-  }, {
-    enabled: !!clusterId && path !== "~",
-  });
+  }, { enabled: false });
 
   useEffect(() => {
+    const basePath = formatPath(homeDir?.path);
+    const testPath = formatPath(path);
+
+    if (!testPath.startsWith(basePath)) {
+      message.info("仅可在家目录下操作");
+      setPath(prevPath);
+      return;
+    }
+
     if (visible && path !== "~") {
       refetch();
     }
-  }, [visible]);
+  }, [homeDir, path, visible]);
 
   useEffect(() => {
     if (!curDirContent) return;
@@ -170,15 +179,20 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     }
     const newExpandedKeys = Array.from(expandDirSet);
     setExpandedKeys(newExpandedKeys);
-    !node.isLeaf && setPath(node.key.toString());
+    if (!node.isLeaf) {
+      setPrevPath(path);
+      setPath(node.key.toString());
+    }
   };
 
   const onLoadDir = async ({ key }: any) => {
+    setPrevPath(path);
     setPath(key);
   };
 
   const closeModal = () => {
     setVisible(false);
+    setPrevPath("~");
     setPath("~");
     setSelectedKeys([]);
     setSelectedFileInfo(undefined);
@@ -205,6 +219,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   const onClickLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, clickPath: string) => {
     e.preventDefault();
     e.stopPropagation();
+    setPrevPath(path);
     setPath(formatPath(clickPath));
     setSelectedKeys([]);
     setSelectedFileInfo(undefined);
@@ -272,7 +287,10 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
               path={formatPath(path)}
               loading={isDirContentLoading}
               onPathChange={(curPath) => {
-                curPath === path ? undefined : setPath(curPath);
+                if (!(curPath === path)) {
+                  setPrevPath(path);
+                  setPath(curPath);
+                }
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0
@@ -325,6 +343,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                   },
                   onDoubleClick: () => {
                     if (r.type === "DIR") {
+                      setPrevPath(path);
                       setPath(join(path, r.name));
                     }
                   },
