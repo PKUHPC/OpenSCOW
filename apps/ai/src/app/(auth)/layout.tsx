@@ -21,6 +21,7 @@ import { JumpToAnotherLink } from "src/layouts/base/header/Components";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
+import { useUiConfig } from "../uiContext";
 import { PublicConfigContext } from "./context";
 import { defaultClusterContext } from "./defaultClusterContext";
 import { userRoutes } from "./routes";
@@ -69,9 +70,8 @@ export default function Layout(
   const publicConfig = configQuery.data;
   const { setDefaultCluster, defaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
 
-  const host = (typeof window === "undefined") ? "" : location.host;
-  const hostname = host?.includes(":") ? host?.split(":")[0] : host;
-  const footerConfig = publicConfig.UI_CONFIG.footer;
+  const { hostname, uiConfig } = useUiConfig();
+  const footerConfig = uiConfig.config.footer;
   const footerText = (hostname && footerConfig?.hostnameMap?.[hostname])
     ?? footerConfig?.defaultText ?? "";
 

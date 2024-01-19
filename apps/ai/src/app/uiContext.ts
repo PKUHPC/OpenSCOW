@@ -12,23 +12,14 @@
 
 "use client";
 
-
 import React, { useContext } from "react";
-import { ClientUserInfo } from "src/server/trpc/route/auth";
-import { Cluster, PublicConfig } from "src/server/trpc/route/config";
+import { UiConfig } from "src/server/trpc/route/config";
 
+export const UiConfigContext = React.createContext<{
+  hostname: string,
+  uiConfig: UiConfig,
+}>(undefined!);
 
-export const PublicConfigContext = React.createContext<{
-  publicConfig: PublicConfig,
-  clusters: Cluster[],
-  user: ClientUserInfo;
-  defaultClusterContext: {
-    defaultCluster: Cluster;
-    setDefaultCluster: (cluster: Cluster) => void;
-    removeDefaultCluster: () => void;
-      }
-      }>(undefined!);
-
-export const usePublicConfig = () => {
-  return useContext(PublicConfigContext);
+export const useUiConfig = () => {
+  return useContext(UiConfigContext);
 };

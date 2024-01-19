@@ -23,7 +23,7 @@ import { ThemeProvider } from "styled-components";
 
 
 type Props = React.PropsWithChildren<{
-  color: string;
+  color: string | undefined;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {

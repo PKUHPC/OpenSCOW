@@ -24,7 +24,7 @@ import { commonConfig } from "src/server/config/common";
 import { config as envConfig } from "src/server/config/env";
 import { uiConfig } from "src/server/config/ui";
 import { router } from "src/server/trpc/def";
-import { authProcedure } from "src/server/trpc/procedure/base";
+import { authProcedure, baseProcedure } from "src/server/trpc/procedure/base";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { USE_MOCK } from "src/utils/processEnv";
 import { z } from "zod";
@@ -86,24 +86,6 @@ const UserLinkSchema = z.object({
   openInNewPage: z.boolean().optional(),
 });
 
-const HarborConfigSchema = z.object({
-  url: z.string(),
-  project: z.string(),
-  user: z.string(),
-  password: z.string(),
-});
-
-const UiConfigSchema = z.object({
-  footer: z.object({
-    defaultText: z.string().optional(),
-    hostnameMap: z.record(z.string(), z.string()).optional(),
-  }).optional(),
-  primaryColor: z.object({
-    defaultColor: z.string().default(DEFAULT_PRIMARY_COLOR),
-    hostnameMap: z.record(z.string(), z.string()).optional(),
-  }).optional(),
-});
-
 const PublicConfigSchema = z.object({
   ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
@@ -124,8 +106,21 @@ const PublicConfigSchema = z.object({
   }),
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
-  HARBOR_CONFIG: HarborConfigSchema,
-  UI_CONFIG: UiConfigSchema,
+});
+
+const UiConfigSchema = z.object({
+  config: z.object({
+    footer: z.object({
+      defaultText: z.string().optional(),
+      hostnameMap: z.record(z.string(), z.string()).optional(),
+    }).optional(),
+    primaryColor: z.object({
+      defaultColor: z.string().default(DEFAULT_PRIMARY_COLOR),
+      hostnameMap: z.record(z.string(), z.string()).optional(),
+    }).optional(),
+  }),
+  defaultPrimaryColor: z.string().default(DEFAULT_PRIMARY_COLOR),
+
 });
 
 // 类型别名
@@ -134,6 +129,8 @@ export type PublicConfig = z.infer<typeof PublicConfigSchema>;
 export type Cluster = z.infer<typeof ClusterSchema>;
 
 export type NavLink = z.infer<typeof NavLinkSchema>;
+
+export type UiConfig = z.infer<typeof UiConfigSchema>;
 
 
 const PartitionSchema = z.object({
@@ -150,7 +147,6 @@ const ClusterConfigSchema = z.object({
   schedulerName: z.string(),
   partitions: z.array(PartitionSchema),
 });
-
 
 export const config = router({
 
@@ -203,10 +199,6 @@ export const config = router({
         SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
         LOGIN_NODES: parseKeyValue(envConfig.LOGIN_NODES),
-
-        HARBOR_CONFIG: aiConfig.harborConfig,
-
-        UI_CONFIG: uiConfig,
       };
     }),
 
@@ -232,5 +224,23 @@ export const config = router({
         });
       }
       return await asyncClientCall(client.config, "getClusterConfig", {});
+    }),
+
+  getUiConfig: baseProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/config/ui",
+        tags: ["config"],
+        summary: "uiConfig",
+      },
+    })
+    .input(z.void())
+    .output(UiConfigSchema)
+    .query(() => {
+      return {
+        config: uiConfig,
+        defaultPrimaryColor: DEFAULT_PRIMARY_COLOR,
+      };
     }),
 });
