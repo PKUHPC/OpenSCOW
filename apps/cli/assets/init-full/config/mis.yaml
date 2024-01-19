@@ -41,6 +41,9 @@ createUser:
   # 是否允许用户从SCOW中创建用户
   enabled: true
 
+  # 是否允许账户管理员创建用户
+  enableAccountAdminUserCreation: true
+
   # SCOW中创建用户界面是使用内置的（builtin）或者使用外置页面（external）
   # 默认builtin
   type: builtin
