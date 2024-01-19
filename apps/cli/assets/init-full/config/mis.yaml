@@ -104,3 +104,7 @@ createUser:
 #         allowedRoles: [tenantAdmin, platformAdmin]
 #   - text: "一级导航2"
 #     url: "https://hahahaha2.com"
+
+
+# 用户是否可以修改作业时限配置
+# userChangeJobLimitEnabled: true

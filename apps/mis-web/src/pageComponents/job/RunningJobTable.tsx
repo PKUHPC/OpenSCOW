@@ -220,6 +220,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
+  // 非用户页面或者用户页面且用户允许修改作业时限
+  const changeJobLimitEnabled = showUser || (!showUser && publicConfig.CHANGE_JOB_LIMIT.userEnabled);
+
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -228,11 +231,13 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
       {selection ? (
         <TableTitle>
           <Space>
-            <BatchChangeJobTimeLimitButton
-              data={selection.selected}
-              disabled={isLoading || selection.selected.length === 0}
-              reload={reload}
-            />
+            {changeJobLimitEnabled && (
+              <BatchChangeJobTimeLimitButton
+                data={selection.selected}
+                disabled={isLoading || selection.selected.length === 0}
+                reload={reload}
+              />
+            )}
           </Space>
         </TableTitle>
       ) : undefined}
@@ -323,12 +328,14 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               >
                 <a>{t(p("finishJobButton"))}</a>
               </Popconfirm>
-              <ChangeJobTimeLimitModalLink
-                reload={reload}
-                data={[r]}
-              >
-                {t(p("changeLimit"))}
-              </ChangeJobTimeLimitModalLink>
+              {changeJobLimitEnabled && (
+                <ChangeJobTimeLimitModalLink
+                  reload={reload}
+                  data={[r]}
+                >
+                  {t(p("changeLimit"))}
+                </ChangeJobTimeLimitModalLink>
+              )}
             </Space>
           )}
         />

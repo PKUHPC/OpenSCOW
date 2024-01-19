@@ -130,3 +130,6 @@ createUser:
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
 
+
+# 用户是否可以修改作业时限配置
+# userChangeJobLimitEnabled: true

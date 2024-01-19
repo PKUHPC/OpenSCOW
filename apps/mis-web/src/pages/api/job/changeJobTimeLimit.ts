@@ -20,6 +20,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { checkJobAccessible } from "src/server/jobAccessible";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
@@ -66,7 +67,14 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
     const client = getClient(JobServiceClient);
 
     // check if the user can change the job time limit
-    const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info, limitMinutes);
+    const { job, jobAccessible } = await checkJobAccessible({
+      actionType: "changeJobLimit",
+      jobId,
+      cluster,
+      info,
+      limitMinutes,
+      userEnabled: publicConfig.CHANGE_JOB_LIMIT.userEnabled,
+    });
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };
