@@ -11,8 +11,9 @@
  */
 
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { MikroORM, Options } from "@mikro-orm/core";
-import { MySqlDriver } from "@mikro-orm/mysql";
+import { MikroORM } from "@mikro-orm/core";
+import { Migrator } from "@mikro-orm/migrations";
+import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
 import { join } from "path";
 import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
@@ -22,25 +23,24 @@ import { entities } from "../entities";
 
 const distPath = process.env.NODE_ENV === "production" ? "build" : "src";
 
-export const ormConfigs = {
+export const ormConfigs = defineConfig({
   host: misConfig.db.host,
   port: misConfig.db.port,
   user: misConfig.db.user,
   dbName: config.DB_NAME ?? misConfig.db.dbName,
   password: config.DB_PASSWORD ?? misConfig.db.password,
-  type: "mysql",
   forceUndefined: true,
-  runMigrations: true,
+  extensions: [Migrator],
   migrations: {
     path: join(distPath, "migrations"),
-    pattern: /^[\w-]+\d+\.(j|t)s$/,
+    glob: "^[\w-]+\d+\.(j|t)s$",
   },
   entities,
   debug: misConfig.db.debug,
   seeder: {
     path: join(distPath, "seenders"),
   },
-} as Options<MySqlDriver>;
+});
 
 export const ormPlugin = plugin(async (server) => {
   // create the database if not exists.
