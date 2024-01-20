@@ -31,7 +31,7 @@ export class User {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true })
+  @ManyToOne(() => Tenant, { ref: true })
     tenant: Ref<Tenant>;
 
   @Property({ unique: true })
