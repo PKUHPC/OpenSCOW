@@ -11,7 +11,7 @@
  */
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
-import { QueryOrder } from "@mikro-orm/core";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
@@ -28,11 +28,11 @@ export const statisticServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(OperationLog, "o");
 
       qb
-        .select("DATE(o.operation_time) as date, COUNT(DISTINCT o.operator_user_id) as userCount")
+        .select(raw("DATE(o.operation_time) as date, COUNT(DISTINCT o.operator_user_id) as userCount"))
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .groupBy("DATE(o.operation_time)")
-        .orderBy({ "DATE(o.operation_time)": QueryOrder.DESC });
+        .groupBy(raw("DATE(o.operation_time)"))
+        .orderBy({ [raw("DATE(o.operation_time)")]: QueryOrder.DESC });
 
       const records: {date: string, userCount: number}[] = await qb.execute();
 

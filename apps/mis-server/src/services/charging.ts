@@ -12,7 +12,7 @@
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { LockMode, QueryOrder } from "@mikro-orm/core";
+import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
@@ -275,12 +275,12 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
       qb
         .select("cr.accountName")
-        .addSelect(["SUM(cr.amount) as `totalAmount`"])
+        .addSelect([raw("SUM(cr.amount) as `totalAmount`")])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
         .groupBy("accountName")
-        .orderBy({ "SUM(cr.amount)": QueryOrder.DESC })
+        .orderBy({ [raw("SUM(cr.amount)")]: QueryOrder.DESC })
         .limit(topRank);
 
       const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
@@ -306,12 +306,12 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
-        .select("DATE(cr.time) as date, SUM(cr.amount) as totalAmount")
+        .select(raw("DATE(cr.time) as date"), raw("SUM(cr.amount) as totalAmount"))
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
-        .groupBy("DATE(cr.time)")
-        .orderBy({ "DATE(cr.time)": QueryOrder.DESC });
+        .groupBy(raw("DATE(cr.time)"))
+        .orderBy({ [raw("DATE(cr.time)")]: QueryOrder.DESC });
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,
@@ -333,12 +333,12 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(PayRecord, "p");
       qb
         .select("p.accountName")
-        .addSelect(["SUM(p.amount) as `totalAmount`"])
+        .addSelect([raw("SUM(p.amount) as `totalAmount`")])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
         .groupBy("accountName")
-        .orderBy({ "SUM(p.amount)": QueryOrder.DESC })
+        .orderBy({ [raw("SUM(p.amount)")]: QueryOrder.DESC })
         .limit(topRank);
 
       const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
@@ -364,12 +364,12 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
       qb
-        .select("DATE(pr.time) as date, SUM(pr.amount) as totalAmount")
+        .select(raw("DATE(pr.time) as date)"), raw("SUM(pr.amount) as totalAmount"))
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
-        .groupBy("DATE(pr.time)")
-        .orderBy({ "DATE(pr.time)": QueryOrder.DESC });
+        .groupBy(raw("DATE(pr.time)"))
+        .orderBy({ [raw("DATE(pr.time)")]: QueryOrder.DESC });
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,

@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import {
@@ -406,11 +406,11 @@ export const jobServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select("DATE(j.time_submit) as date, COUNT(*) as count")
+        .select(raw("DATE(j.time_submit) as date"), raw("COUNT(*) as count"))
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
-        .groupBy("DATE(j.time_submit)")
-        .orderBy({ "DATE(j.time_submit)": QueryOrder.DESC });
+        .groupBy(raw("DATE(j.time_submit)"))
+        .orderBy({ [raw("DATE(j.time_submit)")]: QueryOrder.DESC });
 
       const results: {date: string, count: number}[] = await queryWithCache({
         em,
