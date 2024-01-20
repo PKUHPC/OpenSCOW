@@ -13,7 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
@@ -63,7 +63,7 @@ export const tenantServiceServer = plugin((server) => {
       const tenants = await em.find(Tenant, {});
       const userCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(User, "u")
-          .select("count(u.user_id) as tCount, u.tenant_id as tId")
+          .select(raw("count(u.user_id) as tCount"), raw("u.tenant_id as tId"))
           .groupBy("u.tenant_id").execute("all");
       // 将获查询得的对象数组userCountObjectArray转换为{"tenant_id":"userCountOfTenant"}形式
       const userCount = {};
@@ -72,7 +72,7 @@ export const tenantServiceServer = plugin((server) => {
       });
       const accountCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(Account, "a")
-          .select("count(a.id) as tCount, a.tenant_id as tId")
+          .select(raw("count(a.id) as tCount"), raw("a.tenant_id as tId"))
           .groupBy("a.tenant_id").execute("all");
       // 将获查询得的对象数组accountCountObjectArray转换为{"tenant_id":"accountCountOfTenant"}形式
       const accountCount = {};

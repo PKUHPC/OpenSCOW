@@ -333,7 +333,7 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(PayRecord, "p");
       qb
         .select("p.accountName")
-        .addSelect([raw("SUM(p.amount) as `totalAmount`")])
+        .addSelect(raw("SUM(p.amount) as `totalAmount`"))
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
@@ -445,8 +445,8 @@ export const chargingServiceServer = plugin((server) => {
 
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
-          .select("count(c.id) as total_count")
-          .addSelect("sum(c.amount) as total_amount")
+          .select(raw("count(c.id) as total_count"))
+          .addSelect(raw("sum(c.amount) as total_amount"))
           .where({
             time: { $gte: startTime, $lte: endTime },
             ...searchType,

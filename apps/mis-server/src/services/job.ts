@@ -82,7 +82,7 @@ export const jobServiceServer = plugin((server) => {
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")
          .where(sqlFilter)
-         .select("sum(j.account_price) as total_account_price, sum(j.tenant_price) as total_tenant_price")
+         .select(raw("sum(j.account_price) as total_account_price"), raw("sum(j.tenant_price) as total_tenant_price"))
          .execute("get");
 
       const reply = {
@@ -382,11 +382,11 @@ export const jobServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select("j.user as userId, COUNT(*) as count")
+        .select(raw("j.user as userId"), raw("COUNT(*) as count"))
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
         .groupBy("j.user")
-        .orderBy({ "COUNT(*)": QueryOrder.DESC })
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
         .limit(topRank);
 
       const results: {userId: string, count: number}[] = await queryWithCache({
