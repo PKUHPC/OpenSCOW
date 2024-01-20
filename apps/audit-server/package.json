@@ -29,6 +29,7 @@
     "@mikro-orm/cli": "6.0.5",
     "@mikro-orm/core": "6.0.5",
     "@mikro-orm/migrations": "6.0.5",
+    "@mikro-orm/seeder": "6.0.5",
     "@mikro-orm/mysql": "6.0.5",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",

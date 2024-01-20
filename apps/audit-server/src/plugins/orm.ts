@@ -14,6 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { MikroORM } from "@mikro-orm/core";
 import { Migrator } from "@mikro-orm/migrations";
 import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
+import { SeedManager } from "@mikro-orm/seeder";
 import { join } from "path";
 import { auditConfig } from "src/config/audit";
 import { config } from "src/config/env";
@@ -29,7 +30,7 @@ export const ormConfigs = defineConfig({
   dbName: config.DB_NAME ?? auditConfig.db.dbName,
   password: config.DB_PASSWORD ?? auditConfig.db.password,
   forceUndefined: true,
-  extensions: [Migrator],
+  extensions: [Migrator, SeedManager],
   migrations: {
     path: join(distPath, "migrations"),
     glob: "*.{js,ts}",

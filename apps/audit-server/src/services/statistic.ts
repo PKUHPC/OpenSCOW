@@ -68,7 +68,7 @@ export const statisticServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
-        .select(raw("JSON_EXTRACT(meta_data, '$.$case') as operationType)", raw("COUNT(*) as count")))
+        .select(raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count"))
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: portalOperationType } })
