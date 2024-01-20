@@ -33,7 +33,7 @@ export const ormConfigs = defineConfig({
   extensions: [Migrator],
   migrations: {
     path: join(distPath, "migrations"),
-    glob: "^[\w-]+\d+\.(j|t)s$",
+    glob: "*.{js,ts}",
   },
   entities,
   debug: misConfig.db.debug,
