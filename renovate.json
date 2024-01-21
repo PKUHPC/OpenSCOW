@@ -32,7 +32,8 @@
         "react",
         "react-dom",
         "@types/react",
-        "pino"
+        "pino",
+        "turbo"
       ],
       "enabled": false
     }
