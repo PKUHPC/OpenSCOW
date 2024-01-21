@@ -35,7 +35,6 @@ export const ormConfigs = defineConfig({
     path: join(distPath, "migrations"),
     glob: "*.{js,ts}",
   },
-  forceUtcTimezone: true,
   entities,
   debug: auditConfig.db.debug,
   seeder: {

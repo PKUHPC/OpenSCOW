@@ -31,7 +31,6 @@ export const ormConfigs = defineConfig({
   dbName: config.DB_NAME ?? misConfig.db.dbName,
   password: config.DB_PASSWORD ?? misConfig.db.password,
   forceUndefined: true,
-  forceUtcTimezone: true,
   extensions: [Migrator, SeedManager],
   migrations: {
     path: join(distPath, "migrations"),
