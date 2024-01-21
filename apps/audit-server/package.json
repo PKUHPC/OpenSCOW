@@ -37,7 +37,7 @@
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
     "dayjs": "1.11.10",
-    "pino": "8.17.2",
+    "pino": "8.16.2",
     "pino-pretty": "10.3.1"
   },
   "devDependencies": {

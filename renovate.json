@@ -31,7 +31,8 @@
         "@mdx-js/react",
         "react",
         "react-dom",
-        "@types/react"
+        "@types/react",
+        "pino"
       ],
       "enabled": false
     }

@@ -17,7 +17,7 @@
     "prompts": "2.4.2",
     "@sinclair/typebox": "0.32.12",
     "js-yaml": "4.1.0",
-    "pino": "8.17.2",
+    "pino": "8.16.2",
     "pino-pretty": "10.3.1",
     "octokit": "3.1.2",
     "jszip": "3.10.1",
