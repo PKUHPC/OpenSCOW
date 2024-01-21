@@ -21,9 +21,9 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.11.2",
-    "next": "14.0.3",
-    "styled-components": "6.1.1",
+    "antd": "5.13.2",
+    "next": "14.1.0",
+    "styled-components": "6.1.8",
     "@ant-design/icons": "5.2.6",
     "dayjs": "1.11.10",
     "react": ">=18.2.0",
@@ -33,20 +33,20 @@
     "react-async": "10.0.1"
   },
   "devDependencies": {
-    "antd": "5.11.2",
-    "next": "14.0.3",
+    "antd": "5.13.2",
+    "next": "14.1.0",
     "@scow/config": "workspace:*",
-    "styled-components": "6.1.1",
-    "@grpc/grpc-js": "1.9.11",
+    "styled-components": "6.1.8",
+    "@grpc/grpc-js": "1.9.14",
     "@types/mime-types": "2.1.4",
     "react": "18.2.0",
-    "@types/react": "18.2.37",
+    "@types/react": "18.2.48",
     "react-dom": "18.2.0",
-    "@types/react-dom": "18.2.15",
+    "@types/react-dom": "18.2.18",
     "react-is": "18.2.0",
     "@ant-design/icons": "5.2.6",
     "dayjs": "1.11.10",
-    "@types/styled-components": "5.1.30"
+    "@types/styled-components": "5.1.34"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",
