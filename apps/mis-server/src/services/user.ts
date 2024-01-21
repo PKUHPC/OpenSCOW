@@ -767,7 +767,7 @@ export const userServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(User, "u");
       qb
-        .select(raw("DATE(u.create_time) as date"), raw("count(*) as count"))
+        .select([raw("DATE(u.create_time) as date"), raw("count(*) as count")])
         .where({ createTime: { $gte: startTime } })
         .andWhere({ createTime: { $lte: endTime } })
         .groupBy(raw("DATE(u.create_time)"))

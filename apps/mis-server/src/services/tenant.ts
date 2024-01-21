@@ -63,7 +63,7 @@ export const tenantServiceServer = plugin((server) => {
       const tenants = await em.find(Tenant, {});
       const userCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(User, "u")
-          .select(raw("count(u.user_id) as tCount"), raw("u.tenant_id as tId"))
+          .select([raw("count(u.user_id) as tCount"), raw("u.tenant_id as tId")])
           .groupBy("u.tenant_id").execute("all");
       // 将获查询得的对象数组userCountObjectArray转换为{"tenant_id":"userCountOfTenant"}形式
       const userCount = {};
@@ -72,7 +72,7 @@ export const tenantServiceServer = plugin((server) => {
       });
       const accountCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(Account, "a")
-          .select(raw("count(a.id) as tCount"), raw("a.tenant_id as tId"))
+          .select([raw("count(a.id) as tCount"), raw("a.tenant_id as tId")])
           .groupBy("a.tenant_id").execute("all");
       // 将获查询得的对象数组accountCountObjectArray转换为{"tenant_id":"accountCountOfTenant"}形式
       const accountCount = {};

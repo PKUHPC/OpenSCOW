@@ -82,7 +82,7 @@ export const jobServiceServer = plugin((server) => {
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")
          .where(sqlFilter)
-         .select(raw("sum(j.account_price) as total_account_price"), raw("sum(j.tenant_price) as total_tenant_price"))
+         .select([raw("sum(j.account_price) as total_account_price"), raw("sum(j.tenant_price) as total_tenant_price")])
          .execute("get");
 
       const reply = {
@@ -382,7 +382,7 @@ export const jobServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select(raw("j.user as userId"), raw("COUNT(*) as count"))
+        .select([raw("j.user as userId"), raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
         .groupBy("j.user")
@@ -406,7 +406,7 @@ export const jobServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select(raw("DATE(j.time_submit) as date"), raw("COUNT(*) as count"))
+        .select([raw("DATE(j.time_submit) as date"), raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
         .groupBy(raw("DATE(j.time_submit)"))

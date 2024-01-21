@@ -28,7 +28,7 @@ export const statisticServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(OperationLog, "o");
 
       qb
-        .select(raw("DATE(o.operation_time) as date"), raw("COUNT(DISTINCT o.operator_user_id) as userCount"))
+        .select([raw("DATE(o.operation_time) as date"), raw("COUNT(DISTINCT o.operator_user_id) as userCount")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .groupBy(raw("DATE(o.operation_time)"))
@@ -68,7 +68,7 @@ export const statisticServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
-        .select(raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count"))
+        .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: portalOperationType } })
@@ -122,7 +122,7 @@ export const statisticServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
-        .select(raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count"))
+        .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: misOperationType } })

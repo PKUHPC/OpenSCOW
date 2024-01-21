@@ -306,7 +306,7 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
-        .select(raw("DATE(cr.time) as date"), raw("SUM(cr.amount) as totalAmount"))
+        .select([raw("DATE(cr.time) as date"), raw("SUM(cr.amount) as totalAmount")])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
@@ -364,7 +364,7 @@ export const chargingServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
       qb
-        .select(raw("DATE(pr.time) as date)"), raw("SUM(pr.amount) as totalAmount"))
+        .select([raw("DATE(pr.time) as date)"), raw("SUM(pr.amount) as totalAmount")])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
