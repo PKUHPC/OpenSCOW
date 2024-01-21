@@ -14,12 +14,12 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.9.11",
+    "@grpc/grpc-js": "1.9.14",
     "long": "5.2.3",
-    "protobufjs": "7.2.5"
+    "protobufjs": "7.2.6"
   },
   "devDependencies": {
-    "ts-proto": "1.164.0",
+    "ts-proto": "1.166.4",
     "@ddadaal/tsgrpc-server": "0.19.5",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",

@@ -18,7 +18,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.5",
-    "@grpc/grpc-js": "1.9.11",
+    "@grpc/grpc-js": "1.9.14",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*"
   },
