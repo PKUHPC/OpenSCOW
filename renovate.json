@@ -33,7 +33,8 @@
         "react-dom",
         "@types/react",
         "pino",
-        "turbo"
+        "turbo",
+        "@uiw/react-codemirror"
       ],
       "enabled": false
     }

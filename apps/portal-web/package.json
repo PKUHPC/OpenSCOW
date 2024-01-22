@@ -50,7 +50,7 @@
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.32.12",
     "@uiw/codemirror-theme-github": "4.21.21",
-    "@uiw/react-codemirror": "4.21.21",
+    "@uiw/react-codemirror": "4.21.20",
     "antd": "5.13.2",
     "busboy": "1.6.0",
     "dayjs": "1.11.10",
