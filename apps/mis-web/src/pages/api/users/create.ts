@@ -73,8 +73,10 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
 
   const auth = authenticate((u) =>
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-    (u.accountAffiliations.some((x) => x.role !== UserRole.USER) &&
-    publicConfig.CREATE_USER_CONFIG.misConfig.enableAccountAdminUserCreation) ||
+    (
+      u.accountAffiliations.some((x) => x.role !== UserRole.USER) &&
+      publicConfig.CREATE_USER_CONFIG.misConfig.enableAccountAdminUserCreation
+    ) ||
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN),
   );
 
