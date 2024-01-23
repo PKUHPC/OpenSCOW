@@ -107,4 +107,4 @@ createUser:
 
 
 # 用户是否可以修改作业时限配置
-# userChangeJobLimitEnabled: true
+# allowUserChangeJobTimeLimit: true

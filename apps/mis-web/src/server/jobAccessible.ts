@@ -32,11 +32,11 @@ interface Props {
   cluster: string
   info: UserInfo
   limitMinutes?: number
-  userEnabled?: boolean
+  allowUser?: boolean
 }
 
 export async function checkJobAccessible({
-  actionType, jobId, cluster, info, limitMinutes, userEnabled = true,
+  actionType, jobId, cluster, info, limitMinutes, allowUser = true,
 }: Props,
 ): Promise<Result> {
 
@@ -71,8 +71,8 @@ export async function checkJobAccessible({
   }
   // 用户发起了这个作业
   // 如果是取消作业和查询作业时限，返回"OK"
-  // 如果是修改作业时限，需要userEnabled 为true时返回"OK"
-  if (job.user === info.identityId && (actionType !== "changeJobLimit" || userEnabled)) {
+  // 如果是修改作业时限，需要allowUser 为true时返回"OK"
+  if (job.user === info.identityId && (actionType !== "changeJobLimit" || allowUser)) {
     result.jobAccessible = "OK";
     return result;
   }

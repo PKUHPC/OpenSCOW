@@ -138,7 +138,7 @@ export const MisConfigSchema = Type.Object({
     url: Type.String({ description: "UI扩展站完整URL" }),
   })),
 
-  userChangeJobLimitEnabled: Type.Boolean({
+  allowUserChangeJobTimeLimit: Type.Boolean({
     description: "普通用户是否可以修改作业时限",
     default: true,
   }),

@@ -221,7 +221,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
   // 非用户页面或者用户页面且用户允许修改作业时限
-  const changeJobLimitEnabled = showUser || (!showUser && publicConfig.CHANGE_JOB_LIMIT.userEnabled);
+  const changeJobLimitEnabled = showUser || (!showUser && publicConfig.CHANGE_JOB_LIMIT.allowUser);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;

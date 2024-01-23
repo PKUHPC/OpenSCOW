@@ -99,7 +99,7 @@ export interface PublicRuntimeConfig {
 
   UI_EXTENSION?: { url: string; }
 
-  CHANGE_JOB_LIMIT: { userEnabled: boolean}
+  CHANGE_JOB_LIMIT: { allowUser: boolean}
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

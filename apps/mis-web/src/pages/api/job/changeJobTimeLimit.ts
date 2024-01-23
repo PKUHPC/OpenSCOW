@@ -73,7 +73,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       cluster,
       info,
       limitMinutes,
-      userEnabled: publicConfig.CHANGE_JOB_LIMIT.userEnabled,
+      allowUser: publicConfig.CHANGE_JOB_LIMIT.allowUser,
     });
 
     if (jobAccessible === "NotAllowed") {
