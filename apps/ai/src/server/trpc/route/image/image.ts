@@ -58,6 +58,15 @@ class NoLocalImageError extends TRPCError {
   }
 }
 
+class InternalServerError extends TRPCError {
+  constructor(errMessage: string, process: "Create" | "Copy") {
+    super({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `${process} image failed, ${errMessage}`,
+    });
+  }
+}
+
 export const ImageListSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -190,10 +199,16 @@ export const createImage = procedure
         // 检查是否为tar文件
         if (!sourcePath.endsWith(".tar")) throw new NotTarError(name, tag);
         // 本地镜像时docker加载镜像
-        localImageUrl = await getLoadedImage({ ssh, logger, sourcePath });
+        localImageUrl = await getLoadedImage({ ssh, logger, sourcePath }).catch((e) => {
+          const ex = e as ServiceError;
+          throw new InternalServerError(ex.message, "Create");
+        });
       } else {
         // 远程镜像需先拉取到本地
-        localImageUrl = await getPulledImage({ ssh, logger, sourcePath });
+        localImageUrl = await getPulledImage({ ssh, logger, sourcePath }).catch((e) => {
+          const ex = e as ServiceError;
+          throw new InternalServerError(ex.message, "Create");
+        });
       };
 
       if (localImageUrl === undefined) { throw new NoLocalImageError(name, tag); }
@@ -206,10 +221,7 @@ export const createImage = procedure
         harborImageUrl,
       }).catch((e) => {
         const ex = e as ServiceError;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Create image failed, ${ex.message}`,
-        });
+        throw new InternalServerError(ex.message, "Create");
       });
 
       // 更新数据库
@@ -436,7 +448,11 @@ export const copyImage = procedure
 
     return await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
       // 拉取远程镜像
-      const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path });
+      const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path })
+        .catch((e) => {
+          const ex = e as ServiceError;
+          throw new InternalServerError(ex.message, "Copy");
+        });
       if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
 
       const harborImageUrl = createHarborImageUrl(newName, newTag);
@@ -449,11 +465,8 @@ export const copyImage = procedure
         harborImageUrl,
       }).catch((e) => {
         const ex = e as ServiceError;
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Copy shared image failed, ${ex.message}`,
-        });
-      }); ;
+        throw new InternalServerError(ex.message, "Copy");
+      });
 
       const image = new Image({
         name: input.newName,

@@ -6,10 +6,10 @@ db:
   dbName: scow_ai
 
 harborConfig:
-  url: 10.129.227.64
-  project: test
-  user: admin
-  password: icode@2023CS
+  url: 10.0.0.xxx
+  project: projectName
+  user: user
+  password: password
 
 
 # # 新增导航链接相关配置
