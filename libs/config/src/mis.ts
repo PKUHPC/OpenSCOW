@@ -44,8 +44,8 @@ export const MisConfigSchema = Type.Object({
   createUser: Type.Object({
     enabled: Type.Boolean({ description: "是否启用用户从SCOW中创建用户", default: true }),
 
-    enableAccountAdminUserCreation: Type.Boolean({
-      description: "是否允许账户管理员创建用户",
+    createUserIfNotExistWhenAddingUserToAccountAsAccountAdmin: Type.Boolean({
+      description: "是否允许账户管理员在添加用户至账户但用户不存在时创建用户",
       default: true,
     }),
 

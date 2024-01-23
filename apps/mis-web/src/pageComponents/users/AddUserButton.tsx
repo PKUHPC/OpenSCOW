@@ -82,11 +82,11 @@ interface Props {
   accountName: string;
   refresh: () => void;
   token: string;
-  // 是否来源于账户管理页面
-  isfromAccount?: boolean
+  // 添加用户不存在时是否可以创建用户
+  canCreateUserIfNotExist?: boolean;
 }
 
-export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, isfromAccount }) => {
+export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, canCreateUserIfNotExist = true }) => {
 
   const t = useI18nTranslateToString();
 
@@ -111,7 +111,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, is
           message.error(t(p("notExist")));
         }
         else if (code === "USER_NOT_FOUND") {
-          if (!!isfromAccount && !publicConfig.CREATE_USER_CONFIG.misConfig.enableAccountAdminUserCreation) {
+          if (!canCreateUserIfNotExist) {
             message.error(t(p("createFirst")));
           } else if (useBuiltinCreateUser()) {
             setModalShow(false);
