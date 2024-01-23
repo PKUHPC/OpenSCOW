@@ -14,7 +14,7 @@
 
 import { useRouter } from "next/navigation";
 import { join } from "path";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { FileManager } from "src/app/(auth)/files/FileManager";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
@@ -27,18 +27,22 @@ export default function Page({ params }: { params: { cluster: string; resourceId
 
   const { cluster, path: pathParts } = params;
 
+  const decodePathParts = useMemo(() => {
+    return pathParts.map((path) => decodeURIComponent(path));
+  }, [pathParts]);
+
   const { clusters, publicConfig: { LOGIN_NODES } } = usePublicConfig();
 
-  const fullPath = (pathParts && pathParts.length === 1 && pathParts[0] === "~")
+  const fullPath = (decodePathParts && decodePathParts.length === 1 && decodePathParts[0] === "~")
     ? "~"
-    : "/" + (pathParts?.join("/") ?? "");
+    : "/" + (decodePathParts?.join("/") ?? "");
 
   const homeDirPathQuery = trpc.file.getHomeDir.useQuery({
     clusterId: cluster,
   }, {
     enabled: fullPath === "~",
     onSuccess: ({ path }) => {
-      if (pathParts && pathParts.length === 1 && pathParts[0] === "~") {
+      if (decodePathParts && decodePathParts.length === 1 && decodePathParts[0] === "~") {
         router.push(join("/files", cluster, path));
       }
     },
