@@ -129,6 +129,13 @@ export async function fetchJobs(
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
+        const metadataMap: { [key: string]: any | undefined } = {};
+
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
+        savedFields?.forEach((field) => {
+          metadataMap[field] = pricedJob[field];
+        });
+
         if (account) {
           // charge account
           await charge({
@@ -137,6 +144,7 @@ export async function fetchJobs(
             comment,
             target: account,
             userId: pricedJob.user,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
           // charge tenant
@@ -145,6 +153,7 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account.tenant.$,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
           const ua = await em.findOne(UserAccount, {

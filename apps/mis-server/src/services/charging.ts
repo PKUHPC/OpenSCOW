@@ -14,7 +14,8 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
+import { ChargingServiceServer, ChargingServiceService,
+  MetadataMapProto } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -29,6 +30,7 @@ import {
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { convertMetadataMap, JsonMap } from "src/utils/types";
 
 
 export const chargingServiceServer = plugin((server) => {
@@ -415,16 +417,24 @@ export const chargingServiceServer = plugin((server) => {
       });
 
       return [{
-        results: records.map((x) => ({
-          tenantName: x.tenantName,
-          accountName: x.accountName,
-          amount: decimalToMoney(x.amount),
-          comment: x.comment,
-          index: x.id,
-          time: x.time.toISOString(),
-          type: x.type,
-          userId: x.userId,
-        })),
+        results: records.map((x) => {
+
+          const metadataValue = x.metadata ?
+          { metadataValue: convertMetadataMap(x.metadata as JsonMap) } as MetadataMapProto : undefined;
+
+          return {
+            tenantName: x.tenantName,
+            accountName: x.accountName,
+            amount: decimalToMoney(x.amount),
+            comment: x.comment,
+            index: x.id,
+            time: x.time.toISOString(),
+            type: x.type,
+            userId: x.userId,
+            metadata: metadataValue,
+          };
+
+        }),
       }];
     },
 

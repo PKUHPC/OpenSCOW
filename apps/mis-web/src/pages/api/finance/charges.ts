@@ -20,6 +20,31 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
+import { convertProtoToJsonMap } from "src/utils/metadata";
+
+// export const MetadataMap = Type.Object({
+//   metadataValue: Type.Record(
+//     Type.String(),
+//     Type.Union([
+//       Type.Object({ stringValue: Type.String() }),
+//       Type.Object({ numberValue: Type.Number() }),
+//       Type.Object({ boolValue: Type.Boolean() }),
+//       Type.Object({ nullValue: Type.Null() }),
+//     ]),
+//   ) });
+
+
+export const MetadataMap = Type.Object({
+  metadataValue: Type.Record(
+    Type.String(),
+    Type.Union([
+      Type.String(),
+      Type.Number(),
+      Type.Boolean(),
+      Type.Null(),
+    ]),
+  ) });
+export type MetadataMapType = Static<typeof MetadataMap>;
 
 export const ChargeInfo = Type.Object({
   index: Type.Number(),
@@ -29,6 +54,8 @@ export const ChargeInfo = Type.Object({
   amount: Type.Number(),
   comment: Type.String(),
   tenantName: Type.String(),
+  userId: Type.Optional(Type.String()),
+  metadata: Type.Optional(MetadataMap),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
 
@@ -157,19 +184,20 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
 
 
   const accounts = reply.results.map((x) => {
-    // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accuntName存在
+    // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accountName存在
     const obj = (searchType === SearchType.ACCOUNT || accountName) ?
       ensureNotUndefined(x, ["time", "amount", "accountName"]) : ensureNotUndefined(x, ["time", "amount"]);
-
     return {
       ...obj,
       amount: moneyToNumber(obj.amount),
+      metadata: (obj.metadata && obj.metadata !== null) ? convertProtoToJsonMap(obj.metadata) : undefined,
     };
   });
-
   return {
     200: {
       results: accounts,
     },
   };
 });
+
+

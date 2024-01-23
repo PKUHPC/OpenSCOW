@@ -98,6 +98,8 @@ export interface PublicRuntimeConfig {
   },
 
   UI_EXTENSION?: { url: string; }
+
+  JOB_CHARGE_METADATA: jobChargeMetadataType;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
@@ -166,3 +168,5 @@ export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
 
   return getI18nConfigCurrentText(value as any, languageId);
 };
+
+export type jobChargeMetadataType = MisConfigSchema["jobChargeMetadata"];

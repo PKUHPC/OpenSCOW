@@ -57,6 +57,31 @@ message ChargeResponse {
   common.Money current_balance = 2;
 }
 
+// 定义一个代表 JSON 值的消息
+message JsonValue {
+  oneof value {
+    string string_value = 1;
+    double number_value = 2;
+    bool bool_value = 3;
+    NullValue null_value = 4;
+    // JsonArray array_value = 5;
+    // JsonMap map_value = 6;
+  }
+}
+
+// // 用于表示 JSON 数组的消息
+// message JsonArray {
+//   repeated AnyJson values = 1;
+// }
+
+// 用于表示 JSON 对象（映射）的消息
+message MetadataMapProto {
+  map<string, JsonValue> metadata_value = 1;
+}
+
+// 用于表示 null 值的消息
+message NullValue {}
+
 message ChargeRecord {
   uint64 index = 1;
   string tenant_name = 2;
@@ -66,6 +91,7 @@ message ChargeRecord {
   common.Money amount = 6;
   string comment = 7;
   optional string user_id = 8;
+  optional MetadataMapProto metadata = 9;
 }
 
 // 充值记录及消费记录请求target

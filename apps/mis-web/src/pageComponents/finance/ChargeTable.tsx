@@ -13,6 +13,7 @@
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, DatePicker, Form, Select, Spin, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
@@ -25,6 +26,7 @@ import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
+import { formatMetadataDisplay } from "src/utils/metadata";
 
 import { AccountSelector } from "./AccountSelector";
 
@@ -159,7 +161,6 @@ export const ChargeTable: React.FC<Props> = ({
     return [...account, ...tenant, ...common];
   }, [showAccountName, showTenantName, t]);
 
-
   return (
     <div>
       <Spin spinning={isRecordsLoading || isTotalResultLoading }>
@@ -259,10 +260,22 @@ export const ChargeTable: React.FC<Props> = ({
               <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
             )
           }
+          {/* 确认是否join显示userName */}
+          <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
           <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
           <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-          <Table.Column dataIndex="type" title={t(pCommon("type"))} width="20%" />
-          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="25%" />
+          <Table.Column dataIndex="type" title={t(pCommon("type"))} width="15%" />
+          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="15%" />
+
+          <Table.Column
+            dataIndex="metadata"
+            title="其他"
+            width="25%"
+            render={(v) => {
+              const metadataToDispaly = v ? formatMetadataDisplay(v?.metadataValue) : undefined;
+              return getI18nConfigCurrentText(metadataToDispaly, languageId);
+            }}
+          />
         </Table>
       </Spin>
     </div>
