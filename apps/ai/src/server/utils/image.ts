@@ -111,8 +111,8 @@ export async function commitContainerImage({
   localImageUrl: string,
 }): Promise<void> {
 
-  const resp = await loggedExec(ssh, logger, true, "docker",
-    ["ps", "--no-trunc", "|", "grep", formateContainerId]);
+  const resp = await loggedExec(ssh, logger, true, "sh",
+    ["-c", `docker ps --no-trunc | grep ${formateContainerId}`]);
   if (!resp.stdout) {
     throw new TRPCError({
       code: "NOT_FOUND",
