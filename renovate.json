@@ -31,7 +31,10 @@
         "@mdx-js/react",
         "react",
         "react-dom",
-        "@types/react"
+        "@types/react",
+        "pino",
+        "turbo",
+        "@uiw/react-codemirror"
       ],
       "enabled": false
     }
