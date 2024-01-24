@@ -44,7 +44,8 @@
     "scripts": "build/**/*.js",
     "assets": [
       "assets/**/*",
-      "package.json"
+      "package.json",
+      "node_modules/@sinclair/typebox/**/*"
     ],
     "targets": [
       "node18-linux-x64",
