@@ -15,13 +15,13 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Checkbox, Form, Input, Space, Table } from "antd";
+import { App, Button, Form, Input, Space, Table } from "antd";
 import NextError from "next/error";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { Source, SourceText } from "src/models/Image";
+import { SourceText } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
@@ -70,8 +70,6 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
     ...pageInfo, ...query, clusterId: cluster?.id,
   });
 
-  const deleteSourceFileRef = useRef(false);
-
   const { modal, message } = App.useApp();
 
   if (error) {
@@ -106,8 +104,6 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       }
     },
   });
-
-  const deleteSourceFileMutation = trpc.file.deleteItem.useMutation();
 
   return (
     <div>
@@ -160,7 +156,6 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "source", title: "镜像来源",
             render: (_, r) => SourceText[r.source] },
           { dataIndex: "description", title: "镜像描述" },
-          // { dataIndex: "sourcePath", title: "镜像地址" },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => r.owner } : {},
           { dataIndex: "createTime", title: "创建时间",
@@ -195,63 +190,23 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                       {shareOrUnshareStr}
                     </Button>
 
-                    {/* { r.source === Source.INTERNAL && (
-                    <Space split={<Divider type="vertical" />}>
-                      <Button
-                        type="link"
-                        onClick={() => {
-                          router.push(`/files/${r.clusterId}${r.sourcePath}`);
-                        }}
-                      >
-                  查看文件
-                      </Button>
-                    </Space>
-                  )} */}
-
                     <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
                       编辑
                     </EditImageModalButton>
                     <Button
                       type="link"
                       onClick={() => {
-                        deleteSourceFileRef.current = false;
                         modal.confirm({
                           title: "删除镜像",
                           content: (
                             <>
                               <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
-
-                              {r.source === Source.INTERNAL && (
-                                <Checkbox
-                                  onChange={(e) => (deleteSourceFileRef.current = e.target.checked)}
-                                >
-                                  同时删除源文件
-                                </Checkbox>
-                              )}
-
                             </>
                           ),
                           onOk: async () => {
-                            deleteSourceFileRef.current ?
-
-                              await deleteImageMutation.mutateAsync({
-                                id: r.id,
-                              }).then(async () => {
-                                await deleteSourceFileMutation.mutateAsync({
-                                  target: "FILE",
-                                  clusterId: cluster?.id ?? "",
-                                  path: r.sourcePath,
-                                }).then(() => {
-                                  message.success("删除成功");
-                                  refetch();
-                                });
-                              }) :
-                              await deleteImageMutation.mutateAsync({
-                                id: r.id,
-                              }).then(() => {
-                                message.success("删除成功");
-                                refetch();
-                              });
+                            await deleteImageMutation.mutateAsync({
+                              id: r.id,
+                            });
                           },
                         });
                       }}
