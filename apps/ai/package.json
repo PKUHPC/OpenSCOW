@@ -53,7 +53,7 @@
     "@scow/scheduler-adapter-protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
-    "@sinclair/typebox": "0.31.10",
+    "@sinclair/typebox": "0.32.12",
     "@tanstack/react-query": "4.36.1",
     "@trpc/client": "10.45.0",
     "@trpc/next": "10.45.0",
