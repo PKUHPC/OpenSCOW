@@ -186,6 +186,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     UI_EXTENSION: misConfig.uiExtension,
 
+    JOB_CHARGE_METADATA: misConfig.jobChargeMetadata,
   };
 
   if (!building) {

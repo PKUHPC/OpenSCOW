@@ -22,18 +22,6 @@ import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 import { convertProtoToJsonMap } from "src/utils/metadata";
 
-// export const MetadataMap = Type.Object({
-//   metadataValue: Type.Record(
-//     Type.String(),
-//     Type.Union([
-//       Type.Object({ stringValue: Type.String() }),
-//       Type.Object({ numberValue: Type.Number() }),
-//       Type.Object({ boolValue: Type.Boolean() }),
-//       Type.Object({ nullValue: Type.Null() }),
-//     ]),
-//   ) });
-
-
 export const MetadataMap = Type.Object({
   metadataValue: Type.Record(
     Type.String(),

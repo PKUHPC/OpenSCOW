@@ -11,12 +11,12 @@
  */
 
 import { I18nStringType } from "@scow/config/build/i18n";
+import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import { MetadataMapProto } from "@scow/protos/build/server/charging";
 
-import { parsePlaceholder } from "../../../../libs/libconfig/build/envConfig";
 import { publicConfig } from "./config";
 
-export type FilteredJsonMap = Record<string, boolean | number | string | null>;
+export type FilteredJsonMap = { [key: string]: string | number | boolean | null };
 
 // 定义 protobuf 到前端的类型变换
 export function convertProtoToJsonMap(metadataProto: MetadataMapProto): {metadataValue: FilteredJsonMap} | undefined {
@@ -38,28 +38,24 @@ export function convertProtoToJsonMap(metadataProto: MetadataMapProto): {metadat
   return { metadataValue: result };
 }
 
-
 const displayFormats = publicConfig.JOB_CHARGE_METADATA?.displayFormats;
 
 // 定义替换占位符字段的格式化显示
 export function formatMetadataDisplay(metadataValue: FilteredJsonMap): I18nStringType {
 
-  console.log("【metadataValue】", metadataValue, typeof metadataValue, typeof displayFormats, publicConfig);
   if (typeof displayFormats === "string") {
-    const result = parsePlaceholder(displayFormats, metadataValue);
-    return result;
+    return parsePlaceholder(displayFormats, metadataValue, true);
   }
 
   if (typeof displayFormats === "object") {
     const i18nValue = displayFormats.i18n;
-    const result = {
+    return {
       i18n: {
-        default: parsePlaceholder(i18nValue.default, metadataValue),
-        zh_cn: i18nValue.zh_cn ? parsePlaceholder(i18nValue.zh_cn, metadataValue) : undefined,
-        en: i18nValue.en ? parsePlaceholder(i18nValue.en, metadataValue) : undefined,
+        default: parsePlaceholder(i18nValue.default, metadataValue, true),
+        zh_cn: i18nValue.zh_cn ? parsePlaceholder(i18nValue.zh_cn, metadataValue, true) : undefined,
+        en: i18nValue.en ? parsePlaceholder(i18nValue.en, metadataValue, true) : undefined,
       },
     };
-    return result;
   }
 
   return JSON.stringify(metadataValue);

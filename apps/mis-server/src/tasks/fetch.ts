@@ -27,6 +27,7 @@ import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { PricePlugin } from "src/plugins/price";
 import { toGrpc } from "src/utils/job";
+import { FilteredJsonMap } from "src/utils/types";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
@@ -129,8 +130,7 @@ export async function fetchJobs(
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
-        const metadataMap: { [key: string]: any | undefined } = {};
-
+        const metadataMap: FilteredJsonMap | undefined = {};
         const savedFields = misConfig.jobChargeMetadata?.savedFields;
         savedFields?.forEach((field) => {
           metadataMap[field] = pricedJob[field];
@@ -153,6 +153,7 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account.tenant.$,
+            userId: pricedJob.user,
             metadata: metadataMap,
           }, em, logger, clusterPlugin);
 

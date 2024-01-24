@@ -260,22 +260,25 @@ export const ChargeTable: React.FC<Props> = ({
               <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
             )
           }
-          {/* 确认是否join显示userName */}
-          <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
+          {/* ui样式确认中 */}
+          {/* <Table.Column dataIndex="userId" title={t(pCommon("user"))} /> */}
           <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
           <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
           <Table.Column dataIndex="type" title={t(pCommon("type"))} width="15%" />
-          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="15%" />
-
-          <Table.Column
-            dataIndex="metadata"
-            title="其他"
-            width="25%"
-            render={(v) => {
-              const metadataToDispaly = v ? formatMetadataDisplay(v?.metadataValue) : undefined;
-              return getI18nConfigCurrentText(metadataToDispaly, languageId);
-            }}
-          />
+          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="25%" />
+          {
+            publicConfig.JOB_CHARGE_METADATA?.savedFields && (
+              <Table.Column
+                dataIndex="metadata"
+                title={t(pCommon("other"))}
+                width="25%"
+                render={(v) => {
+                  const metadataToDispaly = v ? formatMetadataDisplay(v?.metadataValue) : undefined;
+                  return getI18nConfigCurrentText(metadataToDispaly, languageId);
+                }}
+              />
+            )
+          }
         </Table>
       </Spin>
     </div>
