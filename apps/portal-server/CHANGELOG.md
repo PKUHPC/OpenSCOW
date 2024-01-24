@@ -1,5 +1,26 @@
 # @scow/portal-server
 
+## 1.4.0
+
+### Minor Changes
+
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+- 26bd8e7: 优化文件系统直接提交脚本任务时如果没有在脚本内指定工作目录，使脚本文件所在的绝对路径作为作业工作目录，并在确认提交对话框中给出提示
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+  - @scow/rich-error-model@2.0.0
+
 ## 1.3.0
 
 ### Minor Changes
