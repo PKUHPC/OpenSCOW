@@ -41,9 +41,6 @@ createUser:
   # 是否允许用户从SCOW中创建用户
   enabled: true
 
-  # 是否允许账户管理员在添加用户至账户但用户不存在时创建用户
-  createUserIfNotExistWhenAddingUserToAccountAsAccountAdmin: true
-
   # SCOW中创建用户界面是使用内置的（builtin）或者使用外置页面（external）
   # 默认builtin
   type: builtin
@@ -63,6 +60,14 @@ createUser:
   # external:
     # 外置页面URL
     # url: http://your-create-user-page.com
+
+# 添加用户至账户相关配置
+# addUserToAccount:
+#   accountAdmin:
+#     # 是否允许账户管理员添加用户至账户
+#     allowed: true
+#     # 是否允许账户管理员添加不存在的用户时创建用户
+#     createUserIfNotExist : true
 
 # # 集群监控配置
 # clusterMonitor:

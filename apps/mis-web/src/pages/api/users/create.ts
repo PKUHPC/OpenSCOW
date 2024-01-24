@@ -75,7 +75,7 @@ export default /* #__PURE__*/typeboxRoute(CreateUserSchema, async (req, res) => 
     u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
     (
       u.accountAffiliations.some((x) => x.role !== UserRole.USER) &&
-      publicConfig.CREATE_USER_CONFIG.misConfig.createUserIfNotExistWhenAddingUserToAccountAsAccountAdmin
+      publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.createUserIfNotExist
     ) ||
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN),
   );

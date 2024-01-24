@@ -44,11 +44,6 @@ export const MisConfigSchema = Type.Object({
   createUser: Type.Object({
     enabled: Type.Boolean({ description: "是否启用用户从SCOW中创建用户", default: true }),
 
-    createUserIfNotExistWhenAddingUserToAccountAsAccountAdmin: Type.Boolean({
-      description: "是否允许账户管理员在添加用户至账户但用户不存在时创建用户",
-      default: true,
-    }),
-
     type: Type.Union([Type.Literal("builtin"), Type.Literal("external")], {
       description: "用户创建方式", default: "builtin",
     }),
@@ -69,6 +64,25 @@ export const MisConfigSchema = Type.Object({
       }, { description: "从管理系统里创建用户时，用户ID的验证规则" })),
     }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
+
+  addUserToAccount: Type.Object({
+    accountAdmin: Type.Object({
+      allowed: Type.Boolean({
+        default: true,
+        description: "是否允许账户管理员添加用户至账户",
+      }),
+      createUserIfNotExist: Type.Boolean({
+        default: true,
+        description: " 是否允许账户管理员添加不存在的用户时创建用户",
+      }),
+    }, {
+      default: {},
+      description: "账户管理员添加用户至账户相关配置",
+    }),
+  }, {
+    default: {},
+    description: "添加用户至账户相关配置",
+  }),
 
   fetchJobs: Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),

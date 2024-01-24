@@ -58,16 +58,20 @@ export const UsersPage: NextPage = requireAuth(
           titleText={title}
         >
           <Space split={<Divider type="vertical" />}>
-            <AddUserButton
-              refresh={reload}
-              accountName={account.accountName}
-              token={userStore.user.token}
-              canCreateUserIfNotExist={
-                (account.role === UserRole.OWNER || account.role === UserRole.ADMIN) &&
-                publicConfig.CREATE_USER_CONFIG.misConfig.createUserIfNotExistWhenAddingUserToAccountAsAccountAdmin
-              }
+            {
+              publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.allowed && (
+                <AddUserButton
+                  refresh={reload}
+                  accountName={account.accountName}
+                  token={userStore.user.token}
+                  canCreateUserIfNotExist={
+                    (account.role === UserRole.OWNER || account.role === UserRole.ADMIN) &&
+                    publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.createUserIfNotExist
+                  }
+                />
+              )
+            }
 
-            />
             <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>
