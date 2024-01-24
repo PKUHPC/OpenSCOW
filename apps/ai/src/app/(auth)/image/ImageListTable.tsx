@@ -82,6 +82,10 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }
 
   const deleteImageMutation = trpc.image.deleteImage.useMutation({
+    onSuccess: () => {
+      message.success("删除镜像成功");
+      refetch();
+    },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
