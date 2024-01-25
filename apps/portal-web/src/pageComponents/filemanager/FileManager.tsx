@@ -503,9 +503,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         })}
         fileNameRender={(_, r) => (
           r.type === "DIR" ? (
-            <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
+            <a onClick={() => {
+              if (!loading) {
+                Router.push(fullUrl(join(path, r.name)));
+              }
+            }}
+            >
               {r.name}
-            </Link>
+            </a>
           ) : (
             <a onClick={() => {
               handlePreview(r.name, r.size);
