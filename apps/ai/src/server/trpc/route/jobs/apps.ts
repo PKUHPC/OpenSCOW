@@ -474,7 +474,7 @@ export const saveImage =
         // 连接到该节点
         return await sshConnect(node, "root", logger, async (ssh) => {
           try {
-            const harborImageUrl = createHarborImageUrl(imageName, imageTag);
+            const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // commit镜像

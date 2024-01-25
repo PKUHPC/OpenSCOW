@@ -183,7 +183,7 @@ export const createImage = procedure
     // 获取加载镜像的集群节点，如果是远程镜像则使用优先级最高的集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
-    const harborImageUrl = createHarborImageUrl(name, tag);
+    const harborImageUrl = createHarborImageUrl(name, tag, user.identityId);
 
     if (!processClusterId) { throw new NoClusterError(name, tag); }
 
@@ -300,6 +300,9 @@ export const deleteImage = procedure
       });
     }
 
+
+
+    // 10.129.227.64/test/admin/image-delete-test:v1
     // 获取harrbor中的reference以删除镜像
     const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}/artifacts`;
@@ -455,7 +458,7 @@ export const copyImage = procedure
         });
       if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
 
-      const harborImageUrl = createHarborImageUrl(newName, newTag);
+      const harborImageUrl = createHarborImageUrl(newName, newTag, user.identityId);
 
       // 制作镜像上传
       await pushImageToHarbor({

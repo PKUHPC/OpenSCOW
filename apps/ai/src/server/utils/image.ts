@@ -24,9 +24,9 @@ export const loadedImageRegex = new RegExp(LOADED_IMAGE_REGEX);
 const { url: harborUrl, project, user: harborUser, password } = aiConfig.harborConfig;
 
 // 创建要上传到harbor的镜像地址
-export function createHarborImageUrl(imageName: string, imageTag: string): string {
+export function createHarborImageUrl(imageName: string, imageTag: string, userId: string): string {
 
-  return `${harborUrl}/${project}/${harborUser}/${imageName}:${imageTag}`;
+  return `${harborUrl}/${project}/${userId}/${imageName}:${imageTag}`;
 };
 
 
