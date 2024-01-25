@@ -1,5 +1,15 @@
 # @scow/docs
 
+## 1.3.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+
 ## 1.2.0
 
 ### Minor Changes

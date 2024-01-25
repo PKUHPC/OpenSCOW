@@ -1,5 +1,12 @@
 # @scow/config
 
+## 1.4.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+- abb7e84: 管理系统新增集群监控功能
+
 ## 1.3.0
 
 ### Minor Changes
