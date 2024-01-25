@@ -130,16 +130,16 @@ createUser:
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
 
-# 自定义消费表单其他存储内容
+# #自定义消费表单其他存储内容
 # jobChargeMetadata:
-#   # 可选。需要保存的作业的字段，标准和jobChargeComment当前的格式字符串中可以使用的字段名相同
-#   savedFields: ["idJob", "account"]
+#   # 可选。需要保存的作业的字段，字段参考src/entities/JobInfo
+#   savedFields: ["idJob", "cluster"]
 
-#   # 可选。定义显示出来的格式。如果不配置，直接将保存的json对象stringify显示
+#   # 可选。定义显示出来的格式。如果不配置，直接显示上面保存的字段的信息
 #   displayFormats:
 #     # i18n格式，在不同语言下，把元数据按不同格式显示出来
-#     # 整个displayFormats也可以填一个string，就和i18n一样
-#     i18n :
-#       default: "账户{{ account }}的作业{{ idJob }}计费"
-#       en: "Account {{ account }} job {{ idJob }}"
-#       zh_cn: "账户{{ account }}的作业{{ idJob }}计费"
+#     # 或字符串格式，直接显示字符串
+#     i18n:
+#       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+#       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
+#       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"

@@ -21,7 +21,7 @@ export type ValueOf<T> = T[keyof T];
 export type FilteredJsonMap = { [key: string]: Omit<AnyJson, "JsonArray" | "JsonMap">; }
 
 // 根据类型转换为对应的 Protobuf message
-export function convertChargeMetadataMap(metadataValue: JsonMap): { [key: string]: JsonValue } {
+export function convertMetadataMap(metadataValue: JsonMap): { [key: string]: JsonValue } {
   const convertedMap: { [key: string]: JsonValue } = {};
 
   for (const key in metadataValue) {
