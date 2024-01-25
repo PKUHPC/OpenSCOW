@@ -300,9 +300,6 @@ export const deleteImage = procedure
       });
     }
 
-
-
-    // 10.129.227.64/test/admin/image-delete-test:v1
     // 获取harrbor中的reference以删除镜像
     const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}/artifacts`;
