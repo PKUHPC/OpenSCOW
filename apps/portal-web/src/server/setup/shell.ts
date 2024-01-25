@@ -20,6 +20,7 @@ import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
+import { createAuditClient } from "src/server/shellAudit";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parseIp } from "src/utils/server";
@@ -139,6 +140,15 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       clusterId: cluster, loginNode: loginNode.address,
     },
   }, OperationResult.SUCCESS);
+
+  const { createShellSession } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+
+  await createShellSession({ session: {
+    user: user.identityId,
+    remoteAddr: parseIp(req) ?? "",
+    isFinished: 0,
+    node: loginNode.address,
+  } });
 
   const send = (data: ShellOutputData) => {
     ws.send(JSON.stringify(data));

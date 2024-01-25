@@ -15,8 +15,10 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ShellServiceServer, ShellServiceService } from "@scow/protos/build/portal/shell";
 import { quote } from "shell-quote";
+import { shellAuditConfig } from "src/config/shellAudit";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
+import { createAuditClient } from "src/utils/shellAudit";
 import { sshConnect } from "src/utils/ssh";
 
 export const shellServiceServer = plugin((server) => {
@@ -72,6 +74,24 @@ export const shellServiceServer = plugin((server) => {
             pipeline(
               channel,
               async function(chunk: Uint8Array) {
+                console.log("+============================", chunk.toString());
+
+                if (shellAuditConfig.auditShell) {
+                  const msgStr: string = chunk.toString();
+
+                  // TODO: audit this
+                  const { writeShellMsg } = createAuditClient(shellAuditConfig, console);
+                  await writeShellMsg({
+                    message: msgStr,
+                    cluster: cluster,
+                    node: loginNode,
+                    user: userId,
+                    session: "sessionIdTodo",
+                    time: "12:--",
+                  });
+
+                }
+
                 return { message: { $case: "data" as const, data: { data: chunk } } };
               },
               call,

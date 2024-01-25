@@ -26,6 +26,7 @@ const { getClusterConfigs, getLoginNode, getSortedClusters,
   getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
+const { getShellAuditConfig } = require("@scow/config/build/shellAudit");
 
 /**
  * Get auth capabilities
@@ -135,6 +136,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
   const auditConfig = getAuditConfig(configPath, console);
+  const shellAuditConfig = getShellAuditConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
   /**
@@ -153,6 +155,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
+    SHELL_AUDIT_CONFIG: shellAuditConfig,
 
     SERVER_I18N_CONFIG_TEXTS: {
       submitJopPromptText: portalConfig.submitJobPromptText,
