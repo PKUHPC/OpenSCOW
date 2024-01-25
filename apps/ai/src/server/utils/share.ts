@@ -120,8 +120,10 @@ export async function shareFileOrDir(
       }
 
       // 复制并从顶层目录递归修改文件夹权限
-      const cpAndChmodCmd = `nohup cp -r ${sourceFilePath} ${targetFullDir} && chmod -R 555 ${targetTopDir}`;
+      const cpAndChmodCmd = `nohup cp -r --preserve=links ${sourceFilePath} ${targetFullDir} &&
+      chmod -R 555 ${targetTopDir}`;
       await ssh.execCommand(cpAndChmodCmd).catch((e) => {
+        failureCallback && failureCallback();
         logger.info("Failed to share %s to %s with error %s", sourceFilePath, targetFullDir, e);
       });
 
