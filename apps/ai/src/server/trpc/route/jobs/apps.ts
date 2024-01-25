@@ -339,7 +339,6 @@ export const createAppSession = procedure
           message: "workingDirectory and mountPoint should be in homeDir",
         });
       }
-
       const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
 
       // make sure appJobsDirectory exists.
@@ -378,7 +377,6 @@ export const createAppSession = procedure
 
         // 将entry.sh写入后将路径传给适配器后启动容器
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
-
         const client = getAdapterClient(clusterId);
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
@@ -542,15 +540,17 @@ export const listAppSessions =
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         // If a job is not running, it cannot be ready
-        const client = getAdapterClient(clusterId);
-        const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
-          filter: {
-            users: [userId], accounts: [],
-            states: ["RUNNING", "PENDING"],
-          },
-        }).then((resp) => resp.jobs);
-
+        let runningJobsInfo: JobInfo[] = [];
+        if (isRunning) {
+          const client = getAdapterClient(clusterId);
+          runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
+            fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
+            filter: {
+              users: [userId], accounts: [],
+              states: ["RUNNING", "PENDING"],
+            },
+          }).then((resp) => resp.jobs);
+        }
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;
           return prev;

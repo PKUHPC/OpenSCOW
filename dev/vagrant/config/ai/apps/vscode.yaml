@@ -28,10 +28,7 @@ web:
   # 运行任务的脚本。可以使用准备脚本定义的
   script: |
     PASSWORD=$PASSWORD
-    code-server
-    -vvv
-    --bind-addr 0.0.0.0:$PORT
-    --auth password
+    code-server -vvv --bind-addr 0.0.0.0:$PORT --auth password
   proxyType: relative
   # 如何连接应用
   connect:
