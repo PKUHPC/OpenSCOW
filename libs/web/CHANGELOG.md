@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 1.3.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+
 ## 1.2.3
 
 ### Patch Changes
