@@ -15,10 +15,12 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { StatisticServiceClient } from "@scow/protos/build/audit/statistic";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { dropDatabase } from "tests/utils/helpers";
 
+dayjs.extend(utc);
 
 let server: Server;
 let client: StatisticServiceClient;
@@ -45,19 +47,20 @@ it("get active user count correctly", async () => {
 
   const em = server.ext.orm.em.fork();
 
+  const now = dayjs();
+
   const logs = new Array(10).fill(null).map((_, index) => new OperationLog({
     operatorUserId: `user-${index}`,
     operatorIp: operationLog.operatorIp,
     operationResult: operationLog.operationResult,
-    operationTime: new Date(),
-    metaData: { "$case": "login" as const,
-      login: {} },
+    operationTime: now.toDate(),
+    metaData: { "$case": "login" as const, login: {} },
   }));
 
   await em.persistAndFlush(logs);
 
-  const today = dayjs().startOf("day");
-  const endDay = dayjs().endOf("day");
+  const today = now.startOf("day");
+  const endDay = now.endOf("day");
 
   const resp = await asyncClientCall(client, "getActiveUserCount", {
     startTime: today.toISOString(),
@@ -66,7 +69,9 @@ it("get active user count correctly", async () => {
 
   expect(resp.results).toMatchObject([
     {
-      date: today.toISOString(),
+      // 应该期待返回的结果的日期为日志的operationTime的UTC日期的开始时间
+      // date: today.toISOString(),
+      date: now.utcOffset(0).startOf("day").toISOString(),
       count: 10,
     },
   ]);

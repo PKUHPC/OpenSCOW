@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { QueryOrder } from "@mikro-orm/core";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
 }
   from "@scow/lib-auth";
@@ -767,11 +767,11 @@ export const userServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(User, "u");
       qb
-        .select("DATE(u.create_time) as date, count(*) as count")
+        .select([raw("DATE(u.create_time) as date"), raw("count(*) as count")])
         .where({ createTime: { $gte: startTime } })
         .andWhere({ createTime: { $lte: endTime } })
-        .groupBy("DATE(u.create_time)")
-        .orderBy({ "DATE(u.create_time)": QueryOrder.DESC });
+        .groupBy(raw("DATE(u.create_time)"))
+        .orderBy({ [raw("DATE(u.create_time)")]: QueryOrder.DESC });
 
       const results: {date: string, count: number}[] = await qb.execute();
 

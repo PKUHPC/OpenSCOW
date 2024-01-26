@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property, Ref } from
+import { Cascade, Entity, ManyToOne, PrimaryKey, Property, Ref } from
   "@mikro-orm/core";
 import { User } from "src/entities/User";
 import { EntityOrRef, toRef } from "src/utils/orm";
@@ -20,7 +20,7 @@ export class StorageQuota {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE", wrappedReference: true })
+  @ManyToOne(() => User, { cascade: [Cascade.ALL], ref: true })
     user: Ref<User>;
 
   @Property()
