@@ -82,9 +82,11 @@ interface Props {
   accountName: string;
   refresh: () => void;
   token: string;
+  // 添加用户不存在时是否可以创建用户
+  canCreateUserIfNotExist?: boolean;
 }
 
-export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
+export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, canCreateUserIfNotExist = true }) => {
 
   const t = useI18nTranslateToString();
 
@@ -109,7 +111,9 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
           message.error(t(p("notExist")));
         }
         else if (code === "USER_NOT_FOUND") {
-          if (useBuiltinCreateUser()) {
+          if (!canCreateUserIfNotExist) {
+            message.error(t(p("createFirst")));
+          } else if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {

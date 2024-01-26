@@ -129,6 +129,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
       misConfig: misConfig.createUser,
       authSupportsCreateUser: capabilities.createUser,
     },
+    ADD_USER_TO_ACCOUNT: {
+      accountAdmin: misConfig.addUserToAccount.accountAdmin,
+    },
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
     ENABLE_CHANGE_EMAIL: capabilities.changeEmail,
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
