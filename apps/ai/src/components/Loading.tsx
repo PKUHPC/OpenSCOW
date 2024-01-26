@@ -10,9 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { LoadingOutlined } from "@ant-design/icons";
+import { styled } from "styled-components";
+
+const CenterLoading = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const Loading: React.FC = () => {
   return (
-    <p> Loading...
-    </p>
+    <CenterLoading>
+      <LoadingOutlined />
+    </CenterLoading>
+
   );
 };
