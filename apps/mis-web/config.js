@@ -191,6 +191,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     UI_EXTENSION: misConfig.uiExtension,
 
+    CHANGE_JOB_LIMIT: {
+      allowUser: misConfig.allowUserChangeJobTimeLimit,
+    },
+
   };
 
   if (!building) {
