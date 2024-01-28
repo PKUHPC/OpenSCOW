@@ -21,7 +21,7 @@
     "nookies": "2.5.2"
   },
   "peerDependencies": {
-    "antd": "5.13.2",
+    "antd": "5.13.3",
     "next": "14.1.0",
     "styled-components": "6.1.8",
     "@ant-design/icons": "5.2.6",
@@ -33,7 +33,7 @@
     "react-async": "10.0.1"
   },
   "devDependencies": {
-    "antd": "5.13.2",
+    "antd": "5.13.3",
     "next": "14.1.0",
     "@scow/config": "workspace:*",
     "styled-components": "6.1.8",
