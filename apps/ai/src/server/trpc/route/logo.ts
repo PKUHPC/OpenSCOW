@@ -51,7 +51,6 @@ export const logo = router({
     }))
     .output(z.void())
     .query(async ({ ctx: { req, res } }) => {
-      console.log(11111);
       return serveIcon(req, res, "assets/icons", DEFAULT_CONFIG_BASE_PATH);
     }),
 });
