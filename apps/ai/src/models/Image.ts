@@ -24,3 +24,9 @@ export enum Source {
   INTERNAL = "INTERNAL",
   EXTERNAL = "EXTERNAL",
 };
+
+export enum Status {
+  CREATING = "CREATING",
+  CREATED = "CREATED",
+  FAILURE = "FAILURE"
+}

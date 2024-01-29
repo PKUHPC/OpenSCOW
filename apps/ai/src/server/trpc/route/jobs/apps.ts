@@ -31,7 +31,7 @@ import { join } from "path";
 import { quote } from "shell-quote";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
-import { Image as ImageEntity, Source } from "src/server/entities/Image";
+import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
@@ -487,7 +487,6 @@ export const saveImage =
             });
 
             // 数据库添加image
-
             const newImage = new ImageEntity({
               name: imageName,
               tag: imageTag,
@@ -495,6 +494,7 @@ export const saveImage =
               path: harborImageUrl,
               owner: userId,
               source: Source.EXTERNAL,
+              status: Status.CREATED,
               sourcePath: harborImageUrl,
             });
             await em.persistAndFlush(newImage);

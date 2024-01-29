@@ -16,7 +16,7 @@ import { sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
 import { config, rootKeyPair } from "src/server/config/env";
-import { Image, Source } from "src/server/entities/Image";
+import { Image, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -31,14 +31,14 @@ import { z } from "zod";
 import { clusters } from "../config";
 import { clusterExist } from "../utils";
 
-class NotTarError extends TRPCError {
-  constructor(name: string, tag: string) {
-    super({
-      code: "UNPROCESSABLE_CONTENT",
-      message: `Image ${name}:${tag} create failed: image is not a tar file`,
-    });
-  }
-};
+// class NotTarError extends TRPCError {
+//   constructor(name: string, tag: string) {
+//     super({
+//       code: "UNPROCESSABLE_CONTENT",
+//       message: `Image ${name}:${tag} create failed: image is not a tar file`,
+//     });
+//   }
+// };
 
 class NoClusterError extends TRPCError {
   constructor(name: string, tag: string) {
@@ -49,14 +49,14 @@ class NoClusterError extends TRPCError {
   }
 };
 
-class NoLocalImageError extends TRPCError {
-  constructor(name: string, tag: string) {
-    super({
-      code: "NOT_FOUND",
-      message: `Image ${name}:${tag} create failed: localImage not found`,
-    });
-  }
-}
+// class NoLocalImageError extends TRPCError {
+//   constructor(name: string, tag: string) {
+//     super({
+//       code: "NOT_FOUND",
+//       message: `Image ${name}:${tag} create failed: localImage not found`,
+//     });
+//   }
+// }
 
 class InternalServerError extends TRPCError {
   constructor(errMessage: string, process: "Create" | "Copy") {
@@ -71,11 +71,12 @@ export const ImageListSchema = z.object({
   id: z.number(),
   name: z.string(),
   owner: z.string(),
-  source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
+  source: z.nativeEnum(Source),
   tag: z.string(),
   description: z.string().optional(),
-  path: z.string(),
-  sourcePath: z.string(),
+  path: z.string().optional(),
+  sourcePath: z.string().optional(),
+  status: z.nativeEnum(Status),
   isShared: z.boolean(),
   clusterId: z.string().optional(),
   createTime: z.string().optional(),
@@ -137,6 +138,7 @@ export const list = procedure
         description: x.description,
         path: x.path,
         sourcePath: x.sourcePath,
+        status: x.status,
         isShared: Boolean(x.isShared),
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,
@@ -160,7 +162,7 @@ export const createImage = procedure
     sourcePath: z.string(),
     clusterId: z.string().optional(),
   }))
-  .output(z.number())
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
 
     if (input.clusterId && !clusterExist(input.clusterId)) {
@@ -171,8 +173,10 @@ export const createImage = procedure
     }
     const em = await forkEntityManager();
     const { name, tag, source, sourcePath } = input;
-    const imageNameTagExist = await em.findOne(Image,
-      { name, tag, owner: user.identityId });
+
+    const imageNameTagExist = await em.findOne(Image, {
+      name, tag, owner: user.identityId });
+
     if (imageNameTagExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -183,55 +187,83 @@ export const createImage = procedure
     // 获取加载镜像的集群节点，如果是远程镜像则使用优先级最高的集群作为本地处理镜像的节点
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
-    const harborImageUrl = createHarborImageUrl(name, tag, user.identityId);
-
     if (!processClusterId) { throw new NoClusterError(name, tag); }
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    return await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+    const harborImageUrl = createHarborImageUrl(name, tag, user.identityId);
 
-      let localImageUrl: string | undefined = undefined;
-      if (source === Source.INTERNAL) {
-        // 本地镜像检查源文件拥有者权限
-        await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
-        // 检查是否为tar文件
-        if (!sourcePath.endsWith(".tar")) throw new NotTarError(name, tag);
-        // 本地镜像时docker加载镜像
-        localImageUrl = await getLoadedImage({ ssh, logger, sourcePath }).catch((e) => {
-          const ex = e as ServiceError;
-          throw new InternalServerError(ex.message, "Create");
+    // 创建一个状态为 creating 的数据
+    const image = new Image({
+      ...input, path: harborImageUrl, status: Status.CREATING, owner: user.identityId,
+    });
+    await em.persistAndFlush([image]);
+
+    const createProcess = async () => {
+      const em = await forkEntityManager();
+      const image = await em.findOne(Image, { name, tag, owner: user.identityId });
+
+      if (!image) {
+        throw new Error(`copyImage error: image ${name}:${tag} not found`);
+      }
+
+      try {
+        await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+
+          let localImageUrl: string | undefined = undefined;
+          if (source === Source.INTERNAL) {
+            // 本地镜像检查源文件拥有者权限
+            await checkSharePermission({ ssh, logger, sourcePath: sourcePath, userId: user.identityId });
+            // 检查是否为tar文件
+            if (!sourcePath.endsWith(".tar")) {
+              throw new Error(`Image ${name}:${tag} create failed: image is not a tar file`);
+            }
+
+            // 本地镜像时docker加载镜像
+            localImageUrl = await getLoadedImage({ ssh, logger, sourcePath }).catch((e) => {
+              const ex = e as ServiceError;
+              throw new Error(`createImage failed, ${ex.message}`);
+            });
+          } else {
+            // 远程镜像需先拉取到本地
+            localImageUrl = await getPulledImage({ ssh, logger, sourcePath }).catch((e) => {
+              const ex = e as ServiceError;
+              throw new Error(`createImage failed, ${ex.message}`);
+            });
+          };
+
+          if (localImageUrl === undefined) {
+            throw new Error(`Image ${name}:${tag} create failed: localImage not found`);
+          }
+
+          // 制作镜像，上传至harbor
+          await pushImageToHarbor({
+            ssh,
+            logger,
+            localImageUrl,
+            harborImageUrl,
+          }).catch((e) => {
+            const ex = e as ServiceError;
+            throw new Error(`createImage failed, ${ex.message}`);
+          });
+
+          // 更新数据库
+          image.status = Status.CREATED;
+          await em.persistAndFlush(image);
+
+          return;
+
         });
-      } else {
-        // 远程镜像需先拉取到本地
-        localImageUrl = await getPulledImage({ ssh, logger, sourcePath }).catch((e) => {
-          const ex = e as ServiceError;
-          throw new InternalServerError(ex.message, "Create");
-        });
+      } catch {
+        image.status = Status.FAILURE;
+        await em.persistAndFlush(image);
       };
 
-      if (localImageUrl === undefined) { throw new NoLocalImageError(name, tag); }
+    };
 
-      // 制作镜像，上传至harbor
-      await pushImageToHarbor({
-        ssh,
-        logger,
-        localImageUrl,
-        harborImageUrl,
-      }).catch((e) => {
-        const ex = e as ServiceError;
-        throw new InternalServerError(ex.message, "Create");
-      });
-
-      // 更新数据库
-      const image = new Image({ ...input, path: harborImageUrl, owner: user.identityId });
-      await em.persistAndFlush(image);
-
-      return image.id;
-
-    });
-
+    createProcess();
+    return;
   });
 
 
@@ -280,7 +312,7 @@ export const deleteImage = procedure
       summary: "delete a image",
     },
   })
-  .input(z.object({ id: z.number() }))
+  .input(z.object({ id: z.number(), force: z.boolean().optional() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
@@ -293,10 +325,17 @@ export const deleteImage = procedure
       });
     }
 
+    if (!input.force && image.status === Status.CREATING) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Image ${image.name}:${image.tag} is still being creating.`,
+      });
+    }
+
     if (image.owner !== user.identityId) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `Image ${input.id} not accessible`,
+        message: `Image ${image.name}:${image.tag} not accessible`,
       });
     }
 
@@ -311,18 +350,30 @@ export const deleteImage = procedure
     });
 
     if (!getReferenceRes.ok) {
-      const errorBody = await getReferenceRes.json();
-      // 来自harbor的错误信息
-      const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
-      logger.error("Failed to get image reference url %s", getReferenceUrl);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to get image reference: " + errorMessage,
-      });
+      const errorText = await getReferenceRes.text(); // 首先获取文本形式的响应体
+
+      // 没有返回值且镜像本身状态就是 failure 的，不需要去 harbor 删除了
+      if (errorText === "" && image.status === Status.FAILURE) {
+        logger.error(`Maybe image ${input.id} not exist on harbor`);
+        await em.removeAndFlush(image);
+        return;
+      }
+      try {
+        const errorBody = JSON.parse(errorText); // 尝试解析为 JSON
+        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        logger.error("Failed to get image reference url %s: %s", getReferenceUrl, errorMessage);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to get image reference: " + errorMessage,
+        });
+      } catch (e) {
+        // 如果解析失败，记录原始响应文本
+        logger.error("Failed to parse JSON from error response: %s", errorText);
+        throw e; // 重新抛出异常或处理错误
+      }
     }
 
     const referenceRes = await getReferenceRes.json();
-
 
     let reference = "";
     for (const item of referenceRes) {
@@ -334,7 +385,7 @@ export const deleteImage = procedure
     if (!reference) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to find image tag in harbor ! Please contact the administrator! ",
+        message: "Failed to find image tag in harbor! Please contact the administrator! ",
       });
     }
 
@@ -353,12 +404,12 @@ export const deleteImage = procedure
       },
     });
 
+    // harbor 删除出错，但状态本身就是失败时无需操作
     if (!deleteRes.ok) {
       const errorBody = await deleteRes.json();
       // 来自harbor的错误信息
       const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
       logger.error("Failed to delete image tag url %s", deleteUrl);
-      console.log("deleteRes", errorBody);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to delete image tag: " + errorMessage,
@@ -391,6 +442,13 @@ export const shareOrUnshareImage = procedure
       });
     };
 
+    if (image.status === Status.CREATING) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `Image ${input.id} is still being creating.`,
+      });
+    }
+
     if (image.owner !== user.identityId) {
       throw new TRPCError({
         code: "FORBIDDEN",
@@ -415,14 +473,14 @@ export const copyImage = procedure
     },
   })
   .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string() }))
-  .output(z.number())
+  .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
 
     const em = await forkEntityManager();
 
     const { id, newName, newTag } = input;
 
-    const sharedImage = await em.findOne(Image, { id, isShared: true });
+    const sharedImage = await em.findOne(Image, { id, isShared: true, status: Status.CREATED });
 
     if (!sharedImage) {
       throw new TRPCError({
@@ -430,6 +488,13 @@ export const copyImage = procedure
         message: `Shared Image ${id} not found`,
       });
     };
+
+    if (!sharedImage.path || !sharedImage.sourcePath) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: `Shared Image ${id} do not have path or sourcePath`,
+      });
+    }
 
     const imageNameTagsExist = await em.findOne(Image,
       { name: newName, tag: newTag, owner: user.identityId });
@@ -440,46 +505,74 @@ export const copyImage = procedure
       });
     };
 
+    // 数据库创建一条状态为创建中的数据
+    const image = new Image({
+      name: newName,
+      tag: newTag,
+      owner: user.identityId,
+      source: Source.EXTERNAL,
+      sourcePath: sharedImage.path,
+      status: Status.CREATING,
+      description: sharedImage.description,
+    });
+    await em.persistAndFlush(image);
+
     const processClusterId = getSortedClusterIds(clusters)[0];
     if (!processClusterId) { throw new NoClusterError(newName, newTag); }
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    return await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
-      // 拉取远程镜像
-      const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path })
-        .catch((e) => {
-          const ex = e as ServiceError;
-          throw new InternalServerError(ex.message, "Copy");
+    const copyProcess = async () => {
+      const em = await forkEntityManager();
+      const image = await em.findOne(Image, { name: newName, tag: newTag, owner: user.identityId });
+
+      if (!image) {
+        throw new Error(`copyImage error: image ${newName}:${newTag} not found`);
+      }
+
+      try {
+        await libConnect(host, "root", rootKeyPair, logger, async (ssh) => {
+          // 拉取远程镜像
+          if (sharedImage.path === undefined) {
+            throw new Error(`copyImage error: shared image ${id} do not have path`);
+          }
+          const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path })
+            .catch((e) => {
+              const ex = e as ServiceError;
+              throw new InternalServerError(ex.message, "Copy");
+            });
+          if (!localImageUrl) {
+            throw new Error(`copyImage Error: Image ${newName}:${newTag} create failed: localImage not found`);
+          }
+
+          const harborImageUrl = createHarborImageUrl(newName, newTag, user.identityId);
+
+          // 制作镜像上传
+          await pushImageToHarbor({
+            ssh,
+            logger,
+            localImageUrl,
+            harborImageUrl,
+          }).catch((e) => {
+            const ex = e as ServiceError;
+            throw new Error(`copyImage failed, ${ex.message}`);
+          });
+
+          image.status = Status.CREATED;
+          image.path = harborImageUrl;
+          await em.persistAndFlush(image);
+
+          return;
+
         });
-      if (!localImageUrl) { throw new NoLocalImageError(newName, newTag); }
+      } catch {
+        image.status = Status.FAILURE;
+        em.persistAndFlush([image]);
+      }
+    };
 
-      const harborImageUrl = createHarborImageUrl(newName, newTag, user.identityId);
+    copyProcess();
+    return;
 
-      // 制作镜像上传
-      await pushImageToHarbor({
-        ssh,
-        logger,
-        localImageUrl,
-        harborImageUrl,
-      }).catch((e) => {
-        const ex = e as ServiceError;
-        throw new InternalServerError(ex.message, "Copy");
-      });
-
-      const image = new Image({
-        name: input.newName,
-        tag: input.newTag,
-        owner: user.identityId,
-        source: Source.EXTERNAL,
-        sourcePath: sharedImage.path,
-        path: harborImageUrl,
-        description: sharedImage.description,
-      });
-      await em.persistAndFlush(image);
-
-      return image.id;
-
-    });
   });

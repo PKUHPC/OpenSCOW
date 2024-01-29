@@ -559,7 +559,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "mappedType": "string"
         },
         "is_shared": {
@@ -570,6 +570,20 @@
           "primary": false,
           "nullable": false,
           "mappedType": "boolean"
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('CREATED','CREATING','FAILURE')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "CREATED",
+            "CREATING",
+            "FAILURE"
+          ],
+          "mappedType": "enum"
         },
         "create_time": {
           "name": "create_time",
@@ -596,6 +610,17 @@
       },
       "name": "image",
       "indexes": [
+        {
+          "keyName": "unique_name_tag_owner",
+          "columnNames": [
+            "name",
+            "tag",
+            "owner"
+          ],
+          "composite": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "PRIMARY",
           "columnNames": [

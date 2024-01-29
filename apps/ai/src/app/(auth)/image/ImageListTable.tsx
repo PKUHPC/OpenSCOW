@@ -15,13 +15,13 @@
 import { PlusOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCClientError } from "@trpc/client";
-import { App, Button, Form, Input, Space, Table } from "antd";
+import { App, Button, Form, Input, Space, Table, Tag } from "antd";
 import NextError from "next/error";
 import { useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { SourceText } from "src/models/Image";
+import { SourceText, Status } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
@@ -90,10 +90,8 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
         message.error("找不到镜像");
-      } else if (data?.code === "INTERNAL_SERVER_ERROR") {
-        message.error(err.message);
       } else {
-        message.error("删除镜像失败");
+        message.error(err.message);
       }
     },
   });
@@ -162,6 +160,18 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "description", title: "镜像描述" },
           isPublic ? { dataIndex: "shareUser", title: "分享者",
             render: (_, r) => r.owner } : {},
+          { dataIndex: "status", title: "状态",
+            render: (_, r) => {
+              switch (r.status) {
+              case Status.CREATING:
+                return <Tag color="processing">创建中</Tag>;
+              case Status.CREATED:
+                return <Tag color="success">已创建</Tag>;
+              default:
+                return <Tag color="error">创建失败</Tag>;
+              }
+            },
+          },
           { dataIndex: "createTime", title: "创建时间",
             render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
           { dataIndex: "action", title: "操作",
@@ -170,39 +180,58 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               return !isPublic ?
                 (
                   <>
-                    <Button
-                      type="link"
-                      onClick={() => {
+                    { r.status === Status.CREATED && (
+                      <Button
+                        type="link"
+                        onClick={() => {
 
-                        modal.confirm({
-                          title: `${shareOrUnshareStr}镜像`,
-                          content: `确认${shareOrUnshareStr}镜像${r.name}${r.tag}？`,
-                          onOk: async () => {
-                            await shareOrUnshareMutation.mutateAsync({
-                              id: r.id,
-                              share: !r.isShared,
-                            }, {
-                              onSuccess() {
-                                refetch();
-                                message.success(`${shareOrUnshareStr}镜像成功`);
-                              },
-                            });
-                          },
-                        });
-                      }}
-                    >
-                      {shareOrUnshareStr}
-                    </Button>
+                          modal.confirm({
+                            title: `${shareOrUnshareStr}镜像`,
+                            content: `确认${shareOrUnshareStr}镜像${r.name}:${r.tag}？`,
+                            onOk: async () => {
+                              await shareOrUnshareMutation.mutateAsync({
+                                id: r.id,
+                                share: !r.isShared,
+                              }, {
+                                onSuccess() {
+                                  refetch();
+                                  message.success(`${shareOrUnshareStr}镜像成功`);
+                                },
+                              });
+                            },
+                          });
+                        }}
+                      >
+                        {shareOrUnshareStr}
+                      </Button>
+                    )}
 
-                    <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
-                      编辑
-                    </EditImageModalButton>
+                    {/* { r.source === Source.INTERNAL && (
+                    <Space split={<Divider type="vertical" />}>
+                      <Button
+                        type="link"
+                        onClick={() => {
+                          router.push(`/files/${r.clusterId}${r.sourcePath}`);
+                        }}
+                      >
+                  查看文件
+                      </Button>
+                    </Space>
+                  )} */}
+
+                    { r.status === Status.CREATED && (
+                      <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
+                        编辑
+                      </EditImageModalButton>
+                    )}
                     <Button
                       type="link"
                       onClick={() => {
                         modal.confirm({
                           title: "删除镜像",
-                          content: (
+                          content: r.status === Status.CREATING ? (
+                            <p>镜像正在创建中，是否强制删除？</p>
+                          ) : (
                             <>
                               <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
                             </>
@@ -210,6 +239,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                           onOk: async () => {
                             await deleteImageMutation.mutateAsync({
                               id: r.id,
+                              force: r.status === Status.CREATING,
                             });
                           },
                         });

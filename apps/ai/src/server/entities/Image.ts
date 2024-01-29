@@ -18,6 +18,12 @@ export enum Source {
   EXTERNAL = "EXTERNAL",
 };
 
+export enum Status {
+  CREATED = "CREATED",
+  CREATING = "CREATING",
+  FAILURE = "FAILURE"
+}
+
 export class Image {
   id!: number;
   name: string;
@@ -28,12 +34,13 @@ export class Image {
   clusterId?: string;
 
   // 这里是上传镜像时的源文件path
-  sourcePath: string;
+  sourcePath?: string;
 
   // 这里是提交作业时可以使用的真实镜像path，每次上传镜像一定对应一个真实的镜像path
-  path: string;
+  path?: string;
 
   isShared: boolean;
+  status: Status;
   createTime?: Date;
   updateTime?: Date;
 
@@ -43,9 +50,10 @@ export class Image {
     source: Source;
     tag: string;
     description?: string;
-    path: string;
-    sourcePath: string;
+    path?: string;
+    sourcePath?: string;
     isShared?: boolean;
+    status: Status;
     clusterId?: string;
     createTime?: Date;
     updateTime?: Date;
@@ -58,6 +66,7 @@ export class Image {
     this.path = init.path;
     this.sourcePath = init.sourcePath;
     this.isShared = init.isShared ?? false;
+    this.status = init.status;
     this.clusterId = init.clusterId;
 
     if (init.createTime) {
@@ -80,11 +89,16 @@ imageEntitySchema.addProperty("name", String);
 imageEntitySchema.addProperty("owner", String);
 imageEntitySchema.addEnum("source", String, { items: () => Source });
 imageEntitySchema.addProperty("tag", String);
+imageEntitySchema.addUnique({
+  properties: ["name", "tag", "owner"],
+  name: "unique_name_tag_owner",
+});
 imageEntitySchema.addProperty("description", String, { nullable: true });
 imageEntitySchema.addProperty("clusterId", String, { nullable: true });
 imageEntitySchema.addProperty("sourcePath", String);
-imageEntitySchema.addProperty("path", String);
+imageEntitySchema.addProperty("path", String, { nullable: true });
 imageEntitySchema.addProperty("isShared", Boolean);
+imageEntitySchema.addEnum("status", String, { items: () => Status });
 imageEntitySchema.addProperty("createTime", Date, { columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP });
 imageEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });

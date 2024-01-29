@@ -69,7 +69,7 @@ export const CreateEditImageModal: React.FC<Props> = (
 
   const createMutation = trpc.image.createImage.useMutation({
     onSuccess() {
-      message.success("添加镜像成功");
+      message.success("添加镜像任务已提交");
       onClose();
       form.resetFields();
       resetForm();
