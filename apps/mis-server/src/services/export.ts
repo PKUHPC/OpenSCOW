@@ -234,7 +234,7 @@ export const exportServiceServer = plugin((server) => {
 
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = getChargesSearchType(type);
-      const filterUserIds = userIds ? userIds.split(",") : [];
+      const filterUserIds = userIds ? userIds.split(",").map((id) => id.trim()) : [];
 
       const query = {
         time: { $gte: startTime, $lte: endTime },

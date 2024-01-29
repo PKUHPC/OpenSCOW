@@ -409,7 +409,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const searchType = getChargesSearchType(type);
 
-      const filterUserIds = userIds ? userIds.split(",") : [];
+      const filterUserIds = userIds ? userIds.split(",").map((id) => id.trim()) : [];
 
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
@@ -461,7 +461,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const searchType = getChargesSearchType(type);
 
-      const filterUserIds = userIds ? userIds.split(",") : [];
+      const filterUserIds = userIds ? userIds.split(",").map((id) => id.trim()) : [];
 
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
