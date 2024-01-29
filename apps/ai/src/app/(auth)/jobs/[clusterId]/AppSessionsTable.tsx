@@ -242,7 +242,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
         x.state === "PENDING" ? "" : x.timeLimit,
     }));
-  }, [data]);
+  }, [data, query]);
 
   return (
     <>
