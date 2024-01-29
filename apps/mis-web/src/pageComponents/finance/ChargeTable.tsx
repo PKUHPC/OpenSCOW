@@ -14,7 +14,7 @@ import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/dat
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, DatePicker, Form, Select, Spin, Table } from "antd";
+import { App, Button, DatePicker, Form, Input, Select, Spin, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -24,6 +24,7 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { SearchType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
+import { ChargeInfo } from "src/pages/api/finance/charges";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { formatMetadataDisplay } from "src/utils/metadata";
@@ -42,6 +43,7 @@ interface FilterForm {
   name?: string;
   time: [dayjs.Dayjs, dayjs.Dayjs];
   type?: string;
+  userIds?: string;
 }
 
 const now = dayjs();
@@ -62,10 +64,12 @@ export const ChargeTable: React.FC<Props> = ({
   const [query, setQuery] = useState<{
     name: string | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
-    type: string | undefined}>({
+    type: string | undefined
+    userIds: string | undefined}>({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       type: undefined,
+      userIds: undefined,
     });
 
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
@@ -76,12 +80,14 @@ export const ChargeTable: React.FC<Props> = ({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       type: undefined,
+      userIds: undefined,
     });
     setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       type: undefined,
+      userIds: undefined,
     });
     setSelectedAccountName(accountName);
   }, [accountName]);
@@ -92,6 +98,7 @@ export const ChargeTable: React.FC<Props> = ({
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
       type: query.type,
+      userIds: query.userIds,
       isPlatformRecords,
       searchType,
       page: pageInfo.page,
@@ -108,6 +115,7 @@ export const ChargeTable: React.FC<Props> = ({
         type: query.type,
         isPlatformRecords,
         searchType,
+        userIds: query.userIds,
       },
     });
   }, [query]);
@@ -119,7 +127,6 @@ export const ChargeTable: React.FC<Props> = ({
   const { data: totalResultData, isLoading: isTotalResultLoading } = useAsync({
     promiseFn: totalResultPromiseFn,
   });
-
 
 
   const handleExport = async (columns: string[]) => {
@@ -140,6 +147,7 @@ export const ChargeTable: React.FC<Props> = ({
           type: query.type,
           searchType: searchType,
           isPlatformRecords: !!isPlatformRecords,
+          userIds: query.userIds,
         },
       });
     }
@@ -147,6 +155,7 @@ export const ChargeTable: React.FC<Props> = ({
 
   const exportOptions = useMemo(() => {
     const common = [
+      { label: t(pCommon("user")), value: "userId" },
       { label: t(p("time")), value: "time" },
       { label: t(p("amount")), value: "amount" },
       { label: t(pCommon("type")), value: "type" },
@@ -170,8 +179,8 @@ export const ChargeTable: React.FC<Props> = ({
             form={form}
             initialValues={query}
             onFinish={async () => {
-              const { name, time, type } = await form.validateFields();
-              setQuery({ name: selectedAccountName ?? name, time, type: selectedType ?? type });
+              const { name, userIds, time, type } = await form.validateFields();
+              setQuery({ name: selectedAccountName ?? name, userIds, time, type: selectedType ?? type });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
           >
@@ -188,6 +197,9 @@ export const ChargeTable: React.FC<Props> = ({
                 </Form.Item>
               )
             }
+            <Form.Item label={t("common.user")} name="userIds">
+              <Input style={{ width: 180 }} placeholder={t("common.userId")} />
+            </Form.Item>
             <Form.Item label={t(pCommon("time"))} name="time">
               <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
             </Form.Item>
@@ -252,26 +264,35 @@ export const ChargeTable: React.FC<Props> = ({
         >
           {
             showAccountName && (
-              <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
+              <Table.Column<ChargeInfo> dataIndex="accountName" title={t(pCommon("account"))} />
             )
           }
           {
             showTenantName && (
-              <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
+              <Table.Column<ChargeInfo> dataIndex="tenantName" title={t("common.tenant")} />
             )
           }
-          {/* ui样式确认中 */}
-          {/* <Table.Column dataIndex="userId" title={t(pCommon("user"))} /> */}
-          <Table.Column dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-          <Table.Column dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-          <Table.Column dataIndex="type" title={t(pCommon("type"))} width="15%" />
-          <Table.Column dataIndex="comment" title={t(pCommon("comment"))} width="25%" />
+
+          <Table.Column<ChargeInfo>
+            dataIndex="userId"
+            title={t(pCommon("user"))}
+            width="15%"
+            render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
+          />
+          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
+          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
+          <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
+          <Table.Column<ChargeInfo>
+            dataIndex="comment"
+            title={t(pCommon("comment"))}
+            width="20%"
+          />
           {
             publicConfig.JOB_CHARGE_METADATA?.savedFields && (
-              <Table.Column
+              <Table.Column<ChargeInfo>
                 dataIndex="metadata"
                 title={t(pCommon("other"))}
-                width="25%"
+                width="20%"
                 render={(v) => {
                   const metadataToDispaly = v ? formatMetadataDisplay(v?.metadataValue) : undefined;
                   return getI18nConfigCurrentText(metadataToDispaly, languageId);

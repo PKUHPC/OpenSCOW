@@ -229,20 +229,24 @@ export const exportServiceServer = plugin((server) => {
         type,
         target,
         count,
+        userIds,
       } = request;
 
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = getChargesSearchType(type);
+      const filterUserIds = userIds ? userIds.split(",") : [];
+
       const query = {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
+        ...(filterUserIds.length > 0 ? { userId: { $in: filterUserIds } } : {}),
       };
-
 
       const recordFormat = (x: Loaded<ChargeRecord, never>) => ({
         tenantName: x.tenantName,
         accountName: x.accountName,
+        userId: x.userId,
         amount: decimalToMoney(x.amount),
         comment: x.comment,
         index: x.id,

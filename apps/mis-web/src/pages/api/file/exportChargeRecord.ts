@@ -42,6 +42,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     accountName: Type.Optional(Type.String()),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
+    userIds: Type.Optional(Type.String()),
   }),
 
   responses:{
@@ -56,7 +57,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count } = query;
+  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count, userIds } = query;
 
   const info = await getUserInfoForCharges(accountName, req, res);
 
@@ -96,6 +97,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       endTime,
       type,
       target,
+      userIds,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -109,6 +111,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
         id: x.index,
         accountName: x.accountName,
         tenantName: x.tenantName,
+        userId: x.userId,
         time: x.time ? new Date(x.time).toISOString() : "",
         amount: nullableMoneyToString(x.amount),
         type: x.type,
@@ -120,6 +123,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       id: "ID",
       accountName: t(pCommon("account")),
       tenantName: t(pCommon("tenant")),
+      userId: t(pCommon("user")),
       time: t(p("time")),
       amount: t(p("amount")),
       type: t(pCommon("type")),

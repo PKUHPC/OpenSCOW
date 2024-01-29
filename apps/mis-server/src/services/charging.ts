@@ -400,17 +400,20 @@ export const chargingServiceServer = plugin((server) => {
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, page, pageSize }
+      const { startTime, endTime, type, target, userIds, page, pageSize }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
 
       const searchType = getChargesSearchType(type);
 
+      const filterUserIds = userIds ? userIds.split(",") : [];
+
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
+        ...(filterUserIds.length > 0 ? { userId: { $in: filterUserIds } } : {}),
       }, {
         ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { time: QueryOrder.DESC },
@@ -449,12 +452,14 @@ export const chargingServiceServer = plugin((server) => {
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target }
+      const { startTime, endTime, type, target, userIds }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
 
       const searchType = getChargesSearchType(type);
+
+      const filterUserIds = userIds ? userIds.split(",") : [];
 
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
@@ -464,6 +469,7 @@ export const chargingServiceServer = plugin((server) => {
             time: { $gte: startTime, $lte: endTime },
             ...searchType,
             ...searchParam,
+            ...(filterUserIds.length > 0 ? { userId: { $in: filterUserIds } } : {}),
           })
           .execute("get");
 
