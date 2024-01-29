@@ -698,6 +698,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     amount: amount1,
     comment: "comment",
     type: "testA",
+    userId: "user_1",
+    metadata: "{ \"cluster\": \"hpc01\", \"idJob\": 1 }",
   };
 
   const request2: ChargeRequest = {
@@ -705,6 +707,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     amount: amount2,
     comment: "comment",
     type: "testB",
+    userId: "user_1",
+    metadata: "{ \"cluster\": \"hpc01\", \"idJob\": 2 }",
   };
 
   const request3: ChargeRequest = {
@@ -713,6 +717,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     amount: amount3,
     comment: "comment",
     type: "testC",
+    userId: "user_2",
+    metadata: "{ \"cluster\": \"hpc02\", \"idJob\": 9 }",
   };
 
   const request4: ChargeRequest = {
@@ -720,6 +726,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     amount: amount4,
     comment: "comment",
     type: "testD",
+    userId: "user_2",
+    metadata: "{ \"cluster\": \"hpc02\", \"idJob\": 10 }",
   };
 
   const startTime = new Date();
@@ -750,6 +758,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
+    userIds: "user_1,user_2",
   });
 
   expect(reply.results).toHaveLength(2);
@@ -761,6 +770,23 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       comment: request3.comment,
       amount: request3.amount,
       type: request3.type,
+      userId: "user_2",
+      metadata: {
+        metadataValue: {
+          "cluster": {
+            "value": {
+              "$case": "stringValue",
+              "stringValue": "hpc02",
+            },
+          },
+          "idJob": {
+            "value": {
+              "$case": "numberValue",
+              "numberValue": 9,
+            },
+          },
+        },
+      },
     },
     {
       accountName: request1.accountName,
@@ -768,6 +794,23 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       comment: request1.comment,
       amount: request1.amount,
       type: request1.type,
+      userId: "user_1",
+      metadata: {
+        metadataValue: {
+          "cluster": {
+            "value": {
+              "$case": "stringValue",
+              "stringValue": "hpc01",
+            },
+          },
+          "idJob": {
+            "value": {
+              "$case": "numberValue",
+              "numberValue": 1,
+            },
+          },
+        },
+      },
     },
   ]as Partial<ChargeRecord>);
 
@@ -929,8 +972,6 @@ it("returns charge records' total results", async () => {
 
   em.clear();
 });
-
-
 
 export function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {

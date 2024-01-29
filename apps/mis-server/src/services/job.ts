@@ -35,6 +35,7 @@ import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { FilteredJsonMap } from "src/utils/types";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -129,6 +130,7 @@ export const jobServiceServer = plugin((server) => {
           return prev;
         }, {});
 
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
 
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
@@ -148,6 +150,11 @@ export const jobServiceServer = plugin((server) => {
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
 
+          const metadataMap: FilteredJsonMap | undefined = {};
+          savedFields?.forEach((field) => {
+            metadataMap[field] = x[field];
+          });
+
           if (newTenantPrice) {
             if (x.tenantPrice.lt(newTenantPrice)) {
               await charge({
@@ -155,6 +162,7 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
@@ -177,6 +185,7 @@ export const jobServiceServer = plugin((server) => {
                 type,
                 amount: newAccountPrice.minus(x.accountPrice),
                 userId: x.user,
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({

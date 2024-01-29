@@ -150,6 +150,7 @@ it("export charge Records", async () => {
     type: "test",
     comment: "test",
     amount,
+    userId: data.userA.userId,
   });
 
   const chargeRecord2 = new ChargeRecord({
@@ -159,6 +160,7 @@ it("export charge Records", async () => {
     type: "test",
     comment: "test",
     amount,
+    userId: data.userA.userId,
   });
 
   const chargeRecord3 = new ChargeRecord({
@@ -179,7 +181,27 @@ it("export charge Records", async () => {
     amount,
   });
 
-  await em.persistAndFlush([chargeRecord1, chargeRecord2, chargeRecord3, chargeRecord4]);
+  const chargeRecord5 = new ChargeRecord({
+    id: 5,
+    time: new Date("2023-12-07T07:23:13.000Z"),
+    target: data.accountA,
+    type: "test",
+    comment: "test",
+    amount,
+    userId: data.userA.userId,
+  });
+
+  const chargeRecord6 = new ChargeRecord({
+    id: 6,
+    time: new Date("2023-12-07T07:24:15.000Z"),
+    target: data.accountB,
+    type: "test",
+    comment: "test",
+    amount,
+    userId: data.userB.userId,
+  });
+
+  await em.persistAndFlush([chargeRecord1, chargeRecord2, chargeRecord3, chargeRecord4, chargeRecord5, chargeRecord6]);
 
   const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
@@ -190,11 +212,12 @@ it("export charge Records", async () => {
   queryEndTime.setDate(startTime.getDate() + 1);
 
   const stream = asyncReplyStreamCall(client, "exportChargeRecord", {
-    count: 2,
+    count: 3,
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
       tenantName: data.accountA.tenant.getProperty("name") } },
+    userIds: data.userA.userId,
   });
 
   const handleChargeResponse = (response: ExportChargeRecordResponse): ChargeRecordProto[] => {
@@ -202,7 +225,7 @@ it("export charge Records", async () => {
   };
   const records = await collectData(stream, handleChargeResponse);
 
-  expect(records).toHaveLength(2);
+  expect(records).toHaveLength(3);
 
   expect(records).toMatchObject([
     {
@@ -213,6 +236,7 @@ it("export charge Records", async () => {
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
+      userId: data.userA.userId,
     },
     {
       index: chargeRecord2.id,
@@ -222,6 +246,17 @@ it("export charge Records", async () => {
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
+      userId: data.userA.userId,
+    },
+    {
+      index: chargeRecord5.id,
+      tenantName: data.accountA.tenant.getProperty("name"),
+      accountName: data.accountA.accountName,
+      time: chargeRecord5.time.toISOString(),
+      amount: decimalToMoney(amount),
+      type: "test",
+      comment: "test",
+      userId: data.userA.userId,
     },
   ]);
 

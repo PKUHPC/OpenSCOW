@@ -50,6 +50,7 @@ message ChargeRequest {
   string type = 4;
   string comment = 5;
   optional string user_id = 6;
+  optional string metadata = 7;
 }
 
 message ChargeResponse {
