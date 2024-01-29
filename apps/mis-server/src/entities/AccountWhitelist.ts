@@ -19,7 +19,7 @@ export class AccountWhitelist {
   @PrimaryKey()
     id!: number;
 
-  @OneToOne(() => Account, (a) => a.whitelist, { wrappedReference: true, nullable: false, unique: true })
+  @OneToOne(() => Account, (a) => a.whitelist, { ref: true, nullable: false, unique: true })
     account: Ref<Account>;
 
   @Property()

@@ -28,7 +28,7 @@ export class Account {
   @Property({ unique: true })
     accountName: string;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true })
+  @ManyToOne(() => Tenant, { ref: true })
     tenant: Ref<Tenant>;
 
   @Property()
@@ -38,7 +38,7 @@ export class Account {
     users = new Collection<UserAccount>(this);
 
   @OneToOne(() => AccountWhitelist, (u) => u.account, {
-    nullable: true, wrappedReference: true, unique: true, owner: true,
+    nullable: true, ref: true, unique: true, owner: true,
   })
     whitelist?: Ref<AccountWhitelist>;
 

@@ -200,7 +200,7 @@ it("get all users", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -277,7 +277,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -311,7 +311,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -365,7 +365,7 @@ it("get all users with sorter", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,

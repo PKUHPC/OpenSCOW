@@ -17,7 +17,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
-import { getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
+import { getEntryIcon, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";

@@ -24,8 +24,20 @@ type Result = {
   job: RunningJob, jobAccessible: JobAccessible
 }
 
-export async function checkJobAccessible(
-  jobId: string, cluster: string, info: UserInfo, limitMinutes?: number,
+type ActionType = "cancelJob" | "changeJobLimit" | "queryJobLimit"
+
+interface Props {
+  actionType: ActionType
+  jobId: string
+  cluster: string
+  info: UserInfo
+  limitMinutes?: number
+  allowUser?: boolean
+}
+
+export async function checkJobAccessible({
+  actionType, jobId, cluster, info, limitMinutes, allowUser = true,
+}: Props,
 ): Promise<Result> {
 
   const client = getClient(JobServiceClient);
@@ -58,7 +70,9 @@ export async function checkJobAccessible(
     return result;
   }
   // 用户发起了这个作业
-  if (job.user === info.identityId) {
+  // 如果是取消作业和查询作业时限，返回"OK"
+  // 如果是修改作业时限，需要allowUser 为true时返回"OK"
+  if (job.user === info.identityId && (actionType !== "changeJobLimit" || allowUser)) {
     result.jobAccessible = "OK";
     return result;
   }

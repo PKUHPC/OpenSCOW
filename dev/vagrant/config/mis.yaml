@@ -130,6 +130,9 @@ createUser:
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
 
+# 用户是否可以修改作业时限配置
+# allowUserChangeJobTimeLimit: true
+
 # #自定义消费表单其他存储内容
 # jobChargeMetadata:
 #   # 可选。需要保存的作业的字段，字段参考src/entities/JobInfo
@@ -143,3 +146,5 @@ createUser:
 #       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
 #       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
 #       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+
+

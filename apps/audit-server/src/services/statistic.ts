@@ -11,7 +11,7 @@
  */
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
-import { QueryOrder } from "@mikro-orm/core";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
@@ -28,11 +28,11 @@ export const statisticServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(OperationLog, "o");
 
       qb
-        .select("DATE(o.operation_time) as date, COUNT(DISTINCT o.operator_user_id) as userCount")
+        .select([raw("DATE(o.operation_time) as date"), raw("COUNT(DISTINCT o.operator_user_id) as userCount")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .groupBy("DATE(o.operation_time)")
-        .orderBy({ "DATE(o.operation_time)": QueryOrder.DESC });
+        .groupBy(raw("DATE(o.operation_time)"))
+        .orderBy({ [raw("DATE(o.operation_time)")]: QueryOrder.DESC });
 
       const records: {date: string, userCount: number}[] = await qb.execute();
 
@@ -68,12 +68,12 @@ export const statisticServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
-        .select("JSON_EXTRACT(meta_data, '$.$case') as operationType, COUNT(*) as count")
+        .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: portalOperationType } })
-        .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
-        .orderBy({ "COUNT(*)": QueryOrder.DESC });
+        .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: portalOperationType } })
+        .groupBy(raw("JSON_EXTRACT(meta_data, '$.$case')"))
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 
@@ -122,12 +122,12 @@ export const statisticServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
-        .select("JSON_EXTRACT(meta_data, '$.$case') as operationType, COUNT(*) as count")
+        .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .andWhere({ "JSON_EXTRACT(meta_data, '$.$case')": { $in: misOperationType } })
-        .groupBy("JSON_EXTRACT(meta_data, '$.$case')")
-        .orderBy({ "COUNT(*)": QueryOrder.DESC });
+        .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: misOperationType } })
+        .groupBy(raw("JSON_EXTRACT(meta_data, '$.$case')"))
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 

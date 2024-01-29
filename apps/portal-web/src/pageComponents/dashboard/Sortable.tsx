@@ -30,7 +30,7 @@ import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Card, message } from "antd";
 import { useRouter } from "next/router";
 import { join } from "path";
-import React, { FC, useCallback, useEffect, useMemo, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
