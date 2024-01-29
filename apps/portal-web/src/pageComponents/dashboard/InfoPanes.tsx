@@ -68,7 +68,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
               loading={loading}
               title={{
                 title:t(p("nodeInfo")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
               }}
               tag={{ itemName:t(p("node")), num:nodeCount }}
               paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
@@ -84,7 +84,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
               cpuInfo={{
                 title:{
                   title:t(p("resourceInfo")),
-                  subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+                  subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
                 },
                 tag:{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) },
                 paneData: [{
@@ -109,7 +109,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
             <InfoPane
               loading={loading}
               title={{ title:t(p("job")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName}`,
+                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
               }}
               tag={{ itemName:t(p("job")), num:jobCount }}
               paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },

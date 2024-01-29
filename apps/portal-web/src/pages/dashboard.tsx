@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -27,6 +28,10 @@ import { Head } from "src/utils/head";
 interface Props {
 }
 
+interface FulfilledResult {
+  clusterInfo: {clusterName: string, partitions: PartitionInfo[]}
+}
+
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
@@ -38,22 +43,47 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  const { data:clusterInfo, isLoading } = useAsync({
+  const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       const clusters = publicConfig.CLUSTERS;
 
-      const rawClusterInfo =
-      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })),
+      const rawClusterInfoPromises = clusters.map((x) =>
+        api.getClusterRunningInfo({ query: { clusterId: x.id } }),
       );
 
-      return rawClusterInfo
-        .map((cluster, idx) => ({ clusterInfo:{ ...cluster.clusterInfo, clusterName:clusters[idx].name } }))
+      const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+      // 处理成功的结果
+      const successfulResults = rawClusterInfoResults
+        .filter(
+          (result): result is PromiseFulfilledResult<FulfilledResult> =>
+            result.status === "fulfilled")
+        .map((result) => result.value);
+
+
+      // 处理失败的结果
+      const failedClusters = clusters.filter((x) =>
+        !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+
+      const clustersInfo = successfulResults
+        .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
+          clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
         .flatMap((cluster) =>
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
+            cpuUsage:x.runningCpuCount / x.cpuCoreCount,
+            // 有些分区没有gpu就为空，前端显示'-'
+            ...x.gpuCoreCount ? { gpuUsage:x.runningGpuCount / x.gpuCoreCount } : {},
           })),
         );
+
+      return {
+        clustersInfo,
+        failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
+      };
+
     }, []),
   });
 
@@ -63,7 +93,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       <QuickEntry></QuickEntry>
       <OverviewTable
         isLoading={isLoading}
-        clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        failedClusters={data?.failedClusters ?? []}
       />
     </div>
   );

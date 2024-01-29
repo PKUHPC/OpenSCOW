@@ -1,5 +1,17 @@
 # @scow/grpc-api
 
+## 1.5.0
+
+### Minor Changes
+
+- f023d52: 新增数据统计接口，audit 新增 GetActiveUserCount，GetPortalUsageCount，GetMisUsageCount, server 新增 GetTopChargeAccount，GetDailyCharge，GetTopPayAccount，GetDailyPay，GetStatisticInfo，GetTopSubmitJobUsers，GetNewJobCount，GetJobTotalCount，GetNewUserCount
+- 081fbcf: server 新增 Export Service, 新增 ExportAccount, ExportUser, ExportChargeRecord, ExportPayRecord 接口，audit-server 新增 ExportOperationLog 接口
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+
 ## 1.4.0
 
 ### Minor Changes

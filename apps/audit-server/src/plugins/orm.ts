@@ -11,8 +11,10 @@
  */
 
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { MikroORM, Options } from "@mikro-orm/core";
-import { MySqlDriver } from "@mikro-orm/mysql";
+import { MikroORM } from "@mikro-orm/core";
+import { Migrator } from "@mikro-orm/migrations";
+import { defineConfig, MySqlDriver } from "@mikro-orm/mysql";
+import { SeedManager } from "@mikro-orm/seeder";
 import { join } from "path";
 import { auditConfig } from "src/config/audit";
 import { config } from "src/config/env";
@@ -21,25 +23,24 @@ import { entities } from "../entities";
 
 const distPath = process.env.NODE_ENV === "production" ? "build" : "src";
 
-export const ormConfigs = {
+export const ormConfigs = defineConfig({
   host: auditConfig.db.host,
   port: auditConfig.db.port,
   user: auditConfig.db.user,
   dbName: config.DB_NAME ?? auditConfig.db.dbName,
   password: config.DB_PASSWORD ?? auditConfig.db.password,
-  type: "mysql",
   forceUndefined: true,
-  runMigrations: true,
+  extensions: [Migrator, SeedManager],
   migrations: {
     path: join(distPath, "migrations"),
-    pattern: /^[\w-]+\d+\.(j|t)s$/,
+    glob: "*.{js,ts}",
   },
   entities,
   debug: auditConfig.db.debug,
   seeder: {
     path: join(distPath, "seenders"),
   },
-} as Options<MySqlDriver>;
+});
 
 export const ormPlugin = plugin(async (server) => {
   // create the database if not exists.

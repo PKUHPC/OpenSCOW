@@ -12,7 +12,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import React, { FC } from "react";
+import { FC } from "react";
 
 import { CardItem, ItemProps } from "./CardItem";
 

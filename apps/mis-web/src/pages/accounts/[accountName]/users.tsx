@@ -23,6 +23,7 @@ import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.accounts.accountName.users.");
@@ -57,7 +58,20 @@ export const UsersPage: NextPage = requireAuth(
           titleText={title}
         >
           <Space split={<Divider type="vertical" />}>
-            <AddUserButton refresh={reload} accountName={account.accountName} token={userStore.user.token} />
+            {
+              publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.allowed && (
+                <AddUserButton
+                  refresh={reload}
+                  accountName={account.accountName}
+                  token={userStore.user.token}
+                  canCreateUserIfNotExist={
+                    (account.role === UserRole.OWNER || account.role === UserRole.ADMIN) &&
+                    publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.createUserIfNotExist
+                  }
+                />
+              )
+            }
+
             <RefreshLink refresh={update} languageId={languageId} />
           </Space>
         </PageTitle>

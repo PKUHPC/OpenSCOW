@@ -1,6 +1,6 @@
 {
   "name": "@scow/audit-server",
-  "version": "2.1.3",
+  "version": "2.2.0",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -25,23 +25,24 @@
     "@ddadaal/tsgrpc-server": "0.19.5",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@grpc/grpc-js": "1.9.11",
-    "@mikro-orm/cli": "5.9.4",
-    "@mikro-orm/core": "5.9.4",
-    "@mikro-orm/migrations": "5.9.4",
-    "@mikro-orm/mysql": "5.9.4",
+    "@grpc/grpc-js": "1.9.14",
+    "@mikro-orm/cli": "6.0.5",
+    "@mikro-orm/core": "6.0.5",
+    "@mikro-orm/migrations": "6.0.5",
+    "@mikro-orm/mysql": "6.0.5",
+    "@mikro-orm/seeder": "6.0.5",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-operation-log": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
-    "dayjs": "1.11.9",
+    "dayjs": "1.11.10",
     "pino": "8.16.2",
-    "pino-pretty": "10.2.3"
+    "pino-pretty": "10.3.1"
   },
   "devDependencies": {
-    "@types/google-protobuf": "3.15.10"
+    "@types/google-protobuf": "3.15.12"
   },
   "mikro-orm": {
     "useTsNode": true,
