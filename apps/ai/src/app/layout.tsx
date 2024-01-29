@@ -33,6 +33,7 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
       <head>
         <meta name="format-detection" content="telephone=no" />
         <link href={join(BASE_PATH, "manifest.json")} rel="manifest" id="manifest" />
+        <link href={join(BASE_PATH, "/api/icon?type=favicon")} rel="icon" type="image/x-icon" />
       </head>
       <ServerClientProvider>
         <ClientLayout initialDark={dark}>

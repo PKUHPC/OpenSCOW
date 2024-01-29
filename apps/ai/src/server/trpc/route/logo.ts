@@ -11,16 +11,15 @@
  */
 
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { serveIcon } from "@scow/lib-web/build/routes/icon/icon";
 import { serveLogo } from "@scow/lib-web/build/routes/icon/logo";
 import { router } from "src/server/trpc/def";
-import { procedure } from "src/server/trpc/procedure/base";
+import { baseProcedure } from "src/server/trpc/procedure/base";
 import { z } from "zod";
-
-const BUILTIN_DEFAULT_DIR = "assets/logo";
 
 export const logo = router({
 
-  logo: procedure
+  logo: baseProcedure
     .meta({
       openapi: {
         method: "GET",
@@ -35,6 +34,24 @@ export const logo = router({
     }))
     .output(z.void())
     .query(async ({ ctx: { req, res } }) => {
-      return serveLogo(req, res, BUILTIN_DEFAULT_DIR, DEFAULT_CONFIG_BASE_PATH);
+      return serveLogo(req, res, "assets/logo", DEFAULT_CONFIG_BASE_PATH);
+    }),
+
+  icon: baseProcedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/icon",
+        tags: ["logo"],
+        summary: "icon",
+      },
+    })
+    .input(z.object({
+      type: z.enum(["favicon", "512", "192"]),
+    }))
+    .output(z.void())
+    .query(async ({ ctx: { req, res } }) => {
+      console.log(11111);
+      return serveIcon(req, res, "assets/icons", DEFAULT_CONFIG_BASE_PATH);
     }),
 });
