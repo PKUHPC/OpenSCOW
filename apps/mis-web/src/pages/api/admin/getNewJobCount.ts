@@ -15,17 +15,14 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
 export const GetNewJobCountResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.Object({
-      year: Type.Number(),
-      month: Type.Number(),
-      day: Type.Number(),
-    }),
+    date: DateSchema,
     count: Type.Number(),
   })),
 });

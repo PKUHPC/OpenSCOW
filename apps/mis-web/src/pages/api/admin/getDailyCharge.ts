@@ -15,6 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { ensureNotUndefined } from "src/utils/checkNull";
@@ -22,11 +23,7 @@ import { getClient } from "src/utils/client";
 
 export const GetDailyChargeResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.Object({
-      year: Type.Number(),
-      month: Type.Number(),
-      day: Type.Number(),
-    }),
+    date: DateSchema,
     amount: Money,
   })),
 });

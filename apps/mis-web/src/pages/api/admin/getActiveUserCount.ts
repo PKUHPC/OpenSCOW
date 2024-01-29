@@ -15,16 +15,13 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { StatisticServiceClient } from "@scow/protos/build/audit/statistic";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { getAuditClient } from "src/utils/client";
 
 export const GetActiveUserCountResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.Object({
-      year: Type.Number(),
-      month: Type.Number(),
-      day: Type.Number(),
-    }),
+    date: DateSchema,
     count: Type.Number(),
   })),
 });
