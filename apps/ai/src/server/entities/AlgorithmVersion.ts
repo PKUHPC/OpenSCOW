@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { EntitySchema, type Ref } from "@mikro-orm/core";
+import { Cascade, EntitySchema, type Ref } from "@mikro-orm/core";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, toRef } from "src/server/utils/orm";
 
 import { Algorithm } from "./Algorithm";
@@ -80,4 +80,4 @@ algorithmVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 algorithmVersionEntitySchema.addProperty("sharedStatus", String);
 algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", {
-  entity: () => Algorithm, onDelete: "CASCADE", wrappedReference: true });
+  entity: () => Algorithm, cascade: [Cascade.ALL], ref: true });

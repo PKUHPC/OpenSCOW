@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { IdentifiedReference, ref, Reference } from "@mikro-orm/core";
+import { Ref, ref, Reference } from "@mikro-orm/core";
 import { EntityManager } from "@mikro-orm/mysql";
 
 export const DEFAULT_PAGE_SIZE = 50;
@@ -23,9 +23,9 @@ export const paginationProps = (page?: number, pageSize: number = DEFAULT_PAGE_S
     } : {}
 );
 
-export type EntityOrRef<T> = T | IdentifiedReference<T>;
+export type EntityOrRef<T> = T | Ref<T>;
 
-export function toRef<T extends {}>(t: EntityOrRef<T>): IdentifiedReference<T> {
+export function toRef<T extends {}>(t: EntityOrRef<T>): Ref<T> {
   if (t instanceof Reference) {
     return t;
   } else {
