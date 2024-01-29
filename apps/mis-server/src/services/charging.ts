@@ -28,6 +28,7 @@ import {
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
+import { convertToDateMessage } from "src/utils/date";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
@@ -299,29 +300,32 @@ export const chargingServiceServer = plugin((server) => {
       ];
     },
 
-    getDailyCharge: async ({ request, em }) => {
+    getDailyCharge: async ({ request, em, logger }) => {
 
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
-        .select([raw("DATE(cr.time) as date"), raw("SUM(cr.amount) as totalAmount")])
+        .select([
+          raw("DATE(CONVERT_TZ(cr.time, 'UTC', ?)) as date", [timeZone]),
+          raw("SUM(cr.amount) as totalAmount"),
+        ])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
-        .groupBy(raw("DATE(cr.time)"))
-        .orderBy({ [raw("DATE(cr.time)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`, `${timeZone}`],
         queryQb: qb,
       });
 
       return [{
         results: records.map((record) => ({
-          date: new Date(record.date).toISOString(),
+          date: convertToDateMessage(record.date, logger),
           amount: numberToMoney(record.totalAmount),
         })),
       }];
@@ -357,29 +361,32 @@ export const chargingServiceServer = plugin((server) => {
       ];
     },
 
-    getDailyPay: async ({ request, em }) => {
+    getDailyPay: async ({ request, em, logger }) => {
 
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
       qb
-        .select([raw("DATE(pr.time) as date"), raw("SUM(pr.amount) as totalAmount")])
+        .select([
+          raw("DATE(CONVERT_TZ(pr.time, 'UTC', ?)) as date", [timeZone]),
+          raw("SUM(pr.amount) as totalAmount"),
+        ])
         .where({ time: { $gte: startTime } })
         .andWhere({ time: { $lte: endTime } })
         .andWhere({ accountName: { $ne: null } })
-        .groupBy(raw("DATE(pr.time)"))
-        .orderBy({ [raw("DATE(pr.time)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const records: {date: string, totalAmount: number}[] = await queryWithCache({
         em,
-        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`],
+        queryKeys: ["get_daily_pay", `${startTime}`, `${endTime}`, `${timeZone}`],
         queryQb: qb,
       });
 
       return [{
         results: records.map((record) => ({
-          date: new Date(record.date).toISOString(),
+          date: convertToDateMessage(record.date, logger),
           amount: numberToMoney(record.totalAmount),
         })),
       }];

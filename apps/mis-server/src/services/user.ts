@@ -39,6 +39,7 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
+import { convertToDateMessage } from "src/utils/date";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
 
@@ -762,22 +763,25 @@ export const userServiceServer = plugin((server) => {
       return [{}];
     },
 
-    getNewUserCount: async ({ request, em }) => {
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+    getNewUserCount: async ({ request, em, logger }) => {
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const qb = em.createQueryBuilder(User, "u");
       qb
-        .select([raw("DATE(u.create_time) as date"), raw("count(*) as count")])
+        .select([raw("DATE(CONVERT_TZ(u.create_time, 'UTC', ?)) as date", [timeZone]), raw("count(*) as count")])
         .where({ createTime: { $gte: startTime } })
         .andWhere({ createTime: { $lte: endTime } })
-        .groupBy(raw("DATE(u.create_time)"))
-        .orderBy({ [raw("DATE(u.create_time)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const results: {date: string, count: number}[] = await qb.execute();
 
       return [
         {
-          results,
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
         },
       ];
     },

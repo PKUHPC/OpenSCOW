@@ -22,7 +22,11 @@ import { getClient } from "src/utils/client";
 
 export const GetDailyPayResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.String(),
+    date: Type.Object({
+      year: Type.Number(),
+      month: Type.Number(),
+      day: Type.Number(),
+    }),
     amount: Money,
   })),
 });
@@ -38,6 +42,8 @@ export const GetDailyPaySchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
 
     endTime: Type.String({ format: "date-time" }),
+
+    timeZone: Type.String(),
 
   }),
 
@@ -56,18 +62,21 @@ export default typeboxRoute(GetDailyPaySchema,
       return;
     }
 
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, timeZone } = req.query;
 
     const client = getClient(ChargingServiceClient);
 
     const { results } = await asyncClientCall(client, "getDailyPay", {
       startTime,
       endTime,
+      timeZone,
     });
 
     return {
       200: {
-        results: results.map((x) => ensureNotUndefined(x, ["date", "amount"])),
+        results: results
+          .filter((x) => x.date !== undefined)
+          .map((x) => ensureNotUndefined(x, ["date", "amount"])),
       },
     };
   });

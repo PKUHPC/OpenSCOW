@@ -20,7 +20,11 @@ import { getClient } from "src/utils/client";
 
 export const GetNewUserCountResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.String(),
+    date: Type.Object({
+      year: Type.Number(),
+      month: Type.Number(),
+      day: Type.Number(),
+    }),
     count: Type.Number(),
   })),
 });
@@ -36,6 +40,8 @@ export const GetNewUserCountSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
 
     endTime: Type.String({ format: "date-time" }),
+
+    timeZone: Type.String(),
 
   }),
 
@@ -54,21 +60,24 @@ export default typeboxRoute(GetNewUserCountSchema,
       return;
     }
 
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, timeZone } = req.query;
 
     const client = getClient(UserServiceClient);
 
     const { results } = await asyncClientCall(client, "getNewUserCount", {
       startTime,
       endTime,
+      timeZone: timeZone,
     });
 
     return {
       200: {
-        results: results.map((result) => ({
-          date: result.date || "",
-          count: result.count,
-        })),
+        results: results
+          .filter((x) => x.date !== undefined)
+          .map((x) => ({
+            date: x.date!,
+            count: x.count,
+          })),
       },
     };
   });

@@ -32,6 +32,7 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
+import { convertToDateMessage } from "src/utils/date";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -402,15 +403,17 @@ export const jobServiceServer = plugin((server) => {
     },
 
     getNewJobCount: async ({ request, em }) => {
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select([raw("DATE(j.time_submit) as date"), raw("COUNT(*) as count")])
+        .select([
+          raw("DATE(CONVERT_TZ(j.time_submit, 'UTC', ?)) as date", [timeZone]),
+          raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
-        .groupBy(raw("DATE(j.time_submit)"))
-        .orderBy({ [raw("DATE(j.time_submit)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const results: {date: string, count: number}[] = await queryWithCache({
         em,
@@ -419,7 +422,10 @@ export const jobServiceServer = plugin((server) => {
       });
       return [
         {
-          results,
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
         },
       ];
     },

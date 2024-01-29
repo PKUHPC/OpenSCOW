@@ -18,6 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
 import { authUrl } from "src/config";
 import { Tenant } from "src/entities/Tenant";
@@ -29,6 +30,7 @@ import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
+dayjs.extend(utc);
 
 const anotherTenant = "anotherTenant";
 
@@ -517,7 +519,7 @@ it("change an inexistent user email", async () => {
   expect(reply.code).toBe(Status.NOT_FOUND);
 });
 
-it("get new user count", async () => {
+it("get new user count in UTC+8 timezone", async () => {
 
   const em = server.ext.orm.em.fork();
   const today = dayjs();
@@ -558,12 +560,34 @@ it("get new user count", async () => {
   const info = await asyncClientCall(client, "getNewUserCount", {
     startTime: twoDaysBefore.startOf("day").toISOString(),
     endTime: today.endOf("day").toISOString(),
+    timeZone: "Asia/Shanghai",
   });
 
+  const todyInUtcPlus8 = today.utcOffset(8);
+
+  const yesterdayInUtcPlus8 = yesterday.utcOffset(8);
+
+  const twoDaysBeforeInUtcPlus8 = twoDaysBefore.utcOffset(8);
+
   expect(info.results).toMatchObject([
-    { date: today.startOf("day").toISOString(), count: 30 },
-    { date: yesterday.startOf("day").toISOString(), count: 20 },
-    { date: twoDaysBefore.startOf("day").toISOString(), count: 10 },
+    { date:
+      {
+        year: todyInUtcPlus8.year(),
+        month: todyInUtcPlus8.month() + 1,
+        day: todyInUtcPlus8.date(),
+      }, count: 30 },
+    { date:
+      {
+        year: yesterdayInUtcPlus8.year(),
+        month: yesterdayInUtcPlus8.month() + 1,
+        day: yesterdayInUtcPlus8.date(),
+      }, count: 20 },
+    { date:
+        {
+          year: twoDaysBeforeInUtcPlus8.year(),
+          month: twoDaysBeforeInUtcPlus8.month() + 1,
+          day: twoDaysBeforeInUtcPlus8.date(),
+        }, count: 10 },
   ]);
 
 });

@@ -293,7 +293,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
 
-  getNewJobCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
+  getNewJobCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
 
   getTenantUsers: async () => ({ results: mockUsers }),
 
@@ -388,12 +388,12 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
-  getNewUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
-  getActiveUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
+  getNewUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
+  getActiveUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
   getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
-  getDailyCharge: async () => ({ results: [{ date: new Date().toISOString(), amount: numberToMoney(10) }]}),
+  getDailyCharge: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
   getTopPayAccount: async () => ({ results: [{ accountName: "test", payAmount: numberToMoney(10) }]}),
-  getDailyPay: async () => ({ results: [{ date: new Date().toISOString(), amount: numberToMoney(10) }]}),
+  getDailyPay: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
   getPortalUsageCount: async () => ({ results: [{ operationType: "submitJob", count: 10 }]}),
   getMisUsageCount: async () => ({ results: [{ operationType: "createAccount", count: 10 }]}),
   getStatisticInfo: async () =>

@@ -4,17 +4,18 @@ package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 
+import "google/type/date.proto";
 
 message Data {
-  // 如果此API返回值只包含date，请使用protobuf专门用来代表日期的类型：https://github.com/googleapis/googleapis/blob/master/google/type/date.proto
-  // 注意返回的Date为UTC时间的date
-  google.protobuf.Timestamp date = 1;
+  google.type.Date date = 1;
   uint32 count = 2;
 }
 
 message GetActiveUserCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  optional string time_zone = 3;
 }
 
 message GetActiveUserCountResponse {
