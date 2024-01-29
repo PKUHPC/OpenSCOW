@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   GetJobsResponse,
   JobBillingItem,
@@ -32,7 +33,6 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
-import { convertToDateMessage } from "src/utils/date";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";

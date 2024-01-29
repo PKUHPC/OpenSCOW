@@ -11,4 +11,5 @@
  */
 
 export * from "./apiAuthPlugin";
+export * from "./date";
 export * from "./systemLanguage";

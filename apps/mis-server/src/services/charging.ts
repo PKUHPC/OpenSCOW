@@ -14,6 +14,7 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { convertToDateMessage } from "@scow/lib-server/build/date";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
@@ -28,7 +29,6 @@ import {
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
-import { convertToDateMessage } from "src/utils/date";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 

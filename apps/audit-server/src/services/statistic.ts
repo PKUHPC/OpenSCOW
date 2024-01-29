@@ -13,9 +13,9 @@
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
+import { convertToDateMessage } from "@scow/lib-server/build/date";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
-import { convertToDateMessage } from "src/utils/date";
 
 
 export const statisticServiceServer = plugin((server) => {

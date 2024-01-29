@@ -166,6 +166,9 @@ importers:
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow

@@ -19,6 +19,7 @@ import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabil
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
   GetAccountUsersResponse,
@@ -39,7 +40,6 @@ import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
-import { convertToDateMessage } from "src/utils/date";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
 
