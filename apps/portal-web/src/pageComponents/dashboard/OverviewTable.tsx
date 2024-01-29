@@ -23,8 +23,8 @@ import { styled } from "styled-components";
 export interface ClusterInfo extends PartitionInfo {
   id: number;
   clusterName: I18nStringType | undefined;
-  cpuUsage: number;
-  gpuUsage?: number;
+  cpuUsage: string;
+  gpuUsage?: string;
 }
 
 interface Props {
@@ -38,8 +38,8 @@ interface InfoProps {
   partitionName: string;
   nodeCount: number;
   pendingJobCount: number;
-  cpuUsage: number;
-  gpuUsage?: number;
+  cpuUsage: string;
+  gpuUsage?: string;
   usageRatePercentage: number;
   partitionStatus: PartitionInfo_PartitionStatus;
 }

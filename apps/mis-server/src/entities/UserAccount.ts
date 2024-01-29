@@ -33,10 +33,10 @@ export class UserAccount {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { cascade: [Cascade.ALL], ref: true })
+  @ManyToOne(() => User, { cascade: [Cascade.ALL], ref: true, nullable: false })
     user: Ref<User>;
 
-  @ManyToOne(() => Account, { cascade: [Cascade.ALL], ref: true })
+  @ManyToOne(() => Account, { cascade: [Cascade.ALL], ref: true, nullable: false })
     account: Ref<Account>;
 
   @Property({ columnType: "varchar(10)", comment: Object.values(UserStatus).join(", ") })
