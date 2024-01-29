@@ -394,7 +394,7 @@ export const createAppSession = procedure
           memoryMb: memory,
           timeLimitMinutes: maxTime,
           // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
-          workingDirectory: workingDirectory ?? appJobsDirectory,
+          workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
           script: remoteEntryPath,
           // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
           extraOptions: [JobType.APP, "web"],
