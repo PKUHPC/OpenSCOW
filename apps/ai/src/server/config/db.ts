@@ -12,7 +12,9 @@
 
 import { join } from "node:path";
 
+import { Migrator } from "@mikro-orm/migrations";
 import { defineConfig } from "@mikro-orm/mysql";
+import { SeedManager } from "@mikro-orm/seeder";
 import { entities } from "src/server/entities";
 import { migrations } from "src/server/migrations";
 
@@ -27,8 +29,8 @@ export const ormConfigs = defineConfig({
   user: aiConfig.db.user,
   dbName: aiConfig.db.dbName,
   password: aiConfig.db.password, // envConfig.DB_PASSWORD ||
-  type: "mysql",
   forceUndefined: true,
+  extensions: [Migrator, SeedManager],
   migrations: {
     pathTs: join(distPath, "migrations"),
     migrationsList: migrations,

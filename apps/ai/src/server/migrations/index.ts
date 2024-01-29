@@ -16,6 +16,7 @@ import { Migration20240103020827 } from './Migration20240103020827'
 import { Migration20240103072610 } from "./Migration20240103072610";
 import { Migration20240112074625 } from "./Migration20240112074625";
 import { Migration20240126070152 } from "./Migration20240126070152";
+import { Migration20240129034339 } from "./Migration20240129034339"
 
 
 export const migrations =
@@ -26,4 +27,5 @@ export const migrations =
   Migration20240103072610,
   Migration20240112074625,
   Migration20240126070152,
+  Migration20240129034339,
 ].map((x) => ({ name: x.name, class: x }));

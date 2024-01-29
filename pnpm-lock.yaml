@@ -143,17 +143,20 @@ importers:
         specifier: 1.9.14
         version: 1.9.14
       '@mikro-orm/cli':
-        specifier: 5.9.4
-        version: 5.9.4(@mikro-orm/migrations@5.9.4)(@mikro-orm/mysql@5.9.4)
+        specifier: 6.0.5
+        version: 6.0.5
       '@mikro-orm/core':
-        specifier: 5.9.4
-        version: 5.9.4(@mikro-orm/migrations@5.9.4)(@mikro-orm/mysql@5.9.4)
+        specifier: 6.0.5
+        version: 6.0.5
       '@mikro-orm/migrations':
-        specifier: 5.9.4
-        version: 5.9.4(@mikro-orm/core@5.9.4)
+        specifier: 6.0.5
+        version: 6.0.5(@mikro-orm/core@6.0.5)
       '@mikro-orm/mysql':
-        specifier: 5.9.4
-        version: 5.9.4(@mikro-orm/core@5.9.4)(@mikro-orm/migrations@5.9.4)
+        specifier: 6.0.5
+        version: 6.0.5(@mikro-orm/core@6.0.5)
+      '@mikro-orm/seeder':
+        specifier: 6.0.5
+        version: 6.0.5(@mikro-orm/core@6.0.5)
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -354,8 +357,8 @@ importers:
         specifier: 8.5.10
         version: 8.5.10
       fs-extra:
-        specifier: 11.1.1
-        version: 11.1.1
+        specifier: 11.2.0
+        version: 11.2.0
       jest-environment-jsdom:
         specifier: 29.7.0
         version: 29.7.0
@@ -9752,7 +9755,7 @@ packages:
       '@jest/types': 29.6.3
       chalk: 4.1.2
       exit: 0.1.2
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jest-config: 29.7.0(@types/node@20.11.5)(ts-node@10.9.2)
       jest-util: 29.7.0
       prompts: 2.4.2
@@ -11793,7 +11796,7 @@ packages:
     resolution: {integrity: sha512-0rcTq621PD5jM/e0a3EJoGC/1TC5ZBCERW82LQuwfGnCa1V8w7dpYH1yNu+SLb6E5dkeCBzKEyLGlFrnr+dUyw==}
     engines: {node: '>=14.14'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
     dev: true
@@ -11802,7 +11805,7 @@ packages:
     resolution: {integrity: sha512-PmDi3uwK5nFuXh7XDTlVnS17xJS7vW36is2+w3xcv8SVxiB4NyATf4ctkVY5bkSjX0Y4nbvZCq1/EjtEyr9ktw==}
     engines: {node: '>=14.14'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
 
@@ -11819,7 +11822,7 @@ packages:
     resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==}
     engines: {node: '>=6 <7 || >=8'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 4.0.0
       universalify: 0.1.2
     dev: true
@@ -11829,7 +11832,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       at-least-node: 1.0.0
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       jsonfile: 6.1.0
       universalify: 2.0.0
 
@@ -14202,7 +14205,7 @@ packages:
     resolution: {integrity: sha512-OfCBkGEw4nN6JLtgRidPX6QxjBQGQf72q3si2uvqyFEMbycSFFHwAZeXx6cJgFM9wmLrf9zBwCP3Ivqa+LLZPw==}
     engines: {node: '>=6'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       js-yaml: 3.14.1
       pify: 4.0.1
       strip-bom: 3.0.0
@@ -18687,7 +18690,7 @@ packages:
     resolution: {integrity: sha512-VIMnQi/Z4HT2Fxuwg5KrY174U1VdUIASQVWXXyqtNRtxSr9IYkn1rsI6Tb6HsrHCmB7gVpNwX6JxPTHcH6IoTA==}
     engines: {node: '>=6'}
     dependencies:
-      graceful-fs: 4.2.10
+      graceful-fs: 4.2.11
       js-yaml: 3.14.1
       pify: 4.0.1
       strip-bom: 3.0.0
@@ -18840,6 +18843,20 @@ packages:
     engines: {node: '>=4'}
     dependencies:
       redis-errors: 1.2.0
+    dev: false
+
+  /redux-immutable@4.0.0(immutable@3.8.2):
+    resolution: {integrity: sha512-SchSn/DWfGb3oAejd+1hhHx01xUoxY+V7TeK0BKqpkLKiQPVFf7DYzEaKmrEVxsWxielKfSK9/Xq66YyxgR1cg==}
+    peerDependencies:
+      immutable: ^3.8.1 || ^4.0.0-rc.1
+    dependencies:
+      immutable: 3.8.2
+    dev: false
+
+  /redux@4.2.1:
+    resolution: {integrity: sha512-LAUYz4lc+Do8/g7aeRa8JkyDErK6ekstQaqWQrNRW//MY1TvCEpMtpTWvlQ+FPbWCx+Xixu/6SHt5N0HR+SB4w==}
+    dependencies:
+      '@babel/runtime': 7.23.8
     dev: false
 
   /reflect-metadata@0.2.1:
@@ -21023,13 +21040,17 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  /ufo@1.3.2:
+    resolution: {integrity: sha512-o+ORpgGwaYQXgqGDwd+hkS4PuZ3QnmqMMxRuajK/a38L6fTpcE5GPIfrf+L/KemFzfUpeUQc1rRS1iDBozvnFA==}
+    dev: false
+
   /umzug@3.5.1:
     resolution: {integrity: sha512-jvhKP16BSjgQFNna4OhyTq5R8FYL51F1Pxdv9B+BVf/5zoazCWDmIQuyMWKsYPdbeLLJW4/dJzvpH2DvM7wcug==}
     engines: {node: '>=12'}
     dependencies:
       '@rushstack/ts-command-line': 4.13.1
       emittery: 0.13.1
-      glob: 8.0.3
+      glob: 8.1.0
       pony-cause: 2.1.4
       type-fest: 3.13.1
     dev: false

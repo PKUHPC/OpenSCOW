@@ -104,12 +104,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -207,6 +209,7 @@
           ],
           "composite": false,
           "keyName": "algorithm_version_algorithm_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -216,6 +219,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -232,10 +236,10 @@
             "id"
           ],
           "referencedTableName": "algorithm",
-          "deleteRule": "CASCADE",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -342,12 +346,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -445,6 +451,7 @@
           ],
           "composite": false,
           "keyName": "dataset_version_dataset_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -454,6 +461,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -470,10 +478,10 @@
             "id"
           ],
           "referencedTableName": "dataset",
-          "deleteRule": "CASCADE",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -618,6 +626,7 @@
             "owner"
           ],
           "composite": true,
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -627,12 +636,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -741,12 +752,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -853,6 +866,7 @@
           ],
           "composite": false,
           "keyName": "model_version_model_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -862,6 +876,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -878,10 +893,11 @@
             "id"
           ],
           "referencedTableName": "model",
-          "deleteRule": "CASCADE",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     }
-  ]
+  ],
+  "nativeEnums": {}
 }
