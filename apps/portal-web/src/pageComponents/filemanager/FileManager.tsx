@@ -349,7 +349,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   };
 
-  const router = useRouter();
   const editFile = queryToString(router.query.edit);
 
   useEffect(() => {
