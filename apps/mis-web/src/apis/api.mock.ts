@@ -84,9 +84,11 @@ export const runningJob: RunningJob = {
 
 const mockAccounts: Required<Account>[] = [
   { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈", comment: "123", balance: numberToMoney(20) },
+    ownerId: "123", ownerName: "哈哈", comment: "123",
+    balance: numberToMoney(20), blockThresholdAmount: numberToMoney(0) },
   { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈哈哈", comment: "123", balance: numberToMoney(30) },
+    ownerId: "123", ownerName: "哈哈哈哈", comment: "123",
+    balance: numberToMoney(30), blockThresholdAmount: numberToMoney(0) },
 ];
 
 const mockUsers = [
@@ -388,6 +390,7 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
+  setBlockThreshold: async () => ({ executed: true }),
   getNewUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
   getActiveUserCount: async () => ({ results: [{ date: new Date().toISOString(), count: 10 }]}),
   getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
