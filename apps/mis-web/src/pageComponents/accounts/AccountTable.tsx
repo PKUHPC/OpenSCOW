@@ -27,6 +27,8 @@ import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
 
+import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
+
 type ShowedTab = "PLATFORM" | "TENANT";
 interface Props {
   data: Static<typeof GetAccountsSchema["responses"]["200"]> | undefined;
@@ -136,6 +138,7 @@ export const AccountTable: React.FC<Props> = ({
     ] : [];
     const remaining = [
       { label: t(pCommon("balance")), value: "balance" },
+      { label:  t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
       { label:  t(p("status")), value: "blocked" },
       { label: t(p("comment")), value: "comment" },
     ];
@@ -207,7 +210,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          width="25%"
+          width="20%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
@@ -231,6 +234,11 @@ export const AccountTable: React.FC<Props> = ({
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
+          render={(b: Money) => moneyToString(b) + t(p("unit")) }
+        />
+        <Table.Column<AdminAccountInfo>
+          dataIndex="blockThresholdAmount"
+          title={t(p("blockThresholdAmount"))}
           render={(b: Money) => moneyToString(b) + t(p("unit")) }
         />
         <Table.Column<AdminAccountInfo>
@@ -323,6 +331,14 @@ export const AccountTable: React.FC<Props> = ({
                     </a>
                   )
               }
+              <SetBlockThresholdAmountLink
+                accountName={r.accountName}
+                balance={r.balance}
+                reload={reload}
+                currentAmount={r.blockThresholdAmount}
+              >
+                {t(p("blockThresholdAmount"))}
+              </SetBlockThresholdAmountLink>
             </Space>
           )}
         />

@@ -62,6 +62,7 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
+      blockThresholdAmount:decimalToMoney(data.accountA.blockThresholdAmount),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -71,6 +72,7 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
+      blockThresholdAmount:decimalToMoney(data.accountB.blockThresholdAmount),
     },
   ]);
 
@@ -94,7 +96,7 @@ it("gets all accounts", async () => {
   const accountC = await em.findOne(Account, { accountName: "hpcc" }) as Account;
   const uaCD = new UserAccount({ user: userD, account: accountC, role: UserRole.OWNER, status: UserStatus.BLOCKED });
   await em.persistAndFlush([userD, uaCD]);
-  
+
   const resp = await asyncClientCall(client, "getAccounts", {});
 
   expect(resp.results).toIncludeSameMembers([
@@ -107,6 +109,7 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
+      blockThresholdAmount:decimalToMoney(data.accountA.blockThresholdAmount),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -116,6 +119,7 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
+      blockThresholdAmount:decimalToMoney(data.accountB.blockThresholdAmount),
     },
     { "accountName": "hpcc",
       "blocked": false,
@@ -125,6 +129,7 @@ it("gets all accounts", async () => {
       "tenantName": data.anotherTenant.name,
       comment: "123",
       balance: decimalToMoney(data.accountC.balance),
+      blockThresholdAmount:decimalToMoney(data.accountC.blockThresholdAmount),
     },
   ]);
 });

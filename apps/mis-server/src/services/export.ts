@@ -170,6 +170,7 @@ export const exportServiceServer = plugin((server) => {
           ownerName: ownerUser.name,
           comment: x.comment,
           balance: decimalToMoney(x.balance),
+          blockThresholdAmount: decimalToMoney(x.blockThresholdAmount),
         };
       };
 

@@ -124,6 +124,7 @@ it("export accounts", async () => {
     comment: data.accountA.comment,
     blocked: data.accountA.blocked,
     balance: decimalToMoney(new Decimal(0)),
+    blockThresholdAmount: decimalToMoney(new Decimal(0)),
   }, {
     accountName: data.accountB.accountName,
     tenantName: data.tenant.name,
@@ -133,6 +134,7 @@ it("export accounts", async () => {
     comment: data.accountB.comment,
     blocked: data.accountB.blocked,
     balance: decimalToMoney(new Decimal(0)),
+    blockThresholdAmount: decimalToMoney(new Decimal(0)),
   },
   ]);
 

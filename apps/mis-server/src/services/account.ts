@@ -11,12 +11,12 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -152,6 +152,7 @@ export const accountServiceServer = plugin((server) => {
             ownerName: ownerUser.name,
             comment: x.comment,
             balance: decimalToMoney(x.balance),
+            blockThresholdAmount: decimalToMoney(x.blockThresholdAmount),
           };
         }),
       }];
@@ -332,6 +333,35 @@ export const accountServiceServer = plugin((server) => {
       await em.flush();
 
       return [{ executed: true }];
+    },
+
+    setBlockThreshold: async ({ request, em, logger }) => {
+      const { accountName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
+
+      await em.transactional(async (em) => {
+
+        const account = await em.findOne(Account, { accountName }, {
+          populate: ["tenant"],
+          lockMode: LockMode.PESSIMISTIC_WRITE,
+        });
+
+        if (!account) {
+          throw <ServiceError>{
+            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+          };
+        }
+
+        account.blockThresholdAmount = new Decimal(moneyToNumber(blockThresholdAmount));
+
+        // 判断账户余额是否小于保证金
+        if (account.balance.isLessThan(moneyToNumber(blockThresholdAmount))) {
+          await blockAccount(account, server.ext.clusters, logger);
+        } else {
+          await unblockAccount(account, server.ext.clusters, logger);
+        }
+
+      });
+      return [{}];
     },
   });
 

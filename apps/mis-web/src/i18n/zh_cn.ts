@@ -225,6 +225,7 @@ export default {
         owner:"拥有者",
         ownerIdOrName: "拥有者ID或姓名",
         tenant:"租户",
+        blockThresholdAmount: "封锁阈值",
         comment:"备注",
         status:"状态",
         mangerMember:"管理成员",
@@ -242,6 +243,12 @@ export default {
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
         blockSuccess: "封锁帐户成功！",
         blockFail: "封锁帐户失败！",
+      },
+      setBlockThresholdAmountModal: {
+        setSuccess:"设置成功",
+        setFail: "设置失败",
+        setAmount:"设置封锁阈值",
+        blockThresholdAmount: "封锁阈值",
       },
     },
     admin:{

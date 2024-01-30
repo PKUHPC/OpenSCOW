@@ -115,6 +115,7 @@ export default route(ExportAccountSchema, async (req, res) => {
       userCount:  t(pCommon("userCount")),
       tenantName: t(p("tenant")),
       balance: t(pCommon("balance")),
+      blockThresholdAmount: t(p("blockThresholdAmount")),
       blocked: t(p("status")),
       comment: t(p("comment")),
     };
@@ -126,6 +127,7 @@ export default route(ExportAccountSchema, async (req, res) => {
         userCount: x.userCount,
         tenantName: x.tenantName,
         balance: nullableMoneyToString(x.balance) + t(p("unit")),
+        blockThresholdAmount: nullableMoneyToString(x.blockThresholdAmount) + t(p("unit")),
         blocked: `${x.blocked ? t(p("block")) : t(p("normal"))}`,
         comment: x.comment,
       };

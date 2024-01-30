@@ -225,6 +225,7 @@ export default {
         owner: "Owner",
         ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
+        blockThresholdAmount: "Block Threshold Amount",
         comment: "Comment",
         status: "Status",
         mangerMember: "Manage Members",
@@ -242,6 +243,12 @@ export default {
         blockConfirmContent: "Do you wish to block account {} within tenant {}?",
         blockSuccess: "Account blocking successful!",
         blockFail: "Account blocking failed!",
+      },
+      setBlockThresholdAmountModal: {
+        setSuccess: "Set Successfully",
+        setFail: "Set Failed",
+        setAmount:"Set block threshold amount",
+        blockThresholdAmount: "Block Threshold Amount",
       },
     },
     admin: {
