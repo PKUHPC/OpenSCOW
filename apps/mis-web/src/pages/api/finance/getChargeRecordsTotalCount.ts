@@ -40,7 +40,7 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     type: Type.Optional(Type.String()),
 
     // 消费的用户id
-    userIds: Type.Optional(Type.String()),
+    userIds: Type.Optional(Type.Array(Type.String())),
 
     accountName: Type.Optional(Type.String()),
 
@@ -71,7 +71,7 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     startTime,
     endTime,
     type,
-    userIds,
+    userIds: userIds ?? [],
     target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
   }), ["totalAmount", "totalCount"]);
 

@@ -51,6 +51,10 @@ const now = dayjs();
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
 
+const convertUserIdArray = (userIds: string | undefined) => {
+  return userIds ? userIds.split(",").map((id) => id.trim()) : [];
+};
+
 export const ChargeTable: React.FC<Props> = ({
   accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
   const t = useI18nTranslateToString();
@@ -98,7 +102,7 @@ export const ChargeTable: React.FC<Props> = ({
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
       type: query.type,
-      userIds: query.userIds,
+      userIds: convertUserIdArray(query.userIds),
       isPlatformRecords,
       searchType,
       page: pageInfo.page,
@@ -115,7 +119,7 @@ export const ChargeTable: React.FC<Props> = ({
         type: query.type,
         isPlatformRecords,
         searchType,
-        userIds: query.userIds,
+        userIds: convertUserIdArray(query.userIds),
       },
     });
   }, [query]);

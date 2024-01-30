@@ -234,13 +234,12 @@ export const exportServiceServer = plugin((server) => {
 
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = getChargesSearchType(type);
-      const filterUserIds = userIds ? userIds.split(",").map((id) => id.trim()) : [];
 
       const query = {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
-        ...(filterUserIds.length > 0 ? { userId: { $in: filterUserIds } } : {}),
+        ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
       };
 
       const recordFormat = (x: Loaded<ChargeRecord, never>) => ({

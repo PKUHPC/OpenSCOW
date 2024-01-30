@@ -91,13 +91,15 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
+    const userIdArray = userIds ? userIds.split(",").map((id) => id.trim()) : [];
+
     const stream = asyncReplyStreamCall(client, "exportChargeRecord", {
       count,
       startTime,
       endTime,
       type,
       target,
-      userIds,
+      userIds: userIdArray,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);

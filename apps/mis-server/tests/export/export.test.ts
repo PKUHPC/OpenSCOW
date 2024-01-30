@@ -217,7 +217,7 @@ it("export charge Records", async () => {
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
       tenantName: data.accountA.tenant.getProperty("name") } },
-    userIds: data.userA.userId,
+    userIds: [data.userA.userId],
   });
 
   const handleChargeResponse = (response: ExportChargeRecordResponse): ChargeRecordProto[] => {

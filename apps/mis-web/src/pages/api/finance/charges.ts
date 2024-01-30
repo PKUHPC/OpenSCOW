@@ -73,7 +73,7 @@ export const GetChargesSchema = typeboxRouteSchema({
     searchType: Type.Optional(Type.Enum(SearchType)),
 
     // 消费的用户id
-    userIds: Type.Optional(Type.String()),
+    userIds: Type.Optional(Type.Array(Type.String())),
 
     /**
      * @minimum 1
@@ -169,7 +169,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     startTime,
     endTime,
     type,
-    userIds,
+    userIds: userIds ?? [],
     target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
     page,
     pageSize,

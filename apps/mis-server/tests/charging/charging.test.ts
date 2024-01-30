@@ -442,6 +442,7 @@ it("returns charge records with query of accountOfTenant", async () => {
       tenantName: account.tenant.getProperty("name") } },
     page: 1,
     pageSize:10,
+    userIds: [],
   });
 
   expect(reply1.results).toHaveLength(1);
@@ -496,6 +497,7 @@ it("returns charge records with query of tenant", async () => {
     target:{ $case:"tenant", tenant:{ tenantName: tenant.name } },
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
+    userIds: [],
   });
 
   expect(reply.results).toHaveLength(2);
@@ -589,6 +591,7 @@ it("returns charge records with query of allTenants", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     type: "test1",
+    userIds: [],
   });
 
   expect(reply.results).toHaveLength(1);
@@ -657,6 +660,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
     type: CHARGE_TYPE_OTHERS,
     page: 1,
     pageSize: 50,
+    userIds: [],
   });
 
   expect(reply.results).toHaveLength(2);
@@ -758,7 +762,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
-    userIds: "user_1,user_2",
+    userIds: ["user_1", "user_2"],
   });
 
   expect(reply.results).toHaveLength(2);
@@ -941,6 +945,7 @@ it("returns charge records' total results", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
+    userIds: [],
   });
 
   expect(reply.totalAmount).toStrictEqual(numberToMoney(130));
