@@ -1,5 +1,16 @@
 # @scow/cli
 
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+
 ## 1.4.0
 
 ### Minor Changes

@@ -1,5 +1,22 @@
 # @scow/mis-server
 
+## 1.4.1
+
+### Patch Changes
+
+- 186c359: 适配 mikro-orm 更新会修改 ref 字段默认为 null
+- afc3350: charge_record 表增加字段 user_id 及 metadata, 以及增加了 time,tenant,account,user_id,type 各字段的索引
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-hook@1.0.7
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/lib-scheduler-adapter@1.1.5
+
 ## 1.4.0
 
 ### Minor Changes

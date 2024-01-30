@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.6.0
+
+### Minor Changes
+
+- afc3350: charge 接口增加可选入参 user_id,metadata, 消费记录查询接口增加查询参数 user_ids,增加返回值 user_id 与 metadata
+
 ## 1.5.0
 
 ### Minor Changes
