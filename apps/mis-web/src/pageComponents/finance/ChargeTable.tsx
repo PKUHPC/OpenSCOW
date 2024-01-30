@@ -294,8 +294,8 @@ export const ChargeTable: React.FC<Props> = ({
                 title={t(pCommon("other"))}
                 width="20%"
                 render={(v) => {
-                  const metadataToDispaly = v ? formatMetadataDisplay(v?.metadataValue) : undefined;
-                  return getI18nConfigCurrentText(metadataToDispaly, languageId);
+                  const metadataToDisplay = v ? formatMetadataDisplay(v) : undefined;
+                  return getI18nConfigCurrentText(metadataToDisplay, languageId);
                 }}
               />
             )

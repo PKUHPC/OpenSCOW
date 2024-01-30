@@ -699,7 +699,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     comment: "comment",
     type: "testA",
     userId: "user_1",
-    metadata: "{ \"cluster\": \"hpc01\", \"idJob\": 1 }",
+    metadata: { "cluster": "hpc01", "idJob": 1 },
   };
 
   const request2: ChargeRequest = {
@@ -708,7 +708,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     comment: "comment",
     type: "testB",
     userId: "user_1",
-    metadata: "{ \"cluster\": \"hpc01\", \"idJob\": 2 }",
+    metadata: { "cluster": "hpc01", "idJob": 2 },
   };
 
   const request3: ChargeRequest = {
@@ -718,7 +718,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     comment: "comment",
     type: "testC",
     userId: "user_2",
-    metadata: "{ \"cluster\": \"hpc02\", \"idJob\": 9 }",
+    metadata: { "cluster": "hpc02", "idJob": 9 },
   };
 
   const request4: ChargeRequest = {
@@ -727,7 +727,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     comment: "comment",
     type: "testD",
     userId: "user_2",
-    metadata: "{ \"cluster\": \"hpc02\", \"idJob\": 10 }",
+    metadata: { "cluster": "hpc02", "idJob": 10 },
   };
 
   const startTime = new Date();
@@ -772,20 +772,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       type: request3.type,
       userId: "user_2",
       metadata: {
-        metadataValue: {
-          "cluster": {
-            "value": {
-              "$case": "stringValue",
-              "stringValue": "hpc02",
-            },
-          },
-          "idJob": {
-            "value": {
-              "$case": "numberValue",
-              "numberValue": 9,
-            },
-          },
-        },
+        "cluster":  "hpc02",
+        "idJob":  9,
       },
     },
     {
@@ -796,20 +784,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       type: request1.type,
       userId: "user_1",
       metadata: {
-        metadataValue: {
-          "cluster": {
-            "value": {
-              "$case": "stringValue",
-              "stringValue": "hpc01",
-            },
-          },
-          "idJob": {
-            "value": {
-              "$case": "numberValue",
-              "numberValue": 1,
-            },
-          },
-        },
+        "cluster":  "hpc01",
+        "idJob":  1,
       },
     },
   ]as Partial<ChargeRecord>);

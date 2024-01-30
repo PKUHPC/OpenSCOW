@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
   JobBillingItem,
@@ -35,7 +36,6 @@ import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
-import { FilteredJsonMap } from "src/utils/types";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -150,7 +150,7 @@ export const jobServiceServer = plugin((server) => {
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
 
-          const metadataMap: FilteredJsonMap | undefined = {};
+          const metadataMap: ChargeRecord["metadata"] = {};
           savedFields?.forEach((field) => {
             metadataMap[field] = x[field];
           });

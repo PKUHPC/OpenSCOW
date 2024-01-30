@@ -21,18 +21,16 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
-import { convertProtoToJsonMap } from "src/utils/metadata";
 
-export const MetadataMap = Type.Object({
-  metadataValue: Type.Record(
+export const MetadataMap = Type.Record(
+  Type.String(),
+  Type.Union([
     Type.String(),
-    Type.Union([
-      Type.String(),
-      Type.Number(),
-      Type.Boolean(),
-      Type.Null(),
-    ]),
-  ) });
+    Type.Number(),
+    Type.Boolean(),
+    Type.Null(),
+  ]),
+);
 export type MetadataMapType = Static<typeof MetadataMap>;
 
 export const ChargeInfo = Type.Object({
@@ -192,7 +190,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     return {
       ...obj,
       amount: moneyToNumber(obj.amount),
-      metadata: (obj.metadata && obj.metadata !== null) ? convertProtoToJsonMap(obj.metadata) : undefined,
+      metadata: obj.metadata ?? undefined,
       userName: obj.userId ? (userMap.get(obj.userId) || "") : "",
     } as ChargeInfo;
   });

@@ -14,6 +14,7 @@ syntax = "proto3";
 package scow.server;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 import "common/money.proto";
 
@@ -50,28 +51,12 @@ message ChargeRequest {
   string type = 4;
   string comment = 5;
   optional string user_id = 6;
-  optional string metadata = 7;
+  optional google.protobuf.Struct metadata = 7;
 }
 
 message ChargeResponse {
   common.Money previous_balance = 1;
   common.Money current_balance = 2;
-}
-
-message JsonValue {
-  oneof value {
-    string string_value = 1;
-    double number_value = 2;
-    bool bool_value = 3;
-    NullValue null_value = 4;
-  }
-}
-
-message NullValue {}
-
-// metadata中保存的 JSON 对象
-message MetadataMapProto {
-  map<string, JsonValue> metadata_value = 1;
 }
 
 message ChargeRecord {
@@ -83,7 +68,7 @@ message ChargeRecord {
   common.Money amount = 6;
   string comment = 7;
   optional string user_id = 8;
-  optional MetadataMapProto metadata = 9;
+  optional google.protobuf.Struct metadata = 9;
 }
 
 // 充值记录及消费记录请求target
