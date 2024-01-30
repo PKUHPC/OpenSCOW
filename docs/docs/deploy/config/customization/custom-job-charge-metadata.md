@@ -34,7 +34,7 @@ jobChargeMetadata:
 | 参数            | 类型                  | 是否必须                         |解释                                                          |
 | --------------- | --------------------- | ---------------------------------|-------------------------------------------------------- |
 | `savedFields`   | `string[]`            | 否                            |想要在数据库实体**ChargeRecord**中的**metadata**字段中保存的作业相关的信息，字段参考[entities/JobInfo](#entitiesjobinfo)， 保存的格式为**Json**格式  |
-| `displayFormats` | `string \| i18n国际化类型` | 否                       |定义上述保存的字段显示出来的格式。如果不配置则直接显示上面保存的**Json**字段信息。如`{"jobId": 1, "account": "a_account"}`。`string \| i18n国际化类型`均可以利用 **{{ 属性名 }}** 使用上述`savedFields`中保存的属性值。|
+| `displayFormats` | `string \| i18n国际化类型` | 否                       |定义上述保存的字段显示出来的格式。如果不配置则直接显示上面保存的**Json**字段信息。如`{"jobId": 1, "account": "a_account"}`。`string \| i18n国际化类型`均可以利用 **\{\{ 属性名 \}\}** 使用上述`savedFields`中保存的属性值。|
 
 
 ## 配置效果展示
