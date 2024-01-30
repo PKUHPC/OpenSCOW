@@ -12,11 +12,9 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ServiceError } from "@grpc/grpc-js";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { UserStatus } from "@scow/protos/build/server/user";
-import { parseErrorDetails } from "@scow/rich-error-model";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
@@ -106,33 +104,13 @@ export async function getAvailablePartitionForItems(
   await Promise.allSettled(accountNames
     .map(async (accountName) => {
       return await asyncClientCall(client, "getAvailablePartitionsForCluster",
-        { cluster, accountName, userId }).catch((e) => {
-        const ex = e as ServiceError;
-        const errors = parseErrorDetails(ex.metadata);
-        console.log("11111", errors[0]);
-        console.log(e.details);
-        // if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
-        //     && errors[0].reason === "SBATCH_FAILED") {
-        //   throw new DetailedError({
-        //     code: Status.INTERNAL,
-        //     message: e.details,
-        //     details: [errorInfo("SBATCH_FAILED")],
-        //   });
-        // }
-        // else {
-        //   throw new DetailedError({
-        //     code: e.code,
-        //     message: e.details,
-        //     details: [errorInfo("SBATCH_FAILED")],
-        //   });
-        // }
-      });
+        { cluster, accountName, userId });
     }),
   ).then((results) => {
     results.forEach((result) => {
-      // if (result.status === "fulfilled") {
-      //   partitions.push(...result.value.partitions);
-      // }
+      if (result.status === "fulfilled") {
+        partitions.push(...result.value.partitions);
+      }
     });
   });
 
