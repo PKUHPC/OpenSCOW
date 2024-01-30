@@ -19,10 +19,11 @@ import {
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useStore } from "simstate";
@@ -345,6 +346,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       return;
     }
   };
+
+  const router = useRouter();
+  const editFile = queryToString(router.query.edit);
+
+  useEffect(() => {
+    if (editFile !== "") {
+      const foundFile = files.find((file) => file.name === editFile);
+      if (foundFile && foundFile.type !== "DIR") {
+        handlePreview(editFile, foundFile.size);
+      }
+    }
+  }, [editFile, files]);
 
   return (
     <div>

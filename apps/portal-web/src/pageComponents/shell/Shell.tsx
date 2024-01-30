@@ -122,7 +122,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
               const fileStartIndex = result.search(EDIT_FILE_PREFIX);
               const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
-              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
+              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
             }
           }
           term.write(data);
