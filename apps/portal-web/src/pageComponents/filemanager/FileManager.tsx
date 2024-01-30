@@ -506,6 +506,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         fileNameRender={(_, r) => (
           r.type === "DIR" ? (
             <a onClick={() => {
+              console.log(loading, path);
               if (!loading) {
                 router.push(fullUrl(join(path, r.name)));
               }
