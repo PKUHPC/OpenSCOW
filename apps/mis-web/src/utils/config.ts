@@ -55,6 +55,13 @@ export interface PublicRuntimeConfig {
     misConfig: MisConfigSchema["createUser"],
     authSupportsCreateUser: boolean | undefined,
   },
+
+  ADD_USER_TO_ACCOUNT: {
+    accountAdmin: {
+      allowed: boolean,
+      createUserIfNotExist: boolean,
+    }
+  }
   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
@@ -98,6 +105,8 @@ export interface PublicRuntimeConfig {
   },
 
   UI_EXTENSION?: { url: string; }
+
+  CHANGE_JOB_LIMIT: { allowUser: boolean}
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

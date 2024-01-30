@@ -37,7 +37,7 @@ export class JobPriceItem {
   @Property()
     description: string;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true, nullable: true })
+  @ManyToOne(() => Tenant, { ref: true, nullable: true })
     tenant?: Ref<Tenant>;
 
   @Property({ type: DecimalType })

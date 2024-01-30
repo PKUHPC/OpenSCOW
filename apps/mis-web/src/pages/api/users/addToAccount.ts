@@ -21,6 +21,7 @@ import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
+import { publicConfig } from "src/utils/config";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const AddUserToAccountSchema = typeboxRouteSchema({
@@ -67,7 +68,9 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
     const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
+          // 账户管理员且允许账户管理员添加用户
+          ((acccountBelonged && acccountBelonged.role !== UserRole.USER)
+          && publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.allowed) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 

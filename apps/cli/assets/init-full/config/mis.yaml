@@ -61,6 +61,14 @@ createUser:
     # 外置页面URL
     # url: http://your-create-user-page.com
 
+# 添加用户至账户相关配置
+# addUserToAccount:
+#   accountAdmin:
+#     # 是否允许账户管理员添加用户至账户
+#     allowed: true
+#     # 是否允许账户管理员添加不存在的用户时创建用户
+#     createUserIfNotExist : true
+
 # # 集群监控配置
 # clusterMonitor:
 #   # 协议 + ip/域名 + 端口，默认为 http://127.0.0.1:4000
@@ -104,3 +112,7 @@ createUser:
 #         allowedRoles: [tenantAdmin, platformAdmin]
 #   - text: "一级导航2"
 #     url: "https://hahahaha2.com"
+
+
+# 用户是否可以修改作业时限配置
+# allowUserChangeJobTimeLimit: true

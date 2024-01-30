@@ -65,6 +65,25 @@ export const MisConfigSchema = Type.Object({
     }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
 
+  addUserToAccount: Type.Object({
+    accountAdmin: Type.Object({
+      allowed: Type.Boolean({
+        default: true,
+        description: "是否允许账户管理员添加用户至账户",
+      }),
+      createUserIfNotExist: Type.Boolean({
+        default: true,
+        description: " 是否允许账户管理员添加不存在的用户时创建用户",
+      }),
+    }, {
+      default: {},
+      description: "账户管理员添加用户至账户相关配置",
+    }),
+  }, {
+    default: {},
+    description: "添加用户至账户相关配置",
+  }),
+
   fetchJobs: Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
     batchSize: Type.Integer({
@@ -137,6 +156,11 @@ export const MisConfigSchema = Type.Object({
   uiExtension: Type.Optional(Type.Object({
     url: Type.String({ description: "UI扩展站完整URL" }),
   })),
+
+  allowUserChangeJobTimeLimit: Type.Boolean({
+    description: "普通用户是否可以修改作业时限",
+    default: true,
+  }),
 
 });
 

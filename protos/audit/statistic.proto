@@ -6,6 +6,8 @@ import "google/protobuf/timestamp.proto";
 
 
 message Data {
+  // 如果此API返回值只包含date，请使用protobuf专门用来代表日期的类型：https://github.com/googleapis/googleapis/blob/master/google/type/date.proto
+  // 注意返回的Date为UTC时间的date
   google.protobuf.Timestamp date = 1;
   uint32 count = 2;
 }

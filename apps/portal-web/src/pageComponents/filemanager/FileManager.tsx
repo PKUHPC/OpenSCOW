@@ -23,7 +23,7 @@ import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
-import Router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useStore } from "simstate";
@@ -94,6 +94,8 @@ const p = prefix("pageComp.fileManagerComp.fileManager.");
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
+  const router = useRouter();
+
   const t = useI18nTranslateToString();
 
   const operationTexts = {
@@ -149,15 +151,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const newPath = paths.length === 1
       ? path : "/" + paths.slice(0, paths.length - 1).join("/");
 
-    Router.push(fullUrl(newPath));
+    router.push(fullUrl(newPath));
   };
 
   const toHome = () => {
-    Router.push(fullUrl("~"));
+    router.push(fullUrl("~"));
   };
 
   const back = () => {
-    Router.back();
+    router.back();
   };
 
   const forward = () => {
@@ -176,7 +178,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       .then(() => { prevPathRef.current = path; })
       .catch(() => {
         if (prevPathRef.current !== path) {
-          Router.push(fullUrl(prevPathRef.current));
+          router.push(fullUrl(prevPathRef.current));
         }
       });
   }, [path]);
@@ -374,7 +376,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <PathBar
           path={path}
           loading={loading}
-          onPathChange={(curPath) => { curPath === path ? reload() : Router.push(fullUrl(curPath)); }}
+          onPathChange={(curPath) => { curPath === path ? reload() : router.push(fullUrl(curPath)); }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
@@ -508,7 +510,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           },
           onDoubleClick: () => {
             if (r.type === "DIR") {
-              Router.push(fullUrl(join(path, r.name)));
+              router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
               handlePreview(r.name, r.size);
             }
@@ -516,9 +518,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         })}
         fileNameRender={(_, r) => (
           r.type === "DIR" ? (
-            <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
+            <a onClick={() => {
+              if (!loading) {
+                router.push(fullUrl(join(path, r.name)));
+              }
+            }}
+            >
               {r.name}
-            </Link>
+            </a>
           ) : (
             <a onClick={() => {
               handlePreview(r.name, r.size);
