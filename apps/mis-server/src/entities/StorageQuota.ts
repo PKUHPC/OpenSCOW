@@ -20,7 +20,7 @@ export class StorageQuota {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { cascade: [Cascade.ALL], ref: true })
+  @ManyToOne(() => User, { cascade: [Cascade.ALL], ref: true, nullable: false })
     user: Ref<User>;
 
   @Property()
