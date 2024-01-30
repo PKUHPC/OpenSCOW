@@ -559,11 +559,14 @@ export default {
         popoverContent3: "Download a file",
         popoverContentFile: "File Name",
         popoverContent4: "By entering",
-        popoverContent5: ", the file in your current path will be downloaded locally. Relative paths "
-        + "are not supported at the moment.",
-        popoverContent6: "If you need to download files from other directories, please use",
+        popoverContent5: ", the file in your current path will be downloaded locally. ",
+        popoverContent6: "Relative paths are not supported at the moment. "
+        + "If you need to download or edit files from other directories, please use",
         popoverContent7: "command to navigate to the file system.",
         popoverContent8: "Usage example: ",
+        popoverContent9: "Edit a file",
+        popoverContent10: "After entering the command ",
+        popoverContent11: ", you will be redirected to a file editing page where you can edit the specified file. ",
         command: "Command",
       },
       index: {
