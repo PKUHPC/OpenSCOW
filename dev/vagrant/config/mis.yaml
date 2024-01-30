@@ -133,15 +133,16 @@ createUser:
 # 用户是否可以修改作业时限配置
 # allowUserChangeJobTimeLimit: true
 
-# #自定义消费表单其他存储内容
+# #自定义消费记录中的作业相关的存储内容
 # jobChargeMetadata:
 #   # 可选。需要保存的作业的字段，字段参考src/entities/JobInfo
 #   savedFields: ["idJob", "cluster"]
 
 #   # 可选。定义显示出来的格式。如果不配置，直接显示上面保存的字段的信息
 #   displayFormats:
-#     # i18n格式，在不同语言下，把元数据按不同格式显示出来
+#     # i18n格式，根据系统语言显示不同的信息
 #     # 或字符串格式，直接显示字符串
+#     # 利用 {{ 属性名 }} 使用上述savedFields中保存的属性值
 #     i18n:
 #       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
 #       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
