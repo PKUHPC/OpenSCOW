@@ -19,7 +19,7 @@
     "@scow/grpc-api": "workspace:*"
   },
   "devDependencies": {
-    "ts-proto": "1.166.4"
+    "ts-proto": "1.167.2"
   },
   "keywords": [],
   "author": "",
