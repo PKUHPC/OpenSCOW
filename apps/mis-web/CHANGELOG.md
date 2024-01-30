@@ -1,5 +1,22 @@
 # @scow/mis-web
 
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- 68447f7: mis 增加控制添加用户至账户相关配置
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
 ## 1.4.0
 
 ### Minor Changes
