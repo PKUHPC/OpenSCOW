@@ -107,6 +107,7 @@ export default {
     export: "导出",
     exportMaxDataErrorMsg: "导出明细过多，最多导出{}条，请重新选择!",
     exportNoDataErrorMsg: "导出为空，请重新选择",
+    other: "其他",
   },
   dashboard: {
     title: "仪表盘",
