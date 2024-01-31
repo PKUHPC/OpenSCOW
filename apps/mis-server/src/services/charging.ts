@@ -14,7 +14,7 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { convertToDateMessage } from "@scow/lib-server/build/date";
+import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
 import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
@@ -304,6 +304,13 @@ export const chargingServiceServer = plugin((server) => {
 
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      if (isValidTimezone(timeZone)) {
+        throw <ServiceError>{
+          code: status.INVALID_ARGUMENT,
+          message: "Invalid timezone",
+        };
+      }
+
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
       qb
@@ -363,7 +370,14 @@ export const chargingServiceServer = plugin((server) => {
 
     getDailyPay: async ({ request, em, logger }) => {
 
-      const { startTime, endTime, timeZone } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      if (isValidTimezone(timeZone)) {
+        throw <ServiceError>{
+          code: status.INVALID_ARGUMENT,
+          message: "Invalid timezone",
+        };
+      }
 
       const qb = em.createQueryBuilder(PayRecord, "pr");
 

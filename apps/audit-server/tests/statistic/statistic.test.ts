@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { StatisticServiceClient } from "@scow/protos/build/audit/statistic";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -72,7 +73,7 @@ it("get active user count correctly in UTC+8 timezone", async () => {
 
   expect(resp.results).toMatchObject([
     {
-      date: { year: nowInUtcPlus8.year(), month: nowInUtcPlus8.month() + 1, day: nowInUtcPlus8.date() },
+      date: dayjsToDateMessage(nowInUtcPlus8),
       count: 10,
     },
   ]);

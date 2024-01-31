@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -284,35 +285,19 @@ it("get new job count correctly in UTC+8 timezone", async () => {
 
   expect(reply.results).toMatchObject([
     {
-      date: {
-        year: todayInUtcPlus8.year(),
-        month: todayInUtcPlus8.month() + 1,
-        day: todayInUtcPlus8.date(),
-      },
+      date: dayjsToDateMessage(todayInUtcPlus8),
       count: 20,
     },
     {
-      date: {
-        year: yesterdayInUtcPlus8.year(),
-        month: yesterdayInUtcPlus8.month() + 1,
-        day: yesterdayInUtcPlus8.date(),
-      },
+      date: dayjsToDateMessage(yesterdayInUtcPlus8),
       count: 30,
     },
     {
-      date: {
-        year: twoDaysBeforeInUtcPlus8.year(),
-        month: twoDaysBeforeInUtcPlus8.month() + 1,
-        day: twoDaysBeforeInUtcPlus8.date(),
-      },
+      date: dayjsToDateMessage(twoDaysBeforeInUtcPlus8),
       count: 15,
     },
     {
-      date: {
-        year: threeDaysBeforeInUtcPlus8.year(),
-        month: threeDaysBeforeInUtcPlus8.month() + 1,
-        day: threeDaysBeforeInUtcPlus8.date(),
-      },
+      date: dayjsToDateMessage(threeDaysBeforeInUtcPlus8),
       count: 1,
     },
 

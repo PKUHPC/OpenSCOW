@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -126,7 +127,7 @@ it("correct get daily Charge Amount in UTC+8 timezone", async () => {
   const results = Array.from({ length: 10 }, (_, i) => {
     const curDateInUtcPlus8 = todayInUtcPlus8.subtract(i, "day");
     return ({
-      date: { year: curDateInUtcPlus8.year(), month: curDateInUtcPlus8.month() + 1, day: curDateInUtcPlus8.date() },
+      date: dayjsToDateMessage(curDateInUtcPlus8),
       amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
     });
   });
@@ -174,7 +175,7 @@ it("correct get daily Pay Amount in UTC+8 timezone", async () => {
   const results = Array.from({ length: 10 }, (_, i) => {
     const curDateInUtcPlus8 = todayInUtcPlus8.subtract(i, "day");
     return ({
-      date: { year: curDateInUtcPlus8.year(), month: curDateInUtcPlus8.month() + 1, day: curDateInUtcPlus8.date() },
+      date: dayjsToDateMessage(curDateInUtcPlus8),
       amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
     });
   });

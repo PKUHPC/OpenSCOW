@@ -15,6 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { createUser } from "@scow/lib-auth";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
@@ -570,24 +571,9 @@ it("get new user count in UTC+8 timezone", async () => {
   const twoDaysBeforeInUtcPlus8 = twoDaysBefore.utcOffset(8);
 
   expect(info.results).toMatchObject([
-    { date:
-      {
-        year: todyInUtcPlus8.year(),
-        month: todyInUtcPlus8.month() + 1,
-        day: todyInUtcPlus8.date(),
-      }, count: 30 },
-    { date:
-      {
-        year: yesterdayInUtcPlus8.year(),
-        month: yesterdayInUtcPlus8.month() + 1,
-        day: yesterdayInUtcPlus8.date(),
-      }, count: 20 },
-    { date:
-        {
-          year: twoDaysBeforeInUtcPlus8.year(),
-          month: twoDaysBeforeInUtcPlus8.month() + 1,
-          day: twoDaysBeforeInUtcPlus8.date(),
-        }, count: 10 },
+    { date: dayjsToDateMessage(todyInUtcPlus8), count: 30 },
+    { date:dayjsToDateMessage(yesterdayInUtcPlus8), count: 20 },
+    { date:dayjsToDateMessage(twoDaysBeforeInUtcPlus8), count: 10 },
   ]);
 
 });

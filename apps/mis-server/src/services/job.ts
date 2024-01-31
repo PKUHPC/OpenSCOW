@@ -17,7 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { convertToDateMessage } from "@scow/lib-server/build/date";
+import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
 import {
   GetJobsResponse,
   JobBillingItem,
@@ -403,7 +403,14 @@ export const jobServiceServer = plugin((server) => {
     },
 
     getNewJobCount: async ({ request, em }) => {
-      const { startTime, endTime, timeZone } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      if (isValidTimezone(timeZone)) {
+        throw <ServiceError>{
+          code: status.INVALID_ARGUMENT,
+          message: "Invalid timezone",
+        };
+      }
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb

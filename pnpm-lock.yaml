@@ -1176,6 +1176,9 @@ importers:
       '@scow/config':
         specifier: workspace:*
         version: link:../config
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
       nookies:
         specifier: 2.5.2
         version: 2.5.2

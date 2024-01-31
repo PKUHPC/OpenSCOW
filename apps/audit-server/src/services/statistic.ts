@@ -11,9 +11,10 @@
  */
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
+import { ServiceError, status } from "@grpc/grpc-js";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
-import { convertToDateMessage } from "@scow/lib-server/build/date";
+import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
 
@@ -25,6 +26,13 @@ export const statisticServiceServer = plugin((server) => {
     getActiveUserCount: async ({ request, em, logger }) => {
 
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      if (isValidTimezone(timeZone)) {
+        throw <ServiceError>{
+          code: status.INVALID_ARGUMENT,
+          message: "Invalid timezone",
+        };
+      }
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb

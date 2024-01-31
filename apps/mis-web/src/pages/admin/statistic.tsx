@@ -28,6 +28,7 @@ import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
+import { dateMessageToDayjs } from "src/utils/date";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -40,7 +41,7 @@ const formateData = (data: Array<{
   count: number
 }>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
   const input = data.map((d) => ({
-    date: new Date(d.date.year, d.date.month - 1, d.date.day),
+    date: dateMessageToDayjs(d.date),
     count: d.count,
   }));
   const countData: {date: dayjs.Dayjs, count: number}[] = [];
