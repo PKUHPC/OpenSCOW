@@ -191,9 +191,15 @@ export const fileServiceServer = plugin((server) => {
         if (pureFiles.length > 0) {
           const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
 
-          const fileSyncCmd = `touch -a ${filePaths}`;
-
-          await loggedExec(ssh, logger, false, fileSyncCmd, []);
+          // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
+          // 一次执行 800 个文件是根据经验设置的安全值，可修改
+          for (let i = 0; i < filePaths.length; i += 800) {
+            const execFilePaths = filePaths.slice(i, i + 800);
+            const fileSyncCmd = `touch -a ${execFilePaths}`;
+            loggedExec(ssh, logger, false, fileSyncCmd, []).catch((err) => {
+              logger.error(err, "touch -a failed", userId, execFilePaths);
+            });
+          }
         }
 
         for (const file of files) {
