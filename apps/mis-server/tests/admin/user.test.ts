@@ -20,6 +20,7 @@ import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
 import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { authUrl } from "src/config";
+import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -125,6 +126,23 @@ it("cannot remove owner from account", async () => {
   }).catch((e) => e);
 
   expect(reply.code).toBe(Status.OUT_OF_RANGE);
+});
+
+it("when removing a user from an account, the account and user cannot be deleted", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+
+  await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+    userId: data.userB.userId,
+  }).catch((e) => e);
+
+  const accountA = await em.findOneOrFail(Account, { id:data.accountA.id });
+  const userB = await em.findOneOrFail(User, { id:data.userB.id });
+
+  expect(accountA).toBeTruthy();
+  expect(userB).toBeTruthy();
 });
 
 it("deletes user", async () => {

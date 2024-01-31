@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
+import { Cascade, Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
@@ -33,10 +33,12 @@ export class UserAccount {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
+  // @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
+  @ManyToOne(() => User, { cascade:[Cascade.ALL], ref: true, nullable: false })
     user: Ref<User>;
 
-  @ManyToOne(() => Account, { deleteRule: "cascade", ref: true, nullable: false })
+  // @ManyToOne(() => Account, { deleteRule: "cascade", ref: true, nullable: false })
+  @ManyToOne(() => Account, { cascade:[Cascade.ALL], ref: true, nullable: false })
     account: Ref<Account>;
 
   @Property({ columnType: "varchar(10)", comment: Object.values(UserStatus).join(", ") })
