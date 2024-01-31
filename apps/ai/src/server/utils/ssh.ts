@@ -20,11 +20,11 @@ import { Logger } from "ts-log";
 
 import { clusterNotFound, loginNodeNotFound } from "./errors";
 
-interface NodeNetInfo {
-  address: string,
-  host: string,
-  port: number,
-}
+// interface NodeNetInfo {
+//   address: string,
+//   host: string,
+//   port: number,
+// }
 
 export function getClusterLoginNode(cluster: string): string | undefined {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);

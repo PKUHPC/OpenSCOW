@@ -104,7 +104,7 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, clusterInfo, isTraining = false, appId, appImage, attributes = []} = props;
+  const { clusterId, appName, clusterInfo, isTraining = false, appId, attributes = []} = props;
 
   const { message } = App.useApp();
 
