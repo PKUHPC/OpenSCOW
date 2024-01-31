@@ -766,7 +766,7 @@ export const userServiceServer = plugin((server) => {
     getNewUserCount: async ({ request, em, logger }) => {
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      if (isValidTimezone(timeZone)) {
+      if (!isValidTimezone(timeZone)) {
         throw <ServiceError>{
           code: Status.INVALID_ARGUMENT,
           message: "Invalid timezone",
