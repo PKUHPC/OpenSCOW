@@ -193,6 +193,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
       allowUser: misConfig.allowUserChangeJobTimeLimit,
     },
 
+    JOB_CHARGE_METADATA: misConfig.jobChargeMetadata,
+
   };
 
   if (!building) {

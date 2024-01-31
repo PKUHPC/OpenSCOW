@@ -18,6 +18,7 @@ import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
   JobBillingItem,
@@ -130,6 +131,7 @@ export const jobServiceServer = plugin((server) => {
           return prev;
         }, {});
 
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
 
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
@@ -149,6 +151,11 @@ export const jobServiceServer = plugin((server) => {
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
 
+          const metadataMap: ChargeRecord["metadata"] = {};
+          savedFields?.forEach((field) => {
+            metadataMap[field] = x[field];
+          });
+
           if (newTenantPrice) {
             if (x.tenantPrice.lt(newTenantPrice)) {
               await charge({
@@ -156,6 +163,7 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
@@ -177,6 +185,8 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newAccountPrice.minus(x.accountPrice),
+                userId: x.user,
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({

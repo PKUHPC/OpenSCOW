@@ -33,7 +33,6 @@ import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { publicConfig } from "src/utils/config";
 import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
@@ -173,16 +172,16 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
       if (!isEditable) {
         switch (item.entry?.$case) {
         case "pageLink":
-          router.push(join(publicConfig.BASE_PATH, item.entry.pageLink.path));
+          router.push(item.entry.pageLink.path);
           break;
 
         case "shell":
-          router.push(join(publicConfig.BASE_PATH, "/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
+          router.push(join("/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
           break;
 
         case "app":
           router.push(
-            join(publicConfig.BASE_PATH, "/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
+            join("/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
           break;
 
         default:

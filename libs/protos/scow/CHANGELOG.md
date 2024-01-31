@@ -1,5 +1,12 @@
 # @scow/protos
 
+## 1.0.7
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+  - @scow/grpc-api@1.6.0
+
 ## 1.0.6
 
 ### Patch Changes

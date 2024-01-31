@@ -49,12 +49,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -95,6 +97,15 @@
           "nullable": true,
           "mappedType": "string"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
         "type": {
           "name": "type",
           "type": "varchar(255)",
@@ -123,10 +134,64 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "charge_record",
       "indexes": [
+        {
+          "columnNames": [
+            "time"
+          ],
+          "composite": false,
+          "keyName": "time",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tenant_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_tenant_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "account_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_account_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "charge_record_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "type"
+          ],
+          "composite": false,
+          "keyName": "charge_record_type_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "static_info",
           "columnNames": [
@@ -135,6 +200,7 @@
             "amount"
           ],
           "composite": true,
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -147,6 +213,7 @@
             "type"
           ],
           "composite": true,
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -156,12 +223,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -466,6 +535,7 @@
           ],
           "composite": false,
           "keyName": "idJob",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -475,6 +545,7 @@
           ],
           "composite": false,
           "keyName": "account",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -484,6 +555,7 @@
           ],
           "composite": false,
           "keyName": "user",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -493,6 +565,7 @@
           ],
           "composite": false,
           "keyName": "time_submit",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -502,6 +575,7 @@
           ],
           "composite": false,
           "keyName": "time_start",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -511,6 +585,7 @@
           ],
           "composite": false,
           "keyName": "time_end",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -520,6 +595,7 @@
           ],
           "composite": false,
           "keyName": "time_used",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -529,6 +605,7 @@
           ],
           "composite": false,
           "keyName": "time_wait",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -538,6 +615,7 @@
           ],
           "composite": false,
           "keyName": "record_time",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -547,12 +625,14 @@
             "bi_job_index"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -631,7 +711,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -643,12 +723,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -668,7 +750,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         },
         "tenant_name": {
@@ -747,6 +829,7 @@
             "amount"
           ],
           "composite": true,
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -756,12 +839,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -799,7 +884,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -811,12 +896,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -847,12 +934,14 @@
             "key"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -893,8 +982,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
-          "default": "current_timestamp(0)",
+          "length": 6,
+          "default": "current_timestamp(6)",
           "mappedType": "datetime"
         }
       },
@@ -906,6 +995,7 @@
           ],
           "composite": false,
           "keyName": "tenant_name_unique",
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -915,12 +1005,14 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -998,7 +1090,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -1010,6 +1102,7 @@
           ],
           "composite": false,
           "keyName": "job_price_item_item_id_unique",
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -1019,6 +1112,7 @@
           ],
           "composite": false,
           "keyName": "job_price_item_tenant_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1028,6 +1122,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -1047,7 +1142,8 @@
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -1125,7 +1221,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 0,
+          "length": 6,
           "mappedType": "datetime"
         }
       },
@@ -1137,6 +1233,7 @@
           ],
           "composite": false,
           "keyName": "account_account_name_unique",
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -1146,6 +1243,7 @@
           ],
           "composite": false,
           "keyName": "account_tenant_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1155,6 +1253,7 @@
           ],
           "composite": false,
           "keyName": "account_whitelist_id_unique",
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -1164,6 +1263,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -1195,7 +1295,8 @@
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -1251,8 +1352,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
-          "default": "current_timestamp(0)",
+          "length": 6,
+          "default": "current_timestamp(6)",
           "mappedType": "datetime"
         },
         "tenant_roles": {
@@ -1292,6 +1393,7 @@
           ],
           "composite": false,
           "keyName": "user_tenant_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1301,6 +1403,7 @@
           ],
           "composite": false,
           "keyName": "user_user_id_unique",
+          "constraint": true,
           "primary": false,
           "unique": true
         },
@@ -1310,6 +1413,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -1328,7 +1432,8 @@
           "referencedTableName": "tenant",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -1377,6 +1482,7 @@
           ],
           "composite": false,
           "keyName": "storage_quota_user_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1386,6 +1492,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -1402,10 +1509,11 @@
             "id"
           ],
           "referencedTableName": "user",
-          "deleteRule": "CASCADE",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     },
     {
       "columns": {
@@ -1487,6 +1595,7 @@
           ],
           "composite": false,
           "keyName": "user_account_user_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1496,6 +1605,7 @@
           ],
           "composite": false,
           "keyName": "user_account_account_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1505,6 +1615,7 @@
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
@@ -1521,7 +1632,7 @@
             "id"
           ],
           "referencedTableName": "user",
-          "deleteRule": "CASCADE",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
         "user_account_account_id_foreign": {
@@ -1534,10 +1645,12 @@
             "id"
           ],
           "referencedTableName": "account",
-          "deleteRule": "CASCADE",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
-      }
+      },
+      "nativeEnums": {}
     }
-  ]
+  ],
+  "nativeEnums": {}
 }

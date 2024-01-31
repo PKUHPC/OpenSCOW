@@ -15,7 +15,8 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
-import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
+import { ChargeRecord as ChargeRecordProto,
+  ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -30,7 +31,6 @@ import {
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
-
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -106,7 +106,8 @@ export const chargingServiceServer = plugin((server) => {
 
     charge: async ({ request, em, logger }) => {
 
-      const { accountName, type, amount, comment, tenantName } = ensureNotUndefined(request, ["amount"]);
+      const { accountName, type, amount, comment, tenantName, userId, metadata }
+        = ensureNotUndefined(request, ["amount"]);
 
       const reply = await em.transactional(async (em) => {
         const target = accountName !== undefined
@@ -135,6 +136,8 @@ export const chargingServiceServer = plugin((server) => {
           comment,
           target,
           type,
+          userId,
+          metadata,
         }, em, logger, server.ext);
       });
 
@@ -265,6 +268,7 @@ export const chargingServiceServer = plugin((server) => {
           index: x.id,
           time: x.time.toISOString(),
           type: x.type,
+          userId: x.userId,
         })),
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
       }];
@@ -417,7 +421,7 @@ export const chargingServiceServer = plugin((server) => {
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, page, pageSize }
+      const { startTime, endTime, type, target, userIds, page, pageSize }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
@@ -428,21 +432,27 @@ export const chargingServiceServer = plugin((server) => {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
+        ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
       }, {
         ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { time: QueryOrder.DESC },
       });
 
       return [{
-        results: records.map((x) => ({
-          tenantName: x.tenantName,
-          accountName: x.accountName,
-          amount: decimalToMoney(x.amount),
-          comment: x.comment,
-          index: x.id,
-          time: x.time.toISOString(),
-          type: x.type,
-        })),
+        results: records.map((x) => {
+          return {
+            tenantName: x.tenantName,
+            accountName: x.accountName,
+            amount: decimalToMoney(x.amount),
+            comment: x.comment,
+            index: x.id,
+            time: x.time.toISOString(),
+            type: x.type,
+            userId: x.userId,
+            metadata: x.metadata as ChargeRecordProto["metadata"] ?? undefined,
+          };
+
+        }),
       }];
     },
 
@@ -457,7 +467,7 @@ export const chargingServiceServer = plugin((server) => {
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target }
+      const { startTime, endTime, type, target, userIds }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
@@ -472,6 +482,7 @@ export const chargingServiceServer = plugin((server) => {
             time: { $gte: startTime, $lte: endTime },
             ...searchType,
             ...searchParam,
+            ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
           })
           .execute("get");
 

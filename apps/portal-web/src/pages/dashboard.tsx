@@ -45,10 +45,12 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
+
       const clusters = publicConfig.CLUSTERS;
 
       const rawClusterInfoPromises = clusters.map((x) =>
-        api.getClusterRunningInfo({ query: { clusterId: x.id } }),
+        api.getClusterRunningInfo({ query: { clusterId: x.id } })
+          .httpError(500, () => {}),
       );
 
       const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
@@ -73,9 +75,9 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
-            cpuUsage:x.runningCpuCount / x.cpuCoreCount,
+            cpuUsage:(x.runningCpuCount / x.cpuCoreCount).toFixed(2),
             // 有些分区没有gpu就为空，前端显示'-'
-            ...x.gpuCoreCount ? { gpuUsage:x.runningGpuCount / x.gpuCoreCount } : {},
+            ...x.gpuCoreCount ? { gpuUsage:(x.runningGpuCount / x.gpuCoreCount).toFixed(2) } : {},
           })),
         );
 
