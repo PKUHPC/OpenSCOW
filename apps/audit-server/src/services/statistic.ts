@@ -27,7 +27,7 @@ export const statisticServiceServer = plugin((server) => {
 
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      if (isValidTimezone(timeZone)) {
+      if (!isValidTimezone(timeZone)) {
         throw <ServiceError>{
           code: status.INVALID_ARGUMENT,
           message: "Invalid timezone",
