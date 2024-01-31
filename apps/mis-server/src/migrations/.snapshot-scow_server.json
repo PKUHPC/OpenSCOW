@@ -97,6 +97,15 @@
           "nullable": true,
           "mappedType": "string"
         },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
         "type": {
           "name": "type",
           "type": "varchar(255)",
@@ -125,10 +134,64 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
         }
       },
       "name": "charge_record",
       "indexes": [
+        {
+          "columnNames": [
+            "time"
+          ],
+          "composite": false,
+          "keyName": "time",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tenant_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_tenant_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "account_name"
+          ],
+          "composite": false,
+          "keyName": "charge_record_account_name_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "keyName": "charge_record_user_id_index",
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "type"
+          ],
+          "composite": false,
+          "keyName": "charge_record_type_index",
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "static_info",
           "columnNames": [

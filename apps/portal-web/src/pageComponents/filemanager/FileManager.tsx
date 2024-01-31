@@ -508,7 +508,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             setSelectedKeys([fileInfoKey(r, path)]);
           },
           onDoubleClick: () => {
-            if (r.type === "DIR") {
+            if (!loading && r.type === "DIR") {
+              setLoading(true);
               router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
               handlePreview(r.name, r.size);
@@ -519,6 +520,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           r.type === "DIR" ? (
             <a onClick={() => {
               if (!loading) {
+                setLoading(true);
                 router.push(fullUrl(join(path, r.name)));
               }
             }}

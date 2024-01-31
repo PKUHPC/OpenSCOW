@@ -110,6 +110,13 @@ export const MisConfigSchema = Type.Object({
     default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
 
+  jobChargeMetadata: Type.Optional(Type.Object({
+    savedFields: Type.Optional(Type.Array(Type.String({
+      description: "需要保存的作业的字段。字段参考src/entities/JobInfo" }))),
+    displayFormats: Type.Optional(createI18nStringSchema({
+      description: "定义元数据显示的格式，i18n类型或string类型，利用{{ 属性名 }}使用上述savedFields中保存的属性" })),
+  })),
+
   navLinks: Type.Optional(Type.Array(
     Type.Object({
       text: Type.String({ description: "一级导航名称" }),

@@ -116,3 +116,40 @@ createUser:
 
 # 用户是否可以修改作业时限配置
 # allowUserChangeJobTimeLimit: true
+
+# # 新增自定义收费规则
+# customAmountStrategies:
+#   # 计费方式id，请勿重复，重复的话后面的计费方式将会覆盖前面的，
+#   # 定义后不能更改，自定义计费项会记录所使用的计费方式id，并存储到数据库里，
+#   # 其作用与"max-cpusAlloc-mem", "max-gpu-cpusAlloc", "gpu", "cpusAlloc"等同，
+#   # 若当前生效的自定义计费项使用了某自定义计费方式id，你不能删除它，否则系统将无法启动，如要删除，请先使该计费项失效
+#   - id: "strategy1"
+#       # 可选，新的计量方式的显示名称，如不填写将使用id的内容
+#     name: "自定义收费计算方式1"
+#       # 可选，计量方式描述
+#     comment: "自定义收费计算方式1，运行时间低于3分钟以下的作业不计费，大于或等于3分钟的按照gpu或cpu用量计算"
+#       # 脚本文件路径，不包含config/scripts前缀，如my-strategy.js即等于config/scripts/my-strategy.js
+#       # 支持commonjs或者esm，内容不支持动态修改，修改后需重启系统
+#       # 自定义计量方式的文件应该默认导出一个如下签名的函数:
+#       # type CustomAmountStrategyFunction = (jobInfo: JobInfo) => number | Promise<number>;
+#       # JobInfo为apps/mis-server/src/bl/PriceMap.ts中的JobInfo类型，提供作业的用量信息
+#     script: "my-strategy.js"
+
+# 自定义可查询消费类型
+# customChargeTypes: ["月租", "存储费"]
+
+# #自定义消费记录中的作业相关的存储内容
+# jobChargeMetadata:
+#   # 可选。需要保存的作业的字段，字段参考src/entities/JobInfo
+#   savedFields: ["idJob", "cluster"]
+
+#   # 可选。定义显示出来的格式。如果不配置，直接显示上面保存的字段的信息
+#   displayFormats:
+#     # i18n格式，根据系统语言显示不同的信息
+#     # 或字符串格式，直接显示字符串
+#     # 利用 {{ 属性名 }} 使用上述savedFields中保存的属性值
+#     i18n:
+#       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+#       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
+#       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+

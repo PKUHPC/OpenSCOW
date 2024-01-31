@@ -1,5 +1,5 @@
 ---
-sidebar_position: 9
+sidebar_position: 10
 title: 自定义可配置项的国际化文本
 ---
 
