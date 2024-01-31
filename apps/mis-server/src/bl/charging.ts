@@ -22,6 +22,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
   target: Tenant | Loaded<Account, "tenant">;
@@ -93,13 +94,15 @@ type ChargeRequest = {
   amount: Decimal;
   comment: string;
   type: string;
+  userId?: string;
+  metadata?: AnyJson;
 };
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
-  const { target, amount, comment, type } = request;
+  const { target, amount, comment, type, userId, metadata } = request;
 
   const record = new ChargeRecord({
     time: new Date(),
@@ -107,6 +110,8 @@ export async function charge(
     target,
     comment,
     amount,
+    userId,
+    metadata,
   });
 
   em.persist(record);
