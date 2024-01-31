@@ -236,6 +236,7 @@
             "id"
           ],
           "referencedTableName": "algorithm",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -478,6 +479,7 @@
             "id"
           ],
           "referencedTableName": "dataset",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -893,6 +895,7 @@
             "id"
           ],
           "referencedTableName": "model",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

@@ -79,4 +79,4 @@ modelVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 modelVersionEntitySchema.addProperty("sharedStatus", String);
 modelVersionEntitySchema.addManyToOne("model", "Model", {
-  entity: () => Model, cascade: [Cascade.ALL], ref: true });
+  entity: () => Model, deleteRule: "cascade", ref: true });

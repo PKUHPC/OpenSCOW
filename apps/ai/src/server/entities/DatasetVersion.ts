@@ -74,4 +74,4 @@ datasetVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 datasetVersionEntitySchema.addProperty("sharedStatus", String);
 datasetVersionEntitySchema.addManyToOne("dataset", "Dataset", {
-  entity: () => Dataset, cascade: [Cascade.ALL], ref: true });
+  entity: () => Dataset, deleteRule: "cascade", ref: true });

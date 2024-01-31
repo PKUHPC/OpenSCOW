@@ -80,4 +80,4 @@ algorithmVersionEntitySchema.addProperty("updateTime", Date, {
   columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP, onUpdate: () => new Date() });
 algorithmVersionEntitySchema.addProperty("sharedStatus", String);
 algorithmVersionEntitySchema.addManyToOne("algorithm", "Algorithm", {
-  entity: () => Algorithm, cascade: [Cascade.ALL], ref: true });
+  entity: () => Algorithm, deleteRule: "cascade", ref: true });
