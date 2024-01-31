@@ -383,7 +383,7 @@ export const deleteImage = procedure
     for (const item of referenceRes) {
       if (item.tags?.length > 0 && item.tags.find((i: { name: string }) => i.name === image.tag)) {
         reference = item.digest;
-        needDeleteArtifact = item.tags.length === 1;
+        needDeleteArtifact = (item.tags.length === 1);
       }
     }
 
@@ -416,7 +416,7 @@ export const deleteImage = procedure
         const errorBody = await deleteArtifact.json();
         // 来自harbor的错误信息
         const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
-        logger.error("Failed to delete image tag url %s", deleteArtifact);
+        logger.error("Failed to delete image artifact url %s", deleteArtifactUrl);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete image tag: " + errorMessage,
