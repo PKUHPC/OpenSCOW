@@ -376,9 +376,14 @@ export const deleteImage = procedure
     const referenceRes = await getReferenceRes.json();
 
     let reference = "";
+
+    // 判断是否是唯一的标签，如果是需要删除上级的特定Artifact
+    let needDeleteArtifact: boolean = false;
+
     for (const item of referenceRes) {
-      if (item.tags.find((i: { name: string }) => i.name === image.tag)) {
+      if (item.tags?.length > 0 && item.tags.find((i: { name: string }) => i.name === image.tag)) {
         reference = item.digest;
+        needDeleteArtifact = item.tags.length === 1;
       }
     }
 
@@ -389,31 +394,60 @@ export const deleteImage = procedure
       });
     }
 
-    const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
-    + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
-    + `/artifacts/${reference}/tags/${image.tag}`;
-
     const authInfo = Buffer.from(`${aiConfig.harborConfig.user}:${aiConfig.harborConfig.password}`).toString("base64");
 
-    const deleteRes = await fetch(deleteUrl, {
-      method: "DELETE",
-      headers: {
-        "content-type": "application/json",
-        "Accept": "application/json",
-        "Authorization": `Basic ${authInfo}`,
-      },
-    });
+    // 如果上面的tag是最相同imageName下相同镜像的最后一个标签，则删除整个Artifact
+    if (needDeleteArtifact) {
 
-    // harbor 删除出错，但状态本身就是失败时无需操作
-    if (!deleteRes.ok) {
-      const errorBody = await deleteRes.json();
-      // 来自harbor的错误信息
-      const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
-      logger.error("Failed to delete image tag url %s", deleteUrl);
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to delete image tag: " + errorMessage,
+      const deleteArtifactUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+      + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
+      + `/artifacts/${reference}`;
+
+      const deleteArtifact = await fetch(deleteArtifactUrl, {
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Basic ${authInfo}`,
+        },
       });
+      // harbor 删除出错，但状态本身就是失败时无需操作
+      if (!deleteArtifact.ok) {
+        const errorBody = await deleteArtifact.json();
+        // 来自harbor的错误信息
+        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        logger.error("Failed to delete image tag url %s", deleteArtifact);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete image tag: " + errorMessage,
+        });
+      }
+
+    // 如果上面的tag不是最相同imageName下相同镜像的最后一个标签，则只删除该标签
+    } else {
+      const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+      + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
+      + `/artifacts/${reference}/tags/${image.tag}`;
+
+      const deleteRes = await fetch(deleteUrl, {
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Basic ${authInfo}`,
+        },
+      });
+      // harbor 删除出错，但状态本身就是失败时无需操作
+      if (!deleteRes.ok) {
+        const errorBody = await deleteRes.json();
+        // 来自harbor的错误信息
+        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        logger.error("Failed to delete image tag url %s", deleteUrl);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete image tag: " + errorMessage,
+        });
+      }
     }
 
     await em.removeAndFlush(image);
