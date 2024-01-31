@@ -44,17 +44,17 @@ sedit () {
     fi
     if [ "$#" -eq 0 ]; then
       echo "Error: Please enter the file you want to edit."
-      echo "Usage: edit [file_path]"
+      echo "Usage: sedit [file_path]"
       return 0
     elif [ "$#" -gt 1 ]; then
-      echo "Error: The edit command only accepts one argument."
-      echo "Usage: edit [file_path]"
+      echo "Error: The sedit command only accepts one argument."
+      echo "Usage: sedit [file_path]"
       return 0
     fi
     result=$(echo $@ | grep "/")
     if [[ "$result" != "" ]]
     then
-        echo "sdown does not support relative paths. Please enter the file name."
+        echo "sedit does not support relative paths. Please enter the file name."
         return 0
     fi
     if [ ! -f "$@" ]; then
