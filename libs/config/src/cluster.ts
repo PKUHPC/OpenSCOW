@@ -95,10 +95,6 @@ export const ClusterConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
     transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
   })),
-  hpcOnly: Type.Optional(Type.Boolean({
-    description: "是否为hpc专用集群，为true时只在portal服务中展示该集群", default: true })),
-  aiOnly: Type.Optional(Type.Boolean({
-    description: "是否为ai服务专用集群，为true时只在ai服务中展示该集群", default: false })),
 });
 
 
