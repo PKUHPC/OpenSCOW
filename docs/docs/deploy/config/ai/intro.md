@@ -44,7 +44,7 @@ title: 配置 AI 系统（beta）
 
 #### K8S调度器适配器
 
-在**AI 系统（beta）**中，我们仍然使用[SCOW调度器适配器](../../../../blog/2023-06-26-scow-scheduler-adapter.md)来实现**K8S**的调度服务。
+在**AI 系统（beta）**中，我们仍然使用[SCOW调度器适配器](https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter)来实现**K8S**的调度服务。
 
 当前版本中，我们提供了调度器适配器的适用版本的二进制文件[scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
 
