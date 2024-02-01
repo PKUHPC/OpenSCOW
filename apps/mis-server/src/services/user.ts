@@ -19,7 +19,7 @@ import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabil
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { convertToDateMessage, isValidTimezone } from "@scow/lib-server/build/date";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
   GetAccountUsersResponse,
@@ -766,12 +766,7 @@ export const userServiceServer = plugin((server) => {
     getNewUserCount: async ({ request, em, logger }) => {
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      if (!isValidTimezone(timeZone)) {
-        throw <ServiceError>{
-          code: Status.INVALID_ARGUMENT,
-          message: "Invalid timezone",
-        };
-      }
+      checktTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(User, "u");
       qb

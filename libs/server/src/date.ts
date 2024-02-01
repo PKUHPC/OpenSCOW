@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger } from "@ddadaal/tsgrpc-server";
+import { status } from "@grpc/grpc-js";
 import { DateMessage } from "@scow/protos/build/google/type/date";
 import dayjs, { Dayjs } from "dayjs";
 import timezone from "dayjs/plugin/timezone";
@@ -73,3 +75,11 @@ export function dayjsToDateMessage(dayjsObj: Dayjs): DateMessage {
   });
 }
 
+export function checktTimeZone(timeZone: string) {
+  if (!isValidTimezone(timeZone)) {
+    throw <ServiceError>{
+      code: status.INVALID_ARGUMENT,
+      message: "Invalid timezone",
+    };
+  }
+}
