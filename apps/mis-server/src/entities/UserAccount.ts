@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cascade, Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
+import { Entity, ManyToOne, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
 import { Account } from "src/entities/Account";
 import { User } from "src/entities/User";
