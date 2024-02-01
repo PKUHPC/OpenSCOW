@@ -12,11 +12,12 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
+import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
 export const staticConfigServiceServer = plugin((server) => {

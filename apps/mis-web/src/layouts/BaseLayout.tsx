@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DesktopOutlined } from "@ant-design/icons";
+import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
@@ -61,7 +61,13 @@ export const BaseLayout =
             user={userStore.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
-            linkText={t("layouts.route.navLinkText")}
+            linkText={t("layouts.route.navLinkTextPortal")}
+          />
+          <JumpToAnotherLink
+            user={userStore.user}
+            icon={<RobotOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.AI_URL}
+            linkText={t("layouts.route.navLinkTextAI")}
           />
           {
             systemLanguageConfig.isUsingI18n ? (

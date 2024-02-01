@@ -63,7 +63,6 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-
   });
 
 });
