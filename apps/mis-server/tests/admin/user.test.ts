@@ -14,6 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
@@ -128,17 +129,47 @@ it("cannot remove owner from account", async () => {
   expect(reply.code).toBe(Status.OUT_OF_RANGE);
 });
 
-it("when removing a user from an account, the account and user cannot be deleted", async () => {
+it("cannot remove a user from account,when user has jobs running or pending", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());
-  const em = server.ext.orm.em.fork();
 
-  await asyncClientCall(client, "removeUserFromAccount", {
+  const reply = await asyncClientCall(client, "removeUserFromAccount", {
     tenantName: data.tenant.name,
     accountName: data.accountA.accountName,
     userId: data.userB.userId,
   }).catch((e) => e);
 
-  const accountA = await em.findOneOrFail(Account, { id:data.accountA.id });
+  expect(reply.code).toBe(Status.FAILED_PRECONDITION);
+});
+
+it("when removing a user from an account, the account and user cannot be deleted", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+
+  const account = new Account({
+    accountName: "account_remove", comment: "", blocked: false, tenant:data.tenant,
+  }) as Loaded<Account, "tenant">;
+
+  const uaA = new UserAccount({
+    account,
+    user: data.userA,
+    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  const uaB = new UserAccount({
+    account,
+    user: data.userB,
+    role: UserRole.USER, status: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  await em.persistAndFlush([account, uaA, uaB]);
+
+  await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: account.accountName,
+    userId: data.userB.userId,
+  });
+
+  const accountA = await em.findOneOrFail(Account, { id:account.id });
   const userB = await em.findOneOrFail(User, { id:data.userB.id });
 
   expect(accountA).toBeTruthy();
