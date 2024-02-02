@@ -7,6 +7,21 @@ title: 配置 AI 系统（beta）
 
 本节介绍如何配置 **AI 系统（beta）**。
 
+# Beta期间配置
+
+SCOW AI当前处于Beta状态，其代码将会和SCOW主线共存，但是SCOW AI的版本发布周期将是独立的，不和SCOW本身同步。
+
+您可以在GitHub的Release中找到格式为`ai-beta.{数字}`的Release，这些Release以及对应的Tag均为SCOW AI的Beta发布版本。快速到所有`ai-beta.` Release的链接[点击此处](https://github.com/PKUHPC/SCOW/releases?q=ai-beta.&expanded=true)。
+
+要使用SCOW AI的具体的版本，您需要修改`install.yml`的`imageTag`为一个具体的`ai-beta.{数字}`的tag，例如：：
+
+```yaml title="install.yaml"
+# 指定使用Beta 1版本
+imageTag: ai-beta.1  
+```
+
+您同样可以使用`master`来跟踪SCOW主线以及其包括的SCOW AI的最新功能。
+
 ## 前期准备
 
 **AI 系统（beta）**需要您底层已部署**K8S集群**、已安装并行文件存储服务，并通过**SCOW调度器适配器**已实现对**K8S集群**的调度服务。
@@ -24,10 +39,10 @@ title: 配置 AI 系统（beta）
 当前**AI 系统（beta）**为试用版本，我们暂时只支持在**docker**容器运行时中执行镜像相关的服务，后续会陆续推出支持**ContainerD**等主流容器运行时的**AI 系统**。
 当前版本**K8S**部署的主要版本信息如下：
 
-| **安装内容** | **版本信息** |
-| -- | -- | 
-| kubernetes | v1.19.13 |
-| Docker Engine | 19.03.12 |
+| **安装内容**  | **版本信息** |
+| ------------- | ------------ |
+| kubernetes    | v1.19.13     |
+| Docker Engine | 19.03.12     |
 
 ### K8S调度服务
 
