@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "管理系统",
+    linkTextMis: "管理系统",
+    linkTextAI: "SCOW AI",
   },
   // routes
   routes: {
@@ -559,11 +560,16 @@ export default {
         popoverContent3: "文件下载",
         popoverContentFile:"文件名",
         popoverContent4: "，输入",
-        popoverContent5: "，您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，",
+        popoverContent5: "，您当前路径下的该文件会被下载到本地",
 
-        popoverContent6: "如果需要下载其他目录下的文件请使用",
+        popoverContent6: "目前不支持输入相对路径，如果需要下载或编辑其他目录下的文件请使用",
         popoverContent7: "命令跳转到文件系统。",
         popoverContent8: "使用示例：",
+
+        popoverContent9: "文件编辑",
+        popoverContent10: "，输入",
+        popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
+
         command:"命令",
       },
       index: {

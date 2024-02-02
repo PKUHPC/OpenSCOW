@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getAiConfig } from "@scow/config/build/ai";
 import { getAppConfigs } from "@scow/config/build/app";
 import { getClusterConfigs } from "@scow/config/build/cluster";
 import { getClusterTextsConfig } from "@scow/config/build/clusterTexts";
@@ -72,5 +73,12 @@ export const checkConfig = ({
     tryRead(getMisConfig);
   } else {
     logger.debug("MIS is not deployed. Skip MIS config check.");
+  }
+
+  if (config.ai) {
+    logger.debug("Checking AI configuration");
+    tryRead(getAiConfig);
+  } else {
+    logger.debug("AI is not deployed. Skip AI config check.");
   }
 };

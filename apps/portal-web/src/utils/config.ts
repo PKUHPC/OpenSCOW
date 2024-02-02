@@ -65,6 +65,8 @@ export interface PublicRuntimeConfig {
 
   MIS_URL: string | undefined;
 
+  AI_URL: string | undefined;
+
   CLUSTERS: Cluster[];
 
   CLUSTER_SORTED_ID_LIST: string[];

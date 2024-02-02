@@ -40,6 +40,7 @@ const changes = {
   "grpc-api": [],
   "config": [],
   "scheduler-adapter-protos": [],
+  "ai": [],
 };
 
 for (const file of files) {
@@ -176,6 +177,7 @@ ${generateContent("portal-web", "门户系统前端")
  + generateContent("auth", "认证系统")
  + generateContent("cli", "CLI")
  + generateContent("gateway", "网关")
+ + generateContent("ai", "AI系统")
 }
 `;
 
