@@ -14,7 +14,7 @@ import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
-import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, undefinedOrDecimalToMoeny } from "@scow/lib-decimal";
 import {
   ExportServiceServer,
   ExportServiceService } from "@scow/protos/build/server/export";
@@ -170,7 +170,7 @@ export const exportServiceServer = plugin((server) => {
           ownerName: ownerUser.name,
           comment: x.comment,
           balance: decimalToMoney(x.balance),
-          blockThresholdAmount: x.blockThresholdAmount ? decimalToMoney(x.blockThresholdAmount) : undefined,
+          blockThresholdAmount: undefinedOrDecimalToMoeny(x.blockThresholdAmount),
         };
       };
 

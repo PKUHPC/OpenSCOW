@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { decimalToMoney, undefinedOrDecimalToMoeny } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
@@ -62,7 +62,7 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
-      blockThresholdAmount:decimalToMoney(data.accountA.blockThresholdAmount),
+      blockThresholdAmount: undefinedOrDecimalToMoeny(data.accountA.blockThresholdAmount),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -72,7 +72,7 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
-      blockThresholdAmount:decimalToMoney(data.accountB.blockThresholdAmount),
+      blockThresholdAmount: undefinedOrDecimalToMoeny(data.accountA.blockThresholdAmount),
     },
   ]);
 
@@ -109,7 +109,7 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
-      blockThresholdAmount:decimalToMoney(data.accountA.blockThresholdAmount),
+      blockThresholdAmount: undefinedOrDecimalToMoeny(data.accountA.blockThresholdAmount),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -119,7 +119,7 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
-      blockThresholdAmount:decimalToMoney(data.accountB.blockThresholdAmount),
+      blockThresholdAmount: undefinedOrDecimalToMoeny(data.accountA.blockThresholdAmount),
     },
     { "accountName": "hpcc",
       "blocked": false,
@@ -129,7 +129,7 @@ it("gets all accounts", async () => {
       "tenantName": data.anotherTenant.name,
       comment: "123",
       balance: decimalToMoney(data.accountC.balance),
-      blockThresholdAmount:decimalToMoney(data.accountC.blockThresholdAmount),
+      blockThresholdAmount: undefinedOrDecimalToMoeny(data.accountA.blockThresholdAmount),
     },
   ]);
 });

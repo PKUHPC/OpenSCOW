@@ -16,7 +16,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
-import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber, undefinedOrDecimalToMoeny } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -155,7 +155,7 @@ export const accountServiceServer = plugin((server) => {
             ownerName: ownerUser.name,
             comment: x.comment,
             balance: decimalToMoney(x.balance),
-            blockThresholdAmount: x.blockThresholdAmount ? decimalToMoney(x.blockThresholdAmount) : undefined,
+            blockThresholdAmount: undefinedOrDecimalToMoeny(x.blockThresholdAmount),
           };
         }),
       }];

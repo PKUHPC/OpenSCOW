@@ -38,3 +38,13 @@ export const decimalToMoney = (dec: Decimal): Money => {
     decimalPlace: abs.multipliedBy(DECIMAL_PLACE).mod(DECIMAL_PLACE).integerValue(Decimal.ROUND_FLOOR).toNumber(),
   };
 };
+
+export const undefinedOrDecimalToMoeny = (dec: Decimal | undefined): Money | undefined => {
+
+  if (dec === undefined) {
+    return undefined;
+  }
+
+  return decimalToMoney(dec);
+};
+
