@@ -48,8 +48,8 @@ export class Account {
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
     balance: Decimal = new Decimal(0);
 
-  @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
-    blockThresholdAmount: Decimal = new Decimal(0);
+  @Property({ type: DecimalType, nullable: true })
+    blockThresholdAmount: Decimal | undefined;
 
   @Property({ columnType: DATETIME_TYPE, nullable: true })
     createTime: Date;

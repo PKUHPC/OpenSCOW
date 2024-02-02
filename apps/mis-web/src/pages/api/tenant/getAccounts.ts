@@ -29,7 +29,7 @@ export const AdminAccountInfo = Type.Object({
   ownerName: Type.String(),
   comment: Type.String(),
   balance: Money,
-  blockThresholdAmount: Money,
+  blockThresholdAmount: Type.Optional(Money),
 });
 export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 
@@ -47,7 +47,7 @@ export async function getAccounts(req: GetAccountsRequest) {
 
   const { results } = await asyncClientCall(uaClient, "getAccounts", req);
 
-  return results.map((x) => ensureNotUndefined(x, ["balance", "blockThresholdAmount"]));
+  return results.map((x) => ensureNotUndefined(x, ["balance"]));
 }
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN)

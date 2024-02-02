@@ -112,6 +112,8 @@ export interface PublicRuntimeConfig {
 
   JOB_CHARGE_METADATA: jobChargeMetadataType;
 
+  DEFAULT_ACCOUNT_BLOCK_THRESHOLD: number;
+
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

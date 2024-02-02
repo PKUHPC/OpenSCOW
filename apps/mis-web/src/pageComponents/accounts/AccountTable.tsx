@@ -11,7 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { moneyToNumber } from "@scow/lib-decimal";
+import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
@@ -25,6 +25,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
+import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
@@ -239,7 +240,9 @@ export const AccountTable: React.FC<Props> = ({
         <Table.Column<AdminAccountInfo>
           dataIndex="blockThresholdAmount"
           title={t(p("blockThresholdAmount"))}
-          render={(b: Money) => moneyToString(b) + t(p("unit")) }
+          render={(b: Money | undefined) => `${
+            b ? moneyToString(b)
+              : moneyToString(numberToMoney(publicConfig.DEFAULT_ACCOUNT_BLOCK_THRESHOLD))} ${t(p("unit"))}`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"

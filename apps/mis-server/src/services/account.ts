@@ -21,6 +21,7 @@ import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { authUrl } from "src/config";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -107,7 +108,9 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        if (account.balance.lte(0)) {
+        const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+
+        if (account.balance.lte(blockThresholdAmount)) {
           throw <ServiceError>{
             code: Status.FAILED_PRECONDITION,
             message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
@@ -152,7 +155,7 @@ export const accountServiceServer = plugin((server) => {
             ownerName: ownerUser.name,
             comment: x.comment,
             balance: decimalToMoney(x.balance),
-            blockThresholdAmount: decimalToMoney(x.blockThresholdAmount),
+            blockThresholdAmount: x.blockThresholdAmount ? decimalToMoney(x.blockThresholdAmount) : undefined,
           };
         }),
       }];
@@ -354,7 +357,7 @@ export const accountServiceServer = plugin((server) => {
         account.blockThresholdAmount = new Decimal(moneyToNumber(blockThresholdAmount));
 
         // 判断账户余额是否小于保证金
-        if (account.balance.isLessThan(moneyToNumber(blockThresholdAmount))) {
+        if (account.balance.lte(moneyToNumber(blockThresholdAmount))) {
           await blockAccount(account, server.ext.clusters, logger);
         } else {
           await unblockAccount(account, server.ext.clusters, logger);

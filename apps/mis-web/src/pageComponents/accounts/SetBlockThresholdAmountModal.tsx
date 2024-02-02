@@ -10,17 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { numberToMoney } from "@scow/lib-decimal";
 import type { Money } from "@scow/protos/build/common/money";
 import { App, Form, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
   accountName: string;
-  currentAmount: Money;
+  currentAmount: Money | undefined;
   balance: Money;
   open: boolean;
   onClose: () => void;
@@ -72,7 +74,10 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
     >
       <Form
         form={form}
-        initialValues={{ blockThresholdAmount: moneyToString(currentAmount) }}
+        initialValues={{ blockThresholdAmount:
+          currentAmount
+            ? moneyToString(currentAmount)
+            : numberToMoney(publicConfig.DEFAULT_ACCOUNT_BLOCK_THRESHOLD) }}
       >
         <Form.Item label={t(pCommon("accountName"))}>
           <strong>{accountName}</strong>

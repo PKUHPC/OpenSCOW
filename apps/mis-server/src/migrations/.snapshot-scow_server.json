@@ -153,6 +153,7 @@
           ],
           "composite": false,
           "keyName": "time",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -162,6 +163,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_tenant_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -171,6 +173,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_account_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -180,6 +183,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_user_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -189,6 +193,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_type_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -1220,10 +1225,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "precision": 19,
           "scale": 4,
-          "default": "0.0000",
           "mappedType": "decimal"
         },
         "create_time": {

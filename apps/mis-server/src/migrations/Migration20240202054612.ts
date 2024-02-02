@@ -1,9 +1,9 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20240130063026 extends Migration {
+export class Migration20240202054612 extends Migration {
 
   async up(): Promise<void> {
-    this.addSql('alter table `account` add `block_threshold_amount` DECIMAL(19,4) not null default 0.0000;');
+    this.addSql('alter table `account` add `block_threshold_amount` DECIMAL(19,4) null;');
   }
 
   async down(): Promise<void> {

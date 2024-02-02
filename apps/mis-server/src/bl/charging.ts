@@ -15,6 +15,7 @@ import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
+import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
@@ -31,6 +32,28 @@ interface PayRequest {
   type: string;
   ipAddress: string;
   operatorId: string;
+}
+
+export function checkShouldBlockAccount(prevBalance: Decimal, account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+
+  if (prevBalance.gt(blockThresholdAmount)
+  && account.balance.lte(blockThresholdAmount)) {
+    return true;
+  }
+  return false;
+}
+
+export function checkShouldUnblockAccount(prevBalance: Decimal, account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+
+  if (prevBalance.lte(blockThresholdAmount)
+  && account.balance.gt(blockThresholdAmount)) {
+    return true;
+  }
+  return false;
 }
 
 export async function pay(
@@ -66,8 +89,7 @@ export async function pay(
 
   if (
     target instanceof Account
-    && prevBalance.lte(target.blockThresholdAmount)
-    && target.balance.gt(target.blockThresholdAmount)
+    && checkShouldUnblockAccount(prevBalance, target)
   ) {
     logger.info("Unblock account %s", target.accountName);
     await unblockAccount(target, clusterPlugin.clusters, logger);
@@ -76,8 +98,7 @@ export async function pay(
   // 充值为负数时，要考虑封锁账户
   if (
     target instanceof Account
-    && prevBalance.gt(target.blockThresholdAmount)
-    && target.balance.lte(target.blockThresholdAmount)
+    && checkShouldBlockAccount(prevBalance, target)
   ) {
     logger.info("Block account %s", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
@@ -121,8 +142,7 @@ export async function charge(
 
   if (
     target instanceof Account
-    && prevBalance.gt(target.blockThresholdAmount)
-    && target.balance.lte(target.blockThresholdAmount)
+    && checkShouldBlockAccount(prevBalance, target)
   ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
