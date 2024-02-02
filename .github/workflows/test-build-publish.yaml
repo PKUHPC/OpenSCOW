@@ -209,7 +209,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           name: SCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
-          body_path: ${{ startsWith(github.ref_name, 'ai-') && null || format('changelogs/{0}.md', github.ref_name) }}
+          body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) }}
           generate_release_notes: ${{ startsWith(github.ref_name, 'ai-') }}
           prerelease: ${{ startsWith(github.ref_name, 'ai-') }}
           files: |
