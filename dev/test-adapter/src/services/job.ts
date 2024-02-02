@@ -19,6 +19,13 @@ export const jobServiceServer = plugin((server) => {
   server.addService<JobServiceServer>(JobServiceService, {
     getJobs: async ({ request }) => {
       const endTimeRange = request.filter?.endTime;
+      const accountNames = request.filter?.accounts;
+
+      // 用于测试removeUserFromAccount接口
+      if (accountNames && accountNames[0] === "account_remove") {
+        return [{ jobs:[], totalCount:0 }];
+      }
+
       return [{
         jobs: testData.filter((x) =>
           x.cluster === clusterId &&
