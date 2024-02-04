@@ -97,7 +97,6 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
   const [newUserInfo, setNewUserInfo] = useState<{ identityId: string; name: string } | undefined>(undefined);
 
   const onAddUser = async (identityId: string, name: string) => {
-    console.log("【name】", name);
     await api.addUserToAccount({ body: { identityId, name, accountName } })
       .httpError(400, ({ code }) => {
         if (code === "ID_NAME_NOT_MATCH") {
