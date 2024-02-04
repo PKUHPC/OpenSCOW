@@ -1077,6 +1077,7 @@ export default {
       exportChargeRecord: "Export Charge Record",
       exportPayRecord: "Export Payment Record",
       exportOperationLog: "Export Operation Log",
+      setAccountBlockThreshold: "Set Account Block Threshold",
     },
     operationDetails: {
       login: "User Login",
@@ -1147,6 +1148,7 @@ export default {
       exportOperationLogFromAccount: "Export Operation Log of Account {}",
       exportOperationLogFromTenant: "Export Operation Log of Tenant {}",
       exportOperationLogFromAdmin: "Export Operation Log of Platform",
+      setAccountBlockThreshold: "Set the block threshold of account {} to {}",
     },
   },
   userRoles: {

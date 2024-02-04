@@ -328,7 +328,9 @@ export const accountServiceServer = plugin((server) => {
         accountName,
       );
 
-      if (account.balance.isLessThanOrEqualTo(0)) {
+      const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+
+      if (account.balance.isLessThanOrEqualTo(blockThresholdAmount)) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await blockAccount(account, server.ext.clusters, logger);
       }

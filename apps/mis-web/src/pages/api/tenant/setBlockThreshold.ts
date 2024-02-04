@@ -56,29 +56,28 @@ export default /* #__PURE__*/route(SetBlockThresholdSchema, async (req, res) => 
 
   const client = getClient(AccountServiceClient);
 
-  // const logInfo = {
-  //   operatorUserId: info.identityId,
-  //   operatorIp: parseIp(req) ?? "",
-  //   operationTypeName: OperationType.blockAccount,
-  //   operationTypePayload:{
-  //     tenantName, accountName, userId: info.identityId,
-  //   },
-  // };
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.setAccountBlockThreshold,
+    operationTypePayload:{
+      accountName, thresholdAmount: numberToMoney(blockThresholdAmount),
+    },
+  };
 
   return await asyncClientCall(client, "setBlockThreshold", {
     accountName,
     blockThresholdAmount: numberToMoney(blockThresholdAmount),
   })
     .then(async () => {
-      // await callLog(logInfo, OperationResult.SUCCESS);
+      await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: {
         executed: true,
       } };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
-      // [Status.FAILED_PRECONDITION]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
-    // async () => await callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });
