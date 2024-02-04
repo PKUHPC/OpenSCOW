@@ -1,5 +1,11 @@
 # @scow/mis-server
 
+## 1.4.2
+
+### Patch Changes
+
+- 448f6bf: 之前升级 mikroORM 时 cascade: [Cascade.ALL]属性会在删除 UserAccount 时把 User 和 Account 也删掉
+
 ## 1.4.1
 
 ### Patch Changes

@@ -1,0 +1,12 @@
+db:
+  host: localhost
+  port: 3306
+  user: root
+  password: mysqlrootpassword
+  dbName: scow_ai
+
+harborConfig:
+  url: 10.0.0.xxx
+  project: projectName
+  user: user
+  password: password

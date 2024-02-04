@@ -129,7 +129,7 @@ export const InstallConfigSchema = Type.Object({
     pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
   }, { default: {} }),
 
-  audit:  Type.Optional(Type.Object({
+  audit: Type.Optional(Type.Object({
     mysqlImage: Type.String({ description: "审计系统数据库镜像", default: "mysql:8" }),
     dbPassword: Type.String({ description: "审计系统数据库密码", default: "must!chang3this" }),
 
@@ -138,6 +138,16 @@ export const InstallConfigSchema = Type.Object({
       auditServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
         description: "audit-server映射出来的端口",
       })),
+    })),
+  })),
+
+  ai: Type.Optional(Type.Object({
+    basePath: Type.String({ description: "AI系统的部署路径，相对于整个系统的basePath", default: "/ai" }),
+    mysqlImage: Type.String({ description: "AI系统数据库镜像", default: "mysql:8" }),
+    dbPassword: Type.String({ description: "AI系统数据库密码", default: "must!chang3this" }),
+
+    portMappings: Type.Optional(Type.Object({
+      db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
     })),
   })),
 

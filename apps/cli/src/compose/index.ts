@@ -45,6 +45,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const MIS_PATH = config.mis?.basePath || "/mis";
   checkPathFormat("mis.basePath", MIS_PATH);
 
+  const AI_PATH = config.ai?.basePath || "/ai";
+  checkPathFormat("ai.basePath", AI_PATH);
+
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
@@ -128,6 +131,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "BASE_PATH": BASE_PATH == "/" ? "" : BASE_PATH,
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
+      "AI_PATH": AI_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
@@ -265,6 +269,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": portalBasePath,
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "AI_URL": join(BASE_PATH, AI_PATH),
+        "AI_DEPLOYED": config.ai ? "true" : "false",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
         "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
@@ -315,6 +321,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
+        "AI_URL": join(BASE_PATH, AI_PATH),
+        "AI_DEPLOYED": config.ai ? "true" : "false",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
         "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
@@ -375,5 +383,48 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: config.audit.portMappings?.db ? { [config.audit.portMappings?.db]: 3306 } : {},
     });
   }
+
+  if (config.ai) {
+    addService("ai", {
+      image: scowImage,
+      ports: {},
+      environment: {
+        "SCOW_LAUNCH_APP": "ai",
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
+        "MIS_URL": join(BASE_PATH, MIS_PATH),
+        "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "DB_PASSWORD": config.ai.dbPassword,
+        "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
+        "PORTAL_DEPLOYED": config.portal ? "true" : "false",
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+        "PROTOCOL": config.gateway.protocol,
+        ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
+      },
+      volumes: {
+        "/etc/hosts": "/etc/hosts",
+        "./config": "/etc/scow",
+        "~/.ssh": "/root/.ssh",
+      },
+    });
+
+    composeSpec.volumes["ai_db_data"] = {};
+
+    addService("ai-db", {
+      image: config.ai.mysqlImage,
+      volumes: {
+        "ai_db_data": "/var/lib/mysql",
+      },
+      environment: {
+        "MYSQL_ROOT_PASSWORD": config.ai.dbPassword,
+      },
+      ports: config.ai.portMappings?.db ? { [config.ai.portMappings?.db]: 3306 } : {},
+    });
+  }
+
   return composeSpec;
 };

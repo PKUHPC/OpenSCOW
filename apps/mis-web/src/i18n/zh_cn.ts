@@ -154,7 +154,8 @@ export default {
         operationLog:"操作日志",
         statistic: "平台数据统计",
       },
-      navLinkText: "门户",
+      navLinkTextPortal: "门户",
+      navLinkTextAI: "SCOW AI",
       dashboard: "仪表盘",
       user: {
         firstNav: "用户空间",
