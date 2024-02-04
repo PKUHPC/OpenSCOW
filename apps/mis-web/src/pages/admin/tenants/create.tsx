@@ -79,9 +79,9 @@ const CreateTenantPageForm: React.FC = () => {
         onOk: async () => {
           await api.createTenant({
             body: {
-              tenantName,
+              tenantName: tenantName.trim(),
               userId,
-              userName,
+              userName: userName.trim(),
               userEmail,
               userPassword,
             },
