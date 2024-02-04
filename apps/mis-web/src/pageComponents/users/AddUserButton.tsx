@@ -55,7 +55,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       onOk={async () => {
         const { identityId, name } = await form.validateFields();
         setLoading(true);
-        onAddingUser(identityId, name).finally(() => setLoading(false));
+        onAddingUser(identityId, name.trim()).finally(() => setLoading(false));
       }}
       confirmLoading={loading}
     >
@@ -97,6 +97,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
   const [newUserInfo, setNewUserInfo] = useState<{ identityId: string; name: string } | undefined>(undefined);
 
   const onAddUser = async (identityId: string, name: string) => {
+    console.log("【name】", name);
     await api.addUserToAccount({ body: { identityId, name, accountName } })
       .httpError(400, ({ code }) => {
         if (code === "ID_NAME_NOT_MATCH") {
@@ -165,7 +166,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
         open={!!newUserInfo}
         newUserInfo={newUserInfo}
         onCreated={({ identityId, name }) => {
-          return onAddUser(identityId, name);
+          return onAddUser(identityId, name.trim());
         }}
         onClose={() => {
           setNewUserInfo(undefined);
