@@ -12,6 +12,6 @@ title: 与SCOW集成
 - 自定义认证系统
   - [使用自定义认证系统](./auth/use.md)
   - [实现自定义认证系统](./auth/impl.md)
-- [SCOW API](./scow-api-hook/api.md)：通过编程调用SCOW的功能
+- [SCOW API](./scow-api-hook/api/api.md)：通过编程调用SCOW的功能
 - [SCOW Hook](./scow-api-hook/hook.md)：监听SCOW的事件
 - [UI扩展](./ui-extension/ui-extension.md)：将您的UI集成进SCOW

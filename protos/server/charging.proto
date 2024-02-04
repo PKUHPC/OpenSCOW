@@ -14,6 +14,7 @@ syntax = "proto3";
 package scow.server;
 
 import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
 import "google/protobuf/struct.proto";
 
 import "common/money.proto";
@@ -223,13 +224,16 @@ message GetTopChargeAccountResponse {
 }
 
 message DailyAmount {
-  google.protobuf.Timestamp date = 1;
+  google.type.Date date = 1;
   common.Money amount = 2;
 }
 
 message GetDailyChargeRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+  optional string time_zone = 3;
 }
 
 message GetDailyChargeResponse {
@@ -256,6 +260,9 @@ message GetTopPayAccountResponse {
 message GetDailyPayRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+  optional string time_zone = 3;
 }
 
 message GetDailyPayResponse {

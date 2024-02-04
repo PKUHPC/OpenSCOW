@@ -28,15 +28,20 @@ import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
+import { dateMessageToDayjs } from "src/utils/date";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
+const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const p = prefix("page.admin.statistic.");
 
-const formateData = (data: Array<{ date: string, count: number }>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
+const formateData = (data: Array<{
+  date: { year: number, month: number, day: number },
+  count: number
+}>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
   const input = data.map((d) => ({
-    date: new Date(d.date),
+    date: dateMessageToDayjs(d.date),
     count: d.count,
   }));
   const countData: {date: dayjs.Dayjs, count: number}[] = [];
@@ -116,6 +121,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return await api.getNewUserCount({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
+      timeZone,
     } });
   }, [query]);
 
@@ -125,6 +131,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return await api.getActiveUserCount({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
+      timeZone,
     } });
   }, [query]);
 
@@ -152,6 +159,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return await api.getDailyCharge({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
+      timeZone,
     } });
   }, [query]);
 
@@ -161,6 +169,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return await api.getDailyPay({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
+      timeZone,
     } });
   }, [query]);
 
@@ -179,6 +188,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     return await api.getNewJobCount({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
+      timeZone,
     } });
   }, [query]);
 

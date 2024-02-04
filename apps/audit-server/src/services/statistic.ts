@@ -13,6 +13,7 @@
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
 
@@ -21,24 +22,28 @@ export const statisticServiceServer = plugin((server) => {
 
   server.addService<StatisticServiceServer>(StatisticServiceService, {
 
-    getActiveUserCount: async ({ request, em }) => {
+    getActiveUserCount: async ({ request, em, logger }) => {
 
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(OperationLog, "o");
-
       qb
-        .select([raw("DATE(o.operation_time) as date"), raw("COUNT(DISTINCT o.operator_user_id) as userCount")])
+        .select([
+          raw("DATE(CONVERT_TZ(o.operation_time, 'UTC', ?)) as date", [timeZone]),
+          raw("COUNT(DISTINCT o.operator_user_id) as userCount"),
+        ])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
-        .groupBy(raw("DATE(o.operation_time)"))
-        .orderBy({ [raw("DATE(o.operation_time)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const records: {date: string, userCount: number}[] = await qb.execute();
 
       return [{
         results: records.map((record) => ({
-          date: record.date,
+          date: convertToDateMessage(record.date, logger),
           count: record.userCount,
         })),
       }];
@@ -72,8 +77,8 @@ export const statisticServiceServer = plugin((server) => {
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: portalOperationType } })
-        .groupBy(raw("JSON_EXTRACT(meta_data, '$.$case')"))
-        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC });
+        .groupBy(raw("operationType"))
+        .orderBy({ [raw("count")]: QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 
@@ -126,8 +131,8 @@ export const statisticServiceServer = plugin((server) => {
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
         .andWhere({ [raw("JSON_EXTRACT(meta_data, '$.$case')")]: { $in: misOperationType } })
-        .groupBy(raw("JSON_EXTRACT(meta_data, '$.$case')"))
-        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC });
+        .groupBy(raw("operationType"))
+        .orderBy({ [raw("count")]: QueryOrder.DESC });
 
       const results: {operationType: string, count: number}[] = await qb.execute();
 

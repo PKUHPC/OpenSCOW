@@ -15,8 +15,10 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -24,6 +26,7 @@ import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { dropDatabase } from "tests/data/helpers";
 
+dayjs.extend(utc);
 
 let server: Server;
 let em: SqlEntityManager;
@@ -106,21 +109,28 @@ it("correct get Top 10 Charge Account", async () => {
 
 });
 
-it("correct get daily Charge Amount", async () => {
+it("correct get daily Charge Amount in UTC+8 timezone", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   const today = dayjs().startOf("day");
 
   const tenDaysAgo = today.clone().subtract(9, "day");
 
-  const reply = await asyncClientCall(client, "getDailyCharge",
-    { startTime: tenDaysAgo.toISOString(), endTime: today.toISOString() });
+  const reply = await asyncClientCall(client, "getDailyCharge", {
+    startTime: tenDaysAgo.toISOString(),
+    endTime: today.toISOString(),
+    timeZone: "Asia/Shanghai",
+  });
 
-  const results = Array.from({ length: 10 }, (_, i) => ({
-    date: today.subtract(i, "day").toISOString(),
-    amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
-  }));
+  const todayInUtcPlus8 = today.utcOffset(8);
 
+  const results = Array.from({ length: 10 }, (_, i) => {
+    const curDateInUtcPlus8 = todayInUtcPlus8.subtract(i, "day");
+    return ({
+      date: dayjsToDateMessage(curDateInUtcPlus8),
+      amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
+    });
+  });
 
   expect(reply.results).toMatchObject(results);
 
@@ -147,20 +157,28 @@ it("correct get Top 10 Pay Account", async () => {
 
 });
 
-it("correct get daily Pay Amount", async () => {
+it("correct get daily Pay Amount in UTC+8 timezone", async () => {
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
   const today = dayjs().startOf("day");
 
   const tenDaysAgo = today.clone().subtract(9, "day");
 
-  const reply = await asyncClientCall(client, "getDailyPay",
-    { startTime: tenDaysAgo.toISOString(), endTime: today.toISOString() });
+  const reply = await asyncClientCall(client, "getDailyPay", {
+    startTime: tenDaysAgo.toISOString(),
+    endTime: today.toISOString(),
+    timeZone: "Asia/Shanghai",
+  });
 
-  const results = Array.from({ length: 10 }, (_, i) => ({
-    date: today.subtract(i, "day").toISOString(),
-    amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
-  }));
+  const todayInUtcPlus8 = today.utcOffset(8);
+
+  const results = Array.from({ length: 10 }, (_, i) => {
+    const curDateInUtcPlus8 = todayInUtcPlus8.subtract(i, "day");
+    return ({
+      date: dayjsToDateMessage(curDateInUtcPlus8),
+      amount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
+    });
+  });
 
 
   expect(reply.results).toMatchObject(results);

@@ -419,6 +419,9 @@ importers:
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
@@ -1429,6 +1432,9 @@ importers:
       '@scow/config':
         specifier: workspace:*
         version: link:../config
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../scheduler-adapter

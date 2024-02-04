@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
@@ -412,15 +413,19 @@ export const jobServiceServer = plugin((server) => {
     },
 
     getNewJobCount: async ({ request, em }) => {
-      const { startTime, endTime } = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
       qb
-        .select([raw("DATE(j.time_submit) as date"), raw("COUNT(*) as count")])
+        .select([
+          raw("DATE(CONVERT_TZ(j.time_submit, 'UTC', ?)) as date", [timeZone]),
+          raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
-        .groupBy(raw("DATE(j.time_submit)"))
-        .orderBy({ [raw("DATE(j.time_submit)")]: QueryOrder.DESC });
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
 
       const results: {date: string, count: number}[] = await queryWithCache({
         em,
@@ -429,7 +434,10 @@ export const jobServiceServer = plugin((server) => {
       });
       return [
         {
-          results,
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
         },
       ];
     },
