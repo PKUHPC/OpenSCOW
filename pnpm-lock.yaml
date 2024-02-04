@@ -1432,6 +1432,9 @@ importers:
       '@scow/config':
         specifier: workspace:*
         version: link:../config
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../scheduler-adapter
