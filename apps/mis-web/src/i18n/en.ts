@@ -1159,6 +1159,7 @@ export default {
       exportOperationLogFromAdmin: "Export Operation Log of Platform",
       setAccountBlockThreshold: "Set the block threshold of account {} to {}",
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
+      unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
     },
   },
   userRoles: {

@@ -1160,6 +1160,7 @@ export default {
       exportOperationLogFromAdmin: "导出平台的操作日志",
       setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
+      unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
     },
   },
   userRoles: {

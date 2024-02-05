@@ -17,7 +17,7 @@ import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
 import { prefix } from "src/i18n";
 import en from "src/i18n/en";
-import { nullableMoneyToString } from "src/utils/money";
+import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 export const OperationResult = {
   UNKNOWN: 0,
@@ -405,9 +405,10 @@ export const getOperationDetail = (
     case "exportOperationLog":
       return getExportOperationLogDetail(operationEvent[logEvent], t);
     case "setAccountBlockThreshold":
-      return t(pDetails("setAccountBlockThreshold"),
-        [operationEvent[logEvent].accountName,
-          nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+      return operationEvent[logEvent].thresholdAmount
+        ? t(pDetails("setAccountBlockThreshold"),
+          [operationEvent[logEvent].accountName, moneyToString(operationEvent[logEvent].thresholdAmount!) ])
+        : t(pDetails("unsetAccountBlockThreshold"), [operationEvent[logEvent].accountName]);
     case "setAccountDefaultBlockThreshold":
       return t(pDetails("setAccountDefaultBlockThreshold"),
         [operationEvent[logEvent].tenantName,
