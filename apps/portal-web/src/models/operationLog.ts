@@ -78,4 +78,5 @@ export const OperationType: OperationTypeEnum = {
   exportPayRecord: "exportPayRecord",
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
+  setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
 };

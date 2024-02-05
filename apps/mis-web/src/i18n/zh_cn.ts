@@ -1087,6 +1087,7 @@ export default {
       exportPayRecord: "导出充值记录",
       exportOperationLog: "导出操作日志",
       setAccountBlockThreshold: "设置账户封锁阈值",
+      setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
     },
     operationDetails: {
       login: "用户登录",
@@ -1158,6 +1159,7 @@ export default {
       exportOperationLogFromTenant: "导出租户{}的操作日志",
       exportOperationLogFromAdmin: "导出平台的操作日志",
       setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
+      setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
     },
   },
   userRoles: {

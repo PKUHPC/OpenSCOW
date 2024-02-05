@@ -367,6 +367,12 @@ message SetAccountBlockThreshold {
   common.Money threshold_amount = 2;
 }
 
+message SetAccountDefaultBlockThreshold {
+  string tenant_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -428,6 +434,7 @@ message CreateOperationLogRequest {
     ExportChargeRecord export_charge_record = 57;
     ExportOperationLog export_operation_log = 58;
     SetAccountBlockThreshold set_account_block_threshold = 59;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
   }
 }
 
@@ -495,6 +502,7 @@ message OperationLog {
     ExportChargeRecord export_charge_record = 59;
     ExportOperationLog export_operation_log = 60;
     SetAccountBlockThreshold set_account_block_threshold = 61;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
   }
 }
 

@@ -84,6 +84,7 @@ export const OperationType: OperationTypeEnum = {
   exportPayRecord: "exportPayRecord",
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
+  setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
 };
 
 export const OperationLog = Type.Object({
@@ -178,6 +179,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     exportPayRecord: t(pTypes("exportPayRecord")),
     exportOperationLog: t(pTypes("exportOperationLog")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
+    setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
   };
 
 };
@@ -225,6 +227,7 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   blockAccount: "030305",
   unblockAccount: "030306",
   setAccountBlockThreshold: "030307",
+  setAccountDefaultBlockThreshold: "030308",
   importUsers: "040101",
   setPlatformAdmin: "040201",
   unsetPlatformAdmin: "040202",
@@ -404,6 +407,10 @@ export const getOperationDetail = (
     case "setAccountBlockThreshold":
       return t(pDetails("setAccountBlockThreshold"),
         [operationEvent[logEvent].accountName,
+          nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+    case "setAccountDefaultBlockThreshold":
+      return t(pDetails("setAccountDefaultBlockThreshold"),
+        [operationEvent[logEvent].tenantName,
           nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
     default:
       return "-";

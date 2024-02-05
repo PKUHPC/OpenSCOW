@@ -123,6 +123,13 @@ export const statisticServiceServer = plugin((server) => {
         "setPlatformBilling",
         "createTenant",
         "tenantPay",
+        "exportUser",
+        "exportAccount",
+        "exportChargeRecord",
+        "exportPayRecord",
+        "exportOperationLog",
+        "setAccountBlockThreshold",
+        "setAccountDefaultBlockThreshold",
       ];
 
       const qb = em.createQueryBuilder(OperationLog, "o");
