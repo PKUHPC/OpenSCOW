@@ -15,13 +15,14 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
 export const GetNewJobCountResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.String(),
+    date: DateSchema,
     count: Type.Number(),
   })),
 });
@@ -37,6 +38,8 @@ export const GetNewJobCountSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
 
     endTime: Type.String({ format: "date-time" }),
+
+    timeZone: Type.String(),
 
   }),
 
@@ -55,18 +58,20 @@ export default typeboxRoute(GetNewJobCountSchema,
       return;
     }
 
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, timeZone } = req.query;
 
     const client = getClient(JobServiceClient);
 
     const { results } = await asyncClientCall(client, "getNewJobCount", {
       startTime,
       endTime,
+      timeZone,
     });
 
     return {
       200: {
-        results: results.map((x) => ensureNotUndefined(x, ["date"])),
+        results: results.filter((x) => x.date !== undefined)
+          .map((x) => ensureNotUndefined(x, ["date"])),
       },
     };
   });

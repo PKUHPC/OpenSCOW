@@ -1,15 +1,15 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 title: SCOW API
 ---
 
 # SCOW API
 
-SCOW系统总体来说分为前端和后端部分（[架构](../../deploy/architecture/index.md)），SCOW的前端和后端部分使用gRPC进行通信。
+SCOW系统总体来说分为前端和后端部分（[架构](../../../deploy/architecture/index.md)），SCOW的前端和后端部分使用gRPC进行通信。
 
 要使用SCOW API，您需要
 
-1. [获取SCOW Protobuf文件](./proto.md)并生成相关代码
+1. [获取SCOW Protobuf文件](../proto.md)并生成相关代码
 2. 编写程序，调用gRPC API与SCOW的后端部分组件`mis-server`, `portal-server`, `audit-server`交互
 
 ## 打开后端服务网络接口
@@ -64,4 +64,4 @@ scowApi:
 
 ## 实际项目示例
 
-- [Go](./examples/go.md#使用scow-api)
+- [Go](../examples/go.md#使用scow-api)

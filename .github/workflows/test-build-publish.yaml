@@ -7,6 +7,7 @@ on:
   push:
     tags:
       - "v**"
+      - "ai-beta.**"
     branches:
       - master
 
@@ -70,7 +71,7 @@ jobs:
         run: pnpm test:ci
 
       - name: Upload test converage
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
@@ -207,9 +208,10 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
-          name: SCOW ${{ github.ref_name }}
-          body_path: changelogs/${{ github.ref_name }}.md
-          generate_release_notes: false
+          name: SCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
+          body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) || null }}
+          generate_release_notes: ${{ startsWith(github.ref_name, 'ai-') }}
+          prerelease: ${{ startsWith(github.ref_name, 'ai-') }}
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
