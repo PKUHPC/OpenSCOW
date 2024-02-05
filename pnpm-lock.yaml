@@ -419,6 +419,9 @@ importers:
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
@@ -1432,6 +1435,9 @@ importers:
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../scheduler-adapter
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../protos/scow
       '@scow/rich-error-model':
         specifier: workspace:*
         version: link:../rich-error-model
@@ -1441,6 +1447,9 @@ importers:
       '@scow/utils':
         specifier: workspace:*
         version: link:../utils
+      dayjs:
+        specifier: 1.11.10
+        version: 1.11.10
       nookies:
         specifier: 2.5.2
         version: 2.5.2
@@ -1454,9 +1463,6 @@ importers:
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.5
         version: 0.19.5(@grpc/grpc-js@1.9.14)
-      '@scow/protos':
-        specifier: workspace:*
-        version: link:../protos/scow
       '@types/shell-quote':
         specifier: 1.7.4
         version: 1.7.4

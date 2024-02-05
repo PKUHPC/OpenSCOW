@@ -22,6 +22,8 @@
     "@grpc/grpc-js": "1.9.14",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*",
+    "@scow/protos": "workspace:*",
+    "dayjs": "1.11.10",
     "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
@@ -31,7 +33,6 @@
   },
   "devDependencies": {
     "@ddadaal/tsgrpc-server": "0.19.5",
-    "@scow/protos": "workspace:*",
     "@types/shell-quote": "1.7.4"
   },
   "volta": {

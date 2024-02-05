@@ -55,7 +55,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       onOk={async () => {
         const { identityId, name } = await form.validateFields();
         setLoading(true);
-        onAddingUser(identityId, name).finally(() => setLoading(false));
+        onAddingUser(identityId, name.trim()).finally(() => setLoading(false));
       }}
       confirmLoading={loading}
     >
@@ -165,7 +165,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
         open={!!newUserInfo}
         newUserInfo={newUserInfo}
         onCreated={({ identityId, name }) => {
-          return onAddUser(identityId, name);
+          return onAddUser(identityId, name.trim());
         }}
         onClose={() => {
           setNewUserInfo(undefined);

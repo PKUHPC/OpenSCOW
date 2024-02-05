@@ -15,12 +15,13 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { StatisticServiceClient } from "@scow/protos/build/audit/statistic";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { getAuditClient } from "src/utils/client";
 
 export const GetActiveUserCountResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.String(),
+    date: DateSchema,
     count: Type.Number(),
   })),
 });
@@ -36,6 +37,8 @@ export const GetActiveUserCountSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
 
     endTime: Type.String({ format: "date-time" }),
+
+    timeZone: Type.String(),
 
   }),
 
@@ -54,7 +57,7 @@ export default typeboxRoute(GetActiveUserCountSchema,
       return;
     }
 
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, timeZone } = req.query;
 
     const client = getAuditClient?.(StatisticServiceClient);
 
@@ -62,13 +65,17 @@ export default typeboxRoute(GetActiveUserCountSchema,
       const { results } = await asyncClientCall(client, "getActiveUserCount", {
         startTime,
         endTime,
+        timeZone,
       });
+
       return {
         200: {
-          results: results.map((result) => ({
-            date: result.date || "",
-            count: result.count,
-          })),
+          results: results
+            .filter((x) => x.date !== undefined)
+            .map((x) => ({
+              date: x.date!,
+              count: x.count,
+            })),
         },
       };
     }
