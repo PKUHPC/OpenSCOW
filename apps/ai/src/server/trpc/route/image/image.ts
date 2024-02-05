@@ -354,7 +354,7 @@ export const deleteImage = procedure
 
       // 没有返回值且镜像本身状态就是 failure 的，不需要去 harbor 删除了
       if (errorText === "" && image.status === Status.FAILURE) {
-        logger.error(`Maybe image ${input.id} not exist on harbor`);
+        logger.error(`Maybe image(${input.id}) ${image.name}:${image.tag} not exist on harbor`);
         await em.removeAndFlush(image);
         return;
       }
@@ -388,10 +388,10 @@ export const deleteImage = procedure
     }
 
     if (!reference) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to find image tag in harbor! Please contact the administrator! ",
-      });
+      // Harbor API 请求接收到正常返回值，但是在Harbor中没有找到对应镜像，则直接删除本地数据库镜像信息
+      logger.error(`Maybe image(${input.id}) ${image.name}:${image.tag} not exist on harbor`);
+      await em.removeAndFlush(image);
+      return;
     }
 
     const authInfo = Buffer.from(`${aiConfig.harborConfig.user}:${aiConfig.harborConfig.password}`).toString("base64");
