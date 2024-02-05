@@ -13,7 +13,7 @@ SCOW AI当前处于Beta状态，其代码将会和SCOW主线共存，但是SCOW 
 
 您可以在GitHub的Release中找到格式为`ai-beta.{数字}`的Release，这些Release以及对应的Tag均为SCOW AI的Beta发布版本。快速到所有`ai-beta.` Release的链接[点击此处](https://github.com/PKUHPC/SCOW/releases?q=ai-beta.&expanded=true)。
 
-要使用SCOW AI的具体的版本，您需要修改`install.yml`的`imageTag`为一个具体的`ai-beta.{数字}`的tag，例如：：
+要使用SCOW AI的具体的版本，您需要修改`install.yml`的`imageTag`为一个具体的`ai-beta.{数字}`的tag，例如：
 
 ```yaml title="install.yaml"
 # 指定使用Beta 1版本
@@ -24,19 +24,11 @@ imageTag: ai-beta.1
 
 ## 前期准备
 
-**AI 系统（beta）** 需要您底层已部署 **K8S集群**、已安装 **并行文件存储服务**、并通过 **适用于 AI 系统（beta）** 的 **SCOW调度器适配器** 已实现对 K8S 集群的调度服务。
+### K8S 集群
 
-同时为了满足提交 **AI** 训练作业，使用和保存镜像等功能，需要使用第三方调度插件 [Kueue](https://kueue.sigs.k8s.io/docs/)、
-第三方镜像管理仓库 [Harbor](https://goharbor.io/)。
+**AI 系统（beta）** 需要用户在使用时提前部署 K8S 的集群环境。
 
-另外，在 **AI 系统（beta）** 中我们仍然延续 **SCOW** 系统的认证系统服务，采用基于 [LDAP](../../config/auth/ldap.md) 认证系统进行用户认证。
-在 K8S 集群中仍然需要像 **SCOW** 系统的 `hpc集群` 一样，在管理节点安装 `LDAP服务端` ，在所有节点安装 `LDAP客户端` 。
-
-### K8S集群
-
-**AI 系统（beta）** 需运行在 K8S 集群服务。这需要用户在使用时提前部署K8S的集群环境。
-
-当前 **AI 系统（beta）** 为试用版本，我们暂时只支持在 `docker` 容器运行时中执行镜像相关的服务，后续会陆续推出支持`ContainerD`等其他主流容器运行时的 **AI** 系统。
+当前 **AI 系统（beta）** 为试用版本，我们暂时只支持在 `docker` 容器运行时中执行镜像相关的服务，后续会陆续推出支持`ContainerD`等其他主流容器运行时的 AI 系统。
 
 当前试用版本中 K8S 部署的主要版本信息如下：
 
@@ -45,7 +37,19 @@ imageTag: ai-beta.1
 | kubernetes    | v1.19.13     |
 | Docker Engine | 19.03.12     |
 
-### K8S调度服务
+### K8S 调度服务
+
+**AI 系统（beta）** 同样通过 **SCOW调度器适配器** 来实现对 K8S 集群的调度服务。
+
+同时为了满足提交 AI 作业、训练 AI 作业的功能，需要使用第三方调度插件 [Kueue](https://kueue.sigs.k8s.io/docs/)、 配置 **Cluster Queue** 的队列信息来协调和处理作业任务。
+
+- **K8S 调度器适配器**
+
+  我们仍然使用 [SCOW调度器适配器](https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter) 来实现 K8S 集群的调度服务。
+
+  当前版本中，我们提供了调度器适配器的适用版本的二进制文件 [scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
+
+  K8S 调度器适配器的配置请参照[此链接](https://github.com/PKUHPC/scow-ai-adapter-config)。
 
 - **第三方调度插件 Kueue**
 
@@ -57,33 +61,39 @@ imageTag: ai-beta.1
 
   Cluster Queue 的配置与实际部署的 **K8S集群** 情况紧密相关，推荐您按照 [Cluster Queue 介绍](https://kueue.sigs.k8s.io/docs/concepts/cluster_queue/) 和实际部署集群的详细情况进行配置。
 
-- **K8S 调度器适配器**
-
-  在 **AI 系统（beta）** 中，我们仍然使用 [SCOW调度器适配器](https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter) 来实现 K8S 集群的调度服务。
-
-  当前版本中，我们提供了调度器适配器的适用版本的二进制文件 [scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
-
-  K8S 调度器适配器的配置请参照[此链接](https://github.com/PKUHPC/scow-ai-adapter-config)。
-
 ### Harbor
 
-当前 **AI 系统（beta）** 版本中，为了实现镜像的保存、上传、分享、复制、删除等功能，需要您已部署可访问的 **Harbor** 镜像仓库。同时需要您已在 **Harbor** 上创建了用于镜像管理的项目，并在 **AI** 服务配置文件中配置该项目名称。
+当前 **AI 系统（beta）** 版本中，为了实现镜像的保存、上传、分享、复制、删除等功能，需要您已部署可访问的 [Harbor](https://goharbor.io/) 镜像仓库。同时需要您已在 **Harbor** 上创建了用于镜像管理的项目，并在 [AI 服务配置文件](#编写-ai-服务配置)中配置该项目名称。
 
-我们在测试版本中支持通过 `http 协议` 实现的 **Harbor API V2.0** 版本接口的访问，所以需要您在此试用版本中部署支持该版本接口的 **Harbor** 镜像仓库。
+我们在测试版本中支持通过 **http 协议** 实现的 **Harbor API V2.0** 版本接口的访问，为了您能流畅体验试用镜像功能，推荐您部署支持该版本接口的 Harbor 镜像仓库。
+
+我们在试用版的测试环境中试用的 Harbor 版本信息为 `版本v2.7.4-8693b25a`。
+
+### 并行文件存储服务
+
+当前 **AI 系统（beta）** 版本中需要您已经提前安装部署了并行文件存储服务。
+
+### LDAP
+
+当前 **AI 系统（beta）** 版本中我们仍然延续 **SCOW** 系统的认证系统服务，采用基于 [LDAP](../../config/auth/ldap.md) 认证系统进行用户认证。
+
+在 K8S 集群中仍然需要像 **SCOW** 系统的 `hpc集群` 一样，在管理节点安装 `LDAP服务端` ，在所有节点安装 `LDAP客户端` 。
 
 
 ## 配置文件
 
 ### 确认集群配置文件
 
-在当前 **AI 系统（beta）** 的试用版本中，我们暂时没有分离不同的集群系统下的 **AI** 服务。后续将会陆续实现其他服务，并实现不同集群上不同服务的分离。
+在当前 **AI 系统（beta）** 的试用版本中，我们暂时没有分离不同的集群系统下的 AI 服务，请您注意在部署了 **K8S** 集群的集群上进行功能体验。
+后续将会陆续实现其他服务，并实现不同集群上不同服务的分离。
 
-请您在部署了 **K8S** 集群的集群配置文件中确认以下内容：
+请在部署了 **K8S** 集群的集群配置文件中确认以下内容：
 
 在`config/clusters/{K8S集群的ID}.yml`中，修改配置(使用 **K8S适配器** 的ip地址和端口号)
 
 ```yaml title="config/clusters/{K8S集群的ID}.yml"
 # 其他配置省略
+# ...
 adapterUrl: localhost:8972
 ```
 
@@ -92,6 +102,8 @@ adapterUrl: localhost:8972
 修改安装配置文件：
 
 ```yaml title="install.yaml"
+# 其他配置省略
+# ...
 # 确保 AI 系统会部署
 ai:
   # dbPassword 为 AI 系统数据库密码
