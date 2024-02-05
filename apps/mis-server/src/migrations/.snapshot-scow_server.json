@@ -980,6 +980,18 @@
           "default": "0.0000",
           "mappedType": "decimal"
         },
+        "default_account_block_threshold": {
+          "name": "default_account_block_threshold",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 19,
+          "scale": 4,
+          "default": "0.0000",
+          "mappedType": "decimal"
+        },
         "create_time": {
           "name": "create_time",
           "type": "DATETIME(6)",

@@ -78,6 +78,7 @@ export default {
     admin: "Administrator",
     accountCount: "Account Count",
     tenantBalance: "Tenant Balance",
+    defaultAccountBlockThreshold: "Default Account Block Threshold",
     jobBillingTable: "Job Pricing Table",
     operationLog: "Operation Log",
     unfinishedJob: "Unfinished Jobs",
@@ -251,6 +252,9 @@ export default {
         setFail: "Set Failed",
         setAmount:"Set block threshold amount",
         blockThresholdAmount: "Block Threshold Amount",
+        curBlockThresholdAmount: "Current Block Threshold Amount",
+        useDefaultBlockThresholdAmount: "Use default block threshold amount",
+        confirmUseDefaultBlockThresholdAmount: "Are you sure you want to use the default block threshold amount?",
       },
     },
     admin: {
@@ -607,6 +611,10 @@ export default {
       },
       tenantSelector: {
         fresh: "Refresh Tenant List",
+      },
+      changeDefaultAccountBlockThresholdModal: {
+        defaultAccountBlockThresholdAmount: "Default Account Block Threshold Amount",
+        setAmount: "Set Default Account Block Threshold",
       },
     },
     user: {

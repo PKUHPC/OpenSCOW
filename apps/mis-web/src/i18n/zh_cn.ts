@@ -78,6 +78,7 @@ export default {
     admin: "管理员",
     accountCount: "账户数量",
     tenantBalance: "租户余额",
+    defaultAccountBlockThreshold: "默认账户封锁阈值",
     jobBillingTable: "作业价格表",
     operationLog: "操作日志",
     unfinishedJob: "未结束的作业",
@@ -251,6 +252,9 @@ export default {
         setFail: "设置失败",
         setAmount:"设置封锁阈值",
         blockThresholdAmount: "封锁阈值",
+        curBlockThresholdAmount: "当前封锁阈值",
+        useDefaultBlockThresholdAmount: "使用默认封锁阈值",
+        confirmUseDefaultBlockThresholdAmount: "确认使用默认封锁阈值？",
       },
     },
     admin:{
@@ -607,6 +611,10 @@ export default {
       },
       tenantSelector:{
         fresh:"刷新租户列表",
+      },
+      changeDefaultAccountBlockThresholdModal: {
+        defaultAccountBlockThresholdAmount: "默认账户封锁阈值",
+        setAmount: "设置默认账户封锁阈值",
       },
     },
     user:{

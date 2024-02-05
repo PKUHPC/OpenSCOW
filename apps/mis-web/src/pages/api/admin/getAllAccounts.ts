@@ -30,6 +30,7 @@ export const AdminAccountInfo = Type.Object({
   comment: Type.String(),
   balance: Money,
   blockThresholdAmount: Type.Optional(Money),
+  defaultBlockThresholdAmount: Money,
 });
 export type AdminAccountInfo = Static<typeof AdminAccountInfo>;
 
@@ -47,7 +48,7 @@ export async function getAllAccounts(req: GetAccountsRequest) {
 
   const { results } = await asyncClientCall(uaClient, "getAccounts", req);
 
-  return results.map((x) => ensureNotUndefined(x, ["balance"]));
+  return results.map((x) => ensureNotUndefined(x, ["balance", "defaultBlockThresholdAmount"]));
 }
 
 const auth = authenticate((info) =>

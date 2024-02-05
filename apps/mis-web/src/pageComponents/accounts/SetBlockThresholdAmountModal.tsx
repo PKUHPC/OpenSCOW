@@ -10,19 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { numberToMoney } from "@scow/lib-decimal";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import type { Money } from "@scow/protos/build/common/money";
-import { App, Form, InputNumber, Modal } from "antd";
+import { App, Form, InputNumber, Modal, Space } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
   accountName: string;
   currentAmount: Money | undefined;
+  defaultBlockThresholdAmount: Money;
   balance: Money;
   open: boolean;
   onClose: () => void;
@@ -38,7 +38,7 @@ const p = prefix("pageComp.accounts.setBlockThresholdAmountModal.");
 const pCommon = prefix("common.");
 
 export const SetBlockThresholdAmountModal: React.FC<Props> = ({
-  accountName, onClose, reload, open, currentAmount, balance,
+  accountName, onClose, reload, open, currentAmount, defaultBlockThresholdAmount, balance,
 }) => {
 
   const t = useI18nTranslateToString();
@@ -46,10 +46,10 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
   const [form] = Form.useForm<FormFields>();
   const [loading, setLoading] = useState(false);
 
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
-  const onOk = async () => {
-    const { blockThresholdAmount } = await form.validateFields();
+
+  const setBlockThresholdAmount = async (blockThresholdAmount?: number | undefined) => {
     setLoading(true);
     await api.setBlockThreshold({ body: { accountName, blockThresholdAmount } })
       .then((res) => {
@@ -64,6 +64,14 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
       .finally(() => setLoading(false));
   };
 
+  const onOk = async () => {
+
+    const { blockThresholdAmount } = await form.validateFields();
+
+    await setBlockThresholdAmount(blockThresholdAmount);
+
+  };
+
   return (
     <Modal
       title={`${t(pCommon("modify"))}${t(p("blockThresholdAmount"))}`}
@@ -74,16 +82,36 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
     >
       <Form
         form={form}
-        initialValues={{ blockThresholdAmount:
-          currentAmount
-            ? moneyToString(currentAmount)
-            : numberToMoney(publicConfig.DEFAULT_ACCOUNT_BLOCK_THRESHOLD) }}
+        initialValues={{ blockThresholdAmount: 0 }}
       >
         <Form.Item label={t(pCommon("accountName"))}>
           <strong>{accountName}</strong>
         </Form.Item>
         <Form.Item label={t(pCommon("balance"))}>
-          <strong>{moneyToString(balance)}</strong>
+          <strong>{moneyToString(balance)} {t(pCommon("unit"))}</strong>
+        </Form.Item>
+        <Form.Item label={t(p("curBlockThresholdAmount"))}>
+          <Space>
+            <strong>{moneyToString(currentAmount ?? defaultBlockThresholdAmount)} {t(pCommon("unit"))}</strong>
+            { currentAmount !== undefined && (
+              <a onClick={() => {
+                modal.confirm({
+                  title: t(p("useDefaultBlockThresholdAmount")),
+                  icon: <ExclamationCircleOutlined />,
+                  content: <div>
+                    <p>{t(p("confirmUseDefaultBlockThresholdAmount"))}</p>
+                  </div>,
+                  onOk: async () => {
+                    await setBlockThresholdAmount();
+                  },
+                });
+              }}
+              >
+                {t(p("useDefaultBlockThresholdAmount"))}
+              </a>
+            )}
+
+          </Space>
         </Form.Item>
         <Form.Item name="blockThresholdAmount" label={t(p("setAmount"))} required>
           <InputNumber precision={2} />

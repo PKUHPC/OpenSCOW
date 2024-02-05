@@ -14,22 +14,22 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { numberToMoney } from "@scow/lib-decimal";
-import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole } from "src/models/User";
+import { TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
-export const SetBlockThresholdSchema = typeboxRouteSchema({
+export const SetDefaultAccountBlockThresholdSchema = typeboxRouteSchema({
   method: "PUT",
 
   body: Type.Object({
-    accountName: Type.String(),
-    blockThresholdAmount: Type.Optional(Type.Number()),
+    tenantName: Type.String(),
+    blockThresholdAmount: Type.Number(),
   }),
 
   responses: {
@@ -39,38 +39,35 @@ export const SetBlockThresholdSchema = typeboxRouteSchema({
     }),
   },
 });
+export default /* #__PURE__*/route(SetDefaultAccountBlockThresholdSchema, async (req, res) => {
 
-export default /* #__PURE__*/route(SetBlockThresholdSchema, async (req, res) => {
-
-  const { accountName, blockThresholdAmount } = req.body;
+  const { tenantName, blockThresholdAmount } = req.body;
 
   const auth = authenticate((u) => {
-    return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
+    return u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
+  const client = getClient(TenantServiceClient);
 
-  const client = getClient(AccountServiceClient);
+  // const logInfo = {
+  //   operatorUserId: info.identityId,
+  //   operatorIp: parseIp(req) ?? "",
+  //   operationTypeName: OperationType.setAccountBlockThreshold,
+  //   operationTypePayload:{
+  //     accountName, thresholdAmount: numberToMoney(blockThresholdAmount),
+  //   },
+  // };
 
-  const logInfo = {
-    operatorUserId: info.identityId,
-    operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.setAccountBlockThreshold,
-    operationTypePayload:{
-      accountName, thresholdAmount: blockThresholdAmount ? numberToMoney(blockThresholdAmount) : undefined,
-    },
-  };
-
-  return await asyncClientCall(client, "setBlockThreshold", {
-    accountName,
-    blockThresholdAmount: blockThresholdAmount ? numberToMoney(blockThresholdAmount) : undefined,
+  return await asyncClientCall(client, "setDefaultAccountBlockThreshold", {
+    tenantName,
+    blockThresholdAmount: numberToMoney(blockThresholdAmount),
   })
     .then(async () => {
-      await callLog(logInfo, OperationResult.SUCCESS);
+      // await callLog(logInfo, OperationResult.SUCCESS);
       return { 200: {
         executed: true,
       } };
@@ -78,6 +75,6 @@ export default /* #__PURE__*/route(SetBlockThresholdSchema, async (req, res) => 
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
-    async () => await callLog(logInfo, OperationResult.FAIL),
+    // async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

@@ -12,7 +12,6 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
-import { numberToMoney } from "@scow/lib-decimal";
 import { OperationResult } from "@scow/lib-operation-log";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { Account } from "@scow/protos/build/server/account";
@@ -27,7 +26,7 @@ import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
 import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
-import { moneyToString, nullableMoneyToString } from "src/utils/money";
+import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
 import { pipeline } from "stream";
@@ -128,9 +127,7 @@ export default route(ExportAccountSchema, async (req, res) => {
         userCount: x.userCount,
         tenantName: x.tenantName,
         balance: nullableMoneyToString(x.balance) + t(p("unit")),
-        blockThresholdAmount: `${
-          x.blockThresholdAmount ? moneyToString(x.blockThresholdAmount)
-            : moneyToString(numberToMoney(publicConfig.DEFAULT_ACCOUNT_BLOCK_THRESHOLD))} ${t(p("unit"))}`,
+        blockThresholdAmount: `${nullableMoneyToString(x.blockThresholdAmount)} ${t(p("unit"))}`,
         blocked: `${x.blocked ? t(p("block")) : t(p("normal"))}`,
         comment: x.comment,
       };

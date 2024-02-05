@@ -16,12 +16,11 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
-import { Decimal, decimalToMoney, moneyToNumber, undefinedOrDecimalToMoeny } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { authUrl } from "src/config";
-import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -108,7 +107,8 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+        const blockThresholdAmount =
+        account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
 
         if (account.balance.lte(blockThresholdAmount)) {
           throw <ServiceError>{
@@ -155,7 +155,10 @@ export const accountServiceServer = plugin((server) => {
             ownerName: ownerUser.name,
             comment: x.comment,
             balance: decimalToMoney(x.balance),
-            blockThresholdAmount: undefinedOrDecimalToMoeny(x.blockThresholdAmount),
+            blockThresholdAmount: x.blockThresholdAmount
+              ? decimalToMoney(x.blockThresholdAmount)
+              : undefined,
+            defaultBlockThresholdAmount: decimalToMoney(x.tenant.getProperty("defaultAccountBlockThreshold")),
           };
         }),
       }];
@@ -328,7 +331,8 @@ export const accountServiceServer = plugin((server) => {
         accountName,
       );
 
-      const blockThresholdAmount = account.blockThresholdAmount ?? misConfig.defaultAccountBlockThreshold;
+      const blockThresholdAmount =
+      account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
 
       if (account.balance.isLessThanOrEqualTo(blockThresholdAmount)) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
@@ -340,32 +344,24 @@ export const accountServiceServer = plugin((server) => {
       return [{ executed: true }];
     },
 
-    setBlockThreshold: async ({ request, em, logger }) => {
-      const { accountName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
+    setBlockThreshold: async ({ request, em }) => {
+      const { accountName, blockThresholdAmount } = request;
 
-      await em.transactional(async (em) => {
-
-        const account = await em.findOne(Account, { accountName }, {
-          populate: ["tenant"],
-          lockMode: LockMode.PESSIMISTIC_WRITE,
-        });
-
-        if (!account) {
-          throw <ServiceError>{
-            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-          };
-        }
-
-        account.blockThresholdAmount = new Decimal(moneyToNumber(blockThresholdAmount));
-
-        // 判断账户余额是否小于保证金
-        if (account.balance.lte(moneyToNumber(blockThresholdAmount))) {
-          await blockAccount(account, server.ext.clusters, logger);
-        } else {
-          await unblockAccount(account, server.ext.clusters, logger);
-        }
-
+      const account = await em.findOne(Account, { accountName }, {
+        populate: ["tenant"],
       });
+
+      if (!account) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+        };
+      }
+      account.blockThresholdAmount = blockThresholdAmount
+        ? new Decimal(moneyToNumber(blockThresholdAmount))
+        : undefined;
+
+      em.persistAndFlush(account);
+
       return [{}];
     },
   });

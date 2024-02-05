@@ -171,11 +171,6 @@ export const MisConfigSchema = Type.Object({
     default: true,
   }),
 
-  defaultAccountBlockThreshold: Type.Number({
-    description: "默认的账户封锁阈值, 新增账户在没有加入白名单且管理员没有手动设置该值时，若余额低于该值，账户将被封锁；单位为元，可以为负数",
-    default: 0,
-  }),
-
 });
 
 const MIS_CONFIG_NAME = "mis";

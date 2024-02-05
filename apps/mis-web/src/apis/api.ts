@@ -91,6 +91,7 @@ import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { SetBlockThresholdSchema } from "src/pages/api/tenant/setBlockThreshold";
+import type { SetDefaultAccountBlockThresholdSchema } from "src/pages/api/tenant/setDefaultAccountBlockThreshold";
 import type { UnblockAccountSchema } from "src/pages/api/tenant/unblockAccount";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
@@ -182,6 +183,7 @@ export const api = {
   createAccount: apiClient.fromTypeboxRoute<typeof CreateAccountSchema>("POST", "/api/tenant/createAccount"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/tenant/getAccounts"),
   getTenants: apiClient.fromTypeboxRoute<typeof GetTenantsSchema>("GET", "/api/tenant/getTenants"),
+  setDefaultAccountBlockThreshold: apiClient.fromTypeboxRoute<typeof SetDefaultAccountBlockThresholdSchema>("PUT", "/api/tenant/setDefaultAccountBlockThreshold"),
   setBlockThreshold: apiClient.fromTypeboxRoute<typeof SetBlockThresholdSchema>("PUT", "/api/tenant/setBlockThreshold"),
   unblockAccount: apiClient.fromTypeboxRoute<typeof UnblockAccountSchema>("PUT", "/api/tenant/unblockAccount"),
   addUserToAccount: apiClient.fromTypeboxRoute<typeof AddUserToAccountSchema>("POST", "/api/users/addToAccount"),

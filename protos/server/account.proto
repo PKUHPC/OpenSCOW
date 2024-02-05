@@ -110,6 +110,7 @@ message Account {
   string comment = 7;
   common.Money balance = 8;
   common.Money block_threshold_amount = 9;
+  common.Money default_block_threshold_amount = 10;
 }
 
 message GetAccountsResponse {

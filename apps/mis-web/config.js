@@ -200,8 +200,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     JOB_CHARGE_METADATA: misConfig.jobChargeMetadata,
 
-    DEFAULT_ACCOUNT_BLOCK_THRESHOLD: misConfig.defaultAccountBlockThreshold,
-
   };
 
   if (!building) {
