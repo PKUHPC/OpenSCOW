@@ -15,7 +15,7 @@ import { getSortedClusterIds } from "@scow/config/build/cluster";
 import { sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { aiConfig } from "src/server/config/ai";
-import { config, rootKeyPair } from "src/server/config/env";
+import { rootKeyPair } from "src/server/config/env";
 import { Image, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -340,7 +340,7 @@ export const deleteImage = procedure
     }
 
     // 获取harrbor中的reference以删除镜像
-    const getReferenceUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+    const getReferenceUrl = `${aiConfig.harborConfig.protocol}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}/artifacts`;
     const getReferenceRes = await fetch(getReferenceUrl, {
       method: "GET",
@@ -399,7 +399,7 @@ export const deleteImage = procedure
     // 如果上面的tag是最相同imageName下相同镜像的最后一个标签，则删除整个Artifact
     if (needDeleteArtifact) {
 
-      const deleteArtifactUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+      const deleteArtifactUrl = `${aiConfig.harborConfig.protocol}://${aiConfig.harborConfig.url}/api/v2.0/projects`
       + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
       + `/artifacts/${reference}`;
 
@@ -425,7 +425,7 @@ export const deleteImage = procedure
 
     // 如果上面的tag不是最相同imageName下相同镜像的最后一个标签，则只删除该标签
     } else {
-      const deleteUrl = `${ config.PROTOCOL || "http"}://${aiConfig.harborConfig.url}/api/v2.0/projects`
+      const deleteUrl = `${aiConfig.harborConfig.protocol}://${aiConfig.harborConfig.url}/api/v2.0/projects`
       + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
       + `/artifacts/${reference}/tags/${image.tag}`;
 
