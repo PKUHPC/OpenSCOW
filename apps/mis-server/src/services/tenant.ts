@@ -44,15 +44,6 @@ export const tenantServiceServer = plugin((server) => {
         fields: ["userId", "name"],
       });
 
-      console.log({
-        accountCount,
-        admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
-        userCount,
-        balance: decimalToMoney(tenant.balance),
-        defaultAccountBlockThreshold: decimalToMoney(tenant.defaultAccountBlockThreshold),
-        financialStaff: financialStaff.map((f) => ({ userId: f.userId, userName: f.name })),
-      });
-
       return [{
         accountCount,
         admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
