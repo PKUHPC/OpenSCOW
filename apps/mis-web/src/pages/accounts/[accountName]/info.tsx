@@ -32,6 +32,7 @@ type Props = SSRProps<{
   ownerId: string;
   balance: number;
   blocked: boolean;
+  blockThresholdAmount: number
 }, 404>
 
 export const AccountInfoPage: NextPage<Props> = requireAuth(
@@ -45,7 +46,7 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { accountName, balance, ownerId, ownerName, blocked } = props;
+  const { accountName, balance, ownerId, ownerName, blocked, blockThresholdAmount } = props;
   const title = t("common.accountInfo");
 
   return (
@@ -65,6 +66,9 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
         <Descriptions.Item label={t("common.accountBalance")}>
           {balance.toFixed(3)} {t("common.unit")}
         </Descriptions.Item>
+        <Descriptions.Item label={t("common.blockThresholdAmount")}>
+          {blockThresholdAmount.toFixed(3)} {t("common.unit")}
+        </Descriptions.Item>
       </Descriptions>
     </div>
   );
@@ -83,6 +87,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       ownerId: "ownerId",
       ownerName: "123",
       blocked: true,
+      blockThresholdAmount: 1.23,
     } };
   }
 
@@ -102,13 +107,13 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   }
 
   const account = accounts[0];
-
   return { props: {
     balance: moneyToNumber(account.balance),
     accountName,
     ownerId: account.ownerId,
     ownerName: account.ownerName,
     blocked: account.blocked,
+    blockThresholdAmount: moneyToNumber(account.blockThresholdAmount ?? account.defaultBlockThresholdAmount),
   } };
 
 

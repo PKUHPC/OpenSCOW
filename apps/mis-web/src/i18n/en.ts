@@ -108,6 +108,7 @@ export default {
     export: "Export",
     exportMaxDataErrorMsg: "Too many details to export, up to {} can be exported, please reselect!",
     exportNoDataErrorMsg: "Export is empty, please reselect",
+    blockThresholdAmount: "Block Threshold Amount",
     other: "Other",
   },
   dashboard: {
