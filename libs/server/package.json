@@ -22,6 +22,7 @@
     "@grpc/grpc-js": "1.9.14",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*",
+    "@scow/protos": "workspace:*",
     "dayjs": "1.11.10",
     "@scow/protos": "workspace:*",
     "@scow/lib-scheduler-adapter": "workspace:*",
