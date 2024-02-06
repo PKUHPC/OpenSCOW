@@ -169,8 +169,8 @@ export const updateModelVersion = procedure
     if (!modelVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `ModelVersion ${versionId} not found` });
 
-    const modelVersionExist = await em.findOne(ModelVersion, { versionName });
-    if (modelVersionExist && modelVersionExist !== modelVersion) {
+    const modelVersionNameExist = await em.findOne(ModelVersion, { versionName, model, id: { $ne: versionId } });
+    if (modelVersionNameExist) {
       throw new TRPCError({ code: "CONFLICT", message: "ModelVersion alreay exist" });
     }
 
