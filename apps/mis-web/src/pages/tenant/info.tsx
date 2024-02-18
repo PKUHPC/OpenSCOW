@@ -131,7 +131,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 
   const client = getClient(TenantServiceClient);
   return await asyncClientCall(client, "getTenantInfo", { tenantName: info.tenant })
-    .then((r) => { console.log(r); return ({ props: { ...r, tenantName: info.tenant } }); },
+    .then((r) => ({ props: { ...r, tenantName: info.tenant } }),
     )
     .catch(handlegRPCError({ [status.NOT_FOUND]: () => ({ props: { error: 404 as const } }) }));
 };
