@@ -15,7 +15,7 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag, Tooltip } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
@@ -238,7 +238,14 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blockThresholdAmount"
-          title={t(p("blockThresholdAmount"))}
+          title={(
+            <Space>
+              { t(pCommon("blockThresholdAmount"))}
+              <Tooltip title={t(p("blockThresholdAmountTooltip"))}>
+                <ExclamationCircleOutlined />
+              </Tooltip>
+            </Space>
+          )}
           render={(_, r) => `${moneyToString(r.blockThresholdAmount ?? r.defaultBlockThresholdAmount)} ${t(p("unit"))}`}
         />
         <Table.Column<AdminAccountInfo>

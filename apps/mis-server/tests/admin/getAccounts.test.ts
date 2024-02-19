@@ -65,7 +65,7 @@ it("gets all accounts", async () => {
       blockThresholdAmount: data.accountA.blockThresholdAmount ? decimalToMoney(
         data.accountA.blockThresholdAmount,
       ) : undefined,
-      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.getProperty("defaultAccountBlockThreshold")),
+      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -78,7 +78,7 @@ it("gets all accounts", async () => {
       blockThresholdAmount: data.accountB.blockThresholdAmount ? decimalToMoney(
         data.accountB.blockThresholdAmount,
       ) : undefined,
-      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.getProperty("defaultAccountBlockThreshold")),
+      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
     },
   ]);
 
@@ -118,7 +118,7 @@ it("gets all accounts", async () => {
       blockThresholdAmount: data.accountA.blockThresholdAmount ? decimalToMoney(
         data.accountA.blockThresholdAmount,
       ) : undefined,
-      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.getProperty("defaultAccountBlockThreshold")),
+      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -131,7 +131,7 @@ it("gets all accounts", async () => {
       blockThresholdAmount: data.accountB.blockThresholdAmount ? decimalToMoney(
         data.accountB.blockThresholdAmount,
       ) : undefined,
-      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.getProperty("defaultAccountBlockThreshold")),
+      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcc",
       "blocked": false,

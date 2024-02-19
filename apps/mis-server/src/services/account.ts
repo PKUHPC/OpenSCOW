@@ -108,7 +108,7 @@ export const accountServiceServer = plugin((server) => {
         }
 
         const blockThresholdAmount =
-        account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
+        account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
         if (account.balance.lte(blockThresholdAmount)) {
           throw <ServiceError>{
@@ -158,7 +158,7 @@ export const accountServiceServer = plugin((server) => {
             blockThresholdAmount: x.blockThresholdAmount
               ? decimalToMoney(x.blockThresholdAmount)
               : undefined,
-            defaultBlockThresholdAmount: decimalToMoney(x.tenant.getProperty("defaultAccountBlockThreshold")),
+            defaultBlockThresholdAmount: decimalToMoney(x.tenant.$.defaultAccountBlockThreshold),
           };
         }),
       }];
@@ -332,7 +332,7 @@ export const accountServiceServer = plugin((server) => {
       );
 
       const blockThresholdAmount =
-      account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
+      account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
       if (account.balance.isLessThanOrEqualTo(blockThresholdAmount)) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
@@ -360,7 +360,7 @@ export const accountServiceServer = plugin((server) => {
         ? new Decimal(moneyToNumber(blockThresholdAmount))
         : undefined;
 
-      em.persistAndFlush(account);
+      await em.persistAndFlush(account);
 
       return [{}];
     },

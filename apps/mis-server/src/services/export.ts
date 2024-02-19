@@ -171,7 +171,7 @@ export const exportServiceServer = plugin((server) => {
           comment: x.comment,
           balance: decimalToMoney(x.balance),
           blockThresholdAmount: decimalToMoney(
-            x.blockThresholdAmount ?? x.tenant.getProperty("defaultAccountBlockThreshold"),
+            x.blockThresholdAmount ?? x.tenant.$.defaultAccountBlockThreshold,
           ),
         };
       };

@@ -230,6 +230,8 @@ export default {
         ownerIdOrName: "拥有者ID或姓名",
         tenant:"租户",
         blockThresholdAmount: "封锁阈值",
+        blockThresholdAmountTooltip: "当账户余额低于此值时，账户将被封锁",
+
         comment:"备注",
         status:"状态",
         mangerMember:"管理成员",
@@ -254,8 +256,10 @@ export default {
         setAmount:"设置封锁阈值",
         blockThresholdAmount: "封锁阈值",
         curBlockThresholdAmount: "当前封锁阈值",
-        useDefaultBlockThresholdAmount: "使用默认封锁阈值",
-        confirmUseDefaultBlockThresholdAmount: "确认使用默认封锁阈值？",
+        curDefaultBlockThresholdAmount: "当前租户默认封锁阈值: ",
+        useDefaultBlockThresholdAmount: "使用租户默认封锁阈值",
+        confirmUseDefaultBlockThresholdAmount: "确认使用租户默认封锁阈值？",
+
       },
     },
     admin:{

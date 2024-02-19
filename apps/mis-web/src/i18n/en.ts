@@ -230,6 +230,8 @@ export default {
         ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
         blockThresholdAmount: "Block Threshold Amount",
+        blockThresholdAmountTooltip: "The account will be blocked "
+        + "when the balance is less than the block threshold amount.",
         comment: "Comment",
         status: "Status",
         mangerMember: "Manage Members",
@@ -253,9 +255,11 @@ export default {
         setFail: "Set Failed",
         setAmount:"Set block threshold amount",
         blockThresholdAmount: "Block Threshold Amount",
-        curBlockThresholdAmount: "Current Block Threshold Amount",
-        useDefaultBlockThresholdAmount: "Use default block threshold amount",
-        confirmUseDefaultBlockThresholdAmount: "Are you sure you want to use the default block threshold amount?",
+        curBlockThresholdAmount: "Current Block Threshold Amount: ",
+        curDefaultBlockThresholdAmount: "Current Tenant Default Block Threshold Amount",
+        useDefaultBlockThresholdAmount: "Use tenant default block threshold amount",
+        confirmUseDefaultBlockThresholdAmount:
+        "Are you sure you want to use the tenant default block threshold amount?",
       },
     },
     admin: {

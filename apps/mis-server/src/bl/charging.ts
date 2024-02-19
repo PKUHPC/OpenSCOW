@@ -36,7 +36,7 @@ interface PayRequest {
 export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
 
   const blockThresholdAmount =
-  account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
   return account.balance.lte(blockThresholdAmount);
 }
@@ -44,7 +44,7 @@ export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
 export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
 
   const blockThresholdAmount =
-  account.blockThresholdAmount ?? account.tenant.getProperty("defaultAccountBlockThreshold");
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
   return account.balance.gt(blockThresholdAmount);
 }

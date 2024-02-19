@@ -98,9 +98,14 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
                 modal.confirm({
                   title: t(p("useDefaultBlockThresholdAmount")),
                   icon: <ExclamationCircleOutlined />,
-                  content: <div>
-                    <p>{t(p("confirmUseDefaultBlockThresholdAmount"))}</p>
-                  </div>,
+                  content: <Space direction="vertical">
+                    <span>{t(p("curDefaultBlockThresholdAmount"))}
+                      <strong>
+                        {moneyToString(defaultBlockThresholdAmount)} {t(pCommon("unit"))}
+                      </strong>
+                    </span>
+                    <span>{t(p("confirmUseDefaultBlockThresholdAmount"))}</span>
+                  </Space>,
                   onOk: async () => {
                     await setBlockThresholdAmount();
                   },
