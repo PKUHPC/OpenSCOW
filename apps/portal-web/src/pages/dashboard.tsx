@@ -10,25 +10,29 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getHostname } from "@scow/lib-web/build/utils/getHostname";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-import { GetServerSideProps, NextPage } from "next";
+import { PartitionInfo } from "@scow/protos/build/portal/config";
+import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
+import { useAsync } from "react-async";
 import { useStore } from "simstate";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
-import { CustomizableLogoAndText } from "src/pageComponents/dashboard/CustomizableLogoAndText";
+import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
+import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { UserStore } from "src/stores/UserStore";
-import { getServerI18nConfigText, publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 interface Props {
-  homeText: string;
-  homeTitle: string;
 }
 
-export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Props) => {
+interface FulfilledResult {
+  clusterInfo: {clusterName: string, partitions: PartitionInfo[]}
+}
+
+export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
   const router = useRouter();
@@ -39,32 +43,63 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)((props: Pr
 
   const t = useI18nTranslateToString();
 
+  const { data, isLoading } = useAsync({
+    promiseFn: useCallback(async () => {
+
+      const clusters = publicConfig.CLUSTERS;
+
+      const rawClusterInfoPromises = clusters.map((x) =>
+        api.getClusterRunningInfo({ query: { clusterId: x.id } })
+          .httpError(500, () => {}),
+      );
+
+      const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+      // 处理成功的结果
+      const successfulResults = rawClusterInfoResults
+        .filter(
+          (result): result is PromiseFulfilledResult<FulfilledResult> =>
+            result.status === "fulfilled")
+        .map((result) => result.value);
+
+
+      // 处理失败的结果
+      const failedClusters = clusters.filter((x) =>
+        !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+
+      const clustersInfo = successfulResults
+        .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
+          clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
+        .flatMap((cluster) =>
+          cluster.clusterInfo.partitions.map((x) => ({
+            clusterName: cluster.clusterInfo.clusterName,
+            ...x,
+            cpuUsage:(x.runningCpuCount / x.cpuCoreCount).toFixed(2),
+            // 有些分区没有gpu就为空，前端显示'-'
+            ...x.gpuCoreCount ? { gpuUsage:(x.runningGpuCount / x.gpuCoreCount).toFixed(2) } : {},
+          })),
+        );
+
+      return {
+        clustersInfo,
+        failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
+      };
+
+    }, []),
+  });
+
   return (
     <div>
       <Head title={t("pages.dashboard.title")} />
-      <CustomizableLogoAndText homeText={props.homeText} homeTitle={props.homeTitle} />
+      <QuickEntry></QuickEntry>
+      <OverviewTable
+        isLoading={isLoading}
+        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        failedClusters={data?.failedClusters ?? []}
+      />
     </div>
   );
 });
-
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-
-  const hostname = getHostname(req);
-
-  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
-
-  const homeTitle = (hostname && runtimeConfig.HOME_TITLES[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeTitle");
-
-  const homeText = (hostname && runtimeConfig.HOME_TEXTS[hostname])
-    ?? getServerI18nConfigText(languageId, "defaultHomeText");
-
-  return {
-    props: {
-      homeText, homeTitle,
-    },
-  };
-};
-
 
 export default DashboardPage;

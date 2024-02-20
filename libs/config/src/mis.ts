@@ -34,6 +34,8 @@ export const MisConfigSchema = Type.Object({
 
   portalUrl: Type.Optional(Type.String({ description: "如果部署了门户系统，设置门户系统的部署URL或者pathname" })),
 
+  aiUrl: Type.Optional(Type.String({ description: "AI系统的部署URL或者路径" })),
+
   predefinedChargingTypes: Type.Array(Type.String(), { description: "预定义的充值类型", default: []}),
 
   accountNamePattern: Type.Optional(Type.Object({
@@ -65,6 +67,25 @@ export const MisConfigSchema = Type.Object({
     }, { default: {}, description: "通过内置页面创建用户时的配置。要使用内置页面，认证系统需要支持创建用户" })),
   }, { default: {}, description: "SCOW的创建用户相关配置" }),
 
+  addUserToAccount: Type.Object({
+    accountAdmin: Type.Object({
+      allowed: Type.Boolean({
+        default: true,
+        description: "是否允许账户管理员添加用户至账户",
+      }),
+      createUserIfNotExist: Type.Boolean({
+        default: true,
+        description: " 是否允许账户管理员添加不存在的用户时创建用户",
+      }),
+    }, {
+      default: {},
+      description: "账户管理员添加用户至账户相关配置",
+    }),
+  }, {
+    default: {},
+    description: "添加用户至账户相关配置",
+  }),
+
   fetchJobs: Type.Object({
     startDate: Type.Optional(Type.String({ description: "从哪个时间点开始获取结束作业信息(ISO 8601)", format: "date-time" })),
     batchSize: Type.Integer({
@@ -90,6 +111,13 @@ export const MisConfigSchema = Type.Object({
     description: "给作业扣费时，扣费项的备注。可以使用{{ 属性名 }}使用作业信息中的属性。字段参考src/entities/JobInfo",
     default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
+
+  jobChargeMetadata: Type.Optional(Type.Object({
+    savedFields: Type.Optional(Type.Array(Type.String({
+      description: "需要保存的作业的字段。字段参考src/entities/JobInfo" }))),
+    displayFormats: Type.Optional(createI18nStringSchema({
+      description: "定义元数据显示的格式，i18n类型或string类型，利用{{ 属性名 }}使用上述savedFields中保存的属性" })),
+  })),
 
   navLinks: Type.Optional(Type.Array(
     Type.Object({
@@ -121,6 +149,28 @@ export const MisConfigSchema = Type.Object({
   customChargeTypes: Type.Optional(Type.Array(
     Type.String(), { description: "用户自定义可查询的消费类型列表" },
   )),
+
+  clusterMonitor: Type.Optional(Type.Object({
+    grafanaUrl: Type.String({ description: "Grafana 地址", default: "http://127.0.0.1:4000" }),
+    resourceStatus: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否开启资源状态，默认为 false", default: false }),
+      proxy: Type.Boolean({ description: "是否通过代理方式嵌入 grafana，默认为 false", default: false }),
+      dashboardUid: Type.String({ description: "默认展示的 grafana 面板 id", default: "shZOtO4Sk" }),
+    })),
+    alarmLogs: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否启用告警日志功能", default: false }),
+    })),
+  }, { description: "集群监控相关功能配置" })),
+
+  uiExtension: Type.Optional(Type.Object({
+    url: Type.String({ description: "UI扩展站完整URL" }),
+  })),
+
+  allowUserChangeJobTimeLimit: Type.Boolean({
+    description: "普通用户是否可以修改作业时限",
+    default: true,
+  }),
+
 });
 
 const MIS_CONFIG_NAME = "mis";

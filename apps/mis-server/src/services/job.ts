@@ -14,9 +14,11 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
   JobBillingItem,
@@ -31,6 +33,7 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -81,7 +84,7 @@ export const jobServiceServer = plugin((server) => {
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")
          .where(sqlFilter)
-         .select("sum(j.account_price) as total_account_price, sum(j.tenant_price) as total_tenant_price")
+         .select([raw("sum(j.account_price) as total_account_price"), raw("sum(j.tenant_price) as total_tenant_price")])
          .execute("get");
 
       const reply = {
@@ -128,6 +131,7 @@ export const jobServiceServer = plugin((server) => {
           return prev;
         }, {});
 
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
 
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
@@ -147,6 +151,11 @@ export const jobServiceServer = plugin((server) => {
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
 
+          const metadataMap: ChargeRecord["metadata"] = {};
+          savedFields?.forEach((field) => {
+            metadataMap[field] = x[field];
+          });
+
           if (newTenantPrice) {
             if (x.tenantPrice.lt(newTenantPrice)) {
               await charge({
@@ -154,6 +163,7 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
@@ -175,6 +185,8 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newAccountPrice.minus(x.accountPrice),
+                userId: x.user,
+                metadata: metadataMap,
               }, em, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({
@@ -374,6 +386,65 @@ export const jobServiceServer = plugin((server) => {
         }
       }
 
+    },
+
+    getTopSubmitJobUsers: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      qb
+        .select([raw("j.user as userId"), raw("COUNT(*) as count")])
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("j.user")
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {userId: string, count: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    getNewJobCount: async ({ request, em }) => {
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      qb
+        .select([
+          raw("DATE(CONVERT_TZ(j.time_submit, 'UTC', ?)) as date", [timeZone]),
+          raw("COUNT(*) as count")])
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const results: {date: string, count: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
+        },
+      ];
+    },
+
+    getJobTotalCount: async ({ em }) => {
+      const count = await em.count(JobInfoEntity, {});
+      return [{ count }];
     },
 
     cancelJob: async ({ request, logger }) => {

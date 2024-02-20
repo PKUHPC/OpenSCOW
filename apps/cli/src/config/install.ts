@@ -36,6 +36,11 @@ export const InstallConfigSchema = Type.Object({
   }, { default: {} }),
 
   gateway: Type.Object({
+    protocol: Type.String({
+      description: "scow 的访问协议，将影响 callbackUrl 的 protocol",
+      default: "http",
+    }),
+
     uploadFileSizeLimit: Type.String({
       description: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值",
       default: "1G",
@@ -94,18 +99,20 @@ export const InstallConfigSchema = Type.Object({
     })),
 
     custom: Type.Optional(Type.Object({
-      type: Type.Enum(AuthCustomType, { description: "自定义认证系统类型", default: AuthCustomType.image }),
+      type: Type.Optional(Type.Enum(AuthCustomType, { description: "自定义认证系统类型", default: AuthCustomType.image })),
       external: Type.Optional(Type.Object({
         url: Type.String({ description: "认证系统的 URL" }),
       })),
-      imageConfig: Type.Optional(Type.Object({
-        imageName: Type.String({ description: "认证系统镜像名" }),
-        ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
-        volumes: Type.Optional(Type.Array(Type.String(), {
-          description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
-        })),
-      }, { description: "认证系统镜像" })),
-      image: Type.Optional(Type.String({ description: "兼容旧版本认证系统镜像名配置" })),
+      image: Type.Optional(Type.Union([
+        Type.Object({
+          imageName: Type.String({ description: "认证系统镜像名" }),
+          ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+          volumes: Type.Optional(Type.Array(Type.String(), {
+            description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
+          })),
+        }, { description: "认证系统镜像" }),
+        Type.String({ description: "兼容旧版本认证系统镜像名配置" }),
+      ], { description: "自定义认证系统镜像配置" })),
       ports: Type.Optional(Type.Array(Type.String(), { description: "兼容旧版本端口映射配置" })),
       volumes: Type.Optional(Type.Array(Type.String(), {
         description: "兼容旧版本，更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
@@ -122,7 +129,7 @@ export const InstallConfigSchema = Type.Object({
     pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
   }, { default: {} }),
 
-  audit:  Type.Optional(Type.Object({
+  audit: Type.Optional(Type.Object({
     mysqlImage: Type.String({ description: "审计系统数据库镜像", default: "mysql:8" }),
     dbPassword: Type.String({ description: "审计系统数据库密码", default: "must!chang3this" }),
 
@@ -133,6 +140,21 @@ export const InstallConfigSchema = Type.Object({
       })),
     })),
   })),
+
+  ai: Type.Optional(Type.Object({
+    basePath: Type.String({ description: "AI系统的部署路径，相对于整个系统的basePath", default: "/ai" }),
+    mysqlImage: Type.String({ description: "AI系统数据库镜像", default: "mysql:8" }),
+    dbPassword: Type.String({ description: "AI系统数据库密码", default: "must!chang3this" }),
+
+    portMappings: Type.Optional(Type.Object({
+      db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
+    })),
+  })),
+
+  misc: Type.Optional(Type.Object({
+    nodeOptions:  Type.Optional(Type.String({ description: "传递给node服务的参数" })),
+  }, { description: "多个不好分类的配置参数参数" })),
+
 }, { description: "审计系统部署选项，如果不设置，则不部署审计系统" });
 
 export type InstallConfigSchema = Static<typeof InstallConfigSchema>;

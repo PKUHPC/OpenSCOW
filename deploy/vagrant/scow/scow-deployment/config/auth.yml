@@ -85,3 +85,51 @@ ldap:
     # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps:
     #   key: value
+
+ui:
+  default:
+    # 登录界面背景图，设置为""(空字符串)则无背景图
+    # 可选配置，默认加载 install.yml 同级的 /public/assets 目录下的 background.png 作为背景图
+    backgroundImagePath: "./assets/background.png"
+    # 登录界面背景色，当背景图无法加载或者没有时，背景色起效
+    # 可选配置，默认为 #9a0000
+    backgroundFallbackColor: "#9a0000"
+    # 登录界面 logo 图, light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
+    # 可选配置，默认为黑暗模式 logo
+    logoType: "dark"
+
+    # 登录界面 slogan 配置
+    # 可选配置，默认右侧无 slogan
+    slogan:
+      # 登录界面 slogan 文字颜色
+      # 可选配置，默认为白色字体
+      color: "white"
+      # 登录界面 slogan 标题
+      # 可选配置，默认无 slogan 标题
+      # title: "开源算力中心门户和管理平台"
+      title:
+        i18n:
+          default: "开源算力中心门户和管理平台"
+          en: "Open-source Compute Center Portal and Management Platform"
+          zh_cn: "开源算力中心门户和管理平台"
+      texts:
+        - i18n:
+            default: "图形化界面，使用方便"
+            en: "Graphical user interface, user-friendly"
+            zh_cn: "图形化界面，使用方便"
+        - i18n:
+            default: "功能丰富，管理简单"
+            en: "Feature-rich, easy management"
+            zh_cn: "功能丰富，管理简单"
+        - i18n:
+            default: "一体化部署，开箱即用"
+            en: "Integrated deployment, ready to use out of the box"
+            zh_cn: "一体化部署，开箱即用"
+        - i18n:
+            default: "标准化平台，支持算力融合"
+            en: "Standardized platform, supporting compute integration"
+            zh_cn: "标准化平台，支持算力融合"
+        - i18n:
+            default: "开源中立，独立自主"
+            en: "Open-source neutrality, independent and autonomous"
+            zh_cn: "开源中立，独立自主"

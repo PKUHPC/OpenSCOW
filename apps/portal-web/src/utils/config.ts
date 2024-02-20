@@ -39,10 +39,6 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
-  HOME_TEXTS: {[hostname: string]: string };
-
-  HOME_TITLES: {[hostname: string]: string };
-
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -50,10 +46,10 @@ export interface ServerRuntimeConfig {
   AUDIT_CONFIG: AuditConfigSchema | undefined;
 
   SERVER_I18N_CONFIG_TEXTS: {
-    defaultHomeTitle: I18nStringType,
-    defaultHomeText: I18nStringType,
     submitJopPromptText?: I18nStringType,
   }
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
@@ -68,6 +64,8 @@ export interface PublicRuntimeConfig {
   ENABLE_APPS: boolean;
 
   MIS_URL: string | undefined;
+
+  AI_URL: string | undefined;
 
   CLUSTERS: Cluster[];
 
@@ -101,6 +99,7 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  UI_EXTENSION?: { url: string; }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

@@ -1,5 +1,53 @@
 # @scow/cli
 
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+
+## 1.4.0
+
+### Minor Changes
+
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- 9059919: 添加外部自定义认证系统
+- abb7e84: 管理系统新增集群监控功能
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+- b342df5: 修复 cli 由于 @sinclair/typebox 更新导致的编译问题
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+
+## 1.3.0
+
+### Minor Changes
+
+- 2302a4639e: install.yaml 文件增加 mis.nodeOptions 参数，可传递给所有 node 服务参数，如“--max-old-space-size=8192”
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+
 ## 1.2.2
 
 ### Patch Changes

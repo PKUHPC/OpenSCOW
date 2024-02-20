@@ -14,6 +14,7 @@ import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
 import { AuthCustomType, InstallConfigSchema } from "src/config/install";
+import { logger } from "src/log";
 
 const IMAGE: string = "mirrors.pku.edu.cn/pkuhpc-icode/scow";
 
@@ -44,6 +45,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const MIS_PATH = config.mis?.basePath || "/mis";
   checkPathFormat("mis.basePath", MIS_PATH);
 
+  const AI_PATH = config.ai?.basePath || "/ai";
+  checkPathFormat("ai.basePath", AI_PATH);
+
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
@@ -54,6 +58,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     services: {} as Record<string, ServiceSpec>,
     volumes: {} as Record<string, object>,
   };
+
+  const nodeOptions = config.misc?.nodeOptions;
 
   // service creation function
   const addService = (
@@ -125,6 +131,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "BASE_PATH": BASE_PATH == "/" ? "" : BASE_PATH,
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
+      "AI_PATH": AI_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
@@ -132,6 +139,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "EXTRA": config.gateway.extra,
       "ALLOWED_SERVER_NAME": config.gateway.allowedServerName,
       "DEFAULT_SERVER_BLOCK": config.gateway.allowedServerName === "_" ? "" : defaultServerBlock,
+      ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
     },
     ports: { [config.port]: 80 },
     volumes: {
@@ -157,28 +165,63 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   const authUrl = config.auth.custom?.type === AuthCustomType.external
     ? config.auth.custom.external?.url : "http://auth:5000";
-  if (authUrl === undefined) {
-    throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
-  }
 
-  if (config.auth.custom?.type === AuthCustomType.image) {
-    const volumes = config.auth.custom.imageConfig?.volumes || config.auth.custom.volumes;
-    for (const key in volumes) {
-      authVolumes[key] = volumes[key];
+  // 是否配置自定义认证系统
+  if (config.auth.custom) {
+    // 未配置 type，则为旧版本自定义认证系统配置
+    if (config.auth.custom.type === undefined) {
+      if (config.auth.custom.image === undefined) {
+        throw new Error("Invalid config: auth/custom/image is required");
+      }
+
+      for (const key in config.auth.custom.volumes) {
+        authVolumes[key] = config.auth.custom.volumes[key];
+      }
+
+      if (typeof config.auth.custom.image === "object" && config.auth.custom.image !== null) {
+        throw new Error("Invalid config: " +
+          "auth/custom/image in the old version of the custom authentication system configuration is a string");
+      }
+
+      logger.info("The current configuration of the custom authentication system is outdated, "
+        + "please read the relevant configuration documentation and update it.");
+
+      addService("auth", {
+        image: config.auth.custom.image,
+        ports: config.auth.custom.ports ?? {},
+        environment: config.auth.custom.environment ?? {},
+        volumes: authVolumes,
+      });
+    } else { // 新版自定义认证系统配置
+
+      // 镜像类型的自定义认证系统
+      if (config.auth.custom.type === AuthCustomType.image) {
+        if (config.auth.custom.image === undefined) {
+          throw new Error("Invalid config: auth/custom/image is required");
+        }
+
+        if (typeof config.auth.custom.image === "string") {
+          throw new Error("Invalid config: auth/custom/image is an object, but it is passed as a string");
+        }
+        const image = config.auth.custom.image.imageName;
+
+        for (const key in config.auth.custom.image.volumes) {
+          authVolumes[key] = config.auth.custom.image.volumes[key];
+        }
+
+        addService("auth", {
+          image,
+          ports: config.auth.custom.image.ports ?? {},
+          environment: config.auth.custom.environment ?? {},
+          volumes: authVolumes,
+        });
+      } else if (config.auth.custom.type === AuthCustomType.external) {
+        if (authUrl === undefined) {
+          throw new Error("Invalid config: when /auth/custom/type is external, /auth/custom/external/url is required");
+        }
+      }
     }
-
-    const image = config.auth.custom.imageConfig?.imageName || config.auth.custom.image;
-    if (image === undefined) {
-      throw new Error("Invalid config: must have /auth/custom/image or /auth/custom/imageConfig/imageName");
-    }
-
-    addService("auth", {
-      image,
-      ports: (config.auth.custom.imageConfig?.ports || config.auth.custom.ports) ?? {},
-      environment: config.auth.custom.environment ?? {},
-      volumes: authVolumes,
-    });
-  } else if (config.auth.custom === undefined || config.auth.custom.type !== AuthCustomType.external) {
+  } else {
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
     addService("auth", {
@@ -188,6 +231,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": BASE_PATH,
         "PORTAL_BASE_PATH": portalBasePath,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.auth.portMappings?.auth ? { [config.auth.portMappings?.auth]: 5000 } : {},
       volumes: authVolumes,
@@ -199,18 +243,22 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
+    composeSpec.volumes["portal_data"] = {};
+
     addService("portal-server", {
       image: scowImage,
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
         "~/.ssh": "/root/.ssh",
+        "portal_data":"/var/lib/scow/portal",
       },
     });
 
@@ -221,12 +269,16 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": portalBasePath,
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "AI_URL": join(BASE_PATH, AI_PATH),
+        "AI_DEPLOYED": config.ai ? "true" : "false",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
-        "AUTH_INTERNAL_URL": authUrl,
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
@@ -253,6 +305,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "DB_PASSWORD": config.mis.dbPassword,
         AUTH_URL: config.auth.custom?.external?.url ?? "",
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "/etc/hosts": "/etc/hosts",
@@ -268,10 +321,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": join(BASE_PATH, MIS_PATH),
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",
+        "AI_URL": join(BASE_PATH, AI_PATH),
+        "AI_DEPLOYED": config.ai ? "true" : "false",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
-        "AUTH_INTERNAL_URL": authUrl,
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "PROTOCOL": config.gateway.protocol,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: {},
       volumes: {
@@ -305,6 +362,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "audit-server",
         "DB_PASSWORD": config.audit.dbPassword,
         ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       volumes: {
         "/etc/hosts": "/etc/hosts",
@@ -325,5 +383,48 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: config.audit.portMappings?.db ? { [config.audit.portMappings?.db]: 3306 } : {},
     });
   }
+
+  if (config.ai) {
+    addService("ai", {
+      image: scowImage,
+      ports: {},
+      environment: {
+        "SCOW_LAUNCH_APP": "ai",
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
+        "MIS_URL": join(BASE_PATH, MIS_PATH),
+        "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "DB_PASSWORD": config.ai.dbPassword,
+        "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
+        "PORTAL_DEPLOYED": config.portal ? "true" : "false",
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "AUDIT_DEPLOYED": config.audit ? "true" : "false",
+        "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
+        "PROTOCOL": config.gateway.protocol,
+        ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
+      },
+      volumes: {
+        "/etc/hosts": "/etc/hosts",
+        "./config": "/etc/scow",
+        "~/.ssh": "/root/.ssh",
+      },
+    });
+
+    composeSpec.volumes["ai_db_data"] = {};
+
+    addService("ai-db", {
+      image: config.ai.mysqlImage,
+      volumes: {
+        "ai_db_data": "/var/lib/mysql",
+      },
+      environment: {
+        "MYSQL_ROOT_PASSWORD": config.ai.dbPassword,
+      },
+      ports: config.ai.portMappings?.db ? { [config.ai.portMappings?.db]: 3306 } : {},
+    });
+  }
+
   return composeSpec;
 };

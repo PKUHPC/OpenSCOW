@@ -37,3 +37,6 @@ createUser:
 #         allowedRoles: [tenantAdmin, platformAdmin]
 #   - text: "一级导航2"
 #     url: "https://hahahaha2.com"
+
+uiExtension:
+  url: http://localhost:16566

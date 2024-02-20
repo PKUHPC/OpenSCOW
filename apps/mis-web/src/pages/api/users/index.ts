@@ -38,10 +38,10 @@ export default typeboxRoute(GetAccountUsersSchema, async (req, res) => {
   const { accountName } = req.query;
 
   const auth = authenticate((u) => {
-    const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+    const accountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
 
     return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-          (acccountBelonged && acccountBelonged.role !== UserRole.USER) || 
+          (accountBelonged && accountBelonged.role !== UserRole.USER) ||
           u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
   });
 

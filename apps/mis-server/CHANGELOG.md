@@ -1,5 +1,73 @@
 # @scow/mis-server
 
+## 1.4.2
+
+### Patch Changes
+
+- 448f6bf: 之前升级 mikroORM 时 cascade: [Cascade.ALL]属性会在删除 UserAccount 时把 User 和 Account 也删掉
+
+## 1.4.1
+
+### Patch Changes
+
+- 186c359: 适配 mikro-orm 更新会修改 ref 字段默认为 null
+- afc3350: charge_record 表增加字段 user_id 及 metadata, 以及增加了 time,tenant,account,user_id,type 各字段的索引
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-hook@1.0.7
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/lib-scheduler-adapter@1.1.5
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- 9059919: 添加外部自定义认证系统
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-hook@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-hook@1.0.5
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+
+## 1.2.3
+
+### Patch Changes
+
+- 1a1189ad48: 管理系统 AllUserTable 恢复计数接口并且新增筛选参数
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-hook@1.0.4
+  - @scow/lib-server@1.1.1
+  - @scow/protos@1.0.4
+  - @scow/lib-scheduler-adapter@1.1.2
+
 ## 1.2.2
 
 ### Patch Changes

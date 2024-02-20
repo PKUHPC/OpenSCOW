@@ -18,6 +18,7 @@ import { join } from "path";
 import { checkConfig } from "src/cmd/checkConfig";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
+import { enterAiDb } from "src/cmd/enterAiDb";
 import { enterAuditDb } from "src/cmd/enterAuditDb";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { init } from "src/cmd/init";
@@ -26,6 +27,7 @@ import { updateCli } from "src/cmd/updateCli";
 import { viewInstall } from "src/cmd/viewInstall";
 import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
+
 
 
 const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8")).version;
@@ -75,6 +77,12 @@ yargs(hideBin(process.argv))
         type: "string",
         description: "output path",
         default: ".",
+      },
+      full: {
+        alias: "f",
+        type: "boolean",
+        description: "Extract full config files",
+        default: false,
       },
     });
   }, (argv) => {
@@ -131,6 +139,9 @@ yargs(hideBin(process.argv))
   })
   .command("audit-db", "Enter audit db", (y) => y, (argv) => {
     enterAuditDb(argv);
+  })
+  .command("ai-db", "Enter ai db", (y) => y, (argv) => {
+    enterAiDb(argv);
   })
   .command("compose", "Run  arbitrary compose commands", (y) => {
     return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });

@@ -17,6 +17,8 @@ package scow.server;
 import "common/money.proto";
 import "google/protobuf/timestamp.proto";
 
+import "google/type/date.proto";
+
 enum UserStatus {
   UNBLOCKED = 0;
   BLOCKED = 1;
@@ -302,6 +304,7 @@ message GetUsersByIdsResponse {
 }
 
 message GetPlatformUsersCountsRequest {
+  optional string id_or_name = 1;
 }
 
 message GetPlatformUsersCountsResponse {
@@ -369,6 +372,22 @@ message ChangeEmailResponse {
 }
 
 
+message GetNewUserCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+  optional string time_zone = 3;
+}
+
+message GetNewUserCountResponse {
+  message DailyUserCount {
+    google.type.Date date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyUserCount results = 1;
+}
+
 
 service UserService {
 
@@ -413,4 +432,6 @@ service UserService {
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
   rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
+
+  rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
 }

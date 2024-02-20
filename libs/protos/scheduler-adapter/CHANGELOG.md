@@ -1,5 +1,17 @@
 # @scow/scheduler-adapter-protos
 
+## 1.3.0
+
+### Minor Changes
+
+- 26bd8e7: **文件系统直接提交脚本任务功能**需要**1.5.0 及以上版本**的接口
+
+## 1.2.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
 ## 1.1.0
 
 ### Minor Changes

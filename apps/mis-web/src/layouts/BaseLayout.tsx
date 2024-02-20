@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DesktopOutlined } from "@ant-design/icons";
+import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
@@ -40,6 +41,8 @@ export const BaseLayout =
 
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
 
+  const uiExtensionStore = useStore(UiExtensionStore);
+
   return (
     <LibBaseLayout
       logout={userStore.logout}
@@ -49,6 +52,8 @@ export const BaseLayout =
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
+      from="mis"
+      extension={uiExtensionStore.config}
       languageId={languageId}
       headerRightContent={(
         <>
@@ -56,7 +61,13 @@ export const BaseLayout =
             user={userStore.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
-            linkText={t("layouts.route.navLinkText")}
+            linkText={t("layouts.route.navLinkTextPortal")}
+          />
+          <JumpToAnotherLink
+            user={userStore.user}
+            icon={<RobotOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.AI_URL}
+            linkText={t("layouts.route.navLinkTextAI")}
           />
           {
             systemLanguageConfig.isUsingI18n ? (

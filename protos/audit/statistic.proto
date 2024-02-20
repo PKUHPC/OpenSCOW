@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package scow.audit;
+
+import "google/protobuf/timestamp.proto";
+
+import "google/type/date.proto";
+
+message Data {
+  google.type.Date date = 1;
+  uint32 count = 2;
+}
+
+message GetActiveUserCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+  optional string time_zone = 3;
+}
+
+message GetActiveUserCountResponse {
+  repeated Data results = 1;
+}
+
+message GetPortalUsageCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetPortalUsageCountResponse {
+  message Data {
+    string operation_type = 1;
+    uint32 count = 2;
+  }
+  repeated Data results = 1;
+}
+
+message GetMisUsageCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+}
+
+message GetMisUsageCountResponse {
+  message Data {
+    string operation_type = 1;
+    uint32 count = 2;
+  }
+  repeated Data results = 1;
+}
+
+service StatisticService {
+  rpc GetActiveUserCount(GetActiveUserCountRequest) returns (GetActiveUserCountResponse);
+  rpc GetPortalUsageCount(GetPortalUsageCountRequest) returns (GetPortalUsageCountResponse);
+  rpc GetMisUsageCount(GetMisUsageCountRequest) returns (GetMisUsageCountResponse);
+
+}

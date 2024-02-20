@@ -1,5 +1,24 @@
 # @scow/gateway
 
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
+## 1.4.0
+
+### Minor Changes
+
+- 9059919: 添加外部自定义认证系统
+
+## 1.3.0
+
+## 1.2.3
+
 ## 1.2.2
 
 ### Patch Changes

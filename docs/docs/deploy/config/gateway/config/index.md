@@ -41,3 +41,16 @@ gateway:
 
 多个域名或 IP 间用空格间隔即可。
 
+## SCOW 访问协议
+
+设置 scow 访问协议`http | https`，将修改认证系统中 callbackUrl 的协议。
+默认情况下 callbackUrl 的 protocol 为 http，
+
+如果配置 https 代理，则建议设置该项确保用户体验的一致性。
+
+```
+gateway:
+  # scow 访问协议，将影响 callbackUrl 的 protocol
+  # callbackUrl 默认的 protocol 为 http
+  protocol: "http"
+```

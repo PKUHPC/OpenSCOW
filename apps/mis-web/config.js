@@ -48,9 +48,14 @@ const specs = {
   PORTAL_DEPLOYED: bool({ desc: "是否部署了门户系统", default: false }),
   PORTAL_URL: str({ desc: "如果部署了门户系统，门户系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署门户系统", default: "" }),
 
+  AI_DEPLOYED: bool({ desc: "是否部署了AI系统", default: false }),
+  AI_URL: str({ desc: "如果部署了AI系统，AI系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署AI系统", default: "" }),
+
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
+
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -113,6 +118,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SERVER_URL: config.SERVER_URL,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
+    PROTOCOL: config.PROTOCOL,
   };
 
   /**
@@ -122,6 +128,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
     CREATE_USER_CONFIG: {
       misConfig: misConfig.createUser,
       authSupportsCreateUser: capabilities.createUser,
+    },
+    ADD_USER_TO_ACCOUNT: {
+      accountAdmin: misConfig.addUserToAccount.accountAdmin,
     },
     ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
     ENABLE_CHANGE_EMAIL: capabilities.changeEmail,
@@ -139,6 +148,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
 
     PORTAL_URL: config.PORTAL_DEPLOYED ? (config.PORTAL_URL || misConfig.portalUrl || "") : undefined,
+
+    AI_URL: config.AI_DEPLOYED ? (config.AI_URL || misConfig.aiUrl || "") : undefined,
 
     PASSWORD_PATTERN: commonConfig.passwordPattern?.regex,
 
@@ -168,6 +179,26 @@ const buildRuntimeConfig = async (phase, basePath) => {
     ],
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
+
+    CLUSTER_MONITOR: {
+      grafanaUrl: misConfig.clusterMonitor?.grafanaUrl,
+      resourceStatus: {
+        enabled: misConfig.clusterMonitor?.resourceStatus?.enabled,
+        proxy: misConfig.clusterMonitor?.resourceStatus?.proxy,
+        dashboardUid: misConfig.clusterMonitor?.resourceStatus?.dashboardUid,
+      },
+      alarmLogs: {
+        enabled: misConfig.clusterMonitor?.alarmLogs?.enabled,
+      },
+    },
+
+    UI_EXTENSION: misConfig.uiExtension,
+
+    CHANGE_JOB_LIMIT: {
+      allowUser: misConfig.allowUserChangeJobTimeLimit,
+    },
+
+    JOB_CHARGE_METADATA: misConfig.jobChargeMetadata,
 
   };
 

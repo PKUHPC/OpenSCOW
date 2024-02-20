@@ -1,5 +1,25 @@
 # @scow/docs
 
+## 1.3.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+
+## 1.2.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- f03e821342: vagrant 部署方式优化,文档网站修改
+
 ## 1.1.2
 
 ### Patch Changes
