@@ -13,7 +13,6 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
-import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Type } from "@sinclair/typebox";
 import { SearchType } from "src/models/User";
