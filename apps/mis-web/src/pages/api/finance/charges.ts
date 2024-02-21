@@ -114,6 +114,22 @@ export async function getUserInfoForCharges(accountName: string | undefined, req
   }
 }
 
+export async function getTenantOfAccount(accountName: string | undefined, info: UserInfo): Promise<string> {
+
+  if (accountName) {
+    const client = getClient(AccountServiceClient);
+
+    const { results } = await asyncClientCall(client, "getAccounts", {
+      accountName,
+    });
+    if (results.length !== 0) {
+      return results[0].tenantName;
+    }
+  }
+
+  return info.tenant;
+}
+
 export const buildChargesRequestTarget = (accountName: string | undefined, tenantName: string,
   searchType: SearchType | undefined, isPlatformRecords: boolean | undefined): (
     { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
@@ -164,18 +180,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
 
-  let tenantName = info.tenant;
-
-  if (accountName) {
-    const client = getClient(AccountServiceClient);
-
-    const { results } = await asyncClientCall(client, "getAccounts", {
-      accountName,
-    });
-    if (results.length !== 0) {
-      tenantName = results[0].tenantName;
-    }
-  }
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
 
   const client = getClient(ChargingServiceClient);
 
@@ -184,7 +189,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     endTime,
     type,
     userIds: userIds ?? [],
-    target: buildChargesRequestTarget(accountName, tenantName, searchType, isPlatformRecords),
+    target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
     page,
     pageSize,
   }), []);

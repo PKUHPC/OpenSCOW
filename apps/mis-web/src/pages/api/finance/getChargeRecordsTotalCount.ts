@@ -13,13 +13,14 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Type } from "@sinclair/typebox";
 import { SearchType } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
-import { buildChargesRequestTarget, getUserInfoForCharges } from "./charges";
+import { buildChargesRequestTarget, getTenantOfAccount, getUserInfoForCharges } from "./charges";
 
 
 export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
@@ -65,6 +66,8 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
 
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
+
   const client = getClient(ChargingServiceClient);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecordsTotalCount", {
@@ -72,7 +75,7 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     endTime,
     type,
     userIds: userIds ?? [],
-    target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+    target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
   }), ["totalAmount", "totalCount"]);
 
   return {

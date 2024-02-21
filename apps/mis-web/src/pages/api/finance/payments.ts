@@ -22,6 +22,8 @@ import { SearchType } from "src/pageComponents/common/PaymentTable";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
+import { getTenantOfAccount } from "./charges";
+
 export const PaymentInfo = Type.Object({
   index: Type.Number(),
   accountName: Type.Optional(Type.String()),
@@ -110,20 +112,7 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     if (!user) { return; }
   }
 
-
-  let tenantOfAccount = user.tenant;
-
-  if (accountName) {
-    const client = getClient(AccountServiceClient);
-
-    const { results } = await asyncClientCall(client, "getAccounts", {
-      accountName,
-    });
-    if (results.length !== 0) {
-      tenantOfAccount = results[0].tenantName;
-    }
-  }
-
+  const tenantOfAccount = await getTenantOfAccount(accountName, user);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
     target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountName),
