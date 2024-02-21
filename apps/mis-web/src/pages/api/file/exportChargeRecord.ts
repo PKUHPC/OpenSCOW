@@ -20,7 +20,7 @@ import { getT, prefix } from "src/i18n";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { SearchType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
-import { buildChargesRequestTarget, getUserInfoForCharges } from "src/pages/api/finance/charges";
+import { buildChargesRequestTarget, getTenantOfAccount, getUserInfoForCharges } from "src/pages/api/finance/charges";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
@@ -63,8 +63,9 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
   if (!info) { return; }
 
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
 
-  const target = buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords);
+  const target = buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords);
 
   const logInfo = {
     operatorUserId: info.identityId,

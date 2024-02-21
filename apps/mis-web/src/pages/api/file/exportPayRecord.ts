@@ -31,6 +31,7 @@ import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
 import { pipeline } from "stream";
 
+import { getTenantOfAccount } from "../finance/charges";
 import { getPaymentRecordTarget } from "../finance/payments";
 
 export const ExportPayRecordSchema = typeboxRouteSchema({
@@ -79,7 +80,11 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   if (!user) { return; }
 
-  const target = getPaymentRecordTarget(searchType, user, targetName);
+  const tenantOfAccount = searchType === SearchType.account
+    ? await getTenantOfAccount(targetName, user)
+    : user.tenantId;
+
+  const target = getPaymentRecordTarget(searchType, user, tenantOfAccount, targetName);
 
   const logInfo = {
     operatorUserId: user.identityId,
