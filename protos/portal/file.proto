@@ -81,6 +81,7 @@ message ReadDirectoryRequest {
   string user_id = 1;
   string cluster = 2;
   string path = 3;
+  optional bool modify_access_time = 4;
 }
 
 message FileInfo {

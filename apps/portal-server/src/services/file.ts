@@ -160,7 +160,7 @@ export const fileServiceServer = plugin((server) => {
     },
 
     readDirectory: async ({ request, logger }) => {
-      const { userId, cluster, path } = request;
+      const { userId, cluster, path, modifyAccessTime } = request;
 
       const host = getClusterLoginNode(cluster);
 
@@ -188,7 +188,7 @@ export const fileServiceServer = plugin((server) => {
         // 通过touch -a命令实现共享文件系统的缓存刷新
         const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
 
-        if (pureFiles.length > 0) {
+        if (pureFiles.length > 0 && modifyAccessTime) {
           const filePaths = pureFiles.map((file) => join(path, file.filename)).join(" ");
 
           // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
