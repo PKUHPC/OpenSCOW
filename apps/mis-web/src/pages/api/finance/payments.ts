@@ -13,6 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -61,7 +62,12 @@ export const GetPaymentsSchema = typeboxRouteSchema({
   },
 });
 
-export const getPaymentRecordTarget = (searchType: SearchType, user: UserInfo, targetName: string | undefined) => {
+export const getPaymentRecordTarget = (
+  searchType: SearchType,
+  user: UserInfo,
+  tenantOfAccount: string,
+  targetName: string | undefined,
+) => {
   switch (searchType) {
   case SearchType.tenant:
     return targetName
@@ -73,7 +79,7 @@ export const getPaymentRecordTarget = (searchType: SearchType, user: UserInfo, t
     return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
   case SearchType.account:
     return targetName
-      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } }
+      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:tenantOfAccount, accountName:targetName! } }
       : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
   default:
     break;
@@ -104,8 +110,23 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     if (!user) { return; }
   }
 
+
+  let tenantOfAccount = user.tenant;
+
+  if (accountName) {
+    const client = getClient(AccountServiceClient);
+
+    const { results } = await asyncClientCall(client, "getAccounts", {
+      accountName,
+    });
+    if (results.length !== 0) {
+      tenantOfAccount = results[0].tenantName;
+    }
+  }
+
+
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
-    target: getPaymentRecordTarget(searchType, user, accountName),
+    target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountName),
     startTime,
     endTime,
   }), ["total"]);

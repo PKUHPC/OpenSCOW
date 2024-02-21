@@ -13,6 +13,7 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
   ChargingServiceClient, TenantTarget } from "@scow/protos/build/server/charging";
 import { UserServiceClient } from "@scow/protos/build/server/user";
@@ -113,7 +114,7 @@ export async function getUserInfoForCharges(accountName: string | undefined, req
   }
 }
 
-export const buildChargesRequestTarget = (accountName: string | undefined, info: UserInfo,
+export const buildChargesRequestTarget = (accountName: string | undefined, tenantName: string,
   searchType: SearchType | undefined, isPlatformRecords: boolean | undefined): (
     { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
     | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
@@ -125,7 +126,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
   if (accountName) {
     return {
       $case: "accountOfTenant" as const,
-      accountOfTenant: { tenantName: info.tenant, accountName: accountName },
+      accountOfTenant: { accountName, tenantName },
     };
   } else {
     if (searchType === SearchType.ACCOUNT) {
@@ -137,7 +138,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
       } else {
         return {
           $case: "accountsOfTenant" as const,
-          accountsOfTenant: { tenantName: info.tenant },
+          accountsOfTenant: { tenantName },
         };
       }
     } else {
@@ -149,7 +150,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
       } else {
         return {
           $case: "tenant" as const,
-          tenant: { tenantName: info.tenant },
+          tenant: { tenantName },
         };
       }
     }
@@ -163,6 +164,19 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
 
+  let tenantName = info.tenant;
+
+  if (accountName) {
+    const client = getClient(AccountServiceClient);
+
+    const { results } = await asyncClientCall(client, "getAccounts", {
+      accountName,
+    });
+    if (results.length !== 0) {
+      tenantName = results[0].tenantName;
+    }
+  }
+
   const client = getClient(ChargingServiceClient);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaginatedChargeRecords", {
@@ -170,7 +184,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     endTime,
     type,
     userIds: userIds ?? [],
-    target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+    target: buildChargesRequestTarget(accountName, tenantName, searchType, isPlatformRecords),
     page,
     pageSize,
   }), []);
