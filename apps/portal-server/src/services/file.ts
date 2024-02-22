@@ -197,7 +197,7 @@ export const fileServiceServer = plugin((server) => {
             const execFileFullPaths = execFilePaths.map((file) => join(path, file.filename)).join(" ");
             const fileSyncCmd = `touch -a ${execFileFullPaths}`;
             loggedExec(ssh, logger, false, fileSyncCmd, []).catch((err) => {
-              logger.error(err, "touch -a s% failed as s%", userId, execFileFullPaths);
+              logger.error(err, "touch -a %s failed as %s", execFileFullPaths, userId);
             });
           }
         }
