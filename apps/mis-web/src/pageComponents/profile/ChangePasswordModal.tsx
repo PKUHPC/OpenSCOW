@@ -45,14 +45,25 @@ export const ChangePasswordModal: React.FC<Props> = ({
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
     api.checkPassword({ query: { password: oldPassword } })
+      .httpError(404, () => {
+        message.error("用户不存在");
+      })
+      .httpError(501, () => {
+        message.error("本功能在当前配置下不可用");
+      })
       .then((result) => {
         if (result.success) {
           return api.changePassword({ body: { newPassword } })
+            .httpError(404, () => {
+              message.error("用户不存在");
+            })
+            .httpError(501, () => {
+              message.error("本功能在当前配置下不可用");
+            })
             .httpError(400, (e) => {
               if (e.code === "PASSWORD_NOT_VALID") {
                 message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
               };
-              throw e;
             })
             .then(() => {
               form.resetFields();

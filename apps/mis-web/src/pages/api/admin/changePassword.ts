@@ -11,7 +11,7 @@
  */
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { changePassword as libChangePassword, getCapabilities } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -53,6 +53,11 @@ export default /* #__PURE__*/typeboxRoute(
   ChangePasswordAsPlatformAdminSchema, async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
+      return { 501: null };
+    }
+
+    const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+    if (!ldapCapabilities.changePassword) {
       return { 501: null };
     }
 
