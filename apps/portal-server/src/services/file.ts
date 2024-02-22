@@ -192,14 +192,21 @@ export const fileServiceServer = plugin((server) => {
 
           // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
           // 一次执行 1000 个文件是根据经验设置的安全值，可修改
-          for (let i = 0; i < pureFiles.length; i += 1000) {
-            const execFilePaths = pureFiles.slice(i, i + 1000);
-            const execFileFullPaths = execFilePaths.map((file) => join(path, file.filename)).join(" ");
-            const fileSyncCmd = `touch -a ${execFileFullPaths}`;
-            loggedExec(ssh, logger, false, fileSyncCmd, []).catch((err) => {
-              logger.error(err, "touch -a %s failed as %s", execFileFullPaths, userId);
-            });
+          const TOUCH_FILES_COUNT = 1000;
+          const execFilePathsList: string[][] = [];
+
+          for (let i = 0; i < pureFiles.length; i += TOUCH_FILES_COUNT) {
+            const slicedExecFiles = pureFiles.slice(i, i + TOUCH_FILES_COUNT);
+            const slicedExecFilesPaths = slicedExecFiles.map((file) => join(path, file.filename));
+            execFilePathsList.push(slicedExecFilesPaths);
           }
+
+          await Promise.allSettled(execFilePathsList.map(async (execFilePaths) => {
+            return loggedExec(ssh, logger, false, "touch -a", execFilePaths).catch((err) => {
+              logger.error(err, "touch -a %s failed as %s", execFilePaths, userId);
+            });
+          }));
+
         }
 
         for (const file of files) {
