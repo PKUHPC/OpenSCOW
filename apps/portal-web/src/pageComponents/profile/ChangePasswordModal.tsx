@@ -47,10 +47,10 @@ export const ChangePasswordModal: React.FC<Props> = ({
     setLoading(true);
     api.checkPassword({ query: { password: oldPassword } })
       .httpError(404, () => {
-        message.error("用户不存在");
+        message.error(t(p("userNotExist")));
       })
       .httpError(501, () => {
-        message.error("本功能在当前配置下不可用");
+        message.error(t(p("unavailable")));
       })
       .then((result) => {
         if (result.success) {
@@ -61,10 +61,10 @@ export const ChangePasswordModal: React.FC<Props> = ({
               };
             })
             .httpError(404, () => {
-              message.error("用户不存在");
+              message.error(t(p("userNotExist")));
             })
             .httpError(501, () => {
-              message.error("本功能在当前配置下不可用");
+              message.error(t(p("unavailable")));
             })
             .then(() => {
               form.resetFields();

@@ -66,6 +66,8 @@ export default {
         oldPassword:"原密码",
         newPassword: "新密码",
         confirm: "确认密码",
+        userNotExist:"用户不存在",
+        unavailable:"本功能在当前配置下不可用",
       },
     },
     // job

@@ -53,9 +53,9 @@ export const ChangeEmailModal: React.FC<Props> = ({
     setLoading(true);
 
     await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
-      .httpError(404, () => { message.error("用户不存在"); })
+      .httpError(404, () => { message.error(t(p("userNotExist"))); })
       .httpError(500, () => { message.error(t(p("changeEmailFail"))); })
-      .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+      .httpError(501, () => { message.error(t(p("unavailable"))); })
       .then(() => {
         form.resetFields();
         form.setFieldValue("oldEmail", newEmail);

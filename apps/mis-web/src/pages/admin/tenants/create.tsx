@@ -103,7 +103,7 @@ const CreateTenantPageForm: React.FC = () => {
               };
               throw e;
             })
-            .httpError(501, () => { message.error("本功能在当前配置下不可用"); })
+            .httpError(501, () => { message.error(t(p("unavailable"))); })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?
                 modal.info({
