@@ -72,7 +72,7 @@ export const ClusterFileTable: React.FC<Props> = ({
     // 清空SelectedKeys
     setSelectedKeys([]);
     selectedCluster ? (
-      await api.listFile({ query: { cluster: selectedCluster.id, path: path, modifyAccessTime: true } })
+      await api.listFile({ query: { cluster: selectedCluster.id, path: path, updateAccessTime: true } })
         .then((d) => {
           setFiles(d.items);
         })

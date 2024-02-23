@@ -42,7 +42,7 @@ export const ListFileSchema = typeboxRouteSchema({
   query: Type.Object({
     cluster: Type.String(),
     path: Type.String(),
-    modifyAccessTime: Type.Optional(Type.Boolean()),
+    updateAccessTime: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
@@ -67,12 +67,12 @@ export default route(ListFileSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, path, modifyAccessTime } = req.query;
+  const { cluster, path, updateAccessTime } = req.query;
 
   const client = getClient(FileServiceClient);
 
   return asyncUnaryCall(client, "readDirectory", {
-    cluster, userId: info.identityId, path, modifyAccessTime,
+    cluster, userId: info.identityId, path, updateAccessTime,
   }).then(({ results }) => ({ 200: {
     items: results.map(({ mode, mtime, name, size, type }) => ({
       mode, mtime, name, size, type: mapType[type],

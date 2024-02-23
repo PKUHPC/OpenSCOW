@@ -160,7 +160,7 @@ export const fileServiceServer = plugin((server) => {
     },
 
     readDirectory: async ({ request, logger }) => {
-      const { userId, cluster, path, modifyAccessTime } = request;
+      const { userId, cluster, path, updateAccessTime } = request;
 
       const host = getClusterLoginNode(cluster);
 
@@ -188,7 +188,7 @@ export const fileServiceServer = plugin((server) => {
         // 通过touch -a命令实现共享文件系统的缓存刷新
         const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
 
-        if (pureFiles.length > 0 && modifyAccessTime) {
+        if (pureFiles.length > 0 && updateAccessTime) {
 
           // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
           // 一次执行 500 个文件是根据经验设置的安全值，可修改
