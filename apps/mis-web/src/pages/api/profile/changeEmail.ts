@@ -13,10 +13,12 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { getCapabilities } from "@scow/lib-auth";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { runtimeConfig } from "src/utils/config";
 import { handlegRPCError } from "src/utils/server";
 
 
@@ -40,6 +42,9 @@ export const ChangeEmailSchema = typeboxRouteSchema({
 
     /** 修改失败 */
     500: Type.Null(),
+
+    /** 本功能在当前配置下不可用。 */
+    501: Type.Null(),
   },
 });
 
@@ -49,6 +54,11 @@ export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) =>
   const info = await auth(req, res);
 
   if (!info) { return; }
+
+  const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+  if (!ldapCapabilities.changeEmail) {
+    return { 501: null };
+  }
 
   const { userId, newEmail } = req.body;
 
@@ -62,5 +72,6 @@ export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) =>
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.UNKNOWN]: () => ({ 500: null }),
+      [Status.UNIMPLEMENTED]: () => ({ 501: null }),
     }));
 });

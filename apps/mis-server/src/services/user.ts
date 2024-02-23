@@ -753,10 +753,24 @@ export const userServiceServer = plugin((server) => {
           identityId: userId,
           newEmail,
         }, logger)
-          .catch(async () => {
-            throw <ServiceError> {
-              code: Status.UNKNOWN, message: "LDAP failed to change email",
-            };
+          .catch(async (e) => {
+            switch (e.status) {
+
+            case "NOT_FOUND":
+              throw <ServiceError>{
+                code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+              };
+
+            case "NOT_SUPPORTED":
+              throw <ServiceError>{
+                code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+              };
+
+            default:
+              throw <ServiceError> {
+                code: Status.UNKNOWN, message: "LDAP failed to change email",
+              };
+            }
           });
       }
 

@@ -11,7 +11,7 @@
  */
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { checkPassword as libCheckPassword } from "@scow/lib-auth";
+import { checkPassword as libCheckPassword, getCapabilities } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
@@ -39,6 +39,11 @@ export default typeboxRoute(CheckPasswordSchema, async (req, res) => {
   const info = await auth(req, res);
 
   if (!info) { return; }
+
+  const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+  if (!ldapCapabilities.checkPassword) {
+    return { 501: null };
+  }
 
   const { password } = req.query;
 

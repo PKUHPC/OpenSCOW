@@ -66,6 +66,8 @@ export default {
         oldPassword: "Old Password",
         newPassword: "New Password",
         confirm: "Confirm Password",
+        userNotExist:"User Not Exist",
+        unavailable:"This feature is not available in the current configuration",
       },
     },
     // job

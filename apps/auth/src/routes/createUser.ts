@@ -55,7 +55,7 @@ export const createUserRoute = fp(async (f) => {
     },
     async (req, rep) => {
       if (!f.auth.createUser) {
-        return await rep.code(501).send(null);
+        return await rep.code(501).send({ code: "NOT_SUPPORTED" });
       }
 
       const { ...rest } = req.body;

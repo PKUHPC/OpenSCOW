@@ -546,6 +546,8 @@ export default {
       oldPassword:"原密码",
       newPassword:"新密码",
       confirmPassword:"确认密码",
+      userNotExist:"用户不存在",
+      unavailable:"本功能在当前配置下不可用",
     },
     tenant:{
       accountWhitelistTable:{
@@ -904,6 +906,7 @@ export default {
           addCompleted: "添加完成！",
           createTenantFailMessage: "创建租户失败",
           createTenant: "创建租户",
+          unavailable:"本功能在当前配置下不可用",
         },
       },
       systemDebug: {

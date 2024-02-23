@@ -546,6 +546,8 @@ export default {
       oldPassword: "Old Password",
       newPassword: "New Password",
       confirmPassword: "Confirm Password",
+      userNotExist:"User Not Exist",
+      unavailable:"This feature is not available in the current configuration",
     },
     tenant: {
       accountWhitelistTable: {
@@ -904,6 +906,7 @@ export default {
           addCompleted: "Added Successfully!",
           createTenantFailMessage: "Failed to create tenant",
           createTenant: "Create Tenant",
+          unavailable:"This feature is not available in the current configuration",
         },
       },
       systemDebug: {
