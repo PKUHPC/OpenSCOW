@@ -14,12 +14,16 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
 import { authUrl } from "src/config";
+import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
@@ -29,6 +33,7 @@ import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
+dayjs.extend(utc);
 
 const anotherTenant = "anotherTenant";
 
@@ -125,6 +130,53 @@ it("cannot remove owner from account", async () => {
   }).catch((e) => e);
 
   expect(reply.code).toBe(Status.OUT_OF_RANGE);
+});
+
+it("cannot remove a user from account,when user has jobs running or pending", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const reply = await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+    userId: data.userB.userId,
+  }).catch((e) => e);
+
+  expect(reply.code).toBe(Status.FAILED_PRECONDITION);
+});
+
+it("when removing a user from an account, the account and user cannot be deleted", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+
+  const account = new Account({
+    accountName: "account_remove", comment: "", blocked: false, tenant:data.tenant,
+  }) as Loaded<Account, "tenant">;
+
+  const uaA = new UserAccount({
+    account,
+    user: data.userA,
+    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  const uaB = new UserAccount({
+    account,
+    user: data.userB,
+    role: UserRole.USER, status: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  await em.persistAndFlush([account, uaA, uaB]);
+
+  await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: account.accountName,
+    userId: data.userB.userId,
+  });
+
+  const accountA = await em.findOneOrFail(Account, { id:account.id });
+  const userB = await em.findOneOrFail(User, { id:data.userB.id });
+
+  expect(accountA).toBeTruthy();
+  expect(userB).toBeTruthy();
 });
 
 it("deletes user", async () => {
@@ -517,7 +569,7 @@ it("change an inexistent user email", async () => {
   expect(reply.code).toBe(Status.NOT_FOUND);
 });
 
-it("get new user count", async () => {
+it("get new user count in UTC+8 timezone", async () => {
 
   const em = server.ext.orm.em.fork();
   const today = dayjs();
@@ -558,12 +610,19 @@ it("get new user count", async () => {
   const info = await asyncClientCall(client, "getNewUserCount", {
     startTime: twoDaysBefore.startOf("day").toISOString(),
     endTime: today.endOf("day").toISOString(),
+    timeZone: "Asia/Shanghai",
   });
 
+  const todyInUtcPlus8 = today.utcOffset(8);
+
+  const yesterdayInUtcPlus8 = yesterday.utcOffset(8);
+
+  const twoDaysBeforeInUtcPlus8 = twoDaysBefore.utcOffset(8);
+
   expect(info.results).toMatchObject([
-    { date: today.startOf("day").toISOString(), count: 30 },
-    { date: yesterday.startOf("day").toISOString(), count: 20 },
-    { date: twoDaysBefore.startOf("day").toISOString(), count: 10 },
+    { date: dayjsToDateMessage(todyInUtcPlus8), count: 30 },
+    { date:dayjsToDateMessage(yesterdayInUtcPlus8), count: 20 },
+    { date:dayjsToDateMessage(twoDaysBeforeInUtcPlus8), count: 10 },
   ]);
 
 });

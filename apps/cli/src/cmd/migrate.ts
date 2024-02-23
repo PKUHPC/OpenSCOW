@@ -56,6 +56,7 @@ export const migrateFromScowDeployment = (options: Props) => {
   const auth = getSectionContent("AUTH");
   const debug = getSectionContent("DEBUG");
   const gateway = getSectionContent("GATEWAY");
+  const ai = getSectionContent("AI");
 
   const config: DeepPartial<InstallConfigSchema> = {
     port: common.PORT,
@@ -105,6 +106,15 @@ export const migrateFromScowDeployment = (options: Props) => {
         },
       } : {},
     },
+
+    ai: ai ? {
+      basePath: ai.BASE_PATH,
+      dbPassword: ai.DB_PASSWORD,
+      portMappings: {
+        ...debug?.OPEN_PORTS?.AI ? { aiServer: debug.OPEN_PORTS.AI } : {},
+        ...debug?.OPEN_PORTS?.DB ? { db: debug.OPEN_PORTS.DB } : {},
+      },
+    } : undefined,
   };
 
   const data = dump(config);

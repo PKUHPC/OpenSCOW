@@ -1,5 +1,23 @@
 # @scow/portal-web
 
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- a41c45b: 修复文件管理列表连续双击文件名导致进入错误目录的问题
+- f126469: 仪表盘处集群无法获取运行时不报 500 的错误提示和快捷方式跳转去掉 basePath
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
 ## 1.4.0
 
 ### Minor Changes

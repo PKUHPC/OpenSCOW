@@ -57,6 +57,20 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
       // 处理成功的结果
       const successfulResults = rawClusterInfoResults
+      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
+        .map((result, idx) => {
+          if (result.status === "fulfilled") {
+            return {
+              ...result,
+              value:{
+                clusterInfo:{ clusterName:clusters[idx].id,
+                  partitions:result.value.clusterInfo.partitions },
+              },
+            } as PromiseSettledResult<FulfilledResult>;
+          }
+
+          return result;
+        })
         .filter(
           (result): result is PromiseFulfilledResult<FulfilledResult> =>
             result.status === "fulfilled")

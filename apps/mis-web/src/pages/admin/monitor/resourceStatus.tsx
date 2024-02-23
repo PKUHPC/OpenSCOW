@@ -25,9 +25,20 @@ import { styled } from "styled-components";
 
 const Container = styled.div`
   display: flex;
-  flex-wrap: wrap;
   flex-direction: column;
+  height: calc(100vh - 140px);
+`;
+
+const FrameContainer = styled.div`
+  display: flex;
+  width: 100%;
   height: 100%;
+`;
+
+const IFrame = styled.iframe`
+  width: 100%;
+  height: 100%;
+  border: none;
 `;
 
 const TitleText = styled(Typography.Title)`
@@ -62,8 +73,8 @@ export const ResourceStatusPage: NextPage = requireAuth(
         <Head title={t(p("resourceStatus"))} />
         <TitleText>{t(p("resourceStatus"))}</TitleText>
         { publicConfig.CLUSTER_MONITOR.resourceStatus.proxy
-          ? <iframe width="100%" height="760px" src={proxyGrafanaUrl}></iframe>
-          : <iframe width="100%" height="760px" src={normalGrafanaUrl}></iframe>
+          ? <FrameContainer><IFrame src={proxyGrafanaUrl}></IFrame></FrameContainer>
+          : <FrameContainer><IFrame src={normalGrafanaUrl}></IFrame></FrameContainer>
         }
       </Container>
     </>

@@ -107,6 +107,7 @@ export default {
     export: "Export",
     exportMaxDataErrorMsg: "Too many details to export, up to {} can be exported, please reselect!",
     exportNoDataErrorMsg: "Export is empty, please reselect",
+    other: "Other",
   },
   dashboard: {
     title: "Dashboard",
@@ -153,7 +154,8 @@ export default {
         operationLog: "Operation Log",
         statistic: "Statistic",
       },
-      navLinkText: "Portal",
+      navLinkTextPortal: "Portal",
+      navLinkTextAI: "SCOW AI",
       dashboard: "Dashboard",
       user: {
         firstNav: "User Space",

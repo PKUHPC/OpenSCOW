@@ -15,6 +15,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
@@ -129,6 +130,12 @@ export async function fetchJobs(
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
+        const metadataMap: ChargeRecord["metadata"] = {};
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
+        savedFields?.forEach((field) => {
+          metadataMap[field] = pricedJob[field];
+        });
+
         if (account) {
           // charge account
           await charge({
@@ -136,6 +143,8 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account,
+            userId: pricedJob.user,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
           // charge tenant
@@ -144,6 +153,8 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account.tenant.$,
+            userId: pricedJob.user,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
           const ua = await em.findOne(UserAccount, {

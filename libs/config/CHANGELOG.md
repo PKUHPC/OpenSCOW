@@ -1,5 +1,15 @@
 # @scow/config
 
+## 1.4.1
+
+### Patch Changes
+
+- afc3350: 在 mis.yaml 中增加 jobChargeMetadata 可选配置可记录需要存储的扣费作业的字段信息
+- 8d417ba: mis 增加 allowUserChangeJobTimeLimit 参数控制普通用户是否可以修改作业时限
+- 68447f7: mis 配置文件增加 addUserToAccount 相关参数
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
 ## 1.4.0
 
 ### Minor Changes

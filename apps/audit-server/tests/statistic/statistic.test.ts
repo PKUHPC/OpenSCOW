@@ -13,6 +13,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { StatisticServiceClient } from "@scow/protos/build/audit/statistic";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -45,7 +46,7 @@ afterEach(async () => {
   await server.close();
 });
 
-it("get active user count correctly", async () => {
+it("get active user count correctly in UTC+8 timezone", async () => {
 
   const em = server.ext.orm.em.fork();
 
@@ -67,13 +68,14 @@ it("get active user count correctly", async () => {
   const resp = await asyncClientCall(client, "getActiveUserCount", {
     startTime: today.toISOString(),
     endTime: endDay.toISOString(),
+    timeZone: "Asia/Shanghai",
   });
+
+  const nowInUtcPlus8 = now.utcOffset(8);
 
   expect(resp.results).toMatchObject([
     {
-      // 应该期待返回的结果的日期为日志的operationTime的UTC日期的开始时间
-      // date: today.toISOString(),
-      date: now.utcOffset(0).startOf("day").toISOString(),
+      date: dayjsToDateMessage(nowInUtcPlus8),
       count: 10,
     },
   ]);

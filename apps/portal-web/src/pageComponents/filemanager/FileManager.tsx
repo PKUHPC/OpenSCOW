@@ -19,6 +19,7 @@ import {
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
@@ -348,6 +349,17 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   };
 
+  const editFile = queryToString(router.query.edit);
+
+  useEffect(() => {
+    if (editFile !== "") {
+      const foundFile = files.find((file) => file.name === editFile);
+      if (foundFile && foundFile.type !== "DIR") {
+        handlePreview(editFile, foundFile.size);
+      }
+    }
+  }, [editFile, files]);
+
   return (
     <div>
       <TitleText>
@@ -496,7 +508,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             setSelectedKeys([fileInfoKey(r, path)]);
           },
           onDoubleClick: () => {
-            if (r.type === "DIR") {
+            if (!loading && r.type === "DIR") {
+              setLoading(true);
               router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
               handlePreview(r.name, r.size);
@@ -507,6 +520,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
           r.type === "DIR" ? (
             <a onClick={() => {
               if (!loading) {
+                setLoading(true);
                 router.push(fullUrl(join(path, r.name)));
               }
             }}

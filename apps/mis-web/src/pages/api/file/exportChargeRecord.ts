@@ -20,7 +20,7 @@ import { getT, prefix } from "src/i18n";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { SearchType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
-import { buildChargesRequestTarget, getUserInfoForCharges } from "src/pages/api/finance/charges";
+import { buildChargesRequestTarget, getTenantOfAccount, getUserInfoForCharges } from "src/pages/api/finance/charges";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
@@ -42,6 +42,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     accountName: Type.Optional(Type.String()),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
+    userIds: Type.Optional(Type.String()),
   }),
 
   responses:{
@@ -56,14 +57,15 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count } = query;
+  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count, userIds } = query;
 
   const info = await getUserInfoForCharges(accountName, req, res);
 
   if (!info) { return; }
 
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
 
-  const target = buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords);
+  const target = buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords);
 
   const logInfo = {
     operatorUserId: info.identityId,
@@ -90,12 +92,15 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
+    const userIdArray = userIds ? userIds.split(",").map((id) => id.trim()) : [];
+
     const stream = asyncReplyStreamCall(client, "exportChargeRecord", {
       count,
       startTime,
       endTime,
       type,
       target,
+      userIds: userIdArray,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -109,6 +114,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
         id: x.index,
         accountName: x.accountName,
         tenantName: x.tenantName,
+        userId: x.userId,
         time: x.time ? new Date(x.time).toISOString() : "",
         amount: nullableMoneyToString(x.amount),
         type: x.type,
@@ -120,6 +126,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       id: "ID",
       accountName: t(pCommon("account")),
       tenantName: t(pCommon("tenant")),
+      userId: t(pCommon("user")),
       time: t(p("time")),
       amount: t(p("amount")),
       type: t(pCommon("type")),

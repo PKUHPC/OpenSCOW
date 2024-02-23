@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:9b61ed13fef9ca689326f40c0c0b4da70e37a18712f200b4c66d3b44fd59d98e AS base
+FROM node:iron-alpine@sha256:f4c96a28c0b2d8981664e03f461c2677152cd9a756012ffa8e2c6727427c2bda AS base
 
 RUN apk update
 
@@ -42,7 +42,7 @@ COPY patches ./patches
 RUN pnpm i --offline --prod --frozen-lockfile
 
 # delete next.js build caches to reduce 200MB+ image size
-RUN rm -rf apps/mis-web/.next/cache apps/portal-web/.next/cache
+RUN rm -rf apps/mis-web/.next/cache apps/portal-web/.next/cache apps/ai/.next/cache
 
 FROM base AS runner
 

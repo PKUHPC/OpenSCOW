@@ -15,6 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ChargingServiceClient } from "@scow/protos/build/server/charging";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { DateSchema } from "src/models/date";
 import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { ensureNotUndefined } from "src/utils/checkNull";
@@ -22,7 +23,7 @@ import { getClient } from "src/utils/client";
 
 export const GetDailyChargeResponse = Type.Object({
   results: Type.Array(Type.Object({
-    date: Type.String(),
+    date: DateSchema,
     amount: Money,
   })),
 });
@@ -38,6 +39,8 @@ export const GetDailyChargeSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
 
     endTime: Type.String({ format: "date-time" }),
+
+    timeZone: Type.String(),
 
   }),
 
@@ -56,18 +59,21 @@ export default typeboxRoute(GetDailyChargeSchema,
       return;
     }
 
-    const { startTime, endTime } = req.query;
+    const { startTime, endTime, timeZone } = req.query;
 
     const client = getClient(ChargingServiceClient);
 
     const { results } = await asyncClientCall(client, "getDailyCharge", {
       startTime,
       endTime,
+      timeZone,
     });
 
     return {
       200: {
-        results: results.map((x) => ensureNotUndefined(x, ["date", "amount"])),
+        results: results
+          .filter((x) => x.date !== undefined)
+          .map((x) => ensureNotUndefined(x, ["date", "amount"])),
       },
     };
   });

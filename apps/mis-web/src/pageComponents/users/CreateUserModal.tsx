@@ -48,7 +48,7 @@ export const CreateUserModal: React.FC<Props> = ({
   const onOk = async () => {
     const { password, email, identityId, name } = await form.validateFields();
     setLoading(true);
-    await api.createUser({ body: { email, identityId, name, password } })
+    await api.createUser({ body: { email, identityId, name: name.trim(), password } })
       .httpError(409, () => { message.error(t(p("alreadyExist"))); })
       .httpError(400, (e) => {
         if (e.code === "USERID_NOT_VALID") {

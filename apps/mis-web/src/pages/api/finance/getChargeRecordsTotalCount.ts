@@ -19,7 +19,7 @@ import { SearchType } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
-import { buildChargesRequestTarget, getUserInfoForCharges } from "./charges";
+import { buildChargesRequestTarget, getTenantOfAccount, getUserInfoForCharges } from "./charges";
 
 
 export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
@@ -39,6 +39,9 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     // 消费类型
     type: Type.Optional(Type.String()),
 
+    // 消费的用户id
+    userIds: Type.Optional(Type.Array(Type.String())),
+
     accountName: Type.Optional(Type.String()),
 
     // 是否为平台管理下的记录：如果是则需查询所有租户，如果不是只查询当前租户
@@ -57,10 +60,12 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType, type } = req.query;
+  const { endTime, startTime, accountName, isPlatformRecords, searchType, type, userIds } = req.query;
 
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
+
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
 
   const client = getClient(ChargingServiceClient);
 
@@ -68,7 +73,8 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     startTime,
     endTime,
     type,
-    target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+    userIds: userIds ?? [],
+    target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
   }), ["totalAmount", "totalCount"]);
 
   return {

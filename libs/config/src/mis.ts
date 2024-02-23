@@ -34,6 +34,8 @@ export const MisConfigSchema = Type.Object({
 
   portalUrl: Type.Optional(Type.String({ description: "如果部署了门户系统，设置门户系统的部署URL或者pathname" })),
 
+  aiUrl: Type.Optional(Type.String({ description: "AI系统的部署URL或者路径" })),
+
   predefinedChargingTypes: Type.Array(Type.String(), { description: "预定义的充值类型", default: []}),
 
   accountNamePattern: Type.Optional(Type.Object({
@@ -109,6 +111,13 @@ export const MisConfigSchema = Type.Object({
     description: "给作业扣费时，扣费项的备注。可以使用{{ 属性名 }}使用作业信息中的属性。字段参考src/entities/JobInfo",
     default: "集群: {{ cluster }}，作业ID：{{ idJob }}",
   }),
+
+  jobChargeMetadata: Type.Optional(Type.Object({
+    savedFields: Type.Optional(Type.Array(Type.String({
+      description: "需要保存的作业的字段。字段参考src/entities/JobInfo" }))),
+    displayFormats: Type.Optional(createI18nStringSchema({
+      description: "定义元数据显示的格式，i18n类型或string类型，利用{{ 属性名 }}使用上述savedFields中保存的属性" })),
+  })),
 
   navLinks: Type.Optional(Type.Array(
     Type.Object({
