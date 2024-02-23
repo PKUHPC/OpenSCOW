@@ -259,25 +259,42 @@ export const getOperationDetail = (
     case "logout":
       return t(pDetails("logout"));
     case "submitJob":
-      return t(pDetails("submitJob"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId || "-"]);
+      return t(pDetails("submitJob"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobId || "-"]);
     case "endJob":
-      return t(pDetails("endJob"), [operationEvent[logEvent].jobId]);
+      return t(pDetails("endJob"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobId || "-"]);
     case "addJobTemplate":
-      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
+      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobTemplateId]);
     case "deleteJobTemplate":
-      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
+      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobTemplateId]);
     case "updateJobTemplate":
       return t(pDetails("updateJobTemplate"),
-        [operationEvent[logEvent].jobTemplateId, operationEvent[logEvent].newJobTemplateId]);
+        [
+          operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobTemplateId,
+          operationEvent[logEvent].newJobTemplateId,
+        ]);
     case "shellLogin":
       return t(pDetails("shellLogin"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].loginNode]);
     case "createDesktop":
-      return t(pDetails("createDesktop"), [operationEvent[logEvent].desktopName, operationEvent[logEvent].wm]);
+      return t(pDetails("createDesktop"), [
+        operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].loginNode || "unknown",
+        operationEvent[logEvent].desktopName,
+        operationEvent[logEvent].wm,
+      ]);
     case "deleteDesktop":
       return t(pDetails("deleteDesktop"),
-        [operationEvent[logEvent].loginNode, operationEvent[logEvent].desktopId]);
+        [
+          operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].loginNode,
+          operationEvent[logEvent].desktopId,
+        ]);
     case "createApp":
-      return t(pDetails("createApp"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
+      return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
     case "createFile":
       return t(pDetails("createFile"), [operationEvent[logEvent].path]);
     case "deleteFile":
@@ -294,7 +311,8 @@ export const getOperationDetail = (
       return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
     case "setJobTimeLimit":
       return t(pDetails("setJobTimeLimit"),
-        [operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
+        [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
     case "createUser":
       return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
     case "addUserToAccount":
@@ -358,11 +376,11 @@ export const getOperationDetail = (
       return t(pDetails("unblockAccount"),
         [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
     case "importUsers":
-      return `${t(pDetails("importUsers1"), [operationEvent[logEvent].tenantName])}${
-        operationEvent[logEvent].importAccounts.map(
-          (account: { accountName: string; userIds: string[];}) =>
-            (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
-        ).join(", ")}`;
+      return `${t(pDetails("importUsers1"),
+        [operationEvent[logEvent].tenantName])}${operationEvent[logEvent].importAccounts.map(
+        (account: { accountName: string; userIds: string[]; }) =>
+          (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
+      ).join(", ")}`;
     case "setPlatformAdmin":
       return t(pDetails("setPlatformAdmin"), [operationEvent[logEvent].userId]);
     case "unsetPlatformAdmin":

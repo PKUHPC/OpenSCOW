@@ -93,7 +93,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.setJobTimeLimit,
       operationTypePayload:{
-        jobId: +jobId, accountName: job.account, limitMinutes,
+        jobId: +jobId, accountName: job.account, limitMinutes, clusterId: cluster,
       },
     };
 

@@ -54,6 +54,7 @@ export default /* #__PURE__*/route(DeleteJobTemplateSchema, async (req, res) => 
     operationTypeName: OperationType.deleteJobTemplate,
     operationTypePayload:{
       jobTemplateId: templateId,
+      clusterId: cluster,
     },
   };
 

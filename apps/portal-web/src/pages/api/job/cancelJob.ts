@@ -52,7 +52,7 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.endJob,
-    operationTypePayload: { jobId },
+    operationTypePayload: { jobId, clusterId: cluster },
   };
 
   return asyncUnaryCall(client, "cancelJob", {
