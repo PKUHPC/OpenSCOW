@@ -39,7 +39,8 @@ const NameContainer = styled.div`
 `;
 
 interface Props {
-  name: string,
+  entryBaseName: string,
+  entryExtraInfo?: string;
   icon?: string,
   logoPath?: string;
   style?: CSSProperties
@@ -49,7 +50,7 @@ interface ImageErrorMap {
   [appId: string]: boolean;
 }
 
-export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
+export const EntryItem: React.FC<Props> = ({ style, entryBaseName, entryExtraInfo, icon, logoPath }) => {
 
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 
@@ -61,7 +62,7 @@ export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
     <ItemContainer style={style}>
       <AvatarContainer>
         {
-          (logoPath && imageErrorMap[name] !== true) ? (
+          (logoPath && imageErrorMap[entryBaseName] !== true) ? (
             <img
               style={{
                 display: "flex",
@@ -72,7 +73,7 @@ export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
                 height: "80px",
               }}
               src={join(publicConfig.PUBLIC_PATH, logoPath)}
-              onError={() => handleImageError(name)}
+              onError={() => handleImageError(entryBaseName)}
             />
           ) : (
             <Avatar
@@ -88,10 +89,10 @@ export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
                 <ColoredIcon name={icon} color='#666' style={{ fontSize:"60px" }} />
                 : <PictureOutlined />}
             />
-          )
-        }
+          )}
       </AvatarContainer>
-      <NameContainer>{name}</NameContainer>
+      <NameContainer>{entryBaseName}</NameContainer>
+      {entryExtraInfo ? <NameContainer>{entryExtraInfo}</NameContainer> : null}
     </ItemContainer>
   );
 };

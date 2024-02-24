@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { MinusOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import {
   closestCenter,
   DndContext,
@@ -25,25 +25,27 @@ import {
   arrayMove,
   rectSortingStrategy,
   SortableContext } from "@dnd-kit/sortable";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Card, message } from "antd";
+import { message } from "antd";
 import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { formatEntryId, getEntryBaseName,
+  getEntryExtraInfo, getEntryIcon, getEntryLogoPath } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { AddEntryModal } from "./AddEntryModal";
-import { CardItem } from "./CardItem";
+import { EntryCardItem } from "./CardItem";
 import { AppWithCluster } from "./QuickEntry";
 import { SortableItem } from "./SortableItem";
 
 const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px 0;
 `;
 
 const ItemContainer = styled.div`
@@ -52,8 +54,13 @@ const ItemContainer = styled.div`
 
 const IconContainer = styled.div`
   position: absolute;
-  top: 12px;
-  right: 20px;
+  top: 8px;
+  right: 8px;
+  :hover {
+    cursor: pointer;
+    transform: scale(1.2);
+  }
+  transition: transform 1s;
 `;
 
 const ClusterContainer = styled.div`
@@ -74,7 +81,6 @@ const p = prefix("pageComp.dashboard.sortable.");
 export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
 
   const t = useI18nTranslateToString();
-  const languageId = useI18n().currentLanguage.id;
   const router = useRouter();
 
   // 实际的快捷入口项
@@ -181,7 +187,8 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
 
         case "app":
           router.push(
-            join("/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
+            join("/apps", item.entry.app.clusterId, "/create", item.entry.app.appId),
+          );
           break;
 
         default:
@@ -240,7 +247,8 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
               >
                 <SortableItem
                   id={x.id}
-                  name={getEntryName(x)}
+                  entryBaseName={getEntryBaseName(x, t)}
+                  entryExtraInfo={getEntryExtraInfo(x)}
                   draggable={isEditable}
                   icon={getEntryIcon(x)}
                   logoPath={getEntryLogoPath(x, apps)}
@@ -250,7 +258,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
                   isEditable && !(activeId && activeItem) ? (
                     <IconContainer onClick={() => { deleteFn(x.id); }}>
                       <MinusOutlined
-                        style={{ backgroundColor:"#ccc", fontSize:"18px", borderRadius:"9px", color:"#fff" }}
+                        style={{ fontSize: "20px" }}
                       />
                     </IconContainer>
                   ) :
@@ -270,9 +278,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
                         }
                       }}
                       >
-                        { getI18nConfigCurrentText(
-                          getEntryClusterName(x as Entry & {entry: {$case: "app" | "shell"} }),
-                          languageId)
+                        {
                         }
                       </ClusterContainer>
                     ) :
@@ -282,27 +288,26 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
             ))}
             {
               isEditable ? (
-                <Card
+                <div
                   style={{
-                    display:"flex",
-                    justifyContent:"center",
-                    alignItems:"center",
-                    width:"130px", height:"157px", margin:"20px 30px",
-                    boxShadow:"rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px" }}
+                    display: "flex", justifyContent: "center", alignItems: "center",
+                    padding: "40px", cursor: "pointer",
+                  }}
                   onClick={() => { setAddEntryOpen(true); }}
                 >
-                  <PlusOutlined style={{ fontSize:"40px", color:"#ccc" }} />
-                </Card>
+                  <PlusCircleOutlined style={{ fontSize: "40px" }} />
+                </div>
               ) : undefined
             }
           </ItemsContainer>
         </SortableContext>
-        <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+        <DragOverlay adjustScale style={{ transformOrigin: "0 0" }}>
           {activeId && activeItem ? (
-            <CardItem
+            <EntryCardItem
               isDragging
               id={activeId.toString()}
-              name={getEntryName(activeItem)}
+              entryBaseName={getEntryBaseName(activeItem, t)}
+              entryExtraInfo={getEntryExtraInfo(activeItem)}
               draggable={isEditable}
               icon={getEntryIcon(activeItem)}
               logoPath={getEntryLogoPath(activeItem, apps)}

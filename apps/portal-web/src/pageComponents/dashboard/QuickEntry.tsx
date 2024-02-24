@@ -22,9 +22,6 @@ import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
 
 const ContentContainer = styled.div`
-  background-color: #fff;
-  padding: 20px;
-  padding-right: 0;
   border-radius: 8px 8px 0 0;
   margin-bottom: 20px;
 `;

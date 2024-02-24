@@ -51,26 +51,43 @@ export const entryNameMap = {
   desktop:"routes.desktop",
 } as const;
 
-export const getEntryName = (item: Entry) => {
-  const t = useI18nTranslateToString();
+export const getEntryBaseName = (item: Entry, t: ReturnType<typeof useI18nTranslateToString>) => {
+  const entry = item.entry;
 
-  if (item.entry?.$case === "pageLink" && entryNameMap[item.name]) {
+  if (!entry) { return ""; }
 
+  if (entry.$case === "pageLink" && entryNameMap[item.name]) {
     return t(entryNameMap[item.name]);
   }
 
   return item.name;
 };
 
-export const getEntryClusterName = (item: Entry & {entry: {$case: "app" | "shell"} }) => {
+export const getEntryExtraInfo = (item: Entry) => {
+  const entry = item.entry;
+
+  if (!entry) { return ""; }
+
+  if (entry.$case === "app") {
+    return `${getEntryClusterName(entry)}`;
+  }
+
+  if (entry.$case === "shell") {
+    return `${getEntryClusterName(entry)}, ${entry.shell.loginNode}`;
+  }
+
+  return undefined;
+};
+
+export const getEntryClusterName = (item: Entry["entry"] & {$case: "app" | "shell" }) => {
   const clusters = publicConfig.CLUSTERS;
 
-  if (item.entry.$case === "shell") {
-    const clusterId = item.entry.shell.clusterId;
+  if (item.$case === "shell") {
+    const clusterId = item.shell.clusterId;
     return clusters.find((x) => x.id === clusterId)?.name;
   }
 
-  const clusterId = item.entry.app.clusterId;
+  const clusterId = item.app.clusterId;
   return clusters.find((x) => x.id === clusterId)?.name;
 
 };

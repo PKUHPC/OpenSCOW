@@ -17,7 +17,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
-import { getEntryIcon, getEntryName } from "src/utils/dashboard";
+import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";
@@ -62,7 +62,7 @@ export const AddEntryModal: React.FC<Props> = ({
 }) => {
   const t = useI18nTranslateToString();
 
-  const staticEntry: Entry[] = defaultEntry.concat([
+  const staticEntries: Entry[] = defaultEntry.concat([
     {
       id:"desktop",
       name:"desktop",
@@ -174,14 +174,15 @@ export const AddEntryModal: React.FC<Props> = ({
       >
         <ItemsContainer>
           {
-            staticEntry.map((item, idx) => (
+            staticEntries.map((item, idx) => (
               <div
                 key={idx}
                 onClick={() => { handleClick(item);
                 }}
+                style={{ cursor: "pointer" }}
               >
                 <EntryItem
-                  name={getEntryName(item)}
+                  entryBaseName={getEntryBaseName(item, t)}
                   icon={getEntryIcon(item)}
                   style={{ padding:"10px" }}
                 />
@@ -193,11 +194,11 @@ export const AddEntryModal: React.FC<Props> = ({
             appInfo.map((item, idx) => (
               <div
                 key={idx}
-                onClick={() => { handleClick(item);
-                }}
+                onClick={() => { handleClick(item); }}
+                style={{ cursor: "pointer" }}
               >
                 <EntryItem
-                  name={item.name}
+                  entryBaseName={item.name}
                   logoPath={apps[item.id].app.logoPath}
                   style={{ padding:"10px" }}
                 />
