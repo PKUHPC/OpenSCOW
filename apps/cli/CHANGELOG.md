@@ -1,5 +1,12 @@
 # @scow/cli
 
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+
 ## 1.4.2
 
 ## 1.4.1

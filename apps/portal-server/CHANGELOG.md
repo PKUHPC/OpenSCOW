@@ -1,5 +1,21 @@
 # @scow/portal-server
 
+## 1.4.3
+
+### Patch Changes
+
+- 941340a: 修复目录文件过多时导致的 touch 命令报错
+- 410fb0e: 修复只需在文件传输时使用 touch -a 来更新时间戳，修复 touch -a 执行时 ssh 关闭报错，文件名特殊字符报错等问题
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.6
+
 ## 1.4.2
 
 ## 1.4.1

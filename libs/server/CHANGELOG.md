@@ -1,5 +1,17 @@
 # @scow/lib-server
 
+## 1.1.5
+
+### Patch Changes
+
+- 443187e: 修复数据统计相关功能时区转换问题
+- 850bbcd: lib-server @scow/protos 从 devDependencies 移动到 dependencies
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.6
+
 ## 1.1.4
 
 ### Patch Changes

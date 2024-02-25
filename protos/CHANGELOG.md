@@ -1,5 +1,15 @@
 # @scow/grpc-api
 
+## 1.7.0
+
+### Minor Changes
+
+- 443187e: GetDailyCharge,GetDailyPay,GetNewJobCount,GetNewUserCount,GetActiveUserCount 接口新增 time_zone 参数以及返回类型由时间戳改为 date
+
+### Patch Changes
+
+- 410fb0e: 在文件管理的 readDirectory 接口下增加可选参数 updateAccessTime，只在文件传输功能时更新时间戳
+
 ## 1.6.0
 
 ### Minor Changes

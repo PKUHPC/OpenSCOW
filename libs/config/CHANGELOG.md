@@ -1,5 +1,11 @@
 # @scow/config
 
+## 1.4.2
+
+### Patch Changes
+
+- 3242957: 在 aiConfig 下的 harborConfig 配置中增加 protocol 配置，默认值为 "http"
+
 ## 1.4.1
 
 ### Patch Changes
