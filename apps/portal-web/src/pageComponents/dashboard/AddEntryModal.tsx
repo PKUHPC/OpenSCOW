@@ -46,6 +46,16 @@ export interface Props {
 const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  gap: 12px;
+`;
+
+const ItemContainer = styled.div`
+  cursor: pointer;
+  height: 120px;
+  min-width: 120px;
+  padding: 12px;
+
+  background-color: ${(p) => p.theme.token.colorBgBlur};
 `;
 
 const p = prefix("pageComp.dashboard.addEntryModal.");
@@ -175,34 +185,26 @@ export const AddEntryModal: React.FC<Props> = ({
         <ItemsContainer>
           {
             staticEntries.map((item, idx) => (
-              <div
-                key={idx}
-                onClick={() => { handleClick(item);
-                }}
-                style={{ cursor: "pointer" }}
-              >
+              <ItemContainer key={idx} onClick={() => { handleClick(item); }}>
                 <EntryItem
                   entryBaseName={getEntryBaseName(item, t)}
                   icon={getEntryIcon(item)}
-                  style={{ padding:"10px" }}
                 />
-              </div>
+              </ItemContainer>
             ),
             )
           }
           {
             appInfo.map((item, idx) => (
-              <div
+              <ItemContainer
                 key={idx}
                 onClick={() => { handleClick(item); }}
-                style={{ cursor: "pointer" }}
               >
                 <EntryItem
                   entryBaseName={item.name}
                   logoPath={apps[item.id].app.logoPath}
-                  style={{ padding:"10px" }}
                 />
-              </div>
+              </ItemContainer>
             ),
             )
           }

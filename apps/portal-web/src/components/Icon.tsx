@@ -51,7 +51,7 @@ const withColor = <P extends IconProps>(
     const { color, style, ...restProps } = props;
 
     const modifiedStyle: CSSProperties = {
-      color: color || "black",
+      color: color,
       ...style,
     };
 

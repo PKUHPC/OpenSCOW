@@ -10,14 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Card } from "antd";
-import { CSSProperties, forwardRef, HTMLAttributes } from "react";
+import { forwardRef, HTMLAttributes } from "react";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";
-
-const Container = styled.div`
-`;
 
 export type CardItemProps = HTMLAttributes<HTMLDivElement> & {
   draggable: boolean;
@@ -28,7 +24,7 @@ export type CardItemProps = HTMLAttributes<HTMLDivElement> & {
 
 export type EntryCardItemProps = CardItemProps & {
   entryBaseName: string,
-  entryExtraInfo?: string;
+  entryExtraInfo?: string[];
   id: string,
   icon?: string,
   logoPath?: string;
@@ -39,33 +35,41 @@ export const EntryCardItem = forwardRef<HTMLDivElement, EntryCardItemProps>
 
   return (
     <CardItem ref={ref} {...props}>
-      <EntryItem entryBaseName={entryBaseName} icon={icon} logoPath={logoPath} entryExtraInfo={entryExtraInfo} />
+      <EntryItem
+        entryBaseName={entryBaseName}
+        icon={icon}
+        logoPath={logoPath}
+        entryExtraInfo={entryExtraInfo}
+      />
+
     </CardItem>
   );
 });
 
+const CardItemContainer = styled.div<{
+  draggable?: boolean;
+  isDragging?: boolean;
+  transparent?: boolean;
+}>`
+  cursor: ${(props) => props.draggable ? (props.isDragging ? "grabbing" : "grab") : "pointer"};
+  opacity: ${((props) => props.transparent ? "0.5" : "1")};
+  transform: ${(props) => props.isDragging ? "scale(1.05)" : "scale(1)"};
+  box-shadow: ${(p) => p.theme.token.boxShadowSecondary};
+
+  background-color: ${(p) => p.theme.token.colorBgElevated};
+
+  padding: 8px;
+  height: 172px;
+  min-width: 148px;
+`;
+
 export const CardItem = forwardRef<HTMLDivElement, CardItemProps>
-(({ draggable, transparent, isDragging, style, children, ...props }, ref) => {
-  const inlineStyles: CSSProperties = {
-    cursor:draggable ?
-      isDragging ? "grabbing" : "grab"
-      : "pointer",
-    opacity: transparent ? "0.5" : "1",
-    boxShadow: isDragging ?
-      "rgb(63 63 68 / 5%) 0px 2px 0px 2px, rgb(34 33 81 / 15%) 0px 2px 3px 2px" :
-      "rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px",
-    transform: isDragging ? "scale(1.05)" : "scale(1)",
-    ...style,
-    padding: "8px",
-    height: "172px",
-  };
+(({ children, ...props }, ref) => {
 
   return (
-    <Container ref={ref} {...props}>
-      <Card style={inlineStyles}>
-        {children}
-      </Card>
-    </Container>
+    <CardItemContainer ref={ref} {...props}>
+      {children}
+    </CardItemContainer>
   );
 });
 
