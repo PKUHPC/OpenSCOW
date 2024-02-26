@@ -1,5 +1,18 @@
 # @scow/audit-server
 
+## 2.2.2
+
+### Patch Changes
+
+- 443187e: 修复数据统计相关功能时区转换问题
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+
 ## 2.2.1
 
 ### Patch Changes

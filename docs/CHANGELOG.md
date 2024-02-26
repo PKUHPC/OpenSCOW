@@ -1,5 +1,12 @@
 # @scow/docs
 
+## 1.3.1
+
+### Patch Changes
+
+- 2f7590a: 优化 AI 配置介绍的文档中部分格式与文字
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+
 ## 1.3.0
 
 ### Minor Changes

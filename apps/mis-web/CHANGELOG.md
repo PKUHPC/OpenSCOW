@@ -1,5 +1,21 @@
 # @scow/mis-web
 
+## 1.4.3
+
+### Patch Changes
+
+- efcd9a8: 修改集群监控 iframe 高度自适应
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- a56ec73: 修复平台管理页面账户消费记录搜索账户名时传参错误问题
+- 2df6de8: 创建用户，账户，租户或添加用户，白名单账户时，对 input 框输入的 用户/账户/租户名称 去掉前后空格
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
 ## 1.4.2
 
 ## 1.4.1
