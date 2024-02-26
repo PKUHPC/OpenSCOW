@@ -16,6 +16,7 @@ import { NodeSSH } from "node-ssh";
 import { Logger } from "ts-log";
 
 import { aiConfig } from "../config/ai";
+import { clusters } from "../config/clusters";
 
 const LOADED_IMAGE_REGEX = "Loaded image: ([\\w./-]+(?::[\\w.-]+)?)";
 
@@ -29,27 +30,37 @@ export function createHarborImageUrl(imageName: string, imageTag: string, userId
   return `${harborUrl}/${project}/${userId}/${imageName}:${imageTag}`;
 };
 
-
-export enum Container {
-  DOCKER = "DOCKER",
-  CONTAINER_D = "CONTAINER_D"
+export enum k8sRuntime {
+  docker = "docker",
+  containerd = "containerd"
 }
 
-// Container === Container.DOCKER的情况
-// TODO：其他容器的情况
+const runtimeCommands = {
+  [k8sRuntime.docker]: "docker",
+  [k8sRuntime.containerd]: "nerdctl",
+};
+
+export function getRuntimeCommand(clusterId: string): string {
+  const runtime = clusters[clusterId].k8s?.runtime;
+  return runtime ? runtimeCommands[runtime] : k8sRuntime.docker;
+}
 
 // 加载本地镜像
 export async function getLoadedImage({
   ssh,
   logger,
   sourcePath,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   sourcePath: string,
+  clusterId: string,
 }): Promise<string | undefined> {
 
-  const loadedResp = await loggedExec(ssh, logger, true, "docker", ["load", "-i", sourcePath]);
+  const command = getRuntimeCommand(clusterId);
+
+  const loadedResp = await loggedExec(ssh, logger, true, command, ["load", "-i", sourcePath]);
   const match = loadedResp.stdout.match(loadedImageRegex);
   return match && match.length > 1 ? match[1] : undefined;
 }
@@ -59,13 +70,18 @@ export async function getPulledImage({
   ssh,
   logger,
   sourcePath,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   sourcePath: string,
+  clusterId: string,
 }): Promise<string | undefined> {
 
-  const pulledResp = await loggedExec(ssh, logger, true, "docker", ["pull", sourcePath]);
+  const command = getRuntimeCommand(clusterId);
+
+  const pulledResp = await loggedExec(ssh, logger, true, command, ["pull", sourcePath]);
+
   return pulledResp ? sourcePath : undefined;
 }
 
@@ -75,25 +91,29 @@ export async function pushImageToHarbor({
   logger,
   localImageUrl,
   harborImageUrl,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   localImageUrl: string,
   harborImageUrl: string,
+  clusterId: string,
 }): Promise<void> {
 
-  // docker login harbor
-  await loggedExec(ssh, logger, true, "docker", ["login", harborUrl, "-u", harborUser, "-p", password]);
+  const command = getRuntimeCommand(clusterId);
 
-  // docker tag
-  await loggedExec(ssh, logger, true, "docker", ["tag", localImageUrl, harborImageUrl]);
+  // login harbor
+  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password]);
+
+  // tag
+  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
 
   // push 镜像至harbor
-  await loggedExec(ssh, logger, true, "docker", ["push", harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["push", harborImageUrl]);
 
   // 清除本地镜像
-  await loggedExec(ssh, logger, true, "docker", ["rmi", harborImageUrl]);
-  await loggedExec(ssh, logger, true, "docker", ["rmi", localImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
 }
 
 // commit制作本地镜像
@@ -103,16 +123,19 @@ export async function commitContainerImage({
   logger,
   formateContainerId,
   localImageUrl,
+  clusterId,
 }: {
   node: string,
   ssh: NodeSSH,
   logger: Logger,
   formateContainerId: string,
   localImageUrl: string,
+  clusterId: string,
 }): Promise<void> {
 
+  const command = getRuntimeCommand(clusterId);
   const resp = await loggedExec(ssh, logger, true, "sh",
-    ["-c", `docker ps --no-trunc | grep ${formateContainerId}`]);
+    ["-c", `${command} ps --no-trunc | grep ${formateContainerId}`]);
   if (!resp.stdout) {
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -121,6 +144,6 @@ export async function commitContainerImage({
   }
 
   // commit镜像
-  await loggedExec(ssh, logger, true, "docker",
+  await loggedExec(ssh, logger, true, command,
     ["commit", formateContainerId, localImageUrl]);
 }

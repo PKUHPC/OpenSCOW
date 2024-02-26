@@ -28,7 +28,7 @@ imageTag: ai-beta.1
 
 **AI 系统（beta）** 需要用户在使用时提前部署 K8S 的集群环境。
 
-当前 **AI 系统（beta）** 为试用版本，我们暂时只支持在 `docker` 容器运行时中执行镜像相关的服务，后续会陆续推出支持`ContainerD`等其他主流容器运行时的 AI 系统。
+当前 **AI 系统（beta）** 为试用版本，我们目前已经支持 `docker` 和 `containerd` 两种容器运行时的 k8s集群中使用 AI 系统。 若集群为`containerd` 运行时，需要在集群的节点上安装 [netdctl](https://github.com/containerd/nerdctl)
 
 当前试用版本中 K8S 部署的主要版本信息如下：
 

@@ -476,11 +476,19 @@ export const saveImage =
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // commit镜像
-            await commitContainerImage({ node, ssh, logger, formateContainerId, localImageUrl });
+            await commitContainerImage({
+              node,
+              ssh,
+              clusterId,
+              logger,
+              formateContainerId,
+              localImageUrl,
+            });
 
             // 保存镜像至harbor
             await pushImageToHarbor({
               ssh,
+              clusterId,
               logger,
               localImageUrl,
               harborImageUrl,
