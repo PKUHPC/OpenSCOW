@@ -294,7 +294,7 @@ export const getOperationDetail = (
           operationEvent[logEvent].desktopId,
         ]);
     case "createApp":
-      return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
+      return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
     case "createFile":
       return t(pDetails("createFile"), [operationEvent[logEvent].path]);
     case "deleteFile":

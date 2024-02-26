@@ -33,28 +33,43 @@ message Logout {
 message SubmitJob {
   string account_name = 1;
   optional uint32 job_id = 2;
-  string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message EndJob {
   uint32 job_id = 1;
-  string cluster_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message AddJobTemplate {
   string job_template_id = 1;
-  string cluster_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message DeleteJobTemplate {
   string job_template_id = 1;
-  string cluster_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message UpdateJobTemplate {
   string job_template_id = 1;
   string new_job_template_id = 2;
-  string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message ShellLogin {
@@ -65,20 +80,32 @@ message ShellLogin {
 message CreateDesktop {
   string desktop_name = 1;
   string wm = 2;
-  string cluster_id = 3;
-  string login_node = 4;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string login_node = 4;
 }
 
 message DeleteDesktop {
   uint32 desktop_id = 1;
   string login_node = 2;
-  string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateApp {
   string account_name = 1;
-  uint32 job_id = 2;
-  string cluster_id = 3;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateFile {
@@ -129,7 +156,10 @@ message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
   int64 limit_minutes = 3;
-  string cluster_id = 4;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 4;
 }
 
 message CreateUser {
