@@ -11,25 +11,16 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Button, Spin, Typography } from "antd";
+import { Button, Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Localized, prefix } from "src/i18n";
+import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
 import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
-
-const ContentContainer = styled.div`
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 20px;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const CardsContainer = styled.div`
   display: flex;
@@ -96,8 +87,6 @@ export const defaultEntry: Entry[] = [
 const p = prefix("pageComp.dashboard.quickEntry.");
 
 export const QuickEntry: React.FC<Props> = () => {
-  const t = useI18nTranslateToString();
-
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
@@ -131,25 +120,29 @@ export const QuickEntry: React.FC<Props> = () => {
     return appWithCluster;
   }, [clusters]) });
 
-  const { Title } = Typography;
-
   const [isEditable, setIsEditable] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
   return (
-    <ContentContainer>
-      <TitleContainer>
-        <Title level={5} style={{ marginBottom:0, lineHeight:"32px" }}>{t(p("quickEntry"))}</Title>
-        {isEditable ? (
+    <DashboardSection
+      style={{ marginBottom: "16px" }}
+      title={<Localized id={p("quickEntry")} />}
+      extra={
+        isEditable ? (
           <div>
             <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
-              {t(p("finish"))}
+              <Localized id={p("finish")} />
             </Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>{t(p("cancel"))}</Button>
+            <Button type="link" onClick={() => { setIsEditable(false); }}>
+              <Localized id={p("cancel")} />
+            </Button>
           </div>
-        ) :
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>{t(p("edit"))}</Button>}
-      </TitleContainer>
+        ) : (
+          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+            <Localized id={p("edit")} />
+          </Button>
+        )}
+    >
       <CardsContainer>
         {getQuickEntriesLoading || getAppsLoading ?
           <Spin /> : (
@@ -161,6 +154,6 @@ export const QuickEntry: React.FC<Props> = () => {
             ></Sortable>
           )}
       </CardsContainer>
-    </ContentContainer>
+    </DashboardSection>
   );
 };

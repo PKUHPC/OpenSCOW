@@ -24,6 +24,7 @@ import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
+import { styled } from "styled-components";
 
 interface Props {
 }
@@ -104,7 +105,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   });
 
   return (
-    <div>
+    <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
       <QuickEntry />
       <OverviewTable
@@ -112,8 +113,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
         failedClusters={data?.failedClusters ?? []}
       />
-    </div>
+    </DashboardPageContent>
   );
 });
+
+const DashboardPageContent = styled.div`
+`;
 
 export default DashboardPage;
