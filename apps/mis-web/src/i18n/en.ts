@@ -747,6 +747,7 @@ export default {
         getBillingTableErrorMessage: "Failed to retrieve cluster and partition information. "
         + "Please contact the administrator.",
         partitionInfo: "Partition Information",
+        loading: "Loading partitions...",
       },
       operationLogs: {
         userOperationLog: "User Operation Log",
