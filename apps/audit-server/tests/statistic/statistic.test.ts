@@ -30,7 +30,9 @@ const operationLog = {
   operatorUserId: "testUserId",
   operatorIp: "127.0.0.1",
   operationResult: OperationResult.SUCCESS,
-  operationEvent: { "$case": "submitJob" as const, submitJob: { accountName: "testAccount", jobId: 123 } },
+  operationEvent: { "$case": "submitJob" as const, submitJob: {
+    accountName: "testAccount", jobId: 123, clusterId: "test",
+  } },
 };
 
 beforeEach(async () => {
@@ -89,7 +91,11 @@ it("get portal usage count correctly", async () => {
     operatorIp: operationLog.operatorIp,
     operationResult: operationLog.operationResult,
     operationTime: new Date(),
-    metaData: { "$case": "submitJob" as const, submitJob: { accountName: "testAccount", jobId: 123 } },
+    metaData: { "$case": "submitJob" as const, submitJob: {
+      accountName: "testAccount",
+      jobId: 123,
+      clusterId: "test",
+    } },
   }));
 
   const endJobLogs = Array.from({ length: 20 }, () => new OperationLog({
@@ -97,7 +103,7 @@ it("get portal usage count correctly", async () => {
     operatorIp: operationLog.operatorIp,
     operationResult: operationLog.operationResult,
     operationTime: new Date(),
-    metaData: { "$case": "endJob" as const, endJob: { jobId: 123 } },
+    metaData: { "$case": "endJob" as const, endJob: { jobId: 123, clusterId: "test" } },
   }));
 
   const shellLoginLogs = Array.from({ length: 30 }, () => new OperationLog({

@@ -30,7 +30,10 @@ const operationLog = {
   operatorUserId: "testUserId",
   operatorIp: "127.0.0.1",
   operationResult: OperationResult.SUCCESS,
-  operationEvent: { "$case": "submitJob" as const, submitJob: { accountName: "testAccount", jobId: 123 } },
+  operationEvent: { "$case": "submitJob" as const, submitJob: {
+    accountName: "testAccount",
+    jobId: 123,
+    clusterId: "test" } },
 };
 
 const operationLog1 = new OperationLog({
@@ -51,6 +54,7 @@ const operationLog2 = new OperationLog({
   metaData: {
     $case: "endJob", endJob: {
       jobId:123,
+      clusterId: "test",
     },
   },
 });
@@ -249,6 +253,7 @@ it("get operation logs", async () => {
       operationEvent: {
         $case: "endJob", endJob: {
           jobId:123,
+          clusterId: "test",
         },
       },
     },

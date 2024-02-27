@@ -70,7 +70,7 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.endJob,
     operationTypePayload: {
-      jobId: +jobId, accountName: job.account,
+      jobId: +jobId, accountName: job.account, clusterId: cluster,
     },
   };
 
