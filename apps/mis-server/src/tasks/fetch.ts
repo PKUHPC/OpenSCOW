@@ -15,6 +15,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
@@ -116,28 +117,34 @@ export async function fetchJobs(
           continue;
         }
 
-        // add job charge for user account
-        const ua = await em.findOne(UserAccount, {
-          account: { accountName: pricedJob.account },
-          user: { userId: pricedJob.user },
+        const account = await em.findOne(Account, {
+          accountName: pricedJob.account,
         }, {
-          populate: ["user", "account", "account.tenant"],
+          populate: ["tenant"],
         });
 
-        if (!ua) {
+        if (!account) {
           logger.warn({ biJobIndex: pricedJob.biJobIndex },
-            "User %s in account %s is not found. Don't charge the job.", pricedJob.user, pricedJob.account);
+            "Account %s is not found. Don't charge the job.", pricedJob.account);
         }
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
-        if (ua) {
+        const metadataMap: ChargeRecord["metadata"] = {};
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
+        savedFields?.forEach((field) => {
+          metadataMap[field] = pricedJob[field];
+        });
+
+        if (account) {
           // charge account
           await charge({
             amount: pricedJob.accountPrice,
             type: misConfig.jobChargeType,
             comment,
-            target: ua.account.$,
+            target: account,
+            userId: pricedJob.user,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
           // charge tenant
@@ -145,10 +152,26 @@ export async function fetchJobs(
             amount: pricedJob.tenantPrice,
             type: misConfig.jobChargeType,
             comment,
-            target: ua.account.$.tenant.getEntity(),
+            target: account.tenant.$,
+            userId: pricedJob.user,
+            metadata: metadataMap,
           }, em, logger, clusterPlugin);
 
-          await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+          const ua = await em.findOne(UserAccount, {
+            account: { accountName: pricedJob.account },
+            user: { userId: pricedJob.user },
+          }, {
+            populate: ["user", "account"],
+          });
+
+          if (!ua) {
+            logger.warn({ biJobIndex: pricedJob.biJobIndex },
+              "User %s in account %s is not found.", pricedJob.user, pricedJob.account);
+          } else {
+            // 用户限额及相关操作
+            await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+          }
+
         }
 
         pricedJobs.push(pricedJob);

@@ -1,5 +1,37 @@
 # @scow/test-adapter
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [26bd8e7]
+  - @scow/scheduler-adapter-protos@1.3.0
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+
+## 1.1.0
+
+### Minor Changes
+
+- 135f2b1be3: 在门户系统的文件管理下，新增将文件直接作为作业文本提交调度器执行的功能，如果调度器 API 版本低于此接口版本报错
+
+### Patch Changes
+
+- Updated dependencies [135f2b1be3]
+  - @scow/scheduler-adapter-protos@1.1.0
+
 ## 1.0.1
 
 ### Patch Changes

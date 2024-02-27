@@ -1,5 +1,137 @@
 # @scow/mis-web
 
+## 1.4.3
+
+### Patch Changes
+
+- efcd9a8: 修改集群监控 iframe 高度自适应
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- a56ec73: 修复平台管理页面账户消费记录搜索账户名时传参错误问题
+- 2df6de8: 创建用户，账户，租户或添加用户，白名单账户时，对 input 框输入的 用户/账户/租户名称 去掉前后空格
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- 68447f7: mis 增加控制添加用户至账户相关配置
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- d1c2e74: UI 扩展
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+- abb7e84: 管理系统新增集群监控功能
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- e6efacf: 修复解封账户时错误提示是变量的问题
+- 5144723: 管理系统的租户管理和平台管理中的账户列表新增拥有者姓名或 id 搜索项
+- Updated dependencies [081fbcf]
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/lib-operation-log@2.1.0
+  - @scow/config@1.4.0
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- 1a1189ad48: 管理系统 AllUserTable 恢复计数接口并且新增筛选参数
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-web@1.2.3
+  - @scow/lib-operation-log@2.0.4
+  - @scow/protos@1.0.4
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.2
+
+### Patch Changes
+
+- d383f8fa94: 更新至 next 14
+- 63c6fd5d4b: 管理系统充值列表传参优化，删除多余参数，统一为 searchType 控制
+- Updated dependencies [d383f8fa94]
+  - @scow/lib-web@1.2.2
+  - @scow/protos@1.0.3
+  - @scow/lib-operation-log@2.0.3
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.1
+
+### Patch Changes
+
+- 7afd8a7225: 修复平台管理员无法进入创建租户页面的权限问题
+- Updated dependencies [b84e4f9cc4]
+  - @scow/lib-web@1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 35e026be3e: 修改获取消费记录方式为分别获取当前页面详细记录及消费记录的总量，总额。在 ChargeRecord 实体中添加(time,type,account_name,tenant_name)的复合索引,索引名 query_info
+- 135f2b1be3: 在门户系统的文件管理下，新增将文件直接作为作业文本提交调度器执行的功能，如果调度器 API 版本低于此接口版本报错
+- a78a6e0b56: 操作日志新增操作内容模糊搜索功能
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+
+### Patch Changes
+
+- 99d01eb605: 适应 scow slurm 适配器仅可取消提交当前作业用户的作业
+- 3e13a35d2d: 移出用户前增加用户是否有运行中作业的判断
+- 62c7f32eb3: 优化 web 端 table，调整列的宽度以百分比固定，使其在大屏/小屏下展示更友好
+- e20be6f9f1: 修改充值页面时间筛选与账户/租户筛选交互不一致问题。修改为只有当点击搜索时才发起查询请求。
+- a3d2f44af6: 门户及管理系统所有显示集群的地方按照集群中配置的优先级进行排序
+- 3bb178aebd: 修改页面表格默认显示数量为 50
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/utils@1.1.0
+  - @scow/lib-web@1.2.0
+  - @scow/protos@1.0.2
+  - @scow/lib-operation-log@2.0.2
+  - @scow/rich-error-model@2.0.0
+
 ## 1.1.0
 
 ### Minor Changes

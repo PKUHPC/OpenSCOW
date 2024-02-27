@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "Management System",
+    linkTextMis: "Management System",
+    linkTextAI: "SCOW AI",
   },
   // routes
   routes: {
@@ -31,7 +32,12 @@ export default {
       appSessions: "Created Apps",
       createApp: "Create App",
     },
-    file: "File Management",
+    file: {
+      fileManager: "File Manager",
+      crossClusterFileTransfer: "File Transfer",
+      clusterFileManager: "Cluster File Manager",
+      transferProgress: "Transfer Progress",
+    },
   },
   // button
   button: {
@@ -60,6 +66,8 @@ export default {
         oldPassword: "Old Password",
         newPassword: "New Password",
         confirm: "Confirm Password",
+        userNotExist:"User Not Exist",
+        unavailable:"This feature is not available in the current configuration",
       },
     },
     // job
@@ -190,6 +198,50 @@ export default {
       },
     },
     fileManagerComp: {
+      clusterFileTable: {
+        fileName: "File Name",
+        modificationDate: "Modification Date",
+        size: "Size",
+        permission: "Permission",
+        notShowHiddenItem: "Do not show hidden items",
+        showHiddenItem: "Show hidden items",
+      },
+      singleCrossClusterTransferSelector: {
+        placeholder: "Please select a cluster",
+      },
+      transferInfoTable: {
+        srcCluster: "Source Cluster",
+        dstCluster: "Destination Cluster",
+        file: "File",
+        transferCount: "Transfer Count",
+        transferSpeed: "Transfer Speed",
+        timeLeft: "Time Remaining",
+        currentProgress: "Current Progress",
+        operation: "Operation",
+        confirmCancelTitle: "Confirm Cancellation",
+        confirmCancelContent: "Are you sure you want to cancel the transfer of the file {} from {} to {}?",
+        confirmOk: "Confirm",
+        cancelSuccess: "Cancellation Successful",
+        cancel: "Cancel",
+      },
+      fileEditModal: {
+        edit: "Edit",
+        prompt: "Prompt",
+        save: "Save",
+        doNotSave: "Do Not Save",
+        notSaved: "Not Saved",
+        notSavePrompt: "The file has not been saved, do you want to save this file?",
+        fileEdit: "File Edit",
+        filePreview: "File Preview",
+        fileLoading: "File is loading...",
+        exitEdit: "Exit Edit Mode",
+        failedGetFile: "Failed to get file: {}",
+        cantReadFile: "Cannot read file: {}",
+        saveFileFail: "File save failed: {}",
+        saveFileSuccess: "File saved successfully",
+        fileSizeExceeded: "File too large (maximum {}), please download and edit",
+        fileFetchAbortPrompt: "Fetch {} operation was aborted",
+      },
       createFileModal: {
         createErrorMessage: "File or directory with the same name already exists!",
         createSuccessMessage: "Created successfully",
@@ -198,6 +250,9 @@ export default {
         fileName: "File Name",
       },
       fileManager: {
+        preview: {
+          cantPreview: "File too large (maximum {}) or format not supported, please download to view",
+        },
         moveCopy: {
           copy: "Copy",
           move: "Move",
@@ -225,9 +280,8 @@ export default {
           paste: "Paste Here",
           operationStarted: "{} in progress, completed: ",
           operationNotStarted: "Selected {} {} items",
-          hidden: "Hidden",
-          notHidden: "Show",
-          hiddenItem: "Hidden Items",
+          notShowHiddenItem: "Do not Show Hidden Items",
+          showHiddenItem: "Show Hidden Items",
           openInShell: "Open in Terminal",
           createFile: "New File",
           mkDir: "New Directory",
@@ -238,6 +292,9 @@ export default {
           deleteConfirmOk: "Confirm",
           deleteSuccessMessage: "Deleted successfully",
           submitConfirmTitle: "Submit Confirmation",
+          submitConfirmNotice: "Please ensure that the script file specifies a valid absolute path "
+          + "as its working directory. If a working directory is not specified, the directory containing "
+          + "the script file will be designated as the default working directory.",
           submitConfirmContent: "Confirm submission of {} to {}?",
           submitConfirmOk: "Confirm",
           submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
@@ -366,6 +423,54 @@ export default {
         appCommentTitle: "Explanation",
       },
     },
+    dashboard:{
+      addEntryModal:{
+        addQuickEntry:"addQuickEntry",
+        cancel:"cancel",
+      },
+      changeClusterModal:{
+        selectCluster:"selectCluster",
+        cluster:"cluster",
+        loginNode:"loginNode",
+      },
+      quickEntry:{
+        quickEntry:"quickEntry",
+        finish:"finish",
+        cancel:"cancel",
+        edit:"edit",
+      },
+      sortable:{
+        alreadyExist:"The quickEntry already exists",
+        exceedMaxSize:"Up to 10 quickEntries can be added",
+        saveFailed:"save Failed",
+        saveSuccessfully:"save Succeeded",
+      },
+      overviewTable:{
+        title:"platform overview",
+        clusterName:"clusterName",
+        partitionName:"partitionName",
+        nodeCount:"nodeCount",
+        pendingJobCount:"pendingJobCount",
+        cpuUsage:"cpuUsage",
+        gpuUsage:"gpuUsage",
+        usageRatePercentage:"usageRatePercentage",
+        partitionStatus:"partitionStatus",
+        available:"available",
+        notAvailable:"notAvailable",
+      },
+      infoPanes:{
+        nodeInfo:"nodeInfo",
+        node:"node",
+        resourceInfo:"resourceInfo",
+        core:"core",
+        running:"running",
+        idle:"idle",
+        notAvailable:"notAvailable",
+        card:"card",
+        job:"job",
+        pending:"pending",
+      },
+    },
   },
   component: {
     errorPages: {
@@ -411,6 +516,16 @@ export default {
         subTitle: "The requested cluster does not exist",
         title: "File Management",
       },
+      fileTransfer: {
+        confirmTransferTitle: "Confirm to start transfer?",
+        confirmTransferContent: "Are you sure to transfer from {} to {}?",
+        confirmOk: "Confirm",
+        transferStartInfo: "Transfer task has started",
+        transferTitle: "Cross-cluster file transfer",
+      },
+      currentTransferInfo: {
+        checkTransfer: "Check file transfer progress",
+      },
     },
     jobs: {
       allJobs: {
@@ -451,11 +566,14 @@ export default {
         popoverContent3: "Download a file",
         popoverContentFile: "File Name",
         popoverContent4: "By entering",
-        popoverContent5: ", the file in your current path will be downloaded locally. Relative paths "
-        + "are not supported at the moment.",
-        popoverContent6: "If you need to download files from other directories, please use",
+        popoverContent5: ", the file in your current path will be downloaded locally. ",
+        popoverContent6: "Relative paths are not supported at the moment. "
+        + "If you need to download or edit files from other directories, please use",
         popoverContent7: "command to navigate to the file system.",
         popoverContent8: "Usage example: ",
+        popoverContent9: "Edit a file",
+        popoverContent10: "After entering the command ",
+        popoverContent11: ", you will be redirected to a file editing page where you can edit the specified file. ",
         command: "Command",
       },
       index: {
@@ -466,8 +584,8 @@ export default {
     _app: {
       sshError: "Unable to connect as a user to the login node. Please make sure the permissions "
       + "of your home directory are 700, 750, or 755.",
-      textExceedsLength:"There are too many welcome messages for terminal login."
-                         + "Please reduce unnecessary information output!",
+      textExceedsLength:"There are too many terminal login prompts. "
+                        + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
     },

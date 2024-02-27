@@ -1,5 +1,129 @@
 # @scow/mis-server
 
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-hook@1.0.8
+  - @scow/lib-scheduler-adapter@1.1.6
+
+## 1.4.2
+
+### Patch Changes
+
+- 448f6bf: 之前升级 mikroORM 时 cascade: [Cascade.ALL]属性会在删除 UserAccount 时把 User 和 Account 也删掉
+
+## 1.4.1
+
+### Patch Changes
+
+- 186c359: 适配 mikro-orm 更新会修改 ref 字段默认为 null
+- afc3350: charge_record 表增加字段 user_id 及 metadata, 以及增加了 time,tenant,account,user_id,type 各字段的索引
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-hook@1.0.7
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/lib-scheduler-adapter@1.1.5
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- 9059919: 添加外部自定义认证系统
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-hook@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-hook@1.0.5
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+
+## 1.2.3
+
+### Patch Changes
+
+- 1a1189ad48: 管理系统 AllUserTable 恢复计数接口并且新增筛选参数
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-hook@1.0.4
+  - @scow/lib-server@1.1.1
+  - @scow/protos@1.0.4
+  - @scow/lib-scheduler-adapter@1.1.2
+
+## 1.2.2
+
+### Patch Changes
+
+- 5b9116e3bd: hook(accountPaid、tenantPaid)增加的传参 type,、comment
+  - @scow/protos@1.0.3
+  - @scow/lib-hook@1.0.3
+  - @scow/lib-scheduler-adapter@1.1.1
+  - @scow/lib-server@1.1.0
+
+## 1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 35e026be3e: 修改获取消费记录方式为分别获取当前页面详细记录及消费记录的总量，总额。在 ChargeRecord 实体中添加(time,type,account_name,tenant_name)的复合索引,索引名 query_info
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+
+### Patch Changes
+
+- 3e13a35d2d: 移出用户前增加用户是否有运行中作业的判断
+- af6a53dfcf: portal-server,auth,mis-server,audit-server 下 pino 日志的时间格式修改为八时区下的 YYYY-MM-DD HH:mm:ss
+- 3bb178aebd: 修改页面表格默认显示数量为 50
+- 438cf1aba4: 修改账户计费逻辑，由根据用户账户关系计算改为根据账户计算
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/scheduler-adapter-protos@1.1.0
+  - @scow/lib-scheduler-adapter@1.1.0
+  - @scow/utils@1.1.0
+  - @scow/lib-server@1.1.0
+  - @scow/protos@1.0.2
+  - @scow/lib-hook@1.0.2
+
 ## 1.1.0
 
 ### Minor Changes

@@ -15,6 +15,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
+import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
@@ -108,9 +109,6 @@ export const appOps = (cluster: string): AppOps => {
         await ssh.mkdir(lastSubmissionDirectory);
 
         const sftp = await ssh.requestSFTP();
-
-        const getEnvVariables = (env: Record<string, string>) =>
-          Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
 
         const submitAndWriteMetadata = async (request: SubmitJobRequest) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
@@ -314,6 +312,10 @@ export const appOps = (cluster: string): AppOps => {
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
+            // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
+            await sftpReaddir(sftp)(jobDir);
+
             if (app.type === "web") {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
@@ -330,8 +332,6 @@ export const appOps = (cluster: string): AppOps => {
             // try to find the output file and try to parse the display number
               const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
               if (await sftpExists(sftp, vncSessionInfoPath)) {
-                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
-
                 const outputFilePath = join(jobDir, VNC_OUTPUT_FILE);
                 if (await sftpExists(sftp, outputFilePath)) {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
@@ -342,7 +342,16 @@ export const appOps = (cluster: string): AppOps => {
                   // ignored if displayId cannot be parsed
                   }
                 }
+
+                host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
+                port = port;
               }
+            }
+            const client = getAdapterClient(cluster);
+            const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+            if (connectionInfo?.response?.$case === "appConnectionInfo") {
+              host = connectionInfo.response.appConnectionInfo.host;
+              port = connectionInfo.response.appConnectionInfo.port;
             }
           }
 
@@ -394,12 +403,22 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
+        const client = getAdapterClient(cluster);
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          return {
+            appId: sessionMetadata.appId,
+            host: connectionInfo.response.appConnectionInfo.host,
+            port: connectionInfo.response.appConnectionInfo.port,
+            password: connectionInfo.response.appConnectionInfo.password,
+          };
+        }
+
         if (app.type === "web") {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
-
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as {[key: string]: string};
             const ip = await getIpFromProxyGateway(cluster, HOST, logger);
@@ -412,6 +431,7 @@ export const appOps = (cluster: string): AppOps => {
             };
           }
         } else {
+
           // for vnc apps,
           // try to find the output file and try to parse the display number
           const vncSessionInfoPath = join(jobDir, VNC_SESSION_INFO);
@@ -445,7 +465,6 @@ export const appOps = (cluster: string): AppOps => {
                     const { password, ip } =
                       await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
                     return {
-                      code: "OK",
                       appId: sessionMetadata.appId,
                       host: ip || host,
                       port: displayIdToPort(displayId!),

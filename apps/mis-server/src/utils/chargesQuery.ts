@@ -91,3 +91,39 @@ export const getChargesSearchType = (type: string | undefined) => {
 
   return searchType;
 };
+
+
+/**
+ *
+ * @param target
+ * case tenant:返回这个租户（tenantName）的充值记录
+ * case allTenants: 返回所有租户充值记录
+ * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+ * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+ * @returns searchParam:  { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } }
+ */
+export const getPaymentsTargetSearchParam = (target:
+| { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
+| { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
+| { $case: "tenant"; tenant: TenantTarget }
+| { $case: "allTenants"; allTenants: AllTenantsTarget }) => {
+  let searchParam: { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } } = {};
+  switch (target?.$case)
+  {
+  case "tenant":
+    searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
+    break;
+  case "allTenants":
+    searchParam = { accountName:undefined };
+    break;
+  case "accountOfTenant":
+    searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };
+    break;
+  case "accountsOfTenant":
+    searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
+    break;
+  default:
+    break;
+  }
+  return searchParam;
+};

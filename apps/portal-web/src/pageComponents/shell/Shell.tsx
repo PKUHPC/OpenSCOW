@@ -14,7 +14,7 @@ import { debounce } from "@scow/lib-web/build/utils/debounce";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
-import { ShellInputData, ShellOutputData } from "src/pages/api/shell";
+import { ShellInputData, ShellOutputData } from "src/server/setup/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
@@ -39,6 +39,8 @@ const OPEN_FILE = "This command is only valid for SCOW web shells";
 const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
 const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
 const DOWNLOAD_FILE_SUFFIX = " in directory ";
+const EDIT_FILE_PREFIX = "SCOW is redirecting to the editor for the file ";
+const EDIT_FILE_SUFFIX = " in directory ";
 
 export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
@@ -46,7 +48,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
   useEffect(() => {
     if (container.current) {
-
       const term = new Terminal({
         cursorBlink: true,
       });
@@ -74,7 +75,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
       );
 
       socket.onopen = () => {
-
         term.clear();
 
         const send = (data: ShellInputData) => {
@@ -97,6 +97,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
         });
       };
 
+
+
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
@@ -116,6 +118,11 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
               const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
               window.location.href = urlToDownload(cluster, join(path, file), true);
+            } else if (result.includes(EDIT_FILE_PREFIX)) {
+              const fileStartIndex = result.search(EDIT_FILE_PREFIX);
+              const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
+              const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
+              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
             }
           }
           term.write(data);
@@ -125,7 +132,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
           term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
           break;
         }
-
       };
 
       return () => {

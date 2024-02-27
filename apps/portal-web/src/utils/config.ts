@@ -12,10 +12,11 @@
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
-import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -38,10 +39,6 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
-  HOME_TEXTS: {[hostname: string]: string };
-
-  HOME_TITLES: {[hostname: string]: string };
-
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -49,10 +46,10 @@ export interface ServerRuntimeConfig {
   AUDIT_CONFIG: AuditConfigSchema | undefined;
 
   SERVER_I18N_CONFIG_TEXTS: {
-    defaultHomeTitle: I18nStringType,
-    defaultHomeText: I18nStringType,
     submitJopPromptText?: I18nStringType,
   }
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
@@ -68,6 +65,8 @@ export interface PublicRuntimeConfig {
 
   MIS_URL: string | undefined;
 
+  AI_URL: string | undefined;
+
   CLUSTERS: Cluster[];
 
   CLUSTER_SORTED_ID_LIST: string[];
@@ -79,6 +78,10 @@ export interface PublicRuntimeConfig {
   BASE_PATH: string;
   // 上传（请求）文件的大小限制
   CLIENT_MAX_BODY_SIZE: string;
+
+  FILE_EDIT_SIZE: string | undefined;
+
+  FILE_PREVIEW_SIZE: string | undefined;
 
   PUBLIC_PATH: string;
 
@@ -94,6 +97,9 @@ export interface PublicRuntimeConfig {
     passwordPatternMessage: I18nStringType | undefined,
   }
 
+  SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
+
+  UI_EXTENSION?: { url: string; }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

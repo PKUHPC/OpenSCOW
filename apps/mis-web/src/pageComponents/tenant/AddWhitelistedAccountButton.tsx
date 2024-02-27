@@ -44,7 +44,7 @@ const NewAccountModal: React.FC<ModalProps> = ({
     const { accountName, comment } = await form.validateFields();
     setLoading(true);
 
-    await api.whitelistAccount({ body: { accountName, comment } })
+    await api.whitelistAccount({ body: { accountName: accountName.trim(), comment } })
       .httpError(404, () => {
         message.error(t(p("notExist")));
       })

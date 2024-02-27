@@ -54,27 +54,25 @@ loginDesktop:
 # 是否启用交互式任务功能
 apps: true
 
-# 主页标题
-homeTitle: 
-  # 默认文本
-  defaultText: "Super Computing on Web"
-  # 从不同域名访问，显示的不同的文本
-  hostnameMap: 
-    a.com: "a.com's SCOW Deployment"
-
-# 主页文本
-homeText: 
-  # 默认文本
-  defaultText: "SCOW"
-  # 从不同域名访问，显示的不同的文本
-  hostnameMap: 
-    a.com: "a.com's SCOW"
-
 # 提交作业命令框中的提示语，可选配置
 submitJobPromptText: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准"
 
 # 是否启用终端功能
 shell: true
+
+# # 文件管理
+# file:
+#   # 文件预览功能
+#   preview:
+#     # 大小限制
+#     # 可接受的格式为nginx的client_max_body_size可接受的值，默认为 50m
+#     limitSize: "50m"
+#   # 文件编辑功能
+#   edit:
+#     # 文件编辑大小限制
+#     # 可接受的格式为nginx的client_max_body_size可接受的值，默认为 1m
+#     # 建议设置为较大值
+#     limitSize: "1m"
 
 # 提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录
 # submitJobDefaultPwd: scow/jobs/{{ name }}

@@ -11,7 +11,8 @@
  */
 
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Form, Input, InputNumber, message, Popconfirm, Select, Space, Table } from "antd";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -219,6 +220,9 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
+  // 非用户页面或者用户页面且用户允许修改作业时限
+  const changeJobLimitEnabled = showUser || (!showUser && publicConfig.CHANGE_JOB_LIMIT.allowUser);
+
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -227,11 +231,13 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
       {selection ? (
         <TableTitle>
           <Space>
-            <BatchChangeJobTimeLimitButton
-              data={selection.selected}
-              disabled={isLoading || selection.selected.length === 0}
-              reload={reload}
-            />
+            {changeJobLimitEnabled && (
+              <BatchChangeJobTimeLimitButton
+                data={selection.selected}
+                disabled={isLoading || selection.selected.length === 0}
+                reload={reload}
+              />
+            )}
           </Space>
         </TableTitle>
       ) : undefined}
@@ -250,7 +256,10 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
         } : {})}
         dataSource={data}
         loading={isLoading}
-        pagination={{ showSizeChanger: true }}
+        pagination={{
+          showSizeChanger: true,
+          defaultPageSize: DEFAULT_PAGE_SIZE,
+        }}
         rowKey={runningJobId}
         scroll={{ x: data?.length ? 1800 : true }}
         tableLayout="fixed"
@@ -319,12 +328,14 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               >
                 <a>{t(p("finishJobButton"))}</a>
               </Popconfirm>
-              <ChangeJobTimeLimitModalLink
-                reload={reload}
-                data={[r]}
-              >
-                {t(p("changeLimit"))}
-              </ChangeJobTimeLimitModalLink>
+              {changeJobLimitEnabled && (
+                <ChangeJobTimeLimitModalLink
+                  reload={reload}
+                  data={[r]}
+                >
+                  {t(p("changeLimit"))}
+                </ChangeJobTimeLimitModalLink>
+              )}
             </Space>
           )}
         />

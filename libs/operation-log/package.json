@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-operation-log",
-  "version": "2.0.1",
+  "version": "2.1.2",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -16,8 +16,8 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.6",
-    "@grpc/grpc-js": "1.9.5",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@grpc/grpc-js": "1.9.14",
     "@scow/protos": "workspace:*"
   },
   "devDependencies": {

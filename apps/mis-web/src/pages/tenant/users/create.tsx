@@ -62,7 +62,7 @@ const CreateUserPageForm: React.FC = () => {
           : t(p("userNotExistAuthMessage")),
         okText: t("common.ok"),
         onOk: async () => {
-          await api.createUser({ body: { email, identityId, name, password } })
+          await api.createUser({ body: { email, identityId, name: name.trim(), password } })
             .httpError(409, () => {
               modal.error({
                 title: t("common.addFail"),

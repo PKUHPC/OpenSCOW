@@ -15,7 +15,10 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
 import { JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
 import { JobInfo } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
@@ -24,6 +27,8 @@ import { range } from "src/utils/array";
 import { reloadEntities } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
+
+dayjs.extend(utc);
 
 let server: Server;
 let em: SqlEntityManager;
@@ -47,7 +52,7 @@ afterEach(async () => {
 
 const mockOriginalJobData = (
   ua: UserAccount,
-  tenantPrice: Decimal, accountPrice: Decimal,
+  tenantPrice: Decimal, accountPrice: Decimal, submitTime?: Date,
 ) => new JobInfo({ cluster: "pkuhpc", ...{
   "jobId": 5119061,
   "account": ua.account.getProperty("accountName"),
@@ -57,8 +62,8 @@ const mockOriginalJobData = (
   "name": "CoW",
   "state": "COMPLETED",
   "workingDirectory": "",
-  "submitTime": "2020-04-23T22:23:00.000Z",
-  "startTime": "2020-04-23T22:25:12.000Z",
+  "submitTime": submitTime ? submitTime.toISOString() : "2020-04-23T22:23:00.000Z",
+  "startTime": submitTime ? submitTime.toISOString() : "2020-04-23T22:25:12.000Z",
   "endTime": "2020-04-23T23:18:02.000Z",
   "gpusAlloc": 0,
   "cpusReq": 32,
@@ -69,7 +74,7 @@ const mockOriginalJobData = (
   "nodesAlloc": 1,
   "timeLimitMinutes": 7200,
   "elapsedSeconds": 3170,
-  "timeWait": 132,
+  "timeWait": submitTime ? 0 : 132,
   "qos": "normal",
   "recordTime": new Date("2020-04-23T23:49:50.000Z"),
 } }, data.tenant.name, {
@@ -139,11 +144,11 @@ it("changes job prices", async () => {
   expect(data.accountB.balance.toNumber()).toBe(prevBBalance.plus(4 - 1.6).toNumber());
 });
 
-it("returns 10 jobs if pageSize is undefined or 0", async () => {
+it("returns 50 jobs if pageSize is undefined or 0", async () => {
 
   const em = server.ext.orm.em.fork();
 
-  await em.persistAndFlush(range(1, 20).map((_) =>
+  await em.persistAndFlush(range(1, 60).map((_) =>
     mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10))));
 
   const test = async (pageSize?: number) => {
@@ -155,9 +160,9 @@ it("returns 10 jobs if pageSize is undefined or 0", async () => {
       pageSize,
     });
 
-    expect(reply.jobs).toHaveLength(10);
-    expect(moneyToNumber(reply.totalAccountPrice!)).toBe(190);
-    expect(moneyToNumber(reply.totalTenantPrice!)).toBe(380);
+    expect(reply.jobs).toHaveLength(50);
+    expect(moneyToNumber(reply.totalAccountPrice!)).toBe(590);
+    expect(moneyToNumber(reply.totalTenantPrice!)).toBe(1180);
   };
 
   await Promise.all([test(0), test()]);
@@ -193,7 +198,7 @@ it("returns jobs starting from start_bi_job_index", async () => {
 
 });
 
-it("returns 0 job if Accout not exist or is not in scope of permissions", async () => {
+it("returns 0 job if Account not exist or is not in scope of permissions", async () => {
   const em = server.ext.orm.em.fork();
 
   await em.persistAndFlush(range(1, 20).map((_) =>
@@ -216,4 +221,85 @@ it("returns 0 job if Accout not exist or is not in scope of permissions", async 
     test({ tenantName: data.tenant.name, userId: "a", accountName: "hpcb", clusters: []}),
   ]);
 
+});
+
+it("get Top Submit Job Users correctly", async () => {
+  const em = server.ext.orm.em.fork();
+
+  const today = dayjs();
+
+  const userAJobs = range(0, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.toDate()));
+  const userBJobs = range(0, 30).map((_) =>
+    mockOriginalJobData(data.uaBB, new Decimal(20), new Decimal(10), today.toDate()));
+  const userCJobs = range(0, 40).map((_) =>
+    mockOriginalJobData(data.uaCC, new Decimal(20), new Decimal(10), today.toDate()));
+  await em.persistAndFlush([...userAJobs, ...userBJobs, ...userCJobs]);
+
+  const client = createClient();
+  const reply = await asyncClientCall(client, "getTopSubmitJobUsers", {
+    startTime: today.startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+  });
+
+  expect(reply.results).toMatchObject([
+    { userId: data.userC.userId, count: 40 },
+    { userId: data.userB.userId, count: 30 },
+    { userId: data.userA.userId, count: 20 },
+  ]);
+
+});
+
+it("get new job count correctly in UTC+8 timezone", async () => {
+
+  const today = dayjs();
+
+  const yesterday = today.clone().subtract(1, "day");
+
+  const twoDaysBefore = today.clone().subtract(2, "day");
+
+  const threeDaysBofre = today.clone().subtract(3, "day");
+
+
+  const todayJobs = range(0, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.toDate()));
+  const yesterdayJobs = range(0, 30).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), yesterday.toDate()));
+  const twoDaysBeforeJobs = range(0, 15).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), twoDaysBefore.toDate()));
+  const threeDaysBeforeJobs = range(0, 1).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), threeDaysBofre.toDate()));
+  await em.persistAndFlush([...todayJobs, ...yesterdayJobs, ...twoDaysBeforeJobs, ...threeDaysBeforeJobs]);
+
+  const client = createClient();
+  const reply = await asyncClientCall(client, "getNewJobCount", {
+    startTime: today.clone().subtract(3, "day").startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+    timeZone: "Asia/Shanghai",
+  });
+
+  const todayInUtcPlus8 = today.utcOffset(8);
+  const yesterdayInUtcPlus8 = yesterday.utcOffset(8);
+  const twoDaysBeforeInUtcPlus8 = twoDaysBefore.utcOffset(8);
+  const threeDaysBeforeInUtcPlus8 = threeDaysBofre.utcOffset(8);
+
+  expect(reply.results).toMatchObject([
+    {
+      date: dayjsToDateMessage(todayInUtcPlus8),
+      count: 20,
+    },
+    {
+      date: dayjsToDateMessage(yesterdayInUtcPlus8),
+      count: 30,
+    },
+    {
+      date: dayjsToDateMessage(twoDaysBeforeInUtcPlus8),
+      count: 15,
+    },
+    {
+      date: dayjsToDateMessage(threeDaysBeforeInUtcPlus8),
+      count: 1,
+    },
+
+  ]);
 });

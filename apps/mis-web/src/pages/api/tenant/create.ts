@@ -13,7 +13,8 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { getLanguageCookie } from "@scow/lib-web/build/utils/languages";
+import { getCapabilities } from "@scow/lib-auth";
+import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -21,7 +22,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { getUserIdRule } from "src/utils/createUser";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
@@ -57,7 +58,8 @@ export const CreateTenantSchema = typeboxRouteSchema({
       message: Type.String(),
     }),
 
-    500: Type.Null(),
+    /** 本功能在当前配置下不可用。 */
+    501: Type.Null(),
   },
 });
 
@@ -65,9 +67,15 @@ const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig
 
 export default /* #__PURE__*/typeboxRoute(CreateTenantSchema, async (req, res) => {
 
+  const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+  if (!ldapCapabilities.createUser) {
+    return { 501: null };
+  }
+
   const { tenantName, userId, userName, userEmail, userPassword } = req.body;
 
-  const languageId = getLanguageCookie(req);
+  const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+
   const userIdRule = getUserIdRule(languageId);
 
   const auth = authenticate((u) =>

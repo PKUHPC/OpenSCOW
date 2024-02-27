@@ -48,12 +48,12 @@ export type DesktopInfo = Desktop & { host: string };
  */
 export async function getUserDesktopsFilePath(
   ssh: NodeSSH,
-  cluser: string,
+  cluster: string,
   userId: string,
   logger: Logger,
 ): Promise<string> {
   const userHomeDir = await getUserHomedir(ssh, userId, logger);
-  const desktopDir = getDesktopConfig(cluser).desktopsDir;
+  const desktopDir = getDesktopConfig(cluster).desktopsDir;
   const userDesktopDir = join(userHomeDir, desktopDir);
   // make sure desktopsDir exists
   await executeAsUser(ssh, userId, logger, true, "mkdir", ["-p", userDesktopDir]);

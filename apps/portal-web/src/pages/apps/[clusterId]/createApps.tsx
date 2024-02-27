@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -22,7 +22,7 @@ import { CreateAppsTable } from "src/pageComponents/app/CreateAppsTable";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
-export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
+export const CreateAppsIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const languageId = useI18n().currentLanguage.id;
 
@@ -53,5 +53,4 @@ export const CreatAppsIndexPage: NextPage = requireAuth(() => true)(() => {
     </div>
   );
 });
-
-export default CreatAppsIndexPage;
+export default CreateAppsIndexPage;

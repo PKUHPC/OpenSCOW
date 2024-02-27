@@ -26,14 +26,20 @@ export const config = envConfig({
   MIS_PATH: str({ desc: "管理系统路径", default: "/mis" }),
   MIS_PATH_INTERNAL_URL: str({ desc: "管理系统内部路径", default: "http://mis-web:3000" }),
 
+  AI_PATH: str({ desc: "AI系统路径", default: "/ai" }),
+  AI_PATH_INTERNAL_URL: str({ desc: "门户系统内部路径", default: "http://ai:3000" }),
+
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 
-  AUTH_INTERNAL_URL: str({ desc: "认证服务内部地址", default: "http://auth:5000" }),
+  AUTH_URL: str({ desc: "认证服务地址", default: "http://auth:5000" }),
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
 
   PUBLIC_DIR: str({ desc: "静态文件在文件系统中的路径。以/结尾", default: "/app/apps/gateway/public/" }),
   PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
+
+  ALLOWED_SERVER_NAME: str({ desc: "允许访问的域名或 IP，多个域名和 IP 间用空格隔开", default: "_" }),
+  DEFAULT_SERVER_BLOCK: str({ desc: "当配置了ALLOWED_SERVER_NAME为特定IP或域名时，设置默认服务块拒绝其他访问", default: "" }),
 });
 

@@ -56,8 +56,11 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 # 进入数据库
 ./cli db
 
-# 将示例配置文件放到当前目录下
+# 将最简版本的示例配置文件放到当前目录下
 ./cli init
+
+# 将全版本的示例配置文件放到当前目录下
+./cli init -f
 
 # 查看当前使用install.yaml的内容
 ./cli view-install

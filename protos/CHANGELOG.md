@@ -1,5 +1,60 @@
 # @scow/grpc-api
 
+## 1.7.0
+
+### Minor Changes
+
+- 443187e: GetDailyCharge,GetDailyPay,GetNewJobCount,GetNewUserCount,GetActiveUserCount 接口新增 time_zone 参数以及返回类型由时间戳改为 date
+
+### Patch Changes
+
+- 410fb0e: 在文件管理的 readDirectory 接口下增加可选参数 updateAccessTime，只在文件传输功能时更新时间戳
+
+## 1.6.0
+
+### Minor Changes
+
+- afc3350: charge 接口增加可选入参 user_id,metadata, 消费记录查询接口增加查询参数 user_ids,增加返回值 user_id 与 metadata
+
+## 1.5.0
+
+### Minor Changes
+
+- f023d52: 新增数据统计接口，audit 新增 GetActiveUserCount，GetPortalUsageCount，GetMisUsageCount, server 新增 GetTopChargeAccount，GetDailyCharge，GetTopPayAccount，GetDailyPay，GetStatisticInfo，GetTopSubmitJobUsers，GetNewJobCount，GetJobTotalCount，GetNewUserCount
+- 081fbcf: server 新增 Export Service, 新增 ExportAccount, ExportUser, ExportChargeRecord, ExportPayRecord 接口，audit-server 新增 ExportOperationLog 接口
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+
+## 1.4.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+## 1.3.1
+
+### Patch Changes
+
+- 1a1189ad48: GetPlatformUsersCounts 新增 id_or_name 参数
+
+## 1.3.0
+
+### Minor Changes
+
+- 5b9116e3bd: hook(accountPaid、tenantPaid) 增加的传参 type,、comment
+
+## 1.2.0
+
+### Minor Changes
+
+- 135f2b1be3: 新增 submitFileAsJob 接口，直接把文件作为作业提交调度器执行
+- 35e026be3e: 标记原有 getChargeRecords 接口为已过时，将在下一个大版本发布后被删除，新增 getPaginatedChargeRecords 与 getChargeRecordsTotalCount 接口，分别获取当前消费记录页面的详细信息与消费记录的总量，总额
+- f6f84b6d60: 管理系统未结束作业新增结束操作
+- a78a6e0b56: GetOperationLogs 新增 operation_detail 传参用于模糊搜索
+
 ## 1.1.0
 
 ### Minor Changes

@@ -50,7 +50,12 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
 
   const { cluster, jobId } = req.query;
 
-  const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
+  const { job, jobAccessible } = await checkJobAccessible({
+    actionType: "cancelJob",
+    jobId,
+    cluster,
+    info,
+  });
 
   if (jobAccessible === "NotAllowed") {
     return { 403: null };
@@ -69,8 +74,9 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     },
   };
 
+  // Cancel the job for the user who submitted the job
   return asyncUnaryCall(client, "cancelJob", {
-    jobId: +jobId, userId: info.identityId, cluster,
+    jobId: +jobId, userId: job.user, cluster,
   }).then(async () => {
     await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };

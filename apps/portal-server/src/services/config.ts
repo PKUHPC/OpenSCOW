@@ -12,11 +12,15 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/protos/build/common/config";
+import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
+  from "@scow/protos/build/portal/config";
+import { ApiVersion } from "@scow/utils/build/version";
 import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
-export const configServiceServer = plugin((server) => {
+export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
     getClusterConfig: async ({ request }) => {
       const { cluster } = request;
@@ -48,5 +52,25 @@ export const configServiceServer = plugin((server) => {
     },
 
 
+  });
+});
+
+export const runtimeConfigServiceServer = plugin((server) => {
+  return server.addService<runTimeConfigServiceServer>(runTimeConfigServiceService, {
+    getClusterInfo: async ({ request }) => {
+      const { cluster } = request;
+
+      const client = getAdapterClient(cluster);
+      if (!client) { throw clusterNotFound(cluster); }
+
+      // 当前接口要求的最低调度器接口版本
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
+      // 检验调度器的API版本是否符合要求，不符合要求报错
+      await checkSchedulerApiVersion(client, minRequiredApiVersion);
+
+      const reply = await asyncClientCall(client.config, "getClusterInfo", {});
+
+      return [reply];
+    },
   });
 });

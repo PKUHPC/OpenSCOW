@@ -11,6 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import type { AccountUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Divider, Space, Table, Tag } from "antd";
@@ -61,7 +62,10 @@ export const UserTable: React.FC<Props> = ({
       loading={isLoading}
       rowKey="userId"
       scroll={{ x: true }}
-      pagination={{ showSizeChanger: true }}
+      pagination={{
+        showSizeChanger: true,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
+      }}
     >
       <Table.Column<AccountUserInfo> dataIndex="userId" title={t(pCommon("userId"))} />
       <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("name"))} />
@@ -214,6 +218,21 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
+                      .httpError(400, (e) => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      })
+                      .httpError(409, () => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: t(p("cannotRemoverUserWhoHaveRunningJobFromAccount")),
+                          duration: 4,
+                        });
+                        reload();
+                      })
                       .then(() => {
                         message.destroy("removeUser");
                         message.success(t(p("removeSuccess")));

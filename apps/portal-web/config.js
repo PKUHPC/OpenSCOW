@@ -15,7 +15,7 @@
 const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
-const { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD,
+const { PHASE_DEVELOPMENT_SERVER,
   PHASE_PRODUCTION_SERVER, PHASE_TEST } = require("next/constants");
 
 const { readVersionFile } = require("@scow/utils/build/version");
@@ -24,7 +24,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getClusterConfigs, getLoginNode, getSortedClusters,
   getSortedClusterIds } = require("@scow/config/build/cluster");
-const { getCommonConfig } = require("@scow/config/build/common");
+const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
 
 /**
@@ -82,6 +82,9 @@ const specs = {
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 
+  AI_DEPLOYED: bool({ desc: "是否部署了AI系统", default: false }),
+  AI_URL: str({ desc: "如果部署了AI系统，AI系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署AI系统", default: "" }),
+
   NOVNC_CLIENT_URL: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写完整路径", default: "/vnc" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
@@ -89,6 +92,8 @@ const specs = {
   PUBLIC_PATH: str({ desc: "SCOW公共文件的路径，需已包含SCOW的base path", default: "/public/" }),
 
   AUDIT_DEPLOYED: bool({ desc: "是否部署了审计系统", default: false }),
+
+  PROTOCOL: str({ desc: "scow 的访问协议，将影响 callbackUrl 的 protocol", default: "http" }),
 };
 
 const mockEnv = process.env.NEXT_PUBLIC_USE_MOCK === "1";
@@ -104,7 +109,10 @@ const config = { _specs: specs };
  */
 const buildRuntimeConfig = async (phase, basePath) => {
 
-  const building = phase === PHASE_PRODUCTION_BUILD;
+  // https://github.com/vercel/next.js/issues/57927
+  // const building = phase === PHASE_PRODUCTION_BUILD;
+  const building = process.env.BUILDING === "1";
+
   const dev = phase === PHASE_DEVELOPMENT_SERVER;
   const testenv = phase === PHASE_TEST;
 
@@ -132,7 +140,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const auditConfig = getAuditConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
-
   /**
    * @type {import("./src/utils/config").ServerRuntimeConfig}
    */
@@ -146,23 +153,23 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
-    HOME_TEXTS: portalConfig.homeText.hostnameMap,
-    HOME_TITLES: portalConfig.homeTitle.hostnameMap,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
 
     SERVER_I18N_CONFIG_TEXTS: {
-      defaultHomeTitle: portalConfig.homeTitle.defaultText,
-      defaultHomeText:  portalConfig.homeText.defaultText,
       submitJopPromptText: portalConfig.submitJobPromptText,
     },
+
+    PROTOCOL: config.PROTOCOL,
   };
 
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
   const enableLoginDesktop = getDesktopEnabled(clusters, portalConfig);
+
+  const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
   /**
    * @type {import("./src/utils/config").PublicRuntimeConfig}
@@ -181,6 +188,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
+    AI_URL: config.AI_DEPLOYED ? (config.AI_URL || portalConfig.aiUrl) : undefined,
+
     CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
 
     CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
@@ -192,6 +201,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     BASE_PATH: basePath,
 
     CLIENT_MAX_BODY_SIZE: config.CLIENT_MAX_BODY_SIZE,
+
+    FILE_EDIT_SIZE: portalConfig.file?.edit.limitSize,
+
+    FILE_PREVIEW_SIZE: portalConfig.file?.preview.limitSize,
 
     CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
       Object.values(clusters).filter(
@@ -208,6 +221,10 @@ const buildRuntimeConfig = async (phase, basePath) => {
     RUNTIME_I18N_CONFIG_TEXTS: {
       passwordPatternMessage: commonConfig.passwordPattern?.errorMessage,
     },
+
+    SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
+
+    UI_EXTENSION: portalConfig.uiExtension,
   };
 
   if (!building && !testenv) {
@@ -215,9 +232,20 @@ const buildRuntimeConfig = async (phase, basePath) => {
     console.log("Version", readVersionFile());
     console.log("Server Runtime Config", serverRuntimeConfig);
     console.log("Public Runtime Config", publicRuntimeConfig);
+
+    // HACK setup ws proxy
+    setTimeout(() => {
+      const url = `http://localhost:${process.env.PORT || 3000}${join(basePath, "/api/setup")}`;
+      console.log("Calling setup url to initialize proxy and shell server", url);
+
+      fetch(url).then(async (res) => {
+        console.log("Call completed. Response: ", await res.text());
+      }).catch((e) => {
+        console.error("Error when calling proxy url to initialize ws proxy server", e);
+      });
+    });
+
   }
-
-
 
   return {
     serverRuntimeConfig,

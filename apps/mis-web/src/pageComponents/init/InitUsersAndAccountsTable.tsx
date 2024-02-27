@@ -11,6 +11,7 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
+import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
 import { Table, Tabs, Typography } from "antd";
@@ -90,7 +91,10 @@ const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
       loading={loading}
       dataSource={data}
       scroll={{ x: true }}
-      pagination={{ showSizeChanger: true }}
+      pagination={{
+        showSizeChanger: true,
+        defaultPageSize: DEFAULT_PAGE_SIZE,
+      }}
       rowKey="accountName"
       bordered
     >

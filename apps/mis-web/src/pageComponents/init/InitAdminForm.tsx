@@ -86,7 +86,7 @@ export const InitAdminForm: React.FC = () => {
         },
         onOk: async () => {
           await api.createInitAdmin(
-            { body: { email, identityId, name, password } })
+            { body: { email, identityId, name: name.trim(), password } })
             .httpError(409, (e) => {
               if (e.code === "ALREADY_EXISTS_IN_SCOW")
                 modal.error({

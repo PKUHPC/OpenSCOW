@@ -1,5 +1,85 @@
 # @scow/auth
 
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-server@1.1.4
+
+## 1.4.0
+
+### Patch Changes
+
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/lib-server@1.1.3
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-server@1.1.2
+
+## 1.2.3
+
+### Patch Changes
+
+- cad49a87d8: 修复 callbackUrl 固定为 http 的问题
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-server@1.1.1
+
+## 1.2.2
+
+### Patch Changes
+
+- 969457662f: 修复 scow 存在的 web 安全漏洞
+  - @scow/lib-server@1.1.0
+
+## 1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 5d2b75ccec: 增加用户指定系统语言功能，可以指定系统唯一语言不再进行语言切换，也可以指定进入 SCOW 时的默认初始语言
+
+### Patch Changes
+
+- af6a53dfcf: portal-server,auth,mis-server,audit-server 下 pino 日志的时间格式修改为八时区下的 YYYY-MM-DD HH:mm:ss
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/utils@1.1.0
+  - @scow/lib-server@1.1.0
+
 ## 1.1.0
 
 ### Minor Changes

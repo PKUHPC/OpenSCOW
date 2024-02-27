@@ -1,5 +1,51 @@
 # @scow/lib-operation-log
 
+## 2.1.2
+
+### Patch Changes
+
+- @scow/protos@1.0.8
+
+## 2.1.1
+
+### Patch Changes
+
+- @scow/protos@1.0.7
+
+## 2.1.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+
+### Patch Changes
+
+- @scow/protos@1.0.6
+
+## 2.0.5
+
+### Patch Changes
+
+- @scow/protos@1.0.5
+
+## 2.0.4
+
+### Patch Changes
+
+- @scow/protos@1.0.4
+
+## 2.0.3
+
+### Patch Changes
+
+- @scow/protos@1.0.3
+
+## 2.0.2
+
+### Patch Changes
+
+- @scow/protos@1.0.2
+
 ## 2.0.1
 
 ### Patch Changes

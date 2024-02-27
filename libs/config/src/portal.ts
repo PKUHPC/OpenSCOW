@@ -13,7 +13,7 @@
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/type";
+import { createI18nStringSchema } from "src/i18n";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -29,32 +29,26 @@ export const PortalConfigSchema = Type.Object({
 
   apps: Type.Boolean({ description: "是否启用交互式任务功能", default: true }),
 
-  homeText: Type.Object({
-    defaultText: createI18nStringSchema({
-      description: "默认主页文本",
-      defaultValue: "Super Computing on Web",
-    }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的文本", default: {} },
-    ),
-  }),
-
-  homeTitle: Type.Object({
-    defaultText: createI18nStringSchema({ description: "默认主页标题", defaultValue: "SCOW" }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的标题", default: {} },
-    ),
-  }),
-
   submitJobPromptText:
   Type.Optional(createI18nStringSchema({
     description: "提交作业命令框中的提示语",
     defaultValue: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
+
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
 
+  aiUrl: Type.Optional(Type.String({ description: "AI系统的部署URL或者路径" })),
+
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
+
+  file: Type.Optional(Type.Object({
+    preview: Type.Object({
+      limitSize: Type.String({ description: "文件预览大小限制", default: "50m" }),
+    }, { description: "文件预览功能", default: {} }),
+    edit: Type.Object({
+      limitSize: Type.String({ description: "文件编辑大小限制", default: "1m" }),
+    }, { description: "文件编辑功能", default: {} }),
+  }, { description: "文件管理" })),
+
 
   submitJobDefaultPwd: Type.String({
     description: "提交作业的默认工作目录。使用{{ name }}代替作业名称。相对于用户的家目录", default: "scow/jobs/{{ name }}" }),
@@ -83,6 +77,9 @@ export const PortalConfigSchema = Type.Object({
     }),
   )),
 
+  uiExtension: Type.Optional(Type.Object({
+    url: Type.String({ description: "UI扩展站完整URL" }),
+  })),
 
 });
 

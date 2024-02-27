@@ -14,6 +14,7 @@ import {
   BookOutlined,
   CloudServerOutlined,
   CloudSyncOutlined,
+  ClusterOutlined,
   DashboardOutlined,
   DesktopOutlined,
   EyeOutlined,
@@ -26,7 +27,7 @@ import {
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { User } from "src/stores/UserStore";
@@ -138,29 +139,38 @@ export const userRoutes: (
     } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
       Icon: FolderOutlined,
-      text: t("routes.file"),
+      text: t("routes.file.fileManager"),
       path: "/files",
       clickToPath: `/files/${defaultCluster.id}/~`,
       clickable: true,
-      children: publicConfig.CLUSTERS.map((cluster) => ({
-        Icon: FolderOutlined,
-        text: getI18nConfigCurrentText(cluster.name, languageId),
-        path: `/files/${cluster.id}`,
-        clickToPath: `/files/${cluster.id}/~`,
-        handleClick: () => { setDefaultCluster(cluster); },
-      } as NavItemProps)).concat(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+      children: [
         {
-          Icon: CloudSyncOutlined,
-          text: "文件传输",
-          path: "/files/fileTransfer",
+          Icon: FolderOutlined,
+          text: t("routes.file.clusterFileManager"),
+          path: "/files/",
+          clickToPath: `/files/${defaultCluster.id}/~`,
+          children: publicConfig.CLUSTERS.map((cluster) => ({
+            Icon: ClusterOutlined,
+            text: getI18nConfigCurrentText(cluster.name, languageId),
+            path: `/files/${cluster.id}`,
+            clickToPath: `/files/${cluster.id}/~`,
+            handleClick: () => { setDefaultCluster(cluster); },
+          } as NavItemProps)),
         },
-        {
-          Icon: CloudServerOutlined,
-          text: "传输进度",
-          path: "/files/currentTransferInfo",
-        },
-      ] : []),
-    }] : []),
+        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+          {
+            Icon: CloudSyncOutlined,
+            text: t("routes.file.crossClusterFileTransfer"),
+            path: "/files/fileTransfer",
+          },
+          {
+            Icon: CloudServerOutlined,
+            text: t("routes.file.transferProgress"),
+            path: "/files/currentTransferInfo",
+          },
+        ] : []),
+      ]},
+    ] : []),
     ...(publicConfig.NAV_LINKS && publicConfig.NAV_LINKS.length > 0
       ? publicConfig.NAV_LINKS.map((link) => {
 

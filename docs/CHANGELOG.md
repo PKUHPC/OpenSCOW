@@ -1,5 +1,44 @@
 # @scow/docs
 
+## 1.3.1
+
+### Patch Changes
+
+- 2f7590a: 优化 AI 配置介绍的文档中部分格式与文字
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+
+## 1.3.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+
+## 1.2.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- f03e821342: vagrant 部署方式优化,文档网站修改
+
+## 1.1.2
+
+### Patch Changes
+
+- 969457662f: 修复 scow 存在的 web 安全漏洞
+
+## 1.1.1
+
+### Patch Changes
+
+- 22441e3515: 添加管理员使用技巧博客，增加传输节点基础环境说明
+
 ## 1.1.0
 
 ### Minor Changes

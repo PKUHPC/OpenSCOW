@@ -19,20 +19,21 @@ import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
 import { chargingServiceServer } from "src/services/charging";
 import { configServiceServer } from "src/services/config";
+import { exportServiceServer } from "src/services/export";
 import { initServiceServer } from "src/services/init";
 import { jobServiceServer } from "src/services/job";
 import { jobChargeLimitServer } from "src/services/jobChargeLimit";
 import { misConfigServiceServer } from "src/services/misConfig";
 import { tenantServiceServer } from "src/services/tenant";
 import { userServiceServer } from "src/services/user";
-import { logger } from "src/utils/logger";
+import { loggerOptions } from "src/utils/logger";
 
 export async function createServer() {
 
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-    logger,
+    logger: loggerOptions,
   });
 
   server.logger.info({ version: readVersionFile() }, "@scow/mis-server: ");
@@ -51,6 +52,7 @@ export async function createServer() {
   await server.register(tenantServiceServer);
   await server.register(configServiceServer);
   await server.register(misConfigServiceServer);
+  await server.register(exportServiceServer);
 
   await server.ext.syncBlockStatus.sync();
 

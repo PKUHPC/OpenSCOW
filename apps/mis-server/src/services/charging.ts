@@ -12,19 +12,25 @@
 
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { LockMode, QueryOrder } from "@mikro-orm/core";
-import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
-import { ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
+import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
+import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { ChargeRecord as ChargeRecordProto,
+  ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { getChargesSearchType, getChargesTargetSearchParam } from "src/utils/chargesQuery";
+import { queryWithCache } from "src/utils/cache";
+import {
+  getChargesSearchType,
+  getChargesTargetSearchParam,
+  getPaymentsTargetSearchParam,
+} from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
-import { paginationProps } from "src/utils/orm";
-
+import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -100,7 +106,8 @@ export const chargingServiceServer = plugin((server) => {
 
     charge: async ({ request, em, logger }) => {
 
-      const { accountName, type, amount, comment, tenantName } = ensureNotUndefined(request, ["amount"]);
+      const { accountName, type, amount, comment, tenantName, userId, metadata }
+        = ensureNotUndefined(request, ["amount"]);
 
       const reply = await em.transactional(async (em) => {
         const target = accountName !== undefined
@@ -129,6 +136,8 @@ export const chargingServiceServer = plugin((server) => {
           comment,
           target,
           type,
+          userId,
+          metadata,
         }, em, logger, server.ext);
       });
 
@@ -158,24 +167,8 @@ export const chargingServiceServer = plugin((server) => {
 
       const { endTime, startTime, target } =
       ensureNotUndefined(request, ["startTime", "endTime", "target"]);
-      let searchParam = {};
-      switch (target?.$case)
-      {
-      case "tenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
-        break;
-      case "allTenants":
-        searchParam = { accountName:undefined };
-        break;
-      case "accountOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:target[target.$case].accountName };
-        break;
-      case "accountsOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
-        break;
-      default:
-        searchParam = {};
-      }
+
+      const searchParam = getPaymentsTargetSearchParam(target);
 
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
@@ -275,11 +268,137 @@ export const chargingServiceServer = plugin((server) => {
           index: x.id,
           time: x.time.toISOString(),
           type: x.type,
+          userId: x.userId,
         })),
         total: decimalToMoney(records.reduce((prev, curr) => prev.plus(curr.amount), new Decimal(0))),
       }];
     },
 
+    getTopChargeAccount: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(ChargeRecord, "cr");
+      qb
+        .select("cr.accountName")
+        .addSelect([raw("SUM(cr.amount) as `totalAmount`")])
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("accountName")
+        .orderBy({ [raw("SUM(cr.amount)")]: QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_top_charge_account", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+
+      return [
+        {
+          results: results.map((x) => ({
+            accountName: x.accountName,
+            chargedAmount: numberToMoney(x.totalAmount),
+          })),
+        },
+      ];
+    },
+
+    getDailyCharge: async ({ request, em, logger }) => {
+
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(ChargeRecord, "cr");
+
+      qb
+        .select([
+          raw("DATE(CONVERT_TZ(cr.time, 'UTC', ?)) as date", [timeZone]),
+          raw("SUM(cr.amount) as totalAmount"),
+        ])
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`, `${timeZone}`],
+        queryQb: qb,
+      });
+
+      return [{
+        results: records.map((record) => ({
+          date: convertToDateMessage(record.date, logger),
+          amount: numberToMoney(record.totalAmount),
+        })),
+      }];
+    },
+
+    getTopPayAccount: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(PayRecord, "p");
+      qb
+        .select("p.accountName")
+        .addSelect(raw("SUM(p.amount) as `totalAmount`"))
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy("accountName")
+        .orderBy({ [raw("SUM(p.amount)")]: QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_top_pay_account", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+
+      return [
+        {
+          results: results.map((x) => ({
+            accountName: x.accountName,
+            payAmount: numberToMoney(x.totalAmount),
+          })),
+        },
+      ];
+    },
+
+    getDailyPay: async ({ request, em, logger }) => {
+
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(PayRecord, "pr");
+
+      qb
+        .select([
+          raw("DATE(CONVERT_TZ(pr.time, 'UTC', ?)) as date", [timeZone]),
+          raw("SUM(pr.amount) as totalAmount"),
+        ])
+        .where({ time: { $gte: startTime } })
+        .andWhere({ time: { $lte: endTime } })
+        .andWhere({ accountName: { $ne: null } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["get_daily_pay", `${startTime}`, `${endTime}`, `${timeZone}`],
+        queryQb: qb,
+      });
+
+      return [{
+        results: records.map((record) => ({
+          date: convertToDateMessage(record.date, logger),
+          amount: numberToMoney(record.totalAmount),
+        })),
+      }];
+    },
 
     /**
        *
@@ -292,7 +411,7 @@ export const chargingServiceServer = plugin((server) => {
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, page, pageSize }
+      const { startTime, endTime, type, target, userIds, page, pageSize }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
@@ -303,21 +422,27 @@ export const chargingServiceServer = plugin((server) => {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
+        ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
       }, {
-        ...paginationProps(page, pageSize || 10),
+        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
         orderBy: { time: QueryOrder.DESC },
       });
 
       return [{
-        results: records.map((x) => ({
-          tenantName: x.tenantName,
-          accountName: x.accountName,
-          amount: decimalToMoney(x.amount),
-          comment: x.comment,
-          index: x.id,
-          time: x.time.toISOString(),
-          type: x.type,
-        })),
+        results: records.map((x) => {
+          return {
+            tenantName: x.tenantName,
+            accountName: x.accountName,
+            amount: decimalToMoney(x.amount),
+            comment: x.comment,
+            index: x.id,
+            time: x.time.toISOString(),
+            type: x.type,
+            userId: x.userId,
+            metadata: x.metadata as ChargeRecordProto["metadata"] ?? undefined,
+          };
+
+        }),
       }];
     },
 
@@ -332,7 +457,7 @@ export const chargingServiceServer = plugin((server) => {
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target }
+      const { startTime, endTime, type, target, userIds }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
@@ -341,12 +466,13 @@ export const chargingServiceServer = plugin((server) => {
 
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
-          .select("count(c.id) as total_count")
-          .addSelect("sum(c.amount) as total_amount")
+          .select(raw("count(c.id) as total_count"))
+          .addSelect(raw("sum(c.amount) as total_amount"))
           .where({
             time: { $gte: startTime, $lte: endTime },
             ...searchType,
             ...searchParam,
+            ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
           })
           .execute("get");
 

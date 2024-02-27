@@ -1,5 +1,123 @@
 # @scow/portal-server
 
+## 1.4.3
+
+### Patch Changes
+
+- 941340a: 修复目录文件过多时导致的 touch 命令报错
+- 410fb0e: 修复只需在文件传输时使用 touch -a 来更新时间戳，修复 touch -a 执行时 ssh 关闭报错，文件名特殊字符报错等问题
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.6
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.5
+
+## 1.4.0
+
+### Minor Changes
+
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+- 26bd8e7: 优化文件系统直接提交脚本任务时如果没有在脚本内指定工作目录，使脚本文件所在的绝对路径作为作业工作目录，并在确认提交对话框中给出提示
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- 6a0c73a972: 修复用户删除无权限目录时导致的崩溃问题
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.3
+
+### Patch Changes
+
+- Updated dependencies [cad49a87d8]
+  - @scow/config@1.2.1
+  - @scow/lib-server@1.1.1
+  - @scow/protos@1.0.4
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.2
+
+## 1.2.2
+
+### Patch Changes
+
+- 3d83f9cbdb: 在 portal-server 中使用交互式应用的 getConnectionConfig 接口，以适配容器式的作业调度器
+  - @scow/protos@1.0.3
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.1
+  - @scow/lib-server@1.1.0
+
+## 1.2.1
+
+## 1.2.0
+
+### Minor Changes
+
+- 135f2b1be3: 在门户系统的文件管理下，新增将文件直接作为作业文本提交调度器执行的功能，如果调度器 API 版本低于此接口版本报错
+
+### Patch Changes
+
+- af6a53dfcf: portal-server,auth,mis-server,audit-server 下 pino 日志的时间格式修改为八时区下的 YYYY-MM-DD HH:mm:ss
+- Updated dependencies [a3d2f44af6]
+- Updated dependencies [f42488eb9e]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [a79aa109bb]
+- Updated dependencies [135f2b1be3]
+- Updated dependencies [5d2b75ccec]
+- Updated dependencies [f577d9d1e4]
+  - @scow/config@1.2.0
+  - @scow/lib-ssh@1.0.1
+  - @scow/scheduler-adapter-protos@1.1.0
+  - @scow/lib-scheduler-adapter@1.1.0
+  - @scow/utils@1.1.0
+  - @scow/lib-server@1.1.0
+  - @scow/protos@1.0.2
+  - @scow/rich-error-model@2.0.0
+
 ## 1.1.0
 
 ### Minor Changes

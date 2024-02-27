@@ -24,12 +24,6 @@
       "groupSlug": "all-minor-patch"
     },
     {
-      "matchPackagePatterns": [
-        "next"
-      ],
-      "enabled": false
-    },
-    {
       "matchFiles": [
         "docs/package.json"
       ],
@@ -38,6 +32,13 @@
         "react",
         "react-dom",
         "@types/react"
+      ],
+      "enabled": false
+    },
+    {
+      "matchPackagePatterns": [
+        "pino",
+        "@uiw/react-codemirror"
       ],
       "enabled": false
     }

@@ -17,12 +17,13 @@ import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
-import { configServiceServer } from "src/services/config";
+import { runtimeConfigServiceServer, staticConfigServiceServer } from "src/services/config";
+import { dashboardServiceServer } from "src/services/dashboard";
 import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
-import { logger } from "src/utils/logger";
+import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
@@ -32,7 +33,7 @@ export async function createServer() {
   const server = new Server({
     host: config.HOST,
     port: config.PORT,
-    logger,
+    logger: loggerOptions,
   });
 
   server.logger.info({ version: readVersionFile() }, "Running @scow/portal-server");
@@ -47,7 +48,9 @@ export async function createServer() {
   await server.register(jobServiceServer);
   await server.register(fileServiceServer);
   await server.register(shellServiceServer);
-  await server.register(configServiceServer);
+  await server.register(staticConfigServiceServer);
+  await server.register(runtimeConfigServiceServer);
+  await server.register(dashboardServiceServer);
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);

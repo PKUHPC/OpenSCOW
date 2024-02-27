@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined } from "@ant-design/icons";
+import { DatabaseOutlined, RobotOutlined } from "@ant-design/icons";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
-import { PropsWithChildren, useMemo } from "react";
+import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
@@ -26,9 +27,10 @@ import { publicConfig } from "src/utils/config";
 interface Props {
   footerText: string;
   versionTag: string | undefined;
+  initialLanguage: string;
 }
 
-export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
+export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
   const { loginNodes } = useStore(LoginNodeStore);
@@ -37,9 +39,13 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const routes = useMemo(() => userRoutes(
+  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
+
+  const routes = userRoutes(
     userStore.user, defaultCluster, loginNodes, setDefaultCluster,
-  ), [userStore.user, defaultCluster, setDefaultCluster]);
+  );
+
+  const uiExtensionStore = useStore(UiExtensionStore);
 
   const logout = () => {
     removeDefaultCluster();
@@ -56,15 +62,27 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
       languageId={languageId}
+      extension={uiExtensionStore.config}
+      from="portal"
       headerRightContent={(
         <>
           <JumpToAnotherLink
             user={userStore.user}
             icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.MIS_URL}
-            linkText={t("baseLayout.linkText")}
+            linkText={t("baseLayout.linkTextMis")}
           />
-          <LanguageSwitcher />
+          <JumpToAnotherLink
+            user={userStore.user}
+            icon={<RobotOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.AI_URL}
+            linkText={t("baseLayout.linkTextAI")}
+          />
+          {
+            systemLanguageConfig.isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={initialLanguage} />
+            ) : undefined
+          }
         </>
       )}
     >

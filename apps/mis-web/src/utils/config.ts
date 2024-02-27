@@ -13,10 +13,11 @@
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
-import { getI18nConfigCurrentText, I18nStringType } from "@scow/lib-web/build/utils/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
 
 export interface ServerRuntimeConfig {
@@ -38,6 +39,8 @@ export interface ServerRuntimeConfig {
 
   SERVER_I18N_CONFIG_TEXTS: {
   };
+
+  PROTOCOL: string;
 }
 
 export interface PublicRuntimeConfig {
@@ -52,6 +55,13 @@ export interface PublicRuntimeConfig {
     misConfig: MisConfigSchema["createUser"],
     authSupportsCreateUser: boolean | undefined,
   },
+
+  ADD_USER_TO_ACCOUNT: {
+    accountAdmin: {
+      allowed: boolean,
+      createUserIfNotExist: boolean,
+    }
+  }
   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
@@ -59,6 +69,8 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN: string | undefined;
 
   PORTAL_URL: string | undefined;
+
+  AI_URL: string | undefined;
 
   PUBLIC_PATH: string;
 
@@ -81,6 +93,24 @@ export interface PublicRuntimeConfig {
   }
 
   CHARGE_TYPE_LIST: string[];
+
+  SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
+
+  CLUSTER_MONITOR: {
+    grafanaUrl: string | undefined,
+    resourceStatus: {
+      enabled: boolean | undefined,
+      proxy: boolean | undefined,
+      dashboardUid: string | undefined,
+    },
+    alarmLogs: { enabled: boolean | undefined }
+  },
+
+  UI_EXTENSION?: { url: string; }
+
+  CHANGE_JOB_LIMIT: { allowUser: boolean}
+
+  JOB_CHARGE_METADATA: jobChargeMetadataType;
 
 }
 
@@ -150,3 +180,5 @@ export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
 
   return getI18nConfigCurrentText(value as any, languageId);
 };
+
+export type jobChargeMetadataType = MisConfigSchema["jobChargeMetadata"];

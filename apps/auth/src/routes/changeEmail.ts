@@ -47,12 +47,9 @@ export const changeEmailRoute = fp(async (f) => {
     },
     async (req, rep) => {
 
-
       if (!f.auth.changeEmail) {
-        return await rep.code(501).send(null);
+        return await rep.code(501).send({ code: "NOT_SUPPORTED" });
       }
-
-
 
       const { identityId, newEmail } = req.body;
 

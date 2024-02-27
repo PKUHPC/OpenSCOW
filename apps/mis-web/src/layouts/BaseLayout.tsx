@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DesktopOutlined } from "@ant-design/icons";
+import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
 import { PropsWithChildren, useMemo } from "react";
@@ -25,16 +26,22 @@ import { publicConfig } from "src/utils/config";
 interface Props {
   footerText: string;
   versionTag: string | undefined;
+  initialLanguage: string;
 }
 
-export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildren<Props>) => {
+export const BaseLayout =
+({ footerText, versionTag, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
+  const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
+
   const routes = useMemo(() => getAvailableRoutes(userStore.user, t), [userStore.user, t]);
+
+  const uiExtensionStore = useStore(UiExtensionStore);
 
   return (
     <LibBaseLayout
@@ -45,6 +52,8 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
       versionTag={versionTag}
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
+      from="mis"
+      extension={uiExtensionStore.config}
       languageId={languageId}
       headerRightContent={(
         <>
@@ -52,9 +61,19 @@ export const BaseLayout = ({ footerText, versionTag, children }: PropsWithChildr
             user={userStore.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
-            linkText={t("layouts.route.navLinkText")}
+            linkText={t("layouts.route.navLinkTextPortal")}
           />
-          <LanguageSwitcher />
+          <JumpToAnotherLink
+            user={userStore.user}
+            icon={<RobotOutlined style={{ paddingRight: 2 }} />}
+            link={publicConfig.AI_URL}
+            linkText={t("layouts.route.navLinkTextAI")}
+          />
+          {
+            systemLanguageConfig.isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={initialLanguage} />
+            ) : undefined
+          }
         </>
       )}
     >

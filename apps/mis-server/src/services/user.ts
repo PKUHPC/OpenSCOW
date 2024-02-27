@@ -11,13 +11,15 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
   GetAccountUsersResponse,
@@ -30,11 +32,13 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config";
+import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
@@ -169,7 +173,11 @@ export const userServiceServer = plugin((server) => {
       await server.ext.clusters.callOnAll(logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
-        throw e;
+        // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
+          throw e;
+        }
       });
 
       const newUserAccount = new UserAccount({
@@ -184,7 +192,7 @@ export const userServiceServer = plugin((server) => {
       await em.persistAndFlush([account, user, newUserAccount]);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await addUserToAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await addUserToAccount(authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -196,7 +204,7 @@ export const userServiceServer = plugin((server) => {
       const userAccount = await em.findOne(UserAccount, {
         user: { userId, tenant: { name: tenantName } },
         account: { accountName, tenant: { name: tenantName } },
-      });
+      }, { populate: ["user", "account"]});
 
       if (!userAccount) {
         throw <ServiceError>{
@@ -211,14 +219,47 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
+      if (userAccount.status === UserStatus.UNBLOCKED) {
+        await blockUserInAccount(userAccount, server.ext, logger);
+        await em.flush();
+      }
+
+      // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
+      const jobs = await server.ext.clusters.callOnAll(
+        logger,
+        async (client) => {
+          const fields = ["job_id", "user", "state", "account"];
+
+          return await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: [userId], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+          });
+        },
+      );
+
+      if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} has jobs running or pending and cannot remove.
+          Please wait for the job to end or end the job manually before moving out.`,
+        };
+      }
+
       await server.ext.clusters.callOnAll(logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
+      }).catch(async (e) => {
+        // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
+          throw e;
+        }
       });
 
       await em.removeAndFlush(userAccount);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await removeUserFromAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await removeUserFromAccount(authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -355,7 +396,7 @@ export const userServiceServer = plugin((server) => {
             message: `Error creating user with userId ${identityId} in database.` };
         });
       // call auth
-      const createdInAuth = await createUser(misConfig.authUrl,
+      const createdInAuth = await createUser(authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
         .then(async () => {
@@ -444,7 +485,7 @@ export const userServiceServer = plugin((server) => {
 
       // query auth
       if (server.ext.capabilities.getUser) {
-        const authUser = await getUser(misConfig.authUrl, { identityId: userId }, server.logger);
+        const authUser = await getUser(authUrl, { identityId: userId }, server.logger);
 
         if (!authUser) {
           throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found from auth` };
@@ -568,13 +609,23 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    getPlatformUsersCounts: async ({ em }) => {
-
-      const totalCount = await em.count(User);
+    getPlatformUsersCounts: async ({ request, em }) => {
+      const { idOrName } = request;
+      const idOrNameQuery = idOrName ? {
+        $and: [
+          {
+            $or: [
+              { userId: { $like: `%${idOrName}%` } },
+              { name: { $like: `%${idOrName}%` } },
+            ],
+          },
+        ],
+      } : {};
+      const totalCount = await em.count(User, idOrNameQuery);
       const totalAdminCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_ADMIN}%` }, ...idOrNameQuery });
       const totalFinanceCount = await em.count(User,
-        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` } });
+        { platformRoles: { $like: `%${PlatformRole.PLATFORM_FINANCE}%` }, ...idOrNameQuery });
 
       return [{
         totalCount: totalCount,
@@ -694,22 +745,61 @@ export const userServiceServer = plugin((server) => {
       user.email = newEmail;
       await em.flush();
 
-      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
+      const ldapCapabilities = await getCapabilities(authUrl);
 
       // 看LDAP是否有修改邮箱的权限
       if (ldapCapabilities.changeEmail) {
-        await libChangeEmail(misConfig.authUrl, {
+        await libChangeEmail(authUrl, {
           identityId: userId,
           newEmail,
         }, logger)
-          .catch(async () => {
-            throw <ServiceError> {
-              code: Status.UNKNOWN, message: "LDAP failed to change email",
-            };
+          .catch(async (e) => {
+            switch (e.status) {
+
+            case "NOT_FOUND":
+              throw <ServiceError>{
+                code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+              };
+
+            case "NOT_SUPPORTED":
+              throw <ServiceError>{
+                code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+              };
+
+            default:
+              throw <ServiceError> {
+                code: Status.UNKNOWN, message: "LDAP failed to change email",
+              };
+            }
           });
       }
 
       return [{}];
+    },
+
+    getNewUserCount: async ({ request, em, logger }) => {
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checktTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(User, "u");
+      qb
+        .select([raw("DATE(CONVERT_TZ(u.create_time, 'UTC', ?)) as date", [timeZone]), raw("count(*) as count")])
+        .where({ createTime: { $gte: startTime } })
+        .andWhere({ createTime: { $lte: endTime } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const results: {date: string, count: number}[] = await qb.execute();
+
+      return [
+        {
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
+        },
+      ];
     },
   });
 });

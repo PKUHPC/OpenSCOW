@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "管理系统",
+    linkTextMis: "管理系统",
+    linkTextAI: "SCOW AI",
   },
   // routes
   routes: {
@@ -31,7 +32,12 @@ export default {
       appSessions: "已创建的应用",
       createApp: "创建应用",
     },
-    file: "文件管理",
+    file: {
+      fileManager: "文件管理",
+      crossClusterFileTransfer: "文件传输",
+      clusterFileManager: "集群文件管理",
+      transferProgress: "传输进度",
+    },
   },
   // button
   button: {
@@ -60,6 +66,8 @@ export default {
         oldPassword:"原密码",
         newPassword: "新密码",
         confirm: "确认密码",
+        userNotExist:"用户不存在",
+        unavailable:"本功能在当前配置下不可用",
       },
     },
     // job
@@ -190,6 +198,50 @@ export default {
       },
     },
     fileManagerComp: {
+      clusterFileTable: {
+        fileName: "文件名",
+        modificationDate: "修改日期",
+        size: "大小",
+        permission: "权限",
+        notShowHiddenItem: "不显示隐藏的项目",
+        showHiddenItem: "显示隐藏的项目",
+      },
+      singleCrossClusterTransferSelector: {
+        placeholder: "请选择集群",
+      },
+      transferInfoTable: {
+        srcCluster: "发送集群",
+        dstCluster: "接收集群",
+        file: "文件",
+        transferCount: "传输数量",
+        transferSpeed: "传输速度",
+        timeLeft: "剩余时间",
+        currentProgress: "当前进度",
+        operation: "操作",
+        confirmCancelTitle: "确认取消",
+        confirmCancelContent: "确认取消 {} -> {} 的文件 {} 的传输吗?",
+        confirmOk: "确认",
+        cancelSuccess: "取消成功",
+        cancel: "取消",
+      },
+      fileEditModal: {
+        edit: "编辑",
+        prompt: "提示",
+        save: "保存",
+        doNotSave: "不保存",
+        notSaved: "未保存",
+        notSavePrompt: "文件未保存，是否保存该文件？",
+        fileEdit: "文件编辑",
+        filePreview: "文件预览",
+        fileLoading: "文件正在加载...",
+        exitEdit: "退出编辑",
+        failedGetFile: "获取文件: {} 失败",
+        cantReadFile: "无法读取文件: {}",
+        saveFileFail: "文件保存失败: {}",
+        saveFileSuccess: "文件保存成功",
+        fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+        fileFetchAbortPrompt: "获取文件 {} 操作被终止",
+      },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
         createSuccessMessage: "创建成功",
@@ -198,6 +250,9 @@ export default {
         fileName: "文件名",
       },
       fileManager: {
+        preview: {
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
+        },
         moveCopy: {
           copy: "复制",
           move: "移动",
@@ -225,9 +280,8 @@ export default {
           paste: "粘贴到此处",
           operationStarted: "正在{}，已完成：",
           operationNotStarted: "已选择{}{}个项",
-          hidden: "不显示",
-          notHidden: "显示",
-          hiddenItem: "隐藏的项目",
+          notShowHiddenItem: "不显示隐藏的项目",
+          showHiddenItem: "显示隐藏的项目",
           openInShell: "在终端中打开",
           createFile: "新文件",
           mkDir: "新目录",
@@ -238,6 +292,9 @@ export default {
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
           submitConfirmTitle: "确认提交",
+          submitConfirmNotice: "请确保脚本文件提供了可用的绝对路径作为工作目录，"
+          + "如未提供则默认为脚本文件所在目录",
+
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功！您的新作业ID为：{}",
@@ -366,6 +423,54 @@ export default {
         appCommentTitle: "说明",
       },
     },
+    dashboard:{
+      overviewTable:{
+        title:"平台概览",
+        clusterName:"集群",
+        partitionName:"分区",
+        nodeCount:"节点总数",
+        pendingJobCount:"作业排队数",
+        cpuUsage:"CPU使用率",
+        gpuUsage:"GPU使用率",
+        usageRatePercentage:"节点使用率",
+        partitionStatus:"分区状态",
+        available:"可用",
+        notAvailable:"不可用",
+      },
+      infoPanes:{
+        nodeInfo:"节点信息",
+        node:"节点",
+        resourceInfo:"资源信息",
+        core:"核",
+        running:"运行中",
+        idle:"空闲",
+        notAvailable:"不可用",
+        card:"卡",
+        job:"作业",
+        pending:"排队中",
+      },
+      addEntryModal:{
+        addQuickEntry:"添加快捷方式",
+        cancel:"取消",
+      },
+      changeClusterModal:{
+        selectCluster:"选择集群",
+        cluster:"集群",
+        loginNode:"登录节点",
+      },
+      quickEntry:{
+        quickEntry:"快捷入口",
+        finish:"完成",
+        cancel:"取消",
+        edit:"编辑",
+      },
+      sortable:{
+        alreadyExist:"已存在该快捷方式",
+        exceedMaxSize:"最多只能添加10个快捷方式",
+        saveFailed:"保存失败",
+        saveSuccessfully:"保存成功",
+      },
+    },
   },
   component:{
     errorPages:{
@@ -411,6 +516,16 @@ export default {
         subTitle: "您所请求的集群不存在",
         title: "文件管理",
       },
+      fileTransfer: {
+        confirmTransferTitle: "确认开始传输?",
+        confirmTransferContent: "确认从 {} 传输到 {} 吗?",
+        confirmOk: "确认",
+        transferStartInfo: "传输任务已经开始",
+        transferTitle: "跨集群文件传输",
+      },
+      currentTransferInfo: {
+        checkTransfer: "文件传输进度查看",
+      },
     },
     jobs: {
       allJobs: {
@@ -451,11 +566,16 @@ export default {
         popoverContent3: "文件下载",
         popoverContentFile:"文件名",
         popoverContent4: "，输入",
-        popoverContent5: "，您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，",
+        popoverContent5: "，您当前路径下的该文件会被下载到本地",
 
-        popoverContent6: "如果需要下载其他目录下的文件请使用",
+        popoverContent6: "目前不支持输入相对路径，如果需要下载或编辑其他目录下的文件请使用",
         popoverContent7: "命令跳转到文件系统。",
         popoverContent8: "使用示例：",
+
+        popoverContent9: "文件编辑",
+        popoverContent10: "，输入",
+        popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
+
         command:"命令",
       },
       index: {
@@ -464,7 +584,7 @@ export default {
       },
     },
     _app: {
-      textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
+      textExceedsLength:"终端登录提示信息过多，请减少'~/.bashrc'等文件中不必要的信息输出!",
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
