@@ -426,6 +426,7 @@ export default {
         + "and set a user as ",
         initAdmin: "Initial Administrator",
         set: " who serves as both a tenant administrator and a platform administrator.",
+        idOrName: "User ID or Name",
       },
     },
     job: {

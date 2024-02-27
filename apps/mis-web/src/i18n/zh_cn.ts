@@ -426,6 +426,7 @@ export default {
 
         initAdmin:"初始管理员",
         set:"指同时为租户管理员和平台管理员的用户。",
+        idOrName: "用户ID或姓名",
       },
     },
     job:{
