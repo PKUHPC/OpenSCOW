@@ -745,6 +745,7 @@ export default {
         getBillingTableErrorMessage: "集群和分区信息获取失败，请联系管理员。",
 
         partitionInfo: "分区信息",
+        loading: "数据加载中...",
       },
       operationLogs: {
         userOperationLog: "本用户操作日志",

@@ -12,7 +12,7 @@
 
 import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { Collapse, Divider, Spin, Typography } from "antd";
+import { Collapse, Divider, Space, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
@@ -84,9 +84,22 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
     <div>
       <Head title={t(p("partitionInfo"))} />
       <PageTitle titleText={t(p("partitionInfo"))} />
-
-      <div style={{ marginBottom: "32px" }}>
-        <Spin spinning={completedRequestCount < clusters.length}>
+      <div>
+        {
+          completedRequestCount < clusters.length ? (
+            <Spin
+              spinning={completedRequestCount < clusters.length}
+              tip={t(p("loading"))}
+            >
+              <></>
+            </Spin>
+          ) : null
+        }
+      </div>
+      <div style={completedRequestCount < clusters.length
+        ? { marginBottom: "32px", marginTop: "48px" } : { marginBottom: "32px" }}
+      >
+        <Space direction="vertical" style={{ width: "100%" }}>
           {clusters.map((cluster) => {
             const data = renderData[cluster.id];
             return (
@@ -105,7 +118,7 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
               ) : null
             );
           })}
-        </Spin>
+        </Space>
       </div>
 
       <div>
