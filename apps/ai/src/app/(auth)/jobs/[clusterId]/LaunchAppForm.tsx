@@ -80,7 +80,7 @@ interface Partition {
   comment?: string;
 }
 
-export enum AccessiblityType {
+export enum AccessibilityType {
   PUBLIC = "PUBLIC",
   PRIVATE = "PRIVATE",
 }
@@ -165,7 +165,7 @@ export const LaunchAppForm = (props: Props) => {
   const imageType = Form.useWatch(["image", "type"], form);
   const selectedImage = Form.useWatch(["image", "name"], form);
 
-  const isImagePublic = imageType !== undefined ? imageType === AccessiblityType.PUBLIC : imageType;
+  const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
     isPublic: isImagePublic,
@@ -287,7 +287,7 @@ export const LaunchAppForm = (props: Props) => {
   useEffect(() => {
     setCurrentPartitionInfo(clusterInfo?.partitions[0]);
     form.setFieldsValue({
-      partition: clusterInfo?.partitions[0].name,
+      partition: clusterInfo?.partitions[0]?.name,
       appJobName: genAppJobName(appName ?? "trainJobs"),
     });
   }, [clusterInfo]);
@@ -393,11 +393,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: AccessiblityType.PRIVATE,
+                      value: AccessibilityType.PRIVATE,
                       label: "我的镜像",
                     },
                     {
-                      value:  AccessiblityType.PUBLIC,
+                      value:  AccessibilityType.PUBLIC,
                       label: "公共镜像",
                     },
                   ]
@@ -439,11 +439,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: AccessiblityType.PRIVATE,
+                      value: AccessibilityType.PRIVATE,
                       label: "我的算法",
                     },
                     {
-                      value:  AccessiblityType.PUBLIC,
+                      value:  AccessibilityType.PUBLIC,
                       label: "公共算法",
                     },
                   ]
@@ -483,11 +483,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: AccessiblityType.PRIVATE,
+                      value: AccessibilityType.PRIVATE,
                       label: "我的数据集",
                     },
                     {
-                      value: AccessiblityType.PUBLIC,
+                      value: AccessibilityType.PUBLIC,
                       label: "公共数据集",
                     },
 
@@ -528,11 +528,11 @@ export const LaunchAppForm = (props: Props) => {
                 options={
                   [
                     {
-                      value: AccessiblityType.PRIVATE,
+                      value: AccessibilityType.PRIVATE,
                       label: "我的模型",
                     },
                     {
-                      value:  AccessiblityType.PUBLIC,
+                      value:  AccessibilityType.PUBLIC,
                       label: "公共模型",
                     },
                   ]
