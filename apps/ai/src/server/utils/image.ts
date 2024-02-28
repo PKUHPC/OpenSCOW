@@ -37,12 +37,22 @@ export enum k8sRuntime {
 
 const runtimeCommands = {
   [k8sRuntime.docker]: "docker",
-  [k8sRuntime.containerd]: "nerdctl",
+  [k8sRuntime.containerd]: "nerdctl -n k8s-io",
+};
+
+const runtimeContainerIdPrefix = {
+  [k8sRuntime.docker]: "docker",
+  [k8sRuntime.containerd]: "containerd",
 };
 
 export function getRuntimeCommand(clusterId: string): string {
   const runtime = clusters[clusterId].k8s?.runtime;
-  return runtime ? runtimeCommands[runtime] : k8sRuntime.docker;
+  return runtimeCommands[runtime ?? k8sRuntime.docker];
+}
+
+function getContainerIdPrefix(clusterId: string): string {
+  const runtime = clusters[clusterId].k8s?.runtime;
+  return runtimeContainerIdPrefix[runtime ?? k8sRuntime.docker];
 }
 
 // 加载本地镜像
@@ -147,3 +157,9 @@ export async function commitContainerImage({
   await loggedExec(ssh, logger, true, command,
     ["commit", formateContainerId, localImageUrl]);
 }
+
+
+export const formatContainerId = (clusterId: string, containerId: string) => {
+  const prefix = getContainerIdPrefix(clusterId);
+  return containerId.replace(`${prefix}://`, "");
+};

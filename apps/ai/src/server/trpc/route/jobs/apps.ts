@@ -37,7 +37,12 @@ import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/s
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
-import { commitContainerImage, createHarborImageUrl, pushImageToHarbor } from "src/server/utils/image";
+import {
+  commitContainerImage,
+  createHarborImageUrl,
+  formatContainerId,
+  pushImageToHarbor,
+} from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -467,7 +472,8 @@ export const saveImage =
         const { node, containerId } = await asyncClientCall(client.app, "getRunningJobNodeInfo", {
           jobId,
         });
-        const formateContainerId = containerId.replace("docker://", "");
+
+        const formateContainerId = formatContainerId(clusterId, containerId);
 
         // 连接到该节点
         return await sshConnect(node, "root", logger, async (ssh) => {
