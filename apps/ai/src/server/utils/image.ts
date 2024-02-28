@@ -37,7 +37,7 @@ export enum k8sRuntime {
 
 const runtimeCommands = {
   [k8sRuntime.docker]: "docker",
-  [k8sRuntime.containerd]: "nerdctl -n k8s-io",
+  [k8sRuntime.containerd]: "nerdctl -n k8s.io",
 };
 
 const runtimeContainerIdPrefix = {
