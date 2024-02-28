@@ -221,13 +221,23 @@ export const createImage = procedure
             }
 
             // 本地镜像时docker加载镜像
-            localImageUrl = await getLoadedImage({ ssh, logger, sourcePath }).catch((e) => {
+            localImageUrl = await getLoadedImage({
+              ssh,
+              clusterId: processClusterId,
+              logger,
+              sourcePath,
+            }).catch((e) => {
               const ex = e as ServiceError;
               throw new Error(`createImage failed, ${ex.message}`);
             });
           } else {
             // 远程镜像需先拉取到本地
-            localImageUrl = await getPulledImage({ ssh, logger, sourcePath }).catch((e) => {
+            localImageUrl = await getPulledImage({
+              ssh,
+              clusterId: processClusterId,
+              logger,
+              sourcePath,
+            }).catch((e) => {
               const ex = e as ServiceError;
               throw new Error(`createImage failed, ${ex.message}`);
             });
@@ -240,6 +250,7 @@ export const createImage = procedure
           // 制作镜像，上传至harbor
           await pushImageToHarbor({
             ssh,
+            clusterId: processClusterId,
             logger,
             localImageUrl,
             harborImageUrl,
@@ -339,7 +350,7 @@ export const deleteImage = procedure
       });
     }
 
-    // 获取harrbor中的reference以删除镜像
+    // 获取harbor中的reference以删除镜像
     const getReferenceUrl = `${aiConfig.harborConfig.protocol}://${aiConfig.harborConfig.url}/api/v2.0/projects`
     + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}/artifacts`;
     const getReferenceRes = await fetch(getReferenceUrl, {
@@ -571,7 +582,13 @@ export const copyImage = procedure
           if (sharedImage.path === undefined) {
             throw new Error(`copyImage error: shared image ${id} do not have path`);
           }
-          const localImageUrl = await getPulledImage({ ssh, logger, sourcePath: sharedImage.path })
+          const localImageUrl = await getPulledImage({
+            ssh,
+            clusterId: processClusterId,
+            logger,
+            sourcePath:
+            sharedImage.path,
+          })
             .catch((e) => {
               const ex = e as ServiceError;
               throw new InternalServerError(ex.message, "Copy");
@@ -585,6 +602,7 @@ export const copyImage = procedure
           // 制作镜像上传
           await pushImageToHarbor({
             ssh,
+            clusterId: processClusterId,
             logger,
             localImageUrl,
             harborImageUrl,
