@@ -78,6 +78,7 @@ export default {
     admin: "Administrator",
     accountCount: "Account Count",
     tenantBalance: "Tenant Balance",
+    defaultAccountBlockThreshold: "Default Account Block Threshold",
     jobBillingTable: "Job Pricing Table",
     operationLog: "Operation Log",
     unfinishedJob: "Unfinished Jobs",
@@ -107,6 +108,7 @@ export default {
     export: "Export",
     exportMaxDataErrorMsg: "Too many details to export, up to {} can be exported, please reselect!",
     exportNoDataErrorMsg: "Export is empty, please reselect",
+    blockThresholdAmount: "Block Threshold Amount",
     other: "Other",
   },
   dashboard: {
@@ -227,6 +229,9 @@ export default {
         owner: "Owner",
         ownerIdOrName: "Owner ID or Name",
         tenant: "Tenant",
+        blockThresholdAmount: "Block Threshold Amount",
+        blockThresholdAmountTooltip: "The account will be blocked "
+        + "when the balance is less than the block threshold amount.",
         comment: "Comment",
         status: "Status",
         mangerMember: "Manage Members",
@@ -244,6 +249,17 @@ export default {
         blockConfirmContent: "Do you wish to block account {} within tenant {}?",
         blockSuccess: "Account blocking successful!",
         blockFail: "Account blocking failed!",
+      },
+      setBlockThresholdAmountModal: {
+        setSuccess: "Set Successfully",
+        setFail: "Set Failed",
+        setAmount:"Set block threshold amount",
+        blockThresholdAmount: "Block Threshold Amount",
+        curBlockThresholdAmount: "Current Block Threshold Amount: ",
+        curDefaultBlockThresholdAmount: "Current Tenant Default Block Threshold Amount",
+        useDefaultBlockThresholdAmount: "Use tenant default block threshold amount",
+        confirmUseDefaultBlockThresholdAmount:
+        "Are you sure you want to use the tenant default block threshold amount?",
       },
     },
     admin: {
@@ -603,6 +619,10 @@ export default {
       },
       tenantSelector: {
         fresh: "Refresh Tenant List",
+      },
+      changeDefaultAccountBlockThresholdModal: {
+        defaultAccountBlockThresholdAmount: "Default Account Block Threshold Amount",
+        setAmount: "Set Default Account Block Threshold",
       },
     },
     user: {
@@ -1075,6 +1095,8 @@ export default {
       exportChargeRecord: "Export Charge Record",
       exportPayRecord: "Export Payment Record",
       exportOperationLog: "Export Operation Log",
+      setAccountBlockThreshold: "Set Account Block Threshold",
+      setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
     },
     operationDetails: {
       login: "User Login",
@@ -1145,6 +1167,9 @@ export default {
       exportOperationLogFromAccount: "Export Operation Log of Account {}",
       exportOperationLogFromTenant: "Export Operation Log of Tenant {}",
       exportOperationLogFromAdmin: "Export Operation Log of Platform",
+      setAccountBlockThreshold: "Set the block threshold of account {} to {}",
+      setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
+      unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
     },
   },
   userRoles: {

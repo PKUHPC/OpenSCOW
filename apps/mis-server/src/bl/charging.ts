@@ -33,6 +33,22 @@ interface PayRequest {
   operatorId: string;
 }
 
+export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  return account.balance.lte(blockThresholdAmount);
+}
+
+export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  return account.balance.gt(blockThresholdAmount);
+}
+
 export async function pay(
   request: PayRequest, em: SqlEntityManager,
   logger: Logger, clusterPlugin: ClusterPlugin,
@@ -64,13 +80,18 @@ export async function pay(
     await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount), type, comment }, logger);
   }
 
-  if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
+  if (
+    target instanceof Account
+    && checkShouldUnblockAccount(target)
+  ) {
     logger.info("Unblock account %s", target.accountName);
     await unblockAccount(target, clusterPlugin.clusters, logger);
   }
 
-  // 充值为负数时，要考虑封锁账户
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
   }
@@ -111,7 +132,10 @@ export async function charge(
   const prevBalance = target.balance;
   target.balance = target.balance.minus(amount);
 
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
   }

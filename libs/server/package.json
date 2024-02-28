@@ -24,6 +24,7 @@
     "@scow/config": "workspace:*",
     "@scow/protos": "workspace:*",
     "dayjs": "1.11.10",
+    "@scow/protos": "workspace:*",
     "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",

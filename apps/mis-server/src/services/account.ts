@@ -16,7 +16,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -107,7 +107,10 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        if (account.balance.lte(0)) {
+        const blockThresholdAmount =
+        account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+        if (account.balance.lte(blockThresholdAmount)) {
           throw <ServiceError>{
             code: Status.FAILED_PRECONDITION,
             message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
@@ -152,6 +155,10 @@ export const accountServiceServer = plugin((server) => {
             ownerName: ownerUser.name,
             comment: x.comment,
             balance: decimalToMoney(x.balance),
+            blockThresholdAmount: x.blockThresholdAmount
+              ? decimalToMoney(x.blockThresholdAmount)
+              : undefined,
+            defaultBlockThresholdAmount: decimalToMoney(x.tenant.$.defaultAccountBlockThreshold),
           };
         }),
       }];
@@ -324,7 +331,10 @@ export const accountServiceServer = plugin((server) => {
         accountName,
       );
 
-      if (account.balance.isLessThanOrEqualTo(0)) {
+      const blockThresholdAmount =
+      account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+      if (account.balance.isLessThanOrEqualTo(blockThresholdAmount)) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await blockAccount(account, server.ext.clusters, logger);
       }
@@ -332,6 +342,27 @@ export const accountServiceServer = plugin((server) => {
       await em.flush();
 
       return [{ executed: true }];
+    },
+
+    setBlockThreshold: async ({ request, em }) => {
+      const { accountName, blockThresholdAmount } = request;
+
+      const account = await em.findOne(Account, { accountName }, {
+        populate: ["tenant"],
+      });
+
+      if (!account) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+        };
+      }
+      account.blockThresholdAmount = blockThresholdAmount
+        ? new Decimal(moneyToNumber(blockThresholdAmount))
+        : undefined;
+
+      await em.persistAndFlush(account);
+
+      return [{}];
     },
   });
 

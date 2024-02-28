@@ -109,10 +109,21 @@ message Account {
   string owner_name = 6;
   string comment = 7;
   common.Money balance = 8;
+  common.Money block_threshold_amount = 9;
+  common.Money default_block_threshold_amount = 10;
 }
 
 message GetAccountsResponse {
   repeated Account results = 1;
+}
+
+message SetBlockThresholdRequest {
+  string account_name = 1;
+  common.Money block_threshold_amount = 2;
+}
+
+message SetBlockThresholdResponse {
+
 }
 
 service AccountService {
@@ -128,4 +139,6 @@ service AccountService {
   rpc WhitelistAccount(WhitelistAccountRequest) returns (WhitelistAccountResponse);
   rpc DewhitelistAccount(DewhitelistAccountRequest)
       returns (DewhitelistAccountResponse);
+
+  rpc SetBlockThreshold(SetBlockThresholdRequest) returns (SetBlockThresholdResponse);
 }
