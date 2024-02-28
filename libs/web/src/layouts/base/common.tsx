@@ -58,7 +58,10 @@ export function createMenuItems(
       icon: iconToNode(route.Icon),
       key: route.path,
       label: (
-        <Link href={route.clickToPath ?? route.path} {...route.openInNewPage ? { target: "_blank" } : {}}>
+        <Link
+          href={route.clickToPath ?? route.path} {...route.openInNewPage ? { target: "_blank" } : {}}
+          style={{ textDecoration:"none" }}
+        >
           {route.text}
         </Link>
       ),
