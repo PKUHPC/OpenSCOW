@@ -70,6 +70,15 @@ message WriteTerminalMsgResponse {
 
 }
 
+message WriteAppProxyRequest {
+  string user = 1;
+  string target = 2;
+}
+
+message WriteAppProxyResponse {
+
+}
+
 service AuditService {
   rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
   rpc GetSessions(GetSessionsRequest) returns (GetSessionsResponse);
@@ -78,5 +87,8 @@ service AuditService {
   rpc GetCommands(GetCommandsRequest) returns (GetCommandsResponse);
 
   rpc WriteTerminalMsg(WriteTerminalMsgRequest) returns (WriteTerminalMsgResponse);
+
+  rpc WriteAppProxy(WriteAppProxyRequest) returns (WriteAppProxyResponse);
+
 
 }

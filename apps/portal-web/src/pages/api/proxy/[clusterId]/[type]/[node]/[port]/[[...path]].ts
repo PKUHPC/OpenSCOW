@@ -13,6 +13,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkCookie } from "src/auth/server";
 import { parseProxyTarget, proxy } from "src/server/setup/proxy";
+import { createAuditClient } from "src/server/shellAudit";
+import { runtimeConfig } from "src/utils/config";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
 
@@ -33,6 +35,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     res.status(400).send(target.message);
     return;
   }
+
+  const { writeAppProxy } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+
+  await writeAppProxy({ session: {
+    user: user.identityId,
+    target: target,
+  } });
+
 
   proxy.web(req, res, {
     target,

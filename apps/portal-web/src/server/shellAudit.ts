@@ -13,7 +13,7 @@
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { ShellAuditConfigSchema } from "@scow/config/build/shellAudit";
-import { AuditServiceClient, CreateSessionRequest, CreateSessionResponse,
+import { AuditServiceClient, CreateSessionRequest, CreateSessionResponse, WriteAppProxyRequest, WriteAppProxyResponse,
   WriteTerminalMsgRequest, WriteTerminalMsgResponse } from "@scow/protos/build/audit/shell";
 import { Logger } from "ts-log";
 
@@ -42,6 +42,14 @@ export const createAuditClient = (
         return {};
       }
       return await asyncUnaryCall(client, "writeTerminalMsg", request);
+    },
+
+    writeAppProxy: async (request: WriteAppProxyRequest): Promise<WriteAppProxyResponse> => {
+      if (!client) {
+        logger.debug("Attempt to audit with %o", request);
+        return {};
+      }
+      return await asyncUnaryCall(client, "writeAppProxy", request);
     },
   };
 };
