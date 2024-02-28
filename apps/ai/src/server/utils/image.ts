@@ -37,6 +37,7 @@ export enum k8sRuntime {
 
 const runtimeCommands = {
   [k8sRuntime.docker]: "docker",
+  // -n namespace，k8s集群相关的容器命令必须加上该参数才有对应数据
   [k8sRuntime.containerd]: "nerdctl -n k8s.io",
 };
 
