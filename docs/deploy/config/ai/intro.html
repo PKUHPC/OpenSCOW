@@ -5,7 +5,7 @@
 <meta name="generator" content="Docusaurus v3.1.1">
 <title data-rh="true">配置 AI 系统（beta） | SCOW</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://PKUHPC.github.io/SCOW/docs/deploy/config/ai/intro"><meta data-rh="true" property="og:locale" content="zh"><meta data-rh="true" name="docusaurus_locale" content="zh"><meta data-rh="true" name="docsearch:language" content="zh"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="配置 AI 系统（beta） | SCOW"><meta data-rh="true" name="description" content="本节介绍如何配置 AI 系统（beta）。"><meta data-rh="true" property="og:description" content="本节介绍如何配置 AI 系统（beta）。"><link data-rh="true" rel="icon" href="/SCOW/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://PKUHPC.github.io/SCOW/docs/deploy/config/ai/intro"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/docs/deploy/config/ai/intro" hreflang="zh"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/docs/deploy/config/ai/intro" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/SCOW/blog/rss.xml" title="SCOW RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/SCOW/blog/atom.xml" title="SCOW Atom Feed"><link rel="stylesheet" href="/SCOW/assets/css/styles.f4c5fa2b.css">
-<script src="/SCOW/assets/js/runtime~main.6f4e9bb6.js" defer="defer"></script>
+<script src="/SCOW/assets/js/runtime~main.b6c26477.js" defer="defer"></script>
 <script src="/SCOW/assets/js/main.c0ef8094.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard" data-theme="light">
@@ -20,7 +20,7 @@
 <h2 class="anchor anchorWithStickyNavbar_L0L0" id="前期准备">前期准备<a href="#前期准备" class="hash-link" aria-label="前期准备的直接链接" title="前期准备的直接链接">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_L0L0" id="k8s-集群">K8S 集群<a href="#k8s-集群" class="hash-link" aria-label="K8S 集群的直接链接" title="K8S 集群的直接链接">​</a></h3>
 <p><strong>AI 系统（beta）</strong> 需要用户在使用时提前部署 K8S 的集群环境。</p>
-<p>当前 <strong>AI 系统（beta）</strong> 为试用版本，我们暂时只支持在 <code>docker</code> 容器运行时中执行镜像相关的服务，后续会陆续推出支持<code>ContainerD</code>等其他主流容器运行时的 AI 系统。</p>
+<p>当前 <strong>AI 系统（beta）</strong> 为试用版本，我们目前已经支持 <code>docker</code> 和 <code>containerd</code> 两种容器运行时的 k8s集群中使用 AI 系统。 若集群为<code>containerd</code> 运行时，需要在集群的节点上安装 <a href="https://github.com/containerd/nerdctl" target="_blank" rel="noopener noreferrer">nerdctl</a></p>
 <p>当前试用版本中 K8S 部署的主要版本信息如下：</p>
 <table><thead><tr><th><strong>安装内容</strong></th><th><strong>版本信息</strong></th></tr></thead><tbody><tr><td>kubernetes</td><td>v1.19.13</td></tr><tr><td>Docker Engine</td><td>19.03.12</td></tr></tbody></table>
 <h3 class="anchor anchorWithStickyNavbar_L0L0" id="k8s-调度服务">K8S 调度服务<a href="#k8s-调度服务" class="hash-link" aria-label="K8S 调度服务的直接链接" title="K8S 调度服务的直接链接">​</a></h3>
@@ -29,7 +29,7 @@
 <ul>
 <li>
 <p><strong>K8S 调度器适配器</strong></p>
-<p>我 们仍然使用 <a href="https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter" target="_blank" rel="noopener noreferrer">SCOW调度器适配器</a> 来实现 K8S 集群的调度服务。</p>
+<p>我们仍然使用 <a href="https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter" target="_blank" rel="noopener noreferrer">SCOW调度器适配器</a> 来实现 K8S 集群的调度服务。</p>
 <p>当前版本中，我们提供了调度器适配器的适用版本的二进制文件 <a href="https://mirrors.pku.edu.cn/scow/releases/" target="_blank" rel="noopener noreferrer">scow-ai-adapter-amd64</a>，欢迎下载进行试用。</p>
 <p>K8S 调度器适配器的配置请参照<a href="https://github.com/PKUHPC/scow-ai-adapter-config" target="_blank" rel="noopener noreferrer">此链接</a>。</p>
 </li>
@@ -54,7 +54,7 @@
 <p>在 K8S 集群中仍然需要像 <strong>SCOW</strong> 系统的 <code>hpc集群</code> 一样，在管理节点安装 <code>LDAP服务端</code> ，在所有节点安装 <code>LDAP客户端</code> 。</p>
 <h2 class="anchor anchorWithStickyNavbar_L0L0" id="配置文件">配置文件<a href="#配置文件" class="hash-link" aria-label="配置文件的直接链接" title="配置文件的直接链接">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_L0L0" id="确认集群配置文件">确认集群配置文件<a href="#确认集群配置文件" class="hash-link" aria-label="确认集群配置文件的直接链接" title="确认集群配置文件的直接链接">​</a></h3>
-<p>在当前 <strong>AI 系统（beta）</strong> 的试用版本中，我们暂时没有分离不同的集群系统下的 AI 服务，请您注意 在部署了 <strong>K8S</strong> 集群的集群上进行功能体验。
+<p>在当前 <strong>AI  系统（beta）</strong> 的试用版本中，我们暂时没有分离不同的集群系统下的 AI 服务，请您注意在部署了 <strong>K8S</strong> 集群的集群上进行功能体验。
 后续将会陆续实现其他服务，并实现不同集群上不同服务的分离。</p>
 <p>请在部署了 <strong>K8S</strong> 集群的集群配置文件中确认以下内容：</p>
 <p>在<code>config/clusters/{K8S集群的ID}.yml</code>中，修改配置(使用 <strong>K8S适配器</strong> 的ip地址和端口号)</p>
