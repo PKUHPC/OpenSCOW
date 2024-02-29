@@ -12,9 +12,8 @@
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Modal } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { ChangeClusterModal } from "src/pageComponents/dashboard/ChangeClusterModal";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
@@ -37,10 +36,6 @@ export interface Props {
   onClose: () => void;
   addItem: (item: Entry) => void;
   apps: AppWithCluster;
-  editItem: (clusterId: string, loginNode?: string) => void;
-  changeClusterOpen: boolean;
-  onChangeClusterClose: () => void;
-  changeClusterItem: Entry | null;
 }
 
 const ItemsContainer = styled.div`
@@ -65,10 +60,6 @@ export const AddEntryModal: React.FC<Props> = ({
   onClose,
   addItem,
   apps,
-  editItem,
-  changeClusterOpen,
-  onChangeClusterClose,
-  changeClusterItem,
 }) => {
   const t = useI18nTranslateToString();
 
@@ -124,19 +115,6 @@ export const AddEntryModal: React.FC<Props> = ({
   const [clustersToSelectedApp, setClustersToSelectedApp] = useState<Cluster[]>([]);
   // 新建快捷方式的部分信息
   const [incompleteEntryInfo, setIncompleteEntryInfo] = useState<IncompleteEntryInfo | null>(null);
-
-  // 设置要修改信息的快捷方式的 是否需要登录节点 和 可用的集群
-  useEffect(() => {
-    if (changeClusterItem?.entry?.$case === "shell") {
-      setNeedLoginNode(true);
-      setClustersToSelectedApp(clusters);
-    }
-    else if (changeClusterItem?.entry?.$case === "app") {
-      setNeedLoginNode(false);
-      setClustersToSelectedApp(apps![changeClusterItem.id.split("-")[0]].clusters);
-    }
-  }, [changeClusterItem]);
-
 
   const handleClick = (item: Entry | IncompleteEntryInfo) => {
 
@@ -219,16 +197,7 @@ export const AddEntryModal: React.FC<Props> = ({
         addItem={addItem}
         closeAddEntryModal={onClose}
       />
-
-      <ChangeClusterModal
-        open={changeClusterOpen}
-        onClose={onChangeClusterClose}
-        needLoginNode={needLoginNode}
-        clusters={clustersToSelectedApp}
-        editItem={editItem}
-      />
     </>
-
   );
 };
 

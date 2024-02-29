@@ -84,10 +84,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
   ))]);
 
   const [addEntryOpen, setAddEntryOpen] = useState(false);
-  const [changeClusterOpen, setChangeClusterOpen] = useState(false);
-
-  // 要修改集信息快捷方式的id
-  const [changeClusterItem] = useState<Entry | null>(null);
 
   // 被拖拽的快捷方式的id
   const [activeId, setActiveId] = useState<string | number | null>(null);
@@ -117,32 +113,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
     setTemItems([...temItems, item]);
   };
 
-  const editItemCluster = (clusterId: string, loginNode?: string) => {
-
-    const newId = changeClusterItem?.id.split("-")[0] + "-" + clusterId;
-
-    if (temItems.find((x) => x.id === newId) && newId !== changeClusterItem?.id) {
-      message.error(t(p("alreadyExist")));
-      return;
-    }
-
-    setTemItems(temItems.map((x) => {
-      if (x.id !== changeClusterItem?.id) {
-        return x;
-      }
-
-      if (x.entry?.$case === "shell") {
-        x.entry.shell.clusterId = clusterId;
-        x.entry.shell.loginNode = loginNode as string;
-      }
-      else if (x.entry?.$case === "app") {
-        x.entry.app.clusterId = clusterId;
-      }
-
-      x.id = newId;
-      return x;
-    }));
-  };
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id);
@@ -287,11 +257,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         onClose={() => { setAddEntryOpen(false); }}
         apps={apps}
         addItem={addItem}
-        // 下面是修改快捷方式相关的内容
-        editItem={editItemCluster}
-        changeClusterOpen={changeClusterOpen}
-        onChangeClusterClose={() => { setChangeClusterOpen(false); }}
-        changeClusterItem={changeClusterItem}
       ></AddEntryModal>
     </div>
   );
