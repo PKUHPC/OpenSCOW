@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
+import { MinusOutlined, PlusCircleOutlined } from "@ant-design/icons";
 import {
   closestCenter,
   DndContext,
@@ -25,42 +25,27 @@ import {
   arrayMove,
   rectSortingStrategy,
   SortableContext } from "@dnd-kit/sortable";
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Card, message } from "antd";
+import { message } from "antd";
 import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { formatEntryId, getEntryClusterName, getEntryIcon, getEntryLogoPath, getEntryName } from "src/utils/dashboard";
+import { formatEntryId, getEntryBaseName,
+  getEntryExtraInfo, getEntryIcon, getEntryLogoPath } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
 import { AddEntryModal } from "./AddEntryModal";
-import { CardItem } from "./CardItem";
+import { EntryCardItem } from "./CardItem";
 import { AppWithCluster } from "./QuickEntry";
 import { SortableItem } from "./SortableItem";
 
 const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-`;
-
-const ItemContainer = styled.div`
-  position: relative;
-`;
-
-const IconContainer = styled.div`
-  position: absolute;
-  top: 12px;
-  right: 20px;
-`;
-
-const ClusterContainer = styled.div`
-  position: absolute;
-  top: 20px;
-  left: 36px;
-  cursor: pointer;
+  gap: 20px;
+  padding: 20px 0;
 `;
 
 interface Props {
@@ -71,10 +56,24 @@ interface Props {
 }
 const p = prefix("pageComp.dashboard.sortable.");
 
+const ItemContainer = styled.div`
+  position: relative;
+`;
+
+const DeleteIconContainer = styled.div`
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: 1000;
+  :hover {
+    transform: scale(1.2);
+  }
+`;
+
 export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
 
   const t = useI18nTranslateToString();
-  const languageId = useI18n().currentLanguage.id;
+  const i18n = useI18n();
   const router = useRouter();
 
   // 实际的快捷入口项
@@ -85,10 +84,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
   ))]);
 
   const [addEntryOpen, setAddEntryOpen] = useState(false);
-  const [changeClusterOpen, setChangeClusterOpen] = useState(false);
-
-  // 要修改集信息快捷方式的id
-  const [changeClusterItem, setChangeClusterItem] = useState<Entry | null>(null);
 
   // 被拖拽的快捷方式的id
   const [activeId, setActiveId] = useState<string | number | null>(null);
@@ -118,32 +113,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
     setTemItems([...temItems, item]);
   };
 
-  const editItemCluster = (clusterId: string, loginNode?: string) => {
-
-    const newId = changeClusterItem?.id.split("-")[0] + "-" + clusterId;
-
-    if (temItems.find((x) => x.id === newId) && newId !== changeClusterItem?.id) {
-      message.error(t(p("alreadyExist")));
-      return;
-    }
-
-    setTemItems(temItems.map((x) => {
-      if (x.id !== changeClusterItem?.id) {
-        return x;
-      }
-
-      if (x.entry?.$case === "shell") {
-        x.entry.shell.clusterId = clusterId;
-        x.entry.shell.loginNode = loginNode as string;
-      }
-      else if (x.entry?.$case === "app") {
-        x.entry.app.clusterId = clusterId;
-      }
-
-      x.id = newId;
-      return x;
-    }));
-  };
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     setActiveId(event.active.id);
@@ -181,7 +150,8 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
 
         case "app":
           router.push(
-            join("/apps", item.entry.app.clusterId, "/create", item.id.split("-")[0]));
+            join("/apps", item.entry.app.clusterId, "/create", item.entry.app.appId),
+          );
           break;
 
         default:
@@ -232,77 +202,49 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         <SortableContext items={temItems} strategy={rectSortingStrategy}>
           <ItemsContainer>
             {temItems.map((x) => (
-              <ItemContainer
-                key={x.id }
-                onClick={() => {
-                  onItemClick(x);
-                }}
-              >
+              <ItemContainer key={x.id}>
+                {(isEditable && activeItem === undefined) ? (
+                  <DeleteIconContainer>
+                    <MinusOutlined
+                      onClick={() => deleteFn(x.id)}
+                      size={8}
+                    />
+                  </DeleteIconContainer>
+                ) : undefined}
                 <SortableItem
                   id={x.id}
-                  name={getEntryName(x)}
+                  key={x.id}
+                  entryBaseName={getEntryBaseName(x, t)}
+                  entryExtraInfo={getEntryExtraInfo(x, i18n.currentLanguage.id)}
                   draggable={isEditable}
                   icon={getEntryIcon(x)}
                   logoPath={getEntryLogoPath(x, apps)}
+                  onClick={() => onItemClick(x)}
                 />
-                {
-                // 拖拽时隐藏删除按钮
-                  isEditable && !(activeId && activeItem) ? (
-                    <IconContainer onClick={() => { deleteFn(x.id); }}>
-                      <MinusOutlined
-                        style={{ backgroundColor:"#ccc", fontSize:"18px", borderRadius:"9px", color:"#fff" }}
-                      />
-                    </IconContainer>
-                  ) :
-                    undefined
-                }
-                {
-                // 拖拽时隐藏集群信息
-                // 交互式应用和shell在非编辑状态显示集群信息
-                  (x.entry?.$case === "app" || x.entry?.$case === "shell") &&
-                  ((!(activeId && activeItem) && isEditable) || !isEditable)
-                    ? (
-                      <ClusterContainer onClick={() =>
-                      {
-                        if (isEditable) {
-                          setChangeClusterOpen(true);
-                          setChangeClusterItem(x);
-                        }
-                      }}
-                      >
-                        { getI18nConfigCurrentText(
-                          getEntryClusterName(x as Entry & {entry: {$case: "app" | "shell"} }),
-                          languageId)
-                        }
-                      </ClusterContainer>
-                    ) :
-                    undefined
-                }
               </ItemContainer>
             ))}
             {
               isEditable ? (
-                <Card
+                <div
                   style={{
-                    display:"flex",
-                    justifyContent:"center",
-                    alignItems:"center",
-                    width:"130px", height:"157px", margin:"20px 30px",
-                    boxShadow:"rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px" }}
+                    display: "flex", justifyContent: "center", alignItems: "center",
+                    padding: "40px", cursor: "pointer",
+                  }}
                   onClick={() => { setAddEntryOpen(true); }}
                 >
-                  <PlusOutlined style={{ fontSize:"40px", color:"#ccc" }} />
-                </Card>
+                  <PlusCircleOutlined style={{ fontSize: "40px" }} />
+                </div>
               ) : undefined
             }
           </ItemsContainer>
         </SortableContext>
-        <DragOverlay adjustScale style={{ transformOrigin: "0 0 " }}>
+        <DragOverlay adjustScale style={{ transformOrigin: "0 0" }}>
           {activeId && activeItem ? (
-            <CardItem
+            <EntryCardItem
               isDragging
               id={activeId.toString()}
-              name={getEntryName(activeItem)}
+              entryBaseName={getEntryBaseName(activeItem, t)}
+              entryExtraInfo={getEntryExtraInfo(activeItem, i18n.currentLanguage.id)}
               draggable={isEditable}
               icon={getEntryIcon(activeItem)}
               logoPath={getEntryLogoPath(activeItem, apps)}
@@ -315,11 +257,6 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         onClose={() => { setAddEntryOpen(false); }}
         apps={apps}
         addItem={addItem}
-        // 下面是修改快捷方式相关的内容
-        editItem={editItemCluster}
-        changeClusterOpen={changeClusterOpen}
-        onChangeClusterClose={() => { setChangeClusterOpen(false); }}
-        changeClusterItem={changeClusterItem}
       ></AddEntryModal>
     </div>
   );

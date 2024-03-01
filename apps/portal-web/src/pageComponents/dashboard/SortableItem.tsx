@@ -14,9 +14,9 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FC } from "react";
 
-import { CardItem, ItemProps } from "./CardItem";
+import { EntryCardItem, EntryCardItemProps } from "./CardItem";
 
-export const SortableItem: FC<ItemProps> = (props) => {
+export const SortableItem: FC<EntryCardItemProps> = (props) => {
   const {
     isDragging,
     attributes,
@@ -32,10 +32,10 @@ export const SortableItem: FC<ItemProps> = (props) => {
   };
 
   return (
-    <CardItem
+    <EntryCardItem
       ref={setNodeRef}
       style={style}
-      withOpacity={isDragging}
+      transparent={isDragging}
       {...props}
       {...attributes}
       {...listeners}
