@@ -10,10 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { GetConfigFn, getDirConfig } from "@scow/lib-config";
+import { getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
+import { Logger } from "ts-log";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
@@ -95,13 +96,26 @@ export const ClusterConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
     transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
   })),
+
+  enabledIn: Type.Object({
+    hpc: Type.Boolean({ description: "是否在HPC中启用" }),
+    ai: Type.Boolean({ description: "是否在AI中启用" }),
+  }, { description: "集群在哪些模块中启用", default: { hpc: true, ai: false } }),
+
 });
 
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> =
-  (baseConfigPath, logger) => {
+
+export type ClusterType = "hpc" | "ai";
+
+export type GetClusterConfigFn<T> = (baseConfigPath?: string, logger?: Logger, type?: ClusterType[]) => T;
+
+export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigSchema>> =
+  (baseConfigPath, logger, clusterType) => {
+
+    const types: ClusterType[] = clusterType ?? ["hpc", "ai"];
 
     const config = getDirConfig(
       ClusterConfigSchema,
@@ -133,6 +147,25 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
     const isUnique = uniqueAddressesList.size === allAddressesList.length;
     if (!isUnique) {
       throw new Error("login node address must be unique across all clusters and all login nodes.");
+    }
+
+
+    for (const cluster in config) {
+      if (Object.hasOwnProperty.call(config, cluster)) {
+        const clusterInfo = config[cluster];
+        if (clusterInfo) {
+          let enabled = false;
+          for (const type of types) {
+            if (clusterInfo.enabledIn[type]) {
+              enabled = true;
+              break;
+            }
+          }
+          if (!enabled) {
+            delete config[cluster];
+          }
+        }
+      }
     }
 
     return config;

@@ -1270,6 +1270,10 @@ importers:
       '@sinclair/typebox':
         specifier: 0.32.13
         version: 0.32.13
+    devDependencies:
+      ts-log:
+        specifier: 2.2.5
+        version: 2.2.5
 
   libs/decimal:
     dependencies:
