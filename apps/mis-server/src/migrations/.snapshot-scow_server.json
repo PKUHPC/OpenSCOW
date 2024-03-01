@@ -153,6 +153,7 @@
           ],
           "composite": false,
           "keyName": "time",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -162,6 +163,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_tenant_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -171,6 +173,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_account_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -180,6 +183,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_user_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -189,6 +193,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_type_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -975,6 +980,18 @@
           "default": "0.0000",
           "mappedType": "decimal"
         },
+        "default_account_block_threshold": {
+          "name": "default_account_block_threshold",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 19,
+          "scale": 4,
+          "default": "0.0000",
+          "mappedType": "decimal"
+        },
         "create_time": {
           "name": "create_time",
           "type": "DATETIME(6)",
@@ -1212,6 +1229,17 @@
           "precision": 19,
           "scale": 4,
           "default": "0.0000",
+          "mappedType": "decimal"
+        },
+        "block_threshold_amount": {
+          "name": "block_threshold_amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "precision": 19,
+          "scale": 4,
           "mappedType": "decimal"
         },
         "create_time": {

@@ -18,6 +18,11 @@ import { Logger } from "ts-log";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
+export enum k8sRuntime {
+  docker = "docker",
+  containerd = "containerd",
+}
+
 const LoginNodeConfigSchema =
   Type.Object(
     {
@@ -102,6 +107,10 @@ export const ClusterConfigSchema = Type.Object({
     ai: Type.Boolean({ description: "是否在AI中启用" }),
   }, { description: "集群在哪些模块中启用", default: { hpc: true, ai: false } }),
 
+  k8s: Type.Optional(Type.Object({
+    runtime: Type.Enum(k8sRuntime, { description: "k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd",
+      default: "containerd" }),
+  }, { description: "k8s 集群配置" })),
 });
 
 

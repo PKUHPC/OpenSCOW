@@ -10,12 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
@@ -49,6 +49,7 @@ export const tenantServiceServer = plugin((server) => {
         admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
+        defaultAccountBlockThreshold: decimalToMoney(tenant.defaultAccountBlockThreshold),
         financialStaff: financialStaff.map((f) => ({ userId: f.userId, userName: f.name })),
       }];
     },
@@ -162,6 +163,22 @@ export const tenantServiceServer = plugin((server) => {
       },
       );
     },
-  });
 
+    setDefaultAccountBlockThreshold: async ({ request, em }) => {
+
+      const { tenantName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!tenant) {
+        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+      tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
+
+      await em.persistAndFlush(tenant);
+
+      return [{}];
+
+    },
+
+  });
 });

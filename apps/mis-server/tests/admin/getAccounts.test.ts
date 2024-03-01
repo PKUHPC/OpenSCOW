@@ -62,6 +62,10 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
+      blockThresholdAmount: data.accountA.blockThresholdAmount ? decimalToMoney(
+        data.accountA.blockThresholdAmount,
+      ) : undefined,
+      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -71,6 +75,10 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
+      blockThresholdAmount: data.accountB.blockThresholdAmount ? decimalToMoney(
+        data.accountB.blockThresholdAmount,
+      ) : undefined,
+      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
     },
   ]);
 
@@ -94,7 +102,7 @@ it("gets all accounts", async () => {
   const accountC = await em.findOne(Account, { accountName: "hpcc" }) as Account;
   const uaCD = new UserAccount({ user: userD, account: accountC, role: UserRole.OWNER, status: UserStatus.BLOCKED });
   await em.persistAndFlush([userD, uaCD]);
-  
+
   const resp = await asyncClientCall(client, "getAccounts", {});
 
   expect(resp.results).toIncludeSameMembers([
@@ -107,6 +115,10 @@ it("gets all accounts", async () => {
       "comment": "",
       "tenantName": data.tenant.name,
       balance: decimalToMoney(data.accountA.balance),
+      blockThresholdAmount: data.accountA.blockThresholdAmount ? decimalToMoney(
+        data.accountA.blockThresholdAmount,
+      ) : undefined,
+      defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -116,6 +128,10 @@ it("gets all accounts", async () => {
       "tenantName": data.tenant.name,
       comment: "",
       balance: decimalToMoney(data.accountB.balance),
+      blockThresholdAmount: data.accountB.blockThresholdAmount ? decimalToMoney(
+        data.accountB.blockThresholdAmount,
+      ) : undefined,
+      defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
     },
     { "accountName": "hpcc",
       "blocked": false,
@@ -125,6 +141,10 @@ it("gets all accounts", async () => {
       "tenantName": data.anotherTenant.name,
       comment: "123",
       balance: decimalToMoney(data.accountC.balance),
+      blockThresholdAmount: data.accountC.blockThresholdAmount ? decimalToMoney(
+        data.accountC.blockThresholdAmount,
+      ) : undefined,
+      defaultBlockThresholdAmount: decimalToMoney(data.accountC.tenant.getProperty("defaultAccountBlockThreshold")),
     },
   ]);
 });

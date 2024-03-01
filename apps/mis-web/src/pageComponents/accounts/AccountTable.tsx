@@ -15,7 +15,7 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag, Tooltip } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
@@ -26,6 +26,8 @@ import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
+
+import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
 
 type ShowedTab = "PLATFORM" | "TENANT";
 interface Props {
@@ -136,6 +138,7 @@ export const AccountTable: React.FC<Props> = ({
     ] : [];
     const remaining = [
       { label: t(pCommon("balance")), value: "balance" },
+      { label:  t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
       { label:  t(p("status")), value: "blocked" },
       { label: t(p("comment")), value: "comment" },
     ];
@@ -207,7 +210,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          width="25%"
+          width="20%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
@@ -232,6 +235,18 @@ export const AccountTable: React.FC<Props> = ({
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
           render={(b: Money) => moneyToString(b) + t(p("unit")) }
+        />
+        <Table.Column<AdminAccountInfo>
+          dataIndex="blockThresholdAmount"
+          title={(
+            <Space>
+              { t(pCommon("blockThresholdAmount"))}
+              <Tooltip title={t(p("blockThresholdAmountTooltip"))}>
+                <ExclamationCircleOutlined />
+              </Tooltip>
+            </Space>
+          )}
+          render={(_, r) => `${moneyToString(r.blockThresholdAmount ?? r.defaultBlockThresholdAmount)} ${t(p("unit"))}`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
@@ -264,7 +279,9 @@ export const AccountTable: React.FC<Props> = ({
                 r.blocked
                   ? (
                     <a onClick={() => {
-                      if (moneyToNumber(r.balance) > 0) {
+                      if (moneyToNumber(r.balance) > moneyToNumber(
+                        r.blockThresholdAmount ?? r.defaultBlockThresholdAmount,
+                      )) {
                         modal.confirm({
                           title: t(p("unblockConfirmTitle")),
                           icon: <ExclamationCircleOutlined />,
@@ -323,6 +340,17 @@ export const AccountTable: React.FC<Props> = ({
                     </a>
                   )
               }
+              {showedTab === "TENANT" && (
+                <SetBlockThresholdAmountLink
+                  accountName={r.accountName}
+                  balance={r.balance}
+                  reload={reload}
+                  currentAmount={r.blockThresholdAmount}
+                  defaultBlockThresholdAmount={r.defaultBlockThresholdAmount}
+                >
+                  {t(p("blockThresholdAmount"))}
+                </SetBlockThresholdAmountLink>
+              )}
             </Space>
           )}
         />

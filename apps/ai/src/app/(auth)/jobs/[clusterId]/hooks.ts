@@ -14,7 +14,7 @@ import { UseQueryResult } from "@tanstack/react-query";
 import { Form, FormInstance } from "antd";
 import { useMemo } from "react";
 
-import { AccessiblityType } from "./LaunchAppForm";
+import { AccessibilityType } from "./LaunchAppForm";
 
 interface Option {
   label: string;
@@ -36,7 +36,7 @@ export function useDataOptions<T>(
 ): { dataOptions: Option[], isDataLoading: boolean } {
   const typePath = [dataType, "type"];
   const itemType = Form.useWatch(typePath, form);
-  const isItemPublic = itemType !== undefined ? itemType === AccessiblityType.PUBLIC : itemType;
+  const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
 
   const { data: items, isLoading: isDataLoading } = queryHook({
     isPublic : isItemPublic, clusterId,
@@ -59,7 +59,7 @@ export function useDataVersionOptions<T>(
   const namePath = [dataType, "name"];
   const selectedItem = Form.useWatch(namePath, form);
   const itemType = Form.useWatch(typePath, form);
-  const isItemPublic = itemType !== undefined ? itemType === AccessiblityType.PUBLIC : itemType;
+  const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
 
   const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
     [`${dataType}Id`]: selectedItem, isPublic : isItemPublic,

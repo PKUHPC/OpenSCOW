@@ -78,6 +78,7 @@ export default {
     admin: "管理员",
     accountCount: "账户数量",
     tenantBalance: "租户余额",
+    defaultAccountBlockThreshold: "默认账户封锁阈值",
     jobBillingTable: "作业价格表",
     operationLog: "操作日志",
     unfinishedJob: "未结束的作业",
@@ -107,6 +108,7 @@ export default {
     export: "导出",
     exportMaxDataErrorMsg: "导出明细过多，最多导出{}条，请重新选择!",
     exportNoDataErrorMsg: "导出为空，请重新选择",
+    blockThresholdAmount: "封锁阈值",
     other: "其他",
   },
   dashboard: {
@@ -227,6 +229,9 @@ export default {
         owner:"拥有者",
         ownerIdOrName: "拥有者ID或姓名",
         tenant:"租户",
+        blockThresholdAmount: "封锁阈值",
+        blockThresholdAmountTooltip: "当账户余额低于此值时，账户将被封锁",
+
         comment:"备注",
         status:"状态",
         mangerMember:"管理成员",
@@ -244,6 +249,17 @@ export default {
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
         blockSuccess: "封锁帐户成功！",
         blockFail: "封锁帐户失败！",
+      },
+      setBlockThresholdAmountModal: {
+        setSuccess:"设置成功",
+        setFail: "设置失败",
+        setAmount:"设置封锁阈值",
+        blockThresholdAmount: "封锁阈值",
+        curBlockThresholdAmount: "当前封锁阈值",
+        curDefaultBlockThresholdAmount: "当前租户默认封锁阈值: ",
+        useDefaultBlockThresholdAmount: "使用租户默认封锁阈值",
+        confirmUseDefaultBlockThresholdAmount: "确认使用租户默认封锁阈值？",
+
       },
     },
     admin:{
@@ -603,6 +619,10 @@ export default {
       },
       tenantSelector:{
         fresh:"刷新租户列表",
+      },
+      changeDefaultAccountBlockThresholdModal: {
+        defaultAccountBlockThresholdAmount: "默认账户封锁阈值",
+        setAmount: "设置默认账户封锁阈值",
       },
     },
     user:{
@@ -1076,6 +1096,8 @@ export default {
       exportChargeRecord: "导出消费记录",
       exportPayRecord: "导出充值记录",
       exportOperationLog: "导出操作日志",
+      setAccountBlockThreshold: "设置账户封锁阈值",
+      setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
     },
     operationDetails: {
       login: "用户登录",
@@ -1146,6 +1168,9 @@ export default {
       exportOperationLogFromAccount: "导出账户{}的操作日志",
       exportOperationLogFromTenant: "导出租户{}的操作日志",
       exportOperationLogFromAdmin: "导出平台的操作日志",
+      setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
+      setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
+      unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
     },
   },
   userRoles: {
