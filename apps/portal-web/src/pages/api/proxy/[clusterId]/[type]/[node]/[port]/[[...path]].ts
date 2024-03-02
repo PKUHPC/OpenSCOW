@@ -38,10 +38,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const { writeAppProxy } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
 
-  await writeAppProxy({ session: {
+  await writeAppProxy({
     user: user.identityId,
     target: target,
-  } });
+  });
 
 
   proxy.web(req, res, {
