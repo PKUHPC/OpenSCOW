@@ -52,7 +52,8 @@ export const GetPaymentsSchema = typeboxRouteSchema({
     accountName: Type.Optional(Type.Array(Type.String())),
 
     searchType: Type.Enum(SearchType),
-
+    // 充值类型
+    type:Type.Optional(Type.Array(Type.String())),
   }),
 
   responses: {
@@ -91,7 +92,7 @@ export const getPaymentRecordTarget = (
 
 export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
 
-  const { endTime, startTime, accountName, searchType } = req.query;
+  const { endTime, startTime, accountName, searchType, type } = req.query;
 
   const client = getClient(ChargingServiceClient);
 
@@ -121,6 +122,7 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountName),
     startTime,
     endTime,
+    type:type ?? [],
   }), ["total"]);
 
   const returnAuditInfo = user.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||

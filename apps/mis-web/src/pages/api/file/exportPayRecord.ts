@@ -44,6 +44,7 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
     targetName: Type.Optional(Type.Array(Type.String())),
     searchType: Type.Enum(SearchType),
+    type:Type.Array(Type.String()),
   }),
 
   responses:{
@@ -57,7 +58,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   const { query } = req;
 
-  const { columns, startTime, endTime, targetName, searchType, count } = query;
+  const { columns, startTime, endTime, targetName, searchType, count, type } = query;
 
   let user;
   if (searchType === SearchType.tenant) {
@@ -118,6 +119,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
       startTime,
       endTime,
       target,
+      type,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);

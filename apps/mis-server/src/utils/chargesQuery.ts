@@ -124,3 +124,14 @@ export const getPaymentsTargetSearchParam = (target:
   }
   return searchParam;
 };
+
+/**
+ * generate payment' search type
+ */
+export const getPaymentsSearchType = (type: string[]) => {
+  if (!type.length) {
+    return { type: { $ne: null } };
+  }
+
+  return { type:{ $in:type } };
+};

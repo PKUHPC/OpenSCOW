@@ -341,6 +341,7 @@ export default {
         paymentAmount:"交费金额",
         ipAddress:"IP地址",
         operatorId:"操作者ID",
+        searchTypePlaceholder:"多个请用逗号隔开",
       },
     },
     dashboard:{
