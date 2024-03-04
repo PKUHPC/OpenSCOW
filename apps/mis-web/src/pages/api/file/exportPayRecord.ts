@@ -42,7 +42,7 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     count: Type.Number(),
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
-    targetName: Type.Optional(Type.String()),
+    targetName: Type.Optional(Type.Array(Type.String())),
     searchType: Type.Enum(SearchType),
   }),
 
@@ -68,7 +68,9 @@ export default route(ExportPayRecordSchema, async (req, res) => {
       user = await authenticate((i) =>
         i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
           i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
-          i.accountAffiliations.some((x) => x.accountName === targetName && x.role !== UserRole.USER),
+          // 排除掉前面的租户财务员和管理员，只剩下账户管理员
+          targetName.length === 1 &&
+          i.accountAffiliations.some((x) => x.accountName === targetName[0] && x.role !== UserRole.USER),
       )(req, res);
     } else {
       user = await authenticate((i) =>

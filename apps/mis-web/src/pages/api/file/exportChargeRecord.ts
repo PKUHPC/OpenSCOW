@@ -39,7 +39,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
     type: Type.Optional(Type.String()),
-    accountName: Type.Optional(Type.String()),
+    accountName: Type.Optional(Type.Array(Type.String())),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
     userIds: Type.Optional(Type.String()),

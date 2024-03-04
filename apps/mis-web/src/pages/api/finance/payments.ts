@@ -49,7 +49,7 @@ export const GetPaymentsSchema = typeboxRouteSchema({
      */
     endTime: Type.String({ format: "date-time" }),
 
-    accountName: Type.Optional(Type.String()),
+    accountName: Type.Optional(Type.Array(Type.String())),
 
     searchType: Type.Enum(SearchType),
 
@@ -67,20 +67,22 @@ export const getPaymentRecordTarget = (
   searchType: SearchType,
   user: UserInfo,
   tenantOfAccount: string,
-  targetName: string | undefined,
+  targetName: string[] | undefined,
 ) => {
   switch (searchType) {
   case SearchType.tenant:
     return targetName
-      ? { $case:"tenant" as const, tenant:{ tenantName:targetName } }
+      ? { $case:"tenant" as const, tenant:{ tenantName:targetName[0] } }
       : { $case:"allTenants" as const, allTenants:{ } };
   case SearchType.selfTenant:
     return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
   case SearchType.selfAccount:
-    return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
+    return { $case:"specificAccountsOfTenant" as const,
+      specificAccountsOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
   case SearchType.account:
     return targetName
-      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:tenantOfAccount, accountName:targetName! } }
+      ? { $case:"specificAccountsOfTenant" as const,
+        specificAccountsOfTenant:{ tenantName:tenantOfAccount, accountName:targetName! } }
       : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
   default:
     break;
@@ -100,7 +102,9 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     user = await authenticate((i) =>
       i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
-      i.accountAffiliations.some((x) => x.accountName === accountName && x.role !== UserRole.USER),
+      // 排除掉前面的租户财务员和管理员，只剩下账户管理员
+      accountName.length === 1 &&
+      i.accountAffiliations.some((x) => x.accountName === accountName[0] && x.role !== UserRole.USER),
     )(req, res);
     if (!user) { return; }
   } else {

@@ -32,7 +32,7 @@ import { formatMetadataDisplay } from "src/utils/metadata";
 import { AccountSelector } from "./AccountSelector";
 
 interface Props {
-  accountName?: string;
+  accountName?: string [];
   showAccountName: boolean;
   showTenantName: boolean;
   isPlatformRecords?: boolean;
@@ -40,7 +40,7 @@ interface Props {
 }
 
 interface FilterForm {
-  name?: string;
+  name?: string [];
   time: [dayjs.Dayjs, dayjs.Dayjs];
   type?: string;
   userIds?: string;
@@ -60,13 +60,13 @@ export const ChargeTable: React.FC<Props> = ({
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
-  const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(accountName);
+  const [selectedAccountNames, setSelectedAccountNames] = useState<string[] | undefined>(accountName);
   const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
-    name: string | undefined,
+    name: string[] | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
     type: string | undefined
     userIds: string | undefined}>({
@@ -93,10 +93,11 @@ export const ChargeTable: React.FC<Props> = ({
       type: undefined,
       userIds: undefined,
     });
-    setSelectedAccountName(accountName);
+    setSelectedAccountNames(accountName);
   }, [accountName]);
 
   const recordsPromiseFn = useCallback(async () => {
+    console.log("query.name", query.name);
     return await api.getCharges({ query: {
       accountName: query.name,
       startTime: query.time[0].clone().startOf("day").toISOString(),
@@ -184,7 +185,8 @@ export const ChargeTable: React.FC<Props> = ({
             initialValues={query}
             onFinish={async () => {
               const { name, userIds, time, type } = await form.validateFields();
-              setQuery({ name: selectedAccountName ?? name, userIds, time, type: selectedType ?? type });
+              console.log("selectedAccountNames", selectedAccountNames);
+              setQuery({ name: selectedAccountNames ?? name, userIds, time, type: selectedType ?? type });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
           >
@@ -193,7 +195,7 @@ export const ChargeTable: React.FC<Props> = ({
                 <Form.Item label={t("common.account")} name="name">
                   <AccountSelector
                     onChange={(value) => {
-                      setSelectedAccountName(value);
+                      setSelectedAccountNames(value);
                     }}
                     placeholder={t("common.selectAccount")}
                     fromAllTenants={showTenantName ? true : false}
