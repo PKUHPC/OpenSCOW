@@ -105,7 +105,7 @@ export const ClusterConfigSchema = Type.Object({
   enabledIn: Type.Object({
     hpc: Type.Boolean({ description: "是否在HPC中启用" }),
     ai: Type.Boolean({ description: "是否在AI中启用" }),
-  }, { description: "集群在哪些模块中启用", default: { hpc: true, ai: false } }),
+  }, { description: "集群在HPC或者Ai中是否启用，默认只在HPC集群启用", default: { hpc: true, ai: false } }),
 
   k8s: Type.Optional(Type.Object({
     runtime: Type.Enum(k8sRuntime, { description: "k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd",
