@@ -70,9 +70,19 @@ message WriteTerminalMsgResponse {
 
 }
 
+message HttpRequest {
+  string method = 1;
+  string url = 2;
+  repeated string headers = 3;
+  string client_ip = 4;
+  string body = 5;
+  string timestamp = 6;
+}
+
 message WriteAppProxyRequest {
   string user = 1;
   string target = 2;
+  HttpRequest request = 3;
 }
 
 message WriteAppProxyResponse {
