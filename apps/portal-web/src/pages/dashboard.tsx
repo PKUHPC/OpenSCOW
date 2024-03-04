@@ -90,9 +90,9 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
-            cpuUsage:(x.runningCpuCount / x.cpuCoreCount).toFixed(2),
+            cpuUsage:((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
             // 有些分区没有gpu就为空，前端显示'-'
-            ...x.gpuCoreCount ? { gpuUsage:(x.runningGpuCount / x.gpuCoreCount).toFixed(2) } : {},
+            ...x.gpuCoreCount ? { gpuUsage:((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) } : {},
           })),
         );
 
