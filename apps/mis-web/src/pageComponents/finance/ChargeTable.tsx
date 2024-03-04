@@ -40,9 +40,9 @@ interface Props {
 }
 
 interface FilterForm {
-  name?: string [];
+  name?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs];
-  type?: string;
+  type?: string[];
   userIds?: string;
 }
 
@@ -61,14 +61,14 @@ export const ChargeTable: React.FC<Props> = ({
   const languageId = useI18n().currentLanguage.id;
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountNames, setSelectedAccountNames] = useState<string[] | undefined>(accountName);
-  const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
+  const [selectedType, setSelectedType] = useState<string[] | undefined>(undefined);
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
     name: string[] | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
-    type: string | undefined
+    type: string[] | undefined
     userIds: string | undefined}>({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
@@ -185,7 +185,6 @@ export const ChargeTable: React.FC<Props> = ({
             initialValues={query}
             onFinish={async () => {
               const { name, userIds, time, type } = await form.validateFields();
-              console.log("selectedAccountNames", selectedAccountNames);
               setQuery({ name: selectedAccountNames ?? name, userIds, time, type: selectedType ?? type });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
@@ -211,8 +210,9 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.type")} name="type">
               <Select
-                style={{ minWidth: "100px" }}
+                style={{ minWidth: "120px" }}
                 allowClear
+                mode="multiple"
                 onChange={(value) => {
                   setSelectedType(value);
                 }}

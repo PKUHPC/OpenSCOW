@@ -37,7 +37,7 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
 
     // 消费类型
-    type: Type.Optional(Type.String()),
+    type: Type.Optional(Type.Array(Type.String())),
 
     // 消费的用户id
     userIds: Type.Optional(Type.Array(Type.String())),
@@ -71,7 +71,7 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
   const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime,
     endTime,
-    type,
+    type:type ?? [],
     userIds: userIds ?? [],
     target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
   }), ["totalAmount", "totalCount"]);

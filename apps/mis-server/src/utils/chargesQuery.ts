@@ -78,25 +78,12 @@ export const getChargesTargetSearchParam = (
 /**
  * generate charge records' search type
  */
-export const getChargesSearchType = (type: string | undefined) => {
-  const typesToSearch = [
-    misConfig.jobChargeType,
-    misConfig.changeJobPriceType,
-    ...(misConfig.customChargeTypes || []),
-  ];
-
-  let searchType = {};
-  if (!type) {
-    searchType = { type: { $ne: null } };
-  } else {
-    if (type === CHARGE_TYPE_OTHERS) {
-      searchType = { type: { $nin: typesToSearch } };
-    } else {
-      searchType = { type: type };
-    }
+export const getChargesSearchType = (type: string[]) => {
+  if (!type.length) {
+    return { type: { $ne: null } };
   }
 
-  return searchType;
+  return { type:{ $in:type } };
 };
 
 
