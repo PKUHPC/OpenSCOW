@@ -119,7 +119,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         ...data,
         operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
         operationType: data.operationEvent?.["$case"] || "unknown",
-        operationDetail: getOperationDetail(data.operationEvent, t, tArgs),
+        operationDetail: getOperationDetail(data.operationEvent, t, tArgs, languageId),
       };
     });
   };

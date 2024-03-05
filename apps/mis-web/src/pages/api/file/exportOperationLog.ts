@@ -216,7 +216,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
         id: x.operationLogId,
         operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
         operationType: OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
-        operationDetail: x.operationEvent ? getOperationDetail(x.operationEvent, t, tArgs) : "",
+        operationDetail: x.operationEvent ? getOperationDetail(x.operationEvent, t, tArgs, languageId) : "",
         operationResult: OperationResultTexts[x.operationResult],
         operatorUserId: x.operatorUserId,
         operationTime: x.operationTime ? new Date(x.operationTime).toISOString() : "",
