@@ -25,13 +25,13 @@ export const ShellAuditConfigSchema = Type.Object({
 
 });
 
-const AUDIT_CONFIG_NAME = "audit";
+const SHELL_AUDIT_CONFIG_NAME = "shellAudit";
 
 export type ShellAuditConfigSchema = Static<typeof ShellAuditConfigSchema>;
 
 export const getShellAuditConfig: GetConfigFn<ShellAuditConfigSchema> = (baseConfigPath) => {
   const config =
-    getConfigFromFile(ShellAuditConfigSchema, AUDIT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+    getConfigFromFile(ShellAuditConfigSchema, SHELL_AUDIT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
   return config;
 
