@@ -102,10 +102,13 @@ export const ClusterConfigSchema = Type.Object({
     transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
   })),
 
-  enabledIn: Type.Object({
-    hpc: Type.Boolean({ description: "是否在HPC中启用" }),
-    ai: Type.Boolean({ description: "是否在AI中启用" }),
-  }, { description: "集群在HPC或者Ai中是否启用，默认只在HPC集群启用", default: { hpc: true, ai: false } }),
+  hpc: Type.Object({
+    enabled: Type.Boolean({ description: "是否在HPC中启用" }),
+  }, { description: "集群在HPC中是否启用, 默认启用", default: { enabled: true } }),
+
+  ai: Type.Object({
+    enabled: Type.Boolean({ description: "是否在AI中启用" }),
+  }, { description: "集群在AI中是否启用, 默认不启用", default: { enabled: false } }),
 
   k8s: Type.Optional(Type.Object({
     runtime: Type.Enum(k8sRuntime, { description: "k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd",
@@ -119,6 +122,10 @@ export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
 export type ClusterType = "hpc" | "ai";
 
+/**
+ * @param
+ * type: 获取的集群类型，如果不传则返回所有集群，如果传入则返回指定类型的集群，例如：["hpc", "ai"] 返回所有HPC和AI集群
+ */
 export type GetClusterConfigFn<T> = (baseConfigPath?: string, logger?: Logger, type?: ClusterType[]) => T;
 
 export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigSchema>> =
@@ -165,7 +172,7 @@ export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigS
         if (clusterInfo) {
           let enabled = false;
           for (const type of types) {
-            if (clusterInfo.enabledIn[type]) {
+            if (clusterInfo[type].enabled) {
               enabled = true;
               break;
             }

@@ -56,10 +56,13 @@ crossClusterFileTransfer:
   # 传输节点的地址(ip地址:端口号)
   transferNode: localhost:22222
 
-# 集群在HPC或者Ai中是否启用，默认只在HPC集群启用
-enabledIn:
-  hpc: true
-  ai: false
+# 集群在HPC或是否启用，默认为true
+hpc:
+  enabled: boolean
+
+# 集群在AI或是否启用，默认为false
+ai:
+  enabled: boolean
 ```
 
 ## 注意
