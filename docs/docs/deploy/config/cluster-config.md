@@ -58,11 +58,11 @@ crossClusterFileTransfer:
 
 # 集群在HPC或是否启用，默认为true
 hpc:
-  enabled: boolean
+  enabled: true
 
 # 集群在AI或是否启用，默认为false
 ai:
-  enabled: boolean
+  enabled: false
 ```
 
 ## 注意
