@@ -48,6 +48,7 @@ export const operationLogServiceServer = plugin((server) => {
         operatorIp,
         operationResult: dbOperationResult,
         metaData: targetAccountName ? { ...operationEvent, targetAccountName } : operationEvent,
+        customEvent: operationEvent.$case === "customEvent" ? operationEvent.customEvent.type : undefined,
       });
       await em.persistAndFlush(operationLog);
       return [];

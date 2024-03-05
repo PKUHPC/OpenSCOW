@@ -30,6 +30,7 @@ export async function filterOperationLogs(
     operationType,
     operationTargetAccountName,
     operationDetail,
+    customEventType,
   }: OperationLogFilter,
 ) {
 
@@ -41,6 +42,7 @@ export async function filterOperationLogs(
       ...((operationType) ? [{ metaData: { $case: operationType } as OperationEvent }] : []),
       ...((operationTargetAccountName) ? [{ metaData: { targetAccountName: operationTargetAccountName } }] : []),
       ...(operationDetail ? [ { metaData: { $like: `%${operationDetail}%` } }] : []),
+      ...(customEventType ? [{ metaData: { customEvent: { type : customEventType } } }] : []),
     ],
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };

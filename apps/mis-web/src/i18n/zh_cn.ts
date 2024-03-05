@@ -1098,6 +1098,7 @@ export default {
       exportOperationLog: "导出操作日志",
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
+      customEvent: "自定义操作行为",
     },
     operationDetails: {
       login: "用户登录",
