@@ -598,9 +598,21 @@ message ExportOperationLogResponse {
   repeated OperationLog operation_logs = 1;
 }
 
+message GetCustomEventTypesRequest {
+
+}
+
+message GetCustomEventTypesResponse {
+  message CustomEventType {
+    string type = 1;
+    common.I18nObject name = 2;
+  }
+  repeated CustomEventType custom_event_types = 1;
+}
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
   rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
   rpc ExportOperationLog(ExportOperationLogRequest) returns (stream ExportOperationLogResponse);
+  rpc GetCustomEventTypes(GetCustomEventTypesRequest) returns (GetCustomEventTypesResponse);
 }

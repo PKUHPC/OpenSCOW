@@ -96,6 +96,7 @@ export const OperationLog = Type.Object({
   operationResult: Type.Enum(OperationResult),
   operationTime: Type.Optional(Type.String()),
   operationEvent: Type.Any(),
+  customEvent: Type.Optional(Type.String()),
 });
 export type OperationLog = Static<typeof OperationLog>;
 

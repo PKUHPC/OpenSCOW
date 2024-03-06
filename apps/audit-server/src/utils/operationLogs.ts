@@ -42,7 +42,7 @@ export async function filterOperationLogs(
       ...((operationType) ? [{ metaData: { $case: operationType } as OperationEvent }] : []),
       ...((operationTargetAccountName) ? [{ metaData: { targetAccountName: operationTargetAccountName } }] : []),
       ...(operationDetail ? [ { metaData: { $like: `%${operationDetail}%` } }] : []),
-      ...(customEventType ? [{ metaData: { customEvent: { type : customEventType } } }] : []),
+      ...(customEventType ? [{ customEvent: customEventType }] : []),
     ],
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
@@ -57,7 +57,10 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
     operatorIp: x.operatorIp,
     operationTime: x.operationTime?.toISOString(),
     operationResult: operationResultFromJSON(x.operationResult),
-    operationEvent: (x.metaData),
+    operationEvent: x.metaData?.$case === "customEvent" ? { ...x.metaData, "customEvent": {
+      ... x.metaData.customEvent,
+      type: x.customEvent || "",
+    } } : (x.metaData),
   };
   return grpcOperationLog;
 }
