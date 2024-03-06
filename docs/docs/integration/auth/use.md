@@ -16,18 +16,43 @@ title: 使用自定义认证系统
 ```yaml title="install.yaml"
 auth:
   custom:
-    # 镜像地址。必填，只要是能访问的镜像地址即可。
-    image: "ghcr.io/pkuhpc/scow-auth:master",
-  
-    # 端口映射（可选）
-    # ports: ["80:80", "3302:3302"],
-  
-    # 环境变量（可选）
-    # environment: ["KEY=123"],
-  
-    # 卷映射（可选）
+    # 自定义认证系统类型
+    # external（使用外部系统） | image（使用自定义认证系统镜像），默认为 image
+    type: image
+    # 自定义外部认证系统配置
+    # 如果 type 为 external 则需要配置 external 选项，否则仍然使用默认认证系统 URL
+    external:
+      url: http://custom-url:port
+
+    # 容器相关配置
+    image:
+      # 自定义认证系统镜像名。必填
+      # imageName: my-custom-auth:v1.0
+
+      # 端口映射。可选
+      # ports:
+      #   - "5000:5000"
+
+      # 更多挂载卷。可选
+      # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
+      # volumes:
+      #   - "./myfile:/etc/myfile"
+
+    # 下列 image、ports、volumes 配置为老版本的配置，已过时，未来将会删除
+    # 兼容老版本,image 在老版本中为字符串
+    # 定义认证系统镜像名。必填
+    # image: my-custom-auth:v1.0
+
+    # 兼容老版本, 端口映射。可选
+    # ports:
+    #   - "5000:5000"
+
+    # 兼容老版本, 更多挂载卷。可选
     # 默认添加/etc/hosts:/etc/hosts和./config:/etc/scow
-    # 可选添加其他映射
     # volumes:
-    #   - ./test.py:/etc/test.py
+    #   - "./myfile:/etc/myfile"
+
+    # 环境变量，可选。
+    # environment:
+    #   - DEBUG=log
 ```

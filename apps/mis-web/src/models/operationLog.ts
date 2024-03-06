@@ -11,12 +11,13 @@
  */
 
 import { OperationEvent, OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
+import { ExportChargeRecord, ExportOperationLog, ExportPayRecord } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
 import { prefix } from "src/i18n";
 import en from "src/i18n/en";
-import { nullableMoneyToString } from "src/utils/money";
+import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 export const OperationResult = {
   UNKNOWN: 0,
@@ -77,6 +78,13 @@ export const OperationType: OperationTypeEnum = {
   createTenant: "createTenant",
   tenantPay: "tenantPay",
   submitFileItemAsJob: "submitFileItemAsJob",
+  exportUser: "exportUser",
+  exportAccount: "exportAccount",
+  exportChargeRecord: "exportChargeRecord",
+  exportPayRecord: "exportPayRecord",
+  exportOperationLog: "exportOperationLog",
+  setAccountBlockThreshold: "setAccountBlockThreshold",
+  setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
 };
 
 export const OperationLog = Type.Object({
@@ -165,6 +173,13 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     createTenant: t(pTypes("createTenant")),
     tenantPay: t(pTypes("tenantPay")),
     submitFileItemAsJob: t(pTypes("submitFileItemAsJob")),
+    exportUser: t(pTypes("exportUser")),
+    exportAccount: t(pTypes("exportAccount")),
+    exportChargeRecord: t(pTypes("exportChargeRecord")),
+    exportPayRecord: t(pTypes("exportPayRecord")),
+    exportOperationLog: t(pTypes("exportOperationLog")),
+    setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
+    setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
   };
 
 };
@@ -211,6 +226,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   accountPay: "030304",
   blockAccount: "030305",
   unblockAccount: "030306",
+  setAccountBlockThreshold: "030307",
+  setAccountDefaultBlockThreshold: "030308",
   importUsers: "040101",
   setPlatformAdmin: "040201",
   unsetPlatformAdmin: "040202",
@@ -220,6 +237,11 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   setPlatformBilling: "040206",
   createTenant: "040301",
   tenantPay: "040302",
+  exportUser: "040303",
+  exportAccount: "040304",
+  exportChargeRecord: "040305",
+  exportPayRecord: "040306",
+  exportOperationLog: "040307",
 };
 
 type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
@@ -243,25 +265,42 @@ export const getOperationDetail = (
     case "logout":
       return t(pDetails("logout"));
     case "submitJob":
-      return t(pDetails("submitJob"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
+      return t(pDetails("submitJob"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobId || "-"]);
     case "endJob":
-      return t(pDetails("endJob"), [operationEvent[logEvent].jobId]);
+      return t(pDetails("endJob"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobId || "-"]);
     case "addJobTemplate":
-      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
+      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobTemplateId]);
     case "deleteJobTemplate":
-      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].jobTemplateId]);
+      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].jobTemplateId]);
     case "updateJobTemplate":
       return t(pDetails("updateJobTemplate"),
-        [operationEvent[logEvent].jobTemplateId, operationEvent[logEvent].newJobTemplateId]);
+        [
+          operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobTemplateId,
+          operationEvent[logEvent].newJobTemplateId,
+        ]);
     case "shellLogin":
       return t(pDetails("shellLogin"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].loginNode]);
     case "createDesktop":
-      return t(pDetails("createDesktop"), [operationEvent[logEvent].desktopName, operationEvent[logEvent].wm]);
+      return t(pDetails("createDesktop"), [
+        operationEvent[logEvent].clusterId || "unknown",
+        operationEvent[logEvent].loginNode || "unknown",
+        operationEvent[logEvent].desktopName,
+        operationEvent[logEvent].wm,
+      ]);
     case "deleteDesktop":
       return t(pDetails("deleteDesktop"),
-        [operationEvent[logEvent].loginNode, operationEvent[logEvent].desktopId]);
+        [
+          operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].loginNode,
+          operationEvent[logEvent].desktopId,
+        ]);
     case "createApp":
-      return t(pDetails("createApp"), [operationEvent[logEvent].accountName, operationEvent[logEvent].jobId]);
+      return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
     case "createFile":
       return t(pDetails("createFile"), [operationEvent[logEvent].path]);
     case "deleteFile":
@@ -278,7 +317,8 @@ export const getOperationDetail = (
       return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
     case "setJobTimeLimit":
       return t(pDetails("setJobTimeLimit"),
-        [operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
+        [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
     case "createUser":
       return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
     case "addUserToAccount":
@@ -342,11 +382,11 @@ export const getOperationDetail = (
       return t(pDetails("unblockAccount"),
         [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
     case "importUsers":
-      return `${t(pDetails("importUsers1"), [operationEvent[logEvent].tenantName])}${
-        operationEvent[logEvent].importAccounts.map(
-          (account: { accountName: string; userIds: string[];}) =>
-            (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
-        ).join(", ")}`;
+      return `${t(pDetails("importUsers1"),
+        [operationEvent[logEvent].tenantName])}${operationEvent[logEvent].importAccounts.map(
+        (account: { accountName: string; userIds: string[]; }) =>
+          (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
+      ).join(", ")}`;
     case "setPlatformAdmin":
       return t(pDetails("setPlatformAdmin"), [operationEvent[logEvent].userId]);
     case "unsetPlatformAdmin":
@@ -368,10 +408,113 @@ export const getOperationDetail = (
         [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
     case "submitFileItemAsJob":
       return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
+    case "exportUser":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportUser"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
+    case "exportAccount":
+      return operationEvent[logEvent].tenantName
+        ? t(pDetails("tenantExportAccount"), [operationEvent[logEvent].tenantName])
+        : t(pDetails("adminExportUser"));
+    case "exportChargeRecord":
+      return getExportChargeRecordDetail(operationEvent[logEvent], t);
+    case "exportPayRecord":
+      return getExportPayRecordDetail(operationEvent[logEvent], t);
+    case "exportOperationLog":
+      return getExportOperationLogDetail(operationEvent[logEvent], t);
+    case "setAccountBlockThreshold":
+      return operationEvent[logEvent].thresholdAmount
+        ? t(pDetails("setAccountBlockThreshold"),
+          [operationEvent[logEvent].accountName, moneyToString(operationEvent[logEvent].thresholdAmount!) ])
+        : t(pDetails("unsetAccountBlockThreshold"), [operationEvent[logEvent].accountName]);
+    case "setAccountDefaultBlockThreshold":
+      return t(pDetails("setAccountDefaultBlockThreshold"),
+        [operationEvent[logEvent].tenantName,
+          nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
     default:
       return "-";
     }
   } catch (e) {
     return "-";
   }
+};
+
+const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: OperationTextsTransType) => {
+  const exportChargeTarget = exportChargeRecord.target;
+  if (!exportChargeTarget) {
+    return "-";
+  }
+  const exportChargeCase = exportChargeTarget.$case;
+  switch (exportChargeCase) {
+  case "accountOfTenant":
+    const accountOfTenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportAccountChargeRecordOfTenant"),
+      [accountOfTenant.tenantName, accountOfTenant.accountName]);
+  case "accountsOfTenant":
+    const accountsOfTenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportAccountsChargeRecordOfTenant"),
+      [accountsOfTenant.tenantName]);
+  case "accountsOfAllTenants":
+    return t(pDetails("exportAccountChargeRecordOfAdmin"));
+  case "tenant":
+    const tenant = exportChargeTarget[exportChargeCase];
+    return t(pDetails("exportTenantChargeRecord"), [tenant.tenantName]);
+  case "allTenants":
+    return t(pDetails("exportTenantsChargeRecordOfAdmin"));
+  default:
+    return "-";
+  }
+};
+
+const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: OperationTextsTransType) => {
+
+  const exportPayTarget = exportPayRecord.target;
+  if (!exportPayTarget) {
+    return "-";
+  }
+  const exportPayCase = exportPayTarget.$case;
+  switch (exportPayCase) {
+  case "accountOfTenant":
+    const accountOfTenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportAccountPayRecordOfTenant"),
+      [accountOfTenant.tenantName, accountOfTenant.accountName]);
+  case "accountsOfTenant":
+    const accountsOfTenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportAccountsPayRecordOfTenant"),
+      [accountsOfTenant.tenantName]);
+  case "tenant":
+    const tenant = exportPayTarget[exportPayCase];
+    return t(pDetails("exportTenantPayRecord"), [tenant.tenantName]);
+  case "allTenants":
+    return t(pDetails("exportTenantsPayRecordOfAdmin"));
+  default:
+    return "-";
+  }
+};
+
+const getExportOperationLogDetail = (exportOperationLog: ExportOperationLog, t: OperationTextsTransType) => {
+  const exportOperationLogSource = exportOperationLog.source;
+  if (!exportOperationLogSource) {
+    return "-";
+  }
+  const sourceCase = exportOperationLogSource.$case;
+  switch (sourceCase) {
+  case "user":
+    const user = exportOperationLogSource.user;
+    return t(pDetails("exportOperationLogFromUser"),
+      [user.userId]);
+  case "account":
+    const account = exportOperationLogSource.account;
+    return t(pDetails("exportOperationLogFromAccount"),
+      [account.accountName]);
+  case "tenant":
+    const tenant = exportOperationLogSource.tenant;
+    return t(pDetails("exportOperationLogFromTenant"),
+      [tenant.tenantName]);
+  case "admin":
+    return t(pDetails("exportOperationLogFromAdmin"));
+  default:
+    return "-";
+  }
+
 };

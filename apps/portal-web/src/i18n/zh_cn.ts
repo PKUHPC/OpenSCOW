@@ -13,7 +13,8 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkText: "管理系统",
+    linkTextMis: "管理系统",
+    linkTextAI: "SCOW AI",
   },
   // routes
   routes: {
@@ -65,6 +66,8 @@ export default {
         oldPassword:"原密码",
         newPassword: "新密码",
         confirm: "确认密码",
+        userNotExist:"用户不存在",
+        unavailable:"本功能在当前配置下不可用",
       },
     },
     // job
@@ -233,6 +236,7 @@ export default {
         saveFileFail: "文件保存失败: {}",
         saveFileSuccess: "文件保存成功",
         fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+        fileFetchAbortPrompt: "获取文件 {} 操作被终止",
       },
       createFileModal: {
         createErrorMessage: "同名文件或者目录已经存在！",
@@ -284,6 +288,9 @@ export default {
           deleteConfirmOk: "确认",
           deleteSuccessMessage: "删除成功",
           submitConfirmTitle: "确认提交",
+          submitConfirmNotice: "请确保脚本文件提供了可用的绝对路径作为工作目录，"
+          + "如未提供则默认为脚本文件所在目录",
+
           submitConfirmContent: "确认提交{}至{}?",
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功！您的新作业ID为：{}",
@@ -418,9 +425,9 @@ export default {
         clusterName:"集群",
         partitionName:"分区",
         nodeCount:"节点总数",
-        runningNodeCount:"运行中节点数",
-        cpuCoreCount:"CPU核心数",
-        gpuCoreCount:"GPU卡数",
+        pendingJobCount:"作业排队数",
+        cpuUsage:"CPU使用率",
+        gpuUsage:"GPU使用率",
         usageRatePercentage:"节点使用率",
         partitionStatus:"分区状态",
         available:"可用",
@@ -437,6 +444,27 @@ export default {
         card:"卡",
         job:"作业",
         pending:"排队中",
+      },
+      addEntryModal:{
+        addQuickEntry:"添加快捷方式",
+        cancel:"取消",
+      },
+      changeClusterModal:{
+        selectCluster:"选择集群",
+        cluster:"集群",
+        loginNode:"登录节点",
+      },
+      quickEntry:{
+        quickEntry:"快捷入口",
+        finish:"完成",
+        cancel:"取消",
+        edit:"编辑",
+      },
+      sortable:{
+        alreadyExist:"已存在该快捷方式",
+        exceedMaxSize:"最多只能添加10个快捷方式",
+        saveFailed:"保存失败",
+        saveSuccessfully:"保存成功",
       },
     },
   },
@@ -534,11 +562,16 @@ export default {
         popoverContent3: "文件下载",
         popoverContentFile:"文件名",
         popoverContent4: "，输入",
-        popoverContent5: "，您当前路径下的该文件会被下载到本地，目前不支持输入相对路径，",
+        popoverContent5: "，您当前路径下的该文件会被下载到本地",
 
-        popoverContent6: "如果需要下载其他目录下的文件请使用",
+        popoverContent6: "目前不支持输入相对路径，如果需要下载或编辑其他目录下的文件请使用",
         popoverContent7: "命令跳转到文件系统。",
         popoverContent8: "使用示例：",
+
+        popoverContent9: "文件编辑",
+        popoverContent10: "，输入",
+        popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
+
         command:"命令",
       },
       index: {
@@ -547,7 +580,7 @@ export default {
       },
     },
     _app: {
-      textExceedsLength:"终端登录欢迎提示信息过多，请减少不必要的信息输出！",
+      textExceedsLength:"终端登录提示信息过多，请减少'~/.bashrc'等文件中不必要的信息输出!",
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",

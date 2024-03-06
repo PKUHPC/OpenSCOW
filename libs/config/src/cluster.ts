@@ -10,12 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { GetConfigFn, getDirConfig } from "@scow/lib-config";
+import { getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
+import { Logger } from "ts-log";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
+
+export enum k8sRuntime {
+  docker = "docker",
+  containerd = "containerd",
+}
 
 const LoginNodeConfigSchema =
   Type.Object(
@@ -95,13 +101,37 @@ export const ClusterConfigSchema = Type.Object({
     enabled: Type.Boolean({ description: "是否开启跨集群传输功能", default: false }),
     transferNode: Type.Optional(Type.String({ description: "跨集群传输文件的节点" })),
   })),
+
+  hpc: Type.Object({
+    enabled: Type.Boolean({ description: "是否在HPC中启用" }),
+  }, { description: "集群在HPC中是否启用, 默认启用", default: { enabled: true } }),
+
+  ai: Type.Object({
+    enabled: Type.Boolean({ description: "是否在AI中启用" }),
+  }, { description: "集群在AI中是否启用, 默认不启用", default: { enabled: false } }),
+
+  k8s: Type.Optional(Type.Object({
+    runtime: Type.Enum(k8sRuntime, { description: "k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd",
+      default: "containerd" }),
+  }, { description: "k8s 集群配置" })),
 });
 
 
 export type ClusterConfigSchema = Static<typeof ClusterConfigSchema>;
 
-export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>> =
-  (baseConfigPath, logger) => {
+
+export type ClusterType = "hpc" | "ai";
+
+/**
+ * @param
+ * type: 获取的集群类型，如果不传则返回所有集群，如果传入则返回指定类型的集群，例如：["hpc", "ai"] 返回所有HPC和AI集群
+ */
+export type GetClusterConfigFn<T> = (baseConfigPath?: string, logger?: Logger, type?: ClusterType[]) => T;
+
+export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigSchema>> =
+  (baseConfigPath, logger, clusterType) => {
+
+    const types: ClusterType[] = clusterType ?? ["hpc", "ai"];
 
     const config = getDirConfig(
       ClusterConfigSchema,
@@ -133,6 +163,25 @@ export const getClusterConfigs: GetConfigFn<Record<string, ClusterConfigSchema>>
     const isUnique = uniqueAddressesList.size === allAddressesList.length;
     if (!isUnique) {
       throw new Error("login node address must be unique across all clusters and all login nodes.");
+    }
+
+
+    for (const cluster in config) {
+      if (Object.hasOwnProperty.call(config, cluster)) {
+        const clusterInfo = config[cluster];
+        if (clusterInfo) {
+          let enabled = false;
+          for (const type of types) {
+            if (clusterInfo[type].enabled) {
+              enabled = true;
+              break;
+            }
+          }
+          if (!enabled) {
+            delete config[cluster];
+          }
+        }
+      }
     }
 
     return config;

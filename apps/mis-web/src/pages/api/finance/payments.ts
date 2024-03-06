@@ -21,6 +21,8 @@ import { SearchType } from "src/pageComponents/common/PaymentTable";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
+import { getTenantOfAccount } from "./charges";
+
 export const PaymentInfo = Type.Object({
   index: Type.Number(),
   accountName: Type.Optional(Type.String()),
@@ -61,15 +63,24 @@ export const GetPaymentsSchema = typeboxRouteSchema({
   },
 });
 
-export const getPaymentRecordTarget = (searchType: SearchType, user: UserInfo, accountName: string | undefined) => {
+export const getPaymentRecordTarget = (
+  searchType: SearchType,
+  user: UserInfo,
+  tenantOfAccount: string,
+  targetName: string | undefined,
+) => {
   switch (searchType) {
+  case SearchType.tenant:
+    return targetName
+      ? { $case:"tenant" as const, tenant:{ tenantName:targetName } }
+      : { $case:"allTenants" as const, allTenants:{ } };
   case SearchType.selfTenant:
     return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
   case SearchType.selfAccount:
-    return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:accountName! } };
+    return { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
   case SearchType.account:
-    return accountName
-      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:user.tenant, accountName:accountName } }
+    return targetName
+      ? { $case:"accountOfTenant" as const, accountOfTenant:{ tenantName:tenantOfAccount, accountName:targetName! } }
       : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
   default:
     break;
@@ -100,8 +111,10 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     if (!user) { return; }
   }
 
+  const tenantOfAccount = await getTenantOfAccount(accountName, user);
+
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
-    target: getPaymentRecordTarget(searchType, user, accountName),
+    target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountName),
     startTime,
     endTime,
   }), ["total"]);

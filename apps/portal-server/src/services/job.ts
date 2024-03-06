@@ -15,13 +15,15 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
+import path from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
+import { getAdapterClient } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -227,7 +229,8 @@ export const jobServiceServer = plugin((server) => {
       if (!client) { throw clusterNotFound(cluster); }
 
       // 当前接口要求的最低调度器接口版本
-      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 2, patch: 0 };
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 5, patch: 0 };
+
       // 检验调度器的API版本是否符合要求，不符合要求报错
       await checkSchedulerApiVersion(client, minRequiredApiVersion);
 
@@ -268,8 +271,9 @@ export const jobServiceServer = plugin((server) => {
           });
       });
 
+      const scriptFileFullPath = path.dirname(filePath);
       const reply = await asyncClientCall(client.job, "submitScriptAsJob", {
-        userId, script,
+        userId, script, scriptFileFullPath,
       }).catch((e) => {
         const ex = e as ServiceError;
         const errors = parseErrorDetails(ex.metadata);

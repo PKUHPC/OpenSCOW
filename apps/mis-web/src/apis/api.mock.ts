@@ -84,9 +84,11 @@ export const runningJob: RunningJob = {
 
 const mockAccounts: Required<Account>[] = [
   { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈", comment: "123", balance: numberToMoney(20) },
+    ownerId: "123", ownerName: "哈哈", comment: "123",
+    balance: numberToMoney(20), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
   { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈哈哈", comment: "123", balance: numberToMoney(30) },
+    ownerId: "123", ownerName: "哈哈哈哈", comment: "123",
+    balance: numberToMoney(30), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
 ];
 
 const mockUsers = [
@@ -291,6 +293,10 @@ export const mockApi: MockApi<typeof api> = {
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
+  getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
+
+  getNewJobCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
+
   getTenantUsers: async () => ({ results: mockUsers }),
 
   logout: async () => null,
@@ -384,6 +390,19 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
+  setBlockThreshold: async () => ({ executed: true }),
+  setDefaultAccountBlockThreshold: async () => ({ executed: true }),
+  getNewUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
+  getActiveUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
+  getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
+  getDailyCharge: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
+  getTopPayAccount: async () => ({ results: [{ accountName: "test", payAmount: numberToMoney(10) }]}),
+  getDailyPay: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
+  getPortalUsageCount: async () => ({ results: [{ operationType: "submitJob", count: 10 }]}),
+  getMisUsageCount: async () => ({ results: [{ operationType: "createAccount", count: 10 }]}),
+  getStatisticInfo: async () =>
+    ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10, newTenant: 10 }),
+  getJobTotalCount: async () => ({ count: 10 }),
   syncBlockStatus: async () => ({
     blockedFailedAccounts: [],
     unblockedFailedAccounts:[],
@@ -439,6 +458,23 @@ export const mockApi: MockApi<typeof api> = {
     operationTime: "2020-04-23T23:49:50.000Z",
     operationEvent: { $case: "login", login: {} },
   }], totalCount: 1 }),
+
+  getAlarmDbId: async () => ({
+    id: 13,
+    uid: "kfcfkxq4",
+    name: "alertdb",
+    type: "mysql",
+  }),
+  getAlarmLogs: async () => ({ results: [{
+    id: 13,
+    status: "resolved",
+    severity: "Warning",
+    fingerprint: "38cc18aad8e553f6",
+    description: "hpc01 partition: normal - CPU usage above 80% (current value: 1)",
+    startsAt: 1702886670000,
+    endsAt: 1702889670000,
+  }]}),
+  getAlarmLogsCount: async () => ({ totalCount: 1 }),
 };
 
 export const MOCK_USER_INFO = {

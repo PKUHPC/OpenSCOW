@@ -94,6 +94,8 @@ export const Account = Type.Object({
   ownerName: Type.String(),
   comment: Type.String(),
   balance: Type.Optional(Money),
+  blockThresholdAmount: Type.Optional(Money),
+  defaultBlockThresholdAmount: Type.Optional(Money),
 });
 export type Account = Static<typeof Account>;
 

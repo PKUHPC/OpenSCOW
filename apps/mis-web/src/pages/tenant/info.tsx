@@ -15,8 +15,9 @@ import { status } from "@grpc/grpc-js";
 import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import type { GetTenantInfoResponse } from "@scow/protos/build/server/tenant";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
-import { Descriptions, Tag } from "antd";
+import { Descriptions, Space, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
+import { useRouter } from "next/router";
 import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
@@ -24,6 +25,9 @@ import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
+import {
+  ChangeDefaultAccountBlockThresholdLink,
+} from "src/pageComponents/tenant/ChangeDefaultAccountBlockThresholdModal";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 import { Head } from "src/utils/head";
@@ -38,6 +42,8 @@ const p = prefix("page.tenant.info.");
 export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))
 ((props: Props) => {
 
+  const router = useRouter();
+
   const t = useI18nTranslateToString();
 
   if ("error" in props) {
@@ -45,7 +51,8 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
   }
 
   const { balance, accountCount, admins,
-    userCount, tenantName, financialStaff } = ensureNotUndefined(props, ["balance"]);
+    userCount, tenantName, financialStaff, defaultAccountBlockThreshold } =
+    ensureNotUndefined(props, ["balance", "defaultAccountBlockThreshold"]);
 
   return (
     <div>
@@ -82,6 +89,17 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
         <Descriptions.Item label={t("common.tenantBalance")}>
           {moneyToNumber(balance).toFixed(3)} {t("common.unit")}
         </Descriptions.Item>
+        <Descriptions.Item label={t("common.defaultAccountBlockThreshold")}>
+          <Space>
+            <span>
+              {moneyToNumber(defaultAccountBlockThreshold).toFixed(3)} {t("common.unit")}
+            </span>
+            <ChangeDefaultAccountBlockThresholdLink
+              tenantName={tenantName}
+              currentAmount={defaultAccountBlockThreshold}
+              reload={() => { router.reload(); }}
+            >修改</ChangeDefaultAccountBlockThresholdLink></Space>
+        </Descriptions.Item>
       </Descriptions>
     </div>
   );
@@ -105,6 +123,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
         financialStaff: [{ userId: "123", userName: "1234" }, { userId: "1234", userName: "12345" }],
         userCount: 100,
         balance: numberToMoney(100),
+        defaultAccountBlockThreshold: numberToMoney(100),
         tenantName: info.tenant,
       },
     };

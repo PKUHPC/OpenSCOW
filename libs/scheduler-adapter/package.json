@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-scheduler-adapter",
-  "version": "1.1.2",
+  "version": "1.1.6",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -16,7 +16,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@grpc/grpc-js": "1.9.11",
+    "@grpc/grpc-js": "1.9.14",
     "@scow/protos": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*"
   },

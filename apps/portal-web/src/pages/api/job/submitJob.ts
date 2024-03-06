@@ -82,6 +82,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypePayload:{
       accountName: account,
+      clusterId: cluster,
     },
   };
 
@@ -128,7 +129,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     async () => await callLog(
       { ...logInfo,
         operationTypeName: OperationType.submitJob,
-        operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
+        operationTypePayload: { ... logInfo.operationTypePayload },
       },
       OperationResult.FAIL,
     )));

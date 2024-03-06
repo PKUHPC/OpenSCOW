@@ -5,6 +5,7 @@ db:
   port: 3308
   user: root
   dbName: scow
+  debug: true
 
 authUrl: http://localhost:5000
 
@@ -41,6 +42,23 @@ createUser:
     #     default: "只能由字母、下划线、数字组成"
     #     en: "Must consist of characters, including numbers, letters, and underscores."
     #     zh_cn: "只能由字母、下划线、数字组成"
+
+# # 集群监控配置
+# clusterMonitor:
+#   # 协议 + ip/域名 + 端口，默认为 http://127.0.0.1:4000
+#   grafanaUrl: "http://172.16.20.125:4000"
+#   # 资源状态相关配置
+#   resourceStatus:
+#     # 是否开启资源状态，默认不开启
+#     enabled: false
+#     # 是否使用代理的方式
+#     proxy: false
+#     # 默认面板 id,默认设置为 shZOtO4Sk
+#     dashboardUid: "shZOtO4Sk"
+#   # 告警日志配置
+#   alarmLogs:
+#     # 是否开启告警日志，默认不开启
+#     enabled: false
 
 # # 新增导航链接相关配置
 # navLinks:
@@ -111,3 +129,23 @@ createUser:
 
 # 自定义可查询消费类型
 # customChargeTypes: ["月租", "存储费"]
+
+# 用户是否可以修改作业时限配置
+# allowUserChangeJobTimeLimit: true
+
+# #自定义消费记录中的作业相关的存储内容
+# jobChargeMetadata:
+#   # 可选。需要保存的作业的字段，字段参考src/entities/JobInfo
+#   savedFields: ["idJob", "cluster"]
+
+#   # 可选。定义显示出来的格式。如果不配置，直接显示上面保存的字段的信息
+#   displayFormats:
+#     # i18n格式，根据系统语言显示不同的信息
+#     # 或字符串格式，直接显示字符串
+#     # 利用 {{ 属性名 }} 使用上述savedFields中保存的属性值
+#     i18n:
+#       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+#       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
+#       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
+
+

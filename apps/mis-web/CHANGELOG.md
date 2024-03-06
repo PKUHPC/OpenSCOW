@@ -1,5 +1,74 @@
 # @scow/mis-web
 
+## 1.4.3
+
+### Patch Changes
+
+- efcd9a8: 修改集群监控 iframe 高度自适应
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- a56ec73: 修复平台管理页面账户消费记录搜索账户名时传参错误问题
+- 2df6de8: 创建用户，账户，租户或添加用户，白名单账户时，对 input 框输入的 用户/账户/租户名称 去掉前后空格
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- 68447f7: mis 增加控制添加用户至账户相关配置
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- d1c2e74: UI 扩展
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+- abb7e84: 管理系统新增集群监控功能
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- e6efacf: 修复解封账户时错误提示是变量的问题
+- 5144723: 管理系统的租户管理和平台管理中的账户列表新增拥有者姓名或 id 搜索项
+- Updated dependencies [081fbcf]
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/lib-operation-log@2.1.0
+  - @scow/config@1.4.0
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes

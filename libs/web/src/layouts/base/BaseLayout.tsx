@@ -15,12 +15,17 @@
 import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useCallback, useState } from "react";
+import { useAsync } from "react-async";
+import { ExtensionManifestsSchema } from "src/extensions/manifests";
+import { fromNavItemProps, rewriteNavigationsRoute, toNavItemProps } from "src/extensions/navigations";
+import { callExtensionRoute } from "src/extensions/routes";
 import { Footer } from "src/layouts/base/Footer";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
+import { useDarkMode } from "src/layouts/darkMode";
 import { styled } from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
@@ -60,23 +65,55 @@ type Props = PropsWithChildren<{
   basePath: string;
   userLinks?: UserLink[];
   languageId: string,
+  from: "portal" | "mis";
+  extension?: {
+    manifests: ExtensionManifestsSchema;
+    url: string;
+  }
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
   children, footerText, versionTag, routes, user, logout,
   headerRightContent, basePath, userLinks, languageId,
+  extension, from,
 }) => {
-
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   const router = useRouter();
 
-  // get the first level route
-  const firstLevelRoute = routes.find((x) => match(x, router.asPath));
-
   const { md } = useBreakpoint();
 
-  const sidebarRoutes = md ? firstLevelRoute?.children : routes;
+  const dark = useDarkMode();
+
+  const { data: finalRoutesData } = useAsync({
+    promiseFn: useCallback(async () => {
+      if (!extension || !extension.manifests[from]?.rewriteNavigations) { return routes; }
+
+      const resp = await callExtensionRoute(rewriteNavigationsRoute(from), {
+        scowDark: dark.dark ? "true" : "false",
+        scowLangId: languageId,
+        scowUserToken: user?.token,
+      }, {
+        navs: fromNavItemProps(routes),
+      }, extension.url).catch(() => {
+        console.warn("Failed to call extension rewriteNavigations.");
+        return { 200: { navs: routes } };
+      });
+
+      if (resp[200]) {
+        return toNavItemProps(routes, resp[200].navs);
+      } else {
+        return routes;
+      }
+
+    }, [from, user, extension, routes]),
+  });
+
+  const finalRoutes = finalRoutesData ?? routes;
+
+  const firstLevelRoute = finalRoutes.find((x) => match(x, router.asPath));
+
+  const sidebarRoutes = md ? firstLevelRoute?.children : finalRoutes;
 
   const hasSidebar = arrayContainsElement(sidebarRoutes);
 
@@ -87,7 +124,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         pathname={router.asPath}
         sidebarCollapsed={sidebarCollapsed}
         hasSidebar={hasSidebar}
-        routes={routes}
+        routes={finalRoutes ?? routes}
         user={user}
         logout={logout}
         right={headerRightContent}

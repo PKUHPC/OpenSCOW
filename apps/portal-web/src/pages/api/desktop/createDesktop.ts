@@ -78,7 +78,7 @@ export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) 
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.createDesktop,
     operationTypePayload:{
-      desktopName, wm,
+      desktopName, wm, clusterId: cluster, loginNode,
     },
   };
 

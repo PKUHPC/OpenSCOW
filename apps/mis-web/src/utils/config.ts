@@ -55,6 +55,13 @@ export interface PublicRuntimeConfig {
     misConfig: MisConfigSchema["createUser"],
     authSupportsCreateUser: boolean | undefined,
   },
+
+  ADD_USER_TO_ACCOUNT: {
+    accountAdmin: {
+      allowed: boolean,
+      createUserIfNotExist: boolean,
+    }
+  }
   ENABLE_CHANGE_PASSWORD: boolean | undefined;
 
   ACCOUNT_NAME_PATTERN: string | undefined;
@@ -62,6 +69,8 @@ export interface PublicRuntimeConfig {
   PASSWORD_PATTERN: string | undefined;
 
   PORTAL_URL: string | undefined;
+
+  AI_URL: string | undefined;
 
   PUBLIC_PATH: string;
 
@@ -86,6 +95,22 @@ export interface PublicRuntimeConfig {
   CHARGE_TYPE_LIST: string[];
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
+
+  CLUSTER_MONITOR: {
+    grafanaUrl: string | undefined,
+    resourceStatus: {
+      enabled: boolean | undefined,
+      proxy: boolean | undefined,
+      dashboardUid: string | undefined,
+    },
+    alarmLogs: { enabled: boolean | undefined }
+  },
+
+  UI_EXTENSION?: { url: string; }
+
+  CHANGE_JOB_LIMIT: { allowUser: boolean}
+
+  JOB_CHARGE_METADATA: jobChargeMetadataType;
 
 }
 
@@ -155,3 +180,5 @@ export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
 
   return getI18nConfigCurrentText(value as any, languageId);
 };
+
+export type jobChargeMetadataType = MisConfigSchema["jobChargeMetadata"];

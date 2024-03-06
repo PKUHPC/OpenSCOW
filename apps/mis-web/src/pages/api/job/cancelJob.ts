@@ -50,7 +50,12 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
 
   const { cluster, jobId } = req.query;
 
-  const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
+  const { job, jobAccessible } = await checkJobAccessible({
+    actionType: "cancelJob",
+    jobId,
+    cluster,
+    info,
+  });
 
   if (jobAccessible === "NotAllowed") {
     return { 403: null };
@@ -65,7 +70,7 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.endJob,
     operationTypePayload: {
-      jobId: +jobId, accountName: job.account,
+      jobId: +jobId, accountName: job.account, clusterId: cluster,
     },
   };
 

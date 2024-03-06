@@ -15,6 +15,11 @@ import { Static, Type } from "@sinclair/typebox";
 import { join } from "path";
 import { logger } from "src/log";
 
+export enum AuthCustomType {
+  external = "external",
+  image = "image"
+}
+
 export const InstallConfigSchema = Type.Object({
   port: Type.Integer({ description: "端口号", default: 80 }),
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
@@ -94,15 +99,28 @@ export const InstallConfigSchema = Type.Object({
     })),
 
     custom: Type.Optional(Type.Object({
-      image: Type.String({ description: "认证系统镜像" }),
-      ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+      type: Type.Optional(Type.Enum(AuthCustomType, { description: "自定义认证系统类型", default: AuthCustomType.image })),
+      external: Type.Optional(Type.Object({
+        url: Type.String({ description: "认证系统的 URL" }),
+      })),
+      image: Type.Optional(Type.Union([
+        Type.Object({
+          imageName: Type.String({ description: "认证系统镜像名" }),
+          ports: Type.Optional(Type.Array(Type.String(), { description: "端口映射" })),
+          volumes: Type.Optional(Type.Array(Type.String(), {
+            description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
+          })),
+        }, { description: "认证系统镜像" }),
+        Type.String({ description: "兼容旧版本认证系统镜像名配置" }),
+      ], { description: "自定义认证系统镜像配置" })),
+      ports: Type.Optional(Type.Array(Type.String(), { description: "兼容旧版本端口映射配置" })),
+      volumes: Type.Optional(Type.Array(Type.String(), {
+        description: "兼容旧版本，更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
+      })),
       environment: Type.Optional(Type.Union([
         Type.Array(Type.String({ description: "格式：变量名=变量值" })),
         Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
       ], { description: "环境变量配置" })),
-      volumes: Type.Optional(Type.Array(Type.String(), {
-        description: "更多挂载卷。默认添加/etc/hosts:/etc/hosts和./config:/etc/scow",
-      })),
     }, { description: "自定义认证系统配置" })),
   }, { default: {} }),
 
@@ -111,7 +129,7 @@ export const InstallConfigSchema = Type.Object({
     pluginsDir: Type.String({ description: "插件目录", default: "./plugins" }),
   }, { default: {} }),
 
-  audit:  Type.Optional(Type.Object({
+  audit: Type.Optional(Type.Object({
     mysqlImage: Type.String({ description: "审计系统数据库镜像", default: "mysql:8" }),
     dbPassword: Type.String({ description: "审计系统数据库密码", default: "must!chang3this" }),
 
@@ -120,6 +138,16 @@ export const InstallConfigSchema = Type.Object({
       auditServer: Type.Optional(Type.Union([Type.String(), Type.Integer()], {
         description: "audit-server映射出来的端口",
       })),
+    })),
+  })),
+
+  ai: Type.Optional(Type.Object({
+    basePath: Type.String({ description: "AI系统的部署路径，相对于整个系统的basePath", default: "/ai" }),
+    mysqlImage: Type.String({ description: "AI系统数据库镜像", default: "mysql:8" }),
+    dbPassword: Type.String({ description: "AI系统数据库密码", default: "must!chang3this" }),
+
+    portMappings: Type.Optional(Type.Object({
+      db: Type.Optional(Type.Union([Type.String(), Type.Integer()], { description: "数据库映射出来的端口" })),
     })),
   })),
 

@@ -17,28 +17,36 @@ import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
+import { compareWithUndefined } from "src/utils/dashboard";
 import { styled } from "styled-components";
-
-interface Props {
-  clusterInfo: ClusterInfo[];
-  isLoading: boolean;
-}
 
 export interface ClusterInfo extends PartitionInfo {
   id: number;
-  clusterName: I18nStringType;
+  clusterName: I18nStringType | undefined;
+  cpuUsage: string;
+  gpuUsage?: string;
+}
+
+interface Props {
+  clusterInfo: ClusterInfo[];
+  failedClusters: ({clusterName: I18nStringType})[];
+  isLoading: boolean;
+}
+
+interface InfoProps {
+  id: number;
+  partitionName: string;
+  nodeCount: number;
+  pendingJobCount: number;
+  cpuUsage: string;
+  gpuUsage?: string;
+  usageRatePercentage: number;
+  partitionStatus: PartitionInfo_PartitionStatus;
 }
 
 interface TableProps {
-  id: number;
-  clusterName: string;
-  partitionName: string;
-  nodeCount: number;
-  runningNodeCount: number;
-  cpuCoreCount: number;
-  gpuCoreCount: number;
-  usageRatePercentage: number;
-  partitionStatus: PartitionInfo_PartitionStatus;
+  clusterName: I18nStringType;
+  info?: InfoProps
 }
 const Container = styled.div`
   /* 修改滚动条样式 */
@@ -69,53 +77,89 @@ const Container = styled.div`
 `;
 const p = prefix("pageComp.dashboard.overviewTable.");
 
-export const OverviewTable: React.FC<Props> = ({ clusterInfo, isLoading }) => {
-
+export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, isLoading }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [selectId, setSelectId] = useState(0);
 
   const selectItem = useMemo(() => clusterInfo[selectId], [clusterInfo, selectId]);
+
   return (
     <Container>
       <Table
         title={() => t(p("title"))}
         tableLayout="fixed"
-        dataSource={clusterInfo as Array<TableProps>}
+        dataSource={(clusterInfo.map((x) => ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
+          .concat(failedClusters)}
         loading={isLoading}
         pagination={false}
         scroll={{ y:275 }}
-        rowClassName={(_, index) => (index === selectId ? "rowBgColor" : "")}
+        rowClassName={(tableProps) => (tableProps.info?.id === selectId ? "rowBgColor" : "")}
         onRow={(r) => {
           return {
             onClick() {
-              setSelectId(r.id);
+              if (r.info?.id !== undefined) {
+                setSelectId(r.info?.id);
+              }
             },
           };
         }}
       >
-        <Table.Column
+        <Table.Column<TableProps>
           dataIndex="clusterName"
           width="15%"
           title={t(p("clusterName"))}
+          sorter={(a, b, sortOrder) =>
+            compareWithUndefined(getI18nConfigCurrentText(a.clusterName, languageId),
+              getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
           render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
         />
-        <Table.Column dataIndex="partitionName" title={t(p("partitionName"))} />
-        <Table.Column dataIndex="nodeCount" title={t(p("nodeCount"))} />
-        <Table.Column dataIndex="runningNodeCount" title={t(p("runningNodeCount"))} />
-        <Table.Column dataIndex="cpuCoreCount" title={t(p("cpuCoreCount"))} />
-        <Table.Column dataIndex="gpuCoreCount" title={t(p("gpuCoreCount"))} />
-        <Table.Column
+        <Table.Column<TableProps>
+          dataIndex="partitionName"
+          title={t(p("partitionName"))}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.partitionName, b.info?.partitionName, sortOrder)}
+          render={(_, r) => r.info?.partitionName ?? "-"}
+        />
+        <Table.Column<TableProps>
+          dataIndex="nodeCount"
+          title={t(p("nodeCount"))}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.nodeCount, b.info?.nodeCount, sortOrder)}
+          render={(_, r) => r.info?.nodeCount ?? "-"}
+        />
+        <Table.Column<TableProps>
           dataIndex="usageRatePercentage"
           title={t(p("usageRatePercentage"))}
-          render={(usageRatePercentage) => usageRatePercentage + "%"}
+          sorter={(a, b, sortOrder) =>
+            compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
+          render={(_, r) => r.info?.usageRatePercentage !== undefined ? r.info?.usageRatePercentage + "%" : "-"}
         />
-        <Table.Column
+        <Table.Column<TableProps>
+          dataIndex="cpuUsage"
+          title={t(p("cpuUsage"))}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
+          render={(_, r) => r.info?.cpuUsage !== undefined ? r.info?.cpuUsage + "%" : "-"}
+        />
+        <Table.Column<TableProps>
+          dataIndex="gpuUsage"
+          title={t(p("gpuUsage"))}
+          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
+          render={(_, r) => r.info?.gpuUsage !== undefined ? r.info?.gpuUsage + "%" : "-" }
+        />
+        <Table.Column<TableProps>
+          dataIndex="pendingJobCount"
+          title={t(p("pendingJobCount"))}
+          sorter={(a, b, sortOrder) =>
+            compareWithUndefined(a.info?.pendingJobCount, b.info?.pendingJobCount, sortOrder)}
+          render={(_, r) => r.info?.pendingJobCount ?? "-" }
+        />
+        <Table.Column<TableProps>
           dataIndex="partitionStatus"
           title={t(p("partitionStatus"))}
-          render={(partitionStatus) => partitionStatus === 1 ?
-            <Tag color="green">{t(p("available"))}</Tag> : <Tag color="red">{t(p("notAvailable"))}</Tag>
+          sorter={(a, b, sortOrder) =>
+            compareWithUndefined(a.info?.partitionStatus, b.info?.partitionStatus, sortOrder)}
+          render={(_, r) => r.info?.partitionStatus === 0 ?
+            <Tag color="red">{t(p("notAvailable"))}</Tag> : <Tag color="green">{t(p("available"))}</Tag>
           }
         />
       </Table>

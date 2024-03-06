@@ -1,5 +1,79 @@
 # @scow/portal-web
 
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 410fb0e: 修复只需在文件传输时使用 touch -a 来更新时间戳，修复 touch -a 执行时 ssh 关闭报错，文件名特殊字符报错等问题
+- 2f687c5: 仪表盘返回的监控数据替换 clusterId
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- a41c45b: 修复文件管理列表连续双击文件名导致进入错误目录的问题
+- f126469: 仪表盘处集群无法获取运行时不报 500 的错误提示和快捷方式跳转去掉 basePath
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+- 3ef7762: 回退 codemirror 版本，解决提交作业界面崩溃问题
+- 43c52ee: 优化文件编辑功能
+- 26bd8e7: 优化文件系统直接提交脚本任务时如果没有在脚本内指定工作目录，使脚本文件所在的绝对路径作为作业工作目录，并在确认提交对话框中给出提示
+- Updated dependencies [081fbcf]
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/lib-operation-log@2.1.0
+  - @scow/config@1.4.0
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- 6a0c73a972: 修复用户删除无权限目录时导致的崩溃问题
+- c18479df2c: 修复了仪表盘信息面板 title 过长时折行问题和调整响应式样式
+- 1a0b45131c: 修改终端登录欢迎语过长会报错的提示
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes

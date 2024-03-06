@@ -1,6 +1,6 @@
 {
   "name": "@scow/protos",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "description": "",
   "main": "build/index.js",
   "private": true,
@@ -13,13 +13,13 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.9.11",
+    "@grpc/grpc-js": "1.9.14",
     "long": "5.2.3",
-    "protobufjs": "7.2.5",
+    "protobufjs": "7.2.6",
     "@scow/grpc-api": "workspace:*"
   },
   "devDependencies": {
-    "ts-proto": "1.164.0"
+    "ts-proto": "1.167.2"
   },
   "keywords": [],
   "author": "",

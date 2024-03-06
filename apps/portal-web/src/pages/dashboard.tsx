@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -19,11 +20,17 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
+import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
+import { styled } from "styled-components";
 
 interface Props {
+}
+
+interface FulfilledResult {
+  clusterInfo: {clusterName: string, partitions: PartitionInfo[]}
 }
 
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
@@ -37,34 +44,80 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  const { data:clusterInfo, isLoading } = useAsync({
+  const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
+
       const clusters = publicConfig.CLUSTERS;
 
-      const rawClusterInfo =
-      await Promise.all(clusters.map((x) => api.getClusterRunningInfo({ query: { clusterId:x.id } })),
+      const rawClusterInfoPromises = clusters.map((x) =>
+        api.getClusterRunningInfo({ query: { clusterId: x.id } })
+          .httpError(500, () => {}),
       );
 
-      return rawClusterInfo
-        .map((cluster, idx) => ({ clusterInfo:{ ...cluster.clusterInfo, clusterName:clusters[idx].name } }))
+      const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+      // 处理成功的结果
+      const successfulResults = rawClusterInfoResults
+      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
+        .map((result, idx) => {
+          if (result.status === "fulfilled") {
+            return {
+              ...result,
+              value:{
+                clusterInfo:{ clusterName:clusters[idx].id,
+                  partitions:result.value.clusterInfo.partitions },
+              },
+            } as PromiseSettledResult<FulfilledResult>;
+          }
+
+          return result;
+        })
+        .filter(
+          (result): result is PromiseFulfilledResult<FulfilledResult> =>
+            result.status === "fulfilled")
+        .map((result) => result.value);
+
+
+      // 处理失败的结果
+      const failedClusters = clusters.filter((x) =>
+        !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+
+      const clustersInfo = successfulResults
+        .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
+          clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
         .flatMap((cluster) =>
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
+            cpuUsage:((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
+            // 有些分区没有gpu就为空，前端显示'-'
+            ...x.gpuCoreCount ? { gpuUsage:((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) } : {},
           })),
         );
+
+      return {
+        clustersInfo,
+        failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
+      };
+
     }, []),
   });
 
   return (
-    <div>
+    <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
+      <QuickEntry />
       <OverviewTable
         isLoading={isLoading}
-        clusterInfo={clusterInfo ? clusterInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        failedClusters={data?.failedClusters ?? []}
       />
-    </div>
+    </DashboardPageContent>
   );
 });
+
+const DashboardPageContent = styled.div`
+`;
 
 export default DashboardPage;

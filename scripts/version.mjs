@@ -39,6 +39,8 @@ const changes = {
   "gateway": [],
   "grpc-api": [],
   "config": [],
+  "scheduler-adapter-protos": [],
+  "ai": [],
 };
 
 for (const file of files) {
@@ -133,12 +135,28 @@ const generateContent = (scowPackage, title) => {
   return content.trim() + "\n\n";
 };
 
+const generateNodesAboutSchedulerAdapterInterfaceVersion = () => {
+  const packageChanges = changes["scheduler-adapter-protos"];
+
+  if (packageChanges.length === 0) { return ""; }
+
+  let content = "# 适配器接口版本的要求变化\n\n";
+
+  for (const change of packageChanges) {
+    content += `- ${change.content}\n`;
+  }
+
+  return content;
+};
+
 const scowApiVersion = readPackageJson("protos/package.json").version;
 const configVersion = readPackageJson("libs/config/package.json").version;
 
 const changelogContent = `# v${rootPackageJson.version}
 
 发布于：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}
+
+${generateNodesAboutSchedulerAdapterInterfaceVersion()}
 
 # 配置文件
 
@@ -159,6 +177,7 @@ ${generateContent("portal-web", "门户系统前端")
  + generateContent("auth", "认证系统")
  + generateContent("cli", "CLI")
  + generateContent("gateway", "网关")
+ + generateContent("ai", "AI系统")
 }
 `;
 

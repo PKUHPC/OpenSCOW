@@ -63,6 +63,7 @@ export default /* #__PURE__*/typeboxRoute(KillDesktopSchema, async (req, res) =>
     operationTypePayload:{
       desktopId: displayId,
       loginNode: loginNode,
+      clusterId: cluster,
     },
   };
 

@@ -83,6 +83,9 @@ const specs = {
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
 
+  AI_DEPLOYED: bool({ desc: "是否部署了AI系统", default: false }),
+  AI_URL: str({ desc: "如果部署了AI系统，AI系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署AI系统", default: "" }),
+
   NOVNC_CLIENT_URL: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写完整路径", default: "/vnc" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
@@ -128,7 +131,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configPath, console);
+  const clusters = getClusterConfigs(configPath, console, ["hpc"]);
 
   Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 
@@ -188,6 +191,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
+    AI_URL: config.AI_DEPLOYED ? (config.AI_URL || portalConfig.aiUrl) : undefined,
+
     CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
 
     CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
@@ -222,6 +227,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
+    UI_EXTENSION: portalConfig.uiExtension,
   };
 
   if (!building && !testenv) {

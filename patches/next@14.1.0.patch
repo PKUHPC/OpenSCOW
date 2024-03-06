@@ -1,0 +1,17 @@
+diff --git a/dist/server/lib/router-server.js b/dist/server/lib/router-server.js
+index de08c64f4483ee0428d540e98c94ef8e43b5d351..be51792103810a33925b0bb84e009aa4920aee9d 100644
+--- a/dist/server/lib/router-server.js
++++ b/dist/server/lib/router-server.js
+@@ -420,9 +420,9 @@ async function initialize(opts) {
+             });
+             // TODO: allow upgrade requests to pages/app paths?
+             // this was not previously supported
+-            if (matchedOutput) {
+-                return socket.end();
+-            }
++            // if (matchedOutput) {
++            //     return socket.end();
++            // }
+             if (parsedUrl.protocol) {
+                 return await (0, _proxyrequest.proxyRequest)(req, socket, parsedUrl, head);
+             }

@@ -68,6 +68,8 @@ export interface PublicRuntimeConfig {
 
   MIS_URL: string | undefined;
 
+  AI_URL: string | undefined;
+
   CLUSTERS: Cluster[];
 
   CLUSTER_SORTED_ID_LIST: string[];
@@ -100,6 +102,7 @@ export interface PublicRuntimeConfig {
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  UI_EXTENSION?: { url: string; }
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

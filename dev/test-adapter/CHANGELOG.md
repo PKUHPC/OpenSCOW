@@ -1,5 +1,26 @@
 # @scow/test-adapter
 
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [26bd8e7]
+  - @scow/scheduler-adapter-protos@1.3.0
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes

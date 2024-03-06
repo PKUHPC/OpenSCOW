@@ -33,10 +33,10 @@ export class UserAccount {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE", wrappedReference: true })
+  @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
     user: Ref<User>;
 
-  @ManyToOne(() => Account, { onDelete: "CASCADE", wrappedReference: true })
+  @ManyToOne(() => Account, { deleteRule: "cascade", ref: true, nullable: false })
     account: Ref<Account>;
 
   @Property({ columnType: "varchar(10)", comment: Object.values(UserStatus).join(", ") })

@@ -1,5 +1,46 @@
 # @scow/auth
 
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-server@1.1.4
+
+## 1.4.0
+
+### Patch Changes
+
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/lib-server@1.1.3
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-server@1.1.2
+
 ## 1.2.3
 
 ### Patch Changes

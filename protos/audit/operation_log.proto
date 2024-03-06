@@ -32,24 +32,44 @@ message Logout {
 
 message SubmitJob {
   string account_name = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message EndJob {
   uint32 job_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message AddJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message DeleteJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message UpdateJobTemplate {
   string job_template_id = 1;
   string new_job_template_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message ShellLogin {
@@ -60,16 +80,32 @@ message ShellLogin {
 message CreateDesktop {
   string desktop_name = 1;
   string wm = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string login_node = 4;
 }
 
 message DeleteDesktop {
   uint32 desktop_id = 1;
   string login_node = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateApp {
   string account_name = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateFile {
@@ -120,6 +156,10 @@ message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
   int64 limit_minutes = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 4;
 }
 
 message CreateUser {
@@ -282,6 +322,97 @@ message TenantPay {
   common.Money amount = 2;
 }
 
+message ExportUser {
+  // 不传则是导出平台所有的用户
+  optional string tenant_name = 1;
+}
+
+message ExportAccount {
+  // 不传则是导出平台所有的账户
+  optional string tenant_name = 1;
+}
+
+
+// 充值记录及消费记录请求target
+message AccountOfTenantTarget {
+  string account_name = 1;
+  string tenant_name = 2;
+}
+message AccountsOfTenantTarget {
+  string tenant_name = 1;
+}
+message TenantTarget {
+  string tenant_name = 1;
+}
+message AllTenantsTarget {
+}
+message AccountsOfAllTenantsTarget {
+}
+
+message ExportPayRecord {
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+    AccountOfTenantTarget account_of_tenant = 1;
+    // 返回这个租户（tenantName）下所有账户的充值记录
+    AccountsOfTenantTarget accounts_of_tenant = 2;
+    // 返回这个租户（tenantName）的充值记录
+    TenantTarget tenant = 3;
+    // 返回所有租户充值记录
+    AllTenantsTarget all_tenants = 4;
+  }
+}
+
+message ExportChargeRecord {
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+    AccountOfTenantTarget account_of_tenant = 4;
+    // 返回这个租户（tenantName）下所有账户的消费记录
+    AccountsOfTenantTarget accounts_of_tenant = 5;
+    // 返回所有租户下所有账户的消费记录
+    AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
+    // 返回这个租户（tenantName）的租户消费记录
+    TenantTarget tenant = 7;
+    // 返回所有租户的租户消费记录
+    AllTenantsTarget all_tenants = 8;
+  }
+}
+
+message ExportOperationLog {
+  message User {
+    string user_id = 1;
+  }
+  message Account {
+    string account_name = 2;
+  }
+  message Tenant {
+    string tenant_name = 3;
+  }
+  message Admin {
+
+  }
+  oneof source {
+    // 导出用户的操作记录
+    User user = 1;
+    // 导出账户的操作记录
+    Account account = 2;
+    // 导出租户的操作记录
+    Tenant tenant = 3;
+    // 导出平台的操作记录
+    Admin admin = 4;
+  }
+}
+
+message SetAccountBlockThreshold {
+  string account_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+message SetAccountDefaultBlockThreshold {
+  string tenant_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -337,6 +468,13 @@ message CreateOperationLogRequest {
     CreateTenant create_tenant = 51;
     TenantPay tenant_pay = 52;
     SubmitFileItemAsJob submit_file_item_as_job = 53;
+    ExportUser export_user = 54;
+    ExportAccount export_account = 55;
+    ExportPayRecord export_pay_record = 56;
+    ExportChargeRecord export_charge_record = 57;
+    ExportOperationLog export_operation_log = 58;
+    SetAccountBlockThreshold set_account_block_threshold = 59;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
   }
 }
 
@@ -398,6 +536,13 @@ message OperationLog {
     CreateTenant create_tenant = 53;
     TenantPay tenant_pay = 54;
     SubmitFileItemAsJob submit_file_item_as_job = 55;
+    ExportUser export_user = 56;
+    ExportAccount export_account = 57;
+    ExportPayRecord export_pay_record = 58;
+    ExportChargeRecord export_charge_record = 59;
+    ExportOperationLog export_operation_log = 60;
+    SetAccountBlockThreshold set_account_block_threshold = 61;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
   }
 }
 
@@ -432,9 +577,18 @@ message GetOperationLogsResponse {
   uint32 total_count = 2;
 }
 
+message ExportOperationLogRequest {
+  uint32 count = 2;
+  OperationLogFilter filter = 3;
+}
+
+message ExportOperationLogResponse {
+  repeated OperationLog operation_logs = 1;
+}
+
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
   rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
-
+  rpc ExportOperationLog(ExportOperationLogRequest) returns (stream ExportOperationLogResponse);
 }

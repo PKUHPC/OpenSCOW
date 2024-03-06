@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createI18n, Lang, languageDictionary, TextIdFromLangDict } from "react-typed-i18n";
+import { createI18n,
+  getDefinition, Lang, languageDictionary, replacePlaceholders, TextIdFromLangDict } from "react-typed-i18n";
 
 const zh_cn = () => import("./zh_cn").then((x) => x.default);
 const en = () => import("./en").then((x) => x.default);
@@ -54,3 +55,16 @@ export function useI18nTranslateToString() {
 
 export type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
 
+export async function getT(languageId: string) {
+  const definitions = await languages[languageId]();
+  return (id: Lang<LangType>, args: React.ReactNode[] = []): string => {
+    return replacePlaceholders(getDefinition(definitions, id), args) as string;
+  };
+};
+
+export async function getTArgs(languageId: string) {
+  const definitions = await languages[languageId]();
+  return (id: Lang<LangType>, args: React.ReactNode[] = []): string | React.ReactNode => {
+    return replacePlaceholders(getDefinition(definitions, id), args);
+  };
+};

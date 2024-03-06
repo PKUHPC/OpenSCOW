@@ -22,6 +22,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
   target: Tenant | Loaded<Account, "tenant">;
@@ -30,6 +31,22 @@ interface PayRequest {
   type: string;
   ipAddress: string;
   operatorId: string;
+}
+
+export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  return account.balance.lte(blockThresholdAmount);
+}
+
+export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  return account.balance.gt(blockThresholdAmount);
 }
 
 export async function pay(
@@ -63,13 +80,18 @@ export async function pay(
     await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount), type, comment }, logger);
   }
 
-  if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
+  if (
+    target instanceof Account
+    && checkShouldUnblockAccount(target)
+  ) {
     logger.info("Unblock account %s", target.accountName);
     await unblockAccount(target, clusterPlugin.clusters, logger);
   }
 
-  // 充值为负数时，要考虑封锁账户
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
   }
@@ -85,13 +107,15 @@ type ChargeRequest = {
   amount: Decimal;
   comment: string;
   type: string;
+  userId?: string;
+  metadata?: AnyJson;
 };
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
-  const { target, amount, comment, type } = request;
+  const { target, amount, comment, type, userId, metadata } = request;
 
   const record = new ChargeRecord({
     time: new Date(),
@@ -99,6 +123,8 @@ export async function charge(
     target,
     comment,
     amount,
+    userId,
+    metadata,
   });
 
   em.persist(record);
@@ -106,7 +132,10 @@ export async function charge(
   const prevBalance = target.balance;
   target.balance = target.balance.minus(amount);
 
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
     await blockAccount(target, clusterPlugin.clusters, logger);
   }

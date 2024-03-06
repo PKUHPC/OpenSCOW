@@ -10,14 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { UniqueConstraintViolationException } from "@mikro-orm/core";
+import { raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -49,6 +49,7 @@ export const tenantServiceServer = plugin((server) => {
         admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
+        defaultAccountBlockThreshold: decimalToMoney(tenant.defaultAccountBlockThreshold),
         financialStaff: financialStaff.map((f) => ({ userId: f.userId, userName: f.name })),
       }];
     },
@@ -63,7 +64,7 @@ export const tenantServiceServer = plugin((server) => {
       const tenants = await em.find(Tenant, {});
       const userCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(User, "u")
-          .select("count(u.user_id) as tCount, u.tenant_id as tId")
+          .select([raw("count(u.user_id) as tCount"), raw("u.tenant_id as tId")])
           .groupBy("u.tenant_id").execute("all");
       // 将获查询得的对象数组userCountObjectArray转换为{"tenant_id":"userCountOfTenant"}形式
       const userCount = {};
@@ -72,7 +73,7 @@ export const tenantServiceServer = plugin((server) => {
       });
       const accountCountObjectArray: { tCount: number, tId: number }[]
         = await em.createQueryBuilder(Account, "a")
-          .select("count(a.id) as tCount, a.tenant_id as tId")
+          .select([raw("count(a.id) as tCount"), raw("a.tenant_id as tId")])
           .groupBy("a.tenant_id").execute("all");
       // 将获查询得的对象数组accountCountObjectArray转换为{"tenant_id":"accountCountOfTenant"}形式
       const accountCount = {};
@@ -137,7 +138,7 @@ export const tenantServiceServer = plugin((server) => {
             };
           });
         // call auth
-        const createdInAuth = await createUser(misConfig.authUrl,
+        const createdInAuth = await createUser(authUrl,
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
           logger)
           .then(async () => {
@@ -162,6 +163,22 @@ export const tenantServiceServer = plugin((server) => {
       },
       );
     },
-  });
 
+    setDefaultAccountBlockThreshold: async ({ request, em }) => {
+
+      const { tenantName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!tenant) {
+        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+      tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
+
+      await em.persistAndFlush(tenant);
+
+      return [{}];
+
+    },
+
+  });
 });

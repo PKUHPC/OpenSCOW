@@ -13,13 +13,26 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
   ChargingServiceClient, TenantTarget } from "@scow/protos/build/server/charging";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
+
+export const MetadataMap = Type.Record(
+  Type.String(),
+  Type.Union([
+    Type.String(),
+    Type.Number(),
+    Type.Boolean(),
+    Type.Null(),
+  ]),
+);
+export type MetadataMapType = Static<typeof MetadataMap>;
 
 export const ChargeInfo = Type.Object({
   index: Type.Number(),
@@ -29,6 +42,9 @@ export const ChargeInfo = Type.Object({
   amount: Type.Number(),
   comment: Type.String(),
   tenantName: Type.String(),
+  userId: Type.Optional(Type.String()),
+  userName: Type.Optional(Type.String()),
+  metadata: Type.Optional(MetadataMap),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
 
@@ -56,6 +72,9 @@ export const GetChargesSchema = typeboxRouteSchema({
 
     // 查询消费记录种类：平台账户消费记录或租户消费记录
     searchType: Type.Optional(Type.Enum(SearchType)),
+
+    // 消费的用户id
+    userIds: Type.Optional(Type.Array(Type.String())),
 
     /**
      * @minimum 1
@@ -95,7 +114,23 @@ export async function getUserInfoForCharges(accountName: string | undefined, req
   }
 }
 
-export const buildChargesRequestTarget = (accountName: string | undefined, info: UserInfo,
+export async function getTenantOfAccount(accountName: string | undefined, info: UserInfo): Promise<string> {
+
+  if (accountName) {
+    const client = getClient(AccountServiceClient);
+
+    const { results } = await asyncClientCall(client, "getAccounts", {
+      accountName,
+    });
+    if (results.length !== 0) {
+      return results[0].tenantName;
+    }
+  }
+
+  return info.tenant;
+}
+
+export const buildChargesRequestTarget = (accountName: string | undefined, tenantName: string,
   searchType: SearchType | undefined, isPlatformRecords: boolean | undefined): (
     { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
     | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
@@ -107,7 +142,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
   if (accountName) {
     return {
       $case: "accountOfTenant" as const,
-      accountOfTenant: { tenantName: info.tenant, accountName: accountName },
+      accountOfTenant: { accountName, tenantName },
     };
   } else {
     if (searchType === SearchType.ACCOUNT) {
@@ -119,7 +154,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
       } else {
         return {
           $case: "accountsOfTenant" as const,
-          accountsOfTenant: { tenantName: info.tenant },
+          accountsOfTenant: { tenantName },
         };
       }
     } else {
@@ -131,7 +166,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
       } else {
         return {
           $case: "tenant" as const,
-          tenant: { tenantName: info.tenant },
+          tenant: { tenantName },
         };
       }
     }
@@ -139,10 +174,13 @@ export const buildChargesRequestTarget = (accountName: string | undefined, info:
 };
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType, type, page, pageSize } = req.query;
+  const { endTime, startTime, accountName, isPlatformRecords,
+    searchType, type, userIds, page, pageSize } = req.query;
 
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
+
+  const tenantOfAccount = await getTenantOfAccount(accountName, info);
 
   const client = getClient(ChargingServiceClient);
 
@@ -150,26 +188,36 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     startTime,
     endTime,
     type,
-    target: buildChargesRequestTarget(accountName, info, searchType, isPlatformRecords),
+    userIds: userIds ?? [],
+    target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
     page,
     pageSize,
   }), []);
 
+  const respUserIds = Array.from(new Set(reply.results.map((x) => x.userId).filter((x) => !!x) as string[]));
+
+  const userClient = getClient(UserServiceClient);
+  const { users } = await asyncClientCall(userClient, "getUsersByIds", {
+    userIds: respUserIds,
+  });
+  const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
   const accounts = reply.results.map((x) => {
-    // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accuntName存在
+    // 如果是查询平台账户消费记录或者查询账户下的消费记录时，确保accountName存在
     const obj = (searchType === SearchType.ACCOUNT || accountName) ?
       ensureNotUndefined(x, ["time", "amount", "accountName"]) : ensureNotUndefined(x, ["time", "amount"]);
-
     return {
       ...obj,
       amount: moneyToNumber(obj.amount),
-    };
+      metadata: obj.metadata ?? undefined,
+      userName: obj.userId ? (userMap.get(obj.userId) || "") : "",
+    } as ChargeInfo;
   });
-
   return {
     200: {
       results: accounts,
     },
   };
 });
+
+

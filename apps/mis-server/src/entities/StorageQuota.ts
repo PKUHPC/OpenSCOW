@@ -20,7 +20,7 @@ export class StorageQuota {
   @PrimaryKey()
     id!: number;
 
-  @ManyToOne(() => User, { onDelete: "CASCADE", wrappedReference: true })
+  @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
     user: Ref<User>;
 
   @Property()

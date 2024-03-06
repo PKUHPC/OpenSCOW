@@ -79,28 +79,31 @@ const CreateTenantPageForm: React.FC = () => {
         onOk: async () => {
           await api.createTenant({
             body: {
-              tenantName,
+              tenantName: tenantName.trim(),
               userId,
-              userName,
+              userName: userName.trim(),
               userEmail,
               userPassword,
             },
-          }).httpError(409, (e) => {
-            modal.error({
-              title: t("common.addFail"),
-              content: t(p("existInSCOWDatabase"),
-                [e.code === "TENANT_ALREADY_EXISTS" ? t("common.tenant") : t("common.user")]),
-              okText: t("common.ok"),
-            });
-          }).httpError(400, (e) => {
-            if (e.code === "USERID_NOT_VALID") {
-              message.error(userIdRule?.message);
-            };
-            if (e.code === "PASSWORD_NOT_VALID") {
-              message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-            };
-            throw e;
           })
+            .httpError(409, (e) => {
+              modal.error({
+                title: t("common.addFail"),
+                content: t(p("existInSCOWDatabase"),
+                  [e.code === "TENANT_ALREADY_EXISTS" ? t("common.tenant") : t("common.user")]),
+                okText: t("common.ok"),
+              });
+            })
+            .httpError(400, (e) => {
+              if (e.code === "USERID_NOT_VALID") {
+                message.error(userIdRule?.message);
+              };
+              if (e.code === "PASSWORD_NOT_VALID") {
+                message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+              };
+              throw e;
+            })
+            .httpError(501, () => { message.error(t(p("unavailable"))); })
             .then((createdInAuth) => {
               !createdInAuth.createdInAuth ?
                 modal.info({

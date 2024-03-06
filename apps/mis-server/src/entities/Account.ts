@@ -18,7 +18,7 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
-import { EntityOrRef, toRef } from "src/utils/orm";
+import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 @Entity()
 export class Account {
@@ -28,7 +28,7 @@ export class Account {
   @Property({ unique: true })
     accountName: string;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true })
+  @ManyToOne(() => Tenant, { ref: true })
     tenant: Ref<Tenant>;
 
   @Property()
@@ -38,7 +38,7 @@ export class Account {
     users = new Collection<UserAccount>(this);
 
   @OneToOne(() => AccountWhitelist, (u) => u.account, {
-    nullable: true, wrappedReference: true, unique: true, owner: true,
+    nullable: true, ref: true, unique: true, owner: true,
   })
     whitelist?: Ref<AccountWhitelist>;
 
@@ -48,12 +48,19 @@ export class Account {
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
     balance: Decimal = new Decimal(0);
 
+  @Property({ type: DecimalType, nullable: true })
+    blockThresholdAmount: Decimal | undefined;
+
+  @Property({ columnType: DATETIME_TYPE, nullable: true })
+    createTime: Date;
+
   constructor(init: {
     accountName: string;
     whitelist?: EntityOrRef<AccountWhitelist>;
     tenant: EntityOrRef<Tenant>;
     blocked: boolean;
     comment?: string;
+    createTime?: Date;
   }) {
     this.accountName = init.accountName;
     this.blocked = init.blocked;
@@ -62,8 +69,8 @@ export class Account {
       this.whitelist = toRef(init.whitelist);
     }
     this.comment = init.comment || "";
+    this.createTime = init.createTime ?? new Date();
   }
-
 
 
 }

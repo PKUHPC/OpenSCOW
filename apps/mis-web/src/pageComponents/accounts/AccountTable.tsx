@@ -15,15 +15,19 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Space, Table, Tag, Tooltip } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
+
+import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
 
 type ShowedTab = "PLATFORM" | "TENANT";
 interface Props {
@@ -35,6 +39,7 @@ interface Props {
 
 interface FilterForm {
   accountName: string | undefined;
+  ownerIdOrName: string | undefined;
 }
 
 const filteredStatuses = {
@@ -63,15 +68,18 @@ export const AccountTable: React.FC<Props> = ({
 
   const [query, setQuery] = useState<FilterForm>({
     accountName: undefined,
+    ownerIdOrName: undefined,
   });
 
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
       && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
   )) : undefined, [data, query, rangeSearchStatus]);
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
-    !query.accountName || x.accountName.includes(query.accountName)
+    (!query.accountName || x.accountName.includes(query.accountName))
+      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
   )) : undefined, [data, query]);
 
   const usersStatusCount = useMemo(() => {
@@ -94,6 +102,49 @@ export const AccountTable: React.FC<Props> = ({
     setCurrentSortInfo({ field: null, order: null });
   };
 
+  const handleExport = async (columns: string[]) => {
+
+    const total = filteredData?.length || 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+
+      window.location.href = urlToExport({
+        exportApi: "exportAccount",
+        columns,
+        count: total,
+        query: {
+          accountName: query.accountName,
+          blocked: rangeSearchStatus === "BLOCKED",
+          debt: rangeSearchStatus === "DEBT",
+          isFromAdmin: showedTab === "PLATFORM",
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("accountName")), value: "accountName" },
+      { label: t(p("owner")), value: "owner" },
+      { label: t(pCommon("userCount")), value: "userCount" },
+    ];
+
+    const tenant = showedTab === "PLATFORM" ? [
+      { label: t(p("tenant")), value: "tenantName" },
+    ] : [];
+    const remaining = [
+      { label: t(pCommon("balance")), value: "balance" },
+      { label:  t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
+      { label:  t(p("status")), value: "blocked" },
+      { label: t(p("comment")), value: "comment" },
+    ];
+    return [...common, ...tenant, ...remaining];
+  }, [showedTab, t]);
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -110,8 +161,19 @@ export const AccountTable: React.FC<Props> = ({
           <Form.Item label={t(p("account"))} name="accountName">
             <Input />
           </Form.Item>
+          <Form.Item label={t(p("ownerIdOrName"))} name="ownerIdOrName">
+            <Input />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
@@ -148,7 +210,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          width="25%"
+          width="20%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
@@ -173,6 +235,18 @@ export const AccountTable: React.FC<Props> = ({
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
           render={(b: Money) => moneyToString(b) + t(p("unit")) }
+        />
+        <Table.Column<AdminAccountInfo>
+          dataIndex="blockThresholdAmount"
+          title={(
+            <Space>
+              { t(pCommon("blockThresholdAmount"))}
+              <Tooltip title={t(p("blockThresholdAmountTooltip"))}>
+                <ExclamationCircleOutlined />
+              </Tooltip>
+            </Space>
+          )}
+          render={(_, r) => `${moneyToString(r.blockThresholdAmount ?? r.defaultBlockThresholdAmount)} ${t(p("unit"))}`}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blocked"
@@ -205,7 +279,9 @@ export const AccountTable: React.FC<Props> = ({
                 r.blocked
                   ? (
                     <a onClick={() => {
-                      if (moneyToNumber(r.balance) > 0) {
+                      if (moneyToNumber(r.balance) > moneyToNumber(
+                        r.blockThresholdAmount ?? r.defaultBlockThresholdAmount,
+                      )) {
                         modal.confirm({
                           title: t(p("unblockConfirmTitle")),
                           icon: <ExclamationCircleOutlined />,
@@ -264,6 +340,17 @@ export const AccountTable: React.FC<Props> = ({
                     </a>
                   )
               }
+              {showedTab === "TENANT" && (
+                <SetBlockThresholdAmountLink
+                  accountName={r.accountName}
+                  balance={r.balance}
+                  reload={reload}
+                  currentAmount={r.blockThresholdAmount}
+                  defaultBlockThresholdAmount={r.defaultBlockThresholdAmount}
+                >
+                  {t(p("blockThresholdAmount"))}
+                </SetBlockThresholdAmountLink>
+              )}
             </Space>
           )}
         />

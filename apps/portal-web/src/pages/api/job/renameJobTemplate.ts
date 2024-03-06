@@ -56,6 +56,7 @@ export default /* #__PURE__*/route(RenameJobTemplateSchema, async (req, res) => 
     operationTypePayload:{
       jobTemplateId: templateId,
       newJobTemplateId: jobName,
+      clusterId: cluster,
     },
   };
 

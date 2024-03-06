@@ -18,6 +18,7 @@ import "common/job.proto";
 import "common/money.proto";
 import "common/ended_job.proto";
 import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
 
 message JobFilter {
   // if neither account_name and user_id is set, query the account from tenant
@@ -150,6 +151,47 @@ message GetMissingDefaultPriceItemsResponse {
   repeated string items = 1;
 }
 
+message GetTopSubmitJobUsersRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+
+  //需要获取top 多少
+  //如果不传，默认取top10的用户
+  optional uint32 top_rank = 3;
+}
+
+message GetTopSubmitJobUsersResponse {
+  message SubmitJobUser {
+    string user_id = 1;
+    uint32 count = 2;
+  }
+  repeated SubmitJobUser results = 1;
+}
+
+message GetNewJobCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+    optional string time_zone = 3;
+}
+
+message GetNewJobCountResponse {
+  message DailyJobCount {
+    google.type.Date date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyJobCount results = 1;
+}
+
+message GetJobTotalCountRequest {
+
+}
+
+message GetJobTotalCountResponse {
+  uint64 count = 1;
+}
+
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);
@@ -170,4 +212,10 @@ service JobService {
   rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemResponse);
 
   rpc GetMissingDefaultPriceItems(GetMissingDefaultPriceItemsRequest) returns (GetMissingDefaultPriceItemsResponse);
+
+  rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
+
+  rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
+
+  rpc GetJobTotalCount(GetJobTotalCountRequest) returns (GetJobTotalCountResponse);
 }
