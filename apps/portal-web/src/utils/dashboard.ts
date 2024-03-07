@@ -16,7 +16,7 @@ import { SortOrder } from "antd/lib/table/interface";
 import { useI18nTranslateToString } from "src/i18n";
 import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
 
-import { getI18nText, publicConfig } from "./config";
+import { publicConfig } from "./config";
 
 
 export const formatEntryId = (item: Entry) => {
