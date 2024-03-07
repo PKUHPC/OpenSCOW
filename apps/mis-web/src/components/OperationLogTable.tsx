@@ -153,6 +153,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           type: queryType,
           operatorUserIds: getOperatorUserIds().join(","),
           operationType: query.operationType,
+          customEventType: query.customEventType,
           operationResult: query.operationResult,
           startTime: query.operationTime?.[0].toISOString(),
           endTime: query.operationTime?.[1].toISOString(),
@@ -285,7 +286,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           title={t(p("operationType"))}
           render={(operationType, r) => {
             return r.operationEvent.$case === "customEvent"
-              ? r.operationEvent.customEvent.name.i18n.default
+              ? getI18nCurrentText(r.operationEvent.customEvent.name, languageId)
               : OperationTypeTexts[operationType];
           }
           }
