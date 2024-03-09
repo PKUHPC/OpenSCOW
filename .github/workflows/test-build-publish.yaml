@@ -206,7 +206,7 @@ jobs:
         working-directory: release
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: SCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
           body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) || null }}
