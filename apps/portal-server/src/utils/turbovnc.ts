@@ -22,7 +22,7 @@ export function getTurboVNCPath(cluster: string) {
 
   const commonTurboVNCPath = getPortalConfig().turboVNCPath;
 
-  const clusterTurboVNCPath = getClusterConfigs()[cluster].turboVNCPath;
+  const clusterTurboVNCPath = getClusterConfigs(undefined, undefined, ["hpc"])[cluster].turboVNCPath;
 
   return clusterTurboVNCPath || commonTurboVNCPath;
 

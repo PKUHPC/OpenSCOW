@@ -18,6 +18,9 @@
     "@scow/lib-config": "workspace:*",
     "@sinclair/typebox": "0.32.13"
   },
+  "devDependencies": {
+    "ts-log": "2.2.5"
+  },
   "volta": {
     "extends": "../../package.json"
   }

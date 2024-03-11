@@ -31,7 +31,7 @@ import { z } from "zod";
 
 
 const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
-const clustersInit = getClusterConfigs(configPath, console);
+const clustersInit = getClusterConfigs(configPath, console, ["ai"]);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
 
 export const clusters = clustersInit;
