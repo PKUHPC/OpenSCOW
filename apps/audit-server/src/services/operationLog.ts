@@ -21,7 +21,8 @@ import {
 } from "@scow/protos/build/audit/operation_log";
 import { I18nObject } from "@scow/protos/build/common/i18n";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
-import { filterOperationLogs, getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
+import { checkCustomEventType, filterOperationLogs,
+  getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
@@ -43,6 +44,8 @@ export const operationLogServiceServer = plugin((server) => {
       const targetAccountName = getTargetAccountName(operationEvent);
 
       const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
+
+      await checkCustomEventType(em, operationEvent);
 
       const operationLog = new OperationLog({
         operatorUserId,

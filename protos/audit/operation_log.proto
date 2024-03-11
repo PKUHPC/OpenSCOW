@@ -420,6 +420,7 @@ message CustomEvent {
   common.I18nObject content = 3;
 }
 
+// INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
