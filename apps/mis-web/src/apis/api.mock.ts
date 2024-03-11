@@ -14,11 +14,11 @@ import { HttpError, JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-r
 import { numberToMoney } from "@scow/lib-decimal";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import type { RunningJob } from "@scow/protos/build/common/job";
-import type { Account } from "@scow/protos/build/server/account";
+import { type Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
 import { OperationResult } from "src/models/operationLog";
-import { ClusterAccountInfo_ImportStatus, PlatformRole,
+import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
@@ -85,9 +85,11 @@ export const runningJob: RunningJob = {
 const mockAccounts: Required<Account>[] = [
   { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
     ownerId: "123", ownerName: "哈哈", comment: "123",
+    state: AccountState.NORMAL, isInWhitelist: false, displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
     balance: numberToMoney(20), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
   { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
     ownerId: "123", ownerName: "哈哈哈哈", comment: "123",
+    state: AccountState.NORMAL, isInWhitelist: false, displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
     balance: numberToMoney(30), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
 ];
 

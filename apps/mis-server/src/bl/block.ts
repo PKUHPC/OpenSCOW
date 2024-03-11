@@ -31,7 +31,7 @@ export async function updateBlockStatusInSlurm(
 ) {
   const blockedAccounts: string[] = [];
   const blockedFailedAccounts: string[] = [];
-  const accounts = await em.find(Account, { blocked: true });
+  const accounts = await em.find(Account, { blockedInCluster: true });
 
   for (const account of accounts) {
     if (account.whitelist) {
@@ -100,7 +100,7 @@ export async function updateUnblockStatusInSlurm(
 ) {
   const accounts = await em.find(Account, {
     $or: [
-      { blocked: false },
+      { blockedInCluster: false },
       { whitelist: { $ne: null } },
     ],
   });
@@ -143,7 +143,7 @@ export async function blockAccount(
   account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
-  if (account.blocked) { return "AlreadyBlocked"; }
+  if (account.blockedInCluster) { return "AlreadyBlocked"; }
 
   if (account.whitelist) {
     return "Whitelisted";
@@ -155,7 +155,7 @@ export async function blockAccount(
     });
   });
 
-  account.blocked = true;
+  account.blockedInCluster = true;
 
   await callHook("accountBlocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
@@ -173,7 +173,7 @@ export async function unblockAccount(
   account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
-  if (!account.blocked) { return "ALREADY_UNBLOCKED"; }
+  if (!account.blockedInCluster) { return "ALREADY_UNBLOCKED"; }
 
   await clusterPlugin.callOnAll(logger, async (client) => {
     await asyncClientCall(client.account, "unblockAccount", {
@@ -181,7 +181,7 @@ export async function unblockAccount(
     });
   });
 
-  account.blocked = false;
+  account.blockedInCluster = false;
   await callHook("accountUnblocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
   return "OK";

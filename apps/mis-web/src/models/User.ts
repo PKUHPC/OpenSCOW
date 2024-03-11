@@ -115,3 +115,20 @@ export enum SearchType {
   TENANT = "TENANT",
 }
 
+export const AccountState = {
+  FROZEN: 0,
+  BLOCKED_BY_ADMIN: 1,
+  NORMAL: 2,
+} as const;
+
+export type AccountState = ValueOf<typeof AccountState>;
+
+export const DisplayedAccountState = {
+  DISPLAYED_FROZEN: 0,
+  DISPLAYED_BLOCKED: 1,
+  DISPLAYED_BELOW_BLOCK_THRESHOLD: 2,
+  DISPLAYED_NORMAL: 3,
+} as const;
+
+export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
+export type DisplayedAccountStateKeys = keyof typeof DisplayedAccountState;

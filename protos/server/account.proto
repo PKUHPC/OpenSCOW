@@ -42,6 +42,30 @@ message UnblockAccountResponse {
   bool executed = 1;
 }
 
+message FreezeAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+// NOT_FOUND: account is not found.
+message FreezeAccountResponse {
+  enum FreezeResult {
+    FREEZE_OK = 0;
+    ALREADY_FROZEN = 1;
+  }
+  FreezeResult result = 1;
+}
+
+message UnFreezeAccountRequest {
+  string tenant_name = 1;
+  string account_name = 2;
+}
+
+// NOT_FOUND: account is not found.
+message UnFreezeAccountResponse {
+  bool executed = 1;
+}
+
 message GetWhitelistedAccountsRequest {
   string tenant_name = 1;
 }
@@ -100,10 +124,28 @@ message GetAccountsRequest {
   optional string account_name = 2;
 }
 
+// account state from table account
+enum AccountState {
+  // FROZEN BY ACCOUNT SELF
+  FROZEN = 0;
+  // BLOCKED BY TENANT OR PLAT ADMIN
+  BLOCKED_BY_ADMIN = 1;
+  NORMAL = 2;
+}
+// displayed state in pageside
+enum DisplayedAccountState {
+  DISPLAYED_FROZEN = 0;
+  DISPLAYED_BLOCKED = 1;
+  DISPLAYED_BELOW_BLOCK_THRESHOLD = 2;
+  DISPLAYED_NORMAL = 3;
+}
+
 message Account {
   string tenant_name = 1;
   string account_name = 2;
   uint64 user_count = 3;
+  // true: blocked in cluster
+  // false: unblocked in cluster
   bool blocked = 4;
   string owner_id = 5;
   string owner_name = 6;
@@ -111,6 +153,9 @@ message Account {
   common.Money balance = 8;
   common.Money block_threshold_amount = 9;
   common.Money default_block_threshold_amount = 10;
+  AccountState state = 11;
+  optional bool is_in_whitelist = 12;
+  DisplayedAccountState displayed_state = 13;
 }
 
 message GetAccountsResponse {

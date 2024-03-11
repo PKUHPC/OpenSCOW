@@ -101,7 +101,7 @@ export const userServiceServer = plugin((server) => {
           const account = curr.account.getEntity();
           prev[account.accountName] = {
             userStatus: PFUserStatus[curr.status],
-            accountBlocked: Boolean(account.blocked),
+            accountBlocked: Boolean(account.blockedInCluster),
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),

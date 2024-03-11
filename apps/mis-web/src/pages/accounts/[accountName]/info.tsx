@@ -10,17 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { Descriptions, Tag } from "antd";
+import { App, Descriptions, Divider, Tag } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { USE_MOCK } from "src/apis/useMock";
 import { requireAuth } from "src/auth/requireAuth";
 import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
-import { useI18nTranslateToString } from "src/i18n";
-import { UserRole } from "src/models/User";
+import { prefix, useI18nTranslateToString } from "src/i18n";
+import { DisplayedAccountState, UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { getAccounts } from "src/pages/api/tenant/getAccounts";
@@ -32,6 +33,7 @@ type Props = SSRProps<{
   ownerId: string;
   balance: number;
   blocked: boolean;
+  displayedState: DisplayedAccountState;
   blockThresholdAmount: number
 }, 404>
 
@@ -41,13 +43,24 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
 )((props: Props) => {
 
   const t = useI18nTranslateToString();
+  const p = prefix("pageComp.accounts.accountTable.");
+
+  const DisplayedStateI18nTexts = {
+    [DisplayedAccountState.DISPLAYED_FROZEN]: t(p("frozen")),
+    [DisplayedAccountState.DISPLAYED_BLOCKED]: t(p("blocked")),
+    [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t(p("debt")),
+    [DisplayedAccountState.DISPLAYED_NORMAL]: t(p("normal")),
+  };
+
 
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { accountName, balance, ownerId, ownerName, blocked, blockThresholdAmount } = props;
+  const { accountName, balance, ownerId, ownerName, displayedState, blockThresholdAmount } = props;
   const title = t("common.accountInfo");
+
+  const { message, modal } = App.useApp();
 
   return (
     <div>
@@ -61,7 +74,58 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
           {ownerName}（ID：{ownerId}）
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountStatus")}>
-          {blocked ? <Tag color="red">{t("common.block")}</Tag> : <Tag color="green">{t("common.normal")}</Tag>}
+
+          <Tag color={ displayedState === DisplayedAccountState.DISPLAYED_NORMAL ? "green" : "red"}>
+            {DisplayedStateI18nTexts[displayedState]}
+          </Tag>
+
+          <Divider type="vertical" />
+          {
+            displayedState !== DisplayedAccountState.DISPLAYED_FROZEN
+              ? (
+                <a onClick={() => {
+                  modal.confirm({
+                    title: "冻结账户",
+                    icon: <ExclamationCircleOutlined />,
+                    content: `是否冻结账户${accountName} ？冻结后该账户将无法使用。`,
+                    onOk: async () => {
+                      // await api.unblockUserInAccount({ body: {
+                      //   identityId: r.userId,
+                      //   accountName: accountName,
+                      // } })
+                      //   .then(() => {
+                      //     message.success(t(p("unsealSuccess")));
+                      //     reload();
+                      //   });
+                    },
+                  });
+                }}
+                >
+                    冻结
+                </a>
+              ) : (
+                <a onClick={() => {
+                  modal.confirm({
+                    title: "解冻",
+                    icon: <ExclamationCircleOutlined />,
+                    content: `是否解冻账户${accountName} ？`,
+                    onOk: async () => {
+                      //   await api.blockUserInAccount({ body: {
+                      //     identityId: r.userId,
+                      //     accountName: accountName,
+                      //   } })
+                      //     .then(() => {
+                      //       message.success(t(p("blockSuccess")));
+                      //       reload();
+                      //     });
+                    },
+                  });
+                }}
+                >
+                    激活
+                </a>
+              )
+          }
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountBalance")}>
           {balance.toFixed(3)} {t("common.unit")}
@@ -70,6 +134,7 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
           {blockThresholdAmount.toFixed(3)} {t("common.unit")}
         </Descriptions.Item>
       </Descriptions>
+
     </div>
   );
 });
@@ -87,6 +152,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       ownerId: "ownerId",
       ownerName: "123",
       blocked: true,
+      displayedState: DisplayedAccountState.DISPLAYED_BLOCKED,
       blockThresholdAmount: 1.23,
     } };
   }
@@ -113,6 +179,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
     ownerId: account.ownerId,
     ownerName: account.ownerName,
     blocked: account.blocked,
+    displayedState: account.displayedState,
     blockThresholdAmount: moneyToNumber(account.blockThresholdAmount ?? account.defaultBlockThresholdAmount),
   } };
 

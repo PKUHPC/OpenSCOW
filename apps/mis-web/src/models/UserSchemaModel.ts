@@ -12,7 +12,8 @@
 
 import { Static, Type } from "@sinclair/typebox";
 
-import { ClusterAccountInfo_ImportStatus, PlatformRole, TenantRole, UserRole, UserStatus } from "./User";
+import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState,
+  PlatformRole, TenantRole, UserRole, UserStatus } from "./User";
 
 // 这个Model重新用typebox定义了
 // 定义Schema时无法复用的@scow/protos/build/server中的interface
@@ -90,6 +91,9 @@ export const Account = Type.Object({
   accountName: Type.String(),
   userCount: Type.Number(),
   blocked: Type.Boolean(),
+  state: Type.Enum(AccountState),
+  displayedState: Type.Enum(DisplayedAccountState),
+  isInWhitelist: Type.Optional(Type.Boolean()),
   ownerId: Type.String(),
   ownerName: Type.String(),
   comment: Type.String(),

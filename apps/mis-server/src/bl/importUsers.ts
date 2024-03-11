@@ -15,7 +15,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { unblockAccount } from "src/bl/block";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
@@ -62,9 +62,11 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   const accountMap: Record<string, Account> = {};
   data.accounts.forEach((account) => {
+    // 导入账户时，如果在集群中的账户状态为封锁，则scow同步封锁状态，默认为被上级手动封锁
+    // 导入账户时，如果在集群中的账户状态为正常，则scow同步正常状态
     accountMap[account.accountName] = new Account({
-      accountName: account.accountName, comment: "", blocked:Boolean(account.blocked),
-      tenant,
+      accountName: account.accountName, comment: "", blockedInCluster: Boolean(account.blocked),
+      tenant, state: Boolean(account.blocked) ? AccountState.BLOCKED_BY_ADMIN : AccountState.NORMAL,
     });
   });
   const existingAccounts = await em.find(Account,

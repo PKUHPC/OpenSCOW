@@ -11,6 +11,7 @@
  */
 
 import { Collection, Entity,
+  Enum,
   ManyToOne, OneToMany, OneToOne, PrimaryKey, Property,
   Ref } from "@mikro-orm/core";
 import { Decimal } from "@scow/lib-decimal";
@@ -19,6 +20,12 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
+
+export enum AccountState {
+  FROZEN = "FROZEN",
+  BLOCKED_BY_ADMIN = "BLOCKED_BY_ADMIN",
+  NORMAL = "NORMAL",
+}
 
 @Entity()
 export class Account {
@@ -32,7 +39,7 @@ export class Account {
     tenant: Ref<Tenant>;
 
   @Property()
-    blocked: boolean;
+    blockedInCluster: boolean;
 
   @OneToMany(() => UserAccount, (u) => u.account)
     users = new Collection<UserAccount>(this);
@@ -51,6 +58,9 @@ export class Account {
   @Property({ type: DecimalType, nullable: true })
     blockThresholdAmount: Decimal | undefined;
 
+  @Enum({ items: () => AccountState, comment: Object.values(AccountState).join(", ") })
+    state: AccountState;
+
   @Property({ columnType: DATETIME_TYPE, nullable: true })
     createTime: Date;
 
@@ -58,19 +68,19 @@ export class Account {
     accountName: string;
     whitelist?: EntityOrRef<AccountWhitelist>;
     tenant: EntityOrRef<Tenant>;
-    blocked: boolean;
+    blockedInCluster: boolean;
+    state: AccountState;
     comment?: string;
     createTime?: Date;
   }) {
     this.accountName = init.accountName;
-    this.blocked = init.blocked;
+    this.blockedInCluster = init.blockedInCluster;
     this.tenant = toRef(init.tenant);
     if (init.whitelist) {
       this.whitelist = toRef(init.whitelist);
     }
     this.comment = init.comment || "";
+    this.state = init.state;
     this.createTime = init.createTime ?? new Date();
   }
-
-
 }

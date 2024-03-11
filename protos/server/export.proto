@@ -23,10 +23,14 @@ message ExportAccountRequest {
   uint32 count = 1;
   optional string tenant_name = 2;
   optional string account_name = 3;
-  // 为true时表明账户被冻结，false则为所有账户
+  // 为true时表明账户被上级手动封锁，false则为所有账户
   optional bool blocked = 4;
-  // 为true时表明账户欠费，false则为所有账户
+  // 为true时表明账户余额小于等于封锁阈值，false则为所有账户
   optional bool debt = 5;
+  // 为true时表明账户为冻结状态，false则为所有账户
+  optional bool frozen = 6;
+  // 为true时表明账户在白名单中或账户为未欠费账户即可以正常使用集群的账户，false则为所有账户
+  optional bool normal = 7;
 }
 
 message ExportAccountResponse {

@@ -18,15 +18,16 @@ import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceServer, AccountServiceService,
-  BlockAccountResponse_Result } from "@scow/protos/build/server/account";
+  accountStateFromJSON, BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { authUrl } from "src/config";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { getAccountStateInfo } from "src/utils/accountUserState";
 import { toRef } from "src/utils/orm";
 
 export const accountServiceServer = plugin((server) => {
@@ -69,7 +70,14 @@ export const accountServiceServer = plugin((server) => {
 
         const result = await blockAccount(account, server.ext.clusters, logger);
 
-        if (result === "AlreadyBlocked") {
+
+        const blockThresholdAmount =
+        account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+        // 如果之前不为欠费或冻结状态但在集群中仍为封锁状态时报错
+        if (result === "AlreadyBlocked" &&
+          account.balance.gt(blockThresholdAmount) &&
+          account.state !== AccountState.FROZEN) {
+
           throw <ServiceError>{
             code: Status.FAILED_PRECONDITION,
             message: `Account ${accountName} has been blocked. `,
@@ -82,6 +90,9 @@ export const accountServiceServer = plugin((server) => {
             message: `The account ${accountName} has been added to the whitelist. `,
           };
         }
+
+        // 账户状态变更为被平台管理员或租户管理员封锁
+        account.state = AccountState.BLOCKED_BY_ADMIN;
 
         return [{ result: BlockAccountResponse_Result.OK }];
       });
@@ -101,20 +112,25 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        if (!account.blocked) {
+        if (!account.blockedInCluster) {
           throw <ServiceError>{
             code: Status.FAILED_PRECONDITION, message: `Account ${accountName} is unblocked`,
           };
         }
 
+        // 将账户从被上级封锁状态变更为正常
+        account.state = AccountState.NORMAL;
+
         const blockThresholdAmount =
         account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
+        // 解除账户封锁时，若余额小于等于封锁阈值则不在集群下解封账户
         if (account.balance.lte(blockThresholdAmount)) {
-          throw <ServiceError>{
-            code: Status.FAILED_PRECONDITION,
-            message: `The account ${accountName} balance is insufficient, please pay or add to the whitelist`,
-          };
+          logger.info(
+            "Can not unblock %s in clusters because the account's balance less than or equal to the blocking threshold",
+            accountName,
+          );
+          return [{ executed: true }];
         }
 
         await unblockAccount(account, server.ext.clusters, logger);
@@ -145,12 +161,18 @@ export const accountServiceServer = plugin((server) => {
           }
 
           const ownerUser = owner.user.getEntity();
+          const thresholdAmount = x.blockThresholdAmount ?? x.tenant.$.defaultAccountBlockThreshold;
+          const displayedAccountState =
+            getAccountStateInfo(x.whitelist?.id, x.state, x.balance, thresholdAmount).displayedState;
 
           return {
             accountName: x.accountName,
             tenantName: x.tenant.$.name,
             userCount: x.users.count(),
-            blocked: Boolean(x.blocked),
+            blocked: Boolean(x.blockedInCluster),
+            state: accountStateFromJSON(x.state),
+            displayedState: displayedAccountState,
+            isInWhitelist: Boolean(!!x.whitelist?.id),
             ownerId: ownerUser.userId,
             ownerName: ownerUser.name,
             comment: x.comment,
@@ -182,7 +204,9 @@ export const accountServiceServer = plugin((server) => {
       }
 
       // insert the account now to avoid future conflict
-      const account = new Account({ accountName, comment, tenant, blocked: true });
+      // 欠费账户
+      const account = new Account({ accountName, comment, tenant,
+        blockedInCluster: true, state: AccountState.NORMAL });
 
       const userAccount = new UserAccount({
         account, user, role: EntityUserRole.OWNER, status: UserStatus.UNBLOCKED,
@@ -297,7 +321,19 @@ export const accountServiceServer = plugin((server) => {
       });
       account.whitelist = toRef(whitelist);
 
-      await unblockAccount(account, server.ext.clusters, logger);
+      // 如果移入白名单之前账户状态为冻结，则冻结状态优先级高于白名单，账户在集群中仍为封锁状态
+      if (account.state === AccountState.FROZEN) {
+        logger.info("Add account %s to whitelist by %s with comment %s, but the account is still frozen",
+          accountName,
+          operatorId,
+          comment,
+        );
+      // 如果移入白名单之前账户状态不为冻结，则账户状态变更为正常，账户在集群中为解封状态
+      } else {
+        account.state = AccountState.NORMAL;
+        await unblockAccount(account, server.ext.clusters, logger);
+      }
+
       await em.persistAndFlush(whitelist);
 
       logger.info("Add account %s to whitelist by %s with comment %s",
@@ -319,7 +355,6 @@ export const accountServiceServer = plugin((server) => {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
         };
       }
-
       if (!account.whitelist) {
         return [{ executed: false }];
       }
