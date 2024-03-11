@@ -20,7 +20,7 @@ export const I18nObjectSchema = Type.Optional(Type.Object({
   i18n: Type.Optional(Type.Object({
     default: Type.String(),
     en: Type.Optional(Type.String()),
-    zh_cn: Type.Optional(Type.String()),
+    zhCn: Type.Optional(Type.String()),
   })),
 }));
 
