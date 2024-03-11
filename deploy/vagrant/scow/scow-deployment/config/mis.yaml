@@ -12,7 +12,7 @@ fetchJobs:
     # 是否开启
     enabled: true
     # 周期的cron表达式
-    cron: "10 */10 * * * *"
+    cron: "*/10 * * * *"
 
 # 预定义的充值类型
 predefinedChargingTypes:
