@@ -14,7 +14,6 @@ import { asyncClientCall, asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import {
-  CreateOperationLogRequest,
   ExportOperationLogResponse,
   OperationLog as OperationLogProto,
   OperationLogServiceClient,

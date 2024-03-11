@@ -745,6 +745,7 @@ export default {
       cannotCancel:"不能取消自己的平台管理员角色",
       alreadyNot:"用户已经不是该角色",
       selectRole:"选择角色",
+      customEventType:"自定义操作类型",
     },
   },
   page: {

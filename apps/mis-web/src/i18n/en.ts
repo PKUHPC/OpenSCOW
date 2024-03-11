@@ -745,6 +745,7 @@ export default {
       cannotCancel: "Cannot cancel your own platform admin role",
       alreadyNot: "User is already not in this role",
       selectRole: "Select Role",
+      customEventType: "Custom Event Type",
     },
   },
   page: {

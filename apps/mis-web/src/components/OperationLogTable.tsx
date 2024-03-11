@@ -211,7 +211,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             />
           </Form.Item>
           {operationType === "customEvent" && (
-            <Form.Item label="自定义操作类型" name="customEventType">
+            <Form.Item label={t(p("customEventType"))} name="customEventType">
               <Select
                 showSearch
                 options={
