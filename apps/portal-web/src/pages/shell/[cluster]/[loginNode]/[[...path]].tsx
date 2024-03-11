@@ -87,7 +87,6 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const { loginNodes } = useStore(LoginNodeStore);
   const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
-  console.log(currentLoginNodeName);
 
   const headerRef = useRef<HTMLDivElement>(null);
 
