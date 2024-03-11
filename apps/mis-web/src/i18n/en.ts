@@ -601,7 +601,7 @@ export default {
         idOrName: "User ID or Name",
         name:"Name",
         tenantRole: "Tenant Role",
-        affiliatedAccountName: "Available Accounts",
+        affiliatedAccountName: "Affiliated Accounts",
         notExist: "User does not exist",
         notAvailable: "This feature is not available in the current configuration",
         changeSuccess: "Modification successful",

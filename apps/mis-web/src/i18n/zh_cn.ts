@@ -601,7 +601,7 @@ export default {
         idOrName:"用户ID或者姓名",
         name:"姓名",
         tenantRole:"租户角色",
-        affiliatedAccountName:"可用账户",
+        affiliatedAccountName:"关联账户",
         notExist:"用户不存在",
         notAvailable:"本功能在当前配置下不可用",
         changeSuccess:"修改成功",
