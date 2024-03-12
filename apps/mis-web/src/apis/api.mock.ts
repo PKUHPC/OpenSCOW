@@ -475,6 +475,7 @@ export const mockApi: MockApi<typeof api> = {
     endsAt: 1702889670000,
   }]}),
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
+  changeTenant: async () => null,
 };
 
 export const MOCK_USER_INFO = {

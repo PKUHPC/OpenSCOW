@@ -95,6 +95,7 @@ import type { SetDefaultAccountBlockThresholdSchema } from "src/pages/api/tenant
 import type { UnblockAccountSchema } from "src/pages/api/tenant/unblockAccount";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
+import type { ChangeTenantSchema } from "src/pages/api/users/changeTenant";
 import type { CreateUserSchema } from "src/pages/api/users/create";
 import type { GetAccountUsersSchema } from "src/pages/api/users/index";
 import type { CancelJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/cancel";
@@ -197,4 +198,5 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  changeTenant: apiClient.fromTypeboxRoute<typeof ChangeTenantSchema>("PUT", "/api/users/changeTenant"),
 };
