@@ -96,7 +96,7 @@ const operationLog5 = new OperationLog({
   operatorIp: operationLog.operatorIp,
   operationResult: operationLog.operationResult,
   operationTime: new Date("2023-12-05T02:15:02.648Z"),
-  customEvent: "test",
+  customEventType: "test",
   metaData: {
     $case: "customEvent",
     customEvent: {

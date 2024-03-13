@@ -45,7 +45,7 @@ export async function filterOperationLogs(
       ...((operationType) ? [{ metaData: { $case: operationType } as OperationEvent }] : []),
       ...((operationTargetAccountName) ? [{ metaData: { targetAccountName: operationTargetAccountName } }] : []),
       ...(operationDetail ? [ { metaData: { $like: `%${operationDetail}%` } }] : []),
-      ...(customEventType ? [{ customEvent: customEventType }] : []),
+      ...(customEventType ? [{ customEventType }] : []),
     ],
     ...(operationResult ? { operation_result: operationResultToJSON(operationResult) } : {}),
   };
@@ -62,7 +62,7 @@ export function toGrpcOperationLog(x: OperationLogEntity): OperationLog {
     operationResult: operationResultFromJSON(x.operationResult),
     operationEvent: x.metaData?.$case === "customEvent" ? { ...x.metaData, "customEvent": {
       ... x.metaData.customEvent,
-      type: x.customEvent || "",
+      type: x.customEventType || "",
     } } : (x.metaData),
   };
   return grpcOperationLog;
@@ -117,7 +117,7 @@ export const checkCustomEventType = async (em: SqlEntityManager<MySqlDriver>, op
 
   const existTypeLog = await em.findOne(OperationLogEntity, {
     metaData: { $case: "customEvent" },
-    customEvent: customEventType,
+    customEventType,
   });
 
   if (

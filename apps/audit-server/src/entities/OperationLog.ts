@@ -45,7 +45,7 @@ export class OperationLog {
   // 用户自定义操作类型
   @Index({ name: "custom_event" })
   @Property({ nullable: true })
-    customEvent?: string;
+    customEventType?: string;
 
   constructor(init: {
       operationLogId?: number;
@@ -54,7 +54,7 @@ export class OperationLog {
       operationTime?: Date;
       operationResult: OperationResult;
       metaData: OperationEvent & { targetAccountName?: string };
-      customEvent?: string;
+      customEventType?: string;
     }) {
     if (init.operationLogId) {
       this.id = init.operationLogId;
@@ -66,8 +66,8 @@ export class OperationLog {
     }
     this.operationResult = init.operationResult;
     this.metaData = init.metaData;
-    if (init.customEvent) {
-      this.customEvent = init.customEvent;
+    if (init.customEventType) {
+      this.customEventType = init.customEventType;
     }
   }
 

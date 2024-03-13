@@ -65,8 +65,8 @@
           "nullable": true,
           "mappedType": "json"
         },
-        "custom_event": {
-          "name": "custom_event",
+        "custom_event_type": {
+          "name": "custom_event_type",
           "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
@@ -79,7 +79,7 @@
       "indexes": [
         {
           "columnNames": [
-            "custom_event"
+            "custom_event_type"
           ],
           "composite": false,
           "keyName": "custom_event",
