@@ -745,6 +745,7 @@ export default {
       cannotCancel:"不能取消自己的平台管理员角色",
       alreadyNot:"用户已经不是该角色",
       selectRole:"选择角色",
+      customEventType:"自定义操作类型",
     },
   },
   page: {
@@ -1098,6 +1099,7 @@ export default {
       exportOperationLog: "导出操作日志",
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
+      customEvent: "自定义操作行为",
     },
     operationDetails: {
       login: "用户登录",

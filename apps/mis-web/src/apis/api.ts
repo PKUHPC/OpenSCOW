@@ -77,6 +77,7 @@ import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMis
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
+import type { GetCustomEventTypesSchema } from "src/pages/api/log/getCustomEventTypes";
 import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLog";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
@@ -171,6 +172,7 @@ export const api = {
   getTopSubmitJobUser: apiClient.fromTypeboxRoute<typeof GetTopSubmitJobUserSchema>("GET", "/api/admin/getTopSubmitJobUser"),
   getNewJobCount: apiClient.fromTypeboxRoute<typeof GetNewJobCountSchema>("GET", "/api/admin/getNewJobCount"),
   getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
+  getCustomEventTypes: apiClient.fromTypeboxRoute<typeof GetCustomEventTypesSchema>("GET", "/api/log/getCustomEventTypes"),
   changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),

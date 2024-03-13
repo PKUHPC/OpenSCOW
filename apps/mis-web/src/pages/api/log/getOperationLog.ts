@@ -36,6 +36,7 @@ export const GetOperationLogFilter = Type.Object({
   operationResult: Type.Optional(Type.Enum(OperationResult)),
   operationDetail: Type.Optional(Type.String()),
   operationTargetAccountName: Type.Optional(Type.String()),
+  customEventType: Type.Optional(Type.String()),
 });
 
 export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
@@ -77,13 +78,15 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   const {
     type, operatorUserIds, startTime, endTime,
-    operationType, operationResult, operationDetail, operationTargetAccountName, page, pageSize } = req.query;
+    operationType, operationResult, operationDetail,
+    operationTargetAccountName, customEventType, page, pageSize } = req.query;
 
   const filter = {
     operatorUserIds: operatorUserIds ? operatorUserIds.split(",") : [],
     startTime, endTime, operationType,
     operationResult, operationTargetAccountName,
     operationDetail,
+    customEventType,
   };
   // 用户请求
   if (type === OperationLogQueryType.USER) {

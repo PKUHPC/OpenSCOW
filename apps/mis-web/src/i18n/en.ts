@@ -745,6 +745,7 @@ export default {
       cannotCancel: "Cannot cancel your own platform admin role",
       alreadyNot: "User is already not in this role",
       selectRole: "Select Role",
+      customEventType: "Custom Event Type",
     },
   },
   page: {
@@ -1097,6 +1098,7 @@ export default {
       exportOperationLog: "Export Operation Log",
       setAccountBlockThreshold: "Set Account Block Threshold",
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
+      customEvent: "Custom Operation Event",
     },
     operationDetails: {
       login: "User Login",
