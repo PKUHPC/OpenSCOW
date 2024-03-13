@@ -134,7 +134,7 @@ export const operationLogServiceServer = plugin((server) => {
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb
         .select([
-          raw("DISTINCT o.custom_event as customType"),
+          raw("DISTINCT o.custom_event_type as customType"),
           raw("JSON_UNQUOTE(JSON_EXTRACT(meta_data, '$.customEvent.name')) AS name"),
         ])
         .where("o.custom_event IS NOT NULL");
