@@ -806,7 +806,7 @@ export const userServiceServer = plugin((server) => {
     changeTenant: async ({ request, em }) => {
       const { userId, tenantName } = request;
 
-      const user = await em.findOne (User, { userId });
+      const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
 
       if (!user) {
         throw <ServiceError>{

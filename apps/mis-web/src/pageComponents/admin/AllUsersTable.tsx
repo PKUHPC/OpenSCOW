@@ -28,6 +28,8 @@ import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 
+import { ChangeTenantModalLink } from "./ChangeTenantModal";
+
 interface FilterForm {
   idOrName: string | undefined;
 }
@@ -301,8 +303,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
 
         <Table.Column<PlatformUserInfo>
-          dataIndex="changePassword"
-          width="7.5%"
+          dataIndex="operation"
+          width="10%"
           fixed="right"
           title={t(pCommon("operation"))}
           render={(_, r) => (
@@ -323,6 +325,23 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
               >
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
+              <ChangeTenantModalLink
+                tenantName={r.tenantName}
+                name={r.name}
+                userId={r.userId}
+                onComplete={async (newTenantName) => {
+                  await api.changeTenant({ body:{
+                    identityId: r.userId,
+                    tenantName: newTenantName,
+                  } })
+                    .httpError(404, () => { message.error(t(p("notExist"))); })
+                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .then(() => { message.success(t(p("success"))); })
+                    .catch(() => { message.error(t(p("fail"))); });
+                }}
+              >
+                修改租户
+              </ChangeTenantModalLink>
             </Space>
           )}
         />
