@@ -137,7 +137,7 @@ export const operationLogServiceServer = plugin((server) => {
           raw("DISTINCT o.custom_event_type as customType"),
           raw("JSON_UNQUOTE(JSON_EXTRACT(meta_data, '$.customEvent.name')) AS name"),
         ])
-        .where("o.custom_event IS NOT NULL");
+        .where("o.custom_event_type IS NOT NULL");
 
       const results: { customType: string, name: string }[] = await qb.execute();
 
