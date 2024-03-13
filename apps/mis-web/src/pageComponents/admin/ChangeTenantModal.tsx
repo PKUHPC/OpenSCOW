@@ -44,6 +44,7 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
     setLoading(true);
     await api.changeTenant({ body:{
       identityId: userId,
+      previousTenantName: tenantName,
       tenantName: newTenantName,
     } })
       .httpError(404, (e) => {

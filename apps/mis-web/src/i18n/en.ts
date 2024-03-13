@@ -1110,6 +1110,7 @@ export default {
       exportOperationLog: "Export Operation Log",
       setAccountBlockThreshold: "Set Account Block Threshold",
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
+      userChangeTenant: "User Change Tenant",
     },
     operationDetails: {
       login: "User Login",
@@ -1183,6 +1184,7 @@ export default {
       setAccountBlockThreshold: "Set the block threshold of account {} to {}",
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
       unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
+      userChangeTenant: "User {} changes from tenant {} to tenant {}",
     },
   },
   userRoles: {

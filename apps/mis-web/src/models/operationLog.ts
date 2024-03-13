@@ -85,6 +85,7 @@ export const OperationType: OperationTypeEnum = {
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
+  userChangeTenant: "userChangeTenant",
 };
 
 export const OperationLog = Type.Object({
@@ -180,6 +181,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     exportOperationLog: t(pTypes("exportOperationLog")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
+    userChangeTenant: t(pTypes("userChangeTenant")),
   };
 
 };
@@ -242,6 +244,7 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   exportChargeRecord: "040305",
   exportPayRecord: "040306",
   exportOperationLog: "040307",
+  userChangeTenant: "040308",
 };
 
 type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
@@ -431,6 +434,11 @@ export const getOperationDetail = (
       return t(pDetails("setAccountDefaultBlockThreshold"),
         [operationEvent[logEvent].tenantName,
           nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+    case "userChangeTenant":
+      return t(pDetails("userChangeTenant"),
+        [operationEvent[logEvent].userId,
+          operationEvent[logEvent].previousTenantName,
+          operationEvent[logEvent].newTenantName]);
     default:
       return "-";
     }

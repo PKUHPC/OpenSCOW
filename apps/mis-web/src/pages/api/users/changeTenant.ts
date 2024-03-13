@@ -17,11 +17,9 @@ import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
-import { checkNameMatch } from "src/server/checkIdNameMatch";
+import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const ChangeTenantSchema = typeboxRouteSchema({
@@ -29,6 +27,7 @@ export const ChangeTenantSchema = typeboxRouteSchema({
 
   body: Type.Object({
     identityId: Type.String(),
+    previousTenantName: Type.String(),
     tenantName: Type.String(),
   }),
 
@@ -43,16 +42,13 @@ export const ChangeTenantSchema = typeboxRouteSchema({
         Type.Literal("USER_ALREADY_EXIST_IN_THIS_TENANT"),
       ]),
     }),
-
-
   },
 });
 
 export default /* #__PURE__*/typeboxRoute(ChangeTenantSchema, async (req, res) => {
-  const { identityId, tenantName } = req.body;
+  const { identityId, tenantName, previousTenantName } = req.body;
 
   const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
-
 
   const info = await auth(req, res);
 
@@ -60,20 +56,22 @@ export default /* #__PURE__*/typeboxRoute(ChangeTenantSchema, async (req, res) =
 
   const client = getClient(UserServiceClient);
 
-  // const logInfo = {
-  //   operatorUserId: info.identityId,
-  //   operatorIp: parseIp(req) ?? "",
-  //   operationTypeName: OperationType.addUserToAccount,
-  //   operationTypePayload:{
-  //     accountName, userId: identityId,
-  //   },
-  // };
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.userChangeTenant,
+    operationTypePayload:{
+      userId: identityId,
+      previousTenantName,
+      newTenantName: tenantName,
+    },
+  };
 
   return await asyncClientCall(client, "changeTenant", {
     userId: identityId,
     tenantName,
   }).then(async () => {
-    // await callLog(logInfo, OperationResult.SUCCESS);
+    await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   })
     .catch(handlegRPCError({
@@ -87,6 +85,6 @@ export default /* #__PURE__*/typeboxRoute(ChangeTenantSchema, async (req, res) =
         }
       },
     },
-    // async () => await callLog(logInfo, OperationResult.FAIL),
+    async () => await callLog(logInfo, OperationResult.FAIL),
     ));
 });

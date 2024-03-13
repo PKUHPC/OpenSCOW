@@ -1111,6 +1111,7 @@ export default {
       exportOperationLog: "导出操作日志",
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
+      userChangeTenant: "用户切换租户",
     },
     operationDetails: {
       login: "用户登录",
@@ -1184,6 +1185,7 @@ export default {
       setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
+      userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
     },
   },
   userRoles: {
