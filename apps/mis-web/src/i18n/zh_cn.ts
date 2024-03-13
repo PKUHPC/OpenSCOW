@@ -293,6 +293,7 @@ export default {
         success:"修改成功",
         fail:"修改失败",
         changePassword:"修改密码",
+        changeTenant: "修改租户",
       },
       createTenantForm:{
         prompt:"请输入租户名并为其创建一个新用户作为该租户的管理员",
@@ -326,6 +327,18 @@ export default {
         charging:"充值中……",
         accountNotFound:"账户未找到",
         chargeFinish:"充值完成！",
+      },
+      changeTenantModal: {
+        modifyTenant: "修改租户",
+        newTenant: "新租户",
+        originalTenant: "原租户",
+        userName: "用户姓名",
+        userId: "用户 ID",
+        newTenantNameRequired: "请输入新租户",
+        userNotFound: "用户不存在",
+        tenantNotFound: "租户不存在",
+        userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
+        userAlreadyExistInThisTenant: "用户已经存在于该租户中",
       },
     },
     commonComponent:{

@@ -293,6 +293,7 @@ export default {
         success: "Modification successful",
         fail: "Modification failed",
         changePassword: "Change Password",
+        changeTenant: "Change Tenant",
       },
       createTenantForm: {
         prompt: "Please enter the tenant name and create a new user as the administrator for this tenant.",
@@ -326,6 +327,18 @@ export default {
         charging: "Charging...",
         accountNotFound: "Account not found.",
         chargeFinish: "Charging completed!",
+      },
+      changeTenantModal: {
+        modifyTenant: "Modify Tenant",
+        newTenant: "New Tenant",
+        originalTenant: "Original Tenant",
+        userName: "User Name",
+        userId: "User ID",
+        newTenantNameRequired: "Please enter a new tenant",
+        userNotFound: "User Not Exist",
+        tenantNotFound: "Tenant Not Exist",
+        userStillMaintainsAccountRelationship: "User still maintains account relationship",
+        userAlreadyExistInThisTenant: "User already exists in this tenant",
       },
     },
     commonComponent: {

@@ -261,7 +261,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         onChange={handleTableChange}
-        scroll={{ x: data?.platformUsers?.length ? 1200 : true }}
+        scroll={{ x: true }}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
@@ -329,18 +329,9 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 tenantName={r.tenantName}
                 name={r.name}
                 userId={r.userId}
-                onComplete={async (newTenantName) => {
-                  await api.changeTenant({ body:{
-                    identityId: r.userId,
-                    tenantName: newTenantName,
-                  } })
-                    .httpError(404, () => { message.error(t(p("notExist"))); })
-                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                    .then(() => { message.success(t(p("success"))); })
-                    .catch(() => { message.error(t(p("fail"))); });
-                }}
+                reload={reload}
               >
-                修改租户
+                {t(p("changeTenant"))}
               </ChangeTenantModalLink>
             </Space>
           )}

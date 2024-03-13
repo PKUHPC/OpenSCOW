@@ -10,28 +10,31 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, Modal } from "antd";
+import { App, Form, Input, Modal } from "antd";
 import { useState } from "react";
+import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
     tenantName: string;
     name: String
     userId: string;
-    onClose: () => void;
-    onComplete: (newTenantName: string) => Promise<void>;
     open: boolean;
+    onClose: () => void;
+    reload: () => void;
 }
 
 interface FormProps {
   newTenantName: string;
 }
-const p = prefix("component.others.");
+const p = prefix("pageComp.admin.changeTenantModal.");
+const pCommon = prefix("common.");
 
-const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClose, onComplete, open }) => {
+const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClose, reload, open }) => {
 
   const t = useI18nTranslateToString();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
@@ -39,20 +42,39 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
   const onOK = async () => {
     const { newTenantName } = await form.validateFields();
     setLoading(true);
-    await onComplete(newTenantName)
+    await api.changeTenant({ body:{
+      identityId: userId,
+      tenantName: newTenantName,
+    } })
+      .httpError(404, (e) => {
+        switch (e.code) {
+        case "USER_NOT_FOUND":
+          message.error(t(p("userNotFound")));
+          break;
+        case "TENANT_NOT_FOUND":
+          message.error(t(p("tenantNotFound")));
+          break;
+        case "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP":
+          message.error(t(p("userStillMaintainsAccountRelationship")));
+          break;
+        case "USER_ALREADY_EXIST_IN_THIS_TENANT":
+          message.error(t(p("userAlreadyExistInThisTenant")));
+          break;
+        default:
+          message.error(t(pCommon("changeFail")));
+        } })
       .then(() => {
+        message.success(t(pCommon("changeSuccess")));
         form.resetFields();
+        reload();
         onClose();
       })
       .finally(() => setLoading(false));
   };
 
-  const languageId = useI18n().currentLanguage.id;
-
   return (
     <Modal
-      // title={`${t(p("modifyUser"))}${name}（ID：${userId}）${t(p("password"))}`}
-      title="修改租户"
+      title={t(p("modifyTenant"))}
       open={open}
       onOk={onOK}
       confirmLoading={loading}
@@ -63,20 +85,18 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
         initialValues={undefined}
         preserve={false}
       >
-
-        <Form.Item label={"用户ID"}>
+        <Form.Item label={t(p("userId"))}>
           <span>{userId}</span>
         </Form.Item>
-        <Form.Item label={"姓名"}>
+        <Form.Item label={t(p("userName"))}>
           <span>{name}</span>
         </Form.Item>
-        <Form.Item label={"原租户"}>
+        <Form.Item label={t(p("originalTenant"))}>
           <span>{tenantName}</span>
         </Form.Item>
         <Form.Item
-          // label={t(p("newPassword"))}
-          rules={[{ required: true, message: "请输入新租户" }]}
-          label="新租户"
+          rules={[{ required: true, message: t(p("newTenantNameRequired")) }]}
+          label={t(p("newTenant"))}
           name="newTenantName"
         >
           <Input />
