@@ -1,16 +1,18 @@
 syntax = "proto3";
 
+
 package scow.audit;
+
+import "google/protobuf/timestamp.proto";
 
 message SshSession {
   string user = 2;
   string remote_addr = 3;
-  int32 is_finished = 4;
-  optional string node = 5;
-  optional string date_start = 6;
-  optional string date_end = 7;
-  optional int32 is_success = 8;
-  optional int32  has_reply = 9;
+  bool is_finished = 4;
+  string node = 5;
+  google.protobuf.Timestamp date_start = 6;
+  google.protobuf.Timestamp date_end = 7;
+  bool is_success = 8;
 }
 
 message CommandInfo {
@@ -22,6 +24,12 @@ message CommandInfo {
   string time = 6;
   string remote_addr = 8;
   string asset_ip = 9;
+}
+
+message OperationInfo {
+  string job_id = 1;
+  string time = 2;
+  string operation = 3;
 }
 
 
@@ -38,6 +46,16 @@ message CreateSessionRequest {
 }
 
 message CreateSessionResponse {
+  int64 session_id = 1;
+}
+
+message SessionEndRequest {
+  int64 session_id = 1;
+  google.protobuf.Timestamp date_end = 2;
+}
+
+message SessionEndResponse {
+
 }
 
 message CreateCommandsRequest {
@@ -70,6 +88,30 @@ message WriteTerminalMsgResponse {
 
 }
 
+message GetAppOperationsRequest {
+
+}
+
+message GetAppOperationsResponse {
+  repeated OperationInfo operations = 1;
+}
+
+message GetAppSessionsRequest {
+
+}
+
+message AppSession {
+  string job_id = 1;
+  string session_id = 2;
+  string submit_time = 3;
+  string app_id = 4;
+  string user_id = 5;
+}
+
+message GetAppSessionsResponse {
+  repeated AppSession app_sessions = 1;
+}
+
 message HttpRequest {
   string method = 1;
   string url = 2;
@@ -88,9 +130,9 @@ message WriteAppProxyRequest {
 message WriteAppProxyResponse {
 
 }
-
 service AuditService {
   rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
+  rpc SessionEnd(SessionEndRequest) returns (SessionEndResponse);
   rpc GetSessions(GetSessionsRequest) returns (GetSessionsResponse);
 
   rpc CreateCommands(CreateCommandsRequest) returns (CreateCommandsResponse);
@@ -98,7 +140,9 @@ service AuditService {
 
   rpc WriteTerminalMsg(WriteTerminalMsgRequest) returns (WriteTerminalMsgResponse);
 
-  rpc WriteAppProxy(WriteAppProxyRequest) returns (WriteAppProxyResponse);
+  rpc GetAppOperations(GetAppOperationsRequest) returns (GetAppOperationsResponse);
+  rpc GetAppSessions(GetAppSessionsRequest) returns (GetAppSessionsResponse);
 
+  rpc WriteAppProxy(WriteAppProxyRequest) returns (WriteAppProxyResponse);
 
 }

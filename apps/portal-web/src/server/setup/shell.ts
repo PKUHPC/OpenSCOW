@@ -141,14 +141,18 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     },
   }, OperationResult.SUCCESS);
 
-  const { createShellSession } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+  const { createShellSession, sessionEnd } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
 
-  await createShellSession({ session: {
+
+  const { sessionId: sessionAuditId } = await createShellSession({ session: {
     user: user.identityId,
     remoteAddr: parseIp(req) ?? "",
-    isFinished: 0,
+    isFinished: false,
     node: loginNode.address,
+    dateStart: new Date().toISOString(),
+    isSuccess: true,
   } });
+
 
   const send = (data: ShellOutputData) => {
     ws.send(JSON.stringify(data));
@@ -201,6 +205,13 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }, OperationResult.FAIL);
     stream.write({ message: { $case: "disconnect", disconnect: {} } });
     stream.end();
+  });
+
+  ws.on("close", async () => {
+    await sessionEnd({
+      sessionId: sessionAuditId,
+      dateEnd: new Date().toISOString(),
+    });
   });
 });
 

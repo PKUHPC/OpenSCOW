@@ -31,7 +31,7 @@ export const createAuditClient = (
     createShellSession: async (request: CreateSessionRequest): Promise<CreateSessionResponse> => {
       if (!client) {
         logger.debug("Attempt to audit with %o", request);
-        return {};
+        return { sessionId: 0 };
       }
       return await asyncUnaryCall(client, "createSession", request);
     },
