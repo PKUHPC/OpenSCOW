@@ -22,9 +22,9 @@ import { DECIMAL_DEFAULT_RAW, DecimalType } from "src/utils/decimal";
 import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 export enum AccountState {
-  FROZEN = "FROZEN",
-  BLOCKED_BY_ADMIN = "BLOCKED_BY_ADMIN",
   NORMAL = "NORMAL",
+  BLOCKED_BY_ADMIN = "BLOCKED_BY_ADMIN",
+  FROZEN = "FROZEN",
 }
 
 @Entity()

@@ -15,10 +15,10 @@ import { AccountState } from "src/entities/Account";
 
 
 export enum DisplayedAccountState {
-  DISPLAYED_FROZEN = 0,
+  DISPLAYED_NORMAL = 0,
   DISPLAYED_BLOCKED = 1,
   DISPLAYED_BELOW_BLOCK_THRESHOLD = 2,
-  DISPLAYED_NORMAL = 3,
+  DISPLAYED_FROZEN = 3,
 }
 
 export interface AccountStateInfo {
