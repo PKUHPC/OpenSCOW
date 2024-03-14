@@ -614,7 +614,7 @@ export default {
         idOrName:"用户ID或者姓名",
         name:"姓名",
         tenantRole:"租户角色",
-        affiliatedAccountName:"可用账户",
+        affiliatedAccountName:"关联账户",
         notExist:"用户不存在",
         notAvailable:"本功能在当前配置下不可用",
         changeSuccess:"修改成功",
@@ -758,6 +758,7 @@ export default {
       cannotCancel:"不能取消自己的平台管理员角色",
       alreadyNot:"用户已经不是该角色",
       selectRole:"选择角色",
+      customEventType:"自定义操作类型",
     },
   },
   page: {
@@ -1112,6 +1113,7 @@ export default {
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
       userChangeTenant: "用户切换租户",
+      customEvent: "自定义操作行为",
     },
     operationDetails: {
       login: "用户登录",

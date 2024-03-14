@@ -614,7 +614,7 @@ export default {
         idOrName: "User ID or Name",
         name:"Name",
         tenantRole: "Tenant Role",
-        affiliatedAccountName: "Available Accounts",
+        affiliatedAccountName: "Affiliated Accounts",
         notExist: "User does not exist",
         notAvailable: "This feature is not available in the current configuration",
         changeSuccess: "Modification successful",
@@ -758,6 +758,7 @@ export default {
       cannotCancel: "Cannot cancel your own platform admin role",
       alreadyNot: "User is already not in this role",
       selectRole: "Select Role",
+      customEventType: "Custom Event Type",
     },
   },
   page: {
@@ -1111,6 +1112,7 @@ export default {
       setAccountBlockThreshold: "Set Account Block Threshold",
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
       userChangeTenant: "User Change Tenant",
+      customEvent: "Custom Operation Event",
     },
     operationDetails: {
       login: "User Login",

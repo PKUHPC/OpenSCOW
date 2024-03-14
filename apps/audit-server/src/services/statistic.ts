@@ -13,7 +13,7 @@
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import { OperationType } from "@scow/lib-operation-log";
-import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import { StatisticServiceServer, StatisticServiceService } from "@scow/protos/build/audit/statistic";
 import { OperationLog } from "src/entities/OperationLog";
 
@@ -26,7 +26,7 @@ export const statisticServiceServer = plugin((server) => {
 
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      checktTimeZone(timeZone);
+      checkTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(OperationLog, "o");
       qb

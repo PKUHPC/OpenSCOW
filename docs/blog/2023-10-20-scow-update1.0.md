@@ -92,7 +92,7 @@ db:
 fetchJobs:
   periodicFetch:
     enabled: true
-    cron: "10 */10 * * * *"
+    cron: "*/10 * * * *"
 
 predefinedChargingTypes:
   - 测试

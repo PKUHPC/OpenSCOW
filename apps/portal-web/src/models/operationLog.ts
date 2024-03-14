@@ -80,4 +80,5 @@ export const OperationType: OperationTypeEnum = {
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
   userChangeTenant: "userChangeTenant",
+  customEvent: "customEvent",
 };
