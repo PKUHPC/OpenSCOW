@@ -18,9 +18,11 @@ import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Router, { useRouter } from "next/router";
 import { useRef } from "react";
+import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
@@ -83,6 +85,9 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const loginNode = router.query.loginNode as string;
   const paths = router.query.path as (string[] | undefined);
 
+  const { loginNodes } = useStore(LoginNodeStore);
+  const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
+
   const headerRef = useRef<HTMLDivElement>(null);
 
   const clusterName =
@@ -97,7 +102,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
         <h2>
           <Localized
             id="pages.shell.loginNode.content"
-            args={[userStore.user.identityId, clusterName, loginNode]}
+            args={[userStore.user.identityId, clusterName, currentLoginNodeName]}
           />
         </h2>
         <Space wrap>
@@ -112,7 +117,6 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
             getPopupContainer={() => headerRef.current || document.body}
             content={() => (
               <div>
-                {/* {t("pages.shell.loginNode.popoverContent1")} */}
                 <p><b>{t("pages.shell.loginNode.popoverContent1")}</b>：
                   <Text code>sopen</Text>{t("pages.shell.loginNode.popoverContent2")}
                 </p>

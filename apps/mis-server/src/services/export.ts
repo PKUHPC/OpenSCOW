@@ -373,7 +373,7 @@ export const exportServiceServer = plugin((server) => {
 
       while (offset < count) {
         const limit = Math.min(batchSize, count - offset);
-        const records = (await em.find(PayRecord, query))
+        const records = (await em.find(PayRecord, query, { limit, offset }))
           .map(recordFormat ?? ((x) => x));
 
         if (records.length === 0) {

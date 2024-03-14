@@ -19,7 +19,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { getI18nCurrentText, prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import {
   getOperationDetail,
   getOperationResultTexts,
@@ -38,6 +38,7 @@ const WordBreakText = styled.div`
 interface FilterForm {
   operatorUserId?: string;
   operationType?: OperationType;
+  customEventType?: string
   operationTime?: [dayjs.Dayjs, dayjs.Dayjs],
   operationResult?: OperationResult;
   operationDetail?: string;
@@ -78,12 +79,15 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       operationTime: [today.clone().subtract(30, "day"), today],
       operationResult: undefined,
       operationDetail: undefined,
+      customEventType: undefined,
     };
   });
 
   const [form] = Form.useForm<FilterForm>();
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
+
+  const operationType = Form.useWatch("operationType", form);
 
   const getOperatorUserIds = () => {
     if (queryType === OperationLogQueryType.USER) {
@@ -103,12 +107,21 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       endTime: query.operationTime?.[1].toISOString(),
       operationTargetAccountName: accountName,
       operationDetail: query.operationDetail,
+      customEventType: query.customEventType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
   }, [query, pageInfo, queryType, accountName, tenantName]);
 
   const { data, isLoading } = useAsync({ promiseFn });
+
+  const getCustomEventTypesPromise = useCallback(async () => {
+    return await api.getCustomEventTypes({});
+  }, []);
+
+  const { data: customEventTypes, isLoading : customEventTypesLoading } = useAsync({
+    promiseFn: getCustomEventTypesPromise,
+  });
 
   const getformatData = (results: OperationLog[] | undefined) => {
     if (!results) {
@@ -119,7 +132,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         ...data,
         operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
         operationType: data.operationEvent?.["$case"] || "unknown",
-        operationDetail: getOperationDetail(data.operationEvent, t, tArgs),
+        operationDetail: getOperationDetail(data.operationEvent, t, tArgs, languageId),
       };
     });
   };
@@ -140,6 +153,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           type: queryType,
           operatorUserIds: getOperatorUserIds().join(","),
           operationType: query.operationType,
+          customEventType: query.customEventType,
           operationResult: query.operationResult,
           startTime: query.operationTime?.[0].toISOString(),
           endTime: query.operationTime?.[1].toISOString(),
@@ -175,8 +189,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           initialValues={query}
           onFinish={async () => {
             const { operationType, operatorUserId,
-              operationResult, operationTime, operationDetail } = await form.validateFields();
-            setQuery({ operationType, operatorUserId, operationResult, operationTime, operationDetail });
+              operationResult, operationTime, operationDetail, customEventType } = await form.validateFields();
+            setQuery({
+              operationType, operatorUserId, operationResult,
+              operationTime, operationDetail, customEventType,
+            });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
@@ -193,6 +210,26 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               style={{ width: 180 }}
             />
           </Form.Item>
+          {operationType === "customEvent" && (
+            <Form.Item label={t(p("customEventType"))} name="customEventType">
+              <Select
+                showSearch
+                options={
+                  customEventTypes?.results?.map((t) => ({
+                    label: getI18nCurrentText(t.name, languageId),
+                    value: t.type,
+                  })) || []
+                }
+                filterOption={(input, option) =>
+                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                }
+                allowClear
+                style={{ width: 180 }}
+                loading={customEventTypesLoading}
+              >
+              </Select>
+            </Form.Item>
+          )}
           <Form.Item label={t(p("operationResult"))} name="operationResult">
             <Select
               options={
@@ -244,10 +281,15 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           dataIndex="operationCode"
           title={t(p("operationCode"))}
         />
-        <Table.Column
+        <Table.Column<OperationLog>
           dataIndex="operationType"
           title={t(p("operationType"))}
-          render={(operationType) => OperationTypeTexts[operationType]}
+          render={(operationType, r) => {
+            return r.operationEvent.$case === "customEvent"
+              ? getI18nCurrentText(r.operationEvent.customEvent.name, languageId)
+              : OperationTypeTexts[operationType];
+          }
+          }
         />
         <Table.Column
           dataIndex="operationDetail"

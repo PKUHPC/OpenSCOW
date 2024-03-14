@@ -15,6 +15,7 @@ package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 import "common/money.proto";
+import "common/i18n.proto";
 
 
 enum OperationResult {
@@ -412,7 +413,14 @@ message SetAccountDefaultBlockThreshold {
   common.Money threshold_amount = 2;
 }
 
+// 用户自定义操作类型，name和content将直接展示
+message CustomEvent {
+  string type = 1;
+  common.I18nObject name = 2;
+  common.I18nObject content = 3;
+}
 
+// INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -475,6 +483,7 @@ message CreateOperationLogRequest {
     ExportOperationLog export_operation_log = 58;
     SetAccountBlockThreshold set_account_block_threshold = 59;
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
+    CustomEvent custom_event = 61;
   }
 }
 
@@ -543,6 +552,7 @@ message OperationLog {
     ExportOperationLog export_operation_log = 60;
     SetAccountBlockThreshold set_account_block_threshold = 61;
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
+    CustomEvent custom_event = 63;
   }
 }
 
@@ -563,6 +573,9 @@ message OperationLogFilter {
 
   // 对operation_event里的信息进行搜索
   optional string operation_detail = 7;
+
+  // 对于customeEvent进行type筛选
+  optional string custom_event_type = 8;
 }
 
 message GetOperationLogsRequest {
@@ -586,9 +599,21 @@ message ExportOperationLogResponse {
   repeated OperationLog operation_logs = 1;
 }
 
+message GetCustomEventTypesRequest {
+
+}
+
+message GetCustomEventTypesResponse {
+  message CustomEventType {
+    string type = 1;
+    common.I18nObject name = 2;
+  }
+  repeated CustomEventType custom_event_types = 1;
+}
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
   rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
   rpc ExportOperationLog(ExportOperationLogRequest) returns (stream ExportOperationLogResponse);
+  rpc GetCustomEventTypes(GetCustomEventTypesRequest) returns (GetCustomEventTypesResponse);
 }

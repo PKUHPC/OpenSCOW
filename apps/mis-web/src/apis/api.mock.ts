@@ -461,6 +461,8 @@ export const mockApi: MockApi<typeof api> = {
     operationEvent: { $case: "login", login: {} },
   }], totalCount: 1 }),
 
+  getCustomEventTypes: async () => ({ results: []}),
+
   getAlarmDbId: async () => ({
     id: 13,
     uid: "kfcfkxq4",

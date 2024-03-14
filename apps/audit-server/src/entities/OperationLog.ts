@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
+import { Entity, Enum, Index, PrimaryKey, Property } from "@mikro-orm/core";
 import { OperationEvent } from "@scow/lib-operation-log";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm"; ;
 
@@ -42,6 +42,11 @@ export class OperationLog {
   @Property({ type: "json", nullable: true })
     metaData?: OperationEvent & { targetAccountName?: string };
 
+  // 用户自定义操作类型
+  @Index({ name: "custom_event" })
+  @Property({ nullable: true })
+    customEventType?: string;
+
   constructor(init: {
       operationLogId?: number;
       operatorUserId: string;
@@ -49,6 +54,7 @@ export class OperationLog {
       operationTime?: Date;
       operationResult: OperationResult;
       metaData: OperationEvent & { targetAccountName?: string };
+      customEventType?: string;
     }) {
     if (init.operationLogId) {
       this.id = init.operationLogId;
@@ -60,6 +66,9 @@ export class OperationLog {
     }
     this.operationResult = init.operationResult;
     this.metaData = init.metaData;
+    if (init.customEventType) {
+      this.customEventType = init.customEventType;
+    }
   }
 
 }
