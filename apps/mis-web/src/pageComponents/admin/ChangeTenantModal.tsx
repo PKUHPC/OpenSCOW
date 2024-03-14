@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { App, Form, Input, Modal } from "antd";
+import { Alert, App, Form, Input, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
@@ -81,6 +81,7 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
       confirmLoading={loading}
       onCancel={onClose}
     >
+      <Alert banner message={t(p("createTenantWarningInfo"))} type="warning" showIcon />
       <Form
         form={form}
         initialValues={undefined}

@@ -339,6 +339,7 @@ export default {
         tenantNotFound: "租户不存在",
         userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
         userAlreadyExistInThisTenant: "用户已经存在于该租户中",
+        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
       },
     },
     commonComponent:{

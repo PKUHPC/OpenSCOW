@@ -339,6 +339,7 @@ export default {
         tenantNotFound: "Tenant Not Exist",
         userStillMaintainsAccountRelationship: "User still maintains account relationship",
         userAlreadyExistInThisTenant: "User already exists in this tenant",
+        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
       },
     },
     commonComponent: {
