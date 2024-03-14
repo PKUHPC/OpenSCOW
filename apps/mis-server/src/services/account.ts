@@ -203,10 +203,12 @@ export const accountServiceServer = plugin((server) => {
         };
       }
 
+      // 新建账户时比较租户默认封锁阈值，如果租户默认封锁阈值小于0则保持账户为在集群中可用状态
+      // 如果租户默认封锁阈值大于等于0，则封锁账户
+      const shouldBlockInCluster: boolean = tenant.defaultAccountBlockThreshold.gte(0);
+
       // insert the account now to avoid future conflict
-      // 欠费账户
-      const account = new Account({ accountName, comment, tenant,
-        blockedInCluster: true, state: AccountState.NORMAL });
+      const account = new Account({ accountName, comment, tenant, blockedInCluster: shouldBlockInCluster });
 
       const userAccount = new UserAccount({
         account, user, role: EntityUserRole.OWNER, status: UserStatus.UNBLOCKED,
@@ -236,17 +238,19 @@ export const accountServiceServer = plugin((server) => {
             accountName, ownerUserId: ownerId,
           });
 
-          await asyncClientCall(client.account, "blockAccount", {
-            accountName,
-          }).catch((e) => {
-            if (e.code === Status.NOT_FOUND) {
-              throw <ServiceError>{
-                code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
-              };
-            } else {
-              throw e;
-            }
-          });
+          if (shouldBlockInCluster) {
+            await asyncClientCall(client.account, "blockAccount", {
+              accountName,
+            }).catch((e) => {
+              if (e.code === Status.NOT_FOUND) {
+                throw <ServiceError>{
+                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
+                };
+              } else {
+                throw e;
+              }
+            });
+          }
 
         },
       ).catch(async (e) => {

@@ -22,7 +22,7 @@ import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { AccountState, DisplayedAccountState } from "src/models/User";
+import { AccountState, DisplayedAccountState, getDisplayedStateI18nTexts } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
@@ -72,12 +72,7 @@ export const AccountTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
-  const DisplayedStateI18nTexts = {
-    [DisplayedAccountState.DISPLAYED_FROZEN]: t(p("frozen")),
-    [DisplayedAccountState.DISPLAYED_BLOCKED]: t(p("blocked")),
-    [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t(p("debt")),
-    [DisplayedAccountState.DISPLAYED_NORMAL]: t(p("normal")),
-  };
+  const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
 
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);

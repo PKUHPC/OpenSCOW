@@ -13,6 +13,8 @@
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
+import { TransType } from "./job";
+
 // Redefine to avoid importing non client packages
 export const TenantRole = {
   TENANT_ADMIN: 0,
@@ -132,3 +134,14 @@ export const DisplayedAccountState = {
 
 export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
 export type DisplayedAccountStateKeys = keyof typeof DisplayedAccountState;
+
+
+export const getDisplayedStateI18nTexts = (t: TransType) => {
+  return {
+    [DisplayedAccountState.DISPLAYED_FROZEN]: t("pageComp.accounts.accountTable.frozen"),
+    [DisplayedAccountState.DISPLAYED_BLOCKED]: t("pageComp.accounts.accountTable.blocked"),
+    [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t("pageComp.accounts.accountTable.debt"),
+    [DisplayedAccountState.DISPLAYED_NORMAL]: t("pageComp.accounts.accountTable.normal"),
+  };
+};
+

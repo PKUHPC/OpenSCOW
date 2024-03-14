@@ -14,7 +14,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { unblockAccount } from "src/bl/block";
+import { blockAccount, unblockAccount } from "src/bl/block";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -119,6 +119,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   // 账户信息导入scow完成后，更新slurm的block状态
   const failedUnblockAccounts = [] as string[];
+  const failedBlockAccounts = [] as string[];
   if (whitelistAll) {
     await Promise.allSettled(accounts.map((acc) => {
       return em.transactional(async (em) => {
@@ -141,10 +142,37 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             operatorId: "",
           });
           account.whitelist = toRef(whitelist);
+          // 加入白名单后账户状态变为正常
+          account.state = AccountState.NORMAL;
           await em.persistAndFlush(whitelist);
         }
       });
     }));
+  // 如果不选择全部添加白名单时，判断租户默认阈值选择是否在集群中封锁账户
+  } else {
+    const shouldBlockInCluster = tenant.defaultAccountBlockThreshold.gte(0);
+    const shouldBlockAccounts = accounts.filter((a) => !a.blockedInCluster);
+
+    if (shouldBlockInCluster) {
+      await Promise.allSettled(shouldBlockAccounts.map((acc) => {
+        return em.transactional(async (em) => {
+          const account = await em.findOne(Account, { accountName: acc.accountName },
+            { populate: ["tenant"]});
+          if (!account) {
+            failedBlockAccounts.push(acc.accountName);
+          } else {
+            try {
+              await blockAccount(account, clusterPlugin, logger);
+            } catch (e) {
+              // 集群封锁账户失败，记录失败账户
+              failedBlockAccounts.push(account.accountName);
+              throw e;
+            }
+          }
+        });
+      }));
+    }
+
   }
   logger.info(
     `Import users complete. ${accounts.length} accounts, \
@@ -154,6 +182,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     logger.warn(idsWithoutName.join(", "));
   }
   if (failedUnblockAccounts.length !== 0) {
+    logger.warn(`${failedUnblockAccounts.length} accounts failed to unblock.`);
+    logger.warn(failedUnblockAccounts.join(", "));
+  }
+  if (failedBlockAccounts.length !== 0) {
     logger.warn(`${failedUnblockAccounts.length} accounts failed to unblock.`);
     logger.warn(failedUnblockAccounts.join(", "));
   }

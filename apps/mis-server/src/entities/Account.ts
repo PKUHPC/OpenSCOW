@@ -58,7 +58,7 @@ export class Account {
   @Property({ type: DecimalType, nullable: true })
     blockThresholdAmount: Decimal | undefined;
 
-  @Enum({ items: () => AccountState, comment: Object.values(AccountState).join(", ") })
+  @Enum({ items: () => AccountState, default: AccountState.NORMAL, comment: Object.values(AccountState).join(", ") })
     state: AccountState;
 
   @Property({ columnType: DATETIME_TYPE, nullable: true })
@@ -69,8 +69,8 @@ export class Account {
     whitelist?: EntityOrRef<AccountWhitelist>;
     tenant: EntityOrRef<Tenant>;
     blockedInCluster: boolean;
-    state: AccountState;
     comment?: string;
+    state?: AccountState;
     createTime?: Date;
   }) {
     this.accountName = init.accountName;
@@ -80,7 +80,7 @@ export class Account {
       this.whitelist = toRef(init.whitelist);
     }
     this.comment = init.comment || "";
-    this.state = init.state;
+    this.state = init.state || AccountState.NORMAL;
     this.createTime = init.createTime ?? new Date();
   }
 }

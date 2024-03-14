@@ -20,7 +20,7 @@ import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
 import { OperationType } from "src/models/operationLog";
-import { DisplayedAccountState, PlatformRole, TenantRole } from "src/models/User";
+import { getDisplayedStateI18nTexts, PlatformRole, TenantRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -112,12 +112,7 @@ export default route(ExportAccountSchema, async (req, res) => {
     const p = prefix("pageComp.accounts.accountTable.");
     const pCommon = prefix("common.");
 
-    const DisplayedStateI18nTexts = {
-      [DisplayedAccountState.DISPLAYED_FROZEN]: t(p("frozen")),
-      [DisplayedAccountState.DISPLAYED_BLOCKED]: t(p("blocked")),
-      [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t(p("debt")),
-      [DisplayedAccountState.DISPLAYED_NORMAL]: t(p("normal")),
-    };
+    const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
 
     const headerColumns = {
       accountName: t(p("accountName")),
