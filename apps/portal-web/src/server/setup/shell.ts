@@ -175,7 +175,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
         cluster: cluster,
         node: loginNode.address,
         user: user.identityId,
-        session: sessionAuditId.toString(),
+        session: sessionAuditId,
         time: new Date().toISOString(),
         remoteIp: parseIp(req) ?? "",
       });

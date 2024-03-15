@@ -45,11 +45,11 @@ message CreateSessionRequest {
 }
 
 message CreateSessionResponse {
-  int64 session_id = 1;
+  string session_id = 1;
 }
 
 message SessionEndRequest {
-  int64 session_id = 1;
+  string session_id = 1;
   google.protobuf.Timestamp date_end = 2;
 }
 
