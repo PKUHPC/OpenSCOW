@@ -301,6 +301,10 @@ export default {
         userEmail:"用户邮箱",
         userPassword:"用户密码",
         confirmPassword:"确认密码",
+        userType: "用户类型",
+        newUser: "新用户",
+        existingUser: "已有用户",
+        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
       },
       ImportUsersTable:{
         selectAccount:"请选择账户！",
@@ -944,6 +948,9 @@ export default {
           createTenantFailMessage: "创建租户失败",
           createTenant: "创建租户",
           unavailable:"本功能在当前配置下不可用",
+          userNotFound: "此用户不存在",
+          tenantExist: "租户已存在",
+          userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
         },
       },
       systemDebug: {

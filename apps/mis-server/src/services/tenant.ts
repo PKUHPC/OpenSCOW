@@ -21,6 +21,7 @@ import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
+import { UserAccount } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 
@@ -177,6 +178,49 @@ export const tenantServiceServer = plugin((server) => {
       await em.persistAndFlush(tenant);
 
       return [{}];
+
+    },
+
+    createTenantWithExistingUserAsAdmin: async ({ request, em }) => {
+
+      const { tenantName, userId, userName } = request;
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (tenant) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
+        };
+      }
+
+      const newTenant = new Tenant({ name: tenantName });
+
+
+      const user = await em.findOne(User, { userId, name: userName });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName} is not found.`,
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      // 修改该用户的租户， 并且作为租户管理员
+      em.assign(user, { tenant: newTenant });
+      user.tenantRoles = [TenantRole.TENANT_ADMIN];
+
+      await em.persistAndFlush([user, newTenant]);
+
+      return [{
+        tenantName: newTenant.name,
+        adminUserId: user.userId,
+      }];
 
     },
 

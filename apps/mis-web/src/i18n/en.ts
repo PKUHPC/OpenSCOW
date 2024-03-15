@@ -301,6 +301,10 @@ export default {
         userEmail: "User Email",
         userPassword: "User Password",
         confirmPassword: "Confirm Password",
+        userType: "User Type",
+        newUser: "New User",
+        existingUser: "Existing User",
+        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
       },
       ImportUsersTable: {
         selectAccount: "Please select an account!",
@@ -944,6 +948,9 @@ export default {
           createTenantFailMessage: "Failed to create tenant",
           createTenant: "Create Tenant",
           unavailable:"This feature is not available in the current configuration",
+          userNotFound: "User Not Exist",
+          tenantExist: "Tenant Already Exists",
+          userStillMaintainsAccountRelationship: "User still maintains account relationship",
         },
       },
       systemDebug: {

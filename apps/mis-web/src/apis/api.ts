@@ -89,6 +89,7 @@ import type { BlockAccountSchema } from "src/pages/api/tenant/blockAccount";
 import type { ChangePasswordAsTenantAdminSchema } from "src/pages/api/tenant/changePassword";
 import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
+import type { CreateTenantWithExistingUserAsAdminSchema } from "src/pages/api/tenant/createTenantWithExistingUserAsAdmin";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { SetBlockThresholdSchema } from "src/pages/api/tenant/setBlockThreshold";
@@ -183,6 +184,7 @@ export const api = {
   blockAccount: apiClient.fromTypeboxRoute<typeof BlockAccountSchema>("PUT", "/api/tenant/blockAccount"),
   changePasswordAsTenantAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsTenantAdminSchema>("PATCH", "/api/tenant/changePassword"),
   createTenant: apiClient.fromTypeboxRoute<typeof CreateTenantSchema>("POST", "/api/tenant/create"),
+  createTenantWithExistingUserAsAdmin: apiClient.fromTypeboxRoute<typeof CreateTenantWithExistingUserAsAdminSchema>("POST", "/api/tenant/createTenantWithExistingUserAsAdmin"),
   createAccount: apiClient.fromTypeboxRoute<typeof CreateAccountSchema>("POST", "/api/tenant/createAccount"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/tenant/getAccounts"),
   getTenants: apiClient.fromTypeboxRoute<typeof GetTenantsSchema>("GET", "/api/tenant/getTenants"),
