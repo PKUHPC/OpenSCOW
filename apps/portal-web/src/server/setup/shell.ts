@@ -141,7 +141,8 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     },
   }, OperationResult.SUCCESS);
 
-  const { createShellSession, sessionEnd } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+  const { createShellSession, sessionEnd,
+    writeShellMsg } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
 
 
   const { sessionId: sessionAuditId } = await createShellSession({ session: {
@@ -164,10 +165,20 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   });
 
 
-  stream.on("data", (chunk: ShellResponse) => {
+  stream.on("data", async (chunk: ShellResponse) => {
     switch (chunk.message?.$case) {
     case "data":
       send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
+      const msgStr: string = chunk.message.data.data.toString();
+      await writeShellMsg({
+        message: msgStr,
+        cluster: cluster,
+        node: loginNode.address,
+        user: user.identityId,
+        session: sessionAuditId.toString(),
+        time: new Date().toISOString(),
+        remoteIp: parseIp(req) ?? "",
+      });
       break;
     case "exit":
       send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });

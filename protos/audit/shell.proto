@@ -1,6 +1,5 @@
 syntax = "proto3";
 
-
 package scow.audit;
 
 import "google/protobuf/timestamp.proto";
@@ -21,7 +20,7 @@ message CommandInfo {
   string input = 3;
   string output = 4;
   string session = 5;
-  string time = 6;
+  google.protobuf.Timestamp time = 6;
   string remote_addr = 8;
   string asset_ip = 9;
 }
@@ -81,7 +80,8 @@ message WriteTerminalMsgRequest {
   string node = 3;
   string user = 4;
   string session = 5;
-  string time = 6;
+  google.protobuf.Timestamp time = 6;
+  string remote_ip = 7;
 }
 
 message WriteTerminalMsgResponse {
