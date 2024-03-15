@@ -16,22 +16,24 @@ import { AccountState } from "src/entities/Account";
 
 export enum DisplayedAccountState {
   DISPLAYED_NORMAL = 0,
-  DISPLAYED_BLOCKED = 1,
-  DISPLAYED_BELOW_BLOCK_THRESHOLD = 2,
-  DISPLAYED_FROZEN = 3,
+  DISPLAYED_FROZEN = 1,
+  DISPLAYED_BLOCKED = 2,
+  DISPLAYED_BELOW_BLOCK_THRESHOLD = 3,
 }
 
 export interface AccountStateInfo {
+  // 当前页面展示的账户状态
   displayedState: DisplayedAccountState,
+  // 是否需要在集群中封锁账户
   shouldBlockInCluster: boolean,
 }
 
 /**
- *
- * @param whitelist
- * @param state
- * @param balance
- * @param thresholdAmount
+ * 根据SCOW数据库保存的信息获取当前页面展示的账户状态
+ * @param whitelistId 白名单ID
+ * @param state 状态 "NORMAL" || "FROZEN" || "BLOCKED_BY_ADMIN"
+ * @param balance 账户余额
+ * @param thresholdAmount 封锁阈值 （账户封锁阈值未设置时为租户默认封锁阈值）
  * @returns
  */
 export const getAccountStateInfo = (

@@ -23,8 +23,8 @@ import { DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
 
 export enum AccountState {
   NORMAL = "NORMAL",
-  BLOCKED_BY_ADMIN = "BLOCKED_BY_ADMIN",
   FROZEN = "FROZEN",
+  BLOCKED_BY_ADMIN = "BLOCKED_BY_ADMIN",
 }
 
 @Entity()

@@ -68,20 +68,28 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        const result = await blockAccount(account, server.ext.clusters, logger);
-
-
         const blockThresholdAmount =
         account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
-        // 如果之前不为欠费或冻结状态但在集群中仍为封锁状态时报错
-        if (result === "AlreadyBlocked" &&
-          account.balance.gt(blockThresholdAmount) &&
-          account.state !== AccountState.FROZEN) {
 
-          throw <ServiceError>{
-            code: Status.FAILED_PRECONDITION,
-            message: `Account ${accountName} has been blocked. `,
-          };
+        const result = await blockAccount(account, server.ext.clusters, logger);
+
+        if (result === "AlreadyBlocked") {
+
+          // 如果账户已被手动冻结，提示账户已被冻结
+          if (account.state === AccountState.FROZEN) {
+            throw <ServiceError>{
+              code: Status.FAILED_PRECONDITION,
+              message: `Account ${accountName} has been frozen. `,
+            };
+          }
+
+          // 如果是未欠费（余额大于封锁阈值）账户，提示账户已被封锁
+          if (account.balance.gt(blockThresholdAmount)) {
+            throw <ServiceError>{
+              code: Status.FAILED_PRECONDITION,
+              message: `Account ${accountName} has been blocked. `,
+            };
+          }
         }
 
         if (result === "Whitelisted") {
@@ -91,7 +99,7 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        // 账户状态变更为被平台管理员或租户管理员封锁
+        // 更改数据库中状态值
         account.state = AccountState.BLOCKED_BY_ADMIN;
 
         return [{ result: BlockAccountResponse_Result.OK }];
@@ -118,14 +126,22 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        // 将账户从被上级封锁状态变更为正常
+        // 将账户从被上级封锁或冻结状态变更为正常
         account.state = AccountState.NORMAL;
 
         const blockThresholdAmount =
         account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
-        // 解除账户封锁时，若余额小于等于封锁阈值则不在集群下解封账户
-        if (account.balance.lte(blockThresholdAmount)) {
+        // 判断解除封锁之后账户是否仍需保持封锁状态
+        const shouldBlockInCluster = getAccountStateInfo(
+          undefined,
+          AccountState.NORMAL,
+          account.balance,
+          blockThresholdAmount,
+        ).shouldBlockInCluster;
+
+        // 解除账户封锁时，若为欠费账户（余额小于等于封锁阈值）则不在集群下解封账户
+        if (shouldBlockInCluster) {
           logger.info(
             "Can not unblock %s in clusters because the account's balance less than or equal to the blocking threshold",
             accountName,
@@ -325,7 +341,7 @@ export const accountServiceServer = plugin((server) => {
       });
       account.whitelist = toRef(whitelist);
 
-      // 如果移入白名单之前账户状态为冻结，则冻结状态优先级高于白名单，账户在集群中仍为封锁状态
+      // 如果移入白名单之前账户状态为冻结，则冻结状态优先级高于白名单，账户在集群中仍为封锁状态，state值不变
       if (account.state === AccountState.FROZEN) {
         logger.info("Add account %s to whitelist by %s with comment %s, but the account is still frozen",
           accountName,
@@ -373,7 +389,15 @@ export const accountServiceServer = plugin((server) => {
       const blockThresholdAmount =
       account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
-      if (account.balance.isLessThanOrEqualTo(blockThresholdAmount)) {
+      // 判断移出白名单后是否应在集群中封锁
+      const shouldBlockInCluster = getAccountStateInfo(
+        undefined,
+        account.state,
+        account.balance,
+        blockThresholdAmount,
+      ).shouldBlockInCluster;
+
+      if (shouldBlockInCluster) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
         await blockAccount(account, server.ext.clusters, logger);
       }
@@ -383,7 +407,7 @@ export const accountServiceServer = plugin((server) => {
       return [{ executed: true }];
     },
 
-    setBlockThreshold: async ({ request, em }) => {
+    setBlockThreshold: async ({ request, em, logger }) => {
       const { accountName, blockThresholdAmount } = request;
 
       const account = await em.findOne(Account, { accountName }, {
@@ -398,6 +422,29 @@ export const accountServiceServer = plugin((server) => {
       account.blockThresholdAmount = blockThresholdAmount
         ? new Decimal(moneyToNumber(blockThresholdAmount))
         : undefined;
+
+      const currentBlockThreshold = blockThresholdAmount ?
+        new Decimal(moneyToNumber(blockThresholdAmount)) :
+        account.tenant.getProperty("defaultAccountBlockThreshold");
+
+      // 判断设置封锁阈值后是否应该在集群中封锁
+      const shouldBlockInCluster = getAccountStateInfo(
+        account.whitelist?.id,
+        account.state,
+        account.balance,
+        currentBlockThreshold,
+      ).shouldBlockInCluster;
+
+      if (shouldBlockInCluster) {
+        logger.info("Account %s may be out of balance. Block the account.", account.accountName);
+        await blockAccount(account, server.ext.clusters, logger);
+      }
+
+      if (!shouldBlockInCluster) {
+        logger.info("The balance of Account %s is greater than the block threshold amount. "
+        + "Unblock the account.", account.accountName);
+        await unblockAccount(account, server.ext.clusters, logger);
+      }
 
       await em.persistAndFlush(account);
 

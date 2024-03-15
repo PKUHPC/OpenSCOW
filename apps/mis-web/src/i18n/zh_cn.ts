@@ -243,7 +243,7 @@ export default {
 
         statusDebtTooltip: "欠费：账户余额<=封锁阈值，无法通过此账户提交作业",
 
-        statusNormalTooltip: "正常：账户状态不是封锁、冻结且账户余额>封锁阈值；或者账户已存在于白名单中",
+        statusNormalTooltip: "正常：账户没有被管理员封锁冻结且账户余额>封锁阈值；或者账户已存在于白名单中",
 
         mangerMember:"管理成员",
         blocked:"封锁",

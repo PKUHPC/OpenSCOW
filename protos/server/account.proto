@@ -103,10 +103,10 @@ message GetAccountsRequest {
 enum AccountState {
   // 未封锁或未冻结，解封或激活时
   NORMAL = 0;
-  // 账户被上级手动封锁
-  BLOCKED_BY_ADMIN = 1;
   // 账户被手动冻结
-  FROZEN = 2;
+  FROZEN = 1;
+  // 账户被上级手动封锁
+  BLOCKED_BY_ADMIN = 2;
 }
 
 // 页面展示的账户状态
@@ -115,14 +115,15 @@ enum DisplayedAccountState {
   // or
   // when not in whitelist and state = normal and balance > block_threshold
   DISPLAYED_NORMAL = 0;
+  // when state = frozen
+  DISPLAYED_FROZEN = 1;
   // when state = blocked_by_admin and not in whitelist
-  DISPLAYED_BLOCKED = 1;
+  DISPLAYED_BLOCKED = 2;
   // when state = normal
   // and not in whitelist
   // and balance <= blcok_threshold
-  DISPLAYED_BELOW_BLOCK_THRESHOLD = 2;
-  // when state = frozen
-  DISPLAYED_FROZEN = 3;
+  DISPLAYED_BELOW_BLOCK_THRESHOLD = 3;
+
 }
 
 message Account {

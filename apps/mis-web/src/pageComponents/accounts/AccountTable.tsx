@@ -45,18 +45,18 @@ interface FilterForm {
 
 const FilteredTypes = {
   ALL: "ALL",
+  DISPLAYED_NORMAL: DisplayedAccountState.DISPLAYED_NORMAL,
   DISPLAYED_FROZEN: DisplayedAccountState.DISPLAYED_FROZEN,
   DISPLAYED_BLOCKED: DisplayedAccountState.DISPLAYED_BLOCKED,
   DISPLAYED_BELOW_BLOCK_THRESHOLD: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
-  DISPLAYED_NORMAL: DisplayedAccountState.DISPLAYED_NORMAL,
 };
 
 const filteredStatuses = {
   "ALL": "pageComp.accounts.accountTable.allAccount",
-  "DISPLAYED_BELOW_BLOCK_THRESHOLD": "pageComp.accounts.accountTable.debtAccount",
-  "DISPLAYED_BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
-  "DISPLAYED_FROZEN": "pageComp.accounts.accountTable.frozenAccount",
   "DISPLAYED_NORMAL": "pageComp.accounts.accountTable.normalAccount",
+  "DISPLAYED_FROZEN": "pageComp.accounts.accountTable.frozenAccount",
+  "DISPLAYED_BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
+  "DISPLAYED_BELOW_BLOCK_THRESHOLD": "pageComp.accounts.accountTable.debtAccount",
 };
 type FilteredStatus = keyof typeof filteredStatuses;
 
@@ -221,10 +221,14 @@ export const AccountTable: React.FC<Props> = ({
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
-            tabs={Object.keys(filteredStatuses).map((status) => ({
-              title: `${t(filteredStatuses[status])}(${accountStatusCount[status as FilteredStatus]})`,
-              key: status,
-            }))}
+            tabs={Object.keys(filteredStatuses)
+              /** 以下为暂时过滤掉冻结状态的页面展示 */
+              .filter((status) => status !== "DISPLAYED_FROZEN")
+              /** 以上为暂时过滤掉冻结状态的页面展示 */
+              .map((status) => ({
+                title: `${t(filteredStatuses[status])}(${accountStatusCount[status as FilteredStatus]})`,
+                key: status,
+              }))}
             onChange={(value) => handleFilterStatusChange(value as FilteredStatus)}
           />
         </Space>
@@ -301,8 +305,10 @@ export const AccountTable: React.FC<Props> = ({
                 title={t(p("statusTooltip"))}
                 content={(
                   <>
-                    <span>{t(p("statusFrozenTooltip"))}</span>
-                    <br />
+                    {/* 以下为暂时过滤掉冻结状态的页面展示，描述需要后期再次确认修改 */}
+                    {/* <span>{t(p("statusFrozenTooltip"))}</span>
+                    <br /> */}
+                    {/* 以上为暂时过滤掉冻结状态的页面展示，描述需要后期再次确认修改 */}
                     <span>{t(p("statusBlockedTooltip"))}</span>
                     <br />
                     <span>{t(p("statusDebtTooltip"))}</span>
@@ -334,11 +340,22 @@ export const AccountTable: React.FC<Props> = ({
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              {/* 只在租户管理下的账户列表中显示管理成员 */}
+              {/* 只在租户管理下的账户列表中显示管理成员和封锁阈值 */}
               {showedTab === "TENANT" && (
-                <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
-                  {t(p("mangerMember"))}
-                </Link>
+                <>
+                  <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
+                    {t(p("mangerMember"))}
+                  </Link>
+                  <SetBlockThresholdAmountLink
+                    accountName={r.accountName}
+                    balance={r.balance}
+                    reload={reload}
+                    currentAmount={r.blockThresholdAmount}
+                    defaultBlockThresholdAmount={r.defaultBlockThresholdAmount}
+                  >
+                    {t(p("blockThresholdAmount"))}
+                  </SetBlockThresholdAmountLink>
+                </>
               )}
               {
                 r.state === AccountState.BLOCKED_BY_ADMIN && (
@@ -399,18 +416,6 @@ export const AccountTable: React.FC<Props> = ({
                     {t(p("blocked"))}
                   </a>
                 )}
-
-              {showedTab === "TENANT" && (
-                <SetBlockThresholdAmountLink
-                  accountName={r.accountName}
-                  balance={r.balance}
-                  reload={reload}
-                  currentAmount={r.blockThresholdAmount}
-                  defaultBlockThresholdAmount={r.defaultBlockThresholdAmount}
-                >
-                  {t(p("blockThresholdAmount"))}
-                </SetBlockThresholdAmountLink>
-              )}
             </Space>
           )}
         />

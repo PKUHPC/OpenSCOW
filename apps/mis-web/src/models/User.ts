@@ -119,17 +119,17 @@ export enum SearchType {
 
 export const AccountState = {
   NORMAL: 0,
-  BLOCKED_BY_ADMIN: 1,
-  FROZEN: 2,
+  FROZEN: 1,
+  BLOCKED_BY_ADMIN: 2,
 } as const;
 
 export type AccountState = ValueOf<typeof AccountState>;
 
 export const DisplayedAccountState = {
   DISPLAYED_NORMAL: 0,
-  DISPLAYED_BLOCKED: 1,
-  DISPLAYED_BELOW_BLOCK_THRESHOLD: 2,
-  DISPLAYED_FROZEN: 3,
+  DISPLAYED_FROZEN: 1,
+  DISPLAYED_BLOCKED: 2,
+  DISPLAYED_BELOW_BLOCK_THRESHOLD: 3,
 } as const;
 
 export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
@@ -137,10 +137,10 @@ export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
 
 export const getDisplayedStateI18nTexts = (t: TransType) => {
   return {
+    [DisplayedAccountState.DISPLAYED_NORMAL]: t("pageComp.accounts.accountTable.normal"),
     [DisplayedAccountState.DISPLAYED_FROZEN]: t("pageComp.accounts.accountTable.frozen"),
     [DisplayedAccountState.DISPLAYED_BLOCKED]: t("pageComp.accounts.accountTable.blocked"),
     [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t("pageComp.accounts.accountTable.debt"),
-    [DisplayedAccountState.DISPLAYED_NORMAL]: t("pageComp.accounts.accountTable.normal"),
   };
 };
 
