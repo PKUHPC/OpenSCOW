@@ -82,7 +82,7 @@ export const exportServiceServer = plugin((server) => {
         name: x.name,
         email: x.email,
         availableAccounts: x.accounts.getItems()
-          .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+          .filter((ua) => ua.blockedInCluster === UserStatus.UNBLOCKED)
           .map((ua) => {
             return ua.account.getProperty("accountName");
           }),

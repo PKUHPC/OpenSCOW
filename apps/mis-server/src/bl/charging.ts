@@ -22,6 +22,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+import { getUserStateInfo } from "src/utils/accountUserState";
 import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
@@ -152,7 +153,14 @@ export async function addJobCharge(
 ) {
   if (ua.usedJobCharge && ua.jobChargeLimit) {
     ua.usedJobCharge = ua.usedJobCharge.plus(charge);
-    if (ua.usedJobCharge.gt(ua.jobChargeLimit)) {
+
+    const shouldBlockUserInCluster = getUserStateInfo(
+      ua.state,
+      ua.jobChargeLimit,
+      ua.usedJobCharge,
+    ).shouldBlockInCluster;
+
+    if (shouldBlockUserInCluster) {
       await blockUserInAccount(ua, clusterPlugin, logger);
     } else {
       await unblockUserInAccount(ua, clusterPlugin, logger);
@@ -168,7 +176,14 @@ export async function setJobCharge(
   if (!ua.usedJobCharge) {
     ua.usedJobCharge = new Decimal(0);
   } else {
-    if (ua.jobChargeLimit.lt(ua.usedJobCharge)) {
+
+    const shouldBlockUserInCluster = getUserStateInfo(
+      ua.state,
+      ua.jobChargeLimit,
+      ua.usedJobCharge,
+    ).shouldBlockInCluster;
+
+    if (shouldBlockUserInCluster) {
       await blockUserInAccount(ua, clusterPlugin, logger);
     } else {
       await unblockUserInAccount(ua, clusterPlugin, logger);

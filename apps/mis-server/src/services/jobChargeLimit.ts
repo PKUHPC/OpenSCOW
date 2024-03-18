@@ -20,11 +20,12 @@ import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow
 import { unblockUserInAccount } from "src/bl/block";
 import { setJobCharge } from "src/bl/charging";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
+import { getUserStateInfo } from "src/utils/accountUserState";
 
 export const jobChargeLimitServer = plugin((server) => {
   server.addService<JobChargeLimitServiceServer>(JobChargeLimitServiceService, {
     cancelJobChargeLimit: async ({ request, em, logger }) => {
-      const { accountName, userId, tenantName, unblock } = request;
+      const { accountName, userId, tenantName } = request;
 
       await em.transactional(async (em) => {
         const userAccount = await em.findOne(UserAccount, {
@@ -56,9 +57,15 @@ export const jobChargeLimitServer = plugin((server) => {
         userAccount.jobChargeLimit = undefined;
         userAccount.usedJobCharge = undefined;
 
-        if (UserStatus.BLOCKED && unblock) {
+        const shouldBlockUserInCluster = getUserStateInfo(
+          userAccount.state,
+          userAccount.jobChargeLimit,
+          userAccount.usedJobCharge,
+        ).shouldBlockInCluster;
+
+        if (!shouldBlockUserInCluster) {
           await unblockUserInAccount(userAccount, server.ext, logger);
-          userAccount.status = UserStatus.UNBLOCKED;
+          userAccount.blockedInCluster = UserStatus.UNBLOCKED;
         }
 
       });

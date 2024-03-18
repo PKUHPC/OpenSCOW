@@ -185,7 +185,7 @@ export const accountServiceServer = plugin((server) => {
       const account = new Account({ accountName, comment, tenant, blocked: true });
 
       const userAccount = new UserAccount({
-        account, user, role: EntityUserRole.OWNER, status: UserStatus.UNBLOCKED,
+        account, user, role: EntityUserRole.OWNER, blockedInCluster: UserStatus.UNBLOCKED,
       });
 
       try {

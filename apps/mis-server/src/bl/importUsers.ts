@@ -94,7 +94,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
         account,
         user,
         role: a.owner === u.userId ? UserRole.OWNER : UserRole.USER,
-        status: u.blocked ? UserStatus.BLOCKED : UserStatus.UNBLOCKED,
+        blockedInCluster: u.blocked ? UserStatus.BLOCKED : UserStatus.UNBLOCKED,
       }));
     });
   });
