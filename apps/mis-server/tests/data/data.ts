@@ -36,19 +36,22 @@ export async function insertInitialData(em: SqlEntityManager) {
   const uaAA = new UserAccount({
     account: accountA,
     user: userA,
-    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   const uaAB = new UserAccount({
     account: accountA,
     user: userB,
-    role: UserRole.ADMIN, status: UserStatus.UNBLOCKED,
+    role: UserRole.ADMIN,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   const uaBB = new UserAccount({
     account: accountB,
     user: userB,
-    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   await em.persistAndFlush([userA, userB, accountA, accountB, uaAA, uaAB, uaBB]);
@@ -57,7 +60,12 @@ export async function insertInitialData(em: SqlEntityManager) {
   const anotherTenant = await em.findOne(Tenant, { name: "another" }) ?? new Tenant({ name: "another" });
   const userC = new User({ tenant: anotherTenant, email: "123", name: "cName", userId: "c" });
   const accountC = new Account({ tenant: anotherTenant, accountName: "hpcc", blocked: false, comment: "123" });
-  const uaCC = new UserAccount({ user: userC, account: accountC, role: UserRole.ADMIN, status: UserStatus.BLOCKED });
+  const uaCC = new UserAccount({
+    user: userC,
+    account: accountC,
+    role: UserRole.ADMIN,
+    blockedInCluster: UserStatus.BLOCKED,
+  });
 
   await em.persistAndFlush([anotherTenant, userC, accountC, uaCC]);
 
@@ -82,19 +90,22 @@ export async function insertBlockedData(em: SqlEntityManager) {
   const uaAA = new UserAccount({
     account: unblockedAccountA,
     user: blockedUserA,
-    role: UserRole.OWNER, status: UserStatus.BLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.BLOCKED,
   });
 
   const uaAB = new UserAccount({
     account: unblockedAccountA,
     user: unblockedUserB,
-    role: UserRole.ADMIN, status: UserStatus.UNBLOCKED,
+    role: UserRole.ADMIN,
+    blockedInCluster: UserStatus.UNBLOCKED,
   });
 
   const uaBB = new UserAccount({
     account: blockedAccountB,
     user: unblockedUserB,
-    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   });
 
   await em.persistAndFlush([uaAA, uaAB, uaBB]);

@@ -155,13 +155,15 @@ it("when removing a user from an account, the account and user cannot be deleted
   const uaA = new UserAccount({
     account,
     user: data.userA,
-    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   const uaB = new UserAccount({
     account,
     user: data.userB,
-    role: UserRole.USER, status: UserStatus.UNBLOCKED,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   await em.persistAndFlush([account, uaA, uaB]);
@@ -188,7 +190,10 @@ it("deletes user", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);
@@ -278,7 +283,10 @@ it("get all users with idOrName", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);

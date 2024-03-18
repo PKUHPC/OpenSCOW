@@ -100,7 +100,12 @@ it("gets all accounts", async () => {
   const anotherTenant = await em.findOne(Tenant, { name: "another" }) as Tenant;
   const userD = new User({ tenant: anotherTenant, email: "123", name: "dName", userId: "d" });
   const accountC = await em.findOne(Account, { accountName: "hpcc" }) as Account;
-  const uaCD = new UserAccount({ user: userD, account: accountC, role: UserRole.OWNER, status: UserStatus.BLOCKED });
+  const uaCD = new UserAccount({
+    user: userD,
+    account: accountC,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.BLOCKED,
+  });
   await em.persistAndFlush([userD, uaCD]);
 
   const resp = await asyncClientCall(client, "getAccounts", {});
