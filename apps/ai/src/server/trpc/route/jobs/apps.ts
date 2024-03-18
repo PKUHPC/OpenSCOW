@@ -689,15 +689,20 @@ procedure
 
       const { jobId, clusterId } = input;
 
-      const client = getAdapterClient(clusterId);
-      const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+      try {
+        const client = getAdapterClient(clusterId);
 
-      if (connectionInfo?.response?.$case === "appConnectionInfo") {
-        const host = connectionInfo.response.appConnectionInfo.host;
-        const port = connectionInfo.response.appConnectionInfo.port;
-        const reachable = await isPortReachable(port, host, TIMEOUT_MS);
-        return { ok: reachable };
-      } else {
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          const host = connectionInfo.response.appConnectionInfo.host;
+          const port = connectionInfo.response.appConnectionInfo.port;
+          const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+          return { ok: reachable };
+        } else {
+          return { ok: false };
+        }
+      } catch (_) {
         return { ok: false };
       }
     },
