@@ -1,0 +1,20 @@
+{
+  "name": "@scow/scowd-protos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOWD.git#branch=master,subdir=protos/api",
+    "build": "rimraf build && tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bufbuild/buf": "1.29.0",
+    "@bufbuild/protobuf": "^1.8.0",
+    "@bufbuild/protoc-gen-es": "^1.8.0",
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/protoc-gen-connect-es": "^1.4.0"
+  }
+}
