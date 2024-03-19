@@ -186,8 +186,8 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     logger.warn(failedUnblockAccounts.join(", "));
   }
   if (failedBlockAccounts.length !== 0) {
-    logger.warn(`${failedUnblockAccounts.length} accounts failed to unblock.`);
-    logger.warn(failedUnblockAccounts.join(", "));
+    logger.warn(`${failedBlockAccounts.length} accounts failed to block.`);
+    logger.warn(failedBlockAccounts.join(", "));
   }
 
   return {

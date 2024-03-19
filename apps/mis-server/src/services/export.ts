@@ -178,6 +178,8 @@ export const exportServiceServer = plugin((server) => {
           comment: x.comment,
           balance: decimalToMoney(x.balance),
           blockThresholdAmount: decimalToMoney(blockThresholdAmount),
+          blocked: Boolean(x.blockedInCluster),
+          state: x.state,
         };
       };
 
@@ -244,8 +246,7 @@ export const exportServiceServer = plugin((server) => {
           // 每两百条传一次
           if (data.length === 200 || writeTotal === records.length) {
             await new Promise(async (resolve) => {
-              // 要确认
-              await writeAsync({ accounts: data as any });
+              await writeAsync({ accounts: data });
               // 清空暂存
               data = [];
               resolve("done");

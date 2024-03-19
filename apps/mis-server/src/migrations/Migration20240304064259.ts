@@ -8,7 +8,8 @@ export class Migration20240304064259 extends Migration {
 
     this.addSql(`
       UPDATE account a
-      SET a.state = CASE
+      SET a.state =
+      CASE
         WHEN a.whitelist_id IS NULL AND a.blocked_in_cluster = 1
           AND a.balance > COALESCE(a.block_threshold_amount, (SELECT t.default_account_block_threshold FROM tenant t WHERE a.tenant_id = t.id))
         THEN 'BLOCKED_BY_ADMIN'
