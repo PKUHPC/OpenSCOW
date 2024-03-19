@@ -5,7 +5,7 @@
 <meta name="generator" content="Docusaurus v3.1.1">
 <title data-rh="true">用户模型 | SCOW</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://PKUHPC.github.io/SCOW/pr-preview/pr-1161/docs/info/mis/business/users"><meta data-rh="true" property="og:locale" content="zh"><meta data-rh="true" name="docusaurus_locale" content="zh"><meta data-rh="true" name="docsearch:language" content="zh"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="用户模型 | SCOW"><meta data-rh="true" name="description" content="用户模型"><meta data-rh="true" property="og:description" content="用户模型"><link data-rh="true" rel="icon" href="/SCOW/pr-preview/pr-1161/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1161/docs/info/mis/business/users"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1161/docs/info/mis/business/users" hreflang="zh"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1161/docs/info/mis/business/users" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/SCOW/pr-preview/pr-1161/blog/rss.xml" title="SCOW RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/SCOW/pr-preview/pr-1161/blog/atom.xml" title="SCOW Atom Feed"><link rel="stylesheet" href="/SCOW/pr-preview/pr-1161/assets/css/styles.f4c5fa2b.css">
-<script src="/SCOW/pr-preview/pr-1161/assets/js/runtime~main.a14c4379.js" defer="defer"></script>
+<script src="/SCOW/pr-preview/pr-1161/assets/js/runtime~main.2dc2a761.js" defer="defer"></script>
 <script src="/SCOW/pr-preview/pr-1161/assets/js/main.17f5172d.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard" data-theme="light">
@@ -17,11 +17,7 @@
 <p>每个用户的用户名和账户名在<strong>整个平台的范围</strong>（注意，并非租户）中唯一。在所使用的认证系统支持的情况下，账户管理员、租户管理员可以创建用户。</p>
 <h2 class="anchor anchorWithStickyNavbar_L0L0" id="账户状态">账户状态<a href="#账户状态" class="hash-link" aria-label="账户状态的直接链接" title="账户状态的直接链接">​</a></h2>
 <p>当前系统中页面展示的账户状态有：<strong>正常</strong>、<strong>封锁</strong>、<strong>欠费</strong>。</p>
-<p>| 状态<br>定义     | 解释                                                                       | 账户在集群中<br>的状态   |
-| ----------- -----| -------------------------------------------------------------------------- |------------------------- |
-| 正常              | 账户未被封锁或冻结，且账户余额 <strong>大于</strong> 账户封锁阈值；或者账户已存在于账户白名单  |   正常                   |
-| 封锁              | 账户已被租户管理员或平台管理员封锁                                             |   封锁                  |
-| 欠费              | 账户未被封锁或冻结，且账户余额 <strong>小于等于</strong> 账户封锁阈值                        |   封锁                   |</p>
+<table><thead><tr><th>状态定义</th><th>解释</th><th>账户在集群中的状态</th></tr></thead><tbody><tr><td>正常</td><td>账户未被封锁或冻结，且账户余额 <strong>大于</strong> 账户封锁阈值；<br>或者账户已存在于账户白名单</td><td>正常</td></tr><tr><td>封锁</td><td>账户已被租户管理员或平台管理员封锁</td><td>封锁</td></tr><tr><td>欠费</td><td>账户未被封锁或冻结，且账户余额 <strong>小于等于</strong> 账户封锁阈值</td><td>封锁</td></tr></tbody></table>
 <p><strong>各状态间的转换条件如下：</strong></p>
 <p><img decoding="async" loading="lazy" alt="用户模型" src="/SCOW/pr-preview/pr-1161/assets/images/account_state_explanation_without_frozen-a1b7520eea8f5431bd74c4106fa2ced4.png" width="3720" height="1808" class="img_ufqS"></p>
 <h3 class="anchor anchorWithStickyNavbar_L0L0" id="1账户处于正常状态时">1.账户处于正常状态时：<a href="#1账户处于正常状态时" class="hash-link" aria-label="1.账户处于正常状态时：的直接链接" title="1.账户处于正常状态时：的直接链接">​</a></h3>
@@ -31,13 +27,13 @@
 <p>不可进行封锁或解封操作</p>
 </li>
 <li>
-<p>移出白名单时，判断账户余额，余额 <strong>大于</strong>  账户封锁阈值，状态变仍为正常；</p>
+<p>移出白名单时，判断账户余额，余额 <strong>大于</strong> 账户封锁阈值，状态变仍为正常；</p>
 </li>
 <li>
 <p>移出白名单时，判断账户余额，余额 <strong>小于等于</strong> 账户封锁阈值，状态变更为欠费；</p>
 </li>
 </ul>
-<p>（2）. 账户不在白名单中：</p>
+<p>（2）. 账户不在白  名单中：</p>
 <ul>
 <li>
 <p>添加白名单：状态仍为正常；</p>
