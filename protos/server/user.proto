@@ -89,7 +89,7 @@ message AccountUserInfo {
   map<string, uint64> storage_quotas = 6;
   optional common.Money job_charge_limit = 7;
   optional common.Money used_job_charge_limit = 8;
-  UserStateInAccount user_state = 9;
+  UserStateInAccount user_state_in_account = 9;
   DisplayedUserState displayed_user_state = 10;
 }
 

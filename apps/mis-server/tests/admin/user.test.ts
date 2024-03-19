@@ -17,8 +17,9 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { dayjsToDateMessage } from "@scow/lib-server/build/date";
-import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
-  SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import { DisplayedUserState, GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
+  SortDirection, TenantRole, UserRole as UserRoleProtoType, UserServiceClient,
+  UserStateInAccount, UserStatus as UserStatusProtoType } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
@@ -633,4 +634,40 @@ it("get new user count in UTC+8 timezone", async () => {
     { date:dayjsToDateMessage(twoDaysBeforeInUtcPlus8), count: 10 },
   ]);
 
+});
+
+it("get account users", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const reply = await asyncClientCall(client, "getAccountUsers", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+  }).catch((e) => e);
+
+  expect(reply.results).toIncludeSameMembers([
+    {
+      userId: "a",
+      name: "AName",
+      email: "a@a.com",
+      role: UserRoleProtoType.OWNER,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+    {
+      userId: "b",
+      name: "BName",
+      email: "b@b.com",
+      role: UserRoleProtoType.ADMIN,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+  ]);
 });

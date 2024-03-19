@@ -85,6 +85,18 @@ export const jobChargeLimitServer = plugin((server) => {
           lockMode: LockMode.PESSIMISTIC_WRITE,
         });
 
+        const limitNumber = moneyToNumber(limit);
+        // 如果设置的限额小于等于0或者小于当前已用额度则报错
+        if (limitNumber <= 0 ||
+        (userAccount?.usedJobCharge && userAccount.usedJobCharge.isGreaterThan(limitNumber))) {
+          throw <ServiceError> {
+            code: Status.INVALID_ARGUMENT, message: userAccount?.usedJobCharge ?
+              `The set quota ${limitNumber} is invalid ,
+              it must be greater than or equal to the used job charge ${userAccount?.usedJobCharge}` :
+              `The set quota ${limitNumber} is invalid , it must be greater than 0`,
+          };
+        }
+
         if (!userAccount) {
           throw <ServiceError>{
             code: Status.NOT_FOUND,
