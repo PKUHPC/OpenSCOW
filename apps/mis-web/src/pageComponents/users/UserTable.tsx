@@ -12,7 +12,7 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import type { AccountUserInfo } from "@scow/protos/build/server/user";
+import { type AccountUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Divider, Popover, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
@@ -20,7 +20,7 @@ import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { DisplayedUserState, UserRole, UserStatus } from "src/models/User";
+import { DisplayedUserState, UserRole, UserStateInAccount } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
 import { GetAccountUsersSchema } from "src/pages/api/users";
 import { moneyToString } from "src/utils/money";
@@ -127,7 +127,7 @@ export const UserTable: React.FC<Props> = ({
               {t(p("limitManage"))}
             </SetJobChargeLimitLink>
             {
-              r.status === UserStatus.BLOCKED
+              r.userStateInAccount === UserStateInAccount.BLOCKED_BY_ADMIN
                 ? (
                   <a onClick={() => {
                     modal.confirm({
