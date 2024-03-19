@@ -19,7 +19,7 @@ import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
@@ -136,6 +136,7 @@ it("pays account with negative amount to block account", async () => {
 
   await reloadEntity(em, account);
   expect(account.blockedInCluster).toBeTruthy();
+  expect(account.state).toBe(AccountState.NORMAL);
 });
 
 it("concurrently pays", async () => {
@@ -218,6 +219,8 @@ it("charges account", async () => {
   await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(-10);
+  expect(account.blockedInCluster).toBeTruthy();
+  expect(account.state).toBe(AccountState.NORMAL);
 });
 
 it("concurrently charges", async () => {
