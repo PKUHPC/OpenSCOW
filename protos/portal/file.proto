@@ -81,10 +81,6 @@ message ReadDirectoryRequest {
   string user_id = 1;
   string cluster = 2;
   string path = 3;
-  // update_access_time 用于指示是否需要更新目录下全部文件的访问时间戳，主要在 SCOW 文件传输功能中使用
-  // 为 true 时表示需要更新文件的访问时间戳，从而确保文件的访问时间与传输时间同步
-  // 为 false 时表示不需要更新文件的访问时间戳
-  optional bool update_access_time = 4;
 }
 
 message FileInfo {
@@ -155,7 +151,7 @@ message GetFileMetadataRequest {
 }
 
 message GetFileMetadataResponse {
-  uint32 size = 1;
+  uint64 size = 1;
   string type = 2;
 }
 

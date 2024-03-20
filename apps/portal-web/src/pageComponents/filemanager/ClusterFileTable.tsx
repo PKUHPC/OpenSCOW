@@ -72,7 +72,7 @@ export const ClusterFileTable: React.FC<Props> = ({
     // 清空SelectedKeys
     setSelectedKeys([]);
     selectedCluster ? (
-      await api.listFile({ query: { cluster: selectedCluster.id, path: path, updateAccessTime: true } })
+      await api.listFile({ query: { cluster: selectedCluster.id, path: path } })
         .then((d) => {
           setFiles(d.items);
         })
@@ -257,7 +257,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         <Table.Column<FileInfo>
           dataIndex="mode"
           title={t(p("permission"))}
-          render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
+          // render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
         />
 
       </Table>

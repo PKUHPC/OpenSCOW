@@ -863,6 +863,9 @@ importers:
 
   apps/portal-server:
     dependencies:
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
         version: 0.17.7(@grpc/grpc-js@1.9.14)
@@ -884,6 +887,9 @@ importers:
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../../libs/scheduler-adapter
+      '@scow/lib-scowd':
+        specifier: workspace:*
+        version: link:../../libs/scowd
       '@scow/lib-server':
         specifier: workspace:*
         version: link:../../libs/server
@@ -899,6 +905,9 @@ importers:
       '@scow/scheduler-adapter-protos':
         specifier: workspace:*
         version: link:../../libs/protos/scheduler-adapter
+      '@scow/scowd-protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/scowd
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -1382,6 +1391,24 @@ importers:
         specifier: 1.167.2
         version: 1.167.2
 
+  libs/protos/scowd:
+    dependencies:
+      '@bufbuild/buf':
+        specifier: 1.29.0
+        version: 1.29.0
+      '@bufbuild/protobuf':
+        specifier: ^1.8.0
+        version: 1.8.0
+      '@bufbuild/protoc-gen-es':
+        specifier: ^1.8.0
+        version: 1.8.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/protoc-gen-connect-es':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0)(@connectrpc/connect@1.4.0)
+
   libs/rich-error-model:
     dependencies:
       '@grpc/grpc-js':
@@ -1421,6 +1448,24 @@ importers:
       '@scow/scheduler-adapter-protos':
         specifier: workspace:*
         version: link:../protos/scheduler-adapter
+
+  libs/scowd:
+    dependencies:
+      '@bufbuild/protobuf':
+        specifier: ^1.8.0
+        version: 1.8.0
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/connect-node':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0)
+      '@grpc/grpc-js':
+        specifier: 1.9.14
+        version: 1.9.14
+      '@scow/scowd-protos':
+        specifier: workspace:*
+        version: link:../protos/scowd
 
   libs/server:
     dependencies:
@@ -3361,7 +3406,6 @@ packages:
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf-darwin-x64@1.29.0:
@@ -3370,7 +3414,6 @@ packages:
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf-linux-aarch64@1.29.0:
@@ -3379,7 +3422,6 @@ packages:
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf-linux-x64@1.29.0:
@@ -3388,7 +3430,6 @@ packages:
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf-win32-arm64@1.29.0:
@@ -3397,7 +3438,6 @@ packages:
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf-win32-x64@1.29.0:
@@ -3406,7 +3446,6 @@ packages:
     cpu: [x64]
     os: [win32]
     requiresBuild: true
-    dev: true
     optional: true
 
   /@bufbuild/buf@1.29.0:
@@ -3421,7 +3460,36 @@ packages:
       '@bufbuild/buf-linux-x64': 1.29.0
       '@bufbuild/buf-win32-arm64': 1.29.0
       '@bufbuild/buf-win32-x64': 1.29.0
-    dev: true
+
+  /@bufbuild/protobuf@1.8.0:
+    resolution: {integrity: sha512-qR9FwI8QKIveDnUYutvfzbC21UZJJryYrLuZGjeZ/VGz+vXelUkK+xgkOHsvPEdYEdxtgUUq4313N8QtOehJ1Q==}
+    dev: false
+
+  /@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0):
+    resolution: {integrity: sha512-jnvBKwHq3o/iOgfKxaxn5Za7ay4oAs8KWgoHiDc9Fsb0g+/d1z+mHlHvmevOiCPcVZsnH6V3LImOJvGStPONpA==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protobuf': 1.8.0
+    peerDependenciesMeta:
+      '@bufbuild/protobuf':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+      '@bufbuild/protoplugin': 1.8.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@bufbuild/protoplugin@1.8.0:
+    resolution: {integrity: sha512-Pb89cTshW+I577qh27VvxGYvZEvQ3zJ8La1OfzPCKugP9d4A4P65WStkAY+aSCiDHk68m1/+mtBb6elfiLPuFg==}
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+      '@typescript/vfs': 1.5.0
+      typescript: 4.5.2
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /@changesets/apply-release-plan@7.0.0:
     resolution: {integrity: sha512-vfi69JR416qC9hWmFGSxj7N6wA5J222XNBmezSVATPWDVPIF7gkd4d8CpbEbXmRWbVrkoli3oerGS6dcL/BGsQ==}
@@ -3790,6 +3858,47 @@ packages:
       '@types/conventional-commits-parser': 5.0.0
       chalk: 5.3.0
     dev: true
+
+  /@connectrpc/connect-node@1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-0ANnrr6SvsjevsWEgdzHy7BaHkluZyS6s4xNoVt7RBHFR5V/kT9lPokoIbYUOU9JHzdRgTaS3x5595mwUsu15g==}
+    engines: {node: '>=16.0.0'}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+      '@connectrpc/connect': 1.4.0
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.8.0)
+      undici: 5.28.3
+    dev: false
+
+  /@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0):
+    resolution: {integrity: sha512-vZeOkKaAjyV4+RH3+rJZIfDFJAfr+7fyYr6sLDKbYX3uuTVszhFe9/YKf5DNqrDb5cKdKVlYkGn6DTDqMitAnA==}
+    peerDependencies:
+      '@bufbuild/protobuf': ^1.4.2
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+    dev: false
+
+  /@connectrpc/protoc-gen-connect-es@1.4.0(@bufbuild/protoc-gen-es@1.8.0)(@connectrpc/connect@1.4.0):
+    resolution: {integrity: sha512-/7vQ8Q7mEBhV8qEVh/eifRQlQnf8EJ6weMwCD2DljVAQRlZYcW9SLxjYZhV1uM1ZZqQC7Cw2vvgXRg2XQswHBg==}
+    engines: {node: '>=16.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protoc-gen-es': ^1.7.2
+      '@connectrpc/connect': 1.4.0
+    peerDependenciesMeta:
+      '@bufbuild/protoc-gen-es':
+        optional: true
+      '@connectrpc/connect':
+        optional: true
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+      '@bufbuild/protoc-gen-es': 1.8.0(@bufbuild/protobuf@1.8.0)
+      '@bufbuild/protoplugin': 1.8.0
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.8.0)
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /@cspotcode/source-map-support@0.8.1:
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -4853,7 +4962,7 @@ packages:
     engines: {node: ^8.13.0 || >=10.10.0}
     dependencies:
       '@grpc/proto-loader': 0.7.10
-      '@types/node': 20.11.5
+      '@types/node': 20.11.10
 
   /@grpc/proto-loader@0.7.10:
     resolution: {integrity: sha512-CAqDfoaQ8ykFd9zqBDn4k6iWT9loLAlc2ETmDFS9JCD70gDcnA4L3AFEo2iV7KyAtAAHFW9ftq1Fz+Vsgq80RQ==}
@@ -7836,6 +7945,14 @@ packages:
       '@typescript-eslint/types': 7.0.1
       eslint-visitor-keys: 3.4.3
     dev: true
+
+  /@typescript/vfs@1.5.0:
+    resolution: {integrity: sha512-AJS307bPgbsZZ9ggCT3wwpg3VbTKMFNHfaY/uF0ahSkYYrPF2dSSKDNIDIQAHm9qJqbLvCsSJH7yN4Vs/CsMMg==}
+    dependencies:
+      debug: 4.3.4(supports-color@5.5.0)
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /@uiw/codemirror-extensions-basic-setup@4.21.20(@codemirror/autocomplete@6.6.0)(@codemirror/commands@6.2.3)(@codemirror/language@6.10.0)(@codemirror/lint@6.0.0)(@codemirror/search@6.2.3)(@codemirror/state@6.4.0)(@codemirror/view@6.23.1):
     resolution: {integrity: sha512-Wyi9q4uw0xGYd/tJ6bULG7tkCLqcUsQT0AQBfCDtnkV3LdiLU0LceTrzJoHJyIKSHsKDJxFQxa1qg3QLt4gIUA==}
@@ -21065,6 +21182,12 @@ packages:
       ts-toolbelt: 9.6.0
     dev: false
 
+  /typescript@4.5.2:
+    resolution: {integrity: sha512-5BlMof9H1yGt0P8/WF+wPNw6GfctgGjXp5hkblpyT+8rkASSmkUKMXrxR0Xg8ThVCi/JnHQiKXeBaEwCeQwMFw==}
+    engines: {node: '>=4.2.0'}
+    hasBin: true
+    dev: false
+
   /typescript@4.9.5:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
@@ -21114,6 +21237,13 @@ packages:
 
   /undici@5.28.2:
     resolution: {integrity: sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==}
+    engines: {node: '>=14.0'}
+    dependencies:
+      '@fastify/busboy': 2.1.0
+    dev: false
+
+  /undici@5.28.3:
+    resolution: {integrity: sha512-3ItfzbrhDlINjaP0duwnNsKpDQk3acHI3gVJ1z4fmwMK31k5G9OVIAMLSIaP6w4FaGkaAkN6zaQO9LUvZ1t7VA==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.1.0
