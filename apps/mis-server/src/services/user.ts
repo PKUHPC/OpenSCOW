@@ -35,6 +35,7 @@ import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { authUrl } from "src/config";
 import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
+import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
@@ -801,5 +802,49 @@ export const userServiceServer = plugin((server) => {
         },
       ];
     },
+
+    changeTenant: async ({ request, em }) => {
+      const { userId, tenantName } = request;
+
+      const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`, details: "USER_NOT_FOUND",
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      const oldTenant = user.tenant.getEntity();
+
+      if (oldTenant.name === tenantName) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: `User ${userId} is already in tenant ${tenantName}.`,
+        };
+      }
+
+      const newTenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!newTenant) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.`, details: "TENANT_NOT_FOUND",
+        };
+      }
+
+      em.assign(user, { tenant: newTenant });
+
+      await em.persistAndFlush(user);
+
+      return [{}];
+
+    },
+
   });
 });

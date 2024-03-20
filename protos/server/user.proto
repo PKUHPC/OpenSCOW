@@ -388,6 +388,19 @@ message GetNewUserCountResponse {
   repeated DailyUserCount results = 1;
 }
 
+message ChangeTenantRequest {
+  string user_id = 1;
+  string tenant_name = 2;
+
+}
+
+// NOT_FOUND: user is not found.
+// NOT_FOUND: tenant is not found.
+// ALREADY_EXISTS: user is already in the tenant
+// FAILED_PRECONDITION: user still maintains account relationship
+message ChangeTenantResponse {
+
+}
 
 service UserService {
 
@@ -434,4 +447,6 @@ service UserService {
   rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
 
   rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
+
+  rpc ChangeTenant(ChangeTenantRequest) returns (ChangeTenantResponse);
 }

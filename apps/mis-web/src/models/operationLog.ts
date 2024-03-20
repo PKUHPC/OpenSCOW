@@ -85,6 +85,7 @@ export const OperationType: OperationTypeEnum = {
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
+  userChangeTenant: "userChangeTenant",
   customEvent: "customEvent",
 };
 
@@ -182,6 +183,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     exportOperationLog: t(pTypes("exportOperationLog")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
+    userChangeTenant: t(pTypes("userChangeTenant")),
     customEvent: t(pTypes("customEvent")),
   };
 
@@ -245,6 +247,7 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   exportChargeRecord: "040305",
   exportPayRecord: "040306",
   exportOperationLog: "040307",
+  userChangeTenant: "040308",
   customEvent: "050001",
 };
 
@@ -436,6 +439,11 @@ export const getOperationDetail = (
       return t(pDetails("setAccountDefaultBlockThreshold"),
         [operationEvent[logEvent].tenantName,
           nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+    case "userChangeTenant":
+      return t(pDetails("userChangeTenant"),
+        [operationEvent[logEvent].userId,
+          operationEvent[logEvent].previousTenantName,
+          operationEvent[logEvent].newTenantName]);
     case "customEvent":
       const c = operationEvent[logEvent]?.content;
       return getI18nCurrentText(c, languageId);

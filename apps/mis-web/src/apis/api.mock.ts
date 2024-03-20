@@ -447,6 +447,7 @@ export const mockApi: MockApi<typeof api> = {
       createdInAuth: false,
     }),
   createTenant: async () => ({ createdInAuth: true }),
+  createTenantWithExistingUserAsAdmin: async () => null,
   validateToken: async () => MOCK_USER_INFO,
 
   getOperationLogs: async () => ({ results: [{
@@ -477,6 +478,7 @@ export const mockApi: MockApi<typeof api> = {
     endsAt: 1702889670000,
   }]}),
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
+  changeTenant: async () => null,
 };
 
 export const MOCK_USER_INFO = {
