@@ -57,7 +57,7 @@ export async function checkCopyFilePath({ host, userIdentityId, toPath, fileName
     }
 
     // 判断文件是否有读写权限
-    const checkReadableResult = await await loggedExec(ssh, logger, false, "ls", [toPath]);
+    const checkReadableResult = await loggedExec(ssh, logger, false, "ls", [toPath]);
 
     if (checkReadableResult.stderr) {
       throw new TRPCError({
