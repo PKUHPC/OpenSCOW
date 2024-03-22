@@ -59,10 +59,10 @@ export async function checkCopyFilePath({ host, userIdentityId, toPath, fileName
     // 判断文件是否有读写权限
     const checkReadableResult = await loggedExec(ssh, logger, false, "ls", [toPath]);
 
-    if (checkReadableResult.stderr) {
+    if (checkReadableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not readable`,
+        message: `${toPath} is not readable, ${checkReadableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_READABLE,
       });
     }
@@ -70,10 +70,10 @@ export async function checkCopyFilePath({ host, userIdentityId, toPath, fileName
     // 尝试写入文件
     const checkWritableResult
       = await loggedExec(ssh, logger, false, "touch", [join(toPath, "test_wirte_permission_file")]);
-    if (checkWritableResult.stderr) {
+    if (checkWritableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not writable`,
+        message: `${toPath} is not writable, ${checkWritableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_WRITABLE,
       });
     } else {
@@ -104,10 +104,10 @@ export async function checkCreateResourcePath({ host, userIdentityId, toPath }: 
     // 判断文件夹是否有读写权限
     const checkReadableResult = await loggedExec(ssh, logger, false, "ls", [toPath]);
 
-    if (checkReadableResult.stderr) {
+    if (checkReadableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not readable`,
+        message: `${toPath} is not readable, ${checkReadableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_READABLE,
       });
     }
@@ -116,10 +116,10 @@ export async function checkCreateResourcePath({ host, userIdentityId, toPath }: 
     const checkWritableResult =
       await loggedExec(ssh, logger, false, "touch", [join(toPath, "test_wirte_permission_file")]);
 
-    if (checkWritableResult.stderr) {
+    if (checkWritableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not writable`,
+        message: `${toPath} is not writable, ${checkWritableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_WRITABLE,
       });
     } else {
