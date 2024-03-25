@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
+import { Status } from "src/models/Image";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
@@ -183,7 +184,9 @@ export const LaunchAppForm = (props: Props) => {
   });
 
   const imageOptions = useMemo(() => {
-    return images?.items.map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
+    return images?.items
+      .filter((x) => x.status === Status.CREATED)
+      .map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
   }, [images]);
 
   // 暂时写死为1
