@@ -336,7 +336,9 @@ export const LaunchAppForm = (props: Props) => {
             account: account,
             partition: partition,
             nodeCount: nodeCount,
-            coreCount: coreCount,
+            coreCount: gpuCount ?
+              gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) :
+              coreCount,
             gpuCount: gpuCount,
             maxTime: maxTime,
             memory: memorySize,
