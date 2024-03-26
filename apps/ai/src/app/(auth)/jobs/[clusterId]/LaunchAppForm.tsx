@@ -399,7 +399,7 @@ export const LaunchAppForm = (props: Props) => {
         {!isTraining && (
           <Form.Item
             label="启动镜像"
-            help={ useCustomImage && <Typography.Text type="danger">{`请选择安装了${appName}应用的容器，并指定启动命令`}</Typography.Text>
+            help={ useCustomImage && <Typography.Text type="danger">{`请选择安装了${appName}应用的镜像，并指定启动命令`}</Typography.Text>
             }
           >
             <Space>
