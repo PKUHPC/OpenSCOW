@@ -224,6 +224,8 @@ export default {
         allAccount:"所有账户",
         debtAccount:"欠费账户",
         blockedAccount: "封锁账户",
+        frozenAccount: "冻结账户",
+        normalAccount: "正常账户",
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",
@@ -234,8 +236,19 @@ export default {
 
         comment:"备注",
         status:"状态",
+        statusTooltip: "账户状态说明",
+        statusFrozenTooltip: "冻结：账户已被账户管理员冻结，无法通过此账户提交作业",
+
+        statusBlockedTooltip: "封锁：账户已被租户管理员或平台管理员封锁，无法通过此账户提交作业",
+
+        statusDebtTooltip: "欠费：账户余额<=封锁阈值，无法通过此账户提交作业",
+
+        statusNormalTooltip: "正常：账户没有被管理员封锁冻结且账户余额>封锁阈值；或者账户已存在于白名单中",
+
         mangerMember:"管理成员",
-        block:"封锁",
+        blocked:"封锁",
+        frozen:"冻结",
+        debt: "欠费",
         normal:"正常",
         unit:" 元",
         unblockConfirmTitle: "确认解除用户封锁？",

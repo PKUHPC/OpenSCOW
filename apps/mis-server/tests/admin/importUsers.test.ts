@@ -113,7 +113,11 @@ it("import users and accounts if an account exists", async () => {
   // a_user1 and user1 exist
   const tenant = await em.findOneOrFail(Tenant, { name: "default" });
   const user = new User({ name: "user1Name", userId: "user1", email: "", tenant });
-  const account = new Account({ accountName: "a_user1", comment: "", blocked: false, tenant });
+  const account = new Account({
+    accountName: "a_user1",
+    comment: "",
+    blockedInCluster: false,
+    tenant });
   await em.persistAndFlush([user, account]);
 
   await asyncClientCall(client, "importUsers", { data: data, whitelist: true });

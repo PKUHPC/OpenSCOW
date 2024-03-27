@@ -1191,8 +1191,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "blocked": {
-          "name": "blocked",
+        "blocked_in_cluster": {
+          "name": "blocked_in_cluster",
           "type": "tinyint(1)",
           "unsigned": false,
           "autoincrement": false,
@@ -1241,6 +1241,21 @@
           "precision": 19,
           "scale": 4,
           "mappedType": "decimal"
+        },
+        "state": {
+          "name": "state",
+          "type": "enum('FROZEN','BLOCKED_BY_ADMIN','NORMAL')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "enumItems": [
+            "FROZEN",
+            "BLOCKED_BY_ADMIN",
+            "NORMAL"
+          ],
+          "comment": "FROZEN, BLOCKED_BY_ADMIN, NORMAL",
+          "mappedType": "enum"
         },
         "create_time": {
           "name": "create_time",

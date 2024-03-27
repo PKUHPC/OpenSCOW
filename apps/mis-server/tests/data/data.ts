@@ -27,10 +27,17 @@ export async function insertInitialData(em: SqlEntityManager) {
   const userB = new User({ name: "BName", userId: "b", email: "b@b.com", tenant });
 
   const accountA = new Account({
-    accountName: "hpca", comment: "", blocked: false, tenant,
+    accountName: "hpca",
+    comment: "",
+    blockedInCluster: false,
+    tenant,
   }) as Loaded<Account, "tenant">;
+
   const accountB = new Account({
-    accountName: "hpcb", comment: "", blocked: false, tenant,
+    accountName: "hpcb",
+    comment: "",
+    blockedInCluster: false,
+    tenant,
   }) as Loaded<Account, "tenant">;
 
   const uaAA = new UserAccount({
@@ -56,7 +63,12 @@ export async function insertInitialData(em: SqlEntityManager) {
   // insert another tenant. every test should work just fine
   const anotherTenant = await em.findOne(Tenant, { name: "another" }) ?? new Tenant({ name: "another" });
   const userC = new User({ tenant: anotherTenant, email: "123", name: "cName", userId: "c" });
-  const accountC = new Account({ tenant: anotherTenant, accountName: "hpcc", blocked: false, comment: "123" });
+  const accountC = new Account({
+    tenant: anotherTenant,
+    accountName: "hpcc",
+    blockedInCluster: false,
+    comment: "123",
+  });
   const uaCC = new UserAccount({ user: userC, account: accountC, role: UserRole.ADMIN, status: UserStatus.BLOCKED });
 
   await em.persistAndFlush([anotherTenant, userC, accountC, uaCC]);
@@ -76,8 +88,18 @@ export async function insertBlockedData(em: SqlEntityManager) {
     tenantRoles: [TenantRole.TENANT_ADMIN]});
   const unblockedUserB = new User({ name: "BlockedB", userId: "b", email: "b@b.com", tenant });
 
-  const unblockedAccountA = new Account({ accountName: "hpca", comment: "", blocked: false, tenant });
-  const blockedAccountB = new Account({ accountName: "hpcb", comment: "", blocked: true, tenant });
+  const unblockedAccountA = new Account({
+    accountName: "hpca",
+    comment: "",
+    blockedInCluster: false,
+    tenant,
+  });
+  const blockedAccountB = new Account({
+    accountName: "hpcb",
+    comment: "",
+    blockedInCluster: true,
+    tenant,
+  });
 
   const uaAA = new UserAccount({
     account: unblockedAccountA,

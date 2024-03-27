@@ -149,7 +149,10 @@ it("when removing a user from an account, the account and user cannot be deleted
   const em = server.ext.orm.em.fork();
 
   const account = new Account({
-    accountName: "account_remove", comment: "", blocked: false, tenant:data.tenant,
+    accountName: "account_remove",
+    comment: "",
+    blockedInCluster: false,
+    tenant:data.tenant,
   }) as Loaded<Account, "tenant">;
 
   const uaA = new UserAccount({
