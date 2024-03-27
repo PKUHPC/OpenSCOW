@@ -63,7 +63,7 @@ const JobShellComponent = dynamic(
     loading: Black,
   });
 
-export const JobShellPage = ({ params }: {params: {clusterId: string, jobId: string}}) => {
+export default function Page({ params }: {params: {clusterId: string, jobId: string}}) {
 
   const { clusterId, jobId } = params;
   const { publicConfig, user } = usePublicConfig();
@@ -94,5 +94,3 @@ export const JobShellPage = ({ params }: {params: {clusterId: string, jobId: str
     </Container>
   );
 };
-
-export default JobShellPage;
