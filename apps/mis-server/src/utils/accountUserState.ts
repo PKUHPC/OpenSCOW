@@ -16,25 +16,12 @@ import { AccountUserInfo_DisplayedUserState as DisplayedUserState } from "@scow/
 import { AccountState } from "src/entities/Account";
 import { UserStateInAccount } from "src/entities/UserAccount";
 
-// export enum DisplayedAccountState {
-//   DISPLAYED_NORMAL = 0,
-//   DISPLAYED_FROZEN = 1,
-//   DISPLAYED_BLOCKED = 2,
-//   DISPLAYED_BELOW_BLOCK_THRESHOLD = 3,
-// }
-
 export interface AccountStateInfo {
   // 当前页面展示的账户状态
   displayedState: DisplayedAccountState,
   // 是否需要在集群中封锁账户
   shouldBlockInCluster: boolean,
 }
-
-// export enum DisplayedUserState {
-//   DISPLAYED_NORMAL = 0,
-//   DISPLAYED_QUOTA_EXCEEDED = 1,
-//   DISPLAYED_BLOCKED = 2,
-// }
 
 export interface UserStateInfo {
   // 账户管理的用户列表下展示的用户状态
