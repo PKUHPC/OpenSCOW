@@ -112,13 +112,13 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const jobId = query.get("jobId");
 
   if (!jobId) {
-    console.log("[shell] param-jobId not passed");
+    log("[shell] param-jobId not passed");
     ws.close(0, "param-jobId not passed");
     return;
   }
 
   if (!clusterId || !clusters[clusterId]) {
-    console.log("[shell] param-clusterId not passed or unknown");
+    log("[shell] param-clusterId not passed or unknown");
     ws.close(0, "param-clusterId not passed or unknown");
     return;
   }
@@ -137,7 +137,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const currentJobInfo = runningJobsInfo.find((jobInfo) => String(jobInfo.jobId) === jobId);
 
   if (!currentJobInfo) {
-    console.log(`[shell] Get running job node info failed, can't find job ${jobId}`);
+    log(`[shell] Get running job node info failed, can't find job ${jobId}`);
     ws.close(0, `Get running job node info failed, can't find job ${jobId}`);
     return;
   }
@@ -178,7 +178,16 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   });
 
   // 将Kubernetes stdout和stderr的输出发送回WebSocket客户端
+  let setWindow = false;
   stdoutStream.on("data", (data) => {
+    if (data.toString().startsWith("stty")) {
+      setWindow = true;
+      return;
+    };
+    if (setWindow === true) {
+      setWindow = false;
+      return;
+    }
     send({ $case: "data", data: { data: data.toString() } });
   });
 
@@ -196,7 +205,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   });
 
   if (!namespace || !pod) {
-    console.log("[shell] Namespace or pod not obtained, please check the adapter version");
+    log("[shell] Namespace or pod not obtained, please check the adapter version");
     ws.close(0, "Namespace or pod not obtained, please check the adapter version");
     return;
   }

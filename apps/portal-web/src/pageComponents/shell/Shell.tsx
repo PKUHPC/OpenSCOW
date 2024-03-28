@@ -91,10 +91,6 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
         term.onData((data) => {
           send({ $case: "data", data: { data } });
         });
-
-        term.onResize(({ cols, rows }) => {
-          send({ $case: "resize", resize: { cols, rows } });
-        });
       };
 
 
