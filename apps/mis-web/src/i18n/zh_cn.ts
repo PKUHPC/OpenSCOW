@@ -224,6 +224,8 @@ export default {
         allAccount:"所有账户",
         debtAccount:"欠费账户",
         blockedAccount: "封锁账户",
+        frozenAccount: "冻结账户",
+        normalAccount: "正常账户",
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",
@@ -234,8 +236,19 @@ export default {
 
         comment:"备注",
         status:"状态",
+        statusTooltip: "账户状态说明",
+        statusFrozenTooltip: "冻结：账户已被账户管理员冻结，无法通过此账户提交作业",
+
+        statusBlockedTooltip: "封锁：账户已被租户管理员或平台管理员封锁，无法通过此账户提交作业",
+
+        statusDebtTooltip: "欠费：账户余额<=封锁阈值，无法通过此账户提交作业",
+
+        statusNormalTooltip: "正常：账户没有被管理员封锁冻结且账户余额>封锁阈值；或者账户已存在于白名单中",
+
         mangerMember:"管理成员",
-        block:"封锁",
+        blocked:"封锁",
+        frozen:"冻结",
+        debt: "欠费",
         normal:"正常",
         unit:" 元",
         unblockConfirmTitle: "确认解除用户封锁？",
@@ -293,6 +306,7 @@ export default {
         success:"修改成功",
         fail:"修改失败",
         changePassword:"修改密码",
+        changeTenant: "修改租户",
       },
       createTenantForm:{
         prompt:"请输入租户名并为其创建一个新用户作为该租户的管理员",
@@ -300,6 +314,10 @@ export default {
         userEmail:"用户邮箱",
         userPassword:"用户密码",
         confirmPassword:"确认密码",
+        userType: "用户类型",
+        newUser: "新用户",
+        existingUser: "已有用户",
+        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
       },
       ImportUsersTable:{
         selectAccount:"请选择账户！",
@@ -326,6 +344,19 @@ export default {
         charging:"充值中……",
         accountNotFound:"账户未找到",
         chargeFinish:"充值完成！",
+      },
+      changeTenantModal: {
+        modifyTenant: "修改租户",
+        newTenant: "新租户",
+        originalTenant: "原租户",
+        userName: "用户姓名",
+        userId: "用户 ID",
+        newTenantNameRequired: "请输入新租户",
+        userNotFound: "用户不存在",
+        tenantNotFound: "租户不存在",
+        userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
+        userAlreadyExistInThisTenant: "用户已经存在于该租户中",
+        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
       },
     },
     commonComponent:{
@@ -938,6 +969,9 @@ export default {
           createTenantFailMessage: "创建租户失败",
           createTenant: "创建租户",
           unavailable:"本功能在当前配置下不可用",
+          userNotFound: "此用户不存在",
+          tenantExist: "租户已存在",
+          userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
         },
       },
       systemDebug: {
@@ -1107,6 +1141,7 @@ export default {
       exportOperationLog: "导出操作日志",
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
+      userChangeTenant: "用户切换租户",
       customEvent: "自定义操作行为",
     },
     operationDetails: {
@@ -1181,6 +1216,7 @@ export default {
       setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
+      userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
     },
   },
   userRoles: {

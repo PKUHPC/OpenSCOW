@@ -43,11 +43,6 @@ export const UserTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
-  // const statusTexts = {
-  //   [UserStatus.BLOCKED]: <Tag color="error">{t(p("block"))}</Tag>,
-  //   [UserStatus.UNBLOCKED]: <Tag color="success">{t(p("normal"))}</Tag>,
-  // };
-
   const DisplayedUserStateTexts = {
     [DisplayedUserState.DISPLAYED_NORMAL]: <Tag color="success">{t(p("normal"))}</Tag>,
     [DisplayedUserState.DISPLAYED_QUOTA_EXCEEDED]: <Tag color="error">{t(p("quotaExceeded"))}</Tag>,

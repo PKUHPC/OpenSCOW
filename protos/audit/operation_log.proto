@@ -413,6 +413,12 @@ message SetAccountDefaultBlockThreshold {
   common.Money threshold_amount = 2;
 }
 
+message UserChangeTenant {
+  string user_id = 1;
+  string previous_tenant_name = 2;
+  string new_tenant_name = 3;
+}
+
 // 用户自定义操作类型，name和content将直接展示
 message CustomEvent {
   string type = 1;
@@ -483,7 +489,8 @@ message CreateOperationLogRequest {
     ExportOperationLog export_operation_log = 58;
     SetAccountBlockThreshold set_account_block_threshold = 59;
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
-    CustomEvent custom_event = 61;
+    UserChangeTenant user_change_tenant = 61;
+    CustomEvent custom_event = 62;
   }
 }
 
@@ -552,7 +559,8 @@ message OperationLog {
     ExportOperationLog export_operation_log = 60;
     SetAccountBlockThreshold set_account_block_threshold = 61;
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
-    CustomEvent custom_event = 63;
+    UserChangeTenant user_change_tenant = 63;
+    CustomEvent custom_event = 64;
   }
 }
 

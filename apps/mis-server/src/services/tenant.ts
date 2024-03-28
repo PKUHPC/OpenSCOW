@@ -17,11 +17,14 @@ import { raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
+import { blockAccount, unblockAccount } from "src/bl/block";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
+import { UserAccount } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { getAccountStateInfo } from "src/utils/accountUserState";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 
 
@@ -164,7 +167,7 @@ export const tenantServiceServer = plugin((server) => {
       );
     },
 
-    setDefaultAccountBlockThreshold: async ({ request, em }) => {
+    setDefaultAccountBlockThreshold: async ({ request, em, logger }) => {
 
       const { tenantName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
       const tenant = await em.findOne(Tenant, { name: tenantName });
@@ -174,9 +177,88 @@ export const tenantServiceServer = plugin((server) => {
       }
       tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
 
-      await em.persistAndFlush(tenant);
+      // 判断租户下各账户是否使用该租户封锁阈值，使用后是否需要在集群中进行封锁
+      const accounts = await em.find(Account, { tenant: tenant, blockThresholdAmount : {} }, {
+        populate: ["tenant"],
+      });
+      if (accounts.length > 0) {
+        await Promise.allSettled(accounts
+          .map(async (account) => {
+            // 判断设置封锁阈值后是否应该在集群中封锁
+            const shouldBlockInCluster = getAccountStateInfo(
+              account.whitelist?.id,
+              account.state,
+              account.balance,
+              new Decimal(moneyToNumber(blockThresholdAmount)),
+            ).shouldBlockInCluster;
+
+            if (shouldBlockInCluster) {
+              logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
+              + "Block the account.", account.accountName);
+              await blockAccount(account, server.ext.clusters, logger);
+            }
+
+            if (!shouldBlockInCluster) {
+              logger.info("The balance of Account %s is greater than the default tenant block threshold amount. "
+              + "Unblock the account.", account.accountName);
+              await unblockAccount(account, server.ext.clusters, logger);
+            }
+          }),
+        ).catch((e) => {
+          logger.error("Block or unblock account failed when set a new default tenant threshold amount.", e);
+        });
+      }
+
+      if (accounts.length > 0) {
+        await em.persistAndFlush([...accounts, tenant]);
+      } else {
+        await em.persistAndFlush(tenant);
+      }
 
       return [{}];
+
+    },
+
+    createTenantWithExistingUserAsAdmin: async ({ request, em }) => {
+
+      const { tenantName, userId, userName } = request;
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (tenant) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
+        };
+      }
+
+      const newTenant = new Tenant({ name: tenantName });
+
+
+      const user = await em.findOne(User, { userId, name: userName });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName} is not found.`,
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      // 修改该用户的租户， 并且作为租户管理员
+      em.assign(user, { tenant: newTenant });
+      user.tenantRoles = [TenantRole.TENANT_ADMIN];
+
+      await em.persistAndFlush([user, newTenant]);
+
+      return [{
+        tenantName: newTenant.name,
+        adminUserId: user.userId,
+      }];
 
     },
 

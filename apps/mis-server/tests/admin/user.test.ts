@@ -17,9 +17,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { dayjsToDateMessage } from "@scow/lib-server/build/date";
-import { DisplayedUserState, GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
+import { AccountUserInfo_DisplayedUserState as DisplayedUserState,
+  AccountUserInfo_UserStateInAccount as UserStateInAccount,
+  GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
   SortDirection, TenantRole, UserRole as UserRoleProtoType, UserServiceClient,
-  UserStateInAccount, UserStatus as UserStatusProtoType } from "@scow/protos/build/server/user";
+  UserStatus as UserStatusProtoType } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
@@ -150,7 +152,10 @@ it("when removing a user from an account, the account and user cannot be deleted
   const em = server.ext.orm.em.fork();
 
   const account = new Account({
-    accountName: "account_remove", comment: "", blocked: false, tenant:data.tenant,
+    accountName: "account_remove",
+    comment: "",
+    blockedInCluster: false,
+    tenant:data.tenant,
   }) as Loaded<Account, "tenant">;
 
   const uaA = new UserAccount({

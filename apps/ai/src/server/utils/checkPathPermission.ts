@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { sftpExists } from "@scow/lib-ssh";
+import { loggedExec, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
 
@@ -57,30 +57,31 @@ export async function checkCopyFilePath({ host, userIdentityId, toPath, fileName
     }
 
     // 判断文件是否有读写权限
-    const checkReadableResult = await ssh.execCommand(`ls ${toPath}`);
+    const checkReadableResult = await loggedExec(ssh, logger, false, "ls", [toPath]);
 
-    if (checkReadableResult.stderr) {
+    if (checkReadableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not readable`,
+        message: `${toPath} is not readable, ${checkReadableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_READABLE,
       });
     }
 
     // 尝试写入文件
-    const checkWritableResult = await ssh.execCommand(`touch ${join(toPath, "test_wirte_permission_file")}`);
-
-    if (checkWritableResult.stderr) {
+    const checkWritableResult
+      = await loggedExec(ssh, logger, false, "touch", [join(toPath, "test_wirte_permission_file")]);
+    if (checkWritableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not writable`,
+        message: `${toPath} is not writable, ${checkWritableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_WRITABLE,
       });
     } else {
       // 删除创建的测试文件
-      await ssh.execCommand(`rm ${join(toPath, "test_wirte_permission_file")}`).catch(() => {
-        logger.info("Failed to delete %s write permission test file.", toPath);
-      });
+      await loggedExec(ssh, logger, false, "rm", [join(toPath, "test_wirte_permission_file")])
+        .catch(() => {
+          logger.info("Failed to delete %s write permission test file.", toPath);
+        });
     }
   });
 }
@@ -101,28 +102,29 @@ export async function checkCreateResourcePath({ host, userIdentityId, toPath }: 
     }
 
     // 判断文件夹是否有读写权限
-    const checkReadableResult = await ssh.execCommand(`ls ${toPath}`);
+    const checkReadableResult = await loggedExec(ssh, logger, false, "ls", [toPath]);
 
-    if (checkReadableResult.stderr) {
+    if (checkReadableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not readable`,
+        message: `${toPath} is not readable, ${checkReadableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_READABLE,
       });
     }
 
     // 尝试写入文件
-    const checkWritableResult = await ssh.execCommand(`touch ${join(toPath, "test_wirte_permission_file")}`);
+    const checkWritableResult =
+      await loggedExec(ssh, logger, false, "touch", [join(toPath, "test_wirte_permission_file")]);
 
-    if (checkWritableResult.stderr) {
+    if (checkWritableResult.code !== 0) {
       throw new TRPCError({
         code: "FORBIDDEN",
-        message: `${toPath} is not writable`,
+        message: `${toPath} is not writable, ${checkWritableResult.stderr}`,
         cause: ErrorCode.FILE_NOT_WRITABLE,
       });
     } else {
       // 删除创建的测试文件
-      await ssh.execCommand(`rm ${join(toPath, "test_wirte_permission_file")}`).catch(() => {
+      await loggedExec(ssh, logger, false, "rm", [join(toPath, "test_wirte_permission_file")]).catch(() => {
         logger.info("Failed to delete %s write permission test file.", toPath);
       });
     }

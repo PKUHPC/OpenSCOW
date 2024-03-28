@@ -79,6 +79,7 @@ export const OperationType: OperationTypeEnum = {
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
+  userChangeTenant: "userChangeTenant",
   customEvent: "customEvent",
 };
 

@@ -42,7 +42,7 @@ beforeEach(async () => {
   const createAccount = (index: number) => new Account({
     accountName: `top${index}`,
     tenant,
-    blocked: false,
+    blockedInCluster: false,
     comment: `top${index}`,
   });
 

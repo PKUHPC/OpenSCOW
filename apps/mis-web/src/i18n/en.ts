@@ -224,6 +224,8 @@ export default {
         allAccount: "All Accounts",
         debtAccount: "Debt Accounts",
         blockedAccount: "Blocked Accounts",
+        frozenAccount: "Frozen Accounts",
+        normalAccount: "Normal Accounts",
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
@@ -234,8 +236,19 @@ export default {
         + "when the balance is less than the block threshold amount.",
         comment: "Comment",
         status: "Status",
+        statusTooltip: "Account Status Explanation",
+        statusFrozenTooltip: "Frozen: The account has been frozen by the account administrator "
+        + "and cannot submit jobs through this account.",
+        statusBlockedTooltip: "Blocked: The account has been blocked by the tenant administrator or "
+        + "platform administrator and cannot submit jobs through this account.",
+        statusDebtTooltip: "Debt: The account balance is less than or equal to the blocking threshold, "
+        + "and jobs cannot be submitted through this account.",
+        statusNormalTooltip: "Normal: The account status is not blocked or frozen, and the account "
+        + "balance is greater than the blocking threshold; or the account is already in the whitelist.",
         mangerMember: "Manage Members",
-        block: "Blocked",
+        blocked: "Blocked",
+        frozen:"Frozen",
+        debt: "Debt",
         normal: "Available",
         unit: "CNY",
         unblockConfirmTitle: "Confirm Unblock of User?",
@@ -293,6 +306,7 @@ export default {
         success: "Modification successful",
         fail: "Modification failed",
         changePassword: "Change Password",
+        changeTenant: "Change Tenant",
       },
       createTenantForm: {
         prompt: "Please enter the tenant name and create a new user as the administrator for this tenant.",
@@ -300,6 +314,10 @@ export default {
         userEmail: "User Email",
         userPassword: "User Password",
         confirmPassword: "Confirm Password",
+        userType: "User Type",
+        newUser: "New User",
+        existingUser: "Existing User",
+        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
       },
       ImportUsersTable: {
         selectAccount: "Please select an account!",
@@ -326,6 +344,19 @@ export default {
         charging: "Charging...",
         accountNotFound: "Account not found.",
         chargeFinish: "Charging completed!",
+      },
+      changeTenantModal: {
+        modifyTenant: "Modify Tenant",
+        newTenant: "New Tenant",
+        originalTenant: "Original Tenant",
+        userName: "User Name",
+        userId: "User ID",
+        newTenantNameRequired: "Please enter a new tenant",
+        userNotFound: "User Not Exist",
+        tenantNotFound: "Tenant Not Exist",
+        userStillMaintainsAccountRelationship: "User still maintains account relationship",
+        userAlreadyExistInThisTenant: "User already exists in this tenant",
+        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
       },
     },
     commonComponent: {
@@ -938,6 +969,9 @@ export default {
           createTenantFailMessage: "Failed to create tenant",
           createTenant: "Create Tenant",
           unavailable:"This feature is not available in the current configuration",
+          userNotFound: "User Not Exist",
+          tenantExist: "Tenant Already Exists",
+          userStillMaintainsAccountRelationship: "User still maintains account relationship",
         },
       },
       systemDebug: {
@@ -1106,6 +1140,7 @@ export default {
       exportOperationLog: "Export Operation Log",
       setAccountBlockThreshold: "Set Account Block Threshold",
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
+      userChangeTenant: "User Change Tenant",
       customEvent: "Custom Operation Event",
     },
     operationDetails: {
@@ -1180,6 +1215,7 @@ export default {
       setAccountBlockThreshold: "Set the block threshold of account {} to {}",
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
       unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
+      userChangeTenant: "User {} changes from tenant {} to tenant {}",
     },
   },
   userRoles: {

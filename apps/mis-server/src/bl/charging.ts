@@ -22,7 +22,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
-import { getUserStateInfo } from "src/utils/accountUserState";
+import { getAccountStateInfo, getUserStateInfo } from "src/utils/accountUserState";
 import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
@@ -39,7 +39,10 @@ export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
   const blockThresholdAmount =
   account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
-  return account.balance.lte(blockThresholdAmount);
+  const accountStateInfo =
+  getAccountStateInfo(account.whitelist?.id, account.state, account.balance, blockThresholdAmount);
+
+  return accountStateInfo.shouldBlockInCluster;
 }
 
 export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
@@ -47,7 +50,10 @@ export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
   const blockThresholdAmount =
   account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
-  return account.balance.gt(blockThresholdAmount);
+  const accountStateInfo =
+  getAccountStateInfo(account.whitelist?.id, account.state, account.balance, blockThresholdAmount);
+
+  return !accountStateInfo.shouldBlockInCluster;
 }
 
 export async function pay(

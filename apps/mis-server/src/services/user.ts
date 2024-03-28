@@ -22,7 +22,7 @@ import { decimalToMoney } from "@scow/lib-decimal";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
-  GetAccountUsersResponse,
+  accountUserInfo_UserStateInAccountFromJSON, GetAccountUsersResponse,
   platformRoleFromJSON,
   platformRoleToJSON,
   QueryIsUserInAccountResponse,
@@ -30,12 +30,12 @@ import {
   tenantRoleToJSON,
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
-  userStateInAccountFromJSON,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { authUrl } from "src/config";
 import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
+import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
@@ -72,7 +72,7 @@ export const userServiceServer = plugin((server) => {
               prev[curr.cluster] = curr.storageQuota;
               return prev;
             }, {}),
-            userStateInAccount: userStateInAccountFromJSON(x.state),
+            userStateInAccount: accountUserInfo_UserStateInAccountFromJSON(x.state),
             displayedUserState: displayedState,
           };
         },
@@ -110,8 +110,8 @@ export const userServiceServer = plugin((server) => {
         accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
           const account = curr.account.getEntity();
           prev[account.accountName] = {
+            accountBlocked: Boolean(account.blockedInCluster),
             userStatus: PFUserStatus[curr.blockedInCluster],
-            accountBlocked: Boolean(account.blocked),
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
@@ -822,5 +822,49 @@ export const userServiceServer = plugin((server) => {
         },
       ];
     },
+
+    changeTenant: async ({ request, em }) => {
+      const { userId, tenantName } = request;
+
+      const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`, details: "USER_NOT_FOUND",
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      const oldTenant = user.tenant.getEntity();
+
+      if (oldTenant.name === tenantName) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: `User ${userId} is already in tenant ${tenantName}.`,
+        };
+      }
+
+      const newTenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!newTenant) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.`, details: "TENANT_NOT_FOUND",
+        };
+      }
+
+      em.assign(user, { tenant: newTenant });
+
+      await em.persistAndFlush(user);
+
+      return [{}];
+
+    },
+
   });
 });

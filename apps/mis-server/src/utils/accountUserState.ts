@@ -11,13 +11,30 @@
  */
 
 import { Decimal } from "@scow/lib-decimal";
+import { Account_DisplayedAccountState as DisplayedAccountState } from "@scow/protos/build/server/account";
+import { AccountUserInfo_DisplayedUserState as DisplayedUserState } from "@scow/protos/build/server/user";
+import { AccountState } from "src/entities/Account";
 import { UserStateInAccount } from "src/entities/UserAccount";
 
-export enum DisplayedUserState {
-  DISPLAYED_NORMAL = 0,
-  DISPLAYED_QUOTA_EXCEEDED = 1,
-  DISPLAYED_BLOCKED = 2,
+// export enum DisplayedAccountState {
+//   DISPLAYED_NORMAL = 0,
+//   DISPLAYED_FROZEN = 1,
+//   DISPLAYED_BLOCKED = 2,
+//   DISPLAYED_BELOW_BLOCK_THRESHOLD = 3,
+// }
+
+export interface AccountStateInfo {
+  // 当前页面展示的账户状态
+  displayedState: DisplayedAccountState,
+  // 是否需要在集群中封锁账户
+  shouldBlockInCluster: boolean,
 }
+
+// export enum DisplayedUserState {
+//   DISPLAYED_NORMAL = 0,
+//   DISPLAYED_QUOTA_EXCEEDED = 1,
+//   DISPLAYED_BLOCKED = 2,
+// }
 
 export interface UserStateInfo {
   // 账户管理的用户列表下展示的用户状态
@@ -25,6 +42,51 @@ export interface UserStateInfo {
   // 是否需要在集群中封锁用户
   shouldBlockInCluster: boolean,
 }
+
+/**
+ * 根据SCOW数据库保存的信息获取当前页面展示的账户状态
+ * @param whitelistId 白名单ID
+ * @param state 状态 "NORMAL" || "FROZEN" || "BLOCKED_BY_ADMIN"
+ * @param balance 账户余额
+ * @param thresholdAmount 封锁阈值 （账户封锁阈值未设置时为租户默认封锁阈值）
+ * @returns
+ */
+export const getAccountStateInfo = (
+  whitelistId: number | undefined,
+  state: AccountState,
+  balance: Decimal,
+  thresholdAmount: Decimal): AccountStateInfo => {
+
+  if (state === AccountState.FROZEN) {
+    return {
+      displayedState: DisplayedAccountState.DISPLAYED_FROZEN,
+      shouldBlockInCluster: true,
+    };
+  }
+
+  if (whitelistId) {
+    return {
+      displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
+      shouldBlockInCluster: false,
+    };
+  }
+
+  if (state === AccountState.BLOCKED_BY_ADMIN) {
+    return {
+      displayedState: DisplayedAccountState.DISPLAYED_BLOCKED,
+      shouldBlockInCluster: true,
+    };
+  }
+
+  return balance.lte(thresholdAmount) ?
+    {
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
+      shouldBlockInCluster: true,
+    } : {
+      displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
+      shouldBlockInCluster: false,
+    };
+};
 
 /**
  * 根据SCOW数据库保存的信息获取当前页面展示的用户状态
