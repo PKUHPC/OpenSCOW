@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import * as k8sClient from "@kubernetes/client-node";
-// import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
+import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { IncomingMessage } from "http";
 import { NextApiRequest } from "next";
@@ -168,7 +168,8 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       stdinStream.write(message.data.data);
       break;
     case "resize":
-      // stdinStream.write(`{"Width":${message.resize.cols},"Height":${message.resize.rows}}`);
+      stdinStream.write(
+        `stty cols ${message.resize.cols} rows ${message.resize.rows}`);
       break;
     case "disconnect":
       stdinStream.end(); // 结束stdin流输入
@@ -213,8 +214,8 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     const rows = query.get("rows");
 
     if (cols && rows) {
-      // k8sWs.send()
-      // stdinStream.write(`{"Width":${queryToIntOrDefault(cols, 80)},"Height":${queryToIntOrDefault(rows, 30)}}`);
+      stdinStream.write(
+        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}`);
     }
   
     ws.on("close", () => {
