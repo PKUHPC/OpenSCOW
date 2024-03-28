@@ -169,7 +169,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       break;
     case "resize":
       stdinStream.write(
-        `stty cols ${message.resize.cols} rows ${message.resize.rows}`);
+        `stty cols ${message.resize.cols} rows ${message.resize.rows}\n`);
       break;
     case "disconnect":
       stdinStream.end(); // 结束stdin流输入
@@ -215,7 +215,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
     if (cols && rows) {
       stdinStream.write(
-        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}`);
+        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}\n`);
     }
   
     ws.on("close", () => {
