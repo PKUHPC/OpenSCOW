@@ -11,7 +11,7 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import k8sClient from "@kubernetes/client-node";
+import * as k8sClient from "@kubernetes/client-node";
 import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { IncomingMessage } from "http";
@@ -158,7 +158,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   const exec = new k8sClient.Exec(kc);
   const k8sWs = await exec.exec(
-    namespace, pod, containerId, ["/bin/sh"], process.stdout, process.stderr, process.stdin, true);
+    namespace, pod, containerId, ["/bin/sh"], null, null, null, true);
 
   log("Connected to shell");
 
