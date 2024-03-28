@@ -86,7 +86,7 @@ export const CreateEditImageModal: React.FC<Props> = (
         ]);
         return;
       }
-      message.error("添加镜像失败");
+      message.error(`添加镜像失败, ${err.message}`);
     },
   });
 
@@ -101,7 +101,7 @@ export const CreateEditImageModal: React.FC<Props> = (
       if (data?.code === "NOT_FOUND") {
         message.error("镜像不存在");
       } else {
-        message.error("编辑镜像失败");
+        message.error(`编辑镜像失败,${e.message}`);
       }
     },
   });
