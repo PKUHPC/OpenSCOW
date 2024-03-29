@@ -602,6 +602,7 @@ export default {
         whiteList:"白名单数量",
         debtSum:"白名单欠费合计",
         joinTime:"加入时间",
+        ownerIdOrName:"用户ID或姓名",
         operatorId:"操作人",
         confirmRemoveWhite:"确认将账户移除白名单？",
         confirmRemoveWhiteText1:"确认要将账户",

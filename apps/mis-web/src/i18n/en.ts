@@ -602,6 +602,7 @@ export default {
         whiteList: "Whitelist Count",
         debtSum: "Total Debt in Whitelist",
         joinTime: "Join Time",
+        ownerIdOrName: "Owner ID or Name",
         operatorId: "Operator",
         confirmRemoveWhite: "Confirm removing the account from the whitelist?",
         confirmRemoveWhiteText1: "Confirm removing the account ",
