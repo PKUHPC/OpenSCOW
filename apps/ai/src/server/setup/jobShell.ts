@@ -187,7 +187,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   let setWindow = false;
   stdoutStream.on("data", (data) => {
     // 如果调整窗口大小会返回同样的命令到前端，直接忽略掉
-    if (data.toString().startsWith("stty")) {
+    if (data.toString().startsWith("stty") || data.toString().startsWith("# stty")) {
       setWindow = true;
       return;
     };

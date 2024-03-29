@@ -82,10 +82,36 @@ imageTag: ai-beta.1
 
 ## 配置文件
 
-### 确认集群配置文件
+### 集群配置文件
 
-在当前 **AI 系统（beta）** 的试用版本中，我们暂时没有分离不同的集群系统下的 AI 服务，请您注意在部署了 **K8S** 集群的集群上进行功能体验。
-后续将会陆续实现其他服务，并实现不同集群上不同服务的分离。
+在当前 **AI 系统（beta）** 的试用版本中，我们支持了配置不同集群使用不同的服务（AI 或 HPC），需要在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
+
+```yaml title="config/clusters/{K8S集群的ID}.yml"
+# 其他配置省略
+# ...
+# 集群在HPC或是否启用，默认为true
+hpc:
+  enabled: true
+
+# 集群在AI或是否启用，默认为false
+ai:
+  enabled: false
+```
+
+此外我们支持了不同容器运行时，并提供了进入运行中的 k8s 作业容器的进行 shell 操作的功能。您需要提供一份能进入到对应 k8s 集群容器的 kubectl config 文件，并将其放置到 SCOW 部署目录中的 config 目录下，然后在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
+
+```yaml title="config/clusters/{K8S集群的ID}.yml"
+# 其他配置省略
+# ...
+k8s:
+  # runtime: docker
+  # 默认为 containerd
+  runtime: containerd
+  # kubectl 配置文件
+  kubectlConfig:
+    # 相对于 SCOW 部署目录下 config 目录的路径
+    path: /kube/xxx
+```
 
 请在部署了 **K8S** 集群的集群配置文件中确认以下内容：
 

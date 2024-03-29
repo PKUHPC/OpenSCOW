@@ -76,7 +76,7 @@ export default function Page({ params }: {params: {clusterId: string, jobId: str
       <Head title={`${clusterId}的终端`} />
       <Header>
         <h2>
-          {`以ID: ${user.identityId} 连接到集群 ${clusterName} 的 ${jobId} 的 POD`}
+          {`用户 ${user.identityId} 连接到集群 ${clusterName} 的作业 ${jobId}`}
         </h2>
         <Space wrap>
           <Button onClick={() => router.refresh()}>
