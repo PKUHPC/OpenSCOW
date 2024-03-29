@@ -112,14 +112,20 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const jobId = query.get("jobId");
 
   if (!jobId) {
-    log("[shell] param-jobId not passed");
+    log("[params] param-jobId not passed");
     ws.close(0, "param-jobId not passed");
     return;
   }
 
   if (!clusterId || !clusters[clusterId]) {
-    log("[shell] param-clusterId not passed or unknown");
+    log("[params] param-clusterId not passed or unknown");
     ws.close(0, "param-clusterId not passed or unknown");
+    return;
+  }
+
+  if (!clusters[clusterId].k8s?.kubectlConfig.path) {
+    log("[config] The current cluster does not have a kubectl configuration file configured.");
+    ws.close(0, "The current cluster does not have a kubectl configuration file configured.");
     return;
   }
 
@@ -180,10 +186,12 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   // 将Kubernetes stdout和stderr的输出发送回WebSocket客户端
   let setWindow = false;
   stdoutStream.on("data", (data) => {
+    // 如果调整窗口大小会返回同样的命令到前端，直接忽略掉
     if (data.toString().startsWith("stty")) {
       setWindow = true;
       return;
     };
+    // 调整窗口大小第二个消息是 #，也需要忽略，不传递回前端
     if (setWindow === true) {
       setWindow = false;
       return;
@@ -212,7 +220,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   try {
     const kc = new k8sClient.KubeConfig();
-    kc.loadFromFile("/etc/scow/ai/kube/config");
+    kc.loadFromFile(join("/etc/scow", clusters[clusterId].k8s?.kubectlConfig.path || "/kube/config"));
     const k8sWs = await new k8sClient.Exec(kc)
       .exec(namespace, pod, "", ["/bin/sh"], stdoutStream, stderrStream, stdinStream, true);
 

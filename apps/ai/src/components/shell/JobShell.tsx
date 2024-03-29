@@ -33,13 +33,6 @@ interface Props {
   jobId: string;
 }
 
-const OPEN_FILE = "This command is only valid for SCOW web shells";
-// const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
-// const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
-// const DOWNLOAD_FILE_SUFFIX = " in directory ";
-// const EDIT_FILE_PREFIX = "SCOW is redirecting to the editor for the file ";
-// const EDIT_FILE_SUFFIX = " in directory ";
-
 export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
 
   const { publicConfig: { BASE_PATH } } = usePublicConfig();
