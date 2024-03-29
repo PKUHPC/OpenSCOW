@@ -25,6 +25,7 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
@@ -51,11 +52,14 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const [form] = Form.useForm<FilterForm>();
 
+  const { message } = App.useApp();
+  const clusterConnError = getClusterConnError(query.cluster.name, "pages.commonError.clusterJobsConnError");
+
   const promiseFn = useCallback(async () => {
     return await api.getRunningJobs({ query: {
       userId: userId,
       cluster: query.cluster.id,
-    } });
+    } }).httpError(503, () => { message.error(clusterConnError); });
   }, [userId, query.cluster]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });

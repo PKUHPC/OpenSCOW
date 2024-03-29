@@ -27,6 +27,7 @@ import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface JobForm {
   cluster: Cluster;
@@ -128,9 +129,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
 
+  const clusterConnError = getClusterConnError(cluster?.name, "pages.commonError.clusterConnError");
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+      ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
+        .httpError(503, () => { message.error(clusterConnError); })
+      : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {
         // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；

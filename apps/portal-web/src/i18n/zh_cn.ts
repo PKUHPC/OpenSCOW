@@ -588,5 +588,14 @@ export default {
     dashboard: {
       title: "仪表盘",
     },
+    commonError: {
+      clusterConnError: "{} 集群无法连接，请稍后重试",
+      clusterAccountsConnError: "{} 集群无法连接，无法获取账户列表，请稍后重试",
+
+      clusterJobsConnError:"{} 集群无法连接，无法获取作业列表，请稍后重试",
+
+      clusterAppsConnError:"{} 集群无法连接，无法获取交互式应用列表，请稍后重试",
+
+    },
   },
 };

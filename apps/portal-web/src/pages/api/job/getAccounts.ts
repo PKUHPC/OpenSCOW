@@ -35,6 +35,10 @@ export const GetAccountsSchema = typeboxRouteSchema({
       code: Type.Literal("ACCOUNT_NOT_FOUND"),
       message: Type.String(),
     }),
+    503: Type.Object({
+      code: Type.Literal("SERVICE_UNAVAILABLE"),
+      message: Type.String(),
+    }),
   },
 });
 const auth = authenticate(() => true);
@@ -50,11 +54,15 @@ export default route(GetAccountsSchema, async (req, res) => {
 
   const client = getClient(JobServiceClient);
 
-  return asyncUnaryCall(client, "listAccounts", {
+  const result = asyncUnaryCall(client, "listAccounts", {
     cluster, userId: info.identityId,
   }).then(({ accounts }) => ({ 200: { accounts } }), handlegRPCError({
     [status.NOT_FOUND]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
     [status.INTERNAL]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
-  }));
+    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
+  }),
+  );
+
+  return result;
 
 });

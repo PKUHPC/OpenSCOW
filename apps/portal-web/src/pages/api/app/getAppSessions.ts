@@ -12,10 +12,12 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { handlegRPCError } from "src/utils/server";
 
 // Cannot use AppSession from protos
 export const AppSession = Type.Object({
@@ -45,6 +47,11 @@ export const GetAppSessionsSchema = typeboxRouteSchema({
     200: Type.Object({
       sessions: Type.Array(AppSession),
     }),
+
+    503: Type.Object({
+      code: Type.Literal("SERVICE_UNAVAILABLE"),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -63,8 +70,10 @@ export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res)
 
   return asyncUnaryCall(client, "listAppSessions", {
     cluster, userId: info.identityId,
-  }).then((reply) => {
-    return { 200: { sessions: reply.sessions } };
-  });
+  }).then((reply) => ({ 200: { sessions: reply.sessions } }), handlegRPCError({
+    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
+    [status.INTERNAL]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
+  }),
+  );
 
 });

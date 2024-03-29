@@ -27,6 +27,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster } from "src/utils/config";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface FilterForm {
  appJobName: string | undefined
@@ -55,10 +56,13 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const [onlyNotEnded, setOnlyNotEnded] = useState(false);
 
+  const clusterConnError = getClusterConnError(cluster.name, "pages.commonError.clusterAppsConnError");
+
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
-      const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } });
+      const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } })
+        .httpError(503, () => { message.error(clusterConnError); });
 
       return sessions.map((x) => ({
         ...x,

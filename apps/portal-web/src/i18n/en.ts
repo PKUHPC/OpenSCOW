@@ -588,5 +588,15 @@ export default {
     dashboard: {
       title: "Dashboard",
     },
+    commonError: {
+      clusterConnError: "The {} cluster is currently unreachable. Please try again later.",
+      clusterAccountsConnError:
+      "The {} cluster is currently unreachable. Unable to retrieve the list of accounts. "
+      + "Please try again later.",
+      clusterJobsConnError:"The {} cluster is currently unreachable. "
+      + "Unable to retrieve the list of jobs. Please try again later.",
+      clusterAppsConnError:"The {} cluster is currently unreachable. "
+      + "Unable to retrieve the list of applications. Please try again later.",
+    },
   },
 };
