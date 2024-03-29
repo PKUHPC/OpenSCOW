@@ -5,7 +5,7 @@
 <meta name="generator" content="Docusaurus v3.1.1">
 <title data-rh="true">用户模型 | SCOW</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:url" content="https://PKUHPC.github.io/SCOW/docs/info/mis/business/users"><meta data-rh="true" property="og:locale" content="zh"><meta data-rh="true" name="docusaurus_locale" content="zh"><meta data-rh="true" name="docsearch:language" content="zh"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="用户模型 | SCOW"><meta data-rh="true" name="description" content="用户模型"><meta data-rh="true" property="og:description" content="用户模型"><link data-rh="true" rel="icon" href="/SCOW/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://PKUHPC.github.io/SCOW/docs/info/mis/business/users"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/docs/info/mis/business/users" hreflang="zh"><link data-rh="true" rel="alternate" href="https://PKUHPC.github.io/SCOW/docs/info/mis/business/users" hreflang="x-default"><link rel="alternate" type="application/rss+xml" href="/SCOW/blog/rss.xml" title="SCOW RSS Feed">
 <link rel="alternate" type="application/atom+xml" href="/SCOW/blog/atom.xml" title="SCOW Atom Feed"><link rel="stylesheet" href="/SCOW/assets/css/styles.f4c5fa2b.css">
-<script src="/SCOW/assets/js/runtime~main.94e7e4ca.js" defer="defer"></script>
+<script src="/SCOW/assets/js/runtime~main.bb9b4561.js" defer="defer"></script>
 <script src="/SCOW/assets/js/main.6c1b76ae.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard" data-theme="light">
@@ -68,6 +68,56 @@
 <li>
 <p>租户管理员或平台管理员主动解封账户，判断账户余额，余额 <strong>小于等于</strong> 账户封锁阈值，状态变更为欠费</p>
 </li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><a href="https://github.com/PKUHPC/SCOW/edit/main/website/docs/info/mis/business/users.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_ne8E" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_a5qV"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="文件选项卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/SCOW/docs/info/mis"><div class="pagination-nav__sublabel">上一页</div><div class="pagination-nav__label">管理系统简介</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/SCOW/docs/info/mis/business/billing"><div class="pagination-nav__sublabel">下一页</div><div class="pagination-nav__label">计费收费</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_hXhv thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#用户模型-1" class="table-of-contents__link toc-highlight">用户模型</a></li><li><a href="#账户状态" class="table-of-contents__link toc-highlight">账户状态</a><ul><li><a href="#1账户处于正常状态时" class="table-of-contents__link toc-highlight">1.账户处于正常状态时：</a></li><li><a href="#2账户处于欠费状态时" class="table-of-contents__link toc-highlight">2.账户处于欠费状态时：</a></li><li><a href="#3账户处于封锁状态时" class="table-of-contents__link toc-highlight">3.账户处于封锁状态时：</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/SCOW/docs/info">Intro</a></li></ul></div><div class="col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"></ul></div><div class="col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/SCOW/blog">Blog</a></li><li class="footer__item"><a href="https://github.com/PKUHPC/SCOW" target="_blank" rel="noopener noreferrer" class="footer__link-item">Repo<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_eEck"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2024 北京大学计算与数字经济研究院. Built with Docusaurus.</div></div></div></footer></div>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_L0L0" id="用户在账户中的状态">用户在账户中的状态<a href="#用户在账户中的状态" class="hash-link" aria-label="用户在账户中的状态的直接链接" title="用户在账户中的状态的直接链接">​</a></h2>
+<p>当前系统中页面展示的用户在账户中的状态有：<strong>正常</strong>、<strong>封锁</strong>、<strong>限额</strong>。</p>
+<table><thead><tr><th>状态定义</th><th>解释</th><th>用户在集群中的状态</th></tr></thead><tbody><tr><td>正常</td><td>用户未被封锁时，1.未设置用户 作业费用限额；<br>2.已设置用户作业费用限额，且用户已用额度 <strong>小于</strong> 用户限额</td><td>正常(账户在集群中未封锁)</td></tr><tr><td>封锁</td><td>用户已被账户管理员或账户拥有者封锁</td><td>封锁</td></tr><tr><td>限额</td><td>用户未被封锁，但已设置用户作业费用限额，且用户已用额度 <strong>大于等于</strong> 用户限额</td><td>封锁</td></tr></tbody></table>
+<p><strong>各状态间的转换条件如下：</strong></p>
+<p><img decoding="async" loading="lazy" alt="用户模型" src="/SCOW/assets/images/user_state_in_account_explanation-78072c0c0c90f8b5deecc6c50b5adc3b.png" width="4020" height="1728" class="img_ufqS"></p>
+<h3 class="anchor anchorWithStickyNavbar_L0L0" id="1用户在账户中处于正常状态时">1.用户在账户中处于正常状态时：<a href="#1用户在账户中处于正常状态时" class="hash-link" aria-label="1.用户在账户中处于正常状态时：的直接链接" title="1.用户在账户中处于正常状态时：的直接链接">​</a></h3>
+<ul>
+<li>
+<p>未设置用户作业费用限额时，即使发生作业扣费，用户在账户中的状态也不发生变化，仍为正常</p>
+</li>
+<li>
+<p>已设置用户作业费用限额，发生扣费使用户已用额度 <strong>小于</strong> 用户限额，状态仍然为正常；发生扣费使用户已用额度 <strong>大于等于</strong> 用户限额，用户在账户中的状态变更为限额</p>
+</li>
+<li>
+<p>已设置用户作业费用限额，修改限额使用户限额 <strong>大于</strong> 用户已用额度，状态仍然为正常；修改限额使用户限额 <strong>等于</strong> 用户已用额度，用户在账户中的状态变更为限额</p>
+</li>
+<li>
+<p>封锁用户时，用户在账户中的状态变更为封锁</p>
+</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_L0L0" id="3用户在账户中处于封锁状态时">3.用户在账户中处于封锁状态时：<a href="#3用户在账户中处于封锁状态时" class="hash-link" aria-label="3.用户在账户中处于封锁状态时：的直接链接" title="3.用户在账户中处于封锁状态时：的直接链接">​</a></h3>
+<ul>
+<li>
+<p>未设置用户作业费用限额时，账户管理员或拥有者主动解封用户后，用户在账户中的状态变更为正常</p>
+</li>
+<li>
+<p>已设置用户作业费用限额，账户管理员或拥有者主动解封用户，判断限额，用户已用额度 <strong>小于</strong> 用户限额时，用户在账户中的状态变更为限额</p>
+</li>
+<li>
+<p>已设置用户作业费用限额，账户管理员或拥有者主动解封用户，判断限额，用户已用额度 <strong>大于等于</strong> 用户限额时，用户在账户中的状态变更为正常</p>
+</li>
+<li>
+<p>设置用户作业费用限额或修改作业费用限额时，不发生状态改变，状态仍为封锁</p>
+</li>
+</ul>
+<h3 class="anchor anchorWithStickyNavbar_L0L0" id="2用户在账户中处于限额状态时">2.用户在账户中处于限额状态时：<a href="#2用户在账户中处于限额状态时" class="hash-link" aria-label="2.用户在账户中处于限额状态时：的直接链接" title="2.用户在账户中处于限额状态时：的直接链接">​</a></h3>
+<ul>
+<li>
+<p>账户管理员或拥有者主动封锁用户时，用户在账户中的状态变更为正常</p>
+</li>
+<li>
+<p>修改用户作业费用限额，使用户限额 <strong>等于</strong> 已用额度时，用户在账户中的状态仍为限额</p>
+</li>
+<li>
+<p>修改用户作业费用限额，使用户限额 <strong>大于</strong> 已用额度时，用户在账户中的状态变更为正常</p>
+</li>
+<li>
+<p>取消限额时，用户在账户中的状态变更为正常</p>
+</li>
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><a href="https://github.com/PKUHPC/SCOW/edit/main/website/docs/info/mis/business/users.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_ne8E" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>编辑此页</a></div><div class="col lastUpdated_a5qV"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="文件选项卡"><a class="pagination-nav__link pagination-nav__link--prev" href="/SCOW/docs/info/mis"><div class="pagination-nav__sublabel">上一页</div><div class="pagination-nav__label">管理系统简介</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/SCOW/docs/info/mis/business/billing"><div class="pagination-nav__sublabel">下一页</div><div class="pagination-nav__label">计费收费</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_hXhv thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#用户模型-1" class="table-of-contents__link toc-highlight">用户模型</a></li><li><a href="#账户状态" class="table-of-contents__link toc-highlight">账户状态</a><ul><li><a href="#1账户处于正常状态时" class="table-of-contents__link toc-highlight">1.账户处于正常状态时：</a></li><li><a href="#2账户处于欠费状态时" class="table-of-contents__link toc-highlight">2.账户处于欠费状态时：</a></li><li><a href="#3账户处于封锁状态时" class="table-of-contents__link toc-highlight">3.账户处于封锁状态时：</a></li></ul></li><li><a href="#用户在账户中的状态" class="table-of-contents__link toc-highlight">用户在账户中的状态</a><ul><li><a href="#1用户在账户中处于正常状态时" class="table-of-contents__link toc-highlight">1.用户在账户中处于正常状态时：</a></li><li><a href="#3用户在账户中处于封锁状态时" class="table-of-contents__link toc-highlight">3.用户在账户中处于封  锁状态时：</a></li><li><a href="#2用户在账户中处于限额状态时" class="table-of-contents__link toc-highlight">2.用户在账户中处于限额状态时：</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Docs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/SCOW/docs/info">Intro</a></li></ul></div><div class="col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"></ul></div><div class="col footer__col"><div class="footer__title">More</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/SCOW/blog">Blog</a></li><li class="footer__item"><a href="https://github.com/PKUHPC/SCOW" target="_blank" rel="noopener noreferrer" class="footer__link-item">Repo<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_eEck"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2024 北京大学计算与数字经济研究院. Built with Docusaurus.</div></div></div></footer></div>
 </body>
 </html>
