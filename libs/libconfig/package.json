@@ -19,7 +19,7 @@
   "dependencies": {
     "@sinclair/typebox": "0.32.13",
     "ajv": "8.12.0",
-    "ajv-formats": "2.1.1",
+    "ajv-formats": "3.0.1",
     "envalid": "8.0.0",
     "js-yaml": "4.1.0"
   },
