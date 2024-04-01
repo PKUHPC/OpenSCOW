@@ -240,7 +240,7 @@ export const createAppSession = procedure
     startCommand: z.string().optional(),
     dataset: z.number().optional(),
     model: z.number().optional(),
-    mountPoints: z.array(z.string()),
+    mountPoints: z.array(z.string()).optional(),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -256,7 +256,7 @@ export const createAppSession = procedure
   }))
   .mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image, startCommand, remoteImageUrl,
-      dataset, model, mountPoints, account, partition, coreCount, nodeCount, gpuCount, memory,
+      dataset, model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
