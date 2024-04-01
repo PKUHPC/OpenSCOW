@@ -65,7 +65,10 @@ export async function serveLoginHtml(
     unicomAuthPath: config.UNICOM_AUTH_PATH,
     unicomRealm: config.UNICOM_REALM,
     unicomClientId: config.UNICOM_CLIENT_ID,
+<<<<<<< HEAD
     unicomRedirectUrl: join(config.AUTH_BASE_PATH, "/public/unicomCallback"),
+=======
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
       authUiHostnameConfig?.backgroundImagePath
       ?? authUiDefaultConfig?.backgroundImagePath ?? "./assets/background.png"),

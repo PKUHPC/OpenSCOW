@@ -427,6 +427,7 @@ message CheckUnicomUserExistRequest {
   string unicom_user_id = 1;
 }
 
+<<<<<<< HEAD
 message UserExisted {
   bool existed = 1;
   string user_id =2;
@@ -441,6 +442,10 @@ message CheckUnicomUserExistResponse {
     UserExisted user_existed = 1;
     UserNotExisted user_not_existed = 2;
   }
+=======
+message CheckUnicomUserExistResponse {
+  bool exsited = 1;
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
 }
 
 service UserService {

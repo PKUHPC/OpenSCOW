@@ -19,7 +19,11 @@ interface GetTokenParams {
 
 export async function getUnicomToken(fetchUrl: string, params: GetTokenParams) {
 
+<<<<<<< HEAD
   return await fetch(fetchUrl, {
+=======
+  return fetch(fetchUrl, {
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -29,6 +33,7 @@ export async function getUnicomToken(fetchUrl: string, params: GetTokenParams) {
     .then((response) => response.json())
     .catch((error) => console.error("Error:", error));
 }
+<<<<<<< HEAD
 
 export async function getUnicomUserInfo(fetchUrl: string, accessToken: string) {
 
@@ -54,3 +59,5 @@ export async function unicomUserLogout(fetchUrl: string, accessToken: string) {
     .then((response) => response.json())
     .catch((error) => console.error("Error:", error));
 }
+=======
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)

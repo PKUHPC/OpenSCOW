@@ -12,12 +12,20 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
+<<<<<<< HEAD
 import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
 import { genRandomString } from "src/utils/genId";
+=======
+import { join } from "path";
+import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
+import { config } from "src/config/env";
+import { getUnicomToken } from "src/service/uincom";
+import { getUserById } from "src/service/user";
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
 
 const QuerystringSchema = Type.Object({
   // 状态标识
@@ -27,9 +35,14 @@ const QuerystringSchema = Type.Object({
 });
 
 enum ErrorCode {
+<<<<<<< HEAD
   INVALID_CODE = "INVALID_CODE",
   INVALID_TOKEN = "INVALID_TOKEN",
   INVALID_USER = "INVALID_USER",
+=======
+
+  INVALID_TOKEN = "INVALID_TOKEN",
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
 }
 
 const ResponsesSchema = Type.Object({
@@ -51,6 +64,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
+<<<<<<< HEAD
       const { code, state } = req.query;
 
       // 获取登录成功后跳转的url
@@ -60,6 +74,11 @@ export const UnicomCallbackRoute = fp(async (f) => {
       await validateCallbackHostname(callback!, req);
 
       // 获取联通token
+=======
+
+      const { code, state } = req.query;
+
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
       const fetchTokenUrl =
       `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/token`;
 
@@ -70,6 +89,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
         redirect_uri: state,
       });
 
+<<<<<<< HEAD
       if (!tokenData) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_CODE });
       }
@@ -107,6 +127,26 @@ export const UnicomCallbackRoute = fp(async (f) => {
       }
 
       return;
+=======
+      const fetchUserInfoUrl =
+      `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/userinfo`;
+
+      const userInfo = await fetch(fetchUserInfoUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${tokenData.access_token}`,
+        },
+      })
+        .then((response) => response.json())
+        .catch((error) => console.error("Error:", error));
+
+      console.log("userInfo", userInfo);
+      return {
+        tokenData,
+        userInfo,
+      };
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
     },
   );
 });

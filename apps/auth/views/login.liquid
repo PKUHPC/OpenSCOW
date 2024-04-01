@@ -48,11 +48,16 @@
                 <input type='text' name="username" placeholder="{{ authTexts.login.username }}" required
                     class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
               </div>
-              <div class="w-80 mb-10">
+              <div class="w-80 mb-5">
                 <div class="relative flex items-center">
                     <input id="password" name="password" placeholder="{{ authTexts.login.password }}" type="password" required
                         class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
                     <div id="eye-elem" class="absolute w-5 h-5 right-3 bg-contain"></div>
+                </div>
+              </div>
+              <div class="w-80 mb-3">
+                <div class="relative flex items-center justify-center">
+                    <div id="unicomLogo" class="w-5 h-5 bg-contain"></div>
                 </div>
               </div>
               {% if enableTotp %}
@@ -170,11 +175,18 @@
         const authPath = "{{ unicomAuthPath }}"
         const realm = "{{ unicomRealm }}"
         const clientId = "{{ unicomClientId }}"
+<<<<<<< HEAD
         const RedirectUrl = "{{ unicomRedirectUrl }}"
 
         const origin = window.location.origin
 
         window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}${RedirectUrl}?callbackUrl=${callbackUrl}&state=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
+=======
+
+        const origin = window.location.origin
+
+        window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&state=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
       })
     </script>
 </body>

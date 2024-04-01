@@ -11,6 +11,7 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+<<<<<<< HEAD
 import { CheckUnicomUserExistResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/getClient";
 
@@ -35,6 +36,27 @@ export async function createUser(userId: string, userInfo) {
     unicomId:userInfo.id,
   });
 
+=======
+import { PlatformUserInfo, UserServiceClient } from "@scow/protos/build/server/user";
+import { getClient } from "src/utils/getClient";
+
+export async function getUserById(id: string): Promise<PlatformUserInfo | undefined> {
+
+  const client = getClient(UserServiceClient);
+
+  const users = await asyncClientCall(client, "getAllUsers", {
+    idOrName:id,
+    page:1,
+  });
+
+  if (!users.platformUsers.length) {
+    return undefined;
+  }
+
+  const user = users.platformUsers.find((i) => i.userId === id);
+
+  return user;
+>>>>>>> 9701eaf1bd (feat:unicom三方登录)
 }
 
 
