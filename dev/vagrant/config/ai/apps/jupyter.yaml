@@ -38,6 +38,6 @@ web:
 attributes:
   - type: text
     name: workingDir
-    label: 指定jupyter工作目录
+    label: jupyter工作目录
     required: true
     placeholder: "请填写绝对路径"

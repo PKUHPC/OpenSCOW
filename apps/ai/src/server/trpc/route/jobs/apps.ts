@@ -18,6 +18,7 @@ import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
+  sftpChmod,
   sftpExists,
   sftpReaddir,
   sftpReadFile,
@@ -96,6 +97,8 @@ interface SessionMetadata {
 }
 
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
+const VNC_ENTRY_COMMAND = fs.readFileSync("assets/app/vnc_entry.sh", { encoding: "utf-8" });
+const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 const SESSION_METADATA_NAME = "session.json";
 
@@ -332,7 +335,6 @@ export const createAppSession = procedure
 
     const userId = user.identityId;
     return await sshConnect(host, userId, logger, async (ssh) => {
-
       const homeDir = await getUserHomedir(ssh, userId, logger);
 
       // 工作目录和挂载点必须在用户的homeDir下
@@ -360,75 +362,94 @@ export const createAppSession = procedure
         customAttributesExport = customAttributesExport + envItem + "\n";
       }
 
+      // SVCPORT 是k8s集群中service的端口, 由适配器提供
+      let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$SVCPORT`;
       if (app.type === "web") {
-        const runtimeVariables = getEnvVariables({
-          PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
-          SERVER_SESSION_INFO,
-        });
-        // SVCPORT 是k8s集群中service的端口, 由适配器提供
-        let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$SVCPORT`;
         for (const key in app.web!.connect.formData) {
           const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
           for (const i in texts) {
             customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
           }
         }
-        const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
+      }
+      const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
 
+      let entryScript = "";
+      let xstartupPath = "";
+      if (app.type === "web") {
+        const runtimeVariables = getEnvVariables({
+          PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
+          SERVER_SESSION_INFO,
+        });
         const beforeScript = runtimeVariables + customAttributesExport + app.web!.beforeScript + sessionInfo;
         // 用户如果传了自定义的启动命令，则根据配置文件去替换默认的启动命令
         const webScript = startCommand ? app.web!.script.replace(app.web!.startCommand, startCommand) : app.web!.script;
-        const entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
+        entryScript = SERVER_ENTRY_COMMAND + beforeScript || "" + webScript;
 
-        // 将entry.sh写入后将路径传给适配器后启动容器
-        await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
-        const client = getAdapterClient(clusterId);
-        const reply = await asyncClientCall(client.job, "submitJob", {
-          userId,
-          jobName: appJobName,
-          image: existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`,
-          algorithm: algorithmVersion?.path,
-          dataset: datasetVersion?.path,
-          model: modelVersion?.path,
-          mountPoint,
-          account,
-          partition: partition!,
-          coreCount,
-          nodeCount,
-          gpuCount: gpuCount ?? 0,
-          memoryMb: memory,
-          timeLimitMinutes: maxTime,
-          // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
-          workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
-          script: remoteEntryPath,
-          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
-          extraOptions: [JobType.APP, "web"],
-        }).catch((e) => {
-          const ex = e as ServiceError;
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `submit job failed, ${ex.details}`,
-          });
+      } else if (app.type === "vnc") {
+        const runtimeVariables = getEnvVariables({
+          SERVER_SESSION_INFO,
+          VNCSERVER_BIN_PATH: startCommand || "vncserver",
         });
 
-        const metadata: SessionMetadata = {
-          jobId: reply.jobId,
-          sessionId: appJobName,
-          submitTime: new Date().toISOString(),
-          appId,
-          image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
-          jobType: JobType.APP,
-        };
-        await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+        xstartupPath = join(homeDir, appJobsDirectory, "xstartup");
+        const xstartupScript = BIN_BASH_SCRIPT_HEADER + app.vnc!.xstartup;
+        await sftpWriteFile(sftp)(xstartupPath, xstartupScript);
+        await sftpChmod(sftp)(xstartupPath, "755");
 
-        return { jobId: reply.jobId };
+        const beforeScript = app.vnc!.beforeScript || "";
+
+        entryScript = runtimeVariables + customAttributesExport + beforeScript + VNC_ENTRY_COMMAND + sessionInfo;
+
       } else {
-        // TODO: if vnc apps
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Unknown app type ${app.type} of app id ${appId}`,
         });
       }
+
+      // 将entry.sh写入后将路径传给适配器后启动容器
+      await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
+      const client = getAdapterClient(clusterId);
+      const reply = await asyncClientCall(client.job, "submitJob", {
+        userId,
+        jobName: appJobName,
+        image: existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`,
+        algorithm: algorithmVersion?.path,
+        dataset: datasetVersion?.path,
+        model: modelVersion?.path,
+        mountPoint,
+        account,
+        partition: partition!,
+        coreCount,
+        nodeCount,
+        gpuCount: gpuCount ?? 0,
+        memoryMb: memory,
+        timeLimitMinutes: maxTime,
+        // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
+        workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
+        script: remoteEntryPath,
+        // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
+        extraOptions: [JobType.APP, app.type],
+        xstartupPath,
+      }).catch((e) => {
+        const ex = e as ServiceError;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `submit job failed, ${ex.details}`,
+        });
+      });
+
+      const metadata: SessionMetadata = {
+        jobId: reply.jobId,
+        sessionId: appJobName,
+        submitTime: new Date().toISOString(),
+        appId,
+        image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
+        jobType: JobType.APP,
+      };
+      await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+      return { jobId: reply.jobId };
     });
 
   });
