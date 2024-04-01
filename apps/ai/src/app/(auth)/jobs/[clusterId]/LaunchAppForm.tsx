@@ -12,6 +12,7 @@
 
 "use client";
 
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Checkbox, Col,
@@ -55,7 +56,7 @@ interface FixedFormFields {
   startCommand?: string;
   dataset: { name: number, version: number };
   model: { name: number, version: number };
-  mountPoint: string | undefined;
+  mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
   gpuCount: number | undefined;
@@ -334,8 +335,9 @@ export const LaunchAppForm = (props: Props) => {
       onFinish={async () => {
 
         const { appJobName, algorithm, dataset, image, remoteImageUrl, startCommand, model,
-          mountPoint, account, partition, coreCount,
+          mountPoints, account, partition, coreCount,
           gpuCount, maxTime, command, customFields } = await form.validateFields();
+
         if (isTraining) {
           await trainJobMutation.mutateAsync({
             clusterId,
@@ -345,7 +347,7 @@ export const LaunchAppForm = (props: Props) => {
             remoteImageUrl,
             dataset: dataset?.version,
             model: model?.version,
-            mountPoint: mountPoint,
+            mountPoints,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
@@ -378,7 +380,7 @@ export const LaunchAppForm = (props: Props) => {
             startCommand,
             dataset: dataset?.version,
             model: model?.version,
-            mountPoint,
+            mountPoints,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
@@ -391,7 +393,8 @@ export const LaunchAppForm = (props: Props) => {
             workingDirectory,
             customAttributes: customFormKeyValue.customFields,
           });
-        } }
+        }
+      }
       }
 
     >
@@ -500,23 +503,63 @@ export const LaunchAppForm = (props: Props) => {
         {
           customFormItems.filter((item) => item?.key?.includes("workingDir"))
         }
-        <Form.Item label="添加挂载点" name="mountPoint">
-          <Input
-            placeholder="选择挂载点"
-            prefix={
-              (
-                <FileSelectModal
-                  allowedFileType={["DIR"]}
-                  onSubmit={(path: string) => {
-                    form.setFieldValue("mountPoint", path);
-                    form.validateFields(["mountPoint"]);
-                  }}
-                  clusterId={clusterId ?? ""}
-                />
-              )
-            }
-          />
-        </Form.Item>
+        <Form.List name="mountPoints">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map((field, index) => (
+                <Space key={field.key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                  <Form.Item
+                    {...field}
+                    label={`挂载点-${index + 1}`}
+                    rules={[
+                      { required: true, message: "请提供挂载点地址" },
+                      // 添加的自定义校验器以确保挂载点不重复
+                      ({ getFieldValue }) => ({
+                        validator(_, value: string) {
+                          const mountPoints: string[] = getFieldValue("mountPoints");
+                          // 使用显式类型注解
+                          const otherMountPoints = mountPoints.filter((_: string, idx: number) => idx !== field.name);
+                          if (otherMountPoints.includes(value)) {
+                            return Promise.reject(new Error("挂载点地址不能重复"));
+                          }
+                          return Promise.resolve();
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input
+                      placeholder="选择挂载点"
+                      prefix={(
+                        <FileSelectModal
+                          allowedFileType={["DIR"]}
+                          onSubmit={(path: string) => {
+                            // 当用户选择路径后触发表单的值更新并进行校验
+                            form.setFieldValue(["mountPoints", field.name], path);
+                            // 校验特定的挂载点字段
+                            form.validateFields([["mountPoints", field.name]]);
+                          }}
+                          clusterId={clusterId ?? ""}
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                  <MinusCircleOutlined
+                    onClick={() => remove(field.name)}
+                  />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  icon={<PlusOutlined />}
+                >
+          添加挂载点
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
         <Divider orientation="left" orientationMargin="0">添加算法/数据集/模型</Divider>
         <Form.Item label="添加类型">
           <Checkbox onChange={(e) => setShowAlgorithm(e.target.checked)}>

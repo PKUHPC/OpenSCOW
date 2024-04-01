@@ -240,7 +240,7 @@ export const createAppSession = procedure
     startCommand: z.string().optional(),
     dataset: z.number().optional(),
     model: z.number().optional(),
-    mountPoint: z.string().optional(),
+    mountPoints: z.array(z.string()),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -256,7 +256,7 @@ export const createAppSession = procedure
   }))
   .mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, algorithm, image, startCommand, remoteImageUrl,
-      dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
+      dataset, model, mountPoints, account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
@@ -338,13 +338,21 @@ export const createAppSession = procedure
 
       // 工作目录和挂载点必须在用户的homeDir下
 
-      if ((workingDirectory && !isParentOrSameFolder(homeDir, workingDirectory))
-        || (mountPoint && !isParentOrSameFolder(homeDir, mountPoint))) {
+      if ((workingDirectory && !isParentOrSameFolder(homeDir, workingDirectory))) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "workingDirectory and mountPoint should be in homeDir",
         });
       }
+
+      mountPoints.forEach((mountPoint) => {
+        if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "mountPoint should be in homeDir",
+          });
+        }
+      });
       const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
 
       // make sure appJobsDirectory exists.
@@ -392,7 +400,7 @@ export const createAppSession = procedure
           algorithm: algorithmVersion?.path,
           dataset: datasetVersion?.path,
           model: modelVersion?.path,
-          mountPoint,
+          mountPoints,
           account,
           partition: partition!,
           coreCount,

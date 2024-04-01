@@ -66,7 +66,7 @@ procedure
     remoteImageUrl: z.string().optional(),
     dataset: z.number().optional(),
     model: z.number().optional(),
-    mountPoint: z.string().optional(),
+    mountPoints: z.array(z.string()),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -82,7 +82,7 @@ procedure
     async ({ input, ctx: { user } }) => {
 
       const { clusterId, trainJobName, algorithm, imageId, remoteImageUrl,
-        dataset, model, mountPoint, account, partition,
+        dataset, model, mountPoints, account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
@@ -109,12 +109,14 @@ procedure
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
 
-        if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "mountPoint should be in homeDir",
-          });
-        }
+        mountPoints.forEach((mountPoint) => {
+          if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "mountPoint should be in homeDir",
+            });
+          }
+        });
 
         const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
 
@@ -134,7 +136,7 @@ procedure
           image: remoteImageUrl || image?.path,
           dataset: datasetVersion?.path,
           model: modelVersion?.path,
-          mountPoint,
+          mountPoints,
           account,
           partition: partition!,
           coreCount,
