@@ -20,6 +20,7 @@ import { logoutRoute } from "src/routes/logout";
 
 import { authRoute } from "./auth";
 import { authCallbackRoute } from "./callback";
+import { UnicomCallbackRoute } from "./unicomCallback";
 import { validateTokenRoute } from "./validateToken";
 
 export const routes = [
@@ -33,4 +34,5 @@ export const routes = [
   getUserRoute,
   changeEmailRoute,
   checkPasswordRoute,
+  UnicomCallbackRoute,
 ];

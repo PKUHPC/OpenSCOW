@@ -444,6 +444,12 @@ importers:
 
   apps/auth:
     dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.7
+        version: 0.17.7(@grpc/grpc-js@1.9.14)
+      '@ddadaal/tsgrpc-common':
+        specifier: 0.2.5
+        version: 0.2.5
       '@fastify/error':
         specifier: 3.4.1
         version: 3.4.1
@@ -468,6 +474,12 @@ importers:
       '@scow/lib-ssh':
         specifier: workspace:*
         version: link:../../libs/ssh
+      '@scow/lib-web':
+        specifier: workspace:*
+        version: link:../../libs/web
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils

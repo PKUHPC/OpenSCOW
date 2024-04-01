@@ -37,6 +37,9 @@ export class User {
   @Property({ unique: true })
     userId: string;
 
+  @Property({ nullable:true })
+    unicomId?: string;
+
   @OneToMany(() => StorageQuota, (u) => u.user)
     storageQuotas = new Collection<StorageQuota>(this);
 
@@ -60,6 +63,7 @@ export class User {
 
   constructor(init: {
     userId: string;
+    unicomId?: string;
     tenant: EntityOrRef<Tenant>;
     name: string;
     email: string;
@@ -68,6 +72,7 @@ export class User {
     platformRoles?: PlatformRole[];
   }) {
     this.userId = init.userId;
+    this.unicomId = init.unicomId;
     this.tenant = toRef(init.tenant);
     this.name = init.name;
     this.email = init.email;

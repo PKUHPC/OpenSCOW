@@ -61,6 +61,10 @@ export async function serveLoginHtml(
     cssUrl: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/tailwind.min.css"),
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
+    unicomLogoPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/unicom-logo.png"),
+    unicomAuthPath: config.UNICOM_AUTH_PATH,
+    unicomRealm: config.UNICOM_REALM,
+    unicomClientId: config.UNICOM_CLIENT_ID,
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
       authUiHostnameConfig?.backgroundImagePath
       ?? authUiDefaultConfig?.backgroundImagePath ?? "./assets/background.png"),

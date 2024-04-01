@@ -47,6 +47,14 @@ export const config = envConfig({
   EXTRA_ALLOWED_CALLBACK_HOSTNAMES: str({ desc: "额外的信任回调域名，以逗号分隔", default: "" }),
 
   PUBLIC_PATH: str({ desc: "静态文件路径前缀。以/开头，以/结尾", default: "/__public__/" }),
+
+  UNICOM_AUTH_PATH: str({ desc: "认证地址", default: "http://58.251.252.26:8002" }),
+  UNICOM_REALM: str({ desc: "用户域", default: "TestRealm" }),
+  UNICOM_CLIENT_ID: str({ desc: "客户端标识", default: "TestClient" }),
+  UNICOM_CLIENT_SECRET: str({ desc: "客户端秘钥", default: "QvhGc7C8an1TiMuO3IaAQmAK4xV6Akso" }),
+
+  MIS_SERVER_URL: str({ default: "http://mis-server", desc: "mis-server地址" }),
+
 });
 
 export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);

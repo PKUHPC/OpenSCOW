@@ -1355,6 +1355,15 @@
           "nullable": false,
           "mappedType": "string"
         },
+        "unicom_id": {
+          "name": "unicom_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
+        },
         "name": {
           "name": "name",
           "type": "varchar(255)",

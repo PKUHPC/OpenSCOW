@@ -402,6 +402,14 @@ message ChangeTenantResponse {
 
 }
 
+message CheckUnicomUserExistRequest {
+  string unicom_user_id = 1;
+}
+
+message CheckUnicomUserExistResponse {
+  bool exsited = 1;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -449,4 +457,5 @@ service UserService {
   rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
 
   rpc ChangeTenant(ChangeTenantRequest) returns (ChangeTenantResponse);
+  rpc CheckUnicomUserExist(CheckUnicomUserExistRequest) returns (CheckUnicomUserExistResponse);
 }
