@@ -123,7 +123,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     return;
   }
 
-  if (!clusters[clusterId].k8s?.kubectlConfig.path) {
+  if (!clusters[clusterId].k8s?.kubeConfig.path) {
     log("[config] The current cluster does not have a kubectl configuration file configured.");
     ws.close(0, "The current cluster does not have a kubectl configuration file configured.");
     return;
@@ -220,7 +220,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   try {
     const kc = new k8sClient.KubeConfig();
-    kc.loadFromFile(join("/etc/scow", clusters[clusterId].k8s?.kubectlConfig.path || "/kube/config"));
+    kc.loadFromFile(join("/etc/scow", clusters[clusterId].k8s?.kubeConfig.path || "/kube/config"));
     const k8sWs = await new k8sClient.Exec(kc)
       .exec(namespace, pod, "", ["/bin/sh"], stdoutStream, stderrStream, stdinStream, true);
 
