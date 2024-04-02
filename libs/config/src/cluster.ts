@@ -27,7 +27,7 @@ const LoginNodeConfigSchema =
   Type.Object({
     name: createI18nStringSchema({ description: "登录节点展示名" }),
     address: Type.String({ description: "集群的登录节点地址" }),
-    scowdUrl: Type.String({ description: "scowd 访问地址" }),
+    scowdUrl: Type.Optional(Type.String({ description: "scowd 访问地址" })),
   });
 
 export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
