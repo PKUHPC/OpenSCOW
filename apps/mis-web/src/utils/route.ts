@@ -24,7 +24,11 @@ export const route: typeof typeboxRoute = (schema, handler) => {
         if (!SCOW_ERROR) { throw e; }
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
         const details = e.details;
-        return { 500: { code, details } } as any;
+
+        // 如果传入了集群ID的元数据
+        const clusterId = e.metadata.get("clusterId")[0] ?? undefined;
+
+        return { 500: { code, details, clusterId } } as any;
       });
     }
   });

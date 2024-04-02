@@ -45,6 +45,7 @@ export type ClusterPlugin = {
 }
 
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
+export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
 
@@ -86,7 +87,16 @@ export const clustersPlugin = plugin(async (f) => {
       }
 
       logger.info("Calling actions on cluster " + cluster);
-      return await call(client);
+
+      return await call(client).catch((e) => {
+        logger.error("Cluster ops fails at %o", e);
+        const reason = "Cluster ID : " + cluster + " Details : " + e;
+        throw new ServiceError({
+          code: status.INTERNAL,
+          details: reason,
+          metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, { clusterId: cluster }),
+        });
+      });
     }),
 
     // throws error if failed.
@@ -119,7 +129,7 @@ export const clustersPlugin = plugin(async (f) => {
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
-        const reason = failed.map((x) => clusters[x.cluster].displayName + ": " + x.error).join("; ");
+        const reason = failed.map((x) => "Cluster ID : " + x.cluster + " Details : " + x.error).join("; ");
         throw new ServiceError({
           code: status.INTERNAL,
           details: reason,

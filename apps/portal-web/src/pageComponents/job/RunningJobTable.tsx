@@ -11,6 +11,7 @@
  */
 
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getClusterJobsConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
 import { join } from "path";
@@ -20,12 +21,12 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
-import { getClusterConnError } from "src/utils/getClusterConnError";
+
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
@@ -53,13 +54,15 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
 
   const { message } = App.useApp();
-  const clusterConnError = getClusterConnError(query.cluster.name, "pages.commonError.clusterJobsConnError");
+
+  const languageId = useI18n().currentLanguage.id;
+  const clusterJobsConnError = getClusterJobsConnError(languageId, query.cluster.name);
 
   const promiseFn = useCallback(async () => {
     return await api.getRunningJobs({ query: {
       userId: userId,
       cluster: query.cluster.id,
-    } }).httpError(503, () => { message.error(clusterConnError); });
+    } }).httpError(503, () => { message.error(clusterJobsConnError); });
   }, [userId, query.cluster]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });

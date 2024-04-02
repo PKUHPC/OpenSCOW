@@ -14,6 +14,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { getClusterAppsConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import type { AppSession } from "@scow/protos/build/portal/app";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
@@ -23,11 +24,10 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster } from "src/utils/config";
-import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface FilterForm {
  appJobName: string | undefined
@@ -47,6 +47,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
   const [form] = Form.useForm<FilterForm>();
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -56,13 +57,12 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const [onlyNotEnded, setOnlyNotEnded] = useState(false);
 
-  const clusterConnError = getClusterConnError(cluster.name, "pages.commonError.clusterAppsConnError");
-
+  const clusterAppsConnError = getClusterAppsConnError(languageId, cluster.name);
   const { data, isLoading, reload } = useAsync({
     promiseFn: useCallback(async () => {
       // List all desktop
       const { sessions } = await api.getAppSessions({ query: { cluster: cluster.id } })
-        .httpError(503, () => { message.error(clusterConnError); });
+        .httpError(503, () => { message.error(clusterAppsConnError); });
 
       return sessions.map((x) => ({
         ...x,

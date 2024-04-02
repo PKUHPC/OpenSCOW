@@ -793,9 +793,10 @@ export default {
       extraMessage: "Please visit http://hpc.pku.edu.cn/guide.html for account opening instructions.",
     },
     _app: {
-      clusterOpErrorTitle: "Operation Failed",
-      clusterOpErrorContent: "Multiple cluster operations encountered errors, and some clusters were not "
+      multiClusterOpErrorTitle: "Operation Failed",
+      multiClusterOpErrorContent: "Multiple cluster operations encountered errors, and some clusters were not "
       + "synchronized with the modifications.",
+      adapterConnErrorContent: "The {} cluster connection failed. ",
       effectErrorMessage: "Server error occurred!",
     },
     profile: {

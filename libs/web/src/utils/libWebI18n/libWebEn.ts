@@ -37,4 +37,12 @@ export default {
   notPositiveNumberError: "Please enter a number greater than 0.",
   compareUsedChargeError: "The set limit cannot be less than the current used amount. Please re-enter.",
   refreshButton: "Refresh",
+  clusterConnError: "The {} cluster is currently unreachable. Please try again later.",
+  clusterAccountsConnError:
+  "The {} cluster is currently unreachable. Unable to retrieve the list of accounts. "
+  + "Please try again later.",
+  clusterJobsConnError:"The {} cluster is currently unreachable. "
+  + "Unable to retrieve the list of jobs. Please try again later.",
+  clusterAppsConnError:"The {} cluster is currently unreachable. "
+  + "Unable to retrieve the list of applications {}. Please try again later.",
 };
