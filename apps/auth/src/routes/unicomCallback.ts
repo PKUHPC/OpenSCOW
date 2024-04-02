@@ -13,12 +13,16 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d48342b372 (fix:修改新建unicomUser的id规则，unicomUser登录的token)
 import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
 import { genRandomString } from "src/utils/genId";
+<<<<<<< HEAD
 =======
 import { join } from "path";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
@@ -26,6 +30,8 @@ import { config } from "src/config/env";
 import { getUnicomToken } from "src/service/uincom";
 import { getUserById } from "src/service/user";
 >>>>>>> 9701eaf1bd (feat:unicom三方登录)
+=======
+>>>>>>> d48342b372 (fix:修改新建unicomUser的id规则，unicomUser登录的token)
 
 const QuerystringSchema = Type.Object({
   // 状态标识
@@ -115,15 +121,25 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       if (userExisted.target?.$case === "userExisted") {
 
+<<<<<<< HEAD
         await cacheUnicomInfo(UnicomToken, userExisted.target.userExisted.userId, req);
         await redirectToWeb(callback!, UnicomToken, rep);
+=======
+        await cacheUnicomInfo(tokenData.access_token, userExisted.target.userExisted.userId, req);
+        await redirectToWeb(callback!, tokenData.access_token, rep);
+>>>>>>> d48342b372 (fix:修改新建unicomUser的id规则，unicomUser登录的token)
       }
       else {
         const userId = `${genRandomString(4)}_${userInfo.phone}`;
         await createUser(userId, userInfo);
 
+<<<<<<< HEAD
         await cacheUnicomInfo(UnicomToken, userId, req);
         await redirectToWeb(callback!, UnicomToken, rep);
+=======
+        await cacheUnicomInfo(tokenData.access_token, userId, req);
+        await redirectToWeb(callback!, tokenData.access_token, rep);
+>>>>>>> d48342b372 (fix:修改新建unicomUser的id规则，unicomUser登录的token)
       }
 
       return;
