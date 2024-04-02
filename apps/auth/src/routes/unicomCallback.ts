@@ -13,10 +13,11 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
 import { join } from "path";
+import { cacheInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
-import { getUnicomToken } from "src/service/uincom";
-import { getUserById } from "src/service/user";
+import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
+import { checkUnicomUserExisted, createUser } from "src/service/user";
 
 const QuerystringSchema = Type.Object({
   // 状态标识
@@ -26,8 +27,9 @@ const QuerystringSchema = Type.Object({
 });
 
 enum ErrorCode {
-
+  INVALID_CODE = "INVALID_CODE",
   INVALID_TOKEN = "INVALID_TOKEN",
+  INVALID_USER = "INVALID_USER",
 }
 
 const ResponsesSchema = Type.Object({
@@ -52,6 +54,13 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       const { code, state } = req.query;
 
+      // 获取登录成功后跳转的url
+      const redirectUrl = new URL(state);
+      const callback = redirectUrl.searchParams.get("callbackUrl");
+
+      await validateCallbackHostname(callback!, req);
+
+      // 获取联通token
       const fetchTokenUrl =
       `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/token`;
 
@@ -62,24 +71,41 @@ export const UnicomCallbackRoute = fp(async (f) => {
         redirect_uri: state,
       });
 
+      if (!tokenData) {
+        return await rep.code(400).send({ code: ErrorCode.INVALID_CODE });
+      }
+
       const fetchUserInfoUrl =
       `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/userinfo`;
 
-      const userInfo = await fetch(fetchUserInfoUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${tokenData.access_token}`,
-        },
-      })
-        .then((response) => response.json())
-        .catch((error) => console.error("Error:", error));
+      // 获取联通用户信息
+      const userInfo = await getUnicomUserInfo(fetchUserInfoUrl, tokenData.access_token);
 
-      console.log("userInfo", userInfo);
-      return {
-        tokenData,
-        userInfo,
-      };
+      if (!userInfo) {
+        return await rep.code(400).send({ code: ErrorCode.INVALID_TOKEN });
+      }
+
+      // 联通用户是否启用和删除
+      if (!userInfo.enabled || userInfo.deleted) {
+        return await rep.code(400).send({ code: ErrorCode.INVALID_USER });
+      }
+
+      const userExisted = await checkUnicomUserExisted(userInfo.id);
+
+      if (userExisted.target?.$case === "userExisted") {
+
+        const info = await cacheInfo(userExisted.target.userExisted.userId, req);
+        await redirectToWeb(callback!, info, rep);
+      }
+      else {
+
+        await createUser(userInfo);
+
+        const info = await cacheInfo(userInfo.phone, req);
+        await redirectToWeb(callback!, info, rep);
+      }
+
+      return;
     },
   );
 });

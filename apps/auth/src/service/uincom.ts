@@ -19,12 +19,25 @@ interface GetTokenParams {
 
 export async function getUnicomToken(fetchUrl: string, params: GetTokenParams) {
 
-  return fetch(fetchUrl, {
+  return await fetch(fetchUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({ ...params, grant_type: "authorization_code" }).toString(),
+  })
+    .then((response) => response.json())
+    .catch((error) => console.error("Error:", error));
+}
+
+export async function getUnicomUserInfo(fetchUrl: string, accessToken: string) {
+
+  return await fetch(fetchUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${accessToken}`,
+    },
   })
     .then((response) => response.json())
     .catch((error) => console.error("Error:", error));

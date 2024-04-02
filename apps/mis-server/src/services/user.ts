@@ -382,8 +382,8 @@ export const userServiceServer = plugin((server) => {
      * 并将公钥插入用户的authorized_keys
      */
     createUser: async ({ request, em, logger }) => {
-      const { name, tenantName, email, identityId, password } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+      const { name, tenantName, email, identityId, password, unicomId } = request;
+      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, unicomId)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -845,6 +845,32 @@ export const userServiceServer = plugin((server) => {
       return [{}];
 
     },
+    checkUnicomUserExist: async ({ request, em }) => {
+      const { unicomUserId } = request;
 
+      const user = await em.findOne(User, { unicomId: unicomUserId });
+
+      if (user) {
+        return [{
+          target:{
+            $case:"userExisted",
+            userExisted:{
+              existed:true,
+              userId:user.userId,
+            },
+          },
+        }];
+      }
+
+      return [{
+        target:{
+          $case:"userNotExisted",
+          userNotExisted:{
+            existed:false,
+          },
+        },
+      }];
+
+    },
   });
 });

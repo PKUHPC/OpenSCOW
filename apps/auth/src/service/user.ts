@@ -11,25 +11,30 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { PlatformUserInfo, UserServiceClient } from "@scow/protos/build/server/user";
+import { CheckUnicomUserExistResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/getClient";
 
-export async function getUserById(id: string): Promise<PlatformUserInfo | undefined> {
+export async function checkUnicomUserExisted(unicomUserId: string): Promise<CheckUnicomUserExistResponse> {
 
   const client = getClient(UserServiceClient);
 
-  const users = await asyncClientCall(client, "getAllUsers", {
-    idOrName:id,
-    page:1,
+  return await asyncClientCall(client, "checkUnicomUserExist", { unicomUserId });
+
+}
+
+export async function createUser(userInfo) {
+
+  const client = getClient(UserServiceClient);
+
+  return await asyncClientCall(client, "createUser", {
+    name:userInfo.account,
+    tenantName:"default",
+    email:userInfo.email ?? "",
+    identityId:userInfo.phone,
+    password:`unicom_${userInfo.phone}`,
+    unicomId:userInfo.id,
   });
 
-  if (!users.platformUsers.length) {
-    return undefined;
-  }
-
-  const user = users.platformUsers.find((i) => i.userId === id);
-
-  return user;
 }
 
 

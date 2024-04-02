@@ -157,6 +157,7 @@ message CreateUserRequest {
   string name = 3;
   string email = 4;
   string password = 5;
+  optional string unicom_id = 6;
 }
 
 // ALREADY_EXISTS: user with id already exists
@@ -406,8 +407,20 @@ message CheckUnicomUserExistRequest {
   string unicom_user_id = 1;
 }
 
+message UserExisted {
+  bool existed = 1;
+  string user_id =2;
+}
+
+message UserNotExisted {
+  bool existed = 1;
+}
+
 message CheckUnicomUserExistResponse {
-  bool exsited = 1;
+  oneof target {
+    UserExisted user_existed = 1;
+    UserNotExisted user_not_existed = 2;
+  }
 }
 
 service UserService {
