@@ -48,16 +48,11 @@
                 <input type='text' name="username" placeholder="{{ authTexts.login.username }}" required
                     class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
               </div>
-              <div class="w-80 mb-5">
+              <div class="w-80 mb-10">
                 <div class="relative flex items-center">
                     <input id="password" name="password" placeholder="{{ authTexts.login.password }}" type="password" required
                         class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
                     <div id="eye-elem" class="absolute w-5 h-5 right-3 bg-contain"></div>
-                </div>
-              </div>
-              <div class="w-80 mb-3">
-                <div class="relative flex items-center justify-center">
-                    <div id="unicomLogo" class="w-5 h-5 bg-contain"></div>
                 </div>
               </div>
               {% if enableTotp %}
@@ -110,10 +105,16 @@
               {% if verifyOtpFail %}
                 <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidOtp }}</p>
               {% endif %}
-              <button type="submit" class="w-80 py-2 mb-14 rounded button-primary text-gray-100 focus:outline-none">
+              <button type="submit" class="w-80 py-2 mb-8 rounded button-primary text-gray-100 focus:outline-none">
                   {{ authTexts.login.login }}
               </button>
+              <div class="w-80 mb-3">
+                <div class="relative flex items-center justify-center">
+                    <div id="unicomLogo" class="w-5 h-5 bg-contain"></div>
+                </div>
+              </div>
             </div>
+
           </form>
           {% if showBindOtpButton %}
             <div class="px-12 mt-4">

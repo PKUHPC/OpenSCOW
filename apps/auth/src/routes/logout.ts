@@ -12,6 +12,8 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
+import { config } from "src/config/env";
+import { unicomUserLogout } from "src/service/uincom";
 const QuerystringSchema = Type.Object({
   token: Type.String(),
 });
@@ -40,6 +42,14 @@ export const logoutRoute = fp(async (f) => {
       const { token } = req.query;
 
       await f.redis.del(token);
+
+      // 如果是联通第三方登录
+      if (token.startsWith("u_")) {
+        const LogoutUrl =
+          `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/logout`;
+
+        await unicomUserLogout(LogoutUrl, token.slice(2));
+      }
 
       return rep.code(204).send(null);
 

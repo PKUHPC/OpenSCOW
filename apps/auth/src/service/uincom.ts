@@ -42,3 +42,15 @@ export async function getUnicomUserInfo(fetchUrl: string, accessToken: string) {
     .then((response) => response.json())
     .catch((error) => console.error("Error:", error));
 }
+
+export async function unicomUserLogout(fetchUrl: string, accessToken: string) {
+
+  return await fetch(fetchUrl, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+    },
+  })
+    .then((response) => response.json())
+    .catch((error) => console.error("Error:", error));
+}

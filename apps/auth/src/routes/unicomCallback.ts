@@ -92,17 +92,19 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       const userExisted = await checkUnicomUserExisted(userInfo.id);
 
+      const UnicomToken = `u_${tokenData.access_token}`;
+
       if (userExisted.target?.$case === "userExisted") {
 
-        await cacheUnicomInfo(tokenData.access_token, userExisted.target.userExisted.userId, req);
-        await redirectToWeb(callback!, tokenData.access_token, rep);
+        await cacheUnicomInfo(UnicomToken, userExisted.target.userExisted.userId, req);
+        await redirectToWeb(callback!, UnicomToken, rep);
       }
       else {
         const userId = `${genRandomString(4)}_${userInfo.phone}`;
         await createUser(userId, userInfo);
 
-        await cacheUnicomInfo(tokenData.access_token, userId, req);
-        await redirectToWeb(callback!, tokenData.access_token, rep);
+        await cacheUnicomInfo(UnicomToken, userId, req);
+        await redirectToWeb(callback!, UnicomToken, rep);
       }
 
       return;
