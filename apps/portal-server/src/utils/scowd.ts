@@ -23,10 +23,14 @@ export function getClusterLoginNodeScowdUrl(cluster: string): string | undefined
 
 const scowdClientForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
-  const client = getClient(loginNode.scowdUrl);
-  prev[cluster] = client;
+  if (!loginNode.scowdUrl) {
+    prev[cluster] = undefined;
+  } else {
+    const client = getClient(loginNode.scowdUrl);
+    prev[cluster] = client;
+  }
   return prev;
-}, {} as Record<string, ScowdClient>);
+}, {} as Record<string, ScowdClient | undefined>);
 
 export const getScowdClient = (cluster: string) => {
   return scowdClientForClusters[cluster];

@@ -250,6 +250,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
+        BUSINESS_VERSION: String(config.business ?? false),
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },

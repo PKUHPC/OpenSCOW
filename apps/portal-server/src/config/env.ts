@@ -30,6 +30,8 @@ export const config = envConfig({
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 
   DOWNLOAD_CHUNK_SIZE: num({ desc: "grpc下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
+
+  BUSINESS_VERSION: bool({ desc: "是否为商业版本", default: false }),
 });
 
 export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);

@@ -25,6 +25,7 @@ export const InstallConfigSchema = Type.Object({
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
   image: Type.Optional(Type.String({ description: "镜像", default: "mirrors.pku.edu.cn/pkuhpc-icode/scow" })),
   imageTag: Type.String({ description: "镜像tag", default: "master" }),
+  business: Type.Optional(Type.Boolean({ description: "是否为商业版", default: false })),
 
   log: Type.Object({
     level: Type.String({ description: "日志级别", default: "info" }),

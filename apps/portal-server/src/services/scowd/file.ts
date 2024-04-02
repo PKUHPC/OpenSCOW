@@ -10,220 +10,208 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ConnectError } from "@connectrpc/connect";
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
-  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
-import { FileInfo, FileInfo_FileType,
+import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
+  sftpReadFile, sftpRealPath, sshRmrf } from "@scow/lib-ssh";
+import { FileInfo, fileInfo_FileTypeFromJSON,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
-import { join } from "path";
+import { FileType } from "@scow/scowd-protos/build/storage/file_pb";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
-import { clusterNotFound } from "src/utils/errors";
+import { clusterNotFound, scowdClientNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
+import { convertCodeToGrpcStatus, getScowdClient } from "src/utils/scowd";
 import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 import { once } from "stream";
 
-export const fileServiceServer = plugin((server) => {
+export const scowdFileServiceServer = plugin((server) => {
 
   server.addService<FileServiceServer>(FileServiceService, {
-    copy: async ({ request, logger }) => {
+    copy: async ({ request }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        // the SFTPWrapper doesn't supprt copy
-        // Use command to do it
-        const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
-
-        if (resp.code !== 0) {
-          throw <ServiceError> { code: status.INTERNAL, message: "cp command failed", details: resp.stderr };
+      try {
+        await client.file.copy({ fromPath, toPath }, { headers: { IdentityId: userId } });
+        return [{}];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
-
-        return [{}];
-      });
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while copying file ${fromPath} to ${toPath}`,
+        };
+      }
     },
 
-    createFile: async ({ request, logger }) => {
+    createFile: async ({ request }) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-
-        const sftp = await ssh.requestSFTP();
-
-        if (await sftpExists(sftp, path)) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${path} already exists` };
+      try {
+        await client.file.createFile({ filePath: path }, { headers: { IdentityId: userId } });
+        return [{}];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
-
-        await sftpWriteFile(sftp)(path, Buffer.alloc(0));
-
-        return [{}];
-      });
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while creating file ${path}`,
+        };
+      }
     },
 
-    deleteDirectory: async ({ request, logger }) => {
+    deleteDirectory: async ({ request }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-
-        await sshRmrf(ssh, path);
-
+      try {
+        await client.file.deleteDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
         return [{}];
-      });
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while deleting directory ${path}`,
+        };
+      }
     },
 
-    deleteFile: async ({ request, logger }) => {
+    deleteFile: async ({ request }) => {
 
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-
-        const sftp = await ssh.requestSFTP();
-
-        await sftpUnlink(sftp)(path);
-
+      try {
+        await client.file.deleteFile({ filePath: path }, { headers: { IdentityId: userId } });
         return [{}];
-      });
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while deleting file ${path}`,
+        };
+      }
     },
 
     getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-
-        const path = await sftpRealPath(sftp)(".");
-
-        return [{ path }];
-      });
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("GetHomeDirectory file started");
+      try {
+        const res = await client.file.getHomeDirectory({}, { headers: { IdentityId: userId } });
+        return [{ path: res.path }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          subLogger.error(err.message);
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while get ${userId}'s home directory`,
+        };
+      }
     },
 
-    makeDirectory: async ({ request, logger }) => {
+    makeDirectory: async ({ request }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-
-        const sftp = await ssh.requestSFTP();
-
-        if (await sftpExists(sftp, path)) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, details: `${path} already exists` };
-        }
-
-        await sftpMkdir(sftp)(path);
-
+      try {
+        await client.file.makeDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
         return [{}];
-      });
-
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while making directory ${path}`,
+        };
+      }
     },
 
-    move: async ({ request, logger }) => {
+    move: async ({ request }) => {
       const { userId, cluster, fromPath, toPath } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
-        if (error) {
-          throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
-        }
-
+      try {
+        await client.file.move({ fromPath, toPath }, { headers: { IdentityId: userId } });
         return [{}];
-      });
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while moving ${fromPath} to ${toPath}`,
+        };
+      }
     },
 
-    readDirectory: async ({ request, logger }) => {
-      const { userId, cluster, path, updateAccessTime } = request;
+    readDirectory: async ({ request }) => {
+      const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      try {
+        const res = await client.file.readDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
 
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, userId);
-          throw <ServiceError> {
-            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
+        const results: FileInfo[] = res.filesInfo.map((info): FileInfo => {
+          return {
+            name: info.name,
+            type: fileInfo_FileTypeFromJSON(info.fileType),
+            mtime: info.modTime,
+            mode: info.mode,
+            size: Number(info.size),
           };
         });
+        return [{ results }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
 
-        if (!stat.isDirectory()) {
-          throw <ServiceError> {
-            code: status.INVALID_ARGUMENT,
-            message: `${path} is not directory or not exists` };
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
-
-        const files = await sftpReaddir(sftp)(path);
-        const list: FileInfo[] = [];
-
-        // 通过touch -a命令实现共享文件系统的缓存刷新
-        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
-
-        if (pureFiles.length > 0 && updateAccessTime) {
-
-          // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
-          // 一次执行 500 个文件是根据经验设置的安全值，可修改
-          // 根据一般系统 getconf ARG_MAX 的值为 2097152 字节，linux 下带有文件路径的文件名最长 4096 字节 设置安全值为500
-          const TOUCH_FILES_COUNT = 500;
-          const execFilePathsList: string[][] = [];
-
-          for (let i = 0; i < pureFiles.length; i += TOUCH_FILES_COUNT) {
-            const slicedExecFiles = pureFiles.slice(i, i + TOUCH_FILES_COUNT);
-            const slicedExecFilesPaths = slicedExecFiles.map((file) => join(path, file.filename));
-            execFilePathsList.push(slicedExecFilesPaths);
-          }
-
-          await Promise.allSettled(execFilePathsList.map(async (execFilePaths) => {
-            return loggedExec(ssh, logger, false, "touch -a", execFilePaths).catch((err) => {
-              logger.error(err, "touch -a %s failed as %s", execFilePaths, userId);
-            });
-          }));
-
-        }
-
-        for (const file of files) {
-
-          const isDir = file.longname.startsWith("d");
-
-          list.push({
-            type: isDir ? FileInfo_FileType.DIR : FileInfo_FileType.FILE,
-            name: file.filename,
-            mtime: new Date(file.attrs.mtime * 1000).toISOString(),
-            size: file.attrs.size,
-            mode: file.attrs.mode,
-          });
-        }
-        return [{ results: list }];
-      });
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while reading directory ${path}`,
+        };
+      }
     },
 
     download: async (call) => {
@@ -353,39 +341,48 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
-    getFileMetadata: async ({ request, logger }) => {
+    getFileMetadata: async ({ request }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      try {
+        const res = await client.file.getFileMetadata({ filePath: path }, { headers: { IdentityId: userId } });
 
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, userId);
-          throw <ServiceError> {
-            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
-          };
-        });
-
-        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
-      });
+        return [{ size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while getting file ${path} metadata`,
+        };
+      }
     },
 
-    exists: async ({ request, logger }) => {
+    exists: async ({ request }) => {
       const { userId, cluster, path } = request;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const exists = await sftpExists(sftp, path);
-        return [{ exists }];
-      });
+      try {
+        const res = await client.file.exists({ path: path }, { headers: { IdentityId: userId } });
+
+        return [{ exists: res.exists }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError>{
+          code: status.UNKNOWN,
+          details: `An unknown error occurred while check file ${path} exists`,
+        };
+      }
     },
 
     startFileTransfer: async ({ request, logger }) => {
