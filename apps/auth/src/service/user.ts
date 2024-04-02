@@ -22,7 +22,7 @@ export async function checkUnicomUserExisted(unicomUserId: string): Promise<Chec
 
 }
 
-export async function createUser(userInfo) {
+export async function createUser(userId: string, userInfo) {
 
   const client = getClient(UserServiceClient);
 
@@ -30,7 +30,7 @@ export async function createUser(userInfo) {
     name:userInfo.account,
     tenantName:"default",
     email:userInfo.email ?? "",
-    identityId:userInfo.phone,
+    identityId: userId,
     password:`unicom_${userInfo.phone}`,
     unicomId:userInfo.id,
   });

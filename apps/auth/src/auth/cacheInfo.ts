@@ -46,3 +46,14 @@ export async function cacheInfo(identityId: string, req: FastifyRequest): Promis
   return token;
 
 }
+
+/**
+ * 传入联通的token以及将对应的用户identityId保存到redis中
+ */
+export async function cacheUnicomInfo(token: string, identityId: string, req: FastifyRequest) {
+
+  await req.server.redis.set(token,
+    identityId, "EX", authConfig.tokenTimeoutSeconds,
+  );
+
+}

@@ -12,11 +12,12 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { cacheInfo } from "src/auth/cacheInfo";
+import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
+import { genRandomString } from "src/utils/genId";
 
 const QuerystringSchema = Type.Object({
   // 状态标识
@@ -93,15 +94,15 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       if (userExisted.target?.$case === "userExisted") {
 
-        const info = await cacheInfo(userExisted.target.userExisted.userId, req);
-        await redirectToWeb(callback!, info, rep);
+        await cacheUnicomInfo(tokenData.access_token, userExisted.target.userExisted.userId, req);
+        await redirectToWeb(callback!, tokenData.access_token, rep);
       }
       else {
+        const userId = `${genRandomString(4)}_${userInfo.phone}`;
+        await createUser(userId, userInfo);
 
-        await createUser(userInfo);
-
-        const info = await cacheInfo(userInfo.phone, req);
-        await redirectToWeb(callback!, info, rep);
+        await cacheUnicomInfo(tokenData.access_token, userId, req);
+        await redirectToWeb(callback!, tokenData.access_token, rep);
       }
 
       return;
