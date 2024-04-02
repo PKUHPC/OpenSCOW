@@ -7,6 +7,10 @@
     "generate": "rimraf generated && buf generate --template buf.gen.yaml ./protos/api",
     "build": "rimraf build && tsc"
   },
+  "files": [
+    "build",
+    "!**/*.map"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
