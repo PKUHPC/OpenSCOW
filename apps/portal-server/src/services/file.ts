@@ -116,18 +116,21 @@ export const fileServiceServer = plugin((server) => {
       }
     },
 
-    getHomeDirectory: async ({ request }) => {
+    getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
       const client = getScowdClient(cluster);
 
       if (!client) { throw scowdClientNotFound(cluster); }
 
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("GetHomeDirectory file started");
       try {
         const res = await client.file.getHomeDirectory({}, { headers: { IdentityId: userId } });
         return [{ path: res.path }];
       } catch (err) {
         if (err instanceof ConnectError) {
+          subLogger.error(err.message);
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
         throw <ServiceError>{
@@ -200,6 +203,7 @@ export const fileServiceServer = plugin((server) => {
         return [{ results }];
       } catch (err) {
         if (err instanceof ConnectError) {
+
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
         throw <ServiceError>{
