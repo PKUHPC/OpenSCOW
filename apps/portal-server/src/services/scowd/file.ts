@@ -11,21 +11,14 @@
  */
 
 import { ConnectError } from "@connectrpc/connect";
-import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
-  sftpReadFile, sftpRealPath, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, fileInfo_FileTypeFromJSON,
-  FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+  FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
 import { FileType } from "@scow/scowd-protos/build/storage/file_pb";
-import { clusters } from "src/config/clusters";
-import { config } from "src/config/env";
-import { clusterNotFound, scowdClientNotFound } from "src/utils/errors";
-import { pipeline } from "src/utils/pipeline";
+import { scowdClientNotFound } from "src/utils/errors";
 import { convertCodeToGrpcStatus, getScowdClient } from "src/utils/scowd";
-import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
-import { once } from "stream";
+import { getClusterTransferNode } from "src/utils/ssh";
 
 export const scowdFileServiceServer = plugin((server) => {
 
@@ -204,7 +197,6 @@ export const scowdFileServiceServer = plugin((server) => {
         return [{ results }];
       } catch (err) {
         if (err instanceof ConnectError) {
-
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
         throw <ServiceError>{
@@ -217,40 +209,31 @@ export const scowdFileServiceServer = plugin((server) => {
     download: async (call) => {
       const { logger, request: { cluster, path, userId } } = call;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
       const subLogger = logger.child({ userId, path, cluster });
       subLogger.info("Download file started");
-
-      await sshConnect(host, userId, subLogger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const readStream = sftp.createReadStream(path, { highWaterMark: config.DOWNLOAD_CHUNK_SIZE });
-
-        // cannot use pipeline because it forwards error
-        // we don't want to forwards error
-        // because the error has code property, conflicting with gRPC'S ServiceError
-        await pipeline(
-          readStream,
-          async (chunk) => {
-            return { chunk: Buffer.from(chunk) };
-          },
-          call,
-        ).catch((e) => {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "Error when reading file",
-            details: e?.message,
-          };
-        }).finally(async () => {
-          readStream.close(() => {});
-          await once(readStream, "close");
-          // await promisify(readStream.close.bind(readStream))();
-        });
-
-      });
-
+    
+      try {
+        const readStream = await client.file.download({ path }, { headers: { IdentityId: userId } });
+      
+        for await (const response of readStream) {
+          call.write(response);
+        }
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw {
+          code: status.INTERNAL,
+          details: `Error when reading file ${path}`,
+        };
+      } finally {
+        call.end();
+        subLogger.info("Download file completed");
+      }
     },
 
     upload: async (call) => {
@@ -265,80 +248,25 @@ export const scowdFileServiceServer = plugin((server) => {
 
       const { cluster, path, userId } = info.message?.info;
 
-      const host = getClusterLoginNode(cluster);
+      const client = getScowdClient(cluster);
 
-      if (!host) { throw clusterNotFound(cluster); }
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-      const logger = call.logger.child({ upload: { userId, path, cluster, host } });
-
+      const logger = call.logger.child({ upload: { userId, path, cluster } });
       logger.info("Upload file started");
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-
-        class RequestError {
-          constructor(
-            public code: ServiceError["code"],
-            public message: ServiceError["message"],
-            public details?: ServiceError["details"],
-          ) {}
-
-          toServiceError(): ServiceError {
-            return <ServiceError> { code: this.code, message: this.message, details: this.details };
-          }
+      try {
+        const res = await client.file.upload(call);
+        return [{ writtenBytes: Number(res.writtenBytes) }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
-
-        try {
-          const writeStream = sftp.createWriteStream(path);
-
-          const { writeAsync } = createWriterExtensions(writeStream);
-
-          let writtenBytes = 0;
-
-          for await (const req of call.iter()) {
-            if (!req.message) {
-              throw new RequestError(
-                status.INVALID_ARGUMENT,
-                "Request is received but message is undefined",
-              );
-            }
-
-            if (req.message.$case !== "chunk") {
-              throw new RequestError(
-                status.INVALID_ARGUMENT,
-                `Expect receive chunk but received message of type ${req.message.$case}`,
-              );
-            }
-            await writeAsync(req.message.chunk);
-            writtenBytes += req.message.chunk.length;
-          }
-
-          // ensure the data is written
-          // if (!writeStream.destroyed) {
-          //   await new Promise<void>((res, rej) => writeStream.end((e) => e ? rej(e) : res()));
-          // }
-          writeStream.end();
-          await once(writeStream, "close");
-
-          logger.info("Upload complete. Received %d bytes", writtenBytes);
-
-          return [{ writtenBytes }];
-        } catch (e: any) {
-          if (e instanceof RequestError) {
-            throw e.toServiceError();
-          } else {
-            throw new RequestError(
-              status.INTERNAL,
-              "Error when writing file",
-              e.message,
-            ).toServiceError();
-          }
-
-        }
-
-      });
-
-
+        throw {
+          code: status.INTERNAL,
+          details: `Error when writing file ${path}`,
+        };
+      }
     },
 
     getFileMetadata: async ({ request }) => {
@@ -385,259 +313,119 @@ export const scowdFileServiceServer = plugin((server) => {
       }
     },
 
-    startFileTransfer: async ({ request, logger }) => {
+    startFileTransfer: async ({ request }) => {
 
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
-      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const {
         host: toTransferNodeHost,
         port: toTransferNodePort,
       } = getClusterTransferNode(toCluster);
 
-      // 执行scow-sync-start
-      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
-        // 密钥路径
-        const sftp = await ssh.requestSFTP();
-        const homePath = await sftpRealPath(sftp)(".");
-        const privateKeyPath = `${homePath}/scow/.scow-sync-ssh/id_rsa`;
+      const client = getScowdClient(fromCluster);
 
-        const cmd = "scow-sync-start";
-        const args = [
-          "-a", toTransferNodeHost,
-          "-u", userId,
-          "-s", fromPath,
-          "-d", toPath,
-          "-m", "2",
-          "-p", toTransferNodePort.toString(),
-          "-k", privateKeyPath,
-        ];
+      if (!client) { throw scowdClientNotFound(fromCluster); }
 
-        const resp = await loggedExec(ssh, logger, true, cmd, args);
-        if (resp.code !== 0) {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "scow-sync-start command failed",
-            details: resp.stderr,
-          };
-        }
+      try {
+        await client.file.startFileTransfer({ 
+          fromPath, toPath, toTransferNodeHost, toTransferNodePort: toTransferNodePort.toString(),
+        }, { headers: { IdentityId: userId } });
+
         return [{}];
-      });
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError> {
+          code: status.UNKNOWN,
+          message: "scow-sync-start command failed",
+        };
+      }
     },
 
-    queryFileTransfer: async ({ request, logger }) => {
+    queryFileTransfer: async ({ request }) => {
 
       const { cluster, userId } = request;
 
-      const transferNodeAddress = getClusterTransferNode(cluster).address;
+      const client = getScowdClient(cluster);
 
-      return await sshConnect(transferNodeAddress, userId, logger, async (ssh) => {
-        const cmd = "scow-sync-query";
+      if (!client) { throw scowdClientNotFound(cluster); }
 
-        const resp = await loggedExec(ssh, logger, true, cmd, []);
-        if (resp.code !== 0) {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "scow-sync-query command failed",
-            details: resp.stderr,
+      try {
+        const res = await client.file.queryFileTransfer({}, { headers: { IdentityId: userId } });
+
+        const transferInfos = res.transferInfos.map((transferInfo) => {
+          return {
+            ...transferInfo,
+            transferSizeKb: Number(transferInfo.transferSizeKb),
+            remainingTimeSeconds: Number(transferInfo.remainingTimeSeconds),
           };
-        }
-
-        interface TransferInfosJson {
-          recvAddress: string,
-          filePath: string,
-          transferSize: string,
-          progress: string,
-          speed: string,
-          leftTime: string
-        }
-
-        // 解析scow-sync-query返回的json数组
-        const transferInfosJsons: TransferInfosJson[] = JSON.parse(resp.stdout);
-        const transferInfos: TransferInfo[] = [];
-
-        // 根据host确定clusterId
-        transferInfosJsons.forEach((info) => {
-          let toCluster = info.recvAddress;
-          for (const key in clusters) {
-            const transferNode = tryGetClusterTransferNode(key);
-            if (transferNode) {
-              const clusterHost = transferNode.host;
-              if (clusterHost === info.recvAddress) {
-                toCluster = key;
-              }
-            }
-            else {
-              continue;
-            }
-          }
-
-          // 将json数组中的string类型解析成protos中定义的格式
-          let speedInKB = 0;
-          const speedMatch = info.speed.match(/([\d\.]+)([kMGB]?B\/s)/);
-          if (speedMatch) {
-            const speed = Number(speedMatch[1]);
-            switch (speedMatch[2]) {
-            case "B/s":
-              speedInKB = speed / 1024;
-              break;
-            case "kB/s":
-              speedInKB = speed;
-              break;
-            case "MB/s":
-              speedInKB = speed * 1024;
-              break;
-            case "GB/s":
-              speedInKB = speed * 1024 * 1024;
-              break;
-            }
-          }
-
-          const [hours, minutes, seconds] = info.leftTime.split(":").map(Number);
-          const leftTimeSeconds = hours * 3600 + minutes * 60 + seconds;
-          transferInfos.push({
-            toCluster: toCluster,
-            filePath: info.filePath,
-            transferSizeKb: Math.floor(Number(info.transferSize.replace(/,/g, "")) / 1024),
-            progress: Number(info.progress.split("%")[0]),
-            speedKBps: speedInKB,
-            remainingTimeSeconds: leftTimeSeconds,
-          });
         });
 
-        return [{ transferInfos:transferInfos }];
-      });
+        return [{ transferInfos }];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError> {
+          code: status.UNKNOWN,
+          message: "scow-sync-start command failed",
+        };
+      }
     },
 
-    terminateFileTransfer: async ({ request, logger }) => {
+    terminateFileTransfer: async ({ request }) => {
       const { fromCluster, toCluster, userId, fromPath } = request;
-      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
+
+      const client = getScowdClient(fromCluster);
+
+      if (!client) { throw scowdClientNotFound(fromCluster); }
+
       const toTransferNodeHost = getClusterTransferNode(toCluster).host;
 
-      return await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
-
-        const cmd = "scow-sync-terminate";
-        const args = [
-          "-a", toTransferNodeHost,
-          "-u", userId,
-          "-s", fromPath,
-        ];
-
-        const resp = await loggedExec(ssh, logger, true, cmd, args);
-
-        if (resp.code !== 0) {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "scow-sync-terminate command failed",
-            details: resp.stderr,
-          };
-        }
+      try {
+        await client.file.terminateFileTransfer({ 
+          toTransferNodeHost, fromPath,
+        }, { headers: { IdentityId: userId } });
 
         return [{}];
-      });
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError> {
+          code: status.UNKNOWN,
+          message: "scow-sync-start command failed",
+        };
+      }
     },
 
-    checkTransferKey: async ({ request, logger }) => {
+    checkTransferKey: async ({ request }) => {
 
       const { fromCluster, toCluster, userId } = request;
 
-      const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
-
       const {
-        address: toTransferNodeAddress,
         host: toTransferNodeHost,
         port: toTransferNodePort,
       } = getClusterTransferNode(toCluster);
 
-      // 检查fromTransferNode -> toTransferNode是否已经免密
-      const { keyConfigured, scowDir, keyDir, privateKeyPath } = await sshConnect(
-        fromTransferNodeAddress, userId, logger, async (ssh) => {
-          // 获取密钥路径
-          const sftp = await ssh.requestSFTP();
-          const homePath = await sftpRealPath(sftp)(".");
-          const scowDir = `${homePath}/scow`;
-          const keyDir = `${scowDir}/.scow-sync-ssh`;
-          const privateKeyPath = `${keyDir}/id_rsa`;
+      const client = getScowdClient(fromCluster);
 
-          const cmd = "scow-sync-start";
-          const args = [
-            "-a", toTransferNodeHost,
-            "-u", userId,
-            "-p", toTransferNodePort.toString(),
-            "-k", privateKeyPath,
-            "-c", // -c,--check参数检查是否免密，并stdout返回true/false
-          ];
+      if (!client) { throw scowdClientNotFound(fromCluster); }
 
-          const resp = await loggedExec(ssh, logger, true, cmd, args);
+      try {
+        await client.file.checkTransferKey({ 
+          toTransferNodeHost, toTransferNodePort: toTransferNodePort.toString(),
+        }, { headers: { IdentityId: userId } });
 
-          if (resp.code !== 0) {
-            throw <ServiceError> {
-              code: status.INTERNAL,
-              message: "check the key of transferring cross clusters failed",
-              details: resp.stderr,
-            };
-          }
-          const lines = resp.stdout.trim().split("\n");
-          const keyConfigured = lines[lines.length - 1] === "true";
-
-          return {
-            keyConfigured: keyConfigured,
-            scowDir: scowDir,
-            keyDir: keyDir,
-            privateKeyPath: privateKeyPath,
-          };
-        });
-
-      // 如果没有配置免密，则生成密钥并配置免密
-      if (!keyConfigured) {
-        // 随机生成密钥并复制公钥
-        const publicKey = await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
-
-          if (!await sftpExists(sftp, scowDir)) {
-            await sftpMkdir(sftp)(scowDir);
-          }
-          if (await sftpExists(sftp, keyDir)) {
-            await sshRmrf(ssh, keyDir);
-          }
-          await sftpMkdir(sftp)(keyDir);
-
-          const genKeyArgs = [
-            "-t", "rsa",
-            "-b", "4096",
-            "-C", "for scow-sync",
-            "-f", privateKeyPath,
-          ];
-          // eslint-disable-next-line quotes
-          const genKeyCmd = `ssh-keygen -N ""`;
-          await loggedExec(ssh, logger, true, genKeyCmd, genKeyArgs);
-
-          // 读公钥
-          const fileData = await sftpReadFile(sftp)(`${privateKeyPath}.pub`);
-          return fileData.toString();
-        });
-
-        // 配置fromTransferNode -> toTransferNode的免密登录
-        await sshConnect(toTransferNodeAddress, userId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
-          const homePath = await sftpRealPath(sftp)(".");
-          // 将公钥写入到authorized_keys中
-          const authorizedKeysPath = `${homePath}/.ssh/authorized_keys`;
-          await sftpAppendFile(sftp)(authorizedKeysPath, `\n${publicKey}\n`);
-        });
-
-        // 尽管copy了公钥，但第一次ssh连接时，会默认需要输入“yes”。以避免潜在的中间人攻击，但是这导致无法自动化，所以这里需要以非交互的方式ssh短连接一次。
-        await sshConnect(fromTransferNodeAddress, userId, logger, async (ssh) => {
-          const firstSshArgs = [
-            "-i", privateKeyPath,
-            "-o", "StrictHostKeyChecking=no",
-            "-p", toTransferNodePort.toString(),
-            toTransferNodeHost,
-            ":",
-          ];
-          const firstSshCmd = "ssh";
-          await loggedExec(ssh, logger, true, firstSshCmd, firstSshArgs);
-        });
-
+        return [{}];
+      } catch (err) {
+        if (err instanceof ConnectError) {
+          throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        }
+        throw <ServiceError> {
+          code: status.UNKNOWN,
+          message: "scow-sync-start command failed",
+        };
       }
       return [{}];
     },

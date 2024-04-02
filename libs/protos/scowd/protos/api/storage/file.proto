@@ -96,7 +96,6 @@ message CopyResponse {
 message UploadRequest {
 
   oneof message {
-    // only first message pass path
     string path = 1;
     bytes chunk = 2;
   };
@@ -114,6 +113,15 @@ message DownloadResponse {
   bytes chunk = 1;
 }
 
+message TransferInfo {
+  string to_cluster = 1;
+  string file_path = 2;
+  uint64 transfer_size_kb = 3; // 单位为KB，B：Byte
+  uint32 progress = 4;
+  float speed_k_bps = 5;
+  uint64 remaining_time_seconds = 6;
+}
+
 message StartFileTransferRequest {
   string to_transfer_node_host = 1;
   string to_transfer_node_port = 2;
@@ -129,7 +137,7 @@ message QueryFileTransferRequest {
 }
 
 message QueryFileTransferResponse {
-  string output = 1;
+  repeated TransferInfo transfer_infos = 1;
 }
 
 message TerminateFileTransferRequest {
@@ -164,7 +172,6 @@ service FileService {
 
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
-
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
   rpc GetHomeDirectory(GetHomeDirectoryRequest) returns (GetHomeDirectoryResponse);
