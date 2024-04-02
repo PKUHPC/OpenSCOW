@@ -170,6 +170,7 @@ export const fileServiceServer = plugin((server) => {
 
       try {
         await client.file.move({ fromPath, toPath }, { headers: { IdentityId: userId } });
+        return [{}];
       } catch (err) {
         if (err instanceof ConnectError) {
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };

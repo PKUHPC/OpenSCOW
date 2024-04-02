@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package api.application;
+
+option go_package = "scowd/protos/gen/api/application;apiv1";
+
+message CreateDesktopRequest {
+    string vnc_server_bin_path = 1;
+    uint32 max_desktops = 2;
+    string wm = 3;
+    string desktop_name = 4;
+    string desktop_dir = 5;
+    string login_node = 6;
+}
+
+message CreateDesktopResponse {
+    string password = 1;
+}
+
+message KillDesktopRequest {
+    string vnc_server_bin_path = 1;
+    uint32 display_id = 2;
+    string login_node = 3;
+    string desktop_dir = 4;
+}
+
+message KillDesktopResponse {
+}
+
+message ConnectToDesktopRequest {
+    uint32 display_id = 1;
+    string vncPasswdPath = 2;
+}
+
+message ConnectToDesktopResponse {
+    string password = 1;
+}
+
+service DesktopService {
+    rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopResponse) {}
+    rpc KillDesktop(KillDesktopRequest) returns (KillDesktopResponse) {}
+    rpc ConnectToDesktop(ConnectToDesktopRequest) returns (ConnectToDesktopResponse) {}
+}

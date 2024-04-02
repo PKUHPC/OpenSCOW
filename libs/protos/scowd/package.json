@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOWD.git#branch=master,subdir=protos/api",
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml ./protos/api",
     "build": "rimraf build && tsc"
   },
   "keywords": [],

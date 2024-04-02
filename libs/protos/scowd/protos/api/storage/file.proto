@@ -1,0 +1,176 @@
+syntax = "proto3";
+
+package api.storage;
+
+option go_package = "scowd/protos/gen/api/storage;apiv1";
+
+enum FileType {
+  FILE = 0;
+  DIR = 1;
+}
+
+message FileInfo {
+  FileType file_type = 1;
+  string name = 2;
+  string mod_time = 3;
+  uint64 size = 4;
+  uint32 mode = 5;
+}
+
+message ReadDirectoryRequest {
+  string dir_path = 1;
+}
+
+message ReadDirectoryResponse {
+  repeated FileInfo files_info = 1;
+}
+
+message CreateFileRequest {
+  string file_path = 1;
+}
+
+message CreateFileResponse {
+}
+
+message MakeDirectoryRequest {
+  string dir_path = 1;
+}
+
+message MakeDirectoryResponse {
+}
+
+message DeleteDirectoryRequest {
+  string dir_path = 1;
+}
+
+message DeleteDirectoryResponse {
+}
+
+message DeleteFileRequest {
+  string file_path = 1;
+}
+
+message DeleteFileResponse {
+}
+
+message GetFileMetadataRequest {
+  string file_path = 1;
+}
+
+message GetFileMetadataResponse {
+  uint64 size = 1;
+  FileType type = 2;
+}
+
+message GetHomeDirectoryRequest {
+}
+
+message GetHomeDirectoryResponse {
+  string path = 1;
+}
+
+message MoveRequest {
+  string from_path = 1;
+  string to_path = 2;
+}
+
+message MoveResponse {
+}
+
+message ExistsRequest {
+  string path = 1;
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+message CopyRequest {
+  string from_path = 1;
+  string to_path = 2;
+}
+
+message CopyResponse {
+}
+
+message UploadRequest {
+
+  oneof message {
+    // only first message pass path
+    string path = 1;
+    bytes chunk = 2;
+  };
+}
+
+message UploadResponse {
+  uint64 written_bytes = 1;
+}
+
+message DownloadRequest {
+  string path = 1;
+}
+
+message DownloadResponse {
+  bytes chunk = 1;
+}
+
+message StartFileTransferRequest {
+  string to_transfer_node_host = 1;
+  string to_transfer_node_port = 2;
+  string from_path = 3;
+  string to_path = 4;
+}
+
+message StartFileTransferResponse {
+
+}
+
+message QueryFileTransferRequest {
+}
+
+message QueryFileTransferResponse {
+  string output = 1;
+}
+
+message TerminateFileTransferRequest {
+  string to_transfer_node_host = 1;
+  string from_path = 2;
+}
+
+message TerminateFileTransferResponse {
+
+}
+
+message CheckTransferKeyRequest {
+  string to_transfer_node_host = 1;
+  string to_transfer_node_port = 2;
+}
+
+message CheckTransferKeyResponse {
+
+}
+
+service FileService {
+  rpc Copy(CopyRequest) returns (CopyResponse) {}
+  rpc Move(MoveRequest) returns (MoveResponse) {}
+  rpc Exists(ExistsRequest) returns (ExistsResponse) {}
+
+  rpc ReadDirectory(ReadDirectoryRequest) returns (ReadDirectoryResponse) {}
+  rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse) {}
+  rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse) {}
+
+  rpc CreateFile(CreateFileRequest) returns (CreateFileResponse) {}
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
+
+  rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc Upload(stream UploadRequest) returns (UploadResponse);
+
+
+  rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+  rpc GetHomeDirectory(GetHomeDirectoryRequest) returns (GetHomeDirectoryResponse);
+
+  rpc StartFileTransfer(StartFileTransferRequest) returns (StartFileTransferResponse);
+  rpc QueryFileTransfer(QueryFileTransferRequest) returns (QueryFileTransferResponse);
+  rpc TerminateFileTransfer(TerminateFileTransferRequest) returns (TerminateFileTransferResponse);
+  rpc CheckTransferKey(CheckTransferKeyRequest) returns (CheckTransferKeyResponse);
+}

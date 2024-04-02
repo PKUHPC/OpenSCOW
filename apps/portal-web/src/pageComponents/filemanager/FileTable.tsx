@@ -115,7 +115,7 @@ export const FileTable: React.FC<Props> = (
       key: "mode",
       dataIndex: "mode",
       title: t(p("mode")),
-      // render: (mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode),
+      render: (mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode),
     },
     ...(actionRender ? [{
       key: "action",
