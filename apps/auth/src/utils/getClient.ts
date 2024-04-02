@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getClientFn } from "@scow/lib-web/build/utils/api";
+import { getClientFn } from "@scow/lib-server/build";
 import { config } from "src/config/env";
 
 export const getClient = getClientFn({ SERVER_URL:config.MIS_SERVER_URL });

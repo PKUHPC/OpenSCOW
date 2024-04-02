@@ -12,7 +12,6 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { join } from "path";
 import { cacheInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
