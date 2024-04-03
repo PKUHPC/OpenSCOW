@@ -209,7 +209,7 @@ export const appOps = (cluster: string): AppOps => {
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
-            workingDirectory, extraOptions,
+            workingDirectory, extraOptions, mountPoints: [],
           });
         } else {
           // vnc app
@@ -232,7 +232,7 @@ export const appOps = (cluster: string): AppOps => {
           return await submitAndWriteMetadata({
             userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
             coreCount, timeLimitMinutes: maxTime, script: envVariables + VNC_ENTRY_COMMAND,
-            workingDirectory, stdout: VNC_OUTPUT_FILE, extraOptions,
+            workingDirectory, stdout: VNC_OUTPUT_FILE, extraOptions, mountPoints: [],
           });
 
         }

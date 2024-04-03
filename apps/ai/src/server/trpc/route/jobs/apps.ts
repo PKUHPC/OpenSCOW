@@ -18,7 +18,6 @@ import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
-  sftpChmod,
   sftpExists,
   sftpReaddir,
   sftpReadFile,
@@ -98,7 +97,6 @@ interface SessionMetadata {
 
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
 const VNC_ENTRY_COMMAND = fs.readFileSync("assets/app/vnc_entry.sh", { encoding: "utf-8" });
-const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
 const SESSION_METADATA_NAME = "session.json";
 
@@ -363,7 +361,7 @@ export const createAppSession = procedure
       }
 
       // SVCPORT 是k8s集群中service的端口, 由适配器提供
-      let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$SVCPORT`;
+      let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":\"$SVCPORT\"`;
       if (app.type === "web") {
         for (const key in app.web!.connect.formData) {
           const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
@@ -375,7 +373,6 @@ export const createAppSession = procedure
       const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
 
       let entryScript = "";
-      let xstartupPath = "";
       if (app.type === "web") {
         const runtimeVariables = getEnvVariables({
           PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
@@ -384,22 +381,17 @@ export const createAppSession = procedure
         const beforeScript = runtimeVariables + customAttributesExport + app.web!.beforeScript + sessionInfo;
         // 用户如果传了自定义的启动命令，则根据配置文件去替换默认的启动命令
         const webScript = startCommand ? app.web!.script.replace(app.web!.startCommand, startCommand) : app.web!.script;
-        entryScript = SERVER_ENTRY_COMMAND + beforeScript || "" + webScript;
-
+        entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
       } else if (app.type === "vnc") {
         const runtimeVariables = getEnvVariables({
           SERVER_SESSION_INFO,
-          VNCSERVER_BIN_PATH: startCommand || "vncserver",
         });
-
-        xstartupPath = join(homeDir, appJobsDirectory, "xstartup");
-        const xstartupScript = BIN_BASH_SCRIPT_HEADER + app.vnc!.xstartup;
-        await sftpWriteFile(sftp)(xstartupPath, xstartupScript);
-        await sftpChmod(sftp)(xstartupPath, "755");
-
+        // 对于vnc 的自定义镜像应用，用户需要传对应的运行镜像中启动脚本的命令
+        const xstartupScript = startCommand || app.vnc!.xstartup;
         const beforeScript = app.vnc!.beforeScript || "";
 
-        entryScript = runtimeVariables + customAttributesExport + beforeScript + VNC_ENTRY_COMMAND + sessionInfo;
+        entryScript = VNC_ENTRY_COMMAND + runtimeVariables + customAttributesExport + beforeScript
+        + sessionInfo + xstartupScript;
 
       } else {
         throw new TRPCError({
@@ -418,7 +410,7 @@ export const createAppSession = procedure
         algorithm: algorithmVersion?.path,
         dataset: datasetVersion?.path,
         model: modelVersion?.path,
-        mountPoint,
+        mountPoints: [],
         account,
         partition: partition!,
         coreCount,
@@ -431,7 +423,6 @@ export const createAppSession = procedure
         script: remoteEntryPath,
         // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
         extraOptions: [JobType.APP, app.type],
-        xstartupPath,
       }).catch((e) => {
         const ex = e as ServiceError;
         throw new TRPCError({
@@ -831,6 +822,15 @@ procedure
     }
 
     switch (app.type) {
+    case AppType.vnc:
+      return {
+        host: reply.host,
+        port: reply.port,
+        password: reply.password,
+        type: "vnc",
+        vnc: {},
+      };
+      break;
     case AppType.web:
       return {
         host: reply.host,

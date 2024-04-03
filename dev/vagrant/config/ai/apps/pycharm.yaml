@@ -9,15 +9,14 @@ name: pycharm
 
 # 指定应用类型，vnc或者web
 type: vnc
-
 image:
   # 镜像名称
-  name: pycharm
+  name: 10.129.227.64/test/admin/pycharm
   # 镜像版本
-  tag: v0.1
+  tag: v1.1
 
 # VNC应用的配置
 vnc:
   # 此X Session的xstartup脚本
   xstartup: |
-    pycharm
+    /dockerstartup/vnc_startup.sh pycharm
