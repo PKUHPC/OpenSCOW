@@ -170,10 +170,11 @@
         const authPath = "{{ unicomAuthPath }}"
         const realm = "{{ unicomRealm }}"
         const clientId = "{{ unicomClientId }}"
+        const RedirectUrl = "{{ unicomRedirectUrl }}"
 
         const origin = window.location.origin
 
-        window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&state=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
+        window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}${RedirectUrl}?callbackUrl=${callbackUrl}&state=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
       })
     </script>
 </body>
