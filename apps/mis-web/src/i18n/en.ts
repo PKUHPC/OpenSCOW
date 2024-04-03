@@ -225,7 +225,7 @@ export default {
         debtAccount: "Debt Accounts",
         blockedAccount: "Blocked Accounts",
         frozenAccount: "Frozen Accounts",
-        normalAccount: "Normal Accounts",
+        normalAccount: "Available Accounts",
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
@@ -243,7 +243,7 @@ export default {
         + "platform administrator and cannot submit jobs through this account.",
         statusDebtTooltip: "Debt: The account balance is less than or equal to the blocking threshold, "
         + "and jobs cannot be submitted through this account.",
-        statusNormalTooltip: "Normal: The account status is not blocked or frozen, and the account "
+        statusNormalTooltip: "Available: The account status is not blocked or frozen, and the account "
         + "balance is greater than the blocking threshold; or the account is already in the whitelist.",
         mangerMember: "Manage Members",
         blocked: "Blocked",
@@ -257,6 +257,7 @@ export default {
         unblockFail: "Account unblocking failed!",
         unblockError: "Account {} has insufficient balance. "
         + "You can add it to the whitelist or unblock by adding funds.",
+        block: "Block",
         unblock: "Unblock",
         blockConfirmTitle: "Confirm Account Block?",
         blockConfirmContent: "Do you wish to block account {} within tenant {}?",
@@ -696,6 +697,7 @@ export default {
       },
       userTable: {
         block: "Block",
+        blocked: "Blocked",
         normal: "Available",
         quotaExceeded: "Quota Exceeded",
         statusExplanation: "User Status Explanation",
@@ -703,8 +705,8 @@ export default {
           + "preventing the selection of this account for job submission.",
         quotaExceededExplanation: "Quota Exceeded: The user is not blocked, but the used quota is greater than or "
         + "equal to the user's quota limit, preventing the selection of this account for job submission.",
-        normalExplanation: "Normal: The user is not blocked, and the used quota is less than the user's quota limit, "
-        + "allowing the selection of this account to submit jobs.",
+        normalExplanation: "Available: The user is not blocked, and the used quota is less than the user's "
+        + "quota limit, allowing the selection of this account to submit jobs.",
         admin: "Admin",
         user: "Regular User",
         role: "Role",
@@ -716,7 +718,7 @@ export default {
         confirmUnsealText2: " ",
         confirmUnsealText3: "?",
         unsealSuccess: "User unsealed successfully!",
-        unseal: "Unseal",
+        unseal: "Unblock",
         confirmBlock: "Confirm blocking user?",
         confirmBlockText1: "Confirm blocking user from account ",
         confirmBlockText2: " ",

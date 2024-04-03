@@ -413,7 +413,7 @@ export const AccountTable: React.FC<Props> = ({
                     });
                   }}
                   >
-                    {t(p("blocked"))}
+                    {t(p("block"))}
                   </a>
                 )}
             </Space>
