@@ -796,7 +796,7 @@ export default {
       multiClusterOpErrorTitle: "操作失败",
       multiClusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
 
-      adapterConnErrorContent: "{} 集群连接失败。",
+      adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
     },
     profile: {

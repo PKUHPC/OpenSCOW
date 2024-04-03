@@ -796,7 +796,7 @@ export default {
       multiClusterOpErrorTitle: "Operation Failed",
       multiClusterOpErrorContent: "Multiple cluster operations encountered errors, and some clusters were not "
       + "synchronized with the modifications.",
-      adapterConnErrorContent: "The {} cluster connection failed. ",
+      adapterConnErrorContent: "The {} cluster is currently unreachable. Please try again later. ",
       effectErrorMessage: "Server error occurred!",
     },
     profile: {
