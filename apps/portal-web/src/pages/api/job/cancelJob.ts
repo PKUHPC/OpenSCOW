@@ -33,6 +33,10 @@ export const CancelJobSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
     404: Type.Object({ code: Type.Literal("JOB_NOT_FOUND") }),
+    503: Type.Object({
+      code: Type.Literal("SERVICE_UNAVAILABLE"),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -62,6 +66,8 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "JOB_NOT_FOUND" } } as const),
+    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
+    [status.INTERNAL]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
   },
   async () => await callLog(logInfo, OperationResult.FAIL),
   ));

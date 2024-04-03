@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
@@ -20,6 +20,7 @@ import { authenticate } from "src/auth/server";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
 import { moneyToString } from "src/utils/money";
+import { route } from "src/utils/route";
 
 import { getUserStatus } from "../dashboard/status";
 
@@ -187,7 +188,7 @@ export async function getAvailableBillingTableItems(
 
 }
 
-export default /* #__PURE__*/typeboxRoute(GetAvailableBillingTableSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAvailableBillingTableSchema, async (req, res) => {
   const { cluster, tenant, userId } = req.query;
   const auth = authenticate(() => true);
   const info = await auth(req, res);

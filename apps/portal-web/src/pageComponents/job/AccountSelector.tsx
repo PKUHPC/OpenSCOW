@@ -11,15 +11,15 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { getClusterAccountsConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import { App, Button, Input, Select, Tooltip } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface Props {
   cluster?: string;
@@ -31,16 +31,15 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const userStore = useStore(UserStore);
   const { message } = App.useApp();
 
-  const languageId = useI18n().currentLanguage.id;
   const clusterName = cluster ?
     (publicConfig.CLUSTERS.find((c) => c.id === cluster)?.name ?? cluster) : undefined;
-  const clusterAccountsConnError = getClusterAccountsConnError(languageId, clusterName);
+  const clusterAccountsConnError = getClusterConnError(clusterName, "pages.commonError.clusterAccountsConnError");
 
   const promiseFn = useCallback(async () => {
     return cluster ?
       api.getAccounts({ query: { cluster } })
         .httpError(404, (error) => { message.error(error.message); })
-        .httpError(503, () => { message.error(clusterAccountsConnError); })
+        .httpError(503, (e) => { message.error(`${clusterAccountsConnError}（${e.message}）`); })
       : { accounts: [] as string[] };
   }, [cluster, userStore.user]);
 

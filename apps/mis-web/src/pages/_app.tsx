@@ -66,7 +66,6 @@ const FailEventHandler: React.FC = () => {
         userStore.logout();
         return;
       }
-      console.log("【_app-global-e】", e);
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
           title: tArgs("page._app.multiClusterOpErrorTitle"),

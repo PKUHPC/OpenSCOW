@@ -125,6 +125,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
+      [status.CANCELLED]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
     },
     async () => await callLog(
       { ...logInfo,

@@ -11,7 +11,6 @@
  */
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { getClusterConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
@@ -22,12 +21,13 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface JobForm {
   cluster: Cluster;
@@ -83,7 +83,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const [loading, setLoading] = useState(false);
 
   const t = useI18nTranslateToString();
-  const languageId = useI18n().currentLanguage.id;
 
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
@@ -130,12 +129,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
 
-  const clusterConnError = getClusterConnError(languageId, cluster?.name);
+  const clusterConnError = getClusterConnError(cluster?.name, "pages.commonError.clusterConnError");
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
       ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
-        .httpError(503, () => { message.error(clusterConnError); })
+        .httpError(503, (e) => { message.error(`${clusterConnError}（${e.message}）`); })
       : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {

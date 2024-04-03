@@ -14,7 +14,6 @@ import { QuestionCircleOutlined } from "@ant-design/icons";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { getClusterJobsConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { App, Button, DatePicker, Form, InputNumber, Popover, Space, Table } from "antd";
 import dayjs from "dayjs";
@@ -29,6 +28,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 
 interface FilterForm {
   time: [dayjs.Dayjs, dayjs.Dayjs];
@@ -60,14 +60,14 @@ export const AllJobQueryTable: React.FC<Props> = ({
   const { message } = App.useApp();
 
   const languageId = useI18n().currentLanguage.id;
-  const clusterJobsConnError = getClusterJobsConnError(languageId, query.cluster.name);
+  const clusterJobsConnError = getClusterConnError(query.cluster.name, "pages.commonError.clusterJobsConnError");
 
   const promiseFn = useCallback(async () => {
     return await api.getAllJobs({ query: {
       cluster: query.cluster.id,
       startTime: query.time[0].toISOString(),
       endTime: query.time[1].toISOString(),
-    } }).httpError(503, () => { message.error(clusterJobsConnError); });
+    } }).httpError(503, (e) => { message.error(`${clusterJobsConnError}（${e.message}）`); });
   }, [userId, query.cluster, query.time]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });

@@ -12,7 +12,6 @@
 
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { getClusterConnError } from "@scow/lib-web/src/utils/CommonClusterConnError";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
@@ -27,6 +26,7 @@ import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 import { styled } from "styled-components";
 
 const Text = styled(Typography.Paragraph)`
@@ -136,12 +136,12 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   const clusterName = clusterId ?
     (publicConfig.CLUSTERS.find((c) => c.id === clusterId)?.name ?? clusterId) : undefined;
+  const clusterConnError = getClusterConnError(clusterName, "pages.commonError.clusterConnError");
 
-  const clusterJobsConnError = getClusterConnError(languageId, clusterName);
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => clusterId
       ? api.getClusterInfo({ query: { cluster:  clusterId } })
-        .httpError(503, () => { message.error(clusterJobsConnError); }) : undefined, []),
+        .httpError(503, (e) => { message.error(`${clusterConnError}（${e.message}）`); }) : undefined, []),
     onResolve: async (data) => {
       if (data) {
         setLoading(true);
