@@ -257,6 +257,7 @@ export default {
         unblockFail: "解封账户失败！",
         unblockError: "账户{}余额不足，您可以将其加入白名单或充值解封",
 
+        block: "封锁",
         unblock: "解除封锁",
         blockConfirmTitle: "确认封锁账户？",
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
@@ -696,6 +697,7 @@ export default {
       },
       userTable:{
         block:"封锁",
+        blocked: "封锁",
         normal:"正常",
         quotaExceeded: "限额",
         statusExplanation: "用户状态说明",
