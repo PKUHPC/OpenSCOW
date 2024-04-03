@@ -84,6 +84,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const t = useI18nTranslateToString();
 
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
+  const clusterConnError = getClusterConnError(cluster?.name, "pages.commonError.clusterConnError");
+
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
@@ -106,7 +109,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         } else {
           throw e;
         }
-      })
+      }).httpError(503, (e) => { message.error(`${clusterConnError}（${e.message}）`); })
       .then(({ jobId }) => {
         message.success(t(p("successMessage")) + jobId);
         Router.push("/jobs/runningJobs");
@@ -114,7 +117,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       .finally(() => setLoading(false));
   };
 
-  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const jobName = Form.useWatch("jobName", form) as string;
 
@@ -128,8 +130,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
-
-  const clusterConnError = getClusterConnError(cluster?.name, "pages.commonError.clusterConnError");
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster

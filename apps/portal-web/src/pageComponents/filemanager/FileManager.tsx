@@ -46,6 +46,7 @@ import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster, publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
+import { getClusterConnError } from "src/utils/getClusterConnError";
 import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
 
@@ -360,6 +361,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   }, [editFile, files]);
 
+
+  const clusterConnError = getClusterConnError(cluster?.name, "pages.commonError.clusterConnError");
+
   return (
     <div>
       <TitleText>
@@ -620,6 +624,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                             throw e;
                           })();
                         })
+                        .httpError(503, (e) => { message.error(`${clusterConnError}（${e.message}）`); })
                         .then((result) => {
                           message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));
                           resetSelectedAndOperation();
