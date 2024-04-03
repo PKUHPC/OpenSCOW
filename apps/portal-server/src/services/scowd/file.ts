@@ -16,6 +16,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { FileInfo, fileInfo_FileTypeFromJSON,
   FileServiceServer, FileServiceService } from "@scow/protos/build/portal/file";
 import { FileType } from "@scow/scowd-protos/build/storage/file_pb";
+import { config } from "src/config/env";
 import { scowdClientNotFound } from "src/utils/errors";
 import { convertCodeToGrpcStatus, getScowdClient } from "src/utils/scowd";
 import { getClusterTransferNode } from "src/utils/ssh";
@@ -217,7 +218,9 @@ export const scowdFileServiceServer = plugin((server) => {
       subLogger.info("Download file started");
     
       try {
-        const readStream = await client.file.download({ path }, { headers: { IdentityId: userId } });
+        const readStream = await client.file.download({ 
+          path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
+        }, { headers: { IdentityId: userId } });
       
         for await (const response of readStream) {
           call.write(response);
@@ -252,11 +255,35 @@ export const scowdFileServiceServer = plugin((server) => {
 
       if (!client) { throw scowdClientNotFound(cluster); }
 
+      class RequestError {
+        constructor(
+          public code: ServiceError["code"],
+          public message: ServiceError["message"],
+          public details?: ServiceError["details"],
+        ) {}
+
+        toServiceError(): ServiceError {
+          return <ServiceError> { code: this.code, message: this.message, details: this.details };
+        }
+      }
+
       const logger = call.logger.child({ upload: { userId, path, cluster } });
       logger.info("Upload file started");
 
       try {
-        const res = await client.file.upload(call);
+        const res = await client.file.upload((async function* () {
+          yield { message: { case: "info", value: { path, userId } } };
+
+          for await (const data of call.iter()) {
+            if (data.message?.$case !== "chunk") {
+              throw new RequestError(
+                status.INVALID_ARGUMENT,
+                `Expect receive chunk but received message of type ${data.message?.$case}`,
+              );
+            }
+            yield { message: { case: "chunk", value: data.message.chunk } };
+          }
+        })());
         return [{ writtenBytes: Number(res.writtenBytes) }];
       } catch (err) {
         if (err instanceof ConnectError) {

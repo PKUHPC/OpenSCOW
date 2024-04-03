@@ -95,8 +95,13 @@ message CopyResponse {
 
 message UploadRequest {
 
+  message Info {
+    string user_id = 1;
+    string path = 2;
+  }
+
   oneof message {
-    string path = 1;
+    Info info = 1;
     bytes chunk = 2;
   };
 }
@@ -107,6 +112,7 @@ message UploadResponse {
 
 message DownloadRequest {
   string path = 1;
+  uint32 chunk_size = 2;
 }
 
 message DownloadResponse {
