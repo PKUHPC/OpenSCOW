@@ -55,7 +55,7 @@
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
     "@sinclair/typebox": "0.32.20",
-    "@tanstack/react-query": "4.36.1",
+    "@tanstack/react-query": "5.28.14",
     "@trpc/client": "10.45.2",
     "@trpc/next": "10.45.2",
     "@trpc/react-query": "10.45.2",
