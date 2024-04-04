@@ -45,7 +45,8 @@
     {
       "matchPackagePatterns": [
         "ldapjs",
-        "@types/ldapjs"
+        "@types/ldapjs",
+        "@tanstack/react-query"
       ],
       "enabled": false
     }
