@@ -41,6 +41,13 @@
         "@uiw/react-codemirror"
       ],
       "enabled": false
+    },
+    {
+      "matchPackagePatterns": [
+        "ldapjs",
+        "@types/ldapjs"
+      ],
+      "enabled": false
     }
   ]
 }
