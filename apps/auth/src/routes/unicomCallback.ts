@@ -17,7 +17,7 @@ import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
-import { genRandomString } from "src/utils/genId";
+import { genRandomStringWithLowercaseAndNumber } from "src/utils/genId";
 
 const QuerystringSchema = Type.Object({
   // 状态标识
@@ -99,7 +99,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
         await redirectToWeb(callback!, UnicomToken, rep);
       }
       else {
-        const userId = `${genRandomString(4)}_${userInfo.phone}`;
+        const userId = `${genRandomStringWithLowercaseAndNumber(6)}_${userInfo.phone}`;
         await createUser(userId, userInfo);
 
         await cacheUnicomInfo(UnicomToken, userId, req);

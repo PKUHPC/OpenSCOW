@@ -10,14 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import * as crypto from "crypto";
+import { customAlphabet } from "nanoid";
 
 /**
  *
- * @param length 多少字节的随机Buffer
- * @returns
+ * @param length
+ * @returns 只包含小写字母和数字
  */
-export function genRandomString(length: number): string {
-  return crypto.randomBytes(length).toString("base64").slice(0, -2);
+export function genRandomStringWithLowercaseAndNumber(length: number) {
+  const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const nanoid = customAlphabet(alphabet, length);
+
+  const randomString = nanoid();
+
+  return randomString;
 }
 
