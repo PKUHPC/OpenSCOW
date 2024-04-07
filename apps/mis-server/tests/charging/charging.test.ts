@@ -19,7 +19,7 @@ import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
@@ -41,7 +41,12 @@ beforeEach(async () => {
 
   const tenant = new Tenant({ name: "test" });
 
-  account = new Account({ accountName: "123", tenant, blocked: false, comment: "test" });
+  account = new Account({
+    accountName: "123",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
 
   await em.persistAndFlush([tenant, account]);
 
@@ -113,7 +118,7 @@ it("pays account with negative amount to block account", async () => {
     type: "test",
   });
 
-  expect(account.blocked).toBe(false);
+  expect(account.blockedInCluster).toBe(false);
   const amount2 = numberToMoney(-5);
   const reply = await asyncClientCall(client, "pay", {
     tenantName: account.tenant.getProperty("name"),
@@ -130,7 +135,8 @@ it("pays account with negative amount to block account", async () => {
   expect(moneyToNumber(reply.currentBalance!)).toBe(0);
 
   await reloadEntity(em, account);
-  expect(account.blocked).toBeTruthy();
+  expect(account.blockedInCluster).toBeTruthy();
+  expect(account.state).toBe(AccountState.NORMAL);
 });
 
 it("concurrently pays", async () => {
@@ -213,6 +219,8 @@ it("charges account", async () => {
   await reloadEntity(em, account);
 
   expect(account.balance.toNumber()).toBe(-10);
+  expect(account.blockedInCluster).toBeTruthy();
+  expect(account.state).toBe(AccountState.NORMAL);
 });
 
 it("concurrently charges", async () => {
@@ -248,7 +256,12 @@ it("concurrently charges", async () => {
 it("returns payment records", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
-  const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
+  const account2 = new Account({
+    accountName: "1234",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await em.persistAndFlush([tenant2, account2]);
 
   const amount1 = numberToMoney(10);
@@ -524,7 +537,12 @@ it("returns charge records with query of allTenants", async () => {
 
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
-  const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
+  const account2 = new Account({
+    accountName: "1234",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await em.persistAndFlush([tenant2, account2]);
 
   const amount1 = numberToMoney(10);
@@ -611,7 +629,12 @@ it("returns charge records with query of allTenants", async () => {
 it("returns charge records with query of accountsOfTenant", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
-  const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
+  const account2 = new Account({
+    accountName: "1234",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await em.persistAndFlush([tenant2, account2]);
 
   const amount1 = numberToMoney(10);
@@ -688,7 +711,12 @@ it("returns charge records with query of accountsOfTenant", async () => {
 it("returns charge records with query allAccountOfAllTenants", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
-  const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
+  const account2 = new Account({
+    accountName: "1234",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await em.persistAndFlush([tenant2, account2]);
 
   const amount1 = numberToMoney(10);
@@ -800,7 +828,12 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
 it("returns charge records' total results", async () => {
   const tenant = await em.findOne(Tenant, { name:"test" }) as Tenant;
   const tenant2 = new Tenant({ name: "test2" });
-  const account2 = new Account({ accountName: "1234", tenant, blocked: false, comment: "test" });
+  const account2 = new Account({
+    accountName: "1234",
+    tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await em.persistAndFlush([tenant2, account2]);
 
   const amount1 = numberToMoney(10);

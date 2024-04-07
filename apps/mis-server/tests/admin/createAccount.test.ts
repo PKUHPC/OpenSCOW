@@ -59,7 +59,11 @@ it("create a new account", async () => {
 
 
 it("cannot create a account if the name exists", async () => {
-  const account = new Account({ accountName: "123", tenant, blocked: false, comment: "test" });
+  const account = new Account({
+    accountName: "123", tenant,
+    blockedInCluster: false,
+    comment: "test",
+  });
   await server.ext.orm.em.fork().persistAndFlush(account);
 
   const reply = await asyncClientCall(client, "createAccount", {

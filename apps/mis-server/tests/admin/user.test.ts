@@ -17,8 +17,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { dayjsToDateMessage } from "@scow/lib-server/build/date";
-import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
-  SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import { AccountUserInfo_DisplayedUserState as DisplayedUserState,
+  AccountUserInfo_UserStateInAccount as UserStateInAccount,
+  GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
+  SortDirection, TenantRole, UserRole as UserRoleProtoType, UserServiceClient,
+  UserStatus as UserStatusProtoType } from "@scow/protos/build/server/user";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
@@ -149,19 +152,24 @@ it("when removing a user from an account, the account and user cannot be deleted
   const em = server.ext.orm.em.fork();
 
   const account = new Account({
-    accountName: "account_remove", comment: "", blocked: false, tenant:data.tenant,
+    accountName: "account_remove",
+    comment: "",
+    blockedInCluster: false,
+    tenant:data.tenant,
   }) as Loaded<Account, "tenant">;
 
   const uaA = new UserAccount({
     account,
     user: data.userA,
-    role: UserRole.OWNER, status: UserStatus.UNBLOCKED,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   const uaB = new UserAccount({
     account,
     user: data.userB,
-    role: UserRole.USER, status: UserStatus.UNBLOCKED,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.UNBLOCKED,
   }) as Loaded<UserAccount, "account" | "user">;
 
   await em.persistAndFlush([account, uaA, uaB]);
@@ -188,7 +196,10 @@ it("deletes user", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);
@@ -278,7 +289,10 @@ it("get all users with idOrName", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);
@@ -625,4 +639,40 @@ it("get new user count in UTC+8 timezone", async () => {
     { date:dayjsToDateMessage(twoDaysBeforeInUtcPlus8), count: 10 },
   ]);
 
+});
+
+it("get account users", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const reply = await asyncClientCall(client, "getAccountUsers", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+  }).catch((e) => e);
+
+  expect(reply.results).toIncludeSameMembers([
+    {
+      userId: "a",
+      name: "AName",
+      email: "a@a.com",
+      role: UserRoleProtoType.OWNER,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+    {
+      userId: "b",
+      name: "BName",
+      email: "b@b.com",
+      role: UserRoleProtoType.ADMIN,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+  ]);
 });
