@@ -258,6 +258,7 @@ export default {
         unblockFail: "解封账户失败！",
         unblockError: "账户{}余额不足，您可以将其加入白名单或充值解封",
 
+        block: "封锁",
         unblock: "解除封锁",
         blockConfirmTitle: "确认封锁账户？",
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
@@ -699,7 +700,16 @@ export default {
       },
       userTable:{
         block:"封锁",
+        blocked: "封锁",
         normal:"正常",
+        quotaExceeded: "限额",
+        statusExplanation: "用户状态说明",
+        blockedExplanation: "封锁：用户已被账户管理员或账户拥有者封锁，无法选择该账户提交作业",
+
+        quotaExceededExplanation: "限额：用户未被封锁，但用户已用额度>=用户限额，无法选择该账户提交作业",
+
+        normalExplanation: "正常：用户未被封锁，且用户已用额度<用户限额，可以选择该账户继续提交作业",
+
         admin:"管理员",
         user:"普通用户",
         role:"角色",

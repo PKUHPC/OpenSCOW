@@ -41,6 +41,14 @@
         "@uiw/react-codemirror"
       ],
       "enabled": false
+    },
+    {
+      "matchPackagePatterns": [
+        "ldapjs",
+        "@types/ldapjs",
+        "@tanstack/react-query"
+      ],
+      "enabled": false
     }
   ]
 }

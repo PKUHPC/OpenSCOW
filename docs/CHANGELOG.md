@@ -1,5 +1,13 @@
 # @scow/docs
 
+## 1.3.2
+
+### Patch Changes
+
+- abda3b2: 修改用户模型文档中账户状态及用户在账户中的状态描述的文字错误
+- d822db7: ai 系统新增支持 k8s 集群的 containerd 运行时
+- 7b9e0b6: 去掉 node-cron 表达式前秒的限制
+
 ## 1.3.1
 
 ### Patch Changes

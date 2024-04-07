@@ -40,7 +40,7 @@ export type DesktopItem = {
   desktopId: number,
   desktopName: string,
   wm: string,
-  createTime: string,
+  createTime?: string,
   addr: string,
 }
 
@@ -83,7 +83,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
             createTime: x.createTime,
             addr: userDesktop.host,
             wm: x.wm,
-          }),
+          }) satisfies DesktopItem,
         ),
       ).flat();
     }, [cluster, loginNode?.address]),
