@@ -51,7 +51,6 @@ export const UnicomCallbackRoute = fp(async (f) => {
       },
     },
     async (req, rep) => {
-
       const { code, state } = req.query;
 
       // 获取登录成功后跳转的url
