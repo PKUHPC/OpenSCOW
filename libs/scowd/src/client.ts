@@ -20,6 +20,7 @@ import { FileService } from "@scow/scowd-protos/build/storage/file_connect";
 
 export interface ScowdClient {
   file: PromiseClient<typeof FileService>;
+  desktop: PromiseClient<typeof DesktopService>
 }
 
 export function getClient<TService extends ServiceType>(

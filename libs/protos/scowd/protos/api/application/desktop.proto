@@ -4,6 +4,8 @@ package api.application;
 
 option go_package = "scowd/protos/gen/api/application;apiv1";
 
+import "google/protobuf/timestamp.proto";
+
 message CreateDesktopRequest {
     string vnc_server_bin_path = 1;
     uint32 max_desktops = 2;
@@ -15,6 +17,7 @@ message CreateDesktopRequest {
 
 message CreateDesktopResponse {
     string password = 1;
+    int32 display_id = 2;
 }
 
 message KillDesktopRequest {
@@ -29,15 +32,34 @@ message KillDesktopResponse {
 
 message ConnectToDesktopRequest {
     uint32 display_id = 1;
-    string vncPasswdPath = 2;
+    string vnc_passwd_path = 2;
 }
 
 message ConnectToDesktopResponse {
     string password = 1;
 }
 
+message ListUserDesktopsRequest {
+    string vnc_server_bin_path = 1;
+    string desktop_dir = 2;
+    string login_node = 3;
+}
+
+message Desktop {
+    uint32 display_id = 1;
+    string desktop_name = 2;
+    string wm = 3;
+    google.protobuf.Timestamp create_time = 4;
+}
+
+// NOT_FOUND: cluster is not found
+message ListUserDesktopsResponse {
+    repeated Desktop user_desktops = 1;
+}
+
 service DesktopService {
     rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopResponse) {}
     rpc KillDesktop(KillDesktopRequest) returns (KillDesktopResponse) {}
     rpc ConnectToDesktop(ConnectToDesktopRequest) returns (ConnectToDesktopResponse) {}
+    rpc ListUserDesktops(ListUserDesktopsRequest) returns (ListUserDesktopsResponse) {}
 }

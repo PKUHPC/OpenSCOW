@@ -45,7 +45,7 @@ export const scowdFileServiceServer = plugin((server) => {
       }
     },
 
-    createFile: async ({ request }) => {
+    createFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;
 
@@ -53,10 +53,14 @@ export const scowdFileServiceServer = plugin((server) => {
 
       if (!client) { throw scowdClientNotFound(cluster); }
 
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("CreateFile started");
+
       try {
         await client.file.createFile({ filePath: path }, { headers: { IdentityId: userId } });
         return [{}];
       } catch (err) {
+        subLogger.error(err);
         if (err instanceof ConnectError) {
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
@@ -67,17 +71,21 @@ export const scowdFileServiceServer = plugin((server) => {
       }
     },
 
-    deleteDirectory: async ({ request }) => {
+    deleteDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
 
       const client = getScowdClient(cluster);
 
       if (!client) { throw scowdClientNotFound(cluster); }
 
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("deleteDirectory started");
+
       try {
         await client.file.deleteDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
         return [{}];
       } catch (err) {
+        subLogger.error(err);
         if (err instanceof ConnectError) {
           throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
         }
