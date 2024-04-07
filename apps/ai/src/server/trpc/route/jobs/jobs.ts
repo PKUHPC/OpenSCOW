@@ -132,7 +132,7 @@ procedure
           image: image!.path,
           dataset: datasetVersion?.path,
           model: modelVersion?.path,
-          mountPoints: [],
+          mountPoint,
           account,
           partition: partition!,
           coreCount,

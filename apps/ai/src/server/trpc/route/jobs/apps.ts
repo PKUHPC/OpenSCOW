@@ -410,7 +410,7 @@ export const createAppSession = procedure
         algorithm: algorithmVersion?.path,
         dataset: datasetVersion?.path,
         model: modelVersion?.path,
-        mountPoints: [],
+        mountPoint,
         account,
         partition: partition!,
         coreCount,
