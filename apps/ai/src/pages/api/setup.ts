@@ -11,6 +11,7 @@
  */
 
 import { NextApiRequest } from "next";
+import { setupJobShellServer } from "src/server/setup/jobShell";
 import { setupWssProxy } from "src/server/setup/proxy";
 
 let setup = false;
@@ -22,6 +23,8 @@ export default async (req: NextApiRequest, res: any) => {
   }
 
   setupWssProxy(res);
+  setupJobShellServer(res);
+
 
   setup = true;
   res.send("Setup complete");

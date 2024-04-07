@@ -113,6 +113,9 @@ export const ClusterConfigSchema = Type.Object({
   k8s: Type.Optional(Type.Object({
     runtime: Type.Enum(k8sRuntime, { description: "k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd",
       default: "containerd" }),
+    kubeConfig: Type.Object({
+      path: Type.String({ description: "集群 kubectl 配置文件路径" }),
+    }, { description: "k8s 集群中 kubectl 的配置" }),
   }, { description: "k8s 集群配置" })),
 });
 
