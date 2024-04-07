@@ -15,7 +15,9 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { Account_AccountState as AccountState,
+  Account_DisplayedAccountState as DisplayedAccountState,
+  AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -66,6 +68,9 @@ it("gets all accounts", async () => {
         data.accountA.blockThresholdAmount,
       ) : undefined,
       defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
+      state: AccountState.NORMAL,
+      isInWhitelist: false,
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -79,6 +84,9 @@ it("gets all accounts", async () => {
         data.accountB.blockThresholdAmount,
       ) : undefined,
       defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
+      state: AccountState.NORMAL,
+      isInWhitelist: false,
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
     },
   ]);
 
@@ -100,7 +108,12 @@ it("gets all accounts", async () => {
   const anotherTenant = await em.findOne(Tenant, { name: "another" }) as Tenant;
   const userD = new User({ tenant: anotherTenant, email: "123", name: "dName", userId: "d" });
   const accountC = await em.findOne(Account, { accountName: "hpcc" }) as Account;
-  const uaCD = new UserAccount({ user: userD, account: accountC, role: UserRole.OWNER, status: UserStatus.BLOCKED });
+  const uaCD = new UserAccount({
+    user: userD,
+    account: accountC,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.BLOCKED,
+  });
   await em.persistAndFlush([userD, uaCD]);
 
   const resp = await asyncClientCall(client, "getAccounts", {});
@@ -119,6 +132,9 @@ it("gets all accounts", async () => {
         data.accountA.blockThresholdAmount,
       ) : undefined,
       defaultBlockThresholdAmount: decimalToMoney(data.accountA.tenant.$.defaultAccountBlockThreshold),
+      state: AccountState.NORMAL,
+      isInWhitelist: false,
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
     },
     { "accountName": "hpcb",
       "blocked": false,
@@ -132,6 +148,9 @@ it("gets all accounts", async () => {
         data.accountB.blockThresholdAmount,
       ) : undefined,
       defaultBlockThresholdAmount: decimalToMoney(data.accountB.tenant.$.defaultAccountBlockThreshold),
+      state: AccountState.NORMAL,
+      isInWhitelist: false,
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
     },
     { "accountName": "hpcc",
       "blocked": false,
@@ -145,6 +164,9 @@ it("gets all accounts", async () => {
         data.accountC.blockThresholdAmount,
       ) : undefined,
       defaultBlockThresholdAmount: decimalToMoney(data.accountC.tenant.getProperty("defaultAccountBlockThreshold")),
+      state: AccountState.NORMAL,
+      isInWhitelist: false,
+      displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
     },
   ]);
 });

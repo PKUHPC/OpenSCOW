@@ -14,7 +14,8 @@
 
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Space, Spin } from "antd";
+import { App, Button, Checkbox, Col,
+  Divider, Form, Input, InputNumber, Row, Select, Space, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
+import { Status } from "src/models/Image";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
@@ -104,7 +106,7 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, clusterInfo, isTraining = false, appId, attributes = []} = props;
+  const { clusterId, appName, clusterInfo, isTraining = false, appId, attributes = [], appImage } = props;
 
   const { message } = App.useApp();
 
@@ -113,6 +115,12 @@ export const LaunchAppForm = (props: Props) => {
   const [form] = Form.useForm<FormFields>();
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+
+  const [useCustomImage, setUseCustomImage] = useState(false);
+
+  const [showAlgorithm, setShowAlgorithm] = useState(false);
+  const [showDataset, setShowDataset] = useState(false);
+  const [showModel, setShowModel] = useState(false);
 
   const { dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading } = useDataOptions<DatasetInterface>(
     form,
@@ -176,7 +184,9 @@ export const LaunchAppForm = (props: Props) => {
   });
 
   const imageOptions = useMemo(() => {
-    return images?.items.map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
+    return images?.items
+      .filter((x) => x.status === Status.CREATED)
+      .map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
   }, [images]);
 
   // 暂时写死为1
@@ -229,7 +239,7 @@ export const LaunchAppForm = (props: Props) => {
       inputItem = (
         <Input
           placeholder={getI18nConfigCurrentText(placeholder, undefined)}
-          suffix={
+          prefix={
             (
               <FileSelectModal
                 allowedFileType={["DIR"]}
@@ -328,15 +338,17 @@ export const LaunchAppForm = (props: Props) => {
           await trainJobMutation.mutateAsync({
             clusterId,
             trainJobName: appJobName,
-            algorithm: algorithm.version,
-            imageId: image.name,
-            dataset: dataset.version,
-            model: model.version,
+            algorithm: algorithm?.version,
+            imageId: image?.name,
+            dataset: dataset?.version,
+            model: model?.version,
             mountPoint: mountPoint,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
-            coreCount: coreCount,
+            coreCount: gpuCount ?
+              gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) :
+              coreCount,
             gpuCount: gpuCount,
             maxTime: maxTime,
             memory: memorySize,
@@ -357,11 +369,11 @@ export const LaunchAppForm = (props: Props) => {
             clusterId,
             appId: appId!,
             appJobName,
-            algorithm: algorithm.version,
-            image: image.name,
+            algorithm: algorithm?.version,
+            image: image?.name,
             startCommand,
-            dataset: dataset.version,
-            model: model.version,
+            dataset: dataset?.version,
+            model: model?.version,
             mountPoint,
             account: account,
             partition: partition,
@@ -383,189 +395,83 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="镜像" required={isTraining}>
-          <Space>
-            <Form.Item name={["image", "type"]} rules={[{ required: isTraining }]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldsValue({ image: { name: undefined } });
-                }}
-                options={
-                  [
-                    {
-                      value: AccessibilityType.PRIVATE,
-                      label: "我的镜像",
-                    },
-                    {
-                      value:  AccessibilityType.PUBLIC,
-                      label: "公共镜像",
-                    },
-                  ]
-                }
-              />
-            </Form.Item>
-            <Form.Item name={["image", "name"]} rules={[{ required: isTraining }]} noStyle>
-              <Select
-                style={{ minWidth: 100 }}
-                allowClear
-                onChange={() => {
-                  form.setFieldValue("startCommand", undefined);
-                }}
-                loading={isImagesLoading && isImagePublic !== undefined}
-                options={imageOptions}
-              />
-            </Form.Item>
-          </Space>
-        </Form.Item>
-        {(selectedImage && !isTraining) ? (
+        <Divider orientation="left" orientationMargin="0">{isTraining ? "训练配置" : "应用配置"}</Divider>
+        {!isTraining && (
           <Form.Item
-            label="启动命令"
-            name="startCommand"
-            rules={[{ required: selectedImage !== undefined }]}
-            dependencies={["image", "name"]}
+            label="启动镜像"
+            help={ useCustomImage && <Typography.Text type="danger">{`请选择安装了${appName}应用的镜像，并指定启动命令`}</Typography.Text>
+            }
           >
-            <Input placeholder="运行镜像里程序的启动命令" />
+            <Space>
+              <strong>
+                {selectedImage
+                  ? imageOptions?.find((x) => x.value === selectedImage)?.label
+                  : appImage ? `${appImage?.name}:${appImage?.tag}` : "-"}
+              </strong>
+              <Checkbox onChange={(e) => setUseCustomImage(e.target.checked)}>使用自定义镜像</Checkbox>
+            </Space>
           </Form.Item>
-        ) : null }
-        <Form.Item label="算法">
-          <Space>
-            <Form.Item name={["algorithm", "type"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
-                }}
-                options={
-                  [
-                    {
-                      value: AccessibilityType.PRIVATE,
-                      label: "我的算法",
-                    },
-                    {
-                      value:  AccessibilityType.PUBLIC,
-                      label: "公共算法",
-                    },
-                  ]
-                }
-              />
-            </Form.Item>
-            <Form.Item name={["algorithm", "name"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldValue(["algorithm", "version"], undefined);
-                }}
-                loading={isAlgorithmLoading}
-                options={algorithmOptions}
-              />
-            </Form.Item>
-            <Form.Item name={["algorithm", "version"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                loading={isAlgorithmVersionsLoading}
-                options={algorithmVersionOptions}
-              />
-            </Form.Item>
-          </Space>
-        </Form.Item>
-        <Form.Item label="数据集">
-          <Space>
-            <Form.Item name={["dataset", "type"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 120 }}
-                onChange={() => {
-                  form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
-                }}
-                options={
-                  [
-                    {
-                      value: AccessibilityType.PRIVATE,
-                      label: "我的数据集",
-                    },
-                    {
-                      value: AccessibilityType.PUBLIC,
-                      label: "公共数据集",
-                    },
+        )}
+        {
+          (isTraining || useCustomImage) && (
+            <>
+              <Form.Item label="镜像" required={true}>
+                <Space>
+                  <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      onChange={() => {
+                        form.setFieldsValue({ image: { name: undefined } });
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: "我的镜像",
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: "公共镜像",
+                          },
+                        ]
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item name={["image", "name"]} rules={[{ required: true }]} noStyle>
+                    <Select
+                      style={{ minWidth: 100 }}
+                      allowClear
+                      onChange={() => {
+                        form.setFieldValue("startCommand", undefined);
+                      }}
+                      loading={isImagesLoading && isImagePublic !== undefined}
+                      options={imageOptions}
+                    />
+                  </Form.Item>
+                </Space>
+              </Form.Item>
+              {(selectedImage && !isTraining) ? (
+                <Form.Item
+                  label="启动命令"
+                  name="startCommand"
+                  rules={[{ required: selectedImage !== undefined }]}
+                  dependencies={["image", "name"]}
+                >
+                  <Input placeholder="运行镜像里程序的启动命令" />
+                </Form.Item>
+              ) : null }
+            </>
+          )
+        }
 
-                  ]
-                }
-              />
-            </Form.Item>
-            <Form.Item name={["dataset", "name"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                loading={isDatasetsLoading}
-                onChange={() => {
-                  form.setFieldValue(["dataset", "version"], undefined);
-                }}
-                options={datasetOptions}
-              />
-            </Form.Item>
-            <Form.Item name={["dataset", "version"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                loading={isDatasetVersionsLoading}
-                options={datasetVersionOptions}
-              />
-            </Form.Item>
-          </Space>
-        </Form.Item>
-        <Form.Item label="模型">
-          <Space>
-            <Form.Item name={["model", "type"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldsValue({ model: { name: undefined, version: undefined } });
-                }}
-                options={
-                  [
-                    {
-                      value: AccessibilityType.PRIVATE,
-                      label: "我的模型",
-                    },
-                    {
-                      value:  AccessibilityType.PUBLIC,
-                      label: "公共模型",
-                    },
-                  ]
-                }
-              />
-            </Form.Item>
-            <Form.Item name={["model", "name"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                onChange={() => {
-                  form.setFieldValue(["model", "version"], undefined);
-                }}
-                loading={isModelsLoading }
-                options={modelOptions}
-              />
-            </Form.Item>
-            <Form.Item name={["model", "version"]} noStyle>
-              <Select
-                allowClear
-                style={{ minWidth: 100 }}
-                loading={isModelVersionsLoading}
-                options={modelVersionOptions}
-              />
-            </Form.Item>
-          </Space>
-        </Form.Item>
-        <Form.Item label="挂载点" name="mountPoint">
+        {
+          customFormItems.filter((item) => item?.key?.includes("workingDir"))
+        }
+        <Form.Item label="添加挂载点" name="mountPoint">
           <Input
             placeholder="选择挂载点"
-            suffix={
+            prefix={
               (
                 <FileSelectModal
                   allowedFileType={["DIR"]}
@@ -579,7 +485,167 @@ export const LaunchAppForm = (props: Props) => {
             }
           />
         </Form.Item>
-        <Divider orientation="left" orientationMargin="0" plain>资源</Divider>
+        <Divider orientation="left" orientationMargin="0">添加算法/数据集/模型</Divider>
+        <Form.Item label="添加类型">
+          <Checkbox onChange={(e) => setShowAlgorithm(e.target.checked)}>
+                算法
+          </Checkbox>
+          <Checkbox onChange={(e) => setShowDataset(e.target.checked)}>
+                数据集
+          </Checkbox>
+          <Checkbox onChange={(e) => setShowModel(e.target.checked)}>
+                模型
+          </Checkbox>
+        </Form.Item>
+        {
+          showAlgorithm ? (
+            <Form.Item label="算法">
+              <Space>
+                <Form.Item name={["algorithm", "type"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    onChange={() => {
+                      form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
+                    }}
+                    options={
+                      [
+                        {
+                          value: AccessibilityType.PRIVATE,
+                          label: "我的算法",
+                        },
+                        {
+                          value:  AccessibilityType.PUBLIC,
+                          label: "公共算法",
+                        },
+                      ]
+                    }
+                  />
+                </Form.Item>
+                <Form.Item name={["algorithm", "name"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    onChange={() => {
+                      form.setFieldValue(["algorithm", "version"], undefined);
+                    }}
+                    loading={isAlgorithmLoading}
+                    options={algorithmOptions}
+                  />
+                </Form.Item>
+                <Form.Item name={["algorithm", "version"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    loading={isAlgorithmVersionsLoading}
+                    options={algorithmVersionOptions}
+                  />
+                </Form.Item>
+              </Space>
+            </Form.Item>
+          ) : null
+        }
+
+        {
+          showDataset ? (
+            <Form.Item label="数据集">
+              <Space>
+                <Form.Item name={["dataset", "type"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 120 }}
+                    onChange={() => {
+                      form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
+                    }}
+                    options={
+                      [
+                        {
+                          value: AccessibilityType.PRIVATE,
+                          label: "我的数据集",
+                        },
+                        {
+                          value: AccessibilityType.PUBLIC,
+                          label: "公共数据集",
+                        },
+
+                      ]
+                    }
+                  />
+                </Form.Item>
+                <Form.Item name={["dataset", "name"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    loading={isDatasetsLoading}
+                    onChange={() => {
+                      form.setFieldValue(["dataset", "version"], undefined);
+                    }}
+                    options={datasetOptions}
+                  />
+                </Form.Item>
+                <Form.Item name={["dataset", "version"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    loading={isDatasetVersionsLoading}
+                    options={datasetVersionOptions}
+                  />
+                </Form.Item>
+              </Space>
+            </Form.Item>
+          ) : null
+        }
+
+        {
+          showModel ? (
+            <Form.Item label="模型">
+              <Space>
+                <Form.Item name={["model", "type"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    onChange={() => {
+                      form.setFieldsValue({ model: { name: undefined, version: undefined } });
+                    }}
+                    options={
+                      [
+                        {
+                          value: AccessibilityType.PRIVATE,
+                          label: "我的模型",
+                        },
+                        {
+                          value:  AccessibilityType.PUBLIC,
+                          label: "公共模型",
+                        },
+                      ]
+                    }
+                  />
+                </Form.Item>
+                <Form.Item name={["model", "name"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    onChange={() => {
+                      form.setFieldValue(["model", "version"], undefined);
+                    }}
+                    loading={isModelsLoading }
+                    options={modelOptions}
+                  />
+                </Form.Item>
+                <Form.Item name={["model", "version"]} noStyle>
+                  <Select
+                    allowClear
+                    style={{ minWidth: 100 }}
+                    loading={isModelVersionsLoading}
+                    options={modelVersionOptions}
+                  />
+                </Form.Item>
+              </Space>
+            </Form.Item>
+          ) : null
+        }
+
+        <Divider orientation="left" orientationMargin="0">资源</Divider>
         <Form.Item
           label="账户"
           name="account"
@@ -662,7 +728,9 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
           <InputNumber min={1} step={1} addonAfter="分钟" />
         </Form.Item>
-        {customFormItems}
+        {
+          customFormItems.filter((item) => !item?.key?.includes("workingDir"))
+        }
         <Row>
           {
             currentPartitionInfo?.gpus

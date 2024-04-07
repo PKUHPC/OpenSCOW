@@ -30,7 +30,6 @@ const AvatarContainer = styled.div`
   display: flex;
   justify-content: center;
   flex: 1;
-
 `;
 
 const NameContainer = styled.div`
@@ -71,6 +70,7 @@ export const EntryItem: React.FC<Props> = ({ style,
             <img
               src={join(publicConfig.PUBLIC_PATH, logoPath)}
               onError={() => handleImageError(entryBaseName)}
+              style={{ maxWidth:"100px", objectFit:"contain" }}
             />
           ) : (
             icon && isSupportedIconName(icon) ?

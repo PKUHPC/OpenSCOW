@@ -75,7 +75,12 @@ it("imports users and accounts", async () => {
   const ua = await em.find(UserAccount, { }, {
     populate: ["account", "user"],
   });
-  expect(ua.map((x) => ({ accountName: x.account.$.accountName, userId: x.user.$.userId, role: x.role, blocked: x.status === UserStatus.BLOCKED })))
+  expect(ua.map((x) => ({
+    accountName: x.account.$.accountName,
+    userId: x.user.$.userId,
+    role: x.role,
+    blocked: x.blockedInCluster === UserStatus.BLOCKED,
+  })))
     .toIncludeSameMembers([
       { accountName: "a_user1", userId: "user1", role: UserRole.OWNER, blocked: false },
       { accountName: "a_user1", userId: "user2", role: UserRole.USER, blocked: true },
@@ -113,7 +118,11 @@ it("import users and accounts if an account exists", async () => {
   // a_user1 and user1 exist
   const tenant = await em.findOneOrFail(Tenant, { name: "default" });
   const user = new User({ name: "user1Name", userId: "user1", email: "", tenant });
-  const account = new Account({ accountName: "a_user1", comment: "", blocked: false, tenant });
+  const account = new Account({
+    accountName: "a_user1",
+    comment: "",
+    blockedInCluster: false,
+    tenant });
   await em.persistAndFlush([user, account]);
 
   await asyncClientCall(client, "importUsers", { data: data, whitelist: true });
@@ -124,7 +133,12 @@ it("import users and accounts if an account exists", async () => {
   const ua = await em.find(UserAccount, { }, {
     populate: ["account", "user"],
   });
-  expect(ua.map((x) => ({ accountName: x.account.$.accountName, userId: x.user.$.userId, role: x.role, blocked: x.status === UserStatus.BLOCKED })))
+  expect(ua.map((x) => ({
+    accountName: x.account.$.accountName,
+    userId: x.user.$.userId,
+    role: x.role,
+    blocked: x.blockedInCluster === UserStatus.BLOCKED,
+  })))
     .toIncludeSameMembers([
       { accountName: "a_user1", userId: "user1", role: UserRole.OWNER, blocked: false },
       { accountName: "a_user1", userId: "user2", role: UserRole.USER, blocked: true },

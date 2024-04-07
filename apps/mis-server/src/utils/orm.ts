@@ -20,11 +20,11 @@ export const paginationProps = (page?: number, pageSize: number = DEFAULT_PAGE_S
   limit: pageSize,
 });
 
-export type EntityOrRef<T> = T | Ref<T>;
+export type EntityOrRef<T extends object> = T | Ref<T>;
 
-export function toRef<T extends {}>(t: EntityOrRef<T>): Ref<T> {
+export function toRef<T extends object>(t: EntityOrRef<T>): Ref<T> {
   if (t instanceof Reference) {
-    return t;
+    return t as Ref<T>;
   } else {
     return Reference.create(t);
   }
