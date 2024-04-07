@@ -14,8 +14,8 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { unblockAccount } from "src/bl/block";
-import { Account } from "src/entities/Account";
+import { blockAccount, unblockAccount } from "src/bl/block";
+import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
@@ -62,9 +62,11 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   const accountMap: Record<string, Account> = {};
   data.accounts.forEach((account) => {
+    // 导入账户时，如果在集群中的账户状态为封锁，则scow同步封锁状态，默认为被上级手动封锁
+    // 导入账户时，如果在集群中的账户状态为正常，则scow同步正常状态
     accountMap[account.accountName] = new Account({
-      accountName: account.accountName, comment: "", blocked:Boolean(account.blocked),
-      tenant,
+      accountName: account.accountName, comment: "", blockedInCluster: Boolean(account.blocked),
+      tenant, state: Boolean(account.blocked) ? AccountState.BLOCKED_BY_ADMIN : AccountState.NORMAL,
     });
   });
   const existingAccounts = await em.find(Account,
@@ -94,7 +96,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
         account,
         user,
         role: a.owner === u.userId ? UserRole.OWNER : UserRole.USER,
-        status: u.blocked ? UserStatus.BLOCKED : UserStatus.UNBLOCKED,
+        blockedInCluster: u.blocked ? UserStatus.BLOCKED : UserStatus.UNBLOCKED,
       }));
     });
   });
@@ -117,6 +119,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
   // 账户信息导入scow完成后，更新slurm的block状态
   const failedUnblockAccounts = [] as string[];
+  const failedBlockAccounts = [] as string[];
   if (whitelistAll) {
     await Promise.allSettled(accounts.map((acc) => {
       return em.transactional(async (em) => {
@@ -139,10 +142,37 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             operatorId: "",
           });
           account.whitelist = toRef(whitelist);
+          // 加入白名单后账户状态变为正常
+          account.state = AccountState.NORMAL;
           await em.persistAndFlush(whitelist);
         }
       });
     }));
+  // 如果不选择全部添加白名单时，判断租户默认阈值选择是否在集群中封锁账户
+  } else {
+    const shouldBlockInCluster = tenant.defaultAccountBlockThreshold.gte(0);
+    const shouldBlockAccounts = accounts.filter((a) => !a.blockedInCluster);
+
+    if (shouldBlockInCluster) {
+      await Promise.allSettled(shouldBlockAccounts.map((acc) => {
+        return em.transactional(async (em) => {
+          const account = await em.findOne(Account, { accountName: acc.accountName },
+            { populate: ["tenant"]});
+          if (!account) {
+            failedBlockAccounts.push(acc.accountName);
+          } else {
+            try {
+              await blockAccount(account, clusterPlugin, logger);
+            } catch (e) {
+              // 集群封锁账户失败，记录失败账户
+              failedBlockAccounts.push(account.accountName);
+              throw e;
+            }
+          }
+        });
+      }));
+    }
+
   }
   logger.info(
     `Import users complete. ${accounts.length} accounts, \
@@ -154,6 +184,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   if (failedUnblockAccounts.length !== 0) {
     logger.warn(`${failedUnblockAccounts.length} accounts failed to unblock.`);
     logger.warn(failedUnblockAccounts.join(", "));
+  }
+  if (failedBlockAccounts.length !== 0) {
+    logger.warn(`${failedBlockAccounts.length} accounts failed to block.`);
+    logger.warn(failedBlockAccounts.join(", "));
   }
 
   return {

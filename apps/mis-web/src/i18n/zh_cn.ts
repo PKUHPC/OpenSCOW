@@ -224,6 +224,8 @@ export default {
         allAccount:"所有账户",
         debtAccount:"欠费账户",
         blockedAccount: "封锁账户",
+        frozenAccount: "冻结账户",
+        normalAccount: "正常账户",
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",
@@ -234,8 +236,19 @@ export default {
 
         comment:"备注",
         status:"状态",
+        statusTooltip: "账户状态说明",
+        statusFrozenTooltip: "冻结：账户已被账户管理员冻结，无法通过此账户提交作业",
+
+        statusBlockedTooltip: "封锁：账户已被租户管理员或平台管理员封锁，无法通过此账户提交作业",
+
+        statusDebtTooltip: "欠费：账户余额<=封锁阈值，无法通过此账户提交作业",
+
+        statusNormalTooltip: "正常：账户没有被管理员封锁冻结且账户余额>封锁阈值；或者账户已存在于白名单中",
+
         mangerMember:"管理成员",
-        block:"封锁",
+        blocked:"封锁",
+        frozen:"冻结",
+        debt: "欠费",
         normal:"正常",
         unit:" 元",
         unblockConfirmTitle: "确认解除用户封锁？",
@@ -244,6 +257,7 @@ export default {
         unblockFail: "解封账户失败！",
         unblockError: "账户{}余额不足，您可以将其加入白名单或充值解封",
 
+        block: "封锁",
         unblock: "解除封锁",
         blockConfirmTitle: "确认封锁账户？",
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
@@ -683,7 +697,16 @@ export default {
       },
       userTable:{
         block:"封锁",
+        blocked: "封锁",
         normal:"正常",
+        quotaExceeded: "限额",
+        statusExplanation: "用户状态说明",
+        blockedExplanation: "封锁：用户已被账户管理员或账户拥有者封锁，无法选择该账户提交作业",
+
+        quotaExceededExplanation: "限额：用户未被封锁，但用户已用额度>=用户限额，无法选择该账户提交作业",
+
+        normalExplanation: "正常：用户未被封锁，且用户已用额度<用户限额，可以选择该账户继续提交作业",
+
         admin:"管理员",
         user:"普通用户",
         role:"角色",
