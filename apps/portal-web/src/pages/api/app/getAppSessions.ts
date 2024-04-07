@@ -10,14 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
-import { handlegRPCError } from "src/utils/server";
+import { route } from "src/utils/route";
 
 // Cannot use AppSession from protos
 export const AppSession = Type.Object({
@@ -47,17 +46,12 @@ export const GetAppSessionsSchema = typeboxRouteSchema({
     200: Type.Object({
       sessions: Type.Array(AppSession),
     }),
-
-    503: Type.Object({
-      code: Type.Literal("SERVICE_UNAVAILABLE"),
-      message: Type.String(),
-    }),
   },
 });
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAppSessionsSchema, async (req, res) => {
 
 
   const info = await auth(req, res);
@@ -70,10 +64,8 @@ export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res)
 
   return asyncUnaryCall(client, "listAppSessions", {
     cluster, userId: info.identityId,
-  }).then((reply) => ({ 200: { sessions: reply.sessions } }), handlegRPCError({
-    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-    [status.INTERNAL]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-  }),
-  );
+  }).then((reply) => {
+    return { 200: { sessions: reply.sessions } };
+  });
 
 });

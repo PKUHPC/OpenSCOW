@@ -91,10 +91,15 @@ export const clustersPlugin = plugin(async (f) => {
       return await call(client).catch((e) => {
         logger.error("Cluster ops fails at %o", e);
         const reason = "Cluster ID : " + cluster + " Details : " + e;
+        const clusterErrorDetails = [{
+          clusterId: cluster,
+          details: e,
+        }];
         throw new ServiceError({
           code: status.INTERNAL,
           details: reason,
-          metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, { clusterId: cluster }),
+          metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR,
+            { clusterErrors: JSON.stringify(clusterErrorDetails) }),
         });
       });
     }),
@@ -130,10 +135,16 @@ export const clustersPlugin = plugin(async (f) => {
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
         const reason = failed.map((x) => "Cluster ID : " + x.cluster + " Details : " + x.error).join("; ");
+
+        const clusterErrorDetails = failed.map((x) => ({
+          clusterId: x.cluster,
+          details: x.error,
+        }));
+
         throw new ServiceError({
           code: status.INTERNAL,
           details: reason,
-          metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
+          metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, { clusterErrors: JSON.stringify(clusterErrorDetails) }),
         });
       }
 

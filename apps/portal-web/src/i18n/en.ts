@@ -584,19 +584,10 @@ export default {
                         + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
+      adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
     },
     dashboard: {
       title: "Dashboard",
-    },
-    commonError: {
-      clusterConnError: "The {} cluster is currently unreachable. Please try again later.",
-      clusterAccountsConnError:
-      "The {} cluster is currently unreachable. Unable to retrieve the list of accounts. "
-      + "Please try again later.",
-      clusterJobsConnError:"The {} cluster is currently unreachable. "
-      + "Unable to retrieve the list of jobs. Please try again later.",
-      clusterAppsConnError:"The {} cluster is currently unreachable. "
-      + "Unable to retrieve the list of applications. Please try again later.",
     },
   },
 };

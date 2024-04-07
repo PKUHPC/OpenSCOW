@@ -584,18 +584,10 @@ export default {
       sshError:"无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755",
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
+      adapterConnectionError: "{} 集群无法连接，请稍后重试 ",
     },
     dashboard: {
       title: "仪表盘",
-    },
-    commonError: {
-      clusterConnError: "{} 集群无法连接，请稍后重试",
-      clusterAccountsConnError: "{} 集群无法连接，无法获取账户列表，请稍后重试",
-
-      clusterJobsConnError:"{} 集群无法连接，无法获取作业列表，请稍后重试",
-
-      clusterAppsConnError:"{} 集群无法连接，无法获取交互式应用列表，请稍后重试",
-
     },
   },
 };

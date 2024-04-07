@@ -76,8 +76,9 @@ const FailEventHandler: React.FC = () => {
         return;
       }
       if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
-        const clusterName = e.data.clusterId ?
-          (publicConfig.CLUSTERS[e.data.clusterId]?.name ?? e.data.clusterId) : undefined;
+        const clusterId = e.data.clusterErrorsArray[0].clusterId;
+        const clusterName = clusterId ?
+          (publicConfig.CLUSTERS[clusterId]?.name ?? clusterId) : undefined;
 
         message.error(`${tArgs("page._app.adapterConnErrorContent",
           [getI18nConfigCurrentText(clusterName, languageId)])}(${

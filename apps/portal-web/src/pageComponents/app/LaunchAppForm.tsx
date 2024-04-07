@@ -24,9 +24,7 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
-import { publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
-import { getClusterConnError } from "src/utils/getClusterConnError";
 import { styled } from "styled-components";
 
 const Text = styled(Typography.Paragraph)`
@@ -134,14 +132,9 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-  const clusterName = clusterId ?
-    (publicConfig.CLUSTERS.find((c) => c.id === clusterId)?.name ?? clusterId) : undefined;
-  const clusterConnError = getClusterConnError(clusterName, "pages.commonError.clusterConnError");
-
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => clusterId
-      ? api.getClusterInfo({ query: { cluster:  clusterId } })
-        .httpError(503, (e) => { message.error(`${clusterConnError}（${e.message}）`); }) : undefined, []),
+      ? api.getClusterInfo({ query: { cluster:  clusterId } }) : undefined, []),
     onResolve: async (data) => {
       if (data) {
         setLoading(true);

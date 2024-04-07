@@ -12,14 +12,12 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 export const Partition = Type.Object({
   name: Type.String(),
@@ -57,10 +55,6 @@ export const GetClusterInfoSchema = typeboxRouteSchema({
 
     403: Type.Null(),
 
-    503: Type.Object({
-      code: Type.Literal("SERVICE_UNAVAILABLE"),
-      message: Type.String(),
-    }),
   },
 });
 
@@ -76,20 +70,16 @@ export default route(GetClusterInfoSchema, async (req, res) => {
 
   const client = getClient(ConfigServiceClient);
 
-  return await asyncUnaryCall(client, "getClusterConfig", {
+  const reply = await asyncUnaryCall(client, "getClusterConfig", {
     cluster,
-  }).then((reply) => {
-    return { 200: { clusterInfo: {
-      submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
-      scheduler: {
-        name: reply.schedulerName,
-        partitions: reply.partitions,
-      },
-    } } };
-  }, handlegRPCError({
-    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-    [status.INTERNAL]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-  }),
-  );
+  });
+
+  return { 200: { clusterInfo: {
+    submitJobDirTemplate: runtimeConfig.SUBMIT_JOB_WORKING_DIR,
+    scheduler: {
+      name: reply.schedulerName,
+      partitions: reply.partitions,
+    },
+  } } };
 
 });

@@ -52,10 +52,6 @@ export const SubmitFileAsJobSchema = typeboxRouteSchema({
       ]),
       message: Type.String(),
     }),
-    503: Type.Object({
-      code: Type.Literal("SERVICE_UNAVAILABLE"),
-      message: Type.String(),
-    }),
   },
 });
 
@@ -94,7 +90,6 @@ export default route(SubmitFileAsJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED" as const, message: err.details } }),
-      [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE" as const, message: err.details } }),
       [status.FAILED_PRECONDITION]: () => ({ 500: {
         code: "FAILED_PRECONDITION" as const,
         message: "The method submitScriptAsJob is not supported with your current scheduler adapter version." } }),

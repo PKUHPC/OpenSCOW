@@ -12,13 +12,11 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { status } from "@grpc/grpc-js";
 import { JobServiceClient } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError } from "src/utils/server";
 
 // Cannot use JobInfo from protos
 export const JobInfo = Type.Object({
@@ -56,10 +54,6 @@ export const GetAllJobsSchema = typeboxRouteSchema({
 
     403: Type.Null(),
 
-    503: Type.Object({
-      code: Type.Literal("SERVICE_UNAVAILABLE"),
-      message: Type.String(),
-    }),
   },
 });
 
@@ -80,8 +74,5 @@ export default route(GetAllJobsSchema, async (req, res) => {
   return asyncUnaryCall(client, "listAllJobs", {
     userId: info.identityId, cluster,
     startTime, endTime,
-  }).then(({ results }) => ({ 200: { results } }), handlegRPCError({
-    [status.CANCELLED]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-    [status.INTERNAL]: (err) => ({ 503: { code: "SERVICE_UNAVAILABLE", message: err.details } } as const),
-  }));
+  }).then(({ results }) => ({ 200: { results } }));
 });
