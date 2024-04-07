@@ -70,8 +70,17 @@ margin: 20px 0;
 export const TitleContainer = styled.div`
   height: 45px;
   font-size: 16px;
+  font-weight: 600;
   padding-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+
+  span:nth-child(2) {
+    color: ${gray[5]};
+  }
 `;
+
 export const PieChartContainer = styled.div`
   display: flex;
   justify-content: center;
