@@ -46,14 +46,17 @@ const runtimeContainerIdPrefix = {
   [k8sRuntime.containerd]: "containerd",
 };
 
-export function getRuntimeCommand(clusterId: string): string {
+export function getK8sRuntime(clusterId: string): k8sRuntime {
   const runtime = clusters[clusterId].k8s?.runtime;
-  return runtimeCommands[runtime ?? k8sRuntime.docker];
+  return runtime ?? k8sRuntime.docker;
 }
 
-function getContainerIdPrefix(clusterId: string): string {
-  const runtime = clusters[clusterId].k8s?.runtime;
-  return runtimeContainerIdPrefix[runtime ?? k8sRuntime.docker];
+export function getRuntimeCommand(runtime: k8sRuntime): string {
+  return runtimeCommands[runtime];
+}
+
+function getContainerIdPrefix(runtime: k8sRuntime): string {
+  return runtimeContainerIdPrefix[runtime];
 }
 
 // 加载本地镜像
@@ -69,7 +72,8 @@ export async function getLoadedImage({
   clusterId: string,
 }): Promise<string | undefined> {
 
-  const command = getRuntimeCommand(clusterId);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
 
   const loadedResp = await loggedExec(ssh, logger, true, command, ["load", "-i", sourcePath]);
   const match = loadedResp.stdout.match(loadedImageRegex);
@@ -89,7 +93,8 @@ export async function getPulledImage({
   clusterId: string,
 }): Promise<string | undefined> {
 
-  const command = getRuntimeCommand(clusterId);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
 
   const pulledResp = await loggedExec(ssh, logger, true, command, ["pull", sourcePath]);
 
@@ -111,7 +116,8 @@ export async function pushImageToHarbor({
   clusterId: string,
 }): Promise<void> {
 
-  const command = getRuntimeCommand(clusterId);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
 
   // login harbor
   await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password]);
@@ -120,7 +126,10 @@ export async function pushImageToHarbor({
   await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
 
   // push 镜像至harbor
-  await loggedExec(ssh, logger, true, command, ["push", harborImageUrl]);
+  // 运行时为 containerd 时，需添加 --all-platforms 确保多平台镜像可以正确推送
+  await loggedExec(ssh, logger, true, command,
+    runtime === k8sRuntime.containerd ?
+      ["push", "--all-platforms", harborImageUrl] : ["push", harborImageUrl]);
 
   // 清除本地镜像
   await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
@@ -144,7 +153,8 @@ export async function commitContainerImage({
   clusterId: string,
 }): Promise<void> {
 
-  const command = getRuntimeCommand(clusterId);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
   const resp = await loggedExec(ssh, logger, true, "sh",
     ["-c", `${command} ps --no-trunc | grep ${formateContainerId}`]);
   if (!resp.stdout) {
@@ -161,6 +171,7 @@ export async function commitContainerImage({
 
 
 export const formatContainerId = (clusterId: string, containerId: string) => {
-  const prefix = getContainerIdPrefix(clusterId);
+  const runtime = getK8sRuntime(clusterId);
+  const prefix = getContainerIdPrefix(runtime);
   return containerId.replace(`${prefix}://`, "");
 };

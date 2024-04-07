@@ -560,7 +560,7 @@ export const copyPublicDatasetVersion = procedure
     } catch (err) {
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: "Copy Error",
+        message: `Copy Error ${err}`,
       });
     }
 

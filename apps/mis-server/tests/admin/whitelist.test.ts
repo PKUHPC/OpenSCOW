@@ -50,7 +50,7 @@ afterEach(async () => {
 });
 
 it("unblocks account when added to whitelist", async () => {
-  a.blocked = true;
+  a.blockedInCluster = true;
 
   await em.flush();
 
@@ -63,7 +63,7 @@ it("unblocks account when added to whitelist", async () => {
 
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeFalsy();
+  expect(a.blockedInCluster).toBeFalsy();
 });
 
 it("blocks account when it is dewhitelisted and balance is < 0", async () => {
@@ -78,7 +78,7 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
 
   a.balance = new Decimal(-1);
 
-  a.blocked = false;
+  a.blockedInCluster = false;
   a.whitelist = toRef(whitelist);
 
   await em.flush();
@@ -93,7 +93,7 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
   await em.refresh(a);
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeTruthy();
+  expect(a.blockedInCluster).toBeTruthy();
 });
 
 it("blocks account when it is dewhitelisted and balance is = 0", async () => {
@@ -108,7 +108,7 @@ it("blocks account when it is dewhitelisted and balance is = 0", async () => {
 
   a.balance = new Decimal(0);
 
-  a.blocked = false;
+  a.blockedInCluster = false;
   a.whitelist = toRef(whitelist);
 
   await em.flush();
@@ -123,13 +123,13 @@ it("blocks account when it is dewhitelisted and balance is = 0", async () => {
   await em.refresh(a);
   await reloadEntity(em, a);
 
-  expect(a.blocked).toBeTruthy();
+  expect(a.blockedInCluster).toBeTruthy();
 });
 
 it("charges user but don't block account if account is whitelist", async () => {
   a.balance = new Decimal(1);
 
-  a.blocked = false;
+  a.blockedInCluster = false;
   a.whitelist = toRef(new AccountWhitelist({
     account : a,
     comment: "123",
@@ -150,7 +150,7 @@ it("charges user but don't block account if account is whitelist", async () => {
   expect(currentBalance.toNumber()).toBe(-1);
   expect(previousBalance.toNumber()).toBe(1);
 
-  expect(a.blocked).toBeFalsy();
+  expect(a.blockedInCluster).toBeFalsy();
 
 });
 

@@ -14,6 +14,7 @@ import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Account } from "@scow/protos/build/server/account";
 import { AccountAffiliation, User } from "@scow/protos/build/server/user";
+import { Static } from "@sinclair/typebox";
 import { Button, Form, Input, Table, Tabs, Typography } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -23,6 +24,7 @@ import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
+import { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
 
 interface UserTableFilterForm {
   idOrName: string | undefined;
@@ -121,31 +123,33 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
   );
 };
 
-const AccountTable: React.FC<DataTableProps<Account>> = ({ data, loading }) => {
+const AccountTable:
+  React.FC<DataTableProps<Static<typeof InitGetAccountsSchema["responses"]["200"][0]>>>
+   = ({ data, loading }) => {
 
-  const t = useI18nTranslateToString();
+     const t = useI18nTranslateToString();
 
-  return (
-    <Table
-      loading={loading}
-      dataSource={data}
-      scroll={{ x: true }}
-      pagination={{
-        showSizeChanger: true,
-        defaultPageSize: DEFAULT_PAGE_SIZE,
-      }}
-      rowKey="accountName"
-      bordered
-    >
-      <Table.Column<Account> dataIndex="accountName" title={t(pCommon("accountName"))} />
-      <Table.Column<Account>
-        dataIndex="ownerName"
-        title={t(pCommon("owner"))}
-        render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
-      />
-    </Table>
-  );
-};
+     return (
+       <Table
+         loading={loading}
+         dataSource={data}
+         scroll={{ x: true }}
+         pagination={{
+           showSizeChanger: true,
+           defaultPageSize: DEFAULT_PAGE_SIZE,
+         }}
+         rowKey="accountName"
+         bordered
+       >
+         <Table.Column<Account> dataIndex="accountName" title={t(pCommon("accountName"))} />
+         <Table.Column<Account>
+           dataIndex="ownerName"
+           title={t(pCommon("owner"))}
+           render={(_, r) => `${r.ownerName} (id: ${r.ownerId})`}
+         />
+       </Table>
+     );
+   };
 
 const usersPromiseFn = async () => (await api.initGetUsers({})).users;
 const accountsPromiseFn = async () => (await api.initGetAccounts({})).accounts;

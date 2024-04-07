@@ -61,13 +61,14 @@ export default /* #__PURE__*/route(SetBlockThresholdSchema, async (req, res) => 
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.setAccountBlockThreshold,
     operationTypePayload:{
-      accountName, thresholdAmount: blockThresholdAmount ? numberToMoney(blockThresholdAmount) : undefined,
+      accountName,
+      thresholdAmount: (blockThresholdAmount !== undefined) ? numberToMoney(blockThresholdAmount) : undefined,
     },
   };
 
   return await asyncClientCall(client, "setBlockThreshold", {
     accountName,
-    blockThresholdAmount: blockThresholdAmount ? numberToMoney(blockThresholdAmount) : undefined,
+    blockThresholdAmount: (blockThresholdAmount !== undefined) ? numberToMoney(blockThresholdAmount) : undefined,
   })
     .then(async () => {
       await callLog(logInfo, OperationResult.SUCCESS);
