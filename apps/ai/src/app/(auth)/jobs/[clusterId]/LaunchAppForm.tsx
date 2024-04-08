@@ -12,6 +12,7 @@
 
 "use client";
 
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Checkbox, Col,
@@ -51,10 +52,11 @@ interface FixedFormFields {
   appJobName: string;
   algorithm: { name: number, version: number };
   image: { name: number };
+  remoteImageUrl: string | undefined;
   startCommand?: string;
   dataset: { name: number, version: number };
   model: { name: number, version: number };
-  mountPoint: string | undefined;
+  mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
   gpuCount: number | undefined;
@@ -172,6 +174,8 @@ export const LaunchAppForm = (props: Props) => {
 
   const imageType = Form.useWatch(["image", "type"], form);
   const selectedImage = Form.useWatch(["image", "name"], form);
+  const remoteImageInput = Form.useWatch("remoteImageUrl", form);
+  const customImage = remoteImageInput || selectedImage;
 
   const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
@@ -322,7 +326,6 @@ export const LaunchAppForm = (props: Props) => {
     },
   });
 
-
   return (
     <Form
       form={form}
@@ -331,18 +334,20 @@ export const LaunchAppForm = (props: Props) => {
       }}
       onFinish={async () => {
 
-        const { appJobName, algorithm, dataset, image, startCommand, model,
-          mountPoint, account, partition, coreCount,
+        const { appJobName, algorithm, dataset, image, remoteImageUrl, startCommand, model,
+          mountPoints, account, partition, coreCount,
           gpuCount, maxTime, command, customFields } = await form.validateFields();
+
         if (isTraining) {
           await trainJobMutation.mutateAsync({
             clusterId,
             trainJobName: appJobName,
             algorithm: algorithm?.version,
             imageId: image?.name,
+            remoteImageUrl,
             dataset: dataset?.version,
             model: model?.version,
-            mountPoint: mountPoint,
+            mountPoints,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
@@ -371,10 +376,11 @@ export const LaunchAppForm = (props: Props) => {
             appJobName,
             algorithm: algorithm?.version,
             image: image?.name,
+            remoteImageUrl,
             startCommand,
             dataset: dataset?.version,
             model: model?.version,
-            mountPoint,
+            mountPoints,
             account: account,
             partition: partition,
             nodeCount: nodeCount,
@@ -387,7 +393,8 @@ export const LaunchAppForm = (props: Props) => {
             workingDirectory,
             customAttributes: customFormKeyValue.customFields,
           });
-        } }
+        }
+      }
       }
 
     >
@@ -399,12 +406,13 @@ export const LaunchAppForm = (props: Props) => {
         {!isTraining && (
           <Form.Item
             label="启动镜像"
-            help={ useCustomImage && <Typography.Text type="danger">{`请选择安装了${appName}应用的镜像，并指定启动命令`}</Typography.Text>
+            help={ useCustomImage &&
+            <Typography.Text type="danger">{`请选择镜像或填写远程镜像地址，确保镜像安装了${appName}应用，并指定启动命令`}</Typography.Text>
             }
           >
             <Space>
               <strong>
-                {selectedImage
+                {remoteImageInput ? remoteImageInput : selectedImage
                   ? imageOptions?.find((x) => x.value === selectedImage)?.label
                   : appImage ? `${appImage?.name}:${appImage?.tag}` : "-"}
               </strong>
@@ -415,9 +423,9 @@ export const LaunchAppForm = (props: Props) => {
         {
           (isTraining || useCustomImage) && (
             <>
-              <Form.Item label="镜像" required={true}>
+              <Form.Item label="镜像">
                 <Space>
-                  <Form.Item name={["image", "type"]} rules={[{ required: true }]} noStyle>
+                  <Form.Item name={["image", "type"]} noStyle>
                     <Select
                       allowClear
                       style={{ minWidth: 100 }}
@@ -438,7 +446,19 @@ export const LaunchAppForm = (props: Props) => {
                       }
                     />
                   </Form.Item>
-                  <Form.Item name={["image", "name"]} rules={[{ required: true }]} noStyle>
+                  <Form.Item
+                    name={["image", "name"]}
+                    rules={[({ getFieldValue }) => ({
+                      validator() {
+                        if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error("请选择镜像或填写远程镜像地址"));
+                      },
+                    })]}
+                    dependencies={["remoteImageUrl"]}
+                    noStyle
+                  >
                     <Select
                       style={{ minWidth: 100 }}
                       allowClear
@@ -451,11 +471,26 @@ export const LaunchAppForm = (props: Props) => {
                   </Form.Item>
                 </Space>
               </Form.Item>
-              {(selectedImage && !isTraining) ? (
+              <Form.Item
+                label="远程镜像地址"
+                name="remoteImageUrl"
+                rules={[({ getFieldValue }) => ({
+                  validator() {
+                    if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error("请选择镜像或填写远程镜像地址"));
+                  },
+                })]}
+                dependencies={[["image", "name"]]}
+              >
+                <Input placeholder="请输入远程镜像地址" />
+              </Form.Item>
+              {(customImage && !isTraining) ? (
                 <Form.Item
                   label="启动命令"
                   name="startCommand"
-                  rules={[{ required: selectedImage !== undefined }]}
+                  rules={[{ required: customImage !== undefined }]}
                   dependencies={["image", "name"]}
                 >
                   <Input placeholder="运行镜像里程序的启动命令" />
@@ -468,23 +503,63 @@ export const LaunchAppForm = (props: Props) => {
         {
           customFormItems.filter((item) => item?.key?.includes("workingDir"))
         }
-        <Form.Item label="添加挂载点" name="mountPoint">
-          <Input
-            placeholder="选择挂载点"
-            prefix={
-              (
-                <FileSelectModal
-                  allowedFileType={["DIR"]}
-                  onSubmit={(path: string) => {
-                    form.setFieldValue("mountPoint", path);
-                    form.validateFields(["mountPoint"]);
-                  }}
-                  clusterId={clusterId ?? ""}
-                />
-              )
-            }
-          />
-        </Form.Item>
+        <Form.List name="mountPoints">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map((field, index) => (
+                <Space key={field.key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                  <Form.Item
+                    {...field}
+                    label={`挂载点-${index + 1}`}
+                    rules={[
+                      { required: true, message: "请提供挂载点地址" },
+                      // 添加的自定义校验器以确保挂载点不重复
+                      ({ getFieldValue }) => ({
+                        validator(_, value: string) {
+                          const mountPoints: string[] = getFieldValue("mountPoints");
+                          // 使用显式类型注解
+                          const otherMountPoints = mountPoints.filter((_: string, idx: number) => idx !== field.name);
+                          if (otherMountPoints.includes(value)) {
+                            return Promise.reject(new Error("挂载点地址不能重复"));
+                          }
+                          return Promise.resolve();
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input
+                      placeholder="选择挂载点"
+                      prefix={(
+                        <FileSelectModal
+                          allowedFileType={["DIR"]}
+                          onSubmit={(path: string) => {
+                            // 当用户选择路径后触发表单的值更新并进行校验
+                            form.setFieldValue(["mountPoints", field.name], path);
+                            // 校验特定的挂载点字段
+                            form.validateFields([["mountPoints", field.name]]);
+                          }}
+                          clusterId={clusterId ?? ""}
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                  <MinusCircleOutlined
+                    onClick={() => remove(field.name)}
+                  />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  icon={<PlusOutlined />}
+                >
+          添加挂载点
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
         <Divider orientation="left" orientationMargin="0">添加算法/数据集/模型</Divider>
         <Form.Item label="添加类型">
           <Checkbox onChange={(e) => setShowAlgorithm(e.target.checked)}>
