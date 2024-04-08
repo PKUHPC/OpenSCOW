@@ -70,8 +70,8 @@ export const UnicomCallbackRoute = fp(async (f) => {
         redirect_uri: state,
       });
 
-      console.log("tokenData", tokenData);
-      if (!tokenData) {
+
+      if (!tokenData || tokenData.code === 500) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_CODE });
       }
 
@@ -80,8 +80,8 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       // 获取联通用户信息
       const userInfo = await getUnicomUserInfo(fetchUserInfoUrl, tokenData.access_token);
-      console.log("userInfo", userInfo);
-      if (!userInfo) {
+
+      if (!userInfo || tokenData.code === 500) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_TOKEN });
       }
 
@@ -89,7 +89,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
       if (!userInfo.enabled || userInfo.deleted) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_USER });
       }
-      console.log("misServerUrl", authConfig.misServerUrl);
+
       const userExisted = await checkUnicomUserExisted(userInfo.id);
 
       const UnicomToken = `u_${tokenData.access_token}`;

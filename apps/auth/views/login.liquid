@@ -40,93 +40,126 @@
     </div>
     <div class="w-full h-screen flex">
       <div class="w-1/2 h-screen ml-20 flex items-center justify-center">
-        <div class="w-80 max-w-md min-w-max bg-white rounded-lg py-12">
-          <form method="post" action="">
-            <div class="mb-16 text-2xl font-semibold text-center">{{ authTexts.login.accountPasswordLogin }}</div>
-            <div class="px-14 flex flex-col items-center">
-              <div class="w-80 mb-10">
-                <input type='text' name="username" placeholder="{{ authTexts.login.username }}" required
-                    class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
-              </div>
-              <div class="w-80 mb-10">
-                <div class="relative flex items-center">
-                    <input id="password" name="password" placeholder="{{ authTexts.login.password }}" type="password" required
-                        class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
-                    <div id="eye-elem" class="absolute w-5 h-5 right-3 bg-contain"></div>
-                </div>
-              </div>
-              {% if enableTotp %}
-                <div class="w-80 mb-10">
-                  <div class="flex items-center">
-                    <input name="otpCode" placeholder="{{ authTexts.login.otpVCode }}" type="text" required
-                      class="px-8 w-full py-2 border rounded text-gray-700 focus:outline-none"/>
-                  </div>
-                </div>
-              {% endif %}
-              {% if enableCaptcha %}
-                <div class="w-80 mb-10">
-                  <div class="flex items-center">
-                    <input name="code" placeholder="{{ authTexts.login.inputVCode }}" type="text" required
-                        class=" px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
-                    <div id="captcha" onclick="refreshCaptcha()" class="cursor-pointer">{{ code }}</div>
-                    <script>
-                      function refreshCaptcha(){
-                        const captchaDiv = document.getElementById("captcha");
-                        fetch("{{ refreshCaptchaPath }}", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            token: "{{ token }}",
-                          }),}
-                          ).then( async function (response) {
-                            captchaDiv.innerHTML = await response.text();
-                          }).catch(() => {
-                            captchaDiv.textContent = "{{ authTexts.login.refreshError }}"
-                          });
-                      }
-                    </script>
-                  </div>
-                </div>
 
-                {% if verifyCaptchaFail %}
-                  <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidVCode }}</p>
+        <div class="tabs">
+          <button class="tablinks active" onclick="openTab(event, 'Login')">账号密码登录</button>
+          <button class="tablinks" onclick="openTab(event, 'Phone')">手机号验证码登录</button>
+        </div>
+
+        <div id="Login" class="tabcontent" style="display: block;">
+          <!-- 现有的账号密码登录表单放在这里 -->
+          <div class="w-80 max-w-md min-w-max bg-white rounded-lg py-12">
+            <form method="post" action="">
+              <div class="mb-16 text-2xl font-semibold text-center">{{ authTexts.login.accountPasswordLogin }}</div>
+              <div class="px-14 flex flex-col items-center">
+                <div class="w-80 mb-10">
+                  <input type='text' name="username" placeholder="{{ authTexts.login.username }}" required
+                      class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                </div>
+                <div class="w-80 mb-10">
+                  <div class="relative flex items-center">
+                      <input id="password" name="password" placeholder="{{ authTexts.login.password }}" type="password" required
+                          class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                      <div id="eye-elem" class="absolute w-5 h-5 right-3 bg-contain"></div>
+                  </div>
+                </div>
+                {% if enableTotp %}
+                  <div class="w-80 mb-10">
+                    <div class="flex items-center">
+                      <input name="otpCode" placeholder="{{ authTexts.login.otpVCode }}" type="text" required
+                        class="px-8 w-full py-2 border rounded text-gray-700 focus:outline-none"/>
+                    </div>
+                  </div>
+                {% endif %}
+                {% if enableCaptcha %}
+                  <div class="w-80 mb-10">
+                    <div class="flex items-center">
+                      <input name="code" placeholder="{{ authTexts.login.inputVCode }}" type="text" required
+                          class=" px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                      <div id="captcha" onclick="refreshCaptcha()" class="cursor-pointer">{{ code }}</div>
+                      <script>
+                        function refreshCaptcha(){
+                          const captchaDiv = document.getElementById("captcha");
+                          fetch("{{ refreshCaptchaPath }}", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              token: "{{ token }}",
+                            }),}
+                            ).then( async function (response) {
+                              captchaDiv.innerHTML = await response.text();
+                            }).catch(() => {
+                              captchaDiv.textContent = "{{ authTexts.login.refreshError }}"
+                            });
+                        }
+                      </script>
+                    </div>
+                  </div>
+
+                  {% if verifyCaptchaFail %}
+                    <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidVCode }}</p>
+                  {% endif %}
+
+                {% else %}
+                  <input type="hidden" name="code" value="" />
                 {% endif %}
 
-              {% else %}
-                <input type="hidden" name="code" value="" />
-              {% endif %}
+                <input type="hidden" name="token" value="{{ token }}" />
+                <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
 
-              <input type="hidden" name="token" value="{{ token }}" />
-              <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
-
-              {% if err %}
-                <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidInput }}</p>
-              {% endif %}
-              {% if verifyOtpFail %}
-                <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidOtp }}</p>
-              {% endif %}
-              <button type="submit" class="w-80 py-2 mb-8 rounded button-primary text-gray-100 focus:outline-none">
-                  {{ authTexts.login.login }}
-              </button>
-              <div class="w-80 mb-3">
-                <div class="relative flex items-center justify-center">
-                    <div id="unicomLogo" class="w-5 h-5 bg-contain"></div>
+                {% if err %}
+                  <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidInput }}</p>
+                {% endif %}
+                {% if verifyOtpFail %}
+                  <p class="my-4 text-center text-red-600">{{ authTexts.login.invalidOtp }}</p>
+                {% endif %}
+                <button type="submit" class="w-80 py-2 mb-8 rounded button-primary text-gray-100 focus:outline-none">
+                    {{ authTexts.login.login }}
+                </button>
+                <div class="w-80 mb-3">
+                  <div class="relative flex items-center justify-center">
+                      <div id="unicomLogo" class="w-5 h-5 bg-contain"></div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </form>
+            {% if showBindOtpButton %}
+              <div class="px-12 mt-4">
+                <form action="{{ otpBasePath }}/bind" method="get">
+                  <button type="submit" name="action" value="bindOtp" class="px text-gray-400">
+                    {{ authTexts.login.bindOtp }}
+                  </button>
+                  <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
+                </form>
+              </div>
+            {% endif %}
+          </div>
 
-          </form>
-          {% if showBindOtpButton %}
-            <div class="px-12 mt-4">
-              <form action="{{ otpBasePath }}/bind" method="get">
-                <button type="submit" name="action" value="bindOtp" class="px text-gray-400">
-                  {{ authTexts.login.bindOtp }}
-                </button>
-                <input type="hidden" name="callbackUrl" value="{{ callbackUrl | escape }}" />
+        </div>
+
+        <div id="Phone" class="tabcontent" style="display: none;">
+          <div class="w-80 max-w-md min-w-max bg-white rounded-lg py-12">
+              <!-- 新增的手机号验证码登录表单 -->
+              <form method="post" action="">
+                <div class="mb-16 text-2xl font-semibold text-center">{{ authTexts.login.accountPasswordLogin }}</div>
+                <div class="px-14 flex flex-col items-center">
+                  <div class="w-80 mb-10">
+                    <input type='text' name="phoneNumber" placeholder="{{ authTextsauthTexts.login.username }}" required
+                          class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                  </div>
+                  <div class="w-80 mb-10">
+                    <input type='text' name="verificationCode" placeholder="{{ authTextsauthTexts.login.password }}" required
+                          class="px-8 w-full border rounded px-3 py-2 text-gray-700 focus:outline-none" />
+                    <button type="button" onclick="sendVerificationCode()" class="send-code">发送验证码</button>
+                  </div>
+                  <button type="submit" class="w-80 py-2 mb-8 rounded button-primary text-gray-100 focus:outline-none">
+                    {{ authTexts.login.login }}
+                  </button>
+                </div>
               </form>
             </div>
-          {% endif %}
         </div>
+
       </div>
       <div class="w-1/2 h-screen pl-48 flex justify-center flex-col hidden-xs">
           <div class="text-4xl font-semibold mb-12"  style="color: {{ sloganColor }}">{{ sloganTitle }}</div>
@@ -174,8 +207,29 @@
 
         const origin = window.location.origin
 
-        window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}${RedirectUrl}?callbackUrl=${callbackUrl}&state=${origin}/public/unicomCallback?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
+        window.location.href = `${authPath}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${origin}${RedirectUrl}?callbackUrl=${callbackUrl}&state=${origin}${RedirectUrl}?callbackUrl=${callbackUrl}&response_type=code&scope=openid&login=true`
       })
+
+      // Tabs切换函数
+      function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+      }
+
+      // 示例：发送验证码的函数，需要根据实际后端接口实现
+      function sendVerificationCode() {
+        // 实现发送验证码的逻辑
+        console.log("发送验证码");
+      }
     </script>
 </body>
 </html>
