@@ -12,7 +12,7 @@
 
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
-import { config } from "src/config/env";
+import { authConfig } from "src/config/auth";
 import { unicomUserLogout } from "src/service/uincom";
 const QuerystringSchema = Type.Object({
   token: Type.String(),
@@ -46,7 +46,7 @@ export const logoutRoute = fp(async (f) => {
       // 如果是联通第三方登录
       if (token.startsWith("u_")) {
         const LogoutUrl =
-          `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/logout`;
+          `${authConfig.unicomAuthPath}/auth/realms/${authConfig.unicomRealm}/protocol/openid-connect/logout`;
 
         await unicomUserLogout(LogoutUrl, token.slice(2));
       }

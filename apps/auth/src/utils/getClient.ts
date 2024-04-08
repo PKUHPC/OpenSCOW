@@ -11,6 +11,6 @@
  */
 
 import { getClientFn } from "@scow/lib-server/build";
-import { config } from "src/config/env";
+import { authConfig } from "src/config/auth";
 
-export const getClient = getClientFn({ SERVER_URL:config.MIS_SERVER_URL });
+export const getClient = getClientFn({ SERVER_URL:authConfig.misServerUrl });

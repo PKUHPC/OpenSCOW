@@ -14,6 +14,7 @@ import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
 import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
+import { authConfig } from "src/config/auth";
 import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
@@ -61,11 +62,11 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       // 获取联通token
       const fetchTokenUrl =
-      `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/token`;
+      `${authConfig.unicomAuthPath}/auth/realms/${authConfig.unicomRealm}/protocol/openid-connect/token`;
 
       const tokenData = await getUnicomToken(fetchTokenUrl, {
-        client_id: config.UNICOM_CLIENT_ID,
-        client_secret: config.UNICOM_CLIENT_SECRET,
+        client_id: authConfig.unicomClientId,
+        client_secret: authConfig.unicomClientSecret,
         code,
         redirect_uri: state,
       });
@@ -75,7 +76,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
       }
 
       const fetchUserInfoUrl =
-      `${config.UNICOM_AUTH_PATH}/auth/realms/${config.UNICOM_REALM}/protocol/openid-connect/userinfo`;
+      `${authConfig.unicomAuthPath}/auth/realms/${authConfig.unicomRealm}/protocol/openid-connect/userinfo`;
 
       // 获取联通用户信息
       const userInfo = await getUnicomUserInfo(fetchUserInfoUrl, tokenData.access_token);

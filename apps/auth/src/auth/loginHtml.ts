@@ -62,9 +62,9 @@ export async function serveLoginHtml(
     eyeImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye.png"),
     eyeCloseImagePath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/eye-close.png"),
     unicomLogoPath: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/assets/icons/unicom-logo.png"),
-    unicomAuthPath: config.UNICOM_AUTH_PATH,
-    unicomRealm: config.UNICOM_REALM,
-    unicomClientId: config.UNICOM_CLIENT_ID,
+    unicomAuthPath: authConfig.unicomAuthPath,
+    unicomRealm: authConfig.unicomRealm,
+    unicomClientId: authConfig.unicomClientId,
     unicomRedirectUrl: join(config.AUTH_BASE_PATH, "/public/unicomCallback"),
     backgroundImagePath: join(config.BASE_PATH, config.PUBLIC_PATH,
       authUiHostnameConfig?.backgroundImagePath

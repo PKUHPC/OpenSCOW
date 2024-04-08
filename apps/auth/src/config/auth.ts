@@ -236,6 +236,11 @@ export const AuthConfigSchema = Type.Object({
   }, { default: {} }),
   otp: Type.Optional(OtpConfigSchema),
   ui: Type.Optional(UiConfigSchema),
+  misServerUrl:Type.String({ description: "mis-server地址", default: "localhost:5004" }),
+  unicomAuthPath:Type.String({ description: "认证地址", default: "http://58.251.252.26:8002" }),
+  unicomRealm:Type.String({ description: "用户域", default: "TestRealm" }),
+  unicomClientId:Type.String({ description: "客户端标识", default: "TestClient" }),
+  unicomClientSecret:Type.String({ description: "客户端秘钥", default: "QvhGc7C8an1TiMuO3IaAQmAK4xV6Akso" }),
 });
 
 export type AuthConfigSchema = Static<typeof AuthConfigSchema>;
