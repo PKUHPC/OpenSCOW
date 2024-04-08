@@ -65,7 +65,7 @@ export const mockApi: MockApi<typeof api> = {
   getQuickEntries:async () => ({ quickEntries: [
     {
       id:"submitJob",
-      name:"提交作业",
+      name:"submitJob",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -76,7 +76,7 @@ export const mockApi: MockApi<typeof api> = {
     },
     {
       id:"runningJob",
-      name:"未结束的作业",
+      name:"runningJobs",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -87,7 +87,7 @@ export const mockApi: MockApi<typeof api> = {
     },
     {
       id:"allJobs",
-      name:"所有作业",
+      name:"allJobs",
       entry:{
         $case:"pageLink",
         pageLink:{

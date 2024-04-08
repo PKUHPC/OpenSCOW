@@ -130,7 +130,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configPath, console);
+  const clusters = getClusterConfigs(configPath, console, ["hpc"]);
 
   Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 

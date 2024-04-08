@@ -15,7 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
-import { Account } from "@scow/protos/build/server/account";
+import { Account, Account_DisplayedAccountState as DisplayedAccountState } from "@scow/protos/build/server/account";
 import { ChargeRecord as ChargeRecordProto, PaymentRecord } from "@scow/protos/build/server/charging";
 import {
   ExportAccountResponse,
@@ -105,6 +105,7 @@ it("export accounts", async () => {
 
   const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
+
   const stream = asyncReplyStreamCall(client, "exportAccount", {
     count: 3,
     tenantName: data.tenant.name,
@@ -113,6 +114,7 @@ it("export accounts", async () => {
   const handleAccountResponse = (response: ExportAccountResponse): Account[] => {
     return response.accounts;
   };
+
   const accounts = await collectData(stream, handleAccountResponse);
 
   expect(accounts).toMatchObject([{
@@ -122,8 +124,9 @@ it("export accounts", async () => {
     ownerId: data.userA.userId,
     ownerName: data.userA.name,
     comment: data.accountA.comment,
-    blocked: data.accountA.blocked,
+    blocked: data.accountA.blockedInCluster,
     balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
   }, {
     accountName: data.accountB.accountName,
     tenantName: data.tenant.name,
@@ -131,8 +134,42 @@ it("export accounts", async () => {
     ownerId: data.userB.userId,
     ownerName: data.userB.name,
     comment: data.accountB.comment,
-    blocked: data.accountB.blocked,
+    blocked: data.accountB.blockedInCluster,
     balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
+  },
+  ]);
+
+});
+
+it("export dept accounts", async () => {
+
+  const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+
+
+  const stream = asyncReplyStreamCall(client, "exportAccount", {
+    count: 3,
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+    debt: true,
+  });
+
+  const handleAccountResponse = (response: ExportAccountResponse): Account[] => {
+    return response.accounts;
+  };
+
+  const accounts = await collectData(stream, handleAccountResponse);
+
+  expect(accounts).toMatchObject([{
+    accountName: data.accountA.accountName,
+    tenantName: data.tenant.name,
+    userCount: 2,
+    ownerId: data.userA.userId,
+    ownerName: data.userA.name,
+    comment: data.accountA.comment,
+    blocked: data.accountA.blockedInCluster,
+    balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
   },
   ]);
 

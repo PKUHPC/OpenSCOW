@@ -10,48 +10,66 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Card } from "antd";
-import { CSSProperties, forwardRef, HTMLAttributes } from "react";
-import { Cluster } from "src/utils/config";
+import { forwardRef, HTMLAttributes } from "react";
 import { styled } from "styled-components";
 
 import { EntryItem } from "./EntryItem";
 
-const Container = styled.div`
-`;
-
-export type ItemProps = HTMLAttributes<HTMLDivElement> & {
-    draggable: boolean,
-    name: string,
-    id: string,
-    cluster?: Cluster,
-    icon?: string,
-    logoPath?: string;
-    withOpacity?: boolean;
-    isDragging?: boolean;
+export type CardItemProps = HTMLAttributes<HTMLDivElement> & {
+  draggable: boolean;
+  transparent?: boolean;
+  isDragging?: boolean;
 };
 
-export const CardItem = forwardRef<HTMLDivElement, ItemProps>
-(({ draggable, withOpacity, isDragging, style, ...props }, ref) => {
-  const inlineStyles: CSSProperties = {
-    cursor:draggable ?
-      isDragging ? "grabbing" : "grab" :
-      "pointer",
-    opacity: withOpacity ? "0.5" : "1",
-    boxShadow: isDragging ?
-      "rgb(63 63 68 / 5%) 0px 2px 0px 2px, rgb(34 33 81 / 15%) 0px 2px 3px 2px" :
-      "rgb(63 63 68 / 5%) 0px 0px 0px 1px, rgb(34 33 81 / 15%) 0px 1px 3px 0px",
-    transform: isDragging ? "scale(1.05)" : "scale(1)",
-    margin:"20px 30px",
-    ...style,
-  };
+
+export type EntryCardItemProps = CardItemProps & {
+  entryBaseName: string,
+  entryExtraInfo?: string[];
+  id: string,
+  icon?: string,
+  logoPath?: string;
+};
+
+export const EntryCardItem = forwardRef<HTMLDivElement, EntryCardItemProps>
+(({ entryBaseName, entryExtraInfo, icon, logoPath, children, ...props }, ref) => {
 
   return (
-    <Container ref={ref} {...props}>
-      <Card style={inlineStyles}>
-        <EntryItem {...props}></EntryItem>
-      </Card>
-    </Container>
+    <CardItem ref={ref} {...props}>
+      <EntryItem
+        entryBaseName={entryBaseName}
+        icon={icon}
+        logoPath={logoPath}
+        entryExtraInfo={entryExtraInfo}
+      />
+
+    </CardItem>
+  );
+});
+
+const CardItemContainer = styled.div<{
+  draggable?: boolean;
+  isDragging?: boolean;
+  transparent?: boolean;
+}>`
+  cursor: ${(props) => props.draggable ? (props.isDragging ? "grabbing" : "grab") : "pointer"};
+  opacity: ${((props) => props.transparent ? "0.5" : "1")};
+  transform: ${(props) => props.isDragging ? "scale(1.05)" : "scale(1)"};
+  box-shadow: ${(p) => p.theme.token.boxShadowSecondary};
+
+  background-color: ${(p) => p.theme.token.colorBgElevated};
+
+  padding: 8px;
+  height: 172px;
+  min-width: 148px;
+`;
+
+export const CardItem = forwardRef<HTMLDivElement, CardItemProps>
+(({ children, ...props }, ref) => {
+
+  return (
+    <CardItemContainer ref={ref} {...props}>
+      {children}
+    </CardItemContainer>
   );
 });
 

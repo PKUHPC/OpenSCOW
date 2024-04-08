@@ -130,7 +130,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
-  const loginNode = loginNodes[cluster.id][0].name;
+  const loginNode = loginNodes[cluster.id][0].address;
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);

@@ -28,7 +28,7 @@
     "@cmfcmf/docusaurus-search-local": "1.1.0"
   },
   "devDependencies": {
-    "@adobe/jsonschema2md": "7.1.5",
+    "@adobe/jsonschema2md": "8.0.1",
     "@algolia/client-search": "4.22.1",
     "@docusaurus/module-type-aliases": "3.1.1",
     "@scow/config": "workspace:*",

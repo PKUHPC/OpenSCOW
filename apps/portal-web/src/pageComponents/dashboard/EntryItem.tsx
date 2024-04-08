@@ -11,7 +11,6 @@
  */
 
 import { PictureOutlined } from "@ant-design/icons";
-import { Avatar } from "antd";
 import { join } from "path";
 import React, { CSSProperties, useState } from "react";
 import { ColoredIcon, isSupportedIconName } from "src/components/Icon";
@@ -22,24 +21,29 @@ const ItemContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  height: 100%;
+  width: 100%;
+  position: relative;
 `;
 
 const AvatarContainer = styled.div`
   display: flex;
   justify-content: center;
+  flex: 1;
 `;
 
 const NameContainer = styled.div`
   text-align: center;
   white-space: nowrap;
-  margin-top: 5px;
+  margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
 `;
 
 interface Props {
-  name: string,
+  entryBaseName: string;
+  entryExtraInfo?: string[];
   icon?: string,
   logoPath?: string;
   style?: CSSProperties
@@ -49,7 +53,8 @@ interface ImageErrorMap {
   [appId: string]: boolean;
 }
 
-export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
+export const EntryItem: React.FC<Props> = ({ style,
+  entryBaseName, entryExtraInfo, icon, logoPath }) => {
 
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 
@@ -61,37 +66,23 @@ export const EntryItem: React.FC<Props> = ({ name, icon, logoPath, style }) => {
     <ItemContainer style={style}>
       <AvatarContainer>
         {
-          (logoPath && imageErrorMap[name] !== true) ? (
+          (logoPath && imageErrorMap[entryBaseName] !== true) ? (
             <img
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                objectFit: "contain",
-                width: "80px",
-                height: "80px",
-              }}
               src={join(publicConfig.PUBLIC_PATH, logoPath)}
-              onError={() => handleImageError(name)}
+              onError={() => handleImageError(entryBaseName)}
+              style={{ maxWidth:"100px", objectFit:"contain" }}
             />
           ) : (
-            <Avatar
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "0",
-                ...icon ? { backgroundColor:"#fff" } : {},
-              }}
-              size={80}
-              icon={icon && isSupportedIconName(icon) ?
-                <ColoredIcon name={icon} color='#666' style={{ fontSize:"60px" }} />
-                : <PictureOutlined />}
-            />
-          )
-        }
+            icon && isSupportedIconName(icon) ?
+              <ColoredIcon name={icon} style={{ fontSize:"60px" }} />
+              : <PictureOutlined style={{ fontSize:"52px" }} />
+          )}
       </AvatarContainer>
-      <NameContainer>{name}</NameContainer>
+      {
+        [entryBaseName, ...entryExtraInfo ?? []].map((x, i) => (
+          <NameContainer key={i}>{x}</NameContainer>
+        ))
+      }
     </ItemContainer>
   );
 };

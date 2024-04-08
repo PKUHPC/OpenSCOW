@@ -31,15 +31,6 @@ import { z } from "zod";
 import { clusters } from "../config";
 import { clusterExist } from "../utils";
 
-// class NotTarError extends TRPCError {
-//   constructor(name: string, tag: string) {
-//     super({
-//       code: "UNPROCESSABLE_CONTENT",
-//       message: `Image ${name}:${tag} create failed: image is not a tar file`,
-//     });
-//   }
-// };
-
 class NoClusterError extends TRPCError {
   constructor(name: string, tag: string) {
     super({
@@ -48,15 +39,6 @@ class NoClusterError extends TRPCError {
     });
   }
 };
-
-// class NoLocalImageError extends TRPCError {
-//   constructor(name: string, tag: string) {
-//     super({
-//       code: "NOT_FOUND",
-//       message: `Image ${name}:${tag} create failed: localImage not found`,
-//     });
-//   }
-// }
 
 class InternalServerError extends TRPCError {
   constructor(errMessage: string, process: "Create" | "Copy") {

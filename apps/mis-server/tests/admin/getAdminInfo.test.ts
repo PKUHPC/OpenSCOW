@@ -96,14 +96,14 @@ it("get statistic info", async () => {
   const todayNewAccount = range(0, 5).map((i) => new Account({
     accountName: `account0${i}`,
     tenant,
-    blocked: false,
+    blockedInCluster: false,
     createTime: today.toDate(),
   }));
 
   const yesterdayNewAccount = range(0, 5).map((i) => new Account({
     accountName: `account1${i}`,
     tenant,
-    blocked: false,
+    blockedInCluster: false,
     createTime: yesterDay.toDate(),
   }));
 
