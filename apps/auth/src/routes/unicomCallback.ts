@@ -15,7 +15,6 @@ import fp from "fastify-plugin";
 import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { authConfig } from "src/config/auth";
-import { config } from "src/config/env";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
 import { checkUnicomUserExisted, createUser } from "src/service/user";
 import { genRandomStringWithLowercaseAndNumber } from "src/utils/genId";
@@ -71,6 +70,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
         redirect_uri: state,
       });
 
+      console.log("tokenData", tokenData);
       if (!tokenData) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_CODE });
       }
@@ -80,7 +80,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
 
       // 获取联通用户信息
       const userInfo = await getUnicomUserInfo(fetchUserInfoUrl, tokenData.access_token);
-
+      console.log("userInfo", userInfo);
       if (!userInfo) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_TOKEN });
       }
@@ -89,7 +89,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
       if (!userInfo.enabled || userInfo.deleted) {
         return await rep.code(400).send({ code: ErrorCode.INVALID_USER });
       }
-
+      console.log("misServerUrl", authConfig.misServerUrl);
       const userExisted = await checkUnicomUserExisted(userInfo.id);
 
       const UnicomToken = `u_${tokenData.access_token}`;
