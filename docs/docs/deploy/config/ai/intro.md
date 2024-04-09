@@ -109,7 +109,7 @@ k8s:
   # runtime: docker
   # 默认为 containerd
   runtime: containerd
-  # kubectl 配置文件
+  # kubeconfig 相关配置
   kubeconfig:
     # 相对于 SCOW 部署目录下 config 目录的路径
     path: /kube/xxx

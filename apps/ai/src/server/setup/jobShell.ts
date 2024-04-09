@@ -124,8 +124,8 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   }
 
   if (!clusters[clusterId].k8s?.kubeconfig.path) {
-    log("[config] The current cluster does not have a kubectl configuration file configured.");
-    ws.close(0, "The current cluster does not have a kubectl configuration file configured.");
+    log("[config] The current cluster does not have kubeconfig configured.");
+    ws.close(0, "The current cluster does not have kubeconfig configured.");
     return;
   }
 
