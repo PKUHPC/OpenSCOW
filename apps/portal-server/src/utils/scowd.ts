@@ -36,6 +36,11 @@ export const getScowdClient = (cluster: string) => {
   return scowdClientForClusters[cluster];
 };
 
+export function getScowdUrlFromLoginNodeAddress(cluster: string, address: string) {
+  const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
+  return loginNodes.find((loginNode) => loginNode.address === address)?.scowdUrl;
+}
+
 // 函数将 Code 转换为 @grpc/grpc-js 的 status
 export function convertCodeToGrpcStatus(code: Code): status {
   switch (code) {

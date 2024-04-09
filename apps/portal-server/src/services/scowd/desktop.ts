@@ -20,15 +20,18 @@ import { Desktop, DesktopServiceServer, DesktopServiceService } from "@scow/prot
 import { clusters } from "src/config/clusters";
 import { ensureEnabled, getDesktopConfig } from "src/utils/desktops";
 import { clusterNotFound, scowdClientNotFound } from "src/utils/errors";
-import { convertCodeToGrpcStatus } from "src/utils/scowd";
+import { convertCodeToGrpcStatus, getScowdUrlFromLoginNodeAddress } from "src/utils/scowd";
 import { checkLoginNodeInCluster } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath } from "src/utils/turbovnc";
 
-export const desktopServiceServer = plugin((server) => {
+export const scowdDesktopServiceServer = plugin((server) => {
 
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
       const { cluster, loginNode: host, wm, userId, desktopName } = request;
+
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("createDesktop started");
 
       ensureEnabled(cluster);
 
@@ -43,12 +46,15 @@ export const desktopServiceServer = plugin((server) => {
       const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
       const { maxDesktops, desktopsDir } = getDesktopConfig(cluster);
 
-      const client = getScowdClient(host);
+      const loginNodeScowdUrl = getScowdUrlFromLoginNodeAddress(cluster, host);
 
-      if (!client) { throw scowdClientNotFound(host); }
+      if (!loginNodeScowdUrl) {
+        subLogger.info(`loginNode ${host} don't have scowdUrl`);
+        throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
+      }
+      const client = getScowdClient(loginNodeScowdUrl);
 
-      const subLogger = logger.child({ userId, cluster });
-      subLogger.info("createDesktop started");
+      if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
       try {
         const res = await client.desktop.createDesktop({
@@ -75,20 +81,26 @@ export const desktopServiceServer = plugin((server) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
 
-      ensureEnabled(cluster);
+      const subLogger = logger.child({ userId, cluster });
+      subLogger.info("killDesktop started");
 
+      ensureEnabled(cluster);
       checkLoginNodeInCluster(cluster, host);
 
       const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
 
-      const client = getScowdClient(host);
+      const loginNodeScowdUrl = getScowdUrlFromLoginNodeAddress(cluster, host);
 
-      if (!client) { throw scowdClientNotFound(host); }
+      if (!loginNodeScowdUrl) {
+        subLogger.info(`loginNode ${host} don't have scowdUrl`);
+        throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
+      }
+
+      const client = getScowdClient(loginNodeScowdUrl);
+
+      if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
       const { desktopsDir } = getDesktopConfig(cluster);
-
-      const subLogger = logger.child({ userId, cluster });
-      subLogger.info("killDesktop started");
 
       try {
         await client.desktop.killDesktop({
@@ -114,17 +126,23 @@ export const desktopServiceServer = plugin((server) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
 
-      ensureEnabled(cluster);
-
-      checkLoginNodeInCluster(cluster, host);
-
-      const client = getScowdClient(host);
-      if (!client) { throw scowdClientNotFound(host); }
-
-      const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
-
       const subLogger = logger.child({ userId, cluster });
       subLogger.info("connectToDesktop started");
+
+      ensureEnabled(cluster);
+      checkLoginNodeInCluster(cluster, host);
+
+      const loginNodeScowdUrl = getScowdUrlFromLoginNodeAddress(cluster, host);
+
+      if (!loginNodeScowdUrl) {
+        subLogger.info(`loginNode ${host} don't have scowdUrl`);
+        throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
+      }
+
+      const client = getScowdClient(loginNodeScowdUrl);
+      if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
+
+      const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
 
       try {
         const res = await client.desktop.connectToDesktop({ vncPasswdPath: vncPasswdPath, displayId },
@@ -158,9 +176,15 @@ export const desktopServiceServer = plugin((server) => {
 
       if (host) {
         checkLoginNodeInCluster(cluster, host);
+        const loginNodeScowdUrl = getScowdUrlFromLoginNodeAddress(cluster, host);
 
-        const client = getScowdClient(host);
-        if (!client) { throw scowdClientNotFound(host); }
+        if (!loginNodeScowdUrl) {
+          subLogger.info(`loginNode ${host} don't have scowdUrl`);
+          throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
+        }
+
+        const client = getScowdClient(loginNodeScowdUrl);
+        if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
         try {
           const res = await client.desktop.listUserDesktops({
@@ -172,7 +196,7 @@ export const desktopServiceServer = plugin((server) => {
           const userDeskTops: Desktop[] = res.userDesktops.map((desktop) => {
 
             const createTime = !desktop.createTime ? undefined
-              : new Date(Number((desktop.createTime.seconds * BigInt(1000)) 
+              : new Date(Number((desktop.createTime.seconds * BigInt(1000))
                 + BigInt(desktop.createTime.nanos / 1000000)));
 
             return {
@@ -183,8 +207,7 @@ export const desktopServiceServer = plugin((server) => {
             };
           });
 
-          const res1 = [{ host, desktops: userDeskTops }];
-          return [{ userDesktops: res1 }];
+          return [{ userDesktops:  [{ host, desktops: userDeskTops }]}];
         } catch (err) {
           subLogger.error(err);
           if (err instanceof ConnectError) {
@@ -203,8 +226,13 @@ export const desktopServiceServer = plugin((server) => {
       }
       // 请求集群的所有登录节点
       const reply = await Promise.all(loginNodes.map(async (loginNode) => {
-        const client = getScowdClient(loginNode.address);
-        if (!client) { throw scowdClientNotFound(loginNode.address); }
+        if (!loginNode.scowdUrl) {
+          subLogger.info(`loginNode ${loginNode.address} don't have scowdUrl`);
+          throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${loginNode.address} don't have scowdUrl` };
+        }
+
+        const client = getScowdClient(loginNode.scowdUrl);
+        if (!client) { throw scowdClientNotFound(loginNode.scowdUrl); }
 
         const res = await client.desktop.listUserDesktops({
           vncServerBinPath: vncserverBinPath,
@@ -212,10 +240,12 @@ export const desktopServiceServer = plugin((server) => {
           desktopDir: desktopsDir,
         }, { headers: { IdentityId: userId } });
 
+        console.log("123123", res);
+
         const userDesktops: Desktop[] = res.userDesktops.map((desktop) => {
 
           const createTime = !desktop.createTime ? undefined
-            : new Date(Number((desktop.createTime.seconds * BigInt(1000)) 
+            : new Date(Number((desktop.createTime.seconds * BigInt(1000))
               + BigInt(desktop.createTime.nanos / 1000000)));
 
           return {

@@ -22,6 +22,7 @@ import { dashboardServiceServer } from "src/services/dashboard";
 import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
+import { scowdDesktopServiceServer } from "src/services/scowd/desktop";
 import { scowdFileServiceServer } from "src/services/scowd/file";
 import { shellServiceServer } from "src/services/shell";
 import { loggerOptions } from "src/utils/logger";
@@ -45,7 +46,6 @@ export async function createServer() {
   }
 
   await server.register(appServiceServer);
-  await server.register(desktopServiceServer);
   await server.register(jobServiceServer);
   await server.register(shellServiceServer);
   await server.register(staticConfigServiceServer);
@@ -54,8 +54,10 @@ export async function createServer() {
 
   if (config.BUSINESS_VERSION) {
     await server.register(scowdFileServiceServer);
+    await server.register(scowdDesktopServiceServer);
   } else {
     await server.register(fileServiceServer);
+    await server.register(desktopServiceServer);
   }
 
   if (process.env.NODE_ENV === "production") {
