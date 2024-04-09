@@ -13,10 +13,6 @@
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget,
   AccountsOfTenantTarget, AccountsTarget, AllTenantsTarget, SpecificAccountsOfTenantTarget,
   TenantTarget } from "@scow/protos/build/server/charging";
-import { misConfig } from "src/config/mis";
-
-import { CHARGE_TYPE_OTHERS } from "./constants";
-
 
 /**
  * generate charge records' search param of target

@@ -170,7 +170,8 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           initialValues={query}
           onFinish={async () => {
             const { name, time, type } = await form.validateFields();
-            setQuery({ name: selectedNames ?? name, time, type:type ? type.split(/,|，/) : []});
+            const trimmedType = type ? type.trim().split(/,|，/) : [];
+            setQuery({ name: selectedNames ?? name, time, type:trimmedType });
           }}
         >
           { (searchType === SearchType.account || searchType === SearchType.tenant) ? (
