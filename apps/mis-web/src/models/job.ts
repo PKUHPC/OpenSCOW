@@ -11,10 +11,13 @@
  */
 
 import type { RunningJob } from "@scow/protos/build/common/job";
+import { Static, Type } from "@sinclair/typebox";
 import dayjs from "dayjs";
 import { Lang } from "react-typed-i18n";
 import en from "src/i18n/en";
 import type { Cluster } from "src/utils/config";
+
+import { Money } from "./UserSchemaModel";
 
 
 export type RunningJobInfo = RunningJob & { cluster: Cluster; runningOrQueueTime: string };
@@ -108,3 +111,36 @@ export const getAmountStrategyAlgorithmDescriptions = (t: TransType): Record<Amo
   };
 };
 
+
+export const AllJobsInfo = Type.Object({
+  jobId: Type.Number(),
+  name: Type.String(),
+  account: Type.String(),
+  user: Type.String(),
+  partition: Type.String(),
+  qos: Type.String(),
+  state: Type.String(),
+  cpusReq: Type.Number(),
+  memReqMb: Type.Number(),
+  nodesReq: Type.Number(),
+  timeLimitMinutes: Type.Number(),
+  submitTime: Type.Optional(Type.String()),
+  workingDirectory: Type.String(),
+  stdoutPath: Type.Optional(Type.String()),
+  stderrPath: Type.Optional(Type.String()),
+  startTime: Type.Optional(Type.String()),
+  elapsedSeconds: Type.Optional(Type.Number()),
+  reason: Type.Optional(Type.String()),
+  nodeList: Type.Optional(Type.String()),
+  gpusAlloc: Type.Optional(Type.Number()),
+  cpusAlloc: Type.Optional(Type.Number()),
+  memAllocMb: Type.Optional(Type.Number()),
+  nodesAlloc: Type.Optional(Type.Number()),
+  endTime: Type.Optional(Type.String()),
+  biJobIndex: Type.Optional(Type.Number()),
+  timeWait: Type.Optional(Type.Number()),
+  recordTime: Type.Optional(Type.String()),
+  accountPrice: Type.Optional(Money),
+  tenantPrice: Type.Optional(Money),
+});
+export type AllJobsInfo = Static<typeof AllJobsInfo>;

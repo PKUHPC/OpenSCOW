@@ -70,9 +70,11 @@ import type { UserExistsSchema } from "src/pages/api/init/userExists";
 import type { AddBillingItemSchema } from "src/pages/api/job/addBillingItem";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { ChangeJobTimeLimitSchema } from "src/pages/api/job/changeJobTimeLimit";
+import type { GetAllJobsSchema } from "src/pages/api/job/getAllJobs";
 import type { GetAvailableBillingTableSchema } from "src/pages/api/job/getAvailableBillingTable";
 import type { GetBillingItemsSchema } from "src/pages/api/job/getBillingItems";
 import type { GetJobByBiJobIndexSchema } from "src/pages/api/job/getJobByBiJobIndex";
+import type { GetJobByIdSchema } from "src/pages/api/job/getJobById";
 import type { GetMissingDefaultPriceItemsSchema } from "src/pages/api/job/getMissingDefaultPriceItems";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimit";
@@ -203,4 +205,7 @@ export const api = {
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
   changeTenant: apiClient.fromTypeboxRoute<typeof ChangeTenantSchema>("PUT", "/api/users/changeTenant"),
+
+  getAllJobs: apiClient.fromTypeboxRoute<typeof GetAllJobsSchema>("GET", "/api/job/getAllJobs"),
+  getJobById: apiClient.fromTypeboxRoute<typeof GetJobByIdSchema>("GET", "/api/job/getJobById"),
 };

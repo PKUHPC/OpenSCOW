@@ -192,6 +192,108 @@ message GetJobTotalCountResponse {
   uint64 count = 1;
 }
 
+message TimeRange {
+  optional google.protobuf.Timestamp start_time = 1;
+  optional google.protobuf.Timestamp end_time = 2;
+}
+message PageInfo {
+  uint32 page = 1;
+  uint64 page_size = 2;
+}
+
+message SortInfo {
+  enum SortOrder {
+    ASC = 0;
+    DESC = 1;
+  }
+
+  string field = 1;
+  SortOrder order = 2;
+}
+
+message AllJobInfo {
+  uint32 job_id = 1;
+  string name = 2;
+  string account = 3;
+  string user = 4;
+  string partition = 5;
+  string qos = 6;
+  string state = 7;
+  // the number of CPUs requested by job
+  int32 cpus_req = 8;
+  // memory requested by job
+  int64 mem_req_mb = 9;
+  // the number of nodes requested by job
+  int32 nodes_req = 10;
+  int64 time_limit_minutes = 11;
+  google.protobuf.Timestamp submit_time = 12;
+  string working_directory = 13;
+  // name of the file that stdout outputs to, relative to the working directory.
+  optional string stdout_path = 14;
+  // name of the file that stderr outputs to, relative to the working directory.
+  optional string stderr_path = 15;
+  optional google.protobuf.Timestamp start_time = 16;
+  optional int64 elapsed_seconds = 17;
+  // indicates why is the job in this state
+  optional string reason = 18;
+  optional string node_list = 19;
+  // the number of GPUs used by job
+  optional int32 gpus_alloc = 20;
+  // the number of CPUs used by job
+  optional int32 cpus_alloc = 21;
+  // memory used by job
+  optional int64 mem_alloc_mb = 22;
+  // the number of nodes used by job
+  optional int32 nodes_alloc = 23;
+  optional google.protobuf.Timestamp end_time = 24;
+
+  // ended job from mis db
+  optional uint64 bi_job_index = 25;
+  optional uint64 time_wait = 26;
+  google.protobuf.Timestamp record_time = 27;
+  common.Money account_price = 28;
+  common.Money tenant_price = 29;
+}
+
+message GetAllJobsRequest {
+  string cluster_id = 1;
+  // filter options. The logical relationship between multiple filtering options is "AND".
+  message Filter {
+    optional string tenant = 1;
+    repeated string users = 2;
+    repeated string accounts = 3;
+    repeated string states = 4;
+    // if set this field, return jobs that submitted between the time range(both endpoints included)
+    optional TimeRange submit_time = 5;
+    // if set this field, return jobs that ended between the time range(both endpoints included)
+    optional TimeRange end_time = 6;
+  }
+  // specify filter options
+  optional Filter filter = 2;
+
+  // 'page' number with a 'pagesize' pagination.
+  // if not set, no pagination
+  optional PageInfo page_info = 3;
+
+  // returned jobs should be sorted if set
+  optional SortInfo sort = 4;
+}
+
+message GetAllJobsResponse {
+  repeated AllJobInfo jobs = 1;
+  // total count of page
+  uint32 total_page = 2;
+}
+
+message GetJobByIdRequest {
+  string cluster_id = 1;
+  uint32 job_id = 2;
+}
+
+message GetJobByIdResponse {
+  AllJobInfo job = 1;
+}
+
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);
@@ -218,4 +320,8 @@ service JobService {
   rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
 
   rpc GetJobTotalCount(GetJobTotalCountRequest) returns (GetJobTotalCountResponse);
+
+  rpc GetAllJobs(GetAllJobsRequest) returns (GetAllJobsResponse);
+
+  rpc GetJobById(GetJobByIdRequest) returns (GetJobByIdResponse);
 }

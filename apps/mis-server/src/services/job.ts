@@ -38,6 +38,34 @@ import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
+const allJobFields = [
+  "job_id",
+  "name",
+  "account",
+  "user",
+  "partition",
+  "qos",
+  "state",
+  "cpus_req",
+  "mem_req_mb",
+  "nodes_req",
+  "time_limit_minutes",
+  "submit_time",
+  "working_directory",
+  "stdout_path",
+  "stderr_path",
+  "start_time",
+  "elapsed_seconds",
+  "reason",
+  "node_list",
+  "gpus_alloc",
+  "cpus_alloc",
+  "mem_alloc_mb",
+  "nodes_alloc",
+  "end_time",
+];
+
+
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
   jobEndTimeStart, jobId, userId, startBiJobIndex,
@@ -461,6 +489,100 @@ export const jobServiceServer = plugin((server) => {
       );
 
       return [{}];
+    },
+
+    getAllJobs: async ({ request, em, logger }) => {
+      const { clusterId, filter, pageInfo, sort } = request;
+
+      const { tenant, accounts } = filter || {};
+
+      const tenantAccounts = tenant ?
+        await em.find(Account, { tenant: { name: tenant } }, { fields: ["accountName"]})
+          .then((accounts) => accounts.map((account) => account.accountName))
+        : [];
+
+      // 如果指定了租户同时指定了账户，但是账户不在租户的账户列表中，返回空
+      if (tenantAccounts.length > 0 && !!accounts && accounts.length > 0
+        && !tenantAccounts.some((account) => accounts.includes(account))) {
+        return [{ jobs: [], totalPage: 1 }];
+      }
+
+      const accountNames = !!accounts && accounts.length > 0
+        ? accounts
+        : tenant !== undefined
+          ? tenantAccounts : [];
+
+      const { jobs: allJobs, totalCount } = await server.ext.clusters.callOnOne(
+        clusterId,
+        logger,
+        async (client) => asyncClientCall(client.job, "getJobs", { filter: {
+          accounts: accountNames,
+          users: filter?.users || [],
+          states: filter?.states || [],
+          submitTime: filter?.submitTime,
+          endTime: filter?.endTime,
+        }, pageInfo, sort, fields: allJobFields }),
+      );
+
+      const jobs = await em.find(JobInfoEntity, {
+        idJob: {
+          $in: allJobs.map((job) => job.jobId),
+        },
+      });
+
+      const biJobsMap = jobs.reduce((acc, job) => {
+        acc.set(job.idJob, job);
+        return acc;
+      }, new Map());
+
+      return [{
+        jobs: allJobs.map((job) => {
+          const biJob = biJobsMap.get(job.jobId);
+          return {
+            ...job,
+            ...(biJob ? {
+              biJobIndex: biJob.biJobIndex,
+              nodelist: biJob.nodelist,
+              timeWait: biJob.timeWait,
+              recordTime: biJob.recordTime?.toISOString(),
+              accountPrice: decimalToMoney(biJob.accountPrice || new Decimal(0)),
+              tenantPrice: decimalToMoney(biJob.tenantPrice || new Decimal(0)),
+            } : {}),
+          };
+
+        }),
+        totalPage: totalCount || 1,
+      }];
+
+    },
+    getJobById: async ({ request, em, logger }) => {
+      const { clusterId, jobId } = request;
+
+      const { job } = await server.ext.clusters.callOnOne(
+        clusterId,
+        logger,
+        async (client) => asyncClientCall(client.job, "getJobById", { jobId: Number(jobId), fields: allJobFields }),
+      );
+
+      if (!job) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Job ${jobId} is not found`,
+        };
+      }
+
+      const biJob = await em.findOne(JobInfoEntity, { idJob: jobId, cluster: clusterId });
+
+      return [{
+        job: {
+          ...job,
+          biJobIndex: biJob?.biJobIndex,
+          nodeList: biJob?.nodelist,
+          timeWait: biJob?.timeWait,
+          recordTime: biJob?.recordTime?.toISOString(),
+          accountPrice: decimalToMoney(biJob?.accountPrice || new Decimal(0)),
+          tenantPrice: decimalToMoney(biJob?.tenantPrice || new Decimal(0)),
+        },
+      }];
     },
   });
 });

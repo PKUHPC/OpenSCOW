@@ -17,6 +17,7 @@ import type { RunningJob } from "@scow/protos/build/common/job";
 import { type Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
+import { AllJobsInfo } from "src/models/job";
 import { OperationResult } from "src/models/operationLog";
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
@@ -109,6 +110,47 @@ const mockUsers = [
     ],
   },
 ];
+
+
+const mockAllJobsInfo: AllJobsInfo = {
+  jobId: 90,
+  name: "name_gdpmf",
+  account: "account_gjatg",
+  user: "user_nqieu",
+  partition: "partition_gwecw",
+  qos: "qos_mlamf",
+  state: "state_rhthc",
+  cpusReq: 46,
+  memReqMb: 9,
+  nodesReq: 19,
+  timeLimitMinutes: 74,
+  submitTime: "2024-04-09T16:15:40+08:00_dhdeg",
+  workingDirectory: "/path/to/working/directory_psqwu",
+  stdoutPath: "/path/to/stdout.log_qhquf",
+  stderrPath: "/path/to/stderr.log_qiasm",
+  startTime: "2024-04-09T16:20:40+08:00_gxuyr",
+  elapsedSeconds: 59,
+  reason: "reason_ptwqq",
+  nodeList: "node01,node02_ljjop",
+  gpusAlloc: 7,
+  cpusAlloc: 9,
+  memAllocMb: 956,
+  nodesAlloc: 1,
+  endTime: "2024-04-09T18:15:40+08:00_goasn",
+  biJobIndex: 14,
+  timeWait: 8,
+  recordTime: "2024-04-09T18:20:40+08:00_rfqtc",
+  accountPrice: {
+    positive: true,
+    yuan: 354,
+    decimalPlace: 0.8064,
+  },
+  tenantPrice: {
+    positive: false,
+    yuan: 172,
+    decimalPlace: 0.3094,
+  },
+};
 
 
 export const mockApi: MockApi<typeof api> = {
@@ -350,6 +392,8 @@ export const mockApi: MockApi<typeof api> = {
   getJobByBiJobIndex: async () => ({ info: mockJobInfo }),
 
   getJobInfo: async () => ({ jobs: [mockJobInfo], totalCount: 1, totalPrice: numberToMoney(100) }),
+  getAllJobs: async () => ({ jobs: [mockAllJobsInfo], totalPage: 1 }),
+  getJobById: async () => ({ job:  mockAllJobsInfo }),
   financePay: async () => ({ balance: 123 }),
   tenantFinancePay: async () => ({ balance: 123 }),
   authCallback: async () => undefined as never,
