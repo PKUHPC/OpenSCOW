@@ -257,7 +257,7 @@ export const ClusterFileTable: React.FC<Props> = ({
         <Table.Column<FileInfo>
           dataIndex="mode"
           title={t(p("permission"))}
-          // render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
+          render={(mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode)}
         />
 
       </Table>
