@@ -61,10 +61,13 @@ procedure
   .input(z.object({
     clusterId: z.string(),
     trainJobName: z.string(),
+    isAlgorithmPrivate: z.boolean().optional(),
     algorithm: z.number().optional(),
     imageId: z.number().optional(),
     remoteImageUrl: z.string().optional(),
+    isDatasetPrivate: z.boolean().optional(),
     dataset: z.number().optional(),
+    isModelPrivate: z.boolean().optional(),
     model: z.number().optional(),
     mountPoints: z.array(z.string()).optional(),
     account: z.string(),
@@ -81,8 +84,8 @@ procedure
   })).mutation(
     async ({ input, ctx: { user } }) => {
 
-      const { clusterId, trainJobName, algorithm, imageId, remoteImageUrl,
-        dataset, model, mountPoints = [], account, partition,
+      const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, imageId, remoteImageUrl,
+        isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
@@ -132,10 +135,22 @@ procedure
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: trainJobName,
-          algorithm: algorithmVersion?.path,
           image: remoteImageUrl || image?.path,
-          dataset: datasetVersion?.path,
-          model: modelVersion?.path,
+          algorithm: algorithmVersion
+            ? isAlgorithmPrivate
+              ? algorithmVersion.privatePath
+              : algorithmVersion.path
+            : undefined,
+          dataset: datasetVersion
+            ? isDatasetPrivate
+              ? datasetVersion.privatePath
+              : datasetVersion.path
+            : undefined,
+          model: modelVersion
+            ? isModelPrivate
+              ? modelVersion.privatePath
+              : modelVersion.path
+            : undefined,
           mountPoints,
           account,
           partition: partition!,

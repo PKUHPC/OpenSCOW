@@ -235,11 +235,14 @@ export const createAppSession = procedure
     clusterId: z.string(),
     appId: z.string(),
     appJobName: z.string(),
+    isAlgorithmPrivate: z.boolean().optional(),
     algorithm: z.number().optional(),
     image: z.number().optional(),
     remoteImageUrl: z.string().optional(),
     startCommand: z.string().optional(),
+    isDatasetPrivate: z.boolean().optional(),
     dataset: z.number().optional(),
+    isModelPrivate: z.boolean().optional(),
     model: z.number().optional(),
     mountPoints: z.array(z.string()).optional(),
     account: z.string(),
@@ -256,8 +259,9 @@ export const createAppSession = procedure
     jobId: z.number(),
   }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const { clusterId, appId, appJobName, algorithm, image, startCommand, remoteImageUrl,
-      dataset, model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
+    const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
+      image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
+      model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
@@ -417,9 +421,21 @@ export const createAppSession = procedure
         jobName: appJobName,
         // 优先用户填写的远程镜像地址
         image: remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`),
-        algorithm: algorithmVersion?.path,
-        dataset: datasetVersion?.path,
-        model: modelVersion?.path,
+        algorithm: algorithmVersion
+          ? isAlgorithmPrivate
+            ? algorithmVersion.privatePath
+            : algorithmVersion.path
+          : undefined,
+        dataset: datasetVersion
+          ? isDatasetPrivate
+            ? datasetVersion.privatePath
+            : datasetVersion.path
+          : undefined,
+        model: modelVersion
+          ? isModelPrivate
+            ? modelVersion.privatePath
+            : modelVersion.path
+          : undefined,
         mountPoints,
         account,
         partition: partition!,
@@ -618,8 +634,11 @@ export const listAppSessions =
           // 如果是训练，不需要连接信息
           if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
 
-            const app = checkAppExist(apps, sessionMetadata.appId);
-
+            const app = apps[sessionMetadata.appId];
+            // 未找到该应用 不报错。
+            if (!app) {
+              return;
+            }
             // judge whether the app is ready
             if (runningJobInfo && runningJobInfo.state === "RUNNING") {
             // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，

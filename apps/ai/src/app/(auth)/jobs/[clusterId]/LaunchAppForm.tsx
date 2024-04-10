@@ -124,6 +124,10 @@ export const LaunchAppForm = (props: Props) => {
   const [showDataset, setShowDataset] = useState(false);
   const [showModel, setShowModel] = useState(false);
 
+  const isAlgorithmPrivate = Form.useWatch(["algorithm", "type"], form) === AccessibilityType.PRIVATE;
+  const isDatasetPrivate = Form.useWatch(["dataset", "type"], form) === AccessibilityType.PRIVATE;
+  const isModelPrivate = Form.useWatch(["model", "type"], form) === AccessibilityType.PRIVATE;
+
   const { dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading } = useDataOptions<DatasetInterface>(
     form,
     "dataset",
@@ -342,10 +346,13 @@ export const LaunchAppForm = (props: Props) => {
           await trainJobMutation.mutateAsync({
             clusterId,
             trainJobName: appJobName,
+            isAlgorithmPrivate,
             algorithm: algorithm?.version,
             imageId: image?.name,
             remoteImageUrl,
+            isDatasetPrivate,
             dataset: dataset?.version,
+            isModelPrivate,
             model: model?.version,
             mountPoints,
             account: account,
@@ -374,11 +381,14 @@ export const LaunchAppForm = (props: Props) => {
             clusterId,
             appId: appId!,
             appJobName,
+            isAlgorithmPrivate,
             algorithm: algorithm?.version,
             image: image?.name,
             remoteImageUrl,
             startCommand,
+            isDatasetPrivate,
             dataset: dataset?.version,
+            isModelPrivate,
             model: model?.version,
             mountPoints,
             account: account,
