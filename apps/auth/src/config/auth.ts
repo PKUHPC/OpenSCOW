@@ -242,8 +242,8 @@ export const AuthConfigSchema = Type.Object({
   unicomClientId:Type.String({ description: "客户端标识", default: "TestClient" }),
   unicomClientSecret:Type.String({ description: "客户端秘钥", default: "QvhGc7C8an1TiMuO3IaAQmAK4xV6Akso" }),
   sendMessageCodeTimeoutSeconds: Type.Number({ description: "验证码发送次数记录过期时间", default: 300 }),
-  alibabaCloudAccessKeyId:Type.String({ description: "阿里云id" }),
-  alibabaCloudAccessKeySecret:Type.String({ description: "阿里云秘钥" }),
+  alibabaCloudAccessKeyId:Type.String({ description: "阿里云id", default: "" }),
+  alibabaCloudAccessKeySecret:Type.String({ description: "阿里云秘钥", default: "" }),
   verificationCodeTimeoutSeconds:Type.Number({ description: "验证码过期时间", default: 300 }),
 });
 
