@@ -16,7 +16,6 @@ import "xterm/css/xterm.css";
 
 import { Button, Space } from "antd";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
@@ -67,7 +66,6 @@ export default function Page({ params }: {params: {clusterId: string, jobId: str
 
   const { clusterId, jobId } = params;
   const { publicConfig, user } = usePublicConfig();
-  const router = useRouter();
 
   const clusterName = publicConfig.CLUSTERS.find((x) => x.id === clusterId)?.name || clusterId;
 
@@ -79,7 +77,7 @@ export default function Page({ params }: {params: {clusterId: string, jobId: str
           {`用户 ${user.identityId} 连接到集群 ${clusterName} 的作业 ${jobId}`}
         </h2>
         <Space wrap>
-          <Button onClick={() => router.refresh()}>
+          <Button onClick={() => window.location.reload()}>
             {"刷新并重新连接"}
           </Button>
         </Space>

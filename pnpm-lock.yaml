@@ -214,6 +214,12 @@ importers:
       '@trpc/server':
         specifier: 10.45.2
         version: 10.45.2
+      '@xterm/addon-fit':
+        specifier: 0.10.0
+        version: 0.10.0(@xterm/xterm@5.5.0)
+      '@xterm/xterm':
+        specifier: 5.5.0
+        version: 5.5.0
       antd:
         specifier: 5.16.0
         version: 5.16.0(react-dom@18.2.0)(react@18.2.0)
@@ -301,12 +307,6 @@ importers:
       ws:
         specifier: 8.16.0
         version: 8.16.0
-      xterm:
-        specifier: 5.3.0
-        version: 5.3.0
-      xterm-addon-fit:
-        specifier: 0.8.0
-        version: 0.8.0(xterm@5.3.0)
       zod:
         specifier: 3.22.4
         version: 3.22.4
@@ -7966,6 +7966,18 @@ packages:
     dependencies:
       '@webassemblyjs/ast': 1.12.1
       '@xtuc/long': 4.2.2
+
+  /@xterm/addon-fit@0.10.0(@xterm/xterm@5.5.0):
+    resolution: {integrity: sha512-UFYkDm4HUahf2lnEyHvio51TNGiLK66mqP2JoATy7hRZeXaGMRDr00JiSF7m63vR5WKATF605yEggJKsw0JpMQ==}
+    peerDependencies:
+      '@xterm/xterm': ^5.0.0
+    dependencies:
+      '@xterm/xterm': 5.5.0
+    dev: false
+
+  /@xterm/xterm@5.5.0:
+    resolution: {integrity: sha512-hqJHYaQb5OptNunnyAnkHyM8aCjZ1MEIDTQu1iIbbTD/xops91NB5yq1ZK/dC2JDbVWtF23zUtl9JE2NqwT87A==}
+    dev: false
 
   /@xtuc/ieee754@1.2.0:
     resolution: {integrity: sha512-DX8nKgqcGwsc0eJSqYt5lwP4DH5FlHnmuWWBRy7X0NcaGR0ZtuyeESgMwTYVEtxmsNGY+qit4QYT/MIYTOTPeA==}

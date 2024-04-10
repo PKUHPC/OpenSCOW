@@ -11,14 +11,14 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { ShellInputData, ShellOutputData } from "src/server/setup/jobShell";
 import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { styled } from "styled-components";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
 
 const TerminalContainer = styled.div`
   background-color: black;
@@ -101,7 +101,7 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
         }
       };
 
-      return () => { 
+      return () => {
         if (socket) socket.close();
         if (term) term.dispose();
         terminalInitialized.current = false;
