@@ -12,13 +12,18 @@
 
 import { customAlphabet } from "nanoid";
 
+
+// slurm username is all lowercase
+const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
+const number = "0123456789";
+
+const numberCaseId = customAlphabet(number, 4);
 /**
  *
  * @param length
  * @returns 只包含小写字母和数字
  */
 export function genRandomStringWithLowercaseAndNumber(length: number) {
-  const alphabet = "0123456789abcdefghijklmnopqrstuvwxyz";
   const nanoid = customAlphabet(alphabet, length);
 
   const randomString = nanoid();
@@ -26,3 +31,4 @@ export function genRandomStringWithLowercaseAndNumber(length: number) {
   return randomString;
 }
 
+export const genVerification = () => numberCaseId();
