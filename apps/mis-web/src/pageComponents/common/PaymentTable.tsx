@@ -26,17 +26,17 @@ import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
-    account = "account",
-    tenant = "tenant",
-    // 仅搜索自己账户
-    selfAccount = "selfAccount",
-    // 仅搜索自己租户
-    selfTenant = "selfTenant",
+  account = "account",
+  tenant = "tenant",
+  // 仅搜索自己账户
+  selfAccount = "selfAccount",
+  // 仅搜索自己租户
+  selfTenant = "selfTenant",
 }
 
 interface Props {
   // 账户充值记录专用项
-  accountName?: string [];
+  accountName?: string[];
   // 搜索类型, self前缀表示只搜索用户自身的账户或租户
   searchType: SearchType;
 }
@@ -56,7 +56,7 @@ interface TableProps {
 
 interface FilterForm {
   // 账户名或租户名
-  name?: string [];
+  name?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs],
   type?: string;
 }
@@ -72,19 +72,19 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [selectedNames, setSelectedNames] = useState<string [] | undefined>(accountName);
+  const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountName);
 
   const [query, setQuery] = useState<{
     name: string[] | undefined,
-    time: [ dayjs.Dayjs, dayjs.Dayjs ]
+    time: [dayjs.Dayjs, dayjs.Dayjs]
     type: string[]
-    }>(() => ({
-      // name作为账户名时可能为 undefined 、长度不定的的数组
-      // name作为租户名时可能为 undefined 、长度为1的的数组
-      name: accountName,
-      time: [today.subtract(1, "year"), today],
-      type: [],
-    }));
+  }>(() => ({
+    // name作为账户名时可能为 undefined 、长度不定的的数组
+    // name作为租户名时可能为 undefined 、长度为1的的数组
+    name: accountName,
+    time: [today.subtract(1, "year"), today],
+    type: [],
+  }));
 
   const { message } = App.useApp();
 
@@ -93,11 +93,11 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       const param = {
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
-        type:query.type,
+        type: query.type,
       };
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
-        return api.getTenantPayments({ query: { ...param, tenantName:query.name ? query.name[0] : undefined } });
+        return api.getTenantPayments({ query: { ...param, tenantName: query.name ? query.name[0] : undefined } });
 
       } else {
         return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
@@ -129,7 +129,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           endTime: query.time[1].clone().endOf("day").toISOString(),
           targetName: query.name,
           searchType: searchType,
-          type:query.type,
+          type: query.type,
         },
       });
     }
@@ -149,10 +149,12 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       { label: t(pCommon("tenant")), value: "tenantName" },
     ] : [];
     const ipAndOperator = searchType !== SearchType.selfAccount ? [
-      { label: t(p("ipAddress")),
-        value: "ipAddress" },
       {
-        label:t(p("operatorId")),
+        label: t(p("ipAddress")),
+        value: "ipAddress",
+      },
+      {
+        label: t(p("operatorId")),
         value: "operatorId",
       },
     ] : [];
@@ -170,11 +172,20 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           initialValues={query}
           onFinish={async () => {
             const { name, time, type } = await form.validateFields();
-            const trimmedType = type ? type.trim().split(/,|，/) : [];
-            setQuery({ name: selectedNames ?? name, time, type:trimmedType });
+            let trimmedType: string[];
+            if (Array.isArray(type) && type.length === 0) {
+              trimmedType = [];
+            } else {
+              trimmedType = type ? type.split(/,|，/).map((item) => item.trim()) : [];
+            }
+            setQuery({
+              name: selectedNames ?? name,
+              time,
+              type: trimmedType,
+            });
           }}
         >
-          { (searchType === SearchType.account || searchType === SearchType.tenant) ? (
+          {(searchType === SearchType.account || searchType === SearchType.tenant) ? (
             <Form.Item
               label={searchType === SearchType.account ?
                 t(pCommon("account")) : t(pCommon("tenant"))}
