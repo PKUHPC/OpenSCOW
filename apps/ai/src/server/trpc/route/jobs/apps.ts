@@ -234,11 +234,14 @@ export const createAppSession = procedure
     clusterId: z.string(),
     appId: z.string(),
     appJobName: z.string(),
+    isAlgorithmPrivate: z.boolean().optional(),
     algorithm: z.number().optional(),
     image: z.number().optional(),
     remoteImageUrl: z.string().optional(),
     startCommand: z.string().optional(),
+    isDatasetPrivate: z.boolean().optional(),
     dataset: z.number().optional(),
+    isModelPrivate: z.boolean().optional(),
     model: z.number().optional(),
     mountPoints: z.array(z.string()).optional(),
     account: z.string(),
@@ -255,8 +258,9 @@ export const createAppSession = procedure
     jobId: z.number(),
   }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const { clusterId, appId, appJobName, algorithm, image, startCommand, remoteImageUrl,
-      dataset, model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
+    const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
+      image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
+      model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
@@ -397,9 +401,21 @@ export const createAppSession = procedure
           jobName: appJobName,
           // 优先用户填写的远程镜像地址
           image: remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`),
-          algorithm: algorithmVersion?.path,
-          dataset: datasetVersion?.path,
-          model: modelVersion?.path,
+          algorithm: algorithmVersion
+            ? isAlgorithmPrivate
+              ? algorithmVersion.privatePath
+              : algorithmVersion.path
+            : undefined,
+          dataset: datasetVersion
+            ? isDatasetPrivate
+              ? datasetVersion.privatePath
+              : datasetVersion.path
+            : undefined,
+          model: modelVersion
+            ? isModelPrivate
+              ? modelVersion.privatePath
+              : modelVersion.path
+            : undefined,
           mountPoints,
           account,
           partition: partition!,
