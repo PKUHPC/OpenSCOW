@@ -52,11 +52,11 @@ export const sendMessagesCodeRoute = fp(async (f) => {
       const { phone, isRegister } = req.query;
 
       // todo
-      // if (isRegister) {
+      if (isRegister) {
 
-      // } else {
+      } else {
 
-      // }
+      }
       const verificationCode = genVerification();
       // 记录手机发送验证码次数
       const phoneSendCodeTimesKey = `${phone}-sendCodeTimes`;
