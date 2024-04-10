@@ -163,6 +163,9 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                     refreshToken={connectivityRefreshToken}
                   />
                 )}
+                <Link href={`/jobShell/${cluster.id}/${record.jobId}`} target="_blank">
+                  {"进入容器"}
+                </Link>
                 <Popconfirm
                   title="确定结束这个任务吗"
                   onConfirm={
@@ -200,16 +203,11 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           }
           {
             (record.state === "RUNNING" && record.jobType === JobType.APP) ? (
-              <>
-                <Link href={`/jobShell/${cluster.id}/${record.jobId}`} target="_blank">
-                  {"进入容器"}
-                </Link>
-                <SaveImageModalButton
-                  reload={refetch}
-                  appSession={record}
-                  clusterId={cluster.id}
-                >保存镜像</SaveImageModalButton>
-              </>
+              <SaveImageModalButton
+                reload={refetch}
+                appSession={record}
+                clusterId={cluster.id}
+              >保存镜像</SaveImageModalButton>
             ) : undefined
           }
           <a onClick={() => {

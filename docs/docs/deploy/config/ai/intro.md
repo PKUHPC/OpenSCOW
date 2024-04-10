@@ -98,7 +98,9 @@ ai:
   enabled: false
 ```
 
-此外我们支持了不同容器运行时，并提供了进入运行中的 k8s 作业容器的进行 shell 操作的功能。您需要提供一份能进入到对应 k8s 集群容器的 kubectl config 文件，并将其放置到 SCOW 部署目录中的 config 目录下，然后在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
+此外我们支持了不同容器运行时，并提供了进入运行中的 k8s 作业容器的进行 shell 操作的功能。
+
+为了能够在 Kubernetes 集群中通过 kubectl 进入到所有命名空间的容器中执行命令（例如 /bin/sh），需要提供一份 kubeconfig 配置文件。该配置文件的 current context 中的用户需要使用 ClusterRole 创建并具备一定的权限，这些权限包括对 pods/exec 的 create 操作，以及对 pods 的 get 和 list 操作。创建完成后，需要将 kubeconfig 文件放置到 SCOW 部署目录中的 config 目录下，然后在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
 
 ```yaml title="config/clusters/{K8S集群的ID}.yml"
 # 其他配置省略
@@ -107,8 +109,8 @@ k8s:
   # runtime: docker
   # 默认为 containerd
   runtime: containerd
-  # kubectl 配置文件
-  kubectlConfig:
+  # kubeconfig 相关配置
+  kubeconfig:
     # 相对于 SCOW 部署目录下 config 目录的路径
     path: /kube/xxx
 ```
