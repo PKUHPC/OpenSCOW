@@ -15,7 +15,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { AccountServiceClient, GetAccountsRequest } from "@scow/protos/build/server/account";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole } from "src/models/User";
+import { AccountState, DisplayedAccountState, PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
@@ -25,6 +25,9 @@ export const AdminAccountInfo = Type.Object({
   accountName: Type.String(),
   userCount: Type.Number(),
   blocked: Type.Boolean(),
+  state: Type.Optional(Type.Enum(AccountState)),
+  displayedState: Type.Optional(Type.Enum(DisplayedAccountState)),
+  isInWhitelist: Type.Optional(Type.Boolean()),
   ownerId: Type.String(),
   ownerName: Type.String(),
   comment: Type.String(),
