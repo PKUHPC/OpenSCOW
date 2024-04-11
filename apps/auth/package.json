@@ -22,8 +22,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@alicloud/dysmsapi20170525": "2.0.24",
-    "@alicloud/openapi-client": "0.4.6",
-    "@alicloud/tea-console": "1.0.0",
+    "@alicloud/openapi-client": "0.4.8",
     "@alicloud/tea-util": "1.4.7",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@fastify/error": "3.4.1",

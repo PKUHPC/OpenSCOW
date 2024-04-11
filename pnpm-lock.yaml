@@ -448,13 +448,10 @@ importers:
         specifier: 2.0.24
         version: 2.0.24
       '@alicloud/openapi-client':
-        specifier: 0.4.6
-        version: 0.4.6
-      '@alicloud/tea-console':
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: ^0.4.8
+        version: 0.4.8
       '@alicloud/tea-util':
-        specifier: 1.4.7
+        specifier: ^1.4.7
         version: 1.4.7
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
@@ -1957,7 +1954,7 @@ packages:
     resolution: {integrity: sha512-RtOwh3L+NbpfnOxySViIKLlNQeT9pZJS496ZTMMz7A29CBrlComC1UDLmwmD5odWF2Okv9ZdsyP3IRiQnoEL+A==}
     dependencies:
       '@alicloud/endpoint-util': 0.0.1
-      '@alicloud/openapi-client': 0.4.6
+      '@alicloud/openapi-client': 0.4.8
       '@alicloud/openapi-util': 0.3.2
       '@alicloud/tea-typescript': 1.8.0
       '@alicloud/tea-util': 1.4.7
@@ -1983,15 +1980,15 @@ packages:
       - supports-color
     dev: false
 
-  /@alicloud/openapi-client@0.4.6:
-    resolution: {integrity: sha512-cyhUQOJehLRslHy2l+lsginiyXdzfV7yF7b9EJcxzGG7zHAEX0XF3OJvfo13n7WgiqCzt9suQBatJz7b5F+14A==}
+  /@alicloud/openapi-client@0.4.8:
+    resolution: {integrity: sha512-l4g+M2i2SIlbTBpEitTac8e64OyESc0xLNf2FwQ5MV4wdEqRYxu8fuSCMVd5dNxhF7HvgvokJDma+WN/a9HLbg==}
     dependencies:
       '@alicloud/credentials': 2.3.0
       '@alicloud/gateway-spi': 0.0.8
       '@alicloud/openapi-util': 0.3.2
       '@alicloud/tea-typescript': 1.8.0
       '@alicloud/tea-util': 1.4.7
-      '@alicloud/tea-xml': 0.0.2
+      '@alicloud/tea-xml': 0.0.3
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -2003,14 +2000,6 @@ packages:
       '@alicloud/tea-util': 1.4.7
       kitx: 2.1.0
       sm3: 1.0.3
-    transitivePeerDependencies:
-      - supports-color
-    dev: false
-
-  /@alicloud/tea-console@1.0.0:
-    resolution: {integrity: sha512-kkdhu/iZRUzZBh58XPaKw+fsKlUAznPRD21wgHSUN+R85ODM66h3+a//hK9dsX3zUbfZ7DqDjZf53zu5ecKk6g==}
-    dependencies:
-      '@alicloud/tea-typescript': 1.8.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -2033,12 +2022,12 @@ packages:
       - supports-color
     dev: false
 
-  /@alicloud/tea-xml@0.0.2:
-    resolution: {integrity: sha512-Xs7v5y7YSNSDDYmiDWAC0/013VWPjS3dQU4KezSLva9VGiTVPaL3S7Nk4NrTmAYCG6MKcrRj/nGEDIWL5KRoPg==}
+  /@alicloud/tea-xml@0.0.3:
+    resolution: {integrity: sha512-+/9GliugjrLglsXVrd1D80EqqKgGpyA0eQ6+1ZdUOYCaRguaSwz44trX3PaxPu/HhIPJg9PsGQQ3cSLXWZjbAA==}
     dependencies:
       '@alicloud/tea-typescript': 1.8.0
       '@types/xml2js': 0.4.14
-      xml2js: 0.4.23
+      xml2js: 0.6.2
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -21244,8 +21233,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /xml2js@0.4.23:
-    resolution: {integrity: sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==}
+  /xml2js@0.6.2:
+    resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
     engines: {node: '>=4.0.0'}
     dependencies:
       sax: 1.2.4
