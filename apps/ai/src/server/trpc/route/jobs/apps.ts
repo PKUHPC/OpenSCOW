@@ -419,24 +419,6 @@ export const createAppSession = procedure
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId,
         jobName: appJobName,
-        // 优先用户填写的远程镜像地址
-        image: remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`),
-        algorithm: algorithmVersion
-          ? isAlgorithmPrivate
-            ? algorithmVersion.privatePath
-            : algorithmVersion.path
-          : undefined,
-        dataset: datasetVersion
-          ? isDatasetPrivate
-            ? datasetVersion.privatePath
-            : datasetVersion.path
-          : undefined,
-        model: modelVersion
-          ? isModelPrivate
-            ? modelVersion.privatePath
-            : modelVersion.path
-          : undefined,
-        mountPoints,
         account,
         partition: partition!,
         coreCount,
@@ -447,8 +429,36 @@ export const createAppSession = procedure
         // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
         workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
         script: remoteEntryPath,
-        // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
-        extraOptions: [JobType.APP, app.type],
+        // 对于AI模块，需要传递的额外参数
+        // 第一个参数确定是创建应用or训练任务，
+        // 第二个参数为创建应用时的appId
+        // 第三个参数为镜像地址
+        // 第四个参数为算法版本地址
+        // 第五个参数为数据集版本地址
+        // 第六个参数为模型版本地址
+        // 第七个参数为多挂载点地址，以逗号分隔
+        extraOptions: [
+          JobType.APP,
+          "web",
+          // 优先用户填写的远程镜像地址
+          (remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`)) || "",
+          algorithmVersion
+            ? isAlgorithmPrivate
+              ? algorithmVersion.privatePath
+              : algorithmVersion.path
+            : "",
+          datasetVersion
+            ? isDatasetPrivate
+              ? datasetVersion.privatePath
+              : datasetVersion.path
+            : "",
+          modelVersion
+            ? isModelPrivate
+              ? modelVersion.privatePath
+              : modelVersion.path
+            : "",
+          mountPoints.join(","),
+        ],
       }).catch((e) => {
         const ex = e as ServiceError;
         throw new TRPCError({
@@ -507,7 +517,7 @@ export const saveImage =
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
         const client = getAdapterClient(clusterId);
 
-        const { node, containerId } = await asyncClientCall(client.app, "getRunningJobNodeInfo", {
+        const { node, containerId } = await asyncClientCall(client.app, "getRunningContainerJobInfo", {
           jobId,
         });
 
