@@ -165,38 +165,20 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const stdoutStream = new PassThrough();
   const stderrStream = new PassThrough();
 
-  // 监听来自客户端WebSocket的消息并写入stdinStream
-  ws.on("message", (data) => {
-    const message = JSON.parse(data.toString());
-
-    switch (message.$case) {
-    case "data":
-      stdinStream.write(message.data.data);
-      break;
-    case "resize":
-      stdinStream.write(
-        `stty cols ${message.resize.cols} rows ${message.resize.rows}\n`);
-      break;
-    case "disconnect":
-      stdinStream.end(); // 结束stdin流输入
-      break;
-    }
-  });
-
   // 将Kubernetes stdout和stderr的输出发送回WebSocket客户端
   // 初始化计数器
-  let ignoreNextMessagesCount = 0;
+  // let ignoreNextMessagesCount = 0;
   stdoutStream.on("data", (data) => {
-    // 如果调整窗口大小会返回同样的命令到前端，直接忽略掉
-    if (data.toString().startsWith("stty") || data.toString().startsWith("# stty")) {
-      ignoreNextMessagesCount = 1;
-      return;
-    };
-    // 调整窗口大小第二个消息是 #，也需要忽略，不传递回前端
-    if (ignoreNextMessagesCount > 0) {
-      ignoreNextMessagesCount -= 1;
-      return;
-    }
+    // // 如果调整窗口大小会返回同样的命令到前端，直接忽略掉
+    // if (data.toString().startsWith("stty") || data.toString().startsWith("# stty")) {
+    //   ignoreNextMessagesCount = 1;
+    //   return;
+    // };
+    // // 调整窗口大小第二个消息是 #，也需要忽略，不传递回前端
+    // if (ignoreNextMessagesCount > 0) {
+    //   ignoreNextMessagesCount -= 1;
+    //   return;
+    // }
     send({ $case: "data", data: { data: data.toString() } });
   });
 
@@ -227,14 +209,23 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
     log("Connected to shell");
 
-    // 调整窗口
-    const cols = query.get("cols");
-    const rows = query.get("rows");
+    // 监听来自客户端WebSocket的消息并写入stdinStream
+    ws.on("message", (data) => {
+      const message = JSON.parse(data.toString());
 
-    if (cols && rows) {
-      stdinStream.write(
-        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}\n`);
-    }
+      switch (message.$case) {
+      case "data":
+        stdinStream.write(message.data.data);
+        break;
+      case "resize":
+        stdinStream.write(
+          `stty cols ${message.resize.cols} rows ${message.resize.rows}\n`);
+        break;
+      case "disconnect":
+        stdinStream.end();
+        break;
+      }
+    });
 
     ws.on("close", () => {
       // 关闭相关流，以确保Kubernetes端的命令执行可以正确结束
@@ -243,6 +234,16 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       stderrStream.end();
       k8sWs.close();
     });
+
+
+    // 调整窗口
+    const cols = query.get("cols");
+    const rows = query.get("rows");
+
+    if (cols && rows) {
+      stdinStream.write(
+        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}\n`);
+    }
   } catch (error) {
     console.error("Error executing command in Kubernetes", error);
     ws.close();
