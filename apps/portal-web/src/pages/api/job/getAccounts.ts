@@ -50,11 +50,14 @@ export default route(GetAccountsSchema, async (req, res) => {
 
   const client = getClient(JobServiceClient);
 
-  return asyncUnaryCall(client, "listAccounts", {
+  const result = asyncUnaryCall(client, "listAccounts", {
     cluster, userId: info.identityId,
   }).then(({ accounts }) => ({ 200: { accounts } }), handlegRPCError({
     [status.NOT_FOUND]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
     [status.INTERNAL]: (err) => ({ 404: { code: "ACCOUNT_NOT_FOUND", message: err.details } } as const),
-  }));
+  }),
+  );
+
+  return result;
 
 });

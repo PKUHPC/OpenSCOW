@@ -584,6 +584,7 @@ export default {
                         + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
+      adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
     },
     dashboard: {
       title: "Dashboard",

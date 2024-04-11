@@ -36,6 +36,9 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
     if (((e as any).code === status.UNIMPLEMENTED) ||
     (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
       scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
+    // 适配器请求连接失败的处理
+    } else if (((e as any).code === status.CANCELLED)) {
+      throw e;
     } else {
       throw <ServiceError> {
         code: Status.UNIMPLEMENTED,

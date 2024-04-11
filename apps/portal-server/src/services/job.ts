@@ -23,7 +23,7 @@ import { ApiVersion } from "@scow/utils/build/version";
 import path from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { getAdapterClient } from "src/utils/clusters";
+import { callOnOne } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -31,30 +31,32 @@ export const jobServiceServer = plugin((server) => {
 
   server.addService<JobServiceServer>(JobServiceService, {
 
-    cancelJob: async ({ request }) => {
+    cancelJob: async ({ request, logger }) => {
 
       const { cluster, jobId, userId } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      await asyncClientCall(client.job, "cancelJob", {
-        userId, jobId,
-      });
+      await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.job, "cancelJob", {
+          userId, jobId,
+        }),
+      );
 
       return [{}];
 
     },
 
-    listAccounts: async ({ request }) => {
+    listAccounts: async ({ request, logger }) => {
       const { cluster, userId } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      const reply = await asyncClientCall(client.account, "listAccounts", {
-        userId,
-      });
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.account, "listAccounts", {
+          userId,
+        }),
+      );
 
       return [{ accounts: reply.accounts }];
     },
@@ -116,42 +118,44 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-    listRunningJobs: async ({ request }) => {
+    listRunningJobs: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      const reply = await asyncClientCall(client.job, "getJobs", {
-        fields: [
-          "job_id", "partition", "name", "user", "state", "elapsed_seconds",
-          "nodes_alloc", "node_list", "reason", "account", "cpus_alloc", "gpus_alloc",
-          "qos", "submit_time", "time_limit_minutes", "working_directory",
-        ],
-        filter: { users: [userId], accounts: [], states: ["PENDING", "RUNNING"]},
-      });
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.job, "getJobs", {
+          fields: [
+            "job_id", "partition", "name", "user", "state", "elapsed_seconds",
+            "nodes_alloc", "node_list", "reason", "account", "cpus_alloc", "gpus_alloc",
+            "qos", "submit_time", "time_limit_minutes", "working_directory",
+          ],
+          filter: { users: [userId], accounts: [], states: ["PENDING", "RUNNING"]},
+        }),
+      );
 
       return [{ results: reply.jobs.map(jobInfoToRunningjob) }];
     },
 
-    listAllJobs: async ({ request }) => {
+    listAllJobs: async ({ request, logger }) => {
       const { cluster, userId, endTime, startTime } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      const reply = await asyncClientCall(client.job, "getJobs", {
-        fields: [
-          "job_id", "name", "account", "partition", "qos", "state", "working_directory",
-          "reason", "elapsed_seconds", "time_limit_minutes", "submit_time",
-          "start_time", "end_time",
-        ],
-        filter: {
-          users: [userId], accounts: [], states: [],
-          submitTime: { startTime, endTime },
-        },
-      });
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.job, "getJobs", {
+          fields: [
+            "job_id", "name", "account", "partition", "qos", "state", "working_directory",
+            "reason", "elapsed_seconds", "time_limit_minutes", "submit_time",
+            "start_time", "end_time",
+          ],
+          filter: {
+            users: [userId], accounts: [], states: [],
+            submitTime: { startTime, endTime },
+          },
+        }),
+      );
 
       return [{ results: reply.jobs.map(jobInfoToPortalJobInfo) }];
 
@@ -161,10 +165,6 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
 
-
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
@@ -173,23 +173,27 @@ export const jobServiceServer = plugin((server) => {
         await createDirectoriesRecursively(sftp, workingDirectory);
       });
 
-      const reply = await asyncClientCall(client.job, "submitJob", {
-        userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
-        memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
-        script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
-      }).catch((e) => {
-        const ex = e as ServiceError;
-        const errors = parseErrorDetails(ex.metadata);
-        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: "sbatch failed",
-            details: e.details,
-          };
-        } else {
-          throw e;
-        }
-      });
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.job, "submitJob", {
+          userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
+          memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
+          script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
+        }).catch((e) => {
+          const ex = e as ServiceError;
+          const errors = parseErrorDetails(ex.metadata);
+          if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+            throw <ServiceError> {
+              code: Status.INTERNAL,
+              message: "sbatch failed",
+              details: e.details,
+            };
+          } else {
+            throw e;
+          }
+        }),
+      );
 
       if (saveAsTemplate) {
         const jobInfo: JobTemplate = {
@@ -224,15 +228,6 @@ export const jobServiceServer = plugin((server) => {
 
     submitFileAsJob: async ({ request, logger }) => {
       const { cluster, userId, filePath } = request;
-
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      // 当前接口要求的最低调度器接口版本
-      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 5, patch: 0 };
-
-      // 检验调度器的API版本是否符合要求，不符合要求报错
-      await checkSchedulerApiVersion(client, minRequiredApiVersion);
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
@@ -272,21 +267,36 @@ export const jobServiceServer = plugin((server) => {
       });
 
       const scriptFileFullPath = path.dirname(filePath);
-      const reply = await asyncClientCall(client.job, "submitScriptAsJob", {
-        userId, script, scriptFileFullPath,
-      }).catch((e) => {
-        const ex = e as ServiceError;
-        const errors = parseErrorDetails(ex.metadata);
-        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: "sbatch failed",
-            details: e.details,
-          };
-        } else {
-          throw e;
-        }
-      });
+
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+
+          // 当前接口要求的最低调度器接口版本
+          const minRequiredApiVersion: ApiVersion = { major: 1, minor: 5, patch: 0 };
+
+          // 检验调度器的API版本是否符合要求，不符合要求报错
+          await checkSchedulerApiVersion(client, minRequiredApiVersion);
+
+          return await asyncClientCall(client.job, "submitScriptAsJob", {
+            userId, script, scriptFileFullPath,
+          }).catch((e) => {
+            const ex = e as ServiceError;
+            const errors = parseErrorDetails(ex.metadata);
+            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+              throw <ServiceError> {
+                code: Status.INTERNAL,
+                message: "sbatch failed",
+                details: e.details,
+              };
+            } else {
+              throw e;
+            }
+          });
+        },
+
+      );
 
       return [{ jobId: reply.jobId }];
     },

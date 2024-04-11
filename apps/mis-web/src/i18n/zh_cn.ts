@@ -795,9 +795,10 @@ export default {
       extraMessage: "请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。",
     },
     _app: {
-      clusterOpErrorTitle: "操作失败",
-      clusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
+      multiClusterOpErrorTitle: "操作失败",
+      multiClusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
 
+      adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
     },
     profile: {

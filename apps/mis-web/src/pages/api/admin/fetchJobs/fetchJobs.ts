@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 
 export const FetchJobsSchema = typeboxRouteSchema({
   method: "POST",
@@ -27,7 +28,7 @@ export const FetchJobsSchema = typeboxRouteSchema({
 });
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default typeboxRoute(FetchJobsSchema,
+export default /* #__PURE__*/route(FetchJobsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
