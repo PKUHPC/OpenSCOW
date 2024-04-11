@@ -439,7 +439,7 @@ export const createAppSession = procedure
         // 第七个参数为多挂载点地址，以逗号分隔
         extraOptions: [
           JobType.APP,
-          "web",
+          app.type,
           // 优先用户填写的远程镜像地址
           (remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`)) || "",
           algorithmVersion
