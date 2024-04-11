@@ -23,8 +23,6 @@ export const appServiceServer = plugin((server) => {
       return [{
         node: "node1",
         containerId: "docker://container1",
-        pod: "pod1",
-        namespace: "default",
       }];
     },
 

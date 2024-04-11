@@ -14,7 +14,6 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
@@ -97,7 +96,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
     {
       title: "类型",
       dataIndex: "jobType",
-      width: "8%",
+      width: "10%",
       render: (_, record) => {
         if (record.jobType === JobType.APP) {
           return "应用";
@@ -108,20 +107,19 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
     {
       title: "应用",
       dataIndex: "appId",
-      width: "8%",
       render: (appId: string, record) => record.appName ?? appId,
       sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: "提交时间",
       dataIndex: "submitTime",
-      width: "200px",
+      width: "15%",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
     },
     {
       title: "状态",
       dataIndex: "state",
-      width: "120px",
+      width: "12%",
       render: (_, record) => (
         record.reason ? (
           <Tooltip title={record.reason}>
@@ -142,7 +140,6 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
     },
     ...(unfinished ? [{
       title: "剩余时间",
-      width: "100px",
       dataIndex: "remainingTime",
     },
     ] : []),
@@ -150,7 +147,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       title: "操作",
       key: "action",
       fixed:"right",
-      width: "350px",
+      width: "10%",
       render: (_, record) => (
         <Space>
           {
@@ -163,9 +160,6 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                     refreshToken={connectivityRefreshToken}
                   />
                 )}
-                <Link href={`/jobShell/${cluster.id}/${record.jobId}`} target="_blank">
-                  {"进入容器"}
-                </Link>
                 <Popconfirm
                   title="确定结束这个任务吗"
                   onConfirm={

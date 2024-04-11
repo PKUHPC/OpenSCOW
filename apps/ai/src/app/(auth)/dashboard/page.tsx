@@ -12,8 +12,8 @@
 
 "use client";
 import { join } from "path";
-import { usePublicConfig } from "src/app/(auth)/context";
 import { Head } from "src/utils/head";
+import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
 const Logo = styled.div`
@@ -25,22 +25,24 @@ const Logo = styled.div`
 
 export default function Page() {
 
-  const { publicConfig: { BASE_PATH } } = usePublicConfig();
+  const { data } = trpc.config.publicConfig.useQuery();
 
   return (
     <div>
       <Head title={"dashboard"} />
       {
-        <Logo>
-          <img
-            alt="logo"
-            src={join(BASE_PATH, "/api/logo?type=logo")}
-            style={{
-              objectFit: "contain",
-              maxWidth: "50%",
-            }}
-          />
-        </Logo>
+        data ? (
+          <Logo>
+            <img
+              alt="logo"
+              src={join(data.BASE_PATH, "/api/logo?type=logo")}
+              style={{
+                objectFit: "contain",
+                maxWidth: "50%",
+              }}
+            />
+          </Logo>
+        ) : undefined
       }
     </div>
   );
