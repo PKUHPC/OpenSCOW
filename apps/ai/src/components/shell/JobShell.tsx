@@ -67,6 +67,19 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
         join(BASE_PATH, "/api/jobShell") + "?" + new URLSearchParams(payload).toString(),
       );
 
+      socket.onmessage = (e) => {
+        const message = JSON.parse(e.data) as ShellOutputData;
+        switch (message.$case) {
+        case "data":
+          const data = Buffer.from(message.data.data);
+          term.write(data);
+          break;
+        case "exit":
+          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+          break;
+        }
+      };
+
       socket.onopen = () => {
         term.clear();
 
@@ -84,21 +97,6 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
         term.onData((data) => {
           send({ $case: "data", data: { data } });
         });
-      };
-
-
-
-      socket.onmessage = (e) => {
-        const message = JSON.parse(e.data) as ShellOutputData;
-        switch (message.$case) {
-        case "data":
-          const data = Buffer.from(message.data.data);
-          term.write(data);
-          break;
-        case "exit":
-          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
-          break;
-        }
       };
 
       return () => {
