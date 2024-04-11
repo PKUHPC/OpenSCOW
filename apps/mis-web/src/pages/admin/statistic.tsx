@@ -175,14 +175,25 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: getDailyPayFn });
 
-  const getTopSubmitJobUserFn = useCallback(async () => {
-    return await api.getTopSubmitJobUser({ query: {
+  // const getTopSubmitJobUserFn = useCallback(async () => {
+  //   return await api.getTopSubmitJobUser({ query: {
+  //     startTime: query.filterTime[0].startOf("day").toISOString(),
+  //     endTime: query.filterTime[1].endOf("day").toISOString(),
+  //   } });
+  // }, [query]);
+
+  // const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
+  // useAsync({ promiseFn: getTopSubmitJobUserFn });
+
+  const getTopSubmitJobUserNameFn = useCallback(async () => {
+    return await api.getTopSubmitJobUserName({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
-  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: getTopSubmitJobUserFn });
+  const { data: topSubmitJobUserName, isLoading: topSubmitJobUserNameLoading } =
+  useAsync({ promiseFn: getTopSubmitJobUserNameFn });
 
   const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {
@@ -263,11 +274,11 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const topSubmitJobUserData = useMemo(() => {
 
-    return topSubmitJobUser?.results.map((r) => ({
-      x: r.userId,
+    return topSubmitJobUserName?.results.map((r) => ({
+      x: r.userName,
       y: r.count,
     })) || [];
-  }, [query, topSubmitJobUser]);
+  }, [query, topSubmitJobUserName]);
 
   const newJobCountData = useMemo(() => {
     if (dailyNewJobCount) {
@@ -484,7 +495,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataBarChart
                   data={topSubmitJobUserData}
                   title={t(p("topTenSubmitJobUser"))}
-                  isLoading={topSubmitJobUserLoading}
+                  isLoading={topSubmitJobUserNameLoading}
                   xLabel={t(p("userName"))}
                   toolTipFormatter={(value) => [value, t(p("jobCount"))]}
                 />

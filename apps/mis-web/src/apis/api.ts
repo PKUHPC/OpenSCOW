@@ -39,6 +39,7 @@ import type { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import type { GetTopChargeAccountSchema } from "src/pages/api/admin/getTopChargeAccount";
 import type { GetTopPayAccountSchema } from "src/pages/api/admin/getTopPayAccount";
 import type { GetTopSubmitJobUserSchema } from "src/pages/api/admin/getTopSubmitJobUser";
+import type { GetTopSubmitJobUserNameSchema } from "src/pages/api/admin/getTopSubmitJobUserName";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
 import type { GetAlarmDbIdSchema } from "src/pages/api/admin/monitor/getAlarmDbId";
 import type { GetAlarmLogsSchema } from "src/pages/api/admin/monitor/getAlarmLogs";
@@ -172,6 +173,7 @@ export const api = {
   queryJobTimeLimit: apiClient.fromTypeboxRoute<typeof QueryJobTimeLimitSchema>("GET", "/api/job/queryJobTimeLimit"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
   getTopSubmitJobUser: apiClient.fromTypeboxRoute<typeof GetTopSubmitJobUserSchema>("GET", "/api/admin/getTopSubmitJobUser"),
+  getTopSubmitJobUserName: apiClient.fromTypeboxRoute<typeof GetTopSubmitJobUserNameSchema>("GET", "/api/admin/getTopSubmitJobUserName"),
   getNewJobCount: apiClient.fromTypeboxRoute<typeof GetNewJobCountSchema>("GET", "/api/admin/getNewJobCount"),
   getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
   getCustomEventTypes: apiClient.fromTypeboxRoute<typeof GetCustomEventTypesSchema>("GET", "/api/log/getCustomEventTypes"),

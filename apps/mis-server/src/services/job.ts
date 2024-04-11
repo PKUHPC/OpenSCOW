@@ -33,6 +33,7 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { User } from "src/entities/User";
 import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
@@ -411,6 +412,46 @@ export const jobServiceServer = plugin((server) => {
         },
       ];
     },
+
+    // 返回用户名，需要联表查询
+    getTopSubmitJobUserName: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      // 获取JobInfoEntity中基于时间范围的前N个userId和计数
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      qb
+        .select([raw("j.user as userId"), raw("COUNT(*) as count")])
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("j.user")
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
+        .limit(topRank);
+
+      const jobInfoResults: {userId: string, count: number}[] = await queryWithCache({
+        em,
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+
+      // // Step 2: 对于每个userId，查询User表获取userName
+      // 对于每个userId查询User表获取userName
+      const results: {userName: string, count: number}[] = [];
+      for (const jobInfo of jobInfoResults) {
+        const user = await em.findOne(User, { userId: jobInfo.userId });
+        results.push({
+          userName:user ? user.name : "Unkonw",
+          count:jobInfo.count,
+        });
+      }
+
+      // 直接返回构建的结果
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
 
     getNewJobCount: async ({ request, em }) => {
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);

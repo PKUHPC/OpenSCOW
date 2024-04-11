@@ -168,6 +168,23 @@ message GetTopSubmitJobUsersResponse {
   repeated SubmitJobUser results = 1;
 }
 
+message GetTopSubmitJobUserNameRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+
+  //需要获取top 多少
+  //如果不传，默认取top10的用户
+  optional uint32 top_rank = 3;
+}
+
+message GetTopSubmitJobUserNameResponse {
+  message SubmitJobUser {
+    string user_name = 1;
+    uint32 count = 2;
+  }
+  repeated SubmitJobUser results = 1;
+}
+
 message GetNewJobCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
@@ -214,6 +231,8 @@ service JobService {
   rpc GetMissingDefaultPriceItems(GetMissingDefaultPriceItemsRequest) returns (GetMissingDefaultPriceItemsResponse);
 
   rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
+
+  rpc GetTopSubmitJobUserName(GetTopSubmitJobUserNameRequest) returns (GetTopSubmitJobUserNameResponse);
 
   rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
 
