@@ -14,18 +14,20 @@ import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
-import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { decimalToMoney } from "@scow/lib-decimal";
+import { account_AccountStateFromJSON } from "@scow/protos/build/server/account";
 import {
   ExportServiceServer,
   ExportServiceService } from "@scow/protos/build/server/export";
 import {
   platformRoleFromJSON,
   platformRoleToJSON, SortDirection, tenantRoleFromJSON, tenantRoleToJSON } from "@scow/protos/build/server/user";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { User } from "src/entities/User";
 import { UserRole, UserStatus } from "src/entities/UserAccount";
+import { getAccountStateInfo } from "src/utils/accountUserState";
 import {
   getChargesSearchType,
   getChargesTargetSearchParam,
@@ -82,7 +84,7 @@ export const exportServiceServer = plugin((server) => {
         name: x.name,
         email: x.email,
         availableAccounts: x.accounts.getItems()
-          .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+          .filter((ua) => ua.blockedInCluster === UserStatus.UNBLOCKED)
           .map((ua) => {
             return ua.account.getProperty("accountName");
           }),
@@ -146,6 +148,8 @@ export const exportServiceServer = plugin((server) => {
         accountName,
         blocked,
         debt,
+        frozen,
+        normal,
         count,
       } = request;
 
@@ -161,18 +165,22 @@ export const exportServiceServer = plugin((server) => {
 
         const ownerUser = owner.user.getEntity();
 
+        const blockThresholdAmount = x.blockThresholdAmount ?? x.tenant.$.defaultAccountBlockThreshold;
+        const exportedState =
+          getAccountStateInfo(x.whitelist?.id, x.state, x.balance, blockThresholdAmount).displayedState;
+
         return {
           accountName: x.accountName,
           tenantName: x.tenant.$.name,
           userCount: x.users.count(),
-          blocked: Boolean(x.blocked),
+          displayedState: exportedState,
           ownerId: ownerUser.userId,
           ownerName: ownerUser.name,
           comment: x.comment,
           balance: decimalToMoney(x.balance),
-          blockThresholdAmount: decimalToMoney(
-            x.blockThresholdAmount ?? x.tenant.$.defaultAccountBlockThreshold,
-          ),
+          blockThresholdAmount: decimalToMoney(blockThresholdAmount),
+          blocked: Boolean(x.blockedInCluster),
+          state: account_AccountStateFromJSON(x.state),
         };
       };
 
@@ -182,16 +190,48 @@ export const exportServiceServer = plugin((server) => {
 
       const { writeAsync } = createWriterExtensions(call);
 
+      const qb = em.createQueryBuilder(Account, "a")
+        .select("*")
+        .leftJoinAndSelect("a.users", "ua")
+        .leftJoinAndSelect("ua.user", "u")
+        .leftJoinAndSelect("a.tenant", "t");
+
+      if (tenantName !== undefined) {
+        qb.andWhere({ "t.name": tenantName });
+      }
+
+      if (accountName !== undefined) {
+        qb.andWhere({ "a.accountName": { $like: `%${accountName}%` } });
+      }
+
+      if (blocked) {
+        qb.andWhere({ "a.state": AccountState.BLOCKED_BY_ADMIN, "a.blockedInCluster": true });
+      }
+
+      if (debt) {
+        qb.andWhere({ "a.state": AccountState.NORMAL })
+          .andWhere("a.whitelist_id IS NULL")
+          .andWhere("CASE WHEN a.block_threshold_amount IS NOT NULL"
+            + " THEN a.balance <= a.block_threshold_amount ELSE a.balance <= t.default_account_block_threshold END");
+      }
+
+      if (frozen) {
+        qb.andWhere({ "a.state": AccountState.FROZEN });
+      }
+
+      if (normal) {
+        qb.andWhere({ "a.blockedInCluster": false });
+      }
+
       while (offset < count) {
         const limit = Math.min(batchSize, count - offset);
-        const records = (await em.find(Account, {
-          $and: [
-            tenantName !== undefined ? { tenant: { name: tenantName } } : {},
-            accountName !== undefined ? { accountName:  { $like: `%${accountName}%` } } : {},
-            blocked ? { blocked } : {},
-            debt ? { balance: { $lt: new Decimal(0) } } : {},
-          ],
-        }, { populate: ["users", "users.user", "tenant"]}))
+
+        const queryResult = await qb
+          .limit(limit)
+          .offset(offset)
+          .getResultList() as Loaded<Account, "tenant" | "users" | "users.user">[];
+
+        const records = queryResult
           .map(recordFormat ?? ((x) => x));
 
         if (records.length === 0) {
@@ -335,7 +375,7 @@ export const exportServiceServer = plugin((server) => {
 
       while (offset < count) {
         const limit = Math.min(batchSize, count - offset);
-        const records = (await em.find(PayRecord, query))
+        const records = (await em.find(PayRecord, query, { limit, offset }))
           .map(recordFormat ?? ((x) => x));
 
         if (records.length === 0) {

@@ -596,8 +596,11 @@ export const listAppSessions =
           // 如果是训练，不需要连接信息
           if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
 
-            const app = checkAppExist(apps, sessionMetadata.appId);
-
+            const app = apps[sessionMetadata.appId];
+            // 未找到该应用 不报错。
+            if (!app) {
+              return;
+            }
             // judge whether the app is ready
             if (runningJobInfo && runningJobInfo.state === "RUNNING") {
             // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
@@ -689,15 +692,20 @@ procedure
 
       const { jobId, clusterId } = input;
 
-      const client = getAdapterClient(clusterId);
-      const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+      try {
+        const client = getAdapterClient(clusterId);
 
-      if (connectionInfo?.response?.$case === "appConnectionInfo") {
-        const host = connectionInfo.response.appConnectionInfo.host;
-        const port = connectionInfo.response.appConnectionInfo.port;
-        const reachable = await isPortReachable(port, host, TIMEOUT_MS);
-        return { ok: reachable };
-      } else {
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          const host = connectionInfo.response.appConnectionInfo.host;
+          const port = connectionInfo.response.appConnectionInfo.port;
+          const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+          return { ok: reachable };
+        } else {
+          return { ok: false };
+        }
+      } catch (_) {
         return { ok: false };
       }
     },

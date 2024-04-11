@@ -15,7 +15,7 @@ import { ExportChargeRecord, ExportOperationLog, ExportPayRecord } from "@scow/p
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
-import { prefix } from "src/i18n";
+import { getI18nCurrentText, prefix } from "src/i18n";
 import en from "src/i18n/en";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
@@ -85,6 +85,8 @@ export const OperationType: OperationTypeEnum = {
   exportOperationLog: "exportOperationLog",
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
+  userChangeTenant: "userChangeTenant",
+  customEvent: "customEvent",
 };
 
 export const OperationLog = Type.Object({
@@ -95,6 +97,7 @@ export const OperationLog = Type.Object({
   operationResult: Type.Enum(OperationResult),
   operationTime: Type.Optional(Type.String()),
   operationEvent: Type.Any(),
+  customEventType: Type.Optional(Type.String()),
 });
 export type OperationLog = Static<typeof OperationLog>;
 
@@ -180,6 +183,8 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     exportOperationLog: t(pTypes("exportOperationLog")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
+    userChangeTenant: t(pTypes("userChangeTenant")),
+    customEvent: t(pTypes("customEvent")),
   };
 
 };
@@ -242,6 +247,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   exportChargeRecord: "040305",
   exportPayRecord: "040306",
   exportOperationLog: "040307",
+  userChangeTenant: "040308",
+  customEvent: "050001",
 };
 
 type OperationTextsArgsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string | React.ReactNode;
@@ -250,6 +257,7 @@ export const getOperationDetail = (
   operationEvent: OperationEvent,
   t: OperationTextsTransType,
   tArgs: OperationTextsArgsTransType,
+  languageId: string,
 ) => {
 
   try {
@@ -431,6 +439,14 @@ export const getOperationDetail = (
       return t(pDetails("setAccountDefaultBlockThreshold"),
         [operationEvent[logEvent].tenantName,
           nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+    case "userChangeTenant":
+      return t(pDetails("userChangeTenant"),
+        [operationEvent[logEvent].userId,
+          operationEvent[logEvent].previousTenantName,
+          operationEvent[logEvent].newTenantName]);
+    case "customEvent":
+      const c = operationEvent[logEvent]?.content;
+      return getI18nCurrentText(c, languageId);
     default:
       return "-";
     }

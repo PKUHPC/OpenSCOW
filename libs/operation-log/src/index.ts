@@ -17,6 +17,7 @@ import {
   CreateOperationLogRequest,
   ExportOperationLogRequest,
   ExportOperationLogResponse,
+  GetCustomEventTypesResponse,
   GetOperationLogsRequest,
   GetOperationLogsResponse,
   OperationLogServiceClient,
@@ -58,6 +59,15 @@ export const createOperationLogClient = (
       }
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
+    },
+    getCustomEventTypes: async (): Promise<GetCustomEventTypesResponse> => {
+
+      if (!client) {
+        return { customEventTypes: []};
+      }
+
+      return await asyncUnaryCall(client, "getCustomEventTypes", {});
+
     },
     exportLog: async (request: ExportOperationLogRequest): Promise<ClientReadableStream<ExportOperationLogResponse>> =>
     {

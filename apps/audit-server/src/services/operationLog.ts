@@ -13,14 +13,16 @@
 import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
-import { QueryOrder } from "@mikro-orm/core";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import {
   OperationLogServiceServer,
   OperationLogServiceService,
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
+import { I18nObject } from "@scow/protos/build/common/i18n";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
-import { filterOperationLogs, getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
+import { checkCustomEventType, filterOperationLogs,
+  getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
 
 
@@ -43,11 +45,14 @@ export const operationLogServiceServer = plugin((server) => {
 
       const dbOperationResult: OperationResult = OperationResult[operationResultToJSON(operationResult)];
 
+      await checkCustomEventType(em, operationEvent);
+
       const operationLog = new OperationLog({
         operatorUserId,
         operatorIp,
         operationResult: dbOperationResult,
         metaData: targetAccountName ? { ...operationEvent, targetAccountName } : operationEvent,
+        customEventType: operationEvent.$case === "customEvent" ? operationEvent.customEvent.type : undefined,
       });
       await em.persistAndFlush(operationLog);
       return [];
@@ -122,6 +127,27 @@ export const operationLogServiceServer = plugin((server) => {
         }
         offset += limit;
       }
+    },
+
+    getCustomEventTypes: async ({ em }) => {
+
+      const qb = em.createQueryBuilder(OperationLog, "o");
+      qb
+        .select([
+          raw("DISTINCT o.custom_event_type as customType"),
+          raw("JSON_UNQUOTE(JSON_EXTRACT(meta_data, '$.customEvent.name')) AS name"),
+        ])
+        .where("o.custom_event_type IS NOT NULL");
+
+      const results: { customType: string, name: string }[] = await qb.execute();
+
+      const customEventTypes = results.map((r) => ({
+        type: r.customType,
+        name: JSON.parse(r.name) as I18nObject,
+      }));
+      return [{
+        customEventTypes,
+      }];
     },
 
   });
