@@ -12,7 +12,6 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import * as k8sClient from "@kubernetes/client-node";
-import { queryToIntOrDefault } from "@scow/lib-web/build/utils/querystring";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { IncomingMessage } from "http";
 import { NextApiRequest } from "next";
@@ -222,16 +221,6 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       stderrStream.end();
       k8sWs.close();
     });
-
-
-    // 调整窗口
-    const cols = query.get("cols");
-    const rows = query.get("rows");
-
-    if (cols && rows) {
-      stdinStream.write(
-        `stty cols ${queryToIntOrDefault(cols, 80)} rows ${queryToIntOrDefault(rows, 30)}\n`);
-    }
   } catch (error) {
     console.error("Error executing command in Kubernetes", error);
     ws.close();

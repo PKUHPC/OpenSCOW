@@ -54,8 +54,6 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
       const payload = {
         cluster,
         jobId,
-        cols: term.cols + "",
-        rows: term.rows + "",
       };
 
       term.write(
