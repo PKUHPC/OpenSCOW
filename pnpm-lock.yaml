@@ -448,10 +448,10 @@ importers:
         specifier: 2.0.24
         version: 2.0.24
       '@alicloud/openapi-client':
-        specifier: ^0.4.8
+        specifier: 0.4.8
         version: 0.4.8
       '@alicloud/tea-util':
-        specifier: ^1.4.7
+        specifier: 1.4.7
         version: 1.4.7
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
