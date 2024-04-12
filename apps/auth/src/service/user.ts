@@ -11,7 +11,8 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { CheckUnicomUserExistResponse, UserServiceClient } from "@scow/protos/build/server/user";
+import { CheckUnicomUserExistResponse, CheckUserExistResponse, UserServiceClient }
+  from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/getClient";
 
 export async function checkUnicomUserExisted(unicomUserId: string): Promise<CheckUnicomUserExistResponse> {
@@ -19,10 +20,9 @@ export async function checkUnicomUserExisted(unicomUserId: string): Promise<Chec
   const client = getClient(UserServiceClient);
 
   return await asyncClientCall(client, "checkUnicomUserExist", { unicomUserId });
-
 }
 
-export async function createUser(userId: string, userInfo) {
+export async function createUnicomUser(userId: string, userInfo) {
 
   const client = getClient(UserServiceClient);
 
@@ -33,6 +33,38 @@ export async function createUser(userId: string, userInfo) {
     identityId: userId,
     password:`unicom_${userInfo.phone}`,
     unicomId:userInfo.id,
+  });
+
+}
+
+export async function checkUserExisted(userId: string, phone: string, email: string):
+Promise<CheckUserExistResponse> {
+
+  const client = getClient(UserServiceClient);
+
+  return await asyncClientCall(client, "checkUserExist", { userId, phone, email });
+}
+
+interface registerUserProps {
+  userId: string,
+  userName: string,
+  email: string,
+  password: string,
+  country: string,
+  phone: string,
+}
+
+export async function registerUser(userInfo: registerUserProps) {
+  const client = getClient(UserServiceClient);
+
+  return await asyncClientCall(client, "createUser", {
+    name:userInfo.userName,
+    tenantName:"default",
+    email:userInfo.email,
+    identityId: userInfo.userId,
+    password:userInfo.password,
+    country:userInfo.country,
+    phone:userInfo.phone,
   });
 
 }

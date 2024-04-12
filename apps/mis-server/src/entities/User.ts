@@ -49,6 +49,12 @@ export class User {
   @Property()
     email: string;
 
+  @Property({ nullable:true })
+    country?: string;
+
+  @Property({ nullable:true })
+    phone?: string;
+
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
     createTime: Date;
 
@@ -67,6 +73,8 @@ export class User {
     tenant: EntityOrRef<Tenant>;
     name: string;
     email: string;
+    country?: string;
+    phone?: string;
     createTime?: Date;
     tenantRoles?: TenantRole[];
     platformRoles?: PlatformRole[];
@@ -76,6 +84,8 @@ export class User {
     this.tenant = toRef(init.tenant);
     this.name = init.name;
     this.email = init.email;
+    this.country = init.country;
+    this.phone = init.phone;
     this.createTime = init.createTime ?? new Date();
     this.tenantRoles = init.tenantRoles ?? [];
     this.platformRoles = init.platformRoles ?? [];

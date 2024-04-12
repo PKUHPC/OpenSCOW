@@ -25,7 +25,8 @@ import { User } from "src/entities/User";
 
 export async function createUserInDatabase(
   userId: string, name: string, email: string, tenantName: string,
-  logger: Logger, em: SqlEntityManager<MySqlDriver>, unicomId?: string) {
+  logger: Logger, em: SqlEntityManager<MySqlDriver>,
+  unicomId?: string, country?: string, phone?: string) {
   // get default tenant
   const tenant = await em.findOne(Tenant, { name: tenantName });
   if (!tenant) {
@@ -33,7 +34,10 @@ export async function createUserInDatabase(
   }
   // new the user
   const user = new User({
-    email, name, tenant, userId, ...unicomId ? { unicomId } : {},
+    email, name, tenant, userId,
+    ...unicomId ? { unicomId } : {},
+    ...country ? { country } : {},
+    ...phone ? { phone } : {},
   });
 
   user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({

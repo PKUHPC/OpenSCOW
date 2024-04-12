@@ -178,6 +178,8 @@ message CreateUserRequest {
   string email = 4;
   string password = 5;
   optional string unicom_id = 6;
+  optional string country = 7;
+  optional string phone = 8;
 }
 
 // ALREADY_EXISTS: user with id already exists
@@ -443,6 +445,18 @@ message CheckUnicomUserExistResponse {
   }
 }
 
+message CheckUserExistRequest {
+  string user_id = 1;
+  string email = 2;
+  string phone = 3;
+}
+
+message CheckUserExistResponse {
+  optional bool user_id_existed = 1;
+  optional bool email_existed = 2;
+  optional bool phone_existed = 3;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -491,4 +505,5 @@ service UserService {
 
   rpc ChangeTenant(ChangeTenantRequest) returns (ChangeTenantResponse);
   rpc CheckUnicomUserExist(CheckUnicomUserExistRequest) returns (CheckUnicomUserExistResponse);
+  rpc CheckUserExist(CheckUserExistRequest) returns (CheckUserExistResponse);
 }

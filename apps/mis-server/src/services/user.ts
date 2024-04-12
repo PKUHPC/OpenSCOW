@@ -402,8 +402,9 @@ export const userServiceServer = plugin((server) => {
      * 并将公钥插入用户的authorized_keys
      */
     createUser: async ({ request, em, logger }) => {
-      const { name, tenantName, email, identityId, password, unicomId } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, unicomId)
+      const { name, tenantName, email, identityId, password, unicomId, country, phone } = request;
+      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em,
+        unicomId, country, phone)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -890,7 +891,22 @@ export const userServiceServer = plugin((server) => {
           },
         },
       }];
+    },
+    checkUserExist: async ({ request, em }) => {
+      const { userId, email, phone } = request;
 
+      const userExisted = await em.findOne(User, {
+        $or: [
+          { userId },
+          { phone },
+          { email },
+        ]});
+
+      return [{
+        userIdExisted:userExisted?.userId === userId,
+        emailExisted:userExisted?.email === email,
+        phoneExisted:userExisted?.phone === phone,
+      }];
     },
   });
 });

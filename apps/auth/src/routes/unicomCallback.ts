@@ -16,7 +16,7 @@ import { cacheUnicomInfo } from "src/auth/cacheInfo";
 import { redirectToWeb, validateCallbackHostname } from "src/auth/callback";
 import { authConfig } from "src/config/auth";
 import { getUnicomToken, getUnicomUserInfo } from "src/service/uincom";
-import { checkUnicomUserExisted, createUser } from "src/service/user";
+import { checkUnicomUserExisted, createUnicomUser } from "src/service/user";
 import { genRandomStringWithLowercaseAndNumber } from "src/utils/genId";
 
 const QuerystringSchema = Type.Object({
@@ -101,7 +101,7 @@ export const UnicomCallbackRoute = fp(async (f) => {
       }
       else {
         const userId = `${genRandomStringWithLowercaseAndNumber(6)}_${userInfo.phone}`;
-        await createUser(userId, userInfo);
+        await createUnicomUser(userId, userInfo);
 
         await cacheUnicomInfo(UnicomToken, userId, req);
         await redirectToWeb(callback!, UnicomToken, rep);
