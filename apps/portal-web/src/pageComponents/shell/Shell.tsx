@@ -11,6 +11,8 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
@@ -18,8 +20,6 @@ import { ShellInputData, ShellOutputData } from "src/server/setup/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
 
 const TerminalContainer = styled.div`
   background-color: black;
