@@ -414,35 +414,31 @@ export const jobServiceServer = plugin((server) => {
     },
 
     // 返回用户名，需要联表查询
-    getTopSubmitJobUserName: async ({ request, em }) => {
-      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+    getUsersWithMostJobSubmissions: async ({ request, em }) => {
+      // topRank不传默认为10，最大限制为10
+      const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       // 获取JobInfoEntity中基于时间范围的前N个userId和计数
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      const kenx = em.getKnex();
+
       qb
         .select([raw("j.user as userId"), raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
+        .leftJoin(em.createQueryBuilder(User), "u", { "j.user": { } })
         .groupBy("j.user")
         .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
-        .limit(topRank);
+        .limit(Math.min(topNUsers, 10));
 
-      const jobInfoResults: {userId: string, count: number}[] = await queryWithCache({
+      console.log(qb.getFormattedQuery());
+
+      const results: {userName: string, userId: string, count: number}[] = await queryWithCache({
         em,
-        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topNUsers}`],
         queryQb: qb,
       });
 
-      // // Step 2: 对于每个userId，查询User表获取userName
-      // 对于每个userId查询User表获取userName
-      const results: {userName: string, count: number}[] = [];
-      for (const jobInfo of jobInfoResults) {
-        const user = await em.findOne(User, { userId: jobInfo.userId });
-        results.push({
-          userName:user ? user.name : "Unkonw",
-          count:jobInfo.count,
-        });
-      }
 
       // 直接返回构建的结果
       return [

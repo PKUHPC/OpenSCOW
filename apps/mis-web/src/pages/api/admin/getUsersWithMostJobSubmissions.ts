@@ -18,17 +18,18 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 
-export const GetTopSubmitJobUserNameResponse = Type.Object({
+export const GetUsersWithMostJobSubmissionsResponse = Type.Object({
   results: Type.Array(Type.Object({
     userName: Type.String(),
+    userId:Type.String(),
     count: Type.Number(),
   })),
 });
 
-export type GetTopSubmitJobUserNameResponse = Static<typeof GetTopSubmitJobUserNameResponse>;
+export type GetUsersWithMostJobSubmissionsResponse = Static<typeof GetUsersWithMostJobSubmissionsResponse>;
 
 
-export const GetTopSubmitJobUserNameSchema = typeboxRouteSchema({
+export const GetUsersWithMostJobSubmissionsSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
@@ -37,19 +38,19 @@ export const GetTopSubmitJobUserNameSchema = typeboxRouteSchema({
 
     endTime: Type.String({ format: "date-time" }),
 
-    // 不传默认为10
-    topRank: Type.Optional(Type.Number()),
+    // 最大为10，不传默认为10
+    topNUsers: Type.Optional(Type.Number()),
 
   }),
 
   responses: {
-    200: GetTopSubmitJobUserNameResponse,
+    200: GetUsersWithMostJobSubmissionsResponse,
   },
 });
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default typeboxRoute(GetTopSubmitJobUserNameSchema,
+export default typeboxRoute(GetUsersWithMostJobSubmissionsSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
@@ -57,14 +58,14 @@ export default typeboxRoute(GetTopSubmitJobUserNameSchema,
       return;
     }
 
-    const { startTime, endTime, topRank } = req.query;
+    const { startTime, endTime, topNUsers } = req.query;
 
     const client = getClient(JobServiceClient);
 
-    const { results } = await asyncClientCall(client, "getTopSubmitJobUserName", {
+    const { results } = await asyncClientCall(client, "getUsersWithMostJobSubmissions", {
       startTime,
       endTime,
-      topRank,
+      topNUsers,
     });
 
     return {

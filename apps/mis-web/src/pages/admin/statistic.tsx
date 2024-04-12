@@ -185,15 +185,15 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   // const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
   // useAsync({ promiseFn: getTopSubmitJobUserFn });
 
-  const getTopSubmitJobUserNameFn = useCallback(async () => {
-    return await api.getTopSubmitJobUserName({ query: {
+  const getUsersWithMostJobSubmissionsFn = useCallback(async () => {
+    return await api.getUsersWithMostJobSubmissions({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
   const { data: topSubmitJobUserName, isLoading: topSubmitJobUserNameLoading } =
-  useAsync({ promiseFn: getTopSubmitJobUserNameFn });
+  useAsync({ promiseFn: getUsersWithMostJobSubmissionsFn });
 
   const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {

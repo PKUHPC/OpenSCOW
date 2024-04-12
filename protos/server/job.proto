@@ -168,21 +168,22 @@ message GetTopSubmitJobUsersResponse {
   repeated SubmitJobUser results = 1;
 }
 
-message GetTopSubmitJobUserNameRequest {
+message GetUsersWithMostJobSubmissionsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
 
   //需要获取top 多少
-  //如果不传，默认取top10的用户
-  optional uint32 top_rank = 3;
+  //最大为10
+  optional uint32 top_n_users = 3;
 }
 
-message GetTopSubmitJobUserNameResponse {
-  message SubmitJobUser {
+message GetUsersWithMostJobSubmissionsResponse {
+  message UserInfo {
     string user_name = 1;
-    uint32 count = 2;
+    string user_id = 2;
+    uint32 count = 3;
   }
-  repeated SubmitJobUser results = 1;
+  repeated UserInfo results = 1;
 }
 
 message GetNewJobCountRequest {
@@ -232,7 +233,7 @@ service JobService {
 
   rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
 
-  rpc GetTopSubmitJobUserName(GetTopSubmitJobUserNameRequest) returns (GetTopSubmitJobUserNameResponse);
+  rpc GetUsersWithMostJobSubmissions(GetUsersWithMostJobSubmissionsRequest) returns (GetUsersWithMostJobSubmissionsResponse);
 
   rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
 
