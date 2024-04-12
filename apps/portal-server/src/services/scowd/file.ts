@@ -224,12 +224,12 @@ export const scowdFileServiceServer = plugin((server) => {
 
       const subLogger = logger.child({ userId, path, cluster });
       subLogger.info("Download file started");
-    
+
       try {
-        const readStream = await client.file.download({ 
+        const readStream = await client.file.download({
           path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
         }, { headers: { IdentityId: userId } });
-      
+
         for await (const response of readStream) {
           call.write(response);
         }
@@ -361,7 +361,7 @@ export const scowdFileServiceServer = plugin((server) => {
       if (!client) { throw scowdClientNotFound(fromCluster); }
 
       try {
-        await client.file.startFileTransfer({ 
+        await client.file.startFileTransfer({
           fromPath, toPath, toTransferNodeHost, toTransferNodePort: toTransferNodePort.toString(),
         }, { headers: { IdentityId: userId } });
 
@@ -418,7 +418,7 @@ export const scowdFileServiceServer = plugin((server) => {
       const toTransferNodeHost = getClusterTransferNode(toCluster).host;
 
       try {
-        await client.file.terminateFileTransfer({ 
+        await client.file.terminateFileTransfer({
           toTransferNodeHost, fromPath,
         }, { headers: { IdentityId: userId } });
 
@@ -448,7 +448,7 @@ export const scowdFileServiceServer = plugin((server) => {
       if (!client) { throw scowdClientNotFound(fromCluster); }
 
       try {
-        await client.file.checkTransferKey({ 
+        await client.file.checkTransferKey({
           toTransferNodeHost, toTransferNodePort: toTransferNodePort.toString(),
         }, { headers: { IdentityId: userId } });
 

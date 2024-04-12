@@ -52,7 +52,7 @@ export async function createServer() {
   await server.register(runtimeConfigServiceServer);
   await server.register(dashboardServiceServer);
 
-  if (config.BUSINESS_VERSION) {
+  if (config.SCOWD_ENABLED) {
     await server.register(scowdFileServiceServer);
     await server.register(scowdDesktopServiceServer);
   } else {

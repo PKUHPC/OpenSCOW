@@ -14,7 +14,11 @@ import { Code } from "@connectrpc/connect";
 import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
+import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
 import { clusters } from "src/config/clusters";
+import { config } from "src/config/env";
+
+const certificates = createScowdCertificates(config);
 
 export function getClusterLoginNodeScowdUrl(cluster: string): string | undefined {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
@@ -26,7 +30,7 @@ const scowdClientForClusters = Object.entries(clusters).reduce((prev, [cluster])
   if (!loginNode.scowdUrl) {
     prev[cluster] = undefined;
   } else {
-    const client = getClient(loginNode.scowdUrl);
+    const client = getClient(loginNode.scowdUrl, certificates);
     prev[cluster] = client;
   }
   return prev;

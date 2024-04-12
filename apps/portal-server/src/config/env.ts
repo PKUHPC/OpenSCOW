@@ -31,7 +31,12 @@ export const config = envConfig({
 
   DOWNLOAD_CHUNK_SIZE: num({ desc: "grpc下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
 
-  BUSINESS_VERSION: bool({ desc: "是否为商业版本", default: false }),
+  SCOWD_ENABLED: bool({ desc: "是否开启 SCOWD", default: false }),
+  SCOWD_SSL_ENABLED: bool({ desc: "到 SCOWD 的连接是否启动SSL", default: true }),
+  SCOWD_SSL_CA_CERT_PATH: str({ desc: "SCOWD CA根证书路径", default: "./scowd/certs/ca.crt" }),
+  SCOWD_SSL_SCOW_CERT_PATH: str({ desc: "SCOWD CA签名的 SCOW 证书路径", default: "./scowd/certs/scow.crt" }),
+  SCOWD_SSL_SCOW_KEY_PATH: str({ desc: "SCOWD CA签名的 SCOW 私钥路径", default: "./scowd/certs/scow.key" }),
+
 });
 
 export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);
