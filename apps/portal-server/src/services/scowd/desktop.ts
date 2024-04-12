@@ -20,7 +20,7 @@ import { Desktop, DesktopServiceServer, DesktopServiceService } from "@scow/prot
 import { clusters } from "src/config/clusters";
 import { ensureEnabled, getDesktopConfig } from "src/utils/desktops";
 import { clusterNotFound, scowdClientNotFound } from "src/utils/errors";
-import { convertCodeToGrpcStatus, getScowdUrlFromLoginNodeAddress } from "src/utils/scowd";
+import { certificates, convertCodeToGrpcStatus, getScowdUrlFromLoginNodeAddress } from "src/utils/scowd";
 import { checkLoginNodeInCluster } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath } from "src/utils/turbovnc";
 
@@ -52,7 +52,7 @@ export const scowdDesktopServiceServer = plugin((server) => {
         subLogger.info(`loginNode ${host} don't have scowdUrl`);
         throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
       }
-      const client = getScowdClient(loginNodeScowdUrl);
+      const client = getScowdClient(loginNodeScowdUrl, certificates);
 
       if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
@@ -96,7 +96,7 @@ export const scowdDesktopServiceServer = plugin((server) => {
         throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
       }
 
-      const client = getScowdClient(loginNodeScowdUrl);
+      const client = getScowdClient(loginNodeScowdUrl, certificates);
 
       if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
@@ -139,7 +139,7 @@ export const scowdDesktopServiceServer = plugin((server) => {
         throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
       }
 
-      const client = getScowdClient(loginNodeScowdUrl);
+      const client = getScowdClient(loginNodeScowdUrl, certificates);
       if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
       const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
@@ -183,7 +183,7 @@ export const scowdDesktopServiceServer = plugin((server) => {
           throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${host} don't have scowdUrl` };
         }
 
-        const client = getScowdClient(loginNodeScowdUrl);
+        const client = getScowdClient(loginNodeScowdUrl, certificates);
         if (!client) { throw scowdClientNotFound(loginNodeScowdUrl); }
 
         try {
@@ -231,7 +231,7 @@ export const scowdDesktopServiceServer = plugin((server) => {
           throw <ServiceError>{ code: Status.INTERNAL, message: `loginNode ${loginNode.address} don't have scowdUrl` };
         }
 
-        const client = getScowdClient(loginNode.scowdUrl);
+        const client = getScowdClient(loginNode.scowdUrl, certificates);
         if (!client) { throw scowdClientNotFound(loginNode.scowdUrl); }
 
         const res = await client.desktop.listUserDesktops({
@@ -239,8 +239,6 @@ export const scowdDesktopServiceServer = plugin((server) => {
           loginNode: loginNode.address,
           desktopDir: desktopsDir,
         }, { headers: { IdentityId: userId } });
-
-        console.log("123123", res);
 
         const userDesktops: Desktop[] = res.userDesktops.map((desktop) => {
 

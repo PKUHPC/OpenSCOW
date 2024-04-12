@@ -18,7 +18,7 @@ import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
-const certificates = createScowdCertificates(config);
+export const certificates = createScowdCertificates(config);
 
 export function getClusterLoginNodeScowdUrl(cluster: string): string | undefined {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
