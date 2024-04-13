@@ -13,7 +13,7 @@ jobs:
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
-          owner: PKUHPC
-          repository: scow-vagrant
+          owner: ${{ secrets.VAGRANT_REPO_OWNER }}
+          repository: ${{ secrets.VAGRANT_REPO_NAME }}
           branches: ${{ github.event.number }}/merge
           soft_fail: true
