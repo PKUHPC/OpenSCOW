@@ -61,6 +61,7 @@ jobs:
         run: docker ps
 
       - name: Prepare dev libs and code
+        if: vars.RUN_TESTS == 'true' || vars.RUN_RELEASE == 'true'
         run: pnpm prepareDev
 
       - name: Wait for ports
