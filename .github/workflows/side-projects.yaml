@@ -15,6 +15,7 @@ jobs:
   scow-vagrant:
     name: Update scow-vagrant
     runs-on: ubuntu-latest
+    if: github.event.repository.name == 'PKUHPC/SCOW'
     steps:
       - uses: actions/checkout@v4
 
@@ -30,5 +31,5 @@ jobs:
         with:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/vagrant
-          repository-name: PKUHPC/scow-vagrant
+          repository-name: ${{ secrets.VAGRANT_REPO_OWNER }}/${{ secrets.VAGRANT_REPO_NAME }}
           branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
