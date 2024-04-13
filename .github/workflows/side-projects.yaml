@@ -15,7 +15,6 @@ jobs:
   scow-vagrant:
     name: Update scow-vagrant
     runs-on: ubuntu-latest
-    if: github.event.repository.name == 'PKUHPC/SCOW'
     steps:
       - uses: actions/checkout@v4
 
