@@ -15,6 +15,7 @@ jobs:
   scow-vagrant:
     name: Update scow-vagrant
     runs-on: ubuntu-latest
+    if: vars.PUSH_VAGRANT == 'true'
     steps:
       - uses: actions/checkout@v4
 

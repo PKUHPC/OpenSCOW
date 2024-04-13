@@ -7,6 +7,7 @@ on:
 jobs:
   delete-scow-vagrant:
     name: Delete scow-vagrant PR branch
+    if: vars.PUSH_VAGRANT == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Delete scow-vagrant PR branch
