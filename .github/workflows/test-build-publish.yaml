@@ -49,18 +49,22 @@ jobs:
         run: pnpm lint
 
       - name: Generate SSH key pairs for test
+        if: vars.RUN_TESTS
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
+        if: vars.RUN_TESTS
         run: pnpm devenv
 
       - name: Check running containers
+        if: vars.RUN_TESTS
         run: docker ps
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
 
       - name: Wait for ports
+        if: vars.RUN_TESTS
         uses: ifaxity/wait-on-action@main
         with:
           log: true
@@ -68,17 +72,19 @@ jobs:
           resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
       - name: Run tests
+        if: vars.RUN_TESTS
         run: pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4
+        if: vars.RUN_TESTS
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
-        if: github.ref == 'refs/heads/master'
+        if: vars.RUN_RELEASE && github.ref == 'refs/heads/master'
         with:
           version: pnpm ci:version
           publish: pnpm ci:publish
