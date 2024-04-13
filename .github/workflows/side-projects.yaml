@@ -25,10 +25,10 @@ jobs:
           FILE_NAME: "./deploy/vagrant/VERSION"
           FILE_DATA: "${{ github.ref_name }}"
 
-      - name: Pushes to scow-vagrant repo
+      - name: Pushes to ${{ vars.VAGRANT_REPO_OWNER }}/${{ vars.VAGRANT_REPO_NAME }} repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/vagrant
-          repository-name: ${{ secrets.VAGRANT_REPO_OWNER }}/${{ secrets.VAGRANT_REPO_NAME }}
+          repository-name: ${{ vars.VAGRANT_REPO_OWNER }}/${{ vars.VAGRANT_REPO_NAME }}
           branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
