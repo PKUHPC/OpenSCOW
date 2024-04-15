@@ -61,6 +61,7 @@ export const GetRunningJobsSchema = typeboxRouteSchema({
     }),
 
     403: Type.Null(),
+
   },
 });
 
@@ -80,5 +81,4 @@ export default route(GetRunningJobsSchema, async (req, res) => {
   return asyncUnaryCall(client, "listRunningJobs", {
     cluster, userId,
   }).then(({ results }) => ({ 200: { results } }));
-
 });

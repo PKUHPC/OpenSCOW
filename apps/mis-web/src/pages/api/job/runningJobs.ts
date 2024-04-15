@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { GetRunningJobsRequest, JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 
 // Cannot use RunningJob from protos
 export const RunningJob = Type.Object({
@@ -81,7 +82,7 @@ export const getRunningJobs = async (request: GetRunningJobsRequest) => {
 };
 
 
-export default typeboxRoute(GetRunningJobsSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetRunningJobsSchema, async (req, res) => {
   const auth = authenticate((u) =>
     // u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
     u.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||

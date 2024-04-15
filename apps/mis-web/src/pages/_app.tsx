@@ -20,7 +20,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 // import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
@@ -33,7 +33,7 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { Provider, useI18nTranslateToString } from "src/i18n";
+import { Provider, useI18n, useI18nTranslate } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -50,11 +50,13 @@ const languagesMap = {
   "en": en,
 };
 
+
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
 
-  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+  const tArgs = useI18nTranslate();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -64,18 +66,29 @@ const FailEventHandler: React.FC = () => {
         userStore.logout();
         return;
       }
-      console.log(e);
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
-          title: t("page._app.clusterOpErrorTitle"),
-          content: `${t("page._app.clusterOpErrorContent")}(${
+          title: tArgs("page._app.multiClusterOpErrorTitle"),
+          content: `${tArgs("page._app.multiClusterOpErrorContent")}(${
             e.data.details
           })`,
         });
         return;
       }
+      if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
+        const clusterId = e.data.clusterErrorsArray[0].clusterId;
+        const clusterName = clusterId ?
+          (publicConfig.CLUSTERS[clusterId]?.name ?? clusterId) : undefined;
 
-      message.error(`${t("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
+        message.error(`${tArgs("page._app.adapterConnErrorContent",
+          [getI18nConfigCurrentText(clusterName, languageId)])}(${
+          e.data.details
+        })`);
+        return;
+      }
+
+
+      message.error(`${tArgs("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
 
     });
   }, []);

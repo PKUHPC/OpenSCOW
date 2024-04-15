@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { Static, Type } from "@sinclair/typebox";
@@ -19,6 +19,7 @@ import { PlatformRole } from "src/models/User";
 import { ClusterAccountInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
+import { route } from "src/utils/route";
 
 // Cannot use GetClusterUsersResponse from protos
 export const GetClusterUsersResponse = Type.Object({
@@ -40,7 +41,7 @@ export const GetClusterUsersSchema = typeboxRouteSchema({
 
 const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
-export default typeboxRoute(GetClusterUsersSchema,
+export default /* #__PURE__*/route(GetClusterUsersSchema,
   async (req, res) => {
 
     // if not initialized, every one can import users
