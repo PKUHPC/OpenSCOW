@@ -11,6 +11,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   tag-if-needed:
     runs-on: ubuntu-latest
+    if: github.event.repository.name == 'PKUHPC/SCOW'
     steps:
       - uses: actions/checkout@v4
         with:

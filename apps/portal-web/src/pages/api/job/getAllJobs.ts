@@ -53,6 +53,7 @@ export const GetAllJobsSchema = typeboxRouteSchema({
     }),
 
     403: Type.Null(),
+
   },
 });
 
@@ -74,5 +75,4 @@ export default route(GetAllJobsSchema, async (req, res) => {
     userId: info.identityId, cluster,
     startTime, endTime,
   }).then(({ results }) => ({ 200: { results } }));
-
 });

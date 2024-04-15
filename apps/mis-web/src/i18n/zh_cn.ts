@@ -28,6 +28,7 @@ export default {
     user:"用户",
     userId:"用户ID",
     userName:"用户名",
+    ownerIdOrName:"用户ID或姓名",
     userFullName:"用户姓名",
     import:"导入",
     fresh:"刷新",
@@ -257,6 +258,7 @@ export default {
         unblockFail: "解封账户失败！",
         unblockError: "账户{}余额不足，您可以将其加入白名单或充值解封",
 
+        block: "封锁",
         unblock: "解除封锁",
         blockConfirmTitle: "确认封锁账户？",
         blockConfirmContent: "确认要在租户{}中封锁账户{}",
@@ -399,6 +401,7 @@ export default {
       chargeTable:{
         time:"扣费日期",
         amount:"扣费金额",
+        ownerIdOrName:"用户ID或姓名",
       },
     },
     init:{
@@ -603,6 +606,7 @@ export default {
         whiteList:"白名单数量",
         debtSum:"白名单欠费合计",
         joinTime:"加入时间",
+        ownerIdOrName:"用户ID或姓名",
         operatorId:"操作人",
         confirmRemoveWhite:"确认将账户移除白名单？",
         confirmRemoveWhiteText1:"确认要将账户",
@@ -697,6 +701,7 @@ export default {
       },
       userTable:{
         block:"封锁",
+        blocked: "封锁",
         normal:"正常",
         quotaExceeded: "限额",
         statusExplanation: "用户状态说明",
@@ -794,9 +799,10 @@ export default {
       extraMessage: "请访问 http://hpc.pku.edu.cn/guide.html 查看如何开户。",
     },
     _app: {
-      clusterOpErrorTitle: "操作失败",
-      clusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
+      multiClusterOpErrorTitle: "操作失败",
+      multiClusterOpErrorContent: "多集群操作出现错误，部分集群未同步修改",
 
+      adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
     },
     profile: {

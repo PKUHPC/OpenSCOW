@@ -46,7 +46,7 @@ export const UserTable: React.FC<Props> = ({
   const DisplayedUserStateTexts = {
     [DisplayedUserState.DISPLAYED_NORMAL]: <Tag color="success">{t(p("normal"))}</Tag>,
     [DisplayedUserState.DISPLAYED_QUOTA_EXCEEDED]: <Tag color="error">{t(p("quotaExceeded"))}</Tag>,
-    [DisplayedUserState.DISPLAYED_BLOCKED]: <Tag color="error">{t(p("block"))}</Tag>,
+    [DisplayedUserState.DISPLAYED_BLOCKED]: <Tag color="error">{t(p("blocked"))}</Tag>,
   };
 
 
@@ -241,7 +241,9 @@ export const UserTable: React.FC<Props> = ({
                       .httpError(400, (e) => {
                         message.destroy("removeUser");
                         message.error({
-                          content: e.message,
+                          content: `${t("page._app.multiClusterOpErrorContent")}(${
+                            e.message
+                          })`,
                           duration: 4,
                         });
                       })

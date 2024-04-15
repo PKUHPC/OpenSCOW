@@ -21,7 +21,10 @@ export const libWebLanguages: { [id: string]: LibWebTextsType } = {
   zh_cn: libWebZhCn,
 };
 
-export const getCurrentLangLibWebText = (languageId: string, key: LibWebTextsKeys): string | undefined => {
+export const getCurrentLangLibWebText = (
+  languageId: string,
+  key: LibWebTextsKeys,
+): string | undefined => {
 
   const currentLibWebTexts = libWebLanguages[languageId];
   const value = currentLibWebTexts[key];
@@ -33,3 +36,4 @@ export const getCurrentLangLibWebText = (languageId: string, key: LibWebTextsKey
   }
 
 };
+

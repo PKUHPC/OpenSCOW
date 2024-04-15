@@ -66,6 +66,15 @@ const Container = styled.div`
     }
   }
 
+  .ant-table-title {
+    padding-left: 24px !important;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
   .rowBgColor{
     background-color: ${({ theme }) => theme.token.colorBorder};
     /* 去除鼠标经过默认的背景颜色 */
@@ -73,8 +82,8 @@ const Container = styled.div`
       background: none !important;
   }
   }
-
 `;
+
 const p = prefix("pageComp.dashboard.overviewTable.");
 
 export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, isLoading }) => {

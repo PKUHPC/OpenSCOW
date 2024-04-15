@@ -54,6 +54,7 @@ export const GetClusterInfoSchema = typeboxRouteSchema({
     }),
 
     403: Type.Null(),
+
   },
 });
 

@@ -601,16 +601,24 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
-                          e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION" ? modal.error({
-                            title: t(p("tableInfo.submitFailedMessage")),
-                            content: e.message,
-                          }) : (() => { throw e; })();
+                          e.code === "SCHEDULER_FAILED" ||
+                          e.code === "FAILED_PRECONDITION"
+                          || e.code === "UNIMPLEMENTED" ? modal.error({
+                              title: t(p("tableInfo.submitFailedMessage")),
+                              content: e.message,
+                            }) : (() => {
+                              message.error(e.message);
+                              throw e;
+                            })();
                         })
                         .httpError(400, (e) => {
                           e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH" ? modal.error({
                             title: t(p("tableInfo.submitFailedMessage")),
                             content: e.message,
-                          }) : (() => { throw e; })();
+                          }) : (() => {
+                            message.error(e.message);
+                            throw e;
+                          })();
                         })
                         .then((result) => {
                           message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));

@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-operation-log",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -17,7 +17,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@grpc/grpc-js": "1.9.14",
+    "@grpc/grpc-js": "1.10.6",
     "@scow/protos": "workspace:*"
   },
   "devDependencies": {
