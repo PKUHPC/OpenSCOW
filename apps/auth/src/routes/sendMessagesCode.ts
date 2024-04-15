@@ -13,6 +13,7 @@
 import { Static, Type } from "@sinclair/typebox";
 import fp from "fastify-plugin";
 import { authConfig } from "src/config/auth";
+import { checkPhoneRegister } from "src/service/user";
 import { genVerification } from "src/utils/genId";
 import { sendMessage, TemplateCode } from "src/utils/sendMessage";
 
@@ -24,13 +25,20 @@ const QuerystringSchema = Type.Object({
 
 export enum ErrorCode {
   EXCEED_SEND_TIMES = "EXCEED_SEND_TIMES",
-  SEND_MESSAGE_CODE_FAILED = "SEND_MESSAGE_CODE_FAILED"
+  SEND_MESSAGE_CODE_FAILED = "SEND_MESSAGE_CODE_FAILED",
+  PHONE_ALREADY_EXISTED = "PHONE_ALREADY_EXISTED",
+  PHONE_NOT_FOUND = "PHONE_NOT_FOUND",
 }
 
 const ResponsesSchema = Type.Object({
   200: Type.Null(),
 
   400: Type.Object({
+    code: Type.Enum(ErrorCode),
+    message:Type.String(),
+  }),
+
+  409: Type.Object({
     code: Type.Enum(ErrorCode),
   }),
 });
@@ -51,13 +59,29 @@ export const sendMessagesCodeRoute = fp(async (f) => {
 
       const { phone, isRegister } = req.query;
 
-      // todo
+      const res = await checkPhoneRegister(phone);
       console.log(isRegister);
-      // if (isRegister) {
+      if (isRegister) {
+        if (res.phoneExisted) {
+          return await rep.code(409).send(
+            {
+              code: ErrorCode.PHONE_ALREADY_EXISTED,
+              message: "phone already existed",
+            },
+          );
+        }
+      }
+      else {
+        if (!res.phoneExisted) {
+          return await rep.code(400).send(
+            {
+              code: ErrorCode.PHONE_NOT_FOUND,
+              message: "phone not found",
+            },
+          );
+        }
+      }
 
-      // } else {
-
-      // }
       const verificationCode = genVerification();
       // 记录手机发送验证码次数
       const phoneSendCodeTimesKey = `${phone}-sendCodeTimes`;
@@ -84,7 +108,6 @@ export const sendMessagesCodeRoute = fp(async (f) => {
         templateCode:TemplateCode.sendVerification,
         templateParam: { code: verificationCode },
       });
-
       if (result !== "OK") {
         // 发送不成功，减去前面加的次数
         await req.server.redis.decr(phoneSendCodeTimesKey);

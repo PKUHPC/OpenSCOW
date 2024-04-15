@@ -457,6 +457,14 @@ message CheckUserExistResponse {
   optional bool phone_existed = 3;
 }
 
+message CheckPhoneRegisterRequest {
+  string phone = 1;
+}
+
+message CheckPhoneRegisterResponse {
+  bool phone_existed = 1;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -506,4 +514,5 @@ service UserService {
   rpc ChangeTenant(ChangeTenantRequest) returns (ChangeTenantResponse);
   rpc CheckUnicomUserExist(CheckUnicomUserExistRequest) returns (CheckUnicomUserExistResponse);
   rpc CheckUserExist(CheckUserExistRequest) returns (CheckUserExistResponse);
+  rpc CheckPhoneRegister(CheckPhoneRegisterRequest) returns (CheckPhoneRegisterResponse);
 }

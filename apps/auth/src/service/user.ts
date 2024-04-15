@@ -11,7 +11,7 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { CheckUnicomUserExistResponse, CheckUserExistResponse, UserServiceClient }
+import { CheckPhoneRegisterResponse, CheckUnicomUserExistResponse, CheckUserExistResponse, UserServiceClient }
   from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/getClient";
 
@@ -69,4 +69,10 @@ export async function registerUser(userInfo: registerUserProps) {
 
 }
 
+export async function checkPhoneRegister(phone: string):
+Promise<CheckPhoneRegisterResponse> {
 
+  const client = getClient(UserServiceClient);
+
+  return await asyncClientCall(client, "checkPhoneRegister", { phone });
+}

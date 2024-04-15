@@ -49,7 +49,7 @@ const ResponsesSchema = Type.Object({
 /**
  * 创建用户
  */
-export const createUserRoute = fp(async (f) => {
+export const registerUserRoute = fp(async (f) => {
   f.post<{
     Body: Static<typeof BodySchema>
     Responses: Static<typeof ResponsesSchema>,
@@ -77,12 +77,12 @@ export const createUserRoute = fp(async (f) => {
         return await rep.code(409).send({ code: ExistedErrorCode.USER_ID_EXISTED });
       }
 
-      console.log("verificationCode", verificationCode);
-      // const redisVerificationCode = await req.server.redis.get(phone);
+      const redisVerificationCode = await req.server.redis.get(phone);
 
-      // if (redisVerificationCode !== verificationCode) {
-      //   return await rep.code(400).send({ code: ErrorCode.VERIFICATION_CODE_WRONG });
-      // }
+      if (redisVerificationCode !== verificationCode) {
+        return await rep.code(400).send({ code: ErrorCode.VERIFICATION_CODE_WRONG });
+      }
+      await req.server.redis.del(phone);
 
       await registerUser({ userId, email, phone, ...rest });
 
