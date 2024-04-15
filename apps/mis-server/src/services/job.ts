@@ -420,25 +420,36 @@ export const jobServiceServer = plugin((server) => {
 
       // 获取JobInfoEntity中基于时间范围的前N个userId和计数
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
-      const kenx = em.getKnex();
-
       qb
         .select([raw("j.user as userId"), raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
-        .leftJoin(em.createQueryBuilder(User), "u", { "j.user": { } })
         .groupBy("j.user")
         .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
         .limit(Math.min(topNUsers, 10));
 
-      console.log(qb.getFormattedQuery());
-
-      const results: {userName: string, userId: string, count: number}[] = await queryWithCache({
+      const jobInfoResults: {userId: string, count: number}[] = await queryWithCache({
         em,
         queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topNUsers}`],
         queryQb: qb,
       });
 
+
+      // 提取所有的userIds
+      const userIds = jobInfoResults.map((jobInfo) => jobInfo.userId);
+      // 根据userId一次性获取userName
+      const users = await em.find(User, { userId: { $in: userIds } });
+      const userMap = new Map(users.map((user) => [user.userId, user.name]));
+
+      // 对结果进行处理
+      const results: {userName: string, userId: string, count: number}[] = [];
+      for (const jobInfo of jobInfoResults) {
+        results.push({
+          userName:userMap.get(jobInfo.userId) || "Unknown", // 使用Map获取用户名
+          userId:jobInfo.userId,
+          count:jobInfo.count,
+        });
+      }
 
       // 直接返回构建的结果
       return [
