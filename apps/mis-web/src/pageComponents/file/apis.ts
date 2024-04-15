@@ -34,15 +34,17 @@ export const urlToExport = ({
     Object.keys(query)
       .filter((key) => query[key] !== undefined)
       .map((key) => {
-        if (Array.isArray(query[key])) {
+        const value = query[key];
+        if (Array.isArray(value) && (value as any[]).length === 0) {
+          return `${key}=${encodeURIComponent("")}`;// 取消type必须存在后注释
+        } else if (Array.isArray(value) && (value as string[]).length > 0) {
           return (query[key] as string[]).map((value) => `${key}=${encodeURIComponent(value)}`).join("&");
+        } else {
+          return `${key}=${encodeURIComponent(value as string | number | boolean)}`;
         }
-
-        const value = query[key] as string | number | boolean;
-        return `${key}=${encodeURIComponent(value)}`;
-      }).join("&")
+      },
+      ).join("&")
   }&count=${count}`;
-
   return join(publicConfig.BASE_PATH, `/api/file/${exportQuery}`);
 };
 

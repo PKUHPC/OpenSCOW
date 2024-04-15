@@ -58,8 +58,13 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   const { query } = req;
 
-  const { columns, startTime, endTime, targetName, searchType, count, type } = query;
-
+  const { columns, startTime, endTime, searchType, count, type } = query;
+  let { targetName } = query;
+  // targetName为空字符串数组视为undefined
+  if (Array.isArray(targetName) && (targetName as string[]).length === 1
+    && targetName[0] === "") {
+    targetName = undefined;
+  }
   let user;
   if (searchType === SearchType.tenant) {
     user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
