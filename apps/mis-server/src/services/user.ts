@@ -894,7 +894,7 @@ export const userServiceServer = plugin((server) => {
     },
     checkUserExist: async ({ request, em }) => {
       const { userId, email, phone } = request;
-      
+
       const userExisted = await em.findOne(User, {
         $or: [
           { userId },
@@ -916,6 +916,32 @@ export const userServiceServer = plugin((server) => {
       return [{
         phoneExisted:userExisted?.phone === phone,
       }];
+    },
+    getUserIdByEmailOrPhone: async ({ request, em }) => {
+      const { email, phone } = request;
+
+      if (email) {
+        const emailUser = await em.findOne(User, { email });
+
+        if (emailUser) {
+
+          return [{
+            userId:emailUser.userId,
+          }];
+        }
+      }
+      else if (phone) {
+        const phoneUser = await em.findOne(User, { phone });
+
+        if (phoneUser) {
+
+          return [{
+            userId:phoneUser.userId,
+          }];
+        }
+      }
+
+      return [{}];
     },
   });
 });

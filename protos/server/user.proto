@@ -465,6 +465,15 @@ message CheckPhoneRegisterResponse {
   bool phone_existed = 1;
 }
 
+message GetUserIdByEmailOrPhoneRequest {
+  optional string phone = 1;
+  optional string email = 2;
+}
+
+message GetUserIdByEmailOrPhoneResponse {
+  optional string user_id = 1;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -515,4 +524,5 @@ service UserService {
   rpc CheckUnicomUserExist(CheckUnicomUserExistRequest) returns (CheckUnicomUserExistResponse);
   rpc CheckUserExist(CheckUserExistRequest) returns (CheckUserExistResponse);
   rpc CheckPhoneRegister(CheckPhoneRegisterRequest) returns (CheckPhoneRegisterResponse);
+  rpc GetUserIdByEmailOrPhone(GetUserIdByEmailOrPhoneRequest) returns (GetUserIdByEmailOrPhoneResponse);
 }

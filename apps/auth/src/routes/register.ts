@@ -51,7 +51,7 @@ const ResponsesSchema = Type.Object({
  */
 export const registerUserRoute = fp(async (f) => {
   f.post<{
-    Body: Static<typeof BodySchema>
+    Body: Static<typeof BodySchema>,
     Responses: Static<typeof ResponsesSchema>,
   }>(
     "/public/register",
@@ -65,7 +65,11 @@ export const registerUserRoute = fp(async (f) => {
 
       const { verificationCode, userId, email, phone, ...rest } = req.body;
 
-      const userExisted = await checkUserExisted(userId, phone, email);
+      // slurm username is all lowercase
+      // 不能包含@，影响后续邮箱登录
+      const formatId = userId.toLowerCase().replace(/@/g, "");
+
+      const userExisted = await checkUserExisted(formatId, phone, email);
 
       if (userExisted.emailExisted) {
         return await rep.code(409).send({ code: ExistedErrorCode.EMAIL_EXISTED });
@@ -84,7 +88,7 @@ export const registerUserRoute = fp(async (f) => {
       }
       await req.server.redis.del(phone);
 
-      await registerUser({ userId, email, phone, ...rest });
+      await registerUser({ userId:formatId, email, phone, ...rest });
 
       return await rep.code(204).send();
     },

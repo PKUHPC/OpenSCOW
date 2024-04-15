@@ -21,3 +21,13 @@ export function ensureNotUndefined<TObj, TKeys extends keyof TObj>(obj: TObj, ke
 
   return obj as any;
 }
+
+export function isValidEmail(email: string) {
+  const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return regex.test(email);
+}
+
+export function isValidPhoneNumber(phone: string) {
+  const regex = /^1[3-9]\d{9}$/;
+  return regex.test(phone);
+}
