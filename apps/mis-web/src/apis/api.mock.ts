@@ -297,7 +297,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
 
-  getTopSubmitJobUserName: async () => ({ results: [{ userName: "name1", count:10 }]}),
+  getUsersWithMostJobSubmissions: async () => ({ results: [{ userName: "name1", userId: "test1", count:10 }]}),
 
   getNewJobCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
 
