@@ -474,6 +474,17 @@ message GetUserIdByEmailOrPhoneResponse {
   optional string user_id = 1;
 }
 
+
+message GetPhoneByUserInfoRequest {
+  optional string phone = 1;
+  optional string email = 2;
+  optional string user_id = 3;
+}
+
+message GetPhoneByUserInfoResponse {
+  optional string phone = 1;
+}
+
 service UserService {
 
   rpc GetUsers(GetUsersRequest) returns (GetUsersResponse);
@@ -525,4 +536,5 @@ service UserService {
   rpc CheckUserExist(CheckUserExistRequest) returns (CheckUserExistResponse);
   rpc CheckPhoneRegister(CheckPhoneRegisterRequest) returns (CheckPhoneRegisterResponse);
   rpc GetUserIdByEmailOrPhone(GetUserIdByEmailOrPhoneRequest) returns (GetUserIdByEmailOrPhoneResponse);
+  rpc GetPhoneByUserInfo(GetPhoneByUserInfoRequest) returns (GetPhoneByUserInfoResponse);
 }

@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { CheckPhoneRegisterResponse, CheckUnicomUserExistResponse, CheckUserExistResponse,
-  GetUserIdByEmailOrPhoneResponse, UserServiceClient }
+  GetPhoneByUserInfoResponse, GetUserIdByEmailOrPhoneResponse, UserServiceClient }
   from "@scow/protos/build/server/user";
 import { getClient } from "src/utils/getClient";
 
@@ -88,4 +88,18 @@ Promise<GetUserIdByEmailOrPhoneResponse> {
   const client = getClient(UserServiceClient);
 
   return await asyncClientCall(client, "getUserIdByEmailOrPhone", { phone:userInfo.phone, email:userInfo.email });
+}
+
+export interface getPhoneByUserInfoProps {
+  phone?: string;
+  email?: string;
+  userId?: string;
+}
+export async function getPhoneByUserInfo(userInfo: getPhoneByUserInfoProps):
+Promise<GetPhoneByUserInfoResponse> {
+
+  const client = getClient(UserServiceClient);
+
+  return await asyncClientCall(client, "getPhoneByUserInfo",
+    { phone:userInfo.phone, email:userInfo.email, userId:userInfo.userId });
 }

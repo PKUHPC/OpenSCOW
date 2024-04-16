@@ -943,5 +943,41 @@ export const userServiceServer = plugin((server) => {
 
       return [{}];
     },
+    getPhoneByUserInfo: async ({ request, em }) => {
+      const { email, phone, userId } = request;
+
+      if (email) {
+        const emailUser = await em.findOne(User, { email });
+
+        if (emailUser) {
+
+          return [{
+            phone:emailUser.phone,
+          }];
+        }
+      }
+      else if (phone) {
+        const phoneUser = await em.findOne(User, { phone });
+
+        if (phoneUser) {
+
+          return [{
+            phone:phoneUser.phone,
+          }];
+        }
+      }
+      else if (userId) {
+        const UserIdUser = await em.findOne(User, { userId });
+
+        if (UserIdUser) {
+
+          return [{
+            phone:UserIdUser.phone,
+          }];
+        }
+      }
+
+      return [{}];
+    },
   });
 });
