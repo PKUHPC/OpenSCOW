@@ -517,9 +517,26 @@ export const saveImage =
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
         const client = getAdapterClient(clusterId);
 
-        const { node, containerId } = await asyncClientCall(client.app, "getRunningContainerJobInfo", {
+        const { job } = await asyncClientCall(client.job, "getJobById", {
+          fields: ["node", "container_id"],
           jobId,
         });
+
+        if (!job) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Can not find this running job",
+          });
+        }
+
+        const { node, containerId } = job;
+
+        if (!node || !containerId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Can not find node or containerId of this running job",
+          });
+        }
 
         const formateContainerId = formatContainerId(clusterId, containerId);
 

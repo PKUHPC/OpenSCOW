@@ -178,9 +178,18 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     stdinStream.end(); // 结束stdin流输入
   });
 
-  const { namespace, pod } = await asyncClientCall(client.app, "getRunningContainerJobInfo", {
+  const { job } = await asyncClientCall(client.job, "getJobById", {
+    fields: ["namespace", "pod"],
     jobId: currentJobInfo.jobId,
   });
+
+  if (!job) {
+    log("[shell] Can not find this running job, please check it.");
+    ws.close(0, "Can not find this running job, please check it.");
+    return;
+  }
+
+  const { namespace, pod } = job;
 
   if (!namespace || !pod) {
     log("[shell] Namespace or pod not obtained, please check the adapter version");
