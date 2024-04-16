@@ -27,6 +27,7 @@ export default {
     tenantRole: "User Role",
     user: "User",
     userId: "User ID",
+    ownerIdOrName:"ownerId Or Name",
     userName: "Username",
     userFullName:"User Name",
     import: "Import",
@@ -399,6 +400,7 @@ export default {
       chargeTable: {
         time: "Deduction Date",
         amount: "Deduction Amount",
+        ownerIdOrName:"ownerId Or Name",
       },
     },
     init: {
@@ -603,6 +605,7 @@ export default {
         whiteList: "Whitelist Count",
         debtSum: "Total Debt in Whitelist",
         joinTime: "Join Time",
+        ownerIdOrName: "Owner ID or Name",
         operatorId: "Operator",
         confirmRemoveWhite: "Confirm removing the account from the whitelist?",
         confirmRemoveWhiteText1: "Confirm removing the account ",

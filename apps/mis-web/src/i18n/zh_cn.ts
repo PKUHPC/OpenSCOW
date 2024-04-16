@@ -28,6 +28,7 @@ export default {
     user:"用户",
     userId:"用户ID",
     userName:"用户名",
+    ownerIdOrName:"用户ID或姓名",
     userFullName:"用户姓名",
     import:"导入",
     fresh:"刷新",
@@ -399,6 +400,7 @@ export default {
       chargeTable:{
         time:"扣费日期",
         amount:"扣费金额",
+        ownerIdOrName:"用户ID或姓名",
       },
     },
     init:{
@@ -603,6 +605,7 @@ export default {
         whiteList:"白名单数量",
         debtSum:"白名单欠费合计",
         joinTime:"加入时间",
+        ownerIdOrName:"用户ID或姓名",
         operatorId:"操作人",
         confirmRemoveWhite:"确认将账户移除白名单？",
         confirmRemoveWhiteText1:"确认要将账户",
