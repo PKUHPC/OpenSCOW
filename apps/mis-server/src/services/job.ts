@@ -33,7 +33,6 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
 import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
@@ -418,38 +417,21 @@ export const jobServiceServer = plugin((server) => {
       // topRank不传默认为10，最大限制为10
       const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      // 获取JobInfoEntity中基于时间范围的前N个userId和计数
-      const qb = em.createQueryBuilder(JobInfoEntity, "j");
-      qb
-        .select([raw("j.user as userId"), raw("COUNT(*) as count")])
-        .where({ timeSubmit: { $gte: startTime } })
-        .andWhere({ timeSubmit: { $lte: endTime } })
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
+
+      const results: {userName: string, userId: string, count: number}[] = await knex("job_info as j")
+        .select([
+          "u.name as userName",
+          "j.user as userId",
+          knex.raw("COUNT(*) as count"),
+        ])
+        .join("user as u", "u.user_id", "=", "j.user")
+        .where("j.time_submit", ">=", startTime)
+        .andWhere("j.time_submit", "<=", endTime)
         .groupBy("j.user")
-        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
-        .limit(Math.min(topNUsers, 10));
-
-      const jobInfoResults: {userId: string, count: number}[] = await queryWithCache({
-        em,
-        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topNUsers}`],
-        queryQb: qb,
-      });
-
-
-      // 提取所有的userIds
-      const userIds = jobInfoResults.map((jobInfo) => jobInfo.userId);
-      // 根据userId一次性获取userName
-      const users = await em.find(User, { userId: { $in: userIds } });
-      const userMap = new Map(users.map((user) => [user.userId, user.name]));
-
-      // 对结果进行处理
-      const results: {userName: string, userId: string, count: number}[] = [];
-      for (const jobInfo of jobInfoResults) {
-        results.push({
-          userName:userMap.get(jobInfo.userId) || "Unknown", // 使用Map获取用户名
-          userId:jobInfo.userId,
-          count:jobInfo.count,
-        });
-      }
+        .orderBy("count", "desc")
+        .limit(Math.max(topNUsers, 10));
 
       // 直接返回构建的结果
       return [

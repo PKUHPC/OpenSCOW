@@ -192,7 +192,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
     } });
   }, [query]);
 
-  const { data: topSubmitJobUserName, isLoading: topSubmitJobUserNameLoading } =
+  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
   useAsync({ promiseFn: getUsersWithMostJobSubmissionsFn });
 
   const getNewJobCountFn = useCallback(async () => {
@@ -274,11 +274,11 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const topSubmitJobUserData = useMemo(() => {
 
-    return topSubmitJobUserName?.results.map((r) => ({
+    return topSubmitJobUser?.results.map((r) => ({
       x: r.userName,
       y: r.count,
     })) || [];
-  }, [query, topSubmitJobUserName]);
+  }, [query, topSubmitJobUser]);
 
   const newJobCountData = useMemo(() => {
     if (dailyNewJobCount) {
@@ -495,7 +495,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataBarChart
                   data={topSubmitJobUserData}
                   title={t(p("topTenSubmitJobUser"))}
-                  isLoading={topSubmitJobUserNameLoading}
+                  isLoading={topSubmitJobUserLoading}
                   xLabel={t(p("userName"))}
                   toolTipFormatter={(value) => [value, t(p("jobCount"))]}
                 />
