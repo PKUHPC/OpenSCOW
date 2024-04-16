@@ -29,6 +29,7 @@ import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
+import { emptyArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
 import { getTenantOfAccount } from "../finance/charges";
@@ -60,11 +61,8 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   const { columns, startTime, endTime, searchType, count, type } = query;
   let { targetName } = query;
-  // targetName为空字符串数组视为undefined
-  if (Array.isArray(targetName) && (targetName as string[]).length === 1
-    && targetName[0] === "") {
-    targetName = undefined;
-  }
+  // targetName为空字符串数组时视为初始态，即undefined
+  targetName = emptyArrayToUndefined(targetName);
   let user;
   if (searchType === SearchType.tenant) {
     user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||

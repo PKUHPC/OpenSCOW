@@ -28,6 +28,7 @@ import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
+import { emptyArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
 export const ExportChargeRecordSchema = typeboxRouteSchema({
@@ -57,7 +58,11 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count, userIds } = query;
+  const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
+  let { accountName, type } = query;
+  // targetName为空字符串数组视为undefined
+  accountName = emptyArrayToUndefined(accountName);
+  type = emptyArrayToUndefined(type);
 
   const info = await getUserInfoForCharges(accountName, req, res);
 
