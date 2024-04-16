@@ -25,6 +25,7 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster } from "src/utils/config";
+
 interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
