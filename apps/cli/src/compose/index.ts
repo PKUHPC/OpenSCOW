@@ -251,7 +251,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
         SCOWD_ENABLED: String(config.scowd?.enabled ?? false),
-        SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enable ?? false),
+        SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enabled ?? false),
         SCOWD_SSL_CA_CERT_PATH: config.scowd?.ssl?.caCertPath ?? "",
         SCOWD_SSL_SCOW_CERT_PATH: config.scowd?.ssl?.scowCertPath ?? "",
         SCOWD_SSL_SCOW_KEY_PATH: config.scowd?.ssl?.scowKeyPath ?? "",
