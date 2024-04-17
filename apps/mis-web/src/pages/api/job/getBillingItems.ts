@@ -148,7 +148,14 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
   for (const cluster of publicConfig.CLUSTER_SORTED_ID_LIST) {
 
     const client = getClient(ConfigServiceClient);
-    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => resp.partitions);
+
+    const partitions = await asyncClientCall(client, "getClusterConfig", { cluster }).then((resp) => {
+      return resp.partitions;
+    }).catch((e) => {
+      console.log(`Cluster ops fails at ${cluster}, error details: ${e}`);
+      return [];
+    });
+
     for (const partition of partitions) {
       for (const qos of partition.qos ?? [""]) {
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");

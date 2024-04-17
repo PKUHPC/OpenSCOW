@@ -10,8 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
+import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { clusters } from "src/config/clusters";
+import { Logger } from "ts-log";
+
+import { scowErrorMetadata } from "./error";
 
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
   const client = getSchedulerAdapterClient(c.adapterUrl);
@@ -21,4 +26,38 @@ const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster
 
 export const getAdapterClient = (cluster: string) => {
   return adapterClientForClusters[cluster];
+};
+
+
+type CallOnOne = <T>(
+  cluster: string,
+  logger: Logger,
+  call: (client: SchedulerAdapterClient) => Promise<T>,
+) => Promise<T>;
+
+export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
+
+export const callOnOne: CallOnOne = async (cluster, logger, call) => {
+  const client = getAdapterClient(cluster);
+
+  if (!client) {
+    throw new Error("Calling actions on non-existing cluster " + cluster);
+  }
+
+  logger.info("Calling actions on cluster " + cluster);
+
+  return await call(client).catch((e) => {
+    logger.error("Cluster ops fails at %o", e);
+
+    const clusterErrorDetails = [{
+      clusterId: cluster,
+      details: e,
+    }];
+    const reason = "Cluster ID : " + cluster + " Details : " + e;
+    throw new ServiceError({
+      code: status.INTERNAL,
+      details: reason,
+      metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, { clusterErrors: JSON.stringify(clusterErrorDetails) }),
+    });
+  });
 };

@@ -83,6 +83,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const t = useI18nTranslateToString();
 
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
+
   const submit = async () => {
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
@@ -113,7 +115,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       .finally(() => setLoading(false));
   };
 
-  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const jobName = Form.useWatch("jobName", form) as string;
 
@@ -130,7 +131,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
+      ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
+      : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {
         // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；

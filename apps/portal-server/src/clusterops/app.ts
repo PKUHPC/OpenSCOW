@@ -27,7 +27,7 @@ import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
-import { getAdapterClient } from "src/utils/clusters";
+import { callOnOne } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
@@ -114,8 +114,11 @@ export const appOps = (cluster: string): AppOps => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
           // submit entry.sh
-          const client = getAdapterClient(cluster);
-          const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
+          const reply = await callOnOne(
+            cluster,
+            logger,
+            async (client) => await asyncClientCall(client.job, "submitJob", request),
+          ).catch((e) => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
             if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
@@ -265,15 +268,17 @@ export const appOps = (cluster: string): AppOps => {
       return await sshConnect(host, "root", logger, async (ssh) => {
 
         // If a job is not running, it cannot be ready
-        const client = getAdapterClient(cluster);
-        const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
-          filter: {
-            users: [userId], accounts: [],
-            states: ["RUNNING", "PENDING"],
-          },
-        }).then((resp) => resp.jobs);
-
+        const runningJobsInfo = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.job, "getJobs", {
+            fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
+            filter: {
+              users: [userId], accounts: [],
+              states: ["RUNNING", "PENDING"],
+            },
+          }),
+        ).then((resp) => resp.jobs);
 
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;
@@ -347,8 +352,12 @@ export const appOps = (cluster: string): AppOps => {
                 port = port;
               }
             }
-            const client = getAdapterClient(cluster);
-            const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+
+            const connectionInfo = await callOnOne(
+              cluster,
+              logger,
+              async (client) => await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger),
+            );
             if (connectionInfo?.response?.$case === "appConnectionInfo") {
               host = connectionInfo.response.appConnectionInfo.host;
               port = connectionInfo.response.appConnectionInfo.port;
@@ -403,8 +412,12 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
-        const client = getAdapterClient(cluster);
-        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+        const connectionInfo = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger),
+        );
+
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           return {
             appId: sessionMetadata.appId,
