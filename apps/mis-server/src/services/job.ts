@@ -414,9 +414,13 @@ export const jobServiceServer = plugin((server) => {
 
     // 返回用户名，需要联表查询
     getUsersWithMostJobSubmissions: async ({ request, em }) => {
-      // topRank不传默认为10，最大限制为10
+      // topNUsers不传默认为10，最大限制为10
       const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
+      // 控制topNUsers的数量
+      if (typeof topNUsers == "number" && topNUsers > 10) {
+        throw new Error("INVALID_ARGUMENT: 'topNUsers' must be lower than 10.");
+      }
       // 直接使用Knex查询构建器
       const knex = em.getKnex();
 
@@ -431,7 +435,7 @@ export const jobServiceServer = plugin((server) => {
         .andWhere("j.time_submit", "<=", endTime)
         .groupBy("j.user")
         .orderBy("count", "desc")
-        .limit(Math.max(topNUsers, 10));
+        .limit(Math.min(topNUsers, 10));
 
       // 直接返回构建的结果
       return [

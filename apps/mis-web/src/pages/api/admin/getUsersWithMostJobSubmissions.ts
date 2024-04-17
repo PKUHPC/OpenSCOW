@@ -26,6 +26,11 @@ export const GetUsersWithMostJobSubmissionsResponse = Type.Object({
   })),
 });
 
+// 定义错误相应类型
+export const ErrorResponse = Type.Object({
+  message: Type.String(),
+});
+
 export type GetUsersWithMostJobSubmissionsResponse = Static<typeof GetUsersWithMostJobSubmissionsResponse>;
 
 
@@ -45,6 +50,7 @@ export const GetUsersWithMostJobSubmissionsSchema = typeboxRouteSchema({
 
   responses: {
     200: GetUsersWithMostJobSubmissionsResponse,
+    400: ErrorResponse,
   },
 });
 
@@ -58,7 +64,13 @@ export default typeboxRoute(GetUsersWithMostJobSubmissionsSchema,
       return;
     }
 
+
     const { startTime, endTime, topNUsers } = req.query;
+    // 检查 topNUsers 是否符合要求
+    if (typeof topNUsers == "number" && (topNUsers > 10)) {
+      res.status(400).send({ message: "Parameter 'topNUsers' must be lower than 10." });
+      return;
+    };
 
     const client = getClient(JobServiceClient);
 
