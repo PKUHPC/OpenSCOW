@@ -30,9 +30,9 @@ export const InstallConfigSchema = Type.Object({
     enabled: Type.Optional(Type.Boolean({ description: "是否开启 scowd", default: false })),
     ssl: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "到 SCOWD 的连接是否启动SSL", default: false }),
-      caCertPath: Type.String({ description: "SCOWD CA根证书路径", default: "./scowd/certs/ca.crt" }),
-      scowCertPath: Type.String({ description: "SCOWD CA签名的 SCOW 证书路径", default: "./scowd/certs/scow.crt" }),
-      scowKeyPath: Type.String({ description: "SCOWD CA签名的 SCOW 私钥路径", default: "./scowd/certs/scow.key" }),
+      caCertPath: Type.String({ description: "SCOWD CA根证书路径", default: "/etc/scow/scowd/certs/ca.crt" }),
+      scowCertPath: Type.String({ description: "SCOWD CA签名的 SCOW 证书路径", default: "/etc/scow/scowd/certs/scow.crt" }),
+      scowKeyPath: Type.String({ description: "SCOWD CA签名的 SCOW 私钥路径", default: "/etc/scow/scowd/certs/scow.key" }),
     }, { description: "scowd ssl 相关配置" })),
   }, { description: "scowd 相关配置" })),
 
