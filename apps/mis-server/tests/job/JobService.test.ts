@@ -321,7 +321,7 @@ it("get Users With Most Job Submissions correctly", async () => {
   await em.persistAndFlush([...userAJobs, ...userBJobs, ...userCJobs]);
 
   const client = createClient();
-  const reply = await asyncClientCall(client, "getTopSubmitJobUsers", {
+  const reply = await asyncClientCall(client, "getUsersWithMostJobSubmissions", {
     startTime: today.startOf("day").toISOString(),
     endTime: today.endOf("day").toISOString(),
   });
