@@ -250,6 +250,8 @@ it("get Top Submit Job Users correctly", async () => {
 
 });
 
+
+
 it("get new job count correctly in UTC+8 timezone", async () => {
 
   const today = dayjs();
@@ -302,4 +304,32 @@ it("get new job count correctly in UTC+8 timezone", async () => {
     },
 
   ]);
+});
+
+
+it("get Users With Most Job Submissions correctly", async () => {
+  const em = server.ext.orm.em.fork();
+
+  const today = dayjs();
+
+  const userAJobs = range(0, 20).map((_) =>
+    mockOriginalJobData(data.uaAA, new Decimal(20), new Decimal(10), today.toDate()));
+  const userBJobs = range(0, 30).map((_) =>
+    mockOriginalJobData(data.uaBB, new Decimal(20), new Decimal(10), today.toDate()));
+  const userCJobs = range(0, 40).map((_) =>
+    mockOriginalJobData(data.uaCC, new Decimal(20), new Decimal(10), today.toDate()));
+  await em.persistAndFlush([...userAJobs, ...userBJobs, ...userCJobs]);
+
+  const client = createClient();
+  const reply = await asyncClientCall(client, "getUsersWithMostJobSubmissions", {
+    startTime: today.startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+  });
+
+  expect(reply.results).toMatchObject([
+    { userName: data.userC.name, userId: data.userC.userId, count: 40 },
+    { userName: data.userB.name, userId: data.userB.userId, count: 30 },
+    { userName: data.userA.name, userId: data.userA.userId, count: 20 },
+  ]);
+
 });
