@@ -418,8 +418,8 @@ export const jobServiceServer = plugin((server) => {
       const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       // 控制topNUsers的数量
-      if (typeof topNUsers == "number" && topNUsers > 10) {
-        throw new Error("INVALID_ARGUMENT: 'topNUsers' must be lower than 10.");
+      if (typeof topNUsers == "number" && (topNUsers > 10 || topNUsers < 0)) {
+        throw <ServiceError> { code: status.INVALID_ARGUMENT, message:"topNUsers must be between 0 and 10" };
       }
       // 直接使用Knex查询构建器
       const knex = em.getKnex();
