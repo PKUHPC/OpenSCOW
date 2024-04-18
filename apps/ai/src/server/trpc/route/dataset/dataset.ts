@@ -36,7 +36,10 @@ export const DatasetListSchema = z.object({
   description: z.string().optional(),
   clusterId: z.string(),
   createTime: z.string().optional(),
-  versions: z.array(z.string()),
+  versions: z.array(z.object({
+    id: z.number(),
+    path: z.string(),
+  })),
 });
 
 export type DatasetInterface = z.infer<typeof DatasetListSchema>;
@@ -101,8 +104,8 @@ export const list = procedure
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,
         versions: isPublic ?
-          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path) :
-          x.versions.map((y) => y.privatePath),
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => ({ id: y.id, path: y.path }))
+          : x.versions.map((y) => ({ id: y.id, path: y.privatePath })),
       }; }), count };
   });
 

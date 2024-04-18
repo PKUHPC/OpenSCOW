@@ -210,6 +210,21 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
               >保存镜像</SaveImageModalButton>
             ) : undefined
           }
+          <Button
+            type="link"
+            onClick={async () => {
+              if (record.jobType === JobType.APP) {
+                record.appId && router.push(join(
+                  "/jobs", cluster.id, "/createApps", record.appId,
+                  `?jobId=${record.jobId}&jobName=${record.sessionId}`));
+              } else if (record.jobType === JobType.TRAIN) {
+                router.push(join(
+                  "/jobs", cluster.id,
+                  "/trainJobs", `?jobId=${record.jobId}&jobName=${record.sessionId}`,
+                ));
+              }
+            }}
+          >再次提交</Button>
           <a onClick={() => {
             router.push(join("/files", cluster.id, record.dataPath));
           }}

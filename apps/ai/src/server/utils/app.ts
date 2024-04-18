@@ -13,13 +13,17 @@
 import { EntityManager } from "@mikro-orm/mysql";
 import { AppConfigSchema } from "@scow/config/build/appForAi";
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { sftpExists, sftpReadFile } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
 import { getAiAppConfigs } from "src/server/config/apps";
 import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
-import { Image } from "src/server/entities/Image";
+import { Image as ImageEntity } from "src/server/entities/Image";
 import { ModelVersion } from "src/server/entities/ModelVersion";
+import { SFTPWrapper } from "ssh2";
+import { Logger } from "ts-log";
+import { z } from "zod";
 
 
 export const getClusterAppConfigs = (cluster: string) => {
@@ -96,9 +100,9 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
     modelVersion = selectedModelVersion;
   }
 
-  let imageOutput: Image | undefined;
+  let imageOutput: ImageEntity | undefined;
   if (image !== undefined) {
-    const existImage = await em.findOne(Image, { id: image });
+    const existImage = await em.findOne(ImageEntity, { id: image });
 
     if (!existImage) {
       throw new TRPCError({
@@ -129,4 +133,34 @@ export const checkAppExist = (apps: Record<string, AppConfigSchema>, appId: stri
     });
   }
   return app;
+};
+
+
+export const fetchJobInputParams = async<T> (
+  inputParamsPath: string,
+  sftp: SFTPWrapper,
+  schema: z.ZodSchema<T>,
+  logger: Logger,
+): Promise<T> => {
+
+  if (!await sftpExists(sftp, inputParamsPath)) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Input params file ${inputParamsPath} is not found`,
+    });
+  }
+
+  try {
+    const inputContent = await sftpReadFile(sftp)(inputParamsPath);
+    const parsedContent = JSON.parse(inputContent.toString());
+    return schema.parse(parsedContent);
+  } catch (e) {
+
+    logger.error(`Failed to parse input params file ${inputParamsPath}: ${e}`);
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: `Failed to parse input params file ${inputParamsPath}`,
+    });
+
+  }
 };
