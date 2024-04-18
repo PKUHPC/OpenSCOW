@@ -17,6 +17,7 @@ RUN corepack enable
 
 WORKDIR /app
 
+COPY package.json .
 COPY pnpm-lock.yaml .
 
 COPY patches ./patches
