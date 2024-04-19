@@ -14,6 +14,7 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
+import { checkUiExtensionConfig, UiExtensionConfigSchema } from "src/uiExtensions";
 
 export enum JobTableType {
   mariadb = "mariadb",
@@ -162,9 +163,7 @@ export const MisConfigSchema = Type.Object({
     })),
   }, { description: "集群监控相关功能配置" })),
 
-  uiExtension: Type.Optional(Type.Object({
-    url: Type.String({ description: "UI扩展站完整URL" }),
-  })),
+  uiExtension: Type.Optional(UiExtensionConfigSchema),
 
   allowUserChangeJobTimeLimit: Type.Boolean({
     description: "普通用户是否可以修改作业时限",
@@ -191,6 +190,10 @@ export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logge
   if (config.createUser.type === "builtin"
   && config.createUser.userIdPattern && !config.createUser.builtin?.userIdPattern) {
     logger?.warn("createUser.userIdPattern is deprecated, please use createUser.builtin.userIdPattern");
+  }
+
+  if (config.uiExtension) {
+    checkUiExtensionConfig(config.uiExtension);
   }
 
   return config;

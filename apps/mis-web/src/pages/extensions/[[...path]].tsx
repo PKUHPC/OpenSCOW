@@ -26,13 +26,13 @@ export const ExtensionPage: NextPage = () => {
 
   const i18n = useI18n();
 
-  if (uiExtensionStore.configLoading) {
+  if (uiExtensionStore.isLoading) {
     return (
       <Spin />
     );
   }
 
-  if (!uiExtensionStore.config) {
+  if (!uiExtensionStore.data) {
     return (
       <NotFoundPage />
     );
@@ -40,9 +40,10 @@ export const ExtensionPage: NextPage = () => {
 
   return (
     <LibExtensionPage
-      uiExtensionStoreConfig={uiExtensionStore.config}
+      uiExtensionStoreConfig={uiExtensionStore.data}
       user={userStore.user}
       currentLanguageId={i18n.currentLanguage.id}
+      NotFoundPageComponent={NotFoundPage}
     />
   );
 

@@ -11,6 +11,7 @@
  */
 
 import { LinkOutlined } from "@ant-design/icons";
+import { join } from "path";
 import { defineExtensionRoute } from "src/extensions/routes";
 import { NavItemProps } from "src/layouts/base/types";
 import { NavIcon } from "src/layouts/icon";
@@ -64,7 +65,8 @@ export const fromNavItemProps = (props: NavItemProps[]): NavItem[] => {
   }));
 };
 
-export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]): NavItemProps[] => {
+export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[],
+  extensionName?: string): NavItemProps[] => {
 
   // create a map with original origin items paths
   const originalItemsMap = new Map<string, NavItemProps>();
@@ -74,12 +76,20 @@ export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]):
     navs.children?.forEach(convertToMap);
   };
 
+  const convertPath = (returnedPath: string) => {
+    if (!returnedPath.startsWith("/")) { return returnedPath; }
+    const parts = ["/extensions"];
+    if (extensionName) { parts.push(extensionName); }
+    parts.push(returnedPath);
+    return join(...parts);
+  };
+
   originalItems.forEach(convertToMap);
 
   const rec = (items: NavItem[]): NavItemProps[] => {
     return items.map((item) => ({
-      path: item.path,
-      clickToPath: item.clickToPath,
+      path: convertPath(item.path),
+      clickToPath: item.clickToPath ? convertPath(item.clickToPath) : undefined,
       text: item.text,
       openInNewPage: item.openInNewPage,
       Icon: (item.icon

@@ -53,7 +53,7 @@ export const BaseLayout =
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
       from="mis"
-      extension={uiExtensionStore.config}
+      extensionStoreData={uiExtensionStore.data}
       languageId={languageId}
       headerRightContent={(
         <>

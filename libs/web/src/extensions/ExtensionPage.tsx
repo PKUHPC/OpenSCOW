@@ -13,7 +13,8 @@
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React from "react";
-import { UiExtensionStore } from "src/extensions/UiExtensionStore";
+import { Head } from "src/components/head";
+import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
 import { queryToArray } from "src/utils/querystring";
@@ -34,19 +35,44 @@ const IFrame = styled.iframe`
 interface Props {
   user: UserInfo | undefined;
 
-  uiExtensionStoreConfig: NonNullable<ReturnType<typeof UiExtensionStore>["config"]>;
+  uiExtensionStoreConfig: UiExtensionStoreData;
 
   currentLanguageId: string;
+
+  NotFoundPageComponent: React.FC;
 }
 
-export const ExtensionPage: React.FC<Props> = ({ user, uiExtensionStoreConfig, currentLanguageId }) => {
-
+export const ExtensionPage: React.FC<Props> = ({
+  user, uiExtensionStoreConfig, currentLanguageId, NotFoundPageComponent,
+}) => {
 
   const router = useRouter();
 
   const { path, ...rest } = router.query;
 
-  const pathParts = queryToArray(router.query.path);
+  const pathParts = [...queryToArray(path)];
+
+  let config: ExtensionManifestWithUrl | undefined = undefined;
+
+  if (uiExtensionStoreConfig) {
+
+    if (uiExtensionStoreConfig.type === "multiple") {
+      const namePart = pathParts.shift();
+
+      if (!namePart) {
+        return (
+          <NotFoundPageComponent />
+        );
+      }
+      config = uiExtensionStoreConfig.extensions.find((x) => x?.name === namePart);
+    } else {
+      config = uiExtensionStoreConfig.extension;
+    }
+  }
+
+  if (!config) {
+    return <NotFoundPageComponent />;
+  }
 
   const darkMode = useDarkMode();
 
@@ -62,15 +88,18 @@ export const ExtensionPage: React.FC<Props> = ({ user, uiExtensionStoreConfig, c
 
   query.set("scowLangId", currentLanguageId);
 
-  const url = joinWithUrl(uiExtensionStoreConfig.url, "extensions", ...pathParts)
+  const url = joinWithUrl(config.url, "extensions", ...pathParts)
     + "?" + query.toString();
 
   return (
-    <FrameContainer>
-      <IFrame
-        src={url}
-      />
-    </FrameContainer>
+    <>
+      <Head title={config?.name ?? "Extension"} />
+      <FrameContainer>
+        <IFrame
+          src={url}
+        />
+      </FrameContainer>
+    </>
   );
 
 };

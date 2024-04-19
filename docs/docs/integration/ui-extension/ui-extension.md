@@ -22,8 +22,25 @@ title: UI扩展
 
 当您的扩展站开发并部署完成后，请在`config/portal.yaml`和/或`config/mis.yaml`中增加以下内容，以开启SCOW UI扩展。
 
+如果您在门户系统或者管理系统中仅使用一个UI扩展，可使用以下配置。您将可以使用`{SCOW URL}/extensions`访问到此UI扩展。
+
 ```yaml title="config/{portal,mis}.yaml"
 uiExtension:
-  # 您的UI扩展页部署URL
+  # 您的UI扩展页部署URL。
   url: http://localhost:16566/basepath
+```
+
+如果您在门户系统或者管理系统中需使用多个UI扩展，请使用以下配置。您将可以使用`{SCOW URL}/extensions/{name}`访问到对应名称的UI扩展。同一份配置文件中的多个UI扩展名称之间的名称不可重复。
+
+```yaml title="config/{portal,mis}.yaml"
+uiExtension:
+  - # 这个UI扩展的名称
+    name: extension1
+    # 您的此UI扩展页部署URL 
+    url: http://localhost:16566/basepath
+
+  - # 这个UI扩展的名称
+    name: extension2
+    # 您的此UI扩展页部署URL 
+    url: http://localhost:16567/basepath
 ```
