@@ -54,20 +54,17 @@ export const ExtensionPage: React.FC<Props> = ({
 
   let config: ExtensionManifestWithUrl | undefined = undefined;
 
-  if (uiExtensionStoreConfig) {
+  if (Array.isArray(uiExtensionStoreConfig)) {
+    const namePart = pathParts.shift();
 
-    if (uiExtensionStoreConfig.type === "multiple") {
-      const namePart = pathParts.shift();
-
-      if (!namePart) {
-        return (
-          <NotFoundPageComponent />
-        );
-      }
-      config = uiExtensionStoreConfig.extensions.find((x) => x?.name === namePart);
-    } else {
-      config = uiExtensionStoreConfig.extension;
+    if (!namePart) {
+      return (
+        <NotFoundPageComponent />
+      );
     }
+    config = uiExtensionStoreConfig.find((x) => x?.name === namePart);
+  } else {
+    config = uiExtensionStoreConfig;
   }
 
   if (!config) {

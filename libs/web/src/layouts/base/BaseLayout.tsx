@@ -86,9 +86,9 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
     promiseFn: useCallback(async () => {
       if (!extensionStoreData) { return routes; }
 
-      const extensions = extensionStoreData.type === "single"
-        ? extensionStoreData.extension ? [extensionStoreData.extension] : []
-        : extensionStoreData.extensions;
+      const extensions = Array.isArray(extensionStoreData)
+        ? extensionStoreData
+        : extensionStoreData ? [extensionStoreData] : [];
 
       let newRoutes = routes;
 

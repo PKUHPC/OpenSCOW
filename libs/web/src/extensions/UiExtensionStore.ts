@@ -33,18 +33,11 @@ export const UiExtensionStore = (uiExtensionConfig?: UiExtensionConfigSchema) =>
       if (!uiExtensionConfig) { return undefined; }
 
       if (Array.isArray(uiExtensionConfig)) {
-        return {
-          type: "multiple",
-          extensions: (await Promise.all(uiExtensionConfig.map(async (config) => {
-            return await fetchManifestsWithErrorHandling(config.url, config.name);
-          }).filter((x) => x))) as (ExtensionManifestWithUrl & { name: string })[] };
+        return (await Promise.all(uiExtensionConfig.map(async (config) => {
+          return await fetchManifestsWithErrorHandling(config.url, config.name);
+        }).filter((x) => x))) as (ExtensionManifestWithUrl & { name: string })[];
       } else {
-        const extension = await fetchManifestsWithErrorHandling(uiExtensionConfig.url);
-        if (!extension) { return undefined; }
-        return {
-          type: "single",
-          extension: { ...extension, name: undefined },
-        };
+        return await fetchManifestsWithErrorHandling(uiExtensionConfig.url);
       }
     }, []),
   });
@@ -52,7 +45,4 @@ export const UiExtensionStore = (uiExtensionConfig?: UiExtensionConfigSchema) =>
   return { data, isLoading };
 };
 
-export type UiExtensionStoreData =
-  | { type: "single"; extension: ExtensionManifestWithUrl & { name: undefined } }
-  | { type: "multiple"; extensions: (ExtensionManifestWithUrl & { name: string })[] }
-  | undefined;
+export type UiExtensionStoreData = ExtensionManifestWithUrl | ExtensionManifestWithUrl[] | undefined;
