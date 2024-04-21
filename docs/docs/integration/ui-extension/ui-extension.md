@@ -1,9 +1,15 @@
 ---
 sidebar_position: 1
-title: UI扩展
+title: UI扩展 (Beta)
 ---
 
-# UI扩展
+# UI扩展 (Beta)
+
+:::caution
+
+实验性功能！
+
+:::
 
 如果您需要在SCOW的界面中增加更多的页面，您可以开发自己的UI，并通过**UI扩展**功能将您的UI集成进SCOW的UI中。这样，您的用户在访问您自己的页面时，也可以获得与访问SCOW的功能一致的体验。
 
