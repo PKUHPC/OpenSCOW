@@ -81,6 +81,8 @@ export const getTargetAccountName = (operationEvent: OperationEvent): string | u
     switch (operationEvent[operationType].target.$case) {
     case "accountOfTenant" :
       return operationEvent[operationType].target.accountOfTenant.accountName;
+    case "specificAccountsOfTenant" :
+      return operationEvent[operationType].target.specificAccountsOfTenant.accountName;
     default:
       return;
     }
