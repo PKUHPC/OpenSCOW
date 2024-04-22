@@ -18,7 +18,7 @@ import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
 import { FileInfo, FileInfo_FileType,
   FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { join } from "path";
-import { clusters } from "src/config/clusters";
+import { currentClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
@@ -459,6 +459,7 @@ export const fileServiceServer = plugin((server) => {
         const transferInfos: TransferInfo[] = [];
 
         // 根据host确定clusterId
+        const clusters = await currentClusters();
         transferInfosJsons.forEach((info) => {
           let toCluster = info.recvAddress;
           for (const key in clusters) {

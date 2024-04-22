@@ -49,6 +49,7 @@ import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFi
 import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
 import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
+import { GetClustersOnlineInfoSchema } from "src/pages/api/getClustersOnlineInfo";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -112,4 +113,5 @@ export const api = {
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
+  getClustersOnlineInfo: apiClient.fromTypeboxRoute<typeof GetClustersOnlineInfoSchema>("GET", "/api/getClustersOnlineInfo"),
 };

@@ -11,20 +11,23 @@
  */
 
 import { useLocalStorage } from "@scow/lib-web/build/utils/hooks";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/config";
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
 
+export function DefaultClusterStore(initialDefaultClusterId: string, currentClusters: Cluster[]) {
 
-
-export function DefaultClusterStore() {
   const [clusterId, setClusterId] = useLocalStorage<String>(
     SCOW_DEFAULT_CLUSTER_ID,
-    publicConfig.CLUSTERS[0].id,
+    initialDefaultClusterId,
   );
 
-  const defaultCluster = publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)
-    || publicConfig.CLUSTERS[0] as Cluster;
+  if (currentClusters.length === 0) {
+    console.log("No available clusters");
+  }
+
+  const defaultCluster = currentClusters.find((cluster) => cluster.id === clusterId)
+    || currentClusters[0] as Cluster;
 
   const setDefaultCluster = (cluster: Cluster) => {
     setClusterId(cluster.id);

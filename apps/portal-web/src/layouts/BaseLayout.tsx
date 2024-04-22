@@ -19,9 +19,11 @@ import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { userRoutes } from "src/layouts/routes";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
+import { refreshDefaultCluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 
 interface Props {
@@ -33,8 +35,11 @@ interface Props {
 export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
+  const { currentClusters } = useStore(CurrentClustersStore);
   const { loginNodes } = useStore(LoginNodeStore);
   const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
+
+  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -42,7 +47,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
 
   const routes = userRoutes(
-    userStore.user, defaultCluster, loginNodes, setDefaultCluster,
+    userStore.user, currentClusters, defaultCluster, loginNodes, setDefaultCluster,
   );
 
   const uiExtensionStore = useStore(UiExtensionStore);

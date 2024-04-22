@@ -13,5 +13,6 @@
 export * from "./apiAuthPlugin";
 export * from "./app";
 export * from "./date";
+export * from "./misCommon";
 export * from "./scheduleAdapter";
 export * from "./systemLanguage";

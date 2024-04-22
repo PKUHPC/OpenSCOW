@@ -182,6 +182,8 @@ export default {
         systemDebug: "平台调试",
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
+        resourceManagement: "资源管理",
+        clusterManagement: "集群管理",
         accountList: "账户列表",
         clusterMonitor: "集群监控",
         resourceStatus: "资源状态",
@@ -1016,6 +1018,9 @@ export default {
           jobSyncSuccessMessage: "作业同步完成，同步到{}条新纪录。",
           syncJobNow: "立刻同步作业",
         },
+        clusterManagement: {
+          title: "集群管理",
+        },
       },
       finance: {
         pay: {
@@ -1149,6 +1154,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
       userChangeTenant: "用户切换租户",
       customEvent: "自定义操作行为",
+      activateCluster: "启用集群",
+      deactivateCluster: "停用集群",
     },
     operationDetails: {
       login: "用户登录",
@@ -1223,6 +1230,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
+      activateCluster: "用户{}启用集群：{}",
+      deactivateCluster: "用户{}停用集群：{}",
     },
   },
   userRoles: {

@@ -14,8 +14,36 @@ import { useState } from "react";
 import { Cluster } from "src/utils/config";
 
 
-export function DefaultClusterStore(defaultCluster: Cluster) {
-  const [cluster, setCluster] = useState<Cluster>(defaultCluster);
+export function DefaultClusterStore(defaultCluster: Cluster | undefined) {
+
+  if (!defaultCluster) {
+    // throw new Error("No available clusters");
+    console.log("No available clusters");
+  }
+  const [cluster, setCluster] = useState<Cluster>(defaultCluster as Cluster);
 
   return { cluster, setCluster };
 }
+
+
+// export function DefaultClusterStore() {
+//   const [clusterId, setClusterId] = useLocalStorage<String>(
+//     SCOW_DEFAULT_CLUSTER_ID,
+//     publicConfig.CLUSTERS[0].id,
+//   );
+
+//   const defaultCluster = publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)
+//     || publicConfig.CLUSTERS[0] as Cluster;
+
+//   const setDefaultCluster = (cluster: Cluster) => {
+//     setClusterId(cluster.id);
+//   };
+
+//   const removeDefaultCluster = () => {
+//     if (typeof window !== "undefined") {
+//       window.localStorage.removeItem(SCOW_DEFAULT_CLUSTER_ID);
+//     }
+//   };
+
+//   return { defaultCluster, setDefaultCluster, removeDefaultCluster };
+// }

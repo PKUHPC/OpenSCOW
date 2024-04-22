@@ -39,6 +39,8 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
+  MIS_SERVER_URL: string | undefined;
+
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -64,6 +66,10 @@ export interface PublicRuntimeConfig {
   ENABLE_APPS: boolean;
 
   MIS_URL: string | undefined;
+
+  MIS_DEPLOYED: boolean;
+
+  MIS_SERVER_URL: string | undefined;
 
   AI_URL: string | undefined;
 

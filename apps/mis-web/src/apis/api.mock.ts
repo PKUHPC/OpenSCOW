@@ -17,6 +17,7 @@ import type { RunningJob } from "@scow/protos/build/common/job";
 import { type Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
+import { ClusterConnectionStatus, ClusterOnlineStatus } from "src/models/cluster";
 import { OperationResult } from "src/models/operationLog";
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
@@ -483,6 +484,31 @@ export const mockApi: MockApi<typeof api> = {
   }]}),
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
   changeTenant: async () => null,
+
+  getClustersConnectionInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    schedulerName: "hpc",
+    connectionStatus: ClusterConnectionStatus.AVAILABLE,
+    partitions: [],
+  }], totalCount: 1 }),
+
+  getClustersOnlineInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    onlineStatus: ClusterOnlineStatus.ONLINE,
+    operatorId: undefined,
+    operatorName: undefined,
+    comment: "",
+  }], totalCount: 1 }),
+
+  activateCluster: async () => ({ executed: true }),
+  deactivateCluster: async () => ({ executed: true }),
+
+  exportAccount: null,
+  exportChargeRecord: null,
+  exportPayRecord: null,
+  exportUser: null,
+  exportOperationLog: null,
+
 };
 
 export const MOCK_USER_INFO = {

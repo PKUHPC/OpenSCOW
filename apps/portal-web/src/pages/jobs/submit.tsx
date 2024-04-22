@@ -16,11 +16,13 @@ import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { getServerI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -39,7 +41,8 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
-          const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
+          const { currentClusters } = useStore(CurrentClustersStore);
+          const clusterObj = currentClusters.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
           return api.getJobTemplate({ query: { cluster, id: jobTemplateId } })
             .then(({ template }) => ({

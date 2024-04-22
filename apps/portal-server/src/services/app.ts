@@ -179,6 +179,7 @@ export const appServiceServer = plugin((server) => {
     },
 
     listAppSessions: async ({ request, logger }) => {
+
       const { cluster, userId } = request;
 
       const clusterops = getClusterOps(cluster);

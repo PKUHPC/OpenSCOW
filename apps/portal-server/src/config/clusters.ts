@@ -11,7 +11,25 @@
  */
 
 import { getClusterConfigs } from "@scow/config/build/cluster";
+import { libGetClustersOnlineInfo } from "@scow/lib-server";
 import { logger } from "src/utils/logger";
 
-export const clusters = getClusterConfigs(undefined, logger, ["hpc"]);
+import { commonConfig } from "./common";
+import { portalConfig } from "./portal";
+
+export const configClusters = getClusterConfigs(undefined, logger, ["hpc"]);
+
+export const currentClusters = async () => {
+  // if mis-server is deployed
+  if (portalConfig.misUrl) {
+
+    const onlineClusters
+       = await libGetClustersOnlineInfo(logger, configClusters, "localhost:5004", commonConfig.scowApi?.auth?.token);
+    logger.info("Current online clusters (when mis deployed): %o", onlineClusters);
+
+    return onlineClusters;
+  } else {
+    return configClusters;
+  }
+};
 

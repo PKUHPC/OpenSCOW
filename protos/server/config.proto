@@ -57,6 +57,83 @@ message GetAvailablePartitionsForClusterResponse {
   repeated Partition partitions = 1;
 }
 
+// 获取当前所有集群的Config
+message GetClustersConnectionInfoRequest {
+}
+
+enum ClusterConnectionStatus {
+  AVAILABLE = 0;
+  ERROR = 1;
+}
+
+message ClusterConnectionInfo {
+  string cluster_id = 1;
+  // 当前集群是否异常
+  ClusterConnectionStatus connection_status = 2;
+  // 非异常状态集群的调度器名称
+  optional string scheduler_name = 3;
+  // 非异常状态集群的分区信息
+  repeated Partition partitions = 4;
+}
+message GetClustersConnectionInfoResponse {
+  repeated ClusterConnectionInfo results = 1;
+  uint32 total_count = 2;
+}
+
+// 获取当前在SCOW中存储的所有集群的状态数据
+message GetClustersOnlineInfoRequest {
+}
+
+enum ClusterOnlineStatus {
+  ONLINE = 0;
+  OFFLINE = 1;
+}
+message ClusterOnlineInfo {
+  string cluster_id = 1;
+  ClusterOnlineStatus online_status = 2;
+  optional string operator_id = 3;
+  optional string comment = 4;
+  // optional string operator_name = 4;
+  // uint32 total_node_count = 7;
+  // uint32 total_core_count = 8;
+  // uint32 total_gpu_count = 9;
+  // uint64 total_memory = 10;
+}
+// 获取SCOW中存储的当前集群的在线状态
+message GetClustersOnlineInfoResponse {
+  repeated ClusterOnlineInfo results = 1;
+  uint32 total_count = 2;
+}
+
+// 启用集群
+message ActivateClusterRequest {
+  string cluster_id = 1;
+  string operator_id = 2;
+  optional string comment = 3;
+}
+
+// NOT_FOUND 集群查询不到时启用失败
+// FAILED_PRECONDITION 集群异常时
+// ALREADY_ACTIVATED
+message ActivateClusterResponse {
+  bool executed = 1;
+  repeated ClusterOnlineInfo current_online_clusters = 2;
+}
+
+// 停用集群
+message DeactivateClusterRequest {
+  string cluster_id = 1;
+  string operator_id = 2;
+  optional string comment = 3;
+}
+
+// NOT_FOUND 集群查询不到时启用失败
+// ALREADY_ACTIVATED
+message DeactivateClusterResponse {
+  bool executed = 1;
+  repeated ClusterOnlineInfo current_online_clusters = 2;
+}
+
 service ConfigService {
 
   /**
@@ -69,4 +146,12 @@ service ConfigService {
   };
 
   rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest) returns (GetAvailablePartitionsForClusterResponse);
+
+  rpc GetClustersConnectionInfo(GetClustersConnectionInfoRequest) returns (GetClustersConnectionInfoResponse);
+
+  rpc GetClustersOnlineInfo(GetClustersOnlineInfoRequest) returns (GetClustersOnlineInfoResponse);
+
+  rpc ActivateCluster(ActivateClusterRequest) returns (ActivateClusterResponse);
+
+  rpc DeactivateCluster(DeactivateClusterRequest) returns (DeactivateClusterResponse);
 }

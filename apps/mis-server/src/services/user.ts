@@ -33,7 +33,6 @@ import {
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { authUrl } from "src/config";
-import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
@@ -180,6 +179,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const clusters = await server.ext.clusters.onlineClusters();
       await server.ext.clusters.callOnAll(logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
@@ -257,6 +257,7 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const clusters = await server.ext.clusters.onlineClusters();
       await server.ext.clusters.callOnAll(logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
       }).catch(async (e) => {
@@ -403,7 +404,8 @@ export const userServiceServer = plugin((server) => {
      */
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+      const user =
+      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, server.ext.clusters)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -422,7 +424,7 @@ export const userServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // insert public key
-          await insertKeyToNewUser(identityId, password, server.logger)
+          await insertKeyToNewUser(identityId, password, server.logger, server.ext.clusters)
             .catch(() => {});
           return true;
         })
@@ -455,19 +457,20 @@ export const userServiceServer = plugin((server) => {
      */
     addUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
-        .catch((e) => {
-          if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS,
-              message: `User with userId ${identityId} already exists in scow.`,
-              details: "EXISTS_IN_SCOW",
-            };
-          }
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: `Error creating user with userId ${identityId} in database.` };
-        });
+      const user
+       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, server.ext.clusters)
+         .catch((e) => {
+           if (e.code === Status.ALREADY_EXISTS) {
+             throw <ServiceError> {
+               code: Status.ALREADY_EXISTS,
+               message: `User with userId ${identityId} already exists in scow.`,
+               details: "EXISTS_IN_SCOW",
+             };
+           }
+           throw <ServiceError> {
+             code: Status.INTERNAL,
+             message: `Error creating user with userId ${identityId} in database.` };
+         });
 
       await callHook("userAdded", { tenantName, userId: user.userId }, logger);
 

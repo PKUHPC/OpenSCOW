@@ -122,30 +122,31 @@ export const tenantServiceServer = plugin((server) => {
         });
 
         // 在数据库中创建user
-        const user = await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
-          .then(async (user) => {
-            user.tenantRoles = [TenantRole.TENANT_ADMIN];
-            await em.persistAndFlush(user);
-            return user;
-          }).catch((e) => {
-            if (e.code === Status.ALREADY_EXISTS) {
-              throw <ServiceError>{
-                code: Status.ALREADY_EXISTS,
-                message: `User with userId ${userId} already exists in scow.`,
-                details: "USER_ALREADY_EXISTS",
-              };
-            }
-            throw <ServiceError>{
-              code: Status.INTERNAL,
-              message: `Error creating user with userId ${userId} in database.`,
-            };
-          });
+        const user =
+         await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em, server.ext.clusters)
+           .then(async (user) => {
+             user.tenantRoles = [TenantRole.TENANT_ADMIN];
+             await em.persistAndFlush(user);
+             return user;
+           }).catch((e) => {
+             if (e.code === Status.ALREADY_EXISTS) {
+               throw <ServiceError>{
+                 code: Status.ALREADY_EXISTS,
+                 message: `User with userId ${userId} already exists in scow.`,
+                 details: "USER_ALREADY_EXISTS",
+               };
+             }
+             throw <ServiceError>{
+               code: Status.INTERNAL,
+               message: `Error creating user with userId ${userId} in database.`,
+             };
+           });
         // call auth
         const createdInAuth = await createUser(authUrl,
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
           logger)
           .then(async () => {
-            await insertKeyToNewUser(userId, userPassword, logger)
+            await insertKeyToNewUser(userId, userPassword, logger, server.ext.clusters)
               .catch(() => { });
             return true;
           })

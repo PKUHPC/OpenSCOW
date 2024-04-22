@@ -12,10 +12,12 @@
 
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
+import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
+import { ClusterOnlineStatus } from "src/models/cluster";
 import { DesktopTable } from "src/pageComponents/desktop/DesktopTable";
 import { Cluster, getLoginDesktopEnabled, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -46,7 +48,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-  const loginDesktopEnabledClusters = publicConfig.CLUSTER_SORTED_ID_LIST
+  const currentClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
+
+  const sortedClusterIdList = publicConfig.MIS_DEPLOYED ?
+    (currentClusters?.results
+      .filter((x) => x.onlineStatus === ClusterOnlineStatus.ONLINE).map((x) => x.clusterId) ?? [])
+    : publicConfig.CLUSTER_SORTED_ID_LIST;
+
+  const loginDesktopEnabledClusters = sortedClusterIdList
     .filter((clusterId) => getLoginDesktopEnabled(clusterId))
     .map((clusterId) => ({
       id: clusterId,

@@ -23,6 +23,7 @@ export const getClientFn = (
 ) => <TClient>(
   ctor: ClientConstructor<TClient>,
 ): TClient => {
+
   return new ctor(
     config.SERVER_URL,
     ChannelCredentials.createInsecure(),

@@ -15,7 +15,7 @@ import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
-import { clusters } from "src/config/clusters";
+import { configClusters, currentClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
@@ -28,6 +28,15 @@ interface NodeNetInfo {
   port: number,
 }
 
+const clusters = async () => await currentClusters();
+
+// 获取配置文件集群中各节点信息
+export function getConfigClusterLoginNode(cluster: string): string | undefined {
+  const loginNode = getLoginNode(configClusters[cluster]?.loginNodes?.[0]);
+  return loginNode?.address;
+}
+
+// TODO: 不要？在线集群节点信息
 export function getClusterLoginNode(cluster: string): string | undefined {
   const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
   return loginNode?.address;

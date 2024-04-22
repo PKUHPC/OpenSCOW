@@ -24,8 +24,10 @@ import { CodeEditor } from "src/components/CodeEditor";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { refreshDefaultCluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 import { formatSize } from "src/utils/format";
 
 interface JobForm {
@@ -185,9 +187,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     }
   }, [currentPartitionInfo]);
 
-  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const { defaultCluster: currentDefaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
+  const defaultCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
+
+  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
+
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount

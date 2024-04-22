@@ -13,9 +13,11 @@
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Modal } from "antd";
 import React, { useMemo, useState } from "react";
+import { useStore } from "simstate";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
-import { Cluster, publicConfig } from "src/utils/config";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { Cluster } from "src/utils/config";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
@@ -89,7 +91,8 @@ export const AddEntryModal: React.FC<Props> = ({
     },
   ]);
 
-  const clusters = publicConfig.CLUSTERS;
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const clusters = currentClusters;
 
   // 所有可创建的app
   const appInfo = useMemo(() => {

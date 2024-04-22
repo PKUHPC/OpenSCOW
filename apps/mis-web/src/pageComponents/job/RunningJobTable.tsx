@@ -28,6 +28,7 @@ import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChang
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -96,6 +97,8 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
+  const { onlineClusters } = useStore(OnlineClustersStore);
+
   const filteredData = useMemo(() => {
     if (!data) { return undefined; }
 
@@ -106,7 +109,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       // add local range filters here
     }
 
-    return filtered.map((x) => RunningJobInfo.fromGrpc(x, publicConfig.CLUSTERS[query.cluster.id]));
+    return filtered.map((x) => RunningJobInfo.fromGrpc(x, onlineClusters[query.cluster.id]));
   }, [data, query.jobId]);
 
   return (

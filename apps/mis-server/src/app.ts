@@ -55,6 +55,7 @@ export async function createServer() {
   await server.register(exportServiceServer);
 
   await server.ext.syncBlockStatus.sync();
+  await server.ext.clusters.syncConfigClusters();
 
   return server;
 }

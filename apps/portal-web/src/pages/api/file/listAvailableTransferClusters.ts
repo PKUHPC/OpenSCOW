@@ -13,7 +13,9 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Static, Type } from "@sinclair/typebox";
+import { useStore } from "simstate";
 import { authenticate } from "src/auth/server";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
@@ -49,7 +51,8 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const clusterList: ClusterInfo[] = publicConfig.CLUSTERS
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const clusterList: ClusterInfo[] = currentClusters
     .filter((x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFileTransfer?.enabled)
     .map((x) => ({
       id: x.id,

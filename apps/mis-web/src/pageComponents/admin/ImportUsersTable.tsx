@@ -24,7 +24,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
 const pCommon = prefix("common.");
@@ -37,11 +37,16 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
+  const { onlineClusters } = useStore(OnlineClustersStore);
   const defaultClusterStore = useStore(DefaultClusterStore);
 
+  if (Object.keys(onlineClusters).length > 0 && !onlineClusters[defaultClusterStore.cluster.id]) {
+    defaultClusterStore.setCluster(Object.values(onlineClusters)[0]);
+  }
+
   const clusterParam = queryToString(qs.cluster);
-  const cluster = (publicConfig.CLUSTERS[clusterParam]
-    ? publicConfig.CLUSTERS[clusterParam]
+  const cluster = (onlineClusters[clusterParam]
+    ? onlineClusters[clusterParam]
     : defaultClusterStore.cluster);
 
   const [form] = Form.useForm<{ whitelist: boolean}>();

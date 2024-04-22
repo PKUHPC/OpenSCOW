@@ -86,6 +86,8 @@ export const OperationType: OperationTypeEnum = {
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
   userChangeTenant: "userChangeTenant",
+  activateCluster: "activateCluster",
+  deactivateCluster: "deactivateCluster",
   customEvent: "customEvent",
 };
 
@@ -184,6 +186,8 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
     userChangeTenant: t(pTypes("userChangeTenant")),
+    activateCluster: t(pTypes("activateCluster")),
+    deactivateCluster: t(pTypes("deactivateCluster")),
     customEvent: t(pTypes("customEvent")),
   };
 
@@ -248,6 +252,8 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   exportPayRecord: "040306",
   exportOperationLog: "040307",
   userChangeTenant: "040308",
+  activateCluster: "040309",
+  deactivateCluster: "040310",
   customEvent: "050001",
 };
 
@@ -444,6 +450,14 @@ export const getOperationDetail = (
         [operationEvent[logEvent].userId,
           operationEvent[logEvent].previousTenantName,
           operationEvent[logEvent].newTenantName]);
+    case "activateCluster":
+      return t(pDetails("activateCluster"),
+        [operationEvent[logEvent].userId,
+          operationEvent[logEvent].clusterId]);
+    case "deactivateCluster":
+      return t(pDetails("activateCluster"),
+        [operationEvent[logEvent].userId,
+          operationEvent[logEvent].clusterId]);
     case "customEvent":
       const c = operationEvent[logEvent]?.content;
       return getI18nCurrentText(c, languageId);

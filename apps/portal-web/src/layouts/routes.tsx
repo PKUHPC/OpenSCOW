@@ -31,13 +31,17 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { User } from "src/stores/UserStore";
+import { refreshDefaultCluster } from "src/utils/cluster";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
   user: User | undefined,
+  currentClusters: Cluster[],
   defaultCluster: Cluster,
   LoginNodes: Record<string, LoginNode[]>,
   setDefaultCluster: (cluster: Cluster) => void,
-) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
+) => NavItemProps[] = (user, currentClusters, defaultCluster, loginNodes, setDefaultCluster) => {
+
+  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 
   if (!user) { return []; }
   const t = useI18nTranslateToString();
@@ -79,12 +83,12 @@ export const userRoutes: (
         },
       ],
     }] : []),
-    ...(publicConfig.ENABLE_SHELL ? [{
+    ...(publicConfig.ENABLE_SHELL && currentClusters.length > 0 ? [{
       Icon: MacCommandOutlined,
       text: "Shell",
       path: "/shell",
       clickToPath:
-        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.address),
+        join(publicConfig.BASE_PATH, "shell", defaultCluster?.id, loginNodes[defaultCluster?.id]?.[0]?.address),
       openInNewPage: true,
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
@@ -108,7 +112,7 @@ export const userRoutes: (
       text: t("routes.desktop"),
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
+    ...(publicConfig.ENABLE_APPS && currentClusters.length > 0 ? [{
       Icon: EyeOutlined,
       text: t("routes.apps.title"),
       path: "/apps",
@@ -137,7 +141,7 @@ export const userRoutes: (
         ],
       } as NavItemProps)),
     } as NavItemProps] : []),
-    ...(publicConfig.CLUSTERS.length > 0 ? [{
+    ...(currentClusters.length > 0 ? [{
       Icon: FolderOutlined,
       text: t("routes.file.fileManager"),
       path: "/files",

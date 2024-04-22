@@ -13,10 +13,13 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { clusters } from "src/config/clusters";
+import { currentClusters } from "src/config/clusters";
 import { Logger } from "ts-log";
 
 import { scowErrorMetadata } from "./error";
+
+
+const clusters = async () => await currentClusters();
 
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
   const client = getSchedulerAdapterClient(c.adapterUrl);

@@ -20,8 +20,8 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
+import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-// import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
@@ -39,11 +39,13 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
+import { ClusterOnlineInfo } from "src/models/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { Cluster, publicConfig, runtimeConfig } from "src/utils/config";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -110,6 +112,7 @@ interface ExtraProps {
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
+  initialOnlineClusters: {[clusterId: string]: Cluster};
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -123,8 +126,16 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const onlineClustersStore = useConstant(() => {
+    return createStore(OnlineClustersStore, extra.initialOnlineClusters);
+  });
+
+  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
+    return Object.keys(extra.initialOnlineClusters).find((c) => c === x);
+  });
   const defaultClusterStore = useConstant(() => {
-    const store = createStore(DefaultClusterStore, publicConfig.CLUSTERS[publicConfig.CLUSTER_SORTED_ID_LIST[0]]);
+    const store = createStore(DefaultClusterStore,
+      initialDefaultClusterId ? extra.initialOnlineClusters[initialDefaultClusterId] : undefined);
     return store;
   });
 
@@ -157,7 +168,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, defaultClusterStore, uiExtensionStore]}>
+        <StoreProvider stores={[userStore, onlineClustersStore, defaultClusterStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />
@@ -186,6 +197,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     initialLanguage: "",
+    initialOnlineClusters: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -221,6 +233,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+
+    const onlineClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
+    const initialOnlineClusters
+     = formatOnlineClusters(onlineClusters?.results as ClusterOnlineInfo[], publicConfig.CLUSTERS);
+    extra.initialOnlineClusters = initialOnlineClusters as {[clusterId: string]: Cluster};
   }
 
   const appProps = await App.getInitialProps(appContext);

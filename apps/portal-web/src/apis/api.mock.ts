@@ -14,6 +14,7 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
+import { ClusterOnlineStatus } from "src/models/cluster";
 export type MockApi<TApi extends Record<
   string,
  (...args: any[]) => JsonFetchResultPromiseLike<any>>
@@ -272,6 +273,14 @@ export const mockApi: MockApi<typeof api> = {
   queryFileTransferProgress: null,
   terminateFileTransfer: null,
   checkTransferKey: null,
+
+  getClustersOnlineInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    onlineStatus: ClusterOnlineStatus.ONLINE,
+    operatorId: undefined,
+    operatorName: undefined,
+    comment: "",
+  }]}),
 
 };
 

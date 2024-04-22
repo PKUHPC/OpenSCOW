@@ -21,8 +21,8 @@ import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { UserStore } from "src/stores/UserStore";
-import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -47,7 +47,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
 
-      const clusters = publicConfig.CLUSTERS;
+      const { currentClusters } = useStore(CurrentClustersStore);
+      const clusters = currentClusters;
 
       const rawClusterInfoPromises = clusters.map((x) =>
         api.getClusterRunningInfo({ query: { clusterId: x.id } })

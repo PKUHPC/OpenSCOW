@@ -17,10 +17,14 @@ import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
+// import { libGetClustersOnlineInfo } from "@scow/lib-web/build/server/misCommon";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
+import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
+// import { getPortalWebOnlineClusters } from "@scow/lib-web/build/utils/misCommon";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
+import { ClusterOnlineInfo } from "@scow/protos/build/server/config";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -38,12 +42,14 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+// import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
+import { Cluster, LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -118,6 +124,7 @@ interface ExtraProps {
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
+  initialCurrentClusters: Cluster[];
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -132,10 +139,19 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const currentClustersStore = useConstant(() => {
+    return createStore(CurrentClustersStore, extra.initialCurrentClusters);
+  });
+
+  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
+    return extra.initialCurrentClusters.find((c) => c.id === x);
+  });
+  const defaultClusterStore
+   = useConstant(() => createStore(DefaultClusterStore, initialDefaultClusterId, extra.initialCurrentClusters));
+
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
     extra.initialLanguage));
 
-  const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
   const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
 
   // Use the layout defined at the page level, if available
@@ -166,7 +182,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore, uiExtensionStore]}>
+        <StoreProvider
+          stores={[userStore, currentClustersStore, defaultClusterStore, loginNodeStore, uiExtensionStore]}
+        >
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}>
               <FloatButtons languageId={ extra.initialLanguage } />
@@ -197,6 +215,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
     initialLanguage: "",
+    initialCurrentClusters: [],
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -231,6 +250,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
+    // TODO:确认是否为数据逻辑
     extra.loginNodes = publicConfig.CLUSTER_SORTED_ID_LIST.reduce((acc, cluster) => {
       acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
       return acc;
@@ -238,6 +258,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     // 从Cookies或header中获取语言id
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+    const currentClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
+    const initialCurrentClusters =
+    formatOnlineClusters(currentClusters?.results as ClusterOnlineInfo[], publicConfig.CLUSTERS) as Cluster[];
+    extra.initialCurrentClusters = publicConfig.MIS_DEPLOYED ? initialCurrentClusters : publicConfig.CLUSTERS;
+
   }
 
   const appProps = await NextApp.getInitialProps(appContext);

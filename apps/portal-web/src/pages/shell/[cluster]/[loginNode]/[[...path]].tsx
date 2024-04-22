@@ -22,6 +22,7 @@ import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -85,13 +86,14 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const loginNode = router.query.loginNode as string;
   const paths = router.query.path as (string[] | undefined);
 
+  const { currentClusters } = useStore(CurrentClustersStore);
   const { loginNodes } = useStore(LoginNodeStore);
   const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
 
   const headerRef = useRef<HTMLDivElement>(null);
 
   const clusterName =
-    getI18nConfigCurrentText(publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster, languageId);
+    getI18nConfigCurrentText(currentClusters.find((x) => x.id === cluster)?.name || cluster, languageId);
 
   const t = useI18nTranslateToString();
 

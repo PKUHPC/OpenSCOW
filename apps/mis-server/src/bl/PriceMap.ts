@@ -15,7 +15,6 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
-import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
@@ -106,10 +105,10 @@ export async function createPriceMap(
 
       const missingPaths = [] as string[];
 
-      for (const cluster in clusters) {
+      // for (const cluster in clusters) {
+      for (const cluster in clusterPlugin.onlineClusters()) {
         for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
-
           const { qos } = partition;
 
           if (path.join(".") in defaultPrices) {

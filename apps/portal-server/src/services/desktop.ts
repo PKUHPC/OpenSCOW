@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
-import { clusters } from "src/config/clusters";
+import { currentClusters } from "src/config/clusters";
 import {
   addDesktopToFile,
   ensureEnabled,
@@ -154,6 +154,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
+      const clusters = await currentClusters();
       const loginNodes = clusters[cluster]?.loginNodes?.map(getLoginNode);
       if (!loginNodes) {
         throw clusterNotFound(cluster);

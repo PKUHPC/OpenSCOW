@@ -14,12 +14,14 @@ import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { Localized, prefix } from "src/i18n";
 import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
-import { Cluster, publicConfig } from "src/utils/config";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { Cluster } from "src/utils/config";
 import { styled } from "styled-components";
 
 const CardsContainer = styled.div`
@@ -91,7 +93,8 @@ export const QuickEntry: React.FC<Props> = () => {
     return await api.getQuickEntries({});
   }, []) });
 
-  const clusters = publicConfig.CLUSTERS;
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const clusters = currentClusters;
 
   // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {

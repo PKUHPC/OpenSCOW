@@ -14,8 +14,10 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Select } from "antd";
 import { useStore } from "simstate";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { refreshDefaultCluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 
 interface Props {
   value?: Cluster[];
@@ -27,6 +29,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
   const languageId = useI18n().currentLanguage.id;
   const t = useI18nTranslateToString();
 
+  const { currentClusters } = useStore(CurrentClustersStore);
+
   return (
     <Select
       mode="multiple"
@@ -34,8 +38,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       value={value?.map((v) => v.id)}
       onChange={(values) => onChange?.(values.map((x) => ({
         id: x,
-        name: publicConfig.CLUSTERS.find((cluster) => cluster.id === x)?.name ?? x })))}
-      options={publicConfig.CLUSTERS.map((x) => ({ value: x.id, label:
+        name: currentClusters.find((cluster) => cluster.id === x)?.name ?? x })))}
+      options={currentClusters.map((x) => ({ value: x.id, label:
         getI18nConfigCurrentText(x.name, languageId) }))}
       key={languageId}
     />
@@ -56,7 +60,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   clusterIds,
 }) => {
 
-  const { setDefaultCluster } = useStore(DefaultClusterStore);
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
+  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -68,15 +74,15 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
       onChange={(value) => {
         onChange?.({
           id: value,
-          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
+          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value });
         setDefaultCluster({
           id: value,
-          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
+          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value });
       }
       }
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat((publicConfig.CLUSTERS.filter((x) => clusterIds?.includes(x.id) ?? true))
+          .concat((currentClusters.filter((x) => clusterIds?.includes(x.id) ?? true))
             .map((x) => ({
               value: x.id,
               label:  getI18nConfigCurrentText(x.name, languageId),

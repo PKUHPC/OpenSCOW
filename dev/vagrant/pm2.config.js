@@ -56,6 +56,7 @@ module.exports = {
         MIS_DEPLOYED: 1,
         AUDIT_DEPLOYED: 1,
         MIS_URL: "localhost:5003",
+        MIS_SEVER_URL: "localhost:5004",
         AI_DEPLOYED: 1,
         AI_URL: "localhost:5006",
         NOVNC_CLIENT_URL: "http://localhost:6080",

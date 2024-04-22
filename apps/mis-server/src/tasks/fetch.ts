@@ -19,7 +19,6 @@ import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
-import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
@@ -187,6 +186,8 @@ export async function fetchJobs(
 
     return result.length;
   };
+
+  const clusters = await clusterPlugin.clusters.onlineClusters();
 
   try {
     let newJobsCount = 0;

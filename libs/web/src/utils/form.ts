@@ -65,3 +65,27 @@ export const compareUsedChargeRule =
     }
     return Promise.resolve();
   };
+
+// 输入值一致校验
+export const validateDataConsistency = <InputtedFieldName extends string>
+  (inputtedFieldName: InputtedFieldName, comparedValue: string, languageId: string) => {
+  return {
+    dependencies: [inputtedFieldName],
+    validateFirst: true,
+    rules: [
+      {
+        required: true,
+        // message: getCurrentLangLibWebText(languageId, "confirmPasswordMessage"),
+        message: "请填入确认值",
+      },
+      {
+        validator: async (_, value) => {
+          if (value && comparedValue && comparedValue !== value) {
+            // throw new Error(getCurrentLangLibWebText(languageId, "confirmPasswordNotEqualError"));
+            throw new Error("数据不一致");
+          }
+        },
+      },
+    ],
+  };
+};

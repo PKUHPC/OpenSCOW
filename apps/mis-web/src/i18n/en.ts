@@ -182,9 +182,11 @@ export default {
         systemDebug: "Platform Debug",
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Job Information Synchronization",
+        resourceManagement: "Resource Management",
+        clusterManagement: "Cluster Management",
         accountList: "Account List",
         clusterMonitor: "Cluster Monitor",
-        resourceStatus: "Resrouce Status",
+        resourceStatus: "Resource Status",
         alarmLog: "Alarm Log",
       },
       tenantManagement: {
@@ -1015,6 +1017,9 @@ export default {
           jobSyncSuccessMessage: "Job synchronization completed, synchronized to {} new records.",
           syncJobNow: "Sync Now",
         },
+        clusterManagement: {
+          title: "集群管理",
+        },
       },
       finance: {
         pay: {
@@ -1148,6 +1153,8 @@ export default {
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
       userChangeTenant: "User Change Tenant",
       customEvent: "Custom Operation Event",
+      activateCluster: "Activate Cluster",
+      deactivateCluster: "Deactivate Cluster",
     },
     operationDetails: {
       login: "User Login",
@@ -1222,6 +1229,8 @@ export default {
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
       unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
       userChangeTenant: "User {} changes from tenant {} to tenant {}",
+      activateCluster: "User {} activates the Cluster: {}",
+      deactivateCluster: "User {} deactivates the Cluster: {}",
     },
   },
   userRoles: {

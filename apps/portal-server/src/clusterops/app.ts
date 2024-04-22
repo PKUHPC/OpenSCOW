@@ -15,16 +15,17 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
+import { getAppConnectionInfoFromAdapter, getEnvVariables, libGetClustersOnlineInfo } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
+import { config } from "dotenv";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
-import { clusters } from "src/config/clusters";
+import { currentClusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
@@ -469,6 +470,7 @@ export const appOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
 
+                const clusters = await currentClusters();
                 // if proxyGateway configured, connect to compute node by proxyGateway and get ip of compute node
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {

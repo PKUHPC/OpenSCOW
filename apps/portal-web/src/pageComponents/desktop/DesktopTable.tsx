@@ -12,7 +12,7 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { Button, Form, Select, Table } from "antd";
+import { App, Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
@@ -26,9 +26,11 @@ import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { refreshDefaultCluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
@@ -52,7 +54,15 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const t = useI18nTranslateToString();
 
-  const { defaultCluster } = useStore(DefaultClusterStore);
+  const { message } = App.useApp();
+
+  if (loginDesktopEnabledClusters.length === 0) {
+    message.error("No available loginNodes");
+  }
+
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
+  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 
   const { loginNodes } = useStore(LoginNodeStore);
 
@@ -64,7 +74,11 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
     ? defaultCluster
     : loginDesktopEnabledClusters[0];
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
+  const cluster = currentClusters.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
+
+  if (!cluster) {
+    message.error("No available cluster");
+  }
 
   const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;
 
