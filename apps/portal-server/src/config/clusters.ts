@@ -15,18 +15,20 @@ import { libGetClustersOnlineInfo } from "@scow/lib-server";
 import { logger } from "src/utils/logger";
 
 import { commonConfig } from "./common";
-import { portalConfig } from "./portal";
+import { config } from "./env";
 
 export const configClusters = getClusterConfigs(undefined, logger, ["hpc"]);
 
 export const currentClusters = async () => {
+
   // if mis-server is deployed
-  if (portalConfig.misUrl) {
+  if (config.MIS_DEPLOYED) {
+
 
     const onlineClusters
-       = await libGetClustersOnlineInfo(logger, configClusters, "localhost:5004", commonConfig.scowApi?.auth?.token);
+       = await libGetClustersOnlineInfo(logger, configClusters,
+         config.MIS_SERVER_URL, commonConfig.scowApi?.auth?.token);
     logger.info("Current online clusters (when mis deployed): %o", onlineClusters);
-
     return onlineClusters;
   } else {
     return configClusters;

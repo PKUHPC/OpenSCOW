@@ -20,7 +20,7 @@ import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { DeactivateClusterModalLink } from "src/components/DeactivateClusterModal";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { ClusterConnectionStatus, ClusterOnlineStatus } from "src/models/cluster";
 import { CombinedClusterInfo } from "src/pages/admin/resource/clusterManagement";
 import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
@@ -38,7 +38,7 @@ interface FilterForm {
   clusters: Cluster[];
 }
 
-// const p = prefix("page.admin.systemDebug.clusterManagement");
+const p = prefix("page.admin.resourceManagement.clusterManagement.");
 const pCommon = prefix("common.");
 
 export const ClusterManagementTable: React.FC<Props> = ({
@@ -50,7 +50,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
   const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
 
-  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
   const [query, setQuery] = useState<FilterForm>(() => {
@@ -88,12 +88,12 @@ export const ClusterManagementTable: React.FC<Props> = ({
             setQuery(await form.validateFields());
           }}
         >
-          <Form.Item label="集群" name="clusters" style={{ minWidth: "200px" }}>
+          <Form.Item label={tArgs(p("clusterFilter"))} name="clusters" style={{ minWidth: "200px" }}>
             <ClusterSelector isUsingAllConfigClusters={true} />
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+              <Button type="primary" htmlType="submit">{tArgs(pCommon("search"))}</Button>
             </Space>
           </Form.Item>
         </Form>
@@ -105,35 +105,32 @@ export const ClusterManagementTable: React.FC<Props> = ({
         loading={isLoading}
         pagination={false}
         rowKey="clusterId"
-        // scroll={{ x: filteredData?.length ? 1200 : true }}
-        // onChange={handleTableChange}
       >
         <Table.Column<CombinedClusterInfo>
           dataIndex="clusterId"
-          title="集群名称"
+          title={tArgs(p("table.clusterName"))}
           render={(_, r) => {
-            // const clusterName = publicConfig.CLUSTERS[r.clusterId].name ?? r.clusterId;
             return getI18nConfigCurrentText(r.clusterId, languageId);
           }}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="partitions"
-          title="节点总数"
+          title={tArgs(p("table.nodesCount"))}
           render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.nodes, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="partitions"
-          title="CPU总核数"
+          title={tArgs(p("table.cpusCount"))}
           render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.cores, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="partitions"
-          title="GPU总卡数"
+          title={tArgs(p("table.gpusCount"))}
           render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.gpus, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="partitions"
-          title="内存总容量"
+          title={tArgs(p("table.totalMemMb"))}
           width="10%"
           render={(_, r) => {
             const totalMemMb = r.partitions?.reduce((sum, p) => sum + p.memMb, 0) || 0;
@@ -142,20 +139,20 @@ export const ClusterManagementTable: React.FC<Props> = ({
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="connectionStatus"
-          title="集群状态"
+          title={tArgs(p("table.clusterState"))}
           render={(_, r) => (
             r.connectionStatus === ClusterConnectionStatus.ERROR ? (
-              <Tag color="red">异常</Tag>
+              <Tag color="red">{tArgs(p("table.errorState"))}</Tag>
             ) : (
               r.onlineStatus === ClusterOnlineStatus.OFFLINE ?
-                <Tag color="red">停用</Tag> :
-                <Tag color="green">正常</Tag>
+                <Tag color="red">{tArgs(p("table.deactivatedState"))}</Tag> :
+                <Tag color="green">{tArgs(p("table.normalState"))}</Tag>
             )
           )}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="operatorId"
-          title="操作员"
+          title={tArgs(p("table.operator"))}
           width="20%"
           render={(_, r) => {
             return r.operatorId ? `${r.operatorName}（ID: ${r.operatorId}）` : "";
@@ -163,17 +160,17 @@ export const ClusterManagementTable: React.FC<Props> = ({
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="updateTime"
-          title="操作时间"
+          title={tArgs(p("table.operatedTime"))}
           width="15%"
           render={(_, r) => formatDateTime(r.updateTime)}
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="comment"
           ellipsis
-          title="备注"
+          title={tArgs(p("table.comment"))}
         />
         <Table.Column<CombinedClusterInfo>
-          title="操作"
+          title={tArgs(p("table.operation"))}
           fixed="right"
           width="10%"
           render={(_, r) => {
@@ -189,14 +186,19 @@ export const ClusterManagementTable: React.FC<Props> = ({
                       <a onClick={() => {
 
                         modal.confirm({
-                          title: "启用集群",
+                          title: tArgs(p("activateModal.title")),
                           icon: <ExclamationCircleOutlined />,
                           content: (
                             <>
                               <p>
-                                请确认是否启用集群名称是 <strong>{clusterName}</strong>，集群ID是 <strong>{r.clusterId}</strong> 的集群？
+                                {tArgs(p("activateModal.content"), [
+                                  <strong key="clusterName">{clusterName}</strong>,
+                                  <strong key="clusterId">{r.clusterId}</strong>,
+                                ])},
+                                {/* 请确认是否启用集群名称是 <strong>{clusterName}</strong>，
+                                集群ID是 <strong>{r.clusterId}</strong> 的集群？ */}
                               </p>
-                              <p style={{ color: "red" }}>注意：启用后请手动同步平台数据。</p>
+                              <p style={{ color: "red" }}>{tArgs(p("activateModal.contentAttention"))}</p>
                             </>
                           ),
                           onOk: async () => {
@@ -213,15 +215,11 @@ export const ClusterManagementTable: React.FC<Props> = ({
                                     { id: curr.clusterId, name: publicConfig.CLUSTERS[curr.clusterId].name };
                                     return acc;
                                   }, {} as {[clusterId: string]: Cluster});
-                                  // setOnlineClusters((prev) => ({
-                                  //   ...prev,
-                                  //   [r.clusterId]: publicConfig.CLUSTERS[r.clusterId],
-                                  // }));
                                   setOnlineClusters(webOnlineClusters ?? {});
-                                  message.success("集群已启用");
+                                  message.success(tArgs(p("activateModal.successMessage")));
                                   reload();
                                 } else {
-                                  message.error(res.reason || "集群启用失败");
+                                  message.error(res.reason || tArgs(p("activateModal.failureMessage")));
                                   reload();
                                 }
                               });
@@ -230,7 +228,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
 
                       }}
                       >
-                      启用
+                        {tArgs(p("table.activate"))}
                       </a>
                     </>
                   )
@@ -247,7 +245,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
                           comment,
                         } }).then((res) => {
                           if (res.executed) {
-                            message.success("集群已停用");
+                            message.success(tArgs(p("deactivateModal.successMessage")));
                             reload();
                             const webOnlineClusters = res.currentOnlineClusters?.reduce((acc, curr) => {
                               acc[curr.clusterId] =
@@ -255,18 +253,14 @@ export const ClusterManagementTable: React.FC<Props> = ({
                               return acc;
                             }, {} as {[clusterId: string]: Cluster});
                             setOnlineClusters(webOnlineClusters ?? {});
-                            // setOnlineClusters((prev) => {
-                            //   delete prev[r.clusterId];
-                            //   return prev;
-                            // });
                           } else {
-                            message.error(res.reason || "集群停用失败");
+                            message.error(res.reason || tArgs(p("deactivateModal.failureMessage")));
                           }
                         });
 
                       }}
                     >
-                      停用
+                      {tArgs(p("table.deactivate"))}
                     </DeactivateClusterModalLink>
                   </>
                 )

@@ -36,7 +36,7 @@ export default {
   confirmPasswordEmailError: "Invalid email format. Please re-enter.",
   notPositiveNumberError: "Please enter a number greater than 0.",
   compareUsedChargeError: "The set limit cannot be less than the current used amount. Please re-enter.",
-  validateDataConsistencyMessage: "请填入确认值",
-  validateDataConsistencyError: "数值不一致，请重新输入",
+  validateDataConsistencyMessage: "Please enter the required values for confirmation",
+  validateDataConsistencyError: "Values are inconsistent, please re-enter",
   refreshButton: "Refresh",
 };

@@ -14,7 +14,7 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { libGetClustersOnlineInfo } from "@scow/lib-web/build/server/misCommon";
 import { Type } from "@sinclair/typebox";
 import { ClusterOnlineInfoSchema } from "src/models/cluster";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const GetClustersOnlineInfoSchema = typeboxRouteSchema({
@@ -31,9 +31,7 @@ export const GetClustersOnlineInfoSchema = typeboxRouteSchema({
 
 export default route(GetClustersOnlineInfoSchema,
   async () => {
-
-    // const reply = await libGetClustersOnlineInfo(runtimeConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
-    const reply = await libGetClustersOnlineInfo("localhost:5004", runtimeConfig.SCOW_API_AUTH_TOKEN);
+    const reply = await libGetClustersOnlineInfo(publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
     return {
       200: {
         results: reply,

@@ -75,14 +75,12 @@ export const validateDataConsistency = <InputtedFieldName extends string>
     rules: [
       {
         required: true,
-        // message: getCurrentLangLibWebText(languageId, "confirmPasswordMessage"),
-        message: "请填入确认值",
+        message: getCurrentLangLibWebText(languageId, "validateDataConsistencyMessage"),
       },
       {
         validator: async (_, value) => {
           if (value && comparedValue && comparedValue !== value) {
-            // throw new Error(getCurrentLangLibWebText(languageId, "confirmPasswordNotEqualError"));
-            throw new Error("数据不一致");
+            throw new Error(getCurrentLangLibWebText(languageId, "validateDataConsistencyError"));
           }
         },
       },

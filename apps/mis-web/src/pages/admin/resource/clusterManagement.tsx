@@ -44,7 +44,7 @@ export const ClusterManagementPage: NextPage =
 
     const t = useI18nTranslateToString();
     const languageId = useI18n().currentLanguage.id;
-    const p = prefix("page.admin.systemDebug.clusterManagement.");
+    const p = prefix("page.admin.resourceManagement.clusterManagement.");
 
     const { setOnlineClusters } = useStore(OnlineClustersStore);
 

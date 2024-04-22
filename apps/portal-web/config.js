@@ -81,7 +81,7 @@ const specs = {
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
-  MIS_SERVER_URL: str({ desc: "如果部署了管理系统，管理系统后端的路径", default: "mis-server:5000" }),
+  MIS_SERVER_URL: str({ desc: "如果部署了管理系统，管理系统后端的路径", default: "" }),
 
   AI_DEPLOYED: bool({ desc: "是否部署了AI系统", default: false }),
   AI_URL: str({ desc: "如果部署了AI系统，AI系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署AI系统", default: "" }),
@@ -139,7 +139,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
   const auditConfig = getAuditConfig(configPath, console);
-  // const misConfig = getMisConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
   /**
@@ -155,10 +154,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     UI_CONFIG: uiConfig,
     LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
-    MIS_SERVER_URL: config.MIS_SERVER_URL,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
-    // MIS_CONFIG: config.MIS_DEPLOYED ? misConfig : undefined,
     AUDIT_CONFIG : config.AUDIT_DEPLOYED ? auditConfig : undefined,
 
     SERVER_I18N_CONFIG_TEXTS: {
@@ -193,7 +190,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
     MIS_DEPLOYED: config.MIS_DEPLOYED,
-    MIS_SERVER_URL: config.MIS_SERVER_URL,
+    MIS_SERVER_URL: config.MIS_DEPLOYED ? config.MIS_SERVER_URL : undefined,
 
     AI_URL: config.AI_DEPLOYED ? (config.AI_URL || portalConfig.aiUrl) : undefined,
 

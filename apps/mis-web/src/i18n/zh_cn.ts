@@ -985,7 +985,6 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
 
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
@@ -1018,8 +1017,48 @@ export default {
           jobSyncSuccessMessage: "作业同步完成，同步到{}条新纪录。",
           syncJobNow: "立刻同步作业",
         },
+      },
+      resourceManagement: {
         clusterManagement: {
           title: "集群管理",
+          clusterFilter: "集群",
+          table: {
+            clusterName: "集群名称",
+            nodesCount: "节点总数",
+            cpusCount: "CPU总核数",
+            gpusCount: "GPU总卡数",
+            totalMemMb: "内存总容量",
+            clusterState: "集群状态",
+            errorState: "异常",
+            deactivatedState: "停用",
+            normalState: "正常",
+            operator: "操作员",
+            operatedTime: "操作时间",
+            comment: "备注",
+            operation: "操作",
+            activate: "启用",
+            deactivate: "停用",
+          },
+          activateModal: {
+            title: "启用集群",
+            content: "请确认是否启用集群名称是 {}，集群ID是 {} 的集群？",
+            contentAttention: "注意：启用后请手动同步平台数据！",
+            successMessage: "集群已启用",
+            failureMessage: "集群启用失败",
+          },
+          deactivateModal: {
+            title: "停用集群",
+            content: "请确认是否停用集群名称是 {}，集群ID是 {} 的集群？",
+            contentInputNotice: "如果确认停用集群，请在下面重复输入上述集群ID和集群名称",
+
+            contentAttention: "注意：停用后集群将不可用，集群所有数据不再更新！",
+
+            clusterNameForm: "集群名称",
+            clusterIdForm: "集群ID",
+            comment: "停用备注",
+            successMessage: "集群已停用",
+            failureMessage: "集群停用失败",
+          },
         },
       },
       finance: {

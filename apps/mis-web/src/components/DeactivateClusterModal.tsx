@@ -14,7 +14,7 @@ import { validateDataConsistency } from "@scow/lib-web/build/utils/form";
 import { Divider, Form, Input, Modal } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 
 interface Props {
     clusterId: string;
@@ -29,11 +29,11 @@ interface FormProps {
   confirmedClusterName: string;
   comment: string;
 }
-const p = prefix("component.others.");
+const p = prefix("page.admin.resourceManagement.clusterManagement.deactivateModal.");
 
 const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClose, onComplete, open }) => {
 
-  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
@@ -53,16 +53,22 @@ const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClo
 
   return (
     <Modal
-      title="停用集群"
+      title={tArgs(p("title"))}
       open={open}
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
     >
       <Divider type="vertical" />
-      <p> 请确认是否停用集群名称是 <strong>{clusterName}</strong>， 集群ID是 <strong>{clusterId}</strong> 的集群？ </p>
-      <p> 如果确认停用集群，请在下面重复输入上述集群名称和集群ID </p>
-      <p style={{ color: "red" }}> 注意：停用后集群将不可用，集群所有数据不再更新! </p>
+      <p>
+        {/* 请确认是否停用集群名称是 <strong>{clusterName}</strong>， 集群ID是 <strong>{clusterId}</strong> 的集群？ */}
+        {tArgs(p("content"), [
+          <strong key="clusterName">{clusterName}</strong>,
+          <strong key="clusterId">{clusterId}</strong>,
+        ])}
+      </p>
+      <p> {tArgs(p("contentInputNotice"))} </p>
+      <p style={{ color: "red" }}> {tArgs(p("contentAttention"))} </p>
 
       <Form
         form={form}
@@ -72,7 +78,7 @@ const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClo
       >
         <Form.Item
           name="confirmedClusterId"
-          label="集群ID"
+          label={tArgs(p("clusterIdForm"))}
           hasFeedback
           {...validateDataConsistency("confirmedClusterId", clusterId, languageId)}
         >
@@ -80,7 +86,7 @@ const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClo
         </Form.Item>
         <Form.Item
           name="confirmedClusterName"
-          label="集群名称"
+          label={tArgs(p("clusterNameForm"))}
           hasFeedback
           {...validateDataConsistency("confirmedClusterName", clusterName, languageId)}
         >
@@ -88,7 +94,7 @@ const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClo
         </Form.Item>
         <Form.Item
           name="comment"
-          label="停用备注"
+          label={tArgs(p("comment"))}
         >
           <Input.TextArea />
         </Form.Item>

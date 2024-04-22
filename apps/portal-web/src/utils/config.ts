@@ -39,8 +39,6 @@ export interface ServerRuntimeConfig {
 
   SERVER_URL: string;
 
-  MIS_SERVER_URL: string | undefined;
-
   SUBMIT_JOB_WORKING_DIR: string;
 
   SCOW_API_AUTH_TOKEN?: string;
