@@ -175,14 +175,25 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: getDailyPayFn });
 
-  const getTopSubmitJobUserFn = useCallback(async () => {
-    return await api.getTopSubmitJobUser({ query: {
+  // const getTopSubmitJobUserFn = useCallback(async () => {
+  //   return await api.getTopSubmitJobUser({ query: {
+  //     startTime: query.filterTime[0].startOf("day").toISOString(),
+  //     endTime: query.filterTime[1].endOf("day").toISOString(),
+  //   } });
+  // }, [query]);
+
+  // const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
+  // useAsync({ promiseFn: getTopSubmitJobUserFn });
+
+  const getUsersWithMostJobSubmissionsFn = useCallback(async () => {
+    return await api.getUsersWithMostJobSubmissions({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
-  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: getTopSubmitJobUserFn });
+  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
+  useAsync({ promiseFn: getUsersWithMostJobSubmissionsFn });
 
   const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {
@@ -264,7 +275,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const topSubmitJobUserData = useMemo(() => {
 
     return topSubmitJobUser?.results.map((r) => ({
-      x: r.userId,
+      x: r.userName,
       y: r.count,
     })) || [];
   }, [query, topSubmitJobUser]);
