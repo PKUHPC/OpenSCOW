@@ -136,7 +136,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
     extra.initialLanguage));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
-  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   // Use the layout defined at the page level, if available
   return (
