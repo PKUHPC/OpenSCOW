@@ -16,6 +16,7 @@ import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UiExtensionConfigSchema } from "@scow/config/build/uiExtensions";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
@@ -106,7 +107,7 @@ export interface PublicRuntimeConfig {
     alarmLogs: { enabled: boolean | undefined }
   },
 
-  UI_EXTENSION?: { url: string; }
+  UI_EXTENSION?: UiExtensionConfigSchema;
 
   CHANGE_JOB_LIMIT: { allowUser: boolean}
 
