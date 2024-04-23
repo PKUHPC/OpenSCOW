@@ -24,7 +24,6 @@ import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { extractTypesFromObjects, range } from "src/utils/array";
-import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { reloadEntity } from "src/utils/orm";
 import { dropDatabase } from "tests/data/helpers";
 

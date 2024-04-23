@@ -38,7 +38,7 @@ export const ChargesPage: NextPage = requireAuth(
       <Head title={title} />
       <PageTitle titleText={title}>
       </PageTitle>
-      <ChargeTable showAccountName={false} showTenantName={false} accountName={accountName} />
+      <ChargeTable showAccountName={false} showTenantName={false} accountName={[accountName]} />
     </div>
   );
 });

@@ -38,7 +38,7 @@ export const PaymentsPage: NextPage = requireAuth(
       <PageTitle titleText={title} />
       <PaymentTable
         searchType={SearchType.selfAccount}
-        accountName={accountName}
+        accountName={[accountName]}
       />
     </div>
   );

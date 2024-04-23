@@ -490,10 +490,10 @@ const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: Operation
   }
   const exportPayCase = exportPayTarget.$case;
   switch (exportPayCase) {
-  case "accountOfTenant":
-    const accountOfTenant = exportPayTarget[exportPayCase];
+  case "specificAccountsOfTenant":
+    const specificAccountsOfTenant = exportPayTarget[exportPayCase];
     return t(pDetails("exportAccountPayRecordOfTenant"),
-      [accountOfTenant.tenantName, accountOfTenant.accountName]);
+      [specificAccountsOfTenant.tenantName, specificAccountsOfTenant.accountName]);
   case "accountsOfTenant":
     const accountsOfTenant = exportPayTarget[exportPayCase];
     return t(pDetails("exportAccountsPayRecordOfTenant"),
