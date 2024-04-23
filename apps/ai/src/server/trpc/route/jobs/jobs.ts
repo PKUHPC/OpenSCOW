@@ -21,7 +21,7 @@ import { join } from "path";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity } from "src/server/utils/app";
+import { checkCreateAppEntity, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -61,11 +61,15 @@ procedure
   .input(z.object({
     clusterId: z.string(),
     trainJobName: z.string(),
+    isAlgorithmPrivate: z.boolean().optional(),
     algorithm: z.number().optional(),
-    imageId: z.number(),
+    imageId: z.number().optional(),
+    remoteImageUrl: z.string().optional(),
+    isDatasetPrivate: z.boolean().optional(),
     dataset: z.number().optional(),
+    isModelPrivate: z.boolean().optional(),
     model: z.number().optional(),
-    mountPoint: z.string().optional(),
+    mountPoints: z.array(z.string()).optional(),
     account: z.string(),
     partition: z.string().optional(),
     coreCount: z.number(),
@@ -80,7 +84,8 @@ procedure
   })).mutation(
     async ({ input, ctx: { user } }) => {
 
-      const { clusterId, trainJobName, algorithm, imageId, dataset, model, mountPoint, account, partition,
+      const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, imageId, remoteImageUrl,
+        isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command } = input;
       const userId = user.identityId;
 
@@ -107,14 +112,25 @@ procedure
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
 
-        if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "mountPoint should be in homeDir",
-          });
-        }
+        mountPoints.forEach((mountPoint) => {
+          if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "mountPoint should be in homeDir",
+            });
+          }
+        });
 
         const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
+
+        // 确保所有映射到容器的路径都不重复
+        validateUniquePaths([
+          trainJobsDirectory,
+          isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
+          isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
+          isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+          ...mountPoints,
+        ]);
 
         // make sure trainJobsDirectory exists.
         await ssh.mkdir(trainJobsDirectory);
@@ -128,11 +144,6 @@ procedure
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: trainJobName,
-          algorithm: algorithmVersion?.path,
-          image: image!.path,
-          dataset: datasetVersion?.path,
-          model: modelVersion?.path,
-          mountPoint,
           account,
           partition: partition!,
           coreCount,
@@ -142,8 +153,35 @@ procedure
           timeLimitMinutes: maxTime,
           workingDirectory: trainJobsDirectory,
           script: remoteEntryPath,
-          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
-          extraOptions: [JobType.TRAIN],
+          // 对于AI模块，需要传递的额外参数
+          // 第一个参数确定是创建应用or训练任务，
+          // 第二个参数为创建应用时的appId
+          // 第三个参数为镜像地址
+          // 第四个参数为算法版本地址
+          // 第五个参数为数据集版本地址
+          // 第六个参数为模型版本地址
+          // 第七个参数为多挂载点地址，以逗号分隔
+          extraOptions: [
+            JobType.TRAIN,
+            "",
+            remoteImageUrl || image?.path || "",
+            algorithmVersion
+              ? isAlgorithmPrivate
+                ? algorithmVersion.privatePath
+                : algorithmVersion.path
+              : "",
+            datasetVersion
+              ? isDatasetPrivate
+                ? datasetVersion.privatePath
+                : datasetVersion.path
+              : "",
+            modelVersion
+              ? isModelPrivate
+                ? modelVersion.privatePath
+                : modelVersion.path
+              : "",
+            mountPoints.join(","),
+          ],
         }).catch((e) => {
           const ex = e as ServiceError;
           throw new TRPCError({
