@@ -42,10 +42,9 @@ export default async () => {
   const nextConfig = {
     compiler: {
       styledComponents: true,
+
     },
-    experimental: {
-      serverMinification: false,
-    },
+    swcMinify: false,
     basePath: BASE_PATH === "/" ? undefined : BASE_PATH,
     assetPrefix: BASE_PATH === "/" ? undefined : BASE_PATH,
     webpack: (config) => {
