@@ -21,7 +21,7 @@ import { join } from "path";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity } from "src/server/utils/app";
+import { checkCreateAppEntity, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -122,6 +122,15 @@ procedure
         });
 
         const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
+
+        // 确保所有映射到容器的路径都不重复
+        validateUniquePaths([
+          trainJobsDirectory,
+          isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
+          isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
+          isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+          ...mountPoints,
+        ]);
 
         // make sure trainJobsDirectory exists.
         await ssh.mkdir(trainJobsDirectory);
@@ -225,4 +234,3 @@ procedure
       jobId,
     });
   });
-  

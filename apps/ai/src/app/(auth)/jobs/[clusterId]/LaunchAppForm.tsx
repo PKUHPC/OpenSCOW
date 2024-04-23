@@ -526,10 +526,17 @@ export const LaunchAppForm = (props: Props) => {
                       // 添加的自定义校验器以确保挂载点不重复
                       ({ getFieldValue }) => ({
                         validator(_, value: string) {
-                          const mountPoints: string[] = getFieldValue("mountPoints");
-                          // 使用显式类型注解
-                          const otherMountPoints = mountPoints.filter((_: string, idx: number) => idx !== field.name);
-                          if (otherMountPoints.includes(value)) {
+
+                          const currentValueNormalized = value.replace(/\/+$/, "");
+
+                          const mountPoints: string[] = getFieldValue("mountPoints").map((mountPoint: string) =>
+                            mountPoint.replace(/\/+$/, ""),
+                          );
+
+                          const currentIndex = mountPoints.findIndex((point) => point === currentValueNormalized);
+
+                          const otherMountPoints = mountPoints.filter((_, idx) => idx !== currentIndex);
+                          if (otherMountPoints.includes(currentValueNormalized)) {
                             return Promise.reject(new Error("挂载点地址不能重复"));
                           }
                           return Promise.resolve();
