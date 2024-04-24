@@ -67,7 +67,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
       languageId={languageId}
-      extension={uiExtensionStore.config}
+      extensionStoreData={uiExtensionStore.data}
       from="portal"
       headerRightContent={(
         <>

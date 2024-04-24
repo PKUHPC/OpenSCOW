@@ -10,17 +10,5 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import NextHead from "next/head";
+export { Head } from "@scow/lib-web/build/components/head";
 
-type Props = React.PropsWithChildren<{
-  title: string;
-}>;
-
-export const Head: React.FC<Props> = ({ title, children }) => {
-  return (
-    <NextHead>
-      <title>{`${title} - scow`}</title>
-      {children}
-    </NextHead>
-  );
-};

@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { DisabledA } from "src/components/DisabledA";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { trpc } from "src/utils/trpc";
+import { openDesktop } from "src/utils/vnc";
 
 import { usePublicConfig } from "../../context";
 
@@ -31,7 +32,7 @@ export interface Props {
 export const ConnectTopAppLink: React.FC<Props> = ({
   session, cluster, refreshToken,
 }) => {
-  const { publicConfig: { BASE_PATH } } = usePublicConfig();
+  const { publicConfig: { BASE_PATH, NOVNC_CLIENT_URL } } = usePublicConfig();
   const { message } = App.useApp();
 
   const { data, refetch } = trpc.jobs.checkAppConnectivity.useQuery({ clusterId: cluster, jobId: session.jobId }, {
@@ -100,7 +101,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       }
 
     } else {
-      // TODO: vnc app
+      const { host, port, password } = reply;
+      openDesktop(BASE_PATH, NOVNC_CLIENT_URL, cluster, host, port, password);
       return;
     }
 

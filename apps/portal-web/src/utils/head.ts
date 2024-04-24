@@ -10,14 +10,4 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
-import { AppServiceServer, AppServiceService } from "@scow/scheduler-adapter-protos/build/protos/app";
-
-export const appServiceServer = plugin((server) => {
-  server.addService<AppServiceServer>(AppServiceService, {
-    getAppConnectionInfo: async () => {
-      return [{}];
-    },
-
-  });
-});
+export { Head } from "@scow/lib-web/build/components/head";

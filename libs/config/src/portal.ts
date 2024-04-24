@@ -14,6 +14,7 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
+import { checkUiExtensionConfig, UiExtensionConfigSchema } from "src/uiExtensions";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -77,9 +78,7 @@ export const PortalConfigSchema = Type.Object({
     }),
   )),
 
-  uiExtension: Type.Optional(Type.Object({
-    url: Type.String({ description: "UI扩展站完整URL" }),
-  })),
+  uiExtension: Type.Optional(UiExtensionConfigSchema),
 
 });
 
@@ -87,5 +86,13 @@ const PORTAL_CONFIG_NAME = "portal";
 
 export type PortalConfigSchema = Static<typeof PortalConfigSchema>;
 
-export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) => {
+
+  const config = getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+
+  if (config.uiExtension) {
+    checkUiExtensionConfig(config.uiExtension);
+  }
+
+  return config;
+};

@@ -22,7 +22,6 @@ import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
 import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { ClusterOnlineInfo } from "@scow/protos/build/server/config";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -149,7 +148,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
     extra.initialLanguage));
 
-  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   // Use the layout defined at the page level, if available
   return (

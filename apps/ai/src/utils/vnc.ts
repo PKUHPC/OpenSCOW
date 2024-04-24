@@ -41,13 +41,11 @@ export function joinWithUrl(base: string, ...paths: string[]) {
 }
 
 
-export const openDesktop = (
-  resourceId: number, novncClientUrl: string, clusterId: string,
-  node: string, port: number, password: string,
-) => {
+export const openDesktop = (basePath: string,
+  novncClientUrl: string, clusterId: string, node: string, port: number, password: string) => {
 
   const params = new URLSearchParams({
-    path: join(PROXY, resourceId.toString(), clusterId, "absolute", node, String(port)),
+    path: join(basePath, PROXY, clusterId, "absolute", node, String(port)),
     host: location.hostname,
     port: location.port,
     password: password,
