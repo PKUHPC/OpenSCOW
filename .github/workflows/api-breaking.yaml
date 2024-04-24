@@ -20,4 +20,4 @@ jobs:
 
       - name: Check API Compatibility
         working-directory: protos
-        run: buf breaking --against '../.git#branch=master,subdir=protos'
+        run: buf breaking --against '../.git#branch=origin/master,subdir=protos'
