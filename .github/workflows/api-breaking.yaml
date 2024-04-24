@@ -26,5 +26,8 @@ jobs:
           node-version: 20.x
           cache: pnpm
 
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
       - name: Check API Compatibility
         run: pnpm api:breaking
