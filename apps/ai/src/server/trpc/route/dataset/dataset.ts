@@ -54,7 +54,7 @@ export const list = procedure
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: z.coerce.boolean().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))

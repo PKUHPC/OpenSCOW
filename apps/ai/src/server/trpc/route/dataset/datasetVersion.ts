@@ -55,7 +55,7 @@ export const versionList = procedure
   .input(z.object({
     ...paginationSchema.shape,
     datasetId: z.number(),
-    isPublic: z.boolean().optional(),
+    isPublic: z.coerce.boolean().optional(),
   }))
   .output(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() }))
   .query(async ({ input }) => {

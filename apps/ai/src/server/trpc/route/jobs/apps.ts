@@ -610,7 +610,7 @@ export const listAppSessions =
         summary: "List APP Sessions",
       },
     })
-    .input(z.object({ clusterId: z.string(), isRunning: z.boolean(), ...paginationSchema.shape }))
+    .input(z.object({ clusterId: z.string(), isRunning: z.coerce.boolean(), ...paginationSchema.shape }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
 

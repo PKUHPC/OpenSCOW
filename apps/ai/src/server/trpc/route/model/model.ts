@@ -52,7 +52,7 @@ export const list = procedure
   .input(z.object({
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: z.coerce.boolean().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(ModelListSchema), count: z.number() }))

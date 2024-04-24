@@ -41,7 +41,7 @@ export const getAlgorithmVersions = procedure
   .input(z.object({
     ...paginationSchema.shape,
     algorithmId: z.number(),
-    isPublic:z.boolean().optional(),
+    isPublic:z.coerce.boolean().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
     id:z.number(),
