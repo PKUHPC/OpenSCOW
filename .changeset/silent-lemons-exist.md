@@ -6,4 +6,4 @@
 "@scow/cli": patch
 ---
 
-scow 对接 scowd 一期，完成文件和桌面功能改造
+scowd 一期改造，完成 HPC 部分文件和桌面支持接入 scowd
