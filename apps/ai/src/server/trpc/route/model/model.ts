@@ -166,7 +166,15 @@ export const updateModel = procedure
 
     const model = await em.findOne(Model, { id });
 
-    const modelExist = await em.findOne(Model, { name });
+    if (!model) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Model (id:${id}) is not found`,
+      });
+    }
+
+    const modelExist = await em.findOne(Model, { name, owner: user.identityId });
+
     if (modelExist && modelExist !== model) {
       throw new TRPCError({
         code: "CONFLICT",
