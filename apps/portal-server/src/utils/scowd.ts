@@ -20,17 +20,23 @@ import { config } from "src/config/env";
 
 export const certificates = createScowdCertificates(config);
 
-export function getClusterLoginNodeScowdUrl(cluster: string): string | undefined {
-  const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
-  return loginNode?.scowdUrl;
+export function getLoginNodeScowdUrl(cluster: string, host: string): string | undefined {
+  const loginNode = getLoginNodeFromAddress(cluster, host);
+
+  if (!loginNode) return undefined;
+
+  const { address, scowdPort } = loginNode;
+  return config.SCOWD_SSL_ENABLED ? `https://${address}:${scowdPort}` : `http://${address}:${scowdPort}`;
 }
 
 const scowdClientForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
-  const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
-  if (!loginNode.scowdUrl) {
+  const clusterInfo = clusters[cluster];
+  const loginNode = getLoginNode(clusterInfo?.loginNodes?.[0]);
+  const scowdUrl = getLoginNodeScowdUrl(cluster, loginNode.address);
+  if (!clusterInfo.scowd?.enabled || !loginNode.scowdPort || !scowdUrl) {
     prev[cluster] = undefined;
   } else {
-    const client = getClient(loginNode.scowdUrl, certificates);
+    const client = getClient(scowdUrl, certificates);
     prev[cluster] = client;
   }
   return prev;
@@ -40,9 +46,12 @@ export const getScowdClient = (cluster: string) => {
   return scowdClientForClusters[cluster];
 };
 
-export function getScowdUrlFromLoginNodeAddress(cluster: string, address: string) {
-  const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
-  return loginNodes.find((loginNode) => loginNode.address === address)?.scowdUrl;
+export function getLoginNodeFromAddress(cluster: string, address: string) {
+  const clusterInfo = clusters[cluster];
+  const loginNodes = clusterInfo?.loginNodes.map(getLoginNode);
+  const loginNode = loginNodes.find((loginNode) => loginNode.address === address);
+
+  return loginNode;
 }
 
 // 函数将 Code 转换为 @grpc/grpc-js 的 status

@@ -14,21 +14,12 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getLoginNode } from "@scow/config/build/cluster";
-import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
+import { getClusterOps } from "src/clusterops";
 import { clusters } from "src/config/clusters";
-import {
-  addDesktopToFile,
-  ensureEnabled,
-  getDesktopConfig,
-  listUserDesktopsFromHost,
-  removeDesktopFromFile,
-} from "src/utils/desktops";
+import { ensureEnabled, getDesktopConfig } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
-import { checkLoginNodeInCluster, sshConnect } from "src/utils/ssh";
-import { displayIdToPort,
-  getTurboVNCBinPath,
-  parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
+import { checkLoginNodeInCluster } from "src/utils/ssh";
 
 export const desktopServiceServer = plugin((server) => {
 
@@ -46,60 +37,12 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
-      const maxDesktops = getDesktopConfig(cluster).maxDesktops;
+      const clusterops = getClusterOps(cluster);
 
+      const reply = await clusterops.desktop.CreateDesktop({ loginNode: host, wm, userId, desktopName }, logger);
 
-      return await sshConnect(host, "root", logger, async (ssh) => {
-
-        // find if the user has running session
-        let resp = await executeAsUser(ssh, userId, logger, true,
-          vncserverBinPath, ["-list"],
-        );
-
-        const ids = parseListOutput(resp.stdout);
-
-        if (ids.length >= maxDesktops) {
-          throw <ServiceError> { code: Status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
-        }
-
-        // start a session
-
-        // explicitly set securitytypes to avoid requiring setting vnc passwd
-        const params = ["-securitytypes", "OTP", "-otp"];
-
-        if (wm) {
-          params.push("-wm");
-          params.push(wm);
-        }
-
-        if (desktopName) {
-          params.push("-name");
-          params.push(desktopName);
-        }
-
-        resp = await executeAsUser(ssh, userId, logger, true, vncserverBinPath, params);
-
-        // parse the OTP from output. the output was in stderr
-        const password = parseOtp(resp.stderr);
-        // parse display id from output
-        const displayId = parseDisplayId(resp.stderr);
-
-        const port = displayIdToPort(displayId);
-
-        const desktopInfo = {
-          host,
-          displayId,
-          desktopName,
-          wm,
-          createTime: new Date().toISOString(),
-        };
-
-        await addDesktopToFile(ssh, cluster, userId, desktopInfo, logger);
-
-        return [{ host, password, port }];
-
-      });
+      return [{ ...reply }];
+      
     },
 
     killDesktop: async ({ request, logger }) => {
@@ -110,18 +53,11 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
+      const clusterops = getClusterOps(cluster);
 
-      return await sshConnect(host, "root", logger, async (ssh) => {
+      await clusterops.desktop.KillDesktop({ loginNode: host, userId, displayId }, logger);
 
-        // kill specific desktop
-        await executeAsUser(ssh, userId, logger, true, vncserverBinPath, ["-kill", ":" + displayId]);
-
-        await removeDesktopFromFile(ssh, cluster, userId, host, displayId, logger);
-
-        return [{}];
-      });
-
+      return [{}];
     },
 
     connectToDesktop: async ({ request, logger }) => {
@@ -132,13 +68,11 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      return await sshConnect(host, "root", logger, async (ssh) => {
+      const clusterops = getClusterOps(cluster);
 
-        const password = await refreshPassword(ssh, cluster, userId, logger, displayId);
+      const reply = await clusterops.desktop.ConnectToDesktop({ loginNode: host, userId, displayId }, logger);
 
-        return [{ host, port: displayIdToPort(displayId), password }];
-      });
-
+      return [{ ...reply }];
     },
 
     listUserDesktops: async ({ request, logger }) => {
@@ -147,11 +81,12 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
+      const clusterops = getClusterOps(cluster);
 
       if (host) {
         checkLoginNodeInCluster(cluster, host);
-        const userDesktops = await listUserDesktopsFromHost(host, cluster, userId, logger);
-        return [{ userDesktops: [userDesktops]}];
+        const reply = await clusterops.desktop.ListUserDesktops({ loginNode: host, userId }, logger);
+        return [{ userDesktops: [{ ...reply }]}];
       }
 
       const loginNodes = clusters[cluster]?.loginNodes?.map(getLoginNode);
@@ -160,7 +95,7 @@ export const desktopServiceServer = plugin((server) => {
       }
       // 请求集群的所有登录节点
       return await Promise.all(loginNodes.map(async (loginNode) => {
-        return await listUserDesktopsFromHost(loginNode.address, cluster, userId, logger);
+        return await clusterops.desktop.ListUserDesktops({ loginNode: loginNode.address, userId }, logger);
       })).then((response) => {
         return [{ userDesktops: response }];
       });

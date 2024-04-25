@@ -22,8 +22,6 @@ import { dashboardServiceServer } from "src/services/dashboard";
 import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
-import { scowdDesktopServiceServer } from "src/services/scowd/desktop";
-import { scowdFileServiceServer } from "src/services/scowd/file";
 import { shellServiceServer } from "src/services/shell";
 import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
@@ -51,14 +49,9 @@ export async function createServer() {
   await server.register(staticConfigServiceServer);
   await server.register(runtimeConfigServiceServer);
   await server.register(dashboardServiceServer);
-
-  if (config.SCOWD_ENABLED) {
-    await server.register(scowdFileServiceServer);
-    await server.register(scowdDesktopServiceServer);
-  } else {
-    await server.register(fileServiceServer);
-    await server.register(desktopServiceServer);
-  }
+  await server.register(fileServiceServer);
+  await server.register(desktopServiceServer);
+  
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);

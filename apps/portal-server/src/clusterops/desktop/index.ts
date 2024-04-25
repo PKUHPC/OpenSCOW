@@ -10,23 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOps } from "src/clusterops/api";
-import { appOps } from "src/clusterops/app";
-import { desktopOps } from "src/clusterops/desktop";
-import { fileOps } from "src/clusterops/file";
-import { jobOps } from "src/clusterops/job";
+import { DesktopOps } from "src/clusterops/api/desktop";
 import { clusters } from "src/config/clusters";
 
-const opsForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
-  prev[cluster] = {
-    app: appOps(cluster),
-    job: jobOps(cluster),
-    desktop: desktopOps(cluster),
-    file: fileOps(cluster),
-  } as ClusterOps;
-  return prev;
-}, {} as Record<string, ClusterOps>);
+import { scowdDesktopServices } from "./scowdDesktop";
+import { sshDesktopServices } from "./sshDesktop";
 
-export const getClusterOps = (cluster: string) => {
-  return opsForClusters[cluster];
+
+export const desktopOps = (cluster: string): DesktopOps => {
+
+  const clusterInfo = clusters[cluster];
+  if (clusterInfo.scowd?.enabled) {
+    return {
+      ...scowdDesktopServices(cluster),
+    };
+  } else {
+    return {
+      ...sshDesktopServices(cluster),
+    };
+  }
 };

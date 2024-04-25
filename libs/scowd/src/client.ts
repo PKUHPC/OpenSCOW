@@ -24,10 +24,10 @@ export interface ScowdClient {
 }
 
 export function getClient<TService extends ServiceType>(
-  address: string, certificates: SslConfig, service: TService,
+  scowdUrl: string, service: TService, certificates?: SslConfig,
 ): PromiseClient<TService> {
   const transport = createConnectTransport({
-    baseUrl: address,
+    baseUrl: scowdUrl,
     httpVersion: "2",
     nodeOptions: {
       ...certificates,
@@ -36,9 +36,9 @@ export function getClient<TService extends ServiceType>(
   return createPromiseClient(service, transport);
 }
 
-export const getScowdClient = (address: string, certificates: SslConfig) => {
+export const getScowdClient = (scowdUrl: string, certificates?: SslConfig) => {
   return <ScowdClient>{
-    file: getClient(address, certificates, FileService),
-    desktop: getClient(address, certificates, DesktopService),
+    file: getClient(scowdUrl, FileService, certificates),
+    desktop: getClient(scowdUrl, DesktopService, certificates),
   };
 };
