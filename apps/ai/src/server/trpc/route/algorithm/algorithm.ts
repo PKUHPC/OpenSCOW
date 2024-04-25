@@ -160,7 +160,10 @@ export const updateAlgorithm = procedure
       });
     }
 
-    const algorithmExist = await em.findOne(Algorithm, { name });
+    const algorithmExist = await em.findOne(Algorithm, { name,
+      owner: user.identityId,
+    });
+
     if (algorithmExist && algorithmExist !== algorithm) {
       throw new TRPCError({
         code: "CONFLICT",

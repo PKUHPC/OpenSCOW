@@ -18,7 +18,8 @@
     "lint": "turbo run lint lint:ts",
     "lint:ts": "eslint --cache --ext .tsx,.ts,.js .",
     "ci:version": "node scripts/version.mjs",
-    "ci:publish": "pnpm publish -r"
+    "ci:publish": "pnpm publish -r",
+    "api:breaking": "cd protos && pnpm exec buf breaking --against '../.git#subdir=protos'"
   },
   "devDependencies": {
     "@bufbuild/buf": "1.30.1",
