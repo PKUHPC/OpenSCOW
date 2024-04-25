@@ -123,6 +123,46 @@ export const ChargeTable: React.FC<Props> = ({
     return getChargesInfo;
   }, [query, pageInfo]);
 
+  // // 测试地址
+  // const recordsPromiseFn = useCallback(async () => {
+  //   const apiUrl = "http://127.0.0.1:4523/m2/4389285-4033570-default/168557812";
+
+  //   try {
+  //     const response = await fetch(apiUrl, {
+  //       method: "POST", // 或 'GET' 根据API的要求
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         // 其他可能需要的头部信息
+  //       },
+  //       body: JSON.stringify({
+  //         accountName: query.name,
+  //         startTime: query.time[0].clone().startOf("day").toISOString(),
+  //         endTime: query.time[1].clone().endOf("day").toISOString(),
+  //         type: query.type,
+  //         isPlatformRecords,
+  //         searchType,
+  //         page: pageInfo.page,
+  //         pageSize: pageInfo.pageSize,
+  //       }),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+  //     const getChargesInfo = await response.json();
+
+  //     // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
+  //     if (query.userIds) {
+  //       getChargesInfo.results = getChargesInfo.results.filter((v) => {
+  //         return v.userId == query.userIds || v.userName == query.userIds;
+  //       });
+  //     }
+  //     return getChargesInfo;
+  //   } catch (error) {
+  //     console.error("Failed to fetch data: ", error);
+  //     return { results: [], totalCount: 0 }; // 根据原始API的返回结构
+  //   }
+  // }, [query, pageInfo]);
+
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
@@ -240,12 +280,12 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.total")}>
               <strong>
-                {recordsData ? recordsData.results.length : 0}
+                {totalResultData?.totalCount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {recordsData ? recordsData.results.reduce(((a, b) => a + b.amount), 0) : 0}
+                {totalResultData?.totalAmount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -269,7 +309,7 @@ export const ChargeTable: React.FC<Props> = ({
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
             defaultPageSize: DEFAULT_PAGE_SIZE,
-            total: recordsData ? recordsData.results.length : 0,
+            total: totalResultData?.totalCount ?? 0,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
