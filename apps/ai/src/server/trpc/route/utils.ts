@@ -34,4 +34,6 @@ export function clusterExist(clusterId: string) {
 }
 
 export const booleanQueryParam =
-() => z.union([z.literal("true"), z.literal("false")]).transform((arg) => Boolean(arg));
+() => z.union([z.literal("true"), z.literal("false")]).transform((arg) =>
+  arg === "true",
+);
