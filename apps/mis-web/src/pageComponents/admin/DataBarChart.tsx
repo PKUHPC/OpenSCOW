@@ -45,7 +45,15 @@ export const DataBarChart: React.FC<Props> = ({
   xLabel = "",
   toolTipFormatter = (value) => value,
 }) => {
-
+  const tickFormatter = (value) => {
+    if (typeof value === "number") {
+      const decimalPart = value.toString().split(".")[1];
+      if (decimalPart && decimalPart.length > 2) {
+        return value.toFixed(2);
+      }
+    }
+    return value;
+  };
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -64,7 +72,7 @@ export const DataBarChart: React.FC<Props> = ({
                     label={{ value: xLabel, position: "insideBottom", offset: 0 }}
                     height={40}
                   />
-                  <YAxis padding={{ top: 20 }} />
+                  <YAxis padding={{ top: 20 }} tickFormatter={tickFormatter} />
                   <Tooltip
                     formatter={toolTipFormatter}
                   />
