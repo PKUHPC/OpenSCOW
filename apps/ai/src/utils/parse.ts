@@ -67,4 +67,6 @@ export const parseIp = (req: NextApiRequest): string | undefined => {
   return forwardedFor ?? req.socket?.remoteAddress;
 };
 
-
+export const parseBooleanParam = (bool: boolean): "true" | "false" => {
+  return bool ? "true" : "false";
+};
