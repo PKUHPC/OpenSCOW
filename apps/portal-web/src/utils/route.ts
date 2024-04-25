@@ -13,6 +13,11 @@
 import { typeboxRoute } from "@ddadaal/next-typed-api-routes-runtime";
 import { Metadata } from "@grpc/grpc-js";
 
+export interface ClusterErrorMetadata {
+  clusterId: string,
+  details: string,
+}
+
 export const route: typeof typeboxRoute = (schema, handler) => {
   return typeboxRoute(schema, async (req, res) => {
     const response = handler(req, res);
@@ -27,7 +32,12 @@ export const route: typeof typeboxRoute = (schema, handler) => {
         const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
         const details = e.details;
         const message = SCOW_CAUSE[0];
-        return { 500: { code, details, message } } as any;
+
+        // 如果包含集群详细错误信息
+        const clusterErrorsString = e.metadata.get("clusterErrors") ?? undefined;
+        const clusterErrorsArray = JSON.parse(clusterErrorsString) as ClusterErrorMetadata[];
+
+        return { 500: { code, details, message, clusterErrorsArray } } as any;
       });
     }
   });

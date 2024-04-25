@@ -10,28 +10,39 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { UiExtensionConfigSchema } from "@scow/config/build/uiExtensions";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { fetchExtensionManifests } from "src/extensions/manifests";
 
-export const UiExtensionStore = (extensionUrl?: string) => {
+const fetchManifestsWithErrorHandling = (url: string, name?: string): Promise<ExtensionManifestWithUrl | undefined> =>
+  fetchExtensionManifests(url)
+    .then((x) => ({ url, manifests: x, name }))
+    .catch((e) => { console.error(`Error fetching extension manifests. ${e}`); return undefined; });
 
-  const { data: config, isLoading: configLoading } = useAsync({
-    promiseFn: useCallback(async () => {
+export type ExtensionManifestWithUrl = {
+  url: string; manifests: Awaited<ReturnType<typeof fetchExtensionManifests>>
+  name?: string;
+};
 
-      if (!extensionUrl) { return undefined; }
+export const UiExtensionStore = (uiExtensionConfig?: UiExtensionConfigSchema) => {
 
-      return await fetchExtensionManifests(extensionUrl)
-        .then((x) => ({
-          url: extensionUrl,
-          manifests: x,
-        }))
-        .catch((e) => {
-          console.error(`Error fetching extension manifests. ${e}`);
-          return undefined;
-        });
+  const { data, isLoading } = useAsync({
+    promiseFn: useCallback(async (): Promise<UiExtensionStoreData> => {
+
+      if (!uiExtensionConfig) { return undefined; }
+
+      if (Array.isArray(uiExtensionConfig)) {
+        return (await Promise.all(uiExtensionConfig.map(async (config) => {
+          return await fetchManifestsWithErrorHandling(config.url, config.name);
+        }).filter((x) => x))) as (ExtensionManifestWithUrl & { name: string })[];
+      } else {
+        return await fetchManifestsWithErrorHandling(uiExtensionConfig.url);
+      }
     }, []),
   });
 
-  return { config, configLoading };
+  return { data, isLoading };
 };
+
+export type UiExtensionStoreData = ExtensionManifestWithUrl | ExtensionManifestWithUrl[] | undefined;

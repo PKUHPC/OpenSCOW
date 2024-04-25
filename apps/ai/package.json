@@ -18,7 +18,7 @@
     "serve": "node start.mjs",
     "serve:next": "next start",
     "build": "npm run build:next",
-    "build:next": "rimraf .next.backup && cross-env BUILDING=1 NEXT_PUBLIC_BASE_PATH=/@BASE_PATH@ next build",
+    "build:next": "rimraf .next.backup && cross-env BUILDING=1 NEXT_PUBLIC_BASE_PATH=/@BASE_PATH@ next build --no-mangling",
     "build:ts": "rimraf build && tsc -p tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "orm": "dotenv -e env/.env.dev -- npx mikro-orm",
     "ormCreate": "dotenv -e env/.env.dev -- npx mikro-orm migration:create",
@@ -97,7 +97,7 @@
   "devDependencies": {
     "@next/bundle-analyzer": "14.1.4",
     "@testing-library/jest-dom": "6.4.2",
-    "@testing-library/react": "14.2.2",
+    "@testing-library/react": "15.0.2",
     "@types/busboy": "1.5.3",
     "@types/google-protobuf": "3.15.12",
     "@types/http-proxy": "1.17.14",

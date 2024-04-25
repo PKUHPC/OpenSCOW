@@ -241,7 +241,9 @@ export const UserTable: React.FC<Props> = ({
                       .httpError(400, (e) => {
                         message.destroy("removeUser");
                         message.error({
-                          content: e.message,
+                          content: `${t("page._app.multiClusterOpErrorContent")}(${
+                            e.message
+                          })`,
                           duration: 4,
                         });
                       })

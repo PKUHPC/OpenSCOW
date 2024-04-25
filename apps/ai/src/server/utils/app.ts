@@ -161,6 +161,24 @@ export const fetchJobInputParams = async<T> (
       code: "INTERNAL_SERVER_ERROR",
       message: `Failed to parse input params file ${inputParamsPath}`,
     });
+  }
+};
 
+export const validateUniquePaths = (paths: (string | undefined)[]) => {
+
+  // 移除尾随斜杠并返回规范化的路径
+  const normalizedPaths = paths.map((path) => path && path.replace(/\/+$/, ""));
+  const pathSet = new Set();
+
+  for (const path of normalizedPaths) {
+    if (path && pathSet.has(path)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `路径 '${path}' 重复，请确保所有路径都是唯一的。`,
+      });
+    }
+    if (path) {
+      pathSet.add(path);
+    }
   }
 };

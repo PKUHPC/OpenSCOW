@@ -33,7 +33,8 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkAppExist, checkCreateAppEntity, fetchJobInputParams, getClusterAppConfigs } from "src/server/utils/app";
+import { checkAppExist, checkCreateAppEntity,
+  fetchJobInputParams, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -362,6 +363,16 @@ export const createAppSession = procedure
         }
       });
       const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
+
+      // 确保所有映射到容器的路径都不重复
+      validateUniquePaths([
+        workingDirectory ?? join(homeDir, appJobsDirectory),
+        isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
+        isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
+        isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+        ...mountPoints,
+      ]);
+
 
       // make sure appJobsDirectory exists.
       await ssh.mkdir(appJobsDirectory);

@@ -20,7 +20,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -32,7 +32,7 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { Provider, useI18nTranslateToString } from "src/i18n";
+import { Provider, useI18n, useI18nTranslate } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -53,7 +53,8 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
+  const languageId = useI18n().currentLanguage.id;
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -67,22 +68,35 @@ const FailEventHandler: React.FC = () => {
       const regex = /exceeds max length/;
       // 如果终端登录欢迎语过长会报错：Packet length xxxx exceeds max length of 262144
       if (regex.test(e.data?.message)) {
-        message.error(t("pages._app.textExceedsLength"));
+        message.error(tArgs("pages._app.textExceedsLength"));
         return;
       }
 
       if (e.data?.code === "SSH_ERROR") {
-        message.error(t("pages._app.sshError"));
+        message.error(tArgs("pages._app.sshError"));
         return;
       }
 
       if (e.data?.code === "SFTP_ERROR") {
         message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
-          e.data?.details || t("pages._app.sftpError"));
+          e.data?.details || tArgs("pages._app.sftpError"));
         return;
       }
 
-      message.error(`${t("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
+      if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
+
+        const clusterId = e.data.clusterErrorsArray[0].clusterId;
+        const clusterName = clusterId ?
+          (publicConfig.CLUSTERS.find((c) => c.id === clusterId)?.name ?? clusterId) : undefined;
+
+        message.error(`${tArgs("pages._app.adapterConnectionError",
+          [getI18nConfigCurrentText(clusterName, languageId)])}(${
+          e.data.details
+        })`);
+        return;
+      }
+
+      message.error(`${tArgs("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 
@@ -122,7 +136,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
     extra.initialLanguage));
 
   const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
-  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   // Use the layout defined at the page level, if available
   return (

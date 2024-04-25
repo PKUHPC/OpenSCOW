@@ -27,6 +27,7 @@ export default {
     tenantRole: "User Role",
     user: "User",
     userId: "User ID",
+    ownerIdOrName:"ownerId Or Name",
     userName: "Username",
     userFullName:"User Name",
     import: "Import",
@@ -399,6 +400,7 @@ export default {
       chargeTable: {
         time: "Deduction Date",
         amount: "Deduction Amount",
+        ownerIdOrName:"ownerId Or Name",
       },
     },
     init: {
@@ -603,6 +605,7 @@ export default {
         whiteList: "Whitelist Count",
         debtSum: "Total Debt in Whitelist",
         joinTime: "Join Time",
+        ownerIdOrName: "Owner ID or Name",
         operatorId: "Operator",
         confirmRemoveWhite: "Confirm removing the account from the whitelist?",
         confirmRemoveWhiteText1: "Confirm removing the account ",
@@ -795,9 +798,10 @@ export default {
       extraMessage: "Please visit http://hpc.pku.edu.cn/guide.html for account opening instructions.",
     },
     _app: {
-      clusterOpErrorTitle: "Operation Failed",
-      clusterOpErrorContent: "Multiple cluster operations encountered errors, and some clusters were not "
+      multiClusterOpErrorTitle: "Operation Failed",
+      multiClusterOpErrorContent: "Multiple cluster operations encountered errors, and some clusters were not "
       + "synchronized with the modifications.",
+      adapterConnErrorContent: "The {} cluster is currently unreachable. Please try again later. ",
       effectErrorMessage: "Server error occurred!",
     },
     profile: {

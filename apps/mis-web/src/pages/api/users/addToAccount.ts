@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UserServiceClient } from "@scow/protos/build/server/user";
@@ -22,6 +22,7 @@ import { checkNameMatch } from "src/server/checkIdNameMatch";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const AddUserToAccountSchema = typeboxRouteSchema({
@@ -61,7 +62,7 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
   },
 });
 
-export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, res) => {
+export default /* #__PURE__*/route(AddUserToAccountSchema, async (req, res) => {
   const { identityId, accountName, name } = req.body;
 
   const auth = authenticate((u) => {
@@ -111,7 +112,6 @@ export default /* #__PURE__*/typeboxRoute(AddUserToAccountSchema, async (req, re
   })
     .catch(handlegRPCError({
       [Status.ALREADY_EXISTS]: (e) => ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }),
-      [Status.INTERNAL]: (e) => { return ({ 409: { code: "ACCOUNT_OR_USER_ERROR" as const, message: e.details } }); },
       [Status.NOT_FOUND]: (e) => {
 
         if (e.details === "USER_OR_TENANT_NOT_FOUND") {

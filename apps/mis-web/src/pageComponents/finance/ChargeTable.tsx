@@ -31,6 +31,7 @@ import { formatMetadataDisplay } from "src/utils/metadata";
 
 import { AccountSelector } from "./AccountSelector";
 
+// ChargeTable 组件的 Props 接口
 interface Props {
   accountName?: string;
   showAccountName: boolean;
@@ -39,6 +40,7 @@ interface Props {
   searchType?: SearchType;
 }
 
+// 过滤充值记录的表单接口
 interface FilterForm {
   name?: string;
   time: [dayjs.Dayjs, dayjs.Dayjs];
@@ -46,11 +48,14 @@ interface FilterForm {
   userIds?: string;
 }
 
+// 当前时间的 dayjs 对象
 const now = dayjs();
 
+// 国际化函数
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
 
+// 将用户 ID 字符串转换为数组的函数
 const convertUserIdArray = (userIds: string | undefined) => {
   return userIds ? userIds.split(",").map((id) => id.trim()) : [];
 };
@@ -74,8 +79,9 @@ export const ChargeTable: React.FC<Props> = ({
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       type: undefined,
       userIds: undefined,
-    });
+    });// 查询对象
 
+  // 过滤后的充值类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
   // 在账户管理下切换不同账户消费记录页面时
@@ -96,18 +102,25 @@ export const ChargeTable: React.FC<Props> = ({
     setSelectedAccountName(accountName);
   }, [accountName]);
 
+  // 异步获取充值记录的函数
   const recordsPromiseFn = useCallback(async () => {
-    return await api.getCharges({ query: {
+    const getChargesInfo = await api.getCharges({ query: {
       accountName: query.name,
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
       type: query.type,
-      userIds: convertUserIdArray(query.userIds),
       isPlatformRecords,
       searchType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
+    // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
+    if (query.userIds) {
+      getChargesInfo.results = getChargesInfo.results.filter((v) => {
+        return v.userId == query.userIds || v.userName == query.userIds;
+      });
+    }
+    return getChargesInfo;
   }, [query, pageInfo]);
 
   const totalResultPromiseFn = useCallback(async () => {
@@ -124,6 +137,7 @@ export const ChargeTable: React.FC<Props> = ({
     });
   }, [query]);
 
+  // 使用异步 hook 获取充值记录和总数
   const { data: recordsData, isLoading: isRecordsLoading } = useAsync({
     promiseFn: recordsPromiseFn,
   });
@@ -132,7 +146,7 @@ export const ChargeTable: React.FC<Props> = ({
     promiseFn: totalResultPromiseFn,
   });
 
-
+  // 处理充值记录导出的函数
   const handleExport = async (columns: string[]) => {
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
@@ -157,6 +171,7 @@ export const ChargeTable: React.FC<Props> = ({
     }
   };
 
+  // 导出按钮的选项
   const exportOptions = useMemo(() => {
     const common = [
       { label: t(pCommon("user")), value: "userId" },
@@ -201,8 +216,8 @@ export const ChargeTable: React.FC<Props> = ({
                 </Form.Item>
               )
             }
-            <Form.Item label={t("common.user")} name="userIds">
-              <Input style={{ width: 180 }} placeholder={t("common.userId")} />
+            <Form.Item label={t("common.ownerIdOrName")} name="userIds">
+              <Input style={{ width: 180 }} placeholder={t("common.ownerIdOrName")} />
             </Form.Item>
             <Form.Item label={t(pCommon("time"))} name="time">
               <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
@@ -225,12 +240,12 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.total")}>
               <strong>
-                {totalResultData ? totalResultData.totalCount : 0}
+                {recordsData ? recordsData.results.length : 0}
               </strong>
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {totalResultData ? totalResultData.totalAmount.toFixed(3) : 0}
+                {recordsData ? recordsData.results.reduce(((a, b) => a + b.amount), 0) : 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -254,7 +269,7 @@ export const ChargeTable: React.FC<Props> = ({
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
             defaultPageSize: DEFAULT_PAGE_SIZE,
-            total: totalResultData?.totalCount,
+            total: recordsData ? recordsData.results.length : 0,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
