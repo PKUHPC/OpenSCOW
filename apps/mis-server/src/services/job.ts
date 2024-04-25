@@ -412,6 +412,40 @@ export const jobServiceServer = plugin((server) => {
       ];
     },
 
+    // 返回用户名，需要联表查询
+    getUsersWithMostJobSubmissions: async ({ request, em }) => {
+      // topNUsers不传默认为10，最大限制为10
+      const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      // 控制topNUsers的数量
+      if (typeof topNUsers == "number" && (topNUsers > 10 || topNUsers < 0)) {
+        throw <ServiceError> { code: status.INVALID_ARGUMENT, message:"topNUsers must be between 0 and 10" };
+      }
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
+
+      const results: {userName: string, userId: string, count: number}[] = await knex("job_info as j")
+        .select([
+          "u.name as userName",
+          "j.user as userId",
+          knex.raw("COUNT(*) as count"),
+        ])
+        .join("user as u", "u.user_id", "=", "j.user")
+        .where("j.time_submit", ">=", startTime)
+        .andWhere("j.time_submit", "<=", endTime)
+        .groupBy("j.user")
+        .orderBy("count", "desc")
+        .limit(Math.min(topNUsers, 10));
+
+      // 直接返回构建的结果
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+
     getNewJobCount: async ({ request, em }) => {
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 

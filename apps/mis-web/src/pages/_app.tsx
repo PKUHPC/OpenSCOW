@@ -128,7 +128,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION?.url));
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   return (
     <>

@@ -406,6 +406,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUDIT_DEPLOYED": config.audit ? "true" : "false",
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PROTOCOL": config.gateway.protocol,
+        "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },

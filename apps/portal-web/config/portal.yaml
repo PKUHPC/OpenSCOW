@@ -84,4 +84,5 @@ shell: true
 #     children: []
 
 uiExtension:
-  url: http://localhost:16566
+  - name: test1
+    url: http://localhost:16566

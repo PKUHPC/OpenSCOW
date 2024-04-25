@@ -99,6 +99,7 @@ const PublicConfigSchema = z.object({
   }),
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
+  NOVNC_CLIENT_URL: z.string(),
 });
 
 const UiConfigSchema = z.object({
@@ -192,6 +193,9 @@ export const config = router({
         SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
         LOGIN_NODES: parseKeyValue(envConfig.LOGIN_NODES),
+
+        NOVNC_CLIENT_URL: envConfig.NOVNC_CLIENT_URL,
+
       };
     }),
 
