@@ -29,6 +29,8 @@ import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
+import { booleanQueryParam } from "../utils";
+
 export const getAlgorithmVersions = procedure
   .meta({
     openapi: {
@@ -41,7 +43,7 @@ export const getAlgorithmVersions = procedure
   .input(z.object({
     ...paginationSchema.shape,
     algorithmId: z.number(),
-    isPublic:z.coerce.boolean().optional(),
+    isPublic:booleanQueryParam().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
     id:z.number(),

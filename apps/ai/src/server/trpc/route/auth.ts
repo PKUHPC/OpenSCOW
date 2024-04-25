@@ -70,7 +70,7 @@ export const auth = router({
     })
     .input(z.object({
       token:z.string(),
-      // fromAuth:z.coerce.boolean(),  //后续与audit集成时需使用
+      // fromAuth: booleanQueryParam(),  //后续与audit集成时需使用
     }))
     .output(z.void())
     .query(async ({ ctx: { res }, input }) => {

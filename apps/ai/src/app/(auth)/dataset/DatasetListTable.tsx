@@ -25,6 +25,7 @@ import { Cluster } from "src/server/trpc/route/config";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
@@ -79,7 +80,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: 10 });
 
   const { data, refetch, isFetching, error } = trpc.dataset.list.useQuery({
-    ...pageInfo, ...query, clusterId: query.cluster?.id, isPublic,
+    ...pageInfo, ...query, clusterId: query.cluster?.id, isPublic: parseBooleanParam(isPublic),
   });
   if (error) {
     message.error("找不到数据集");

@@ -29,7 +29,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusters } from "../config";
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 class NoClusterError extends TRPCError {
   constructor(name: string, tag: string) {
@@ -76,9 +76,9 @@ export const list = procedure
   .input(z.object({
     ...paginationSchema.shape,
     nameOrTagOrDesc: z.string().optional(),
-    isPublic: z.coerce.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
     clusterId: z.string().optional(),
-    withExternal: z.coerce.boolean().optional(),
+    withExternal: booleanQueryParam().optional(),
   }))
   .output(z.object({ items: z.array(ImageListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
@@ -305,7 +305,7 @@ export const deleteImage = procedure
       summary: "delete a image",
     },
   })
-  .input(z.object({ id: z.number(), force: z.coerce.boolean().optional() }))
+  .input(z.object({ id: z.number(), force: booleanQueryParam().optional() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
@@ -456,7 +456,7 @@ export const shareOrUnshareImage = procedure
       summary: "share a image",
     },
   })
-  .input(z.object({ id: z.number(), share: z.coerce.boolean() }))
+  .input(z.object({ id: z.number(), share: z.boolean() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
