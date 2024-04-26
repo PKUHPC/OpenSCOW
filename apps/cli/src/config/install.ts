@@ -29,14 +29,14 @@ export const InstallConfigSchema = Type.Object({
   scowd: Type.Optional(Type.Object({
     ssl: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "到 SCOWD 的连接是否启动SSL", default: false }),
-      caCertPath: Type.String({ description: "SCOWD CA根证书路径, 相对 config 的默认目录", default: "scowd/certs/ca.crt" }),
+      caCertPath: Type.String({ description: "SCOWD CA根证书路径, 相对 config 的默认目录", default: "./scowd/certs/ca.crt" }),
       scowCertPath: Type.String({ 
         description: "SCOWD CA签名的 SCOW 证书路径， 相对 config 的默认目录", 
-        default: "scowd/certs/scow.crt",
+        default: "./scowd/certs/scow.crt",
       }),
       scowKeyPath: Type.String({ 
         description: "SCOWD CA签名的 SCOW 私钥路径， 相对 config 的默认目录", 
-        default: "scowd/certs/scow.key",
+        default: "./scowd/certs/scow.key",
       }),
     }, { description: "scowd  全局 ssl 相关配置" })),
   }, { description: "全局 scowd 相关配置" })),
