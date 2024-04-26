@@ -102,6 +102,7 @@ export default /* #__PURE__*/route(ChangeJobTimeLimitSchema,
       cluster,
       limitMinutes,
       jobId,
+      operatorUserId: info.identityId,
     })
       .then(async () => {
         await callLog(logInfo, OperationResult.SUCCESS);
