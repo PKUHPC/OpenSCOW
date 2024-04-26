@@ -44,9 +44,9 @@ export default route(GetClustersConnectionInfoSchema,
 
     const client = getClient(ConfigServiceClient);
 
-    const result = await asyncClientCall(client, "getClustersConnectionInfo", {});
+    const results = await asyncClientCall(client, "getClustersConnectionInfo", {});
 
     return {
-      200: result,
+      200: results,
     };
   });

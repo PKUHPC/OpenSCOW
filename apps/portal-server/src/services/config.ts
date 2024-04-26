@@ -17,13 +17,15 @@ import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/co
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
-import { callOnOne } from "src/utils/clusters";
+import { callOnOne, checkOnlineClusters } from "src/utils/clusters";
 
 export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
 
     getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
+
       const reply = await callOnOne(
         cluster,
         logger,

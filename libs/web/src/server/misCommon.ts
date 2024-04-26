@@ -11,41 +11,15 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ClusterOnlineInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterDatabaseInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { getClientFn } from "src/utils/api";
 
-// export type ClientConstructor<TClient> =
-// new (address: string, credentials: ChannelCredentials, options?: ClientOptions) => TClient;
-
-// export const getClientFn = (
-//   serverUrl: string,
-//   scowApiAuthToken?: string,
-// ) => <TClient>(
-//   ctor: ClientConstructor<TClient>,
-// ): TClient => {
-//   return new ctor(
-//     serverUrl,
-//     ChannelCredentials.createInsecure(),
-//     scowApiAuthToken ?
-//       {
-//         callInvocationTransformer: (props) => {
-//           props.metadata.add("authorization", `Bearer ${scowApiAuthToken}`);
-//           return props;
-//         },
-//       } : undefined,
-//   );
-// };
-
-export const libGetClustersOnlineInfo = async (
-  // logger: Logger,
-  // configClusters: Record<string, ClusterConfigSchema>,
-  // configClusters: Cluster[],
+export const libGetClustersDatabaseInfo = async (
   misServerUrl?: string,
   scowApiAuthToken?: string,
-// ): Promise<Record<string, ClusterConfigSchema>> => {
-): Promise<ClusterOnlineInfo[]> => {
+): Promise<ClusterDatabaseInfo[]> => {
 
-  // 判断 管理系统 是否存在
+  // if mis is Deployed
   if (!misServerUrl) {
     return [];
   }
@@ -57,21 +31,10 @@ export const libGetClustersOnlineInfo = async (
   const getMisClient = getClientFn(config);
   const client = getMisClient(ConfigServiceClient);
   try {
-
-    const reply = await asyncClientCall(client, "getClustersOnlineInfo", {});
+    const reply = await asyncClientCall(client, "getClustersDatabaseInfo", {});
     return reply.results;
-    // const currentOnlineClusterIds = clustersOnlineInfo.filter((cluster) => {
-    //   cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
-    // }).map((cluster) => cluster.clusterId);
-
-    // return currentOnlineClusterIds.reduce((acc, clusterId) => {
-    //   if (configClusters[clusterId]) {
-    //     acc[clusterId] = configClusters[clusterId];
-    //   }
-    //   return acc;
-    // }, {} as Record<string, ClusterConfigSchema>);
   } catch (e: any) {
-    console.log(e.details);
+    console.error(e.details);
     return [];
   }
 };

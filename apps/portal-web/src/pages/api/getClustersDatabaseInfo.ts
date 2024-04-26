@@ -11,27 +11,27 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { libGetClustersOnlineInfo } from "@scow/lib-web/build/server/misCommon";
+import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
+import { libGetClustersDatabaseInfo } from "@scow/lib-web/build/server/misCommon";
 import { Type } from "@sinclair/typebox";
-import { ClusterOnlineInfoSchema } from "src/models/cluster";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-export const GetClustersOnlineInfoSchema = typeboxRouteSchema({
+export const GetClustersDatabaseInfoSchema = typeboxRouteSchema({
 
   method: "GET",
 
   responses: {
     200: Type.Object({
-      results: Type.Array(ClusterOnlineInfoSchema),
+      results: Type.Array(ClusterDatabaseInfoSchema),
     }),
 
   },
 });
 
-export default route(GetClustersOnlineInfoSchema,
+export default route(GetClustersDatabaseInfoSchema,
   async () => {
-    const reply = await libGetClustersOnlineInfo(publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
+    const reply = await libGetClustersDatabaseInfo(publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
     return {
       200: {
         results: reply,

@@ -23,7 +23,7 @@ export function DefaultClusterStore(initialDefaultClusterId: string, currentClus
   );
 
   if (currentClusters.length === 0) {
-    console.log("No available clusters");
+    console.info("No available clusters in setting default cluster");
   }
 
   const defaultCluster = currentClusters.find((cluster) => cluster.id === clusterId)

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterOnlineStatus } from "@scow/config/build/type";
 import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -19,7 +20,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterConnectionStatus, ClusterOnlineStatus, Partition } from "src/models/cluster";
+import { ClusterConnectionStatus, Partition } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { ClusterManagementTable } from "src/pageComponents/admin/ClusterManagementTable";
 import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
@@ -51,7 +52,7 @@ export const ClusterManagementPage: NextPage =
     const promiseFn = useCallback(async () => {
       const [connectionClustersData, onlineClustersData] = await Promise.all([
         api.getClustersConnectionInfo({}),
-        api.getClustersOnlineInfo({}),
+        api.getClustersDatabaseInfo({}),
       ]);
 
       const onlineDataMap = onlineClustersData.results.reduce((acc, onlineData) => {

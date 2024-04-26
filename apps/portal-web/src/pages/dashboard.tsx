@@ -44,11 +44,11 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
+  const { currentClusters } = useStore(CurrentClustersStore);
+  const clusters = currentClusters;
+
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-
-      const { currentClusters } = useStore(CurrentClustersStore);
-      const clusters = currentClusters;
 
       const rawClusterInfoPromises = clusters.map((x) =>
         api.getClusterRunningInfo({ query: { clusterId: x.id } })
@@ -108,7 +108,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
-      <QuickEntry />
+      <QuickEntry clusters={clusters} />
       <OverviewTable
         isLoading={isLoading}
         clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}

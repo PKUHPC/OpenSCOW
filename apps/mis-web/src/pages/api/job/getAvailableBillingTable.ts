@@ -54,17 +54,6 @@ export const JobBillingTableItem = Type.Object({
 });
 export type JobBillingTableItem = Static<typeof JobBillingTableItem>;
 
-// export const Partition = Type.Object({
-//   name: Type.String(),
-//   memMb: Type.Number(),
-//   cores: Type.Number(),
-//   gpus: Type.Number(),
-//   nodes: Type.Number(),
-//   qos: Type.Optional(Type.Array(Type.String())),
-//   comment: Type.Optional(Type.String()),
-// });
-// export type Partition = Static<typeof Partition>;
-
 export const ClusterPartitions = Type.Object({
   cluster: Type.String(),
   partitions: Type.Array(Partition),

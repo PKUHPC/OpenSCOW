@@ -13,23 +13,21 @@
 import { ChannelCredentials, ClientOptions } from "@grpc/grpc-js";
 
 export type ClientConstructor<TClient> =
-  new (address: string, credentials: ChannelCredentials, options?: ClientOptions) => TClient;
+new (address: string, credentials: ChannelCredentials, options?: ClientOptions) => TClient;
 
 export const getClientFn = (
-  config: {
-    SERVER_URL: string;
-    SCOW_API_AUTH_TOKEN?: string;
-  },
+  serverUrl: string,
+  scowApiAuthToken?: string,
 ) => <TClient>(
   ctor: ClientConstructor<TClient>,
 ): TClient => {
   return new ctor(
-    config.SERVER_URL,
+    serverUrl,
     ChannelCredentials.createInsecure(),
-    config.SCOW_API_AUTH_TOKEN ?
+    scowApiAuthToken ?
       {
         callInvocationTransformer: (props) => {
-          props.metadata.add("authorization", `Bearer ${config.SCOW_API_AUTH_TOKEN}`);
+          props.metadata.add("authorization", `Bearer ${scowApiAuthToken}`);
           return props;
         },
       } : undefined,

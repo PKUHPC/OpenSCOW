@@ -10,13 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/config";
+import { route } from "src/utils/route";
 
 export const ListDesktopsSchema = typeboxRouteSchema({
   method: "GET",
@@ -46,7 +47,7 @@ export const ListDesktopsSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(ListDesktopsSchema, async (req, res) => {
+export default /* #__PURE__*/route(ListDesktopsSchema, async (req, res) => {
 
   const { cluster, loginNode } = req.query;
 

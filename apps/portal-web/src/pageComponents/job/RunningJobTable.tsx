@@ -44,6 +44,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 }) => {
 
   const { currentClusters } = useStore(CurrentClustersStore);
+
   const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
   refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 

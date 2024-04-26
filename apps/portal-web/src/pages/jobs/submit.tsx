@@ -41,7 +41,12 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
+
+          // const currentClusters
+          // = publicConfig.MIS_DEPLOYED ? useOnlineClusters().currentClusters : publicConfig.CLUSTERS;
+          // showMessageWhenNoClusters(currentClusters.map((x) => x.id));
           const { currentClusters } = useStore(CurrentClustersStore);
+
           const clusterObj = currentClusters.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
           return api.getJobTemplate({ query: { cluster, id: jobTemplateId } })

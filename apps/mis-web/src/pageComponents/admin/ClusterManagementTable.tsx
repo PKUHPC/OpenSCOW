@@ -11,6 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { ClusterOnlineStatus } from "@scow/config/build/type";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Form, Space, Table, Tag } from "antd";
@@ -21,7 +22,7 @@ import { ClusterSelector } from "src/components/ClusterSelector";
 import { DeactivateClusterModalLink } from "src/components/DeactivateClusterModal";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslate } from "src/i18n";
-import { ClusterConnectionStatus, ClusterOnlineStatus } from "src/models/cluster";
+import { ClusterConnectionStatus } from "src/models/cluster";
 import { CombinedClusterInfo } from "src/pages/admin/resource/clusterManagement";
 import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import { getSortedClusterValues } from "src/utils/cluster";
@@ -195,8 +196,6 @@ export const ClusterManagementTable: React.FC<Props> = ({
                                   <strong key="clusterName">{clusterName}</strong>,
                                   <strong key="clusterId">{r.clusterId}</strong>,
                                 ])},
-                                {/* 请确认是否启用集群名称是 <strong>{clusterName}</strong>，
-                                集群ID是 <strong>{r.clusterId}</strong> 的集群？ */}
                               </p>
                               <p style={{ color: "red" }}>{tArgs(p("activateModal.contentAttention"))}</p>
                             </>
@@ -205,7 +204,6 @@ export const ClusterManagementTable: React.FC<Props> = ({
                             await api.activateCluster({
                               body: {
                                 clusterId: r.clusterId,
-                                comment: "",
                               },
                             })
                               .then((res) => {
@@ -255,6 +253,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
                             setOnlineClusters(webOnlineClusters ?? {});
                           } else {
                             message.error(res.reason || tArgs(p("deactivateModal.failureMessage")));
+                            reload();
                           }
                         });
 

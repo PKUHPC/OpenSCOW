@@ -28,7 +28,7 @@ import type { GetAllAccountsSchema } from "src/pages/api/admin/getAllAccounts";
 import type { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetClustersConnectionInfoSchema } from "src/pages/api/admin/getClustersConnectionInfo";
-import type { GetClustersOnlineInfoSchema } from "src/pages/api/admin/getClustersOnlineInfo";
+import type { GetClustersDatabaseInfoSchema } from "src/pages/api/admin/getClustersDatabaseInfo";
 import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
 import type { GetDailyChargeSchema } from "src/pages/api/admin/getDailyCharge";
 import type { GetDailyPaySchema } from "src/pages/api/admin/getDailyPay";
@@ -136,7 +136,7 @@ export const api = {
   getAllUsers: apiClient.fromTypeboxRoute<typeof GetAllUsersSchema>("GET", "/api/admin/getAllUsers"),
   getClusterUsers: apiClient.fromTypeboxRoute<typeof GetClusterUsersSchema>("GET", "/api/admin/getClusterUsers"),
   getClustersConnectionInfo: apiClient.fromTypeboxRoute<typeof GetClustersConnectionInfoSchema>("GET", "/api/admin/getClustersConnectionInfo"),
-  getClustersOnlineInfo: apiClient.fromTypeboxRoute<typeof GetClustersOnlineInfoSchema>("GET", "/api/admin/getClustersOnlineInfo"),
+  getClustersDatabaseInfo: apiClient.fromTypeboxRoute<typeof GetClustersDatabaseInfoSchema>("GET", "/api/admin/getClustersDatabaseInfo"),
   getDailyCharge: apiClient.fromTypeboxRoute<typeof GetDailyChargeSchema>("GET", "/api/admin/getDailyCharge"),
   getDailyPay: apiClient.fromTypeboxRoute<typeof GetDailyPaySchema>("GET", "/api/admin/getDailyPay"),
   getJobTotalCount: apiClient.fromTypeboxRoute<typeof GetJobTotalCountSchema>("GET", "/api/admin/getJobTotalCount"),
@@ -150,6 +150,7 @@ export const api = {
   getTopChargeAccount: apiClient.fromTypeboxRoute<typeof GetTopChargeAccountSchema>("GET", "/api/admin/getTopChargeAccount"),
   getTopPayAccount: apiClient.fromTypeboxRoute<typeof GetTopPayAccountSchema>("GET", "/api/admin/getTopPayAccount"),
   getTopSubmitJobUser: apiClient.fromTypeboxRoute<typeof GetTopSubmitJobUserSchema>("GET", "/api/admin/getTopSubmitJobUser"),
+  getUsersWithMostJobSubmissions: apiClient.fromTypeboxRoute<typeof GetUsersWithMostJobSubmissionsSchema>("GET", "/api/admin/getUsersWithMostJobSubmissions"),
   importUsers: apiClient.fromTypeboxRoute<typeof ImportUsersSchema>("POST", "/api/admin/importUsers"),
   getAlarmDbId: apiClient.fromTypeboxRoute<typeof GetAlarmDbIdSchema>("GET", "/api/admin/monitor/getAlarmDbId"),
   getAlarmLogs: apiClient.fromTypeboxRoute<typeof GetAlarmLogsSchema>("GET", "/api/admin/monitor/getAlarmLogs"),
@@ -193,12 +194,8 @@ export const api = {
   getJobInfo: apiClient.fromTypeboxRoute<typeof GetJobInfoSchema>("GET", "/api/job/jobInfo"),
   queryJobTimeLimit: apiClient.fromTypeboxRoute<typeof QueryJobTimeLimitSchema>("GET", "/api/job/queryJobTimeLimit"),
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
-  // getTopSubmitJobUser: apiClient.fromTypeboxRoute<typeof GetTopSubmitJobUserSchema>("GET", "/api/admin/getTopSubmitJobUser"),
-  getUsersWithMostJobSubmissions: apiClient.fromTypeboxRoute<typeof GetUsersWithMostJobSubmissionsSchema>("GET", "/api/admin/getUsersWithMostJobSubmissions"),
-  // getNewJobCount: apiClient.fromTypeboxRoute<typeof GetNewJobCountSchema>("GET", "/api/admin/getNewJobCount"),
-  getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
   getCustomEventTypes: apiClient.fromTypeboxRoute<typeof GetCustomEventTypesSchema>("GET", "/api/log/getCustomEventTypes"),
-  // getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
+  getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
   changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),

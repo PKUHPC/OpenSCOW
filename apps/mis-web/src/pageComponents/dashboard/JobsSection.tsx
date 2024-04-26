@@ -31,6 +31,7 @@ interface Props {
 export const JobsSection: React.FC<Props> = ({ user }) => {
 
   const { onlineClusters } = useStore(OnlineClustersStore);
+
   const promiseFn = useCallback(() => {
     return Promise.all(publicConfig.CLUSTER_SORTED_ID_LIST
       .filter((clusterId) => Object.keys(onlineClusters).find((x) => x === clusterId))

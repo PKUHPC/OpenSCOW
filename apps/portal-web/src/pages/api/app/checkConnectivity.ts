@@ -10,11 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { runtimeConfig } from "src/utils/config";
 import { isPortReachable } from "src/utils/isPortReachable";
+import { route } from "src/utils/route";
 
 export const CheckAppConnectivitySchema = typeboxRouteSchema({
   method: "GET",
@@ -34,7 +35,7 @@ const auth = authenticate(() => true);
 
 const TIMEOUT_MS = 3000;
 
-export default /* #__PURE__*/typeboxRoute(CheckAppConnectivitySchema, async (req, res) => {
+export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) => {
 
   const info = await auth(req, res);
 

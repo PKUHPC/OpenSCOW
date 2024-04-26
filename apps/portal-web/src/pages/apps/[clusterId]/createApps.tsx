@@ -29,6 +29,7 @@ export const CreateAppsIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const router = useRouter();
   const clusterId = queryToString(router.query.clusterId);
+
   const { currentClusters } = useStore(CurrentClustersStore);
   const cluster = currentClusters.find((x) => x.id === clusterId);
 

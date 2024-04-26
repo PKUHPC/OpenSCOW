@@ -14,8 +14,8 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
-  clusterOnlineStatusFromJSON, ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
-import { getClustersOnlineInfo } from "src/bl/common";
+  ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
+import { getClustersDatabaseInfo } from "src/bl/common";
 import { configClusters } from "src/config/clusters";
 import { Cluster, ClusterOnlineStatus } from "src/entities/Cluster";
 
@@ -89,31 +89,34 @@ export const misConfigServiceServer = plugin((server) => {
         }
       }));
 
-      return [ { results: clusterResponse, totalCount: clusterResponse.length }];
+      return [{ results: clusterResponse }];
     },
 
-    getClustersOnlineInfo: async ({ em, logger }) => {
+    getClustersDatabaseInfo: async ({ em, logger }) => {
 
-      logger.info("Get current clusters online info started.");
+      const reply = await getClustersDatabaseInfo(em, logger);
+      // logger.info("Get current clusters online and offline info started.");
 
-      const clusterOnlineData = await em.findAll(Cluster, {});
+      // const clustersFromDb = await em.findAll(Cluster, {});
 
-      const reply = clusterOnlineData.map((x) => {
-        return {
-          clusterId: x.clusterId,
-          onlineStatus: clusterOnlineStatusFromJSON(x.onlineStatus),
-          operatorId: x.operatorId,
-          comment: x.comment,
-        };
-      });
+      // const reply = clustersFromDb.map((x) => {
+      //   return {
+      //     clusterId: x.clusterId,
+      //     onlineStatus: clusterOnlineStatusFromJSON(x.onlineStatus),
+      //     operatorId: x.operatorId,
+      //     comment: x.comment,
+      //   };
+      // });
 
-      const clusterOnlineStatusList = reply.map((x) => {
-        return `(Cluster ID: ${x.clusterId}) : ${x.onlineStatus}`;
-      }).join("; ");
+      // const clusterOnlineStatusList = clustersFromDb.map((x) => {
+      //   return `(Cluster ID: ${x.clusterId}) : ${x.onlineStatus}`;
+      // }).join("; ");
 
-      logger.info("Current clusters list: %s", clusterOnlineStatusList);
+      // logger.info("Current clusters list: %s", clusterOnlineStatusList);
 
-      return [{ results: reply, totalCount: reply.length }];
+      // return reply;
+
+      return [{ results: reply }];
     },
 
     activateCluster: async ({ request, em, logger }) => {
@@ -127,7 +130,7 @@ export const misConfigServiceServer = plugin((server) => {
         };
       }
 
-      // 实时判断当前适配器连接状态
+      // check current scheduler adapter connection state
       await server.ext.clusters.callOnOne(
         clusterId,
         logger,
@@ -135,7 +138,7 @@ export const misConfigServiceServer = plugin((server) => {
       ).catch((e) => {
         logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
         throw <ServiceError>{
-          code: status.UNIMPLEMENTED,
+          code: status.FAILED_PRECONDITION,
           message: `Activate cluster failed, Cluster（ Cluster ID: ${clusterId}） is currently unreachable.`,
         };
       });
@@ -149,9 +152,8 @@ export const misConfigServiceServer = plugin((server) => {
 
       cluster.onlineStatus = ClusterOnlineStatus.ONLINE;
       cluster.operatorId = operatorId;
-      if (comment) {
-        cluster.comment = comment;
-      };
+      // 启用集群暂时不支持输入备注
+      cluster.comment = "";
 
       await em.persistAndFlush(cluster);
 
@@ -161,12 +163,7 @@ export const misConfigServiceServer = plugin((server) => {
         comment,
       );
 
-      const clustersOnlineInfo = await getClustersOnlineInfo(em, logger);
-      const currentOnlineClusters
-        = clustersOnlineInfo.filter((x) => x.onlineStatus === clusterOnlineStatusFromJSON(ClusterOnlineStatus.ONLINE));
-
-
-      return [{ executed: true, currentOnlineClusters }];
+      return [{ executed: true }];
 
     },
 
@@ -190,9 +187,7 @@ export const misConfigServiceServer = plugin((server) => {
 
       cluster.onlineStatus = ClusterOnlineStatus.OFFLINE;
       cluster.operatorId = operatorId;
-      if (comment) {
-        cluster.comment = comment;
-      };
+      cluster.comment = comment ?? "";
 
       await em.persistAndFlush(cluster);
 
@@ -202,11 +197,7 @@ export const misConfigServiceServer = plugin((server) => {
         comment,
       );
 
-      const clustersOnlineInfo = await getClustersOnlineInfo(em, logger);
-      const currentOnlineClusters
-       = clustersOnlineInfo.filter((x) => x.onlineStatus === clusterOnlineStatusFromJSON(ClusterOnlineStatus.ONLINE));
-
-      return [{ executed: true, currentOnlineClusters }];
+      return [{ executed: true }];
 
     },
 

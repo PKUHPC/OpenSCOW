@@ -55,6 +55,11 @@ export const GetBillingItemsSchema = typeboxRouteSchema({
      */
     activeOnly: Type.Boolean(),
 
+    /**
+     * currently online cluster ids only
+     */
+    currentOnlineClusterIds: Type.Optional(Type.Array(Type.String())),
+
   }),
 
   responses: {
@@ -116,7 +121,9 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
 
 
 export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res) => {
-  const { tenant, activeOnly } = req.query;
+  const { tenant, activeOnly, currentOnlineClusterIds } = req.query;
+
+  console.log("【currentOnlineClusterIds】", currentOnlineClusterIds);
 
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
@@ -145,7 +152,10 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
 
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
-  for (const cluster of publicConfig.CLUSTER_SORTED_ID_LIST) {
+  const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => currentOnlineClusterIds?.includes(id));
+  if (sortedIds.length === 0) { console.log("Cluster ops failed , error details: No available clusters"); }
+
+  for (const cluster of sortedIds) {
 
     const client = getClient(ConfigServiceClient);
 

@@ -27,7 +27,9 @@ import {
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { getClusterAppConfigs } from "src/utils/app";
+import { checkOnlineClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
+import { logger } from "src/utils/logger";
 
 const errorInfo = (reason: string) =>
   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
@@ -38,6 +40,7 @@ export const appServiceServer = plugin((server) => {
     connectToApp: async ({ request, logger }) => {
 
       const { cluster, sessionId, userId } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -95,6 +98,8 @@ export const appServiceServer = plugin((server) => {
 
       const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
         proxyBasePath, partition, qos, userId, customAttributes } = request;
+
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -181,6 +186,7 @@ export const appServiceServer = plugin((server) => {
     listAppSessions: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
 
       const clusterops = getClusterOps(cluster);
 
@@ -194,6 +200,8 @@ export const appServiceServer = plugin((server) => {
     getAppMetadata: async ({ request }) => {
 
       const { appId, cluster } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
+
       const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
@@ -257,6 +265,7 @@ export const appServiceServer = plugin((server) => {
     listAvailableApps: async ({ request }) => {
 
       const { cluster } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -269,6 +278,8 @@ export const appServiceServer = plugin((server) => {
     getAppLastSubmission: async ({ request, logger }) => {
 
       const { userId, cluster, appId } = request;
+      await checkOnlineClusters({ clusterIds: [cluster], logger });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }

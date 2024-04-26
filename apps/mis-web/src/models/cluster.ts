@@ -13,15 +13,6 @@
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
-export const ClusterConnectionStatus = {
-  AVAILABLE: 0,
-  ERROR: 1,
-} as const;
-
-export type ClusterConnectionStatus = ValueOf<typeof ClusterConnectionStatus>;
-
-export type ClusterOnlineStatus = ValueOf<typeof ClusterOnlineStatus>;
-
 export const Partition = Type.Object({
   name: Type.String(),
   memMb: Type.Number(),
@@ -33,14 +24,12 @@ export const Partition = Type.Object({
 });
 export type Partition = Static<typeof Partition>;
 
-// export const getClusterStatusI18nTexts = (t: TransType) => {
-//   return {
-//     [DisplayedAccountState.DISPLAYED_NORMAL]: t("pageComp.accounts.accountTable.normal"),
-//     [DisplayedAccountState.DISPLAYED_FROZEN]: t("pageComp.accounts.accountTable.frozen"),
-//     [DisplayedAccountState.DISPLAYED_BLOCKED]: t("pageComp.accounts.accountTable.blocked"),
-//     [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t("pageComp.accounts.accountTable.debt"),
-//   };
-// };
+export const ClusterConnectionStatus = {
+  AVAILABLE: 0,
+  ERROR: 1,
+} as const;
+
+export type ClusterConnectionStatus = ValueOf<typeof ClusterConnectionStatus>;
 
 export const ClusterConnectionInfoSchema = Type.Object({
   clusterId: Type.String(),
@@ -50,18 +39,3 @@ export const ClusterConnectionInfoSchema = Type.Object({
 });
 
 export type ClusterConnectionInfo = Static<typeof ClusterConnectionInfoSchema>;
-
-export const ClusterOnlineStatus = {
-  ONLINE: 0,
-  OFFLINE: 1,
-} as const;
-
-export const ClusterOnlineInfoSchema = Type.Object({
-  clusterId: Type.String(),
-  onlineStatus: Type.Enum(ClusterOnlineStatus),
-  operatorId: Type.Optional(Type.String()),
-  operatorName: Type.Optional(Type.String()),
-  comment: Type.Optional(Type.String()),
-});
-
-export type ClusterOnlineInfo = Static<typeof ClusterOnlineInfoSchema>;

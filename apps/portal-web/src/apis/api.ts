@@ -14,6 +14,7 @@
 
 import { apiClient } from "src/apis/client";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
+import type { GetClustersDatabaseInfoSchema } from "src/pages/api//getClustersDatabaseInfo";
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
@@ -49,7 +50,6 @@ import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFi
 import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
 import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
-import { GetClustersOnlineInfoSchema } from "src/pages/api/getClustersOnlineInfo";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -101,6 +101,7 @@ export const api = {
   startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("POST", "/api/file/startFileTransfer"),
   terminateFileTransfer: apiClient.fromTypeboxRoute<typeof TerminateFileTransferSchema>("POST", "/api/file/terminateFileTransfer"),
   uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
+  getClustersDatabaseInfo: apiClient.fromTypeboxRoute<typeof GetClustersDatabaseInfoSchema>("GET", "/api//getClustersDatabaseInfo"),
   cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   deleteJobTemplate: apiClient.fromTypeboxRoute<typeof DeleteJobTemplateSchema>("DELETE", "/api/job/deleteJobTemplate"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
@@ -113,5 +114,4 @@ export const api = {
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  getClustersOnlineInfo: apiClient.fromTypeboxRoute<typeof GetClustersOnlineInfoSchema>("GET", "/api/getClustersOnlineInfo"),
 };

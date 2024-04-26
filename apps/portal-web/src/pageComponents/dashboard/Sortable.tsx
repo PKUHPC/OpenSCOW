@@ -32,6 +32,7 @@ import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Cluster } from "src/utils/config";
 import { formatEntryId, getEntryBaseName,
   getEntryExtraInfo, getEntryIcon, getEntryLogoPath } from "src/utils/dashboard";
 import { styled } from "styled-components";
@@ -52,7 +53,8 @@ interface Props {
   isEditable: boolean,
   isFinished: boolean,
   quickEntryArray: Entry[],
-  apps: AppWithCluster;
+  apps: AppWithCluster,
+  clusters: Cluster[],
 }
 const p = prefix("pageComp.dashboard.sortable.");
 
@@ -70,7 +72,7 @@ const DeleteIconContainer = styled.div`
   }
 `;
 
-export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps }) => {
+export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps, clusters }) => {
 
   const t = useI18nTranslateToString();
   const i18n = useI18n();
@@ -257,6 +259,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         onClose={() => { setAddEntryOpen(false); }}
         apps={apps}
         addItem={addItem}
+        clusters={clusters}
       ></AddEntryModal>
     </div>
   );

@@ -39,7 +39,6 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { ClusterOnlineInfo } from "src/models/cluster";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import {
@@ -56,6 +55,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+  const { setOnlineClusters } = useStore(OnlineClustersStore);
 
   const languageId = useI18n().currentLanguage.id;
   const tArgs = useI18nTranslate();
@@ -86,6 +86,28 @@ const FailEventHandler: React.FC = () => {
           [getI18nConfigCurrentText(clusterName, languageId)])}(${
           e.data.details
         })`);
+        return;
+      }
+
+      if (e.data?.code === "NO_ONLINE_CLUSTERS") {
+        message.error(tArgs("page._app.noOnlineClusters"));
+        setOnlineClusters({});
+        return;
+      }
+
+      if (e.data?.code === "NOT_EXIST_IN_ONLINE_CLUSTERS") {
+        message.error(tArgs("page._app.notExistInOnlineClusters"));
+
+        const currentOnlineClusterIds = e.data.currentOnlineClusterIds;
+        const newOnlineClusters: {[clusterId: string]: Cluster} = {};
+        currentOnlineClusterIds.forEach((id) => {
+          if (publicConfig.CLUSTERS[id]) {
+            newOnlineClusters[id] = publicConfig.CLUSTERS[id];
+          }
+        });
+        setOnlineClusters(newOnlineClusters);
+        // 刷新当前页面
+        // window.location.reload();
         return;
       }
 
@@ -133,6 +155,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
     return Object.keys(extra.initialOnlineClusters).find((c) => c === x);
   });
+
   const defaultClusterStore = useConstant(() => {
     const store = createStore(DefaultClusterStore,
       initialDefaultClusterId ? extra.initialOnlineClusters[initialDefaultClusterId] : undefined);
@@ -234,14 +257,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-    const onlineClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
-    const initialOnlineClusters
-     = formatOnlineClusters(onlineClusters?.results as ClusterOnlineInfo[], publicConfig.CLUSTERS);
-    extra.initialOnlineClusters = initialOnlineClusters as {[clusterId: string]: Cluster};
+    // get initial online clusters
+    const clustersFromDb = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
+    const onlineClusters
+     = formatOnlineClusters({ clustersFromDb: clustersFromDb?.results, misConfigClusters: publicConfig.CLUSTERS });
+    extra.initialOnlineClusters = onlineClusters.misOnlineClusters ?? {};
   }
 
   const appProps = await App.getInitialProps(appContext);
-
   return { ...appProps, extra } as Props;
 };
 

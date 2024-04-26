@@ -455,7 +455,7 @@ export const getOperationDetail = (
         [operationEvent[logEvent].userId,
           operationEvent[logEvent].clusterId]);
     case "deactivateCluster":
-      return t(pDetails("activateCluster"),
+      return t(pDetails("deactivateCluster"),
         [operationEvent[logEvent].userId,
           operationEvent[logEvent].clusterId]);
     case "customEvent":

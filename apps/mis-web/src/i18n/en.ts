@@ -111,6 +111,7 @@ export default {
     exportNoDataErrorMsg: "Export is empty, please reselect",
     blockThresholdAmount: "Block Threshold Amount",
     other: "Other",
+    noAvailableClusters: "Currently no available clusters.",
   },
   dashboard: {
     title: "Dashboard",
@@ -805,6 +806,9 @@ export default {
       + "synchronized with the modifications.",
       adapterConnErrorContent: "The {} cluster is currently unreachable. Please try again later. ",
       effectErrorMessage: "Server error occurred!",
+      noOnlineClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInOnlineClusters: "The cluster(s) being queried may have been deactivated. "
+      + "Please try again after refreshing the page.",
     },
     profile: {
       index: {

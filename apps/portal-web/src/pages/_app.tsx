@@ -55,6 +55,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+  const currentClusterStore = useStore(CurrentClustersStore);
   const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
@@ -95,6 +96,24 @@ const FailEventHandler: React.FC = () => {
           [getI18nConfigCurrentText(clusterName, languageId)])}(${
           e.data.details
         })`);
+        return;
+      }
+
+
+      if (e.data?.code === "NO_ONLINE_CLUSTERS") {
+        message.error(tArgs("pages._app.noOnlineClusters"));
+        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters([]);
+        return;
+      }
+
+      if (e.data?.code === "NOT_EXIST_IN_ONLINE_CLUSTERS") {
+        message.error(tArgs("pages._app.notExistInOnlineClusters"));
+
+        const currentOnlineClusterIds = e.data.currentOnlineClusterIds;
+        const onlineClusters = publicConfig.CLUSTERS.map((x) => currentOnlineClusterIds.includes(x.id));
+        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters(onlineClusters);
+        // 刷新当前页面
+        // window.location.reload();
         return;
       }
 
@@ -254,10 +273,15 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     // 从Cookies或header中获取语言id
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
-    const currentClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
-    const initialCurrentClusters =
-    formatOnlineClusters(currentClusters?.results as ClusterOnlineInfo[], publicConfig.CLUSTERS) as Cluster[];
-    extra.initialCurrentClusters = publicConfig.MIS_DEPLOYED ? initialCurrentClusters : publicConfig.CLUSTERS;
+
+    // get current initial online clusters
+    const currentClusters = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
+    const initialOnlineClusters =
+    formatOnlineClusters({
+      clustersFromDb: currentClusters?.results,
+      configClusters: publicConfig.CLUSTERS,
+      misDeployed: publicConfig.MIS_DEPLOYED });
+    extra.initialCurrentClusters = initialOnlineClusters.onlineClusters ?? [];
 
   }
 

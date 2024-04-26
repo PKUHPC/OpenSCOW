@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { I18nStringType } from "@scow/config/build/i18n";
@@ -19,6 +19,7 @@ import { appCustomAttribute_AttributeTypeToJSON,
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export const I18nStringSchemaType = Type.Union([
@@ -103,7 +104,7 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAppMetadataSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

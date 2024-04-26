@@ -15,12 +15,13 @@ import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { ClusterOnlineStatus } from "@scow/protos/build/server/config";
-import { getClustersOnlineInfo, updateCluster } from "src/bl/common";
+import { getClustersDatabaseInfo, updateCluster } from "src/bl/common";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { scowErrorMetadata } from "src/utils/error";
+import { checkOnlineClusters, NO_ONLINE_CLUSTERS } from "src/utils/cluster";
 
 type CallOnAllResult<T> = {
   cluster: string;
@@ -31,6 +32,7 @@ type CallOnAllResult<T> = {
 type CallOnAll = <T>(
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
+  isUsingAllConfigClusters?: boolean,
 ) => Promise<CallOnAllResult<T>>;
 
 type CallOnOne = <T>(
@@ -43,7 +45,6 @@ export type ClusterPlugin = {
   clusters: {
     callOnAll: CallOnAll;
     callOnOne: CallOnOne;
-    syncConfigClusters: () => Promise<void>;
     onlineClusters: () => Promise<Record<string, ClusterConfigSchema>>;
   }
 }
@@ -69,8 +70,11 @@ export const clustersPlugin = plugin(async (f) => {
     }));
   }
 
+  // initial clusters database
+  const configClusterIds = Object.keys(configClusters);
+  await updateCluster(f.ext.orm.em.fork(), configClusterIds, f.logger);
 
-  // TODO：确认是否可以直接删除
+  // adapterClient of all config clusters
   const adapterClientForClusters = Object.entries(configClusters).reduce((prev, [cluster, c]) => {
     const client = getSchedulerAdapterClient(c.adapterUrl);
 
@@ -80,11 +84,10 @@ export const clustersPlugin = plugin(async (f) => {
   }, {} as Record<string, SchedulerAdapterClient>);
 
   const getOnlineClusters = async () => {
-    const clustersOnlineInfo = await getClustersOnlineInfo(f.ext.orm.em.fork(), logger);
+    const clustersOnlineInfo = await getClustersDatabaseInfo(f.ext.orm.em.fork(), logger);
     const currentOnlineClusterIds = clustersOnlineInfo.filter((cluster) => {
-      cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
+      return cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
     }).map((cluster) => cluster.clusterId);
-
     return currentOnlineClusterIds.reduce((acc, clusterId) => {
       if (configClusters[clusterId]) {
         acc[clusterId] = configClusters[clusterId];
@@ -93,6 +96,7 @@ export const clustersPlugin = plugin(async (f) => {
     }, {} as Record<string, ClusterConfigSchema>);
   };
 
+  // adapterClients of online clusters
   const getAdapterClientForOnlineClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
     return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
       const client = getSchedulerAdapterClient(c.adapterUrl);
@@ -108,18 +112,16 @@ export const clustersPlugin = plugin(async (f) => {
   const logger = f.logger.child({ plugin: "cluster" });
 
   const clustersPlugin = {
-    // sync Cluster Entity through clusters config file when server starts
-    syncConfigClusters: async () => {
-      const configClusterIds = Object.keys(adapterClientForClusters);
-      return await updateCluster(f.ext.orm.em.fork(), configClusterIds, logger);
-    },
-
-    // get current onlineClusters
+    // get current online Clusters
     onlineClusters: async () => {
       return await getOnlineClusters();
     },
 
     callOnOne: <CallOnOne>(async (cluster, logger, call) => {
+
+      const currentOnlineClusters = await getOnlineClusters();
+      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+
       const client = getAdapterClient(cluster);
 
       if (!client) {
@@ -145,11 +147,27 @@ export const clustersPlugin = plugin(async (f) => {
     }),
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (logger, call) => {
+    callOnAll: <CallOnAll>(async (logger, call, isUsingAllConfigClusters: boolean = false) => {
 
-      const currentOnlineClusters = await getOnlineClusters();
-      logger.info("Current Online Clusters %o", currentOnlineClusters);
-      const adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(currentOnlineClusters);
+      let adapterClientForOnlineClusters: Record<string, SchedulerAdapterClient>;
+      if (isUsingAllConfigClusters) {
+        adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(configClusters);
+      } else {
+        const currentOnlineClusters = await getOnlineClusters();
+        logger.info("Current Online Clusters %o", currentOnlineClusters);
+
+        if (Object.keys(currentOnlineClusters).length === 0) {
+          throw new ServiceError({
+            code: status.INTERNAL,
+            details: "No available clusters. Please try again later",
+            metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
+          });
+        }
+
+        adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(currentOnlineClusters);
+      }
+
+
       const responses = await Promise.all(Object.entries(adapterClientForOnlineClusters)
         .map(async ([cluster, client]) => {
           return call(client).then((result) => {

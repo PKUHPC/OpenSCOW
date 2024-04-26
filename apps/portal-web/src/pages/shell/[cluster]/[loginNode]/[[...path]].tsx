@@ -87,6 +87,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const paths = router.query.path as (string[] | undefined);
 
   const { currentClusters } = useStore(CurrentClustersStore);
+
   const { loginNodes } = useStore(LoginNodeStore);
   const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
 

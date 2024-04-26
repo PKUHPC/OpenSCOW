@@ -13,10 +13,10 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { ClusterOnlineInfoSchema } from "src/models/cluster";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
@@ -37,7 +37,7 @@ export const DeactivateClusterSchema = typeboxRouteSchema({
     200: Type.Object({
       executed: Type.Boolean(),
       reason: Type.Optional(Type.String()),
-      currentOnlineClusters: Type.Optional(Type.Array(ClusterOnlineInfoSchema)),
+      currentOnlineClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
     }),
     // 集群不存在
     404: Type.Null(),
@@ -72,7 +72,7 @@ export default /* #__PURE__*/route(DeactivateClusterSchema, async (req, res) => 
   })
     .then(async (reply) => {
       await callLog(logInfo, OperationResult.SUCCESS);
-      return { 200: { executed: true, currentOnlineClusters: reply.currentOnlineClusters } };
+      return { 200: reply };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),

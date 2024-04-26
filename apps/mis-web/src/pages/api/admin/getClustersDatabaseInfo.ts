@@ -12,31 +12,30 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
+import { ClusterDatabaseInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
-import { ClusterOnlineInfo, ClusterOnlineInfoSchema } from "src/models/cluster";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
-export const GetClustersOnlineInfoSchema = typeboxRouteSchema({
+export const GetClustersDatabaseInfoSchema = typeboxRouteSchema({
 
   method: "GET",
 
   responses: {
     200: Type.Object({
-      results: Type.Array(ClusterOnlineInfoSchema),
-      totalCount: Type.Number(),
+      results: Type.Array(ClusterDatabaseInfoSchema),
     }),
 
   },
 });
 
-export default route(GetClustersOnlineInfoSchema,
+export default route(GetClustersDatabaseInfoSchema,
   async () => {
 
     const client = getClient(ConfigServiceClient);
-    const result = await asyncClientCall(client, "getClustersOnlineInfo", {});
+    const result = await asyncClientCall(client, "getClustersDatabaseInfo", {});
 
     const operatorIds = Array.from(new Set(result.results.map((x) => x.operatorId)));
     const userIds = operatorIds.filter((id) => typeof id === "string" && id !== undefined && id !== null) as string[];
@@ -48,7 +47,7 @@ export default route(GetClustersOnlineInfoSchema,
 
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
-    const clustersOnlineInfo: ClusterOnlineInfo[] = result.results.map((x) => {
+    const clustersDatabaseInfo: ClusterDatabaseInfo[] = result.results.map((x) => {
       return {
         ...x,
         operatorName: x.operatorId ? userMap.get(x.operatorId) : "",
@@ -57,8 +56,7 @@ export default route(GetClustersOnlineInfoSchema,
 
     return {
       200: {
-        results: clustersOnlineInfo,
-        totalCount: result.totalCount,
+        results: clustersDatabaseInfo,
       },
     };
   });

@@ -26,7 +26,6 @@ import { dropDatabase } from "tests/data/helpers";
 let server: Server;
 let client: InitServiceClient;
 
-
 beforeEach(async () => {
   server = await createServer();
   await server.start();
@@ -44,7 +43,8 @@ it("Test function userExist", async () => {
   const email = "test01@test01.com";
   const em = server.ext.orm.em.fork();
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
-  await createUserInDatabase(identityId, name, email, tenant.name, server.logger, em);
+  await createUserInDatabase(
+    identityId, name, email, tenant.name, server.logger, em, server.ext.clusters);
   const result = await asyncClientCall(client, "userExists", {
     userId: identityId,
   });

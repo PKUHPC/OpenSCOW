@@ -16,6 +16,7 @@ import { NextPage } from "next";
 import Router from "next/router";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -24,6 +25,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
+import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.admin.jobBilling.");
@@ -49,12 +51,19 @@ export const AdminJobBillingTablePage: NextPage =
 export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) => {
 
   const t = useI18nTranslateToString();
+
+  const { onlineClusters } = useStore(OnlineClustersStore);
+  const currentOnlineClusterIds = Object.keys(onlineClusters);
+  console.log("【currentOnlineClusterIds】", currentOnlineClusterIds);
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.getBillingItems({ query: { tenant, activeOnly: false } });
+    return await api.getBillingItems({ query: { tenant, activeOnly: false, currentOnlineClusterIds } });
   }, [tenant]) });
 
   return (
     <div>
+      { currentOnlineClusterIds.length === 0 &&
+        <div style={{ marginBottom: 20 }}>{t("common.noAvailableClusters")}</div>
+      }
       <FilterFormContainer>
         <Form layout="inline">
           <Form.Item label={t(p("managementObject"))}>

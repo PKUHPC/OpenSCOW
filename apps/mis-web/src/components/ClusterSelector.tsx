@@ -17,7 +17,6 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
-
 interface Props {
   value?: Cluster[];
   onChange?: (clusters: Cluster[]) => void;
@@ -35,6 +34,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllCo
   const languageId = useI18n().currentLanguage.id;
 
   const { onlineClusters } = useStore(OnlineClustersStore);
+
   const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : onlineClusters;
 
   return (
@@ -72,7 +72,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({
             value: x,
-            label:  getI18nConfigCurrentText(onlineClusters[x].name, languageId),
+            label:  getI18nConfigCurrentText(onlineClusters[x]?.name, languageId),
             disabled: false,
           })))
       }

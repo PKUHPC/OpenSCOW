@@ -23,6 +23,7 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const languageId = useI18n().currentLanguage.id;
   const t = useI18nTranslateToString();
+
   const { currentClusters } = useStore(CurrentClustersStore);
 
   return (

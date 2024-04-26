@@ -26,7 +26,6 @@ export const Cluster = Type.Object({
 
 export type ClusterInfo = Static<typeof Cluster>;
 
-
 export const ListAvailableTransferClustersSchema = typeboxRouteSchema({
   method: "GET",
 
@@ -51,7 +50,11 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
+  // const currentClusters
+  // = publicConfig.MIS_DEPLOYED ? useOnlineClusters().currentClusters : publicConfig.CLUSTERS;
+  // showMessageWhenNoClusters(currentClusters.map((x) => x.id));
   const { currentClusters } = useStore(CurrentClustersStore);
+
   const clusterList: ClusterInfo[] = currentClusters
     .filter((x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFileTransfer?.enabled)
     .map((x) => ({

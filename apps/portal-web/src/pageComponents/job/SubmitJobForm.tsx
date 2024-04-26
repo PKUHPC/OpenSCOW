@@ -21,6 +21,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
+import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
@@ -188,6 +189,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   }, [currentPartitionInfo]);
 
   const { currentClusters } = useStore(CurrentClustersStore);
+
+  if (currentClusters.length === 0) {
+    return <NotFoundPage />;
+  }
+
   const { defaultCluster: currentDefaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
   const defaultCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;

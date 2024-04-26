@@ -61,6 +61,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
 }) => {
 
   const { currentClusters } = useStore(CurrentClustersStore);
+
   const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
   refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 

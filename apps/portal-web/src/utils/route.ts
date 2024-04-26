@@ -35,9 +35,17 @@ export const route: typeof typeboxRoute = (schema, handler) => {
 
         // 如果包含集群详细错误信息
         const clusterErrorsString = e.metadata.get("clusterErrors") ?? undefined;
-        const clusterErrorsArray = JSON.parse(clusterErrorsString) as ClusterErrorMetadata[];
+        const clusterErrorsArray
+         = clusterErrorsString && clusterErrorsString.length > 0 ?
+         JSON.parse(clusterErrorsString) as ClusterErrorMetadata[] : undefined;
 
-        return { 500: { code, details, message, clusterErrorsArray } } as any;
+        // 如果包含当前在线集群的信息
+        const currentOnlineClusterIdsStr = e.metadata.get("currentOnlineClusterIds") ?? undefined;
+        const currentOnlineClusterIds
+         = currentOnlineClusterIdsStr && currentOnlineClusterIdsStr.length > 0 ?
+         JSON.parse(currentOnlineClusterIdsStr) as string[] : undefined;
+
+        return { 500: { code, details, message, clusterErrorsArray, currentOnlineClusterIds } } as any;
       });
     }
   });

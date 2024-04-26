@@ -60,6 +60,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading, isUserPartitio
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+
   const { onlineClusters } = useStore(OnlineClustersStore);
 
   const clusterTotalQosCounts = data && data.length ?

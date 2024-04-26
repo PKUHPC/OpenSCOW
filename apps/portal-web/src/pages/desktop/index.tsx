@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterOnlineStatus } from "@scow/config/build/type";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
 import { api } from "src/apis";
@@ -17,7 +18,6 @@ import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
-import { ClusterOnlineStatus } from "src/models/cluster";
 import { DesktopTable } from "src/pageComponents/desktop/DesktopTable";
 import { Cluster, getLoginDesktopEnabled, publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -28,7 +28,7 @@ type Props = {
 export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
 ((props: Props) => {
 
-  if (!publicConfig.ENABLE_LOGIN_DESKTOP) {
+  if (!publicConfig.ENABLE_LOGIN_DESKTOP || props.loginDesktopEnabledClusters.length === 0) {
     return <NotFoundPage />;
   }
 
@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-  const currentClusters = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
+  const currentClusters = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
 
   const sortedClusterIdList = publicConfig.MIS_DEPLOYED ?
     (currentClusters?.results

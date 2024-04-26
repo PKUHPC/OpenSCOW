@@ -10,32 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
-import { ClusterOnlineInfo } from "@scow/protos/build/server/config";
-import { useEffect, useState } from "react";
-import { api } from "src/apis";
-import { Cluster, publicConfig } from "src/utils/config";
+import { useState } from "react";
+import { Cluster } from "src/utils/config";
 
 
 export function OnlineClustersStore(initialOnlineClusters: {[clusterId: string]: Cluster;}) {
   const [onlineClusters, setOnlineClusters]
    = useState<{[clusterId: string]: Cluster;}>(initialOnlineClusters);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const clustersFromDatabase
-         = await api.getClustersOnlineInfo({}).then((x) => x, () => undefined);
-        const webOnlineClusters
-         = formatOnlineClusters(clustersFromDatabase?.results as ClusterOnlineInfo[], publicConfig.CLUSTERS);
-
-        setOnlineClusters(webOnlineClusters as {[clusterId: string]: Cluster;});
-      } catch (error) {
-        console.error("Error fetching current clusters:", error);
-      }
-    };
-    fetchData();
-  }, []);
 
   return { onlineClusters, setOnlineClusters };
 }

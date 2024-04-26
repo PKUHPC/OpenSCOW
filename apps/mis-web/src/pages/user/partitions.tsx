@@ -23,6 +23,7 @@ import { checkCookie } from "src/auth/server";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import { UserStore } from "src/stores/UserStore";
 import { getSortedClusterValues } from "src/utils/cluster";
 import { publicConfig, runtimeConfig } from "src/utils/config";
@@ -63,12 +64,12 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
   const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
   const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
 
-  const clusters = getSortedClusterValues();
-
-
-  publicConfig.CLUSTER_SORTED_ID_LIST.forEach((clusterId) => {
+  const { onlineClusters } = useStore(OnlineClustersStore);
+  const clusters = getSortedClusterValues().filter((x) => Object.keys(onlineClusters).includes(x.id));
+  const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => onlineClusters[id]);
+  sortedIds.forEach((clusterId) => {
     useAsync({ promiseFn: useCallback(async () => {
-      const cluster = publicConfig.CLUSTERS[clusterId];
+      const cluster = onlineClusters[clusterId];
       return api.getAvailableBillingTable({
         query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
         .then((data) => {
@@ -94,7 +95,13 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
             >
               <></>
             </Spin>
-          ) : null
+          ) : (
+            clusters.length === 0 ? (
+              <>
+                {t("common.noAvailableClusters")}
+              </>
+            ) : null
+          )
         }
       </div>
       <div style={completedRequestCount < clusters.length

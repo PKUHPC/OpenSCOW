@@ -13,10 +13,10 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { ClusterOnlineInfoSchema } from "src/models/cluster";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
@@ -37,7 +37,7 @@ export const ActivateClusterSchema = typeboxRouteSchema({
     200: Type.Object({
       executed: Type.Boolean(),
       reason: Type.Optional(Type.String()),
-      currentOnlineClusters: Type.Optional(Type.Array(ClusterOnlineInfoSchema)),
+      currentOnlineClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
     }),
     // 集群不存在
     404: Type.Null(),
@@ -45,7 +45,7 @@ export const ActivateClusterSchema = typeboxRouteSchema({
 });
 
 export default /* #__PURE__*/route(ActivateClusterSchema, async (req, res) => {
-  const { clusterId, comment } = req.body;
+  const { clusterId } = req.body;
 
   const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
@@ -67,16 +67,15 @@ export default /* #__PURE__*/route(ActivateClusterSchema, async (req, res) => {
 
   return await asyncClientCall(client, "activateCluster", {
     clusterId,
-    comment,
     operatorId: info.identityId,
   })
     .then(async (reply) => {
       await callLog(logInfo, OperationResult.SUCCESS);
-      return { 200: { executed: true, currentOnlineClusters: reply.currentOnlineClusters } };
+      return { 200: reply };
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
-      [Status.UNIMPLEMENTED]: (e) => ({ 200: { executed: false, reason: e.details } }),
+      [Status.FAILED_PRECONDITION]: (e) => ({ 200: { executed: false, reason: e.details } }),
       [Status.ALREADY_EXISTS]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),

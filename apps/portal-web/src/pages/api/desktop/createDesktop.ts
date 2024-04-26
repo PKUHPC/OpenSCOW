@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
@@ -20,6 +20,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/config";
+import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const CreateDesktopSchema = typeboxRouteSchema({
@@ -58,7 +59,7 @@ export const CreateDesktopSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(CreateDesktopSchema, async (req, res) => {
+export default /* #__PURE__*/route(CreateDesktopSchema, async (req, res) => {
 
   const { cluster, loginNode, wm, desktopName } = req.body;
 

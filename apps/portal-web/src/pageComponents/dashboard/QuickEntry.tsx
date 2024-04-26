@@ -14,13 +14,11 @@ import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
 import { Localized, prefix } from "src/i18n";
 import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { Cluster } from "src/utils/config";
 import { styled } from "styled-components";
 
@@ -37,7 +35,7 @@ export interface AppWithCluster {
 }
 
 interface Props {
-
+  clusters: Cluster[];
 }
 
 export const defaultEntry: Entry[] = [
@@ -88,13 +86,11 @@ export const defaultEntry: Entry[] = [
 ];
 const p = prefix("pageComp.dashboard.quickEntry.");
 
-export const QuickEntry: React.FC<Props> = () => {
+export const QuickEntry: React.FC<Props> = ({ clusters }) => {
+
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
-
-  const { currentClusters } = useStore(CurrentClustersStore);
-  const clusters = currentClusters;
 
   // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {
@@ -154,6 +150,7 @@ export const QuickEntry: React.FC<Props> = () => {
               isFinished={isFinished}
               quickEntryArray={data?.quickEntries.length ? data?.quickEntries : defaultEntry }
               apps={apps ?? {}}
+              clusters={clusters}
             ></Sortable>
           )}
       </CardsContainer>

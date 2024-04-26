@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Static, Type } from "@sinclair/typebox";
+
 import { I18nStringType } from "./i18n";
 
 export type Cluster = { id: string; name: I18nStringType; }
@@ -19,10 +21,12 @@ export enum ClusterOnlineStatus {
   OFFLINE = 1,
 }
 
-export type ClusterOnlineInfo = {
-  comment?: string | undefined;
-  operatorId?: string | undefined;
-  operatorName?: string | undefined;
-  clusterId: string;
-  onlineStatus: ClusterOnlineStatus;
-}
+export const ClusterDatabaseInfoSchema = Type.Object({
+  clusterId: Type.String(),
+  onlineStatus: Type.Enum(ClusterOnlineStatus),
+  operatorId: Type.Optional(Type.String()),
+  operatorName: Type.Optional(Type.String()),
+  comment: Type.Optional(Type.String()),
+});
+
+export type ClusterDatabaseInfo = Static<typeof ClusterDatabaseInfoSchema>;

@@ -111,6 +111,7 @@ export default {
     exportNoDataErrorMsg: "导出为空，请重新选择",
     blockThresholdAmount: "封锁阈值",
     other: "其他",
+    noAvailableClusters: "当前暂无可用集群",
   },
   dashboard: {
     title: "仪表盘",
@@ -805,6 +806,9 @@ export default {
 
       adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
+      noOnlineClusters: "现在没有可用的集群，请在页面刷新后重试。",
+      notExistInOnlineClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
+
     },
     profile: {
       index: {

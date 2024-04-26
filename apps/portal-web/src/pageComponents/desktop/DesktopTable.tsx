@@ -12,7 +12,7 @@
 
 import { PlusOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { App, Button, Form, Select, Table } from "antd";
+import { Button, Form, Select, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useRouter } from "next/router";
@@ -54,13 +54,8 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const t = useI18nTranslateToString();
 
-  const { message } = App.useApp();
-
-  if (loginDesktopEnabledClusters.length === 0) {
-    message.error("No available loginNodes");
-  }
-
   const { currentClusters } = useStore(CurrentClustersStore);
+
   const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
   refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
 
@@ -75,10 +70,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     ? defaultCluster
     : loginDesktopEnabledClusters[0];
   const cluster = currentClusters.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
-
-  if (!cluster) {
-    message.error("No available cluster");
-  }
 
   const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;
 
