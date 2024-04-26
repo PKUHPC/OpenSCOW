@@ -21,6 +21,7 @@ import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { CopyPublicModelModal } from "./CopyPublicModelModal";
@@ -45,7 +46,10 @@ export const ModelVersionList: React.FC<Props> = (
   const router = useRouter();
 
   const { data: versionData, isFetching, refetch, error: versionError } =
-    trpc.model.versionList.useQuery({ modelId, isPublic });
+    trpc.model.versionList.useQuery({
+      modelId,
+      isPublic: isPublic !== undefined ? parseBooleanParam(isPublic) : undefined,
+    });
   if (versionError) {
     message.error("找不到模型版本");
   }

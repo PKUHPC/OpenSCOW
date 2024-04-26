@@ -24,7 +24,7 @@ import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 export const DatasetListSchema = z.object({
   id: z.number(),
@@ -54,7 +54,7 @@ export const list = procedure
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))

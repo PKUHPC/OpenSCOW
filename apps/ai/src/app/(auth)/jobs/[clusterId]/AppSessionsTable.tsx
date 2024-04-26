@@ -25,6 +25,7 @@ import { Cluster } from "src/server/trpc/route/config";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { calculateAppRemainingTime, compareDateTime, formatDateTime } from "src/utils/datetime";
 import { compareNumber } from "src/utils/math";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { ConnectTopAppLink } from "./ConnectToAppLink";
@@ -69,7 +70,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
   const [connectivityRefreshToken, setConnectivityRefreshToken] = useState(false);
 
   const { data, refetch, isLoading, isFetching } = trpc.jobs.listAppSessions.useQuery({
-    clusterId: cluster.id, isRunning: unfinished,
+    clusterId: cluster.id, isRunning: parseBooleanParam(unfinished),
   });
 
   const cancelJobMutation = trpc.jobs.cancelJob.useMutation({
