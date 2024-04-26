@@ -20,7 +20,7 @@ import { displayIdToPort, getTurboVNCBinPath,
   parseDisplayId, parseListOutput, parseOtp, refreshPassword } from "src/utils/turbovnc";
 
 export const sshDesktopServices = (cluster: string): DesktopOps => ({
-  CreateDesktop: async (request, logger) => {
+  createDesktop: async (request, logger) => {
     const { loginNode: host, wm, userId, desktopName } = request;
 
     const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
@@ -79,7 +79,7 @@ export const sshDesktopServices = (cluster: string): DesktopOps => ({
     });
   },
 
-  KillDesktop: async (request, logger) => {
+  killDesktop: async (request, logger) => {
 
     const { loginNode: host, displayId, userId } = request;
 
@@ -97,7 +97,7 @@ export const sshDesktopServices = (cluster: string): DesktopOps => ({
 
   },
 
-  ConnectToDesktop: async (request, logger) => {
+  connectToDesktop: async (request, logger) => {
 
     const { loginNode: host, displayId, userId } = request;
 
@@ -110,7 +110,7 @@ export const sshDesktopServices = (cluster: string): DesktopOps => ({
 
   },
 
-  ListUserDesktops: async (request, logger) => {
+  listUserDesktops: async (request, logger) => {
 
     const { loginNode: host, userId } = request;
 

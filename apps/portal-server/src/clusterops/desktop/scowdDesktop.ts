@@ -10,18 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ConnectError } from "@connectrpc/connect";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { getScowdClient } from "@scow/lib-scowd/build/client";
 import { Desktop } from "@scow/protos/build/portal/desktop";
 import { DesktopOps } from "src/clusterops/api/desktop";
 import { getDesktopConfig } from "src/utils/desktops";
 import { scowdClientNotFound } from "src/utils/errors";
-import { certificates, convertCodeToGrpcStatus, getLoginNodeScowdUrl } from "src/utils/scowd";
+import { certificates, getLoginNodeScowdUrl } from "src/utils/scowd";
 import { displayIdToPort, getTurboVNCBinPath } from "src/utils/turbovnc";
 
 export const scowdDesktopServices = (cluster: string): DesktopOps => ({
-  CreateDesktop: async (request, logger) => {
+  createDesktop: async (request) => {
     const { loginNode: host, wm, userId, desktopName } = request;
 
     const vncserverBinPath = getTurboVNCBinPath(cluster, "vncserver");
@@ -36,28 +35,17 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const client = getScowdClient(scowdUrl, certificates);
     if (!client) { throw scowdClientNotFound(scowdUrl); }
 
-    try {
-      const res = await client.desktop.createDesktop({
-        vncServerBinPath: vncserverBinPath,
-        maxDesktops, wm, desktopName,
-        desktopDir: desktopsDir, loginNode: host,
-      },
-      { headers: { IdentityId: userId } });
+    const res = await client.desktop.createDesktop({
+      userId,
+      vncServerBinPath: vncserverBinPath,
+      maxDesktops, wm, desktopName,
+      desktopDir: desktopsDir, loginNode: host,
+    });
 
-      return { host, password: res.password, port: displayIdToPort(res.displayId) };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while creating desktop ${desktopName}`,
-      };
-    }
+    return { host, password: res.password, port: displayIdToPort(res.displayId) };
   },
 
-  KillDesktop: async (request, logger) => {
+  killDesktop: async (request) => {
 
     const { loginNode: host, displayId, userId } = request;
 
@@ -74,27 +62,15 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
 
     const { desktopsDir } = getDesktopConfig(cluster);
 
-    try {
-      await client.desktop.killDesktop({
-        vncServerBinPath: vncserverBinPath,
-        displayId, desktopDir: desktopsDir, loginNode: host,
-      },
-      { headers: { IdentityId: userId } });
+    await client.desktop.killDesktop({
+      userId, vncServerBinPath: vncserverBinPath,
+      displayId, desktopDir: desktopsDir, loginNode: host,
+    });
 
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while killing desktop on port ${displayIdToPort(displayId)}`,
-      };
-    }
+    return {};
   },
 
-  ConnectToDesktop: async (request, logger) => {
+  connectToDesktop: async (request) => {
 
     const { loginNode: host, displayId, userId } = request;
 
@@ -109,25 +85,12 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
 
     const vncPasswdPath = getTurboVNCBinPath(cluster, "vncpasswd");
 
-    try {
-      const res = await client.desktop.connectToDesktop({ vncPasswdPath: vncPasswdPath, displayId },
-        { headers: { IdentityId: userId } });
+    const res = await client.desktop.connectToDesktop({ userId, vncPasswdPath: vncPasswdPath, displayId });
 
-      return { host, port: displayIdToPort(displayId), password: res.password };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while connecting to desktop on port ${displayIdToPort(displayId)}`,
-      };
-    }
-
+    return { host, port: displayIdToPort(displayId), password: res.password };
   },
 
-  ListUserDesktops: async (request, logger) => {
+  listUserDesktops: async (request) => {
 
     const { loginNode: host, userId } = request;
 
@@ -143,47 +106,38 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const client = getScowdClient(scowdUrl, certificates);
     if (!client) { throw scowdClientNotFound(scowdUrl); }
 
-    try {
-      const res = await client.desktop.listUserDesktops({
-        vncServerBinPath: vncserverBinPath,
-        loginNode: host,
-        desktopDir: desktopsDir,
-      }, { headers: { IdentityId: userId } });
+    
+    const res = await client.desktop.listUserDesktops({
+      userId,
+      vncServerBinPath: vncserverBinPath,
+      loginNode: host,
+      desktopDir: desktopsDir,
+    });
 
-      const userDeskTops: Desktop[] = res.userDesktops.map((desktop) => {
+    const userDeskTops: Desktop[] = res.userDesktops.map((desktop) => {
 
-        const createTime = !desktop.createTime ? undefined
-          : new Date(Number((desktop.createTime.seconds * BigInt(1000))
-            + BigInt(desktop.createTime.nanos / 1000000)));
+      const createTime = !desktop.createTime ? undefined
+        : new Date(Number((desktop.createTime.seconds * BigInt(1000))
+          + BigInt(desktop.createTime.nanos / 1000000)));
 
+      return {
+        desktopName: desktop.desktopName,
+        displayId: desktop.displayId,
+        wm: desktop.wm,
+        createTime: createTime?.toISOString(),
+      };
+    });
+
+    return { 
+      host, 
+      desktops: userDeskTops.map((desktop) => {
         return {
-          desktopName: desktop.desktopName,
           displayId: desktop.displayId,
+          desktopName: desktop.desktopName,
           wm: desktop.wm,
-          createTime: createTime?.toISOString(),
+          createTime: desktop.createTime,
         };
-      });
-
-      return { 
-        host, 
-        desktops: userDeskTops.map((desktop) => {
-          return {
-            displayId: desktop.displayId,
-            desktopName: desktop.desktopName,
-            wm: desktop.wm,
-            createTime: desktop.createTime,
-          };
-        }),
-      };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while list user ${userId} desktop`,
-      };
-    }
+      }),
+    };
   },
 });

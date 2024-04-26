@@ -23,7 +23,7 @@ import { sshConnect } from "src/utils/ssh";
 import { once } from "stream";
 
 export const sshFileServices = (host: string): FileOps => ({
-  Copy: async (request, logger) => {
+  copy: async (request, logger) => {
     const { userId, fromPath, toPath } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -39,7 +39,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  CreateFile: async (request, logger) => {
+  createFile: async (request, logger) => {
 
     const { userId, path } = request;
 
@@ -57,7 +57,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  DeleteDirectory: async (request, logger) => {
+  deleteDirectory: async (request, logger) => {
     const { userId, path } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -68,7 +68,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  DeleteFile: async (request, logger) => {
+  deleteFile: async (request, logger) => {
 
     const { userId, path } = request;
 
@@ -82,7 +82,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  GetHomeDirectory: async (request, logger) => {
+  getHomeDirectory: async (request, logger) => {
     const { userId } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -94,7 +94,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  MakeDirectory: async (request, logger) => {
+  makeDirectory: async (request, logger) => {
     const { userId, path } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -112,7 +112,7 @@ export const sshFileServices = (host: string): FileOps => ({
 
   },
 
-  Move: async (request, logger) => {
+  move: async (request, logger) => {
     const { userId, fromPath, toPath } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -126,7 +126,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  ReadDirectory: async (request, logger) => {
+  readDirectory: async (request, logger) => {
     const { userId, path, updateAccessTime } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -189,7 +189,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  Download: async (request, logger) => {
+  download: async (request, logger) => {
     const { userId, path, call } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -221,7 +221,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  Upload: async (request, logger) => {
+  upload: async (request, logger) => {
     const { call, userId, path } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -284,15 +284,11 @@ export const sshFileServices = (host: string): FileOps => ({
             e.message,
           ).toServiceError();
         }
-
       }
-
     });
-
-
   },
 
-  GetFileMetadata: async (request, logger) => {
+  getFileMetadata: async (request, logger) => {
     const { userId, path } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {
@@ -309,7 +305,7 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
-  Exists: async (request, logger) => {
+  exists: async (request, logger) => {
     const { userId, path } = request;
 
     return await sshConnect(host, userId, logger, async (ssh) => {

@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Code } from "@connectrpc/connect";
-import { status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
@@ -52,44 +50,4 @@ export function getLoginNodeFromAddress(cluster: string, address: string) {
   const loginNode = loginNodes.find((loginNode) => loginNode.address === address);
 
   return loginNode;
-}
-
-// 函数将 Code 转换为 @grpc/grpc-js 的 status
-export function convertCodeToGrpcStatus(code: Code): status {
-  switch (code) {
-  case Code.Canceled:
-    return status.CANCELLED;
-  case Code.Unknown:
-    return status.UNKNOWN;
-  case Code.InvalidArgument:
-    return status.INVALID_ARGUMENT;
-  case Code.DeadlineExceeded:
-    return status.DEADLINE_EXCEEDED;
-  case Code.NotFound:
-    return status.NOT_FOUND;
-  case Code.AlreadyExists:
-    return status.ALREADY_EXISTS;
-  case Code.PermissionDenied:
-    return status.PERMISSION_DENIED;
-  case Code.ResourceExhausted:
-    return status.RESOURCE_EXHAUSTED;
-  case Code.FailedPrecondition:
-    return status.FAILED_PRECONDITION;
-  case Code.Aborted:
-    return status.ABORTED;
-  case Code.OutOfRange:
-    return status.OUT_OF_RANGE;
-  case Code.Unimplemented:
-    return status.UNIMPLEMENTED;
-  case Code.Internal:
-    return status.INTERNAL;
-  case Code.Unavailable:
-    return status.UNAVAILABLE;
-  case Code.DataLoss:
-    return status.DATA_LOSS;
-  case Code.Unauthenticated:
-    return status.UNAUTHENTICATED;
-  default:
-    return status.OK;
-  }
 }

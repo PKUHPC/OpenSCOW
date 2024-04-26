@@ -63,8 +63,8 @@ export interface ListUserDesktopsReply {
 }
 
 export interface DesktopOps {
-  CreateDesktop(req: CreateDesktopRequest, logger: Logger): Promise<CreateDesktopReply>;
-  KillDesktop(req: KillDesktopRequest, logger: Logger): Promise<KillDesktopReply>;
-  ConnectToDesktop(req: ConnectToDesktopRequest, logger: Logger): Promise<ConnectToDesktopReply>;
-  ListUserDesktops(req: ListUserDesktopsRequest, logger: Logger): Promise<ListUserDesktopsReply>;
+  createDesktop(req: CreateDesktopRequest, logger: Logger): Promise<CreateDesktopReply>;
+  killDesktop(req: KillDesktopRequest, logger: Logger): Promise<KillDesktopReply>;
+  connectToDesktop(req: ConnectToDesktopRequest, logger: Logger): Promise<ConnectToDesktopReply>;
+  listUserDesktops(req: ListUserDesktopsRequest, logger: Logger): Promise<ListUserDesktopsReply>;
 }

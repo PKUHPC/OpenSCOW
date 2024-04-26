@@ -10,201 +10,101 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ConnectError } from "@connectrpc/connect";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ScowdClient } from "@scow/lib-scowd/build/client";
 import { FileInfo, fileInfo_FileTypeFromJSON } from "@scow/protos/build/portal/file";
 import { FileType } from "@scow/scowd-protos/build/storage/file_pb";
 import { FileOps } from "src/clusterops/api/file";
 import { config } from "src/config/env";
-import { convertCodeToGrpcStatus } from "src/utils/scowd";
 
 export const scowdFileServices = (client: ScowdClient): FileOps => ({
-  Copy: async (request, logger) => {
+  copy: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    try {
-      await client.file.copy({ fromPath, toPath }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while copying file ${fromPath} to ${toPath}`,
-      };
-    }
+    await client.file.copy({ fromPath, toPath }, { headers: { IdentityId: userId } });
+    return {};
+    
   },
 
-  CreateFile: async (request, logger) => {
+  createFile: async (request) => {
 
     const { userId, path } = request;
 
-    try {
-      await client.file.createFile({ filePath: path }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while creating file ${path}`,
-      };
-    }
+    await client.file.createFile({ filePath: path }, { headers: { IdentityId: userId } });
+    return {};
+    
   },
 
-  DeleteDirectory: async (request, logger) => {
+  deleteDirectory: async (request) => {
     const { userId, path } = request;
 
-    try {
-      await client.file.deleteDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while deleting directory ${path}`,
-      };
-    }
+    await client.file.deleteDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
+    return {};
   },
 
-  DeleteFile: async (request, logger) => {
+  deleteFile: async (request) => {
 
     const { userId, path } = request;
 
-    try {
-      await client.file.deleteFile({ filePath: path }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while deleting file ${path}`,
-      };
-    }
+    await client.file.deleteFile({ filePath: path }, { headers: { IdentityId: userId } });
+    return {};
   },
 
-  GetHomeDirectory: async (request, logger) => {
+  getHomeDirectory: async (request) => {
     const { userId } = request;
 
-    try {
-      const res = await client.file.getHomeDirectory({}, { headers: { IdentityId: userId } });
-      return { path: res.path };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while get ${userId}'s home directory`,
-      };
-    }
+    const res = await client.file.getHomeDirectory({}, { headers: { IdentityId: userId } });
+    return { path: res.path };
   },
 
-  MakeDirectory: async (request, logger) => {
+  makeDirectory: async (request) => {
     const { userId, path } = request;
 
-    try {
-      await client.file.makeDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while making directory ${path}`,
-      };
-    }
+    await client.file.makeDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
+    return {};
   },
 
-  Move: async (request, logger) => {
+  move: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    try {
-      await client.file.move({ fromPath, toPath }, { headers: { IdentityId: userId } });
-      return {};
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while moving ${fromPath} to ${toPath}`,
-      };
-    }
+    await client.file.move({ fromPath, toPath }, { headers: { IdentityId: userId } });
+    return {};
+    
   },
 
-  ReadDirectory: async (request, logger) => {
+  readDirectory: async (request) => {
     const { userId, path } = request;
 
-    try {
-      const res = await client.file.readDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
+    
+    const res = await client.file.readDirectory({ userId, dirPath: path });
 
-      const results: FileInfo[] = res.filesInfo.map((info): FileInfo => {
-        return {
-          name: info.name,
-          type: fileInfo_FileTypeFromJSON(info.fileType),
-          mtime: info.modTime,
-          mode: info.mode,
-          size: Number(info.size),
-        };
-      });
-      return { results };
-    } catch (err) {
-      logger.error(err);
-
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while reading directory ${path}`,
+    const results: FileInfo[] = res.filesInfo.map((info): FileInfo => {
+      return {
+        name: info.name,
+        type: fileInfo_FileTypeFromJSON(info.fileType),
+        mtime: info.modTime,
+        mode: info.mode,
+        size: Number(info.size),
       };
-    }
+    });
+    return { results };
   },
 
-  Download: async (request, logger) => {
+  download: async (request) => {
     const { userId, path, call } = request;
 
-    try {
-      const readStream = await client.file.download({
-        path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
-      }, { headers: { IdentityId: userId } });
+    const readStream = await client.file.download({
+      userId, path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
+    });
 
-      for await (const response of readStream) {
-        call.write(response);
-      }
-
-      return {};
-    } catch (err) {
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw {
-        code: status.INTERNAL,
-        details: `Error when reading file ${path}`,
-      };
-    } finally {
-      call.end();
-      logger.info("Download file completed");
+    for await (const response of readStream) {
+      call.write(response);
     }
+
+    return {};
   },
 
-  Upload: async (request, logger) => {
+  upload: async (request, logger) => {
     const { call, userId, path } = request;
 
     class RequestError {
@@ -221,67 +121,35 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
 
     logger.info("Upload file started");
 
-    try {
-      const res = await client.file.upload((async function* () {
-        yield { message: { case: "info", value: { path, userId } } };
+    const res = await client.file.upload((async function* () {
+      yield { message: { case: "info", value: { path, userId } } };
 
-        for await (const data of call.iter()) {
-          if (data.message?.$case !== "chunk") {
-            throw new RequestError(
-              status.INVALID_ARGUMENT,
-              `Expect receive chunk but received message of type ${data.message?.$case}`,
-            );
-          }
-          yield { message: { case: "chunk", value: data.message.chunk } };
+      for await (const data of call.iter()) {
+        if (data.message?.$case !== "chunk") {
+          throw new RequestError(
+            status.INVALID_ARGUMENT,
+            `Expect receive chunk but received message of type ${data.message?.$case}`,
+          );
         }
-      })());
-      return { writtenBytes: Number(res.writtenBytes) };
-    } catch (err) {
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
+        yield { message: { case: "chunk", value: data.message.chunk } };
       }
-      throw {
-        code: status.INTERNAL,
-        details: `Error when writing file ${path}`,
-      };
-    }
+    })());
+    return { writtenBytes: Number(res.writtenBytes) };
   },
 
-  GetFileMetadata: async (request, logger) => {
+  getFileMetadata: async (request) => {
     const { userId, path } = request;
 
-    try {
-      const res = await client.file.getFileMetadata({ filePath: path }, { headers: { IdentityId: userId } });
+    const res = await client.file.getFileMetadata({ userId, filePath: path });
 
-      return { size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while getting file ${path} metadata`,
-      };
-    }
+    return { size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" };
   },
 
-  Exists: async (request, logger) => {
+  exists: async (request) => {
     const { userId, path } = request;
 
-    try {
-      const res = await client.file.exists({ path: path }, { headers: { IdentityId: userId } });
+    const res = await client.file.exists({ userId, path: path });
 
-      return { exists: res.exists };
-    } catch (err) {
-      logger.error(err);
-      if (err instanceof ConnectError) {
-        throw <ServiceError>{ code: convertCodeToGrpcStatus(err.code), details: err.message };
-      }
-      throw <ServiceError>{
-        code: status.UNKNOWN,
-        details: `An unknown error occurred while check file ${path} exists`,
-      };
-    }
+    return { exists: res.exists };
   },
 });

@@ -18,7 +18,8 @@ message FileInfo {
 }
 
 message ReadDirectoryRequest {
-  string dir_path = 1;
+  string user_id = 1;
+  string dir_path = 2;
 }
 
 message ReadDirectoryResponse {
@@ -26,35 +27,40 @@ message ReadDirectoryResponse {
 }
 
 message CreateFileRequest {
-  string file_path = 1;
+  string user_id = 1;
+  string file_path = 2;
 }
 
 message CreateFileResponse {
 }
 
 message MakeDirectoryRequest {
-  string dir_path = 1;
+  string user_id = 1;
+  string dir_path = 2;
 }
 
 message MakeDirectoryResponse {
 }
 
 message DeleteDirectoryRequest {
-  string dir_path = 1;
+  string user_id = 1;
+  string dir_path = 2;
 }
 
 message DeleteDirectoryResponse {
 }
 
 message DeleteFileRequest {
-  string file_path = 1;
+  string user_id = 1;
+  string file_path = 2;
 }
 
 message DeleteFileResponse {
 }
 
 message GetFileMetadataRequest {
-  string file_path = 1;
+  string user_id = 1;
+  string file_path = 2;
 }
 
 message GetFileMetadataResponse {
@@ -63,6 +69,7 @@ message GetFileMetadataResponse {
 }
 
 message GetHomeDirectoryRequest {
+  string user_id = 1;
 }
 
 message GetHomeDirectoryResponse {
@@ -70,15 +77,17 @@ message GetHomeDirectoryResponse {
 }
 
 message MoveRequest {
-  string from_path = 1;
-  string to_path = 2;
+  string user_id = 1;
+  string from_path = 2;
+  string to_path = 3;
 }
 
 message MoveResponse {
 }
 
 message ExistsRequest {
-  string path = 1;
+  string user_id = 1;
+  string path = 2;
 }
 
 message ExistsResponse {
@@ -86,8 +95,9 @@ message ExistsResponse {
 }
 
 message CopyRequest {
-  string from_path = 1;
-  string to_path = 2;
+  string user_id = 1;
+  string from_path = 2;
+  string to_path = 3;
 }
 
 message CopyResponse {
@@ -111,8 +121,9 @@ message UploadResponse {
 }
 
 message DownloadRequest {
-  string path = 1;
-  uint32 chunk_size = 2;
+  string user_id = 1;
+  string path = 2;
+  uint32 chunk_size = 3;
 }
 
 message DownloadResponse {
@@ -129,10 +140,11 @@ message TransferInfo {
 }
 
 message StartFileTransferRequest {
-  string to_transfer_node_host = 1;
-  string to_transfer_node_port = 2;
-  string from_path = 3;
-  string to_path = 4;
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string to_transfer_node_port = 3;
+  string from_path = 4;
+  string to_path = 5;
 }
 
 message StartFileTransferResponse {
@@ -140,6 +152,7 @@ message StartFileTransferResponse {
 }
 
 message QueryFileTransferRequest {
+  string user_id = 1;
 }
 
 message QueryFileTransferResponse {
@@ -147,8 +160,9 @@ message QueryFileTransferResponse {
 }
 
 message TerminateFileTransferRequest {
-  string to_transfer_node_host = 1;
-  string from_path = 2;
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string from_path = 3;
 }
 
 message TerminateFileTransferResponse {
@@ -156,8 +170,9 @@ message TerminateFileTransferResponse {
 }
 
 message CheckTransferKeyRequest {
-  string to_transfer_node_host = 1;
-  string to_transfer_node_port = 2;
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string to_transfer_node_port = 3;
 }
 
 message CheckTransferKeyResponse {

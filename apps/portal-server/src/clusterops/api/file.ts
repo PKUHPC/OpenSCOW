@@ -138,22 +138,22 @@ export interface GetFileMetadataReply {
 }
 
 export interface FileOps {
-  Copy(req: CopyRequest, logger: Logger): Promise<CopyReply>;
-  Move(req: MoveRequest, logger: Logger): Promise<MoveReply>;
-  Exists(req: ExistsRequest, logger: Logger): Promise<ExistsReply>;
+  copy(req: CopyRequest, logger: Logger): Promise<CopyReply>;
+  move(req: MoveRequest, logger: Logger): Promise<MoveReply>;
+  exists(req: ExistsRequest, logger: Logger): Promise<ExistsReply>;
 
-  CreateFile(req: CreateFileRequest, logger: Logger): Promise<CreateFileReply>;
-  DeleteFile(req: DeleteFileRequest, logger: Logger): Promise<DeleteFileReply>;
+  createFile(req: CreateFileRequest, logger: Logger): Promise<CreateFileReply>;
+  deleteFile(req: DeleteFileRequest, logger: Logger): Promise<DeleteFileReply>;
 
-  ReadDirectory(req: ReadDirectoryRequest, logger: Logger): Promise<ReadDirectoryReply>;
-  DeleteDirectory(req: DeleteDirectoryRequest, logger: Logger): Promise<DeleteDirectoryReply>;
-  GetHomeDirectory(req: GetHomeDirectoryRequest, logger: Logger): Promise<GetHomeDirectoryReply>;
-  MakeDirectory(req: MakeDirectoryRequest, logger: Logger): Promise<MakeDirectoryReply>;
+  readDirectory(req: ReadDirectoryRequest, logger: Logger): Promise<ReadDirectoryReply>;
+  deleteDirectory(req: DeleteDirectoryRequest, logger: Logger): Promise<DeleteDirectoryReply>;
+  getHomeDirectory(req: GetHomeDirectoryRequest, logger: Logger): Promise<GetHomeDirectoryReply>;
+  makeDirectory(req: MakeDirectoryRequest, logger: Logger): Promise<MakeDirectoryReply>;
 
-  Upload(req: UploadRequest, logger: Logger): Promise<UploadReply>;
-  Download(req: DownloadRequest, logger: Logger): Promise<DownloadReply>;
+  upload(req: UploadRequest, logger: Logger): Promise<UploadReply>;
+  download(req: DownloadRequest, logger: Logger): Promise<DownloadReply>;
 
-  GetFileMetadata(req: GetFileMetadataRequest, logger: Logger): Promise<GetFileMetadataReply>;
+  getFileMetadata(req: GetFileMetadataRequest, logger: Logger): Promise<GetFileMetadataReply>;
 
   // StartFileTransfer(req: StartFileTransferRequest, logger: Logger): Promise<StartFileTransferReply>;
   // QueryFileTransfer(req: QueryFileTransferRequest, logger: Logger): Promise<QueryFileTransferReply>;
