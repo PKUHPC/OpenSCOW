@@ -32,7 +32,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.Copy({ userId, fromPath, toPath }, logger);
+      await clusterops.file.copy({ userId, fromPath, toPath }, logger);
 
       return [{}];
     },
@@ -47,7 +47,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.CreateFile({ userId, path }, logger);
+      await clusterops.file.createFile({ userId, path }, logger);
 
       return [{}];
     },
@@ -61,7 +61,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.DeleteDirectory({ userId, path }, logger);
+      await clusterops.file.deleteDirectory({ userId, path }, logger);
 
       return [{}];
     },
@@ -76,7 +76,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.DeleteFile({ userId, path }, logger);
+      await clusterops.file.deleteFile({ userId, path }, logger);
 
       return [{}];
     },
@@ -90,7 +90,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.file.GetHomeDirectory({ userId }, logger);
+      const reply = await clusterops.file.getHomeDirectory({ userId }, logger);
 
       return [{ ...reply }];
     },
@@ -104,7 +104,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.MakeDirectory({ userId, path }, logger);
+      await clusterops.file.makeDirectory({ userId, path }, logger);
 
       return [{}];
     },
@@ -118,7 +118,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.Move({ userId, fromPath, toPath }, logger);
+      await clusterops.file.move({ userId, fromPath, toPath }, logger);
 
       return [{}];
     },
@@ -132,7 +132,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.file.ReadDirectory({ userId, path, updateAccessTime }, logger);
+      const reply = await clusterops.file.readDirectory({ userId, path, updateAccessTime }, logger);
 
       return [{ ...reply }];
     },
@@ -149,7 +149,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.file.Download({ userId, path, call }, logger);
+      await clusterops.file.download({ userId, path, call }, logger);
 
     },
 
@@ -175,7 +175,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.file.Upload({ userId, path, call }, logger);
+      const reply = await clusterops.file.upload({ userId, path, call }, logger);
 
       return [{ ...reply }];
 
@@ -190,7 +190,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.file.GetFileMetadata({ userId, path }, logger);
+      const reply = await clusterops.file.getFileMetadata({ userId, path }, logger);
 
       return [{ ...reply }];
     },
@@ -204,7 +204,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.file.Exists({ userId, path }, logger);
+      const reply = await clusterops.file.exists({ userId, path }, logger);
 
       return [{ ...reply }];
     },

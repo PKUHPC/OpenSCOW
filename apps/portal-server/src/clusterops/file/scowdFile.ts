@@ -21,7 +21,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
   copy: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    await client.file.copy({ fromPath, toPath }, { headers: { IdentityId: userId } });
+    await client.file.copy({ userId, fromPath, toPath });
     return {};
     
   },
@@ -30,7 +30,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
 
     const { userId, path } = request;
 
-    await client.file.createFile({ filePath: path }, { headers: { IdentityId: userId } });
+    await client.file.createFile({ userId, filePath: path });
     return {};
     
   },
@@ -38,7 +38,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
   deleteDirectory: async (request) => {
     const { userId, path } = request;
 
-    await client.file.deleteDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
+    await client.file.deleteDirectory({ userId, dirPath: path });
     return {};
   },
 
@@ -46,28 +46,28 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
 
     const { userId, path } = request;
 
-    await client.file.deleteFile({ filePath: path }, { headers: { IdentityId: userId } });
+    await client.file.deleteFile({ userId, filePath: path });
     return {};
   },
 
   getHomeDirectory: async (request) => {
     const { userId } = request;
 
-    const res = await client.file.getHomeDirectory({}, { headers: { IdentityId: userId } });
+    const res = await client.file.getHomeDirectory({ userId });
     return { path: res.path };
   },
 
   makeDirectory: async (request) => {
     const { userId, path } = request;
 
-    await client.file.makeDirectory({ dirPath: path }, { headers: { IdentityId: userId } });
+    await client.file.makeDirectory({ userId, dirPath: path });
     return {};
   },
 
   move: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    await client.file.move({ fromPath, toPath }, { headers: { IdentityId: userId } });
+    await client.file.move({ userId, fromPath, toPath });
     return {};
     
   },

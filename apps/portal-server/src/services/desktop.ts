@@ -39,7 +39,7 @@ export const desktopServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.desktop.CreateDesktop({ loginNode: host, wm, userId, desktopName }, logger);
+      const reply = await clusterops.desktop.createDesktop({ loginNode: host, wm, userId, desktopName }, logger);
 
       return [{ ...reply }];
       
@@ -55,7 +55,7 @@ export const desktopServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      await clusterops.desktop.KillDesktop({ loginNode: host, userId, displayId }, logger);
+      await clusterops.desktop.killDesktop({ loginNode: host, userId, displayId }, logger);
 
       return [{}];
     },
@@ -70,7 +70,7 @@ export const desktopServiceServer = plugin((server) => {
 
       const clusterops = getClusterOps(cluster);
 
-      const reply = await clusterops.desktop.ConnectToDesktop({ loginNode: host, userId, displayId }, logger);
+      const reply = await clusterops.desktop.connectToDesktop({ loginNode: host, userId, displayId }, logger);
 
       return [{ ...reply }];
     },
@@ -85,7 +85,7 @@ export const desktopServiceServer = plugin((server) => {
 
       if (host) {
         checkLoginNodeInCluster(cluster, host);
-        const reply = await clusterops.desktop.ListUserDesktops({ loginNode: host, userId }, logger);
+        const reply = await clusterops.desktop.listUserDesktops({ loginNode: host, userId }, logger);
         return [{ userDesktops: [{ ...reply }]}];
       }
 
@@ -95,7 +95,7 @@ export const desktopServiceServer = plugin((server) => {
       }
       // 请求集群的所有登录节点
       return await Promise.all(loginNodes.map(async (loginNode) => {
-        return await clusterops.desktop.ListUserDesktops({ loginNode: loginNode.address, userId }, logger);
+        return await clusterops.desktop.listUserDesktops({ loginNode: loginNode.address, userId }, logger);
       })).then((response) => {
         return [{ userDesktops: response }];
       });
