@@ -25,7 +25,7 @@ import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 export const ModelListSchema = z.object({
   id: z.number(),
@@ -52,7 +52,7 @@ export const list = procedure
   .input(z.object({
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(ModelListSchema), count: z.number() }))
@@ -163,7 +163,15 @@ export const updateModel = procedure
 
     const model = await em.findOne(Model, { id });
 
-    const modelExist = await em.findOne(Model, { name });
+    if (!model) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `Model (id:${id}) is not found`,
+      });
+    }
+
+    const modelExist = await em.findOne(Model, { name, owner: user.identityId });
+
     if (modelExist && modelExist !== model) {
       throw new TRPCError({
         code: "CONFLICT",

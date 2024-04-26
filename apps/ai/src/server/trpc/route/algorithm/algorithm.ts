@@ -23,7 +23,7 @@ import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 
 export const getAlgorithms = procedure
@@ -39,8 +39,8 @@ export const getAlgorithms = procedure
     ...paginationSchema.shape,
     framework: z.nativeEnum(Framework).optional(),
     nameOrDesc: z.string().optional(),
-    clusterId:z.string().optional(),
-    isPublic:z.boolean().optional(),
+    clusterId: z.string().optional(),
+    isPublic: booleanQueryParam().optional(),
   }))
   .output(z.object({ items: z.array(z.object({
     id:z.number(),
@@ -160,7 +160,10 @@ export const updateAlgorithm = procedure
       });
     }
 
-    const algorithmExist = await em.findOne(Algorithm, { name });
+    const algorithmExist = await em.findOne(Algorithm, { name,
+      owner: user.identityId,
+    });
+
     if (algorithmExist && algorithmExist !== algorithm) {
       throw new TRPCError({
         code: "CONFLICT",
