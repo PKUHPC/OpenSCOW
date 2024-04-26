@@ -74,8 +74,8 @@ export const getChargesTargetSearchParam = (
 /**
  * generate charge records' search type
  */
-export const getChargesSearchType = (type: string[]) => {
-  if (!type.length) {
+export const getChargesSearchType = (type: string[] | undefined) => {
+  if (!type?.length) {
     return { type: { $ne: null } };
   }
 
@@ -93,6 +93,7 @@ export const getChargesSearchType = (type: string[]) => {
  */
 
 export const getPaymentsTargetSearchParam = (target:
+| { $case: "accountOfTenant";accountOfTenant: AccountOfTenantTarget; }
 | { $case: "specificAccountsOfTenant"; specificAccountsOfTenant: SpecificAccountsOfTenantTarget }
 | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
 | { $case: "tenant"; tenant: TenantTarget }

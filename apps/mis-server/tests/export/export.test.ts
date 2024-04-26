@@ -253,7 +253,7 @@ it("export charge Records", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
-      tenantName: data.accountA.tenant.getProperty("name") } }, type:[chargeRecord1.type],
+      tenantName: data.accountA.tenant.getProperty("name") } }, types:[chargeRecord1.type],
     userIds: [data.userA.userId],
   });
 

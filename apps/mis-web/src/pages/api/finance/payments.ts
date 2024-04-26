@@ -49,7 +49,7 @@ export const GetPaymentsSchema = typeboxRouteSchema({
      */
     endTime: Type.String({ format: "date-time" }),
 
-    accountName: Type.Optional(Type.Array(Type.String())),
+    accountNames: Type.Optional(Type.Array(Type.String())),
 
     searchType: Type.Enum(SearchType),
     // 充值类型
@@ -92,20 +92,20 @@ export const getPaymentRecordTarget = (
 
 export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
 
-  const { endTime, startTime, accountName, searchType, type } = req.query;
+  const { endTime, startTime, accountNames, searchType, type } = req.query;
 
   const client = getClient(ChargingServiceClient);
 
   let user: UserInfo | undefined;
 
   // check whether the user can access the account
-  if (accountName) {
+  if (accountNames) {
     user = await authenticate((i) =>
       i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
       i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
       // 排除掉前面的租户财务员和管理员，只剩下账户管理员
-      accountName.length === 1 &&
-      i.accountAffiliations.some((x) => x.accountName === accountName[0] && x.role !== UserRole.USER),
+      accountNames.length === 1 &&
+      i.accountAffiliations.some((x) => x.accountName === accountNames[0] && x.role !== UserRole.USER),
     )(req, res);
     if (!user) { return; }
   } else {
@@ -116,10 +116,10 @@ export default typeboxRoute(GetPaymentsSchema, async (req, res) => {
     if (!user) { return; }
   }
 
-  const tenantOfAccount = await getTenantOfAccount(accountName, user);
+  const tenantOfAccount = await getTenantOfAccount(accountNames, user);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaymentRecords", {
-    target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountName),
+    target: getPaymentRecordTarget(searchType, user, tenantOfAccount, accountNames),
     startTime,
     endTime,
     type:type ?? [],

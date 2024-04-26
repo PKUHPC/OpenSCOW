@@ -100,7 +100,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
         return api.getTenantPayments({ query: { ...param, tenantName: query.name ? query.name[0] : undefined } });
 
       } else {
-        return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
+        return api.getPayments({ query: { ...param, accountNames: query.name, searchType } });
       }
     }, [query]),
   });

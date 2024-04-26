@@ -81,7 +81,7 @@ export const ChargeTable: React.FC<Props> = ({
       userIds: undefined,
     });// 查询对象
 
-  // 过滤后的充值类型数组
+  // 过滤后的消费类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
   // 在账户管理下切换不同账户消费记录页面时
@@ -102,10 +102,10 @@ export const ChargeTable: React.FC<Props> = ({
     setSelectedAccountNames(accountName);
   }, [accountName]);
 
-  // 异步获取充值记录的函数
+  // 异步获取消费记录的函数
   const recordsPromiseFn = useCallback(async () => {
     const getChargesInfo = await api.getCharges({ query: {
-      accountName: query.name,
+      accountNames: query.name,
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
       type: query.type,
@@ -126,10 +126,10 @@ export const ChargeTable: React.FC<Props> = ({
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
-        accountName: query.name,
+        accountNames: query.name,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
-        type: query.type,
+        types: query.type,
         isPlatformRecords,
         searchType,
         userIds: convertUserIdArray(query.userIds),
@@ -137,7 +137,7 @@ export const ChargeTable: React.FC<Props> = ({
     });
   }, [query]);
 
-  // 使用异步 hook 获取充值记录和总数
+  // 使用异步 hook 获取消费记录和总数
   const { data: recordsData, isLoading: isRecordsLoading } = useAsync({
     promiseFn: recordsPromiseFn,
   });
@@ -146,7 +146,7 @@ export const ChargeTable: React.FC<Props> = ({
     promiseFn: totalResultPromiseFn,
   });
 
-  // 处理充值记录导出的函数
+  // 处理消费记录导出的函数
   const handleExport = async (columns: string[]) => {
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
@@ -162,7 +162,7 @@ export const ChargeTable: React.FC<Props> = ({
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
           accountName: query.name,
-          type: query.type,
+          types: query.type,
           searchType: searchType,
           isPlatformRecords: !!isPlatformRecords,
           userIds: query.userIds,

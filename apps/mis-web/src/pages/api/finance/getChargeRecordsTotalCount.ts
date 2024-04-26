@@ -37,12 +37,12 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
 
     // 消费类型
-    type: Type.Optional(Type.Array(Type.String())),
+    types: Type.Optional(Type.Array(Type.String())),
 
     // 消费的用户id
     userIds: Type.Optional(Type.Array(Type.String())),
 
-    accountName: Type.Optional(Type.Array(Type.String())),
+    accountNames: Type.Optional(Type.Array(Type.String())),
 
     // 是否为平台管理下的记录：如果是则需查询所有租户，如果不是只查询当前租户
     isPlatformRecords: Type.Optional(Type.Boolean()),
@@ -60,20 +60,20 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) => {
-  const { endTime, startTime, accountName, isPlatformRecords, searchType, type, userIds } = req.query;
-  const info = await getUserInfoForCharges(accountName, req, res);
+  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIds } = req.query;
+  const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
 
-  const tenantOfAccount = await getTenantOfAccount(accountName, info);
+  const tenantOfAccount = await getTenantOfAccount(accountNames, info);
 
   const client = getClient(ChargingServiceClient);
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime,
     endTime,
-    type:type ?? [],
+    types:types ?? [],
     userIds: userIds ?? [],
-    target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
+    target: buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords),
   }), ["totalAmount", "totalCount"]);
 
   return {

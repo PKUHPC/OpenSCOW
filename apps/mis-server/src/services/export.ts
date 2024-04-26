@@ -270,13 +270,14 @@ export const exportServiceServer = plugin((server) => {
         startTime,
         endTime,
         type,
+        types,
         target,
         count,
         userIds,
       } = request;
 
       const searchParam = getChargesTargetSearchParam(target);
-      const searchType = getChargesSearchType(type);
+      const searchType = getChargesSearchType(types ?? type);
 
       const query = {
         time: { $gte: startTime, $lte: endTime },

@@ -39,7 +39,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     count: Type.Number(),
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
-    type: Type.Optional(Type.Array(Type.String())),
+    types: Type.Optional(Type.Array(Type.String())),
     accountName: Type.Optional(Type.Array(Type.String())),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
@@ -59,10 +59,10 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
   const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
-  let { accountName, type } = query;
+  let { accountName, types } = query;
   // targetName为空字符串数组视为undefined
   accountName = emptyArrayToUndefined(accountName);
-  type = emptyArrayToUndefined(type);
+  types = emptyArrayToUndefined(types);
 
   const info = await getUserInfoForCharges(accountName, req, res);
 
@@ -103,7 +103,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       count,
       startTime,
       endTime,
-      type:type ?? [],
+      types:types ?? [],
       target,
       userIds: userIdArray,
     });
