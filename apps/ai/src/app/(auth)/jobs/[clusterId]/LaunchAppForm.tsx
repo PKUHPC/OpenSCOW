@@ -30,6 +30,7 @@ import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
 import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
 import { formatSize } from "src/utils/format";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { useDataOptions, useDataVersionOptions } from "./hooks";
@@ -51,7 +52,7 @@ interface Props {
 interface FixedFormFields {
   appJobName: string;
   algorithm: { name: number, version: number };
-  image: { name: number };
+  image: { type?: AccessibilityType, name?: number };
   remoteImageUrl: string | undefined;
   startCommand?: string;
   dataset: { name: number, version: number };
@@ -184,9 +185,9 @@ export const LaunchAppForm = (props: Props) => {
   const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
-    isPublic: isImagePublic,
+    isPublic: isImagePublic !== undefined ? parseBooleanParam(isImagePublic) : undefined,
     clusterId,
-    withExternal: true,
+    withExternal: "true",
   }, {
     enabled: isImagePublic !== undefined,
   });

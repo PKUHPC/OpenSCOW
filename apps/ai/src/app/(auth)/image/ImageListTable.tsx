@@ -25,6 +25,7 @@ import { SourceText, Status } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { CopyImageModal } from "./CopyImageModal";
@@ -67,7 +68,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
   const cluster = Form.useWatch("cluster", form);
 
   const { data, refetch, isFetching, error } = trpc.image.list.useQuery({
-    ...pageInfo, ...query, clusterId: cluster?.id,
+    ...pageInfo, ...query, isPublic: parseBooleanParam(isPublic), clusterId: cluster?.id,
   });
 
   const { modal, message } = App.useApp();
@@ -239,7 +240,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                           onOk: async () => {
                             await deleteImageMutation.mutateAsync({
                               id: r.id,
-                              force: r.status === Status.CREATING,
+                              force: parseBooleanParam(r.status === Status.CREATING),
                             });
                           },
                         });
