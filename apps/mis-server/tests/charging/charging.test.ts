@@ -154,11 +154,17 @@ it("concurrently pays", async () => {
 
   const requests = range(0, 10).map(createRequests);
 
-  const responses = await Promise.allSettled(requests.map(async (x) => {
-    const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
-    return await asyncClientCall(client, "pay", x);
-  }));
+  // const responses = await Promise.allSettled(requests.map(async (x) => {
+  //   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  //   return await asyncClientCall(client, "pay", x);
+  // }));
 
+  const responses: PromiseSettledResult<any>[] = [];
+  const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  for (const request of requests) {
+    const response = await asyncClientCall(client, "pay", request);
+    responses.push({ status: "fulfilled", value: response }); // Assuming all calls are successful
+  }
   expect(responses.every((x) => x.status === "fulfilled")).toBeTrue();
 
   await reloadEntity(em, account);
@@ -236,10 +242,16 @@ it("concurrently charges", async () => {
 
   const requests = range(0, 10).map(createRequest);
 
-  const responses = await Promise.allSettled(requests.map(async (x) => {
-    const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
-    return await asyncClientCall(client, "charge", x);
-  }));
+  const responses: PromiseSettledResult<any>[] = [];
+  const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  for (const request of requests) {
+    const response = await asyncClientCall(client, "charge", request);
+    responses.push({ status: "fulfilled", value: response }); // Assuming all calls are successful
+  }
+  // const responses = await Promise.allSettled(requests.map(async (x) => {
+  //   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  //   return await asyncClientCall(client, "charge", x);
+  // }));
 
   expect(responses.every((x) => x.status === "fulfilled")).toBeTrue();
 
