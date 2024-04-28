@@ -53,7 +53,13 @@ export const createHookClient = (
         event: { $case: eventName, [eventName]: eventPayload },
       }).then(
         () => { logger.debug("Hook call completed"); },
-        (e) => { logger.error(e, "Error when calling hook"); },
+        (e) => {
+          logger.error(e, "Error when calling hook");
+          // 如果是修改作业时限的hook，允许抛出错误
+          if (eventName === "allowChangeJobTimeLimit") {
+            throw e;
+          }
+        },
       );
     },
   };

@@ -269,15 +269,7 @@ export const jobServiceServer = plugin((server) => {
     changeJobTimeLimit: async ({ request, logger }) => {
       const { cluster, limitMinutes, jobId, operatorUserId } = request;
 
-      try {
-        await callHook("allowChangeJobTimeLimit", { cluster, limitMinutes, jobId, operatorUserId }, logger);
-      } catch (error) {
-        throw <ServiceError>{
-          code: Status.FAILED_PRECONDITION,
-          message: `The system does not allow you ${operatorUserId} to change the job`
-          + ` with cluster ${cluster} jobid ${jobId} time limit.` + error,
-        };
-      }
+      await callHook("allowChangeJobTimeLimit", { cluster, limitMinutes, jobId, operatorUserId }, logger);
 
       await server.ext.clusters.callOnOne(
         cluster,
