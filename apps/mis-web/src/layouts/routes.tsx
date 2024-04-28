@@ -131,12 +131,6 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
             text: t(pPlatform("jobSynchronization")),
             path: "/admin/systemDebug/fetchJobs",
           },
-          // ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
-          //   [{
-          //     Icon: ClusterOutlined,
-          //     text: t("layouts.route.platformManagement.clusterManagement"),
-          //     path: "/admin/systemDebug/clusterManagement",
-          //   }] : []),
         ],
       },
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{

@@ -31,7 +31,6 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { User } from "src/stores/UserStore";
-import { refreshDefaultCluster } from "src/utils/cluster";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
   user: User | undefined,
@@ -41,13 +40,10 @@ export const userRoutes: (
   setDefaultCluster: (cluster: Cluster) => void,
 ) => NavItemProps[] = (user, currentClusters, defaultCluster, loginNodes, setDefaultCluster) => {
 
-  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
-
   if (!user) { return []; }
   const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
-
 
   return [
     {
@@ -91,7 +87,7 @@ export const userRoutes: (
         join(publicConfig.BASE_PATH, "shell", defaultCluster?.id, loginNodes[defaultCluster?.id]?.[0]?.address),
       openInNewPage: true,
       clickable: true,
-      children: publicConfig.CLUSTERS.map(({ name, id }) => ({
+      children: currentClusters.map(({ name, id }) => ({
         openInNewPage: true,
         Icon: CloudServerOutlined,
         text: getI18nConfigCurrentText(name, languageId),
@@ -118,7 +114,7 @@ export const userRoutes: (
       path: "/apps",
       clickToPath: `/apps/${defaultCluster.id}/sessions`,
       clickable: true,
-      children: publicConfig.CLUSTERS.map((cluster) => ({
+      children: currentClusters.map((cluster) => ({
         Icon: FolderOutlined,
         text: getI18nConfigCurrentText(cluster.name, languageId),
         path: `/apps/${cluster.id}`,
@@ -153,7 +149,7 @@ export const userRoutes: (
           text: t("routes.file.clusterFileManager"),
           path: "/files/",
           clickToPath: `/files/${defaultCluster.id}/~`,
-          children: publicConfig.CLUSTERS.map((cluster) => ({
+          children: currentClusters.map((cluster) => ({
             Icon: ClusterOutlined,
             text: getI18nConfigCurrentText(cluster.name, languageId),
             path: `/files/${cluster.id}`,

@@ -17,6 +17,7 @@ export function refreshDefaultCluster(
   currentClusters: Cluster[],
   setDefaultCluster: (cluster: Cluster) => void,
 ) {
+
   if (defaultCluster &&
     currentClusters.length > 0 &&
     !currentClusters.find((x) => x.id === defaultCluster.id)) {

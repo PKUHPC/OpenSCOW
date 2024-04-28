@@ -88,6 +88,10 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const { currentClusters } = useStore(CurrentClustersStore);
 
+  if (!currentClusters.some((x) => x.id === cluster)) {
+    return <NotFoundPage />;
+  }
+
   const { loginNodes } = useStore(LoginNodeStore);
   const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
 

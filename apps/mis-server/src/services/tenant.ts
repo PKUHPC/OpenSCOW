@@ -123,7 +123,7 @@ export const tenantServiceServer = plugin((server) => {
 
         // 在数据库中创建user
         const user =
-         await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em, server.ext.clusters)
+         await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
            .then(async (user) => {
              user.tenantRoles = [TenantRole.TENANT_ADMIN];
              await em.persistAndFlush(user);
@@ -146,7 +146,7 @@ export const tenantServiceServer = plugin((server) => {
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
           logger)
           .then(async () => {
-            await insertKeyToNewUser(userId, userPassword, logger, server.ext.clusters)
+            await insertKeyToNewUser(userId, userPassword, logger)
               .catch(() => { });
             return true;
           })

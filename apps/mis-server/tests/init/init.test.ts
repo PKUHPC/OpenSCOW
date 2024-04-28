@@ -43,8 +43,7 @@ it("Test function userExist", async () => {
   const email = "test01@test01.com";
   const em = server.ext.orm.em.fork();
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
-  await createUserInDatabase(
-    identityId, name, email, tenant.name, server.logger, em, server.ext.clusters);
+  await createUserInDatabase(identityId, name, email, tenant.name, server.logger, em);
   const result = await asyncClientCall(client, "userExists", {
     userId: identityId,
   });

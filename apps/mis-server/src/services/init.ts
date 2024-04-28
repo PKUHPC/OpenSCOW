@@ -48,7 +48,7 @@ export const initServiceServer = plugin((server) => {
       // 显示两种情况，认证系统中创建失败的原因ALREADY_EXISTS_IN_AUTH=>成功
       // 显示两种情况，其他错误=>失败
       const user =
-       await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em, server.ext.clusters)
+       await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
          .catch((e) => {
            if (e.code === Status.ALREADY_EXISTS) {
              throw <ServiceError> {
@@ -72,7 +72,7 @@ export const initServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // 插入公钥失败也认为是创建用户成功
-          await insertKeyToNewUser(userId, password, server.logger, server.ext.clusters)
+          await insertKeyToNewUser(userId, password, server.logger)
             .catch(() => null);
           return true;
         })

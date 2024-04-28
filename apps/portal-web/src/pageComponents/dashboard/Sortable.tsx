@@ -31,6 +31,7 @@ import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
+import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/config";
 import { formatEntryId, getEntryBaseName,
@@ -147,12 +148,19 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
           break;
 
         case "shell":
-          router.push(join("/shell", item.entry.shell.clusterId, item.entry.shell.loginNode));
+          const savedShellClusterId = item.entry.shell.clusterId;
+          if (!clusters.some((x) => x.id === savedShellClusterId)) {
+            return <NotFoundPage />;
+          }
+          router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
           break;
-
         case "app":
+          const savedAppClusterId = item.entry.app.clusterId;
+          if (!clusters.some((x) => x.id === savedAppClusterId)) {
+            return <NotFoundPage />;
+          }
           router.push(
-            join("/apps", item.entry.app.clusterId, "/create", item.entry.app.appId),
+            join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
           );
           break;
 

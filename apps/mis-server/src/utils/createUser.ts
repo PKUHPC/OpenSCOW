@@ -17,11 +17,11 @@ import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { insertKeyAsUser } from "@scow/lib-ssh";
+import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
-import { ClusterPlugin } from "src/plugins/clusters";
 
 export async function createUserInDatabase(
   userId: string,
@@ -29,24 +29,19 @@ export async function createUserInDatabase(
   email: string,
   tenantName: string,
   logger: Logger,
-  em: SqlEntityManager<MySqlDriver>,
-  clusterPlugin: ClusterPlugin["clusters"]) {
+  em: SqlEntityManager<MySqlDriver>) {
   // get default tenant
   const tenant = await em.findOne(Tenant, { name: tenantName });
   if (!tenant) {
     throw <ServiceError> { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
   }
 
-  const clusters = await clusterPlugin.onlineClusters();
-  if (Object.keys(clusters).length === 0) {
-    throw <ServiceError> { code: Status.NOT_FOUND, message: "Clusters are not found." };
-  }
   // new the user
   const user = new User({
     email, name, tenant, userId,
   });
 
-  user.storageQuotas.add(Object.keys(clusters).map((x) => new StorageQuota({
+  user.storageQuotas.add(Object.keys(configClusters).map((x) => new StorageQuota({
     cluster: x,
     storageQuota: 0,
     user: user!,
@@ -71,13 +66,11 @@ export async function insertKeyToNewUser(
   userId: string,
   password: string,
   logger: Logger,
-  clusterPlugin: ClusterPlugin["clusters"],
 ) {
   // Making an ssh Request to the login node as the user created.
   if (process.env.NODE_ENV === "production") {
 
-    const clusters = await clusterPlugin.onlineClusters();
-    await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
+    await Promise.all(Object.values(configClusters).map(async ({ displayName, loginNodes }) => {
       const node = getLoginNode(loginNodes[0]);
       logger.info("Checking if user can login to %s by login node %s", displayName, node.name);
 

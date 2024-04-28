@@ -39,6 +39,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
   const { currentClusters } = useStore(CurrentClustersStore);
 
   const { loginNodes } = useStore(LoginNodeStore);
+
   const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
 
   refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);

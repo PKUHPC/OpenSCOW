@@ -34,8 +34,9 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllCo
   const languageId = useI18n().currentLanguage.id;
 
   const { onlineClusters } = useStore(OnlineClustersStore);
-
   const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : onlineClusters;
+  const sortedIds =
+    publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(clusters)?.includes(id));
 
   return (
     <Select
@@ -43,7 +44,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllCo
       placeholder={t(p("selectCluster"))}
       value={value?.map((v) => v.id)}
       onChange={(values) => onChange?.(values.map((x) => ({ id: x, name: clusters[x]?.name })))}
-      options={publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({ value: x, label:
+      options={sortedIds.map((x) => ({ value: x, label:
         getI18nConfigCurrentText(clusters[x]?.name, languageId) }))}
       style={{ minWidth: "96px" }}
     />
@@ -62,6 +63,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
   const languageId = useI18n().currentLanguage.id;
 
   const { onlineClusters } = useStore(OnlineClustersStore);
+  const sortedIds =
+  publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(onlineClusters)?.includes(id));
+
 
   return (
     <Select
@@ -70,7 +74,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
       onChange={(value) => onChange?.({ id: value, name: onlineClusters[value].name })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({
+          .concat(sortedIds.map((x) => ({
             value: x,
             label:  getI18nConfigCurrentText(onlineClusters[x]?.name, languageId),
             disabled: false,

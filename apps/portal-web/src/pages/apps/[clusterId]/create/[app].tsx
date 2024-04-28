@@ -17,11 +17,14 @@ import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
+import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
+import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
 import { Head } from "src/utils/head";
 
 
@@ -33,6 +36,11 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const { message } = App.useApp();
   const t = useI18nTranslateToString();
+
+  const { currentClusters } = useStore(CurrentClustersStore);
+  if (!currentClusters.some((x) => x.id === clusterId)) {
+    return <NotFoundPage />;
+  }
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {

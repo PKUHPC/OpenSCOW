@@ -405,7 +405,7 @@ export const userServiceServer = plugin((server) => {
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
       const user =
-      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, server.ext.clusters)
+      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -424,7 +424,7 @@ export const userServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // insert public key
-          await insertKeyToNewUser(identityId, password, server.logger, server.ext.clusters)
+          await insertKeyToNewUser(identityId, password, server.logger)
             .catch(() => {});
           return true;
         })
@@ -458,7 +458,7 @@ export const userServiceServer = plugin((server) => {
     addUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId } = request;
       const user
-       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em, server.ext.clusters)
+       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
          .catch((e) => {
            if (e.code === Status.ALREADY_EXISTS) {
              throw <ServiceError> {
