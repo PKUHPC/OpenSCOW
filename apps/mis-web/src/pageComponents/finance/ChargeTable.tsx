@@ -44,13 +44,12 @@ interface Props {
 interface FilterForm {
   name?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs];
-  type?: string[];
+  types?: string[];
   userIds?: string;
 }
 
 // 当前时间的 dayjs 对象
 const now = dayjs();
-
 // 国际化函数
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
@@ -73,11 +72,11 @@ export const ChargeTable: React.FC<Props> = ({
   const [query, setQuery] = useState<{
     name: string[] | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
-    type: string[] | undefined
+    types: string[] | undefined
     userIds: string | undefined}>({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
+      types: undefined,
       userIds: undefined,
     });// 查询对象
 
@@ -89,14 +88,14 @@ export const ChargeTable: React.FC<Props> = ({
     form.setFieldsValue({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
+      types: undefined,
       userIds: undefined,
     });
     setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery({
       name: accountName,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
+      types: undefined,
       userIds: undefined,
     });
     setSelectedAccountNames(accountName);
@@ -108,7 +107,7 @@ export const ChargeTable: React.FC<Props> = ({
       accountNames: query.name,
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
-      type: query.type,
+      types: query.types,
       isPlatformRecords,
       searchType,
       page: pageInfo.page,
@@ -130,7 +129,7 @@ export const ChargeTable: React.FC<Props> = ({
         accountNames: query.name,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
-        types: query.type,
+        types: query.types,
         isPlatformRecords,
         searchType,
         userIds: convertUserIdArray(query.userIds),
@@ -162,8 +161,8 @@ export const ChargeTable: React.FC<Props> = ({
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
-          accountName: query.name,
-          types: query.type,
+          accountNames: query.name,
+          types: query.types,
           searchType: searchType,
           isPlatformRecords: !!isPlatformRecords,
           userIds: query.userIds,
@@ -199,8 +198,8 @@ export const ChargeTable: React.FC<Props> = ({
             form={form}
             initialValues={query}
             onFinish={async () => {
-              const { name, userIds, time, type } = await form.validateFields();
-              setQuery({ name: selectedAccountNames ?? name, userIds, time, type: selectedType ?? type });
+              const { name, userIds, time, types } = await form.validateFields();
+              setQuery({ name: selectedAccountNames ?? name, userIds, time, types: selectedType ?? types });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
           >
@@ -277,7 +276,7 @@ export const ChargeTable: React.FC<Props> = ({
               form.setFieldsValue({
                 name: query.name,
                 time: query.time,
-                type: query.type,
+                types: query.types,
               });
               setPageInfo({ page, pageSize });
             },

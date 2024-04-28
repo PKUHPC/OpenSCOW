@@ -126,6 +126,7 @@ message GetChargeRecordsResponse {
 message GetPaginatedChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  //当types设置时，以types为准，否则以type为准
   optional string type = 3 [deprecated=true];
   repeated string types = 13;
   oneof target {
@@ -157,6 +158,7 @@ message GetPaginatedChargeRecordsResponse {
 message GetChargeRecordsTotalCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
+  //当types设置时，以types为准，否则以type为准
   optional string type = 3 [deprecated=true];
   repeated string types = 11;
   oneof target {

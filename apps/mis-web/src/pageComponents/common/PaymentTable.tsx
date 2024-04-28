@@ -36,7 +36,7 @@ export enum SearchType {
 
 interface Props {
   // 账户充值记录专用项
-  accountName?: string[];
+  accountNames?: string[];
   // 搜索类型, self前缀表示只搜索用户自身的账户或租户
   searchType: SearchType;
 }
@@ -66,13 +66,13 @@ const today = dayjs().endOf("day");
 const p = prefix("pageComp.commonComponent.paymentTable.");
 const pCommon = prefix("common.");
 
-export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
+export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountName);
+  const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountNames);
 
   const [query, setQuery] = useState<{
     name: string[] | undefined,
@@ -81,7 +81,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
   }>(() => ({
     // name作为账户名时可能为 undefined 、长度不定的的数组
     // name作为租户名时可能为 undefined 、长度为1的的数组
-    name: accountName,
+    name: accountNames,
     time: [today.subtract(1, "year"), today],
     type: [],
   }));
@@ -106,9 +106,9 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, name: accountName }));
-    setSelectedNames(accountName);
-  }, [accountName]);
+    setQuery((q) => ({ ...q, name: accountNames }));
+    setSelectedNames(accountNames);
+  }, [accountNames]);
 
   const handleExport = async (columns: string[]) => {
 

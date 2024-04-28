@@ -63,7 +63,7 @@ export const GetChargesSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
 
     // 消费类型
-    type: Type.Optional(Type.Array(Type.String())),
+    types: Type.Optional(Type.Array(Type.String())),
 
     accountNames: Type.Optional(Type.Array(Type.String())),
 
@@ -187,7 +187,7 @@ export const buildChargesRequestTarget = (accountNames: string[] | undefined, te
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const { endTime, startTime, accountNames, isPlatformRecords,
-    searchType, type, userIds, page, pageSize } = req.query;
+    searchType, types, userIds, page, pageSize } = req.query;
 
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
@@ -199,7 +199,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime,
     endTime,
-    types:type ?? [],
+    types:types ?? [],
     userIds: userIds ?? [],
     target: buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords),
     page,

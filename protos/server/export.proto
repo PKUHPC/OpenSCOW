@@ -66,6 +66,7 @@ message ExportChargeRecordRequest {
   uint32 count = 1;
   google.protobuf.Timestamp start_time = 2;
   google.protobuf.Timestamp end_time = 3;
+  //当types设置时，以types为准，否则以type为准
   optional string type = 4 [deprecated=true];
   repeated string types = 12;
   oneof target {

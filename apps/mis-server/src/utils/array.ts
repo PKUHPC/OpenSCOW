@@ -30,6 +30,6 @@ export function extractTypesFromObjects(array: ObjectTypeWithType[]): string[] {
       types.add(item.type);
     }
   }
-  return types.size > 0 ? Array.from(types) : [""];
+  return types.size > 0 ? Array.from(types) : [];
 }
 

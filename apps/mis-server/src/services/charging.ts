@@ -27,7 +27,6 @@ import { queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
   getChargesTargetSearchParam,
-  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
@@ -170,12 +169,12 @@ export const chargingServiceServer = plugin((server) => {
       ensureNotUndefined(request, ["startTime", "endTime", "target", "type"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-      const searchType = getPaymentsSearchType(type);
+      const searchTypes = getChargesSearchType(type);
 
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchParam,
-        ...searchType,
+        ...searchTypes,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{

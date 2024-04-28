@@ -123,12 +123,12 @@ export const getPaymentsTargetSearchParam = (target:
 };
 
 /**
- * generate payment' search type
+ * generate payment search type
  */
-export const getPaymentsSearchType = (type: string[]) => {
-  if (!type.length) {
+export const getPaymentsSearchType = (types: string[] | undefined) => {
+  if (!types?.length) {
     return { type: { $ne: null } };
   }
 
-  return { type:{ $in:type } };
+  return { type:{ $in:types } };
 };

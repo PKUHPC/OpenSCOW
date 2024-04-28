@@ -40,7 +40,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
     types: Type.Optional(Type.Array(Type.String())),
-    accountName: Type.Optional(Type.Array(Type.String())),
+    accountNames: Type.Optional(Type.Array(Type.String())),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
     userIds: Type.Optional(Type.String()),
@@ -59,18 +59,18 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
   const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
-  let { accountName, types } = query;
+  let { accountNames, types } = query;
   // targetName为空字符串数组视为undefined
-  accountName = emptyArrayToUndefined(accountName);
+  accountNames = emptyArrayToUndefined(accountNames);
   types = emptyArrayToUndefined(types);
 
-  const info = await getUserInfoForCharges(accountName, req, res);
+  const info = await getUserInfoForCharges(accountNames, req, res);
 
   if (!info) { return; }
 
-  const tenantOfAccount = await getTenantOfAccount(accountName, info);
+  const tenantOfAccount = await getTenantOfAccount(accountNames, info);
 
-  const target = buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords);
+  const target = buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords);
 
   const logInfo = {
     operatorUserId: info.identityId,
