@@ -32,13 +32,14 @@ type CallOnAllResult<T> = {
 type CallOnAll = <T>(
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
-  isUsingAllConfigClusters?: boolean,
+  doNotCheckOnlineClusters?: boolean,
 ) => Promise<CallOnAllResult<T>>;
 
 type CallOnOne = <T>(
   cluster: string,
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
+  doNotCheckOnlineClusters?: boolean,
 ) => Promise<T>;
 
 export type ClusterPlugin = {
@@ -117,10 +118,12 @@ export const clustersPlugin = plugin(async (f) => {
       return await getOnlineClusters();
     },
 
-    callOnOne: <CallOnOne>(async (cluster, logger, call) => {
+    callOnOne: <CallOnOne>(async (cluster, logger, call, doNotCheckOnlineClusters: boolean = false) => {
 
-      const currentOnlineClusters = await getOnlineClusters();
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      if (!doNotCheckOnlineClusters) {
+        const currentOnlineClusters = await getOnlineClusters();
+        checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      }
 
       const client = getAdapterClient(cluster);
 
@@ -147,10 +150,10 @@ export const clustersPlugin = plugin(async (f) => {
     }),
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (logger, call, isUsingAllConfigClusters: boolean = false) => {
+    callOnAll: <CallOnAll>(async (logger, call, doNotCheckOnlineClusters: boolean = false) => {
 
       let adapterClientForOnlineClusters: Record<string, SchedulerAdapterClient>;
-      if (isUsingAllConfigClusters) {
+      if (doNotCheckOnlineClusters) {
         adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(configClusters);
       } else {
         const currentOnlineClusters = await getOnlineClusters();
