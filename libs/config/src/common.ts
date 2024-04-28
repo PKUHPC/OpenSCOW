@@ -23,7 +23,11 @@ export const ScowApiConfigSchema = Type.Object({
 
 export const ScowHookConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否启用SCOW Hook", default: true }),
-  url: Type.String({ description: "SCOW Hook的URL" }),
+  url: Type.Optional(Type.String({ description: "SCOW Hook的URL" })),
+  hooks: Type.Optional(Type.Array(Type.Object({
+    name: Type.Optional(Type.String({ description: "Hook的名称" })),
+    url: Type.String({ description: "Hook的URL" }),
+  }), { description: "多个Hook的URL。SCOW将会以数组的顺序逐个调用各个hook。" })),
 }, { description: "SCOW Hook配置" });
 
 export const CommonConfigSchema = Type.Object({
