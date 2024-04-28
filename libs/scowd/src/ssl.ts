@@ -23,7 +23,6 @@ export interface SslConfig {
   ca?: Buffer;
   key?: Buffer;
   cert?: Buffer;
-  rejectUnauthorized?: boolean;
 }
 
 export const createScowdCertificates = (config: ScowdCertificatesConfig) => {
@@ -32,6 +31,5 @@ export const createScowdCertificates = (config: ScowdCertificatesConfig) => {
       ca: readFileSync(config.SCOWD_SSL_CA_CERT_PATH),
       key: readFileSync(config.SCOWD_SSL_SCOW_PRIVATE_KEY_PATH),
       cert: readFileSync(config.SCOWD_SSL_SCOW_CERT_PATH),
-      rejectUnauthorized: true,
     } : {};
 };
