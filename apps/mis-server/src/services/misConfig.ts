@@ -136,6 +136,7 @@ export const misConfigServiceServer = plugin((server) => {
         clusterId,
         logger,
         async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
+        true,
       ).catch((e) => {
         logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
         throw <ServiceError>{
