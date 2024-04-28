@@ -12,7 +12,7 @@
 
 import { FileOps } from "src/clusterops/api/file";
 import { clusters } from "src/config/clusters";
-import { clusterNotFound, scowdClientNotFound } from "src/utils/errors";
+import { clusterNotFound } from "src/utils/errors";
 import { getScowdClient } from "src/utils/scowd";
 import { getClusterLoginNode } from "src/utils/ssh";
 
@@ -25,8 +25,6 @@ export const fileOps = (cluster: string): FileOps => {
   const clusterInfo = clusters[cluster];
   if (clusterInfo.scowd?.enabled) {
     const client = getScowdClient(cluster);
-
-    if (!client) { throw scowdClientNotFound(cluster); }
     
     return {
       ...scowdFileServices(client),

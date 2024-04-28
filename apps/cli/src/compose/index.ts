@@ -249,8 +249,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       join(configPath, config.scowd.ssl.caCertPath) : "";
     const scowdSslScowCertPath = config.scowd?.ssl?.scowCertPath ?
       join(configPath, config.scowd.ssl.scowCertPath) : "";
-    const scowdSslScowKeyPath = config.scowd?.ssl?.scowKeyPath ?
-      join(configPath, config.scowd.ssl.scowKeyPath) : "";
+    const scowdSslScowPrivateKeyPath = config.scowd?.ssl?.scowPrivateKeyPath ?
+      join(configPath, config.scowd.ssl.scowPrivateKeyPath) : "";
 
     composeSpec.volumes["portal_data"] = {};
 
@@ -262,7 +262,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enabled ?? false),
         SCOWD_SSL_CA_CERT_PATH: scowdSslCaCertPath,
         SCOWD_SSL_SCOW_CERT_PATH: scowdSslScowCertPath,
-        SCOWD_SSL_SCOW_KEY_PATH: scowdSslScowKeyPath,
+        SCOWD_SSL_SCOW_PRIVATE_KEY_PATH: scowdSslScowPrivateKeyPath,
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },

@@ -16,6 +16,8 @@ import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
 import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
+import { scowdClientNotFound } from "./errors";
+
 export const certificates = createScowdCertificates(config);
 
 export function getLoginNodeScowdUrl(cluster: string, host: string): string | undefined {
@@ -41,7 +43,10 @@ const scowdClientForClusters = Object.entries(clusters).reduce((prev, [cluster])
 }, {} as Record<string, ScowdClient | undefined>);
 
 export const getScowdClient = (cluster: string) => {
-  return scowdClientForClusters[cluster];
+  const client = scowdClientForClusters[cluster];
+  if (!client) { throw scowdClientNotFound(cluster); }
+
+  return client;
 };
 
 export function getLoginNodeFromAddress(cluster: string, address: string) {

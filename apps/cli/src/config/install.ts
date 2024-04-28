@@ -34,7 +34,7 @@ export const InstallConfigSchema = Type.Object({
         description: "SCOWD CA签名的 SCOW 证书路径， 相对 config 的默认目录", 
         default: "./scowd/certs/scow.crt",
       }),
-      scowKeyPath: Type.String({ 
+      scowPrivateKeyPath: Type.String({ 
         description: "SCOWD CA签名的 SCOW 私钥路径， 相对 config 的默认目录", 
         default: "./scowd/certs/scow.key",
       }),
