@@ -348,11 +348,10 @@ export const exportServiceServer = plugin((server) => {
         endTime,
         target,
         count,
-        type,
+        types,
       } = ensureNotUndefined(request, ["target"]);
       const searchParam = getPaymentsTargetSearchParam(target);
-      const searchType = getPaymentsSearchType(type);
-      console.log(type, "adf");
+      const searchType = getPaymentsSearchType(types);
       const query: { time: { $gte: string; $lte: string }; [key: string]: any } = {
         time: { $gte: startTime as string, $lte: endTime as string },
         ...searchParam,

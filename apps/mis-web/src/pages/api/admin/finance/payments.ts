@@ -50,7 +50,7 @@ export const GetTenantPaymentsSchema = typeboxRouteSchema({
     tenantName: Type.Optional(Type.String()),
 
     // 充值类型
-    type:Type.Optional(Type.Array(Type.String())),
+    types:Type.Optional(Type.Array(Type.String())),
   }),
 
   responses: {
@@ -62,7 +62,7 @@ export const GetTenantPaymentsSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetTenantPaymentsSchema, async (req, res) => {
-  const { endTime, startTime, tenantName, type } = req.query;
+  const { endTime, startTime, tenantName, types } = req.query;
 
   const client = getClient(ChargingServiceClient);
 
@@ -76,7 +76,7 @@ export default typeboxRoute(GetTenantPaymentsSchema, async (req, res) => {
       { $case:"allTenants", allTenants:{ } },
     startTime,
     endTime,
-    type:type ?? [],
+    types:types ?? [],
   }), ["total"]);
 
   const tenants = reply.results.map((x) => {

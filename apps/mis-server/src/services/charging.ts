@@ -167,12 +167,11 @@ export const chargingServiceServer = plugin((server) => {
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target, type } =
-      ensureNotUndefined(request, ["startTime", "endTime", "target", "type"]);
+      const { endTime, startTime, target, types } =
+      ensureNotUndefined(request, ["startTime", "endTime", "target", "types"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-      const searchTypes = getPaymentsSearchType(type);
-
+      const searchTypes = getPaymentsSearchType(types);
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchParam,

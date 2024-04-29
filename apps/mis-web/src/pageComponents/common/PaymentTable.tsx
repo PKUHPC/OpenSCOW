@@ -77,13 +77,13 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
   const [query, setQuery] = useState<{
     name: string[] | undefined,
     time: [dayjs.Dayjs, dayjs.Dayjs]
-    type: string[]
+    types: string[]
   }>(() => ({
     // name作为账户名时可能为 undefined 、长度不定的的数组
     // name作为租户名时可能为 undefined 、长度为1的的数组
     name: accountNames,
     time: [today.subtract(1, "year"), today],
-    type: [],
+    types: [],
   }));
 
   const { message } = App.useApp();
@@ -93,7 +93,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
       const param = {
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
-        type: query.type,
+        types: query.types,
       };
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
@@ -129,7 +129,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
           endTime: query.time[1].clone().endOf("day").toISOString(),
           targetName: query.name,
           searchType: searchType,
-          type: query.type,
+          types: query.types,
         },
       });
     }
@@ -181,7 +181,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
             setQuery({
               name: selectedNames ?? name,
               time,
-              type: trimmedType,
+              types: trimmedType,
             });
           }}
         >

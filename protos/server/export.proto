@@ -94,7 +94,7 @@ message ExportPayRecordRequest {
   uint32 count = 1;
   google.protobuf.Timestamp start_time = 2;
   google.protobuf.Timestamp end_time = 3;
-  repeated string type = 9;
+  repeated string types = 9;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
     AccountOfTenantTarget account_of_tenant = 4 [deprecated=true];

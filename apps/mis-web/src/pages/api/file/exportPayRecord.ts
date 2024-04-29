@@ -45,7 +45,7 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     endTime: Type.String({ format: "date-time" }),
     targetName: Type.Optional(Type.Array(Type.String())),
     searchType: Type.Enum(SearchType),
-    type:Type.Optional(Type.Array(Type.String())),
+    types:Type.Optional(Type.Array(Type.String())),
   }),
 
   responses:{
@@ -60,10 +60,10 @@ export default route(ExportPayRecordSchema, async (req, res) => {
   const { query } = req;
 
   const { columns, startTime, endTime, searchType, count } = query;
-  let { targetName, type } = query;
+  let { targetName, types } = query;
   // targetName为空字符串数组时视为初始态，即undefined
   targetName = emptyArrayToUndefined(targetName);
-  type = emptyArrayToUndefined(type);
+  types = emptyArrayToUndefined(types);
   let user;
   if (searchType === SearchType.tenant) {
     user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
@@ -123,7 +123,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
       startTime,
       endTime,
       target,
-      type:type ?? [],
+      types:types ?? [],
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
