@@ -54,6 +54,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           .httpError(500, () => {}),
       );
 
+
+
       const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
 
       // 处理成功的结果

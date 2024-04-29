@@ -157,7 +157,7 @@ export default {
         operationLog: "Operation Log",
         statistic: "Statistic",
       },
-      navLinkTextPortal: "SCOW HPC",
+      navLinkTextPortal: "Supercomputer Platform",
       navLinkTextAI: "SCOW AI",
       dashboard: "Dashboard",
       user: {
