@@ -332,7 +332,7 @@ it("returns payment records", async () => {
     target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{ accountName:
        [account.accountName, account2.accountName],
     tenantName: account.tenant.getProperty("name") },
-    }, type:[request1.type],
+    }, types:[request1.type],
   });
 
   expect(reply1.results).toHaveLength(1);
@@ -352,7 +352,7 @@ it("returns payment records", async () => {
     target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{ accountName:
          [account.accountName, account2.accountName],
     tenantName: account.tenant.getProperty("name") },
-    }, type:extractTypesFromObjects([request1, request3]),
+    }, types:extractTypesFromObjects([request1, request3]),
   });
 
   expect(reply2.results).toHaveLength(2);
@@ -374,7 +374,7 @@ it("returns payment records", async () => {
   const reply3 = await asyncClientCall(client, "getPaymentRecords", {
     target:{ $case:"tenant", tenant:{ tenantName: account.tenant.getProperty("name") } },
     startTime: startTime.toISOString(),
-    endTime, type:[request2.type],
+    endTime, types:[request2.type],
   });
 
   expect(reply3.results).toHaveLength(1);
@@ -392,7 +392,7 @@ it("returns payment records", async () => {
   const reply4 = await asyncClientCall(client, "getPaymentRecords", {
     target:{ $case:"tenant", tenant:{ tenantName: account.tenant.getProperty("name") } },
     startTime: startTime.toISOString(),
-    endTime, type:[request3.type],
+    endTime, types:[request3.type],
   });
 
   expect(reply4.results).toHaveLength(0);
@@ -401,7 +401,7 @@ it("returns payment records", async () => {
   const reply5 = await asyncClientCall(client, "getPaymentRecords", {
     target:{ $case: "allTenants", allTenants:{} },
     startTime: startTime.toISOString(),
-    endTime, type:extractTypesFromObjects([request2, request4]),
+    endTime, types:extractTypesFromObjects([request2, request4]),
   });
 
   expect(reply5.results).toHaveLength(2);
@@ -426,7 +426,7 @@ it("returns payment records", async () => {
   // accountsOfTenant
   const reply6 = await asyncClientCall(client, "getPaymentRecords", {
     startTime: startTime.toISOString(),
-    endTime, type:extractTypesFromObjects([request1, request3]),
+    endTime, types:extractTypesFromObjects([request1, request3]),
     target:{ $case:"accountsOfTenant", accountsOfTenant:{
       tenantName: account.tenant.getProperty("name") } },
   });

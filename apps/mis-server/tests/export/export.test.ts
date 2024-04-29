@@ -356,7 +356,7 @@ it("export pay Records", async () => {
     target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{
       accountName: [data.accountA.accountName, data.accountB.accountName],
       tenantName: data.accountA.tenant.getProperty("name"),
-    } }, type:[payRecord1.type],
+    } }, types:[payRecord1.type],
   });
   const handlePaymentResponse = (response: ExportPayRecordResponse): PaymentRecord[] => {
     return response.payRecords;

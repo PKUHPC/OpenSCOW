@@ -105,9 +105,6 @@ export const getChargesSearchTypes = (type: string[] | undefined) => {
   return { type:{ $in:type } };
 };
 
-
-
-
 /**
  *
  * @param target
