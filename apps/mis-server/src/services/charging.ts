@@ -26,7 +26,9 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
+  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
@@ -169,7 +171,7 @@ export const chargingServiceServer = plugin((server) => {
       ensureNotUndefined(request, ["startTime", "endTime", "target", "type"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-      const searchTypes = getChargesSearchType(type);
+      const searchTypes = getPaymentsSearchType(type);
 
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
@@ -417,8 +419,7 @@ export const chargingServiceServer = plugin((server) => {
       const { startTime, endTime, type, types, target, userIds, page, pageSize }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
       const searchParam = getChargesTargetSearchParam(target);
-
-      const searchType = getChargesSearchType(types ?? type);
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
@@ -463,8 +464,7 @@ export const chargingServiceServer = plugin((server) => {
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
-      const searchType = getChargesSearchType(types ?? type);
-
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
           .select(raw("count(c.id) as total_count"))

@@ -30,6 +30,7 @@ import { UserRole, UserStatus } from "src/entities/UserAccount";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
   getPaymentsSearchType,
   getPaymentsTargetSearchParam,
@@ -278,8 +279,7 @@ export const exportServiceServer = plugin((server) => {
       } = request;
 
       const searchParam = getChargesTargetSearchParam(target);
-      const searchType = getChargesSearchType(types ?? type);
-
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const query = {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,

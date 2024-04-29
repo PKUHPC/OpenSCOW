@@ -13,7 +13,9 @@
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget,
   AccountsOfTenantTarget, AccountsTarget, AllTenantsTarget, SpecificAccountsOfTenantTarget,
   TenantTarget } from "@scow/protos/build/server/charging";
+import { misConfig } from "src/config/mis";
 
+import { CHARGE_TYPE_OTHERS } from "./constants";
 /**
  * generate charge records' search param of target
  *
@@ -74,13 +76,36 @@ export const getChargesTargetSearchParam = (
 /**
  * generate charge records' search type
  */
-export const getChargesSearchType = (type: string[] | undefined) => {
+export const getChargesSearchType = (type: string | undefined) => {
+  const typesToSearch = [
+    misConfig.jobChargeType,
+    misConfig.changeJobPriceType,
+    ...(misConfig.customChargeTypes || []),
+  ];
+
+  let searchType = {};
+  if (!type) {
+    searchType = { type: { $ne: null } };
+  } else {
+    if (type === CHARGE_TYPE_OTHERS) {
+      searchType = { type: { $nin: typesToSearch } };
+    } else {
+      searchType = { type: type };
+    }
+  }
+
+  return searchType;
+};
+
+export const getChargesSearchTypes = (type: string[] | undefined) => {
   if (!type?.length) {
     return { type: { $ne: null } };
   }
 
   return { type:{ $in:type } };
 };
+
+
 
 
 /**
