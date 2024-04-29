@@ -123,6 +123,7 @@ export const ChargeTable: React.FC<Props> = ({
     return getChargesInfo;
   }, [query, pageInfo]);
 
+
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
@@ -240,12 +241,12 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.total")}>
               <strong>
-                {recordsData ? recordsData.results.length : 0}
+                {totalResultData?.totalCount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {recordsData ? recordsData.results.reduce(((a, b) => a + b.amount), 0) : 0}
+                {totalResultData?.totalAmount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -269,7 +270,7 @@ export const ChargeTable: React.FC<Props> = ({
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
             defaultPageSize: DEFAULT_PAGE_SIZE,
-            total: recordsData ? recordsData.results.length : 0,
+            total: totalResultData?.totalCount ?? 0,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
