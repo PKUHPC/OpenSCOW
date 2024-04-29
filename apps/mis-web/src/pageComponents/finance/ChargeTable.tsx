@@ -29,7 +29,7 @@ import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { formatMetadataDisplay } from "src/utils/metadata";
 
-import { AccountSelector } from "./AccountSelector";
+import { AccountMultiSelector } from "./AccountMultiSelector";
 
 // ChargeTable 组件的 Props 接口
 interface Props {
@@ -206,7 +206,7 @@ export const ChargeTable: React.FC<Props> = ({
             {
               showAccountName && (
                 <Form.Item label={t("common.account")} name="name">
-                  <AccountSelector
+                  <AccountMultiSelector
                     onChange={(value) => {
                       setSelectedAccountNames(value);
                     }}

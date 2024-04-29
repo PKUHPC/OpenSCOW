@@ -22,7 +22,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
-import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
+import { AccountMultiSelector } from "src/pageComponents/finance/AccountMultiSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
@@ -192,7 +192,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
               name="name"
             >
               {searchType === SearchType.account ? (
-                <AccountSelector
+                <AccountMultiSelector
                   onChange={(item) => {
                     setSelectedNames(item);
                   }}
