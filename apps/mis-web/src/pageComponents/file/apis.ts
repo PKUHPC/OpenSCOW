@@ -28,23 +28,30 @@ export const urlToExport = ({
     query: {[key: string]: string | number | boolean | string[] | undefined}
   },
 ) => {
-  const exportQuery = `${exportApi}?${
-    columns.map((column) => `columns=${column}`).join("&")
-  }&${
-    Object.keys(query)
-      .filter((key) => query[key] !== undefined)
-      .map((key) => {
-        const value = query[key];
-        if (Array.isArray(value) && (value as any[]).length === 0) {
-          return `${key}=${encodeURIComponent("")}`;// 取消type必须存在后注释
-        } else if (Array.isArray(value) && (value as string[]).length > 0) {
-          return (query[key] as string[]).map((value) => `${key}=${encodeURIComponent(value)}`).join("&");
+  const params = new URLSearchParams();
+  columns.forEach((column) => {
+    params.append("columns", column);
+  });
+
+  Object.keys(query).forEach((key) => {
+    const value = query[key];
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          value.forEach((item) => {
+            params.append(key, item.toString());
+          });
         } else {
-          return `${key}=${encodeURIComponent(value as string | number | boolean)}`;
+          params.append(key, "");
         }
-      },
-      ).join("&")
-  }&count=${count}`;
-  return join(publicConfig.BASE_PATH, `/api/file/${exportQuery}`);
+      } else {
+        params.append(key, value.toString());
+      }
+    }
+  });
+  params.append("count", count.toString());
+  const queryString = params.toString();
+  const fullPath = join(publicConfig.BASE_PATH, `/api/file/${exportApi}?${queryString}`);
+  return fullPath;
 };
 
