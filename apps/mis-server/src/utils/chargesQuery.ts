@@ -11,7 +11,7 @@
  */
 
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget,
-  AccountsOfTenantTarget, AccountsTarget, AllTenantsTarget, SpecificAccountsOfTenantTarget,
+  AccountsOfTenantTarget, AccountsTarget, AllTenantsTarget,
   TenantTarget } from "@scow/protos/build/server/charging";
 import { misConfig } from "src/config/mis";
 
@@ -23,7 +23,7 @@ import { CHARGE_TYPE_OTHERS } from "./constants";
  * case tenant:返回这个租户（tenantName）的消费记录
  * case allTenants: 返回所有租户消费记录
  * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
- * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
+ * case accountsOfTenant: 返回这个租户（tenantName）下任意多个账户的消费记录
  * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
  * case accounts: 返回多个特定账户的消费记录
  *
@@ -55,7 +55,7 @@ export const getChargesTargetSearchParam = (
   case "accountOfTenant":
     searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
     break;
-  // 当前租户下所有账户的消费记录
+  // 当前租户下多个账户的消费记录
   case "accountsOfTenant":
     searchParam = { tenantName: target[target.$case].tenantName, accountName: { $ne:null } };
     break;
@@ -110,33 +110,30 @@ export const getChargesSearchTypes = (types: string[] | undefined) => {
  * @param target
  * case tenant:返回这个租户（tenantName）的充值记录
  * case allTenants: 返回所有租户充值记录
- * case specificAccountsOfTenant: 返回这个租户（tenantName）下特定账户（[accountName]）的充值记录
- * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+ * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的充值记录
  */
 
 export const getPaymentsTargetSearchParam = (target:
 | { $case: "accountOfTenant";accountOfTenant: AccountOfTenantTarget; }
-| { $case: "specificAccountsOfTenant"; specificAccountsOfTenant: SpecificAccountsOfTenantTarget }
 | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
 | { $case: "tenant"; tenant: TenantTarget }
 | { $case: "allTenants"; allTenants: AllTenantsTarget }):
- { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } | { $in: string[] } } => {
+ { tenantName?: string | { $ne: null }, accountName?: { $in: string[] } | string | { $ne: null }} => {
 
   let searchParam: { tenantName?: string | { $ne: null },
-   accountName?: string | { $ne: null } | { $in: string[] }} = {};
+   accountName?: { $in: string[] } | string | { $ne: null }} = {};
+  const { accountNames, tenantName } = target[target.$case];
   switch (target?.$case)
   {
   case "tenant":
-    searchParam = { tenantName: target[target.$case].tenantName, accountName:undefined };
+    searchParam = { tenantName, accountName:undefined };
     break;
   case "allTenants":
     searchParam = { accountName:undefined };
     break;
-  case "specificAccountsOfTenant":
-    searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $in:target[target.$case].accountName } };
-    break;
   case "accountsOfTenant":
-    searchParam = { tenantName: target[target.$case].tenantName, accountName:{ $ne:null } };
+    const accountName = accountNames.length === 0 ? { $ne:null } : { $in:accountNames };
+    searchParam = { tenantName, accountName };
     break;
   default:
     break;

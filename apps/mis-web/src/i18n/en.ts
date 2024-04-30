@@ -1212,7 +1212,7 @@ export default {
       exportTenantChargeRecord: "Export Charge Record of Tenant {}",
       exportTenantsChargeRecordOfAdmin: "Export Charge Record of All Tenants in Platform",
       exportAccountPayRecordOfTenant: "Export Payment Record of Account {} in Tenant {}",
-      exportAccountsPayRecordOfTenant: "Export Payment Record of All Accounts in Tenant {}",
+      exportAccountsPayRecordOfTenant: "Export Payment Record of Multiple Accounts in Tenant {}",
       exportTenantPayRecord: "Export Payment Record of Tenant {}",
       exportTenantsPayRecordOfAdmin:"Export Payment Record of All Tenants in Platform",
       exportOperationLogFromUser: "Export Operation Log of User {}",

@@ -166,7 +166,7 @@ export const buildChargesRequestTarget = (accountNames: string[] | undefined, te
       } else {
         return {
           $case: "accountsOfTenant" as const,
-          accountsOfTenant: { tenantName },
+          accountsOfTenant: { tenantName, accountNames: []},
         };
       }
     } else {

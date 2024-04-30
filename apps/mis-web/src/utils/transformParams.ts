@@ -10,9 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export function emptyArrayToUndefined(arr: string[] | undefined) {
-  if (Array.isArray(arr) && (arr as string[]).length === 1
-  && arr[0] === "") {
+export function emptyStringArrayToUndefined(arr: string[] | undefined) {
+  if (Array.isArray(arr) && arr.length === 1 && arr[0] === "") {
     return undefined;
   }
   return arr;

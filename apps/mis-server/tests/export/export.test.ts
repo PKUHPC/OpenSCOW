@@ -353,8 +353,8 @@ it("export pay Records", async () => {
     count: 2,
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{
-      accountName: [data.accountA.accountName, data.accountB.accountName],
+    target:{ $case:"accountsOfTenant", accountsOfTenant:{
+      accountNames: [data.accountA.accountName, data.accountB.accountName],
       tenantName: data.accountA.tenant.getProperty("name"),
     } }, types:[payRecord1.type],
   });

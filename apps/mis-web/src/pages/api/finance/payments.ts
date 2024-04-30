@@ -78,13 +78,13 @@ export const getPaymentRecordTarget = (
   case SearchType.selfTenant:
     return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
   case SearchType.selfAccount:
-    return { $case:"specificAccountsOfTenant" as const,
-      specificAccountsOfTenant:{ tenantName:user.tenant, accountName:targetNames! } };
+    return { $case:"accountsOfTenant" as const,
+      accountsOfTenant:{ tenantName:user.tenant, accountNames:targetNames ?? []} };
   case SearchType.account:
     return targetNames
-      ? { $case:"specificAccountsOfTenant" as const,
-        specificAccountsOfTenant:{ tenantName:tenantOfAccount, accountName:targetNames! } }
-      : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
+      ? { $case:"accountsOfTenant" as const,
+        accountsOfTenant:{ tenantName:tenantOfAccount, accountNames:targetNames } }
+      : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant, accountNames:[]} };
   default:
     break;
   }

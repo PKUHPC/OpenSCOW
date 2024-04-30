@@ -325,11 +325,10 @@ it("returns payment records", async () => {
   // Set a future time to ensure all latest records are fetched
   const endTime = dayjs().add(1, "day").toISOString();
 
-  // specificAccountsOfTenant
   const reply1 = await asyncClientCall(client, "getPaymentRecords", {
     startTime: startTime.toISOString(),
     endTime,
-    target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{ accountName:
+    target:{ $case:"accountsOfTenant", accountsOfTenant:{ accountNames:
        [account.accountName, account2.accountName],
     tenantName: account.tenant.getProperty("name") },
     }, types:[request1.type],
@@ -349,7 +348,7 @@ it("returns payment records", async () => {
   const reply2 = await asyncClientCall(client, "getPaymentRecords", {
     startTime: startTime.toISOString(),
     endTime,
-    target:{ $case:"specificAccountsOfTenant", specificAccountsOfTenant:{ accountName:
+    target:{ $case:"accountsOfTenant", accountsOfTenant:{ accountNames:
          [account.accountName, account2.accountName],
     tenantName: account.tenant.getProperty("name") },
     }, types:extractTypesFromObjects([request1, request3]),
@@ -428,7 +427,7 @@ it("returns payment records", async () => {
     startTime: startTime.toISOString(),
     endTime, types:extractTypesFromObjects([request1, request3]),
     target:{ $case:"accountsOfTenant", accountsOfTenant:{
-      tenantName: account.tenant.getProperty("name") } },
+      tenantName: account.tenant.getProperty("name"), accountNames:[]} },
   });
 
   expect(reply6.results).toHaveLength(2);
@@ -714,7 +713,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfTenant", accountsOfTenant:{
-      tenantName: account.tenant.getProperty("name") } },
+      tenantName: account.tenant.getProperty("name"), accountNames:[]} },
     types: extractTypesFromObjects([request1, request2]),
     page: 1,
     pageSize: 50,
@@ -1113,7 +1112,6 @@ it("returns charge records with query of accounts", async () => {
   const queryEndTime = new Date(startTime);
   queryEndTime.setDate(startTime.getDate() + 1);
 
-  // specificAccountsOfTenant
   const reply1 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),

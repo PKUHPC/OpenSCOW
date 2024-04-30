@@ -1213,7 +1213,7 @@ export default {
       exportTenantChargeRecord: "导出租户{}的消费记录",
       exportTenantsChargeRecordOfAdmin: "导出平台所有租户的消费记录",
       exportAccountPayRecordOfTenant: "导出租户{}内账户{}的充值记录",
-      exportAccountsPayRecordOfTenant: "导出租户{}内所有账户的充值记录",
+      exportAccountsPayRecordOfTenant: "导出租户{}内多个账户的充值记录",
       exportTenantPayRecord: "导出租户{}的消费记录",
       exportTenantsPayRecordOfAdmin: "导出平台所有租户的充值记录",
       exportOperationLogFromUser: "导出用户{}的操作日志",

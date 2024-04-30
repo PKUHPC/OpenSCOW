@@ -28,7 +28,7 @@ import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
-import { emptyArrayToUndefined } from "src/utils/transformParams";
+import { emptyStringArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
 export const ExportChargeRecordSchema = typeboxRouteSchema({
@@ -60,8 +60,8 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
   const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
   let { accountNames, types } = query;
-  accountNames = emptyArrayToUndefined(accountNames);
-  types = emptyArrayToUndefined(types);
+  accountNames = emptyStringArrayToUndefined(accountNames);
+  types = emptyStringArrayToUndefined(types);
 
   const info = await getUserInfoForCharges(accountNames, req, res);
 
