@@ -341,7 +341,6 @@ message AccountOfTenantTarget {
 }
 message AccountsOfTenantTarget {
   string tenant_name = 1;
-  repeated string account_names =2;
 }
 message TenantTarget {
   string tenant_name = 1;
