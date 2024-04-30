@@ -43,7 +43,7 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     count: Type.Number(),
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
-    targetName: Type.Optional(Type.Array(Type.String())),
+    targetNames: Type.Optional(Type.Array(Type.String())),
     searchType: Type.Enum(SearchType),
     types:Type.Optional(Type.Array(Type.String())),
   }),
@@ -60,22 +60,22 @@ export default route(ExportPayRecordSchema, async (req, res) => {
   const { query } = req;
 
   const { columns, startTime, endTime, searchType, count } = query;
-  let { targetName, types } = query;
+  let { targetNames, types } = query;
   // targetName为空字符串数组时视为初始态，即undefined
-  targetName = emptyArrayToUndefined(targetName);
+  targetNames = emptyArrayToUndefined(targetNames);
   types = emptyArrayToUndefined(types);
   let user;
   if (searchType === SearchType.tenant) {
     user = await authenticate((i) => i.platformRoles.includes(PlatformRole.PLATFORM_FINANCE) ||
     i.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))(req, res);
   } else {
-    if (targetName) {
+    if (targetNames) {
       user = await authenticate((i) =>
         i.tenantRoles.includes(TenantRole.TENANT_FINANCE) ||
           i.tenantRoles.includes(TenantRole.TENANT_ADMIN) ||
           // 排除掉前面的租户财务员和管理员，只剩下账户管理员
-          targetName.length === 1 &&
-          i.accountAffiliations.some((x) => x.accountName === targetName[0] && x.role !== UserRole.USER),
+          targetNames.length === 1 &&
+          i.accountAffiliations.some((x) => x.accountName === targetNames[0] && x.role !== UserRole.USER),
       )(req, res);
     } else {
       user = await authenticate((i) =>
@@ -88,10 +88,10 @@ export default route(ExportPayRecordSchema, async (req, res) => {
   if (!user) { return; }
 
   const tenantOfAccount = searchType === SearchType.account
-    ? await getTenantOfAccount(targetName, user)
+    ? await getTenantOfAccount(targetNames, user)
     : user.tenantId;
 
-  const target = getPaymentRecordTarget(searchType, user, tenantOfAccount, targetName);
+  const target = getPaymentRecordTarget(searchType, user, tenantOfAccount, targetNames);
 
   const logInfo = {
     operatorUserId: user.identityId,

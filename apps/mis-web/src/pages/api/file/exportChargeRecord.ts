@@ -60,7 +60,6 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
   const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
   let { accountNames, types } = query;
-  // targetName为空字符串数组视为undefined
   accountNames = emptyArrayToUndefined(accountNames);
   types = emptyArrayToUndefined(types);
 

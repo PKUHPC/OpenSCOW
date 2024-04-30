@@ -56,7 +56,7 @@ interface TableProps {
 
 interface FilterForm {
   // 账户名或租户名
-  name?: string[];
+  names?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs],
   type?: string;
 }
@@ -75,13 +75,13 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
   const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountNames);
 
   const [query, setQuery] = useState<{
-    name: string[] | undefined,
+    names: string[] | undefined,
     time: [dayjs.Dayjs, dayjs.Dayjs]
     types: string[]
   }>(() => ({
     // name作为账户名时可能为 undefined 、长度不定的的数组
     // name作为租户名时可能为 undefined 、长度为1的的数组
-    name: accountNames,
+    names: accountNames,
     time: [today.subtract(1, "year"), today],
     types: [],
   }));
@@ -97,10 +97,10 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
       };
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
-        return api.getTenantPayments({ query: { ...param, tenantName: query.name ? query.name[0] : undefined } });
+        return api.getTenantPayments({ query: { ...param, tenantName: query.names ? query.names[0] : undefined } });
 
       } else {
-        return api.getPayments({ query: { ...param, accountNames: query.name, searchType } });
+        return api.getPayments({ query: { ...param, accountNames: query.names, searchType } });
       }
     }, [query]),
   });
@@ -127,7 +127,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
-          targetName: query.name,
+          targetNames: query.names,
           searchType: searchType,
           types: query.types,
         },
@@ -171,17 +171,17 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { name, time, type } = await form.validateFields();
-            let trimmedType: string[];
+            const { names, time, type } = await form.validateFields();
+            let trimmedTypes: string[];
             if (Array.isArray(type) && type.length === 0) {
-              trimmedType = [];
+              trimmedTypes = [];
             } else {
-              trimmedType = type ? type.split(/,|，/).map((item) => item.trim()) : [];
+              trimmedTypes = type ? type.split(/,|，/).map((item) => item.trim()) : [];
             }
             setQuery({
-              name: selectedNames ?? name,
+              names: selectedNames ?? names,
               time,
-              types: trimmedType,
+              types: trimmedTypes,
             });
           }}
         >

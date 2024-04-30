@@ -44,7 +44,7 @@ type Props = {
 
 const p = prefix("pageComp.finance.AccountSelector.");
 
-export const AccountMultiSelector: React.FC<Props> = ({
+export const AccountSelector: React.FC<Props> = ({
   onChange, value, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
 }) => {
 

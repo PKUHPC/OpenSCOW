@@ -68,22 +68,22 @@ export const getPaymentRecordTarget = (
   searchType: SearchType,
   user: UserInfo,
   tenantOfAccount: string,
-  targetName: string[] | undefined,
+  targetNames: string[] | undefined,
 ) => {
   switch (searchType) {
   case SearchType.tenant:
-    return targetName
-      ? { $case:"tenant" as const, tenant:{ tenantName:targetName[0] } }
+    return targetNames
+      ? { $case:"tenant" as const, tenant:{ tenantName:targetNames[0] } }
       : { $case:"allTenants" as const, allTenants:{ } };
   case SearchType.selfTenant:
     return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
   case SearchType.selfAccount:
     return { $case:"specificAccountsOfTenant" as const,
-      specificAccountsOfTenant:{ tenantName:user.tenant, accountName:targetName! } };
+      specificAccountsOfTenant:{ tenantName:user.tenant, accountName:targetNames! } };
   case SearchType.account:
-    return targetName
+    return targetNames
       ? { $case:"specificAccountsOfTenant" as const,
-        specificAccountsOfTenant:{ tenantName:tenantOfAccount, accountName:targetName! } }
+        specificAccountsOfTenant:{ tenantName:tenantOfAccount, accountName:targetNames! } }
       : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant } };
   default:
     break;

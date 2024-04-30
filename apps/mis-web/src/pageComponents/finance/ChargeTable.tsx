@@ -33,7 +33,7 @@ import { AccountMultiSelector } from "./AccountMultiSelector";
 
 // ChargeTable 组件的 Props 接口
 interface Props {
-  accountName?: string [];
+  accountNames?: string [];
   showAccountName: boolean;
   showTenantName: boolean;
   isPlatformRecords?: boolean;
@@ -42,7 +42,7 @@ interface Props {
 
 // 过滤充值记录的表单接口
 interface FilterForm {
-  name?: string[];
+  names?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs];
   types?: string[];
   userIds?: string;
@@ -60,21 +60,21 @@ const convertUserIdArray = (userIds: string | undefined) => {
 };
 
 export const ChargeTable: React.FC<Props> = ({
-  accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
+  accountNames, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
-  const [selectedAccountNames, setSelectedAccountNames] = useState<string[] | undefined>(accountName);
-  const [selectedType, setSelectedType] = useState<string[] | undefined>(undefined);
+  const [selectedAccountNames, setSelectedAccountNames] = useState<string[] | undefined>(accountNames);
+  const [selectedTypes, setSelectedTypes] = useState<string[] | undefined>(undefined);
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
-    name: string[] | undefined,
+    names: string[] | undefined,
     time: [ dayjs.Dayjs, dayjs.Dayjs ]
     types: string[] | undefined
     userIds: string | undefined}>({
-      name: accountName,
+      names: accountNames,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       types: undefined,
       userIds: undefined,
@@ -86,25 +86,25 @@ export const ChargeTable: React.FC<Props> = ({
   // 在账户管理下切换不同账户消费记录页面时
   useDidUpdateEffect(() => {
     form.setFieldsValue({
-      name: accountName,
+      names: accountNames,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       types: undefined,
       userIds: undefined,
     });
     setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery({
-      name: accountName,
+      names: accountNames,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       types: undefined,
       userIds: undefined,
     });
-    setSelectedAccountNames(accountName);
-  }, [accountName]);
+    setSelectedAccountNames(accountNames);
+  }, [accountNames]);
 
   // 异步获取消费记录的函数
   const recordsPromiseFn = useCallback(async () => {
     const getChargesInfo = await api.getCharges({ query: {
-      accountNames: query.name,
+      accountNames: query.names,
       startTime: query.time[0].clone().startOf("day").toISOString(),
       endTime: query.time[1].clone().endOf("day").toISOString(),
       types: query.types,
@@ -126,7 +126,7 @@ export const ChargeTable: React.FC<Props> = ({
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
-        accountNames: query.name,
+        accountNames: query.names,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
         types: query.types,
@@ -161,7 +161,7 @@ export const ChargeTable: React.FC<Props> = ({
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
-          accountNames: query.name,
+          accountNames: query.names,
           types: query.types,
           searchType: searchType,
           isPlatformRecords: !!isPlatformRecords,
@@ -198,8 +198,8 @@ export const ChargeTable: React.FC<Props> = ({
             form={form}
             initialValues={query}
             onFinish={async () => {
-              const { name, userIds, time, types } = await form.validateFields();
-              setQuery({ name: selectedAccountNames ?? name, userIds, time, types: selectedType ?? types });
+              const { names, userIds, time, types } = await form.validateFields();
+              setQuery({ names: selectedAccountNames ?? names, userIds, time, types: selectedTypes ?? types });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
           >
@@ -228,7 +228,7 @@ export const ChargeTable: React.FC<Props> = ({
                 allowClear
                 mode="multiple"
                 onChange={(value) => {
-                  setSelectedType(value);
+                  setSelectedTypes(value);
                 }}
                 placeholder={t("common.selectType")}
               >
@@ -274,7 +274,7 @@ export const ChargeTable: React.FC<Props> = ({
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
-                name: query.name,
+                names: query.names,
                 time: query.time,
                 types: query.types,
               });

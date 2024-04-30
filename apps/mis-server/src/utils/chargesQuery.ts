@@ -97,12 +97,12 @@ export const getChargesSearchType = (type: string | undefined) => {
   return searchType;
 };
 
-export const getChargesSearchTypes = (type: string[] | undefined) => {
-  if (!type?.length) {
+export const getChargesSearchTypes = (types: string[] | undefined) => {
+  if (!types?.length) {
     return { type: { $ne: null } };
   }
 
-  return { type:{ $in:type } };
+  return { type:{ $in:types } };
 };
 
 /**
