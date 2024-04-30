@@ -21,6 +21,7 @@ import type { AdminAccountInfo } from "src/pages/api/tenant/getAccounts";
 import { UserStore } from "src/stores/UserStore";
 
 type Props = {
+  value: string[];
   onChange?: (value: string[]) => void;
   placeholder?: string;
   disabled?: boolean;
@@ -44,14 +45,11 @@ type Props = {
 const p = prefix("pageComp.finance.AccountSelector.");
 
 export const AccountMultiSelector: React.FC<Props> = ({
-  onChange, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
+  value, onChange, placeholder, disabled, autoSelect, onAccountsFetched, fromAllTenants,
 }) => {
 
   const t = useI18nTranslateToString();
-
   const [inputValue, setInputValue] = useState<string>("");
-  const [selectedValues, setSelectedValues] = useState<string[]>([]);
-
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
@@ -71,19 +69,11 @@ export const AccountMultiSelector: React.FC<Props> = ({
   const options = data ? data.results.map((i) => ({ label: i.accountName, value:  i.accountName })) : [];
 
   const onBlur = () => {
-    // 检查输入值是否与选项匹配
     const match = options.find((option) => option.value === inputValue);
-
-    if (match && !selectedValues.includes(match.value)) {
-      setSelectedValues((prevSelectedValues) => {
-        const newValue = [...prevSelectedValues, match.value];
-
-        onChange?.(newValue);
-        return newValue;
-      });
+    if (match) {
+      onChange?.([match.value]); // 确保更新为新选择的值
     }
-    // 清空输入值
-    setInputValue("");
+    setInputValue(""); // 清空输入框
   };
   return (
     <Input.Group compact>
@@ -92,11 +82,10 @@ export const AccountMultiSelector: React.FC<Props> = ({
         loading={isLoading}
         options={options}
         placeholder={placeholder}
-        value={selectedValues}
+        value={value}
         disabled={disabled}
         style={{ width: "calc(100% - 32px)", minWidth: "200px" }}
         onChange={(v) => {
-          setSelectedValues(v);
           onChange?.(v);
         } }
         onBlur={onBlur}

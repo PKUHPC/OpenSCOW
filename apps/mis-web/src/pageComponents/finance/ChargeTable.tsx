@@ -207,6 +207,7 @@ export const ChargeTable: React.FC<Props> = ({
               showAccountName && (
                 <Form.Item label={t("common.account")} name="name">
                   <AccountMultiSelector
+                    value={selectedAccountNames ?? []}
                     onChange={(value) => {
                       setSelectedAccountNames(value);
                     }}

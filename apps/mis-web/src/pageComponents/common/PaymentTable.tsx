@@ -193,6 +193,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
             >
               {searchType === SearchType.account ? (
                 <AccountMultiSelector
+                  value={selectedNames ?? []}
                   onChange={(item) => {
                     setSelectedNames(item);
                   }}
