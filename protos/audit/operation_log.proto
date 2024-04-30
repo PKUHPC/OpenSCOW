@@ -341,6 +341,7 @@ message AccountOfTenantTarget {
 }
 message AccountsOfTenantTarget {
   string tenant_name = 1;
+  repeated string account_names =2;
 }
 message TenantTarget {
   string tenant_name = 1;
@@ -370,7 +371,7 @@ message ExportChargeRecord {
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenantTarget account_of_tenant = 4;
-    // 返回这个租户（tenantName）下所有账户的消费记录
+    // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
     // 返回所有租户下所有账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
