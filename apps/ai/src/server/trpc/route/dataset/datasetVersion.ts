@@ -30,6 +30,8 @@ import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { z } from "zod";
 
+import { booleanQueryParam } from "../utils";
+
 export const DatasetVersionListSchema = z.object({
   id: z.number(),
   versionName: z.string(),
@@ -55,7 +57,7 @@ export const versionList = procedure
   .input(z.object({
     ...paginationSchema.shape,
     datasetId: z.number(),
-    isPublic: z.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
   }))
   .output(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() }))
   .query(async ({ input }) => {
