@@ -87,6 +87,9 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
+  // 定义排序方式
+  const [sorter, setSorter] = useState({ field: "", order: "" });
+
   const operationType = Form.useWatch("operationType", form);
 
   const getOperatorUserIds = () => {
@@ -110,8 +113,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       customEventType: query.customEventType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      // 新增排序参数
+      sortBy: sorter.field,
+      sortOrder: sorter.order,
     } });
-  }, [query, pageInfo, queryType, accountName, tenantName]);
+  }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 
   const { data, isLoading } = useAsync({ promiseFn });
 
@@ -137,6 +143,14 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     });
   };
 
+  // 处理表格排序事件
+  const handleTableChange = (pagination, filters, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field: sorter.field,
+      order: sorter.order ?? "default",
+    });
+  };
 
   const handleExport = async (columns: string[]) => {
     const total = data?.totalCount ?? 0;
@@ -267,6 +281,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       <Table
         dataSource={getformatData(data?.results)}
         loading={isLoading}
+        onChange={handleTableChange}
         pagination={{
           current: pageInfo.page,
           pageSize: pageInfo.pageSize,
@@ -276,7 +291,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
       >
-        <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
+        <Table.Column<OperationLog>
+          dataIndex="operationLogId"
+          title="ID"
+          sorter={true}
+        />
         <Table.Column
           dataIndex="operationCode"
           title={t(p("operationCode"))}
@@ -303,16 +322,19 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           dataIndex="operationResult"
           title={t(p("operationResult"))}
           render={(operationResult) => OperationResultTexts[operationResult] }
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operationTime"
           title={t(p("operationTime"))}
           render={formatDateTime}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorUserId"
           title={t(p("operatorUserId"))}
           render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorIp"
@@ -320,6 +342,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           render={(operatorIp) => (
             <WordBreakText>{operatorIp}</WordBreakText>
           )}
+          sorter={true}
         />
       </Table>
     </div>

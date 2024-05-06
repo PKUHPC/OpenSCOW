@@ -59,16 +59,61 @@ export const operationLogServiceServer = plugin((server) => {
     },
 
     getOperationLogs: async ({ request, em, logger }) => {
-      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter", "page"]);
+      const { filter, page, pageSize, sortBy, sortOrder } =
+      ensureNotUndefined(request, ["filter", "page", "pageSize", "sortBy", "sortOrder"]);
 
       const sqlFilter = await filterOperationLogs(filter);
 
       logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
-      const [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { operationTime: QueryOrder.DESC },
-      });
+      // 处理排序方式,升序OR降序
+      let orderBy: QueryOrder | undefined;
+      switch (sortOrder) {
+      case "ascend":
+        orderBy = QueryOrder.ASC;
+        break;
+
+      case "descend":
+        orderBy = QueryOrder.DESC;
+        break;
+      }
+
+      // 规范化sortBy的名字
+      let formatSorter: string = sortBy;
+      switch (sortBy) {
+      case "operationLogId":
+        formatSorter = "id";
+        break;
+      }
+
+      // 合法排序的key
+      const validKey = [
+        "id",
+        "operatorUserId",
+        "operatorIp",
+        "customEventType",
+        "operationResult",
+        "operationTime",
+      ];
+
+      // 当formatSorter中的值在OperationLog不存在时，抛出错误
+      if (formatSorter && !validKey.includes(formatSorter)) {
+        throw <ServiceError> { code: status.INVALID_ARGUMENT,
+          message:`sortBy is invalid,it must be ${validKey.join("or")} or undefinded` };
+      }
+
+      let operationLogs, count;
+
+      if (orderBy && formatSorter) {
+        [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+          orderBy:{ [formatSorter]:orderBy },
+        });
+      } else {
+        [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        });
+      }
 
       const res = operationLogs.map(toGrpcOperationLog);
 
@@ -76,6 +121,7 @@ export const operationLogServiceServer = plugin((server) => {
         results: res,
         totalCount: count,
       }];
+
     },
 
     exportOperationLog: async (call) => {

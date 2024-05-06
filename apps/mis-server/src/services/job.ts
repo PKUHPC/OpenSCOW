@@ -70,16 +70,36 @@ export const jobServiceServer = plugin((server) => {
 
     getJobs: async ({ request, em, logger }) => {
 
-      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
+      const { filter, page, pageSize, sortBy, sortOrder } =
+      ensureNotUndefined(request, ["filter", "sortBy", "sortOrder"]);
 
       const sqlFilter = filterJobs(filter);
 
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
+      let jobs, count;
 
-      const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { timeEnd: QueryOrder.DESC },
-      });
+      // 获取 JobInfoEntity 实体的所有列名
+      const jobInfoColumns = em.getMetadata().get(JobInfoEntity).properties;
+      // 没有对应的key抛错
+      if (sortBy && !(sortBy in jobInfoColumns)) {
+        throw <ServiceError>{
+          code: Status.INVALID_ARGUMENT,
+          message: "sortBy key is invalid,it must be the key of JobInfoEntity!",
+        };
+      }
+
+      // 处理排序参数
+      if (sortBy && sortOrder !== "default") {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+          orderBy: { [sortBy]: sortOrder === "ascend" ? QueryOrder.ASC : QueryOrder.DESC },
+        });
+      } else {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        });
+      }
+
 
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")

@@ -86,6 +86,10 @@ export const GetChargesSchema = typeboxRouteSchema({
      * @type integer
      */
     pageSize: Type.Optional(Type.Integer()),
+
+    sortBy:Type.Optional(Type.String()),
+
+    sortOrder:Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -175,7 +179,7 @@ export const buildChargesRequestTarget = (accountName: string | undefined, tenan
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const { endTime, startTime, accountName, isPlatformRecords,
-    searchType, type, userIds, page, pageSize } = req.query;
+    searchType, type, userIds, page, pageSize, sortBy, sortOrder } = req.query;
 
   const info = await getUserInfoForCharges(accountName, req, res);
   if (!info) return;
@@ -192,6 +196,8 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
     page,
     pageSize,
+    sortBy,
+    sortOrder,
   }), []);
 
   const respUserIds = Array.from(new Set(reply.results.map((x) => x.userId).filter((x) => !!x) as string[]));

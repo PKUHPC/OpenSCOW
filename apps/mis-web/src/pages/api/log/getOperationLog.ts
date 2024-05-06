@@ -37,6 +37,7 @@ export const GetOperationLogFilter = Type.Object({
   operationDetail: Type.Optional(Type.String()),
   operationTargetAccountName: Type.Optional(Type.String()),
   customEventType: Type.Optional(Type.String()),
+
 });
 
 export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
@@ -54,8 +55,10 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
 
     page: Type.Integer({ minimum: 1 }),
 
-
     pageSize: Type.Optional(Type.Integer()),
+
+    sortBy: Type.Optional(Type.String()),
+    sortOrder: Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -79,7 +82,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
   const {
     type, operatorUserIds, startTime, endTime,
     operationType, operationResult, operationDetail,
-    operationTargetAccountName, customEventType, page, pageSize } = req.query;
+    operationTargetAccountName, customEventType, page, pageSize, sortBy, sortOrder } = req.query;
 
   const filter = {
     operatorUserIds: operatorUserIds ? operatorUserIds.split(",") : [],
@@ -130,7 +133,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
     }
   }
   const { getLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
-  const resp = await getLog({ filter, page, pageSize });
+  const resp = await getLog({ filter, page, pageSize, sortBy, sortOrder });
 
   const { results, totalCount } = resp;
 

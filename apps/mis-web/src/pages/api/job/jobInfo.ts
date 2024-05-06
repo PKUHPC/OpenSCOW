@@ -102,6 +102,10 @@ export const GetJobInfoSchema = typeboxRouteSchema({
      * @type integer
      */
     pageSize: Type.Optional(Type.Integer()),
+
+    sortBy: Type.Optional(Type.String()),
+
+    sortOrder: Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -127,7 +131,8 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
 
   if (!info) { return; }
 
-  const { page = 1, accountName, userId, jobEndTimeEnd, jobEndTimeStart, jobId, clusters, pageSize } = req.query;
+  const { page = 1, accountName, userId, jobEndTimeEnd, jobEndTimeStart, jobId, clusters, pageSize, sortBy, sortOrder }
+  = req.query;
 
   const filter: JobFilter = {
     tenantName: info.tenant,
@@ -153,6 +158,8 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
     filter,
     page,
     pageSize,
+    sortBy,
+    sortOrder,
   });
 
   return {

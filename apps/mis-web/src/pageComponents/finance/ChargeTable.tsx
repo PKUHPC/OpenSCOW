@@ -81,6 +81,9 @@ export const ChargeTable: React.FC<Props> = ({
       userIds: undefined,
     });// 查询对象
 
+  // 定义排序状态
+  const [sorter, setSorter] = useState({ field: "", order: "" });
+
   // 过滤后的充值类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
@@ -113,6 +116,8 @@ export const ChargeTable: React.FC<Props> = ({
       searchType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      sortBy: sorter.field,
+      sortOrder: sorter.order ?? "default",
     } });
     // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
     if (query.userIds) {
@@ -299,7 +304,7 @@ export const ChargeTable: React.FC<Props> = ({
             width="15%"
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
           />
-          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
+          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time")) } render={(v) => formatDateTime(v)} />
           <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
           <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
           <Table.Column<ChargeInfo>
