@@ -74,14 +74,12 @@ message ExportChargeRecordRequest {
     AccountOfTenantTarget account_of_tenant = 5;
     // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 6;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 7;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 8;
     // 返回所有租户的租户消费记录
     AllTenantsTarget all_tenants = 9;
-    // 返回多个特定账户的消费记录
-    AccountsTarget accounts = 11;
   }
   repeated string user_ids = 10;
 }

@@ -197,7 +197,7 @@ export const chargingServiceServer = plugin((server) => {
      * case tenant:返回这个租户（tenantName）的消费记录
      * case allTenants: 返回所有租户消费记录
      * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-     * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
      * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
      *
      * Deprecated Notice
@@ -408,8 +408,7 @@ export const chargingServiceServer = plugin((server) => {
        * case allTenants: 返回所有租户消费记录
        * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
        * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
-       * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
-       * case accounts: 返回多个特定账户的消费记录
+       * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
        *
        * @returns
        */
@@ -452,8 +451,7 @@ export const chargingServiceServer = plugin((server) => {
    * case allTenants: 返回所有租户消费记录
    * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
    * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
-   * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
-   * case accounts: 返回多个特定账户的消费记录
+   * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
    *
    * @returns
    */

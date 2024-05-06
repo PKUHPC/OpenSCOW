@@ -14,7 +14,7 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
-import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AccountsTarget, AllTenantsTarget,
+import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
   ChargingServiceClient, TenantTarget } from "@scow/protos/build/server/charging";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
@@ -135,52 +135,42 @@ export async function getTenantOfAccount(accountNames: string[] | undefined, inf
 
 export const buildChargesRequestTarget = (accountNames: string[] | undefined, tenantName: string,
   searchType: SearchType | undefined, isPlatformRecords: boolean | undefined): (
-    { $case: "accounts"; accounts: AccountsTarget }
-    | { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
+    { $case: "accountOfTenant"; accountOfTenant: AccountOfTenantTarget }
     | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
     | { $case: "accountsOfAllTenants"; accountsOfAllTenants: AccountsOfAllTenantsTarget }
     | { $case: "tenant"; tenant: TenantTarget }
     | { $case: "allTenants"; allTenants: AllTenantsTarget }
     | undefined
   ) => {
-  if (accountNames) {
-    // 多个账户名
-    if (accountNames.length !== 1) {
-      return {
-        $case: "accounts" as const,
-        accounts: { accounts:accountNames },
-      };
-    }
-
+  if (accountNames?.length == 1) {
     return {
       $case: "accountOfTenant" as const,
       accountOfTenant: { accountName:accountNames[0], tenantName },
     };
-  } else {
-    if (searchType === SearchType.ACCOUNT) {
-      if (isPlatformRecords) {
-        return {
-          $case: "accountsOfAllTenants" as const,
-          accountsOfAllTenants: {},
-        };
-      } else {
-        return {
-          $case: "accountsOfTenant" as const,
-          accountsOfTenant: { tenantName, accountNames: []},
-        };
-      }
+  }
+  if (searchType === SearchType.ACCOUNT) {
+    if (isPlatformRecords) {
+      return {
+        $case: "accountsOfAllTenants" as const,
+        accountsOfAllTenants: { accountNames:accountNames?.length ? accountNames : []},
+      };
     } else {
-      if (isPlatformRecords) {
-        return {
-          $case: "allTenants" as const,
-          allTenants: {},
-        };
-      } else {
-        return {
-          $case: "tenant" as const,
-          tenant: { tenantName },
-        };
-      }
+      return {
+        $case: "accountsOfTenant" as const,
+        accountsOfTenant: { tenantName, accountNames: accountNames?.length ? accountNames : []},
+      };
+    }
+  } else {
+    if (isPlatformRecords) {
+      return {
+        $case: "allTenants" as const,
+        allTenants: {},
+      };
+    } else {
+      return {
+        $case: "tenant" as const,
+        tenant: { tenantName },
+      };
     }
   }
 };
