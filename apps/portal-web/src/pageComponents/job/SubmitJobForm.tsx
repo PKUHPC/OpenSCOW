@@ -42,6 +42,7 @@ interface JobForm {
   comment: string;
   workingDirectory: string;
   output: string;
+  scriptOutput: string;
   errorOutput: string;
   save: boolean;
 }
@@ -64,6 +65,7 @@ const initialValues = {
   gpuCount: 1,
   maxTime: 30,
   output: "job.%j.out",
+  scriptOutput:"job.%j.script",
   errorOutput: "job.%j.err",
   save: false,
 } as Partial<JobForm>;
@@ -86,7 +88,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, scriptOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
@@ -337,7 +339,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={10}>
+        <Col span={24} sm={9}>
           <Form.Item<JobForm>
             label={t(p("workingDirectory"))}
             name="workingDirectory"
@@ -365,20 +367,35 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={5}>
           <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={5}>
           <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
+            <Input />
+          </Form.Item>
+        </Col>
+        {/* 脚本文件 */}
+        <Col span={12} sm={5}>
+          <Form.Item<JobForm>
+            label={t(p("scriptOutput"))}
+            name="scriptOutput"
+            tooltip={(
+              <>
+                <span>{t(p("wdTooltip1"))}</span>
+                <br />
+                <span>{t(p("wdTooltip3"))}</span>
+              </>
+            )}
+          >
             <Input />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
           {t(p("totalNodeCount"))}{nodeCount}
         </Col>
-
         {currentPartitionInfo?.gpus ? (
           <Col className="ant-form-item" span={12} sm={6}>
             {t(p("totalGpuCount"))}{nodeCount * gpuCount}

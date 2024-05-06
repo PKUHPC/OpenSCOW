@@ -183,8 +183,11 @@ export default {
 
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
 
+        wdTooltip3: "2.该文件用于保存适配器返回的脚本，默认值参考输出文件，若为空则不保存脚本。",
+
         output: "标准输出文件",
         errorOutput: "错误输出文件",
+        scriptOutput:"脚本输出文件",
         totalNodeCount: "总节点数：",
         totalGpuCount: "总GPU卡数：",
         totalCoreCount: "总CPU核心数：",
