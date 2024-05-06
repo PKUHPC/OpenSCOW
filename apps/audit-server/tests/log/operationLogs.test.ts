@@ -309,6 +309,8 @@ it("get operation logs", async () => {
   const resp = await asyncClientCall(client, "getOperationLogs", {
     page: 1,
     pageSize:10,
+    sortBy:"operationLogId",
+    sortOrder:"descend",
     filter: { operatorUserIds: ["testUserId"], operationDetail: "123" },
   });
 
@@ -348,6 +350,8 @@ it("get logs for custom event", async () => {
   const resp = await asyncClientCall(client, "getOperationLogs", {
     page: 1,
     pageSize:10,
+    sortBy:"operationLogId",
+    sortOrder:"descend",
     filter: { operatorUserIds: ["testUserId"]},
   });
 
