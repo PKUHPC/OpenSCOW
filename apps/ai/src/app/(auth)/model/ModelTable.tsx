@@ -22,6 +22,7 @@ import { ModalButton } from "src/components/ModalLink";
 import { ModelInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { CreateAndEditModalModal } from "./CreateAndEditModelModal";
@@ -68,7 +69,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
     { ...pageInfo,
       nameOrDesc:query.nameOrDesc,
       clusterId:query.clusterId,
-      isPublic,
+      isPublic: parseBooleanParam(isPublic),
     });
   if (error) {
     message.error("找不到模型");

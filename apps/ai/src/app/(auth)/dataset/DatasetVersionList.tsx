@@ -21,6 +21,7 @@ import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { AppRouter } from "src/server/trpc/router";
 import { getSharedStatusText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { CopyPublicDatasetModal } from "./CopyPublicDatasetModal";
@@ -45,7 +46,10 @@ export const DatasetVersionList: React.FC<Props> = (
   const router = useRouter();
 
   const { data: versionData, isFetching, refetch, error: versionError }
-    = trpc.dataset.versionList.useQuery({ datasetId, isPublic });
+    = trpc.dataset.versionList.useQuery({
+      datasetId,
+      isPublic:  isPublic !== undefined ? parseBooleanParam(isPublic) : undefined,
+    });
   if (versionError) {
     message.error("找不到数据集版本");
   }
