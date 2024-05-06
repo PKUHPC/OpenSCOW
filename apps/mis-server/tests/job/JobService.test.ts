@@ -158,6 +158,8 @@ it("returns 50 jobs if pageSize is undefined or 0", async () => {
       filter: { tenantName: data.tenant.name, clusters: []},
       page: 1,
       pageSize,
+      sortBy:"account",
+      sortOrder:"descend",
     });
 
     expect(reply.jobs).toHaveLength(50);
@@ -186,6 +188,8 @@ it("returns jobs starting from start_bi_job_index", async () => {
   const reply = await asyncClientCall(client, "getJobs", {
     page: 1,
     pageSize: 100,
+    sortBy:"account",
+    sortOrder:"descend",
     filter: {
       clusters: [],
       tenantName: data.tenant.name,
@@ -210,6 +214,8 @@ it("returns 0 job if Account not exist or is not in scope of permissions", async
       filter,
       page: 1,
       pageSize: 10,
+      sortBy:"account",
+      sortOrder:"descend",
     });
     expect(reply.jobs).toHaveLength(0);
   };
