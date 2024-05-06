@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "xterm/css/xterm.css";
+import "@xterm/xterm/css/xterm.css";
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Popover, Space, Typography } from "antd";
