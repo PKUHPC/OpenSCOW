@@ -83,6 +83,8 @@ export const getTargetAccountName = (operationEvent: OperationEvent): string | u
       return operationEvent[operationType].target.accountOfTenant.accountName;
     case "accountsOfTenant" :
       return operationEvent[operationType].target.accountsOfTenant.accountNames;
+    case "accountsOfAllTenants":
+      return operationEvent[operationType].target.accountsOfAllTenants.accountNames;
     default:
       return;
     }
