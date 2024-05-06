@@ -17,11 +17,9 @@ import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { ClusterOnlineStatus } from "@scow/protos/build/server/config";
-import { getClustersDatabaseInfo, updateCluster } from "src/bl/common";
+import { updateCluster } from "src/bl/common";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { checkOnlineClusters, NO_ONLINE_CLUSTERS } from "src/utils/cluster";
 
 type CallOnAllResult<T> = {
   cluster: string;
@@ -30,16 +28,16 @@ type CallOnAllResult<T> = {
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
+  // clusters for calling to connect to adapter client
+  clusters: Record<string, ClusterConfigSchema>,
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
-  doNotCheckOnlineClusters?: boolean,
 ) => Promise<CallOnAllResult<T>>;
 
 type CallOnOne = <T>(
   cluster: string,
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
-  doNotCheckOnlineClusters?: boolean,
 ) => Promise<T>;
 
 export type ClusterPlugin = {
@@ -84,19 +82,6 @@ export const clustersPlugin = plugin(async (f) => {
     return prev;
   }, {} as Record<string, SchedulerAdapterClient>);
 
-  const getOnlineClusters = async () => {
-    const clustersOnlineInfo = await getClustersDatabaseInfo(f.ext.orm.em.fork(), logger);
-    const currentOnlineClusterIds = clustersOnlineInfo.filter((cluster) => {
-      return cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
-    }).map((cluster) => cluster.clusterId);
-    return currentOnlineClusterIds.reduce((acc, clusterId) => {
-      if (configClusters[clusterId]) {
-        acc[clusterId] = configClusters[clusterId];
-      }
-      return acc;
-    }, {} as Record<string, ClusterConfigSchema>);
-  };
-
   // adapterClients of online clusters
   const getAdapterClientForOnlineClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
     return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
@@ -110,20 +95,11 @@ export const clustersPlugin = plugin(async (f) => {
     return adapterClientForClusters[cluster];
   };
 
-  const logger = f.logger.child({ plugin: "cluster" });
+  f.logger.child({ plugin: "cluster" });
 
   const clustersPlugin = {
-    // get current online Clusters
-    onlineClusters: async () => {
-      return await getOnlineClusters();
-    },
 
-    callOnOne: <CallOnOne>(async (cluster, logger, call, doNotCheckOnlineClusters: boolean = false) => {
-
-      if (!doNotCheckOnlineClusters) {
-        const currentOnlineClusters = await getOnlineClusters();
-        checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
-      }
+    callOnOne: <CallOnOne>(async (cluster, logger, call) => {
 
       const client = getAdapterClient(cluster);
 
@@ -150,26 +126,9 @@ export const clustersPlugin = plugin(async (f) => {
     }),
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (logger, call, doNotCheckOnlineClusters: boolean = false) => {
+    callOnAll: <CallOnAll>(async (clusters, logger, call) => {
 
-      let adapterClientForOnlineClusters: Record<string, SchedulerAdapterClient>;
-      if (doNotCheckOnlineClusters) {
-        adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(configClusters);
-      } else {
-        const currentOnlineClusters = await getOnlineClusters();
-        logger.info("Current Online Clusters %o", currentOnlineClusters);
-
-        if (Object.keys(currentOnlineClusters).length === 0) {
-          throw new ServiceError({
-            code: status.INTERNAL,
-            details: "No available clusters. Please try again later",
-            metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
-          });
-        }
-
-        adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(currentOnlineClusters);
-      }
-
+      const adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(clusters);
 
       const responses = await Promise.all(Object.entries(adapterClientForOnlineClusters)
         .map(async ([cluster, client]) => {

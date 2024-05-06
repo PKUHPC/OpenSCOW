@@ -123,8 +123,6 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
 export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res) => {
   const { tenant, activeOnly, currentOnlineClusterIds } = req.query;
 
-  console.log("【currentOnlineClusterIds】", currentOnlineClusterIds);
-
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
     const info = await auth(req, res);

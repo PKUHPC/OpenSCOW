@@ -54,7 +54,6 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
 
   const { onlineClusters } = useStore(OnlineClustersStore);
   const currentOnlineClusterIds = Object.keys(onlineClusters);
-  console.log("【currentOnlineClusterIds】", currentOnlineClusterIds);
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({ query: { tenant, activeOnly: false, currentOnlineClusterIds } });
   }, [tenant]) });

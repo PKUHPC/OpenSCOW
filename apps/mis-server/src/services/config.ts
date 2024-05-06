@@ -16,6 +16,8 @@ import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/co
 
 export const configServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
+
+    // do not need check cluster's activation
     getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
 

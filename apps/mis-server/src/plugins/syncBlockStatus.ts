@@ -39,7 +39,13 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     if (synchronizeIsRunning) return;
 
     synchronizeIsRunning = true;
-    return synchronizeBlockStatus(f.ext.orm.em.fork(), logger, f.ext).finally(() => { synchronizeIsRunning = false; });
+    return synchronizeBlockStatus(f.ext.orm.em.fork(), logger, f.ext)
+      // .catch((e) => {
+      //   if (e.data?.code === "NO_ONLINE_CLUSTERS") {
+      //     logger.error("No available activated clusters in SCOW.");
+      //   }
+      // })
+      .finally(() => { synchronizeIsRunning = false; });
   };
 
   const task = cron.schedule(

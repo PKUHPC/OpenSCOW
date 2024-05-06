@@ -91,10 +91,11 @@ export async function createPriceMap(
   // partitions info for all clusters
   const partitionsForClusters: Record<string, Partition[]> = {};
 
+  // call for all config clusters
   const reply = await clusterPlugin.callOnAll(
+    configClusters,
     logger,
     async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-    true,
   );
   reply.forEach((x) => {
     partitionsForClusters[x.cluster] = x.result.partitions;

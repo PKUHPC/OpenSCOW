@@ -20,18 +20,13 @@ export const NO_ONLINE_CLUSTERS = "NO_ONLINE_CLUSTERS";
 export const NOT_EXIST_IN_ONLINE_CLUSTERS = "NOT_EXIST_IN_ONLINE_CLUSTERS";
 
 export const checkOnlineClusters
-= async (
-  { clusterIds,
-    onlineClusters,
-    logger,
-  }:
+= ({ clusterIds, onlineClusters, logger }:
   { clusterIds: string[],
     onlineClusters: Record<string, ClusterConfigSchema>,
     logger: Logger
-  },
-) => {
+  }) => {
 
-  logger.info("Checking online status of clusters with ids (%o) ", clusterIds);
+  logger.info("Checking activation status of clusters with ids (%o) ", clusterIds);
   if (Object.keys(onlineClusters).length === 0) {
     throw new ServiceError({
       code: status.INTERNAL,
@@ -42,11 +37,11 @@ export const checkOnlineClusters
 
   const exist = clusterIds.every((id) => Object.keys(onlineClusters).find((x) => x === id));
   if (!exist) {
-    logger.info("Querying offline clusters with ids (%o). The current online clusters' ids: %o",
+    logger.info("Querying deactivated clusters with ids (%o). The current activated clusters' ids: %o",
       clusterIds, Object.keys(onlineClusters));
     throw new ServiceError({
       code: status.INTERNAL,
-      details: "Querying offline clusters. Please refresh the page and try again",
+      details: "Querying deactivated clusters. Please refresh the page and try again",
       metadata: scowErrorMetadata(NOT_EXIST_IN_ONLINE_CLUSTERS,
         { currentOnlineClusterIds:
           Object.keys(onlineClusters).length > 0 ? JSON.stringify(Object.keys(onlineClusters)) : "" }),
@@ -54,4 +49,3 @@ export const checkOnlineClusters
   }
 
 };
-

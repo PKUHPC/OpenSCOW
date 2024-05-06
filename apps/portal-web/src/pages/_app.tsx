@@ -265,7 +265,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    // TODO:确认是否为数据逻辑
+    // use all clusters in config files
     extra.loginNodes = publicConfig.CLUSTER_SORTED_ID_LIST.reduce((acc, cluster) => {
       acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
       return acc;

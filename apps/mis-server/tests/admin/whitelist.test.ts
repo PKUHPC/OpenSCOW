@@ -14,11 +14,12 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
-import { SqlEntityManager } from "@mikro-orm/mysql";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { charge } from "src/bl/charging";
+import { getOnlineClusters } from "src/bl/common";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { reloadEntity, toRef } from "src/utils/orm";
@@ -26,7 +27,7 @@ import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
-let em: SqlEntityManager;
+let em: SqlEntityManager<MySqlDriver>;
 let client: AccountServiceClient;
 let data: InitialData;
 let a: Loaded<Account, "tenant">;
@@ -138,12 +139,14 @@ it("charges user but don't block account if account is whitelist", async () => {
 
   await em.flush();
 
+  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+
   const { currentBalance, previousBalance } = await charge({
     amount: new Decimal(2),
     comment: "",
     target: a,
     type: "haha",
-  }, em.fork(), server.logger, server.ext);
+  }, em.fork(), currentOnlineClusters, server.logger, server.ext);
 
   await reloadEntity(em, a);
 

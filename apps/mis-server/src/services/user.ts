@@ -32,6 +32,7 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
+import { getOnlineClusters } from "src/bl/common";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -179,13 +180,15 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      const clusters = await server.ext.clusters.onlineClusters();
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+
+      await server.ext.clusters.callOnAll(currentOnlineClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS")
+           !== Object.keys(currentOnlineClusters).length) {
           throw e;
         }
       });
@@ -229,15 +232,17 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
       // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
       if (userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
         userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
-        await blockUserInAccount(userAccount, server.ext, logger);
+        await blockUserInAccount(userAccount, currentOnlineClusters, server.ext, logger);
         await em.flush();
       }
 
       // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
       const jobs = await server.ext.clusters.callOnAll(
+        currentOnlineClusters,
         logger,
         async (client) => {
           const fields = ["job_id", "user", "state", "account"];
@@ -257,13 +262,14 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      const clusters = await server.ext.clusters.onlineClusters();
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+
+      await server.ext.clusters.callOnAll(currentOnlineClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+           !== Object.keys(currentOnlineClusters).length) {
           throw e;
         }
       });
@@ -299,7 +305,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await blockUserInAccount(user, server.ext, logger);
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      await blockUserInAccount(user, currentOnlineClusters, server.ext, logger);
       user.state = UserStateInAccount.BLOCKED_BY_ADMIN;
       user.blockedInCluster = UserStatus.BLOCKED;
 
@@ -335,8 +342,9 @@ export const userServiceServer = plugin((server) => {
         user.usedJobCharge,
       ).shouldBlockInCluster;
 
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
       if (!stillBlockUserInCluster) {
-        await unblockUserInAccount(user, server.ext, logger);
+        await unblockUserInAccount(user, currentOnlineClusters, server.ext, logger);
         user.blockedInCluster = UserStatus.UNBLOCKED;
       }
       user.state = UserStateInAccount.NORMAL;

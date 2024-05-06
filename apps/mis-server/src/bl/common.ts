@@ -10,10 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { LockMode, MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { ClusterDatabaseInfo, clusterOnlineStatusFromJSON } from "@scow/protos/build/server/config";
+import { status } from "@grpc/grpc-js";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { ClusterDatabaseInfo, ClusterOnlineStatus,
+  clusterOnlineStatusFromJSON } from "@scow/protos/build/server/config";
+import { configClusters } from "src/config/clusters";
 import { Cluster } from "src/entities/Cluster";
+import { NO_ONLINE_CLUSTERS } from "src/utils/cluster";
 
 export async function updateCluster(
   em: SqlEntityManager<MySqlDriver>,
@@ -62,10 +69,8 @@ export async function getClustersDatabaseInfo(
   logger: Logger,
 ): Promise<ClusterDatabaseInfo[]> {
 
-  logger.info("Get current clusters online and offline info started.");
-
-  // const clustersFromDb = await em.find(Cluster, {}, { lockMode: LockMode.PESSIMISTIC_READ });
   const clustersFromDb = await em.find(Cluster, {});
+
   const reply = clustersFromDb.map((x) => {
     return {
       clusterId: x.clusterId,
@@ -84,3 +89,27 @@ export async function getClustersDatabaseInfo(
   return reply;
 }
 
+
+export const getOnlineClusters = async (em: SqlEntityManager<MySqlDriver>, logger: Logger) => {
+
+  const clustersOnlineInfo = await getClustersDatabaseInfo(em, logger);
+
+  const currentOnlineClusterIds = clustersOnlineInfo.filter((cluster) => {
+    return cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
+  }).map((cluster) => cluster.clusterId);
+
+  if (currentOnlineClusterIds.length === 0) {
+    throw new ServiceError({
+      code: status.INTERNAL,
+      details: "No available clusters. Please try again later",
+      metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
+    });
+  }
+
+  return currentOnlineClusterIds.reduce((acc, clusterId) => {
+    if (configClusters[clusterId]) {
+      acc[clusterId] = configClusters[clusterId];
+    }
+    return acc;
+  }, {} as Record<string, ClusterConfigSchema>);
+};

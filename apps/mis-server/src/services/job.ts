@@ -26,7 +26,8 @@ import {
   JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
-import { getActiveBillingItems } from "src/bl/PriceMap";
+import { getOnlineClusters } from "src/bl/common";
+import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
@@ -34,6 +35,7 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
+import { checkOnlineClusters } from "src/utils/cluster";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -133,6 +135,8 @@ export const jobServiceServer = plugin((server) => {
 
         const savedFields = misConfig.jobChargeMetadata?.savedFields;
 
+        const currentOnlineClusters = await getOnlineClusters(em, logger);
+
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
             x.biJobIndex, x.tenantPrice.toFixed(2), x.accountPrice.toFixed(2),
@@ -164,7 +168,7 @@ export const jobServiceServer = plugin((server) => {
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
                 metadata: metadataMap,
-              }, em, logger, server.ext);
+              }, em, currentOnlineClusters, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
                 target: account.tenant.$,
@@ -173,7 +177,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, logger, server.ext);
+              }, em, currentOnlineClusters, logger, server.ext);
             }
             x.tenantPrice = newTenantPrice;
           }
@@ -187,7 +191,7 @@ export const jobServiceServer = plugin((server) => {
                 amount: newAccountPrice.minus(x.accountPrice),
                 userId: x.user,
                 metadata: metadataMap,
-              }, em, logger, server.ext);
+              }, em, currentOnlineClusters, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({
                 target: account,
@@ -196,7 +200,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, logger, server.ext);
+              }, em, currentOnlineClusters, logger, server.ext);
             }
             x.accountPrice = newAccountPrice;
           }
@@ -237,6 +241,9 @@ export const jobServiceServer = plugin((server) => {
         : tenantName !== undefined
           ? tenantAccounts : [];
 
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+
       const reply = await server.ext.clusters.callOnOne(
         cluster,
         logger,
@@ -265,8 +272,11 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    changeJobTimeLimit: async ({ request, logger }) => {
+    changeJobTimeLimit: async ({ request, em, logger }) => {
       const { cluster, limitMinutes, jobId } = request;
+
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,
@@ -282,9 +292,12 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-    queryJobTimeLimit: async ({ request, logger }) => {
+    queryJobTimeLimit: async ({ request, em, logger }) => {
 
       const { cluster, jobId } = request;
+
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -336,10 +349,10 @@ export const jobServiceServer = plugin((server) => {
         historyItems: activeOnly ? [] : billingItems.filter((x) => !activePrices.includes(x)).map(priceItemToGrpc) }];
     },
 
-    getMissingDefaultPriceItems: async () => {
+    getMissingDefaultPriceItems: async ({ em }) => {
 
       // check price map completeness
-      const priceMap = await server.ext.price.createPriceMap();
+      const priceMap = await createPriceMap(em, server.ext.clusters, logger);
       const missingItems = priceMap.getMissingDefaultPriceItems();
 
       return [{ items: missingItems }];
@@ -481,8 +494,11 @@ export const jobServiceServer = plugin((server) => {
       return [{ count }];
     },
 
-    cancelJob: async ({ request, logger }) => {
+    cancelJob: async ({ request, em, logger }) => {
       const { cluster, userId, jobId } = request;
+
+      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,

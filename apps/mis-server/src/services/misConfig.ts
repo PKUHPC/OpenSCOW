@@ -15,7 +15,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
-import { getClustersDatabaseInfo } from "src/bl/common";
+import { getClustersDatabaseInfo, getOnlineClusters } from "src/bl/common";
 import { configClusters } from "src/config/clusters";
 import { Cluster, ClusterOnlineStatus } from "src/entities/Cluster";
 
@@ -28,10 +28,12 @@ export const misConfigServiceServer = plugin((server) => {
      * Use the new API function GetAvailablePartitionsForCluster instead.
      * @deprecated
      */
-    getAvailablePartitions: async ({ request, logger }) => {
+    getAvailablePartitions: async ({ request, em, logger }) => {
 
       const { accountName, userId } = request;
+      const currentOnlineClusters = await getOnlineClusters(em, logger).catch();
       const reply = await server.ext.clusters.callOnAll(
+        currentOnlineClusters,
         logger,
         async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
           accountName, userId,
@@ -49,6 +51,7 @@ export const misConfigServiceServer = plugin((server) => {
     getAvailablePartitionsForCluster: async ({ request, logger }) => {
 
       const { cluster, accountName, userId } = request;
+      // do not need check cluster's activation
       const reply = await server.ext.clusters.callOnOne(
         cluster,
         logger,
@@ -65,12 +68,12 @@ export const misConfigServiceServer = plugin((server) => {
       const clusterResponse: ClusterConnectionInfo[] = [];
 
       // check connection status of config clusters
+      // do not need check cluster's activation
       await Promise.allSettled(Object.keys(configClusters).map(async (cluster) => {
         const reply = await server.ext.clusters.callOnOne(
           cluster,
           logger,
           async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-          true,
         ).catch((e) => {
           logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
           clusterResponse.push({
@@ -96,26 +99,6 @@ export const misConfigServiceServer = plugin((server) => {
     getClustersDatabaseInfo: async ({ em, logger }) => {
 
       const reply = await getClustersDatabaseInfo(em, logger);
-      // logger.info("Get current clusters online and offline info started.");
-
-      // const clustersFromDb = await em.findAll(Cluster, {});
-
-      // const reply = clustersFromDb.map((x) => {
-      //   return {
-      //     clusterId: x.clusterId,
-      //     onlineStatus: clusterOnlineStatusFromJSON(x.onlineStatus),
-      //     operatorId: x.operatorId,
-      //     comment: x.comment,
-      //   };
-      // });
-
-      // const clusterOnlineStatusList = clustersFromDb.map((x) => {
-      //   return `(Cluster ID: ${x.clusterId}) : ${x.onlineStatus}`;
-      // }).join("; ");
-
-      // logger.info("Current clusters list: %s", clusterOnlineStatusList);
-
-      // return reply;
 
       return [{ results: reply }];
     },
@@ -132,11 +115,11 @@ export const misConfigServiceServer = plugin((server) => {
       }
 
       // check current scheduler adapter connection state
+      // do not need check cluster's activation
       await server.ext.clusters.callOnOne(
         clusterId,
         logger,
         async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-        true,
       ).catch((e) => {
         logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
         throw <ServiceError>{

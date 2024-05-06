@@ -74,7 +74,7 @@ export async function calculateJobPrice(
 
   logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
-  // TODO: 确认是否为数据逻辑
+  // use all clusters from config files
   const clusters = configClusters;
   const clusterInfo = clusters[info.cluster];
 
