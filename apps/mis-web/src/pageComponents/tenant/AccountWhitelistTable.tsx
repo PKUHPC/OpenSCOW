@@ -134,7 +134,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                 <>
                   <Divider type="vertical" />
                   <span>
-                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(3)} {t(pCommon("unit"))}</strong>
+                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(2)} {t(pCommon("unit"))}</strong>
                   </span>
                 </>
               </div>
