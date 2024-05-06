@@ -45,14 +45,9 @@ export const DataBarChart: React.FC<Props> = ({
   xLabel = "",
   toolTipFormatter = (value) => value,
 }) => {
-  const tickFormatter = (value) => {
-    if (typeof value === "number") {
-      const decimalPart = value.toString().split(".")[1];
-      if (decimalPart && decimalPart.length > 2) {
-        return value.toFixed(2);
-      }
-    }
-    return value;
+  const tickFormatter = (value: number) => {
+    const roundedValue = Number.isInteger(value) ? value : parseFloat(value.toFixed(2));
+    return roundedValue.toString();
   };
   return (
     <StatisticContainer>
