@@ -123,6 +123,7 @@ export const ChargeTable: React.FC<Props> = ({
     return getChargesInfo;
   }, [query, pageInfo]);
 
+
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
@@ -240,12 +241,12 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.total")}>
               <strong>
-                {recordsData ? recordsData.results.length : 0}
+                {totalResultData?.totalCount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {recordsData ? recordsData.results.reduce(((a, b) => a + b.amount), 0) : 0}
+                {totalResultData?.totalAmount?.toFixed(2) ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -269,7 +270,7 @@ export const ChargeTable: React.FC<Props> = ({
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
             defaultPageSize: DEFAULT_PAGE_SIZE,
-            total: recordsData ? recordsData.results.length : 0,
+            total: totalResultData?.totalCount ?? 0,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
@@ -299,7 +300,7 @@ export const ChargeTable: React.FC<Props> = ({
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
           />
           <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
+          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(2)} />
           <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
           <Table.Column<ChargeInfo>
             dataIndex="comment"
