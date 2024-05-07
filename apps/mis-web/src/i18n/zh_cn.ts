@@ -157,7 +157,7 @@ export default {
         operationLog:"操作日志",
         statistic: "平台数据统计",
       },
-      navLinkTextPortal: "SCOW HPC",
+      navLinkTextPortal: "超算平台",
       navLinkTextAI: "SCOW AI",
       dashboard: "仪表盘",
       user: {
