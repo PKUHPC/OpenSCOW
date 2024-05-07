@@ -29,7 +29,7 @@ import { getSortedClusterValues } from "src/utils/cluster";
 import { Cluster, publicConfig } from "src/utils/config";
 
 interface Props {
-  data?: Record<string, CombinedClusterInfo>;
+  data?: CombinedClusterInfo[];
   isLoading: boolean;
   reload: () => void;
 }
@@ -66,12 +66,11 @@ export const ClusterManagementTable: React.FC<Props> = ({
     if (!data) return undefined;
 
     if (!query.clusters || query.clusters.length === 0) {
-      return Object.values(data);
+      return data;
     }
 
-    const filteredValues = Object.entries(data)
-      .filter(([clusterId]) => query.clusters.some((c) => c.id === clusterId))
-      .map(([_, value]) => value);
+    const filteredValues = data
+      .filter((cluster) => query.clusters.some((c) => c.id === cluster.clusterId));
 
     return filteredValues;
 
@@ -111,7 +110,8 @@ export const ClusterManagementTable: React.FC<Props> = ({
           dataIndex="clusterId"
           title={tArgs(p("table.clusterName"))}
           render={(_, r) => {
-            return getI18nConfigCurrentText(r.clusterId, languageId);
+            const clusterName = publicConfig.CLUSTERS[r.clusterId].name;
+            return getI18nConfigCurrentText(clusterName ?? r.clusterId, languageId);
           }}
         />
         <Table.Column<CombinedClusterInfo>
@@ -161,7 +161,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
         />
         <Table.Column<CombinedClusterInfo>
           dataIndex="updateTime"
-          title={tArgs(p("table.operatedTime"))}
+          title={tArgs(p("table.lastOperatedTime"))}
           width="15%"
           render={(_, r) => formatDateTime(r.updateTime)}
         />
@@ -193,8 +193,8 @@ export const ClusterManagementTable: React.FC<Props> = ({
                             <>
                               <p>
                                 {tArgs(p("activateModal.content"), [
-                                  <strong key="clusterName">{clusterName}</strong>,
                                   <strong key="clusterId">{r.clusterId}</strong>,
+                                  <strong key="clusterName">{clusterName}</strong>,
                                 ])},
                               </p>
                               <p style={{ color: "red" }}>{tArgs(p("activateModal.contentAttention"))}</p>

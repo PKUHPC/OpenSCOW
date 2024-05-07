@@ -20,7 +20,7 @@ import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";

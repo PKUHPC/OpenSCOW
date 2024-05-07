@@ -20,7 +20,7 @@ import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
 import { createServer } from "src/app";
 import { addJobCharge } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { UserAccount, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { reloadEntity } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";

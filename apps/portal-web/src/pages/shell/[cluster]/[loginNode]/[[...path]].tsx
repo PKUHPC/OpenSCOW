@@ -20,6 +20,7 @@ import Router, { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
+import { ClusterNotAvailablePage } from "src/components/errorPages/CLusterNotAvailablePage";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
@@ -89,7 +90,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const { currentClusters } = useStore(CurrentClustersStore);
 
   if (!currentClusters.some((x) => x.id === cluster)) {
-    return <NotFoundPage />;
+    return <ClusterNotAvailablePage />;
   }
 
   const { loginNodes } = useStore(LoginNodeStore);

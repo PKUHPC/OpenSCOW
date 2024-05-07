@@ -18,7 +18,7 @@ import { parsePlaceholder } from "@scow/lib-config";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { createPriceMap } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";

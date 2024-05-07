@@ -15,6 +15,7 @@ syntax = "proto3";
 package scow.server;
 
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 message GetAvailablePartitionsRequest {
   option deprecated = true;
@@ -101,6 +102,7 @@ message ClusterDatabaseInfo {
   string cluster_id = 1;
   ClusterActivationStatus activation_status = 2;
   optional google.protobuf.Struct last_activation_operation = 3;
+  google.protobuf.Timestamp update_time = 4;
 }
 
 message GetClustersDatabaseInfoResponse {
@@ -114,7 +116,6 @@ message ActivateClusterRequest {
 
 // NOT_FOUND: cluster is not found
 // FAILED_PRECONDITION: scheduler adapter can not be accessed
-// ALREADY_ACTIVATED: cluster is already activated
 message ActivateClusterResponse {
   bool executed = 1;
 }

@@ -77,6 +77,7 @@ export async function getClustersDatabaseInfo(
       clusterId: x.clusterId,
       activationStatus: clusterActivationStatusFromJSON(x.activationStatus),
       lastActivationOperation: x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"],
+      updateTime: x.updateTime ? new Date(x.updateTime).toISOString() : "",
     };
   });
 

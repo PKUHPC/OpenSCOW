@@ -1037,7 +1037,7 @@ export default {
             deactivatedState: "停用",
             normalState: "正常",
             operator: "操作员",
-            operatedTime: "操作时间",
+            lastOperatedTime: "上次启用/停用时间",
             comment: "备注",
             operation: "操作",
             activate: "启用",
@@ -1045,14 +1045,14 @@ export default {
           },
           activateModal: {
             title: "启用集群",
-            content: "请确认是否启用集群名称是 {}，集群ID是 {} 的集群？",
+            content: "请确认是否启用集群ID是 {}，集群名称是 {} 的集群？",
             contentAttention: "注意：启用后请手动同步平台数据！",
             successMessage: "集群已启用",
             failureMessage: "集群启用失败，集群可能已被启用",
           },
           deactivateModal: {
             title: "停用集群",
-            content: "请确认是否停用集群名称是 {}，集群ID是 {} 的集群？",
+            content: "请确认是否停用集群ID是 {}，集群名称是 {} 的集群？",
             contentInputNotice: "如果确认停用集群，请在下面重复输入上述集群ID和集群名称",
 
             contentAttention: "注意：停用后集群将不可用，集群所有数据不再更新！",

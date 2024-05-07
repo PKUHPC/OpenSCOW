@@ -32,7 +32,7 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";

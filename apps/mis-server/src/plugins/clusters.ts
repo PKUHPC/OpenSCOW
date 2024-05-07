@@ -17,7 +17,7 @@ import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { updateCluster } from "src/bl/common";
+import { updateCluster } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 

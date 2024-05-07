@@ -481,6 +481,7 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "No Available Cluster(s).",
     },
     others: {
       clusterSelector: "Please select a cluster.",

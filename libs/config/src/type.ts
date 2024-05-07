@@ -27,6 +27,7 @@ export const ClusterDatabaseInfoSchema = Type.Object({
   operatorId: Type.Optional(Type.String()),
   operatorName: Type.Optional(Type.String()),
   deactivationComment: Type.Optional(Type.String()),
+  updateTime: Type.Optional(Type.String()),
 });
 
 export type ClusterDatabaseInfo = Static<typeof ClusterDatabaseInfoSchema>;

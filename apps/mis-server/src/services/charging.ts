@@ -18,7 +18,7 @@ import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date
 import { ChargeRecord as ChargeRecordProto,
   ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";

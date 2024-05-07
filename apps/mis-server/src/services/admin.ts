@@ -20,7 +20,7 @@ import {
   ClusterAccountInfo_ImportStatus,
 } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";

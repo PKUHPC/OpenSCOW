@@ -19,7 +19,7 @@ import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow/protos/build/server/job_charge_limit";
 import { unblockUserInAccount } from "src/bl/block";
 import { setJobCharge } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { getUserStateInfo } from "src/utils/accountUserState";
 

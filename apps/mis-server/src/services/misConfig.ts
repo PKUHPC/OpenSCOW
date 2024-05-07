@@ -16,7 +16,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
   ClusterDatabaseInfo,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
-import { getActivatedClusters, getClustersDatabaseInfo } from "src/bl/common";
+import { getActivatedClusters, getClustersDatabaseInfo } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
 import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
 

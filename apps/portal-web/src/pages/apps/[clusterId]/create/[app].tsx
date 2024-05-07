@@ -20,7 +20,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
-import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { ClusterNotAvailablePage } from "src/components/errorPages/CLusterNotAvailablePage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
@@ -39,7 +39,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
 
   const { currentClusters } = useStore(CurrentClustersStore);
   if (!currentClusters.some((x) => x.id === clusterId)) {
-    return <NotFoundPage />;
+    return <ClusterNotAvailablePage />;
   }
 
   const { data, isLoading } = useAsync({

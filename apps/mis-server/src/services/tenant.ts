@@ -18,7 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
 import { blockAccount, unblockAccount } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";

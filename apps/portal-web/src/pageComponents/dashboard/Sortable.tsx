@@ -31,7 +31,7 @@ import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { ClusterNotAvailablePage } from "src/components/errorPages/CLusterNotAvailablePage";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/config";
 import { formatEntryId, getEntryBaseName,
@@ -149,19 +149,19 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
 
         case "shell":
           const savedShellClusterId = item.entry.shell.clusterId;
-          if (!clusters.some((x) => x.id === savedShellClusterId)) {
-            return <NotFoundPage />;
-          }
           router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
+          if (!clusters.some((x) => x.id === savedShellClusterId)) {
+            return <ClusterNotAvailablePage />;
+          }
           break;
         case "app":
           const savedAppClusterId = item.entry.app.clusterId;
-          if (!clusters.some((x) => x.id === savedAppClusterId)) {
-            return <NotFoundPage />;
-          }
           router.push(
             join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
           );
+          if (!clusters.some((x) => x.id === savedAppClusterId)) {
+            return <ClusterNotAvailablePage />;
+          }
           break;
 
         default:

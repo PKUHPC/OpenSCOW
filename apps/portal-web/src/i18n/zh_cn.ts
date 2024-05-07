@@ -481,6 +481,7 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
+      clusterNotAvailable: "没有可以访问的集群。",
     },
     others:{
       clusterSelector: "请选择集群",

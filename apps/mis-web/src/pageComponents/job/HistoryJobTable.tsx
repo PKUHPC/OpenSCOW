@@ -21,6 +21,7 @@ import { App, AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumbe
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
@@ -28,6 +29,7 @@ import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { getSortedClusterValues } from "src/utils/cluster";
 import type { Cluster } from "src/utils/config";
 import { getClusterName } from "src/utils/config";
@@ -70,12 +72,15 @@ export const JobTable: React.FC<Props> = ({
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(undefined);
 
+  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const sortedClusters = getSortedClusterValues().filter((x) => Object.keys(activatedClusters).includes(x.id));
+
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      clusters: getSortedClusterValues(),
+      clusters: sortedClusters,
       accountName: typeof accountNames === "string" ? accountNames : undefined,
     };
   });

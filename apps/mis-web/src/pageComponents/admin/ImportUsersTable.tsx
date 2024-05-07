@@ -40,7 +40,9 @@ export const ImportUsersTable: React.FC = () => {
   const { activatedClusters } = useStore(ActivatedClustersStore);
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  if (Object.keys(activatedClusters).length > 0 && !activatedClusters[defaultClusterStore.cluster.id]) {
+  if ((Object.keys(activatedClusters).length > 0 &&
+   defaultClusterStore.cluster &&
+   !activatedClusters[defaultClusterStore.cluster.id]) || !defaultClusterStore.cluster) {
     defaultClusterStore.setCluster(Object.values(activatedClusters)[0]);
   }
 

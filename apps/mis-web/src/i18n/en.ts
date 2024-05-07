@@ -1037,7 +1037,7 @@ export default {
             deactivatedState: "Deactivated",
             normalState: "Normal",
             operator: "Operator",
-            operatedTime: "Operation Time",
+            lastOperatedTime: "Last Operation Time",
             comment: "Comment",
             operation: "Operation",
             activate: "Activate",
@@ -1045,14 +1045,14 @@ export default {
           },
           activateModal: {
             title: "Activate Cluster",
-            content: "Please confirm if you want to activate the cluster named {}, with Cluster ID {}?",
+            content: "Please confirm if you want to activate the cluster with Cluster ID {}, named {}?",
             contentAttention: "Attention: Please manually synchronize platform data after activation!",
             successMessage: "The cluster has been activated.",
             failureMessage: "Failed to activate the cluster. The cluster may have been activated.",
           },
           deactivateModal: {
             title: "Deactivate Cluster",
-            content: "Please confirm if you want to deactivate the cluster named {}, with Cluster ID {}?",
+            content: "Please confirm if you want to deactivate the cluster with Cluster ID {}, named {}?",
             contentInputNotice: "If you confirm the deactivation of the cluster, "
             + "please re-enter the cluster ID and name below.",
             contentAttention: "Attention: After deactivation, the cluster will not be available, "

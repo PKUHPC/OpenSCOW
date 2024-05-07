@@ -21,7 +21,7 @@ import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 
-import { getActivatedClusters } from "./common";
+import { getActivatedClusters } from "./clustersUtils";
 
 
 /**
@@ -40,7 +40,6 @@ export async function updateBlockStatusInSlurm(
 
   const accounts = await em.find(Account, { blockedInCluster: true });
 
-  // const currentActivatedClusters = await getActivatedClusters(em, logger);
   const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
     logger.info(e);
     return {};
@@ -130,7 +129,6 @@ export async function updateUnblockStatusInSlurm(
   const unblockedAccounts: string[] = [];
   const unblockedFailedAccounts: string[] = [];
 
-  // const currentActivatedClusters = await getActivatedClusters(em, logger);
   const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
     logger.info(e);
     return {};

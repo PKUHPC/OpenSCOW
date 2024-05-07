@@ -50,50 +50,35 @@ export const ClusterManagementPage: NextPage =
     const { setActivatedClusters } = useStore(ActivatedClustersStore);
 
     const promiseFn = useCallback(async () => {
-      const [connectionClustersData, activatedClustersData] = await Promise.all([
+      const [connectionClustersData, dbClustersData] = await Promise.all([
         api.getClustersConnectionInfo({}),
         api.getClustersDatabaseInfo({}),
       ]);
 
-      const activatedDataMap = activatedClustersData.results.reduce((acc, activatedData) => {
-        if (acc[activatedData.clusterId]) {
-          acc[activatedData.clusterId].push(activatedData);
-        } else {
-          acc[activatedData.clusterId] = [activatedData];
-        }
-        return acc;
-      }, {});
-
-      const connectionDataMap = connectionClustersData.results.reduce((acc, data) => {
-        if (acc[data.clusterId]) {
-          acc[data.clusterId].push(data);
-        } else {
-          acc[data.clusterId] = [data];
-        }
-        return acc;
-      }, {});
-
-      const combinedDataMap: Record<string, CombinedClusterInfo> = {};
+      const combinedClusterList: CombinedClusterInfo[] = [];
       // 在线集群初始化
       setActivatedClusters({});
-      Object.keys(activatedDataMap).forEach((key) => {
-        const concatData = {
-          ...activatedDataMap[key][0],
-          ...connectionDataMap[key][0],
-        } as CombinedClusterInfo;
-        combinedDataMap[key] = concatData;
-        if (concatData.activationStatus === ClusterActivationStatus.ACTIVATED) {
-          setActivatedClusters((prev) => {
-            return {
-              ...prev,
-              [key]: publicConfig.CLUSTERS[key],
-            };
-          });
+      connectionClustersData.results.forEach((cluster) => {
+        const currentCluster = dbClustersData.results.find((dbCluster) => dbCluster.clusterId === cluster.clusterId);
+        if (currentCluster) {
+          const combinedData = {
+            ...cluster,
+            ...currentCluster,
+          } as CombinedClusterInfo;
+          combinedClusterList.push(combinedData);
+          if (combinedData.activationStatus === ClusterActivationStatus.ACTIVATED) {
+            setActivatedClusters((prev) => {
+              return {
+                ...prev,
+                [combinedData.clusterId]: publicConfig.CLUSTERS[combinedData.clusterId],
+              };
+            });
+          }
         }
-
       });
 
-      return combinedDataMap;
+      return combinedClusterList;
+
     }, []);
 
     const [refreshToken, update] = useRefreshToken();
@@ -107,7 +92,7 @@ export const ClusterManagementPage: NextPage =
           <RefreshLink refresh={update} languageId={languageId} />
         </PageTitle>
         <ClusterManagementTable
-          data={data as Record<string, CombinedClusterInfo> | undefined}
+          data={data}
           isLoading={isLoading}
           reload={reload}
         />

@@ -61,10 +61,9 @@ const DeactivateClusterModal: React.FC<Props> = ({ clusterId, clusterName, onClo
     >
       <Divider type="vertical" />
       <p>
-        {/* 请确认是否停用集群名称是 <strong>{clusterName}</strong>， 集群ID是 <strong>{clusterId}</strong> 的集群？ */}
         {tArgs(p("content"), [
-          <strong key="clusterName">{clusterName}</strong>,
           <strong key="clusterId">{clusterId}</strong>,
+          <strong key="clusterName">{clusterName}</strong>,
         ])}
       </p>
       <p> {tArgs(p("contentInputNotice"))} </p>

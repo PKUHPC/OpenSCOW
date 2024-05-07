@@ -26,7 +26,7 @@ import {
   JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";

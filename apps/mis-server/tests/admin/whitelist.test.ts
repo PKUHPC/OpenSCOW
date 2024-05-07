@@ -19,7 +19,7 @@ import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { charge } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { reloadEntity, toRef } from "src/utils/orm";
