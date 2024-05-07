@@ -819,7 +819,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
   const queryEndTime = new Date(startTime);
   queryEndTime.setDate(startTime.getDate() + 1);
 
-  // accountsOfAllTenants  console.log("这里需要修改")
+  // accountsOfAllTenants
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
