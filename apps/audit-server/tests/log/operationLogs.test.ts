@@ -198,6 +198,7 @@ it("create operation log with targetAccountName", async () => {
         $case: "accountsOfTenant" as const,
         accountsOfTenant: {
           tenantName: "testTenant",
+          accountNames: [],
         },
       },
       },
@@ -243,6 +244,8 @@ it("create operation log with targetAccountName", async () => {
   expect(operationLogs[1].metaData?.$case).toEqual("exportPayRecord");
   expect(operationLogs[1].metaData?.[operationLogs[1].metaData?.$case])
     .toEqual(exportPayRecordLog.operationEvent.exportPayRecord);
+  expect(operationLogs[1].metaData?.targetAccountName)
+    .toEqual(exportPayRecordLog.operationEvent.exportPayRecord.target.accountsOfTenant.accountNames);
 
   expect(operationLogs[2].metaData?.$case).toEqual("exportChargeRecord");
   expect(operationLogs[2].metaData?.[operationLogs[2].metaData?.$case])

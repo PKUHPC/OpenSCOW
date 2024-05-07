@@ -819,11 +819,11 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
   const queryEndTime = new Date(startTime);
   queryEndTime.setDate(startTime.getDate() + 1);
 
-  // accountsOfAllTenants
+  // accountsOfAllTenants  console.log("这里需要修改")
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: ["user_1", "user_2"], types:extractTypesFromObjects([request1, request2, request3, request4]),
   });
 
@@ -1013,7 +1013,7 @@ it("returns charge records' total results", async () => {
   const reply1 = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: [], types:extractTypesFromObjects(requestArr),
   });
 
@@ -1024,7 +1024,7 @@ it("returns charge records' total results", async () => {
   const reply2 = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: [], types:[request1.type],
   });
 
@@ -1115,8 +1115,8 @@ it("returns charge records with query of accounts", async () => {
   const reply1 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accounts", accounts:{
-      accounts:[account.accountName, account2.accountName]}
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{
+      accountNames:[account.accountName, account2.accountName]}
       ,
     },
     page: 1,
@@ -1140,9 +1140,8 @@ it("returns charge records with query of accounts", async () => {
   const reply2 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accounts", accounts:{
-      accounts:[account.accountName, account2.accountName]}
-      ,
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{
+      accountNames:[account.accountName, account2.accountName]},
     },
     page: 1,
     pageSize:10,
@@ -1155,9 +1154,8 @@ it("returns charge records with query of accounts", async () => {
   const reply3 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accounts", accounts:{
-      accounts:[account.accountName, account3.accountName]}
-      ,
+    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{
+      accountNames:[account.accountName, account3.accountName]},
     },
     page: 1,
     pageSize:10,
