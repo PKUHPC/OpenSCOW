@@ -1,5 +1,20 @@
 # @scow/portal-server
 
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.0
 
 ### Patch Changes
