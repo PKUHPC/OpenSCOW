@@ -247,7 +247,7 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {totalResultData?.totalAmount ?? 0}
+                {totalResultData?.totalAmount?.toFixed(2) ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -301,7 +301,7 @@ export const ChargeTable: React.FC<Props> = ({
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
           />
           <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
+          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(2)} />
           <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
           <Table.Column<ChargeInfo>
             dataIndex="comment"

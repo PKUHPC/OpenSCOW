@@ -73,8 +73,8 @@
     "tslib": "2.6.2",
     "typescript": "5.4.3",
     "ws": "8.16.0",
-    "xterm": "5.3.0",
-    "xterm-addon-fit": "0.8.0"
+    "@xterm/xterm": "5.5.0",
+    "@xterm/addon-fit": "0.10.0"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

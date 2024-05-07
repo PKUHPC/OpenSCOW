@@ -224,7 +224,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
           </Form.Item>
           <Form.Item label={t(p("sum"))}>
             <strong>
-              {data ? data.total.toFixed(3) : 0}
+              {data ? data.total.toFixed(2) : 0}
             </strong>
           </Form.Item>
           <Form.Item>
@@ -260,7 +260,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
             : undefined
         }
         <Table.Column dataIndex="time" title={t(p("paymentDate"))} width="13.5%" render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(3)} />
+        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(2)} />
         <Table.Column
           dataIndex="type"
           title={t(pCommon("type"))}
