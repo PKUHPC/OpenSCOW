@@ -14,6 +14,8 @@ syntax = "proto3";
 
 package scow.server;
 
+import "google/protobuf/struct.proto";
+
 message GetAvailablePartitionsRequest {
   option deprecated = true;
   string account_name = 1;
@@ -88,18 +90,17 @@ message GetClustersConnectionInfoResponse {
 message GetClustersDatabaseInfoRequest {
 }
 
-enum ClusterOnlineStatus {
+enum ClusterActivationStatus {
   // status when cluster is activated
-  ONLINE = 0;
+  ACTIVATED = 0;
   // status when cluster is deactivated
-  OFFLINE = 1;
+  DEACTIVATED = 1;
 }
 
 message ClusterDatabaseInfo {
   string cluster_id = 1;
-  ClusterOnlineStatus online_status = 2;
-  optional string operator_id = 3;
-  optional string comment = 4;
+  ClusterActivationStatus activation_status = 2;
+  optional google.protobuf.Struct last_activation_operation = 3;
 }
 
 message GetClustersDatabaseInfoResponse {
@@ -109,7 +110,6 @@ message GetClustersDatabaseInfoResponse {
 message ActivateClusterRequest {
   string cluster_id = 1;
   string operator_id = 2;
-  optional string comment = 3;
 }
 
 // NOT_FOUND: cluster is not found
@@ -122,11 +122,10 @@ message ActivateClusterResponse {
 message DeactivateClusterRequest {
   string cluster_id = 1;
   string operator_id = 2;
-  optional string comment = 3;
+  optional string deactivation_comment = 3;
 }
 
 // NOT_FOUND: cluster is not found
-// ALREADY_ACTIVATED: cluster is already deactivated
 message DeactivateClusterResponse {
   bool executed = 1;
 }

@@ -13,7 +13,7 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { libGetCurrentOnlineClusters } from "@scow/lib-server";
+import { libGetCurrentActivatedClusters } from "@scow/lib-server";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { configClusters } from "src/config/clusters";
 import { commonConfig } from "src/config/common";
@@ -44,7 +44,7 @@ export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const callOnOne: CallOnOne = async (cluster, logger, call) => {
 
-  await checkOnlineClusters({ clusterIds: [cluster], logger });
+  await checkActivatedClusters({ clusterIds: [cluster], logger });
 
   const client = getAdapterClient(cluster);
 
@@ -73,10 +73,10 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
 };
 
 
-export const NO_ONLINE_CLUSTERS = "NO_ONLINE_CLUSTERS";
-export const NOT_EXIST_IN_ONLINE_CLUSTERS = "NOT_EXIST_IN_ONLINE_CLUSTERS";
+export const NO_ACTIVATED_CLUSTERS = "NO_ACTIVATED_CLUSTERS";
+export const NOT_EXIST_IN_ACTIVATED_CLUSTERS = "NOT_EXIST_IN_ACTIVATED_CLUSTERS";
 
-export const checkOnlineClusters
+export const checkActivatedClusters
 = async (
   { clusterIds, logger }: {clusterIds: string[], logger: Logger},
 ) => {
@@ -85,31 +85,31 @@ export const checkOnlineClusters
     return;
   }
 
-  logger.info("Checking online status of clusters with ids (%o) ", clusterIds);
-  const onlineClusters = await libGetCurrentOnlineClusters(
+  logger.info("Checking activation status of clusters with ids (%o) ", clusterIds);
+  const activatedClusters = await libGetCurrentActivatedClusters(
     pinoLogger,
     configClusters,
     config.MIS_SERVER_URL,
     commonConfig.scowApi?.auth?.token);
 
-  if (Object.keys(onlineClusters).length === 0) {
+  if (Object.keys(activatedClusters).length === 0) {
     throw new ServiceError({
       code: status.INTERNAL,
       details: "No available clusters. Please try again later",
-      metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
+      metadata: scowErrorMetadata(NO_ACTIVATED_CLUSTERS, { currentActivatedClusters: "" }),
     });
   }
 
-  const exist = clusterIds.every((id) => Object.keys(onlineClusters).find((x) => x === id));
+  const exist = clusterIds.every((id) => Object.keys(activatedClusters).find((x) => x === id));
   if (!exist) {
-    logger.info("Querying offline clusters with ids (%o). The current online clusters' ids: %o",
-      clusterIds, Object.keys(onlineClusters));
+    logger.info("Querying deactivated clusters with ids (%o). The current activated clusters' ids: %o",
+      clusterIds, Object.keys(activatedClusters));
     throw new ServiceError({
       code: status.INTERNAL,
-      details: "Querying offline clusters. Please refresh the page and try again",
-      metadata: scowErrorMetadata(NOT_EXIST_IN_ONLINE_CLUSTERS,
-        { currentOnlineClusterIds:
-          Object.keys(onlineClusters).length > 0 ? JSON.stringify(Object.keys(onlineClusters)) : "" }),
+      details: "Querying deactivated clusters. Please refresh the page and try again",
+      metadata: scowErrorMetadata(NOT_EXIST_IN_ACTIVATED_CLUSTERS,
+        { currentActivatedClusterIds:
+          Object.keys(activatedClusters).length > 0 ? JSON.stringify(Object.keys(activatedClusters)) : "" }),
     });
   }
 

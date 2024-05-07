@@ -15,7 +15,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ShellServiceServer, ShellServiceService } from "@scow/protos/build/portal/shell";
 import { quote } from "shell-quote";
-import { checkOnlineClusters } from "src/utils/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { pipeline } from "src/utils/pipeline";
 import { sshConnect } from "src/utils/ssh";
@@ -41,7 +41,7 @@ export const shellServiceServer = plugin((server) => {
       logger.info("Received shell connection");
 
       const { cluster, loginNode, userId, rows, cols, path } = connect;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       if (!loginNode) { throw clusterNotFound(cluster); }
 

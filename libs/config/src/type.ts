@@ -16,17 +16,17 @@ import { I18nStringType } from "./i18n";
 
 export type Cluster = { id: string; name: I18nStringType; }
 
-export enum ClusterOnlineStatus {
-  ONLINE = 0,
-  OFFLINE = 1,
+export enum ClusterActivationStatus {
+  ACTIVATED = 0,
+  DEACTIVATED = 1,
 }
 
 export const ClusterDatabaseInfoSchema = Type.Object({
   clusterId: Type.String(),
-  onlineStatus: Type.Enum(ClusterOnlineStatus),
+  activationStatus: Type.Enum(ClusterActivationStatus),
   operatorId: Type.Optional(Type.String()),
   operatorName: Type.Optional(Type.String()),
-  comment: Type.Optional(Type.String()),
+  deactivationComment: Type.Optional(Type.String()),
 });
 
 export type ClusterDatabaseInfo = Static<typeof ClusterDatabaseInfoSchema>;

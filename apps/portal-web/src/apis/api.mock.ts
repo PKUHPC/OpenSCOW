@@ -11,7 +11,7 @@
  */
 
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { ClusterOnlineStatus } from "@scow/config/build/type";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
@@ -276,7 +276,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getClustersDatabaseInfo: async () => ({ results: [{
     clusterId: "hpc01",
-    onlineStatus: ClusterOnlineStatus.ONLINE,
+    activationStatus: ClusterActivationStatus.ACTIVATED,
     operatorId: undefined,
     operatorName: undefined,
     comment: "",

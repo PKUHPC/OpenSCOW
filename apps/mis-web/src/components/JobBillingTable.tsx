@@ -15,7 +15,7 @@ import { Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 
 import { AmountStrategyDescriptionsItem } from "./AmonutStrategyDescriptionsItem";
 
@@ -61,7 +61,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading, isUserPartitio
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { onlineClusters } = useStore(OnlineClustersStore);
+  const { activatedClusters } = useStore(ActivatedClustersStore);
 
   const clusterTotalQosCounts = data && data.length ?
     data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
@@ -77,7 +77,7 @@ export const JobBillingTable: React.FC<Props> = ({ data, loading, isUserPartitio
   const columns: ColumnsType<JobBillingTableItem> = [
     ...(isUserPartitionsPage ? [] : [
       { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
-        children: getI18nConfigCurrentText(onlineClusters[r.cluster]?.name, languageId) ?? r.cluster,
+        children: getI18nConfigCurrentText(activatedClusters[r.cluster]?.name, languageId) ?? r.cluster,
         props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
       }) },
     ])

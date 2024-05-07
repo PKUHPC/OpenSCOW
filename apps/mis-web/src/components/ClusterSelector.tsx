@@ -14,7 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Select } from "antd";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 interface Props {
@@ -22,7 +22,7 @@ interface Props {
   onChange?: (clusters: Cluster[]) => void;
   // is using config clusters or not
   // true: use config clusters
-  // false or not exist： use current online clusters from db
+  // false or not exist： use current activated clusters from db
   isUsingAllConfigClusters?: boolean;
 }
 
@@ -33,8 +33,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllCo
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { onlineClusters } = useStore(OnlineClustersStore);
-  const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : onlineClusters;
+  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : activatedClusters;
   const sortedIds =
     publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(clusters)?.includes(id));
 
@@ -62,21 +62,21 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { onlineClusters } = useStore(OnlineClustersStore);
+  const { activatedClusters } = useStore(ActivatedClustersStore);
   const sortedIds =
-  publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(onlineClusters)?.includes(id));
+  publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(activatedClusters)?.includes(id));
 
 
   return (
     <Select
       placeholder={t(p("selectCluster"))}
       value={value?.id}
-      onChange={(value) => onChange?.({ id: value, name: onlineClusters[value].name })}
+      onChange={(value) => onChange?.({ id: value, name: activatedClusters[value].name })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
           .concat(sortedIds.map((x) => ({
             value: x,
-            label:  getI18nConfigCurrentText(onlineClusters[x]?.name, languageId),
+            label:  getI18nConfigCurrentText(activatedClusters[x]?.name, languageId),
             disabled: false,
           })))
       }

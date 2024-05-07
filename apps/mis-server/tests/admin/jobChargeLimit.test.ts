@@ -20,7 +20,7 @@ import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { JobChargeLimitServiceClient } from "@scow/protos/build/server/job_charge_limit";
 import { createServer } from "src/app";
 import { addJobCharge } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { UserAccount, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { reloadEntity } from "src/utils/orm";
 import { InitialData, insertInitialData } from "tests/data/data";
@@ -189,9 +189,9 @@ it("adds job charge", async () => {
 
   const charge = new Decimal(20.4);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expectDecimalEqual(ua.usedJobCharge, charge);
   expectDecimalEqual(ua.jobChargeLimit, limit);
@@ -208,9 +208,9 @@ it("blocks user if used > limit", async () => {
 
   const charge = new Decimal(120.4);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expectDecimalEqual(ua.usedJobCharge, charge);
   expectDecimalEqual(ua.jobChargeLimit, limit);
@@ -227,9 +227,9 @@ it("blocks user if used = limit", async () => {
 
   const charge = new Decimal(100);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expectDecimalEqual(ua.usedJobCharge, charge);
   expectDecimalEqual(ua.jobChargeLimit, limit);
@@ -263,9 +263,9 @@ it("unblocks user if limit > used is positive and state is normal", async () => 
 
   const charge = new Decimal(-20.4);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expectDecimalEqual(ua.jobChargeLimit, limit);
   expectDecimalEqual(ua.usedJobCharge, new Decimal(99.6));
@@ -283,9 +283,9 @@ it("still block user if limit > used is positive and state is BLOCKED_BY_ADMIN",
 
   const charge = new Decimal(-20.4);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expectDecimalEqual(ua.jobChargeLimit, limit);
   expectDecimalEqual(ua.usedJobCharge, new Decimal(99.6));
@@ -298,9 +298,9 @@ it("does nothing if no limit", async () => {
 
   const charge = new Decimal(120.4);
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
-  await addJobCharge(ua, charge, currentOnlineClusters, server.ext, server.logger);
+  await addJobCharge(ua, charge, currentActivatedClusters, server.ext, server.logger);
 
   expect(ua.jobChargeLimit).toBeUndefined();
   expect(ua.usedJobCharge).toBeUndefined();

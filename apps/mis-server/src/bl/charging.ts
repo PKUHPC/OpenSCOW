@@ -59,7 +59,7 @@ export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
 
 export async function pay(
   request: PayRequest, em: SqlEntityManager,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const {
@@ -94,7 +94,7 @@ export async function pay(
     && checkShouldUnblockAccount(target)
   ) {
     logger.info("Unblock account %s", target.accountName);
-    await unblockAccount(target, currentOnlineClusters, clusterPlugin.clusters, logger);
+    await unblockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
   if (
@@ -102,7 +102,7 @@ export async function pay(
     && checkShouldBlockAccount(target)
   ) {
     logger.info("Block account %s", target.accountName);
-    await blockAccount(target, currentOnlineClusters, clusterPlugin.clusters, logger);
+    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -122,7 +122,7 @@ type ChargeRequest = {
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const { target, amount, comment, type, userId, metadata } = request;
@@ -147,7 +147,7 @@ export async function charge(
     && checkShouldBlockAccount(target)
   ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
-    await blockAccount(target, currentOnlineClusters, clusterPlugin.clusters, logger);
+    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -159,7 +159,7 @@ export async function charge(
 export async function addJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
   charge: Decimal,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin,
   logger: Logger,
 ) {
@@ -173,9 +173,9 @@ export async function addJobCharge(
     ).shouldBlockInCluster;
 
     if (shouldBlockUserInCluster) {
-      await blockUserInAccount(ua, currentOnlineClusters, clusterPlugin, logger);
+      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, currentOnlineClusters, clusterPlugin, logger);
+      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     }
   }
 }
@@ -183,7 +183,7 @@ export async function addJobCharge(
 export async function setJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
   charge: Decimal,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin,
   logger: Logger,
 ) {
@@ -199,9 +199,9 @@ export async function setJobCharge(
     ).shouldBlockInCluster;
 
     if (shouldBlockUserInCluster) {
-      await blockUserInAccount(ua, currentOnlineClusters, clusterPlugin, logger);
+      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, currentOnlineClusters, clusterPlugin, logger);
+      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     }
   }
 }

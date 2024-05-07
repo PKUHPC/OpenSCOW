@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOnlineStatus } from "@scow/config/build/type";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import { RefreshLink, useRefreshToken } from "@scow/lib-web/build/utils/refreshToken";
 import { NextPage } from "next";
 import { useCallback } from "react";
@@ -23,7 +23,7 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterConnectionStatus, Partition } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { ClusterManagementTable } from "src/pageComponents/admin/ClusterManagementTable";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -33,8 +33,8 @@ export interface CombinedClusterInfo {
   schedulerName: string,
   connectionStatus: ClusterConnectionStatus,
   partitions: Partition[],
-  onlineStatus: ClusterOnlineStatus,
-  comment?: string,
+  activationStatus: ClusterActivationStatus,
+  deactivationComment?: string,
   operatorId?: string,
   operatorName?: string,
   updateTime: string,
@@ -47,19 +47,19 @@ export const ClusterManagementPage: NextPage =
     const languageId = useI18n().currentLanguage.id;
     const p = prefix("page.admin.resourceManagement.clusterManagement.");
 
-    const { setOnlineClusters } = useStore(OnlineClustersStore);
+    const { setActivatedClusters } = useStore(ActivatedClustersStore);
 
     const promiseFn = useCallback(async () => {
-      const [connectionClustersData, onlineClustersData] = await Promise.all([
+      const [connectionClustersData, activatedClustersData] = await Promise.all([
         api.getClustersConnectionInfo({}),
         api.getClustersDatabaseInfo({}),
       ]);
 
-      const onlineDataMap = onlineClustersData.results.reduce((acc, onlineData) => {
-        if (acc[onlineData.clusterId]) {
-          acc[onlineData.clusterId].push(onlineData);
+      const activatedDataMap = activatedClustersData.results.reduce((acc, activatedData) => {
+        if (acc[activatedData.clusterId]) {
+          acc[activatedData.clusterId].push(activatedData);
         } else {
-          acc[onlineData.clusterId] = [onlineData];
+          acc[activatedData.clusterId] = [activatedData];
         }
         return acc;
       }, {});
@@ -75,15 +75,15 @@ export const ClusterManagementPage: NextPage =
 
       const combinedDataMap: Record<string, CombinedClusterInfo> = {};
       // 在线集群初始化
-      setOnlineClusters({});
-      Object.keys(onlineDataMap).forEach((key) => {
+      setActivatedClusters({});
+      Object.keys(activatedDataMap).forEach((key) => {
         const concatData = {
-          ...onlineDataMap[key][0],
+          ...activatedDataMap[key][0],
           ...connectionDataMap[key][0],
         } as CombinedClusterInfo;
         combinedDataMap[key] = concatData;
-        if (concatData.onlineStatus === ClusterOnlineStatus.ONLINE) {
-          setOnlineClusters((prev) => {
+        if (concatData.activationStatus === ClusterActivationStatus.ACTIVATED) {
+          setActivatedClusters((prev) => {
             return {
               ...prev,
               [key]: publicConfig.CLUSTERS[key],

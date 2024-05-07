@@ -36,7 +36,7 @@ export interface ImportUsersData {
 
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   whitelistAll: boolean,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
@@ -132,7 +132,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
           failedUnblockAccounts.push(acc.accountName);
         } else {
           try {
-            await unblockAccount(account, currentOnlineClusters, clusterPlugin, logger);
+            await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger);
           } catch (e) {
             // 集群解锁账户失败，记录失败账户
             failedUnblockAccounts.push(account.accountName);
@@ -165,7 +165,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             failedBlockAccounts.push(acc.accountName);
           } else {
             try {
-              await blockAccount(account, currentOnlineClusters, clusterPlugin, logger);
+              await blockAccount(account, currentActivatedClusters, clusterPlugin, logger);
             } catch (e) {
               // 集群封锁账户失败，记录失败账户
               failedBlockAccounts.push(account.accountName);

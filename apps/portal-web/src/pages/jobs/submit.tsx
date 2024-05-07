@@ -42,9 +42,6 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
 
-          // const currentClusters
-          // = publicConfig.MIS_DEPLOYED ? useOnlineClusters().currentClusters : publicConfig.CLUSTERS;
-          // showMessageWhenNoClusters(currentClusters.map((x) => x.id));
           const { currentClusters } = useStore(CurrentClustersStore);
 
           const clusterObj = currentClusters.find((x) => x.id === cluster);

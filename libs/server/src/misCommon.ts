@@ -13,12 +13,11 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { ClusterOnlineStatus, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterActivationStatus, ConfigServiceClient } from "@scow/protos/build/server/config";
 
 import { getClientFn } from "./api";
 
-// libGetClustersOnlineInfo
-export const libGetCurrentOnlineClusters = async (
+export const libGetCurrentActivatedClusters = async (
   logger: Logger,
   configClusters: Record<string, ClusterConfigSchema>,
   misServerUrl?: string,
@@ -37,14 +36,14 @@ export const libGetCurrentOnlineClusters = async (
   const clustersDatabaseInfo = reply.results;
 
   const filteredList = clustersDatabaseInfo.filter((cluster) =>
-    cluster.onlineStatus === ClusterOnlineStatus.ONLINE);
-  const currentOnlineClusterIds = filteredList.map((cluster) => cluster.clusterId);
+    cluster.activationStatus === ClusterActivationStatus.ACTIVATED);
+  const currentActivatedClusterIds = filteredList.map((cluster) => cluster.clusterId);
 
-  if (currentOnlineClusterIds.length === 0) {
-    logger.info("No available online clusters. %o", clustersDatabaseInfo);
+  if (currentActivatedClusterIds.length === 0) {
+    logger.info("No available activated clusters. %o", clustersDatabaseInfo);
     return {};
   }
-  return currentOnlineClusterIds.reduce((acc, clusterId) => {
+  return currentActivatedClusterIds.reduce((acc, clusterId) => {
     if (configClusters[clusterId]) {
       acc[clusterId] = configClusters[clusterId];
     }

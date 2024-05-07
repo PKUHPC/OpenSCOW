@@ -257,39 +257,29 @@
           "nullable": false,
           "mappedType": "string"
         },
-        "online_status": {
-          "name": "online_status",
-          "type": "enum('ONLINE','OFFLINE')",
+        "activation_status": {
+          "name": "activation_status",
+          "type": "enum('ACTIVATED','DEACTIVATED')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "default": "'ONLINE'",
+          "default": "'ACTIVATED'",
           "enumItems": [
-            "ONLINE",
-            "OFFLINE"
+            "ACTIVATED",
+            "DEACTIVATED"
           ],
-          "comment": "ONLINE, OFFLINE",
+          "comment": "ACTIVATED, DEACTIVATED",
           "mappedType": "enum"
         },
-        "operator_id": {
-          "name": "operator_id",
-          "type": "varchar(255)",
+        "last_activation_operation": {
+          "name": "last_activation_operation",
+          "type": "json",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "mappedType": "string"
-        },
-        "comment": {
-          "name": "comment",
-          "type": "varchar(255)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "default": "''",
-          "mappedType": "string"
+          "mappedType": "json"
         },
         "create_time": {
           "name": "create_time",

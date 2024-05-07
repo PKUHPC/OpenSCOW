@@ -29,7 +29,6 @@ export const ActivateClusterSchema = typeboxRouteSchema({
 
   body: Type.Object({
     clusterId: Type.String(),
-    comment: Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -37,7 +36,7 @@ export const ActivateClusterSchema = typeboxRouteSchema({
     200: Type.Object({
       executed: Type.Boolean(),
       reason: Type.Optional(Type.String()),
-      currentOnlineClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
+      currentActivatedClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
     }),
     // 集群不存在
     404: Type.Null(),
@@ -76,7 +75,6 @@ export default /* #__PURE__*/route(ActivateClusterSchema, async (req, res) => {
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.FAILED_PRECONDITION]: (e) => ({ 200: { executed: false, reason: e.details } }),
-      [Status.ALREADY_EXISTS]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));

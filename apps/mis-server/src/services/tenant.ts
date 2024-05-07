@@ -18,7 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
 import { blockAccount, unblockAccount } from "src/bl/block";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -184,7 +184,7 @@ export const tenantServiceServer = plugin((server) => {
         populate: ["tenant"],
       });
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
       if (accounts.length > 0) {
         await Promise.allSettled(accounts
           .map(async (account) => {
@@ -199,13 +199,13 @@ export const tenantServiceServer = plugin((server) => {
             if (shouldBlockInCluster) {
               logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
               + "Block the account.", account.accountName);
-              await blockAccount(account, currentOnlineClusters, server.ext.clusters, logger);
+              await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
             }
 
             if (!shouldBlockInCluster) {
               logger.info("The balance of Account %s is greater than the default tenant block threshold amount. "
               + "Unblock the account.", account.accountName);
-              await unblockAccount(account, currentOnlineClusters, server.ext.clusters, logger);
+              await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
             }
           }),
         ).catch((e) => {

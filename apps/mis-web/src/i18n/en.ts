@@ -806,8 +806,8 @@ export default {
       + "synchronized with the modifications.",
       adapterConnErrorContent: "The {} cluster is currently unreachable. Please try again later. ",
       effectErrorMessage: "Server error occurred!",
-      noOnlineClusters: "No available clusters. Please try again after refreshing the page.",
-      notExistInOnlineClusters: "The cluster(s) being queried may have been deactivated. "
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
       + "Please try again after refreshing the page.",
     },
     profile: {
@@ -1048,7 +1048,7 @@ export default {
             content: "Please confirm if you want to activate the cluster named {}, with Cluster ID {}?",
             contentAttention: "Attention: Please manually synchronize platform data after activation!",
             successMessage: "The cluster has been activated.",
-            failureMessage: "Failed to activate the cluster.",
+            failureMessage: "Failed to activate the cluster. The cluster may have been activated.",
           },
           deactivateModal: {
             title: "Deactivate Cluster",
@@ -1061,7 +1061,7 @@ export default {
             clusterIdForm: "Cluster ID",
             comment: "Deactivation Comment",
             successMessage: "The cluster has been deactivated.",
-            failureMessage: "Failed to deactivate the cluster.",
+            failureMessage: "Failed to deactivate the cluster. The cluster may have been deactivated.",
           },
         },
       },

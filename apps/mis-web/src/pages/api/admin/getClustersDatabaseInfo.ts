@@ -37,7 +37,11 @@ export default route(GetClustersDatabaseInfoSchema,
     const client = getClient(ConfigServiceClient);
     const result = await asyncClientCall(client, "getClustersDatabaseInfo", {});
 
-    const operatorIds = Array.from(new Set(result.results.map((x) => x.operatorId)));
+    const operatorIds = Array.from(new Set(result.results.map((x) => {
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"];
+      return lastActivationOperation?.operatorId ?? undefined;
+    })));
+
     const userIds = operatorIds.filter((id) => typeof id === "string" && id !== undefined && id !== null) as string[];
 
     const userClient = getClient(UserServiceClient);
@@ -48,9 +52,13 @@ export default route(GetClustersDatabaseInfoSchema,
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
     const clustersDatabaseInfo: ClusterDatabaseInfo[] = result.results.map((x) => {
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"];
+
       return {
         ...x,
-        operatorName: x.operatorId ? userMap.get(x.operatorId) : "",
+        operatorId: lastActivationOperation?.operatorId ?? "",
+        operatorName: lastActivationOperation?.operatorId ? userMap.get(lastActivationOperation?.operatorId) : "",
+        deactivationComment: lastActivationOperation?.deactivationComment ?? "",
       };
     });
 

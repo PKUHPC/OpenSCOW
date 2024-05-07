@@ -20,7 +20,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
+import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/activatedClusters";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
@@ -39,8 +39,8 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
@@ -55,7 +55,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const { setOnlineClusters } = useStore(OnlineClustersStore);
+  const { setActivatedClusters } = useStore(ActivatedClustersStore);
 
   const languageId = useI18n().currentLanguage.id;
   const tArgs = useI18nTranslate();
@@ -89,23 +89,23 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
-      if (e.data?.code === "NO_ONLINE_CLUSTERS") {
-        message.error(tArgs("page._app.noOnlineClusters"));
-        setOnlineClusters({});
+      if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("page._app.noActivatedClusters"));
+        setActivatedClusters({});
         return;
       }
 
-      if (e.data?.code === "NOT_EXIST_IN_ONLINE_CLUSTERS") {
-        message.error(tArgs("page._app.notExistInOnlineClusters"));
+      if (e.data?.code === "NOT_EXIST_IN_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("page._app.notExistInActivatedClusters"));
 
-        const currentOnlineClusterIds = e.data.currentOnlineClusterIds;
-        const newOnlineClusters: {[clusterId: string]: Cluster} = {};
-        currentOnlineClusterIds.forEach((id) => {
+        const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
+        const newActivatedClusters: {[clusterId: string]: Cluster} = {};
+        currentActivatedClusterIds.forEach((id: string) => {
           if (publicConfig.CLUSTERS[id]) {
-            newOnlineClusters[id] = publicConfig.CLUSTERS[id];
+            newActivatedClusters[id] = publicConfig.CLUSTERS[id];
           }
         });
-        setOnlineClusters(newOnlineClusters);
+        setActivatedClusters(newActivatedClusters);
         // 刷新当前页面
         // window.location.reload();
         return;
@@ -134,7 +134,7 @@ interface ExtraProps {
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
-  initialOnlineClusters: {[clusterId: string]: Cluster};
+  initialActivatedClusters: {[clusterId: string]: Cluster};
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -148,17 +148,17 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const onlineClustersStore = useConstant(() => {
-    return createStore(OnlineClustersStore, extra.initialOnlineClusters);
+  const activatedClustersStore = useConstant(() => {
+    return createStore(ActivatedClustersStore, extra.initialActivatedClusters);
   });
 
   const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
-    return Object.keys(extra.initialOnlineClusters).find((c) => c === x);
+    return Object.keys(extra.initialActivatedClusters).find((c) => c === x);
   });
 
   const defaultClusterStore = useConstant(() => {
     const store = createStore(DefaultClusterStore,
-      initialDefaultClusterId ? extra.initialOnlineClusters[initialDefaultClusterId] : undefined);
+      initialDefaultClusterId ? extra.initialActivatedClusters[initialDefaultClusterId] : undefined);
     return store;
   });
 
@@ -191,7 +191,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, onlineClustersStore, defaultClusterStore, uiExtensionStore]}>
+        <StoreProvider stores={[userStore, activatedClustersStore, defaultClusterStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />
@@ -220,7 +220,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     initialLanguage: "",
-    initialOnlineClusters: {},
+    initialActivatedClusters: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -257,11 +257,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-    // get initial online clusters
+    // get initial activated clusters
     const clustersFromDb = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
-    const onlineClusters
-     = formatOnlineClusters({ clustersFromDb: clustersFromDb?.results, misConfigClusters: publicConfig.CLUSTERS });
-    extra.initialOnlineClusters = onlineClusters.misOnlineClusters ?? {};
+    const activatedClusters
+     = formatActivatedClusters({ clustersFromDb: clustersFromDb?.results, misConfigClusters: publicConfig.CLUSTERS });
+    extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
   }
 
   const appProps = await App.getInitialProps(appContext);

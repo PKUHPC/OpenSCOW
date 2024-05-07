@@ -29,15 +29,14 @@ export const DeactivateClusterSchema = typeboxRouteSchema({
 
   body: Type.Object({
     clusterId: Type.String(),
-    comment: Type.Optional(Type.String()),
+    deactivationComment: Type.Optional(Type.String()),
   }),
 
   responses: {
     // 如果集群已经下线了，那么executed为false
     200: Type.Object({
       executed: Type.Boolean(),
-      reason: Type.Optional(Type.String()),
-      currentOnlineClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
+      currentActivatedClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
     }),
     // 集群不存在
     404: Type.Null(),
@@ -45,7 +44,7 @@ export const DeactivateClusterSchema = typeboxRouteSchema({
 });
 
 export default /* #__PURE__*/route(DeactivateClusterSchema, async (req, res) => {
-  const { clusterId, comment } = req.body;
+  const { clusterId, deactivationComment } = req.body;
 
   const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN));
 
@@ -67,7 +66,7 @@ export default /* #__PURE__*/route(DeactivateClusterSchema, async (req, res) => 
 
   return await asyncClientCall(client, "deactivateCluster", {
     clusterId,
-    comment,
+    deactivationComment,
     operatorId: info.identityId,
   })
     .then(async (reply) => {
@@ -76,7 +75,6 @@ export default /* #__PURE__*/route(DeactivateClusterSchema, async (req, res) => 
     })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
-      [Status.ALREADY_EXISTS]: (e) => ({ 200: { executed: false, reason: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));

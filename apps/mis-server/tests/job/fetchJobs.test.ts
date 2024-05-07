@@ -16,7 +16,7 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { setJobCharge } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserStatus } from "src/entities/UserAccount";
@@ -54,9 +54,9 @@ afterEach(async () => {
 it("fetches the data", async () => {
 
   // set job charge limit of user b in account b
-  const currentOnlineClusters = await getOnlineClusters(initialEm, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(initialEm, server.logger);
 
-  await setJobCharge(data.uaBB, new Decimal(0.01), currentOnlineClusters, server.ext, server.logger);
+  await setJobCharge(data.uaBB, new Decimal(0.01), currentActivatedClusters, server.ext, server.logger);
   await initialEm.flush();
 
   await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext);

@@ -21,7 +21,8 @@ import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 
-import { getOnlineClusters } from "./common";
+import { getActivatedClusters } from "./common";
+
 
 /**
  * Update block status of accounts and users in the slurm.
@@ -39,13 +40,13 @@ export async function updateBlockStatusInSlurm(
 
   const accounts = await em.find(Account, { blockedInCluster: true });
 
-  // const currentOnlineClusters = await getOnlineClusters(em, logger);
-  const currentOnlineClusters = await getOnlineClusters(em, logger).catch((e) => {
+  // const currentActivatedClusters = await getActivatedClusters(em, logger);
+  const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
     logger.info(e);
     return {};
   });
 
-  if (Object.keys(currentOnlineClusters).length === 0) {
+  if (Object.keys(currentActivatedClusters).length === 0) {
     logger.info("No available activated clusters in SCOW.");
     return {
       blockedAccounts,
@@ -61,7 +62,7 @@ export async function updateBlockStatusInSlurm(
     }
 
     try {
-      await clusterPlugin.callOnAll(currentOnlineClusters, logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "blockAccount", {
           accountName: account.accountName,
         }),
@@ -79,7 +80,7 @@ export async function updateBlockStatusInSlurm(
 
   for (const ua of userAccounts) {
     try {
-      await clusterPlugin.callOnAll(currentOnlineClusters, logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.user, "blockUserInAccount", {
           accountName: ua.account.$.accountName,
           userId: ua.user.$.userId,
@@ -129,13 +130,13 @@ export async function updateUnblockStatusInSlurm(
   const unblockedAccounts: string[] = [];
   const unblockedFailedAccounts: string[] = [];
 
-  // const currentOnlineClusters = await getOnlineClusters(em, logger);
-  const currentOnlineClusters = await getOnlineClusters(em, logger).catch((e) => {
+  // const currentActivatedClusters = await getActivatedClusters(em, logger);
+  const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
     logger.info(e);
     return {};
   });
 
-  if (Object.keys(currentOnlineClusters).length === 0) {
+  if (Object.keys(currentActivatedClusters).length === 0) {
     logger.info("No available activated clusters in SCOW.");
     return {
       unblockedAccounts,
@@ -145,7 +146,7 @@ export async function updateUnblockStatusInSlurm(
 
   for (const account of accounts) {
     try {
-      await clusterPlugin.callOnAll(currentOnlineClusters, logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "unblockAccount", {
           accountName: account.accountName,
         }),
@@ -176,7 +177,7 @@ export async function updateUnblockStatusInSlurm(
 **/
 export async function blockAccount(
   account: Loaded<Account, "tenant">,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin["clusters"],
   logger: Logger,
 ): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
@@ -187,7 +188,7 @@ export async function blockAccount(
     return "Whitelisted";
   }
 
-  await clusterPlugin.callOnAll(currentOnlineClusters, logger, async (client) => {
+  await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
     });
@@ -209,14 +210,14 @@ export async function blockAccount(
 **/
 export async function unblockAccount(
   account: Loaded<Account, "tenant">,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin["clusters"],
   logger: Logger,
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
   if (!account.blockedInCluster) { return "ALREADY_UNBLOCKED"; }
 
-  await clusterPlugin.callOnAll(currentOnlineClusters, logger, async (client) => {
+  await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "unblockAccount", {
       accountName: account.accountName,
     });
@@ -234,7 +235,7 @@ export async function unblockAccount(
  * */
 export async function blockUserInAccount(
   ua: Loaded<UserAccount, "user" | "account">,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
   if (ua.blockedInCluster == UserStatus.BLOCKED) {
@@ -244,7 +245,7 @@ export async function blockUserInAccount(
   const accountName = ua.account.$.accountName;
   const userId = ua.user.$.userId;
 
-  await clusterPlugin.clusters.callOnAll(currentOnlineClusters, logger, async (client) =>
+  await clusterPlugin.clusters.callOnAll(currentActivatedClusters, logger, async (client) =>
     await asyncClientCall(client.user, "blockUserInAccount", {
       accountName,
       userId,
@@ -264,7 +265,7 @@ export async function blockUserInAccount(
  * */
 export async function unblockUserInAccount(
   ua: Loaded<UserAccount, "user" | "account">,
-  currentOnlineClusters: Record<string, ClusterConfigSchema>,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
   if (ua.blockedInCluster === UserStatus.UNBLOCKED) {
@@ -274,7 +275,7 @@ export async function unblockUserInAccount(
   const accountName = ua.account.getProperty("accountName");
   const userId = ua.user.getProperty("userId");
 
-  await clusterPlugin.clusters.callOnAll(currentOnlineClusters, logger, async (client) =>
+  await clusterPlugin.clusters.callOnAll(currentActivatedClusters, logger, async (client) =>
     await asyncClientCall(client.user, "unblockUserInAccount", {
       accountName,
       userId,

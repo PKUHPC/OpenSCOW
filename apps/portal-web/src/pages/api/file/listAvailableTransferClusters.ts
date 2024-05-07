@@ -50,9 +50,6 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  // const currentClusters
-  // = publicConfig.MIS_DEPLOYED ? useOnlineClusters().currentClusters : publicConfig.CLUSTERS;
-  // showMessageWhenNoClusters(currentClusters.map((x) => x.id));
   const { currentClusters } = useStore(CurrentClustersStore);
 
   const clusterList: ClusterInfo[] = currentClusters

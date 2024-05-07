@@ -11,7 +11,7 @@
  */
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
-import { ClusterOnlineStatus } from "@scow/config/build/type";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Form, Space, Table, Tag } from "antd";
@@ -24,7 +24,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { ClusterConnectionStatus } from "src/models/cluster";
 import { CombinedClusterInfo } from "src/pages/admin/resource/clusterManagement";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { getSortedClusterValues } from "src/utils/cluster";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -46,7 +46,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
 
-  const { setOnlineClusters } = useStore(OnlineClustersStore);
+  const { setActivatedClusters } = useStore(ActivatedClustersStore);
 
   const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
@@ -145,7 +145,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
             r.connectionStatus === ClusterConnectionStatus.ERROR ? (
               <Tag color="red">{tArgs(p("table.errorState"))}</Tag>
             ) : (
-              r.onlineStatus === ClusterOnlineStatus.OFFLINE ?
+              r.activationStatus === ClusterActivationStatus.DEACTIVATED ?
                 <Tag color="red">{tArgs(p("table.deactivatedState"))}</Tag> :
                 <Tag color="green">{tArgs(p("table.normalState"))}</Tag>
             )
@@ -166,7 +166,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
           render={(_, r) => formatDateTime(r.updateTime)}
         />
         <Table.Column<CombinedClusterInfo>
-          dataIndex="comment"
+          dataIndex="deactivationComment"
           ellipsis
           title={tArgs(p("table.comment"))}
         />
@@ -180,7 +180,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
             return (
               <>
                 {
-                  r.onlineStatus === ClusterOnlineStatus.OFFLINE
+                  r.activationStatus === ClusterActivationStatus.DEACTIVATED
                 && r.connectionStatus === ClusterConnectionStatus.AVAILABLE
                   && (
                     <>
@@ -208,12 +208,12 @@ export const ClusterManagementTable: React.FC<Props> = ({
                             })
                               .then((res) => {
                                 if (res.executed) {
-                                  const webOnlineClusters = res.currentOnlineClusters?.reduce((acc, curr) => {
+                                  const webActivatedClusters = res.currentActivatedClusters?.reduce((acc, curr) => {
                                     acc[curr.clusterId] =
                                     { id: curr.clusterId, name: publicConfig.CLUSTERS[curr.clusterId].name };
                                     return acc;
                                   }, {} as {[clusterId: string]: Cluster});
-                                  setOnlineClusters(webOnlineClusters ?? {});
+                                  setActivatedClusters(webActivatedClusters ?? {});
                                   message.success(tArgs(p("activateModal.successMessage")));
                                   reload();
                                 } else {
@@ -231,28 +231,28 @@ export const ClusterManagementTable: React.FC<Props> = ({
                     </>
                   )
                 }
-                { r.onlineStatus === ClusterOnlineStatus.ONLINE && (
+                { r.activationStatus === ClusterActivationStatus.ACTIVATED && (
                   <>
                     <DeactivateClusterModalLink
                       clusterId={r.clusterId}
                       clusterName={clusterName}
-                      onComplete={async (confirmedClusterId, comment) => {
+                      onComplete={async (confirmedClusterId, deactivationComment) => {
 
                         return await api.deactivateCluster({ body:{
                           clusterId: confirmedClusterId,
-                          comment,
+                          deactivationComment,
                         } }).then((res) => {
                           if (res.executed) {
                             message.success(tArgs(p("deactivateModal.successMessage")));
                             reload();
-                            const webOnlineClusters = res.currentOnlineClusters?.reduce((acc, curr) => {
+                            const webActivatedClusters = res.currentActivatedClusters?.reduce((acc, curr) => {
                               acc[curr.clusterId] =
                               { id: curr.clusterId, name: publicConfig.CLUSTERS[curr.clusterId].name };
                               return acc;
                             }, {} as {[clusterId: string]: Cluster});
-                            setOnlineClusters(webOnlineClusters ?? {});
+                            setActivatedClusters(webActivatedClusters ?? {});
                           } else {
-                            message.error(res.reason || tArgs(p("deactivateModal.failureMessage")));
+                            message.error(tArgs(p("deactivateModal.failureMessage")));
                             reload();
                           }
                         });

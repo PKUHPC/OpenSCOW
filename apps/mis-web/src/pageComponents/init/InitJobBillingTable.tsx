@@ -17,7 +17,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 
 const p = prefix("pageComp.init.initJobBillingTable.");
 const pCommon = prefix("common.");
@@ -25,12 +25,12 @@ const pCommon = prefix("common.");
 export const InitJobBillingTable: React.FC = () => {
 
   const t = useI18nTranslateToString();
-  const { onlineClusters } = useStore(OnlineClustersStore);
-  const currentOnlineClusterIds = Object.keys(onlineClusters);
+  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const currentActivatedClusterIds = Object.keys(activatedClusters);
 
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({
-      query: { tenant: undefined, activeOnly: false, currentOnlineClusterIds },
+      query: { tenant: undefined, activeOnly: false, currentActivatedClusterIds },
     });
   }, []) });
 
@@ -40,7 +40,7 @@ export const InitJobBillingTable: React.FC = () => {
         {t(p("set"))}
         <a onClick={reload}>{t(pCommon("fresh"))}</a>
       </Typography.Paragraph>
-      { currentOnlineClusterIds.length === 0 &&
+      { currentActivatedClusterIds.length === 0 &&
         <div style={{ marginBottom: 20 }}>{t("common.noAvailableClusters")}</div>
       }
       <ManageJobBillingTable

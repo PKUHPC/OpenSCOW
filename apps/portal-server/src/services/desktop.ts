@@ -17,7 +17,7 @@ import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { configClusters } from "src/config/clusters";
-import { checkOnlineClusters } from "src/utils/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import {
   addDesktopToFile,
   ensureEnabled,
@@ -36,7 +36,7 @@ export const desktopServiceServer = plugin((server) => {
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
       const { cluster, loginNode: host, wm, userId, desktopName } = request;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       ensureEnabled(cluster);
 
@@ -107,7 +107,7 @@ export const desktopServiceServer = plugin((server) => {
     killDesktop: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       ensureEnabled(cluster);
 
@@ -130,7 +130,7 @@ export const desktopServiceServer = plugin((server) => {
     connectToDesktop: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       ensureEnabled(cluster);
 
@@ -148,7 +148,7 @@ export const desktopServiceServer = plugin((server) => {
     listUserDesktops: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, userId } = request;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       ensureEnabled(cluster);
 
@@ -175,7 +175,7 @@ export const desktopServiceServer = plugin((server) => {
     listAvailableWms: async ({ request, logger }) => {
 
       const { cluster } = request;
-      await checkOnlineClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: [cluster], logger });
 
       ensureEnabled(cluster);
 

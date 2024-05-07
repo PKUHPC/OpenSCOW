@@ -14,10 +14,11 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
+  ClusterDatabaseInfo,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
-import { getClustersDatabaseInfo, getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters, getClustersDatabaseInfo } from "src/bl/common";
 import { configClusters } from "src/config/clusters";
-import { Cluster, ClusterOnlineStatus } from "src/entities/Cluster";
+import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
 
 export const misConfigServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
@@ -31,9 +32,9 @@ export const misConfigServiceServer = plugin((server) => {
     getAvailablePartitions: async ({ request, em, logger }) => {
 
       const { accountName, userId } = request;
-      const currentOnlineClusters = await getOnlineClusters(em, logger).catch();
+      const currentActivatedClusters = await getActivatedClusters(em, logger).catch();
       const reply = await server.ext.clusters.callOnAll(
-        currentOnlineClusters,
+        currentActivatedClusters,
         logger,
         async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
           accountName, userId,
@@ -63,6 +64,7 @@ export const misConfigServiceServer = plugin((server) => {
       return [reply];
     },
 
+    // get connection status from scheduler adapter of cluster
     getClustersConnectionInfo: async ({ logger }) => {
 
       const clusterResponse: ClusterConnectionInfo[] = [];
@@ -104,7 +106,7 @@ export const misConfigServiceServer = plugin((server) => {
     },
 
     activateCluster: async ({ request, em, logger }) => {
-      const { clusterId, operatorId, comment } = request;
+      const { clusterId, operatorId } = request;
 
       const cluster = await em.findOne(Cluster, { clusterId });
 
@@ -128,24 +130,27 @@ export const misConfigServiceServer = plugin((server) => {
         };
       });
 
-      if (cluster.onlineStatus === ClusterOnlineStatus.ONLINE) {
-        throw <ServiceError>{
-          code: status.ALREADY_EXISTS,
-          message: `Cluster（ Cluster ID: ${clusterId}） is already activated.`,
-        };
+      // when the cluster has already been activated
+      if (cluster.activationStatus === ClusterActivationStatus.ACTIVATED) {
+        logger.info("Cluster (Cluster ID: %s) has already been activated",
+          clusterId,
+        );
+        return [{ executed: false }];
       }
 
-      cluster.onlineStatus = ClusterOnlineStatus.ONLINE;
-      cluster.operatorId = operatorId;
-      // 启用集群暂时不支持输入备注
-      cluster.comment = "";
+      cluster.activationStatus = ClusterActivationStatus.ACTIVATED;
+
+      // save operator userId in lastActivationOperation
+      const lastActivationOperationMap: ClusterDatabaseInfo["lastActivationOperation"] = {};
+
+      lastActivationOperationMap["operatorId"] = operatorId;
+      cluster.lastActivationOperation = lastActivationOperationMap;
 
       await em.persistAndFlush(cluster);
 
-      logger.info("Cluster (Cluster ID: %s) is successfully activated by user (User Id: %s) with comment %s",
+      logger.info("Cluster (Cluster ID: %s) is successfully activated by user (User Id: %s)",
         clusterId,
         operatorId,
-        comment,
       );
 
       return [{ executed: true }];
@@ -153,7 +158,7 @@ export const misConfigServiceServer = plugin((server) => {
     },
 
     deactivateCluster: async ({ request, em, logger }) => {
-      const { clusterId, operatorId, comment } = request;
+      const { clusterId, operatorId, deactivationComment } = request;
 
       const cluster = await em.findOne(Cluster, { clusterId });
 
@@ -163,23 +168,31 @@ export const misConfigServiceServer = plugin((server) => {
         };
       }
 
-      if (cluster.onlineStatus === ClusterOnlineStatus.OFFLINE) {
-        throw <ServiceError>{
-          code: status.ALREADY_EXISTS,
-          message: `Cluster（ Cluster ID: ${clusterId}） is already deactivated.`,
-        };
+      if (cluster.activationStatus === ClusterActivationStatus.DEACTIVATED) {
+
+        logger.info("Cluster (Cluster ID: %s) has already been deactivated");
+
+        return [{ executed: false }];
       }
 
-      cluster.onlineStatus = ClusterOnlineStatus.OFFLINE;
-      cluster.operatorId = operatorId;
-      cluster.comment = comment ?? "";
+      cluster.activationStatus = ClusterActivationStatus.DEACTIVATED;
+
+      // save operator userId and deactivation in lastActivationOperation
+      const lastActivationOperationMap: ClusterDatabaseInfo["lastActivationOperation"] = {};
+      lastActivationOperationMap["operatorId"] = operatorId;
+
+      if (deactivationComment) {
+        lastActivationOperationMap["deactivationComment"] = deactivationComment;
+      }
+      cluster.lastActivationOperation = lastActivationOperationMap;
+
 
       await em.persistAndFlush(cluster);
 
       logger.info("Cluster (Cluster ID: %s) is successfully deactivated by user (User Id: %s) with comment %s",
         clusterId,
         operatorId,
-        comment,
+        deactivationComment,
       );
 
       return [{ executed: true }];

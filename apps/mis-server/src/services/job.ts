@@ -26,7 +26,7 @@ import {
   JobServiceServer, JobServiceService,
 } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
@@ -35,7 +35,7 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
-import { checkOnlineClusters } from "src/utils/cluster";
+import { checkActivatedClusters } from "src/utils/cluster";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -135,7 +135,7 @@ export const jobServiceServer = plugin((server) => {
 
         const savedFields = misConfig.jobChargeMetadata?.savedFields;
 
-        const currentOnlineClusters = await getOnlineClusters(em, logger);
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
 
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
@@ -168,7 +168,7 @@ export const jobServiceServer = plugin((server) => {
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
                 metadata: metadataMap,
-              }, em, currentOnlineClusters, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
                 target: account.tenant.$,
@@ -177,7 +177,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, currentOnlineClusters, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             }
             x.tenantPrice = newTenantPrice;
           }
@@ -191,7 +191,7 @@ export const jobServiceServer = plugin((server) => {
                 amount: newAccountPrice.minus(x.accountPrice),
                 userId: x.user,
                 metadata: metadataMap,
-              }, em, currentOnlineClusters, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({
                 target: account,
@@ -200,7 +200,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, currentOnlineClusters, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             }
             x.accountPrice = newAccountPrice;
           }
@@ -241,8 +241,8 @@ export const jobServiceServer = plugin((server) => {
         : tenantName !== undefined
           ? tenantAccounts : [];
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -275,8 +275,8 @@ export const jobServiceServer = plugin((server) => {
     changeJobTimeLimit: async ({ request, em, logger }) => {
       const { cluster, limitMinutes, jobId } = request;
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,
@@ -296,8 +296,8 @@ export const jobServiceServer = plugin((server) => {
 
       const { cluster, jobId } = request;
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -497,8 +497,8 @@ export const jobServiceServer = plugin((server) => {
     cancelJob: async ({ request, em, logger }) => {
       const { cluster, userId, jobId } = request;
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,

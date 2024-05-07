@@ -44,7 +44,6 @@ export type ClusterPlugin = {
   clusters: {
     callOnAll: CallOnAll;
     callOnOne: CallOnOne;
-    onlineClusters: () => Promise<Record<string, ClusterConfigSchema>>;
   }
 }
 
@@ -82,8 +81,8 @@ export const clustersPlugin = plugin(async (f) => {
     return prev;
   }, {} as Record<string, SchedulerAdapterClient>);
 
-  // adapterClients of online clusters
-  const getAdapterClientForOnlineClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
+  // adapterClients of activated clusters
+  const getAdapterClientForActivatedClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
     return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
       const client = getSchedulerAdapterClient(c.adapterUrl);
       prev[cluster] = client;
@@ -128,9 +127,9 @@ export const clustersPlugin = plugin(async (f) => {
     // throws error if failed.
     callOnAll: <CallOnAll>(async (clusters, logger, call) => {
 
-      const adapterClientForOnlineClusters = getAdapterClientForOnlineClusters(clusters);
+      const adapterClientForActivatedClusters = getAdapterClientForActivatedClusters(clusters);
 
-      const responses = await Promise.all(Object.entries(adapterClientForOnlineClusters)
+      const responses = await Promise.all(Object.entries(adapterClientForActivatedClusters)
         .map(async ([cluster, client]) => {
           return call(client).then((result) => {
             logger.info("Executing on %s success", cluster);

@@ -12,10 +12,11 @@
 
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
 import { DATETIME_TYPE } from "src/utils/orm";
+import { AnyJson } from "src/utils/types";
 
-export enum ClusterOnlineStatus {
-  ONLINE = "ONLINE",
-  OFFLINE = "OFFLINE",
+export enum ClusterActivationStatus {
+  ACTIVATED = "ACTIVATED",
+  DEACTIVATED = "DEACTIVATED",
 }
 
 @Entity()
@@ -26,15 +27,12 @@ export class Cluster {
   @Property({ unique: true })
     clusterId: string;
 
-  @Enum({ items: () => ClusterOnlineStatus,
-    default: ClusterOnlineStatus.ONLINE, comment: Object.values(ClusterOnlineStatus).join(", ") })
-    onlineStatus: ClusterOnlineStatus;
+  @Enum({ items: () => ClusterActivationStatus,
+    default: ClusterActivationStatus.ACTIVATED, comment: Object.values(ClusterActivationStatus).join(", ") })
+    activationStatus: ClusterActivationStatus;
 
-  @Property({ nullable: true })
-    operatorId?: string;
-
-  @Property({ default: "" })
-    comment: string;
+  @Property({ type: "json", nullable: true })
+    lastActivationOperation?: AnyJson;
 
   @Property({ columnType: DATETIME_TYPE, nullable: true })
     createTime: Date;
@@ -44,16 +42,14 @@ export class Cluster {
 
   constructor(init: {
     clusterId: string;
-    onlineStatus?: ClusterOnlineStatus;
-    operatorId?: string;
-    comment?: string;
+    activationStatus?: ClusterActivationStatus;
+    lastActivationOperation?: AnyJson;
     createTime?: Date;
     updateTime?: Date;
   }) {
     this.clusterId = init.clusterId;
-    this.onlineStatus = init.onlineStatus || ClusterOnlineStatus.ONLINE;
-    this.operatorId = init.operatorId;
-    this.comment = init.comment || "";
+    this.activationStatus = init.activationStatus || ClusterActivationStatus.ACTIVATED;
+    this.lastActivationOperation = init.lastActivationOperation;
     this.createTime = init.createTime ?? new Date();
     this.updateTime = init.updateTime ?? new Date();
   }

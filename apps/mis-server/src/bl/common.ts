@@ -16,11 +16,11 @@ import { status } from "@grpc/grpc-js";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
-import { ClusterDatabaseInfo, ClusterOnlineStatus,
-  clusterOnlineStatusFromJSON } from "@scow/protos/build/server/config";
+import { ClusterActivationStatus,
+  clusterActivationStatusFromJSON, ClusterDatabaseInfo } from "@scow/protos/build/server/config";
 import { configClusters } from "src/config/clusters";
 import { Cluster } from "src/entities/Cluster";
-import { NO_ONLINE_CLUSTERS } from "src/utils/cluster";
+import { NO_ACTIVATED_CLUSTERS } from "src/utils/cluster";
 
 export async function updateCluster(
   em: SqlEntityManager<MySqlDriver>,
@@ -72,41 +72,41 @@ export async function getClustersDatabaseInfo(
   const clustersFromDb = await em.find(Cluster, {});
 
   const reply = clustersFromDb.map((x) => {
+
     return {
       clusterId: x.clusterId,
-      onlineStatus: clusterOnlineStatusFromJSON(x.onlineStatus),
-      operatorId: x.operatorId,
-      comment: x.comment,
+      activationStatus: clusterActivationStatusFromJSON(x.activationStatus),
+      lastActivationOperation: x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"],
     };
   });
 
-  const clusterOnlineStatusList = clustersFromDb.map((x) => {
-    return `(Cluster ID: ${x.clusterId}) : ${x.onlineStatus}`;
+  const clusterDatabaseList = clustersFromDb.map((x) => {
+    return `(Cluster ID: ${x.clusterId}) : ${x.activationStatus}`;
   }).join("; ");
 
-  logger.info("Current clusters list: %s", clusterOnlineStatusList);
+  logger.info("Current clusters list: %s", clusterDatabaseList);
 
   return reply;
 }
 
 
-export const getOnlineClusters = async (em: SqlEntityManager<MySqlDriver>, logger: Logger) => {
+export const getActivatedClusters = async (em: SqlEntityManager<MySqlDriver>, logger: Logger) => {
 
-  const clustersOnlineInfo = await getClustersDatabaseInfo(em, logger);
+  const clustersDbInfo = await getClustersDatabaseInfo(em, logger);
 
-  const currentOnlineClusterIds = clustersOnlineInfo.filter((cluster) => {
-    return cluster.onlineStatus === ClusterOnlineStatus.ONLINE;
+  const currentActivatedClusterIds = clustersDbInfo.filter((cluster) => {
+    return cluster.activationStatus === ClusterActivationStatus.ACTIVATED;
   }).map((cluster) => cluster.clusterId);
 
-  if (currentOnlineClusterIds.length === 0) {
+  if (currentActivatedClusterIds.length === 0) {
     throw new ServiceError({
       code: status.INTERNAL,
       details: "No available clusters. Please try again later",
-      metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
+      metadata: scowErrorMetadata(NO_ACTIVATED_CLUSTERS, { currentActivatedClusters: "" }),
     });
   }
 
-  return currentOnlineClusterIds.reduce((acc, clusterId) => {
+  return currentActivatedClusterIds.reduce((acc, clusterId) => {
     if (configClusters[clusterId]) {
       acc[clusterId] = configClusters[clusterId];
     }

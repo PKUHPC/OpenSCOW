@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterOnlineStatus } from "@scow/config/build/type";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { GetServerSideProps, NextPage } from "next";
 import { api } from "src/apis";
@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const sortedClusterIdList = publicConfig.MIS_DEPLOYED ?
     (currentClusters?.results
-      .filter((x) => x.onlineStatus === ClusterOnlineStatus.ONLINE).map((x) => x.clusterId) ?? [])
+      .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED).map((x) => x.clusterId) ?? [])
     : publicConfig.CLUSTER_SORTED_ID_LIST;
 
   const loginDesktopEnabledClusters = sortedClusterIdList

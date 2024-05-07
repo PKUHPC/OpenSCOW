@@ -585,8 +585,8 @@ export default {
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
       adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
-      noOnlineClusters: "No available clusters. Please try again after refreshing the page.",
-      notExistInOnlineClusters: "The cluster(s) being queried may have been deactivated. "
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
       + "Please try again after refreshing the page.",
     },
     dashboard: {

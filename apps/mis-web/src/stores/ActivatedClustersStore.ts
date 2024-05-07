@@ -14,9 +14,9 @@ import { useState } from "react";
 import { Cluster } from "src/utils/config";
 
 
-export function OnlineClustersStore(initialOnlineClusters: {[clusterId: string]: Cluster;}) {
-  const [onlineClusters, setOnlineClusters]
-   = useState<{[clusterId: string]: Cluster;}>(initialOnlineClusters);
+export function ActivatedClustersStore(initialActivatedClusters: {[clusterId: string]: Cluster;}) {
+  const [activatedClusters, setActivatedClusters]
+   = useState<{[clusterId: string]: Cluster;}>(initialActivatedClusters);
 
-  return { onlineClusters, setOnlineClusters };
+  return { activatedClusters, setActivatedClusters };
 }

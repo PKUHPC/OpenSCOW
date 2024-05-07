@@ -16,35 +16,35 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { Logger } from "pino";
 
-export const NO_ONLINE_CLUSTERS = "NO_ONLINE_CLUSTERS";
-export const NOT_EXIST_IN_ONLINE_CLUSTERS = "NOT_EXIST_IN_ONLINE_CLUSTERS";
+export const NO_ACTIVATED_CLUSTERS = "NO_ACTIVATED_CLUSTERS";
+export const NOT_EXIST_IN_ACTIVATED_CLUSTERS = "NOT_EXIST_IN_ACTIVATED_CLUSTERS";
 
-export const checkOnlineClusters
-= ({ clusterIds, onlineClusters, logger }:
+export const checkActivatedClusters
+= ({ clusterIds, activatedClusters, logger }:
   { clusterIds: string[],
-    onlineClusters: Record<string, ClusterConfigSchema>,
+    activatedClusters: Record<string, ClusterConfigSchema>,
     logger: Logger
   }) => {
 
   logger.info("Checking activation status of clusters with ids (%o) ", clusterIds);
-  if (Object.keys(onlineClusters).length === 0) {
+  if (Object.keys(activatedClusters).length === 0) {
     throw new ServiceError({
       code: status.INTERNAL,
       details: "No available clusters. Please try again later",
-      metadata: scowErrorMetadata(NO_ONLINE_CLUSTERS, { currentOnlineClusters: "" }),
+      metadata: scowErrorMetadata(NO_ACTIVATED_CLUSTERS, { currentActivatedClusters: "" }),
     });
   }
 
-  const exist = clusterIds.every((id) => Object.keys(onlineClusters).find((x) => x === id));
+  const exist = clusterIds.every((id) => Object.keys(activatedClusters).find((x) => x === id));
   if (!exist) {
     logger.info("Querying deactivated clusters with ids (%o). The current activated clusters' ids: %o",
-      clusterIds, Object.keys(onlineClusters));
+      clusterIds, Object.keys(activatedClusters));
     throw new ServiceError({
       code: status.INTERNAL,
       details: "Querying deactivated clusters. Please refresh the page and try again",
-      metadata: scowErrorMetadata(NOT_EXIST_IN_ONLINE_CLUSTERS,
-        { currentOnlineClusterIds:
-          Object.keys(onlineClusters).length > 0 ? JSON.stringify(Object.keys(onlineClusters)) : "" }),
+      metadata: scowErrorMetadata(NOT_EXIST_IN_ACTIVATED_CLUSTERS,
+        { currentActivatedClusterIds:
+          Object.keys(activatedClusters).length > 0 ? JSON.stringify(Object.keys(activatedClusters)) : "" }),
     });
   }
 

@@ -20,7 +20,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { formatOnlineClusters } from "@scow/lib-web/build/utils/misCommon/onlineClusters";
+import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/activatedClusters";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
@@ -63,6 +63,9 @@ const FailEventHandler: React.FC = () => {
   // 所以不需要每次userStore变化时来重新注册handler
   useEffect(() => {
     failEvent.register((e) => {
+
+      console.log("【global-e】", e);
+
       if (e.status === 401) {
         userStore.logout();
         return;
@@ -100,18 +103,18 @@ const FailEventHandler: React.FC = () => {
       }
 
 
-      if (e.data?.code === "NO_ONLINE_CLUSTERS") {
-        message.error(tArgs("pages._app.noOnlineClusters"));
+      if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("pages._app.noActivatedClusters"));
         if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters([]);
         return;
       }
 
-      if (e.data?.code === "NOT_EXIST_IN_ONLINE_CLUSTERS") {
-        message.error(tArgs("pages._app.notExistInOnlineClusters"));
+      if (e.data?.code === "NOT_EXIST_IN_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("pages._app.notExistInActivatedClusters"));
 
-        const currentOnlineClusterIds = e.data.currentOnlineClusterIds;
-        const onlineClusters = publicConfig.CLUSTERS.map((x) => currentOnlineClusterIds.includes(x.id));
-        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters(onlineClusters);
+        const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
+        const activatedClusters = publicConfig.CLUSTERS.map((x) => currentActivatedClusterIds.includes(x.id));
+        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters(activatedClusters);
         // 刷新当前页面
         // window.location.reload();
         return;
@@ -274,14 +277,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     // 从Cookies或header中获取语言id
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-    // get current initial online clusters
+    // get current initial activated clusters
     const currentClusters = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
-    const initialOnlineClusters =
-    formatOnlineClusters({
+    const initialActivatedClusters =
+    formatActivatedClusters({
       clustersFromDb: currentClusters?.results,
       configClusters: publicConfig.CLUSTERS,
       misDeployed: publicConfig.MIS_DEPLOYED });
-    extra.initialCurrentClusters = initialOnlineClusters.onlineClusters ?? [];
+    extra.initialCurrentClusters = initialActivatedClusters.activatedClusters ?? [];
 
   }
 

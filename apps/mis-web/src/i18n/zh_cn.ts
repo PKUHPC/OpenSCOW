@@ -806,8 +806,8 @@ export default {
 
       adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
-      noOnlineClusters: "现在没有可用的集群，请在页面刷新后重试。",
-      notExistInOnlineClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
+      noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
+      notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
 
     },
     profile: {
@@ -1048,7 +1048,7 @@ export default {
             content: "请确认是否启用集群名称是 {}，集群ID是 {} 的集群？",
             contentAttention: "注意：启用后请手动同步平台数据！",
             successMessage: "集群已启用",
-            failureMessage: "集群启用失败",
+            failureMessage: "集群启用失败，集群可能已被启用",
           },
           deactivateModal: {
             title: "停用集群",
@@ -1061,7 +1061,7 @@ export default {
             clusterIdForm: "集群ID",
             comment: "停用备注",
             successMessage: "集群已停用",
-            failureMessage: "集群停用失败",
+            failureMessage: "集群停用失败，集群可能已被停用",
           },
         },
       },

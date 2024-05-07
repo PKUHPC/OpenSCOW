@@ -18,7 +18,7 @@ import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date
 import { ChargeRecord as ChargeRecordProto,
   ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -88,7 +88,7 @@ export const chargingServiceServer = plugin((server) => {
 
         }
 
-        const currentOnlineClusters = await getOnlineClusters(em, logger);
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
 
         return await pay({
           amount: new Decimal(moneyToNumber(amount)),
@@ -97,7 +97,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           ipAddress,
           operatorId,
-        }, em, currentOnlineClusters, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -134,7 +134,7 @@ export const chargingServiceServer = plugin((server) => {
           }
         }
 
-        const currentOnlineClusters = await getOnlineClusters(em, logger);
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
 
         return await charge({
           amount: new Decimal(moneyToNumber(amount)),
@@ -143,7 +143,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           userId,
           metadata,
-        }, em, currentOnlineClusters, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{

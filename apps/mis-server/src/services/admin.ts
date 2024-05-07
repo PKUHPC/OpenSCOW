@@ -20,14 +20,14 @@ import {
   ClusterAccountInfo_ImportStatus,
 } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, User } from "src/entities/User";
 import { UserAccount, UserRole } from "src/entities/UserAccount";
-import { checkOnlineClusters } from "src/utils/cluster";
+import { checkActivatedClusters } from "src/utils/cluster";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -105,12 +105,12 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
 
       const reply = await importUsers(data as ImportUsersData,
         em,
         whitelist,
-        currentOnlineClusters,
+        currentActivatedClusters,
         server.ext.clusters, logger);
 
       return [reply];
@@ -120,8 +120,8 @@ export const adminServiceServer = plugin((server) => {
     getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
-      checkOnlineClusters({ clusterIds: [cluster], onlineClusters: currentOnlineClusters, logger });
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
 
       const result = await server.ext.clusters.callOnOne(
         cluster,
@@ -229,7 +229,7 @@ export const adminServiceServer = plugin((server) => {
     syncBlockStatus: async ({ em, logger }) => {
       // check whether there is activated cluster in SCOW
       // cause syncBlockStatus in plugin will skip the check
-      await getOnlineClusters(em, logger);
+      await getActivatedClusters(em, logger);
       const reply = await server.ext.syncBlockStatus.sync();
       return [reply];
     },

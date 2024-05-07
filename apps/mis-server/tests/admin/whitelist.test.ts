@@ -19,7 +19,7 @@ import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { charge } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { reloadEntity, toRef } from "src/utils/orm";
@@ -139,14 +139,14 @@ it("charges user but don't block account if account is whitelist", async () => {
 
   await em.flush();
 
-  const currentOnlineClusters = await getOnlineClusters(em, server.logger);
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
   const { currentBalance, previousBalance } = await charge({
     amount: new Decimal(2),
     comment: "",
     target: a,
     type: "haha",
-  }, em.fork(), currentOnlineClusters, server.logger, server.ext);
+  }, em.fork(), currentActivatedClusters, server.logger, server.ext);
 
   await reloadEntity(em, a);
 

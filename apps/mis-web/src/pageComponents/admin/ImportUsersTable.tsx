@@ -23,8 +23,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { OnlineClustersStore } from "src/stores/OnlineClustersStore";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
 const pCommon = prefix("common.");
@@ -37,16 +37,16 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
-  const { onlineClusters } = useStore(OnlineClustersStore);
+  const { activatedClusters } = useStore(ActivatedClustersStore);
   const defaultClusterStore = useStore(DefaultClusterStore);
 
-  if (Object.keys(onlineClusters).length > 0 && !onlineClusters[defaultClusterStore.cluster.id]) {
-    defaultClusterStore.setCluster(Object.values(onlineClusters)[0]);
+  if (Object.keys(activatedClusters).length > 0 && !activatedClusters[defaultClusterStore.cluster.id]) {
+    defaultClusterStore.setCluster(Object.values(activatedClusters)[0]);
   }
 
   const clusterParam = queryToString(qs.cluster);
-  const cluster = (onlineClusters[clusterParam]
-    ? onlineClusters[clusterParam]
+  const cluster = (activatedClusters[clusterParam]
+    ? activatedClusters[clusterParam]
     : defaultClusterStore.cluster);
 
   const [form] = Form.useForm<{ whitelist: boolean}>();

@@ -18,7 +18,7 @@ import { parsePlaceholder } from "@scow/lib-config";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
-import { getOnlineClusters } from "src/bl/common";
+import { getActivatedClusters } from "src/bl/common";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { createPriceMap } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
@@ -80,7 +80,7 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
 
-      const currentOnlineClusters = await getOnlineClusters(em, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
 
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];
@@ -147,7 +147,7 @@ export async function fetchJobs(
             target: account,
             userId: pricedJob.user,
             metadata: metadataMap,
-          }, em, currentOnlineClusters, logger, clusterPlugin);
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           // charge tenant
           await charge({
@@ -157,7 +157,7 @@ export async function fetchJobs(
             target: account.tenant.$,
             userId: pricedJob.user,
             metadata: metadataMap,
-          }, em, currentOnlineClusters, logger, clusterPlugin);
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           const ua = await em.findOne(UserAccount, {
             account: { accountName: pricedJob.account },
@@ -171,7 +171,7 @@ export async function fetchJobs(
               "User %s in account %s is not found.", pricedJob.user, pricedJob.account);
           } else {
             // 用户限额及相关操作
-            await addJobCharge(ua, pricedJob.accountPrice, currentOnlineClusters, clusterPlugin, logger);
+            await addJobCharge(ua, pricedJob.accountPrice, currentActivatedClusters, clusterPlugin, logger);
           }
 
         }
@@ -190,7 +190,7 @@ export async function fetchJobs(
     return result.length;
   };
 
-  const clusters = await getOnlineClusters(em, logger);
+  const clusters = await getActivatedClusters(em, logger);
 
   try {
     let newJobsCount = 0;
