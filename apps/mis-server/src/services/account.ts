@@ -318,7 +318,7 @@ export const accountServiceServer = plugin((server) => {
     },
 
     whitelistAccount: async ({ request, em, logger }) => {
-      const { accountName, comment, operatorId, tenantName } = request;
+      const { accountName, comment, operatorId, tenantName, expirationDate } = request;
 
       const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } },
         { populate: [ "tenant"]});
@@ -338,6 +338,7 @@ export const accountServiceServer = plugin((server) => {
         time: new Date(),
         comment,
         operatorId,
+        expirationDate:new Date(expirationDate),
       });
       account.whitelist = toRef(whitelist);
 

@@ -31,15 +31,20 @@ export class AccountWhitelist {
   @Property()
     operatorId: string;
 
+  @Property()
+    expirationDate: Date;
+
   constructor(init: {
     account: EntityOrRef<Account>,
     time?: Date,
     comment: string
     operatorId: string;
+    expirationDate?: Date
   }) {
     this.account = toRef(init.account);
     this.time = init.time ?? new Date();
     this.comment = init.comment;
     this.operatorId = init.operatorId;
+    this.expirationDate = init.expirationDate ?? new Date("2099-12-31 00:00");
   }
 }

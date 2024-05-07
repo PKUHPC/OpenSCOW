@@ -65,6 +65,7 @@ message WhitelistAccountRequest {
   string account_name = 2;
   string operator_id = 3;
   string comment = 4;
+  string expiration_date = 5;
 }
 
 // NOT_FOUND: account is not found.

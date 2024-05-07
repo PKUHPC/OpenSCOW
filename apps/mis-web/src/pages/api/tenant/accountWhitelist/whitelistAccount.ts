@@ -29,6 +29,7 @@ export const WhitelistAccountSchema = typeboxRouteSchema({
   body: Type.Object({
     accountName: Type.String(),
     comment: Type.String(),
+    expirationDate:Type.String(),
   }),
 
   responses: {
@@ -47,7 +48,7 @@ export default route(WhitelistAccountSchema,
       return;
     }
 
-    const { accountName, comment } = req.body;
+    const { accountName, comment, expirationDate } = req.body;
 
     const logInfo = {
       operatorUserId: info.identityId,
@@ -65,6 +66,7 @@ export default route(WhitelistAccountSchema,
       accountName,
       operatorId: info.identityId,
       comment,
+      expirationDate,
     })
       .then(async () => {
         await callLog(logInfo, OperationResult.SUCCESS);

@@ -11,7 +11,8 @@
  */
 
 import { PlusOutlined } from "@ant-design/icons";
-import { App, Button, Form, Input, Modal } from "antd";
+import { App, Button, DatePicker, Flex, Form, Input, Modal, Select } from "antd";
+import dayjs from "dayjs";
 import React, { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
@@ -19,6 +20,8 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 interface FormProps {
   accountName: string;
   comment: string;
+  indate: string;
+  expirationDate: dayjs.Dayjs
 }
 
 interface ModalProps {
@@ -39,12 +42,60 @@ const NewAccountModal: React.FC<ModalProps> = ({
   const { message } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<FormProps>();
+  const [selectedOption, setSelectedOption] = useState<string>("custom"); // 添加状态来跟踪选择的选项
+
+
+  const options = [ // 定义 Select 选项数组，使用国际化函数 t() 翻译每个选项的 label
+    { value: "custom", label: t(p("custom")) },
+    { value: "oneWeek", label: t(p("oneWeek")) },
+    { value: "oneMonth", label: t(p("oneMonth")) },
+    { value: "oneYear", label: t(p("oneYear")) },
+    { value: "permanent", label: t(p("permanent")) },
+  ];
+
+  // 定义规范时间
+  const dateFormat = "YYYY-MM-DD";
+  // dateRange的时间
+  const [expirationDate, setExpirationDate] = useState<dayjs.Dayjs>(dayjs());
+
+  // 对dateRange时间根据options选项进行处理
+  React.useEffect(() => {
+    let newDate: dayjs.Dayjs;
+    switch (selectedOption) {
+    case "oneWeek":
+      newDate = dayjs().add(1, "week");
+      break;
+
+    case "oneMonth":
+      newDate = dayjs().add(1, "month");
+      break;
+
+    case "oneYear":
+      newDate = dayjs().add(1, "year");
+      break;
+
+    case "permanent":
+      newDate = dayjs("2099-12-31");
+      break;
+
+    case "custom":
+      newDate = expirationDate.isValid() ? expirationDate : dayjs();
+      break;
+
+    default:
+      newDate = dayjs();
+      break;
+    }
+    setExpirationDate(newDate); // 更新组件状态
+    form.setFieldsValue({ expirationDate: newDate });
+  }, [selectedOption]);
+
+
 
   const onOk = async () => {
-    const { accountName, comment } = await form.validateFields();
-    setLoading(true);
-
-    await api.whitelistAccount({ body: { accountName: accountName.trim(), comment } })
+    const { accountName, indate, expirationDate, comment } = await form.validateFields();
+    await api.whitelistAccount({ body: { accountName: accountName.trim(), comment,
+      expirationDate:expirationDate.toISOString() } })
       .httpError(404, () => {
         message.error(t(p("notExist")));
       })
@@ -70,6 +121,33 @@ const NewAccountModal: React.FC<ModalProps> = ({
         <Form.Item name="accountName" rules={[{ required: true }]} label={t(pCommon("accountName"))}>
           <Input />
         </Form.Item>
+        {/* 日期选择 */}
+        <Flex justify='space-between'>
+          <Form.Item
+            name="indate"
+            label={t(pCommon("indate"))}
+            rules={[{ required: true }]}
+          >
+            <Select
+              defaultValue={options[0].value}
+              options={options}
+              onChange={(value) => setSelectedOption(value)} // 更新选择
+            />
+          </Form.Item>
+          <Form.Item
+            name="expirationDate"
+            rules={[{ required: selectedOption === "custom", message:"请输入有效期" }]}
+            style={{ width: "60%" }}
+          >
+            {/*  根据选项禁用或启用 DatePicker */}
+            <DatePicker
+              disabled={selectedOption !== "custom"}
+              minDate={dayjs(dayjs().format(dateFormat))}
+              value={ expirationDate }
+              onChange={(date) => setExpirationDate(date)} // 更新状态
+            />
+          </Form.Item>
+        </Flex>
         <Form.Item name="comment" rules={[{ required: true }]} label={t(pCommon("comment"))}>
           <Input.TextArea />
         </Form.Item>
@@ -82,11 +160,15 @@ interface Props {
   refresh: () => void;
 }
 
+
+
 export const AddWhitelistedAccountButton: React.FC<Props> = ({ refresh }) => {
 
   const [modalShow, setModalShow] = useState(false);
 
   const t = useI18nTranslateToString();
+
+
 
   return (
     <>

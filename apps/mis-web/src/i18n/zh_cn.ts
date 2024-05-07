@@ -41,6 +41,7 @@ export default {
     amount:"金额",
     unit:"元",
     comment:"备注",
+    indate:"有效期",
     submit:"提交",
     time:"时间",
     type:"类型",
@@ -236,6 +237,7 @@ export default {
         blockThresholdAmountTooltip: "当账户余额低于此值时，账户将被封锁",
 
         comment:"备注",
+        indate:"有效期",
         status:"状态",
         statusTooltip: "账户状态说明",
         statusFrozenTooltip: "冻结：账户已被账户管理员冻结，无法通过此账户提交作业",
@@ -617,6 +619,12 @@ export default {
         notExist:"账户不存在！",
         addSuccess:"添加成功！",
         addWhiteList:"添加白名单账户",
+        indate:"有效期",
+        custom:"自定义",
+        oneWeek:"一周",
+        oneMonth:"一个月",
+        oneYear:"一年",
+        permanent:"永久有效",
       },
       adminJobTable:{
         batch:"批量搜索",

@@ -41,6 +41,8 @@ export default {
     amount: "Amount",
     unit: "CNY",
     comment: "Comment",
+    indate:"Indate",
+
     submit: "Submit",
     time: "Time",
     type: "Type",
@@ -236,6 +238,7 @@ export default {
         blockThresholdAmountTooltip: "The account will be blocked "
         + "when the balance is less than the block threshold amount.",
         comment: "Comment",
+        indate:"Indate",
         status: "Status",
         statusTooltip: "Account Status Explanation",
         statusFrozenTooltip: "Frozen: The account has been frozen by the account administrator "
@@ -617,6 +620,13 @@ export default {
         notExist: "Account does not exist!",
         addSuccess: "Added successfully!",
         addWhiteList: "Add Whitelisted Account",
+        indate:"Indate",
+        custom:"Custom",
+        oneWeek:"One Week",
+        oneMonth:"One Month",
+        oneYear:"One Year",
+        permanent:"Permanent",
+
       },
       adminJobTable: {
         batch: "Batch Search",
