@@ -150,3 +150,32 @@ export const checkCustomEventType = async (em: SqlEntityManager<MySqlDriver>, op
   }
 
 };
+
+/**
+ * @param operationEvent
+ * @returns targetAccountName
+ * @description
+ * 如果是导出消费记录或者导出充值记录且target是accountOfTenant，返回accountName
+ * 如果是导出操作日志且source是account，返回accountName
+ */
+export const addOperationLogAccountNames = (operationLog: OperationLog): OperationLog => {
+  const operationType = operationLog.operationEvent?.$case;
+  if (operationType !== "exportChargeRecord" && operationType !== "exportPayRecord") {
+    return operationLog;
+  }
+  const targetObject = operationLog.operationEvent[operationType].target;
+  const targetCase = targetObject.$case;
+  const caseObject = targetObject[targetCase];
+  const addLogAccountNames = () => {
+    const logCopy = JSON.parse(JSON.stringify(operationLog));
+    logCopy.operationEvent[operationType].target[targetCase].accountNames = [];
+    return logCopy;
+  };
+  switch (targetCase) {
+  case "accountsOfTenant" :
+  case "accountsOfAllTenants":
+    return caseObject.accountNames ? operationLog : addLogAccountNames();
+  default:
+    return operationLog;
+  }
+};

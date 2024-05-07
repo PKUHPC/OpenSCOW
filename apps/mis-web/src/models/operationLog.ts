@@ -471,7 +471,7 @@ const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: 
     const accountsOfTenant = exportChargeTarget[exportChargeCase];
     const { accountNames } = accountsOfTenant;
     if (accountNames.length === 0) {
-      return t(pDetails("exportAccountsChargeRecordOfTenant"),
+      return t(pDetails("exportAllAccountsChargeRecordOfTenant"),
         [accountsOfTenant.tenantName]);
     } else if (accountNames.length === 1) {
       return t(pDetails("exportAccountChargeRecordOfTenant"),
@@ -493,7 +493,7 @@ const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: 
     } else {
       const accountStr = accountNames.join("、");
       const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
-      return t(pDetails("exportAccountChargeRecordOfTenant"),
+      return t(pDetails("exportAccountsChargeRecordOfAdmin"),
         [resultStr]);
     }
   case "tenant":
