@@ -23,7 +23,7 @@ import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { Cluster } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -51,7 +51,7 @@ const StorageForm: React.FC = () => {
   const [current, setCurent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { defaultCluster } = useStore(ActivatedClustersStore);
 
   const t = useI18nTranslateToString();
 
@@ -107,7 +107,7 @@ const StorageForm: React.FC = () => {
         name="cluster"
         label={t("common.cluster")}
         rules={[{ required: true }]}
-        initialValue={defaultClusterStore.cluster}
+        initialValue={defaultCluster}
       >
         <SingleClusterSelector />
       </Form.Item>

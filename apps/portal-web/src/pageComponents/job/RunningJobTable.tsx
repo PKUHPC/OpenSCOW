@@ -24,8 +24,6 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { refreshDefaultCluster } from "src/utils/cluster";
 import { Cluster } from "src/utils/config";
 
 interface FilterForm {
@@ -43,10 +41,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const { currentClusters } = useStore(CurrentClustersStore);
-
-  const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
-  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
+  const { defaultCluster } = useStore(CurrentClustersStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {

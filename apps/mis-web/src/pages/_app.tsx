@@ -40,7 +40,6 @@ import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
 import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
@@ -152,16 +151,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return createStore(ActivatedClustersStore, extra.initialActivatedClusters);
   });
 
-  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
-    return Object.keys(extra.initialActivatedClusters).find((c) => c === x);
-  });
-
-  const defaultClusterStore = useConstant(() => {
-    const store = createStore(DefaultClusterStore,
-      initialDefaultClusterId ? extra.initialActivatedClusters[initialDefaultClusterId] : undefined);
-    return store;
-  });
-
   const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   return (
@@ -191,7 +180,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, activatedClustersStore, defaultClusterStore, uiExtensionStore]}>
+        <StoreProvider stores={[userStore, activatedClustersStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />

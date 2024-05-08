@@ -24,7 +24,6 @@ export const route: typeof typeboxRoute = (schema, handler) => {
     if (response instanceof Promise) {
       return response.catch((e) => {
 
-        console.log("【route-e】", e);
         if (!(e.metadata instanceof Metadata)) { throw e; }
 
         const SCOW_ERROR = (e.metadata as Metadata).get("IS_SCOW_ERROR");

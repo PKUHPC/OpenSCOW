@@ -27,9 +27,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { refreshDefaultCluster } from "src/utils/cluster";
 import { Cluster } from "src/utils/config";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
@@ -54,10 +52,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(CurrentClustersStore);
-
-  const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
-  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
+  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
 
   const { loginNodes } = useStore(LoginNodeStore);
 

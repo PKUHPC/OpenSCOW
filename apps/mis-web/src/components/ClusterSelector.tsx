@@ -31,19 +31,14 @@ const p = prefix("component.others.");
 
 export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllConfigClusters }) => {
 
-  console.log("【multi-value】", value);
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const { activatedClusters } = useStore(ActivatedClustersStore);
   const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : activatedClusters;
 
-  console.log("【multi-clusters】", clusters);
   const sortedIds =
     publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(clusters)?.includes(id));
-
-  console.log("【multi-config-sortedIds】", publicConfig.CLUSTER_SORTED_ID_LIST);
-  console.log("【multi-sortedIds】", sortedIds);
 
   return (
     <Select
@@ -66,16 +61,12 @@ interface SingleSelectionProps {
 
 export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, onChange, label }) => {
 
-  console.log("【single-value】", value);
-
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const { activatedClusters } = useStore(ActivatedClustersStore);
   const sortedIds =
   publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(activatedClusters)?.includes(id));
-  console.log("【single-activatedClusters】", activatedClusters);
-  console.log("【single-sortedIds】", sortedIds);
 
   return (
     <Select

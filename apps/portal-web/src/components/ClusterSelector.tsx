@@ -15,8 +15,6 @@ import { Select } from "antd";
 import { useStore } from "simstate";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { refreshDefaultCluster } from "src/utils/cluster";
 import { Cluster } from "src/utils/config";
 
 interface Props {
@@ -60,11 +58,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   clusterIds,
 }) => {
 
-  const { currentClusters } = useStore(CurrentClustersStore);
-
-  const { defaultCluster, setDefaultCluster } = useStore(DefaultClusterStore);
-  refreshDefaultCluster(defaultCluster, currentClusters, setDefaultCluster);
-
+  const { currentClusters, setDefaultCluster } = useStore(CurrentClustersStore);
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 

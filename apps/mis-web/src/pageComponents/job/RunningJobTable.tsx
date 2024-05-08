@@ -28,7 +28,6 @@ import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChang
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
 import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { Cluster, publicConfig } from "src/utils/config";
 
 
@@ -61,13 +60,13 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const [selected, setSelected] = useState<RunningJobInfo[]>([]);
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
-      cluster: defaultClusterStore.cluster,
+      cluster: defaultCluster,
     };
   });
 
@@ -96,8 +95,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   }, [userId, searchType.current, query.cluster, query.accountName, query.jobId]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
-
-  const { activatedClusters } = useStore(ActivatedClustersStore);
 
   const filteredData = useMemo(() => {
     if (!data) { return undefined; }

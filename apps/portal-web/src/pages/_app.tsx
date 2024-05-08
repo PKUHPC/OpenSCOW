@@ -40,7 +40,6 @@ import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
@@ -55,7 +54,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const currentClusterStore = useStore(CurrentClustersStore);
+  const { setCurrentClusters } = useStore(CurrentClustersStore);
   const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
@@ -63,8 +62,6 @@ const FailEventHandler: React.FC = () => {
   // 所以不需要每次userStore变化时来重新注册handler
   useEffect(() => {
     failEvent.register((e) => {
-
-      console.log("【global-e】", e);
 
       if (e.status === 401) {
         userStore.logout();
@@ -105,7 +102,7 @@ const FailEventHandler: React.FC = () => {
 
       if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
         message.error(tArgs("pages._app.noActivatedClusters"));
-        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters([]);
+        setCurrentClusters([]);
         return;
       }
 
@@ -113,10 +110,8 @@ const FailEventHandler: React.FC = () => {
         message.error(tArgs("pages._app.notExistInActivatedClusters"));
 
         const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
-        const activatedClusters = publicConfig.CLUSTERS.map((x) => currentActivatedClusterIds.includes(x.id));
-        if (currentClusterStore.setCurrentClusters) currentClusterStore.setCurrentClusters(activatedClusters);
-        // 刷新当前页面
-        // window.location.reload();
+        const activatedClusters = publicConfig.CLUSTERS.filter((x) => currentActivatedClusterIds.includes(x.id));
+        setCurrentClusters(activatedClusters);
         return;
       }
 
@@ -161,12 +156,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return createStore(CurrentClustersStore, extra.initialCurrentClusters);
   });
 
-  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
-    return extra.initialCurrentClusters.find((c) => c.id === x);
-  });
-  const defaultClusterStore
-   = useConstant(() => createStore(DefaultClusterStore, initialDefaultClusterId, extra.initialCurrentClusters));
-
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
     extra.initialLanguage));
 
@@ -201,7 +190,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       }}
       >
         <StoreProvider
-          stores={[userStore, currentClustersStore, defaultClusterStore, loginNodeStore, uiExtensionStore]}
+          stores={[userStore, currentClustersStore, loginNodeStore, uiExtensionStore]}
         >
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}>
