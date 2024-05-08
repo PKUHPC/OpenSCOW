@@ -1,5 +1,11 @@
 # @scow/demo-vagrant
 
+## 2.0.3
+
+### Patch Changes
+
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+
 ## 2.0.2
 
 ### Patch Changes
