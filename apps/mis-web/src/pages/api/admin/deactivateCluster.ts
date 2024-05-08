@@ -13,7 +13,6 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -36,7 +35,6 @@ export const DeactivateClusterSchema = typeboxRouteSchema({
     // 如果集群已经下线了，那么executed为false
     200: Type.Object({
       executed: Type.Boolean(),
-      currentActivatedClusters: Type.Optional(Type.Array(ClusterDatabaseInfoSchema)),
     }),
     // 集群不存在
     404: Type.Null(),

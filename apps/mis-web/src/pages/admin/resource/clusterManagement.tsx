@@ -38,6 +38,7 @@ export interface CombinedClusterInfo {
   operatorId?: string,
   operatorName?: string,
   updateTime: string,
+  hpcEnabled?: boolean,
 }
 
 export const ClusterManagementPage: NextPage =

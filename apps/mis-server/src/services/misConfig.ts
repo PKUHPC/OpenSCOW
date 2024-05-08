@@ -116,13 +116,6 @@ export const misConfigServiceServer = plugin((server) => {
         };
       }
 
-      // TODO: 暂时只增加对在门户系统使用的集群的集群启用
-      if (!configClusters[clusterId].hpc.enabled) {
-        throw <ServiceError>{
-          code: status.NOT_FOUND, message: `Can not activate a Cluster（ Cluster ID: ${clusterId}） not used in HPC.`,
-        };
-      }
-
       // check current scheduler adapter connection state
       // do not need check cluster's activation
       await server.ext.clusters.callOnOne(
@@ -172,13 +165,6 @@ export const misConfigServiceServer = plugin((server) => {
       if (!cluster) {
         throw <ServiceError>{
           code: status.NOT_FOUND, message: `Cluster（ Cluster ID: ${clusterId}） is not found`,
-        };
-      }
-
-      // TODO: 暂时只增加对在门户系统使用的集群的集群停用
-      if (!configClusters[clusterId].hpc.enabled) {
-        throw <ServiceError>{
-          code: status.NOT_FOUND, message: `Can not deactivate a Cluster（ Cluster ID: ${clusterId}） not used in HPC.`,
         };
       }
 

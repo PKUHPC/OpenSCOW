@@ -16,7 +16,6 @@ import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Form, Space, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
-import { useStore } from "simstate";
 import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { DeactivateClusterModalLink } from "src/components/DeactivateClusterModal";
@@ -24,7 +23,6 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { ClusterConnectionStatus } from "src/models/cluster";
 import { CombinedClusterInfo } from "src/pages/admin/resource/clusterManagement";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
 import { getSortedClusterValues } from "src/utils/cluster";
 import { Cluster, publicConfig } from "src/utils/config";
 
@@ -45,8 +43,6 @@ const pCommon = prefix("common.");
 export const ClusterManagementTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
-
-  const { setActivatedClusters } = useStore(ActivatedClustersStore);
 
   const { message, modal } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
@@ -179,8 +175,16 @@ export const ClusterManagementTable: React.FC<Props> = ({
             = getI18nConfigCurrentText(publicConfig.CLUSTERS[r.clusterId].name, languageId);
             return (
               <>
+                {/* TODO: 暂时只对门户系统（HPC）中的集群增加启用和停用功能 */}
                 {
-                  r.activationStatus === ClusterActivationStatus.DEACTIVATED
+                  !r.hpcEnabled && (
+                    <>
+                      <p>--</p>
+                    </>
+                  )
+                }
+                {
+                  r.hpcEnabled && r.activationStatus === ClusterActivationStatus.DEACTIVATED
                 && r.connectionStatus === ClusterConnectionStatus.AVAILABLE
                   && (
                     <>
@@ -208,12 +212,6 @@ export const ClusterManagementTable: React.FC<Props> = ({
                             })
                               .then((res) => {
                                 if (res.executed) {
-                                  const webActivatedClusters = res.currentActivatedClusters?.reduce((acc, curr) => {
-                                    acc[curr.clusterId] =
-                                    { id: curr.clusterId, name: publicConfig.CLUSTERS[curr.clusterId].name };
-                                    return acc;
-                                  }, {} as {[clusterId: string]: Cluster});
-                                  setActivatedClusters(webActivatedClusters ?? {});
                                   message.success(tArgs(p("activateModal.successMessage")));
                                   reload();
                                 } else {
@@ -231,7 +229,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
                     </>
                   )
                 }
-                { r.activationStatus === ClusterActivationStatus.ACTIVATED && (
+                { r.hpcEnabled && r.activationStatus === ClusterActivationStatus.ACTIVATED && (
                   <>
                     <DeactivateClusterModalLink
                       clusterId={r.clusterId}
@@ -245,12 +243,6 @@ export const ClusterManagementTable: React.FC<Props> = ({
                           if (res.executed) {
                             message.success(tArgs(p("deactivateModal.successMessage")));
                             reload();
-                            const webActivatedClusters = res.currentActivatedClusters?.reduce((acc, curr) => {
-                              acc[curr.clusterId] =
-                              { id: curr.clusterId, name: publicConfig.CLUSTERS[curr.clusterId].name };
-                              return acc;
-                            }, {} as {[clusterId: string]: Cluster});
-                            setActivatedClusters(webActivatedClusters ?? {});
                           } else {
                             message.error(tArgs(p("deactivateModal.failureMessage")));
                             reload();

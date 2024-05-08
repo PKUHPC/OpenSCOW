@@ -12,11 +12,12 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
-import { ClusterDatabaseInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterDatabaseInfo, ClusterDatabaseInfoSchema } from "@scow/config/build/type";
+import { ClusterDatabaseInfo as ClusterDatabaseInfoProto, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
+import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 export const GetClustersDatabaseInfoSchema = typeboxRouteSchema({
@@ -38,7 +39,7 @@ export default route(GetClustersDatabaseInfoSchema,
     const result = await asyncClientCall(client, "getClustersDatabaseInfo", {});
 
     const operatorIds = Array.from(new Set(result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"];
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfoProto["lastActivationOperation"];
       return lastActivationOperation?.operatorId ?? undefined;
     })));
 
@@ -52,13 +53,14 @@ export default route(GetClustersDatabaseInfoSchema,
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
     const clustersDatabaseInfo: ClusterDatabaseInfo[] = result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"];
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfoProto["lastActivationOperation"];
 
       return {
         ...x,
         operatorId: lastActivationOperation?.operatorId ?? "",
         operatorName: lastActivationOperation?.operatorId ? userMap.get(lastActivationOperation?.operatorId) : "",
         deactivationComment: lastActivationOperation?.deactivationComment ?? "",
+        hpcEnabled: runtimeConfig.CLUSTERS_CONFIG[x.clusterId].hpc.enabled,
       };
     });
 

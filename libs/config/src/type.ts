@@ -28,6 +28,7 @@ export const ClusterDatabaseInfoSchema = Type.Object({
   operatorName: Type.Optional(Type.String()),
   deactivationComment: Type.Optional(Type.String()),
   updateTime: Type.Optional(Type.String()),
+  hpcEnabled: Type.Optional(Type.Boolean()),
 });
 
 export type ClusterDatabaseInfo = Static<typeof ClusterDatabaseInfoSchema>;
