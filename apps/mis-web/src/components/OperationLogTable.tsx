@@ -25,7 +25,7 @@ import {
   getOperationResultTexts,
   getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
-  OperationResult } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder } from "src/models/operationLog";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
@@ -54,6 +54,11 @@ interface Props {
   queryType: OperationLogQueryType;
   accountName?: string
   tenantName?: string;
+}
+
+interface Order {
+  field: OperationSortBy | undefined;
+  order: OperationSortOrder;
 }
 
 const today = dayjs().endOf("day");
@@ -88,7 +93,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
   // 定义排序方式
-  const [sorter, setSorter] = useState({ field: "", order: "" });
+  const [sorter, setSorter] = useState<Order>({ field: "id", order: "default" });
 
   const operationType = Form.useWatch("operationType", form);
 
@@ -144,10 +149,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   };
 
   // 处理表格排序事件
-  const handleTableChange = (pagination, filters, sorter) => {
+  const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
-      field: sorter.field,
+      // 补全代码
+      field:sorter.field === "operationLogId" ? "id" : sorter.field,
       order: sorter.order ?? "default",
     });
   };

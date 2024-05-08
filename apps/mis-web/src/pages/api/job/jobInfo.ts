@@ -12,12 +12,35 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { GetJobsRequest, JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import { GetJobsRequest, GetJobsRequest_SortBy as SortBy
+  , GetJobsRequest_SortOrder as SortOrder, JobFilter
+  , JobServiceClient,
+} from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { JobSortBy, JobSortOrder } from "src/models/job";
 import { TenantRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
+
+export const mapJobSortByType = {
+  "idJob":SortBy.ID_JOB,
+  "account":SortBy.ACCOUNT,
+  "cluster":SortBy.CLUSTER,
+  "jobName":SortBy.JOB_NAME,
+  "partition":SortBy.PARTITION,
+  "price":SortBy.PRICE,
+  "qos":SortBy.QOS,
+  "timeEnd":SortBy.TIME_END,
+  "timeSubmit":SortBy.TIME_SUBMIT,
+  "user":SortBy.USER,
+}as { [key: string]: SortBy};
+
+export const mapJobSortOrderType = {
+  "descend":SortOrder.DESCEND,
+  "ascend":SortOrder.ASCEND,
+  "default":SortOrder.DEFAULT,
+}as { [key: string]: SortOrder};
 
 export const GetJobFilter = Type.Object({
 
@@ -103,9 +126,9 @@ export const GetJobInfoSchema = typeboxRouteSchema({
      */
     pageSize: Type.Optional(Type.Integer()),
 
-    sortBy: Type.Optional(Type.String()),
+    sortBy: Type.Optional(JobSortBy),
 
-    sortOrder: Type.Optional(Type.String()),
+    sortOrder: Type.Optional(JobSortOrder),
   }),
 
   responses: {
@@ -154,12 +177,15 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
     return { 403: null };
   }
 
+  const mapJobSortBy = sortBy ? mapJobSortByType[sortBy] : undefined;
+  const mapJobSortOrder = sortOrder ? mapJobSortOrderType[sortOrder] : undefined;
+
   const result = await getJobInfo({
     filter,
     page,
     pageSize,
-    sortBy,
-    sortOrder,
+    sortBy:mapJobSortBy,
+    sortOrder:mapJobSortOrder,
   });
 
   return {

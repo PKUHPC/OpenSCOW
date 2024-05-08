@@ -35,11 +35,32 @@ message JobFilter {
 
 message GetJobsRequest {
   JobFilter filter = 1;
+
   uint32 page = 2;
+
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 3;
-  optional string sort_by = 4;
-  optional string sort_order = 5;
+
+  enum SortBy {
+    ID_JOB = 0;
+    JOB_NAME = 1;
+    ACCOUNT = 2;
+    USER = 3;
+    CLUSTER = 4;
+    PARTITION = 5;
+    QOS = 6;
+    TIME_SUBMIT = 7;
+    TIME_END = 8;
+    PRICE = 9;
+  }
+  optional SortBy sort_by = 4;
+
+  enum SortOrder{
+    DESCEND = 0;
+    ASCEND = 1;
+    DEFAULT = 2;
+  }
+  optional SortOrder sort_order = 5;
 }
 
 message GetJobsResponse {

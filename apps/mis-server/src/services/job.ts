@@ -23,8 +23,7 @@ import {
   GetJobsResponse,
   JobBillingItem,
   JobFilter,
-  JobServiceServer, JobServiceService,
-} from "@scow/protos/build/server/job";
+  JobServiceServer, JobServiceService } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
 import { getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
@@ -37,6 +36,7 @@ import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateGetJobsOptions } from "src/utils/queryOptions";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -78,21 +78,10 @@ export const jobServiceServer = plugin((server) => {
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
       let jobs, count;
 
-      // 获取 JobInfoEntity 实体的所有列名
-      const jobInfoColumns = em.getMetadata().get(JobInfoEntity).properties;
-      // 没有对应的key抛错
-      if (sortBy && !(sortBy in jobInfoColumns)) {
-        throw <ServiceError>{
-          code: Status.INVALID_ARGUMENT,
-          message: "sortBy key is invalid,it must be the key of JobInfoEntity!",
-        };
-      }
-
       // 处理排序参数
-      if (sortBy && sortOrder !== "default") {
+      if (sortBy !== undefined && sortOrder !== undefined) {
         [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
-          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-          orderBy: { [sortBy]: sortOrder === "ascend" ? QueryOrder.ASC : QueryOrder.DESC },
+          ...generateGetJobsOptions(page, pageSize, sortBy, sortOrder),
         });
       } else {
         [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {

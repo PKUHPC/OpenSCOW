@@ -26,6 +26,7 @@ import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { JobSortBy, JobSortOrder } from "src/models/job";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import { getSortedClusterValues } from "src/utils/cluster";
@@ -50,6 +51,11 @@ interface Props {
   showAccount: boolean;
   showedPrices: ("tenant" | "account")[];
   priceTexts?: { tenant?: string; account?: string };
+}
+
+interface Sorter {
+  field: JobSortBy,
+  order: JobSortOrder
 }
 
 const p = prefix("pageComp.job.historyJobTable.");
@@ -92,7 +98,7 @@ export const JobTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
 
   // 定义排序状态
-  const [sorter, setSorter] = useState({ field: "", order: "" });
+  const [sorter, setSorter] = useState<Sorter>({ field:"idJob", order:"default" });
 
 
   const promiseFn = useCallback(async () => {
@@ -226,7 +232,7 @@ interface JobInfoTableProps {
   pageInfo: { page: number, pageSize: number };
   setPageInfo?: (info: { page: number, pageSize: number }) => void;
   isLoading: boolean;
-  setSorter: (sorter: { field: string, order: string}) => void;
+  setSorter: (sorter: Sorter) => void;
   showAccount: boolean;
   showUser: boolean;
   showedPrices: ("tenant" | "account")[];

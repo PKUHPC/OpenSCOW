@@ -15,6 +15,8 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import {
+  GetOperationLogsRequest_SortBy,
+  GetOperationLogsRequest_SortOrder,
   OperationLogServiceServer,
   OperationLogServiceService,
   operationResultToJSON,
@@ -69,37 +71,36 @@ export const operationLogServiceServer = plugin((server) => {
       // 处理排序方式,升序OR降序
       let orderBy: QueryOrder | undefined;
       switch (sortOrder) {
-      case "ascend":
+      case GetOperationLogsRequest_SortOrder.ASCEND:
         orderBy = QueryOrder.ASC;
         break;
-
-      case "descend":
+      case GetOperationLogsRequest_SortOrder.DESCEND:
         orderBy = QueryOrder.DESC;
         break;
-      }
-
-      // 规范化sortBy的名字
-      let formatSorter: string = sortBy;
-      switch (sortBy) {
-      case "operationLogId":
-        formatSorter = "id";
+      default:
+        // 不排序
+        orderBy = undefined;
         break;
       }
 
-      // 合法排序的key
-      const validKey = [
-        "id",
-        "operatorUserId",
-        "operatorIp",
-        "customEventType",
-        "operationResult",
-        "operationTime",
-      ];
-
-      // 当formatSorter中的值在OperationLog不存在时，抛出错误
-      if (formatSorter && !validKey.includes(formatSorter)) {
-        throw <ServiceError> { code: status.INVALID_ARGUMENT,
-          message:`sortBy is invalid,it must be ${validKey.join("or")} or undefinded` };
+      // // 规范化sortBy的名字
+      let formatSorter: string | undefined;
+      switch (sortBy) {
+      case GetOperationLogsRequest_SortBy.ID:
+        formatSorter = "id";
+        break;
+      case GetOperationLogsRequest_SortBy.OPERATION_RESULT:
+        formatSorter = "operationResult";
+        break;
+      case GetOperationLogsRequest_SortBy.OPERATION_TIME:
+        formatSorter = "operationTime";
+        break;
+      case GetOperationLogsRequest_SortBy.OPERATOR_IP:
+        formatSorter = "operatorIp";
+        break;
+      case GetOperationLogsRequest_SortBy.OPERATOR_USER_ID:
+        formatSorter = "operatorUserId";
+        break;
       }
 
       let operationLogs, count;

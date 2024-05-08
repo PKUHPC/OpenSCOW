@@ -11,6 +11,7 @@
  */
 
 import type { RunningJob } from "@scow/protos/build/common/job";
+import { Static, Type } from "@sinclair/typebox";
 import dayjs from "dayjs";
 import { Lang } from "react-typed-i18n";
 import en from "src/i18n/en";
@@ -108,3 +109,24 @@ export const getAmountStrategyAlgorithmDescriptions = (t: TransType): Record<Amo
   };
 };
 
+export const JobSortOrder = Type.Union([
+  Type.Literal("descend"),
+  Type.Literal("ascend"),
+  Type.Literal("default"),
+]);
+export type JobSortOrder = Static<typeof JobSortOrder>
+
+export const JobSortBy = Type.Union(
+  [ Type.Literal("idJob"),
+    Type.Literal("jobName"),
+    Type.Literal("account"),
+    Type.Literal("user"),
+    Type.Literal("clusterName"),
+    Type.Literal("partition"),
+    Type.Literal("qos"),
+    Type.Literal("timeSubmit"),
+    Type.Literal("timeEnd"),
+    Type.Literal("Price"),
+  ],
+);
+export type JobSortBy = Static<typeof JobSortBy>

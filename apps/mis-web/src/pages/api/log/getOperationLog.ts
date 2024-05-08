@@ -13,16 +13,30 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
+import { GetOperationLogsRequest_SortBy as SortBy,
+  GetOperationLogsRequest_SortOrder as SortOrder } from "@scow/protos/build/audit/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationLog, OperationLogQueryType,
-  OperationResult, OperationType } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 
+export const mapOperationSortByType = {
+  "id":SortBy.ID,
+  "operationResult":SortBy.OPERATION_RESULT,
+  "operationTime":SortBy.OPERATION_TIME,
+  "operatorIp":SortBy.OPERATOR_IP,
+  "operatorUserId":SortBy.OPERATOR_USER_ID,
+} as { [key: string]: SortBy};
 
+export const mapOperationSortOrderType = {
+  "descend":SortOrder.DESCEND,
+  "ascend":SortOrder.ASCEND,
+  "default":SortOrder.DEFAULT,
+};
 
 export const GetOperationLogFilter = Type.Object({
 
@@ -57,8 +71,9 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
 
     pageSize: Type.Optional(Type.Integer()),
 
-    sortBy: Type.Optional(Type.String()),
-    sortOrder: Type.Optional(Type.String()),
+    sortBy: Type.Optional(OperationSortBy),
+
+    sortOrder: Type.Optional(OperationSortOrder),
   }),
 
   responses: {
@@ -132,8 +147,17 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return { 403: null };
     }
   }
+  const mapOperationSortBy = sortBy ? mapOperationSortByType[sortBy] : undefined;
+  const mapOperationSortOrder = sortOrder ? mapOperationSortOrderType[sortOrder] : undefined;
+
   const { getLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
-  const resp = await getLog({ filter, page, pageSize, sortBy, sortOrder });
+  const resp = await getLog({
+    filter,
+    page,
+    pageSize,
+    sortBy:mapOperationSortBy,
+    sortOrder:mapOperationSortOrder,
+  });
 
   const { results, totalCount } = resp;
 
