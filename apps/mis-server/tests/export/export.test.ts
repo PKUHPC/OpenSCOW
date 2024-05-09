@@ -194,7 +194,7 @@ it("export charge Records", async () => {
     id: 2,
     time: new Date("2023-12-07T07:21:47.000Z"),
     target: data.accountA,
-    type: "test",
+    type: "testB",
     comment: "test",
     amount,
     userId: data.userA.userId,
@@ -253,7 +253,7 @@ it("export charge Records", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
-      tenantName: data.accountA.tenant.getProperty("name") } },
+      tenantName: data.accountA.tenant.getProperty("name") } }, types:[chargeRecord1.type],
     userIds: [data.userA.userId],
   });
 
@@ -262,7 +262,7 @@ it("export charge Records", async () => {
   };
   const records = await collectData(stream, handleChargeResponse);
 
-  expect(records).toHaveLength(3);
+  expect(records).toHaveLength(2);
 
   expect(records).toMatchObject([
     {
@@ -270,16 +270,6 @@ it("export charge Records", async () => {
       tenantName: data.accountA.tenant.getProperty("name"),
       accountName: data.accountA.accountName,
       time: chargeRecord1.time.toISOString(),
-      amount: decimalToMoney(amount),
-      type: "test",
-      comment: "test",
-      userId: data.userA.userId,
-    },
-    {
-      index: chargeRecord2.id,
-      tenantName: data.accountA.tenant.getProperty("name"),
-      accountName: data.accountA.accountName,
-      time: chargeRecord2.time.toISOString(),
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
@@ -320,7 +310,7 @@ it("export pay Records", async () => {
     id: 2,
     time: new Date("2023-12-07T07:21:47.000Z"),
     target: data.accountA,
-    type: "test",
+    type: "testB",
     comment: "test",
     amount,
     operatorId: "test",
@@ -363,8 +353,10 @@ it("export pay Records", async () => {
     count: 2,
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
-      tenantName: data.accountA.tenant.getProperty("name") } },
+    target:{ $case:"accountsOfTenant", accountsOfTenant:{
+      accountNames: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.accountA.tenant.getProperty("name"),
+    } }, types:[payRecord1.type],
   });
   const handlePaymentResponse = (response: ExportPayRecordResponse): PaymentRecord[] => {
     return response.payRecords;
@@ -386,15 +378,15 @@ it("export pay Records", async () => {
       ipAddress: payRecord1.ipAddress,
     },
     {
-      index: payRecord2.id,
-      tenantName: data.accountA.tenant.getProperty("name"),
-      accountName: data.accountA.accountName,
-      time: payRecord2.time.toISOString(),
+      index: payRecord3.id,
+      tenantName: data.accountB.tenant.getProperty("name"),
+      accountName: data.accountB.accountName,
+      time: payRecord3.time.toISOString(),
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
-      operatorId: payRecord2.operatorId,
-      ipAddress: payRecord2.ipAddress,
+      operatorId: payRecord3.operatorId,
+      ipAddress: payRecord3.ipAddress,
     },
   ]);
 

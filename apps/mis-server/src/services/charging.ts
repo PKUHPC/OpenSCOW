@@ -26,7 +26,9 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
+  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
@@ -158,21 +160,21 @@ export const chargingServiceServer = plugin((server) => {
      *
      * case tenant:返回这个租户（tenantName）的充值记录
      * case allTenants: 返回该所有租户充值记录
-     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
-     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的充值记录
      *
      * @returns
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target } =
-      ensureNotUndefined(request, ["startTime", "endTime", "target"]);
+      const { endTime, startTime, target, types } =
+      ensureNotUndefined(request, ["startTime", "endTime", "target", "types"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-
+      const searchTypes = getPaymentsSearchType(types);
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchParam,
+        ...searchTypes,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
@@ -405,19 +407,16 @@ export const chargingServiceServer = plugin((server) => {
        * case tenant:返回这个租户（tenantName）的消费记录
        * case allTenants: 返回所有租户消费记录
        * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-       * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-       * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+       * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+       * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
        *
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds, page, pageSize }
+      const { startTime, endTime, type, types, target, userIds, page, pageSize }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
-
       const searchParam = getChargesTargetSearchParam(target);
-
-      const searchType = getChargesSearchType(type);
-
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const records = await em.find(ChargeRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
@@ -451,19 +450,17 @@ export const chargingServiceServer = plugin((server) => {
    * case tenant:返回这个租户（tenantName）的消费记录
    * case allTenants: 返回所有租户消费记录
    * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-   * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-   * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+   * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+   * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
    *
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds }
+      const { startTime, endTime, type, types, target, userIds }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
-
-      const searchType = getChargesSearchType(type);
-
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
           .select(raw("count(c.id) as total_count"))
