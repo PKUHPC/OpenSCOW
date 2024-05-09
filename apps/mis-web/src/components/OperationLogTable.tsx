@@ -152,7 +152,6 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
-      // 补全代码
       field:sorter.field === "operationLogId" ? "id" : sorter.field,
       order: sorter.order ?? "default",
     });

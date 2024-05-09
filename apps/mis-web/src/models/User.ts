@@ -157,3 +157,19 @@ export const getDisplayedStateI18nTexts = (t: TransType) => {
   };
 };
 
+export const ChargesSortBy = Type.Union([
+  Type.Literal("userId"),
+  Type.Literal("time"),
+  Type.Literal("amount"),
+  Type.Literal("type"),
+]);
+
+export type ChargesSortBy = Static<typeof ChargesSortBy>
+
+export const ChargesSortOrder = Type.Union([
+  Type.Literal("descend"),
+  Type.Literal("ascend"),
+  Type.Literal("default"),
+]);
+
+export type ChargesSortOrder = Static<typeof ChargesSortOrder>

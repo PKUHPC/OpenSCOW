@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { GetPaginatedChargeRecordsRequest_SortBy as ChargesSortBy
+  , GetPaginatedChargeRecordsRequest_SortOrder as ChargesSortOrder } from "@scow/protos/build/server/charging";
 import { GetJobsRequest_SortBy, GetJobsRequest_SortOrder } from "@scow/protos/build/server/job";
 import { GetAllUsersRequest_UsersSortField, SortDirection } from "@scow/protos/build/server/user";
 
@@ -44,6 +46,8 @@ export const generateAllUsersQueryOptions = (
   };
 };
 
+// generate query options of all jobs
+// with options: paginationProps, orderBy
 export const generateGetJobsOptions = (
   page: number,
   pageSize?: number,
@@ -56,5 +60,30 @@ export const generateGetJobsOptions = (
     orderBy: (sortBy !== undefined && sortOrder !== undefined) ?
       { [mapUsersSortField[sortBy]]:
         sortOrder === GetJobsRequest_SortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
+  };
+};
+
+
+// generate query options of all charges
+// with options: paginationProps, orderBy
+export const mapChargesSortField = {
+  [ChargesSortBy.USER_ID]: "userId",
+  [ChargesSortBy.TIME]: "time",
+  [ChargesSortBy.TYPE]: "type",
+  [ChargesSortBy.AMOUNT]: "amount",
+};
+
+
+export const generateChargersOptions = (
+  page: number,
+  pageSize?: number,
+  sortBy?: ChargesSortBy,
+  sortOrder?: ChargesSortOrder,
+) => {
+  return {
+    ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+    orderBy: (sortBy !== undefined && sortOrder !== undefined) ?
+      { [mapChargesSortField[sortBy]]:
+        sortOrder === ChargesSortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
   };
 };

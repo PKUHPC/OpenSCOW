@@ -21,7 +21,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { SearchType } from "src/models/User";
+import { ChargesSortBy, ChargesSortOrder, SearchType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { ChargeInfo } from "src/pages/api/finance/charges";
@@ -46,6 +46,11 @@ interface FilterForm {
   time: [dayjs.Dayjs, dayjs.Dayjs];
   type?: string;
   userIds?: string;
+}
+
+interface Sorter {
+  field: ChargesSortBy;
+  order: ChargesSortOrder;
 }
 
 // 当前时间的 dayjs 对象
@@ -82,7 +87,15 @@ export const ChargeTable: React.FC<Props> = ({
     });// 查询对象
 
   // 定义排序状态
-  const [sorter, setSorter] = useState({ field: "", order: "" });
+  const [sorter, setSorter] = useState<Sorter>({ field: "userId", order: "default" });
+
+  const handleTableChange = (pagination, _, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field:sorter.field,
+      order: sorter.order ?? "default",
+    });
+  };
 
   // 过滤后的充值类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
@@ -270,6 +283,7 @@ export const ChargeTable: React.FC<Props> = ({
         <Table
           tableLayout="fixed"
           dataSource={recordsData?.results}
+          onChange={handleTableChange}
           pagination={{
             showSizeChanger: true,
             current: pageInfo.page,
@@ -303,10 +317,25 @@ export const ChargeTable: React.FC<Props> = ({
             title={t(pCommon("user"))}
             width="15%"
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
+            sorter={true}
           />
-          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time")) } render={(v) => formatDateTime(v)} />
-          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-          <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
+          <Table.Column<ChargeInfo>
+            dataIndex="time"
+            title={t(p("time")) }
+            render={(v) => formatDateTime(v)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="amount"
+            title={t(p("amount"))}
+            render={(v) => v.toFixed(3)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="type"
+            title={t(pCommon("type"))}
+            sorter={true}
+          />
           <Table.Column<ChargeInfo>
             dataIndex="comment"
             title={t(pCommon("comment"))}

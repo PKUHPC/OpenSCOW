@@ -136,9 +136,22 @@ message GetPaginatedChargeRecordsRequest {
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 11;
 
-  optional string sort_by = 12;
+  enum SortBy {
+    USER_ID = 0;
+    TIME = 1;
+    AMOUNT = 2;
+    TYPE = 3;
+  }
 
-  optional string sort_order = 13;
+  optional SortBy sort_by = 12;
+
+  enum SortOrder{
+    DESCEND = 0;
+    ASCEND = 1;
+    DEFAULT = 2;
+  }
+
+  optional SortOrder sort_order = 13;
 }
 
 message GetPaginatedChargeRecordsResponse {

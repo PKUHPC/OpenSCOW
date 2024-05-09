@@ -15,11 +15,13 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
-  ChargingServiceClient, TenantTarget } from "@scow/protos/build/server/charging";
+  ChargingServiceClient, GetPaginatedChargeRecordsRequest_SortBy as SortBy,
+  GetPaginatedChargeRecordsRequest_SortOrder as SortOrder, TenantTarget } from "@scow/protos/build/server/charging";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { PlatformRole, SearchType, TenantRole, UserInfo, UserRole } from "src/models/User";
+import { ChargesSortBy, ChargesSortOrder, PlatformRole, SearchType, TenantRole,
+  UserInfo, UserRole } from "src/models/User";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
 
@@ -33,6 +35,19 @@ export const MetadataMap = Type.Record(
   ]),
 );
 export type MetadataMapType = Static<typeof MetadataMap>;
+
+export const mapChargesSortByType = {
+  "userId":SortBy.USER_ID,
+  "time":SortBy.TIME,
+  "amount":SortBy.AMOUNT,
+  "type":SortBy.TYPE,
+} as { [key: string]: SortBy};
+
+export const mapChargesSortOrderType = {
+  "descend":SortOrder.DESCEND,
+  "ascend":SortOrder.ASCEND,
+  "default":SortOrder.DEFAULT,
+} as { [key: string]: SortOrder};
 
 export const ChargeInfo = Type.Object({
   index: Type.Number(),
@@ -87,9 +102,9 @@ export const GetChargesSchema = typeboxRouteSchema({
      */
     pageSize: Type.Optional(Type.Integer()),
 
-    sortBy:Type.Optional(Type.String()),
+    sortBy:Type.Optional(ChargesSortBy),
 
-    sortOrder:Type.Optional(Type.String()),
+    sortOrder:Type.Optional(ChargesSortOrder),
   }),
 
   responses: {
@@ -188,6 +203,9 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
 
   const client = getClient(ChargingServiceClient);
 
+  const mapChargesSortBy = sortBy ? mapChargesSortByType[sortBy] : undefined;
+  const mapChargesSortOrder = sortOrder ? mapChargesSortOrderType[sortOrder] : undefined;
+
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime,
     endTime,
@@ -196,8 +214,8 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     target: buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords),
     page,
     pageSize,
-    sortBy,
-    sortOrder,
+    sortBy:mapChargesSortBy,
+    sortOrder:mapChargesSortOrder,
   }), []);
 
   const respUserIds = Array.from(new Set(reply.results.map((x) => x.userId).filter((x) => !!x) as string[]));

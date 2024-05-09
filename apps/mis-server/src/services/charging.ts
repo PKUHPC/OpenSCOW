@@ -31,6 +31,7 @@ import {
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateChargersOptions } from "src/utils/queryOptions";
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -411,8 +412,8 @@ export const chargingServiceServer = plugin((server) => {
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds, page, pageSize }
-      = ensureNotUndefined(request, ["startTime", "endTime"]);
+      const { startTime, endTime, type, target, userIds, page, pageSize, sortBy, sortOrder }
+      = ensureNotUndefined(request, ["startTime", "endTime", "sortBy", "sortOrder"]);
 
       const searchParam = getChargesTargetSearchParam(target);
 
@@ -423,9 +424,10 @@ export const chargingServiceServer = plugin((server) => {
         ...searchType,
         ...searchParam,
         ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
-      }, {
+      }, sortBy !== undefined && sortOrder !== undefined ? {
+        ...generateChargersOptions(page ?? 1, pageSize, sortBy, sortOrder),
+      } : {
         ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { time: QueryOrder.DESC },
       });
 
       return [{
