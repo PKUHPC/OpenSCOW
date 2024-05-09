@@ -264,7 +264,7 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {totalResultData?.totalAmount ?? 0}
+                {totalResultData?.totalAmount?.toFixed(2) ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>

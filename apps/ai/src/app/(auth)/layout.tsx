@@ -95,7 +95,7 @@ export default function Layout(
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
             // linkText={t("baseLayout.linkTextAI")}
-            linkText="超算平台"
+            linkText="HPC"
           />
           {/* {
             systemLanguageConfig.isUsingI18n ? (

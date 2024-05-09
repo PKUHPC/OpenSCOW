@@ -22,6 +22,7 @@ interface Props {
   loading: boolean
   icon: React.ReactNode | React.ForwardRefExoticComponent<{}>;
   iconColor?: string
+  precision?: number | undefined
 }
 
 const Container = styled.div`
@@ -40,7 +41,8 @@ const iconToNode = (Icon: any, color?: string) => {
 
 const p = prefix("pageComp.admin.statisticCard.");
 
-export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalValue = 0, loading, icon, iconColor }) =>
+export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0,
+  totalValue = 0, loading, icon, iconColor, precision = 0 }) =>
 {
   const t = useI18nTranslateToString();
 
@@ -52,7 +54,7 @@ export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalVa
           <Statistic
             title={title}
             value={newAddValue}
-            precision={0}
+            precision={precision}
             loading={loading}
             valueStyle={{ color: "#94070A" }}
           />
@@ -63,7 +65,7 @@ export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0, totalVa
         title={`${t(p("total"))}${title}: `}
         value={totalValue}
         loading={loading}
-        precision={0}
+        precision={precision}
         valueStyle={{ color: "grey", marginLeft: "10px", fontSize: 14, marginBottom: 4 }}
       />
     </Card>
