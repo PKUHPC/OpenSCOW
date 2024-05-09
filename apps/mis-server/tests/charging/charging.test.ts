@@ -456,6 +456,8 @@ it("returns charge records with query of accountOfTenant", async () => {
     page: 1,
     pageSize:10,
     userIds: [],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply1.results).toHaveLength(1);
@@ -511,6 +513,8 @@ it("returns charge records with query of tenant", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     userIds: [],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -610,6 +614,8 @@ it("returns charge records with query of allTenants", async () => {
     endTime: queryEndTime.toISOString(),
     type: "test1",
     userIds: [],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(1);
@@ -684,6 +690,8 @@ it("returns charge records with query of accountsOfTenant", async () => {
     page: 1,
     pageSize: 50,
     userIds: [],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -791,6 +799,8 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
     userIds: ["user_1", "user_2"],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
