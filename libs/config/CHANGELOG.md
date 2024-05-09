@@ -1,5 +1,14 @@
 # @scow/config
 
+## 1.4.4
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- e312efb: AI 模块支持创建 vnc 类型应用
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- 640a599: 支持填写多个 hook 地址
+
 ## 1.4.3
 
 ### Patch Changes

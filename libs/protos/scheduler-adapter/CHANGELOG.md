@@ -1,5 +1,11 @@
 # @scow/scheduler-adapter-protos
 
+## 1.3.1
+
+### Patch Changes
+
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+
 ## 1.3.0
 
 ### Minor Changes
