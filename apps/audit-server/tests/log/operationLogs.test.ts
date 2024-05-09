@@ -15,6 +15,8 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import {
   ExportOperationLogResponse,
+  GetOperationLogsRequest_SortBy,
+  GetOperationLogsRequest_SortOrder,
   OperationLog as OperationLogProto,
   OperationLogServiceClient,
   OperationResult as OperationResultProto,
@@ -309,8 +311,8 @@ it("get operation logs", async () => {
   const resp = await asyncClientCall(client, "getOperationLogs", {
     page: 1,
     pageSize:10,
-    sortBy:undefined,
-    sortOrder:undefined,
+    sortBy:GetOperationLogsRequest_SortBy.ID,
+    sortOrder:GetOperationLogsRequest_SortOrder.DEFAULT,
     filter: { operatorUserIds: ["testUserId"], operationDetail: "123" },
   });
 
@@ -350,8 +352,8 @@ it("get logs for custom event", async () => {
   const resp = await asyncClientCall(client, "getOperationLogs", {
     page: 1,
     pageSize:10,
-    sortBy:undefined,
-    sortOrder:undefined,
+    sortBy:GetOperationLogsRequest_SortBy.ID,
+    sortOrder:GetOperationLogsRequest_SortOrder.DEFAULT,
     filter: { operatorUserIds: ["testUserId"]},
   });
 

@@ -16,7 +16,8 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { dayjsToDateMessage } from "@scow/lib-server/build/date";
-import { JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
+import { GetJobsRequest_SortBy,
+  GetJobsRequest_SortOrder, JobFilter, JobServiceClient } from "@scow/protos/build/server/job";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
@@ -158,8 +159,8 @@ it("returns 50 jobs if pageSize is undefined or 0", async () => {
       filter: { tenantName: data.tenant.name, clusters: []},
       page: 1,
       pageSize,
-      sortBy:undefined,
-      sortOrder:undefined,
+      sortBy:GetJobsRequest_SortBy.ACCOUNT,
+      sortOrder:GetJobsRequest_SortOrder.DEFAULT,
     });
 
     expect(reply.jobs).toHaveLength(50);
@@ -188,8 +189,8 @@ it("returns jobs starting from start_bi_job_index", async () => {
   const reply = await asyncClientCall(client, "getJobs", {
     page: 1,
     pageSize: 100,
-    sortBy:undefined,
-    sortOrder:undefined,
+    sortBy:GetJobsRequest_SortBy.ACCOUNT,
+    sortOrder:GetJobsRequest_SortOrder.DEFAULT,
     filter: {
       clusters: [],
       tenantName: data.tenant.name,
@@ -214,8 +215,8 @@ it("returns 0 job if Account not exist or is not in scope of permissions", async
       filter,
       page: 1,
       pageSize: 10,
-      sortBy:undefined,
-      sortOrder:undefined,
+      sortBy:GetJobsRequest_SortBy.ACCOUNT,
+      sortOrder:GetJobsRequest_SortOrder.DEFAULT,
     });
     expect(reply.jobs).toHaveLength(0);
   };
