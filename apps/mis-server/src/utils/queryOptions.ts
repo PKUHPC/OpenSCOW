@@ -19,17 +19,11 @@ import { DEFAULT_PAGE_SIZE, paginationProps } from "./orm";
 
 // sort fields' text for mis pageComponent AllUsersTable
 export const mapUsersSortField = {
-  [GetJobsRequest_SortBy.ACCOUNT]: "account",
-  [GetJobsRequest_SortBy.CLUSTER]: "cluster",
-  [GetJobsRequest_SortBy.ID_JOB]: "idJob",
-  [GetJobsRequest_SortBy.JOB_NAME]: "jobName",
-  [GetJobsRequest_SortBy.PARTITION]: "partition",
-  [GetJobsRequest_SortBy.PRICE]: "price",
-  [GetJobsRequest_SortBy.QOS]: "qos",
-  [GetJobsRequest_SortBy.TIME_END]: "timeEnd",
-  [GetJobsRequest_SortBy.TIME_SUBMIT]: "timeSubmit",
-  [GetJobsRequest_SortBy.USER]: "user",
+  [GetAllUsersRequest_UsersSortField.USER_ID]: "userId",
+  [GetAllUsersRequest_UsersSortField.NAME]: "name",
+  [GetAllUsersRequest_UsersSortField.CREATE_TIME]: "createTime",
 };
+
 
 
 // generate query options of all users
@@ -46,6 +40,19 @@ export const generateAllUsersQueryOptions = (
   };
 };
 
+export const mapJobsSortField = {
+  [GetJobsRequest_SortBy.ACCOUNT]: "account",
+  [GetJobsRequest_SortBy.CLUSTER]: "cluster",
+  [GetJobsRequest_SortBy.ID_JOB]: "idJob",
+  [GetJobsRequest_SortBy.JOB_NAME]: "jobName",
+  [GetJobsRequest_SortBy.PARTITION]: "partition",
+  [GetJobsRequest_SortBy.PRICE]: "price",
+  [GetJobsRequest_SortBy.QOS]: "qos",
+  [GetJobsRequest_SortBy.TIME_END]: "timeEnd",
+  [GetJobsRequest_SortBy.TIME_SUBMIT]: "timeSubmit",
+  [GetJobsRequest_SortBy.USER]: "user",
+};
+
 // generate query options of all jobs
 // with options: paginationProps, orderBy
 export const generateGetJobsOptions = (
@@ -58,7 +65,7 @@ export const generateGetJobsOptions = (
   return {
     ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
     orderBy: (sortBy !== undefined && sortOrder !== undefined) ?
-      { [mapUsersSortField[sortBy]]:
+      { [mapJobsSortField[sortBy]]:
         sortOrder === GetJobsRequest_SortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
   };
 };
