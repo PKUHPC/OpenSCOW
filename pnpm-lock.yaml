@@ -1041,6 +1041,12 @@ importers:
       '@uiw/react-codemirror':
         specifier: 4.21.20
         version: 4.21.20(@babel/runtime@7.24.4)(@codemirror/autocomplete@6.6.0)(@codemirror/language@6.10.1)(@codemirror/lint@6.0.0)(@codemirror/search@6.2.3)(@codemirror/state@6.4.0)(@codemirror/theme-one-dark@6.1.0)(@codemirror/view@6.26.1)(codemirror@6.0.1)(react-dom@18.2.0)(react@18.2.0)
+      '@xterm/addon-fit':
+        specifier: 0.10.0
+        version: 0.10.0(@xterm/xterm@5.5.0)
+      '@xterm/xterm':
+        specifier: 5.5.0
+        version: 5.5.0
       antd:
         specifier: 5.16.0
         version: 5.16.0(react-dom@18.2.0)(react@18.2.0)
@@ -1110,12 +1116,6 @@ importers:
       ws:
         specifier: 8.16.0
         version: 8.16.0
-      xterm:
-        specifier: 5.3.0
-        version: 5.3.0
-      xterm-addon-fit:
-        specifier: 0.8.0
-        version: 0.8.0(xterm@5.3.0)
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
         specifier: 0.9.1

@@ -52,6 +52,8 @@ import { isPortReachable } from "src/utils/isPortReachable";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
+import { booleanQueryParam } from "../utils";
+
 const ImageSchema = z.object({
   name: z.string(),
   tag: z.string().optional(),
@@ -673,7 +675,11 @@ export const listAppSessions =
         summary: "List APP Sessions",
       },
     })
-    .input(z.object({ clusterId: z.string(), isRunning: z.boolean(), ...paginationSchema.shape }))
+    .input(z.object({
+      clusterId: z.string(),
+      isRunning: booleanQueryParam(),
+      ...paginationSchema.shape,
+    }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
 

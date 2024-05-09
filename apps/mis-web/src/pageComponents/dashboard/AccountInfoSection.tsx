@@ -94,7 +94,7 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
                           title={t("dashboard.account.balance")}
                           valueStyle={{ color: minOne < 0 ? "red" : undefined }}
                           prefix={"￥"}
-                          value={minOne.toFixed(3)}
+                          value={minOne.toFixed(2)}
                         />
                       </Row>
                     </StatCard>

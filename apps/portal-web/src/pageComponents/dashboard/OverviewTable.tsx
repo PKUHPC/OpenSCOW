@@ -94,6 +94,13 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
 
   const selectItem = useMemo(() => clusterInfo[selectId], [clusterInfo, selectId]);
 
+  // 定义一个函数来获取颜色，根据给定的使用率
+  const getColorByUsage = (usage: number) => {
+    if (usage >= 90) return "red";
+    if (usage >= 70) return "orange";
+    return "green";
+  };
+
   return (
     <Container>
       <Table
@@ -141,19 +148,37 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
           title={t(p("usageRatePercentage"))}
           sorter={(a, b, sortOrder) =>
             compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
-          render={(_, r) => r.info?.usageRatePercentage !== undefined ? r.info?.usageRatePercentage + "%" : "-"}
+          render={(_, r) => (
+            <span style={{ color: r.info?.usageRatePercentage ?
+              getColorByUsage(r.info?.usageRatePercentage) : "black" }}
+            >
+              {r.info?.usageRatePercentage ? `${r.info.usageRatePercentage}%` : "-"}
+            </span>
+          )}
         />
         <Table.Column<TableProps>
           dataIndex="cpuUsage"
           title={t(p("cpuUsage"))}
           sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
-          render={(_, r) => r.info?.cpuUsage !== undefined ? r.info?.cpuUsage + "%" : "-"}
+          render={(_, r) => (
+            <span style={{ color: r.info?.cpuUsage ?
+              getColorByUsage(Number(r.info?.cpuUsage)) : "black" }}
+            >
+              {r.info?.cpuUsage !== undefined ? Number(r.info?.cpuUsage).toFixed(2) + "%" : "-"}
+            </span>
+          )}
         />
         <Table.Column<TableProps>
           dataIndex="gpuUsage"
           title={t(p("gpuUsage"))}
           sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
-          render={(_, r) => r.info?.gpuUsage !== undefined ? r.info?.gpuUsage + "%" : "-" }
+          render={(_, r) => (
+            <span style={{ color: r.info?.gpuUsage ?
+              getColorByUsage(Number(r.info?.gpuUsage)) : "black" }}
+            >
+              {r.info?.gpuUsage !== undefined ? Number(r.info?.gpuUsage).toFixed(2) + "%" : "-"}
+            </span>
+          )}
         />
         <Table.Column<TableProps>
           dataIndex="pendingJobCount"

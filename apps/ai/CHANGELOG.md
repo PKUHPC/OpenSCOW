@@ -1,5 +1,30 @@
 # @scow/ai
 
+## 0.2.1
+
+### Patch Changes
+
+- 55a619e: 修复 更新算法和模型时查找已存在实体逻辑错误的问题
+- c178b72: xterm npm 包更名
+- 01bd823: 修复 trpc openapi 将 boolean params 全部转为 string 的问题
+- e312efb: AI 模块支持创建 vnc 类型应用
+- a737493: jupyter 启动命令参数 PasswordIdentityProvider.hashed_password 改为 ServerApp.password
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- a4d36e2: 启用 serverMinification，只关闭 name mangling
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- e312efb: ai 新增以 shell 的方式进入容器的功能
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-operation-log@2.1.4
+  - @scow/lib-server@1.2.1
+  - @scow/lib-scheduler-adapter@1.1.8
+  - @scow/rich-error-model@2.0.0
+
 ## 0.2.0
 
 ### Minor Changes

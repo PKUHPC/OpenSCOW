@@ -18,7 +18,19 @@ title: SCOW Hook
 
 ```yaml title="config/common.yaml"
 scowHook:
+  # 启用SCOW Hook功能，默认为true
+  # enabled: true
+
+  # 若您只有一个hook，您可以直接使用url属性，并填入您的Hook的地址
   url: 您的gRPC服务器的地址
+
+  # 若您有多个hook，则可以使用hooks属性，逐个填入您的地址。
+  # 若您填写了hooks，则url属性将会被忽略
+  hooks:
+    - name: hook-name-1 # hook名，可选，若填写了，则在日志中可以看到被调用的hook的名字
+      url: hook 1地址 # hook服务器端地址
+    - name: hook-name-2
+      url: hook 2地址
 ```
 
 5. 重启SCOW

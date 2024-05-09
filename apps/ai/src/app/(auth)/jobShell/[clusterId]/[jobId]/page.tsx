@@ -12,7 +12,7 @@
 
 "use client";
 
-import "xterm/css/xterm.css";
+import "@xterm/xterm/css/xterm.css";
 
 import { Button, Space } from "antd";
 import dynamic from "next/dynamic";

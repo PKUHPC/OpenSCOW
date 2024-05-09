@@ -1,5 +1,25 @@
 # @scow/mis-web
 
+## 1.5.1
+
+### Patch Changes
+
+- 93be965: 账户白名单、账户消费记录下都支持以用户 ID 和姓名搜索
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- e44340d: 修复了管理系统下消费记录总数金额显示错误以及翻页的问题
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.0
 
 ### Minor Changes

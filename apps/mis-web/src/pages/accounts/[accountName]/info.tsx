@@ -69,10 +69,10 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
           </Tag>
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountBalance")}>
-          {balance.toFixed(3)} {t("common.unit")}
+          {balance.toFixed(2)} {t("common.unit")}
         </Descriptions.Item>
         <Descriptions.Item label={t("common.blockThresholdAmount")}>
-          {blockThresholdAmount.toFixed(3)} {t("common.unit")}
+          {blockThresholdAmount.toFixed(2)} {t("common.unit")}
         </Descriptions.Item>
       </Descriptions>
 

@@ -31,6 +31,7 @@ import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVe
 import { AppCustomAttribute, CreateAppInput } from "src/server/trpc/route/jobs/apps";
 import { TrainJobInput } from "src/server/trpc/route/jobs/jobs";
 import { formatSize } from "src/utils/format";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
 import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
@@ -209,9 +210,9 @@ export const LaunchAppForm = (props: Props) => {
   const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
-    isPublic: isImagePublic,
+    isPublic: isImagePublic !== undefined ? parseBooleanParam(isImagePublic) : undefined,
     clusterId,
-    withExternal: true,
+    withExternal: "true",
   }, {
     enabled: isImagePublic !== undefined,
   });

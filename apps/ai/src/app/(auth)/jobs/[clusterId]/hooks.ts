@@ -13,6 +13,7 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { Form, FormInstance } from "antd";
 import { useMemo } from "react";
+import { parseBooleanParam } from "src/utils/parse";
 
 import { AccessibilityType } from "./LaunchAppForm";
 
@@ -38,7 +39,8 @@ export function useDataOptions<T>(
   const itemType = Form.useWatch(typePath, form);
   const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
   const { data: items, isLoading: isDataLoading } = queryHook({
-    isPublic : isItemPublic, clusterId,
+    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
+    clusterId,
   }, { enabled: isItemPublic !== undefined });
 
   const dataOptions = useMemo(() => {
@@ -61,7 +63,8 @@ export function useDataVersionOptions<T>(
   const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
 
   const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
-    [`${dataType}Id`]: selectedItem, isPublic : isItemPublic,
+    [`${dataType}Id`]: selectedItem,
+    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
   }, { enabled: selectedItem !== undefined });
 
   const dataVersionOptions = useMemo(() => {
