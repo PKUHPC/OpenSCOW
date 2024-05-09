@@ -20,7 +20,7 @@ import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/activatedClusters";
+import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/clustersActivation";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";

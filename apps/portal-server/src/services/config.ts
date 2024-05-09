@@ -24,7 +24,7 @@ export const staticConfigServiceServer = plugin((server) => {
 
     getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,

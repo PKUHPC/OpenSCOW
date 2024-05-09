@@ -41,7 +41,7 @@ export const shellServiceServer = plugin((server) => {
       logger.info("Received shell connection");
 
       const { cluster, loginNode, userId, rows, cols, path } = connect;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       if (!loginNode) { throw clusterNotFound(cluster); }
 

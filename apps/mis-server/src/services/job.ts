@@ -18,6 +18,7 @@ import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
@@ -35,7 +36,6 @@ import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
-import { checkActivatedClusters } from "src/utils/cluster";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -242,7 +242,7 @@ export const jobServiceServer = plugin((server) => {
           ? tenantAccounts : [];
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -276,7 +276,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, limitMinutes, jobId } = request;
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,
@@ -297,7 +297,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, jobId } = request;
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -498,7 +498,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, userId, jobId } = request;
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,

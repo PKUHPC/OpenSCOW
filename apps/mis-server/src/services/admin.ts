@@ -14,6 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import {
   AdminServiceServer, AdminServiceService,
   ClusterAccountInfo,
@@ -27,7 +28,6 @@ import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, User } from "src/entities/User";
 import { UserAccount, UserRole } from "src/entities/UserAccount";
-import { checkActivatedClusters } from "src/utils/cluster";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -121,7 +121,7 @@ export const adminServiceServer = plugin((server) => {
       const { cluster } = request;
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      checkActivatedClusters({ clusterIds: [cluster], activatedClusters: currentActivatedClusters, logger });
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const result = await server.ext.clusters.callOnOne(
         cluster,

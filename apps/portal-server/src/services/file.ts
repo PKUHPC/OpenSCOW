@@ -31,7 +31,7 @@ export const fileServiceServer = plugin((server) => {
   server.addService<FileServiceServer>(FileServiceService, {
     copy: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -53,7 +53,7 @@ export const fileServiceServer = plugin((server) => {
     createFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -75,7 +75,7 @@ export const fileServiceServer = plugin((server) => {
 
     deleteDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -92,7 +92,7 @@ export const fileServiceServer = plugin((server) => {
     deleteFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -110,7 +110,7 @@ export const fileServiceServer = plugin((server) => {
 
     getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -125,7 +125,7 @@ export const fileServiceServer = plugin((server) => {
 
     makeDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -148,7 +148,7 @@ export const fileServiceServer = plugin((server) => {
 
     move: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -167,7 +167,7 @@ export const fileServiceServer = plugin((server) => {
 
     readDirectory: async ({ request, logger }) => {
       const { userId, cluster, path, updateAccessTime } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -235,7 +235,7 @@ export const fileServiceServer = plugin((server) => {
 
     download: async (call) => {
       const { logger, request: { cluster, path, userId } } = call;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -291,7 +291,7 @@ export const fileServiceServer = plugin((server) => {
 
       const logger = call.logger.child({ upload: { userId, path, cluster, host } });
 
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       logger.info("Upload file started");
 
@@ -365,7 +365,7 @@ export const fileServiceServer = plugin((server) => {
 
     getFileMetadata: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -387,7 +387,7 @@ export const fileServiceServer = plugin((server) => {
 
     exists: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -403,7 +403,7 @@ export const fileServiceServer = plugin((server) => {
     startFileTransfer: async ({ request, logger }) => {
 
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
-      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster], logger });
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
 
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const {
@@ -444,7 +444,7 @@ export const fileServiceServer = plugin((server) => {
     queryFileTransfer: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
-      await checkActivatedClusters({ clusterIds: [cluster], logger });
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const transferNodeAddress = getClusterTransferNode(cluster).address;
 
@@ -529,7 +529,7 @@ export const fileServiceServer = plugin((server) => {
 
     terminateFileTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath } = request;
-      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster], logger });
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
 
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const toTransferNodeHost = getClusterTransferNode(toCluster).host;
@@ -560,7 +560,7 @@ export const fileServiceServer = plugin((server) => {
     checkTransferKey: async ({ request, logger }) => {
 
       const { fromCluster, toCluster, userId } = request;
-      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster], logger });
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
 
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
 

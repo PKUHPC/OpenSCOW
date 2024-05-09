@@ -12,7 +12,7 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { ClusterDatabaseInfoSchema } from "@scow/config/build/type";
-import { libGetClustersDatabaseInfo } from "@scow/lib-web/build/server/misCommon";
+import { libGetClustersDatabaseInfo } from "@scow/lib-web/build/server/clustersActivation";
 import { Type } from "@sinclair/typebox";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";

@@ -16,11 +16,12 @@ import { status } from "@grpc/grpc-js";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { NO_ACTIVATED_CLUSTERS } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ClusterActivationStatus,
   clusterActivationStatusFromJSON, ClusterDatabaseInfo } from "@scow/protos/build/server/config";
 import { configClusters } from "src/config/clusters";
 import { Cluster } from "src/entities/Cluster";
-import { NO_ACTIVATED_CLUSTERS } from "src/utils/cluster";
+
 
 export async function updateCluster(
   em: SqlEntityManager<MySqlDriver>,

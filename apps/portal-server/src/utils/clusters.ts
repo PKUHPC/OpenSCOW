@@ -13,8 +13,9 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { libGetCurrentActivatedClusters } from "@scow/lib-server";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { libCheckActivatedClusters,
+  libGetCurrentActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { configClusters } from "src/config/clusters";
 import { commonConfig } from "src/config/common";
 import { config } from "src/config/env";
@@ -44,7 +45,7 @@ export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const callOnOne: CallOnOne = async (cluster, logger, call) => {
 
-  await checkActivatedClusters({ clusterIds: [cluster], logger });
+  await checkActivatedClusters({ clusterIds: cluster });
 
   const client = getAdapterClient(cluster);
 
@@ -72,46 +73,22 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
   });
 };
 
-
-export const NO_ACTIVATED_CLUSTERS = "NO_ACTIVATED_CLUSTERS";
-export const NOT_EXIST_IN_ACTIVATED_CLUSTERS = "NOT_EXIST_IN_ACTIVATED_CLUSTERS";
-
 export const checkActivatedClusters
 = async (
-  { clusterIds, logger }: {clusterIds: string[], logger: Logger},
+  { clusterIds }: {clusterIds: string[] | string},
 ) => {
 
   if (!config.MIS_DEPLOYED) {
     return;
   }
 
-  logger.info("Checking activation status of clusters with ids (%o) ", clusterIds);
   const activatedClusters = await libGetCurrentActivatedClusters(
     pinoLogger,
     configClusters,
     config.MIS_SERVER_URL,
     commonConfig.scowApi?.auth?.token);
 
-  if (Object.keys(activatedClusters).length === 0) {
-    throw new ServiceError({
-      code: status.INTERNAL,
-      details: "No available clusters. Please try again later",
-      metadata: scowErrorMetadata(NO_ACTIVATED_CLUSTERS, { currentActivatedClusters: "" }),
-    });
-  }
-
-  const exist = clusterIds.every((id) => Object.keys(activatedClusters).find((x) => x === id));
-  if (!exist) {
-    logger.info("Querying deactivated clusters with ids (%o). The current activated clusters' ids: %o",
-      clusterIds, Object.keys(activatedClusters));
-    throw new ServiceError({
-      code: status.INTERNAL,
-      details: "Querying deactivated clusters. Please refresh the page and try again",
-      metadata: scowErrorMetadata(NOT_EXIST_IN_ACTIVATED_CLUSTERS,
-        { currentActivatedClusterIds:
-          Object.keys(activatedClusters).length > 0 ? JSON.stringify(Object.keys(activatedClusters)) : "" }),
-    });
-  }
+  return libCheckActivatedClusters({ clusterIds, activatedClusters, logger: pinoLogger });
 
 };
 
