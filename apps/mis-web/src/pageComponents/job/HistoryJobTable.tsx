@@ -396,7 +396,6 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
               width="8%"
               title={finalPriceText[v]}
               render={(price: Money) => moneyToString(price) + " " + t(pCommon("unit"))}
-              sorter={true}
             />
           ))
         }
