@@ -152,7 +152,7 @@ message GetPaginatedChargeRecordsRequest {
   optional SortBy sort_by = 12;
 
 
-  optional common.SortOrder sort_order = 13;
+  optional common.SortOrder sort_order = 14;
 }
 
 message GetPaginatedChargeRecordsResponse {
