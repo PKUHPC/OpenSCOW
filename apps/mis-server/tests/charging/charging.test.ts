@@ -491,7 +491,7 @@ it("returns charge records with query of accountOfTenant", async () => {
     pageSize:10,
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
     types:[request1.type],
   });
 
@@ -549,7 +549,7 @@ it("returns charge records with query of tenant", async () => {
     endTime: queryEndTime.toISOString(),
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
     types:extractTypesFromObjects([request1, request2]),
   });
 
@@ -651,7 +651,7 @@ it("returns charge records with query of allTenants", async () => {
     types: [request1.type],
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply.results).toHaveLength(1);
@@ -727,7 +727,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
     pageSize: 50,
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -836,7 +836,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: ["user_1", "user_2"], types:extractTypesFromObjects([request1, request2, request3, request4]),
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -1136,7 +1136,7 @@ it("returns charge records with query of accounts", async () => {
     userIds: [],
     types:extractTypesFromObjects([request1, request3]),
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply1.results).toHaveLength(2);
@@ -1162,7 +1162,7 @@ it("returns charge records with query of accounts", async () => {
     userIds: [],
     types:extractTypesFromObjects([request2]),
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply2.results).toHaveLength(0);
@@ -1178,7 +1178,7 @@ it("returns charge records with query of accounts", async () => {
     userIds: [],
     types:extractTypesFromObjects([request1, request2, request3, request4]),
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:SortOrder.ASCEND,
+    sortOrder:SortOrder.DEFAULT,
   });
 
   expect(reply3.results).toHaveLength(2);
