@@ -28,6 +28,7 @@ import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
+import { emptyStringArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
 export const ExportChargeRecordSchema = typeboxRouteSchema({
@@ -38,8 +39,8 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     count: Type.Number(),
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
-    type: Type.Optional(Type.String()),
-    accountName: Type.Optional(Type.String()),
+    types: Type.Optional(Type.Array(Type.String())),
+    accountNames: Type.Optional(Type.Array(Type.String())),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
     userIds: Type.Optional(Type.String()),
@@ -57,15 +58,18 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count, userIds } = query;
+  const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds } = query;
+  let { accountNames, types } = query;
+  accountNames = emptyStringArrayToUndefined(accountNames);
+  types = emptyStringArrayToUndefined(types);
 
-  const info = await getUserInfoForCharges(accountName, req, res);
+  const info = await getUserInfoForCharges(accountNames, req, res);
 
   if (!info) { return; }
 
-  const tenantOfAccount = await getTenantOfAccount(accountName, info);
+  const tenantOfAccount = await getTenantOfAccount(accountNames, info);
 
-  const target = buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords);
+  const target = buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords);
 
   const logInfo = {
     operatorUserId: info.identityId,
@@ -98,7 +102,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       count,
       startTime,
       endTime,
-      type,
+      types:types ?? [],
       target,
       userIds: userIdArray,
     });
