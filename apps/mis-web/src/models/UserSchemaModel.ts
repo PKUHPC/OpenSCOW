@@ -83,6 +83,8 @@ export const AccountStatus = Type.Object({
   jobChargeLimit: Type.Optional(Money),
   usedJobCharge: Type.Optional(Money),
   balance: Type.Optional(Money),
+  isInWhitelist: Type.Optional(Type.Boolean()),
+  blockThresholdAmount:Type.Optional(Money),
 });
 export type AccountStatus = Static<typeof AccountStatus>;
 
