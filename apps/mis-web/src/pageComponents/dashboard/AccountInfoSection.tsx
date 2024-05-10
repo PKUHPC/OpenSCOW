@@ -27,6 +27,7 @@ interface Props {
   info: Record<string, AccountInfo>;
 }
 
+// max-width: calc(100%/2 - 8px); 考虑换行后限制最大宽度
 const CardContainer = styled.div`
   flex: 1;
   min-width: 300px;
