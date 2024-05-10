@@ -1135,6 +1135,8 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request3]),
+    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply1.results).toHaveLength(2);
@@ -1159,6 +1161,8 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request2]),
+    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply2.results).toHaveLength(0);
@@ -1173,6 +1177,8 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request2, request3, request4]),
+    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply3.results).toHaveLength(2);
