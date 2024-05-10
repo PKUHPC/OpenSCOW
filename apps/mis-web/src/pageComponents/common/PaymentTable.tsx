@@ -13,7 +13,7 @@
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { App, Button, DatePicker, Form, Table } from "antd";
+import { App, Button, DatePicker, Form, Input, Table } from "antd";
 import dayjs from "dayjs";
 import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
@@ -22,21 +22,21 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
-import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
+import { AccountMultiSelector } from "src/pageComponents/finance/AccountMultiSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
-    account = "account",
-    tenant = "tenant",
-    // 仅搜索自己账户
-    selfAccount = "selfAccount",
-    // 仅搜索自己租户
-    selfTenant = "selfTenant",
+  account = "account",
+  tenant = "tenant",
+  // 仅搜索自己账户
+  selfAccount = "selfAccount",
+  // 仅搜索自己租户
+  selfTenant = "selfTenant",
 }
 
 interface Props {
   // 账户充值记录专用项
-  accountName?: string;
+  accountNames?: string[];
   // 搜索类型, self前缀表示只搜索用户自身的账户或租户
   searchType: SearchType;
 }
@@ -56,8 +56,9 @@ interface TableProps {
 
 interface FilterForm {
   // 账户名或租户名
-  name?: string;
+  names?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs],
+  type?: string;
 }
 
 const today = dayjs().endOf("day");
@@ -65,17 +66,24 @@ const today = dayjs().endOf("day");
 const p = prefix("pageComp.commonComponent.paymentTable.");
 const pCommon = prefix("common.");
 
-export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
+export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [selectedName, setSelectedName] = useState<string | undefined>(accountName);
+  const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountNames);
 
-  const [query, setQuery] = useState(() => ({
-    name: accountName,
+  const [query, setQuery] = useState<{
+    names: string[] | undefined,
+    time: [dayjs.Dayjs, dayjs.Dayjs]
+    types: string[]
+  }>(() => ({
+    // name作为账户名时可能为 undefined 、长度不定的的数组
+    // name作为租户名时可能为 undefined 、长度为1的的数组
+    names: accountNames,
     time: [today.subtract(1, "year"), today],
+    types: [],
   }));
 
   const { message } = App.useApp();
@@ -85,21 +93,22 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       const param = {
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
+        types: query.types,
       };
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
-        return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
+        return api.getTenantPayments({ query: { ...param, tenantName: query.names ? query.names[0] : undefined } });
 
       } else {
-        return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
+        return api.getPayments({ query: { ...param, accountNames: query.names, searchType } });
       }
     }, [query]),
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, name: accountName }));
-    setSelectedName(accountName);
-  }, [accountName]);
+    setQuery((q) => ({ ...q, name: accountNames }));
+    setSelectedNames(accountNames);
+  }, [accountNames]);
 
   const handleExport = async (columns: string[]) => {
 
@@ -118,8 +127,9 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
-          targetName: query.name,
+          targetNames: query.names,
           searchType: searchType,
+          types: query.types,
         },
       });
     }
@@ -139,10 +149,12 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
       { label: t(pCommon("tenant")), value: "tenantName" },
     ] : [];
     const ipAndOperator = searchType !== SearchType.selfAccount ? [
-      { label: t(p("ipAddress")),
-        value: "ipAddress" },
       {
-        label:t(p("operatorId")),
+        label: t(p("ipAddress")),
+        value: "ipAddress",
+      },
+      {
+        label: t(p("operatorId")),
         value: "operatorId",
       },
     ] : [];
@@ -159,27 +171,38 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { name, time } = await form.validateFields();
-            setQuery({ name: selectedName ?? name, time });
+            const { names, time, type } = await form.validateFields();
+            let trimmedTypes: string[];
+            if (Array.isArray(type) && type.length === 0) {
+              trimmedTypes = [];
+            } else {
+              trimmedTypes = type ? type.split(/,|，/).map((item) => item.trim()) : [];
+            }
+            setQuery({
+              names: selectedNames ?? names,
+              time,
+              types: trimmedTypes,
+            });
           }}
         >
-          { (searchType === SearchType.account || searchType === SearchType.tenant) ? (
+          {(searchType === SearchType.account || searchType === SearchType.tenant) ? (
             <Form.Item
               label={searchType === SearchType.account ?
                 t(pCommon("account")) : t(pCommon("tenant"))}
               name="name"
             >
               {searchType === SearchType.account ? (
-                <AccountSelector
+                <AccountMultiSelector
+                  value={selectedNames ?? []}
                   onChange={(item) => {
-                    setSelectedName(item);
+                    setSelectedNames(item);
                   }}
                   placeholder={t(pCommon("selectAccount"))}
                 />
               ) : (
                 <TenantSelector
                   onChange={(item) => {
-                    setSelectedName(item);
+                    setSelectedNames([item]);
 
                   }}
                   placeholder={t(pCommon("selectTenant"))}
@@ -190,6 +213,9 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
             : undefined}
           <Form.Item label={t(pCommon("time"))} name="time">
             <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
+          </Form.Item>
+          <Form.Item label={t("common.type")} name="type">
+            <Input style={{ width: 180 }} placeholder={t(p("searchTypePlaceholder"))} />
           </Form.Item>
           <Form.Item label={t(p("total"))}>
             <strong>

@@ -10,26 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export function range(start = 1, end = 0, step = 1): number[] {
-  const r = [] as number[];
-  for (let i = start; i < end; i += step) {
-    r.push(i);
+export function emptyStringArrayToUndefined(arr: string[] | undefined) {
+  if (Array.isArray(arr) && arr.length === 1 && arr[0] === "") {
+    return undefined;
   }
-  return r;
+  return arr;
 }
-
-type ObjectTypeWithType = {
-  type: string;
-  [key: string]: any;
-};
-
-export function extractTypesFromObjects(array: ObjectTypeWithType[]): string[] {
-  const types = new Set<string>();
-  for (const item of array) {
-    if (item.type) {
-      types.add(item.type);
-    }
-  }
-  return Array.from(types);
-}
-
