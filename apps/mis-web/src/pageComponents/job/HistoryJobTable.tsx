@@ -55,7 +55,7 @@ interface Props {
 
 interface Sorter {
   field: JobSortBy,
-  order: JobSortOrder
+  order: JobSortOrder,
 }
 
 const p = prefix("pageComp.job.historyJobTable.");

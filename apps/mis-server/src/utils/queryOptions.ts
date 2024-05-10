@@ -10,9 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { GetPaginatedChargeRecordsRequest_SortBy as ChargesSortBy
-  , GetPaginatedChargeRecordsRequest_SortOrder as ChargesSortOrder } from "@scow/protos/build/server/charging";
-import { GetJobsRequest_SortBy, GetJobsRequest_SortOrder } from "@scow/protos/build/server/job";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
+import { GetPaginatedChargeRecordsRequest_SortBy as ChargesSortBy } from "@scow/protos/build/server/charging";
+import { GetJobsRequest_SortBy } from "@scow/protos/build/server/job";
 import { GetAllUsersRequest_UsersSortField, SortDirection } from "@scow/protos/build/server/user";
 
 import { DEFAULT_PAGE_SIZE, paginationProps } from "./orm";
@@ -40,6 +40,7 @@ export const generateAllUsersQueryOptions = (
   };
 };
 
+// 规范化GetJobsRequest_SortBy的名字
 export const mapJobsSortField = {
   [GetJobsRequest_SortBy.ACCOUNT]: "account",
   [GetJobsRequest_SortBy.CLUSTER]: "cluster",
@@ -59,14 +60,14 @@ export const generateGetJobsOptions = (
   page: number,
   pageSize?: number,
   sortBy?: GetJobsRequest_SortBy,
-  sortOrder?: GetJobsRequest_SortOrder,
+  sortOrder?: SortOrder,
 ) => {
 
   return {
     ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
     orderBy: (sortBy !== undefined && sortOrder !== undefined) ?
       { [mapJobsSortField[sortBy]]:
-        sortOrder === GetJobsRequest_SortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
+        sortOrder === SortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
   };
 };
 
@@ -85,12 +86,12 @@ export const generateChargersOptions = (
   page: number,
   pageSize?: number,
   sortBy?: ChargesSortBy,
-  sortOrder?: ChargesSortOrder,
+  sortOrder?: SortOrder,
 ) => {
   return {
     ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
     orderBy: (sortBy !== undefined && sortOrder !== undefined) ?
       { [mapChargesSortField[sortBy]]:
-        sortOrder === ChargesSortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
+        sortOrder === SortOrder.ASCEND ? "ASC" : "DESC" } : undefined,
   };
 };

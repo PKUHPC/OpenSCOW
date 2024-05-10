@@ -13,10 +13,11 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { moneyToNumber } from "@scow/lib-decimal";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { AccountOfTenantTarget, AccountsOfAllTenantsTarget, AccountsOfTenantTarget, AllTenantsTarget,
-  ChargingServiceClient, GetPaginatedChargeRecordsRequest_SortBy as SortBy,
-  GetPaginatedChargeRecordsRequest_SortOrder as SortOrder, TenantTarget } from "@scow/protos/build/server/charging";
+  ChargingServiceClient,
+  GetPaginatedChargeRecordsRequest_SortBy as SortBy, TenantTarget } from "@scow/protos/build/server/charging";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";

@@ -120,7 +120,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       pageSize: pageInfo.pageSize,
       // 新增排序参数
       sortBy: sorter.field,
-      sortOrder: sorter.order,
+      sortOrder: sorter.order ?? "default",
     } });
   }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 
@@ -153,7 +153,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
       field:sorter.field === "operationLogId" ? "id" : sorter.field,
-      order: sorter.order ?? "default",
+      order: sorter.order,
     });
   };
 

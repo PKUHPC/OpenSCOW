@@ -87,7 +87,7 @@ export const ChargeTable: React.FC<Props> = ({
     });// 查询对象
 
   // 定义排序状态
-  const [sorter, setSorter] = useState<Sorter>({ field: "userId", order: "default" });
+  const [sorter, setSorter] = useState<Sorter>({ field: "userId", order:"default" });
 
   const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package scow.common;
+
+enum SortOrder{
+  ASCEND = 0;
+  DESCEND = 1;
+  DEFAULT = 2;
+}

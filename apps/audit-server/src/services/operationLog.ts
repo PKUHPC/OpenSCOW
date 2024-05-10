@@ -16,12 +16,12 @@ import { status } from "@grpc/grpc-js";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import {
   GetOperationLogsRequest_SortBy,
-  GetOperationLogsRequest_SortOrder,
   OperationLogServiceServer,
   OperationLogServiceService,
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { I18nObject } from "@scow/protos/build/common/i18n";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { checkCustomEventType, filterOperationLogs,
   getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
@@ -71,10 +71,10 @@ export const operationLogServiceServer = plugin((server) => {
       // 处理排序方式,升序OR降序
       let orderBy: QueryOrder | undefined;
       switch (sortOrder) {
-      case GetOperationLogsRequest_SortOrder.ASCEND:
+      case SortOrder.ASCEND:
         orderBy = QueryOrder.ASC;
         break;
-      case GetOperationLogsRequest_SortOrder.DESCEND:
+      case SortOrder.DESCEND:
         orderBy = QueryOrder.DESC;
         break;
       default:
@@ -100,6 +100,9 @@ export const operationLogServiceServer = plugin((server) => {
         break;
       case GetOperationLogsRequest_SortBy.OPERATOR_USER_ID:
         formatSorter = "operatorUserId";
+        break;
+      case GetOperationLogsRequest_SortBy.UNKNOW:
+        formatSorter = undefined;
         break;
       }
 

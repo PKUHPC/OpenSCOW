@@ -12,8 +12,8 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { GetJobsRequest, GetJobsRequest_SortBy as SortBy
-  , GetJobsRequest_SortOrder as SortOrder, JobFilter
+import { SortOrder } from "@scow/protos/build/common/sort_order";
+import { GetJobsRequest, GetJobsRequest_SortBy as SortBy, JobFilter
   , JobServiceClient,
 } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";

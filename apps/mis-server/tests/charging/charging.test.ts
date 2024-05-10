@@ -16,9 +16,9 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { ChargeRequest, ChargingServiceClient,
-  GetPaginatedChargeRecordsRequest_SortBy,
-  GetPaginatedChargeRecordsRequest_SortOrder, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
+  GetPaginatedChargeRecordsRequest_SortBy, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { Account, AccountState } from "src/entities/Account";
@@ -459,7 +459,7 @@ it("returns charge records with query of accountOfTenant", async () => {
     pageSize:10,
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:GetPaginatedChargeRecordsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply1.results).toHaveLength(1);
@@ -516,7 +516,7 @@ it("returns charge records with query of tenant", async () => {
     endTime: queryEndTime.toISOString(),
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:GetPaginatedChargeRecordsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -617,7 +617,7 @@ it("returns charge records with query of allTenants", async () => {
     type: "test1",
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:GetPaginatedChargeRecordsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply.results).toHaveLength(1);
@@ -693,7 +693,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
     pageSize: 50,
     userIds: [],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:GetPaginatedChargeRecordsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -802,7 +802,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ } },
     userIds: ["user_1", "user_2"],
     sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:GetPaginatedChargeRecordsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
   });
 
   expect(reply.results).toHaveLength(2);

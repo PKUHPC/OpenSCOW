@@ -16,12 +16,12 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import {
   ExportOperationLogResponse,
   GetOperationLogsRequest_SortBy,
-  GetOperationLogsRequest_SortOrder,
   OperationLog as OperationLogProto,
   OperationLogServiceClient,
   OperationResult as OperationResultProto,
   operationResultFromJSON,
 } from "@scow/protos/build/audit/operation_log";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { createServer } from "src/app";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { dropDatabase } from "tests/utils/helpers";
@@ -312,7 +312,7 @@ it("get operation logs", async () => {
     page: 1,
     pageSize:10,
     sortBy:GetOperationLogsRequest_SortBy.ID,
-    sortOrder:GetOperationLogsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
     filter: { operatorUserIds: ["testUserId"], operationDetail: "123" },
   });
 
@@ -353,7 +353,7 @@ it("get logs for custom event", async () => {
     page: 1,
     pageSize:10,
     sortBy:GetOperationLogsRequest_SortBy.ID,
-    sortOrder:GetOperationLogsRequest_SortOrder.DEFAULT,
+    sortOrder:SortOrder.ASCEND,
     filter: { operatorUserIds: ["testUserId"]},
   });
 

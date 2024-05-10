@@ -17,6 +17,7 @@ package scow.server;
 import "common/job.proto";
 import "common/money.proto";
 import "common/ended_job.proto";
+import "common/sort_order.proto";
 import "google/protobuf/timestamp.proto";
 import "google/type/date.proto";
 
@@ -42,25 +43,21 @@ message GetJobsRequest {
   optional uint64 page_size = 3;
 
   enum SortBy {
-    ID_JOB = 0;
-    JOB_NAME = 1;
-    ACCOUNT = 2;
-    USER = 3;
-    CLUSTER = 4;
-    PARTITION = 5;
-    QOS = 6;
-    TIME_SUBMIT = 7;
-    TIME_END = 8;
-    PRICE = 9;
+    UNKNOW = 0;
+    ID_JOB = 1;
+    JOB_NAME = 2;
+    ACCOUNT = 3;
+    USER = 4;
+    CLUSTER = 5;
+    PARTITION = 6;
+    QOS = 7;
+    TIME_SUBMIT = 8;
+    TIME_END = 9;
+    PRICE = 10;
   }
   optional SortBy sort_by = 4;
 
-  enum SortOrder{
-    DESCEND = 0;
-    ASCEND = 1;
-    DEFAULT = 2;
-  }
-  optional SortOrder sort_order = 5;
+  optional common.SortOrder sort_order = 5;
 }
 
 message GetJobsResponse {
