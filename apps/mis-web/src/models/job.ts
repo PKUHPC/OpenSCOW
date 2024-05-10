@@ -121,7 +121,7 @@ export const JobSortBy = Type.Union(
     Type.Literal("jobName"),
     Type.Literal("account"),
     Type.Literal("user"),
-    Type.Literal("clusterName"),
+    Type.Literal("cluster"),
     Type.Literal("partition"),
     Type.Literal("qos"),
     Type.Literal("timeSubmit"),
