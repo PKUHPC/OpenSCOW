@@ -31,7 +31,7 @@ import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { ClusterNotAvailablePage } from "src/components/errorPages/CLusterNotAvailablePage";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/config";
 import { formatEntryId, getEntryBaseName,

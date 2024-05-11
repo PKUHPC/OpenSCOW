@@ -55,7 +55,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
   const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
 
   const { loginNodes } = useStore(LoginNodeStore);
-
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
 
@@ -65,7 +64,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     ? defaultCluster
     : loginDesktopEnabledClusters[0];
   const cluster = currentClusters.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
-
   const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;
 
   const { data, isLoading, reload } = useAsync({

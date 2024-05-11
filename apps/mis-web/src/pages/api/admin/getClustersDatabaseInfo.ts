@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ClusterDatabaseInfo, ClusterDatabaseInfoSchema } from "@scow/config/build/type";
-import { ClusterDatabaseInfo as ClusterDatabaseInfoProto, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterDatabaseInfo_LastActivationOperation, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
@@ -39,7 +39,7 @@ export default route(GetClustersDatabaseInfoSchema,
     const result = await asyncClientCall(client, "getClustersDatabaseInfo", {});
 
     const operatorIds = Array.from(new Set(result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfoProto["lastActivationOperation"];
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation;
       return lastActivationOperation?.operatorId ?? undefined;
     })));
 
@@ -53,7 +53,7 @@ export default route(GetClustersDatabaseInfoSchema,
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
     const clustersDatabaseInfo: ClusterDatabaseInfo[] = result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfoProto["lastActivationOperation"];
+      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation;
 
       return {
         ...x,

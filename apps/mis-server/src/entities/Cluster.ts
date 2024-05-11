@@ -12,11 +12,17 @@
 
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
 import { DATETIME_TYPE } from "src/utils/orm";
-import { AnyJson } from "src/utils/types";
 
 export enum ClusterActivationStatus {
   ACTIVATED = "ACTIVATED",
   DEACTIVATED = "DEACTIVATED",
+}
+
+export interface LastActivationOperation {
+  // activation operator userId
+  operatorId?: string,
+  // comment only when deactivate a cluster
+  deactivationComment?: string,
 }
 
 @Entity()
@@ -32,7 +38,7 @@ export class Cluster {
     activationStatus: ClusterActivationStatus;
 
   @Property({ type: "json", nullable: true })
-    lastActivationOperation?: AnyJson;
+    lastActivationOperation?: LastActivationOperation;
 
   @Property({ columnType: DATETIME_TYPE, nullable: true })
     createTime: Date;
@@ -43,7 +49,7 @@ export class Cluster {
   constructor(init: {
     clusterId: string;
     activationStatus?: ClusterActivationStatus;
-    lastActivationOperation?: AnyJson;
+    lastActivationOperation?: LastActivationOperation;
     createTime?: Date;
     updateTime?: Date;
   }) {

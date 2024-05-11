@@ -20,7 +20,7 @@ import Router, { useRouter } from "next/router";
 import { useRef } from "react";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
-import { ClusterNotAvailablePage } from "src/components/errorPages/CLusterNotAvailablePage";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";

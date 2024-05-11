@@ -179,7 +179,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
                 {
                   !r.hpcEnabled && (
                     <>
-                      <p>--</p>
+                      --
                     </>
                   )
                 }

@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
-  ClusterDatabaseInfo,
+  ClusterDatabaseInfo_LastActivationOperation,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
 import { getActivatedClusters, getClustersDatabaseInfo } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
@@ -141,7 +141,7 @@ export const misConfigServiceServer = plugin((server) => {
       cluster.activationStatus = ClusterActivationStatus.ACTIVATED;
 
       // save operator userId in lastActivationOperation
-      const lastActivationOperationMap: ClusterDatabaseInfo["lastActivationOperation"] = {};
+      const lastActivationOperationMap: ClusterDatabaseInfo_LastActivationOperation = {};
 
       lastActivationOperationMap["operatorId"] = operatorId;
       cluster.lastActivationOperation = lastActivationOperationMap;
@@ -178,7 +178,7 @@ export const misConfigServiceServer = plugin((server) => {
       cluster.activationStatus = ClusterActivationStatus.DEACTIVATED;
 
       // save operator userId and deactivation in lastActivationOperation
-      const lastActivationOperationMap: ClusterDatabaseInfo["lastActivationOperation"] = {};
+      const lastActivationOperationMap: ClusterDatabaseInfo_LastActivationOperation = {};
       lastActivationOperationMap["operatorId"] = operatorId;
 
       if (deactivationComment) {

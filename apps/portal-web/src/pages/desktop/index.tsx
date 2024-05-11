@@ -50,10 +50,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const currentClusters = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
 
+  const activatedClusterIds = currentClusters?.results
+    .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED).map((x) => x.clusterId) ?? [];
+  const sortedCurrentClusterIds = publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => activatedClusterIds.includes(id));
+
   const sortedClusterIdList = publicConfig.MIS_DEPLOYED ?
-    (currentClusters?.results
-      .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED).map((x) => x.clusterId) ?? [])
-    : publicConfig.CLUSTER_SORTED_ID_LIST;
+    sortedCurrentClusterIds : publicConfig.CLUSTER_SORTED_ID_LIST;
 
   const loginDesktopEnabledClusters = sortedClusterIdList
     .filter((clusterId) => getLoginDesktopEnabled(clusterId))

@@ -14,7 +14,6 @@ syntax = "proto3";
 
 package scow.server;
 
-import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 
 message GetAvailablePartitionsRequest {
@@ -99,9 +98,13 @@ enum ClusterActivationStatus {
 }
 
 message ClusterDatabaseInfo {
+  message LastActivationOperation {
+    optional string operator_id = 1;
+    optional string deactivation_comment = 2;
+  }
   string cluster_id = 1;
   ClusterActivationStatus activation_status = 2;
-  optional google.protobuf.Struct last_activation_operation = 3;
+  LastActivationOperation last_activation_operation = 3;
   google.protobuf.Timestamp update_time = 4;
 }
 

@@ -18,7 +18,8 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { NO_ACTIVATED_CLUSTERS } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ClusterActivationStatus,
-  clusterActivationStatusFromJSON, ClusterDatabaseInfo } from "@scow/protos/build/server/config";
+  clusterActivationStatusFromJSON, ClusterDatabaseInfo,
+  ClusterDatabaseInfo_LastActivationOperation } from "@scow/protos/build/server/config";
 import { configClusters } from "src/config/clusters";
 import { Cluster } from "src/entities/Cluster";
 
@@ -77,7 +78,7 @@ export async function getClustersDatabaseInfo(
     return {
       clusterId: x.clusterId,
       activationStatus: clusterActivationStatusFromJSON(x.activationStatus),
-      lastActivationOperation: x.lastActivationOperation as ClusterDatabaseInfo["lastActivationOperation"],
+      lastActivationOperation: x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation,
       updateTime: x.updateTime ? new Date(x.updateTime).toISOString() : "",
     };
   });

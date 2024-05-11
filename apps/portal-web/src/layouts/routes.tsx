@@ -103,7 +103,7 @@ export const userRoutes: (
         })),
       } as NavItemProps)),
     } as NavItemProps] : []),
-    ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
+    ...(publicConfig.ENABLE_LOGIN_DESKTOP && currentClusters.length > 0 ? [{
       Icon: DesktopOutlined,
       text: t("routes.desktop"),
       path: "/desktop",

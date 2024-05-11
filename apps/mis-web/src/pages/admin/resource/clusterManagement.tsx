@@ -57,9 +57,13 @@ export const ClusterManagementPage: NextPage =
       ]);
 
       const combinedClusterList: CombinedClusterInfo[] = [];
-      // 在线集群初始化
-      setActivatedClusters({});
-      connectionClustersData.results.forEach((cluster) => {
+
+      // sort by cluster's priority
+      const sortedConnectionClustersData = connectionClustersData.results.sort((a, b) => {
+        const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST;
+        return sortedIds.indexOf(a.clusterId) - sortedIds.indexOf(b.clusterId);
+      });
+      sortedConnectionClustersData.forEach((cluster) => {
         const currentCluster = dbClustersData.results.find((dbCluster) => dbCluster.clusterId === cluster.clusterId);
         if (currentCluster) {
           const combinedData = {
