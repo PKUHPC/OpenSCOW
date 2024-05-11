@@ -64,6 +64,7 @@ it("update block status with whitelist accounts", async () => {
     accountName: data.blockedAccountB.accountName,
     comment: "test",
     operatorId: "123",
+    expirationDate:new Date("2025-01-01T00:00:00.000Z").toISOString(),
   });
 
   const blockedData = await updateBlockStatusInSlurm(
