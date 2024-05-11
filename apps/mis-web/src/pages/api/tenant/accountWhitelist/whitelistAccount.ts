@@ -29,7 +29,7 @@ export const WhitelistAccountSchema = typeboxRouteSchema({
   body: Type.Object({
     accountName: Type.String(),
     comment: Type.String(),
-    expirationDate:Type.String(),
+    expirationDate:Type.String({ format: "date-time" }),
   }),
 
   responses: {

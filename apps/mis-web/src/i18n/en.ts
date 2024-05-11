@@ -616,6 +616,7 @@ export default {
         confirmRemoveWhiteText2: " from the whitelist?",
         removeWhiteSuccess: "Successfully removed from the whitelist!",
         removeWhite: "Remove from Whitelist",
+        expirationDate:"expirationDate",
       },
       addWhitelistedAccountButton: {
         notExist: "Account does not exist!",

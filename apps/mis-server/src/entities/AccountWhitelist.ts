@@ -31,8 +31,9 @@ export class AccountWhitelist {
   @Property()
     operatorId: string;
 
-  @Property()
-    expirationDate: Date;
+  // 当expirationDate为undefined时，即为永久有效
+  @Property({ nullable: true })
+    expirationDate?: Date;
 
   constructor(init: {
     account: EntityOrRef<Account>,
@@ -45,6 +46,7 @@ export class AccountWhitelist {
     this.time = init.time ?? new Date();
     this.comment = init.comment;
     this.operatorId = init.operatorId;
-    this.expirationDate = init.expirationDate ?? new Date("2099-12-31 00:00");
+    // undefined为永久有效
+    this.expirationDate = init.expirationDate ?? undefined;
   }
 }

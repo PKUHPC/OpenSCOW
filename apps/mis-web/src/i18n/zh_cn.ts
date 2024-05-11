@@ -615,6 +615,7 @@ export default {
         confirmRemoveWhiteText2:"从白名单移除？",
         removeWhiteSuccess:"移出白名单成功！",
         removeWhite:"从白名单中去除",
+        expirationDate:"有效期",
       },
       addWhitelistedAccountButton:{
         notExist:"账户不存在！",

@@ -54,6 +54,7 @@ message WhitelistedAccount {
   string operator_id = 5;
   string comment = 6;
   common.Money balance = 7;
+  google.protobuf.Timestamp expiration_date = 8;
 }
 
 message GetWhitelistedAccountsResponse {
@@ -65,7 +66,7 @@ message WhitelistAccountRequest {
   string account_name = 2;
   string operator_id = 3;
   string comment = 4;
-  string expiration_date = 5;
+  google.protobuf.Timestamp expiration_date = 5;
 }
 
 // NOT_FOUND: account is not found.

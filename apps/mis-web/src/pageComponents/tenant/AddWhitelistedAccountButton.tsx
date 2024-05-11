@@ -11,7 +11,7 @@
  */
 
 import { PlusOutlined } from "@ant-design/icons";
-import { App, Button, DatePicker, Flex, Form, Input, Modal, Select } from "antd";
+import { App, Button, DatePicker, Form, Input, Modal, Select } from "antd";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import { api } from "src/apis";
@@ -20,7 +20,6 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 interface FormProps {
   accountName: string;
   comment: string;
-  indate: string;
   expirationDate: dayjs.Dayjs
 }
 
@@ -33,19 +32,26 @@ interface ModalProps {
 const p = prefix("pageComp.tenant.addWhitelistedAccountButton.");
 const pCommon = prefix("common.");
 
-const NewAccountModal: React.FC<ModalProps> = ({
-  open, close, refresh,
-}) => {
+// 过期时间选择组件的interface
+interface PickExpDateProps {
+  id?: string;
+  value?: dayjs.Dayjs;
+  onChange?: (value: dayjs.Dayjs) => void;
+}
+
+// 过期时间选择组件
+const PickExpDate: React.FC<PickExpDateProps> = (props) => {
+  const { id, value = dayjs(), onChange } = props;
+
 
   const t = useI18nTranslateToString();
 
-  const { message } = App.useApp();
-  const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm<FormProps>();
-  const [selectedOption, setSelectedOption] = useState<string>("custom"); // 添加状态来跟踪选择的选项
+  // 添加状态来跟踪选择的选项
+  const [selectedOption, setSelectedOption] = useState<string>("custom");
 
 
-  const options = [ // 定义 Select 选项数组，使用国际化函数 t() 翻译每个选项的 label
+  // 定义 Select 选项数组，使用国际化函数 t() 翻译每个选项的 label
+  const options = [
     { value: "custom", label: t(p("custom")) },
     { value: "oneWeek", label: t(p("oneWeek")) },
     { value: "oneMonth", label: t(p("oneMonth")) },
@@ -55,45 +61,89 @@ const NewAccountModal: React.FC<ModalProps> = ({
 
   // 定义规范时间
   const dateFormat = "YYYY-MM-DD";
+
   // dateRange的时间
   const [expirationDate, setExpirationDate] = useState<dayjs.Dayjs>(dayjs());
 
   // 对dateRange时间根据options选项进行处理
   React.useEffect(() => {
-    let newDate: dayjs.Dayjs;
+    let newDate: dayjs.Dayjs | string;
     switch (selectedOption) {
+
+    // 一周
     case "oneWeek":
       newDate = dayjs().add(1, "week");
       break;
 
+      // 一个礼拜
     case "oneMonth":
       newDate = dayjs().add(1, "month");
       break;
 
+    // 一年
     case "oneYear":
       newDate = dayjs().add(1, "year");
       break;
 
+      // 永久生效
     case "permanent":
       newDate = dayjs("2099-12-31");
       break;
 
+      // 自定义时间
     case "custom":
-      newDate = expirationDate.isValid() ? expirationDate : dayjs();
+      newDate = expirationDate ?? dayjs();
       break;
 
     default:
       newDate = dayjs();
       break;
     }
-    setExpirationDate(newDate); // 更新组件状态
-    form.setFieldsValue({ expirationDate: newDate });
+    // 传递值
+    onChange?.(newDate);
+    // 更新组件状态
+    setExpirationDate(newDate);
   }, [selectedOption]);
 
+  return (
+    <div id={id}>
+      <Select
+        defaultValue={options[0].value}
+        options={options}
+        onChange={(value) => setSelectedOption(value)} // 更新选择
+        style={{ width: "35%", marginRight:"5%" }}
+      />
+      {/*  根据选项禁用或启用 DatePicker */}
+      <DatePicker
+        disabled={selectedOption !== "custom"}
+        minDate={dayjs(dayjs().format(dateFormat))}
+        value={ expirationDate }
+        style={{ width: "60%" }}
+        onChange={(date) =>
+        {
+          setExpirationDate(date);
+          onChange?.(date);
+        }
+        } // 更新状态
+      />
+    </div>
+  );
+};
+
+
+const NewAccountModal: React.FC<ModalProps> = ({
+  open, close, refresh,
+}) => {
+
+  const t = useI18nTranslateToString();
+
+  const { message } = App.useApp();
+  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm<FormProps>();
 
 
   const onOk = async () => {
-    const { accountName, indate, expirationDate, comment } = await form.validateFields();
+    const { accountName, expirationDate, comment } = await form.validateFields();
     await api.whitelistAccount({ body: { accountName: accountName.trim(), comment,
       expirationDate:expirationDate.toISOString() } })
       .httpError(404, () => {
@@ -122,32 +172,13 @@ const NewAccountModal: React.FC<ModalProps> = ({
           <Input />
         </Form.Item>
         {/* 日期选择 */}
-        <Flex justify='space-between'>
-          <Form.Item
-            name="indate"
-            label={t(pCommon("indate"))}
-            rules={[{ required: true }]}
-          >
-            <Select
-              defaultValue={options[0].value}
-              options={options}
-              onChange={(value) => setSelectedOption(value)} // 更新选择
-            />
-          </Form.Item>
-          <Form.Item
-            name="expirationDate"
-            rules={[{ required: selectedOption === "custom", message:"请输入有效期" }]}
-            style={{ width: "60%" }}
-          >
-            {/*  根据选项禁用或启用 DatePicker */}
-            <DatePicker
-              disabled={selectedOption !== "custom"}
-              minDate={dayjs(dayjs().format(dateFormat))}
-              value={ expirationDate }
-              onChange={(date) => setExpirationDate(date)} // 更新状态
-            />
-          </Form.Item>
-        </Flex>
+        <Form.Item name="expirationDate" label={t(pCommon("indate"))} rules={[{ required: true }]}>
+          <PickExpDate
+            id="expirationDate"
+            value={form.getFieldValue("expirationDate")}
+            onChange={(date) => form.setFieldsValue({ expirationDate: date })}
+          />
+        </Form.Item>
         <Form.Item name="comment" rules={[{ required: true }]} label={t(pCommon("comment"))}>
           <Input.TextArea />
         </Form.Item>

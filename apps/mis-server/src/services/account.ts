@@ -289,6 +289,17 @@ export const accountServiceServer = plugin((server) => {
 
       const { tenantName } = request;
 
+      // 删除过期的白名单账户
+      const today = new Date();
+      const expiredWhitelists = await em.find(AccountWhitelist, {
+        expirationDate: { $lt: today },
+        account: { tenant: { name: tenantName } },
+      });
+
+      if (expiredWhitelists.length > 0) {
+        await em.removeAndFlush(expiredWhitelists);
+      }
+
       const results = await em.find(AccountWhitelist, { account: { tenant: { name: tenantName } } }, {
         populate: ["account"],
       });
@@ -302,7 +313,6 @@ export const accountServiceServer = plugin((server) => {
         accounts: results.map((x) => {
 
           const accountOwner = owners.find((o) => o.account.id === x.account.id)!.user.$;
-
           return {
             accountName: x.account.$.accountName,
             comment: x.comment,
@@ -311,6 +321,8 @@ export const accountServiceServer = plugin((server) => {
             ownerId: accountOwner.userId + "",
             ownerName: accountOwner.name,
             balance: decimalToMoney(x.account.$.balance),
+            expirationDate:x.expirationDate?.toISOString().includes("2099") ? undefined
+              : x.expirationDate?.toISOString(),
           };
 
         }),
@@ -338,7 +350,8 @@ export const accountServiceServer = plugin((server) => {
         time: new Date(),
         comment,
         operatorId,
-        expirationDate:new Date(expirationDate),
+        // expirationDate为undefined时为永久有效
+        expirationDate:expirationDate ? new Date(expirationDate) : undefined,
       });
       account.whitelist = toRef(whitelist);
 
