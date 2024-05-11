@@ -35,6 +35,8 @@ message AccountStatus {
   optional common.Money job_charge_limit = 3;
   optional common.Money used_job_charge = 4;
   common.Money balance = 5;
+  optional bool is_in_whitelist = 6;
+  common.Money block_threshold_amount = 7;
 }
 
 message GetUserStatusResponse {

@@ -106,6 +106,11 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (!tenant) {
+        throw <ServiceError>{ code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+
       return [{
         accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
           const account = curr.account.getEntity();
@@ -115,6 +120,9 @@ export const userServiceServer = plugin((server) => {
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
+            isInWhitelist: Boolean(account.whitelist),
+            blockThresholdAmount:account.blockThresholdAmount ?
+              decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
           } as AccountStatus;
           return prev;
         }, {}),
