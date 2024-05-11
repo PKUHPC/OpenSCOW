@@ -142,7 +142,7 @@ message GetPaginatedChargeRecordsRequest {
   optional uint64 page_size = 11;
 
   enum SortBy {
-    UNKNOW = 0;
+    UNKNOWN = 0;
     USER_ID = 1;
     TIME = 2;
     AMOUNT = 3;

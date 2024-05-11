@@ -43,7 +43,7 @@ message GetJobsRequest {
   optional uint64 page_size = 3;
 
   enum SortBy {
-    UNKNOW = 0;
+    UNKNOWN = 0;
     ID_JOB = 1;
     JOB_NAME = 2;
     ACCOUNT = 3;
