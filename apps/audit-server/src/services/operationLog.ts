@@ -101,7 +101,7 @@ export const operationLogServiceServer = plugin((server) => {
       case GetOperationLogsRequest_SortBy.OPERATOR_USER_ID:
         formatSorter = "operatorUserId";
         break;
-      case GetOperationLogsRequest_SortBy.UNKNOW:
+      case GetOperationLogsRequest_SortBy.UNKNOWN:
         formatSorter = undefined;
         break;
       }
