@@ -32,11 +32,9 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
   body: Type.Object({
     identityId: Type.String(),
     /**
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
+     * @pattern CommonConfig.PASSWORD_PATTERN || ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
-    newPassword: Type.String({
-      pattern:  "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$",
-    }),
+    newPassword: Type.String(),
   }),
 
   responses: {
