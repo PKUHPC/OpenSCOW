@@ -1,5 +1,17 @@
 # @scow/auth
 
+## 1.5.1
+
+### Patch Changes
+
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-server@1.2.1
+
 ## 1.5.0
 
 ### Patch Changes

@@ -30,7 +30,9 @@ import { UserRole, UserStatus } from "src/entities/UserAccount";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
+  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { mapUsersSortField } from "src/utils/queryOptions";
@@ -270,14 +272,14 @@ export const exportServiceServer = plugin((server) => {
         startTime,
         endTime,
         type,
+        types,
         target,
         count,
         userIds,
       } = request;
 
       const searchParam = getChargesTargetSearchParam(target);
-      const searchType = getChargesSearchType(type);
-
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const query = {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
@@ -346,14 +348,16 @@ export const exportServiceServer = plugin((server) => {
         endTime,
         target,
         count,
+        types,
       } = ensureNotUndefined(request, ["target"]);
-
       const searchParam = getPaymentsTargetSearchParam(target);
-      const query = {
-        time: { $gte: startTime, $lte: endTime },
+      const searchTypes = getPaymentsSearchType(types);
+      const query: { time: { $gte: string; $lte: string }; [key: string]: any } = {
+        time: { $gte: startTime as string, $lte: endTime as string },
         ...searchParam,
+        ...searchTypes,
       };
-
+      // type并非仅有一个空字符串时，增加type条件
       const recordFormat = (x: Loaded<PayRecord, never>) => ({
         tenantName: x.tenantName,
         accountName: x.accountName,

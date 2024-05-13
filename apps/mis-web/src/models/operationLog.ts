@@ -481,11 +481,35 @@ const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: 
     return t(pDetails("exportAccountChargeRecordOfTenant"),
       [accountOfTenant.tenantName, accountOfTenant.accountName]);
   case "accountsOfTenant":
+  {
     const accountsOfTenant = exportChargeTarget[exportChargeCase];
-    return t(pDetails("exportAccountsChargeRecordOfTenant"),
-      [accountsOfTenant.tenantName]);
+    const { accountNames } = accountsOfTenant;
+    if (accountNames.length === 0) {
+      return t(pDetails("exportAllAccountsChargeRecordOfTenant"),
+        [accountsOfTenant.tenantName]);
+    } else if (accountNames.length === 1) {
+      return t(pDetails("exportAccountChargeRecordOfTenant"),
+        [accountsOfTenant.tenantName, accountNames[0]]);
+    } else {
+      const accountStr = accountNames.join("、");
+      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+      return t(pDetails("exportAccountsChargeRecordOfTenant"),
+        [accountsOfTenant.tenantName, resultStr]);
+    }
+  }
   case "accountsOfAllTenants":
-    return t(pDetails("exportAccountChargeRecordOfAdmin"));
+    const accountsOfAllTenants = exportChargeTarget[exportChargeCase];
+    const { accountNames } = accountsOfAllTenants;
+    if (accountNames.length === 0) {
+      return t(pDetails("exportAllAccountsChargeRecordOfAdmin"));
+    } else if (accountNames.length === 1) {
+      return t(pDetails("exportAccountChargeRecordOfAdmin"), accountNames);
+    } else {
+      const accountStr = accountNames.join("、");
+      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+      return t(pDetails("exportAccountsChargeRecordOfAdmin"),
+        [resultStr]);
+    }
   case "tenant":
     const tenant = exportChargeTarget[exportChargeCase];
     return t(pDetails("exportTenantChargeRecord"), [tenant.tenantName]);
@@ -504,14 +528,21 @@ const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: Operation
   }
   const exportPayCase = exportPayTarget.$case;
   switch (exportPayCase) {
-  case "accountOfTenant":
-    const accountOfTenant = exportPayTarget[exportPayCase];
-    return t(pDetails("exportAccountPayRecordOfTenant"),
-      [accountOfTenant.tenantName, accountOfTenant.accountName]);
   case "accountsOfTenant":
     const accountsOfTenant = exportPayTarget[exportPayCase];
-    return t(pDetails("exportAccountsPayRecordOfTenant"),
-      [accountsOfTenant.tenantName]);
+    const { accountNames } = accountsOfTenant;
+    if (accountNames.length === 0) {
+      return t(pDetails("exportAllAccountsPayRecordOfTenant"),
+        [accountsOfTenant.tenantName]);
+    } else if (accountNames.length === 1) {
+      return t(pDetails("exportAccountPayRecordOfTenant"),
+        [accountsOfTenant.tenantName, accountNames[0]]);
+    } else {
+      const accountStr = accountNames.join("、");
+      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+      return t(pDetails("exportAccountsPayRecordOfTenant"),
+        [accountsOfTenant.tenantName, resultStr]);
+    }
   case "tenant":
     const tenant = exportPayTarget[exportPayCase];
     return t(pDetails("exportTenantPayRecord"), [tenant.tenantName]);
