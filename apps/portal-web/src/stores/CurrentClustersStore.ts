@@ -15,7 +15,6 @@ import { useEffect, useState } from "react";
 import { Cluster, publicConfig } from "src/utils/config";
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
-export const NOT_EXIST_CLUSTER: Cluster = { id: "", name: "" };
 
 export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
 
@@ -26,16 +25,16 @@ export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
     return currentClusters.find((c) => c.id === x);
   });
 
-  const [clusterId, setClusterId] = useLocalStorage<String>(
+  const [clusterId, setClusterId] = useLocalStorage<String | undefined>(
     SCOW_DEFAULT_CLUSTER_ID,
-    initialDefaultClusterId ?? "",
+    initialDefaultClusterId || undefined,
   );
 
-  const defaultCluster = currentClusters.find((cluster) => cluster.id === clusterId)
-  || (currentClusters[0] as Cluster ?? NOT_EXIST_CLUSTER);
+  const defaultCluster: Cluster | undefined = currentClusters.find((cluster) => cluster.id === clusterId)
+  || currentClusters[0] || undefined;
 
-  const setDefaultCluster = (cluster: Cluster) => {
-    setClusterId(cluster.id);
+  const setDefaultCluster = (cluster: Cluster | undefined) => {
+    setClusterId(cluster?.id ?? undefined);
   };
 
   const removeDefaultCluster = () => {
@@ -49,13 +48,10 @@ export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
     if (publicConfig.MIS_DEPLOYED) {
       // 可用集群不存在时
       if (currentClusters.length === 0) {
-
-        // 保证页面正常渲染，后端报错处理，传递id为""的对象
-        setDefaultCluster(NOT_EXIST_CLUSTER);
+        setDefaultCluster(undefined);
       } else {
-
-        // 上一次记录的默认集群为NOT_EXIST_CLUSTER的情况
-        if (!defaultCluster.id) {
+        // 上一次记录的集群为undefined的情况，使用可用集群中的某一个集群作为新的默认集群
+        if (!defaultCluster?.id) {
           setDefaultCluster(currentClusters[0]);
 
           // 上一次记录的默认集群已不在可用集群中的情况
@@ -68,14 +64,13 @@ export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
       }
     }
 
-
   }, [currentClusters]);
 
 
   return {
     currentClusters,
     setCurrentClusters,
-    defaultCluster,
+    defaultCluster: defaultCluster as Cluster | undefined,
     setDefaultCluster,
     removeDefaultCluster,
   };

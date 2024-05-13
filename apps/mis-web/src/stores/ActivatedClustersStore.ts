@@ -13,8 +13,6 @@
 import { useEffect, useState } from "react";
 import { Cluster, publicConfig } from "src/utils/config";
 
-export const NOT_EXIST_CLUSTER: Cluster = { id: "", name: "" };
-
 export function ActivatedClustersStore(
   initialActivatedClusters: {[clusterId: string]: Cluster;},
 ) {
@@ -25,27 +23,26 @@ export function ActivatedClustersStore(
     return Object.keys(initialActivatedClusters).find((c) => c === x);
   });
   const initialDefaultCluster
-   = initialDefaultClusterId ? activatedClusters[initialDefaultClusterId] : NOT_EXIST_CLUSTER;
+   = initialDefaultClusterId ? activatedClusters[initialDefaultClusterId] : undefined;
 
-  const [ defaultCluster, setDefaultCluster ] = useState<Cluster>(initialDefaultCluster);
+  const [ defaultCluster, setDefaultCluster ] = useState<Cluster | undefined>(initialDefaultCluster);
 
   useEffect(() => {
 
     // 可用集群不存在时
     if (Object.keys(activatedClusters).length === 0) {
-      // 保证页面正常渲染，后端报错处理，传递id为""的对象
-      setDefaultCluster(NOT_EXIST_CLUSTER);
+      setDefaultCluster(undefined);
     } else {
 
-      // 上一次记录的默认集群为NOT_EXIST_CLUSTER的情况
-      if (!defaultCluster.id) {
+      // 上一次记录的默认集群为undefined的情况，使用可用集群中的某一个集群作为新的默认集群
+      if (!defaultCluster?.id) {
         setDefaultCluster(Object.values(activatedClusters)[0]);
 
       // 上一次记录的默认集群已不在可用集群中的情况
       } else {
         const currentDefaultExists = Object.keys(activatedClusters).find((x) => x === defaultCluster?.id);
         if (!currentDefaultExists) {
-          setDefaultCluster(activatedClusters[0]);
+          setDefaultCluster(Object.values(activatedClusters)[0]);
         }
       }
     }

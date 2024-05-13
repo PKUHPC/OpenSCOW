@@ -21,6 +21,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
@@ -54,14 +55,20 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
 
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
   const { loginNodes } = useStore(LoginNodeStore);
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
 
   const [selectedLoginNodeAddress, setSelectedLoginNodeAddress] = useState("");
-  // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
-  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
-    ? defaultCluster
+
+  // 如果默认集群(不存在时优先选取可用集群中某一集群作为当前默认集群)没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群
+  const currentDefaultCluster = defaultCluster ?? currentClusters[0];
+  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === currentDefaultCluster.id)
+    ? currentDefaultCluster
     : loginDesktopEnabledClusters[0];
   const cluster = currentClusters.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
   const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;

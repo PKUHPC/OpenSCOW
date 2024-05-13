@@ -481,7 +481,8 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
-      clusterNotAvailable: "没有可以访问的集群。",
+      clusterNotAvailable: "当前没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
     others:{
       clusterSelector: "请选择集群",
@@ -594,7 +595,8 @@ export default {
       title: "仪表盘",
     },
     common: {
-      noAvailableClusters: "当前暂无可用集群",
+      noAvailableClusters: "当前没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
   },
 };

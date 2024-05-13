@@ -111,7 +111,8 @@ export default {
     exportNoDataErrorMsg: "Export is empty, please reselect",
     blockThresholdAmount: "Block Threshold Amount",
     other: "Other",
-    noAvailableClusters: "Currently no available clusters.",
+    noAvailableClusters: "There are currently no available clusters."
+    + " Please try again later or contact the administrator.",
   },
   dashboard: {
     title: "Dashboard",
@@ -762,6 +763,8 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "There are currently no available clusters."
+      + " Please try again later or contact the administrator.",
     },
     others: {
       seeDetails: "For details, please refer to the documentation",

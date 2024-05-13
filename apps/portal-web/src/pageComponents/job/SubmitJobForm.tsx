@@ -21,6 +21,7 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
@@ -185,10 +186,16 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     }
   }, [currentPartitionInfo]);
 
-  const { currentClusters, defaultCluster: currentDefaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
+
+  // 没有可用集群的情况不再渲染
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
 
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const defaultCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
+  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
+    (defaultCluster ?? currentClusters[0]);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -207,7 +214,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       form={form}
       initialValues={{
         ...initial,
-        cluster: defaultCluster,
+        cluster: currentQueryCluster,
       }}
       onFinish={submit}
     >
@@ -359,7 +366,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                       form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                       form.validateFields(["workingDirectory"]);
                     }}
-                    cluster={cluster || defaultCluster}
+                    cluster={cluster || currentQueryCluster}
                   />
                 )
               }

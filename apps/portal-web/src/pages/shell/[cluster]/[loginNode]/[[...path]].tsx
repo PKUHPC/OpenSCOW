@@ -89,7 +89,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
 
   const { currentClusters } = useStore(CurrentClustersStore);
 
-  if (!currentClusters.some((x) => x.id === cluster)) {
+  if (!currentClusters.find((x) => x.id === cluster)) {
     return <ClusterNotAvailablePage />;
   }
 

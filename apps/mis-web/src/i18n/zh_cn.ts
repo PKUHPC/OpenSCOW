@@ -111,7 +111,8 @@ export default {
     exportNoDataErrorMsg: "导出为空，请重新选择",
     blockThresholdAmount: "封锁阈值",
     other: "其他",
-    noAvailableClusters: "当前暂无可用集群",
+    noAvailableClusters: "当前没有可用集群。"
+    + "请稍后再试或联系管理员。",
   },
   dashboard: {
     title: "仪表盘",
@@ -758,6 +759,8 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
+      clusterNotAvailable: "当前没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
     others:{
       seeDetails:"细节请查阅文档",

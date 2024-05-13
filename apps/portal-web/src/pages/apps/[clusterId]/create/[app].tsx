@@ -38,7 +38,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const t = useI18nTranslateToString();
 
   const { currentClusters } = useStore(CurrentClustersStore);
-  if (!currentClusters.some((x) => x.id === clusterId)) {
+  if (!currentClusters.find((x) => x.id === clusterId)) {
     return <ClusterNotAvailablePage />;
   }
 

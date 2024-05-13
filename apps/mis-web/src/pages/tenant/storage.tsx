@@ -19,6 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
@@ -48,10 +49,15 @@ const StorageForm: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [current, setCurent] = useState<number | undefined>(undefined);
+  const [current, setCurrent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
 
-  const { defaultCluster } = useStore(ActivatedClustersStore);
+  const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
+  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  const currentDefaultCluster = defaultCluster ?? Object.values(activatedClusters)[0];
 
   const t = useI18nTranslateToString();
 
@@ -66,7 +72,7 @@ const StorageForm: React.FC = () => {
       .httpError(400, () => { message.error(t(p("balanceChangeIllegal"))); })
       .then(({ currentQuota }) => {
         message.success(t(p("editSuccess")));
-        setCurent(currentQuota);
+        setCurrent(currentQuota);
       })
       .finally(() => setLoading(false));
   };
@@ -82,7 +88,7 @@ const StorageForm: React.FC = () => {
     await api.queryStorageQuota({ query: { cluster: cluster.id, userId } })
       .httpError(404, () => { message.error(t(p("userNotFound"))); })
       .then(({ currentQuota }) => {
-        setCurent(currentQuota);
+        setCurrent(currentQuota);
       })
       .finally(() => setCurrentLoading(false));
   };
@@ -107,7 +113,7 @@ const StorageForm: React.FC = () => {
         name="cluster"
         label={t("common.cluster")}
         rules={[{ required: true }]}
-        initialValue={defaultCluster}
+        initialValue={currentDefaultCluster}
       >
         <SingleClusterSelector />
       </Form.Item>

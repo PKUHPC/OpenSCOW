@@ -35,9 +35,9 @@ import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
   user: User | undefined,
   currentClusters: Cluster[],
-  defaultCluster: Cluster,
+  defaultCluster: Cluster | undefined,
   LoginNodes: Record<string, LoginNode[]>,
-  setDefaultCluster: (cluster: Cluster) => void,
+  setDefaultCluster: (cluster: Cluster | undefined) => void,
 ) => NavItemProps[] = (user, currentClusters, defaultCluster, loginNodes, setDefaultCluster) => {
 
   if (!user) { return []; }
@@ -79,30 +79,34 @@ export const userRoutes: (
         },
       ],
     }] : []),
-    ...(publicConfig.ENABLE_SHELL && currentClusters.length > 0 ? [{
-      Icon: MacCommandOutlined,
-      text: "Shell",
-      path: "/shell",
-      clickToPath:
-        join(publicConfig.BASE_PATH, "shell", defaultCluster?.id, loginNodes[defaultCluster?.id]?.[0]?.address),
-      openInNewPage: true,
-      clickable: true,
-      children: currentClusters.map(({ name, id }) => ({
+    ...(publicConfig.ENABLE_SHELL && currentClusters.length > 0 ?
+      [{
+        Icon: MacCommandOutlined,
+        text: "Shell",
+        path: "/shell",
+        clickToPath:
+        join(publicConfig.BASE_PATH,
+          "shell",
+          defaultCluster?.id ?? currentClusters[0].id,
+          loginNodes[defaultCluster?.id ?? currentClusters[0].id]?.[0]?.address),
         openInNewPage: true,
-        Icon: CloudServerOutlined,
-        text: getI18nConfigCurrentText(name, languageId),
-        path: `/shell/${id}`,
-        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.address),
-        handleClick: () => { setDefaultCluster({ name, id }); },
-        children: loginNodes[id]?.map((loginNode) => ({
+        clickable: true,
+        children: currentClusters.map(({ name, id }) => ({
           openInNewPage: true,
           Icon: CloudServerOutlined,
-          text: loginNode.name,
-          path: `/shell/${id}/${loginNode.address}`,
+          text: getI18nConfigCurrentText(name, languageId),
+          path: `/shell/${id}`,
+          clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.address),
           handleClick: () => { setDefaultCluster({ name, id }); },
-        })),
-      } as NavItemProps)),
-    } as NavItemProps] : []),
+          children: loginNodes[id]?.map((loginNode) => ({
+            openInNewPage: true,
+            Icon: CloudServerOutlined,
+            text: loginNode.name,
+            path: `/shell/${id}/${loginNode.address}`,
+            handleClick: () => { setDefaultCluster({ name, id }); },
+          })),
+        } as NavItemProps)),
+      } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP && currentClusters.length > 0 ? [{
       Icon: DesktopOutlined,
       text: t("routes.desktop"),
@@ -112,7 +116,7 @@ export const userRoutes: (
       Icon: EyeOutlined,
       text: t("routes.apps.title"),
       path: "/apps",
-      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickToPath: `/apps/${defaultCluster?.id ?? currentClusters[0].id}/sessions`,
       clickable: true,
       children: currentClusters.map((cluster) => ({
         Icon: FolderOutlined,
@@ -141,14 +145,14 @@ export const userRoutes: (
       Icon: FolderOutlined,
       text: t("routes.file.fileManager"),
       path: "/files",
-      clickToPath: `/files/${defaultCluster.id}/~`,
+      clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
       clickable: true,
       children: [
         {
           Icon: FolderOutlined,
           text: t("routes.file.clusterFileManager"),
           path: "/files/",
-          clickToPath: `/files/${defaultCluster.id}/~`,
+          clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
           children: currentClusters.map((cluster) => ({
             Icon: ClusterOutlined,
             text: getI18nConfigCurrentText(cluster.name, languageId),

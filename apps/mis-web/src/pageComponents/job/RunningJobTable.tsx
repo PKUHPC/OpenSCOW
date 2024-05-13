@@ -19,6 +19,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { ModalLink } from "src/components/ModalLink";
 import { TableTitle } from "src/components/TableTitle";
@@ -62,11 +63,15 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
 
+  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
-      cluster: defaultCluster,
+      cluster: defaultCluster ?? Object.values(activatedClusters)[0],
     };
   });
 

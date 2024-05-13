@@ -24,6 +24,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
@@ -43,14 +44,18 @@ export const AllJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const { defaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
+
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
 
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      cluster: defaultCluster,
+      cluster: defaultCluster ?? currentClusters[0],
     };
   });
 
