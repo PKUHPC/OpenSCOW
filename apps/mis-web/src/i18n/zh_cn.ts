@@ -118,11 +118,7 @@ export default {
     account: {
       title: "账户信息",
       state: "状态",
-      balance: "可用余额",
-      status: {
-        blocked: "封锁",
-        normal: "正常",
-      },
+      balance: "可用额度",
       alert: "您不属于任何一个账户。",
     },
     job: {
