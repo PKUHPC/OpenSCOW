@@ -14,10 +14,10 @@ import { useEffect, useState } from "react";
 import { Cluster, publicConfig } from "src/utils/config";
 
 export function ActivatedClustersStore(
-  initialActivatedClusters: {[clusterId: string]: Cluster;},
+  initialActivatedClusters: {[clusterId: string]: Cluster},
 ) {
   const [activatedClusters, setActivatedClusters]
-   = useState<{[clusterId: string]: Cluster;}>(initialActivatedClusters);
+   = useState<{[clusterId: string]: Cluster}>(initialActivatedClusters);
 
   const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
     return Object.keys(initialActivatedClusters).find((c) => c === x);

@@ -24,7 +24,7 @@ import { ClusterConnectionStatus, Partition } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { ClusterManagementTable } from "src/pageComponents/admin/ClusterManagementTable";
 import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { publicConfig } from "src/utils/config";
+import { Cluster, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 
@@ -57,7 +57,7 @@ export const ClusterManagementPage: NextPage =
       ]);
 
       const combinedClusterList: CombinedClusterInfo[] = [];
-
+      const currentActivatedClusters: {[clusterId: string]: Cluster} = {};
       // sort by cluster's priority
       const sortedConnectionClustersData = connectionClustersData.results.sort((a, b) => {
         const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST;
@@ -72,15 +72,11 @@ export const ClusterManagementPage: NextPage =
           } as CombinedClusterInfo;
           combinedClusterList.push(combinedData);
           if (combinedData.activationStatus === ClusterActivationStatus.ACTIVATED) {
-            setActivatedClusters((prev) => {
-              return {
-                ...prev,
-                [combinedData.clusterId]: publicConfig.CLUSTERS[combinedData.clusterId],
-              };
-            });
+            currentActivatedClusters[combinedData.clusterId] = publicConfig.CLUSTERS[combinedData.clusterId];
           }
         }
       });
+      setActivatedClusters(currentActivatedClusters);
 
       return combinedClusterList;
 

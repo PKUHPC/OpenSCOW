@@ -56,7 +56,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
-
   const searchType = useRef<"precision" | "range">("range");
 
   const [selected, setSelected] = useState<RunningJobInfo[]>([]);
