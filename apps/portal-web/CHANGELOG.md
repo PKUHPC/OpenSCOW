@@ -1,5 +1,23 @@
 # @scow/portal-web
 
+## 1.5.1
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- c178b72: xterm npm 包更名
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.0
 
 ### Minor Changes

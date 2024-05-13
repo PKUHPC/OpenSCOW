@@ -10,13 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { moneyToNumber } from "@scow/lib-decimal";
-import type { Money } from "@scow/protos/build/common/money";
-
-export function moneyToString(money: Money) {
-  return moneyToNumber(money).toFixed(2);
-}
-
-export function nullableMoneyToString(money: Money | undefined) {
-  return money ? moneyToString(money) : Number.prototype.toFixed.call(0, 2);
+export function emptyStringArrayToUndefined(arr: string[] | undefined) {
+  if (Array.isArray(arr) && arr.length === 1 && arr[0] === "") {
+    return undefined;
+  }
+  return arr;
 }

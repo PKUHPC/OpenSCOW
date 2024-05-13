@@ -1,5 +1,12 @@
 # @scow/lib-hook
 
+## 1.0.10
+
+### Patch Changes
+
+- 640a599: 支持填写多个 hook 地址
+  - @scow/protos@1.0.10
+
 ## 1.0.9
 
 ### Patch Changes
