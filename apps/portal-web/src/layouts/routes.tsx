@@ -11,17 +11,11 @@
  */
 
 import {
-  BookOutlined,
   CloudServerOutlined,
   CloudSyncOutlined,
   ClusterOutlined,
-  DashboardOutlined,
-  DesktopOutlined,
-  EyeOutlined,
-  FolderOutlined,
   LinkOutlined,
   Loading3QuartersOutlined,
-  MacCommandOutlined,
   PlusCircleOutlined,
   PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
@@ -30,6 +24,8 @@ import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { ApplicationIcon, DashBoardIcon, DesktopIcon
+  , FileManagerIcon, JobIcon, ShellIcon } from "src/icons/headerIcons/headerIcons";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
@@ -47,23 +43,23 @@ export const userRoutes: (
 
   return [
     {
-      Icon: DashboardOutlined,
+      Icon: DashBoardIcon,
       text: t("routes.dashboard"),
       path: "/dashboard",
     },
     ...(publicConfig.ENABLE_JOB_MANAGEMENT ? [{
-      Icon: BookOutlined,
+      Icon: JobIcon,
       text: t("routes.job.title"),
       path: "/jobs",
       clickToPath: "/jobs/runningJobs",
       children: [
         {
-          Icon: BookOutlined,
+          Icon: JobIcon,
           text: t("routes.job.runningJobs"),
           path: "/jobs/runningJobs",
         },
         {
-          Icon: BookOutlined,
+          Icon: JobIcon,
           text: t("routes.job.allJobs"),
           path: "/jobs/allJobs",
         },
@@ -80,7 +76,7 @@ export const userRoutes: (
       ],
     }] : []),
     ...(publicConfig.ENABLE_SHELL ? [{
-      Icon: MacCommandOutlined,
+      Icon: ShellIcon,
       text: "Shell",
       path: "/shell",
       clickToPath:
@@ -104,18 +100,18 @@ export const userRoutes: (
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
-      Icon: DesktopOutlined,
+      Icon: DesktopIcon,
       text: t("routes.desktop"),
       path: "/desktop",
     }] : []),
     ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
-      Icon: EyeOutlined,
+      Icon: ApplicationIcon,
       text: t("routes.apps.title"),
       path: "/apps",
       clickToPath: `/apps/${defaultCluster.id}/sessions`,
       clickable: true,
       children: publicConfig.CLUSTERS.map((cluster) => ({
-        Icon: FolderOutlined,
+        Icon: FileManagerIcon,
         text: getI18nConfigCurrentText(cluster.name, languageId),
         path: `/apps/${cluster.id}`,
         clickToPath: `/apps/${cluster.id}/sessions`,
@@ -138,14 +134,14 @@ export const userRoutes: (
       } as NavItemProps)),
     } as NavItemProps] : []),
     ...(publicConfig.CLUSTERS.length > 0 ? [{
-      Icon: FolderOutlined,
+      Icon: FileManagerIcon,
       text: t("routes.file.fileManager"),
       path: "/files",
       clickToPath: `/files/${defaultCluster.id}/~`,
       clickable: true,
       children: [
         {
-          Icon: FolderOutlined,
+          Icon: FileManagerIcon,
           text: t("routes.file.clusterFileManager"),
           path: "/files/",
           clickToPath: `/files/${defaultCluster.id}/~`,

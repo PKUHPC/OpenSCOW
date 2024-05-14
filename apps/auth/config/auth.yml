@@ -1,6 +1,6 @@
 authType: ldap
 
-redisUrl: localhost:6379
+redisUrl: 172.16.20.148:6379
 
 allowedCallbackHostnames:
   - localhost
@@ -55,7 +55,7 @@ captcha:
   enabled: true
 
 ldap:
-  url: ldap://localhost:389
+  url: ldap://172.16.20.148:389
   bindDN: cn=Manager,ou=hpc,o=pku
   bindPassword: admin
   searchBase: ou=hpc,o=pku

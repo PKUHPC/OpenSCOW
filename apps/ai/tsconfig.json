@@ -35,7 +35,7 @@
     "**/*.tsx",
     "src/**/*.ts",
     ".next/types/**/*.ts"
-  ],
+, "../portal-web/src/icons/headerIcons/icons/headerIcons.jsicons/headerIcons.js"  ],
   "exclude": [
     "node_modules"
   ],

@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, RobotOutlined } from "@ant-design/icons";
+import { RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
@@ -18,6 +18,7 @@ import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { MisIcon } from "src/icons/headerIcons/headerIcons";
 import { userRoutes } from "src/layouts/routes";
 import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -47,6 +48,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
 
   const uiExtensionStore = useStore(UiExtensionStore);
 
+
   const logout = () => {
     removeDefaultCluster();
     userStore.logout();
@@ -68,7 +70,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
         <>
           <JumpToAnotherLink
             user={userStore.user}
-            icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
+            icon={<MisIcon style={{ paddingRight: 2, stroke:"#9B0000", fill:"#9B0000" }} />}
             link={publicConfig.MIS_URL}
             linkText={t("baseLayout.linkTextMis")}
           />
