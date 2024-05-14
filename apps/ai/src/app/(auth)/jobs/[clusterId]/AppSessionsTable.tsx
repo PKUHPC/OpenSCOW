@@ -214,16 +214,20 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           <Button
             type="link"
             onClick={async () => {
+              let basePath = `/jobs/${cluster.id}`;
+              const searchParams = new URLSearchParams({
+                jobId:  record.jobId.toString(),
+                jobName: record.sessionId,
+              });
+
               if (record.jobType === JobType.APP) {
-                record.appId && router.push(join(
-                  "/jobs", cluster.id, "/createApps", record.appId,
-                  `?jobId=${record.jobId}&jobName=${record.sessionId}`));
+                if (record.appId) {
+                  basePath += `/createApps/${record.appId}`;
+                }
               } else if (record.jobType === JobType.TRAIN) {
-                router.push(join(
-                  "/jobs", cluster.id,
-                  "/trainJobs", `?jobId=${record.jobId}&jobName=${record.sessionId}`,
-                ));
+                basePath += "/trainJobs";
               }
+              router.push(`${basePath}?${searchParams.toString()}`);
             }}
           >再次提交</Button>
           <a onClick={() => {

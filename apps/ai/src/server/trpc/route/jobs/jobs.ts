@@ -128,7 +128,7 @@ procedure
 
         const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
 
-        // 确保所有映射到容器的路径都不重复s
+        // 确保所有映射到容器的路径都不重复
         validateUniquePaths([
           trainJobsDirectory,
           isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,

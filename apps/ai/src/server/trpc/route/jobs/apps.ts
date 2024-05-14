@@ -507,7 +507,7 @@ export const getCreateAppParams =
     .meta({
       openapi: {
         method: "GET",
-        path: "/appSessions/{jobId}/params",
+        path: "/appSessions/{jobId}/submissionParameters",
         tags: ["appSessions"],
         summary: "Get Create App Session Parameters",
       },
