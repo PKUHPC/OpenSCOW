@@ -221,7 +221,7 @@ procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/jobs/{jobId}/params",
+      path: "/jobs/{jobId}/submissionParameters",
       tags: ["jobs"],
       summary: "Get Submit Train Job Parameters",
     },
