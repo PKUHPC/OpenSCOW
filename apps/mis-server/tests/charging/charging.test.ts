@@ -1171,17 +1171,19 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request2, request3, request4]),
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply3.results).toHaveLength(2);
   expect(reply3.results).toMatchObject([{
-    accountName: request4.accountName,
-    comment: request4.comment,
-    amount: request4.amount,
-  }, {
     accountName: request1.accountName,
     comment: request1.comment,
     amount: request1.amount,
+  }, {
+    accountName: request4.accountName,
+    comment: request4.comment,
+    amount: request4.amount,
   } ]as Partial<ChargeRecord>);
 
   em.clear();
