@@ -112,7 +112,6 @@ export const getAmountStrategyAlgorithmDescriptions = (t: TransType): Record<Amo
 export const JobSortOrder = Type.Union([
   Type.Literal("descend"),
   Type.Literal("ascend"),
-  Type.Literal("default"),
 ]);
 export type JobSortOrder = Static<typeof JobSortOrder>
 

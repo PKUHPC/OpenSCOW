@@ -14,18 +14,16 @@ import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { QueryOrder, raw } from "@mikro-orm/core";
-import {
-  GetOperationLogsRequest_SortBy,
-  OperationLogServiceServer,
+import { OperationLogServiceServer,
   OperationLogServiceService,
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { I18nObject } from "@scow/protos/build/common/i18n";
-import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
 import { addOperationLogAccountNames, checkCustomEventType, filterOperationLogs,
   getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateOperationOptions } from "src/utils/querryOptions";
 
 
 export const operationLogServiceServer = plugin((server) => {
@@ -62,56 +60,19 @@ export const operationLogServiceServer = plugin((server) => {
 
     getOperationLogs: async ({ request, em, logger }) => {
       const { filter, page, pageSize, sortBy, sortOrder } =
-      ensureNotUndefined(request, ["filter", "page", "pageSize", "sortBy", "sortOrder"]);
+      ensureNotUndefined(request, ["filter", "page"]);
 
       const sqlFilter = await filterOperationLogs(filter);
 
       logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
-      // 处理排序方式,升序OR降序
-      let orderBy: QueryOrder | undefined;
-      switch (sortOrder) {
-      case SortOrder.ASCEND:
-        orderBy = QueryOrder.ASC;
-        break;
-      case SortOrder.DESCEND:
-        orderBy = QueryOrder.DESC;
-        break;
-      default:
-        // 不排序
-        orderBy = undefined;
-        break;
-      }
 
-      // // 规范化sortBy的名字
-      let formatSorter: string | undefined;
-      switch (sortBy) {
-      case GetOperationLogsRequest_SortBy.ID:
-        formatSorter = "id";
-        break;
-      case GetOperationLogsRequest_SortBy.OPERATION_RESULT:
-        formatSorter = "operationResult";
-        break;
-      case GetOperationLogsRequest_SortBy.OPERATION_TIME:
-        formatSorter = "operationTime";
-        break;
-      case GetOperationLogsRequest_SortBy.OPERATOR_IP:
-        formatSorter = "operatorIp";
-        break;
-      case GetOperationLogsRequest_SortBy.OPERATOR_USER_ID:
-        formatSorter = "operatorUserId";
-        break;
-      case GetOperationLogsRequest_SortBy.UNKNOWN:
-        formatSorter = undefined;
-        break;
-      }
 
       let operationLogs, count;
 
-      if (orderBy && formatSorter) {
+      if (sortBy !== undefined && sortBy !== undefined) {
         [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
-          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-          orderBy:{ [formatSorter]:orderBy },
+          ...generateOperationOptions(page, pageSize, sortBy, sortOrder),
         });
       } else {
         [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {

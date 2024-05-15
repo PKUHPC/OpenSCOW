@@ -71,7 +71,7 @@ export const jobServiceServer = plugin((server) => {
     getJobs: async ({ request, em, logger }) => {
 
       const { filter, page, pageSize, sortBy, sortOrder } =
-      ensureNotUndefined(request, ["filter", "sortBy", "sortOrder"]);
+      ensureNotUndefined(request, ["filter"]);
 
       const sqlFilter = filterJobs(filter);
 

@@ -49,8 +49,8 @@ interface FilterForm {
 }
 
 interface Sorter {
-  field: ChargesSortBy;
-  order: ChargesSortOrder;
+  field: ChargesSortBy | undefined;
+  order: ChargesSortOrder | undefined;
 }
 
 // 当前时间的 dayjs 对象
@@ -86,13 +86,13 @@ export const ChargeTable: React.FC<Props> = ({
     });// 查询对象
 
   // 定义排序状态
-  const [sorter, setSorter] = useState<Sorter>({ field: "userId", order:"default" });
+  const [sorter, setSorter] = useState<Sorter>({ field: undefined, order:undefined });
 
   const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
       field:sorter.field,
-      order: sorter.order ?? "default",
+      order: sorter.order,
     });
   };
 
@@ -129,7 +129,7 @@ export const ChargeTable: React.FC<Props> = ({
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       sortBy: sorter.field,
-      sortOrder: sorter.order ?? "default",
+      sortOrder: sorter.order,
     } });
     // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
     if (query.userIds) {

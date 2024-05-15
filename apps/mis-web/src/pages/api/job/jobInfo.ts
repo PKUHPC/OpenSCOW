@@ -39,7 +39,6 @@ export const mapJobSortByType = {
 export const mapJobSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-  "default":SortOrder.DEFAULT,
 }as { [key: string]: SortOrder};
 
 export const GetJobFilter = Type.Object({

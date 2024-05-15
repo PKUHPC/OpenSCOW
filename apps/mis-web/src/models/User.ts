@@ -169,7 +169,6 @@ export type ChargesSortBy = Static<typeof ChargesSortBy>
 export const ChargesSortOrder = Type.Union([
   Type.Literal("descend"),
   Type.Literal("ascend"),
-  Type.Literal("default"),
 ]);
 
 export type ChargesSortOrder = Static<typeof ChargesSortOrder>

@@ -54,8 +54,8 @@ interface Props {
 }
 
 interface Sorter {
-  field: JobSortBy,
-  order: JobSortOrder,
+  field: JobSortBy | undefined,
+  order: JobSortOrder | undefined,
 }
 
 const p = prefix("pageComp.job.historyJobTable.");
@@ -98,7 +98,7 @@ export const JobTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
 
   // 定义排序状态
-  const [sorter, setSorter] = useState<Sorter>({ field:"idJob", order:"default" });
+  const [sorter, setSorter] = useState<Sorter>({ field:undefined, order:undefined });
 
 
   const promiseFn = useCallback(async () => {
@@ -117,7 +117,7 @@ export const JobTable: React.FC<Props> = ({
     return await api.getJobInfo({ query: {
       ...diffQuery,
       sortBy: sorter.field,
-      sortOrder: sorter.order ?? "default",
+      sortOrder: sorter.order,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),

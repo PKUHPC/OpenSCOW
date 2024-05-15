@@ -58,7 +58,7 @@ interface Props {
 
 interface Order {
   field: OperationSortBy | undefined;
-  order: OperationSortOrder;
+  order: OperationSortOrder | undefined;
 }
 
 const today = dayjs().endOf("day");
@@ -93,7 +93,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
   // 定义排序方式
-  const [sorter, setSorter] = useState<Order>({ field: "id", order: "default" });
+  const [sorter, setSorter] = useState<Order>({ field: undefined, order: undefined });
 
   const operationType = Form.useWatch("operationType", form);
 
@@ -120,7 +120,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       pageSize: pageInfo.pageSize,
       // 新增排序参数
       sortBy: sorter.field,
-      sortOrder: sorter.order ?? "default",
+      sortOrder: sorter.order,
     } });
   }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 

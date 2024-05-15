@@ -415,7 +415,7 @@ export const chargingServiceServer = plugin((server) => {
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
       const { startTime, endTime, type, types, target, userIds, page, pageSize, sortBy, sortOrder }
-      = ensureNotUndefined(request, ["startTime", "endTime", "sortBy", "sortOrder"]);
+      = ensureNotUndefined(request, ["startTime", "endTime"]);
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
       const records = await em.find(ChargeRecord, {

@@ -47,7 +47,6 @@ export const mapChargesSortByType = {
 export const mapChargesSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-  "default":SortOrder.DEFAULT,
 } as { [key: string]: SortOrder};
 
 export const ChargeInfo = Type.Object({

@@ -35,8 +35,7 @@ export const mapOperationSortByType = {
 export const mapOperationSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-  "default":SortOrder.DEFAULT,
-};
+} as { [key: string]: SortOrder };
 
 export const GetOperationLogFilter = Type.Object({
 
@@ -150,20 +149,24 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
   const mapOperationSortBy = sortBy ? mapOperationSortByType[sortBy] : undefined;
   const mapOperationSortOrder = sortOrder ? mapOperationSortOrderType[sortOrder] : undefined;
 
+  const client = getClient(UserServiceClient);
+
   const { getLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
   const resp = await getLog({
     filter,
     page,
     pageSize,
     sortBy:mapOperationSortBy,
-    sortOrder:mapOperationSortOrder ?? undefined,
+    sortOrder:mapOperationSortOrder,
   });
+
+
 
   const { results, totalCount } = resp;
 
   const userIds = Array.from(new Set(results.map((x) => x.operatorUserId)));
 
-  const client = getClient(UserServiceClient);
+
   const { users } = await asyncClientCall(client, "getUsersByIds", {
     userIds,
   });

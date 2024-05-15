@@ -121,7 +121,6 @@ export type OperationSortBy = Static<typeof OperationSortBy>
 export const OperationSortOrder = Type.Union([
   Type.Literal("descend"),
   Type.Literal("ascend"),
-  Type.Literal("default"),
 ]);
 export type OperationSortOrder = Static<typeof OperationSortOrder>
 
