@@ -426,7 +426,7 @@ export const chargingServiceServer = plugin((server) => {
       }, sortBy !== undefined && sortOrder !== undefined ? {
         ...generateChargersOptions(page ?? 1, pageSize, sortBy, sortOrder),
       } : {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        ...paginationProps(page ?? 1, pageSize || DEFAULT_PAGE_SIZE),
       });
 
       return [{
