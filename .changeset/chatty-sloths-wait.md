@@ -1,8 +1,5 @@
 ---
 "@scow/mis-server": minor
-"@scow/demo-vagrant": minor
-"@scow/mis-web": minor
-"@scow/auth": minor
 "@scow/grpc-api": minor
 ---
 

@@ -20,7 +20,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 interface FormProps {
   accountName: string;
   comment: string;
-  expirationDate: dayjs.Dayjs
+  expirationTime: dayjs.Dayjs
 }
 
 interface ModalProps {
@@ -63,7 +63,7 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
   const dateFormat = "YYYY-MM-DD";
 
   // dateRange的时间
-  const [expirationDate, setExpirationDate] = useState<dayjs.Dayjs>(dayjs());
+  const [expirationTime, setExpirationTime] = useState<dayjs.Dayjs>(dayjs());
 
   // 对dateRange时间根据options选项进行处理
   React.useEffect(() => {
@@ -92,7 +92,7 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
 
       // 自定义时间
     case "custom":
-      newDate = expirationDate ?? dayjs();
+      newDate = expirationTime ?? dayjs();
       break;
 
     default:
@@ -102,7 +102,7 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
     // 传递值
     onChange?.(newDate);
     // 更新组件状态
-    setExpirationDate(newDate);
+    setExpirationTime(newDate);
   }, [selectedOption]);
 
   return (
@@ -117,11 +117,11 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
       <DatePicker
         disabled={selectedOption !== "custom"}
         minDate={dayjs(dayjs().format(dateFormat))}
-        value={ expirationDate }
+        value={ expirationTime }
         style={{ width: "60%" }}
         onChange={(date) =>
         {
-          setExpirationDate(date);
+          setExpirationTime(date);
           onChange?.(date);
         }
         } // 更新状态
@@ -143,9 +143,9 @@ const NewAccountModal: React.FC<ModalProps> = ({
 
 
   const onOk = async () => {
-    const { accountName, expirationDate, comment } = await form.validateFields();
+    const { accountName, expirationTime, comment } = await form.validateFields();
     await api.whitelistAccount({ body: { accountName: accountName.trim(), comment,
-      expirationDate:expirationDate.toISOString() } })
+      expirationTime:expirationTime.toISOString() } })
       .httpError(404, () => {
         message.error(t(p("notExist")));
       })
@@ -172,11 +172,11 @@ const NewAccountModal: React.FC<ModalProps> = ({
           <Input />
         </Form.Item>
         {/* 日期选择 */}
-        <Form.Item name="expirationDate" label={t(pCommon("indate"))} rules={[{ required: true }]}>
+        <Form.Item name="expirationTime" label={t(pCommon("expirationTime"))} rules={[{ required: true }]}>
           <PickExpDate
-            id="expirationDate"
-            value={form.getFieldValue("expirationDate")}
-            onChange={(date) => form.setFieldsValue({ expirationDate: date })}
+            id="expirationTime"
+            value={form.getFieldValue("expirationTime")}
+            onChange={(date) => form.setFieldsValue({ expirationTime: date })}
           />
         </Form.Item>
         <Form.Item name="comment" rules={[{ required: true }]} label={t(pCommon("comment"))}>

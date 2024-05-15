@@ -291,26 +291,32 @@ export const accountServiceServer = plugin((server) => {
 
       // 删除过期的白名单账户
       const today = new Date();
-      const expiredWhitelists = await em.find(AccountWhitelist, {
-        expirationDate: { $lt: today },
-        account: { tenant: { name: tenantName } },
+
+      // 查询所有相关信息，并删除过期的白名单账户
+      const results = await em.find(AccountWhitelist, {
+        $and: [
+          { account: { tenant: { name: tenantName } } },
+        ],
+      }, {
+        populate: ["account"],
       });
 
+      // 删除过期的白名单账户
+      const expiredWhitelists = results.filter((x) => x.expirationTime && x.expirationTime < today);
       if (expiredWhitelists.length > 0) {
         await em.removeAndFlush(expiredWhitelists);
       }
-
-      const results = await em.find(AccountWhitelist, { account: { tenant: { name: tenantName } } }, {
-        populate: ["account"],
-      });
 
       const owners = await em.find(UserAccount, {
         account: { accountName: results.map((x) => x.account.$.accountName), tenant: { name: tenantName } },
         role: EntityUserRole.OWNER,
       }, { populate: ["user"]});
 
+      // 过滤结果，排除已删除的白名单账户
+      const validResults = results.filter((x) => !expiredWhitelists.includes(x));
+
       return [{
-        accounts: results.map((x) => {
+        accounts: validResults.map((x) => {
 
           const accountOwner = owners.find((o) => o.account.id === x.account.id)!.user.$;
           return {
@@ -321,8 +327,8 @@ export const accountServiceServer = plugin((server) => {
             ownerId: accountOwner.userId + "",
             ownerName: accountOwner.name,
             balance: decimalToMoney(x.account.$.balance),
-            expirationDate:x.expirationDate?.toISOString().includes("2099") ? undefined
-              : x.expirationDate?.toISOString(),
+            expirationTime:x.expirationTime?.toISOString().includes("2099") ? undefined
+              : x.expirationTime?.toISOString(),
           };
 
         }),
@@ -330,7 +336,7 @@ export const accountServiceServer = plugin((server) => {
     },
 
     whitelistAccount: async ({ request, em, logger }) => {
-      const { accountName, comment, operatorId, tenantName, expirationDate } = request;
+      const { accountName, comment, operatorId, tenantName, expirationTime } = request;
 
       const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } },
         { populate: [ "tenant"]});
@@ -350,8 +356,8 @@ export const accountServiceServer = plugin((server) => {
         time: new Date(),
         comment,
         operatorId,
-        // expirationDate为undefined时为永久有效
-        expirationDate:expirationDate ? new Date(expirationDate) : undefined,
+        // expirationTime为undefined时为永久有效
+        expirationTime:expirationTime ? new Date(expirationTime) : undefined,
       });
       account.whitelist = toRef(whitelist);
 
