@@ -844,10 +844,10 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       comment: request1.comment,
       amount: request1.amount,
       type: request1.type,
-      userId: "user_2",
+      userId: "user_1",
       metadata: {
-        "cluster":  "hpc02",
-        "idJob":  9,
+        "cluster":  "hpc01",
+        "idJob":  1,
       },
     },
     {
@@ -856,10 +856,10 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       comment: request3.comment,
       amount: request3.amount,
       type: request3.type,
-      userId: "user_1",
+      userId: "user_2",
       metadata: {
-        "cluster":  "hpc01",
-        "idJob":  1,
+        "cluster":  "hpc02",
+        "idJob":  9,
       },
     },
   ]as Partial<ChargeRecord>);
