@@ -16,7 +16,9 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
+import { ChargeRequest, ChargingServiceClient, GetPaginatedChargeRecordsRequest_SortBy, PaymentRecord, PayRequest,
+} from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { Account, AccountState } from "src/entities/Account";
@@ -545,6 +547,8 @@ it("returns charge records with query of tenant", async () => {
     endTime: queryEndTime.toISOString(),
     userIds: [],
     types:extractTypesFromObjects([request1, request2]),
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -553,15 +557,15 @@ it("returns charge records with query of tenant", async () => {
     {
       tenantName: tenant.name,
       accountName: undefined,
-      comment: request2.comment,
-      amount: request2.amount,
-      type: request2.type,
-    }, {
-      tenantName: tenant.name,
-      accountName: undefined,
       comment: request1.comment,
       amount: request1.amount,
       type: request1.type,
+    }, {
+      tenantName: tenant.name,
+      accountName: undefined,
+      comment: request2.comment,
+      amount: request2.amount,
+      type: request2.type,
     } ] as Partial<ChargeRecord>);
 
   em.clear();
@@ -718,24 +722,26 @@ it("returns charge records with query of accountsOfTenant", async () => {
     page: 1,
     pageSize: 50,
     userIds: [],
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
 
   expect(reply.results).toMatchObject([
     {
-      accountName: request2.accountName,
-      tenantName: account.tenant.getProperty("name"),
-      comment: request2.comment,
-      amount: request2.amount,
-      type: request2.type,
-    },
-    {
       accountName: request1.accountName,
       tenantName: account.tenant.getProperty("name"),
       comment: request1.comment,
       amount: request1.amount,
       type: request1.type,
+    },
+    {
+      accountName: request2.accountName,
+      tenantName: account.tenant.getProperty("name"),
+      comment: request2.comment,
+      amount: request2.amount,
+      type: request2.type,
     },
   ]as Partial<ChargeRecord>);
 
@@ -825,23 +831,13 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: ["user_1", "user_2"], types:extractTypesFromObjects([request1, request2, request3, request4]),
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
 
   expect(reply.results).toMatchObject([
-    {
-      accountName: request3.accountName,
-      tenantName: request3.tenantName,
-      comment: request3.comment,
-      amount: request3.amount,
-      type: request3.type,
-      userId: "user_2",
-      metadata: {
-        "cluster":  "hpc02",
-        "idJob":  9,
-      },
-    },
     {
       accountName: request1.accountName,
       tenantName: request1.tenantName,
@@ -852,6 +848,18 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
       metadata: {
         "cluster":  "hpc01",
         "idJob":  1,
+      },
+    },
+    {
+      accountName: request3.accountName,
+      tenantName: request3.tenantName,
+      comment: request3.comment,
+      amount: request3.amount,
+      type: request3.type,
+      userId: "user_2",
+      metadata: {
+        "cluster":  "hpc02",
+        "idJob":  9,
       },
     },
   ]as Partial<ChargeRecord>);
@@ -1123,18 +1131,20 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request3]),
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply1.results).toHaveLength(2);
 
   expect(reply1.results).toMatchObject([{
-    accountName: request3.accountName,
-    comment: request3.comment,
-    amount: request3.amount,
-  }, {
     accountName: request1.accountName,
     comment: request1.comment,
     amount: request1.amount,
+  }, {
+    accountName: request3.accountName,
+    comment: request3.comment,
+    amount: request3.amount,
   } ]as Partial<ChargeRecord>);
 
   const reply2 = await asyncClientCall(client, "getPaginatedChargeRecords", {
@@ -1161,17 +1171,19 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request2, request3, request4]),
+    sortBy:undefined,
+    sortOrder:undefined,
   });
 
   expect(reply3.results).toHaveLength(2);
   expect(reply3.results).toMatchObject([{
-    accountName: request4.accountName,
-    comment: request4.comment,
-    amount: request4.amount,
-  }, {
     accountName: request1.accountName,
     comment: request1.comment,
     amount: request1.amount,
+  }, {
+    accountName: request4.accountName,
+    comment: request4.comment,
+    amount: request4.amount,
   } ]as Partial<ChargeRecord>);
 
   em.clear();

@@ -108,6 +108,24 @@ export enum OperationLogQueryType {
   PLATFORM = 3,
 };
 
+
+export const OperationSortBy = Type.Union(
+  [ Type.Literal("id"),
+    Type.Literal("operationResult"),
+    Type.Literal("operationTime"),
+    Type.Literal("operatorIp"),
+    Type.Literal("operatorUserId")],
+);
+export type OperationSortBy = Static<typeof OperationSortBy>
+
+export const OperationSortOrder = Type.Union([
+  Type.Literal("descend"),
+  Type.Literal("ascend"),
+]);
+export type OperationSortOrder = Static<typeof OperationSortOrder>
+
+
+
 type OperationTextsTransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
 const pRes = prefix("operationLog.resultTexts.");
 const pTypes = prefix("operationLog.operationTypeTexts.");

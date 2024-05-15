@@ -21,7 +21,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { SearchType } from "src/models/User";
+import { ChargesSortBy, ChargesSortOrder, SearchType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { ChargeInfo } from "src/pages/api/finance/charges";
@@ -46,6 +46,11 @@ interface FilterForm {
   time: [dayjs.Dayjs, dayjs.Dayjs];
   types?: string[];
   userIds?: string;
+}
+
+interface Sorter {
+  field: ChargesSortBy | undefined;
+  order: ChargesSortOrder | undefined;
 }
 
 // 当前时间的 dayjs 对象
@@ -80,6 +85,17 @@ export const ChargeTable: React.FC<Props> = ({
       userIds: undefined,
     });// 查询对象
 
+  // 定义排序状态
+  const [sorter, setSorter] = useState<Sorter>({ field: undefined, order:undefined });
+
+  const handleTableChange = (pagination, _, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field:sorter.field,
+      order: sorter.order,
+    });
+  };
+
   // 过滤后的消费类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
@@ -112,6 +128,8 @@ export const ChargeTable: React.FC<Props> = ({
       searchType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      sortBy: sorter.field,
+      sortOrder: sorter.order,
     } });
     // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
     if (query.userIds) {
@@ -266,6 +284,7 @@ export const ChargeTable: React.FC<Props> = ({
         <Table
           tableLayout="fixed"
           dataSource={recordsData?.results}
+          onChange={handleTableChange}
           pagination={{
             showSizeChanger: true,
             current: pageInfo.page,
@@ -299,10 +318,25 @@ export const ChargeTable: React.FC<Props> = ({
             title={t(pCommon("user"))}
             width="15%"
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
+            sorter={true}
           />
-          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(2)} />
-          <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
+          <Table.Column<ChargeInfo>
+            dataIndex="time"
+            title={t(p("time")) }
+            render={(v) => formatDateTime(v)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="amount"
+            title={t(p("amount"))}
+            render={(v) => v.toFixed(3)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="type"
+            title={t(pCommon("type"))}
+            sorter={true}
+          />
           <Table.Column<ChargeInfo>
             dataIndex="comment"
             title={t(pCommon("comment"))}
