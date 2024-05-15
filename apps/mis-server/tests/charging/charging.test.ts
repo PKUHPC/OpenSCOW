@@ -16,8 +16,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { ChargeRequest, ChargingServiceClient,
-  GetPaginatedChargeRecordsRequest_SortBy, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
+import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { Account, AccountState } from "src/entities/Account";
@@ -489,8 +488,6 @@ it("returns charge records with query of accountOfTenant", async () => {
     page: 1,
     pageSize:10,
     userIds: [],
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
     types:[request1.type],
   });
 
@@ -547,8 +544,6 @@ it("returns charge records with query of tenant", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     userIds: [],
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
     types:extractTypesFromObjects([request1, request2]),
   });
 
@@ -649,8 +644,6 @@ it("returns charge records with query of allTenants", async () => {
     endTime: queryEndTime.toISOString(),
     types: [request1.type],
     userIds: [],
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(1);
@@ -725,8 +718,6 @@ it("returns charge records with query of accountsOfTenant", async () => {
     page: 1,
     pageSize: 50,
     userIds: [],
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -834,8 +825,6 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: ["user_1", "user_2"], types:extractTypesFromObjects([request1, request2, request3, request4]),
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply.results).toHaveLength(2);
@@ -1134,8 +1123,6 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request3]),
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply1.results).toHaveLength(2);
@@ -1160,8 +1147,6 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request2]),
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply2.results).toHaveLength(0);
@@ -1176,8 +1161,6 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request1, request2, request3, request4]),
-    sortBy:GetPaginatedChargeRecordsRequest_SortBy.AMOUNT,
-    sortOrder:undefined,
   });
 
   expect(reply3.results).toHaveLength(2);
