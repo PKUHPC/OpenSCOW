@@ -33,7 +33,8 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
+import { checkAppExist, checkCreateAppEntity,
+  fetchJobInputParams, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -224,39 +225,43 @@ export const getAppMetadata = procedure
     return { appName: app.name, appImage: app.image, attributes, appComment: comment };
   });
 
+const CreateAppInputSchema = z.object({
+  clusterId: z.string(),
+  appId: z.string(),
+  appJobName: z.string(),
+  isAlgorithmPrivate: z.boolean().optional(),
+  algorithm: z.number().optional(),
+  image: z.number().optional(),
+  remoteImageUrl: z.string().optional(),
+  startCommand: z.string().optional(),
+  isDatasetPrivate: z.boolean().optional(),
+  dataset: z.number().optional(),
+  isModelPrivate: z.boolean().optional(),
+  model: z.number().optional(),
+  mountPoints: z.array(z.string()).optional(),
+  account: z.string(),
+  partition: z.string().optional(),
+  coreCount: z.number(),
+  nodeCount: z.number(),
+  gpuCount: z.number().optional(),
+  memory: z.number().optional(),
+  maxTime: z.number(),
+  workingDirectory: z.string().optional(),
+  customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
+});
+
+export type CreateAppInput = z.infer<typeof CreateAppInputSchema>;
+
 export const createAppSession = procedure
   .meta({
     openapi: {
       method: "POST",
       path: "/appSessions",
-      tags: ["app"],
+      tags: ["appSessions"],
       summary: "Create APP Session",
     },
   })
-  .input(z.object({
-    clusterId: z.string(),
-    appId: z.string(),
-    appJobName: z.string(),
-    isAlgorithmPrivate: z.boolean().optional(),
-    algorithm: z.number().optional(),
-    image: z.number().optional(),
-    remoteImageUrl: z.string().optional(),
-    startCommand: z.string().optional(),
-    isDatasetPrivate: z.boolean().optional(),
-    dataset: z.number().optional(),
-    isModelPrivate: z.boolean().optional(),
-    model: z.number().optional(),
-    mountPoints: z.array(z.string()).optional(),
-    account: z.string(),
-    partition: z.string().optional(),
-    coreCount: z.number(),
-    nodeCount: z.number(),
-    gpuCount: z.number().optional(),
-    memory: z.number().optional(),
-    maxTime: z.number(),
-    workingDirectory: z.string().optional(),
-    customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
-  }))
+  .input(CreateAppInputSchema)
   .output(z.object({
     jobId: z.number(),
   }))
@@ -488,19 +493,77 @@ export const createAppSession = procedure
         jobType: JobType.APP,
       };
       await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+
+      // 保存提交参数
+      await sftpWriteFile(sftp)(join(appJobsDirectory, `${reply.jobId}-input.json`), JSON.stringify(input));
+
       return { jobId: reply.jobId };
     });
 
   });
 
+export const getCreateAppParams =
+  procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/appSessions/{jobId}/submissionParameters",
+        tags: ["appSessions"],
+        summary: "Get Create App Session Parameters",
+      },
+    })
+    .input(z.object({
+      clusterId: z.string(),
+      jobId: z.number(),
+      jobName: z.string(),
+    }))
+    .output(CreateAppInputSchema)
+    .query(async ({ input, ctx: { user } }) => {
+
+      const { clusterId, jobId, jobName } = input;
+      const userId = user.identityId;
+      const host = getClusterLoginNode(clusterId);
+      if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+
+        const homeDir = await getUserHomedir(ssh, userId, logger);
+        const jobsDirectory = join(aiConfig.appJobsDir, jobName);
+
+        const sftp = await ssh.requestSFTP();
+
+        // 读取作业信息
+        const metadataPath = join(jobsDirectory, SESSION_METADATA_NAME);
+
+        if (!await sftpExists(sftp, metadataPath)) {
+          return {} as CreateAppInput;
+        }
+
+        const content = await sftpReadFile(sftp)(metadataPath);
+        const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
+
+        if (sessionMetadata.jobType !== JobType.APP) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Job type of job ${jobId} is not APP`,
+          });
+        }
+
+        const inputParamsPath = join(homeDir, jobsDirectory, `${jobId}-input.json`);
+
+        return await fetchJobInputParams<CreateAppInput>(
+          inputParamsPath, sftp, CreateAppInputSchema, logger,
+        );
+      });
+    });
 
 export const saveImage =
   procedure
     .meta({
       openapi: {
         method: "POST",
-        path: "/apps/{jobId}/saveImage",
-        tags: ["app"],
+        path: "/appSessions/{jobId}/saveImage",
+        tags: ["appSessions"],
         summary: "Save Image From App Session",
       },
     })
@@ -760,7 +823,7 @@ procedure
       method: "GET",
       path: "/appSessions/{jobId}/checkConnectivity",
       tags: ["appSessions"],
-      summary: "List App Sessions",
+      summary: "Check APP Session Connectivity",
     },
   })
   .input(z.object({
