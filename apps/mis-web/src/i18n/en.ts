@@ -120,10 +120,6 @@ export default {
       title: "Account Information",
       state: "Status",
       balance: "Available Balance",
-      status: {
-        blocked: "Blocked",
-        normal: "Available",
-      },
       alert: "You do not belong to any account.",
     },
     job: {

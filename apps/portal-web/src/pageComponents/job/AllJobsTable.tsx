@@ -12,7 +12,7 @@
 
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
-import { compareNumber } from "@scow/lib-web/build/utils/math";
+import { compareNumber, compareTimeAsSeconds } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { Button, DatePicker, Form, InputNumber, Popover, Space, Table } from "antd";
@@ -169,40 +169,79 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         sorter={(a, b) => compareNumber(+a.jobId, +b.jobId)}
         defaultSortOrder="descend"
       />
-      <Table.Column<JobInfo> dataIndex="name" ellipsis title={t(p("jobName"))} />
-      <Table.Column<JobInfo> dataIndex="account" width="10%" ellipsis title={t(p("account"))} />
-      <Table.Column<JobInfo> dataIndex="partition" width="6.5%" ellipsis title={t(p("partition"))} />
-      <Table.Column<JobInfo> dataIndex="qos" width="6.5%" ellipsis title={t(p("qos"))} />
-      <Table.Column<JobInfo> dataIndex="state" width="6%" title={t(p("state"))} />
+      <Table.Column<JobInfo>
+        dataIndex="name"
+        ellipsis
+        title={t(p("jobName"))}
+        sorter={(a, b) => a.name.localeCompare(b.name)}
+      />
+      <Table.Column<JobInfo>
+        dataIndex="account"
+        width="10%"
+        ellipsis
+        title={t(p("account"))}
+        sorter={(a, b) => a.account.localeCompare(b.account)}
+      />
+      <Table.Column<JobInfo>
+        dataIndex="partition"
+        width="6.5%"
+        ellipsis
+        title={t(p("partition"))}
+        sorter={(a, b) => a.partition.localeCompare(b.partition)}
+      />
+      <Table.Column<JobInfo>
+        dataIndex="qos"
+        width="6.5%"
+        ellipsis
+        title={t(p("qos"))}
+        sorter={(a, b) => (isNaN(Number(a.qos)) || isNaN(Number(b.qos))) ?
+          a.qos.localeCompare(b.qos) : Number(a.qos) - Number(b.qos)}
+      />
+      <Table.Column<JobInfo>
+        dataIndex="state"
+        width="6%"
+        title={t(p("state"))}
+        sorter={(a, b) => a.state.localeCompare(b.state)}
+      />
       <Table.Column<JobInfo>
         dataIndex="submitTime"
         width="8.6%"
         title={t(p("submitTime"))}
         render={(t) => formatDateTime(t)}
+        sorter={(a, b) => Number(dayjs(a.submitTime).isAfter(dayjs(b.submitTime))) }
       />
       <Table.Column<JobInfo>
         dataIndex="startTime"
         width="8.6%"
         title={t(p("startTime"))}
         render={(t) => formatDateTime(t)}
+        sorter={(a, b) => Number(dayjs(a.startTime).isAfter(dayjs(b.startTime))) }
       />
       <Table.Column<JobInfo>
         dataIndex="endTime"
         width="8.6%"
         title={t(p("endTime"))}
         render={(t) => formatDateTime(t)}
+        sorter={(a, b) => Number(dayjs(a.endTime).isAfter(dayjs(b.endTime))) }
       />
       <Table.Column<JobInfo>
         dataIndex="elapsed"
         width="5.4%"
         title={t(p("elapsed"))}
+        sorter={(a, b) => compareTimeAsSeconds(a.elapsed, b.elapsed, ":")}
       />
-      <Table.Column<JobInfo> dataIndex="timeLimit" width="6.5%" title={t(p("timeLimit"))} />
+      <Table.Column<JobInfo>
+        dataIndex="timeLimit"
+        width="6.5%"
+        title={t(p("timeLimit"))}
+        sorter={(a, b) => compareTimeAsSeconds(a.timeLimit, b.timeLimit, ":")}
+      />
       <Table.Column<JobInfo>
         dataIndex="reason"
         ellipsis
         title={t(p("reason"))}
         render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
+        sorter={(a, b) => a.reason.localeCompare(b.reason)}
       />
       <Table.Column<JobInfo>
         title={t(p("more"))}
