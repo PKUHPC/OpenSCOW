@@ -211,6 +211,25 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
               >保存镜像</SaveImageModalButton>
             ) : undefined
           }
+          <Button
+            type="link"
+            onClick={async () => {
+              let basePath = `/jobs/${cluster.id}`;
+              const searchParams = new URLSearchParams({
+                jobId:  record.jobId.toString(),
+                jobName: record.sessionId,
+              });
+
+              if (record.jobType === JobType.APP) {
+                if (record.appId) {
+                  basePath += `/createApps/${record.appId}`;
+                }
+              } else if (record.jobType === JobType.TRAIN) {
+                basePath += "/trainJobs";
+              }
+              router.push(`${basePath}?${searchParams.toString()}`);
+            }}
+          >再次提交</Button>
           <a onClick={() => {
             router.push(join("/files", cluster.id, record.dataPath));
           }}
