@@ -15,17 +15,17 @@ import {
   CloudSyncOutlined,
   ClusterOutlined,
   LinkOutlined,
-  Loading3QuartersOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
   SaveOutlined } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
-import { ApplicationIcon, DashBoardIcon, DesktopIcon
-  , FileManagerIcon, JobIcon, ShellIcon } from "src/icons/headerIcons/headerIcons";
+import { AllJobsIcon, ApplicationIcon
+  , AppSessionsIcon, ClusterFileManagerIcon
+  , CreateAppIcon, DashBoardIcon, DesktopIcon
+  , FileManagerIcon, JobIcon, RunningJobsIcon
+  , ShellClusterIcon, ShellIcon, SubmitJobIcon } from "src/icons/headerIcons/headerIcons";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode, publicConfig } from "src/utils/config";
 export const userRoutes: (
@@ -54,17 +54,17 @@ export const userRoutes: (
       clickToPath: "/jobs/runningJobs",
       children: [
         {
-          Icon: JobIcon,
+          Icon: RunningJobsIcon,
           text: t("routes.job.runningJobs"),
           path: "/jobs/runningJobs",
         },
         {
-          Icon: JobIcon,
+          Icon: AllJobsIcon,
           text: t("routes.job.allJobs"),
           path: "/jobs/allJobs",
         },
         {
-          Icon: PlusCircleOutlined,
+          Icon: SubmitJobIcon,
           text: t("routes.job.submitJob"),
           path: "/jobs/submit",
         },
@@ -85,7 +85,7 @@ export const userRoutes: (
       clickable: true,
       children: publicConfig.CLUSTERS.map(({ name, id }) => ({
         openInNewPage: true,
-        Icon: CloudServerOutlined,
+        Icon: ShellClusterIcon,
         text: getI18nConfigCurrentText(name, languageId),
         path: `/shell/${id}`,
         clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.address),
@@ -118,13 +118,13 @@ export const userRoutes: (
         handleClick: () => { setDefaultCluster(cluster); },
         children: [
           {
-            Icon: Loading3QuartersOutlined,
+            Icon: AppSessionsIcon,
             text: t("routes.apps.appSessions"),
             path: `/apps/${cluster.id}/sessions`,
             handleClick: () => { setDefaultCluster(cluster); },
           },
           {
-            Icon: PlusOutlined,
+            Icon: CreateAppIcon,
             text: t("routes.apps.createApp"),
             clickable: false,
             path: `/apps/${cluster.id}/createApps`,
@@ -141,7 +141,7 @@ export const userRoutes: (
       clickable: true,
       children: [
         {
-          Icon: FileManagerIcon,
+          Icon: ClusterFileManagerIcon,
           text: t("routes.file.clusterFileManager"),
           path: "/files/",
           clickToPath: `/files/${defaultCluster.id}/~`,
@@ -160,7 +160,7 @@ export const userRoutes: (
             path: "/files/fileTransfer",
           },
           {
-            Icon: CloudServerOutlined,
+            Icon: ShellClusterIcon,
             text: t("routes.file.transferProgress"),
             path: "/files/currentTransferInfo",
           },

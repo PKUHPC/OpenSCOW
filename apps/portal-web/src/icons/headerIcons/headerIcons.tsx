@@ -209,3 +209,196 @@ V21C0.75 20.3096 1.30964 19.75 2 19.75Z"
 );
 
 export const MisIcon = (props) => <Icon component={misSVG} {...props} />;
+
+// 所有作业图标
+const allJobsSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4.67856" y="5.57141" width="20.3214" height="19.4286" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="1.10718" y="1" width="7.82143" height="7.82143" rx="1" fill="white" stroke="#6B747F" strokeWidth="2" />
+    <rect
+      x="1.10715"
+      y="12.7142"
+      width="7.82143"
+      height="7.82143"
+      rx="1"
+      fill="white"
+      stroke="#6B747F"
+      strokeWidth="2"
+    />
+    <rect x="11.8214" y="1" width="7.82143" height="7.82143" rx="1" fill="white" stroke="#6B747F" strokeWidth="2" />
+    <path d="M14.3929 15.2858H21.5357" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3929 17.9642H19.75" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3929 20.6428H17.9643" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+export const AllJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={allJobsSVG} {...props} ref={ref} />
+));
+
+// 提交作业图标
+const submitJobSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.9231 20.6428L20.4616 20.6428" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M18.6923 18.8572L18.6923 22.4286" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path
+      d="M22.2308 14.3929V4.97059
+    V3C22.2308 1.89543 21.3353 1 20.2308 1H3C1.89543 1 1 1.89543 1 3
+    V24C1 25.1046 1.89543 26 3 26H13.8269"
+      stroke="#6B747F"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path d="M6.30768 9.92859H16.9231" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 13.5H14.2692" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 17.0714H12.5" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path
+      d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
+    C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
+    C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
+      stroke="#6B747F"
+      strokeWidth="1.5"
+    />
+  </svg>
+);
+export const SubmitJobIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={submitJobSVG} {...props} ref={ref} />
+));
+
+// 未结束作业图标
+const runningJobsSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M22.2308 14.3929V4.97059V3
+    C22.2308 1.89543 21.3353 1 20.2308 1H3C1.89543 1 1 1.89543 1 3V24C1 25.1046 1.89543 26 3 26H13.8269"
+      stroke="#6B747F"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <path d="M6.30768 9.92859H16.9231" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 13.5H14.2692" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 17.0714H12.5" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path
+      d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
+    C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
+    C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
+      stroke="#6B747F"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
+    C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
+    C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
+      stroke="#6B747F"
+      strokeWidth="1.5"
+    />
+    <path d="M18.6923 18.8572L18.6923 21.5357H20.4615" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+export const RunningJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={runningJobsSVG} {...props} ref={ref} />
+));
+
+
+// shell集群图标
+const shellClusterSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3.67856" y="1" width="17.6429" height="8.71429" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="1" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="9.92856" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="18.8571" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <path d="M6.25 5.35718H10.7143" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
+    <path d="M12.5 8.92859L12.5 19.6429" stroke="#6B747F" strokeWidth="2" />
+    <path
+      d="M3.57144 19.6428V14.3928C3.57144 13.8405 4.01916 13.3928 4.57144 13.3928
+    H20.4286C20.9809 13.3928 21.4286 13.8405 21.4286 14.3928V19.6428"
+      stroke="#6B747F"
+      strokeWidth="2"
+    />
+  </svg>
+);
+export const ShellClusterIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={shellClusterSVG} {...props} ref={ref} />
+));
+
+// 集群文件管理图标
+const clusterFileManagerSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M11.1438 2H3.00003V4.25H12.1724L11.1438 2
+    ZM3.00003 0C1.89546 0 1.00003 0.89543 1.00003 2V4.01347C0.931494 4.14893 0.892883 4.3021 0.892883 4.46429
+    V6.25C0.892883 6.39257 0.922719 6.52817 0.976487 6.6509C0.921837 6.87738 0.892883 7.11388 0.892883 7.35714
+    V22.1071C0.892883 23.764 2.23603 25.1071 3.89288 25.1071H11.4273C11.9796 25.1071 12.4273 24.6594 12.4273 24.1071
+    C12.4273 23.5549 11.9796 23.1071 11.4273 23.1071H3.89288C3.3406 23.1071 2.89288 22.6594 2.89288 22.1071V7.35714
+    C2.89288 6.80486 3.3406 6.35714 3.89288 6.35714H23.1072C23.6595 6.35714 24.1072 6.80486 24.1072 7.35714
+    V13.1017C24.1072 13.654 24.5549 14.1017 25.1072 14.1017C25.6595 14.1017 26.1072 13.654 26.1072 13.1017V7.35714
+    C26.1072 5.70029 24.764 4.35714 23.1072 4.35714H14.1718
+    C14.1886 4.04871 14.1331 3.7286 13.9913 3.41848L12.9628 1.16848
+    C12.6373 0.456608 11.9265 0 11.1438 0H3.00003ZM15 12.2143
+    V14.5714H21.8215V12.2143H15ZM14.5 10.7143C13.9477 10.7143 13.5 11.162 13.5 11.7143V15.0714
+    C13.5 15.2761 13.5615 15.4665 13.6671 15.625
+    C13.5615 15.7835 13.5 15.9739 13.5 16.1786V19.5357C13.5 19.7404 13.5615 19.9308 13.6671 20.0893
+    C13.5615 20.2478 13.5 20.4381 13.5 20.6429
+    V24C13.5 24.5523 13.9477 25 14.5 25H22.3215C22.8737 25 23.3215 24.5523 23.3215 24V20.6429
+    C23.3215 20.4381 23.2599 20.2478 23.1544 20.0893
+    C23.2599 19.9308 23.3215 19.7404 23.3215 19.5357V16.1786C23.3215 15.9739 23.2599 15.7835 23.1544 15.625
+    C23.2599 15.4665 23.3215 15.2761 23.3215 15.0714V11.7143C23.3215 11.162 22.8737 10.7143 22.3215 10.7143
+    H14.5ZM15 16.6786V19.0357H21.8215V16.6786H15ZM15 23.5V21.1429H21.8215V23.5H15ZM15.6199 13.3929
+    C15.6199 12.9786 15.9557 12.6429 16.3699 12.6429H18.7615
+    C19.1757 12.6429 19.5115 12.9786 19.5115 13.3929C19.5115 13.8071 19.1757 14.1429 18.7615 14.1429H16.3699
+    C15.9557 14.1429 15.6199 13.8071 15.6199 13.3929ZM16.3699 17.1071C15.9557 17.1071 15.6199 17.4429 15.6199 17.8571
+    C15.6199 18.2714 15.9557 18.6071 16.3699 18.6071H18.7615C19.1757 18.6071 19.5115 18.2714 19.5115 17.8571
+    C19.5115 17.4429 19.1757 17.1071 18.7615 17.1071H16.3699ZM15.6199 22.3214
+    C15.6199 21.9072 15.9557 21.5714 16.3699 21.5714
+    18.7615C19.1757 21.5714 19.5115 21.9072 19.5115 22.3214C19.5115 22.7356 19.1757 23.0714 18.7615 23.0714
+    H16.3699C15.9557 23.0714 15.6199 22.7356 15.6199 22.3214Z"
+      fill="#6B747F"
+    />
+  </svg>
+);
+export const ClusterFileManagerIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={clusterFileManagerSVG} {...props} ref={ref} />
+));
+
+// 创建应用图标
+const createAppSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <path d="M15 19L23 19" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
+    <path d="M19 15L19 23" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
+export const CreateAppIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={createAppSVG} {...props} ref={ref} />
+));
+
+// 已创建APP图标
+const appSessionsSVG = () => (
+  <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="14" y="14" width="10" height="10" rx="5" fill="#6B747F" stroke="#6B747F" strokeWidth="2" />
+    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <path
+      d="M17 19.2857L18.4545 21
+    L21 18"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+export const AppSessionsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={appSessionsSVG} {...props} ref={ref} />
+));
