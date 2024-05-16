@@ -92,13 +92,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
-
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
       maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory, output, errorOutput,
+      workingDirectory, save, memory, output, errorOutput, scriptOutput,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
