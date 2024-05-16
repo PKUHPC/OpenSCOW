@@ -120,26 +120,10 @@ export async function pushImageToHarbor({
   const command = getRuntimeCommand(runtime);
 
   // login harbor
-  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password])
-    .catch(async (e) => {
-
-      logger.error(e, "Permission denied to connect to the image repository.");
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `Can not connect to the image repository: ${e}`,
-      });
-    });
+  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password]);
 
   // tag
-  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl])
-    .catch(async (e) => {
-
-      logger.error(e, "Can not tag the local image.");
-      throw new TRPCError({
-        code: "CONFLICT",
-        message: `Can not tag the local image: ${e}`,
-      });
-    });
+  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
 
   // push 镜像至harbor
   await loggedExec(ssh, logger, true, command, ["push", harborImageUrl])
