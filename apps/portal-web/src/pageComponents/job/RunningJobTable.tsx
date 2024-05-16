@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { compareTimeAsSeconds } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { App, Button, Form, InputNumber, Popconfirm, Space, Table } from "antd";
 import Router from "next/router";
@@ -59,6 +60,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     } });
   }, [userId, query.cluster]);
 
+
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
   const filteredData = useMemo(() => {
@@ -73,6 +75,8 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   }, [data, query.jobId]);
 
   const t = useI18nTranslateToString();
+
+
 
   return (
     <div>
@@ -125,6 +129,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const [previewItem, setPreviewItem] = useState<RunningJobInfo | undefined>(undefined);
 
+
   return (
     <>
       <Table
@@ -142,19 +147,21 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           dataIndex="jobId"
           width="5.2%"
           title={t(p("jobInfoTable.jobId"))}
-          sorter={(a, b) => a.jobId.localeCompare(b.jobId)}
+          sorter={(a, b) => (isNaN(Number(a.jobId)) || isNaN(Number(b.jobId))) ?
+            a.jobId.localeCompare(b.jobId) : Number(a.jobId) - Number(b.jobId)}
         />
         <Table.Column<RunningJobInfo>
           dataIndex="name"
           ellipsis
           title={t(p("jobInfoTable.name"))}
+          sorter={(a, b) => a.name.localeCompare(b.name)}
         />
-
         <Table.Column<RunningJobInfo>
           dataIndex="account"
           width="10%"
           ellipsis
           title={t(p("jobInfoTable.account"))}
+          sorter={(a, b) => a.account.localeCompare(b.account)}
         />
 
         <Table.Column<RunningJobInfo>
@@ -162,24 +169,62 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
           width="6.7%"
           ellipsis
           title={t(p("jobInfoTable.partition"))}
+          sorter={(a, b) => a.partition.localeCompare(b.partition)}
         />
-        <Table.Column<RunningJobInfo> dataIndex="qos" width="6.7%" ellipsis title={t(p("jobInfoTable.qos"))} />
-        <Table.Column<RunningJobInfo> dataIndex="nodes" width="4.5%" title={t(p("jobInfoTable.nodes"))} />
-        <Table.Column<RunningJobInfo> dataIndex="cores" width="4.5%" title={t(p("jobInfoTable.cores"))} />
-        <Table.Column<RunningJobInfo> dataIndex="gpus" width="5%" title={t(p("jobInfoTable.gpus"))} />
-        <Table.Column<RunningJobInfo> dataIndex="state" width="6.1%" title={t(p("jobInfoTable.state"))} />
-        <Table.Column
+        <Table.Column<RunningJobInfo>
+          dataIndex="qos"
+          width="6.7%"
+          ellipsis
+          title={t(p("jobInfoTable.qos"))}
+          sorter={(a, b) => (isNaN(Number(a.qos)) || isNaN(Number(b.qos))) ?
+            a.qos.localeCompare(b.qos) : Number(a.qos) - Number(b.qos)}
+        />
+        <Table.Column<RunningJobInfo>
+          dataIndex="nodes"
+          width="4.5%"
+          title={t(p("jobInfoTable.nodes"))}
+          sorter={(a, b) => (isNaN(Number(a.nodes)) || isNaN(Number(b.nodes))) ?
+            a.nodes.localeCompare(b.nodes) : Number(a.nodes) - Number(b.nodes)}
+        />
+        <Table.Column<RunningJobInfo>
+          dataIndex="cores"
+          width="4.5%"
+          title={t(p("jobInfoTable.cores"))}
+          sorter={(a, b) => (isNaN(Number(a.cores)) || isNaN(Number(b.cores))) ?
+            a.cores.localeCompare(b.cores) : Number(a.cores) - Number(b.cores)}
+        />
+        <Table.Column<RunningJobInfo>
+          dataIndex="gpus"
+          width="5%"
+          title={t(p("jobInfoTable.gpus"))}
+          sorter={(a, b) => (isNaN(Number(a.gpus)) || isNaN(Number(b.gpus))) ?
+            a.gpus.localeCompare(b.gpus) : Number(a.gpus) - Number(b.gpus)}
+        />
+        <Table.Column<RunningJobInfo>
+          dataIndex="state"
+          width="6.1%"
+          title={t(p("jobInfoTable.state"))}
+          sorter={(a, b) => a.state.localeCompare(b.state)}
+        />
+        <Table.Column<RunningJobInfo>
           dataIndex="runningOrQueueTime"
           width="6.7%"
           title={t(p("jobInfoTable.runningOrQueueTime"))}
+          sorter={(a, b) => compareTimeAsSeconds(a.runningOrQueueTime, b.runningOrQueueTime, ":")}
         />
         <Table.Column<RunningJobInfo>
           dataIndex="nodesOrReason"
           ellipsis
           title={t(p("jobInfoTable.nodesOrReason"))}
           render={(d: string) => d.startsWith("(") && d.endsWith(")") ? d.substring(1, d.length - 1) : d}
+          sorter={(a, b) => a.nodesOrReason.localeCompare(b.nodesOrReason)}
         />
-        <Table.Column<RunningJobInfo> dataIndex="timeLimit" width="6.7%" title={t(p("jobInfoTable.timeLimit"))} />
+        <Table.Column<RunningJobInfo>
+          dataIndex="timeLimit"
+          width="6.7%"
+          title={t(p("jobInfoTable.timeLimit"))}
+          sorter={(a, b) => compareTimeAsSeconds(a.timeLimit, b.timeLimit, ":")}
+        />
         <Table.Column<RunningJobInfo>
           title={t(p("jobInfoTable.more"))}
           width="10%"

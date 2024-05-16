@@ -18,6 +18,7 @@ import "google/type/date.proto";
 import "google/protobuf/struct.proto";
 
 import "common/money.proto";
+import "common/sort_order.proto";
 
 message PayRequest {
   common.Money amount = 1;
@@ -139,6 +140,19 @@ message GetPaginatedChargeRecordsRequest {
   optional uint32 page = 10;
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 11;
+
+  enum SortBy {
+    UNKNOWN = 0;
+    USER_ID = 1;
+    TIME = 2;
+    AMOUNT = 3;
+    TYPE = 4;
+  }
+
+  optional SortBy sort_by = 12;
+
+
+  optional common.SortOrder sort_order = 14;
 }
 
 message GetPaginatedChargeRecordsResponse {
