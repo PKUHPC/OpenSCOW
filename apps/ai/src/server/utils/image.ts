@@ -120,16 +120,45 @@ export async function pushImageToHarbor({
   const command = getRuntimeCommand(runtime);
 
   // login harbor
-  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password]);
+  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password])
+    .catch(async (e) => {
+
+      // 清除拉取的镜像
+      await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
+
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: `Can not access to the image repository: ${e}`,
+      });
+    });
 
   // tag
-  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl])
+    .catch(async (e) => {
+      // 清除拉取的镜像
+      await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
 
-  // push 镜像至harbor
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Can not tag the local image: ${e}`,
+      });
+    });
+
+  // // push 镜像至harbor
+  // await loggedExec(ssh, logger, true, command, ["push", harborImageUrl])
   // 运行时为 containerd 时，需添加 --all-platforms 确保多平台镜像可以正确推送
   await loggedExec(ssh, logger, true, command,
     runtime === k8sRuntime.containerd ?
-      ["push", "--all-platforms", harborImageUrl] : ["push", harborImageUrl]);
+      ["push", "--all-platforms", harborImageUrl] : ["push", harborImageUrl])
+    .catch(async (e) => {
+      // 清除本地镜像
+      await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
+      await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Can not push image to the external repository: ${e}`,
+      });
+    }); ;
 
   // 清除本地镜像
   await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
