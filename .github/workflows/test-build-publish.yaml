@@ -179,7 +179,7 @@ jobs:
           file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
           # only build arm64 in tag commits or branches with name starting with `arm-`
-          platforms: linux/amd64/v8
+          platforms: linux/arm64/v8
 
 
   release:
