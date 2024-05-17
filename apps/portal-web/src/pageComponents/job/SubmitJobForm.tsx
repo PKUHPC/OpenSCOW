@@ -83,6 +83,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
 
+  // 脚本输出目录input的状态
+  const [scriptOutputStatus, setScriptOutputStatus] = useState<"" | "warning">("");
+
+  // 脚本输出目录input的提示文字
+  const [scriptOutputPlaceholder, setScriptOutputPlaceholder] = useState<string | undefined>(undefined);
+
   const t = useI18nTranslateToString();
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
@@ -201,6 +207,17 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     : nodeCount * coreCount;
+
+  const handleScriptOutputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const scriptOutputValue = e.target.value.trim();
+    if (!scriptOutputValue) {
+      setScriptOutputStatus("warning");
+      setScriptOutputPlaceholder(t(p("scriptWillNotBeSaved")));
+    } else {
+      setScriptOutputStatus("");
+      setScriptOutputPlaceholder(undefined);
+    }
+  };
 
   return (
     <Form<JobForm>
@@ -389,7 +406,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
               </>
             )}
           >
-            <Input />
+            <Input
+              placeholder={scriptOutputPlaceholder}
+              status={scriptOutputStatus}
+              onChange={handleScriptOutputChange}
+            />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>

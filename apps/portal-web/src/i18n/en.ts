@@ -188,6 +188,7 @@ export default {
         output: "Standard Output File",
         errorOutput: "Error Output File",
         scriptOutput:"Script Output File",
+        scriptWillNotBeSaved:"Script Will Not Be Saved",
         totalNodeCount: "Total Nodes: ",
         totalGpuCount: "Total GPUs: ",
         totalCoreCount: "Total CPU Cores: ",

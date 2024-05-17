@@ -188,6 +188,7 @@ export default {
         output: "标准输出文件",
         errorOutput: "错误输出文件",
         scriptOutput:"脚本输出文件",
+        scriptWillNotBeSaved:"作业脚本将不会被保留",
         totalNodeCount: "总节点数：",
         totalGpuCount: "总GPU卡数：",
         totalCoreCount: "总CPU核心数：",
