@@ -126,10 +126,20 @@ export async function pushImageToHarbor({
   await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
 
   // push 镜像至harbor
-  // 运行时为 containerd 时，需添加 --all-platforms 确保多平台镜像可以正确推送
-  await loggedExec(ssh, logger, true, command,
-    runtime === k8sRuntime.containerd ?
-      ["push", "--all-platforms", harborImageUrl] : ["push", harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["push", harborImageUrl])
+    .catch(async (e) => {
+
+      logger.error(e, "Can not push image to the external repository. "
+        + "Please verify if the image list includes unnecessary multi-platform image data.");
+      // 为了避免可能由于错误镜像缓存引起的问题，清除localImage,taggedImage
+      logger.info("Deleting the locally pulled image and the tagged image ...");
+      await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
+      await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Can not push image to the external repository. : ${e}`,
+      });
+    }); ;
 
   // 清除本地镜像
   await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);

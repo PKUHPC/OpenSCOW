@@ -41,6 +41,8 @@ export default {
     amount: "Amount",
     unit: "CNY",
     comment: "Comment",
+    expirationTime:"expirationTime",
+
     submit: "Submit",
     time: "Time",
     type: "Type",
@@ -232,6 +234,7 @@ export default {
         blockThresholdAmountTooltip: "The account will be blocked "
         + "when the balance is less than the block threshold.",
         comment: "Comment",
+        expirationTime:"expirationTime",
         status: "Status",
         statusTooltip: "Status:",
         statusFrozenTooltip: "Frozen: The account has been frozen by the account administrator "
@@ -609,11 +612,19 @@ export default {
         confirmRemoveWhiteText2: " from the whitelist?",
         removeWhiteSuccess: "Successfully removed from the whitelist!",
         removeWhite: "Remove from Whitelist",
+        expirationTime:"expirationTime",
       },
       addWhitelistedAccountButton: {
         notExist: "Account does not exist!",
         addSuccess: "Added successfully!",
         addWhiteList: "Add Whitelisted Account",
+        expirationTime:"expirationTime",
+        custom:"Custom",
+        oneWeek:"One Week",
+        oneMonth:"One Month",
+        oneYear:"One Year",
+        permanent:"Permanent",
+
       },
       adminJobTable: {
         batch: "Batch Search",
