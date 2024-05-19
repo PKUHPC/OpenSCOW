@@ -14,7 +14,7 @@ concurrency:
 jobs:
   scow-vagrant:
     name: Update scow-vagrant
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     if: vars.PUSH_VAGRANT == 'true'
     steps:
       - uses: actions/checkout@v4

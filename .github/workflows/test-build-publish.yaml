@@ -21,7 +21,7 @@ env:
 jobs:
   test-version-packages:
     name: Test and version packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     permissions:
       contents: write
@@ -96,7 +96,7 @@ jobs:
 
   scow-cli:
     needs: test-version-packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     steps:
       - uses: actions/checkout@v4
@@ -129,7 +129,7 @@ jobs:
 
   build-images:
     needs: test-version-packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     permissions:
       contents: read
@@ -183,7 +183,7 @@ jobs:
 
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     needs:
       - scow-cli
       - build-images
