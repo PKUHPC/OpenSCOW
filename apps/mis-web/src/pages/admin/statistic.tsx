@@ -402,7 +402,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   data={
                     newUserCountData.map((d) => ({
                       x: d.date.format("YYYY-MM-DD"),
-                      y: d.count,
+                      y: Number(d.count),
                     }))}
                   isLoading={newUserLoading}
                   title={t(p("newUserCount"))}
@@ -413,7 +413,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={activeUserCountData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count,
+                    y: Number(d.count),
                   }))}
                   title={t(p("activeUserCount"))}
                   toolTipFormatter={(value) => [value, t(p("userCount"))]}
@@ -447,7 +447,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={dailyChargeData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count.toFixed(2),
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
@@ -469,7 +469,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={dailyPayData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count.toFixed(2),
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}
@@ -541,7 +541,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataBarChart
                   data={misUsageCountData.map((d) => ({
                     x: OperationTypeTexts[d.operationType],
-                    y: d.count,
+                    y:d.count,
                   }))}
                   title={t(p("misFeatureUsageCount"))}
                   toolTipFormatter={(value) => [value, t(p("usageCount"))]}

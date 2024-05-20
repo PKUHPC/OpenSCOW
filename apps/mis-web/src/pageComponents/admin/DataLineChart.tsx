@@ -45,7 +45,7 @@ export const DataLineChart: React.FC<Props> = ({
   lineType = "linear",
   toolTipFormatter = (value) => value,
 }) => {
-
+  console.log(data);
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -56,7 +56,10 @@ export const DataLineChart: React.FC<Props> = ({
               data={data}
             >
               <XAxis dataKey="x" padding={{ left: 20, right: 20 }} type="category" />
-              <YAxis padding={{ top: 20 }} />
+              <YAxis
+                domain={["dataMin", "dataMax"]}
+                interval={"preserveStartEnd"}
+              />
               <Tooltip
                 formatter={toolTipFormatter}
               />
