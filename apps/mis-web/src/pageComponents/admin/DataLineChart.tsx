@@ -45,7 +45,6 @@ export const DataLineChart: React.FC<Props> = ({
   lineType = "linear",
   toolTipFormatter = (value) => value,
 }) => {
-  console.log(data);
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (

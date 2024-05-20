@@ -402,7 +402,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   data={
                     newUserCountData.map((d) => ({
                       x: d.date.format("YYYY-MM-DD"),
-                      y: Number(d.count),
+                      y: d.count,
                     }))}
                   isLoading={newUserLoading}
                   title={t(p("newUserCount"))}
@@ -413,7 +413,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={activeUserCountData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: Number(d.count),
+                    y: d.count,
                   }))}
                   title={t(p("activeUserCount"))}
                   toolTipFormatter={(value) => [value, t(p("userCount"))]}
