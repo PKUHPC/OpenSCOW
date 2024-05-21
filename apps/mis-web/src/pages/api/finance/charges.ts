@@ -60,6 +60,7 @@ export const ChargeInfo = Type.Object({
   userId: Type.Optional(Type.String()),
   userName: Type.Optional(Type.String()),
   metadata: Type.Optional(MetadataMap),
+  userIdOrName:Type.Optional(Type.String()),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
 
@@ -105,6 +106,9 @@ export const GetChargesSchema = typeboxRouteSchema({
     sortBy:Type.Optional(ChargesSortBy),
 
     sortOrder:Type.Optional(ChargesSortOrder),
+
+    // 消费的用户id或者name
+    userIdOrName:  Type.Optional(Type.Array(Type.String())),
   }),
 
   responses: {
@@ -196,7 +200,7 @@ export const buildChargesRequestTarget = (accountNames: string[] | undefined, te
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const { endTime, startTime, accountNames, isPlatformRecords,
-    searchType, types, userIds, page, pageSize, sortBy, sortOrder } = req.query;
+    searchType, types, userIds, page, pageSize, sortBy, sortOrder, userIdOrName } = req.query;
 
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
@@ -218,6 +222,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     pageSize,
     sortBy:mapChargesSortBy,
     sortOrder:mapChargesSortOrder,
+    userIdOrName:userIdOrName ?? [],
   }), []);
 
   const respUserIds = Array.from(new Set(reply.results.map((x) => x.userId).filter((x) => !!x) as string[]));

@@ -153,6 +153,8 @@ message GetPaginatedChargeRecordsRequest {
 
 
   optional common.SortOrder sort_order = 14;
+
+  repeated string user_id_or_name = 15;
 }
 
 message GetPaginatedChargeRecordsResponse {
@@ -178,7 +180,8 @@ message GetChargeRecordsTotalCountRequest {
     // 返回所有租户的租户消费记录
     AllTenantsTarget all_tenants = 8;
   }
-  repeated string user_ids = 9;
+
+  repeated string user_id_or_name = 9;
 }
 
 message GetChargeRecordsTotalCountResponse {
