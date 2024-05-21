@@ -82,14 +82,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
+  const t = useI18nTranslateToString();
 
   // 脚本输出目录input的状态
-  const [scriptOutputStatus, setScriptOutputStatus] = useState<"" | "warning">("");
+  const [scriptOutputStatus, setScriptOutputStatus] = useState<"success" | "warning">("success");
 
   // 脚本输出目录input的提示文字
-  const [scriptOutputPlaceholder, setScriptOutputPlaceholder] = useState<string | undefined>(undefined);
+  const [scriptOutputHelp, setScriptOutputHelp] = useState<string | undefined>(t(p("scriptWillBeSaved")));
 
-  const t = useI18nTranslateToString();
+
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
@@ -212,10 +213,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     const scriptOutputValue = e.target.value.trim();
     if (!scriptOutputValue) {
       setScriptOutputStatus("warning");
-      setScriptOutputPlaceholder(t(p("scriptWillNotBeSaved")));
+      setScriptOutputHelp(t(p("scriptWillNotBeSaved")));
     } else {
-      setScriptOutputStatus("");
-      setScriptOutputPlaceholder(undefined);
+      setScriptOutputStatus("success");
+      setScriptOutputHelp(t(p("scriptWillBeSaved")));
     }
   };
 
@@ -405,10 +406,10 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                 <span>{t(p("wdTooltip3"))}</span>
               </>
             )}
+            validateStatus={scriptOutputStatus}
+            help={scriptOutputHelp}
           >
             <Input
-              placeholder={scriptOutputPlaceholder}
-              status={scriptOutputStatus}
               onChange={handleScriptOutputChange}
             />
           </Form.Item>
