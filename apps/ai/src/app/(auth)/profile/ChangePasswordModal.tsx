@@ -45,7 +45,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
     },
     onError(e) {
       if (e.data?.code === "BAD_REQUEST") {
-        message.error(`修改密码失败:${e.message}`);
+        message.error(`修改密码失败: ${e.message}`);
       }
       else if (e.data?.code === "CONFLICT") {
         message.error("原密码错误");
@@ -85,8 +85,10 @@ export const ChangePasswordModal: React.FC<Props> = ({
           <Input.Password />
         </Form.Item>
         <Form.Item
-          rules={[{ required: true },
-            { pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined }]}
+          rules={[
+            { required: true },
+            { pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined },
+          ]}
           label="新密码"
           name="newPassword"
         >
