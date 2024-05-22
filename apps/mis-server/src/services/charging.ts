@@ -415,25 +415,27 @@ export const chargingServiceServer = plugin((server) => {
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, types, target, page, pageSize, sortBy, sortOrder, userIdOrName }
+      const { startTime, endTime, type, types, target, page, pageSize, sortBy, sortOrder, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
       // userId数组
-      const userIdArray: string[] = [];
+      let userIdArray: string[] | undefined = undefined;
 
       // 如果 userIdOrName 存在，查询 User 表
-      if (userIdOrName) {
-        const users = await em.find(User, {
+      if (userIdsOrNames) {
+        const userQueries = userIdsOrNames.map((nameOrId: string) => ({
           $or: [
-            { id:{ $like: `%${userIdOrName}%` } },
-            { name: { $like: `%${userIdOrName}%` } },
+            { id: { $like: `%${nameOrId}%` } },
+            { name: { $like: `%${nameOrId}%` } },
           ],
+        }));
+
+        const users = await em.find(User, {
+          $or: userQueries,
         });
-        for (const user of users) {
-          userIdArray.push(user.userId);
-        }
+        userIdArray = users.map((user) => user.userId);
       }
 
 
@@ -441,7 +443,7 @@ export const chargingServiceServer = plugin((server) => {
         time: { $gte: startTime, $lte: endTime },
         ...searchType,
         ...searchParam,
-        ...(userIdArray.length > 0 ? { userId: { $in: userIdArray } } : {}),
+        ...(userIdsOrNames.length > 0 || userIdArray ? { userId: { $in: userIdArray } } : {}),
       }, sortBy !== undefined && sortOrder !== undefined ? {
         ...generateChargersOptions(page ?? 1, pageSize, sortBy, sortOrder),
       } : {
@@ -477,27 +479,30 @@ export const chargingServiceServer = plugin((server) => {
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, types, target, userIdOrName }
+      const { startTime, endTime, type, types, target, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
       // userId数组
-      const userIdArray: string[] = [];
+      let userIdArray: string[] | undefined = undefined;
 
       // 如果 userIdOrName 存在，查询 User 表
-      if (userIdOrName) {
-        const users = await em.find(User, {
+      if (userIdsOrNames) {
+        const userQueries = userIdsOrNames.map((nameOrId: string) => ({
           $or: [
-            { id:{ $like: `%${userIdOrName}%` } },
-            { name: { $like: `%${userIdOrName}%` } },
+            { id: { $like: `%${nameOrId}%` } },
+            { name: { $like: `%${nameOrId}%` } },
           ],
+        }));
+
+        const users = await em.find(User, {
+          $or: userQueries,
         });
-        for (const user of users) {
-          userIdArray.push(user.userId);
-        }
+        userIdArray = users.map((user) => user.userId);
       }
+
 
       const { total_count, total_amount }: { total_count: number, total_amount: string }
         = await em.createQueryBuilder(ChargeRecord, "c")
@@ -507,7 +512,7 @@ export const chargingServiceServer = plugin((server) => {
             time: { $gte: startTime, $lte: endTime },
             ...searchType,
             ...searchParam,
-            ...(userIdArray.length > 0 ? { userId: { $in: userIdArray } } : {}),
+            ...(userIdsOrNames.length > 0 || userIdArray ? { userId: { $in: userIdArray } } : {}),
           })
           .execute("get");
 

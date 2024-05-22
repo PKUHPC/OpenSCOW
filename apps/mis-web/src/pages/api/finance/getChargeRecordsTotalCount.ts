@@ -48,7 +48,7 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     searchType: Type.Optional(Type.Enum(SearchType)),
 
     // 消费的用户id或姓名
-    userIdOrName: Type.Optional(Type.Array(Type.String())),
+    userIdsOrNames: Type.Optional(Type.Array(Type.String())),
 
   }),
 
@@ -61,7 +61,7 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) => {
-  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIdOrName } = req.query;
+  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIdsOrNames } = req.query;
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
 
@@ -74,7 +74,7 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     endTime,
     types:types ?? [],
     target: buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords),
-    userIdOrName:userIdOrName ?? [],
+    userIdsOrNames:userIdsOrNames ?? [],
   }), ["totalAmount", "totalCount"]);
 
   return {

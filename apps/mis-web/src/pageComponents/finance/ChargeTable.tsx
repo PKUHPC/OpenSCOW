@@ -130,7 +130,7 @@ export const ChargeTable: React.FC<Props> = ({
       pageSize: pageInfo.pageSize,
       sortBy: sorter.field,
       sortOrder: sorter.order,
-      userIdOrName:convertUserIdArray(query.userIds),
+      userIdsOrNames:convertUserIdArray(query.userIds),
     } });
 
     return getChargesInfo;
@@ -146,7 +146,7 @@ export const ChargeTable: React.FC<Props> = ({
         types: query.types,
         isPlatformRecords,
         searchType,
-        userIdOrName:convertUserIdArray(query.userIds),
+        userIdsOrNames:convertUserIdArray(query.userIds),
       },
     });
   }, [query]);

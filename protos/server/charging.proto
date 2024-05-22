@@ -154,7 +154,7 @@ message GetPaginatedChargeRecordsRequest {
 
   optional common.SortOrder sort_order = 14;
 
-  repeated string user_id_or_name = 15;
+  repeated string user_ids_or_names = 15;
 }
 
 message GetPaginatedChargeRecordsResponse {
@@ -181,7 +181,7 @@ message GetChargeRecordsTotalCountRequest {
     AllTenantsTarget all_tenants = 8;
   }
 
-  repeated string user_id_or_name = 9;
+  repeated string user_ids_or_names = 9;
 }
 
 message GetChargeRecordsTotalCountResponse {
