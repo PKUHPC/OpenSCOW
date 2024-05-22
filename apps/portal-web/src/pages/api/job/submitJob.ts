@@ -39,6 +39,7 @@ export const SubmitJobInfo = Type.Object({
   memory: Type.Optional(Type.String()),
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
+  scriptOutput:Type.Optional(Type.String()),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
@@ -73,7 +74,8 @@ export default route(SubmitJobSchema, async (req, res) => {
   if (!info) { return; }
 
   const { cluster, command, jobName, coreCount, gpuCount, maxTime, save,
-    nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = req.body;
+    nodeCount, partition, qos, account, comment
+    , workingDirectory, output, errorOutput, scriptOutput, memory } = req.body;
 
   const client = getClient(JobServiceClient);
 
@@ -102,6 +104,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     workingDirectory,
     output,
     errorOutput,
+    scriptOutput:scriptOutput === undefined || scriptOutput.trim() === "" ? undefined : scriptOutput.trim(),
     saveAsTemplate: save,
   })
     .then(async ({ jobId }) => {

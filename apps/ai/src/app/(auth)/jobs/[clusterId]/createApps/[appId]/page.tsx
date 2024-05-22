@@ -13,6 +13,7 @@
 "use client";
 
 import { LoadingOutlined } from "@ant-design/icons";
+import { useSearchParams } from "next/navigation";
 import { PageTitle } from "src/components/PageTitle";
 import { trpc } from "src/utils/trpc";
 
@@ -22,13 +23,27 @@ import { LaunchAppForm } from "../../LaunchAppForm";
 export default function Page({ params }: {params: {clusterId: string, appId: string}}) {
 
   const { appId, clusterId } = params;
+  const searchParams = useSearchParams();
+
+  const jobId = searchParams?.get("jobId");
+  const jobName = searchParams?.get("jobName");
 
   const { data: appInfo, isLoading: isAppLoading } = trpc.jobs.getAppMetadata.useQuery({ clusterId, appId });
 
   const { data: clusterInfo, isLoading: isClusterLoading } = trpc.config.getClusterConfig.useQuery({ clusterId });
 
+  const parsedJobId = jobId ? parseInt(jobId, 10) : null;
+  const { data: createAppParams, isLoading: isCreateAppParamsLoading } = trpc.jobs.getCreateAppParams.useQuery(
+    { clusterId, jobId: parsedJobId!, jobName: jobName! }, {
+      enabled: (!!jobId && !!jobName),
+      retry: false,
+    });
 
-  if (isAppLoading || isClusterLoading || !appInfo || !clusterInfo) {
+
+  if (
+    isAppLoading || isClusterLoading
+    || !appInfo || !clusterInfo
+    || (!!jobId && !!jobName && (isCreateAppParamsLoading))) {
     return <LoadingOutlined />;
   }
 
@@ -43,6 +58,7 @@ export default function Page({ params }: {params: {clusterId: string, appId: str
         appComment={appInfo.appComment}
         clusterInfo={clusterInfo}
         appImage={appInfo.appImage}
+        createAppParams={createAppParams}
       />
     </div>
   );

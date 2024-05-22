@@ -63,6 +63,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
               output: template.output,
               errorOutput: template.errorOutput,
               save: false,
+              scriptOutput:template.scriptOutput,
             }));
         } else {
           return undefined;

@@ -347,6 +347,9 @@ importers:
       '@types/shell-quote':
         specifier: 1.7.5
         version: 1.7.5
+      '@types/ssh2':
+        specifier: 1.15.0
+        version: 1.15.0
       '@types/styled-components':
         specifier: 5.1.34
         version: 5.1.34
@@ -7623,17 +7626,10 @@ packages:
       '@types/node': 20.12.4
     dev: true
 
-  /@types/ssh2@1.11.19:
-    resolution: {integrity: sha512-ydbQAqEcdNVy2t1w7dMh6eWMr+iOgtEkqM/3K9RMijMaok/ER7L8GW6PwsOypHCN++M+c8S/UR9SgMqNIFstbA==}
-    dependencies:
-      '@types/node': 18.18.10
-    dev: false
-
   /@types/ssh2@1.15.0:
     resolution: {integrity: sha512-YcT8jP5F8NzWeevWvcyrrLB3zcneVjzYY9ZDSMAMboI+2zR1qYWFhwsyOFVzT7Jorn67vqxC0FRiw8YyG9P1ww==}
     dependencies:
       '@types/node': 18.18.10
-    dev: true
 
   /@types/stack-utils@2.0.1:
     resolution: {integrity: sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==}
@@ -15629,7 +15625,7 @@ packages:
     resolution: {integrity: sha512-GLcw49yFd9+rUpP+FgX6wrF/N90cmuDl2n0i8d3L828b6riRjkb9w3SS+XvviRWbrAhLxuMKywFqxvQDZQ1bug==}
     engines: {node: '>= 10'}
     dependencies:
-      '@types/ssh2': 1.11.19
+      '@types/ssh2': 1.15.0
       is-stream: 2.0.1
       make-dir: 3.1.0
       sb-promise-queue: 2.1.0

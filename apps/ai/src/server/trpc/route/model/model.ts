@@ -34,7 +34,10 @@ export const ModelListSchema = z.object({
   algorithmName: z.string().optional(),
   algorithmFramework: z.nativeEnum(Framework).optional(),
   isShared: z.boolean(),
-  versions: z.array(z.string()),
+  versions: z.array(z.object({
+    id: z.number(),
+    path: z.string(),
+  })),
   owner: z.string(),
   clusterId: z.string(),
   createTime: z.string().optional(),
@@ -93,8 +96,8 @@ export const list = procedure
         algorithmFramework: x.algorithmFramework,
         isShared: Boolean(x.isShared),
         versions: input.isPublic ?
-          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path)
-          : x.versions.map((y) => y.privatePath),
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => ({ id: y.id, path: y.path }))
+          : x.versions.map((y) => ({ id: y.id, path: y.privatePath })),
         owner: x.owner,
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,

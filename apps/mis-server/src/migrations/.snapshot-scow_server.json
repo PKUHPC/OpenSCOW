@@ -39,6 +39,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "expiration_time": {
+          "name": "expiration_time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "account_whitelist",

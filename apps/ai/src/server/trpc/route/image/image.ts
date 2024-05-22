@@ -202,7 +202,7 @@ export const createImage = procedure
               throw new Error(`Image ${name}:${tag} create failed: image is not a tar file`);
             }
 
-            // 本地镜像时docker加载镜像
+            // 本地镜像时加载镜像
             localImageUrl = await getLoadedImage({
               ssh,
               clusterId: processClusterId,

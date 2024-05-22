@@ -94,6 +94,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
     }, [cluster, loginNode?.address]),
   });
 
+
   const { data: availableWms, isLoading: isWmLoading } = useAsync({
     promiseFn: useCallback(async () => api.listAvailableWms({ query: { cluster: cluster.id } }), [cluster.id]),
   });
@@ -104,11 +105,13 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       dataIndex: "desktopId",
       key: "desktopId",
       width: "10%",
+      sorter:(a, b) => a.desktopId - b.desktopId,
     },
     {
       title: t(p("tableItem.desktopName")),
       dataIndex: "desktopName",
       key: "desktopName",
+      sorter:(a, b) => a.desktopName.localeCompare(b.desktopName),
     },
     {
       title: t(p("tableItem.wm")),
@@ -118,6 +121,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       render: (wm) => {
         return availableWms?.wms.find((x) => x.wm === wm)?.name || wm;
       },
+      sorter:(a, b) => a.wm.localeCompare(b.wm),
     },
     {
       title: t(p("tableItem.addr")),
@@ -127,6 +131,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       render: (addr: string) => {
         return loginNodes[cluster.id].find((x) => x.address === addr)?.name || addr;
       },
+      sorter:(a, b) => a.addr.localeCompare(b.addr),
     },
     {
       title: t(p("tableItem.createTime")),
@@ -136,6 +141,7 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
       render: (createTime) => {
         return createTime ? dayjs(createTime).format("YYYY-MM-DD[T]HH:mm:ss") : "";
       },
+      sorter:(a, b) => Number(dayjs(a.createTime).isAfter(dayjs(b.createTime))),
     },
     {
       title: t("button.actionButton"),

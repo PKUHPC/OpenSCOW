@@ -17,6 +17,8 @@ import "google/protobuf/timestamp.proto";
 import "common/money.proto";
 import "common/i18n.proto";
 
+import "common/sort_order.proto";
+
 
 enum OperationResult {
   UNKNOWN = 0;
@@ -607,6 +609,17 @@ message GetOperationLogsRequest {
   uint32 page = 2;
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 3;
+  enum SortBy{
+    UNKNOWN = 0;
+    ID = 1;
+    OPERATION_RESULT = 2;
+    OPERATION_TIME = 3;
+    OPERATOR_USER_ID = 4;
+    OPERATOR_IP = 5;
+  }
+  optional SortBy sort_by = 4;
+
+  optional common.SortOrder sort_order = 5;
 }
 
 message GetOperationLogsResponse {

@@ -16,11 +16,11 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { checkSchedulerApiVersion } from "@scow/lib-server";
-import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
+import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
-import path from "path";
+import path, { join } from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
 import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
@@ -173,7 +173,8 @@ export const jobServiceServer = plugin((server) => {
 
     submitJob: async ({ request, logger }) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
-        nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
+        nodeCount, partition, qos, account, comment, workingDirectory, output
+        , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
       // make sure working directory exists
@@ -206,6 +207,15 @@ export const jobServiceServer = plugin((server) => {
         }),
       );
 
+      // 保存作业脚本
+      if (scriptOutput) {
+        await sshConnect(host, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          const scriptPath = join(workingDirectory, scriptOutput);
+          await sftpWriteFile(sftp)(scriptPath, reply.generatedScript);
+        });
+      }
+
       if (saveAsTemplate) {
         const jobInfo: JobTemplate = {
           jobName,
@@ -222,7 +232,9 @@ export const jobServiceServer = plugin((server) => {
           output,
           errorOutput,
           memory,
+          scriptOutput,
         };
+
 
         const clusterOps = getClusterOps(cluster);
         if (!clusterOps) { throw clusterNotFound(cluster); }
@@ -232,7 +244,6 @@ export const jobServiceServer = plugin((server) => {
           userId, jobId: reply.jobId, jobInfo,
         }, logger);
       }
-
       return [{ jobId: reply.jobId }];
     },
 

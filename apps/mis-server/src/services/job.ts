@@ -24,8 +24,7 @@ import {
   GetJobsResponse,
   JobBillingItem,
   JobFilter,
-  JobServiceServer, JobServiceService,
-} from "@scow/protos/build/server/job";
+  JobServiceServer, JobServiceService } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
@@ -39,6 +38,7 @@ import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateGetJobsOptions } from "src/utils/queryOptions";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -72,16 +72,25 @@ export const jobServiceServer = plugin((server) => {
 
     getJobs: async ({ request, em, logger }) => {
 
-      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
+      const { filter, page, pageSize, sortBy, sortOrder } =
+      ensureNotUndefined(request, ["filter"]);
 
       const sqlFilter = filterJobs(filter);
 
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
+      let jobs, count;
 
-      const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { timeEnd: QueryOrder.DESC },
-      });
+      // 处理排序参数
+      if (sortBy !== undefined && sortOrder !== undefined) {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...generateGetJobsOptions(page, pageSize, sortBy, sortOrder),
+        });
+      } else {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        });
+      }
+
 
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")
