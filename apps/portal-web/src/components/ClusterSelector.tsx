@@ -14,8 +14,8 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Select } from "antd";
 import { useStore } from "simstate";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 interface Props {
   value?: Cluster[];
@@ -27,7 +27,7 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
   const languageId = useI18n().currentLanguage.id;
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
 
   return (
     <Select
@@ -58,7 +58,7 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   clusterIds,
 }) => {
 
-  const { currentClusters, setDefaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, setDefaultCluster } = useStore(ClusterInfoStore);
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 

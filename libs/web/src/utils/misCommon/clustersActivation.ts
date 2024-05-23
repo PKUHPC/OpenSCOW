@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cluster, ClusterActivationStatus, ClusterDatabaseInfo } from "@scow/config/build/type";
+import { Cluster, ClusterActivationStatus, ClusterRuntimeInfo } from "@scow/config/build/type";
 
 /**
  * format clusters used in web into activated clusters only
- * @param clustersFromDb clusters activation data from db, if mis is not deployed => []
+ * @param clustersRuntimeInfo clusters activation data from db, if mis is not deployed => []
  * @param  misConfigClusters config clusters type used in mis => {[clusterId: string]: Cluster},
  * @param configClusters config clusters type used in portal or other system => Cluster[]
  * @param misDeployed mis is deployed or not
@@ -23,12 +23,12 @@ import { Cluster, ClusterActivationStatus, ClusterDatabaseInfo } from "@scow/con
  * @returns activatedClusters
  */
 export function formatActivatedClusters({
-  clustersFromDb,
+  clustersRuntimeInfo,
   misConfigClusters,
   configClusters,
   misDeployed = true,
 }: {
-  clustersFromDb?: ClusterDatabaseInfo[],
+  clustersRuntimeInfo?: ClusterRuntimeInfo[],
   misConfigClusters?: {[clusterId: string]: Cluster},
   configClusters?: Cluster[],
   misDeployed?: boolean,
@@ -43,14 +43,14 @@ export function formatActivatedClusters({
     return { activatedClusters: configClusters };
   }
 
-  if (!clustersFromDb || clustersFromDb.length === 0) {
+  if (!clustersRuntimeInfo || clustersRuntimeInfo.length === 0) {
     console.info("No available activated clusters in database.");
     return misConfigClusters ? { misActivatedClusters : {} } : { activatedClusters: []};
   }
 
   if (configClusters) {
     const activatedClusters = configClusters.filter((cluster) =>
-      clustersFromDb.find((x) =>
+      clustersRuntimeInfo.find((x) =>
         x.activationStatus === ClusterActivationStatus.ACTIVATED && x.clusterId === cluster.id),
     );
     return { activatedClusters: activatedClusters ?? []};
@@ -63,7 +63,7 @@ export function formatActivatedClusters({
       console.warn("No available clusters in Mis");
       return { misActivatedClusters: {} };
     } else {
-      clustersFromDb.forEach((x) => {
+      clustersRuntimeInfo.forEach((x) => {
         if (x.activationStatus === ClusterActivationStatus.ACTIVATED) {
           misActivatedClusters[x.clusterId] = misConfigClusters[x.clusterId];
         }

@@ -14,6 +14,7 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -39,11 +40,12 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { Cluster, publicConfig, runtimeConfig } from "src/utils/config";
+import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -54,7 +56,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const { setActivatedClusters } = useStore(ActivatedClustersStore);
+  const { publicConfigClusters, setActivatedClusters } = useStore(ClusterInfoStore);
 
   const languageId = useI18n().currentLanguage.id;
   const tArgs = useI18nTranslate();
@@ -79,7 +81,7 @@ const FailEventHandler: React.FC = () => {
       if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
         const clusterId = e.data.clusterErrorsArray[0].clusterId;
         const clusterName = clusterId ?
-          (publicConfig.CLUSTERS[clusterId]?.name ?? clusterId) : undefined;
+          (publicConfigClusters[clusterId]?.name ?? clusterId) : undefined;
 
         message.error(`${tArgs("page._app.adapterConnErrorContent",
           [getI18nConfigCurrentText(clusterName, languageId)])}(${
@@ -100,16 +102,18 @@ const FailEventHandler: React.FC = () => {
         const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
         const newActivatedClusters: {[clusterId: string]: Cluster} = {};
         currentActivatedClusterIds.forEach((id: string) => {
-          if (publicConfig.CLUSTERS[id]) {
-            newActivatedClusters[id] = publicConfig.CLUSTERS[id];
+          if (publicConfigClusters[id]) {
+            newActivatedClusters[id] = publicConfigClusters[id];
           }
         });
         setActivatedClusters(newActivatedClusters);
-        // 刷新当前页面
-        // window.location.reload();
         return;
       }
 
+      if (e.data?.code === "NO_CLUSTERS") {
+        message.error(tArgs("page._app.noClusters"));
+        return;
+      }
 
       message.error(`${tArgs("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
 
@@ -133,6 +137,7 @@ interface ExtraProps {
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
+  clusterConfigs: { [clusterId: string]: ClusterConfigSchema; };
   initialActivatedClusters: {[clusterId: string]: Cluster};
 }
 
@@ -147,8 +152,8 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const activatedClustersStore = useConstant(() => {
-    return createStore(ActivatedClustersStore, extra.initialActivatedClusters);
+  const clusterInfoStore = useConstant(() => {
+    return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialActivatedClusters);
   });
 
   const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
@@ -180,7 +185,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, activatedClustersStore, uiExtensionStore]}>
+        <StoreProvider stores={[userStore, clusterInfoStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />
@@ -209,6 +214,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     initialLanguage: "",
+    clusterConfigs: {},
     initialActivatedClusters: {},
   };
 
@@ -233,6 +239,28 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...result,
           token: token,
         };
+
+        // get cluster configs from config file
+        const data = await api.getClusterConfigsInfo({ query: { token } })
+          .then((x) => x, () => ({ clusterConfigs: {} }));
+
+        const clusterConfigs = data?.clusterConfigs;
+        if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
+
+          extra.clusterConfigs = clusterConfigs;
+          const publicConfigClusters
+          = getPublicConfigClusters(clusterConfigs);
+          // get initial activated clusters
+          const clustersRuntimeInfo =
+            await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
+
+          const activatedClusters
+            = formatActivatedClusters({
+              clustersRuntimeInfo: clustersRuntimeInfo?.results,
+              misConfigClusters: publicConfigClusters });
+          extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
+
+        }
       }
     }
 
@@ -245,12 +273,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
-
-    // get initial activated clusters
-    const clustersFromDb = await api.getClustersDatabaseInfo({}).then((x) => x, () => undefined);
-    const activatedClusters
-     = formatActivatedClusters({ clustersFromDb: clustersFromDb?.results, misConfigClusters: publicConfig.CLUSTERS });
-    extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
   }
 
   const appProps = await App.getInitialProps(appContext);

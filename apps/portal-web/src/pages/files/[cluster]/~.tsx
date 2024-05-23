@@ -23,7 +23,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { ServerErrorPage } from "src/components/errorPages/ServerErrorPage";
 import { Redirect } from "src/components/Redirect";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 export const HomeDirFileManagerPage: NextPage = requireAuth(() => true)(() => {
 
@@ -31,7 +31,7 @@ export const HomeDirFileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const cluster = queryToString(router.query.cluster);
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
   if (!currentClusters.find((x) => x.id === cluster)) {
     return <ClusterNotAvailablePage />;
   }

@@ -10,14 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Cluster } from "@scow/config/build/type";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { SortOrder } from "antd/lib/table/interface";
 import { useI18nTranslateToString } from "src/i18n";
 import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
-
-import { publicConfig } from "./config";
-
 
 export const formatEntryId = (item: Entry) => {
 
@@ -64,27 +62,28 @@ export const getEntryBaseName = (item: Entry, t: ReturnType<typeof useI18nTransl
   return item.name;
 };
 
-export const getEntryExtraInfo = (item: Entry, currentLanguageId: string) => {
+export const getEntryExtraInfo = (item: Entry, currentLanguageId: string, publicConfigClusters: Cluster[]) => {
   const entry = item.entry;
 
   if (!entry) { return []; }
 
 
   if (entry.$case === "app") {
-    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry), currentLanguageId);
+    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry, publicConfigClusters), currentLanguageId);
     return [clusterName];
   }
 
   if (entry.$case === "shell") {
-    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry), currentLanguageId);
+    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry, publicConfigClusters), currentLanguageId);
     return [clusterName, entry.shell.loginNode];
   }
 
   return [];
 };
 
-export const getEntryClusterName = (item: Entry["entry"] & {$case: "app" | "shell" }) => {
-  const clusters = publicConfig.CLUSTERS;
+export const getEntryClusterName = (item: Entry["entry"] & {$case: "app" | "shell" }
+  , publicConfigClusters: Cluster[]) => {
+  const clusters = publicConfigClusters;
 
   if (item.$case === "shell") {
     const clusterId = item.shell.clusterId;

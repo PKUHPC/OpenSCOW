@@ -595,6 +595,7 @@ export default {
       noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
       notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
       + "Please try again after refreshing the page.",
+      noClusters: "Unable to find cluster configuration files. Please contact the system administrator.",
     },
     dashboard: {
       title: "Dashboard",

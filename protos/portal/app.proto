@@ -108,16 +108,9 @@ message GetAppMetadataRequest {
   string cluster = 2;
 }
 
-message I18nStringProtoType {
-  oneof value {
-    string direct_string = 1;
-    common.I18nObject i18n_object = 2;
-  }
-}
-
 message SelectOption {
   string value = 1;
-  I18nStringProtoType label = 2;
+  common.I18nStringProtoType label = 2;
   optional bool require_gpu = 3;
 }
 
@@ -128,7 +121,7 @@ message AppCustomAttribute {
     SELECT = 2;
   }
   AttributeType type = 1;
-  I18nStringProtoType label = 2;
+  common.I18nStringProtoType label = 2;
   string name = 3;
   repeated SelectOption options = 4;
   bool required =5;
@@ -136,13 +129,13 @@ message AppCustomAttribute {
     string text = 6;
     uint32 number = 7;
   }
-  optional I18nStringProtoType placeholder = 8;
+  optional common.I18nStringProtoType placeholder = 8;
 }
 
 message GetAppMetadataResponse {
   string app_name = 1;
   repeated AppCustomAttribute attributes = 2;
-  optional I18nStringProtoType app_comment = 3;
+  optional common.I18nStringProtoType app_comment = 3;
 }
 
 message ListAvailableAppsRequest {

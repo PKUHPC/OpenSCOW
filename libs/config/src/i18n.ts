@@ -61,3 +61,17 @@ export type I18nStringType = string | {
     zh_cn?: string,
   }
 }
+
+
+export interface I18nObject {
+  i18n?: I18nObject_I18n | undefined;
+}
+
+export interface I18nObject_I18n {
+  default: string;
+  en?: string | undefined;
+  zhCn?: string | undefined;
+}
+export interface I18nStringProtoType {
+  value?: { $case: "directString"; directString: string } | { $case: "i18nObject"; i18nObject: I18nObject } | undefined;
+}

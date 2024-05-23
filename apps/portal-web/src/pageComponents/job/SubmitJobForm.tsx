@@ -25,8 +25,8 @@ import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAva
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { formatSize } from "src/utils/format";
 
 interface JobForm {
@@ -194,7 +194,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     }
   }, [currentPartitionInfo]);
 
-  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
 
   // 没有可用集群的情况不再渲染
   if (!defaultCluster && currentClusters.length === 0) {

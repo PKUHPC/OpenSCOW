@@ -10,31 +10,45 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { useLocalStorage } from "@scow/lib-web/build/utils/hooks";
 import { useEffect, useState } from "react";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster, getDesktopEnabled, getPublicConfigClusters } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
 
-export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
+export function ClusterInfoStore(
+  clusterConfigs: {[clusterId: string]: ClusterConfigSchema},
+  initialCurrentClusters: Cluster[],
+) {
 
+  // 配置文件集群信息
+  const publicConfigClusters = getPublicConfigClusters(clusterConfigs);
+
+  // 配置文件按集群优先级排序的集群id列表
+  const clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+
+  // 当前可用集群
   const [currentClusters, setCurrentClusters] = useState<Cluster[]>(!publicConfig.MIS_DEPLOYED
-    ? publicConfig.CLUSTERS : initialCurrentClusters);
+    ? publicConfigClusters : initialCurrentClusters);
 
-  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
+  const initialDefaultClusterId = clusterSortedIdList.find((x) => {
     return currentClusters.find((c) => c.id === x);
   });
 
-  const [clusterId, setClusterId] = useLocalStorage<String | undefined>(
+  const [clusterId, setClusterId] = useLocalStorage<String>(
     SCOW_DEFAULT_CLUSTER_ID,
-    initialDefaultClusterId || undefined,
+    initialDefaultClusterId || "",
   );
 
+  // 默认集群
   const defaultCluster: Cluster | undefined = currentClusters.find((cluster) => cluster.id === clusterId)
   || currentClusters[0] || undefined;
 
   const setDefaultCluster = (cluster: Cluster | undefined) => {
-    setClusterId(cluster?.id ?? undefined);
+    setClusterId(cluster?.id ?? "");
   };
 
   const removeDefaultCluster = () => {
@@ -66,12 +80,22 @@ export function CurrentClustersStore(initialCurrentClusters: Cluster[]) {
 
   }, [currentClusters]);
 
+  // ENABLE_LOGIN_DESKTOP
+  const enableLoginDesktop = getDesktopEnabled(clusterConfigs);
+
+  // CROSS_CLUSTER_FILE_TRANSFER_ENABLED
+  const crossClusterFileTransferEnabled = Object.values(clusterConfigs).filter(
+    (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1;
 
   return {
+    publicConfigClusters,
+    clusterSortedIdList,
     currentClusters,
     setCurrentClusters,
     defaultCluster: defaultCluster as Cluster | undefined,
     setDefaultCluster,
     removeDefaultCluster,
+    enableLoginDesktop,
+    crossClusterFileTransferEnabled,
   };
 }

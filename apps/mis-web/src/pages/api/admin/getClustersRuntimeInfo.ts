@@ -12,34 +12,48 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ClusterDatabaseInfo, ClusterDatabaseInfoSchema } from "@scow/config/build/type";
-import { ClusterDatabaseInfo_LastActivationOperation, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterRuntimeInfo, ClusterRuntimeInfoSchema } from "@scow/config/build/type";
+import { ConfigServiceClient as CommonConfigServiceClient } from "@scow/protos/build/common/config";
+import { ClusterRuntimeInfo_LastActivationOperation, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
+import { authenticate } from "src/auth/server";
+import { validateToken } from "src/auth/token";
 import { getClient } from "src/utils/client";
-import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-export const GetClustersDatabaseInfoSchema = typeboxRouteSchema({
+export const GetClustersRuntimeInfoSchema = typeboxRouteSchema({
 
   method: "GET",
 
+  // only set the token query when firstly used in getInitialProps
+  query: Type.Object({
+    token: Type.Optional(Type.String()),
+  }),
+
   responses: {
     200: Type.Object({
-      results: Type.Array(ClusterDatabaseInfoSchema),
+      results: Type.Array(ClusterRuntimeInfoSchema),
     }),
 
   },
 });
 
-export default route(GetClustersDatabaseInfoSchema,
-  async () => {
+const auth = authenticate(() => true);
+
+export default route(GetClustersRuntimeInfoSchema,
+  async (req, res) => {
+
+    const { token } = req.query;
+    // when firstly used in getInitialProps, check the token
+    // when logged in, use auth()
+    const info = token ? await validateToken(token) : await auth(req, res);
+    if (!info) { return { 403: null }; }
 
     const client = getClient(ConfigServiceClient);
-    const result = await asyncClientCall(client, "getClustersDatabaseInfo", {});
-
+    const result = await asyncClientCall(client, "getClustersRuntimeInfo", {});
     const operatorIds = Array.from(new Set(result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation;
+      const lastActivationOperation = x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation;
       return lastActivationOperation?.operatorId ?? undefined;
     })));
 
@@ -52,15 +66,19 @@ export default route(GetClustersDatabaseInfoSchema,
 
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
-    const clustersDatabaseInfo: ClusterDatabaseInfo[] = result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation;
+    const commonConfigClient = getClient(CommonConfigServiceClient);
+    const clustersConfigServerInfo = await asyncClientCall(commonConfigClient, "getClusterConfigsInfo", {});
+    const clusterConfigs = clustersConfigServerInfo.clusterConfigs;
+
+    const clustersDatabaseInfo: ClusterRuntimeInfo[] = result.results.map((x) => {
+      const lastActivationOperation = x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation;
 
       return {
         ...x,
         operatorId: lastActivationOperation?.operatorId ?? "",
         operatorName: lastActivationOperation?.operatorId ? userMap.get(lastActivationOperation?.operatorId) : "",
         deactivationComment: lastActivationOperation?.deactivationComment ?? "",
-        hpcEnabled: runtimeConfig.CLUSTERS_CONFIG[x.clusterId].hpc.enabled,
+        hpcEnabled: clusterConfigs[x.clusterId]?.hpc?.enabled,
       };
     });
 

@@ -486,6 +486,22 @@ export const mockApi: MockApi<typeof api> = {
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
   changeTenant: async () => null,
 
+  getClusterConfigsInfo: async () => ({ clusterConfigs: {
+    hpc01: {
+      displayName: "hpc01Name",
+      priority: 1,
+      adapterUrl: "0.0.0.0:0000",
+      proxyGateway: undefined,
+      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+      loginDesktop: undefined,
+      turboVncPath: undefined,
+      crossClusterFileTransfer: undefined,
+      hpc: { enabled: true },
+      ai: { enabled: false },
+      k8s: undefined,
+    },
+  } }),
+
   getClustersConnectionInfo: async () => ({ results: [{
     clusterId: "hpc01",
     schedulerName: "hpc",
@@ -493,7 +509,7 @@ export const mockApi: MockApi<typeof api> = {
     partitions: [],
   }]}),
 
-  getClustersDatabaseInfo: async () => ({ results: [{
+  getClustersRuntimeInfo: async () => ({ results: [{
     clusterId: "hpc01",
     activationStatus: ClusterActivationStatus.ACTIVATED,
     operatorId: undefined,

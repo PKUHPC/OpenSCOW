@@ -14,8 +14,8 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Select } from "antd";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 interface Props {
   value?: Cluster[];
@@ -34,11 +34,11 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllCo
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { activatedClusters } = useStore(ActivatedClustersStore);
-  const clusters = isUsingAllConfigClusters ? publicConfig.CLUSTERS : activatedClusters;
+  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+  const clusters = isUsingAllConfigClusters ? publicConfigClusters : activatedClusters;
 
   const sortedIds =
-    publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(clusters)?.includes(id));
+    clusterSortedIdList.filter((id) => Object.keys(clusters)?.includes(id));
 
   return (
     <Select
@@ -64,9 +64,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
   const sortedIds =
-  publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => Object.keys(activatedClusters)?.includes(id));
+    clusterSortedIdList.filter((id) => Object.keys(activatedClusters)?.includes(id));
 
   return (
     <Select

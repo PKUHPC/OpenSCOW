@@ -16,7 +16,7 @@ import { NextPage } from "next";
 import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -24,7 +24,7 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
   const languageId = useI18n().currentLanguage.id;
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
 
   return (
     <div>

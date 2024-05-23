@@ -31,14 +31,19 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { User } from "src/stores/UserStore";
-import { Cluster, LoginNode, publicConfig } from "src/utils/config";
+import { Cluster, LoginNode } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 export const userRoutes: (
   user: User | undefined,
   currentClusters: Cluster[],
   defaultCluster: Cluster | undefined,
   LoginNodes: Record<string, LoginNode[]>,
+  enableLoginDesktop: boolean,
+  crossClusterFileTransferEnabled: boolean,
   setDefaultCluster: (cluster: Cluster | undefined) => void,
-) => NavItemProps[] = (user, currentClusters, defaultCluster, loginNodes, setDefaultCluster) => {
+) => NavItemProps[] = (
+  user, currentClusters, defaultCluster, loginNodes,
+  enableLoginDesktop, crossClusterFileTransfer, setDefaultCluster) => {
 
   if (!user) { return []; }
   const t = useI18nTranslateToString();
@@ -107,7 +112,7 @@ export const userRoutes: (
           })),
         } as NavItemProps)),
       } as NavItemProps] : []),
-    ...(publicConfig.ENABLE_LOGIN_DESKTOP && currentClusters.length > 0 ? [{
+    ...(enableLoginDesktop && currentClusters.length > 0 ? [{
       Icon: DesktopOutlined,
       text: t("routes.desktop"),
       path: "/desktop",
@@ -161,7 +166,7 @@ export const userRoutes: (
             handleClick: () => { setDefaultCluster(cluster); },
           } as NavItemProps)),
         },
-        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+        ...(crossClusterFileTransfer ? [
           {
             Icon: CloudSyncOutlined,
             text: t("routes.file.crossClusterFileTransfer"),

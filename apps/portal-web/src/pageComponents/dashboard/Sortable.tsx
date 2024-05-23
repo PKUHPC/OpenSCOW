@@ -33,7 +33,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { formatEntryId, getEntryBaseName,
   getEntryExtraInfo, getEntryIcon, getEntryLogoPath } from "src/utils/dashboard";
 import { styled } from "styled-components";
@@ -55,7 +55,8 @@ interface Props {
   isFinished: boolean,
   quickEntryArray: Entry[],
   apps: AppWithCluster,
-  clusters: Cluster[],
+  currentClusters: Cluster[],
+  publicConfigClusters: Cluster[],
 }
 const p = prefix("pageComp.dashboard.sortable.");
 
@@ -73,7 +74,8 @@ const DeleteIconContainer = styled.div`
   }
 `;
 
-export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, apps, clusters }) => {
+export const Sortable: FC<Props> = ({
+  isEditable, isFinished, quickEntryArray, apps, currentClusters, publicConfigClusters }) => {
 
   const t = useI18nTranslateToString();
   const i18n = useI18n();
@@ -150,7 +152,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         case "shell":
           const savedShellClusterId = item.entry.shell.clusterId;
           router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
-          if (!clusters.some((x) => x.id === savedShellClusterId)) {
+          if (!currentClusters.some((x) => x.id === savedShellClusterId)) {
             return <ClusterNotAvailablePage />;
           }
           break;
@@ -159,7 +161,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
           router.push(
             join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
           );
-          if (!clusters.some((x) => x.id === savedAppClusterId)) {
+          if (!currentClusters.some((x) => x.id === savedAppClusterId)) {
             return <ClusterNotAvailablePage />;
           }
           break;
@@ -225,7 +227,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
                   id={x.id}
                   key={x.id}
                   entryBaseName={getEntryBaseName(x, t)}
-                  entryExtraInfo={getEntryExtraInfo(x, i18n.currentLanguage.id)}
+                  entryExtraInfo={getEntryExtraInfo(x, i18n.currentLanguage.id, publicConfigClusters)}
                   draggable={isEditable}
                   icon={getEntryIcon(x)}
                   logoPath={getEntryLogoPath(x, apps)}
@@ -254,7 +256,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
               isDragging
               id={activeId.toString()}
               entryBaseName={getEntryBaseName(activeItem, t)}
-              entryExtraInfo={getEntryExtraInfo(activeItem, i18n.currentLanguage.id)}
+              entryExtraInfo={getEntryExtraInfo(activeItem, i18n.currentLanguage.id, publicConfigClusters)}
               draggable={isEditable}
               icon={getEntryIcon(activeItem)}
               logoPath={getEntryLogoPath(activeItem, apps)}
@@ -267,7 +269,7 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         onClose={() => { setAddEntryOpen(false); }}
         apps={apps}
         addItem={addItem}
-        clusters={clusters}
+        clusters={currentClusters}
       ></AddEntryModal>
     </div>
   );

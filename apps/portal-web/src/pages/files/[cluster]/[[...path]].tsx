@@ -19,7 +19,7 @@ import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { FileManager } from "src/pageComponents/filemanager/FileManager";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
@@ -33,7 +33,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
 
   const clusterObj = currentClusters.find((x) => x.id === cluster);
 

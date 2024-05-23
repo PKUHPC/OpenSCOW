@@ -14,9 +14,9 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ClusterConnectionInfo, ClusterConnectionStatus,
-  ClusterDatabaseInfo_LastActivationOperation,
+  ClusterRuntimeInfo_LastActivationOperation,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
-import { getActivatedClusters, getClustersDatabaseInfo } from "src/bl/clustersUtils";
+import { getActivatedClusters, getClustersRuntimeInfo } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
 import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
 
@@ -98,9 +98,9 @@ export const misConfigServiceServer = plugin((server) => {
       return [{ results: clusterResponse }];
     },
 
-    getClustersDatabaseInfo: async ({ em, logger }) => {
+    getClustersRuntimeInfo: async ({ em, logger }) => {
 
-      const reply = await getClustersDatabaseInfo(em, logger);
+      const reply = await getClustersRuntimeInfo(em, logger);
 
       return [{ results: reply }];
     },
@@ -141,7 +141,7 @@ export const misConfigServiceServer = plugin((server) => {
       cluster.activationStatus = ClusterActivationStatus.ACTIVATED;
 
       // save operator userId in lastActivationOperation
-      const lastActivationOperationMap: ClusterDatabaseInfo_LastActivationOperation = {};
+      const lastActivationOperationMap: ClusterRuntimeInfo_LastActivationOperation = {};
 
       lastActivationOperationMap["operatorId"] = operatorId;
       cluster.lastActivationOperation = lastActivationOperationMap;
@@ -178,7 +178,7 @@ export const misConfigServiceServer = plugin((server) => {
       cluster.activationStatus = ClusterActivationStatus.DEACTIVATED;
 
       // save operator userId and deactivation in lastActivationOperation
-      const lastActivationOperationMap: ClusterDatabaseInfo_LastActivationOperation = {};
+      const lastActivationOperationMap: ClusterRuntimeInfo_LastActivationOperation = {};
       lastActivationOperationMap["operatorId"] = operatorId;
 
       if (deactivationComment) {

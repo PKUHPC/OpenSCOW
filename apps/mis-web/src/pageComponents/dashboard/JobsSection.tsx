@@ -19,9 +19,8 @@ import { Section } from "src/components/Section";
 import { Localized, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
 import { RunningJobInfoTable } from "src/pageComponents/job/RunningJobTable";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { User } from "src/stores/UserStore";
-import { publicConfig } from "src/utils/config";
 
 
 interface Props {
@@ -30,10 +29,10 @@ interface Props {
 
 export const JobsSection: React.FC<Props> = ({ user }) => {
 
-  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
 
   const promiseFn = useCallback(() => {
-    return Promise.all(publicConfig.CLUSTER_SORTED_ID_LIST
+    return Promise.all(clusterSortedIdList
       .filter((clusterId) => Object.keys(activatedClusters).find((x) => x === clusterId))
       .map(async (clusterId) => {
 

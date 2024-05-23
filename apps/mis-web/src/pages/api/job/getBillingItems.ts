@@ -21,7 +21,6 @@ import { authenticate } from "src/auth/server";
 import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
 
 // Cannot use BillingItemType from pageComponents/job/ManageJobBillingTable
 export const BillingItemType = Type.Object({
@@ -59,6 +58,8 @@ export const GetBillingItemsSchema = typeboxRouteSchema({
      * currently activated cluster ids only
      */
     currentActivatedClusterIds: Type.Optional(Type.Array(Type.String())),
+
+    clusterSortedIdList: Type.Array(Type.String()),
 
   }),
 
@@ -121,7 +122,7 @@ const calculateNextId = (data?: JobBillingItem[], tenant?: string) => {
 
 
 export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res) => {
-  const { tenant, activeOnly, currentActivatedClusterIds } = req.query;
+  const { tenant, activeOnly, currentActivatedClusterIds, clusterSortedIdList } = req.query;
 
   if (tenant) {
     const auth = authenticate((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) || (u.tenant === tenant));
@@ -150,7 +151,7 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
 
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
-  const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST.filter((id) => currentActivatedClusterIds?.includes(id));
+  const sortedIds = clusterSortedIdList.filter((id) => currentActivatedClusterIds?.includes(id));
   if (sortedIds.length === 0) { console.log("Cluster ops failed , error details: No available clusters"); }
 
   for (const cluster of sortedIds) {

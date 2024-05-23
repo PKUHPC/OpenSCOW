@@ -24,7 +24,7 @@ import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAva
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
 const pCommon = prefix("common.");
@@ -37,7 +37,7 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
-  const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
+  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
 
   if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
     return <ClusterNotAvailablePage />;

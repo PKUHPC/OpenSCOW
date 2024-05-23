@@ -15,8 +15,9 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getClusterConfigsInfo } from "src/server/clusterInfo";
 import { getClient } from "src/utils/client";
-import { getLoginDesktopEnabled } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/cluster";
 import { route } from "src/utils/route";
 
 // Cannot use AvailableWm from protos
@@ -50,7 +51,8 @@ export default /* #__PURE__*/route(ListAvailableWmsSchema, async (req, res) => {
 
   const { cluster } = req.query;
 
-  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+  const clusterConfigs = await getClusterConfigsInfo();
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster, clusterConfigs);
 
   if (!loginDesktopEnabled) {
     return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };

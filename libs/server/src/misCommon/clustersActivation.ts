@@ -44,7 +44,7 @@ export const libGetCurrentActivatedClusters = async (
   const getMisClient = getClientFn(misServerUrl, scowApiAuthToken);
   const client = getMisClient(ConfigServiceClient);
 
-  const reply = await asyncClientCall(client, "getClustersDatabaseInfo", {});
+  const reply = await asyncClientCall(client, "getClustersRuntimeInfo", {});
   const clustersDatabaseInfo = reply.results;
 
   const filteredList = clustersDatabaseInfo.filter((cluster) =>
@@ -67,6 +67,7 @@ export const libGetCurrentActivatedClusters = async (
 
 export const NO_ACTIVATED_CLUSTERS = "NO_ACTIVATED_CLUSTERS";
 export const NOT_EXIST_IN_ACTIVATED_CLUSTERS = "NOT_EXIST_IN_ACTIVATED_CLUSTERS";
+export const NO_CLUSTERS = "NO_CLUSTERS";
 
 /**
  * check current querying clusters is in activated clusters or not

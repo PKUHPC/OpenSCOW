@@ -23,7 +23,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
@@ -87,7 +87,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const loginNode = router.query.loginNode as string;
   const paths = router.query.path as (string[] | undefined);
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
 
   if (!currentClusters.find((x) => x.id === cluster)) {
     return <ClusterNotAvailablePage />;

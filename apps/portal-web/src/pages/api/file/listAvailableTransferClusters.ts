@@ -11,11 +11,12 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { libGetClustersRuntimeInfo } from "@scow/lib-web/build/server/clustersActivation";
 import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
+import { ClusterActivationStatus } from "@scow/protos/build/server/config";
 import { Static, Type } from "@sinclair/typebox";
-import { useStore } from "simstate";
 import { authenticate } from "src/auth/server";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { getClusterConfigsInfo } from "src/server/clusterInfo";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
@@ -50,13 +51,17 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const clusterConfigs = await getClusterConfigsInfo();
 
-  const clusterList: ClusterInfo[] = currentClusters
-    .filter((x) => runtimeConfig.CLUSTERS_CONFIG[x.id].crossClusterFileTransfer?.enabled)
+  const clustersRuntimeInfo = await libGetClustersRuntimeInfo(
+    publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
+
+  const clusterList: ClusterInfo[] = clustersRuntimeInfo
+    .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED
+      && clusterConfigs[x.clusterId].crossClusterFileTransfer?.enabled)
     .map((x) => ({
-      id: x.id,
-      name: getI18nConfigCurrentText(x.name, languageId),
+      id: x.clusterId,
+      name: getI18nConfigCurrentText(clusterConfigs[x.clusterId].displayName, languageId),
     }));
 
 

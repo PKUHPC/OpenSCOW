@@ -29,8 +29,9 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import type { Cluster } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 
 
 interface FilterForm {
@@ -61,7 +62,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const [selected, setSelected] = useState<RunningJobInfo[]>([]);
 
-  const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
+  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
 
   if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
     return <ClusterNotAvailablePage />;

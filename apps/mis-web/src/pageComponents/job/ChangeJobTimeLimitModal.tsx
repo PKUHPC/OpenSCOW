@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
-import type { Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/cluster";
 
 interface Props {
   open: boolean;

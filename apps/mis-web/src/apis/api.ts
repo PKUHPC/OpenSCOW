@@ -13,6 +13,7 @@
 /* eslint-disable max-len */
 
 import { apiClient } from "src/apis/client";
+import type { getClusterConfigsInfoSchema } from "src/pages/api//clusterConfigsInfo";
 import type { ActivateClusterSchema } from "src/pages/api/admin/activateCluster";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
@@ -28,7 +29,7 @@ import type { GetAllAccountsSchema } from "src/pages/api/admin/getAllAccounts";
 import type { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import type { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import type { GetClustersConnectionInfoSchema } from "src/pages/api/admin/getClustersConnectionInfo";
-import type { GetClustersDatabaseInfoSchema } from "src/pages/api/admin/getClustersDatabaseInfo";
+import type { GetClustersRuntimeInfoSchema } from "src/pages/api/admin/getClustersRuntimeInfo";
 import type { GetClusterUsersSchema } from "src/pages/api/admin/getClusterUsers";
 import type { GetDailyChargeSchema } from "src/pages/api/admin/getDailyCharge";
 import type { GetDailyPaySchema } from "src/pages/api/admin/getDailyPay";
@@ -136,7 +137,7 @@ export const api = {
   getAllUsers: apiClient.fromTypeboxRoute<typeof GetAllUsersSchema>("GET", "/api/admin/getAllUsers"),
   getClusterUsers: apiClient.fromTypeboxRoute<typeof GetClusterUsersSchema>("GET", "/api/admin/getClusterUsers"),
   getClustersConnectionInfo: apiClient.fromTypeboxRoute<typeof GetClustersConnectionInfoSchema>("GET", "/api/admin/getClustersConnectionInfo"),
-  getClustersDatabaseInfo: apiClient.fromTypeboxRoute<typeof GetClustersDatabaseInfoSchema>("GET", "/api/admin/getClustersDatabaseInfo"),
+  getClustersRuntimeInfo: apiClient.fromTypeboxRoute<typeof GetClustersRuntimeInfoSchema>("GET", "/api/admin/getClustersRuntimeInfo"),
   getDailyCharge: apiClient.fromTypeboxRoute<typeof GetDailyChargeSchema>("GET", "/api/admin/getDailyCharge"),
   getDailyPay: apiClient.fromTypeboxRoute<typeof GetDailyPaySchema>("GET", "/api/admin/getDailyPay"),
   getJobTotalCount: apiClient.fromTypeboxRoute<typeof GetJobTotalCountSchema>("GET", "/api/admin/getJobTotalCount"),
@@ -166,6 +167,7 @@ export const api = {
   authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
+  getClusterConfigsInfo: apiClient.fromTypeboxRoute<typeof getClusterConfigsInfoSchema>("GET", "/api//clusterConfigsInfo"),
   getUserStatus: apiClient.fromTypeboxRoute<typeof GetUserStatusSchema>("GET", "/api/dashboard/status"),
   exportAccount: apiClient.fromTypeboxRoute<typeof ExportAccountSchema>("GET", "/api/file/exportAccount"),
   exportChargeRecord: apiClient.fromTypeboxRoute<typeof ExportChargeRecordSchema>("GET", "/api/file/exportChargeRecord"),

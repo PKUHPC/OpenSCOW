@@ -16,6 +16,7 @@ import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Form, Space, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { DeactivateClusterModalLink } from "src/components/DeactivateClusterModal";
@@ -23,8 +24,8 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 import { ClusterConnectionStatus } from "src/models/cluster";
 import { CombinedClusterInfo } from "src/pages/admin/resource/clusterManagement";
-import { getSortedClusterValues } from "src/utils/cluster";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster, getSortedClusterValues } from "src/utils/cluster";
 
 interface Props {
   data?: CombinedClusterInfo[];
@@ -50,10 +51,12 @@ export const ClusterManagementTable: React.FC<Props> = ({
   const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
+  const { publicConfigClusters, clusterSortedIdList } = useStore(ClusterInfoStore);
+
   const [query, setQuery] = useState<FilterForm>(() => {
 
     return {
-      clusters: getSortedClusterValues(),
+      clusters: getSortedClusterValues(publicConfigClusters, clusterSortedIdList),
     };
   });
 
@@ -106,7 +109,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
           dataIndex="clusterId"
           title={tArgs(p("table.clusterName"))}
           render={(_, r) => {
-            const clusterName = publicConfig.CLUSTERS[r.clusterId].name;
+            const clusterName = publicConfigClusters[r.clusterId].name;
             return getI18nConfigCurrentText(clusterName ?? r.clusterId, languageId);
           }}
         />
@@ -172,7 +175,7 @@ export const ClusterManagementTable: React.FC<Props> = ({
           width="10%"
           render={(_, r) => {
             const clusterName
-            = getI18nConfigCurrentText(publicConfig.CLUSTERS[r.clusterId].name, languageId);
+            = getI18nConfigCurrentText(publicConfigClusters[r.clusterId].name, languageId);
             return (
               <>
                 {/* TODO: 暂时只对门户系统（HPC）中的集群增加启用和停用功能 */}

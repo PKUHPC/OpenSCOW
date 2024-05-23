@@ -15,7 +15,7 @@ import { Button, Modal } from "antd";
 import React, { useMemo, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 

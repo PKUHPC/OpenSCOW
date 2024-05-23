@@ -64,10 +64,10 @@ afterEach(async () => {
 
 it("gets clusters initial database info", async () => {
 
-  const clustersFromDb = await asyncClientCall(client, "getClustersDatabaseInfo", {});
+  const clustersRuntimeInfo = await asyncClientCall(client, "getClustersRuntimeInfo", {});
 
-  expect(clustersFromDb.results.length).toEqual(4);
-  expect(clustersFromDb.results.map((x) => ({
+  expect(clustersRuntimeInfo.results.length).toEqual(4);
+  expect(clustersRuntimeInfo.results.map((x) => ({
     clusterId: x.clusterId,
     activationStatus: x.activationStatus,
     lastActivationOperation: x.lastActivationOperation,

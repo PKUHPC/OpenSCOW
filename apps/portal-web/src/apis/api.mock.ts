@@ -274,7 +274,23 @@ export const mockApi: MockApi<typeof api> = {
   terminateFileTransfer: null,
   checkTransferKey: null,
 
-  getClustersDatabaseInfo: async () => ({ results: [{
+  getClusterConfigsInfo: async () => ({ clusterConfigs: {
+    hpc01: {
+      displayName: "hpc01Name",
+      priority: 1,
+      adapterUrl: "0.0.0.0:0000",
+      proxyGateway: undefined,
+      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+      loginDesktop: undefined,
+      turboVncPath: undefined,
+      crossClusterFileTransfer: undefined,
+      hpc: { enabled: true },
+      ai: { enabled: false },
+      k8s: undefined,
+    },
+  } }),
+
+  getClustersRuntimeInfo: async () => ({ results: [{
     clusterId: "hpc01",
     activationStatus: ClusterActivationStatus.ACTIVATED,
     operatorId: undefined,

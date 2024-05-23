@@ -18,8 +18,8 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { NO_ACTIVATED_CLUSTERS } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ClusterActivationStatus,
-  clusterActivationStatusFromJSON, ClusterDatabaseInfo,
-  ClusterDatabaseInfo_LastActivationOperation } from "@scow/protos/build/server/config";
+  clusterActivationStatusFromJSON, ClusterRuntimeInfo,
+  ClusterRuntimeInfo_LastActivationOperation } from "@scow/protos/build/server/config";
 import { configClusters } from "src/config/clusters";
 import { Cluster } from "src/entities/Cluster";
 
@@ -66,10 +66,10 @@ export async function updateCluster(
 
 }
 
-export async function getClustersDatabaseInfo(
+export async function getClustersRuntimeInfo(
   em: SqlEntityManager<MySqlDriver>,
   logger: Logger,
-): Promise<ClusterDatabaseInfo[]> {
+): Promise<ClusterRuntimeInfo[]> {
 
   const clustersFromDb = await em.find(Cluster, {});
 
@@ -78,7 +78,7 @@ export async function getClustersDatabaseInfo(
     return {
       clusterId: x.clusterId,
       activationStatus: clusterActivationStatusFromJSON(x.activationStatus),
-      lastActivationOperation: x.lastActivationOperation as ClusterDatabaseInfo_LastActivationOperation,
+      lastActivationOperation: x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation,
       updateTime: x.updateTime ? new Date(x.updateTime).toISOString() : "",
     };
   });
@@ -95,7 +95,7 @@ export async function getClustersDatabaseInfo(
 
 export const getActivatedClusters = async (em: SqlEntityManager<MySqlDriver>, logger: Logger) => {
 
-  const clustersDbInfo = await getClustersDatabaseInfo(em, logger);
+  const clustersDbInfo = await getClustersRuntimeInfo(em, logger);
 
   const currentActivatedClusterIds = clustersDbInfo.filter((cluster) => {
     return cluster.activationStatus === ClusterActivationStatus.ACTIVATED;

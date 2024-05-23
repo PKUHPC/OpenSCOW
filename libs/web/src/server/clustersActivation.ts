@@ -11,13 +11,13 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ClusterDatabaseInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterRuntimeInfo, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { getClientFn } from "src/utils/api";
 
-export const libGetClustersDatabaseInfo = async (
+export const libGetClustersRuntimeInfo = async (
   misServerUrl?: string,
   scowApiAuthToken?: string,
-): Promise<ClusterDatabaseInfo[]> => {
+): Promise<ClusterRuntimeInfo[]> => {
 
   // if mis is Deployed
   if (!misServerUrl) {
@@ -31,7 +31,7 @@ export const libGetClustersDatabaseInfo = async (
   const getMisClient = getClientFn(config);
   const client = getMisClient(ConfigServiceClient);
   try {
-    const reply = await asyncClientCall(client, "getClustersDatabaseInfo", {});
+    const reply = await asyncClientCall(client, "getClustersRuntimeInfo", {});
     return reply.results;
   } catch (e: any) {
     console.error(e.details);

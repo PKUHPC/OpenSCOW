@@ -24,7 +24,7 @@ import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAva
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { LaunchAppForm } from "src/pageComponents/app/LaunchAppForm";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 
@@ -37,7 +37,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const { message } = App.useApp();
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
   if (!currentClusters.find((x) => x.id === clusterId)) {
     return <ClusterNotAvailablePage />;
   }

@@ -25,7 +25,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
 import { PlatformOrTenantRadio } from "src/pageComponents/job/PlatformOrTenantRadio";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.admin.jobBilling.");
@@ -52,10 +52,11 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
 
   const t = useI18nTranslateToString();
 
-  const { activatedClusters } = useStore(ActivatedClustersStore);
+  const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
   const currentActivatedClusterIds = Object.keys(activatedClusters);
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.getBillingItems({ query: { tenant, activeOnly: false, currentActivatedClusterIds } });
+    return await api.getBillingItems({
+      query: { tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList } });
   }, [tenant]) });
 
   return (

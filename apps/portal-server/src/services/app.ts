@@ -15,13 +15,13 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { I18nStringType } from "@scow/config/build/i18n";
+import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
-  I18nStringProtoType,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
@@ -209,6 +209,7 @@ export const appServiceServer = plugin((server) => {
       }
       const attributes: AppCustomAttribute[] = [];
 
+      // TODO 替换
       // config中的文本映射到protobuf中定义的grpc返回值的类型
       const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringProtoType | undefined => {
 

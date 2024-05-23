@@ -28,10 +28,9 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { getSortedClusterValues } from "src/utils/cluster";
-import type { Cluster } from "src/utils/config";
-import { getClusterName } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import type { Cluster } from "src/utils/cluster";
+import { getClusterName, getSortedClusterValues } from "src/utils/cluster";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -72,8 +71,9 @@ export const AdminJobTable: React.FC<Props> = () => {
 
   const rangeSearch = useRef(true);
 
-  const { activatedClusters } = useStore(ActivatedClustersStore);
-  const sortedClusters = getSortedClusterValues().filter((x) => Object.keys(activatedClusters).includes(x.id));
+  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+  const sortedClusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
+    .filter((x) => Object.keys(activatedClusters).includes(x.id));
 
 
   const [query, setQuery] = useState<FilterForm>(() => {
@@ -221,6 +221,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+  const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
 
@@ -278,7 +279,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
           dataIndex="cluster"
           ellipsis
           title={t(pCommon("cluster"))}
-          render={(cluster) => getClusterName(cluster, languageId)}
+          render={(cluster) => getClusterName(cluster, languageId, publicConfigClusters)}
         />
         <Table.Column<JobInfo> dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
         <Table.Column<JobInfo> dataIndex="qos" width="6.7%" ellipsis title="QOS" />

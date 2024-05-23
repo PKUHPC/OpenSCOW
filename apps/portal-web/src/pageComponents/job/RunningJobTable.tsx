@@ -25,8 +25,8 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 interface FilterForm {
   jobId: number | undefined;
@@ -43,7 +43,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
 
   if (!defaultCluster && currentClusters.length === 0) {
     return <ClusterNotAvailablePage />;

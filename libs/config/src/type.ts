@@ -21,7 +21,7 @@ export enum ClusterActivationStatus {
   DEACTIVATED = 1,
 }
 
-export const ClusterDatabaseInfoSchema = Type.Object({
+export const ClusterRuntimeInfoSchema = Type.Object({
   clusterId: Type.String(),
   activationStatus: Type.Enum(ClusterActivationStatus),
   operatorId: Type.Optional(Type.String()),
@@ -31,4 +31,12 @@ export const ClusterDatabaseInfoSchema = Type.Object({
   hpcEnabled: Type.Optional(Type.Boolean()),
 });
 
-export type ClusterDatabaseInfo = Static<typeof ClusterDatabaseInfoSchema>;
+export type ClusterRuntimeInfo = Static<typeof ClusterRuntimeInfoSchema>;
+
+
+export type LoginNodesType = string[] |
+  {
+    name: I18nStringType,
+    address: string,
+  }[]
+

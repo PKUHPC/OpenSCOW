@@ -20,7 +20,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { AppSessionsTable } from "src/pageComponents/app/AppSessionsTable";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 export const SessionsIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -29,7 +29,7 @@ export const SessionsIndexPage: NextPage = requireAuth(() => true)(() => {
   const router = useRouter();
   const clusterId = queryToString(router.query.clusterId);
 
-  const { currentClusters } = useStore(CurrentClustersStore);
+  const { currentClusters } = useStore(ClusterInfoStore);
   const cluster = currentClusters.find((x) => x.id === clusterId);
 
   const tArgs = useI18nTranslate();

@@ -24,8 +24,8 @@ import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.storage.");
@@ -52,7 +52,7 @@ const StorageForm: React.FC = () => {
   const [current, setCurrent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
 
-  const { activatedClusters, defaultCluster } = useStore(ActivatedClustersStore);
+  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
   if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
     return <ClusterNotAvailablePage />;
   }

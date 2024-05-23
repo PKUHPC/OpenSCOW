@@ -23,8 +23,8 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterConnectionStatus, Partition } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { ClusterManagementTable } from "src/pageComponents/admin/ClusterManagementTable";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { Head } from "src/utils/head";
 
 
@@ -48,19 +48,19 @@ export const ClusterManagementPage: NextPage =
     const languageId = useI18n().currentLanguage.id;
     const p = prefix("page.admin.resourceManagement.clusterManagement.");
 
-    const { setActivatedClusters } = useStore(ActivatedClustersStore);
+    const { publicConfigClusters, clusterSortedIdList, setActivatedClusters } = useStore(ClusterInfoStore);
 
     const promiseFn = useCallback(async () => {
       const [connectionClustersData, dbClustersData] = await Promise.all([
         api.getClustersConnectionInfo({}),
-        api.getClustersDatabaseInfo({}),
+        api.getClustersRuntimeInfo({ query: {} }),
       ]);
 
       const combinedClusterList: CombinedClusterInfo[] = [];
       const currentActivatedClusters: {[clusterId: string]: Cluster} = {};
       // sort by cluster's priority
       const sortedConnectionClustersData = connectionClustersData.results.sort((a, b) => {
-        const sortedIds = publicConfig.CLUSTER_SORTED_ID_LIST;
+        const sortedIds = clusterSortedIdList;
         return sortedIds.indexOf(a.clusterId) - sortedIds.indexOf(b.clusterId);
       });
       sortedConnectionClustersData.forEach((cluster) => {
@@ -72,12 +72,11 @@ export const ClusterManagementPage: NextPage =
           } as CombinedClusterInfo;
           combinedClusterList.push(combinedData);
           if (combinedData.activationStatus === ClusterActivationStatus.ACTIVATED) {
-            currentActivatedClusters[combinedData.clusterId] = publicConfig.CLUSTERS[combinedData.clusterId];
+            currentActivatedClusters[combinedData.clusterId] = publicConfigClusters[combinedData.clusterId];
           }
         }
       });
       setActivatedClusters(currentActivatedClusters);
-
       return combinedClusterList;
 
     }, []);

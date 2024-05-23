@@ -87,7 +87,7 @@ message GetClustersConnectionInfoResponse {
 }
 
 // get current clusters info from database
-message GetClustersDatabaseInfoRequest {
+message GetClustersRuntimeInfoRequest {
 }
 
 enum ClusterActivationStatus {
@@ -97,19 +97,19 @@ enum ClusterActivationStatus {
   DEACTIVATED = 1;
 }
 
-message ClusterDatabaseInfo {
+message ClusterRuntimeInfo {
   message LastActivationOperation {
     optional string operator_id = 1;
     optional string deactivation_comment = 2;
   }
   string cluster_id = 1;
-  ClusterActivationStatus activation_status = 2;
-  LastActivationOperation last_activation_operation = 3;
-  google.protobuf.Timestamp update_time = 4;
+  ClusterActivationStatus activation_status = 14;
+  LastActivationOperation last_activation_operation = 15;
+  google.protobuf.Timestamp update_time = 16;
 }
 
-message GetClustersDatabaseInfoResponse {
-  repeated ClusterDatabaseInfo results = 1;
+message GetClustersRuntimeInfoResponse {
+  repeated ClusterRuntimeInfo results = 1;
 }
 
 message ActivateClusterRequest {
@@ -149,7 +149,7 @@ service ConfigService {
 
   rpc GetClustersConnectionInfo(GetClustersConnectionInfoRequest) returns (GetClustersConnectionInfoResponse);
 
-  rpc GetClustersDatabaseInfo(GetClustersDatabaseInfoRequest) returns (GetClustersDatabaseInfoResponse);
+  rpc GetClustersRuntimeInfo(GetClustersRuntimeInfoRequest) returns (GetClustersRuntimeInfoResponse);
 
   rpc ActivateCluster(ActivateClusterRequest) returns (ActivateClusterResponse);
 

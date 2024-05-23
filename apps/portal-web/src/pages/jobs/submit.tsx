@@ -22,7 +22,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { getServerI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -42,7 +42,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
 
-          const { currentClusters } = useStore(CurrentClustersStore);
+          const { currentClusters } = useStore(ClusterInfoStore);
 
           const clusterObj = currentClusters.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }

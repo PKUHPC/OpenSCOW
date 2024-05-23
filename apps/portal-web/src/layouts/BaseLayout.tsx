@@ -19,7 +19,7 @@ import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { userRoutes } from "src/layouts/routes";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -34,9 +34,11 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
 
   const userStore = useStore(UserStore);
 
-  const { loginNodes } = useStore(LoginNodeStore);
+  const { currentClusters, defaultCluster, setDefaultCluster, removeDefaultCluster,
+    enableLoginDesktop, crossClusterFileTransferEnabled,
+  } = useStore(ClusterInfoStore);
 
-  const { currentClusters, defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(CurrentClustersStore);
+  const { loginNodes } = useStore(LoginNodeStore);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -44,7 +46,9 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
 
   const routes = userRoutes(
-    userStore.user, currentClusters, defaultCluster, loginNodes, setDefaultCluster,
+    userStore.user, currentClusters, defaultCluster, loginNodes,
+    enableLoginDesktop, crossClusterFileTransferEnabled,
+    setDefaultCluster,
   );
 
   const uiExtensionStore = useStore(UiExtensionStore);

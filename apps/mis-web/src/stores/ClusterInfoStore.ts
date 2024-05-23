@@ -10,16 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { useEffect, useState } from "react";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
 
-export function ActivatedClustersStore(
+// export function ClusterInfoStore(
+export function ClusterInfoStore(
+  clusterConfigs: {[clusterId: string]: ClusterConfigSchema},
   initialActivatedClusters: {[clusterId: string]: Cluster},
 ) {
+
+  const publicConfigClusters = getPublicConfigClusters(clusterConfigs);
+
+  const clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+
   const [activatedClusters, setActivatedClusters]
    = useState<{[clusterId: string]: Cluster}>(initialActivatedClusters);
 
-  const initialDefaultClusterId = publicConfig.CLUSTER_SORTED_ID_LIST.find((x) => {
+  const initialDefaultClusterId = clusterSortedIdList.find((x) => {
     return Object.keys(initialActivatedClusters).find((c) => c === x);
   });
   const initialDefaultCluster
@@ -49,5 +58,12 @@ export function ActivatedClustersStore(
 
   }, [activatedClusters]);
 
-  return { activatedClusters, setActivatedClusters, defaultCluster, setDefaultCluster };
+  return {
+    publicConfigClusters,
+    clusterSortedIdList,
+    activatedClusters,
+    setActivatedClusters,
+    defaultCluster,
+    setDefaultCluster,
+  };
 }

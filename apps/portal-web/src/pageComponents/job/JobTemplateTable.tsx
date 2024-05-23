@@ -23,8 +23,8 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { CurrentClustersStore } from "src/stores/CurrentClustersStore";
-import { type Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 interface Props {}
 
@@ -48,7 +48,7 @@ const p = prefix("pageComp.job.jobTemplateModal.");
 
 export const JobTemplateTable: React.FC<Props> = () => {
 
-  const { currentClusters, defaultCluster } = useStore(CurrentClustersStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
 
   if (!defaultCluster && currentClusters.length === 0) {
     return <ClusterNotAvailablePage />;

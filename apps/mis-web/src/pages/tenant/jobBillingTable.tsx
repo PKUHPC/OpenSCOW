@@ -20,7 +20,7 @@ import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import { ManageJobBillingTable } from "src/pageComponents/job/ManageJobBillingTable";
-import { ActivatedClustersStore } from "src/stores/ActivatedClustersStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.jobBillingTable.");
@@ -33,11 +33,12 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
     const tenant = userStore.user.tenant;
 
     const t = useI18nTranslateToString();
-    const { activatedClusters } = useStore(ActivatedClustersStore);
+    const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
     const currentActivatedClusterIds = Object.keys(activatedClusters);
 
     const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
-      return await api.getBillingItems({ query: { tenant: tenant, activeOnly: false, currentActivatedClusterIds } });
+      return await api.getBillingItems({
+        query: { tenant: tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList } });
     }, [userStore.user]) });
 
     return (

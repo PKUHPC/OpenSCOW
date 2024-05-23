@@ -818,6 +818,7 @@ export default {
       noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
       notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
 
+      noClusters: "无法找到集群的配置文件，请联系管理员。",
     },
     profile: {
       index: {
