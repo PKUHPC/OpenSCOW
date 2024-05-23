@@ -17,6 +17,15 @@ package scow.portal;
 import "google/protobuf/timestamp.proto";
 import "common/i18n.proto";
 
+// 为确保兼容性保留原有声明，作为同名别名
+// 其他proto引用时请使用 common/i18n.proto/I18nStringProtoType
+message I18nStringProtoType {
+  oneof value {
+    string direct_string = 1;
+    common.I18nObject i18n_object = 2;
+  }
+}
+
 message ConnectToAppRequest {
   string user_id = 1;
   string cluster = 2;
@@ -110,7 +119,7 @@ message GetAppMetadataRequest {
 
 message SelectOption {
   string value = 1;
-  common.I18nStringProtoType label = 2;
+  I18nStringProtoType label = 2;
   optional bool require_gpu = 3;
 }
 
@@ -121,7 +130,7 @@ message AppCustomAttribute {
     SELECT = 2;
   }
   AttributeType type = 1;
-  common.I18nStringProtoType label = 2;
+  I18nStringProtoType label = 2;
   string name = 3;
   repeated SelectOption options = 4;
   bool required =5;
@@ -129,13 +138,13 @@ message AppCustomAttribute {
     string text = 6;
     uint32 number = 7;
   }
-  optional common.I18nStringProtoType placeholder = 8;
+  optional I18nStringProtoType placeholder = 8;
 }
 
 message GetAppMetadataResponse {
   string app_name = 1;
   repeated AppCustomAttribute attributes = 2;
-  optional common.I18nStringProtoType app_comment = 3;
+  optional I18nStringProtoType app_comment = 3;
 }
 
 message ListAvailableAppsRequest {

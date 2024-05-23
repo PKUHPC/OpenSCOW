@@ -117,7 +117,7 @@ message ClusterConfigSchemaProto {
     Kubeconfig kubeconfig = 2;
   }
   // 集群的显示名称
-  common.I18nStringProtoType display_name = 1;
+  I18nStringProtoType display_name = 1;
   // 集群使用的优先级, 数字越小越先展示
   // default value is Number.MAX_SAFE_INTEGER = 9007199254740991 2^53 − 1.
   optional int64 priority = 2;

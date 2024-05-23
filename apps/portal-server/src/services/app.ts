@@ -14,8 +14,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { I18nStringType } from "@scow/config/build/i18n";
-import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
+import { getI18nSeverTypeFormat } from "@scow/lib-server";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
@@ -208,25 +207,6 @@ export const appServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
       const attributes: AppCustomAttribute[] = [];
-
-      // TODO 替换
-      // config中的文本映射到protobuf中定义的grpc返回值的类型
-      const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringProtoType | undefined => {
-
-        if (!i18nConfig) return undefined;
-
-        if (typeof i18nConfig === "string") {
-          return { value: { $case: "directString", directString: i18nConfig } };
-        } else {
-          return { value: { $case: "i18nObject", i18nObject: {
-            i18n: {
-              default: i18nConfig.i18n.default,
-              en: i18nConfig.i18n.en,
-              zhCn: i18nConfig.i18n.zh_cn,
-            },
-          } } };
-        }
-      };
 
       if (app.attributes) {
         app.attributes.forEach((item) => {

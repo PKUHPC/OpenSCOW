@@ -13,8 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { I18nStringType } from "@scow/config/build/i18n";
-import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
+import { getI18nTypeFormat } from "@scow/lib-web/src/utils/typeConversion";
 import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -60,27 +59,6 @@ export const AppCustomAttribute = Type.Object({
   select: Type.Array(SelectOption),
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
-
-// protobuf中定义的grpc返回值的类型映射到前端I18nStringType
-const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined): I18nStringType => {
-
-  if (!i18nProtoType?.value) return "";
-
-  if (i18nProtoType.value.$case === "directString") {
-    return i18nProtoType.value.directString;
-  } else {
-    const i18nObj = i18nProtoType.value.i18nObject.i18n;
-    if (!i18nObj) return "";
-    return {
-      i18n: {
-        default: i18nObj.default,
-        en: i18nObj.en,
-        zh_cn: i18nObj.zhCn,
-      },
-    };
-  }
-
-};
 
 export const GetAppMetadataSchema = typeboxRouteSchema({
   method: "GET",
