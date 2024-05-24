@@ -34,7 +34,7 @@ import {
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
-import { generateChargersOptions } from "src/utils/queryOptions";
+import { mapChargesSortField } from "src/utils/queryOptions";
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -420,48 +420,43 @@ export const chargingServiceServer = plugin((server) => {
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
-      // userId数组
-      let userIdArray: string[] | undefined = undefined;
+      const qb = em.createQueryBuilder(ChargeRecord, "cr").select("*")
+        .where({
+          time: { $gte: startTime, $lte: endTime },
+          ...searchParam,
+          ...searchType,
+        })
+        .offset(((page ?? 1) - 1) * (pageSize ?? DEFAULT_PAGE_SIZE))
+        .limit(pageSize ?? DEFAULT_PAGE_SIZE);
 
-      // 如果 userIdOrName 存在，查询 User 表
-      if (userIdsOrNames) {
-        const userQueries = userIdsOrNames.map((nameOrId: string) => ({
-          $or: [
-            { id: { $like: `%${nameOrId}%` } },
-            { name: { $like: `%${nameOrId}%` } },
-          ],
-        }));
+      let records;
 
-        const users = await em.find(User, {
-          $or: userQueries,
+      if (userIdsOrNames && userIdsOrNames.length > 0) {
+        const sql = qb.getKnexQuery().andWhere(function() {
+          this.whereIn("cr.user_id", function() {
+            this.select("user_id")
+              .from("user")
+              .whereIn("user_id", userIdsOrNames.map((name) => `${name}`))
+              .orWhereIn("name", userIdsOrNames.map((name) => `${name}`));
+          });
         });
-        userIdArray = users.map((user) => user.userId);
+        records = await em.getConnection().execute(sql);
+      } else {
+        records = await qb.getResult();
       }
-
-
-      const records = await em.find(ChargeRecord, {
-        time: { $gte: startTime, $lte: endTime },
-        ...searchType,
-        ...searchParam,
-        ...(userIdsOrNames.length > 0 || userIdArray ? { userId: { $in: userIdArray } } : {}),
-      }, sortBy !== undefined && sortOrder !== undefined ? {
-        ...generateChargersOptions(page ?? 1, pageSize, sortBy, sortOrder),
-      } : {
-        ...paginationProps(page ?? 1, pageSize || DEFAULT_PAGE_SIZE),
-      });
 
       return [{
         results: records.map((x) => {
           return {
             tenantName: x.tenantName,
             accountName: x.accountName,
-            amount: decimalToMoney(x.amount),
+            amount: decimalToMoney(new Decimal(x.amount)),
             comment: x.comment,
             index: x.id,
-            time: x.time.toISOString(),
+            time: typeof x.time === "string" ? x.time : x.time?.toISOString(),
             type: x.type,
             userId: x.userId,
-            metadata: x.metadata as ChargeRecordProto["metadata"] ?? undefined,
+            metadata: x.metadata,
           };
 
         }),
