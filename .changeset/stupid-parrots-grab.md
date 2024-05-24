@@ -1,11 +1,4 @@
 ---
-"@scow/audit-server": minor
-"@scow/mis-server": minor
-"@scow/portal-web": minor
-"@scow/demo-vagrant": minor
-"@scow/mis-web": minor
-"@scow/auth": minor
-"@scow/lib-web": minor
 "@scow/grpc-api": minor
 ---
 
