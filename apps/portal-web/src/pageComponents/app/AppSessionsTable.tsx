@@ -26,7 +26,7 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 
 interface FilterForm {
  appJobName: string | undefined

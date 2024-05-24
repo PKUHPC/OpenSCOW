@@ -14,6 +14,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -34,7 +35,9 @@ export interface ImportUsersData {
 }
 
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
-  whitelistAll: boolean, clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
+  whitelistAll: boolean,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
@@ -129,7 +132,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
           failedUnblockAccounts.push(acc.accountName);
         } else {
           try {
-            await unblockAccount(account, clusterPlugin, logger);
+            await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger);
           } catch (e) {
             // 集群解锁账户失败，记录失败账户
             failedUnblockAccounts.push(account.accountName);
@@ -162,7 +165,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             failedBlockAccounts.push(acc.accountName);
           } else {
             try {
-              await blockAccount(account, clusterPlugin, logger);
+              await blockAccount(account, currentActivatedClusters, clusterPlugin, logger);
             } catch (e) {
               // 集群封锁账户失败，记录失败账户
               failedBlockAccounts.push(account.accountName);

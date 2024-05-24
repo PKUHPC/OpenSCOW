@@ -12,8 +12,11 @@
 
 import { ServiceError } from "@grpc/grpc-js";
 import { I18nStringType } from "@scow/config/build/i18n";
+import { LoginNodesType } from "@scow/config/build/type";
 import { sftpWriteFile, sshRawConnect, sshRmrf } from "@scow/lib-ssh";
-import { I18nStringProtoType, SubmissionInfo } from "@scow/protos/build/portal/app";
+import { ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
+import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
+import { SubmissionInfo } from "@scow/protos/build/portal/app";
 import { randomBytes } from "crypto";
 import FormData from "form-data";
 import { NodeSSH } from "node-ssh";
@@ -180,6 +183,24 @@ export const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined
         zh_cn: i18nObj.zhCn,
       },
     };
+  }
+
+};
+
+
+// protobuf中定义的grpc返回值的loginNodes类型映射到前端loginNode
+export const getLoginNodesTypeFormat = (
+  protoType: ClusterConfigSchemaProto_LoginNodesProtoType | undefined): LoginNodesType => {
+
+  if (!protoType?.value) return [];
+  if (protoType.value.$case === "loginNodeAddresses") {
+    return protoType.value.loginNodeAddresses.loginNodeAddressesValue;
+  } else {
+    const loginNodeConfigs = protoType.value.loginNodeConfigs;
+    return loginNodeConfigs.loginNodeConfigsValue.map((x) => ({
+      name: getI18nTypeFormat(x.name),
+      address: x.address,
+    }));
   }
 
 };

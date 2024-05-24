@@ -23,7 +23,7 @@ import { ApiVersion } from "@scow/utils/build/version";
 import path, { join } from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { callOnOne } from "src/utils/clusters";
+import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -34,6 +34,7 @@ export const jobServiceServer = plugin((server) => {
     cancelJob: async ({ request, logger }) => {
 
       const { cluster, jobId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       await callOnOne(
         cluster,
@@ -49,6 +50,7 @@ export const jobServiceServer = plugin((server) => {
 
     listAccounts: async ({ request, logger }) => {
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -63,6 +65,7 @@ export const jobServiceServer = plugin((server) => {
 
     getJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -79,6 +82,7 @@ export const jobServiceServer = plugin((server) => {
     listJobTemplates: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -94,6 +98,8 @@ export const jobServiceServer = plugin((server) => {
 
     deleteJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }
@@ -107,6 +113,8 @@ export const jobServiceServer = plugin((server) => {
 
     renameJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId, jobName } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }
@@ -121,6 +129,7 @@ export const jobServiceServer = plugin((server) => {
     listRunningJobs: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -140,6 +149,7 @@ export const jobServiceServer = plugin((server) => {
 
     listAllJobs: async ({ request, logger }) => {
       const { cluster, userId, endTime, startTime } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -165,6 +175,7 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory, output
         , errorOutput, memory, scriptOutput } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);
@@ -239,6 +250,7 @@ export const jobServiceServer = plugin((server) => {
 
     submitFileAsJob: async ({ request, logger }) => {
       const { cluster, userId, filePath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }

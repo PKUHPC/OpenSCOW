@@ -19,6 +19,7 @@ import path from "path";
 
 const quickEntryPath = "/var/lib/scow/portal/quickEntries";
 
+// 在线集群单独处理
 export const dashboardServiceServer = plugin((server) => {
   return server.addService<DashboardServiceServer>(DashboardServiceService, {
     getQuickEntries:async ({ request, logger }) => {

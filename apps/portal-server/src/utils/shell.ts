@@ -11,7 +11,7 @@
  */
 
 import { sftpChmod } from "@scow/lib-ssh";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { getConfigClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { Logger } from "ts-log";
 
 
@@ -22,7 +22,7 @@ const SHELL_FILE_REMOTE = "/etc/profile.d/scow-shell-file.sh";
 
 export async function initShellFile(cluster: string, logger: Logger) {
 
-  const host = getClusterLoginNode(cluster);
+  const host = getConfigClusterLoginNode(cluster);
   if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
 
   return await sshConnect(host, "root", logger, async (ssh) => {
