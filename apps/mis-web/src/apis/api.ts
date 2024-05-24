@@ -13,7 +13,7 @@
 /* eslint-disable max-len */
 
 import { apiClient } from "src/apis/client";
-import type { getClusterConfigsInfoSchema } from "src/pages/api//clusterConfigsInfo";
+import type { getClusterConfigFilesSchema } from "src/pages/api//clusterConfigsInfo";
 import type { ActivateClusterSchema } from "src/pages/api/admin/activateCluster";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
@@ -167,7 +167,7 @@ export const api = {
   authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
-  getClusterConfigsInfo: apiClient.fromTypeboxRoute<typeof getClusterConfigsInfoSchema>("GET", "/api//clusterConfigsInfo"),
+  getClusterConfigFiles: apiClient.fromTypeboxRoute<typeof getClusterConfigFilesSchema>("GET", "/api//clusterConfigsInfo"),
   getUserStatus: apiClient.fromTypeboxRoute<typeof GetUserStatusSchema>("GET", "/api/dashboard/status"),
   exportAccount: apiClient.fromTypeboxRoute<typeof ExportAccountSchema>("GET", "/api/file/exportAccount"),
   exportChargeRecord: apiClient.fromTypeboxRoute<typeof ExportChargeRecordSchema>("GET", "/api/file/exportChargeRecord"),

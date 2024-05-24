@@ -26,7 +26,7 @@ import { parseIp } from "src/utils/server";
 import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
 
-import { getClusterConfigsInfo } from "../clusterInfo";
+import { getClusterConfigFiles } from "../clusterConfig";
 
 export type ShellQuery = {
   cluster: string;
@@ -98,7 +98,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const cluster = query.get("cluster");
   const loginNodeAddress = query.get("loginNode");
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
 
   if (!cluster || !clusterConfigs[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);

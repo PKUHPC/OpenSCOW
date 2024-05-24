@@ -23,18 +23,15 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { getI18nTypeFormat, getLoginNodesTypeFormat } from "@scow/lib-web/src/utils/typeConversion";
-import { ClusterConfigSchemaProto_LoginNodesProtoType, ConfigServiceClient } from "@scow/protos/build/common/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
-import { getClient } from "src/utils/client";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { route } from "src/utils/route";
 
 
-export const getClusterConfigsInfoSchema = typeboxRouteSchema({
+export const getClusterConfigFilesSchema = typeboxRouteSchema({
   method: "GET",
 
   // only set the query value when firstly used in getInitialProps
@@ -53,7 +50,7 @@ export const getClusterConfigsInfoSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(getClusterConfigsInfoSchema,
+export default route(getClusterConfigFilesSchema,
   async (req, res) => {
 
     const { token } = req.query;
@@ -63,21 +60,7 @@ export default route(getClusterConfigsInfoSchema,
     const info = token ? await validateToken(token) : await auth(req, res);
     if (!info) { return { 403: null }; }
 
-    const client = getClient(ConfigServiceClient);
-    const result = await asyncClientCall(client, "getClusterConfigsInfo", {});
-
-    const modifiedClusters: Record<string, ClusterConfigSchema> = {};
-    Object.keys(result.clusterConfigs).forEach((key) => {
-
-      const cluster = result.clusterConfigs[key];
-      const newCluster = {
-        ...cluster,
-        displayName: getI18nTypeFormat(cluster.displayName),
-        loginNodes: getLoginNodesTypeFormat(
-          cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
-      };
-      modifiedClusters[key] = newCluster as ClusterConfigSchema;
-    });
+    const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
 
     return {
       200: { clusterConfigs: modifiedClusters },

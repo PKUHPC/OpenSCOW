@@ -116,35 +116,38 @@ message ClusterConfigSchemaProto {
     // k8s 集群 kubeconfig 相关配置
     Kubeconfig kubeconfig = 2;
   }
+
+  // 集群ID
+  string cluster_id = 1;
   // 集群的显示名称
-  I18nStringProtoType display_name = 1;
+  I18nStringProtoType display_name = 2;
   // 集群使用的优先级, 数字越小越先展示
   // default value is Number.MAX_SAFE_INTEGER = 9007199254740991 2^53 − 1.
-  optional int64 priority = 2;
+  optional int64 priority = 3;
   // 调度器适配器服务地址
-  string adapter_url = 3;
-  ProxyGateway proxy_gateway = 4;
-  LoginNodesProtoType login_nodes = 5;
-  optional LoginDesktopConfigSchemaProto login_desktop = 6;
+  string adapter_url = 4;
+  ProxyGateway proxy_gateway = 5;
+  LoginNodesProtoType login_nodes = 6;
+  optional LoginDesktopConfigSchemaProto login_desktop = 7;
   // TurboVNC的安装路径
-  optional string turbo_vnc_path = 7;
-  optional CrossClusterFileTransfer cross_cluster_file_transfer = 8;
-  Hpc hpc = 9;
-  Ai ai = 10;
-  optional K8s k8s = 11;
+  optional string turbo_vnc_path = 8;
+  optional CrossClusterFileTransfer cross_cluster_file_transfer = 9;
+  Hpc hpc = 10;
+  Ai ai = 11;
+  optional K8s k8s = 12;
 }
 
-message GetClusterConfigsInfoRequest {
+message GetClusterConfigFilesRequest {
 
 }
 
-message GetClusterConfigsInfoResponse {
-  map<string, ClusterConfigSchemaProto> cluster_configs = 1;
+message GetClusterConfigFilesResponse {
+  repeated ClusterConfigSchemaProto cluster_configs = 1;
 }
 
 service ConfigService {
   rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
 
   // 获取 SCOW 部署的集群配置文件中的集群信息
-  rpc GetClusterConfigsInfo(GetClusterConfigsInfoRequest) returns (GetClusterConfigsInfoResponse);
+  rpc GetClusterConfigFiles(GetClusterConfigFilesRequest) returns (GetClusterConfigFilesResponse);
 }

@@ -13,11 +13,9 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { ClusterConnectionInfo, ClusterConnectionStatus,
-  ClusterRuntimeInfo_LastActivationOperation,
+import { ClusterRuntimeInfo_LastActivationOperation,
   ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/server/config";
 import { getActivatedClusters, getClustersRuntimeInfo } from "src/bl/clustersUtils";
-import { configClusters } from "src/config/clusters";
 import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
 
 export const misConfigServiceServer = plugin((server) => {
@@ -62,40 +60,6 @@ export const misConfigServiceServer = plugin((server) => {
       );
 
       return [reply];
-    },
-
-    // get connection status from scheduler adapter of cluster
-    getClustersConnectionInfo: async ({ logger }) => {
-
-      const clusterResponse: ClusterConnectionInfo[] = [];
-
-      // check connection status of config clusters
-      // do not need check cluster's activation
-      await Promise.allSettled(Object.keys(configClusters).map(async (cluster) => {
-        const reply = await server.ext.clusters.callOnOne(
-          cluster,
-          logger,
-          async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-        ).catch((e) => {
-          logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
-          clusterResponse.push({
-            clusterId: cluster,
-            connectionStatus: ClusterConnectionStatus.ERROR,
-            partitions: [],
-          });
-        });
-
-        if (reply) {
-          clusterResponse.push({
-            clusterId: cluster,
-            connectionStatus: ClusterConnectionStatus.AVAILABLE,
-            schedulerName: reply.schedulerName,
-            partitions: reply.partitions,
-          });
-        }
-      }));
-
-      return [{ results: clusterResponse }];
     },
 
     getClustersRuntimeInfo: async ({ em, logger }) => {

@@ -18,7 +18,7 @@ import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { publicConfig } from "src/utils/config";
 
-import { getClusterConfigsInfo } from "../clusterInfo";
+import { getClusterConfigFiles } from "../clusterConfig";
 
 /**
  * Parse proxy target
@@ -103,7 +103,7 @@ export const setupWssProxy = (req: NextApiRequest) => {
       return;
     }
 
-    const clusterConfigs = await getClusterConfigsInfo();
+    const clusterConfigs = await getClusterConfigFiles();
 
     // req.url of raw node.js request object doesn't remove base path
     const target = parseProxyTarget(req.url!, true, clusterConfigs);

@@ -16,7 +16,7 @@ import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/bu
 import { ClusterActivationStatus } from "@scow/protos/build/server/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
@@ -51,7 +51,7 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
 
   const clustersRuntimeInfo = await libGetClustersRuntimeInfo(
     publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);

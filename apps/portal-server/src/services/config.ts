@@ -39,7 +39,7 @@ export const staticConfigServiceServer = plugin((server) => {
       return [reply];
     },
 
-    getClusterConfigsInfo: async ({ logger }) => {
+    getClusterConfigFiles: async ({ logger }) => {
 
       const clusterConfigs = getClusterConfigs(undefined, logger, ["hpc"]);
 

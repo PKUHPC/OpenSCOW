@@ -53,7 +53,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-  const resp = await api.getClusterConfigsInfo({ query: {} });
+  const resp = await api.getClusterConfigFiles({ query: {} });
   const clusterConfigs = resp.clusterConfigs;
   const clusterSortedIdList = getSortedClusterIds(resp.clusterConfigs);
 

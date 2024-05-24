@@ -12,7 +12,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkCookie } from "src/auth/server";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { parseProxyTarget, proxy } from "src/server/setup/proxy";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -27,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
 
   // req.url of next.js removes base path
   const target = parseProxyTarget(req.url!, false, clusterConfigs);

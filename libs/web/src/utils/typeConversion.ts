@@ -10,9 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { LoginNodesType } from "@scow/config/build/type";
-import { ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
+import { ClusterConfigSchemaProto,
+  ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
 import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
 
 // protobuf中定义的grpc返回值的类型映射到前端I18nStringType
@@ -50,5 +52,25 @@ export const getLoginNodesTypeFormat = (
       address: x.address,
     }));
   }
+
+};
+
+// protobuf中定义的grpc返回值的 ClusterConfigs 类型映射到前端
+export const getClusterConfigsTypeFormat = (
+  protoType: ClusterConfigSchemaProto[]): Record<string, ClusterConfigSchema> => {
+
+  const modifiedClusters: Record<string, ClusterConfigSchema> = {};
+  protoType.forEach((cluster) => {
+
+    const newCluster = {
+      ...cluster,
+      displayName: getI18nTypeFormat(cluster.displayName),
+      loginNodes: getLoginNodesTypeFormat(
+      cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
+    };
+    modifiedClusters[cluster.clusterId] = newCluster as ClusterConfigSchema;
+  });
+
+  return modifiedClusters;
 
 };

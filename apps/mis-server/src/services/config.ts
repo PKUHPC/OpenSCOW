@@ -37,7 +37,7 @@ export const configServiceServer = plugin((server) => {
     },
 
 
-    getClusterConfigsInfo: async ({ em, logger }) => {
+    getClusterConfigFiles: async ({ em, logger }) => {
 
       const clusterConfigs = getClusterConfigs(undefined, logger);
 

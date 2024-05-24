@@ -59,33 +59,6 @@ message GetAvailablePartitionsForClusterResponse {
   repeated Partition partitions = 1;
 }
 
-// get current connection state of all clusters from config files
-message GetClustersConnectionInfoRequest {
-}
-
-// current connection status
-// available: can access to scheduler adapter
-// error: can not access to scheduler adapter
-enum ClusterConnectionStatus {
-  AVAILABLE = 0;
-  ERROR = 1;
-}
-
-message ClusterConnectionInfo {
-  string cluster_id = 1;
-  ClusterConnectionStatus connection_status = 2;
-  // scheduler name of cluster
-  // value exisits when connectionStatus is available
-  optional string scheduler_name = 3;
-  // scheduler name of cluster
-  // value exisits when connectionStatus is available
-  repeated Partition partitions = 4;
-}
-
-message GetClustersConnectionInfoResponse {
-  repeated ClusterConnectionInfo results = 1;
-}
-
 // get current clusters info from database
 message GetClustersRuntimeInfoRequest {
 }
@@ -146,8 +119,6 @@ service ConfigService {
   };
 
   rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest) returns (GetAvailablePartitionsForClusterResponse);
-
-  rpc GetClustersConnectionInfo(GetClustersConnectionInfoRequest) returns (GetClustersConnectionInfoResponse);
 
   rpc GetClustersRuntimeInfo(GetClustersRuntimeInfoRequest) returns (GetClustersRuntimeInfoResponse);
 

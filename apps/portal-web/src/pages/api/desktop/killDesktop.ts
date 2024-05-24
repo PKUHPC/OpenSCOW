@@ -16,7 +16,7 @@ import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/cluster";
@@ -46,7 +46,7 @@ export default /* #__PURE__*/route(KillDesktopSchema, async (req, res) => {
 
   const { cluster, loginNode, displayId } = req.body;
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
   const loginDesktopEnabled = getLoginDesktopEnabled(cluster, clusterConfigs);
 
   if (!loginDesktopEnabled) {

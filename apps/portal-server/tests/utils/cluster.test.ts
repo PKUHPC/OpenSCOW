@@ -51,19 +51,18 @@ it("get cluster configs info", async () => {
 
   const clusterConfigsByReadingFiles = getClusterConfigs(undefined, logger, ["hpc"]);
 
-  const reply = await asyncUnaryCall(client, "getClusterConfigsInfo", { query: {} });
+  const reply = await asyncUnaryCall(client, "getClusterConfigFiles", { query: {} });
 
   const modifiedClusters: Record<string, ClusterConfigSchema> = {};
-  Object.keys(reply.clusterConfigs).forEach((key) => {
+  reply.clusterConfigs.forEach((cluster) => {
 
-    const cluster = reply.clusterConfigs[key];
     const newCluster = {
       ...cluster,
       displayName: getI18nTypeFormat(cluster.displayName),
       loginNodes: !cluster.loginNodes ? [] :
         getLoginNodesTypeFormat(cluster.loginNodes),
     };
-    modifiedClusters[key] = newCluster as ClusterConfigSchema;
+    modifiedClusters[cluster.clusterId] = newCluster as ClusterConfigSchema;
   });
 
   expect(modifiedClusters).toEqual(clusterConfigsByReadingFiles);

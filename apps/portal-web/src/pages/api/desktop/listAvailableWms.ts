@@ -15,7 +15,7 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { getClient } from "src/utils/client";
 import { getLoginDesktopEnabled } from "src/utils/cluster";
 import { route } from "src/utils/route";
@@ -51,7 +51,7 @@ export default /* #__PURE__*/route(ListAvailableWmsSchema, async (req, res) => {
 
   const { cluster } = req.query;
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
   const loginDesktopEnabled = getLoginDesktopEnabled(cluster, clusterConfigs);
 
   if (!loginDesktopEnabled) {

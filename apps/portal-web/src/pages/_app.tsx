@@ -260,7 +260,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         };
 
         // get cluster configs from config file
-        const data = await api.getClusterConfigsInfo({ query: { token } })
+        const data = await api.getClusterConfigFiles({ query: { token } })
           .then((x) => x, () => ({ clusterConfigs: {} }));
 
         const clusterConfigs = data?.clusterConfigs;

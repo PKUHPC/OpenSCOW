@@ -13,12 +13,12 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ClusterRuntimeInfo, ClusterRuntimeInfoSchema } from "@scow/config/build/type";
-import { ConfigServiceClient as CommonConfigServiceClient } from "@scow/protos/build/common/config";
 import { ClusterRuntimeInfo_LastActivationOperation, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 
@@ -66,13 +66,10 @@ export default route(GetClustersRuntimeInfoSchema,
 
     const userMap = new Map(users.map((x) => [x.userId, x.userName]));
 
-    const commonConfigClient = getClient(CommonConfigServiceClient);
-    const clustersConfigServerInfo = await asyncClientCall(commonConfigClient, "getClusterConfigsInfo", {});
-    const clusterConfigs = clustersConfigServerInfo.clusterConfigs;
+    const clusterConfigs = await getClusterConfigFiles();
 
     const clustersDatabaseInfo: ClusterRuntimeInfo[] = result.results.map((x) => {
       const lastActivationOperation = x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation;
-
       return {
         ...x,
         operatorId: lastActivationOperation?.operatorId ?? "",

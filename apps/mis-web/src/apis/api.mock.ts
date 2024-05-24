@@ -486,7 +486,7 @@ export const mockApi: MockApi<typeof api> = {
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
   changeTenant: async () => null,
 
-  getClusterConfigsInfo: async () => ({ clusterConfigs: {
+  getClusterConfigFiles: async () => ({ clusterConfigs: {
     hpc01: {
       displayName: "hpc01Name",
       priority: 1,

@@ -274,7 +274,7 @@ export const mockApi: MockApi<typeof api> = {
   terminateFileTransfer: null,
   checkTransferKey: null,
 
-  getClusterConfigsInfo: async () => ({ clusterConfigs: {
+  getClusterConfigFiles: async () => ({ clusterConfigs: {
     hpc01: {
       displayName: "hpc01Name",
       priority: 1,

@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { isPortReachable } from "src/utils/isPortReachable";
 import { route } from "src/utils/route";
 
@@ -43,7 +43,7 @@ export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) 
 
   const { host, port, cluster } = req.query;
 
-  const clusterConfigs = await getClusterConfigsInfo();
+  const clusterConfigs = await getClusterConfigFiles();
   // TODO ignore proxy gateway
   const proxyGateway = clusterConfigs[cluster].proxyGateway;
 

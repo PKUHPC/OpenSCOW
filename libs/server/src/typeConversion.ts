@@ -65,14 +65,15 @@ ClusterConfigSchemaProto_LoginNodesProtoType | undefined => {
 
 export const convertClusterConfigsToServerProtoType = (
   clusterConfigs: Record<string, ClusterConfigSchema>,
-): Record<string, ClusterConfigSchemaProto> => {
+): ClusterConfigSchemaProto[] => {
 
-  const clusterConfigsProto: Record<string, ClusterConfigSchemaProto> = {};
+  const clusterConfigsProto: ClusterConfigSchemaProto[] = [];
 
   for (const key in clusterConfigs) {
     const item = clusterConfigs[key];
 
     const protoItem: ClusterConfigSchemaProto = {
+      clusterId: key,
       displayName: getI18nSeverTypeFormat(item.displayName) as I18nStringProtoType,
       adapterUrl: item.adapterUrl,
       priority: item.priority ?? Number.MAX_SAFE_INTEGER,
@@ -104,7 +105,7 @@ export const convertClusterConfigsToServerProtoType = (
         } : undefined,
     };
 
-    clusterConfigsProto[key] = protoItem;
+    clusterConfigsProto.push(protoItem);
   }
 
   return clusterConfigsProto;

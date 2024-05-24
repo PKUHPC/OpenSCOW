@@ -27,12 +27,12 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
-import { getClusterConfigsInfo } from "src/server/clusterInfo";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { route } from "src/utils/route";
 
 
 
-export const getClusterConfigsInfoSchema = typeboxRouteSchema({
+export const getClusterConfigFilesSchema = typeboxRouteSchema({
   method: "GET",
 
   // only set the query value when firstly used in getInitialProps
@@ -52,7 +52,7 @@ export const getClusterConfigsInfoSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(getClusterConfigsInfoSchema,
+export default route(getClusterConfigFilesSchema,
   async (req, res) => {
 
     const { token } = req.query;
@@ -61,7 +61,7 @@ export default route(getClusterConfigsInfoSchema,
     const info = token ? await validateToken(token) : await auth(req, res);
     if (!info) { return { 403: null }; }
 
-    const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigsInfo();
+    const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
 
     return {
       200: { clusterConfigs: modifiedClusters },
