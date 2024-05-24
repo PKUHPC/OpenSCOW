@@ -21,12 +21,10 @@ import { checkCookie } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parseIp } from "src/utils/server";
 import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
-
-import { getClusterConfigFiles } from "../clusterConfig";
 
 export type ShellQuery = {
   cluster: string;
@@ -98,13 +96,11 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const cluster = query.get("cluster");
   const loginNodeAddress = query.get("loginNode");
 
-  const clusterConfigs = await getClusterConfigFiles();
-
-  if (!cluster || !clusterConfigs[cluster]) {
+  if (!cluster || !runtimeConfig.CLUSTERS_CONFIG[cluster]) {
     throw new Error(`Unknown cluster ${cluster}`);
   }
 
-  const loginNode = clusterConfigs[cluster].loginNodes.map(getLoginNode).find(
+  const loginNode = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes.map(getLoginNode).find(
     (x) => x.address === loginNodeAddress,
   );
 

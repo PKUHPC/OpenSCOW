@@ -18,7 +18,6 @@ import { createUser } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
 import { blockAccount, unblockAccount } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -123,25 +122,24 @@ export const tenantServiceServer = plugin((server) => {
         });
 
         // 在数据库中创建user
-        const user =
-         await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
-           .then(async (user) => {
-             user.tenantRoles = [TenantRole.TENANT_ADMIN];
-             await em.persistAndFlush(user);
-             return user;
-           }).catch((e) => {
-             if (e.code === Status.ALREADY_EXISTS) {
-               throw <ServiceError>{
-                 code: Status.ALREADY_EXISTS,
-                 message: `User with userId ${userId} already exists in scow.`,
-                 details: "USER_ALREADY_EXISTS",
-               };
-             }
-             throw <ServiceError>{
-               code: Status.INTERNAL,
-               message: `Error creating user with userId ${userId} in database.`,
-             };
-           });
+        const user = await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
+          .then(async (user) => {
+            user.tenantRoles = [TenantRole.TENANT_ADMIN];
+            await em.persistAndFlush(user);
+            return user;
+          }).catch((e) => {
+            if (e.code === Status.ALREADY_EXISTS) {
+              throw <ServiceError>{
+                code: Status.ALREADY_EXISTS,
+                message: `User with userId ${userId} already exists in scow.`,
+                details: "USER_ALREADY_EXISTS",
+              };
+            }
+            throw <ServiceError>{
+              code: Status.INTERNAL,
+              message: `Error creating user with userId ${userId} in database.`,
+            };
+          });
         // call auth
         const createdInAuth = await createUser(authUrl,
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
@@ -183,8 +181,6 @@ export const tenantServiceServer = plugin((server) => {
       const accounts = await em.find(Account, { tenant: tenant, blockThresholdAmount : {} }, {
         populate: ["tenant"],
       });
-
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
       if (accounts.length > 0) {
         await Promise.allSettled(accounts
           .map(async (account) => {
@@ -199,13 +195,13 @@ export const tenantServiceServer = plugin((server) => {
             if (shouldBlockInCluster) {
               logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
               + "Block the account.", account.accountName);
-              await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+              await blockAccount(account, server.ext.clusters, logger);
             }
 
             if (!shouldBlockInCluster) {
               logger.info("The balance of Account %s is greater than the default tenant block threshold amount. "
               + "Unblock the account.", account.accountName);
-              await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+              await unblockAccount(account, server.ext.clusters, logger);
             }
           }),
         ).catch((e) => {

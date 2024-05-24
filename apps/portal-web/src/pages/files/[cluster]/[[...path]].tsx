@@ -15,11 +15,10 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { FileManager } from "src/pageComponents/filemanager/FileManager";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
@@ -33,9 +32,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  const { currentClusters } = useStore(ClusterInfoStore);
-
-  const clusterObj = currentClusters.find((x) => x.id === cluster);
+  const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
 
   const fullPath = "/" + pathParts?.join("/") ?? "";
 

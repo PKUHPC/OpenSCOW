@@ -23,10 +23,9 @@ import { checkCookie } from "src/auth/server";
 import { JobBillingTable } from "src/components/JobBillingTable";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { UserStore } from "src/stores/UserStore";
 import { getSortedClusterValues } from "src/utils/cluster";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -64,14 +63,11 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
   const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
   const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
 
-  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+  const clusters = getSortedClusterValues();
 
-  const clusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
-    .filter((x) => Object.keys(activatedClusters).includes(x.id));
-  const sortedIds = clusterSortedIdList.filter((id) => activatedClusters[id]);
-  sortedIds.forEach((clusterId) => {
+  publicConfig.CLUSTER_SORTED_ID_LIST.forEach((clusterId) => {
     useAsync({ promiseFn: useCallback(async () => {
-      const cluster = activatedClusters[clusterId];
+      const cluster = publicConfig.CLUSTERS[clusterId];
       return api.getAvailableBillingTable({
         query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
         .then((data) => {
@@ -97,13 +93,7 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
             >
               <></>
             </Spin>
-          ) : (
-            clusters.length === 0 ? (
-              <>
-                {t("common.noAvailableClusters")}
-              </>
-            ) : null
-          )
+          ) : null
         }
       </div>
       <div style={completedRequestCount < clusters.length

@@ -19,13 +19,12 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
-import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import { Cluster } from "src/utils/cluster";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { Cluster } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.storage.");
@@ -49,15 +48,10 @@ const StorageForm: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [current, setCurrent] = useState<number | undefined>(undefined);
+  const [current, setCurent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
 
-  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
-  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
-
-  const currentDefaultCluster = defaultCluster ?? Object.values(activatedClusters)[0];
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
   const t = useI18nTranslateToString();
 
@@ -72,7 +66,7 @@ const StorageForm: React.FC = () => {
       .httpError(400, () => { message.error(t(p("balanceChangeIllegal"))); })
       .then(({ currentQuota }) => {
         message.success(t(p("editSuccess")));
-        setCurrent(currentQuota);
+        setCurent(currentQuota);
       })
       .finally(() => setLoading(false));
   };
@@ -88,7 +82,7 @@ const StorageForm: React.FC = () => {
     await api.queryStorageQuota({ query: { cluster: cluster.id, userId } })
       .httpError(404, () => { message.error(t(p("userNotFound"))); })
       .then(({ currentQuota }) => {
-        setCurrent(currentQuota);
+        setCurent(currentQuota);
       })
       .finally(() => setCurrentLoading(false));
   };
@@ -113,7 +107,7 @@ const StorageForm: React.FC = () => {
         name="cluster"
         label={t("common.cluster")}
         rules={[{ required: true }]}
-        initialValue={currentDefaultCluster}
+        initialValue={defaultClusterStore.cluster}
       >
         <SingleClusterSelector />
       </Form.Item>

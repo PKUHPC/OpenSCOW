@@ -12,7 +12,7 @@
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { useState } from "react";
-import { LoginNode } from "src/utils/cluster";
+import { LoginNode } from "src/utils/config";
 export function LoginNodeStore(initLoginNodes: Record<string, LoginNode[]>, initLanguageId: string) {
 
   const [languageId, setLanguageId] = useState<string>(initLanguageId);

@@ -14,14 +14,12 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import {
   AdminServiceServer, AdminServiceService,
   ClusterAccountInfo,
   ClusterAccountInfo_ImportStatus,
 } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/clustersUtils";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -105,13 +103,7 @@ export const adminServiceServer = plugin((server) => {
         };
       }
 
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
-
-      const reply = await importUsers(data as ImportUsersData,
-        em,
-        whitelist,
-        currentActivatedClusters,
-        server.ext.clusters, logger);
+      const reply = await importUsers(data as ImportUsersData, em, whitelist, server.ext.clusters, logger);
 
       return [reply];
 
@@ -119,9 +111,6 @@ export const adminServiceServer = plugin((server) => {
 
     getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
-
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
-      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const result = await server.ext.clusters.callOnOne(
         cluster,
@@ -226,10 +215,7 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
-    syncBlockStatus: async ({ em, logger }) => {
-      // check whether there is activated cluster in SCOW
-      // cause syncBlockStatus in plugin will skip the check
-      await getActivatedClusters(em, logger);
+    syncBlockStatus: async () => {
       const reply = await server.ext.syncBlockStatus.sync();
       return [reply];
     },

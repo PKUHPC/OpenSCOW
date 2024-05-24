@@ -12,42 +12,30 @@
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Select } from "antd";
-import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import { Cluster } from "src/utils/cluster";
+import { Cluster, publicConfig } from "src/utils/config";
+
 
 interface Props {
   value?: Cluster[];
   onChange?: (clusters: Cluster[]) => void;
-  // is using config clusters or not
-  // true: use config clusters
-  // false or not exist： use current activated clusters from db
-  isUsingAllConfigClusters?: boolean;
 }
-
 
 const p = prefix("component.others.");
 
-export const ClusterSelector: React.FC<Props> = ({ value, onChange, isUsingAllConfigClusters }) => {
+export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
-
-  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
-  const clusters = isUsingAllConfigClusters ? publicConfigClusters : activatedClusters;
-
-  const sortedIds =
-    clusterSortedIdList.filter((id) => Object.keys(clusters)?.includes(id));
 
   return (
     <Select
       mode="multiple"
       placeholder={t(p("selectCluster"))}
       value={value?.map((v) => v.id)}
-      onChange={(values) => onChange?.(values.map((x) => ({ id: x, name: clusters[x]?.name })))}
-      options={sortedIds.map((x) => ({ value: x, label:
-        getI18nConfigCurrentText(clusters[x]?.name, languageId) }))}
+      onChange={(values) => onChange?.(values.map((x) => ({ id: x, name: publicConfig.CLUSTERS[x].name })))}
+      options={publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({ value: x, label:
+        getI18nConfigCurrentText(publicConfig.CLUSTERS[x].name, languageId) }))}
       style={{ minWidth: "96px" }}
     />
   );
@@ -64,20 +52,16 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({ value, o
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
-  const sortedIds =
-    clusterSortedIdList.filter((id) => Object.keys(activatedClusters)?.includes(id));
-
   return (
     <Select
       placeholder={t(p("selectCluster"))}
       value={value?.id}
-      onChange={(value) => onChange?.({ id: value, name: activatedClusters[value].name })}
+      onChange={(value) => onChange?.({ id: value, name: publicConfig.CLUSTERS[value].name })}
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat(sortedIds.map((x) => ({
+          .concat(publicConfig.CLUSTER_SORTED_ID_LIST.map((x) => ({
             value: x,
-            label:  getI18nConfigCurrentText(activatedClusters[x]?.name, languageId),
+            label:  getI18nConfigCurrentText(publicConfig.CLUSTERS[x].name, languageId),
             disabled: false,
           })))
       }

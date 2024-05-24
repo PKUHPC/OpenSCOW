@@ -136,3 +136,4 @@ export async function insertBlockedData(em: SqlEntityManager) {
 }
 
 export type BlockedData = Awaited<ReturnType<typeof insertBlockedData>>;
+

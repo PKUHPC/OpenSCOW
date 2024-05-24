@@ -16,7 +16,6 @@ import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
 import { createServer } from "src/app";
 import { setJobCharge } from "src/bl/charging";
-import { getActivatedClusters } from "src/bl/clustersUtils";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserStatus } from "src/entities/UserAccount";
@@ -54,12 +53,11 @@ afterEach(async () => {
 it("fetches the data", async () => {
 
   // set job charge limit of user b in account b
-  const currentActivatedClusters = await getActivatedClusters(initialEm, server.logger);
 
-  await setJobCharge(data.uaBB, new Decimal(0.01), currentActivatedClusters, server.ext, server.logger);
+  await setJobCharge(data.uaBB, new Decimal(0.01), server.ext, server.logger);
   await initialEm.flush();
 
-  await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext);
+  await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext, server.ext);
 
   const em = server.ext.orm.em.fork();
 
@@ -139,7 +137,7 @@ it("jobs can be imported when jobs from other clusters already exist in the data
 
   await em.persistAndFlush(existedJob);
 
-  await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext);
+  await fetchJobs(server.ext.orm.em.fork(), server.logger, server.ext, server.ext);
 
   const jobs = await em.find(JobInfo, {});
 

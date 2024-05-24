@@ -26,9 +26,6 @@ export const config = envConfig({
 
   PORTAL_BASE_PATH: str({ desc: "门户系统base path", default: "/" }),
 
-  MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
-  MIS_SERVER_URL: str({ desc: "如果部署了管理系统，管理系统后端服务的路径", default: "" }),
-
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
 

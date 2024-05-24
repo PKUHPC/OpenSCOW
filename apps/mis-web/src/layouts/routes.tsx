@@ -12,8 +12,6 @@
 
 import {
   AccountBookOutlined, AlertOutlined, BookOutlined, CloudServerOutlined,
-  ClusterOutlined,
-  ControlOutlined,
   DashboardOutlined,
   InfoOutlined, LineChartOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, MonitorOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, ProfileOutlined,
@@ -133,19 +131,6 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       },
-      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
-        Icon: ControlOutlined,
-        text: t(pPlatform("resourceManagement")),
-        path: "/admin/resource",
-        clickable: false,
-        children: [
-          {
-            Icon: ClusterOutlined,
-            text: t("layouts.route.platformManagement.clusterManagement"),
-            path: "/admin/resource/clusterManagement",
-          },
-        ],
-      }] : []),
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) &&
       (publicConfig.CLUSTER_MONITOR.resourceStatus.enabled || publicConfig.CLUSTER_MONITOR.alarmLogs.enabled) ? [{
           Icon: MonitorOutlined,

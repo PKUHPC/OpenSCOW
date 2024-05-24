@@ -11,10 +11,12 @@
  */
 
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { createPriceMap } from "src/bl/PriceMap";
+import { createPriceMap, PriceMap } from "src/bl/PriceMap";
 
 export interface PricePlugin {
-  price: {}
+  price: {
+    createPriceMap: () => Promise<PriceMap>;
+  }
 }
 
 
@@ -34,6 +36,8 @@ export const pricePlugin = plugin(async (s) => {
     logger.info("Platform price items are complete. ");
   }
 
-  s.addExtension("price", <PricePlugin["price"]>{});
+  s.addExtension("price", <PricePlugin["price"]>{
+    createPriceMap: () => createPriceMap(s.ext.orm.em.fork(), s.ext.clusters, logger),
+  });
 
 });

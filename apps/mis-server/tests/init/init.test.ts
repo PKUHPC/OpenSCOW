@@ -26,6 +26,7 @@ import { dropDatabase } from "tests/data/helpers";
 let server: Server;
 let client: InitServiceClient;
 
+
 beforeEach(async () => {
   server = await createServer();
   await server.start();

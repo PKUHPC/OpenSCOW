@@ -486,8 +486,6 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
-      clusterNotAvailable: "当前正在访问的集群不可用或没有可用集群。"
-      + "请稍后再试或联系管理员。",
     },
     others:{
       clusterSelector: "请选择集群",
@@ -592,17 +590,9 @@ export default {
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
       adapterConnectionError: "{} 集群无法连接，请稍后重试 ",
-      noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
-      notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
-
-      noClusters: "无法找到集群的配置文件，请联系管理员。",
     },
     dashboard: {
       title: "仪表盘",
-    },
-    common: {
-      noAvailableClusters: "当前没有可用集群。"
-      + "请稍后再试或联系管理员。",
     },
   },
 };

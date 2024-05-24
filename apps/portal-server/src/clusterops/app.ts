@@ -24,7 +24,7 @@ import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
-import { configClusters } from "src/config/clusters";
+import { clusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
@@ -469,7 +469,6 @@ export const appOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
 
-                const clusters = configClusters;
                 // if proxyGateway configured, connect to compute node by proxyGateway and get ip of compute node
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {

@@ -12,11 +12,9 @@
 
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { Descriptions, Drawer } from "antd";
-import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import { getClusterName } from "src/utils/cluster";
+import { getClusterName } from "src/utils/config";
 
 interface Props {
   open: boolean;
@@ -33,7 +31,6 @@ export const RunningJobDrawer: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
-  const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   const drawerItems = [
     [t(p("cluster")), "cluster", getClusterName],
@@ -71,8 +68,7 @@ export const RunningJobDrawer: React.FC<Props> = ({
               <Descriptions.Item key={item.jobId} label={label}>
                 {/* 如果是集群项展示，则根据当前语言id获取集群名称 */}
                 {format ?
-                  (key === "cluster" ?
-                    getClusterName(item[key].id, languageId, publicConfigClusters) : format(item[key], item))
+                  (key === "cluster" ? getClusterName(item[key].id, languageId) : format(item[key], item))
                   : item[key] as string}
               </Descriptions.Item>
             ))}

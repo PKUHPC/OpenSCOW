@@ -13,13 +13,12 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
-import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { updateCluster } from "src/bl/clustersUtils";
-import { configClusters } from "src/config/clusters";
+import { clusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
+import { scowErrorMetadata } from "src/utils/error";
 
 type CallOnAllResult<T> = {
   cluster: string;
@@ -28,8 +27,6 @@ type CallOnAllResult<T> = {
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
-  // clusters for calling to connect to adapter client
-  clusters: Record<string, ClusterConfigSchema>,
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<CallOnAllResult<T>>;
@@ -53,7 +50,7 @@ export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 export const clustersPlugin = plugin(async (f) => {
 
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(configClusters).map(async ({ displayName, loginNodes }) => {
+    await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
       const address = loginNode.address;
       const node = loginNode.name;
@@ -68,12 +65,7 @@ export const clustersPlugin = plugin(async (f) => {
     }));
   }
 
-  // initial clusters database
-  const configClusterIds = Object.keys(configClusters);
-  await updateCluster(f.ext.orm.em.fork(), configClusterIds, f.logger);
-
-  // adapterClient of all config clusters
-  const adapterClientForClusters = Object.entries(configClusters).reduce((prev, [cluster, c]) => {
+  const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
     const client = getSchedulerAdapterClient(c.adapterUrl);
 
     prev[cluster] = client;
@@ -81,25 +73,13 @@ export const clustersPlugin = plugin(async (f) => {
     return prev;
   }, {} as Record<string, SchedulerAdapterClient>);
 
-  // adapterClients of activated clusters
-  const getAdapterClientForActivatedClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
-    return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
-      const client = getSchedulerAdapterClient(c.adapterUrl);
-      prev[cluster] = client;
-      return prev;
-    }, {} as Record<string, SchedulerAdapterClient>);
-  };
-
   const getAdapterClient = (cluster: string) => {
     return adapterClientForClusters[cluster];
   };
 
-  f.logger.child({ plugin: "cluster" });
-
   const clustersPlugin = {
 
     callOnOne: <CallOnOne>(async (cluster, logger, call) => {
-
       const client = getAdapterClient(cluster);
 
       if (!client) {
@@ -125,11 +105,9 @@ export const clustersPlugin = plugin(async (f) => {
     }),
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (clusters, logger, call) => {
+    callOnAll: <CallOnAll>(async (logger, call) => {
 
-      const adapterClientForActivatedClusters = getAdapterClientForActivatedClusters(clusters);
-
-      const responses = await Promise.all(Object.entries(adapterClientForActivatedClusters)
+      const responses = await Promise.all(Object.entries(adapterClientForClusters)
         .map(async ([cluster, client]) => {
           return call(client).then((result) => {
             logger.info("Executing on %s success", cluster);

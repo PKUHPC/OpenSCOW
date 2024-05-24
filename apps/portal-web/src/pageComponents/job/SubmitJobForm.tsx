@@ -21,12 +21,11 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
-import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import { Cluster } from "src/utils/cluster";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { Cluster, publicConfig } from "src/utils/config";
 import { formatSize } from "src/utils/format";
 
 interface JobForm {
@@ -194,16 +193,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     }
   }, [currentPartitionInfo]);
 
-  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
-
-  // 没有可用集群的情况不再渲染
-  if (!defaultCluster && currentClusters.length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
-
+  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
-    (defaultCluster ?? currentClusters[0]);
+  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -233,7 +225,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       form={form}
       initialValues={{
         ...initial,
-        cluster: currentQueryCluster,
+        cluster: defaultCluster,
       }}
       onFinish={submit}
     >
@@ -385,7 +377,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                       form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                       form.validateFields(["workingDirectory"]);
                     }}
-                    cluster={cluster || currentQueryCluster}
+                    cluster={cluster || defaultCluster}
                   />
                 )
               }

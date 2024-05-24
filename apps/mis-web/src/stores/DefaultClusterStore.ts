@@ -10,22 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Result } from "antd";
-import { useI18nTranslateToString } from "src/i18n";
-import { Head } from "src/utils/head";
+import { useState } from "react";
+import { Cluster } from "src/utils/config";
 
-export const ClusterNotAvailablePage = () => {
 
-  const t = useI18nTranslateToString();
+export function DefaultClusterStore(defaultCluster: Cluster) {
+  const [cluster, setCluster] = useState<Cluster>(defaultCluster);
 
-  return (
-    <>
-      <Head title={t("component.errorPages.notExist")} />
-      <Result
-        status="404"
-        title={"404"}
-        subTitle={t("component.errorPages.clusterNotAvailable")}
-      />
-    </>
-  );
-};
+  return { cluster, setCluster };
+}

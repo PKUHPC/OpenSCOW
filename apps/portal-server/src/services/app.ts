@@ -14,19 +14,19 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { getI18nSeverTypeFormat } from "@scow/lib-server";
+import { I18nStringType } from "@scow/config/build/i18n";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
+  I18nStringProtoType,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { getClusterAppConfigs } from "src/utils/app";
-import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
 const errorInfo = (reason: string) =>
@@ -38,7 +38,6 @@ export const appServiceServer = plugin((server) => {
     connectToApp: async ({ request, logger }) => {
 
       const { cluster, sessionId, userId } = request;
-      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -96,8 +95,6 @@ export const appServiceServer = plugin((server) => {
 
       const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
         proxyBasePath, partition, qos, userId, customAttributes } = request;
-
-      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -182,9 +179,7 @@ export const appServiceServer = plugin((server) => {
     },
 
     listAppSessions: async ({ request, logger }) => {
-
       const { cluster, userId } = request;
-      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -198,8 +193,6 @@ export const appServiceServer = plugin((server) => {
     getAppMetadata: async ({ request }) => {
 
       const { appId, cluster } = request;
-      await checkActivatedClusters({ clusterIds: cluster });
-
       const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
@@ -207,6 +200,24 @@ export const appServiceServer = plugin((server) => {
         throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
       }
       const attributes: AppCustomAttribute[] = [];
+
+      // config中的文本映射到protobuf中定义的grpc返回值的类型
+      const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringProtoType | undefined => {
+
+        if (!i18nConfig) return undefined;
+
+        if (typeof i18nConfig === "string") {
+          return { value: { $case: "directString", directString: i18nConfig } };
+        } else {
+          return { value: { $case: "i18nObject", i18nObject: {
+            i18n: {
+              default: i18nConfig.i18n.default,
+              en: i18nConfig.i18n.en,
+              zhCn: i18nConfig.i18n.zh_cn,
+            },
+          } } };
+        }
+      };
 
       if (app.attributes) {
         app.attributes.forEach((item) => {
@@ -245,7 +256,6 @@ export const appServiceServer = plugin((server) => {
     listAvailableApps: async ({ request }) => {
 
       const { cluster } = request;
-      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -258,8 +268,6 @@ export const appServiceServer = plugin((server) => {
     getAppLastSubmission: async ({ request, logger }) => {
 
       const { userId, cluster, appId } = request;
-      await checkActivatedClusters({ clusterIds: cluster });
-
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }

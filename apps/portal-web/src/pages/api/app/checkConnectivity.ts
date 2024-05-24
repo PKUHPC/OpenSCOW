@@ -10,12 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getClusterConfigFiles } from "src/server/clusterConfig";
+import { runtimeConfig } from "src/utils/config";
 import { isPortReachable } from "src/utils/isPortReachable";
-import { route } from "src/utils/route";
 
 export const CheckAppConnectivitySchema = typeboxRouteSchema({
   method: "GET",
@@ -35,7 +34,7 @@ const auth = authenticate(() => true);
 
 const TIMEOUT_MS = 3000;
 
-export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) => {
+export default /* #__PURE__*/typeboxRoute(CheckAppConnectivitySchema, async (req, res) => {
 
   const info = await auth(req, res);
 
@@ -43,9 +42,8 @@ export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) 
 
   const { host, port, cluster } = req.query;
 
-  const clusterConfigs = await getClusterConfigFiles();
   // TODO ignore proxy gateway
-  const proxyGateway = clusterConfigs[cluster].proxyGateway;
+  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[cluster].proxyGateway;
 
   if (proxyGateway) {
     return { 200: { ok: true } };
