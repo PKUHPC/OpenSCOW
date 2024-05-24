@@ -13,7 +13,7 @@
 import { parseTime } from "@scow/lib-web/build/utils/datetime";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import dayjs from "dayjs";
-import type { Cluster } from "src/utils/cluster";
+import type { Cluster } from "src/utils/config";
 
 
 export type RunningJobInfo = RunningJob & { cluster: Cluster; runningOrQueueTime: string };

@@ -21,7 +21,7 @@ import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SingleCrossClusterTransferSelector } from "src/pageComponents/filemanager/SingleCrossClusterTransferSelector";
 import { FileInfo } from "src/pages/api/file/list";
-import { Cluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";
 import { formatSize } from "src/utils/format";
 import { styled } from "styled-components";

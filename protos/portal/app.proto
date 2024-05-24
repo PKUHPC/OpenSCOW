@@ -17,15 +17,6 @@ package scow.portal;
 import "google/protobuf/timestamp.proto";
 import "common/i18n.proto";
 
-// 为确保兼容性保留原有声明，作为同名别名
-// 其他proto引用时请使用 common/i18n.proto/I18nStringProtoType
-message I18nStringProtoType {
-  oneof value {
-    string direct_string = 1;
-    common.I18nObject i18n_object = 2;
-  }
-}
-
 message ConnectToAppRequest {
   string user_id = 1;
   string cluster = 2;
@@ -115,6 +106,13 @@ message ListAppSessionsResponse {
 message GetAppMetadataRequest {
   string app_id = 1;
   string cluster = 2;
+}
+
+message I18nStringProtoType {
+  oneof value {
+    string direct_string = 1;
+    common.I18nObject i18n_object = 2;
+  }
 }
 
 message SelectOption {

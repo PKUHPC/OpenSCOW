@@ -11,6 +11,7 @@
  */
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
+import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
@@ -25,6 +26,8 @@ export interface ServerRuntimeConfig {
 
   AUTH_INTERNAL_URL: string;
 
+  CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
+
   UI_CONFIG?: UiConfigSchema;
 
   PORTAL_CONFIG: PortalConfigSchema;
@@ -32,6 +35,8 @@ export interface ServerRuntimeConfig {
   DEFAULT_PRIMARY_COLOR: string;
 
   MOCK_USER_ID: string | undefined;
+
+  LOGIN_NODES: Record<string, string>;
 
   SERVER_URL: string;
 
@@ -53,17 +58,19 @@ export interface PublicRuntimeConfig {
 
   ENABLE_SHELL: boolean;
 
+  ENABLE_LOGIN_DESKTOP: boolean;
+
   ENABLE_JOB_MANAGEMENT: boolean;
 
   ENABLE_APPS: boolean;
 
   MIS_URL: string | undefined;
 
-  MIS_DEPLOYED: boolean;
-
-  MIS_SERVER_URL: string | undefined;
-
   AI_URL: string | undefined;
+
+  CLUSTERS: Cluster[];
+
+  CLUSTER_SORTED_ID_LIST: string[];
 
   NOVNC_CLIENT_URL: string;
 
@@ -85,6 +92,8 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
+  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
+
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
   }
@@ -97,6 +106,7 @@ export interface PublicRuntimeConfig {
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
+export type Cluster = { id: string; name: I18nStringType; }
 export type NavLink = {
   text: string;
   url?: string;
@@ -104,6 +114,22 @@ export type NavLink = {
   iconPath?: string;
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 }
+
+export const getLoginDesktopEnabled = (cluster: string): boolean => {
+
+  const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
+
+  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+
+  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
+};
+
+export type LoginNode = { name: string, address: string }
+
+export const getClusterName = (clusterId: string, languageId: string) => {
+  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
+   || clusterId;
+};
 
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串

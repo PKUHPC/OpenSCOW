@@ -20,11 +20,10 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import { Cluster } from "src/utils/cluster";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import type { Cluster } from "src/utils/config";
 
 interface Props {}
 
@@ -48,15 +47,11 @@ const p = prefix("pageComp.job.jobTemplateModal.");
 
 export const JobTemplateTable: React.FC<Props> = () => {
 
-  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
-
-  if (!defaultCluster && currentClusters.length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
+  const { defaultCluster } = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
-      cluster: defaultCluster ?? currentClusters[0],
+      cluster: defaultCluster,
     };
   });
 

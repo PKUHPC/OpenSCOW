@@ -15,12 +15,11 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { AppSessionsTable } from "src/pageComponents/app/AppSessionsTable";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
 export const SessionsIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -28,9 +27,7 @@ export const SessionsIndexPage: NextPage = requireAuth(() => true)(() => {
   const languageId = useI18n().currentLanguage.id;
   const router = useRouter();
   const clusterId = queryToString(router.query.clusterId);
-
-  const { currentClusters } = useStore(ClusterInfoStore);
-  const cluster = currentClusters.find((x) => x.id === clusterId);
+  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterId);
 
   const tArgs = useI18nTranslate();
   const t = useI18nTranslateToString();

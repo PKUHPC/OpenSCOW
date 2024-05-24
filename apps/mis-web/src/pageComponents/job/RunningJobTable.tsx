@@ -20,7 +20,6 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { ModalLink } from "src/components/ModalLink";
 import { TableTitle } from "src/components/TableTitle";
@@ -29,9 +28,8 @@ import { runningJobId, RunningJobInfo } from "src/models/job";
 import { BatchChangeJobTimeLimitButton } from "src/pageComponents/job/BatchChangeJobTimeLimitButton";
 import { ChangeJobTimeLimitModal } from "src/pageComponents/job/ChangeJobTimeLimitModal";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
-import type { Cluster } from "src/utils/cluster";
-import { publicConfig } from "src/utils/config";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { Cluster, publicConfig } from "src/utils/config";
 
 
 interface FilterForm {
@@ -58,21 +56,18 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
+
   const searchType = useRef<"precision" | "range">("range");
 
   const [selected, setSelected] = useState<RunningJobInfo[]>([]);
 
-  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
-
-  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
-      cluster: defaultCluster ?? Object.values(activatedClusters)[0],
+      cluster: defaultClusterStore.cluster,
     };
   });
 
@@ -112,7 +107,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       // add local range filters here
     }
 
-    return filtered.map((x) => RunningJobInfo.fromGrpc(x, activatedClusters[query.cluster.id]));
+    return filtered.map((x) => RunningJobInfo.fromGrpc(x, publicConfig.CLUSTERS[query.cluster.id]));
   }, [data, query.jobId]);
 
   return (

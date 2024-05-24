@@ -11,7 +11,6 @@
  */
 
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
@@ -273,30 +272,6 @@ export const mockApi: MockApi<typeof api> = {
   queryFileTransferProgress: null,
   terminateFileTransfer: null,
   checkTransferKey: null,
-
-  getClusterConfigFiles: async () => ({ clusterConfigs: {
-    hpc01: {
-      displayName: "hpc01Name",
-      priority: 1,
-      adapterUrl: "0.0.0.0:0000",
-      proxyGateway: undefined,
-      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
-      loginDesktop: undefined,
-      turboVncPath: undefined,
-      crossClusterFileTransfer: undefined,
-      hpc: { enabled: true },
-      ai: { enabled: false },
-      k8s: undefined,
-    },
-  } }),
-
-  getClustersRuntimeInfo: async () => ({ results: [{
-    clusterId: "hpc01",
-    activationStatus: ClusterActivationStatus.ACTIVATED,
-    operatorId: undefined,
-    operatorName: undefined,
-    comment: "",
-  }]}),
 
 };
 

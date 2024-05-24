@@ -22,10 +22,3 @@ message I18nObject {
   }
   I18n i18n = 1;
 }
-
-message I18nStringProtoType {
-  oneof value {
-    string direct_string = 1;
-    I18nObject i18n_object = 2;
-  }
-}

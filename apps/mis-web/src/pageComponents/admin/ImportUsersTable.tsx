@@ -20,11 +20,11 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { publicConfig } from "src/utils/config";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
 const pCommon = prefix("common.");
@@ -37,20 +37,12 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
-  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
-
-  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
+  const defaultClusterStore = useStore(DefaultClusterStore);
 
   const clusterParam = queryToString(qs.cluster);
-  const cluster = (activatedClusters[clusterParam]
-    ? activatedClusters[clusterParam]
-    : defaultCluster);
-
-  if (!cluster) {
-    return <ClusterNotAvailablePage />;
-  }
+  const cluster = (publicConfig.CLUSTERS[clusterParam]
+    ? publicConfig.CLUSTERS[clusterParam]
+    : defaultClusterStore.cluster);
 
   const [form] = Form.useForm<{ whitelist: boolean}>();
 

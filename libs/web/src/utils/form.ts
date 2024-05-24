@@ -65,25 +65,3 @@ export const compareUsedChargeRule =
     }
     return Promise.resolve();
   };
-
-// check consistency of the compared value and the input value
-export const validateDataConsistency = <InputFieldName extends string>
-  (inputFieldName: InputFieldName, comparedValue: string, languageId: string) => {
-  return {
-    dependencies: [inputFieldName],
-    validateFirst: true,
-    rules: [
-      {
-        required: true,
-        message: getCurrentLangLibWebText(languageId, "validateDataConsistencyMessage"),
-      },
-      {
-        validator: async (_, value: string) => {
-          if (value && comparedValue && comparedValue !== value) {
-            throw new Error(getCurrentLangLibWebText(languageId, "validateDataConsistencyError"));
-          }
-        },
-      },
-    ],
-  };
-};

@@ -13,7 +13,6 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
@@ -59,7 +58,6 @@ export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
 
 export async function pay(
   request: PayRequest, em: SqlEntityManager,
-  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const {
@@ -94,7 +92,7 @@ export async function pay(
     && checkShouldUnblockAccount(target)
   ) {
     logger.info("Unblock account %s", target.accountName);
-    await unblockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
+    await unblockAccount(target, clusterPlugin.clusters, logger);
   }
 
   if (
@@ -102,7 +100,7 @@ export async function pay(
     && checkShouldBlockAccount(target)
   ) {
     logger.info("Block account %s", target.accountName);
-    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
+    await blockAccount(target, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -122,7 +120,6 @@ type ChargeRequest = {
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
-  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const { target, amount, comment, type, userId, metadata } = request;
@@ -147,7 +144,7 @@ export async function charge(
     && checkShouldBlockAccount(target)
   ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
-    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
+    await blockAccount(target, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -158,10 +155,7 @@ export async function charge(
 
 export async function addJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
-  charge: Decimal,
-  currentActivatedClusters: Record<string, ClusterConfigSchema>,
-  clusterPlugin: ClusterPlugin,
-  logger: Logger,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
   if (ua.usedJobCharge && ua.jobChargeLimit) {
     ua.usedJobCharge = ua.usedJobCharge.plus(charge);
@@ -173,19 +167,16 @@ export async function addJobCharge(
     ).shouldBlockInCluster;
 
     if (shouldBlockUserInCluster) {
-      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
+      await blockUserInAccount(ua, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
+      await unblockUserInAccount(ua, clusterPlugin, logger);
     }
   }
 }
 
 export async function setJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
-  charge: Decimal,
-  currentActivatedClusters: Record<string, ClusterConfigSchema>,
-  clusterPlugin: ClusterPlugin,
-  logger: Logger,
+  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
   ua.jobChargeLimit = charge;
   if (!ua.usedJobCharge) {
@@ -199,9 +190,9 @@ export async function setJobCharge(
     ).shouldBlockInCluster;
 
     if (shouldBlockUserInCluster) {
-      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
+      await blockUserInAccount(ua, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
+      await unblockUserInAccount(ua, clusterPlugin, logger);
     }
   }
 }

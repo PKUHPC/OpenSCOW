@@ -15,13 +15,12 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, InputNumber, Modal, Select, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { useState } from "react";
-import { useStore } from "simstate";
 import { api } from "src/apis";
 import { JobBillingTableItem } from "src/components/JobBillingTable";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AmountStrategy } from "src/models/job";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { publicConfig } from "src/utils/config";
 
 const p = prefix("pageComp.job.editableJobBillingTable.");
 const pCommon = prefix("common.");
@@ -104,8 +103,6 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { publicConfigClusters } = useStore(ClusterInfoStore);
-
   const clusterTotalQosCounts = data && data.length ?
     data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
       const { cluster } = item;
@@ -119,7 +116,7 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
 
   const columns: ColumnsType<JobBillingTableItem> = [
     { dataIndex: "cluster", title: t(pCommon("cluster")), key: "index", render: (_, r) => ({
-      children: getI18nConfigCurrentText(publicConfigClusters[r.cluster]?.name, languageId) ?? r.cluster,
+      children: getI18nConfigCurrentText(publicConfig.CLUSTERS[r.cluster]?.name, languageId) ?? r.cluster,
       props: { rowSpan: r.clusterItemIndex === 0 && clusterTotalQosCounts ? clusterTotalQosCounts[r.cluster] : 0 },
     }) },
     { dataIndex: "partition", title: t(p("name")), key: "index", render: (_, r) => ({

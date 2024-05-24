@@ -15,7 +15,7 @@ import { Button, Modal } from "antd";
 import React, { useMemo, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
-import { Cluster } from "src/utils/cluster";
+import { Cluster, publicConfig } from "src/utils/config";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
@@ -36,7 +36,6 @@ export interface Props {
   onClose: () => void;
   addItem: (item: Entry) => void;
   apps: AppWithCluster;
-  clusters: Cluster[];
 }
 
 const ItemsContainer = styled.div`
@@ -61,7 +60,6 @@ export const AddEntryModal: React.FC<Props> = ({
   onClose,
   addItem,
   apps,
-  clusters,
 }) => {
   const t = useI18nTranslateToString();
 
@@ -90,6 +88,8 @@ export const AddEntryModal: React.FC<Props> = ({
       },
     },
   ]);
+
+  const clusters = publicConfig.CLUSTERS;
 
   // 所有可创建的app
   const appInfo = useMemo(() => {

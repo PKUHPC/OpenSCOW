@@ -80,7 +80,5 @@ export const OperationType: OperationTypeEnum = {
   setAccountBlockThreshold: "setAccountBlockThreshold",
   setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
   userChangeTenant: "userChangeTenant",
-  activateCluster: "activateCluster",
-  deactivateCluster: "deactivateCluster",
   customEvent: "customEvent",
 };

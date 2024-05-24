@@ -11,6 +11,7 @@
  */
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
+import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
 import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { MisConfigSchema } from "@scow/config/build/mis";
@@ -29,6 +30,8 @@ export interface ServerRuntimeConfig {
   UI_CONFIG: UiConfigSchema | undefined;
   DEFAULT_PRIMARY_COLOR: string;
 
+  CLUSTERS_CONFIG: {[clusterId: string]: ClusterConfigSchema};
+
   CLUSTER_TEXTS_CONFIG: ClusterTextsConfigSchema;
 
   SCOW_API_AUTH_TOKEN?: string;
@@ -43,6 +46,10 @@ export interface ServerRuntimeConfig {
 
 export interface PublicRuntimeConfig {
   BASE_PATH: string;
+
+  CLUSTERS: { [clusterId: string]: Cluster };
+
+  CLUSTER_SORTED_ID_LIST: string[];
 
   PREDEFINED_CHARGING_TYPES: string[];
   CREATE_USER_CONFIG: {
@@ -111,6 +118,7 @@ export interface PublicRuntimeConfig {
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
+export type Cluster = { id: string; name: I18nStringType; }
 export type NavLink = {
   text: string;
   url?: string;
@@ -126,6 +134,10 @@ export type CustomAmountStrategy = {
   name?: string | undefined;
   comment?: string | undefined;
 }
+
+export const getClusterName = (clusterId: string, languageId: string) => {
+  return getI18nConfigCurrentText(publicConfig.CLUSTERS[clusterId]?.name, languageId) || clusterId;
+};
 
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串

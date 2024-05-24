@@ -42,7 +42,6 @@ export async function createServer() {
   for (const plugin of plugins) {
     await server.register(plugin);
   }
-
   await server.register(accountServiceServer);
   await server.register(userServiceServer);
   await server.register(adminServiceServer);

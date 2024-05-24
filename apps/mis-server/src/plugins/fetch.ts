@@ -37,7 +37,7 @@ export const fetchPlugin = plugin(async (f) => {
     if (fetchIsRunning) return;
 
     fetchIsRunning = true;
-    return fetchJobs(f.ext.orm.em.fork(), logger, f.ext).finally(() => { fetchIsRunning = false; });
+    return fetchJobs(f.ext.orm.em.fork(), logger, f.ext, f.ext).finally(() => { fetchIsRunning = false; });
   };
 
   const task = cron.schedule(

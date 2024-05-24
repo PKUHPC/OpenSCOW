@@ -15,12 +15,11 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Progress, Space } from "antd";
 import React, { useCallback } from "react";
 import { useAsync } from "react-async";
-import { useStore } from "simstate";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { StatCard } from "src/components/StatCard";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
 
 interface Props {
@@ -60,15 +59,13 @@ export const StorageCard: React.FC<Props> = ({
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { publicConfigClusters } = useStore(ClusterInfoStore);
-
   const { data, isLoading, run } = useAsync({
     deferFn: useCallback(async () => api.queryStorageUsage({ query: { cluster } }), [cluster]),
   });
 
   return (
     <StatCard
-      title={`${getI18nConfigCurrentText(publicConfigClusters[cluster]?.name, languageId) ?? cluster}
+      title={`${getI18nConfigCurrentText(publicConfig.CLUSTERS[cluster]?.name, languageId) ?? cluster}
       ${t(p("storage"))}${data ? t(p("storage")) + "/" : ""}${t(p("totalLimited"))}`}
     >
       <Container>

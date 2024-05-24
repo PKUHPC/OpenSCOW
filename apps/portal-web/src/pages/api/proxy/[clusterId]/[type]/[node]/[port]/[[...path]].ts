@@ -12,7 +12,6 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import { checkCookie } from "src/auth/server";
-import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { parseProxyTarget, proxy } from "src/server/setup/proxy";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -27,10 +26,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const clusterConfigs = await getClusterConfigFiles();
-
   // req.url of next.js removes base path
-  const target = parseProxyTarget(req.url!, false, clusterConfigs);
+  const target = parseProxyTarget(req.url!, false);
 
   if (target instanceof Error) {
     res.status(400).send(target.message);

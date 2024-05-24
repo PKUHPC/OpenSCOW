@@ -16,7 +16,7 @@ import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Cluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 
 interface TransferData {
   cluster: string;

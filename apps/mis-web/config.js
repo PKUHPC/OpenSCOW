@@ -11,6 +11,7 @@
  */
 
 const { envConfig, str, bool } = require("@scow/lib-config");
+const { getClusterConfigs, getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getMisConfig } = require("@scow/config/build/mis");
 const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getClusterTextsConfig } = require("@scow/config/build/clusterTexts");
@@ -91,6 +92,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configBasePath = mockEnv ? join(__dirname, "config") : undefined;
 
+  const clusters = getClusterConfigs(configBasePath, console);
   const clusterTexts = getClusterTextsConfig(configBasePath, console);
   const uiConfig = getUiConfig(configBasePath, console);
   const misConfig = getMisConfig(configBasePath, console);
@@ -109,6 +111,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
+    CLUSTERS_CONFIG: clusters,
     CLUSTER_TEXTS_CONFIG: clusterTexts,
     UI_CONFIG: uiConfig,
     DEFAULT_PRIMARY_COLOR,
@@ -134,6 +137,13 @@ const buildRuntimeConfig = async (phase, basePath) => {
     PREDEFINED_CHARGING_TYPES: misConfig.predefinedChargingTypes,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
+
+    CLUSTERS: Object.keys(clusters).reduce((prev, curr) => {
+      prev[curr] = { id: curr, name: clusters[curr].displayName };
+      return prev;
+    }, {}),
+
+    CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
 
     ACCOUNT_NAME_PATTERN: misConfig.accountNamePattern?.regex,
 

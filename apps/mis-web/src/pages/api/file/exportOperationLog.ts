@@ -49,7 +49,7 @@ export const GetOperationLogFilter = Type.Object({
 export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
 
 
-export const ExportOperationLogSchema = typeboxRouteSchema({
+export const GetOperationLogsSchema = typeboxRouteSchema({
 
   method: "GET",
 
@@ -111,7 +111,7 @@ const getExportSource = (
   }
 };
 
-export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
+export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
   const auth = authenticate(() => true);
 
 

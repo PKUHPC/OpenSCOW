@@ -19,7 +19,7 @@ import { Localized, prefix } from "src/i18n";
 import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
-import { Cluster } from "src/utils/cluster";
+import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
 
 const CardsContainer = styled.div`
@@ -35,8 +35,7 @@ export interface AppWithCluster {
 }
 
 interface Props {
-  currentClusters: Cluster[];
-  publicConfigClusters: Cluster[];
+
 }
 
 export const defaultEntry: Entry[] = [
@@ -87,15 +86,16 @@ export const defaultEntry: Entry[] = [
 ];
 const p = prefix("pageComp.dashboard.quickEntry.");
 
-export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClusters }) => {
-
+export const QuickEntry: React.FC<Props> = () => {
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
 
+  const clusters = publicConfig.CLUSTERS;
+
   // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {
-    const appsInfo = await Promise.all(currentClusters.map((x) => {
+    const appsInfo = await Promise.all(clusters.map((x) => {
       return api.listAvailableApps({ query: { cluster: x.id } });
     }));
 
@@ -114,11 +114,11 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
           appWithCluster[y.id].app.logoPath = y.logoPath;
         }
 
-        appWithCluster[y.id].clusters.push(currentClusters[idx]);
+        appWithCluster[y.id].clusters.push(clusters[idx]);
       });
     });
     return appWithCluster;
-  }, [currentClusters]) });
+  }, [clusters]) });
 
   const [isEditable, setIsEditable] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -151,8 +151,6 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
               isFinished={isFinished}
               quickEntryArray={data?.quickEntries.length ? data?.quickEntries : defaultEntry }
               apps={apps ?? {}}
-              currentClusters={currentClusters}
-              publicConfigClusters={publicConfigClusters}
             ></Sortable>
           )}
       </CardsContainer>

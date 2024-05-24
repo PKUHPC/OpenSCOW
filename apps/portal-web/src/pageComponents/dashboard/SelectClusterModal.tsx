@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster } from "src/utils/cluster";
+import { Cluster } from "src/utils/config";
 
 import { EntryCase, IncompleteEntryInfo } from "./AddEntryModal";
 

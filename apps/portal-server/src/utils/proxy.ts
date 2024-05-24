@@ -12,7 +12,7 @@
 
 import { loggedExec, sftpWriteFile } from "@scow/lib-ssh";
 import { dirname } from "path";
-import { configClusters } from "src/config/clusters";
+import { clusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { sshConnect } from "src/utils/ssh";
 import { Logger } from "ts-log";
@@ -22,9 +22,9 @@ export const setupProxyGateway = async (logger: Logger) => {
   let portalBasePath = config.PORTAL_BASE_PATH;
   if (!portalBasePath.endsWith("/")) { portalBasePath += "/"; }
 
-  for (const id of Object.keys(configClusters)) {
+  for (const id of Object.keys(clusters)) {
 
-    const proxyGatewayConfig = configClusters[id].proxyGateway;
+    const proxyGatewayConfig = clusters[id].proxyGateway;
 
     if (!proxyGatewayConfig?.autoSetupNginx) { continue; }
 
@@ -85,7 +85,7 @@ export const parseIp = (stdout: string): string => {
 export const getIpFromProxyGateway
   = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
 
-    const proxyGatewayConfig = configClusters?.[clusterId]?.proxyGateway;
+    const proxyGatewayConfig = clusters?.[clusterId]?.proxyGateway;
 
     if (!proxyGatewayConfig) return "";
     const url = new URL(proxyGatewayConfig.url);

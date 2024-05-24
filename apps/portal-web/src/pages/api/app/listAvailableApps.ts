@@ -10,12 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
-import { route } from "src/utils/route";
 
 // Cannot use App from protos
 export const App = Type.Object({
@@ -53,7 +52,7 @@ export const ListAvailableAppsSchema = typeboxRouteSchema({
 //
 // For now, the API requires token from query
 // and authenticate manually
-export default /* #__PURE__*/route(ListAvailableAppsSchema, async (req) => {
+export default /* #__PURE__*/typeboxRoute(ListAvailableAppsSchema, async (req) => {
 
   const { cluster } = req.query;
 

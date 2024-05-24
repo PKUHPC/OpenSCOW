@@ -20,7 +20,6 @@ title: "portal-web"
 |`SERVER_URL`|字符串|门户后端的路径|portal-server:5000|
 |`MIS_DEPLOYED`|布尔值|是否部署了管理系统|false|
 |`MIS_URL`|字符串|如果部署了管理系统，设置URL或者路径。相对于整个系统的base path。将会覆盖配置文件。空字符串等价于未部署管理系统||
-|`MIS_SEVER_URL`|字符串|如果部署了管理系统，管理系统后端的路径。未部署管理系统时为空字符串||
 
 <!-- ENV TABLE END -->
 

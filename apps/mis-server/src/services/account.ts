@@ -20,7 +20,6 @@ import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
-import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -48,9 +47,7 @@ export const accountServiceServer = plugin((server) => {
           };
         }
 
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
         const jobs = await server.ext.clusters.callOnAll(
-          currentActivatedClusters,
           logger,
           async (client) => {
             const fields = [
@@ -74,9 +71,7 @@ export const accountServiceServer = plugin((server) => {
         const blockThresholdAmount =
         account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
 
-        const result = await blockAccount(account,
-          currentActivatedClusters,
-          server.ext.clusters, logger);
+        const result = await blockAccount(account, server.ext.clusters, logger);
 
         if (result === "AlreadyBlocked") {
 
@@ -130,6 +125,7 @@ export const accountServiceServer = plugin((server) => {
             code: Status.FAILED_PRECONDITION, message: `Account ${accountName} is unblocked`,
           };
         }
+
         // 将账户从被上级封锁或冻结状态变更为正常
         account.state = AccountState.NORMAL;
 
@@ -153,8 +149,7 @@ export const accountServiceServer = plugin((server) => {
           return [{ executed: true }];
         }
 
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, server.ext.clusters, logger);
 
         return [{ executed: true }];
 
@@ -251,10 +246,8 @@ export const accountServiceServer = plugin((server) => {
         throw e;
       };
 
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
       logger.info("Creating account in cluster.");
       await server.ext.clusters.callOnAll(
-        currentActivatedClusters,
         logger,
         async (client) => {
           await asyncClientCall(client.account, "createAccount", {
@@ -378,8 +371,7 @@ export const accountServiceServer = plugin((server) => {
       // 如果移入白名单之前账户状态不为冻结，则账户状态变更为正常，账户在集群中为解封状态
       } else {
         account.state = AccountState.NORMAL;
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, server.ext.clusters, logger);
       }
 
       await em.persistAndFlush(whitelist);
@@ -427,8 +419,7 @@ export const accountServiceServer = plugin((server) => {
 
       if (shouldBlockInCluster) {
         logger.info("Account %s is out of balance and not whitelisted. Block the account.", account.accountName);
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await blockAccount(account, server.ext.clusters, logger);
       }
 
       await em.flush();
@@ -464,17 +455,15 @@ export const accountServiceServer = plugin((server) => {
         currentBlockThreshold,
       ).shouldBlockInCluster;
 
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
-
       if (shouldBlockInCluster) {
         logger.info("Account %s may be out of balance. Block the account.", account.accountName);
-        await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await blockAccount(account, server.ext.clusters, logger);
       }
 
       if (!shouldBlockInCluster) {
         logger.info("The balance of Account %s is greater than the block threshold amount. "
         + "Unblock the account.", account.accountName);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, server.ext.clusters, logger);
       }
 
       await em.persistAndFlush(account);
