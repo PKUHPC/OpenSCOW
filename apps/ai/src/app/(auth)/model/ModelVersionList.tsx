@@ -186,7 +186,7 @@ export const ModelVersionList: React.FC<Props> = (
                               await shareMutation.mutateAsync({
                                 versionId: r.id,
                                 modelId,
-                                sourceFilePath: r.path });
+                              });
                           },
                         });
                       }}

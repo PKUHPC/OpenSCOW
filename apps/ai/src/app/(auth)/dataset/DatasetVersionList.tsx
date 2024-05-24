@@ -180,7 +180,6 @@ export const DatasetVersionList: React.FC<Props> = (
                           await shareMutation.mutateAsync({
                             datasetVersionId: r.id,
                             datasetId: r.datasetId,
-                            sourceFilePath: r.path,
                           });
                       },
                     });
