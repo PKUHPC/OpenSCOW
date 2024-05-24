@@ -20,12 +20,13 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { runningJobId, RunningJobInfo } from "src/models/job";
 import { RunningJobDrawer } from "src/pageComponents/job/RunningJobDrawer";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 interface FilterForm {
   jobId: number | undefined;
@@ -42,12 +43,16 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const { defaultCluster } = useStore(DefaultClusterStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
       jobId: undefined,
-      cluster: defaultCluster,
+      cluster: defaultCluster ?? currentClusters[0],
     };
   });
 

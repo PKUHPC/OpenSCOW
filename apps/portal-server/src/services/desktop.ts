@@ -16,7 +16,8 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { executeAsUser } from "@scow/lib-ssh";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import {
   addDesktopToFile,
   ensureEnabled,
@@ -35,6 +36,7 @@ export const desktopServiceServer = plugin((server) => {
   server.addService<DesktopServiceServer>(DesktopServiceService, {
     createDesktop: async ({ request, logger }) => {
       const { cluster, loginNode: host, wm, userId, desktopName } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       ensureEnabled(cluster);
 
@@ -105,6 +107,7 @@ export const desktopServiceServer = plugin((server) => {
     killDesktop: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       ensureEnabled(cluster);
 
@@ -127,6 +130,7 @@ export const desktopServiceServer = plugin((server) => {
     connectToDesktop: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, displayId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       ensureEnabled(cluster);
 
@@ -144,6 +148,7 @@ export const desktopServiceServer = plugin((server) => {
     listUserDesktops: async ({ request, logger }) => {
 
       const { cluster, loginNode: host, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       ensureEnabled(cluster);
 
@@ -154,6 +159,7 @@ export const desktopServiceServer = plugin((server) => {
         return [{ userDesktops: [userDesktops]}];
       }
 
+      const clusters = configClusters;
       const loginNodes = clusters[cluster]?.loginNodes?.map(getLoginNode);
       if (!loginNodes) {
         throw clusterNotFound(cluster);
@@ -169,6 +175,7 @@ export const desktopServiceServer = plugin((server) => {
     listAvailableWms: async ({ request }) => {
 
       const { cluster } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       ensureEnabled(cluster);
 

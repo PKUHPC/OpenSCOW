@@ -15,13 +15,15 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Button, Col, Row } from "antd";
 import { NextPage } from "next";
 import { useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { Redirect } from "src/components/Redirect";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterFileTable } from "src/pageComponents/filemanager/ClusterFileTable";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 
 type FileInfoKey = React.Key;
 
@@ -85,6 +87,8 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
+  const { crossClusterFileTransferEnabled } = useStore(ClusterInfoStore);
+
   const [clusterLeft, setClusterLeft] = useState<Cluster>();
   const [clusterRight, setClusterRight] = useState<Cluster>();
 
@@ -94,7 +98,7 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
   const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>([]);
   const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>([]);
 
-  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
+  if (!crossClusterFileTransferEnabled) {
     return <Redirect url="/dashboard" />;
   }
 

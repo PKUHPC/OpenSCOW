@@ -486,6 +486,8 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "The cluster you are currently accessing is unavailable or there are no available clusters. "
+      + " Please try again later or contact the administrator.",
     },
     others: {
       clusterSelector: "Please select a cluster.",
@@ -590,9 +592,17 @@ export default {
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
       adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
+      + "Please try again after refreshing the page.",
+      noClusters: "Unable to find cluster configuration files. Please contact the system administrator.",
     },
     dashboard: {
       title: "Dashboard",
+    },
+    common: {
+      noAvailableClusters: "There are currently no available clusters."
+      + " Please try again later or contact the administrator.",
     },
   },
 };
