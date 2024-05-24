@@ -61,9 +61,9 @@ export const getClusterConfigsTypeFormat = (
 
   const modifiedClusters: Record<string, ClusterConfigSchema> = {};
   protoType.forEach((cluster) => {
-
+    const { clusterId, ... rest } = cluster;
     const newCluster = {
-      ...cluster,
+      ...rest,
       displayName: getI18nTypeFormat(cluster.displayName),
       loginNodes: getLoginNodesTypeFormat(
       cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
