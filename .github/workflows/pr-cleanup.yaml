@@ -8,7 +8,7 @@ jobs:
   delete-scow-vagrant:
     name: Delete scow-vagrant PR branch
     if: vars.PUSH_VAGRANT == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     steps:
       - name: Delete scow-vagrant PR branch
         uses: dawidd6/action-delete-branch@v3

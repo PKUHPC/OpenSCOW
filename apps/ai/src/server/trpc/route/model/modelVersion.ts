@@ -303,10 +303,9 @@ export const shareModelVersion = procedure
   .input(z.object({
     modelId: z.number(),
     versionId: z.number(),
-    sourceFilePath: z.string(),
   }))
   .output(z.void())
-  .mutation(async ({ input:{ modelId, versionId, sourceFilePath }, ctx: { user } }) => {
+  .mutation(async ({ input:{ modelId, versionId }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const modelVersion = await em.findOne(ModelVersion, { id: versionId });
     if (!modelVersion)
@@ -328,7 +327,7 @@ export const shareModelVersion = procedure
 
     const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
       // 确认是否具有分享权限
-      await checkSharePermission({ ssh, logger, sourcePath: sourceFilePath, userId: user.identityId });
+      await checkSharePermission({ ssh, logger, sourcePath: modelVersion.privatePath, userId: user.identityId });
       // 获取分享路径的上级路径
       const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
       return dirname(dirname(userHomeDir));
@@ -349,7 +348,7 @@ export const shareModelVersion = procedure
       if (!model)
         throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
 
-      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
+      const versionPath = join(targetFullPath, path.basename(modelVersion.privatePath));
       modelVersion.sharedStatus = SharedStatus.SHARED;
       modelVersion.path = versionPath;
       if (!model.isShared) { model.isShared = true; };
@@ -370,7 +369,7 @@ export const shareModelVersion = procedure
 
     shareFileOrDir({
       clusterId: model.clusterId,
-      sourceFilePath,
+      sourceFilePath:modelVersion.privatePath,
       userId: user.identityId,
       sharedTarget: SHARED_TARGET.MODEL,
       targetName: model.name,

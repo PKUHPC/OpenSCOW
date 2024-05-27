@@ -59,6 +59,7 @@ it("unblocks account when added to whitelist", async () => {
     accountName: a.accountName,
     comment: "test",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z").toISOString(),
   });
 
   await reloadEntity(em, a);
@@ -72,6 +73,7 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
     account: a,
     comment: "",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -102,6 +104,7 @@ it("blocks account when it is dewhitelisted and balance is = 0", async () => {
     account: a,
     comment: "",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -134,6 +137,7 @@ it("charges user but don't block account if account is whitelist", async () => {
     account : a,
     comment: "123",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   }));
 
   await em.flush();
@@ -161,6 +165,7 @@ it("get whitelisted accounts", async () => {
     comment: "",
     operatorId: "123",
     time: new Date("2023-01-01T00:00:00.000Z"),
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -183,6 +188,7 @@ it("get whitelisted accounts", async () => {
       "comment": "",
       "addTime": "2023-01-01T00:00:00.000Z",
       balance: decimalToMoney(data.accountA.balance),
+      "expirationTime":"2025-01-01T00:00:00.000Z",
     },
   ]);
 

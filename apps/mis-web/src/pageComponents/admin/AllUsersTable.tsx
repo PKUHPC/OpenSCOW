@@ -21,12 +21,13 @@ import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
+import { getRuntimeI18nConfigText } from "src/utils/config";
 
 import { ChangeTenantModalLink } from "./ChangeTenantModal";
 
@@ -234,6 +235,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -319,6 +321,11 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                   } })
                     .httpError(404, () => { message.error(t(p("notExist"))); })
                     .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .httpError(400, (e) => {
+                      if (e.code === "PASSWORD_NOT_VALID") {
+                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                      };
+                    })
                     .then(() => { message.success(t(p("success"))); })
                     .catch(() => { message.error(t(p("fail"))); });
                 }}

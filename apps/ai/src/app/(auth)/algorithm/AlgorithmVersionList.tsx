@@ -187,7 +187,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                               await shareMutation.mutateAsync({
                                 algorithmVersionId: r.id,
                                 algorithmId,
-                                sourceFilePath: r.path });
+                              });
                           },
                         });
                       }}
