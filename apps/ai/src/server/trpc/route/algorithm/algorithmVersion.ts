@@ -285,10 +285,9 @@ export const shareAlgorithmVersion = procedure
   .input(z.object({
     algorithmId: z.number(),
     algorithmVersionId: z.number(),
-    sourceFilePath: z.string(),
   }))
   .output(z.void())
-  .mutation(async ({ input:{ algorithmId, algorithmVersionId, sourceFilePath }, ctx: { user } }) => {
+  .mutation(async ({ input:{ algorithmId, algorithmVersionId }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
     if (!algorithmVersion)
@@ -309,7 +308,7 @@ export const shareAlgorithmVersion = procedure
 
     const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
       // 确认是否具有分享权限
-      await checkSharePermission({ ssh, logger, sourcePath: sourceFilePath, userId: user.identityId });
+      await checkSharePermission({ ssh, logger, sourcePath: algorithmVersion.privatePath, userId: user.identityId });
       // 获取分享路径的上级路径
       const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
       return dirname(dirname(userHomeDir));
@@ -330,7 +329,7 @@ export const shareAlgorithmVersion = procedure
       if (!algorithm)
         throw new TRPCError({ code: "NOT_FOUND", message: `Algorithm id:${algorithmId} not found` });
 
-      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
+      const versionPath = join(targetFullPath, path.basename(algorithmVersion.privatePath));
       algorithmVersion.sharedStatus = SharedStatus.SHARED;
       algorithmVersion.path = versionPath;
       if (!algorithm.isShared) { algorithm.isShared = true; };
@@ -351,7 +350,7 @@ export const shareAlgorithmVersion = procedure
 
     shareFileOrDir({
       clusterId: algorithm.clusterId,
-      sourceFilePath,
+      sourceFilePath:algorithmVersion.privatePath,
       userId: user.identityId,
       sharedTarget: SHARED_TARGET.ALGORITHM,
       targetName: algorithm.name,
