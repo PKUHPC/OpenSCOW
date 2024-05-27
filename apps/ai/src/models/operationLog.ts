@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationTypeEnum } from "@scow/lib-operation-log/build/index";
+import { OperationTypeEnum } from "@scow/lib-operation-log";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
 export const OperationResult = {
