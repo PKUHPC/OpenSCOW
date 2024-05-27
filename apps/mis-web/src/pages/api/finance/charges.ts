@@ -60,7 +60,6 @@ export const ChargeInfo = Type.Object({
   userId: Type.Optional(Type.String()),
   userName: Type.Optional(Type.String()),
   metadata: Type.Optional(MetadataMap),
-  userIdsOrNames:Type.Optional(Type.String()),
 });
 export type ChargeInfo = Static<typeof ChargeInfo>;
 
