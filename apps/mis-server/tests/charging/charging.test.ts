@@ -836,7 +836,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
     userIds: ["user_1", "user_2"], types:extractTypesFromObjects([request1, request2, request3, request4]),
     sortBy:undefined,
     sortOrder:undefined,
-    userIdsOrNames:[""],
+    userIdsOrNames:[],
   });
 
   expect(reply.results).toHaveLength(2);
