@@ -179,6 +179,11 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             title={t(p("joinTime"))}
             render={(time: string) => formatDateTime(time) }
           />
+          <Table.Column<WhitelistedAccount>
+            dataIndex="expirationTime"
+            title={t(p("expirationTime"))}
+            render={(time: string | undefined) => time ? formatDateTime(time) : "永久有效"}
+          />
           <Table.Column<WhitelistedAccount> dataIndex="comment" title={t(pCommon("comment"))} />
           <Table.Column<WhitelistedAccount> dataIndex="operatorId" title={t(p("operatorId"))} />
           <Table.Column<WhitelistedAccount>
