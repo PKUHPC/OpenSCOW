@@ -490,7 +490,7 @@ it("returns charge records with query of accountOfTenant", async () => {
     pageSize:10,
     userIds: [],
     types:[request1.type],
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply1.results).toHaveLength(1);
@@ -549,7 +549,7 @@ it("returns charge records with query of tenant", async () => {
     types:extractTypesFromObjects([request1, request2]),
     sortBy:undefined,
     sortOrder:undefined,
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply.results).toHaveLength(2);
@@ -649,7 +649,7 @@ it("returns charge records with query of allTenants", async () => {
     endTime: queryEndTime.toISOString(),
     types: [request1.type],
     userIds: [],
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply.results).toHaveLength(1);
@@ -726,7 +726,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
     userIds: [],
     sortBy:undefined,
     sortOrder:undefined,
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply.results).toHaveLength(2);
@@ -1026,7 +1026,7 @@ it("returns charge records' total results", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
-    userIdsOrNames: [""], types:extractTypesFromObjects(requestArr),
+    userIdsOrNames: [], types:extractTypesFromObjects(requestArr),
   });
 
   expect(reply1.totalAmount).toStrictEqual(numberToMoney(130));
@@ -1037,7 +1037,7 @@ it("returns charge records' total results", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
-    userIdsOrNames: [""], types:[request1.type],
+    userIdsOrNames: [], types:[request1.type],
   });
 
   expect(reply2.totalAmount).toStrictEqual(numberToMoney(100));
@@ -1137,7 +1137,7 @@ it("returns charge records with query of accounts", async () => {
     types:extractTypesFromObjects([request1, request3]),
     sortBy:undefined,
     sortOrder:undefined,
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply1.results).toHaveLength(2);
@@ -1162,7 +1162,7 @@ it("returns charge records with query of accounts", async () => {
     pageSize:10,
     userIds: [],
     types:extractTypesFromObjects([request2]),
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply2.results).toHaveLength(0);
@@ -1179,7 +1179,7 @@ it("returns charge records with query of accounts", async () => {
     types:extractTypesFromObjects([request1, request2, request3, request4]),
     sortBy:undefined,
     sortOrder:undefined,
-    userIdsOrNames: [""],
+    userIdsOrNames: [],
   });
 
   expect(reply3.results).toHaveLength(2);
