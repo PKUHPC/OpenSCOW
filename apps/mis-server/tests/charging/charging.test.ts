@@ -49,6 +49,13 @@ beforeEach(async () => {
     comment: "test",
   });
 
+  const user = new User({
+    userId: "tester",
+    tenant,
+    name: "Tester",
+    email: "tester@example.com",
+  });
+
   await em.persistAndFlush([tenant, account]);
 
   await server.start();
@@ -1217,7 +1224,7 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
   const user1 = { id: "user1", name: "User One" };
   const user2 = { id: "user2", name: "User Two" };
 
-  await em.persistAndFlush([tenant, account1]);
+  await em.persistAndFlush([tenant, account1, testUser1, testUser2]);
 
   const chargeRequests = [
     { accountName: account1.accountName, tenantName: tenant.name,
@@ -1233,6 +1240,9 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
   for (const request of chargeRequests) {
     await asyncClientCall(client, "charge", request);
   }
+
+  await em.flush();
+  await reloadEntity(em, account1);
 
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
@@ -1282,12 +1292,11 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
     blockedInCluster: false,
     comment: "test",
   });
-  const testUser3 = new User({
-    name: "User Three", userId: "user3", email: "test3@test3.com",
+  const testUserUnkown = new User({
+    name: "User Unkown", userId: "user9", email: "test3@test3.com",
     tenant: tenant,
   });
-
-  await em.persistAndFlush([tenant, account2]);
+  await em.persistAndFlush([tenant, account2, testUserUnkown]);
 
   const chargeRequests: ChargeRequest[] = [
     { accountName: account2.accountName, tenantName: tenant.name,
@@ -1303,6 +1312,9 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
   for (const request of chargeRequests) {
     await asyncClientCall(client, "charge", request);
   }
+
+  await em.flush();
+  await reloadEntity(em, account2);
 
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
@@ -1359,7 +1371,7 @@ it("returns paginated charge records filtered by userId", async () => {
 
   const user3 = { id: "user3", name: "User Three" };
 
-  await em.persistAndFlush([tenant, account3]);
+  await em.persistAndFlush([tenant, account3, testUser3]);
 
   const chargeRequests = [
     { accountName: account3.accountName, tenantName: tenant.name
@@ -1373,6 +1385,9 @@ it("returns paginated charge records filtered by userId", async () => {
   for (const request of chargeRequests) {
     await asyncClientCall(client, "charge", request);
   }
+
+  await em.flush();
+  await reloadEntity(em, account3);
 
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
@@ -1426,7 +1441,7 @@ it("returns paginated charge records filtered by userName", async () => {
   });
   const user4 = { id: "user4", name: "User Four" };
 
-  await em.persistAndFlush([tenant, account4]);
+  await em.persistAndFlush([tenant, account4, testUser4]);
 
   const chargeRequests = [
     { accountName: account4.accountName, tenantName: tenant.name,
@@ -1440,6 +1455,9 @@ it("returns paginated charge records filtered by userName", async () => {
   for (const request of chargeRequests) {
     await asyncClientCall(client, "charge", request);
   }
+
+  await em.flush();
+  await reloadEntity(em, account4);
 
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
