@@ -1015,20 +1015,20 @@ export const listApps = procedure
       if (tags) {
         return tags.split(",")
           .some((tag) =>
-            (config.tags.includes(tag) || config.clusterSpecificConfigs?.some((x) => x.config.tags.includes(tag))),
+            (config.tags?.includes(tag) || config.clusterSpecificConfigs?.some((x) => x.config.tags?.includes(tag))),
           );
       }
       return true;
     }).map(([id, config]) => {
 
       const aggregateTags = config.clusterSpecificConfigs?.reduce((prev, curr) => {
-        curr.config.tags.forEach((tag) => {
+        curr.config.tags?.forEach((tag) => {
           if (!prev.has(tag)) {
             prev.add(tag);
           }
         });
         return prev;
-      }, new Set(config.tags)) || config.tags;
+      }, new Set(config.tags)) || config.tags || [];
 
       return ({
         id,

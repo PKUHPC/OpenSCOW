@@ -68,6 +68,7 @@ interface FixedFormFields {
   mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
+  nodeCount: number;
   gpuCount: number | undefined;
   account: string;
   maxTime: number;
@@ -440,16 +441,19 @@ export const LaunchAppForm = (props: Props) => {
         appJobName: genAppJobName(appName ?? "trainJobs"),
       });
     } else {
-      const { account, partition, gpuCount, coreCount, maxTime, mountPoints } = inputParams;
+      const { account, partition, gpuCount, coreCount, maxTime, mountPoints, nodeCount } = inputParams;
       const workingDir = "workingDirectory" in inputParams ? inputParams.workingDirectory : undefined;
       const customAttributes = "customAttributes" in inputParams ? inputParams.customAttributes : {};
       const command = "command" in inputParams ? inputParams.command : undefined;
+      const framework = "framework" in inputParams ? inputParams.framework : undefined;
       form.setFieldsValue({
         mountPoints,
         customFields: {
           ...customAttributes,
           workingDir,
         },
+        nodeCount,
+        framework,
         account,
         partition,
         gpuCount,
@@ -668,6 +672,7 @@ export const LaunchAppForm = (props: Props) => {
                   <Form.Item
                     label="分布式训练框架"
                     name="framework"
+                    rules={[{ required: true }]}
                   >
                     <Select options={
                       [
