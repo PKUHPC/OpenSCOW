@@ -89,6 +89,10 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
   const { crossClusterFileTransferEnabled } = useStore(ClusterInfoStore);
 
+  if (!crossClusterFileTransferEnabled) {
+    return <Redirect url="/dashboard" />;
+  }
+
   const [clusterLeft, setClusterLeft] = useState<Cluster>();
   const [clusterRight, setClusterRight] = useState<Cluster>();
 
@@ -97,10 +101,6 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
   const [selectedKeysLeft, setSelectedKeysLeft] = useState<FileInfoKey[]>([]);
   const [selectedKeysRight, setSelectedKeysRight] = useState<FileInfoKey[]>([]);
-
-  if (!crossClusterFileTransferEnabled) {
-    return <Redirect url="/dashboard" />;
-  }
 
   return (
     <>

@@ -59,6 +59,7 @@ export default route(getClusterConfigFilesSchema,
     // when firstly used in getInitialProps, check the token
     // when logged in, use auth()
     const info = token ? await validateToken(token) : await auth(req, res);
+
     if (!info) { return { 403: null }; }
 
     const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();

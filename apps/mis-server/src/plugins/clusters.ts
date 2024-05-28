@@ -110,7 +110,7 @@ export const clustersPlugin = plugin(async (f) => {
 
       return await call(client).catch((e) => {
         logger.error("Cluster ops fails at %o", e);
-        const reason = "Cluster ID : " + cluster + " Details : " + e;
+        const reason = "Cluster ID : " + cluster + ", Details : " + e.details;
         const clusterErrorDetails = [{
           clusterId: cluster,
           details: e,

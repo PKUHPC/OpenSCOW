@@ -63,7 +63,7 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
       details: e,
     }];
 
-    const reason = "Cluster ID : " + cluster + " Details : " + e;
+    const reason = "Cluster ID : " + cluster + ", Details : " + e.details;
     throw new ServiceError({
       code: status.INTERNAL,
       details: reason,

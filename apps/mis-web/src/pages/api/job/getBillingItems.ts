@@ -152,7 +152,7 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
   const result = { activeItems: [] as BillingItemType[], historyItems: [] as BillingItemType[], nextId };
 
   const sortedIds = clusterSortedIdList.filter((id) => currentActivatedClusterIds?.includes(id));
-  if (sortedIds.length === 0) { console.log("Cluster ops failed , error details: No available clusters"); }
+  if (sortedIds.length === 0) { console.info("Cluster ops failed , error details: No available clusters"); }
 
   for (const cluster of sortedIds) {
 

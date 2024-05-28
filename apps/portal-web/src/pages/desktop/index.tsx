@@ -16,6 +16,7 @@ import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/bu
 import { GetServerSideProps, NextPage } from "next";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { getTokenFromCookie } from "src/auth/cookie";
 import { requireAuth } from "src/auth/requireAuth";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { PageTitle } from "src/components/PageTitle";
@@ -53,11 +54,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
 
-  const resp = await api.getClusterConfigFiles({ query: {} });
+  const token = getTokenFromCookie({ req });
+  const resp = await api.getClusterConfigFiles({ query: { token } });
   const clusterConfigs = resp.clusterConfigs;
   const clusterSortedIdList = getSortedClusterIds(resp.clusterConfigs);
-
-  const currentClusters = await api.getClustersRuntimeInfo({ query: {} }).then((x) => x, () => undefined);
+  const currentClusters = await api.getClustersRuntimeInfo({ query: { token } });
 
   const activatedClusterIds = currentClusters?.results
     .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED).map((x) => x.clusterId) ?? [];

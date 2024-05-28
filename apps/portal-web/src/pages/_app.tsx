@@ -307,8 +307,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
   const appProps = await NextApp.getInitialProps(appContext);
 
-  // getAvailable
-
   return { ...appProps, extra } as Props;
 };
 

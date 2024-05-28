@@ -76,11 +76,11 @@ export const convertClusterConfigsToServerProtoType = (
       clusterId: key,
       displayName: getI18nSeverTypeFormat(item.displayName) as I18nStringProtoType,
       adapterUrl: item.adapterUrl,
-      priority: item.priority ?? Number.MAX_SAFE_INTEGER,
+      priority: item.priority,
       proxyGateway: item.proxyGateway ?
         {
           url: item.proxyGateway.url || "",
-          autoSetupNginx: item.proxyGateway.autoSetupNginx || false,
+          autoSetupNginx: item.proxyGateway.autoSetupNginx,
         } : undefined,
       loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes) as ClusterConfigSchemaProto_LoginNodesProtoType,
       loginDesktop: item.loginDesktop ?
@@ -93,14 +93,14 @@ export const convertClusterConfigsToServerProtoType = (
       turboVncPath: item.turboVNCPath ?? undefined,
       crossClusterFileTransfer: item.crossClusterFileTransfer ?
         {
-          enabled: item.crossClusterFileTransfer?.enabled ?? false,
+          enabled: item.crossClusterFileTransfer.enabled,
           transferNode: item.crossClusterFileTransfer?.transferNode ?? undefined,
         } : undefined,
-      hpc: item.hpc && Object.keys(item.hpc).length > 0 ? { enabled: item.hpc.enabled } : { enabled: true },
-      ai: item.ai && Object.keys(item.ai).length > 0 ? { enabled: item.ai.enabled } : { enabled: false },
+      hpc: { enabled: item.hpc.enabled },
+      ai: { enabled: item.ai.enabled },
       k8s: item.k8s ?
         {
-          runtime: clusterConfigSchemaProto_K8sRuntimeFromJSON(item.k8s.runtime) ?? "containerd",
+          runtime: clusterConfigSchemaProto_K8sRuntimeFromJSON(item.k8s.runtime.toUpperCase()),
           kubeconfig: { path: item.k8s.kubeconfig.path },
         } : undefined,
     };

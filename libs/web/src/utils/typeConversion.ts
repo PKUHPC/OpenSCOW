@@ -13,7 +13,7 @@
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { LoginNodesType } from "@scow/config/build/type";
-import { ClusterConfigSchemaProto,
+import { ClusterConfigSchemaProto, clusterConfigSchemaProto_K8sRuntimeToJSON,
   ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
 import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
 
@@ -67,6 +67,10 @@ export const getClusterConfigsTypeFormat = (
       displayName: getI18nTypeFormat(cluster.displayName),
       loginNodes: getLoginNodesTypeFormat(
       cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
+      k8s: cluster.k8s ? {
+        k8sRuntime: clusterConfigSchemaProto_K8sRuntimeToJSON(cluster.k8s.runtime).toLowerCase(),
+        kubeconfig: cluster.k8s.kubeconfig,
+      } : undefined,
     };
     modifiedClusters[cluster.clusterId] = newCluster as ClusterConfigSchema;
   });

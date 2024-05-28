@@ -47,7 +47,7 @@ message ClusterConfigSchemaProto {
     string url = 1;
     // 是否自动配置nginx
     // default value is false
-    optional bool auto_setup_nginx = 2;
+    bool auto_setup_nginx = 2;
   }
   message LoginNodeConfigSchemaProto {
     // 登录节点展示名
@@ -87,19 +87,19 @@ message ClusterConfigSchemaProto {
   message CrossClusterFileTransfer {
     // 是否开启跨集群传输功能
     // default value = false
-    optional bool enabled = 1;
+    bool enabled = 1;
     // 跨集群传输文件的节点
     optional string transfer_node = 2;
   }
   message Hpc {
     // 集群在HPC中是否启用, 默认启用
     // default value = true
-    optional bool enabled = 1;
+    bool enabled = 1;
   }
   message Ai {
     // 集群在AI中是否启用, 默认不启用
     // default value = false
-    optional bool enabled = 1;
+    bool enabled = 1;
   }
   enum K8sRuntime {
     DOCKER = 0;
@@ -112,7 +112,7 @@ message ClusterConfigSchemaProto {
   message K8s {
     // k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd
     // default value = containerd
-    optional K8sRuntime runtime = 1;
+    K8sRuntime runtime = 1;
     // k8s 集群 kubeconfig 相关配置
     Kubeconfig kubeconfig = 2;
   }
@@ -123,10 +123,10 @@ message ClusterConfigSchemaProto {
   I18nStringProtoType display_name = 2;
   // 集群使用的优先级, 数字越小越先展示
   // default value is Number.MAX_SAFE_INTEGER = 9007199254740991 2^53 − 1.
-  optional int64 priority = 3;
+  int64 priority = 3;
   // 调度器适配器服务地址
   string adapter_url = 4;
-  ProxyGateway proxy_gateway = 5;
+  optional ProxyGateway proxy_gateway = 5;
   LoginNodesProtoType login_nodes = 6;
   optional LoginDesktopConfigSchemaProto login_desktop = 7;
   // TurboVNC的安装路径
