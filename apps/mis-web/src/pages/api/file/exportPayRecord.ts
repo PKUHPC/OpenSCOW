@@ -12,13 +12,14 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncReplyStreamCall } from "@ddadaal/tsgrpc-client";
+import { OperationType } from "@scow/lib-operation-log";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { PaymentRecord } from "@scow/protos/build/server/charging";
 import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { SearchType } from "src/pageComponents/common/PaymentTable";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
