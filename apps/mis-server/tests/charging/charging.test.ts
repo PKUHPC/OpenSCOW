@@ -1389,6 +1389,14 @@ it("returns paginated charge records filtered by userId", async () => {
   await em.flush();
   await reloadEntity(em, account3);
 
+
+  // 输出调试信息，确保所有数据已正确持久化
+  const chargeRecords = await em.find(ChargeRecord, {});
+  console.log("Persisted charge records:", chargeRecords);
+
+  const users = await em.find(User, {});
+  console.log("Persisted charge records:", users);
+
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
   queryStartTime.setDate(startTime.getDate() - 1);
