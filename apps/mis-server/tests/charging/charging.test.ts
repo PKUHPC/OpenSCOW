@@ -832,7 +832,6 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountsOfAllTenants", accountsOfAllTenants:{ accountNames:[]} },
     userIds: [], types:extractTypesFromObjects([request1, request2, request3, request4]),
     sortBy:undefined,
     sortOrder:undefined,
