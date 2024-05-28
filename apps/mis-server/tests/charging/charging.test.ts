@@ -1274,7 +1274,6 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
   const totalCountReply = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     userIdsOrNames: [user1.id, user2.name],
     types: ["typeA", "typeB"],
   });
@@ -1336,16 +1335,15 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
   expect(reply.results).toMatchObject([
     { accountName: chargeRequests[0].accountName,
       comment: chargeRequests[0].comment, amount: chargeRequests[0].amount },
-    { accountName: chargeRequests[1].accountName,
-      comment: chargeRequests[1].comment, amount: chargeRequests[1].amount },
     { accountName: chargeRequests[2].accountName,
       comment: chargeRequests[2].comment, amount: chargeRequests[2].amount },
+    { accountName: chargeRequests[1].accountName,
+      comment: chargeRequests[1].comment, amount: chargeRequests[1].amount },
   ] as Partial<ChargeRecord>);
 
   const totalCountReply = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     types: ["typeA", "typeB"],
     userIdsOrNames:[],
   });
