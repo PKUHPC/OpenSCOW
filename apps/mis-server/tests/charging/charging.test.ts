@@ -1260,7 +1260,7 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
     userIdsOrNames: ["user1", "User Two"],
     types: ["typeA", "typeB"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(reply.results).toHaveLength(3);
   expect(reply.results).toMatchObject([
     { accountName: chargeRequests[0].accountName, comment: chargeRequests[0].comment,
@@ -1278,7 +1278,7 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
     userIdsOrNames: [user1.id, user2.name],
     types: ["typeA", "typeB"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(totalCountReply.totalCount).toBe(3);
   expect(totalCountReply.totalAmount).toStrictEqual(numberToMoney(60));
 });
@@ -1331,7 +1331,7 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
     userIdsOrNames:[],
     types: ["typeA", "typeB"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(reply.results).toHaveLength(3);
   expect(reply.results).toMatchObject([
     { accountName: chargeRequests[0].accountName,
@@ -1349,7 +1349,7 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
     types: ["typeA", "typeB"],
     userIdsOrNames:[],
   });
-  console.log("Reply results:", reply.results);
+
   expect(totalCountReply.totalCount).toBe(3);
   expect(totalCountReply.totalAmount).toStrictEqual(numberToMoney(75));
 });
@@ -1387,14 +1387,6 @@ it("returns paginated charge records filtered by userId", async () => {
   await em.flush();
   await reloadEntity(em, account3);
 
-
-  // 输出调试信息，确保所有数据已正确持久化
-  const chargeRecords = await em.find(ChargeRecord, {});
-  console.log("Persisted charge records:", chargeRecords);
-
-  const users = await em.find(User, {});
-  console.log("Persisted charge records:", users);
-
   const startTime = new Date();
   const queryStartTime = new Date(startTime);
   queryStartTime.setDate(startTime.getDate() - 1);
@@ -1411,7 +1403,7 @@ it("returns paginated charge records filtered by userId", async () => {
     userIdsOrNames: [user3.id],
     types: ["typeC", "typeD"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(reply.results).toHaveLength(2);
   expect(reply.results).toMatchObject([
     { accountName: chargeRequests[0].accountName, comment: chargeRequests[0].comment,
@@ -1479,7 +1471,7 @@ it("returns paginated charge records filtered by userName", async () => {
     userIdsOrNames: [user4.name],
     types: ["typeE", "typeF"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(reply.results).toHaveLength(2);
   expect(reply.results).toMatchObject([
     { accountName: chargeRequests[0].accountName, comment: chargeRequests[0].comment,
@@ -1495,7 +1487,7 @@ it("returns paginated charge records filtered by userName", async () => {
     userIdsOrNames: [user4.name],
     types: ["typeE", "typeF"],
   });
-  console.log("Reply results:", reply.results);
+
   expect(totalCountReply.totalCount).toBe(2);
   expect(totalCountReply.totalAmount).toStrictEqual(numberToMoney(150));
 });
