@@ -16,9 +16,7 @@ import { ChannelCredentials } from "@grpc/grpc-js";
 import * as grpc from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
-import { SortOrder } from "@scow/protos/build/common/sort_order";
-import { ChargeRequest, ChargingServiceClient, GetPaginatedChargeRecordsRequest_SortBy, PaymentRecord, PayRequest,
-} from "@scow/protos/build/server/charging";
+import { ChargeRequest, ChargingServiceClient, PaymentRecord, PayRequest } from "@scow/protos/build/server/charging";
 import dayjs from "dayjs";
 import { createServer } from "src/app";
 import { Account, AccountState } from "src/entities/Account";
