@@ -1254,7 +1254,6 @@ it("returns paginated charge records with userIdsOrNames filter", async () => {
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     page: 1,
     pageSize: 10,
     userIds:[],
@@ -1326,7 +1325,6 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     page: 1,
     pageSize: 10,
     userIds:[],
@@ -1407,7 +1405,6 @@ it("returns paginated charge records filtered by userId", async () => {
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     page: 1,
     pageSize: 10,
     userIds:[],
@@ -1426,7 +1423,6 @@ it("returns paginated charge records filtered by userId", async () => {
   const totalCountReply = await asyncClientCall(client, "getChargeRecordsTotalCount", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     userIdsOrNames: [user3.id],
     types: ["typeC", "typeD"],
   });
@@ -1477,7 +1473,6 @@ it("returns paginated charge records filtered by userName", async () => {
   const reply = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target: { $case: "tenant", tenant: { tenantName: tenant.name } },
     page: 1,
     pageSize: 10,
     userIds:[],
