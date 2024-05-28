@@ -1277,7 +1277,7 @@ it("returns paginated charge records without userIdsOrNames filter", async () =>
 
   await em.persistAndFlush([tenant, account2]);
 
-  const chargeRequests = [
+  const chargeRequests: ChargeRequest[] = [
     { accountName: account2.accountName, tenantName: tenant.name,
       amount: numberToMoney(15), comment: "charge1", type: "typeA" },
     { accountName: account2.accountName, tenantName: tenant.name,
@@ -1356,6 +1356,7 @@ it("returns paginated charge records filtered by userId", async () => {
 
   for (const request of chargeRequests) {
     await asyncClientCall(client, "charge", request);
+    await reloadEntity(em, account3);
   }
 
   const startTime = new Date();
