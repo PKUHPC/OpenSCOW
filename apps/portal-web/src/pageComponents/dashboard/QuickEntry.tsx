@@ -27,6 +27,13 @@ const CardsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
+const EditButton = styled.button`
+  border: #DEDEDF 1px solid;
+  background-color: #fafafa;
+  color: #262743;
+`;
+
+
 export interface AppWithCluster {
   [appId: string]: {
     app: App;
@@ -125,7 +132,7 @@ export const QuickEntry: React.FC<Props> = () => {
 
   return (
     <DashboardSection
-      style={{ marginBottom: "16px" }}
+      style={{ marginBottom: "16px", border:"#DEDEDF 1px solid" }}
       title={<Localized id={p("quickEntry")} />}
       extra={
         isEditable ? (
@@ -133,14 +140,17 @@ export const QuickEntry: React.FC<Props> = () => {
             <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
               <Localized id={p("finish")} />
             </Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>
+            <Button
+              type="link"
+              onClick={() => { setIsEditable(false); }}
+            >
               <Localized id={p("cancel")} />
             </Button>
           </div>
         ) : (
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+          <EditButton type="button" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
             <Localized id={p("edit")} />
-          </Button>
+          </EditButton>
         )}
     >
       <CardsContainer>

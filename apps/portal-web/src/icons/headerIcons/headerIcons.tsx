@@ -16,19 +16,19 @@ import React, { LegacyRef } from "react";
 // 仪表盘图标
 const dashBoardSVG = () => (
   <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="14" cy="14" r="13" stroke="#262743" strokeWidth="2" />
-    <circle cx="14" cy="14" r="2.25" stroke="#262743" strokeWidth="1.5" />
+    <circle cx="14" cy="14" r="13" stroke="currentColor" strokeWidth="2" />
+    <circle cx="14" cy="14" r="2.25" stroke="currentColor" strokeWidth="1.5" />
     <path
       d="M6 14C6 12.9494 6.20693 11.9091 6.60896 10.9385
     C7.011 9.96793 7.60028 9.08601 8.34315 8.34314C9.08602 7.60028 9.96793 7.011 10.9385 6.60896
     C11.9091 6.20692 12.9494 6 14 6
     C15.0506 6 16.0909 6.20693 17.0615 6.60896
     M21.391 10.9385C21.7931 11.9091 22 12.9494 22 14"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
     />
-    <path d="M16 12L20 8" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M16 12L20 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 
 );
@@ -48,13 +48,13 @@ const jobSVG = () => (
     C23 26.5523 22.5523 27 22 27
     H2C1.44772 27 1 26.5523 1 26
     V2C1 1.44772 1.44772 1 2 1Z"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
-    <path d="M6 10H18" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6 14H15" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6 18H13" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6 10H18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6 14H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6 18H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -66,20 +66,20 @@ export const JobIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((pr
 // shell图标
 const shellSVG = () => (
   <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="1" y="1" width="26" height="26" rx="1" stroke="#262743" strokeWidth="2" />
-    <line x1="6.55671e-08" y1="10.25" x2="28" y2="10.25" stroke="#262743" strokeWidth="1.5" />
-    <circle cx="5" cy="6" r="1" fill="#262743" />
-    <circle cx="9" cy="6" r="1" fill="#262743" />
-    <circle cx="13" cy="6" r="1" fill="#262743" />
+    <rect x="1" y="1" width="26" height="26" rx="1" stroke="currentColor" strokeWidth="2" />
+    <line x1="6.55671e-08" y1="10.25" x2="28" y2="10.25" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="5" cy="6" r="1" fill="currentColor" />
+    <circle cx="9" cy="6" r="1" fill="currentColor" />
+    <circle cx="13" cy="6" r="1" fill="currentColor" />
     <path
       d="M7 15.6001L11.2 18.9251
     L7 22.2501"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <path d="M14 21.2002H20.3" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14 21.2002H20.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -96,20 +96,20 @@ const desktopSVG = () => (
     V26C1 27.1046 1.89543 28 3 28
     H27C28.1046 28 29 27.1046 29 26
     V9C29 7.89543 28.1046 7 27 7H23"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
     />
     <path
       d="M8 1H22C22.5523 1 23 1.44771 23 2
     V3.65294V13.3941V21C23 21.5523 22.5523 22 22 22
     H8C7.44772 22 7 21.5523 7 21V2C7 1.44772 7.44772 1 8 1Z"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
-    <path d="M10.5 9H19.5" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M10.5 12H17.25" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M10.5 15H15.75" stroke="#262743" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M10.5 9H19.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M10.5 12H17.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M10.5 15H15.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 
@@ -124,19 +124,19 @@ const applicationSVG = () => (
     <path
       d="M26.4292 14.0916C26.4292 16.3292 25.7918 18.5214 24.5902 20.4165
     C23.3887 22.3116 21.6717 23.8326 19.6365 24.805"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
     <path
       d="M14.4161 1.18918C12.0487 1.18918 9.73399 1.88183 7.7628 3.18015
     C5.79161 4.47846 4.25177 6.32455 3.33667 8.48657"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
-    <rect x="1" y="13.902" width="13.2475" height="13.0981" rx="1" stroke="#262743" strokeWidth="2" />
-    <rect x="18.585" y="0.75" width="8.66503" height="8.56538" rx="1.25" stroke="#262743" strokeWidth="1.5" />
+    <rect x="1" y="13.902" width="13.2475" height="13.0981" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="18.585" y="0.75" width="8.66503" height="8.56538" rx="1.25" stroke="currentColor" strokeWidth="1.5" />
   </svg>
 );
 
@@ -147,22 +147,22 @@ export const ApplicationIcon: React.ForwardRefExoticComponent<{}> = React.forwar
 
 // 文件管理图标
 const fileManagerSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M23 15V5.44706V3C23 1.89543 22.1046 1 21 1
     H3C1.89543 1 1 1.89543 1 3V27C1 28.1046 1.89543 29 3 29H12"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
     <path
       d="M22.4615 28H15.7692L13 23.1648L15.7692 18
     H22.4615L25 23.1648L22.4615 28Z"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinejoin="round"
     />
-    <circle cx="2" cy="2" r="2" transform="matrix(1 0 0 -1 17 25)" fill="#262743" />
+    <circle cx="2" cy="2" r="2" transform="matrix(1 0 0 -1 17 25)" fill="currentColor" />
   </svg>
 );
 
@@ -212,23 +212,41 @@ export const MisIcon = (props) => <Icon component={misSVG} {...props} />;
 
 // 所有作业图标
 const allJobsSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="4.67856" y="5.57141" width="20.3214" height="19.4286" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="1.10718" y="1" width="7.82143" height="7.82143" rx="1" fill="white" stroke="#6B747F" strokeWidth="2" />
+  <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4.67856" y="5.57141" width="20.3214" height="19.4286" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect
+      x="1.10718"
+      y="1"
+      width="7.82143"
+      height="7.82143"
+      rx="1"
+      fill="white"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
     <rect
       x="1.10715"
       y="12.7142"
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="white"
-      stroke="#6B747F"
+      fill="currentColor"
+      stroke="currentColor"
       strokeWidth="2"
     />
-    <rect x="11.8214" y="1" width="7.82143" height="7.82143" rx="1" fill="white" stroke="#6B747F" strokeWidth="2" />
-    <path d="M14.3929 15.2858H21.5357" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M14.3929 17.9642H19.75" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M14.3929 20.6428H17.9643" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <rect
+      x="11.8214"
+      y="1"
+      width="7.82143"
+      height="7.82143"
+      rx="1"
+      fill="currentColor"
+      stroke="currentColor"
+      strokeWidth="2"
+    />
+    <path d="M14.3929 15.2858H21.5357" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3929 17.9642H19.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3929 20.6428H17.9643" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 export const AllJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
@@ -238,25 +256,25 @@ export const AllJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef
 
 // 提交作业图标
 const submitJobSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M16.9231 20.6428L20.4616 20.6428" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M18.6923 18.8572L18.6923 22.4286" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+  <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16.9231 20.6428L20.4616 20.6428" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M18.6923 18.8572L18.6923 22.4286" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path
       d="M22.2308 14.3929V4.97059
     V3C22.2308 1.89543 21.3353 1 20.2308 1H3C1.89543 1 1 1.89543 1 3
     V24C1 25.1046 1.89543 26 3 26H13.8269"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
-    <path d="M6.30768 9.92859H16.9231" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6.30768 13.5H14.2692" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6.30768 17.0714H12.5" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 9.92859H16.9231" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 13.5H14.2692" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 17.0714H12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path
       d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
     C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
     C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="1.5"
     />
   </svg>
@@ -268,32 +286,32 @@ export const SubmitJobIcon: React.ForwardRefExoticComponent<{}> = React.forwardR
 
 // 未结束作业图标
 const runningJobsSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 24 27" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M22.2308 14.3929V4.97059V3
     C22.2308 1.89543 21.3353 1 20.2308 1H3C1.89543 1 1 1.89543 1 3V24C1 25.1046 1.89543 26 3 26H13.8269"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
-    <path d="M6.30768 9.92859H16.9231" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6.30768 13.5H14.2692" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M6.30768 17.0714H12.5" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 9.92859H16.9231" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 13.5H14.2692" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M6.30768 17.0714H12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     <path
       d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
     C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
     C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="1.5"
     />
     <path
       d="M23.25 20.6429C23.25 23.1939 21.2029 25.2501 18.6923 25.2501
     C16.1817 25.2501 14.1346 23.1939 14.1346 20.6429C14.1346 18.0919 16.1817 16.0358 18.6923 16.0358
     C21.2029 16.0358 23.25 18.0919 23.25 20.6429Z"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="1.5"
     />
-    <path d="M18.6923 18.8572L18.6923 21.5357H20.4615" stroke="#6B747F" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M18.6923 18.8572L18.6923 21.5357H20.4615" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
 );
 export const RunningJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
@@ -305,16 +323,16 @@ export const RunningJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwar
 // shell集群图标
 const shellClusterSVG = () => (
   <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="3.67856" y="1" width="17.6429" height="8.71429" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="1" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="9.92856" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="18.8571" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <path d="M6.25 5.35718H10.7143" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
-    <path d="M12.5 8.92859L12.5 19.6429" stroke="#6B747F" strokeWidth="2" />
+    <rect x="3.67856" y="1" width="17.6429" height="8.71429" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="1" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="9.92856" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="18.8571" y="18.8572" width="5.14286" height="5.14286" rx="1" stroke="currentColor" strokeWidth="2" />
+    <path d="M6.25 5.35718H10.7143" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path d="M12.5 8.92859L12.5 19.6429" stroke="currentColor" strokeWidth="2" />
     <path
       d="M3.57144 19.6428V14.3928C3.57144 13.8405 4.01916 13.3928 4.57144 13.3928
     H20.4286C20.9809 13.3928 21.4286 13.8405 21.4286 14.3928V19.6428"
-      stroke="#6B747F"
+      stroke="currentColor"
       strokeWidth="2"
     />
   </svg>
@@ -326,7 +344,7 @@ export const ShellClusterIcon: React.ForwardRefExoticComponent<{}> = React.forwa
 
 // 集群文件管理图标
 const clusterFileManagerSVG = () => (
-  <svg width="14" height="14" viewBox="0 0 27 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="14" height="14" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       fillRule="evenodd"
       clipRule="evenodd"
@@ -357,7 +375,7 @@ const clusterFileManagerSVG = () => (
     C15.6199 21.9072 15.9557 21.5714 16.3699 21.5714
     18.7615C19.1757 21.5714 19.5115 21.9072 19.5115 22.3214C19.5115 22.7356 19.1757 23.0714 18.7615 23.0714
     H16.3699C15.9557 23.0714 15.6199 22.7356 15.6199 22.3214Z"
-      fill="#6B747F"
+      fill="currentColor"
     />
   </svg>
 );
@@ -369,11 +387,11 @@ export const ClusterFileManagerIcon: React.ForwardRefExoticComponent<{}> = React
 // 创建应用图标
 const createAppSVG = () => (
   <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <path d="M15 19L23 19" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
-    <path d="M19 15L19 23" stroke="#6B747F" strokeWidth="2" strokeLinecap="round" />
+    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
+    <path d="M15 19L23 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <path d="M19 15L19 23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
   </svg>
 );
 export const CreateAppIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
@@ -384,14 +402,14 @@ export const CreateAppIcon: React.ForwardRefExoticComponent<{}> = React.forwardR
 // 已创建APP图标
 const appSessionsSVG = () => (
   <svg width="14" height="14" viewBox="0 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
-    <rect x="14" y="14" width="10" height="10" rx="5" fill="#6B747F" stroke="#6B747F" strokeWidth="2" />
-    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="#6B747F" strokeWidth="2" />
+    <rect x="1" y="1" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="1" y="14.3928" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
+    <rect x="14" y="14" width="10" height="10" rx="5" fill="currentColor" stroke="currentColor" strokeWidth="2" />
+    <rect x="14.3929" y="1" width="9.5" height="9.5" rx="1" stroke="currentColor" strokeWidth="2" />
     <path
       d="M17 19.2857L18.4545 21
     L21 18"
-      stroke="white"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"

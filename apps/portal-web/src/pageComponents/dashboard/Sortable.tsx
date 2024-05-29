@@ -202,7 +202,9 @@ export const Sortable: FC<Props> = ({ isEditable, isFinished, quickEntryArray, a
         <SortableContext items={temItems} strategy={rectSortingStrategy}>
           <ItemsContainer>
             {temItems.map((x) => (
-              <ItemContainer key={x.id}>
+              <ItemContainer
+                key={x.id}
+              >
                 {(isEditable && activeItem === undefined) ? (
                   <DeleteIconContainer>
                     <MinusOutlined

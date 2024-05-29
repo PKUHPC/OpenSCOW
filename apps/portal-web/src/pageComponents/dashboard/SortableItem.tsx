@@ -29,6 +29,9 @@ export const SortableItem: FC<EntryCardItemProps> = (props) => {
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: transition || undefined,
+    border:"#DEDEDF 1px solid",
+    boxShadow: "none",
+    borderRadius:"8px",
   };
 
   return (
