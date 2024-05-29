@@ -130,13 +130,9 @@ export const ChargeTable: React.FC<Props> = ({
       pageSize: pageInfo.pageSize,
       sortBy: sorter.field,
       sortOrder: sorter.order,
+      userIdsOrNames:convertUserIdArray(query.userIds),
     } });
-    // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
-    if (query.userIds) {
-      getChargesInfo.results = getChargesInfo.results.filter((v) => {
-        return v.userId == query.userIds || v.userName == query.userIds;
-      });
-    }
+
     return getChargesInfo;
   }, [query, pageInfo]);
 
@@ -150,7 +146,7 @@ export const ChargeTable: React.FC<Props> = ({
         types: query.types,
         isPlatformRecords,
         searchType,
-        userIds: convertUserIdArray(query.userIds),
+        userIdsOrNames:convertUserIdArray(query.userIds),
       },
     });
   }, [query]);
