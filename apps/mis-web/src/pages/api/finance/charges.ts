@@ -105,6 +105,9 @@ export const GetChargesSchema = typeboxRouteSchema({
     sortBy:Type.Optional(ChargesSortBy),
 
     sortOrder:Type.Optional(ChargesSortOrder),
+
+    // 消费的用户id或者name
+    userIdsOrNames:  Type.Optional(Type.Array(Type.String())),
   }),
 
   responses: {
@@ -196,7 +199,7 @@ export const buildChargesRequestTarget = (accountNames: string[] | undefined, te
 
 export default typeboxRoute(GetChargesSchema, async (req, res) => {
   const { endTime, startTime, accountNames, isPlatformRecords,
-    searchType, types, userIds, page, pageSize, sortBy, sortOrder } = req.query;
+    searchType, types, userIds, page, pageSize, sortBy, sortOrder, userIdsOrNames } = req.query;
 
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
@@ -218,6 +221,7 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
     pageSize,
     sortBy:mapChargesSortBy,
     sortOrder:mapChargesSortOrder,
+    userIdsOrNames:userIdsOrNames ?? [],
   }), []);
 
   const respUserIds = Array.from(new Set(reply.results.map((x) => x.userId).filter((x) => !!x) as string[]));
