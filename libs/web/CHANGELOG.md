@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 1.3.3
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
 ## 1.3.2
 
 ### Patch Changes

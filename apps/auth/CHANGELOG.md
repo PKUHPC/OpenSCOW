@@ -1,5 +1,15 @@
 # @scow/auth
 
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-server@1.2.2
+
 ## 1.5.1
 
 ### Patch Changes
