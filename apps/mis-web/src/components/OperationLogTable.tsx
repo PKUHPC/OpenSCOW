@@ -133,7 +133,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   });
 
   const operationTypes = useMemo(() => {
-    const standardTypeOptions = Object.keys(OperationTypeTexts).map((key) => ({
+    const { customEvent, ...otherTypes } = OperationTypeTexts;
+    const standardTypeOptions = Object.keys(otherTypes).map((key) => ({
       label: OperationTypeTexts[key],
       value: key,
     }));
