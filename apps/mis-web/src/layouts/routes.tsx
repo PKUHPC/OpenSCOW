@@ -71,6 +71,11 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
               text: t(pPlatform("createTenant")),
               path: "/admin/tenants/create",
             },
+            {
+              Icon: PartitionOutlined,
+              text: "可用分区",
+              path: "/admin/tenants/partitions",
+            },
           ],
         },
         {
@@ -252,6 +257,16 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string, t: TransTy
               Icon: StarOutlined,
               text: t(pTenant("whitelist")),
               path: "/tenant/accounts/whitelist",
+            },
+            {
+              Icon: BookOutlined,
+              text: "可用分区集",
+              path: "/tenant/accounts/partitionCollection",
+            },
+            {
+              Icon: PartitionOutlined,
+              text: "可用分区",
+              path: "/tenant/accounts/partitions",
             },
           ],
         },

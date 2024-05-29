@@ -85,11 +85,12 @@ chmod +x scow-cli
 
 根据以下顺序配置系统：
 
-1. [编写集群信息配置文件](../config/cluster-config.md)
-2. [配置认证系统](../config/auth/intro.md)
-3. （可选）[配置门户系统](../config/portal/intro.md)
-4. （可选）[配置管理系统](../config/mis/intro.md)
-5. （可选）[配置审计系统](../config/audit/intro.md)
+1. SCOW安装文件 install.yaml（按照自己集群需求修改对应参数）
+2. [编写集群信息配置文件](../config/cluster-config.md)
+3. [配置认证系统](../config/auth/intro.md)
+4. （可选）[配置门户系统](../config/portal/intro.md)
+5. （可选）[配置管理系统](../config/mis/intro.md)
+6. （可选）[配置审计系统](../config/audit/intro.md)
 
 部署完成后，运行以下命令启动系统。
 
