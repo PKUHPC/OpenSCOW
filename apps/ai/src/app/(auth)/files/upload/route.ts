@@ -10,10 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationType } from "@scow/lib-operation-log";
 import { NextRequest, NextResponse } from "next/server";
+import { OperationResult } from "src/models/operationLog";
 import { getUserInfo } from "src/server/auth/server";
+import { callLog } from "src/server/setup/operationLog";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { pipeline, Readable } from "stream";
 import { promisify } from "util";
 import { z } from "zod";
@@ -40,14 +44,29 @@ export async function POST(request: NextRequest) {
 
   const uploadedFile = formData.get("file");
 
+  const logInfo = {
+    operatorUserId: user.identityId,
+    operatorIp: parseIp(request) ?? "",
+    operationTypeName: OperationType.uploadFile,
+    operationTypePayload:{
+      clusterId, path,
+    },
+  };
+
   // // File is only an interface. Blob is class
   if (!uploadedFile || !(uploadedFile instanceof Blob)) {
+    await callLog(logInfo, OperationResult.FAIL);
+
     return NextResponse.json({ code: "INVALID_FILE" }, { status: 400 });
   }
 
   const host = getClusterLoginNode(clusterId);
 
-  if (!host) { return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 }); }
+  if (!host) {
+    await callLog(logInfo, OperationResult.FAIL);
+
+    return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 });
+  }
 
 
   return await sshConnect(host, user.identityId, logger, async (ssh) => {
@@ -62,10 +81,12 @@ export async function POST(request: NextRequest) {
       const nodeReadableStream = readableStreamToNodeReadable(readableStream);
       await pipelineAsync(nodeReadableStream, writeStream);
 
+      await callLog(logInfo, OperationResult.SUCCESS);
+
       return NextResponse.json({ message: "success" }, { status: 200 });
 
     } catch (e: any) {
-
+      console.log(e);
     }
   });
 

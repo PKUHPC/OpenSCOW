@@ -11,10 +11,11 @@
  */
 
 import { changePassword, checkPassword, deleteToken } from "@scow/lib-auth";
+import { OperationType } from "@scow/lib-operation-log";
 import { joinWithUrl } from "@scow/utils";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { deleteUserToken, getUserToken, setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
