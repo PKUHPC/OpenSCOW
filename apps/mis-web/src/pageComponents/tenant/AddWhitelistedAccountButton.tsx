@@ -63,7 +63,7 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
   const dateFormat = "YYYY-MM-DD";
 
   // dateRange的时间
-  const [expirationTime, setExpirationTime] = useState<dayjs.Dayjs>(dayjs());
+  const [expirationTime, setExpirationTime] = useState<dayjs.Dayjs>(dayjs().add(1, "day").endOf("day"));
 
   // 对dateRange时间根据options选项进行处理
   React.useEffect(() => {
@@ -72,31 +72,31 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
 
     // 一周
     case "oneWeek":
-      newDate = dayjs().add(1, "week");
+      newDate = dayjs().add(1, "week").endOf("day");
       break;
 
       // 一个礼拜
     case "oneMonth":
-      newDate = dayjs().add(1, "month");
+      newDate = dayjs().add(1, "month").endOf("day");
       break;
 
     // 一年
     case "oneYear":
-      newDate = dayjs().add(1, "year");
+      newDate = dayjs().add(1, "year").endOf("day");
       break;
 
       // 永久生效
     case "permanent":
-      newDate = dayjs("2099-12-31");
+      newDate = dayjs("2099-12-31").endOf("day");
       break;
 
       // 自定义时间
     case "custom":
-      newDate = expirationTime ?? dayjs();
+      newDate = expirationTime ?? dayjs().add(1, "day").endOf("day");
       break;
 
     default:
-      newDate = dayjs();
+      newDate = dayjs().add(1, "day").endOf("day");
       break;
     }
     // 传递值
@@ -116,7 +116,7 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
       {/*  根据选项禁用或启用 DatePicker */}
       <DatePicker
         disabled={selectedOption !== "custom"}
-        minDate={dayjs(dayjs().format(dateFormat))}
+        minDate={dayjs(dayjs().add(1, "day").format(dateFormat))}
         value={ expirationTime }
         style={{ width: "60%" }}
         onChange={(date) =>
