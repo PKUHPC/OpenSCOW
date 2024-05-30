@@ -1,5 +1,19 @@
 # @scow/portal-web
 
+## 1.5.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.1
 
 ### Patch Changes
