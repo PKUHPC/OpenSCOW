@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationType } from "@scow/lib-operation-log";
 import { NextRequest, NextResponse } from "next/server";
 import { OperationResult } from "src/models/operationLog";
 import { getUserInfo } from "src/server/auth/server";
@@ -47,7 +46,7 @@ export async function POST(request: NextRequest) {
   const logInfo = {
     operatorUserId: user.identityId,
     operatorIp: parseIp(request) ?? "",
-    operationTypeName: OperationType.uploadFile,
+    operationTypeName: "uploadFile" as const,
     operationTypePayload:{
       clusterId, path,
     },
@@ -86,7 +85,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: "success" }, { status: 200 });
 
     } catch (e: any) {
-      console.log(e);
+
     }
   });
 
