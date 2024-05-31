@@ -13,12 +13,13 @@
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { Button, Modal } from "antd";
 import React, { useMemo, useState } from "react";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Localized, prefix, useI18nTranslateToString } from "src/i18n";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster, publicConfig } from "src/utils/config";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
+import Bullet from "./Bullet";
 import { EntryItem } from "./EntryItem";
 import { AppWithCluster, defaultEntry } from "./QuickEntry";
 
@@ -46,11 +47,14 @@ const ItemsContainer = styled.div`
 
 const ItemContainer = styled.div`
   cursor: pointer;
-  height: 120px;
-  min-width: 120px;
-  padding: 12px;
-
+  height: 170px;
+  flex: 1 1 200px;
+  max-width: 200px;
+  padding-bottom: 12px;
+  box-shadow: 0px 2px 10px 0px #1C01011A;
   background-color: ${(p) => p.theme.token.colorBgBlur};
+  font-size:18px;
+  font-weight:700;
 `;
 
 const p = prefix("pageComp.dashboard.addEntryModal.");
@@ -149,10 +153,21 @@ export const AddEntryModal: React.FC<Props> = ({
   return (
     <>
       <Modal
-        title={t(p("addQuickEntry"))}
+        title={(
+          <>
+            <Bullet style={{
+              width: "0.8em", /* 与字体大小相对应 */
+              height:" 0.8em", /* 与字体大小相对应 */
+              backgroundColor:" #9B0000",
+              marginRight:"1em",
+            }}
+            />
+            <Localized id={p("addQuickEntry")} />
+          </>
+        )}
         open={open}
-        width={600}
-        onCancel={onClose}
+        width={1310}
+        closeIcon={null}
         destroyOnClose
         footer={[
           <Button key="back" onClick={onClose}>

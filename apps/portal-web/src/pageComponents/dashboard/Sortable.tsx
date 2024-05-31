@@ -58,6 +58,8 @@ const p = prefix("pageComp.dashboard.sortable.");
 
 const ItemContainer = styled.div`
   position: relative;
+  box-shadow: 0px 2px 10px 0px #1C01011A;
+  border-radius: 10px;
 `;
 
 const DeleteIconContainer = styled.div`

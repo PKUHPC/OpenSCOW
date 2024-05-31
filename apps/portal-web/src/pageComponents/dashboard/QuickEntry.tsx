@@ -11,7 +11,7 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Button, Spin } from "antd";
+import { Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -22,6 +22,8 @@ import { App } from "src/pages/api/app/listAvailableApps";
 import { Cluster, publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
 
+import Bullet from "./Bullet";
+
 const CardsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -31,6 +33,7 @@ const EditButton = styled.button`
   border: #DEDEDF 1px solid;
   background-color: #fafafa;
   color: #262743;
+  border-radius:5px;
 `;
 
 
@@ -75,7 +78,7 @@ export const defaultEntry: Entry[] = [
       $case:"pageLink",
       pageLink:{
         path: "/jobs/allJobs",
-        icon:"BookOutlined",
+        icon:"AllJobsOutlined",
       },
     },
   },
@@ -133,19 +136,34 @@ export const QuickEntry: React.FC<Props> = () => {
   return (
     <DashboardSection
       style={{ marginBottom: "16px", border:"#DEDEDF 1px solid" }}
-      title={<Localized id={p("quickEntry")} />}
+      title={ (
+        <>
+          <Bullet style={{
+            width: "0.8em", /* 与字体大小相对应 */
+            height:" 0.8em", /* 与字体大小相对应 */
+            backgroundColor:" #9B0000",
+            marginRight:"1em",
+          }}
+          />
+          <Localized id={p("quickEntry")} />
+        </>
+      )}
       extra={
         isEditable ? (
           <div>
-            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
+            <EditButton
+              type="button"
+              style={{ marginRight:"20px" }}
+              onClick={() => { setIsEditable(false); setIsFinished(true); }}
+            >
               <Localized id={p("finish")} />
-            </Button>
-            <Button
-              type="link"
+            </EditButton>
+            <EditButton
+              type="button"
               onClick={() => { setIsEditable(false); }}
             >
               <Localized id={p("cancel")} />
-            </Button>
+            </EditButton>
           </div>
         ) : (
           <EditButton type="button" onClick={() => { setIsEditable(true); setIsFinished(false); }}>

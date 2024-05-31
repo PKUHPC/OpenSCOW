@@ -10,15 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { BookOutlined, DesktopOutlined, MacCommandOutlined, PlusCircleOutlined, SaveOutlined } from "@ant-design/icons";
 import React, { ComponentType, CSSProperties, ReactElement } from "react";
+import { AllJobsIcon, DeskTopIcon, RunningJobIcon,
+  ShellIcon, SubmitJobIcon, TemplatejobIcon } from "src/icons/EntryItemIcon";
 
 const iconMap = {
-  PlusCircleOutlined: <PlusCircleOutlined />,
-  BookOutlined: <BookOutlined />,
-  SaveOutlined: <SaveOutlined />,
-  DesktopOutlined: <DesktopOutlined />,
-  MacCommandOutlined: <MacCommandOutlined />,
+  PlusCircleOutlined: <SubmitJobIcon />,
+  BookOutlined: <RunningJobIcon />,
+  SaveOutlined: <TemplatejobIcon />,
+  DesktopOutlined: <DeskTopIcon />,
+  MacCommandOutlined: <ShellIcon />,
+  AllJobsOutlined:<AllJobsIcon />,
 };
 
 export type IconName = keyof typeof iconMap;

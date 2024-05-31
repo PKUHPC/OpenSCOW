@@ -74,7 +74,7 @@ export const EntryItem: React.FC<Props> = ({ style,
             />
           ) : (
             icon && isSupportedIconName(icon) ?
-              <ColoredIcon name={icon} style={{ fontSize:"60px" }} />
+              <ColoredIcon name={icon} style={{ fontSize:"60px", color:"#9B0000" }} />
               : <PictureOutlined style={{ fontSize:"52px" }} />
           )}
       </AvatarContainer>
