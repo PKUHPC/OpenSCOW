@@ -1,5 +1,25 @@
 # @scow/ai
 
+## 0.2.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 7bcf3bb: AI 新增再次提交作业功能
+- 0957f1a: 修改多平台镜像由于只在 nerdclt push 命令下指定 --all-platforms 导致其他平台层数据缺失无法推送的问题
+- d080a8b: 增加 ai 系统下个人信息中修改密码的后端校验
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- 44c8d67: 修改 copy 命令
+- ad1a565: 数据集、算法、模型的分享去掉源文件地址参数；复制命令换用处理过的命令
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/lib-server@1.2.2
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.9
+
 ## 0.2.1
 
 ### Patch Changes

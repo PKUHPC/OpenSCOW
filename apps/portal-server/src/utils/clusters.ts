@@ -58,18 +58,26 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
   return await call(client).catch((e) => {
     logger.error("Cluster ops fails at %o", e);
 
+    const errorDetail = e instanceof Error ? e : JSON.stringify(e);
+
     const clusterErrorDetails = [{
       clusterId: cluster,
-      details: e,
+      details: errorDetail,
     }];
+    const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail;
 
-    const reason = "Cluster ID : " + cluster + ", Details : " + e.details;
-    throw new ServiceError({
-      code: status.INTERNAL,
-      details: reason,
-      metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, {
-        clusterErrors: clusterErrorDetails.length > 0 ? JSON.stringify(clusterErrorDetails) : "" }),
-    });
+    // 统一错误处理
+    if (e instanceof Error) {
+      throw new ServiceError({
+        code: status.INTERNAL,
+        details: reason,
+        metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, { clusterErrors: JSON.stringify(clusterErrorDetails) }),
+      });
+    // 如果是已经封装过的grpc error, 直接抛出错误
+    } else {
+      throw e;
+    }
+
   });
 };
 
