@@ -32,6 +32,7 @@ export const SortableItem: FC<EntryCardItemProps> = (props) => {
     border:"#DEDEDF 1px solid",
     boxShadow: "none",
     borderRadius:"8px",
+    fontWeight:700,
   };
 
   return (

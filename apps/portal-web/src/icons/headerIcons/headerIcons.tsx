@@ -50,7 +50,7 @@ const jobSVG = () => (
       d="M1.16675 8V3C1.16675 1.89543 2.06218 1 3.16675 1H26.0001
 C27.1047 1 28.0001 1.89543 28.0001 3V5.44706V17.3059V27C28.0001 28.1046 27.1047 29 26.0001 29
 H3.16675C2.06218 29 1.16675 28.1046 1.16675 27V22"
-      stroke="#262743"
+      stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
     />
@@ -151,7 +151,7 @@ export const ApplicationIcon: React.ForwardRefExoticComponent<{}> = React.forwar
 
 // 文件管理图标
 const fileManagerSVG = () => (
-  <svg width="1em" height="1em" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="1em" height="1em" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M23 15V5.44706V3C23 1.89543 22.1046 1 21 1
     H3C1.89543 1 1 1.89543 1 3V27C1 28.1046 1.89543 29 3 29H12"
@@ -224,7 +224,7 @@ const allJobsSVG = () => (
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="white"
+      fill="#F5EBEB"
       stroke="currentColor"
       strokeWidth="2"
     />
@@ -234,7 +234,7 @@ const allJobsSVG = () => (
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="currentColor"
+      fill="#F5EBEB"
       stroke="currentColor"
       strokeWidth="2"
     />
@@ -244,7 +244,7 @@ const allJobsSVG = () => (
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="currentColor"
+      fill="#F5EBEB"
       stroke="currentColor"
       strokeWidth="2"
     />

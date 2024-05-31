@@ -21,6 +21,7 @@ export const HeaderItem = styled.div`
   /* justify-content: center; */
   height: 100%;
 
+
   @media (max-width: ${antdBreakpoints.md}px) {
     padding-right: 4px;
   }
@@ -38,9 +39,10 @@ interface JumpToAnotherLinkProps {
   icon: React.ReactNode;
   link: string | undefined;
   linkText: string;
+  inIcon?: React.ReactNode;
 }
 
-export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ user, link, icon, linkText }) => {
+export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ user, link, icon, linkText, inIcon }) => {
   if (!link) { return null; }
 
   return (
@@ -55,6 +57,7 @@ export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ user, link
         <HiddenOnSmallScreenSpan>
           {linkText}
         </HiddenOnSmallScreenSpan>
+        {inIcon}
       </Typography.Link>
     </HeaderItem>
 
