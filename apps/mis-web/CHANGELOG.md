@@ -1,5 +1,29 @@
 # @scow/mis-web
 
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- d080a8b: 修复在 common.yml 中自定义更改用户密码正则后在管理系统不生效的问题，
+  增加平台管理和租户管理下修改用户密码的后端校验
+- c7f2646: 操作日志文案修改：移动文件/文件夹改为移动或重命名文件/文件夹
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- 90217ac: 操作日志自定义操作类型合并至操作行为进行搜索查询
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 98a166f: 修复了平台数据统计图（折线图）溢出的问题.
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- f0b3162: 将白名单过期时间选择的最小日期调整至+1 天,将所选择日期的时分秒调整至 24:00:00(00:00:00).
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.1
 
 ### Patch Changes

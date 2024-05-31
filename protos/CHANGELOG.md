@@ -1,5 +1,20 @@
 # @scow/grpc-api
 
+## 1.9.0
+
+### Minor Changes
+
+- 89191ea: GetPaginatedChargeRecords 添加字段 user_id_or_name，将 GetChargeRecordsTotalCount 中的 userIds 改为 user_id_or_name.
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 6304074: JobTemplate 新增 script_output 可选字段，SubmitJobRequest 新增可选字段 script_output。
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- f534377: 为 getOperationLogs、 getPaginatedChargeRecords、 getJobs 三个 API 新增了 sortBy、sortOreder 参数，表示排序的列、排序方式（升序、降序、默认）
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
 ## 1.8.1
 
 ### Patch Changes
