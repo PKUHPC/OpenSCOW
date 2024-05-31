@@ -58,7 +58,7 @@ export default route(ListAvailableTransferClustersSchema, async (req, res) => {
 
   const clusterList: ClusterInfo[] = clustersRuntimeInfo
     .filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED
-      && clusterConfigs[x.clusterId].crossClusterFileTransfer?.enabled)
+      && clusterConfigs[x.clusterId]?.crossClusterFileTransfer?.enabled)
     .map((x) => ({
       id: x.clusterId,
       name: getI18nConfigCurrentText(clusterConfigs[x.clusterId].displayName, languageId),

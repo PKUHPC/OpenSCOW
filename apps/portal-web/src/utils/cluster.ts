@@ -31,7 +31,6 @@ export function getDesktopEnabled(
       const curClusterDesktopEnabled = clusters?.[cur]?.loginDesktop?.enabled !== undefined
         ? !!clusters[cur]?.loginDesktop?.enabled
         : runtimeConfig.PORTAL_CONFIG?.loginDesktop?.enabled;
-        // : portalConfig.loginDesktop.enabled;
 
       return pre || curClusterDesktopEnabled;
     }), false,
