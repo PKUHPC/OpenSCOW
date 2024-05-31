@@ -161,9 +161,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  console.dir(extra.clusterConfigs, { depth: null });
-  console.dir(extra.initialCurrentClusters, { depth: null });
-  console.dir(loginNodes, { depth: null });
   const clusterInfoStore = useConstant(() => {
     return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialCurrentClusters);
   });
