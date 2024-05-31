@@ -1,10 +1,9 @@
 authType: ldap
 
-redisUrl: 172.16.20.148:6379
+redisUrl: localhost:6379
 
 allowedCallbackHostnames:
   - localhost
-
 # ldap认证支持绑定和验证otp，ssh认证仅支持验证
 otp:
   # 是否启用otp功能， 默认false
@@ -50,12 +49,11 @@ otp:
     validateUrl: http://localhost:9999/otp/remote/validateCode
     # 当用户点击绑定OTP时跳转的链接, 建议是绑定OTP的网站或者说明的地址
     redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
-
 captcha:
   enabled: true
 
 ldap:
-  url: ldap://172.16.20.148:389
+  url: ldap://localhost:389
   bindDN: cn=Manager,ou=hpc,o=pku
   bindPassword: admin
   searchBase: ou=hpc,o=pku
@@ -63,14 +61,12 @@ ldap:
   addUser:
     userBase: "ou=People,ou=hpc,o=pku"
     userIdDnKey: cn
-
     groupStrategy: "newGroupPerUser"
     newGroupPerUser:
       groupBase: "ou=Group,ou=hpc,o=pku"
       groupIdDnKey: cn
     oneGroupForAllUsers:
       gidNumber: 1000
-
     extraProps:
       # test overriding existing property
       mail: mail is {{ mail }}
@@ -78,19 +74,15 @@ ldap:
     uid: uid
     name: cn
     mail: mail
-
 ssh:
   baseNode: localhost:22222
-
 # auth 界面 ui 配置
 ui:
   default:
     # 登录界面背景图
     backgroundImagePath: "./assets/background.png"
-
     # 登录界面背景色，当背景图无法加载时，背景色起效
     backgroundFallbackColor: "#8c8c8c"
-
     # 登录界面 logo 图,
     logo:
       # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
@@ -100,7 +92,6 @@ ui:
       customLogoPath: ""
       # 自定义点击 logo 跳转地址
       customLogoLink: "https://icode.pku.edu.cn/SCOW/"
-
     # 登录界面 slogan 配置
     slogan:
       # 登录界面 slogan 文字颜色
@@ -151,20 +142,15 @@ ui:
       #         default: "普通用户：demo_user / demo_user"
       #         en: "Regular User: demo_user / demo_user"
       #         zh_cn: "普通用户：demo_user / demo_user"
-
     # 登陆界面底部 Power By 字体颜色配置
     footerTextColor: "white"
-
   # 根据不域名进行不同的展示，对具体hostname生效的生效，可以不填
   # hostnameMap:
-
   #   a.com:
   #     # 登录界面背景图
   #     backgroundImagePath: "./assets/background1.png"
-
   #     # 登录界面背景色，当背景图无法加载时，背景色起效
   #     backgroundFallbackColor: "#000"
-
   #     # 登录界面 logo 图,
   #     logo:
   #       # 如果没有配置自定义 logo, 则使用 type 选择 SCOW Logo
@@ -174,7 +160,6 @@ ui:
   #       customLogoPath: ""
   #       # 自定义点击 logo 跳转地址
   #       customLogoLink: "https://icode.pku.edu.cn/SCOW/"
-
   #     # 登录界面 slogan 配置
   #     slogan:
   #       # 登录界面 slogan 文字颜色
@@ -188,6 +173,5 @@ ui:
   #         - "一体化部署，开箱即用."
   #         - "标准化平台，支持算力融合."
   #         - "开源中立，独立自主."
-
   #     # 登陆界面底部 Power By 字体颜色配置
   #     footerTextColor: "black"
