@@ -32,7 +32,7 @@ async function main() {
     switch (command) {
 
     case "fetchJobs":
-      await fetchJobs(em, logger, server.ext, server.ext);
+      await fetchJobs(em, logger, server.ext);
       break;
 
     case "createPriceItems":

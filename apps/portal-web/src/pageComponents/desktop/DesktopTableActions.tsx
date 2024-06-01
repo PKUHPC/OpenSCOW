@@ -15,7 +15,7 @@ import React, { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { DesktopItem } from "src/pageComponents/desktop/DesktopTable";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { openDesktop } from "src/utils/vnc";
 
 interface Props {

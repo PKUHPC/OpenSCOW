@@ -19,6 +19,7 @@ import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow/protos/build/server/job_charge_limit";
 import { unblockUserInAccount } from "src/bl/block";
 import { setJobCharge } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { getUserStateInfo } from "src/utils/accountUserState";
 
@@ -63,8 +64,11 @@ export const jobChargeLimitServer = plugin((server) => {
           userAccount.usedJobCharge,
         ).shouldBlockInCluster;
 
+
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         if (!shouldBlockUserInCluster) {
-          await unblockUserInAccount(userAccount, server.ext, logger);
+          await unblockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
           userAccount.blockedInCluster = UserStatus.UNBLOCKED;
         }
 
@@ -104,7 +108,10 @@ export const jobChargeLimitServer = plugin((server) => {
           };
         }
 
-        await setJobCharge(userAccount, new Decimal(moneyToNumber(limit)), server.ext, logger);
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+        await setJobCharge(userAccount,
+          new Decimal(moneyToNumber(limit)), currentActivatedClusters, server.ext, logger);
 
         logger.info("Set %s job charge limit to user %s account %s. Current used %s",
           userAccount.jobChargeLimit!.toFixed(2),

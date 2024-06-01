@@ -13,11 +13,17 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { clusters } from "src/config/clusters";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { libCheckActivatedClusters,
+  libGetCurrentActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
+import { configClusters } from "src/config/clusters";
+import { commonConfig } from "src/config/common";
+import { config } from "src/config/env";
+import { logger as pinoLogger } from "src/utils/logger";
 import { Logger } from "ts-log";
 
-import { scowErrorMetadata } from "./error";
 
+const clusters = configClusters;
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
   const client = getSchedulerAdapterClient(c.adapterUrl);
   prev[cluster] = client;
@@ -38,6 +44,9 @@ type CallOnOne = <T>(
 export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const callOnOne: CallOnOne = async (cluster, logger, call) => {
+
+  await checkActivatedClusters({ clusterIds: cluster });
+
   const client = getAdapterClient(cluster);
 
   if (!client) {
@@ -71,3 +80,23 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
 
   });
 };
+
+export const checkActivatedClusters
+= async (
+  { clusterIds }: {clusterIds: string[] | string},
+) => {
+
+  if (!config.MIS_DEPLOYED) {
+    return;
+  }
+
+  const activatedClusters = await libGetCurrentActivatedClusters(
+    pinoLogger,
+    configClusters,
+    config.MIS_SERVER_URL,
+    commonConfig.scowApi?.auth?.token);
+
+  return libCheckActivatedClusters({ clusterIds, activatedClusters, logger: pinoLogger });
+
+};
+

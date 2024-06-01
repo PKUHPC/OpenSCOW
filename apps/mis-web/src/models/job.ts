@@ -15,7 +15,7 @@ import { Static, Type } from "@sinclair/typebox";
 import dayjs from "dayjs";
 import { Lang } from "react-typed-i18n";
 import en from "src/i18n/en";
-import type { Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/cluster";
 
 
 export type RunningJobInfo = RunningJob & { cluster: Cluster; runningOrQueueTime: string };

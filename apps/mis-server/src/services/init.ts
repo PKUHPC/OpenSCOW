@@ -47,19 +47,20 @@ export const initServiceServer = plugin((server) => {
       // 需要注意，如果扔出异常，前端会根据异常结果显示不同提示
       // 显示两种情况，认证系统中创建失败的原因ALREADY_EXISTS_IN_AUTH=>成功
       // 显示两种情况，其他错误=>失败
-      const user = await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
-        .catch((e) => {
-          if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS,
-              message:`User with userId ${userId} already exists in scow.`,
-              details: "EXISTS_IN_SCOW",
-            };
-          }
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: `Error creating user with userId ${userId} in database.` };
-        });
+      const user =
+       await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
+         .catch((e) => {
+           if (e.code === Status.ALREADY_EXISTS) {
+             throw <ServiceError> {
+               code: Status.ALREADY_EXISTS,
+               message:`User with userId ${userId} already exists in scow.`,
+               details: "EXISTS_IN_SCOW",
+             };
+           }
+           throw <ServiceError> {
+             code: Status.INTERNAL,
+             message: `Error creating user with userId ${userId} in database.` };
+         });
 
       user.platformRoles.push(PlatformRole.PLATFORM_ADMIN);
       user.tenantRoles.push(TenantRole.TENANT_ADMIN);

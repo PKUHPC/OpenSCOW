@@ -423,6 +423,16 @@ message UserChangeTenant {
   string new_tenant_name = 3;
 }
 
+message ActivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+message DeactivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
 // 用户自定义操作类型，name和content将直接展示
 message CustomEvent {
   string type = 1;
@@ -495,6 +505,8 @@ message CreateOperationLogRequest {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
     UserChangeTenant user_change_tenant = 61;
     CustomEvent custom_event = 62;
+    ActivateCluster activate_cluster = 63;
+    DeactivateCluster deactivate_cluster = 64;
   }
 }
 
@@ -565,6 +577,8 @@ message OperationLog {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
     UserChangeTenant user_change_tenant = 63;
     CustomEvent custom_event = 64;
+    ActivateCluster activate_cluster = 65;
+    DeactivateCluster deactivate_cluster = 66;
   }
 }
 
