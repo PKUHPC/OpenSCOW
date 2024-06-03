@@ -325,7 +325,7 @@ export const ChargeTable: React.FC<Props> = ({
           <Table.Column<ChargeInfo>
             dataIndex="amount"
             title={t(p("amount"))}
-            render={(v) => v.toFixed(3)}
+            render={(v) => v.toFixed(2)}
             sorter={true}
           />
           <Table.Column<ChargeInfo>
