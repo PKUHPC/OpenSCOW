@@ -19,6 +19,7 @@ import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { ChargeRecord as ChargeRecordProto,
   ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -91,6 +92,8 @@ export const chargingServiceServer = plugin((server) => {
 
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await pay({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -98,7 +101,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           ipAddress,
           operatorId,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -135,6 +138,8 @@ export const chargingServiceServer = plugin((server) => {
           }
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await charge({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -142,7 +147,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           userId,
           metadata,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{

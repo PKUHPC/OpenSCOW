@@ -13,9 +13,10 @@
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button } from "antd";
 import { NextPage } from "next";
+import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
-import { publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Head } from "src/utils/head";
 
 export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
@@ -23,13 +24,15 @@ export const ShellIndexPage: NextPage = requireAuth(() => true)(() => {
   const languageId = useI18n().currentLanguage.id;
   const t = useI18nTranslateToString();
 
+  const { currentClusters } = useStore(ClusterInfoStore);
+
   return (
     <div>
       <Head title={t("pages.shell.index.title")} />
       <h1>
         <Localized id="pages.shell.index.content"></Localized>
       </h1>
-      {publicConfig.CLUSTERS.map(({ id, name }) => (
+      {currentClusters.map(({ id, name }) => (
         <a key={id} href={`/shell/${id}`} target="__blank">
           <Button>
             {getI18nConfigCurrentText(name, languageId)}

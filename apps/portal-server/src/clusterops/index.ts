@@ -13,7 +13,9 @@
 import { ClusterOps } from "src/clusterops/api";
 import { appOps } from "src/clusterops/app";
 import { jobOps } from "src/clusterops/job";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
+
+const clusters = configClusters;
 
 const opsForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
   prev[cluster] = {

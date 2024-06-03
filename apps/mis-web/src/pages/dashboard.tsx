@@ -122,6 +122,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
     return prev;
   }, {} as Record<string, AccountInfo>);
+
   return {
     props: {
       accounts,

@@ -21,14 +21,15 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DesktopTableActions } from "src/pageComponents/desktop/DesktopTableActions";
 import { NewDesktopTableModal } from "src/pageComponents/desktop/NewDesktopTableModal";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 
 const NewDesktopTableModalButton = ModalButton(NewDesktopTableModal, { type: "primary", icon: <PlusOutlined /> });
 
@@ -52,20 +53,24 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const t = useI18nTranslateToString();
 
-  const { defaultCluster } = useStore(DefaultClusterStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
 
   const { loginNodes } = useStore(LoginNodeStore);
-
   const clusterQuery = queryToString(router.query.cluster);
   const loginQuery = queryToString(router.query.loginNode);
 
   const [selectedLoginNodeAddress, setSelectedLoginNodeAddress] = useState("");
-  // 如果默认集群没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群。
-  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === defaultCluster.id)
-    ? defaultCluster
-    : loginDesktopEnabledClusters[0];
-  const cluster = publicConfig.CLUSTERS.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
 
+  // 如果默认集群(不存在时优先选取可用集群中某一集群作为当前默认集群)没开启登录节点桌面功能，则取开启此功能的某一集群为默认集群
+  const currentDefaultCluster = defaultCluster ?? currentClusters[0];
+  const enabledDefaultCluster = loginDesktopEnabledClusters.find((x) => x.id === currentDefaultCluster.id)
+    ? currentDefaultCluster
+    : loginDesktopEnabledClusters[0];
+  const cluster = currentClusters.find((x) => x.id === clusterQuery) ?? enabledDefaultCluster;
   const loginNode = loginNodes[cluster.id].find((x) => x.address === loginQuery) ?? undefined;
 
   const { data, isLoading, reload } = useAsync({

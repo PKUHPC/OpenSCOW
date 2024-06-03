@@ -15,10 +15,12 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
 import { compareWithUndefined } from "src/utils/dashboard";
 import { styled } from "styled-components";
+
+import { DashboardSection } from "./DashboardSection";
 
 export interface ClusterInfo extends PartitionInfo {
   id: number;
@@ -102,103 +104,112 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
   };
 
   return (
-    <Container>
-      <Table
-        title={() => t(p("title"))}
-        tableLayout="fixed"
-        dataSource={(clusterInfo.map((x) => ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
-          .concat(failedClusters)}
-        loading={isLoading}
-        pagination={false}
-        scroll={{ y:275 }}
-        rowClassName={(tableProps) => (tableProps.info?.id === selectId ? "rowBgColor" : "")}
-        onRow={(r) => {
-          return {
-            onClick() {
-              if (r.info?.id !== undefined) {
-                setSelectId(r.info?.id);
-              }
-            },
-          };
-        }}
-      >
-        <Table.Column<TableProps>
-          dataIndex="clusterName"
-          width="15%"
-          title={t(p("clusterName"))}
-          sorter={(a, b, sortOrder) =>
-            compareWithUndefined(getI18nConfigCurrentText(a.clusterName, languageId),
-              getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
-          render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
-        />
-        <Table.Column<TableProps>
-          dataIndex="partitionName"
-          title={t(p("partitionName"))}
-          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.partitionName, b.info?.partitionName, sortOrder)}
-          render={(_, r) => r.info?.partitionName ?? "-"}
-        />
-        <Table.Column<TableProps>
-          dataIndex="nodeCount"
-          title={t(p("nodeCount"))}
-          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.nodeCount, b.info?.nodeCount, sortOrder)}
-          render={(_, r) => r.info?.nodeCount ?? "-"}
-        />
-        <Table.Column<TableProps>
-          dataIndex="usageRatePercentage"
-          title={t(p("usageRatePercentage"))}
-          sorter={(a, b, sortOrder) =>
-            compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
-          render={(_, r) => (
-            <span style={{ color: r.info?.usageRatePercentage ?
-              getColorByUsage(r.info?.usageRatePercentage) : "black" }}
-            >
-              {r.info?.usageRatePercentage ? `${r.info.usageRatePercentage}%` : "-"}
-            </span>
-          )}
-        />
-        <Table.Column<TableProps>
-          dataIndex="cpuUsage"
-          title={t(p("cpuUsage"))}
-          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
-          render={(_, r) => (
-            <span style={{ color: r.info?.cpuUsage ?
-              getColorByUsage(Number(r.info?.cpuUsage)) : "black" }}
-            >
-              {r.info?.cpuUsage !== undefined ? Number(r.info?.cpuUsage).toFixed(2) + "%" : "-"}
-            </span>
-          )}
-        />
-        <Table.Column<TableProps>
-          dataIndex="gpuUsage"
-          title={t(p("gpuUsage"))}
-          sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
-          render={(_, r) => (
-            <span style={{ color: r.info?.gpuUsage ?
-              getColorByUsage(Number(r.info?.gpuUsage)) : "black" }}
-            >
-              {r.info?.gpuUsage !== undefined ? Number(r.info?.gpuUsage).toFixed(2) + "%" : "-"}
-            </span>
-          )}
-        />
-        <Table.Column<TableProps>
-          dataIndex="pendingJobCount"
-          title={t(p("pendingJobCount"))}
-          sorter={(a, b, sortOrder) =>
-            compareWithUndefined(a.info?.pendingJobCount, b.info?.pendingJobCount, sortOrder)}
-          render={(_, r) => r.info?.pendingJobCount ?? "-" }
-        />
-        <Table.Column<TableProps>
-          dataIndex="partitionStatus"
-          title={t(p("partitionStatus"))}
-          sorter={(a, b, sortOrder) =>
-            compareWithUndefined(a.info?.partitionStatus, b.info?.partitionStatus, sortOrder)}
-          render={(_, r) => r.info?.partitionStatus === 0 ?
-            <Tag color="red">{t(p("notAvailable"))}</Tag> : <Tag color="green">{t(p("available"))}</Tag>
-          }
-        />
-      </Table>
-      <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
-    </Container>
+    (isLoading || clusterInfo.length > 0) ? (
+      <Container>
+        <Table
+          title={() => t(p("title"))}
+          tableLayout="fixed"
+          dataSource={(clusterInfo.map((x) => ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
+            .concat(failedClusters)}
+          loading={isLoading}
+          pagination={false}
+          scroll={{ y:275 }}
+          rowClassName={(tableProps) => (tableProps.info?.id === selectId ? "rowBgColor" : "")}
+          onRow={(r) => {
+            return {
+              onClick() {
+                if (r.info?.id !== undefined) {
+                  setSelectId(r.info?.id);
+                }
+              },
+            };
+          }}
+        >
+          <Table.Column<TableProps>
+            dataIndex="clusterName"
+            width="15%"
+            title={t(p("clusterName"))}
+            sorter={(a, b, sortOrder) =>
+              compareWithUndefined(getI18nConfigCurrentText(a.clusterName, languageId),
+                getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
+            render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
+          />
+          <Table.Column<TableProps>
+            dataIndex="partitionName"
+            title={t(p("partitionName"))}
+            sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.partitionName, b.info?.partitionName, sortOrder)}
+            render={(_, r) => r.info?.partitionName ?? "-"}
+          />
+          <Table.Column<TableProps>
+            dataIndex="nodeCount"
+            title={t(p("nodeCount"))}
+            sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.nodeCount, b.info?.nodeCount, sortOrder)}
+            render={(_, r) => r.info?.nodeCount ?? "-"}
+          />
+          <Table.Column<TableProps>
+            dataIndex="usageRatePercentage"
+            title={t(p("usageRatePercentage"))}
+            sorter={(a, b, sortOrder) =>
+              compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
+            render={(_, r) => (
+              <span style={{ color: r.info?.usageRatePercentage ?
+                getColorByUsage(r.info?.usageRatePercentage) : "black" }}
+              >
+                {r.info?.usageRatePercentage ? `${r.info.usageRatePercentage}%` : "-"}
+              </span>
+            )}
+          />
+          <Table.Column<TableProps>
+            dataIndex="cpuUsage"
+            title={t(p("cpuUsage"))}
+            sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
+            render={(_, r) => (
+              <span style={{ color: r.info?.cpuUsage ?
+                getColorByUsage(Number(r.info?.cpuUsage)) : "black" }}
+              >
+                {r.info?.cpuUsage !== undefined ? Number(r.info?.cpuUsage).toFixed(2) + "%" : "-"}
+              </span>
+            )}
+          />
+          <Table.Column<TableProps>
+            dataIndex="gpuUsage"
+            title={t(p("gpuUsage"))}
+            sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
+            render={(_, r) => (
+              <span style={{ color: r.info?.gpuUsage ?
+                getColorByUsage(Number(r.info?.gpuUsage)) : "black" }}
+              >
+                {r.info?.gpuUsage !== undefined ? Number(r.info?.gpuUsage).toFixed(2) + "%" : "-"}
+              </span>
+            )}
+          />
+          <Table.Column<TableProps>
+            dataIndex="pendingJobCount"
+            title={t(p("pendingJobCount"))}
+            sorter={(a, b, sortOrder) =>
+              compareWithUndefined(a.info?.pendingJobCount, b.info?.pendingJobCount, sortOrder)}
+            render={(_, r) => r.info?.pendingJobCount ?? "-" }
+          />
+          <Table.Column<TableProps>
+            dataIndex="partitionStatus"
+            title={t(p("partitionStatus"))}
+            sorter={(a, b, sortOrder) =>
+              compareWithUndefined(a.info?.partitionStatus, b.info?.partitionStatus, sortOrder)}
+            render={(_, r) => r.info?.partitionStatus === 0 ?
+              <Tag color="red">{t(p("notAvailable"))}</Tag> : <Tag color="green">{t(p("available"))}</Tag>
+            }
+          />
+        </Table>
+        <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
+      </Container>
 
+    ) : (
+      <DashboardSection
+        style={{ marginBottom: "16px" }}
+        title={<Localized id={"pageComp.dashboard.overviewTable.title"} />}
+      >
+        {t("pages.common.noAvailableClusters")}
+      </DashboardSection>
+    )
   );
 };
