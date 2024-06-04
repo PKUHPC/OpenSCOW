@@ -13,6 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationType } from "@scow/lib-operation-log";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
