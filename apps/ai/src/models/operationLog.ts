@@ -19,4 +19,3 @@ export const OperationResult = {
 } as const;
 
 export type OperationResult = ValueOf<typeof OperationResult>
-

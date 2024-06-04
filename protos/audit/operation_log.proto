@@ -423,6 +423,16 @@ message UserChangeTenant {
   string new_tenant_name = 3;
 }
 
+message ActivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+message DeactivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
 // 用户自定义操作类型，name和content将直接展示
 message CustomEvent {
   string type = 1;
@@ -573,19 +583,21 @@ message CreateOperationLogRequest {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
     UserChangeTenant user_change_tenant = 61;
     CustomEvent custom_event = 62;
-    CreateImage create_image = 63;
-    UpdateImage update_image = 64;
-    ShareImage share_image = 65;
-    DeleteImage delete_image = 66;
-    CopyImage copy_image = 67;
-    CreateDataset create_dataset = 68;
-    UpdateDataset update_dataset = 69;
-    DeleteDataset delete_dataset = 70;
-    CreateDatasetVersion create_dataset_version = 71;
-    UpdateDatasetVersion update_dataset_version = 72;
-    ShareDatasetVersion share_dataset_version = 73;
-    DeleteDatasetVersion delete_dataset_version = 74;
-    CopyDatasetVersion copy_dataset_version = 75;
+    ActivateCluster activate_cluster = 63;
+    DeactivateCluster deactivate_cluster = 64;
+    CreateImage create_image = 65;
+    UpdateImage update_image = 66;
+    ShareImage share_image = 67;
+    DeleteImage delete_image = 68;
+    CopyImage copy_image = 69;
+    CreateDataset create_dataset = 70;
+    UpdateDataset update_dataset = 71;
+    DeleteDataset delete_dataset = 72;
+    CreateDatasetVersion create_dataset_version = 73;
+    UpdateDatasetVersion update_dataset_version = 74;
+    ShareDatasetVersion share_dataset_version = 75;
+    DeleteDatasetVersion delete_dataset_version = 76;
+    CopyDatasetVersion copy_dataset_version = 77;
   }
 }
 
@@ -656,19 +668,21 @@ message OperationLog {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
     UserChangeTenant user_change_tenant = 63;
     CustomEvent custom_event = 64;
-    CreateImage create_image = 65;
-    UpdateImage update_image = 66;
-    ShareImage share_image = 67;
-    DeleteImage delete_image = 68;
-    CopyImage copy_image = 69;
-    CreateDataset create_dataset = 70;
-    UpdateDataset update_dataset = 71;
-    DeleteDataset delete_dataset = 72;
-    CreateDatasetVersion create_dataset_version = 73;
-    UpdateDatasetVersion update_dataset_version = 74;
-    ShareDatasetVersion share_dataset_version = 75;
-    DeleteDatasetVersion delete_dataset_version = 76;
-    CopyDatasetVersion copy_dataset_version = 77;
+    ActivateCluster activate_cluster = 65;
+    DeactivateCluster deactivate_cluster = 66;
+    CreateImage create_image = 67;
+    UpdateImage update_image = 68;
+    ShareImage share_image = 69;
+    DeleteImage delete_image = 70;
+    CopyImage copy_image = 71;
+    CreateDataset create_dataset = 72;
+    UpdateDataset update_dataset = 73;
+    DeleteDataset delete_dataset = 74;
+    CreateDatasetVersion create_dataset_version = 75;
+    UpdateDatasetVersion update_dataset_version = 76;
+    ShareDatasetVersion share_dataset_version = 77;
+    DeleteDatasetVersion delete_dataset_version = 78;
+    CopyDatasetVersion copy_dataset_version = 79;
   }
 }
 

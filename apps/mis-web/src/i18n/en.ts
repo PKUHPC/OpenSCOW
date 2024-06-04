@@ -112,6 +112,8 @@ export default {
     exportNoDataErrorMsg: "Export is empty, please reselect",
     blockThresholdAmount: "Block Threshold Amount",
     other: "Other",
+    noAvailableClusters: "There are currently no available clusters."
+    + " Please try again later or contact the administrator.",
   },
   dashboard: {
     title: "Dashboard",
@@ -179,6 +181,8 @@ export default {
         systemDebug: "Platform Operation",
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Jobs Synchronization",
+        resourceManagement: "Resource Management",
+        clusterManagement: "Cluster Management",
         accountList: "Accounts",
         clusterMonitor: "Monitor",
         resourceStatus: "Status",
@@ -765,6 +769,8 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "The cluster you are currently accessing is unavailable or there are no available clusters. "
+      + " Please try again later or contact the administrator.",
     },
     others: {
       seeDetails: "For details, please refer to the documentation",
@@ -810,6 +816,10 @@ export default {
       + "synchronized with the modifications.",
       adapterConnErrorContent: "The {} cluster is currently unreachable. Please try again later. ",
       effectErrorMessage: "Server error occurred!",
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
+      + "Please try again after refreshing the page.",
+      noClusters: "Unable to find cluster configuration files. Please contact the system administrator.",
     },
     profile: {
       index: {
@@ -1023,6 +1033,49 @@ export default {
           syncJobNow: "Sync Now",
         },
       },
+      resourceManagement: {
+        clusterManagement: {
+          title: "Cluster Management",
+          clusterFilter: "Cluster",
+          table: {
+            clusterName: "Cluster Name",
+            nodesCount: "Total Nodes",
+            cpusCount: "Total CPU Cores",
+            gpusCount: "Total GPU Cards",
+            totalMemMb: "Total Memory Capacity",
+            clusterState: "Cluster State",
+            errorState: "Error",
+            deactivatedState: "Deactivated",
+            normalState: "Normal",
+            operator: "Operator",
+            lastOperatedTime: "Last Operation Time",
+            comment: "Comment",
+            operation: "Operation",
+            activate: "Activate",
+            deactivate: "Deactivate",
+          },
+          activateModal: {
+            title: "Activate Cluster",
+            content: "Please confirm if you want to activate the cluster with Cluster ID {}, named {}?",
+            contentAttention: "Attention: Please manually synchronize platform data after activation!",
+            successMessage: "The cluster has been activated.",
+            failureMessage: "Failed to activate the cluster. The cluster may have been activated.",
+          },
+          deactivateModal: {
+            title: "Deactivate Cluster",
+            content: "Please confirm if you want to deactivate the cluster with Cluster ID {}, named {}?",
+            contentInputNotice: "If you confirm the deactivation of the cluster, "
+            + "please re-enter the cluster ID and name below.",
+            contentAttention: "Attention: After deactivation, the cluster will not be available, "
+            + "and all data updates for the cluster will cease!",
+            clusterNameForm: "Cluster Name",
+            clusterIdForm: "Cluster ID",
+            comment: "Deactivation Comment",
+            successMessage: "The cluster has been deactivated.",
+            failureMessage: "Failed to deactivate the cluster. The cluster may have been deactivated.",
+          },
+        },
+      },
       finance: {
         pay: {
           tenantCharge: "Tenant Charge",
@@ -1168,6 +1221,8 @@ export default {
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
       userChangeTenant: "User Change Tenant",
       customEvent: "Custom Operation Event",
+      activateCluster: "Activate Cluster",
+      deactivateCluster: "Deactivate Cluster",
     },
     operationDetails: {
       login: "User Login",
@@ -1260,6 +1315,8 @@ export default {
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
       unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",
       userChangeTenant: "User {} changes from tenant {} to tenant {}",
+      activateCluster: "User {} activates the Cluster: {}",
+      deactivateCluster: "User {} deactivates the Cluster: {}",
     },
   },
   userRoles: {

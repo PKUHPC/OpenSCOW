@@ -21,8 +21,8 @@ import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { UserStore } from "src/stores/UserStore";
-import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -44,12 +44,12 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
+  const { publicConfigClusters, currentClusters } = useStore(ClusterInfoStore);
+
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
 
-      const clusters = publicConfig.CLUSTERS;
-
-      const rawClusterInfoPromises = clusters.map((x) =>
+      const rawClusterInfoPromises = currentClusters.map((x) =>
         api.getClusterRunningInfo({ query: { clusterId: x.id } })
           .httpError(500, () => {}),
       );
@@ -66,7 +66,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             return {
               ...result,
               value:{
-                clusterInfo:{ clusterName:clusters[idx].id,
+                clusterInfo:{ clusterName: currentClusters[idx].id,
                   partitions:result.value.clusterInfo.partitions },
               },
             } as PromiseSettledResult<FulfilledResult>;
@@ -81,13 +81,13 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
 
       // 处理失败的结果
-      const failedClusters = clusters.filter((x) =>
+      const failedClusters = currentClusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
 
       const clustersInfo = successfulResults
         .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
-          clusterName: clusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
+          clusterName: currentClusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
         .flatMap((cluster) =>
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
@@ -109,7 +109,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
-      <QuickEntry />
+      <QuickEntry currentClusters={currentClusters} publicConfigClusters={publicConfigClusters} />
       <OverviewTable
         isLoading={isLoading}
         clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
