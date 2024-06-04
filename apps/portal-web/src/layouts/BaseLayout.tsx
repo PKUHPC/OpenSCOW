@@ -18,7 +18,7 @@ import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
-import { InIcon, MisIcon } from "src/icons/headerIcons/headerIcons";
+import { MisIcon } from "src/icons/headerIcons/headerIcons";
 import { userRoutes } from "src/layouts/routes";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -79,7 +79,6 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
             icon={<MisIcon style={{ paddingRight: 2, stroke:"#9B0000", fill:"#9B0000" }} />}
             link={publicConfig.MIS_URL}
             linkText={t("baseLayout.linkTextMis")}
-            inIcon={ <InIcon />}
           />
           <JumpToAnotherLink
             user={userStore.user}
