@@ -44,6 +44,8 @@ const ItemsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  max-height: 650px; /* 设置最大高度 */
+  overflow: auto; /* 启用滚动条 */
 `;
 
 const ItemContainer = styled.div`

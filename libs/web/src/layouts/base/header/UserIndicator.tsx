@@ -37,7 +37,6 @@ const InlineBlockA = styled.a`
   cursor: pointer;
   line-height: 45px;
   display: inline-block;
-  color:#262743;
   font-size:16px
 `;
 
