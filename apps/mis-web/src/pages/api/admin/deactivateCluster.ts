@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { PlatformRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
