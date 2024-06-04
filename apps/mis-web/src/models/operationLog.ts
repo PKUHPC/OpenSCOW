@@ -101,6 +101,19 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     moveFileItem: t(pTypes("moveFileItem")),
     copyFileItem: t(pTypes("copyFileItem")),
     setJobTimeLimit: t(pTypes("setJobTimeLimit")),
+    createImage:t(pTypes("createImage")),
+    updateImage:t(pTypes("updateImage")),
+    shareImage:t(pTypes("shareImage")),
+    deleteImage:t(pTypes("deleteImage")),
+    copyImage:t(pTypes("copyImage")),
+    createDataset:t(pTypes("createDataset")),
+    updateDataset:t(pTypes("updateDataset")),
+    deleteDataset:t(pTypes("deleteDataset")),
+    createDatasetVersion:t(pTypes("createDatasetVersion")),
+    updateDatasetVersion:t(pTypes("updateDatasetVersion")),
+    shareDatasetVersion:t(pTypes("shareDatasetVersion")),
+    copyDatasetVersion:t(pTypes("copyDatasetVersion")),
+    deleteDatasetVersion:t(pTypes("deleteDatasetVersion")),
     createUser: t(pTypes("createUser")),
     addUserToAccount: t(pTypes("addUserToAccount")),
     removeUserFromAccount: t(pTypes("removeUserFromAccount")),
@@ -166,6 +179,19 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   copyFileItem: "010507",
   submitFileItemAsJob: "010508",
   setJobTimeLimit: "010601",
+  createImage:"010701",
+  updateImage:"010702",
+  shareImage:"010703",
+  deleteImage:"010704",
+  copyImage:"010705",
+  createDataset:"010801",
+  updateDataset:"010802",
+  deleteDataset:"010803",
+  createDatasetVersion:"010804",
+  updateDatasetVersion:"010805",
+  shareDatasetVersion:"010806",
+  copyDatasetVersion:"010807",
+  deleteDatasetVersion:"010808",
   createUser: "020201",
   addUserToAccount: "020202",
   removeUserFromAccount: "020203",
@@ -283,6 +309,50 @@ export const getOperationDetail = (
       return t(pDetails("setJobTimeLimit"),
         [operationEvent[logEvent].clusterId || "unknown",
           operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
+    case "createImage":
+      return t(pDetails("createImage"),
+        [operationEvent[logEvent].clusterId || "-",
+          operationEvent[logEvent].imageId, operationEvent[logEvent].tag]);
+    case "updateImage":
+      return t(pDetails("updateImage"),
+        [operationEvent[logEvent].imageId]);
+    case "shareImage":
+      return t(pDetails("shareImage"),
+        [operationEvent[logEvent].imageId]);
+    case "deleteImage":
+      return t(pDetails("deleteImage"),
+        [operationEvent[logEvent].imageId]);
+    case "copyImage":
+      return t(pDetails("copyImage"),
+        [operationEvent[logEvent].sourceImageId,
+          operationEvent[logEvent].targetImageId, operationEvent[logEvent].targetImageTag]);
+    case "createDataset":
+      return t(pDetails("createDataset"),
+        [operationEvent[logEvent].clusterId || "-",
+          operationEvent[logEvent].datasetId]);
+    case "updateDataset":
+      return t(pDetails("updateDataset"),
+        [operationEvent[logEvent].datasetId]);
+    case "deleteDataset":
+      return t(pDetails("deleteDataset"),
+        [operationEvent[logEvent].datasetId ]);
+    case "createDatasetVersion":
+      return t(pDetails("createDatasetVersion"),
+        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+    case "updateDatasetVersion":
+      return t(pDetails("updateDatasetVersion"),
+        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+    case "shareDatasetVersion":
+      return t(pDetails("shareDatasetVersion"),
+        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+    case "copyDatasetVersion":
+      return t(pDetails("copyDatasetVersion"),
+        [operationEvent[logEvent].sourceDatasetId, operationEvent[logEvent].sourceDatasetVersionId,
+          operationEvent[logEvent].targetDatasetId, operationEvent[logEvent].targetDatasetVersionId,
+        ]);
+    case "deleteDatasetVersion":
+      return t(pDetails("deleteDatasetVersion"),
+        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
     case "createUser":
       return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
     case "addUserToAccount":

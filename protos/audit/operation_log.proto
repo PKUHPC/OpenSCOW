@@ -430,6 +430,84 @@ message CustomEvent {
   common.I18nObject content = 3;
 }
 
+message CreateImage {
+  string cluster_id = 1;
+  uint32 image_id = 2;
+  string tag = 3;
+}
+
+message UpdateImage {
+  uint32 image_id = 1;
+}
+
+message ShareImage {
+  uint32 image_id = 1;
+}
+
+message DeleteImage {
+  uint32 image_id = 1;
+}
+
+message CopyImage {
+  uint32 source_image_id = 1;
+  uint32 target_image_id = 2;
+  string target_image_tag = 3;
+}
+
+message CreateDataset {
+  string cluster_id = 1;
+  uint32 dataset_id = 2;
+}
+
+message UpdateDataset {
+  uint32 dataset_id = 1;
+}
+
+message DeleteDataset {
+  uint32 dataset_id = 12;
+}
+
+message CreateDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message UpdateDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyDatasetVersion {
+  uint32 source_dataset_id = 1;
+  uint32 source_dataset_version_id = 2;
+  uint32 target_dataset_id = 3;
+  uint32 target_dataset_version_id = 4;
+}
+
+message CreateAiTrain {
+  string cluster_id = 1;
+  uint32 job_id = 2;
+}
+
+message CancelAiTrainOrApp {
+  string cluster_id = 1;
+  uint32 job_id = 2;
+}
+
+message SaveImage {
+  uint32 job_id = 1;
+}
+
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
@@ -495,6 +573,19 @@ message CreateOperationLogRequest {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
     UserChangeTenant user_change_tenant = 61;
     CustomEvent custom_event = 62;
+    CreateImage create_image = 63;
+    UpdateImage update_image = 64;
+    ShareImage share_image = 65;
+    DeleteImage delete_image = 66;
+    CopyImage copy_image = 67;
+    CreateDataset create_dataset = 68;
+    UpdateDataset update_dataset = 69;
+    DeleteDataset delete_dataset = 70;
+    CreateDatasetVersion create_dataset_version = 71;
+    UpdateDatasetVersion update_dataset_version = 72;
+    ShareDatasetVersion share_dataset_version = 73;
+    DeleteDatasetVersion delete_dataset_version = 74;
+    CopyDatasetVersion copy_dataset_version = 75;
   }
 }
 
@@ -565,6 +656,19 @@ message OperationLog {
     SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
     UserChangeTenant user_change_tenant = 63;
     CustomEvent custom_event = 64;
+    CreateImage create_image = 65;
+    UpdateImage update_image = 66;
+    ShareImage share_image = 67;
+    DeleteImage delete_image = 68;
+    CopyImage copy_image = 69;
+    CreateDataset create_dataset = 70;
+    UpdateDataset update_dataset = 71;
+    DeleteDataset delete_dataset = 72;
+    CreateDatasetVersion create_dataset_version = 73;
+    UpdateDatasetVersion update_dataset_version = 74;
+    ShareDatasetVersion share_dataset_version = 75;
+    DeleteDatasetVersion delete_dataset_version = 76;
+    CopyDatasetVersion copy_dataset_version = 77;
   }
 }
 
