@@ -125,7 +125,7 @@ export const createDatasetVersion = procedure
 
     if (!res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
-        { datasetId, versionId:0 } },
+        { datasetId } },
       OperationResult.FAIL);
     }
 
@@ -622,8 +622,7 @@ export const copyPublicDatasetVersion = procedure
 
     if (!res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
-        { sourceDatasetId:datasetId, sourceDatasetVersionId:datasetVersionId,
-          targetDatasetId:0, targetDatasetVersionId:0 } },
+        { sourceDatasetId:datasetId, sourceDatasetVersionId:datasetVersionId } },
       OperationResult.FAIL);
     }
 

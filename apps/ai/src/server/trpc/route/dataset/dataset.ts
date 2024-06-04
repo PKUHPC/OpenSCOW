@@ -147,7 +147,7 @@ export const createDataset = procedure
     }
 
     if (!res.ok) {
-      await callLog({ ...logInfo, operationTypePayload:{ clusterId, datasetId:0 } },
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId } },
         OperationResult.FAIL);
     }
 

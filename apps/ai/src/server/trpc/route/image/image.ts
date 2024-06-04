@@ -164,7 +164,7 @@ export const createImage = procedure
     }
 
     if (!res.ok) {
-      await callLog({ ...logInfo, operationTypePayload:{ clusterId:clusterId ?? "", tag, imageId:0 } },
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId:clusterId ?? "" } },
         OperationResult.FAIL);
     }
 
@@ -612,7 +612,7 @@ export const copyImage = procedure
 
     if (!res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
-        { sourceImageId:id, targetImageId:0, targetImageTag:newTag } },
+        { sourceImageId:id } },
       OperationResult.FAIL);
     }
 

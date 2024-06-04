@@ -316,7 +316,7 @@ export const getOperationDetail = (
     case "createImage":
       return t(pDetails("createImage"),
         [operationEvent[logEvent].clusterId || "-",
-          operationEvent[logEvent].imageId, operationEvent[logEvent].tag]);
+          operationEvent[logEvent].imageId || "-", operationEvent[logEvent].tag || "-"]);
     case "updateImage":
       return t(pDetails("updateImage"),
         [operationEvent[logEvent].imageId]);
@@ -329,11 +329,11 @@ export const getOperationDetail = (
     case "copyImage":
       return t(pDetails("copyImage"),
         [operationEvent[logEvent].sourceImageId,
-          operationEvent[logEvent].targetImageId, operationEvent[logEvent].targetImageTag]);
+          operationEvent[logEvent].targetImageId || "-", operationEvent[logEvent].targetImageTag || "-"]);
     case "createDataset":
       return t(pDetails("createDataset"),
         [operationEvent[logEvent].clusterId || "-",
-          operationEvent[logEvent].datasetId]);
+          operationEvent[logEvent].datasetId || "-"]);
     case "updateDataset":
       return t(pDetails("updateDataset"),
         [operationEvent[logEvent].datasetId]);
@@ -342,7 +342,7 @@ export const getOperationDetail = (
         [operationEvent[logEvent].datasetId ]);
     case "createDatasetVersion":
       return t(pDetails("createDatasetVersion"),
-        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId || "-"]);
     case "updateDatasetVersion":
       return t(pDetails("updateDatasetVersion"),
         [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
@@ -352,7 +352,7 @@ export const getOperationDetail = (
     case "copyDatasetVersion":
       return t(pDetails("copyDatasetVersion"),
         [operationEvent[logEvent].sourceDatasetId, operationEvent[logEvent].sourceDatasetVersionId,
-          operationEvent[logEvent].targetDatasetId, operationEvent[logEvent].targetDatasetVersionId,
+          operationEvent[logEvent].targetDatasetId || "-", operationEvent[logEvent].targetDatasetVersionId || "-",
         ]);
     case "deleteDatasetVersion":
       return t(pDetails("deleteDatasetVersion"),

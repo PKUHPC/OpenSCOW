@@ -442,8 +442,8 @@ message CustomEvent {
 
 message CreateImage {
   string cluster_id = 1;
-  uint32 image_id = 2;
-  string tag = 3;
+  optional string tag = 2;
+  optional uint32 image_id = 3;
 }
 
 message UpdateImage {
@@ -460,13 +460,13 @@ message DeleteImage {
 
 message CopyImage {
   uint32 source_image_id = 1;
-  uint32 target_image_id = 2;
-  string target_image_tag = 3;
+  optional uint32 target_image_id = 2;
+  optional string target_image_tag = 3;
 }
 
 message CreateDataset {
   string cluster_id = 1;
-  uint32 dataset_id = 2;
+  optional uint32 dataset_id = 2;
 }
 
 message UpdateDataset {
@@ -479,7 +479,7 @@ message DeleteDataset {
 
 message CreateDatasetVersion {
   uint32 dataset_id = 1;
-  uint32 version_id = 2;
+  optional uint32 version_id = 2;
 }
 
 message UpdateDatasetVersion {
@@ -500,8 +500,8 @@ message DeleteDatasetVersion {
 message CopyDatasetVersion {
   uint32 source_dataset_id = 1;
   uint32 source_dataset_version_id = 2;
-  uint32 target_dataset_id = 3;
-  uint32 target_dataset_version_id = 4;
+  optional uint32 target_dataset_id = 3;
+  optional uint32 target_dataset_version_id = 4;
 }
 
 message CreateAiTrain {
