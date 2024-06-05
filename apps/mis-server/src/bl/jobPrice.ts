@@ -16,7 +16,7 @@ import { Decimal } from "@scow/lib-decimal";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { join } from "path";
 import { JobInfo, PriceMap } from "src/bl/PriceMap";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
@@ -74,6 +74,8 @@ export async function calculateJobPrice(
 
   logger.trace(`Calculating price for job ${info.jobId} in cluster ${info.cluster}`);
 
+  // use all clusters from config files
+  const clusters = configClusters;
   const clusterInfo = clusters[info.cluster];
 
   if (!clusterInfo) {

@@ -14,11 +14,12 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
-import { SqlEntityManager } from "@mikro-orm/mysql";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { charge } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { Account } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { reloadEntity, toRef } from "src/utils/orm";
@@ -26,7 +27,7 @@ import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
-let em: SqlEntityManager;
+let em: SqlEntityManager<MySqlDriver>;
 let client: AccountServiceClient;
 let data: InitialData;
 let a: Loaded<Account, "tenant">;
@@ -59,6 +60,7 @@ it("unblocks account when added to whitelist", async () => {
     accountName: a.accountName,
     comment: "test",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z").toISOString(),
   });
 
   await reloadEntity(em, a);
@@ -72,6 +74,7 @@ it("blocks account when it is dewhitelisted and balance is < 0", async () => {
     account: a,
     comment: "",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -102,6 +105,7 @@ it("blocks account when it is dewhitelisted and balance is = 0", async () => {
     account: a,
     comment: "",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -134,16 +138,19 @@ it("charges user but don't block account if account is whitelist", async () => {
     account : a,
     comment: "123",
     operatorId: "123",
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   }));
 
   await em.flush();
+
+  const currentActivatedClusters = await getActivatedClusters(em, server.logger);
 
   const { currentBalance, previousBalance } = await charge({
     amount: new Decimal(2),
     comment: "",
     target: a,
     type: "haha",
-  }, em.fork(), server.logger, server.ext);
+  }, em.fork(), currentActivatedClusters, server.logger, server.ext);
 
   await reloadEntity(em, a);
 
@@ -161,6 +168,7 @@ it("get whitelisted accounts", async () => {
     comment: "",
     operatorId: "123",
     time: new Date("2023-01-01T00:00:00.000Z"),
+    expirationTime:new Date("2025-01-01T00:00:00.000Z"),
   });
 
   await em.persistAndFlush(whitelist);
@@ -183,6 +191,7 @@ it("get whitelisted accounts", async () => {
       "comment": "",
       "addTime": "2023-01-01T00:00:00.000Z",
       balance: decimalToMoney(data.accountA.balance),
+      "expirationTime":"2025-01-01T00:00:00.000Z",
     },
   ]);
 

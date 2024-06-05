@@ -41,6 +41,7 @@ export default {
     amount:"金额",
     unit:"元",
     comment:"备注",
+    expirationTime:"有效期",
     submit:"提交",
     time:"时间",
     type:"类型",
@@ -111,17 +112,15 @@ export default {
     exportNoDataErrorMsg: "导出为空，请重新选择",
     blockThresholdAmount: "封锁阈值",
     other: "其他",
+    noAvailableClusters: "当前没有可用集群。"
+    + "请稍后再试或联系管理员。",
   },
   dashboard: {
     title: "仪表盘",
     account: {
       title: "账户信息",
       state: "状态",
-      balance: "可用余额",
-      status: {
-        blocked: "封锁",
-        normal: "正常",
-      },
+      balance: "可用额度",
       alert: "您不属于任何一个账户。",
     },
     job: {
@@ -157,7 +156,7 @@ export default {
         operationLog:"操作日志",
         statistic: "平台数据统计",
       },
-      navLinkTextPortal: "SCOW HPC",
+      navLinkTextPortal: "超算平台",
       navLinkTextAI: "SCOW AI",
       dashboard: "仪表盘",
       user: {
@@ -182,6 +181,8 @@ export default {
         systemDebug: "平台调试",
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
+        resourceManagement: "资源管理",
+        clusterManagement: "集群管理",
         accountList: "账户列表",
         clusterMonitor: "集群监控",
         resourceStatus: "资源状态",
@@ -236,6 +237,7 @@ export default {
         blockThresholdAmountTooltip: "当账户余额低于此值时，账户将被封锁",
 
         comment:"备注",
+        expirationTime:"有效期",
         status:"状态",
         statusTooltip: "账户状态说明",
         statusFrozenTooltip: "冻结：账户已被账户管理员冻结，无法通过此账户提交作业",
@@ -374,6 +376,7 @@ export default {
         paymentAmount:"交费金额",
         ipAddress:"IP地址",
         operatorId:"操作者ID",
+        searchTypePlaceholder:"多个请用逗号隔开",
       },
     },
     dashboard:{
@@ -612,11 +615,18 @@ export default {
         confirmRemoveWhiteText2:"从白名单移除？",
         removeWhiteSuccess:"移出白名单成功！",
         removeWhite:"从白名单中去除",
+        expirationTime:"有效期",
       },
       addWhitelistedAccountButton:{
         notExist:"账户不存在！",
         addSuccess:"添加成功！",
         addWhiteList:"添加白名单账户",
+        expirationTime:"有效期",
+        custom:"自定义",
+        oneWeek:"一周",
+        oneMonth:"一个月",
+        oneYear:"一年",
+        permanent:"永久有效",
       },
       adminJobTable:{
         batch:"批量搜索",
@@ -758,6 +768,8 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
+      clusterNotAvailable: "当前正在访问的集群不可用或没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
     others:{
       seeDetails:"细节请查阅文档",
@@ -803,6 +815,10 @@ export default {
 
       adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
+      noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
+      notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
+
+      noClusters: "无法找到集群的配置文件，请联系管理员。",
     },
     profile: {
       index: {
@@ -983,7 +999,6 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
 
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
@@ -1015,6 +1030,49 @@ export default {
           notSynced: "未同步过",
           jobSyncSuccessMessage: "作业同步完成，同步到{}条新纪录。",
           syncJobNow: "立刻同步作业",
+        },
+      },
+      resourceManagement: {
+        clusterManagement: {
+          title: "集群管理",
+          clusterFilter: "集群",
+          table: {
+            clusterName: "集群名称",
+            nodesCount: "节点总数",
+            cpusCount: "CPU总核数",
+            gpusCount: "GPU总卡数",
+            totalMemMb: "内存总容量",
+            clusterState: "集群状态",
+            errorState: "异常",
+            deactivatedState: "停用",
+            normalState: "正常",
+            operator: "操作员",
+            lastOperatedTime: "上次启用/停用时间",
+            comment: "备注",
+            operation: "操作",
+            activate: "启用",
+            deactivate: "停用",
+          },
+          activateModal: {
+            title: "启用集群",
+            content: "请确认是否启用集群ID是 {}，集群名称是 {} 的集群？",
+            contentAttention: "注意：启用后请手动同步平台数据！",
+            successMessage: "集群已启用",
+            failureMessage: "集群启用失败，集群可能已被启用",
+          },
+          deactivateModal: {
+            title: "停用集群",
+            content: "请确认是否停用集群ID是 {}，集群名称是 {} 的集群？",
+            contentInputNotice: "如果确认停用集群，请在下面重复输入上述集群ID和集群名称",
+
+            contentAttention: "注意：停用后集群将不可用，集群所有数据不再更新！",
+
+            clusterNameForm: "集群名称",
+            clusterIdForm: "集群ID",
+            comment: "停用备注",
+            successMessage: "集群已停用",
+            failureMessage: "集群停用失败，集群可能已被停用",
+          },
         },
       },
       finance: {
@@ -1106,7 +1164,7 @@ export default {
       uploadFile: "上传文件",
       createDirectory: "新建文件夹",
       deleteDirectory: "删除文件夹",
-      moveFileItem: "移动文件/文件夹",
+      moveFileItem: "移动或重命名文件/文件夹",
       copyFileItem: "复制文件/文件夹",
       setJobTimeLimit: "设置作业时限",
       createUser: "创建用户",
@@ -1149,6 +1207,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
       userChangeTenant: "用户切换租户",
       customEvent: "自定义操作行为",
+      activateCluster: "启用集群",
+      deactivateCluster: "停用集群",
     },
     operationDetails: {
       login: "用户登录",
@@ -1167,7 +1227,7 @@ export default {
       uploadFile: "上传文件：{}",
       createDirectory: "新建文件夹：{}",
       deleteDirectory: "删除文件夹：{}",
-      moveFileItem: "移动文件/文件夹：{}至{}",
+      moveFileItem: "移动或重命名文件/文件夹：{}至{}",
       copyFileItem: "复制文件/文件夹：{}至{}",
       setJobTimeLimit: "设置作业(集群：{}, ID: {})时限 {} 分钟",
       createUser: "创建用户{}",
@@ -1207,13 +1267,17 @@ export default {
       tenantExportAccount: "导出租户{}内的账户列表",
       adminExportAccount: "导出平台的账户列表",
       exportAccountChargeRecordOfTenant: "导出租户{}内账户{}的消费记录",
-      exportAccountsChargeRecordOfTenant: "导出租户{}内所有账户的消费记录",
-      exportAccountChargeRecordOfAdmin: "导出平台所有账户的消费记录",
+      exportAccountsChargeRecordOfTenant: "导出租户{}内账户{}的消费记录",
+      exportAllAccountsChargeRecordOfTenant: "导出租户{}内所有账户的消费记录",
+      exportAllAccountsChargeRecordOfAdmin: "导出平台所有账户的消费记录",
+      exportAccountsChargeRecordOfAdmin:"导出平台中账户{}的消费记录",
+      exportAccountChargeRecordOfAdmin:"导出平台中账户{}的消费记录",
       exportTenantChargeRecord: "导出租户{}的消费记录",
       exportTenantsChargeRecordOfAdmin: "导出平台所有租户的消费记录",
       exportAccountPayRecordOfTenant: "导出租户{}内账户{}的充值记录",
-      exportAccountsPayRecordOfTenant: "导出租户{}内所有账户的充值记录",
-      exportTenantPayRecord: "导出租户{}的消费记录",
+      exportAccountsPayRecordOfTenant:"导出租户{}内账户{}的充值记录",
+      exportAllAccountsPayRecordOfTenant: "导出租户{}内所有账户的充值记录",
+      exportTenantPayRecord: "导出租户{}的充值记录",
       exportTenantsPayRecordOfAdmin: "导出平台所有租户的充值记录",
       exportOperationLogFromUser: "导出用户{}的操作日志",
       exportOperationLogFromAccount: "导出账户{}的操作日志",
@@ -1223,6 +1287,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
+      activateCluster: "用户{}启用集群：{}",
+      deactivateCluster: "用户{}停用集群：{}",
     },
   },
   userRoles: {

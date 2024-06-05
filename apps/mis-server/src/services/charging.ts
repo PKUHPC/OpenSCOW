@@ -15,9 +15,11 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { ChargeRecord as ChargeRecordProto,
   ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -26,11 +28,14 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
+  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
-import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { DEFAULT_PAGE_SIZE } from "src/utils/orm";
+import { mapChargesSortField } from "src/utils/queryOptions";
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -87,6 +92,8 @@ export const chargingServiceServer = plugin((server) => {
 
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await pay({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -94,7 +101,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           ipAddress,
           operatorId,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -131,6 +138,8 @@ export const chargingServiceServer = plugin((server) => {
           }
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await charge({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -138,7 +147,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           userId,
           metadata,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -158,21 +167,21 @@ export const chargingServiceServer = plugin((server) => {
      *
      * case tenant:返回这个租户（tenantName）的充值记录
      * case allTenants: 返回该所有租户充值记录
-     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
-     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的充值记录
      *
      * @returns
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target } =
-      ensureNotUndefined(request, ["startTime", "endTime", "target"]);
+      const { endTime, startTime, target, types } =
+      ensureNotUndefined(request, ["startTime", "endTime", "target", "types"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-
+      const searchTypes = getPaymentsSearchType(types);
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchParam,
+        ...searchTypes,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
@@ -405,40 +414,63 @@ export const chargingServiceServer = plugin((server) => {
        * case tenant:返回这个租户（tenantName）的消费记录
        * case allTenants: 返回所有租户消费记录
        * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-       * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-       * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+       * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+       * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
        *
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds, page, pageSize }
+      const { startTime, endTime, type, types, target, page, pageSize, sortBy, sortOrder, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
-
       const searchParam = getChargesTargetSearchParam(target);
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
-      const searchType = getChargesSearchType(type);
+      const qb = em.createQueryBuilder(ChargeRecord, "cr").select("*")
+        .where({
+          time: { $gte: startTime, $lte: endTime },
+          ...searchParam,
+          ...searchType,
+        })
+        .offset(((page ?? 1) - 1) * (pageSize ?? DEFAULT_PAGE_SIZE))
+        .limit(pageSize ?? DEFAULT_PAGE_SIZE);
 
-      const records = await em.find(ChargeRecord, {
-        time: { $gte: startTime, $lte: endTime },
-        ...searchType,
-        ...searchParam,
-        ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
-      }, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { time: QueryOrder.DESC },
-      });
+      // 排序
+      if (sortBy !== undefined && sortOrder !== undefined) {
+        const order = SortOrder[sortOrder] == "DESCEND" ? "desc" : "asc";
+        qb.orderBy({ [mapChargesSortField[sortBy]]: order });
+      }
+
+      let records;
+
+      // 如果存在userIdsOrNames字段，则用knex
+      if (userIdsOrNames && userIdsOrNames.length > 0) {
+        const sql = qb.getKnexQuery().andWhere(function() {
+          this.whereIn("cr.user_id", function() {
+            this.select("user_id")
+              .from("user");
+            for (const idOrName of userIdsOrNames) {
+              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+                .orWhereRaw("name like " + `'%${idOrName}%'`);
+            }
+          });
+        });
+
+        records = await em.getConnection().execute(sql);
+      } else {
+        records = await qb.getResult();
+      }
 
       return [{
         results: records.map((x) => {
           return {
-            tenantName: x.tenantName,
-            accountName: x.accountName,
-            amount: decimalToMoney(x.amount),
+            tenantName: x.tenantName ?? x.tenant_name,
+            accountName: x.accountName ?? x.account_name,
+            amount: decimalToMoney(new Decimal(x.amount)),
             comment: x.comment,
             index: x.id,
-            time: x.time.toISOString(),
+            time: typeof x.time === "string" ? x.time : x.time?.toISOString(),
             type: x.type,
-            userId: x.userId,
+            userId: x.userId ?? x.user_id,
             metadata: x.metadata as ChargeRecordProto["metadata"] ?? undefined,
           };
 
@@ -451,34 +483,50 @@ export const chargingServiceServer = plugin((server) => {
    * case tenant:返回这个租户（tenantName）的消费记录
    * case allTenants: 返回所有租户消费记录
    * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-   * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-   * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+   * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+   * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
    *
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds }
+      const { startTime, endTime, type, types, target, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
-      const searchType = getChargesSearchType(type);
 
-      const { total_count, total_amount }: { total_count: number, total_amount: string }
-        = await em.createQueryBuilder(ChargeRecord, "c")
-          .select(raw("count(c.id) as total_count"))
-          .addSelect(raw("sum(c.amount) as total_amount"))
-          .where({
-            time: { $gte: startTime, $lte: endTime },
-            ...searchType,
-            ...searchParam,
-            ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
-          })
-          .execute("get");
+      const qb = em.createQueryBuilder(ChargeRecord, "c")
+        .select([raw("count(c.id) as total_count"), raw("sum(c.amount) as total_amount")])
+        .where({
+          time: { $gte: startTime, $lte: endTime },
+          ...searchType,
+          ...searchParam,
+        });
+
+      let result;
+
+      // 如果存在userIdsOrNames字段，则用knex
+      if (userIdsOrNames && userIdsOrNames.length > 0) {
+        const sql = qb.getKnexQuery().andWhere(function() {
+          this.whereIn("c.user_id", function() {
+            this.select("user_id")
+              .from("user");
+            for (const idOrName of userIdsOrNames) {
+              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+                .orWhereRaw("name like " + `'%${idOrName}%'`);
+            }
+          });
+        });
+
+        result = await em.getConnection().execute(sql);
+      } else {
+        result = await qb.execute("get");
+      }
 
       return [{
-        totalAmount: decimalToMoney(new Decimal(total_amount)),
-        totalCount: total_count,
+        totalAmount: decimalToMoney(new Decimal(result.total_amount ?? result[0].total_amount)),
+        totalCount: result.total_count ?? result[0].total_count,
       }];
     },
 

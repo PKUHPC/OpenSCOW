@@ -83,6 +83,8 @@ export const AccountStatus = Type.Object({
   jobChargeLimit: Type.Optional(Money),
   usedJobCharge: Type.Optional(Money),
   balance: Type.Optional(Money),
+  isInWhitelist: Type.Optional(Type.Boolean()),
+  blockThresholdAmount:Type.Optional(Money),
 });
 export type AccountStatus = Static<typeof AccountStatus>;
 
@@ -129,6 +131,7 @@ export const WhitelistedAccount = Type.Object({
   operatorId: Type.String(),
   comment: Type.String(),
   balance: Type.Optional(Money),
+  expirationTime:Type.Optional(Type.String({ format: "date-time" })),
 });
 export type WhitelistedAccount = Static<typeof WhitelistedAccount>;
 

@@ -134,7 +134,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                 <>
                   <Divider type="vertical" />
                   <span>
-                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(3)} {t(pCommon("unit"))}</strong>
+                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(2)} {t(pCommon("unit"))}</strong>
                   </span>
                 </>
               </div>
@@ -178,6 +178,11 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             dataIndex="addTime"
             title={t(p("joinTime"))}
             render={(time: string) => formatDateTime(time) }
+          />
+          <Table.Column<WhitelistedAccount>
+            dataIndex="expirationTime"
+            title={t(p("expirationTime"))}
+            render={(time: string | undefined) => time ? formatDateTime(time) : "永久有效"}
           />
           <Table.Column<WhitelistedAccount> dataIndex="comment" title={t(pCommon("comment"))} />
           <Table.Column<WhitelistedAccount> dataIndex="operatorId" title={t(p("operatorId"))} />

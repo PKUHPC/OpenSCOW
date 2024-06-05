@@ -25,20 +25,33 @@ export const urlToExport = ({
     exportApi: string
     columns: string[],
     count: number,
-    query: {[key: string]: string | number | boolean | undefined}
+    query: {[key: string]: string | number | boolean | string[] | undefined}
   },
 ) => {
-  const exportQuery = `${exportApi}?${
-    columns.map((column) => `columns=${column}`).join("&")
-  }&${
-    Object.keys(query)
-      .filter((key) => query[key] !== undefined)
-      .map((key) => {
-        const value = query[key] as string | number | boolean;
-        return `${key}=${encodeURIComponent(value)}`;
-      }).join("&")
-  }&count=${count}`;
+  const params = new URLSearchParams();
+  columns.forEach((column) => {
+    params.append("columns", column);
+  });
 
-  return join(publicConfig.BASE_PATH, `/api/file/${exportQuery}`);
+  Object.keys(query).forEach((key) => {
+    const value = query[key];
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          value.forEach((item) => {
+            params.append(key, item.toString());
+          });
+        } else {
+          params.append(key, "");
+        }
+      } else {
+        params.append(key, value.toString());
+      }
+    }
+  });
+  params.append("count", count.toString());
+  const queryString = params.toString();
+  const fullPath = join(publicConfig.BASE_PATH, `/api/file/${exportApi}?${queryString}`);
+  return fullPath;
 };
 

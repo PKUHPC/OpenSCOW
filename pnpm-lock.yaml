@@ -347,6 +347,9 @@ importers:
       '@types/shell-quote':
         specifier: 1.7.5
         version: 1.7.5
+      '@types/ssh2':
+        specifier: 1.15.0
+        version: 1.15.0
       '@types/styled-components':
         specifier: 5.1.34
         version: 5.1.34
@@ -1046,7 +1049,13 @@ importers:
         version: 4.21.25(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.26.1)
       '@uiw/react-codemirror':
         specifier: 4.21.20
-        version: 4.21.20(@babel/runtime@7.24.4)(@codemirror/autocomplete@6.16.0)(@codemirror/language@6.10.1)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.26.1)(codemirror@6.0.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 4.21.20(@babel/runtime@7.24.4)(@codemirror/autocomplete@6.6.0)(@codemirror/language@6.10.1)(@codemirror/lint@6.0.0)(@codemirror/search@6.2.3)(@codemirror/state@6.4.0)(@codemirror/theme-one-dark@6.1.0)(@codemirror/view@6.26.1)(codemirror@6.0.1)(react-dom@18.2.0)(react@18.2.0)
+      '@xterm/addon-fit':
+        specifier: 0.10.0
+        version: 0.10.0(@xterm/xterm@5.5.0)
+      '@xterm/xterm':
+        specifier: 5.5.0
+        version: 5.5.0
       antd:
         specifier: 5.16.0
         version: 5.16.0(react-dom@18.2.0)(react@18.2.0)
@@ -1116,12 +1125,6 @@ importers:
       ws:
         specifier: 8.16.0
         version: 8.16.0
-      xterm:
-        specifier: 5.3.0
-        version: 5.3.0
-      xterm-addon-fit:
-        specifier: 0.8.0
-        version: 0.8.0(xterm@5.3.0)
     devDependencies:
       '@ddadaal/next-typed-api-routes-cli':
         specifier: 0.9.1
@@ -1542,6 +1545,18 @@ importers:
 
   libs/web:
     dependencies:
+      '@ddadaal/tsgrpc-client':
+        specifier: 0.17.7
+        version: 0.17.7(@grpc/grpc-js@1.10.6)
+      '@grpc/grpc-js':
+        specifier: 1.10.6
+        version: 1.10.6
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../config
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../protos/scow
       '@scow/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1561,12 +1576,6 @@ importers:
       '@ant-design/icons':
         specifier: 5.3.6
         version: 5.3.6(react-dom@18.2.0)(react@18.2.0)
-      '@grpc/grpc-js':
-        specifier: 1.10.6
-        version: 1.10.6
-      '@scow/config':
-        specifier: workspace:*
-        version: link:../config
       '@types/mime-types':
         specifier: 2.1.4
         version: 2.1.4
@@ -7741,7 +7750,7 @@ packages:
   /@types/ssh2@1.15.0:
     resolution: {integrity: sha512-YcT8jP5F8NzWeevWvcyrrLB3zcneVjzYY9ZDSMAMboI+2zR1qYWFhwsyOFVzT7Jorn67vqxC0FRiw8YyG9P1ww==}
     dependencies:
-      '@types/node': 18.19.31
+      '@types/node': 18.18.10
 
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}

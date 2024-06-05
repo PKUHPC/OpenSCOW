@@ -24,7 +24,7 @@ import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 export const DatasetListSchema = z.object({
   id: z.number(),
@@ -36,7 +36,10 @@ export const DatasetListSchema = z.object({
   description: z.string().optional(),
   clusterId: z.string(),
   createTime: z.string().optional(),
-  versions: z.array(z.string()),
+  versions: z.array(z.object({
+    id: z.number(),
+    path: z.string(),
+  })),
 });
 
 export type DatasetInterface = z.infer<typeof DatasetListSchema>;
@@ -54,7 +57,7 @@ export const list = procedure
     ...paginationSchema.shape,
     nameOrDesc: z.string().optional(),
     type: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
     clusterId: z.string().optional(),
   }))
   .output(z.object({ items: z.array(DatasetListSchema), count: z.number() }))
@@ -101,8 +104,8 @@ export const list = procedure
         clusterId: x.clusterId,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,
         versions: isPublic ?
-          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => y.path) :
-          x.versions.map((y) => y.privatePath),
+          x.versions.filter((x) => (x.sharedStatus === SharedStatus.SHARED)).map((y) => ({ id: y.id, path: y.path }))
+          : x.versions.map((y) => ({ id: y.id, path: y.privatePath })),
       }; }), count };
   });
 

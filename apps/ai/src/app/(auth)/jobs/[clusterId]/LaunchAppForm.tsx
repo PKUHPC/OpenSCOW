@@ -28,11 +28,13 @@ import { Status } from "src/models/Image";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
-import { AppCustomAttribute } from "src/server/trpc/route/jobs/apps";
+import { AppCustomAttribute, CreateAppInput } from "src/server/trpc/route/jobs/apps";
+import { TrainJobInput } from "src/server/trpc/route/jobs/jobs";
 import { formatSize } from "src/utils/format";
+import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
-import { useDataOptions, useDataVersionOptions } from "./hooks";
+import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
 
 interface Props {
   appId?: string;
@@ -46,16 +48,22 @@ interface Props {
   clusterId: string;
   clusterInfo: ClusterConfig;
   isTraining?: boolean;
+  createAppParams?: CreateAppInput
+  trainJobInput?: TrainJobInput
 }
 
 interface FixedFormFields {
   appJobName: string;
-  algorithm: { name: number, version: number };
-  image: { name: number };
+  showAlgorithm: boolean;
+  algorithm: { type: AccessibilityType, name: number, version: number };
+  useCustomImage: boolean;
+  image: { type: AccessibilityType, name: number };
   remoteImageUrl: string | undefined;
   startCommand?: string;
-  dataset: { name: number, version: number };
-  model: { name: number, version: number };
+  showDataset: boolean;
+  dataset: { type: AccessibilityType, name: number, version: number };
+  showModel: boolean;
+  model: { type: AccessibilityType, name: number, version: number };
   mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
@@ -108,7 +116,8 @@ const inputNumberFloorConfig = {
 
 export const LaunchAppForm = (props: Props) => {
 
-  const { clusterId, appName, clusterInfo, isTraining = false, appId, attributes = [], appImage } = props;
+  const { clusterId, appName, clusterInfo, isTraining = false,
+    appId, attributes = [], appImage, createAppParams, trainJobInput } = props;
 
   const { message } = App.useApp();
 
@@ -118,17 +127,20 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-  const [useCustomImage, setUseCustomImage] = useState(false);
 
-  const [showAlgorithm, setShowAlgorithm] = useState(false);
-  const [showDataset, setShowDataset] = useState(false);
-  const [showModel, setShowModel] = useState(false);
+
+  const showAlgorithm = Form.useWatch("showAlgorithm", form);
+  const showDataset = Form.useWatch("showDataset", form);
+  const showModel = Form.useWatch("showModel", form);
+  const useCustomImage = Form.useWatch("useCustomImage", form);
 
   const isAlgorithmPrivate = Form.useWatch(["algorithm", "type"], form) === AccessibilityType.PRIVATE;
   const isDatasetPrivate = Form.useWatch(["dataset", "type"], form) === AccessibilityType.PRIVATE;
   const isModelPrivate = Form.useWatch(["model", "type"], form) === AccessibilityType.PRIVATE;
 
-  const { dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading } = useDataOptions<DatasetInterface>(
+  const {
+    data: datasets, dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading,
+  } = useDataOptions<DatasetInterface>(
     form,
     "dataset",
     trpc.dataset.list.useQuery,
@@ -136,7 +148,11 @@ export const LaunchAppForm = (props: Props) => {
     (dataset) => ({ label: `${dataset.name}(${dataset.owner})`, value: dataset.id }),
   );
 
-  const { dataVersionOptions: datasetVersionOptions, isDataVersionsLoading: isDatasetVersionsLoading } =
+  const {
+    dataVersions: datasetVersions,
+    dataVersionOptions: datasetVersionOptions,
+    isDataVersionsLoading: isDatasetVersionsLoading,
+  } =
   useDataVersionOptions<DatasetVersionInterface>(
     form,
     "dataset",
@@ -144,7 +160,9 @@ export const LaunchAppForm = (props: Props) => {
     (x) => ({ label: x.versionName, value: x.id }),
   );
 
-  const { dataOptions: algorithmOptions, isDataLoading:  isAlgorithmLoading } = useDataOptions<AlgorithmInterface>(
+  const {
+    data: algorithms, dataOptions: algorithmOptions, isDataLoading:  isAlgorithmLoading,
+  } = useDataOptions<AlgorithmInterface>(
     form,
     "algorithm",
     trpc.algorithm.getAlgorithms.useQuery,
@@ -152,7 +170,11 @@ export const LaunchAppForm = (props: Props) => {
     (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
   );
 
-  const { dataVersionOptions: algorithmVersionOptions, isDataVersionsLoading: isAlgorithmVersionsLoading } =
+  const {
+    dataVersions: algorithmVersions,
+    dataVersionOptions: algorithmVersionOptions,
+    isDataVersionsLoading: isAlgorithmVersionsLoading,
+  } =
   useDataVersionOptions<AlgorithmVersionInterface>(
     form,
     "algorithm",
@@ -160,7 +182,7 @@ export const LaunchAppForm = (props: Props) => {
     (x) => ({ label: x.versionName, value: x.id }),
   );
 
-  const { dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModelInterface>(
+  const { data: models, dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModelInterface>(
     form,
     "model",
     trpc.model.list.useQuery,
@@ -168,7 +190,11 @@ export const LaunchAppForm = (props: Props) => {
     (x) => ({ label: `${x.name}(${x.owner})`, value: x.id }),
   );
 
-  const { dataVersionOptions: modelVersionOptions, isDataVersionsLoading: isModelVersionsLoading } =
+  const {
+    dataVersions: modelVersions,
+    dataVersionOptions: modelVersionOptions,
+    isDataVersionsLoading: isModelVersionsLoading,
+  } =
   useDataVersionOptions<ModelVersionInterface>(
     form,
     "model",
@@ -184,9 +210,9 @@ export const LaunchAppForm = (props: Props) => {
   const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
   const { data: images, isLoading: isImagesLoading } = trpc.image.list.useQuery({
-    isPublic: isImagePublic,
+    isPublic: isImagePublic !== undefined ? parseBooleanParam(isImagePublic) : undefined,
     clusterId,
-    withExternal: true,
+    withExternal: "true",
   }, {
     enabled: isImagePublic !== undefined,
   });
@@ -302,13 +328,136 @@ export const LaunchAppForm = (props: Props) => {
     );
   }), [attributes, currentPartitionInfo]);
 
+
+  useEffect(() => {
+    // 处理算法相关数据
+    const inputParams = trainJobInput || createAppParams;
+    if (inputParams && inputParams.algorithm !== undefined
+      && inputParams.isAlgorithmPrivate !== undefined) {
+      const { isAlgorithmPrivate, algorithm: algorithmId } = inputParams;
+      // 如果用户修改表单值，则不再初始化数据
+      if (!form.isFieldsTouched(["showAlgorithm",
+        ["algorithm", "type"], ["algorithm", "name"],
+        ["algorithm", "version"]])) {
+        setEntityInitData<AlgorithmVersionInterface, AlgorithmInterface>(
+          "algorithm",
+          algorithms,
+          algorithmVersions,
+          algorithmId,
+          isAlgorithmPrivate,
+          form,
+          "showAlgorithm",
+        );
+      }
+    }
+  }, [createAppParams, trainJobInput, algorithms, algorithmVersions, form]);
+
+  useEffect(() => {
+    // 处理数据集相关数据
+    const inputParams = trainJobInput || createAppParams;
+    if (inputParams && inputParams.dataset !== undefined
+      && inputParams.isDatasetPrivate !== undefined) {
+      const { isDatasetPrivate, dataset: datasetId } = inputParams;
+      // 如果用户修改表单值，则不再初始化数据
+      if (!form.isFieldsTouched(["showDataset",
+        ["dataset", "type"], ["dataset", "name"],
+        ["dataset", "version"]])) {
+        setEntityInitData<DatasetVersionInterface, DatasetInterface>(
+          "dataset",
+          datasets,
+          datasetVersions,
+          datasetId,
+          isDatasetPrivate,
+          form,
+          "showDataset",
+        );
+      }
+    }
+  }, [ createAppParams, trainJobInput, datasets, datasetVersions, form]);
+
+  useEffect(() => {
+    // 处理模型相关数据
+    const inputParams = trainJobInput || createAppParams;
+    if (inputParams && inputParams.model !== undefined
+      && inputParams.isModelPrivate !== undefined) {
+      const { isModelPrivate, model: modelId } = inputParams;
+      // 如果用户修改表单值，则不再初始化数据
+      if (!form.isFieldsTouched(["showModel",
+        ["model", "type"], ["model", "name"],
+        ["model", "version"]])) {
+        setEntityInitData<ModelVersionInterface, ModelInterface>(
+          "model",
+          models,
+          modelVersions,
+          modelId,
+          isModelPrivate,
+          form,
+          "showModel",
+        );
+      }
+    }
+  }, [createAppParams, trainJobInput, models, modelVersions, form]);
+
+
+  // 处理镜像
+  useEffect(() => {
+    const inputParams = trainJobInput || createAppParams;
+    if (inputParams && (inputParams.remoteImageUrl || inputParams.image)) {
+      if (!form.isFieldsTouched([
+        "useCustomImage",
+        "startCommand",
+        "remoteImageUrl",
+        ["image", "type"],
+        ["image", "name"],
+      ])) {
+        form.setFieldValue("useCustomImage", true);
+        if ("startCommand" in inputParams) {
+          form.setFieldValue("startCommand", inputParams.startCommand);
+        }
+        if (!!images?.items?.length) {
+          form.setFieldValue(["image", "name"], inputParams.image);
+        } else {
+          if (inputParams.remoteImageUrl) {
+            form.setFieldValue("remoteImageUrl", inputParams.remoteImageUrl);
+          } else {
+            form.setFieldValue(["image", "type"], AccessibilityType.PRIVATE);
+          }
+        }
+      }
+    }
+  }, [createAppParams, trainJobInput, images, form]);
+
+
   useEffect(() => {
     setCurrentPartitionInfo(clusterInfo?.partitions[0]);
-    form.setFieldsValue({
-      partition: clusterInfo?.partitions[0]?.name,
-      appJobName: genAppJobName(appName ?? "trainJobs"),
-    });
-  }, [clusterInfo]);
+    const inputParams = trainJobInput || createAppParams;
+    if (!inputParams) {
+      form.setFieldsValue({
+        partition: clusterInfo?.partitions[0]?.name,
+        appJobName: genAppJobName(appName ?? "trainJobs"),
+      });
+    } else {
+      const { account, partition, gpuCount, coreCount, maxTime, mountPoints } = inputParams;
+      const workingDir = "workingDirectory" in inputParams ? inputParams.workingDirectory : undefined;
+      const customAttributes = "customAttributes" in inputParams ? inputParams.customAttributes : {};
+      const command = "command" in inputParams ? inputParams.command : undefined;
+      form.setFieldsValue({
+        mountPoints,
+        customFields: {
+          ...customAttributes,
+          workingDir,
+        },
+        account,
+        partition,
+        gpuCount,
+        coreCount,
+        maxTime,
+        appJobName: genAppJobName(appName ?? "trainJobs"),
+        command,
+      });
+    }
+
+  }, [createAppParams, trainJobInput, clusterInfo]);
 
   const createAppSessionMutation = trpc.jobs.createAppSession.useMutation({
     onSuccess() {
@@ -348,7 +497,7 @@ export const LaunchAppForm = (props: Props) => {
             trainJobName: appJobName,
             isAlgorithmPrivate,
             algorithm: algorithm?.version,
-            imageId: image?.name,
+            image: image?.name,
             remoteImageUrl,
             isDatasetPrivate,
             dataset: dataset?.version,
@@ -426,7 +575,18 @@ export const LaunchAppForm = (props: Props) => {
                   ? imageOptions?.find((x) => x.value === selectedImage)?.label
                   : appImage ? `${appImage?.name}:${appImage?.tag}` : "-"}
               </strong>
-              <Checkbox onChange={(e) => setUseCustomImage(e.target.checked)}>使用自定义镜像</Checkbox>
+              <Form.Item
+                noStyle
+                name="useCustomImage"
+                valuePropName="checked"
+              >
+                <Checkbox onChange={() => {
+                  form.setFieldsValue({
+                    image: { type: undefined, name: undefined }, remoteImageUrl: undefined, startCommand: undefined,
+                  });
+                }}
+                >使用自定义镜像</Checkbox>
+              </Form.Item>
             </Space>
           </Form.Item>
         )}
@@ -578,16 +738,42 @@ export const LaunchAppForm = (props: Props) => {
           )}
         </Form.List>
         <Divider orientation="left" orientationMargin="0">添加算法/数据集/模型</Divider>
-        <Form.Item label="添加类型">
-          <Checkbox onChange={(e) => setShowAlgorithm(e.target.checked)}>
-                算法
-          </Checkbox>
-          <Checkbox onChange={(e) => setShowDataset(e.target.checked)}>
-                数据集
-          </Checkbox>
-          <Checkbox onChange={(e) => setShowModel(e.target.checked)}>
-                模型
-          </Checkbox>
+        <Form.Item label="添加类型" style={{ marginBottom: 0 }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Form.Item
+              name="showAlgorithm"
+              valuePropName="checked"
+              style={{ display: "inline-block", marginRight: 8 }}
+            >
+              <Checkbox onChange={() =>
+                form.setFieldsValue({ algorithm: { type: undefined, name: undefined, version: undefined } })}
+              >
+            算法
+              </Checkbox>
+            </Form.Item>
+            <Form.Item
+              name="showDataset"
+              valuePropName="checked"
+              style={{ display: "inline-block", marginRight: 8 }}
+            >
+              <Checkbox onChange={() =>
+                form.setFieldsValue({ dataset: { type: undefined, name: undefined, version: undefined } })}
+              >
+            数据集
+              </Checkbox>
+            </Form.Item>
+            <Form.Item
+              name="showModel"
+              valuePropName="checked"
+              style={{ display: "inline-block", marginRight: 8 }}
+            >
+              <Checkbox onChange={() =>
+                form.setFieldsValue({ model: { type: undefined, name: undefined, version: undefined } })}
+              >
+            模型
+              </Checkbox>
+            </Form.Item>
+          </div>
         </Form.Item>
         {
           showAlgorithm ? (

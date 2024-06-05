@@ -32,10 +32,12 @@ import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 
 
-export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"> & {
+export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "usedJobCharge"
+| "blockThresholdAmount" > & {
   balance: number;
   jobChargeLimit: Money | null;
   usedJobCharge: Money | null;
+  blockThresholdAmount: number
 }
 
 type Props = {
@@ -106,19 +108,21 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
 
   const accounts = Object.entries(status.accountStatuses).reduce((prev, [accountName, info]) => {
 
-    const { balance, ...validated } = ensureNotUndefined(info, ["balance"]);
+    const { balance, blockThresholdAmount, ...validated }
+     = ensureNotUndefined(info, ["balance", "blockThresholdAmount"]);
 
     prev[accountName] = {
       ...validated,
       balance: moneyToNumber(balance),
-
       // 不能使用undefined，NextJs中：`undefined` cannot be serialized as JSON
       jobChargeLimit: validated.jobChargeLimit ?? null,
       usedJobCharge: validated.usedJobCharge ?? null,
+      blockThresholdAmount:moneyToNumber(blockThresholdAmount),
     };
 
     return prev;
   }, {} as Record<string, AccountInfo>);
+
   return {
     props: {
       accounts,

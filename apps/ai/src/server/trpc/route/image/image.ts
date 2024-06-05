@@ -29,7 +29,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { z } from "zod";
 
 import { clusters } from "../config";
-import { clusterExist } from "../utils";
+import { booleanQueryParam, clusterExist } from "../utils";
 
 class NoClusterError extends TRPCError {
   constructor(name: string, tag: string) {
@@ -76,9 +76,9 @@ export const list = procedure
   .input(z.object({
     ...paginationSchema.shape,
     nameOrTagOrDesc: z.string().optional(),
-    isPublic: z.boolean().optional(),
+    isPublic: booleanQueryParam().optional(),
     clusterId: z.string().optional(),
-    withExternal: z.boolean().optional(),
+    withExternal: booleanQueryParam().optional(),
   }))
   .output(z.object({ items: z.array(ImageListSchema), count: z.number() }))
   .query(async ({ input, ctx: { user } }) => {
@@ -202,7 +202,7 @@ export const createImage = procedure
               throw new Error(`Image ${name}:${tag} create failed: image is not a tar file`);
             }
 
-            // 本地镜像时docker加载镜像
+            // 本地镜像时加载镜像
             localImageUrl = await getLoadedImage({
               ssh,
               clusterId: processClusterId,
@@ -305,7 +305,7 @@ export const deleteImage = procedure
       summary: "delete a image",
     },
   })
-  .input(z.object({ id: z.number(), force: z.boolean().optional() }))
+  .input(z.object({ id: z.number(), force: booleanQueryParam().optional() }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();

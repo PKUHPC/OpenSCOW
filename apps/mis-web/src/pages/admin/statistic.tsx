@@ -244,7 +244,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
     return topChargeAccount?.results.map((r) => ({
       x: r.accountName,
-      y: moneyToNumber(r.chargedAmount),
+      y: moneyToNumber(r.chargedAmount).toFixed(2),
     })) || [];
   }, [query, topChargeAccount]);
 
@@ -252,7 +252,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
     return topPayAccount?.results.map((r) => ({
       x: r.accountName,
-      y: moneyToNumber(r.payAmount),
+      y: moneyToNumber(r.payAmount).toFixed(2),
     })) || [];
   }, [query, topPayAccount]);
 
@@ -383,6 +383,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"
+            precision={2}
           />
         </Col>
         <Col span={24}>
@@ -446,7 +447,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={dailyChargeData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count,
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
@@ -468,7 +469,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataLineChart
                   data={dailyPayData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count,
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}
@@ -540,7 +541,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                 <DataBarChart
                   data={misUsageCountData.map((d) => ({
                     x: OperationTypeTexts[d.operationType],
-                    y: d.count,
+                    y:d.count,
                   }))}
                   title={t(p("misFeatureUsageCount"))}
                   toolTipFormatter={(value) => [value, t(p("usageCount"))]}

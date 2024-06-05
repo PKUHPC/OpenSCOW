@@ -10,12 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 
 // Cannot use SubmissionInfo from protos
 export const SubmissionInfo = Type.Object({
@@ -54,7 +55,7 @@ export const GetAppLastSubmissionSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(GetAppLastSubmissionSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAppLastSubmissionSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

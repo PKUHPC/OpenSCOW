@@ -1,5 +1,38 @@
 # @scow/mis-server
 
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-hook@1.0.11
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.5.1
+
+### Patch Changes
+
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-hook@1.0.10
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+
 ## 1.5.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 1.3.3
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
+## 1.3.2
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+
 ## 1.3.1
 
 ### Patch Changes

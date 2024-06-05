@@ -1,5 +1,33 @@
 # @scow/portal-server
 
+## 1.5.2
+
+### Patch Changes
+
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.0
 
 ### Patch Changes

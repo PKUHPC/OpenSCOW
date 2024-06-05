@@ -21,11 +21,12 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountSelector } from "src/pageComponents/job/AccountSelector";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { formatSize } from "src/utils/format";
 
 interface JobForm {
@@ -42,6 +43,7 @@ interface JobForm {
   comment: string;
   workingDirectory: string;
   output: string;
+  scriptOutput: string;
   errorOutput: string;
   save: boolean;
 }
@@ -64,6 +66,7 @@ const initialValues = {
   gpuCount: 1,
   maxTime: 30,
   output: "job.%j.out",
+  scriptOutput:"job.%j.script",
   errorOutput: "job.%j.err",
   save: false,
 } as Partial<JobForm>;
@@ -80,23 +83,29 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
-
   const t = useI18nTranslateToString();
+
+  // 脚本输出目录input的状态
+  const [scriptOutputStatus, setScriptOutputStatus] = useState<"success" | "warning">("success");
+
+  // 脚本输出目录input的提示文字
+  const [scriptOutputHelp, setScriptOutputHelp] = useState<string | undefined>(t(p("scriptWillBeSaved")));
+
+
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, scriptOutput, save,
       maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
 
     setLoading(true);
-
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
       maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory, output, errorOutput,
+      workingDirectory, save, memory, output, errorOutput, scriptOutput,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
@@ -185,9 +194,16 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     }
   }, [currentPartitionInfo]);
 
-  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+
+  // 没有可用集群的情况不再渲染
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
   // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const defaultCluster = publicConfig.CLUSTERS.find((x) => x.id === initial.cluster?.id) ?? currentDefaultCluster;
+  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
+    (defaultCluster ?? currentClusters[0]);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -201,12 +217,23 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     : nodeCount * coreCount;
 
+  const handleScriptOutputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const scriptOutputValue = e.target.value.trim();
+    if (!scriptOutputValue) {
+      setScriptOutputStatus("warning");
+      setScriptOutputHelp(t(p("scriptWillNotBeSaved")));
+    } else {
+      setScriptOutputStatus("success");
+      setScriptOutputHelp(t(p("scriptWillBeSaved")));
+    }
+  };
+
   return (
     <Form<JobForm>
       form={form}
       initialValues={{
         ...initial,
-        cluster: defaultCluster,
+        cluster: currentQueryCluster,
       }}
       onFinish={submit}
     >
@@ -337,7 +364,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={10}>
+        <Col span={24} sm={9}>
           <Form.Item<JobForm>
             label={t(p("workingDirectory"))}
             name="workingDirectory"
@@ -358,27 +385,46 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                       form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                       form.validateFields(["workingDirectory"]);
                     }}
-                    cluster={cluster || defaultCluster}
+                    cluster={cluster || currentQueryCluster}
                   />
                 )
               }
             />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={5}>
           <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={5}>
           <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
             <Input />
+          </Form.Item>
+        </Col>
+        {/* 脚本文件 */}
+        <Col span={12} sm={5}>
+          <Form.Item<JobForm>
+            label={t(p("scriptOutput"))}
+            name="scriptOutput"
+            tooltip={(
+              <>
+                <span>{t(p("wdTooltip1"))}</span>
+                <br />
+                <span>{t(p("wdTooltip3"))}</span>
+              </>
+            )}
+            validateStatus={scriptOutputStatus}
+            help={scriptOutputHelp}
+          >
+            <Input
+              onChange={handleScriptOutputChange}
+            />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
           {t(p("totalNodeCount"))}{nodeCount}
         </Col>
-
         {currentPartitionInfo?.gpus ? (
           <Col className="ant-form-item" span={12} sm={6}>
             {t(p("totalGpuCount"))}{nodeCount * gpuCount}

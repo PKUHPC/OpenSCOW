@@ -1,5 +1,24 @@
 # @scow/cli
 
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+
+## 1.5.1
+
+### Patch Changes
+
+- e312efb: AI 模块支持创建 vnc 类型应用
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+
 ## 1.5.0
 
 ### Patch Changes

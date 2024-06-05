@@ -32,8 +32,8 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
-import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
@@ -106,6 +106,11 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (!tenant) {
+        throw <ServiceError>{ code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+
       return [{
         accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
           const account = curr.account.getEntity();
@@ -115,6 +120,9 @@ export const userServiceServer = plugin((server) => {
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
+            isInWhitelist: Boolean(account.whitelist),
+            blockThresholdAmount:account.blockThresholdAmount ?
+              decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
           } as AccountStatus;
           return prev;
         }, {}),
@@ -180,12 +188,15 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS")
+           !== Object.keys(currentActivatedClusters).length) {
           throw e;
         }
       });
@@ -229,15 +240,17 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
       // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
       if (userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
         userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
-        await blockUserInAccount(userAccount, server.ext, logger);
+        await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
         await em.flush();
       }
 
       // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
       const jobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
         logger,
         async (client) => {
           const fields = ["job_id", "user", "state", "account"];
@@ -257,12 +270,14 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+           !== Object.keys(currentActivatedClusters).length) {
           throw e;
         }
       });
@@ -298,7 +313,8 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await blockUserInAccount(user, server.ext, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      await blockUserInAccount(user, currentActivatedClusters, server.ext, logger);
       user.state = UserStateInAccount.BLOCKED_BY_ADMIN;
       user.blockedInCluster = UserStatus.BLOCKED;
 
@@ -334,8 +350,9 @@ export const userServiceServer = plugin((server) => {
         user.usedJobCharge,
       ).shouldBlockInCluster;
 
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
       if (!stillBlockUserInCluster) {
-        await unblockUserInAccount(user, server.ext, logger);
+        await unblockUserInAccount(user, currentActivatedClusters, server.ext, logger);
         user.blockedInCluster = UserStatus.UNBLOCKED;
       }
       user.state = UserStateInAccount.NORMAL;
@@ -403,7 +420,8 @@ export const userServiceServer = plugin((server) => {
      */
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+      const user =
+      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -455,19 +473,20 @@ export const userServiceServer = plugin((server) => {
      */
     addUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
-        .catch((e) => {
-          if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS,
-              message: `User with userId ${identityId} already exists in scow.`,
-              details: "EXISTS_IN_SCOW",
-            };
-          }
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: `Error creating user with userId ${identityId} in database.` };
-        });
+      const user
+       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+         .catch((e) => {
+           if (e.code === Status.ALREADY_EXISTS) {
+             throw <ServiceError> {
+               code: Status.ALREADY_EXISTS,
+               message: `User with userId ${identityId} already exists in scow.`,
+               details: "EXISTS_IN_SCOW",
+             };
+           }
+           throw <ServiceError> {
+             code: Status.INTERNAL,
+             message: `Error creating user with userId ${identityId} in database.` };
+         });
 
       await callHook("userAdded", { tenantName, userId: user.userId }, logger);
 

@@ -1,6 +1,6 @@
 {
   "name": "@scow/ai",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "private": true,
   "files": [
     ".next",
@@ -111,6 +111,7 @@
     "@types/url-join": "4.0.3",
     "@types/ws": "8.5.10",
     "@types/shell-quote": "1.7.5",
+    "@types/ssh2": "1.15.0",
     "fs-extra": "11.2.0",
     "jest-environment-jsdom": "29.7.0",
     "nextjs-node-loader": "1.1.5",

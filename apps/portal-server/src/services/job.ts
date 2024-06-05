@@ -16,14 +16,14 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { checkSchedulerApiVersion } from "@scow/lib-server";
-import { createDirectoriesRecursively, sftpReadFile, sftpStat } from "@scow/lib-ssh";
+import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
-import path from "path";
+import path, { join } from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
-import { callOnOne } from "src/utils/clusters";
+import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 
@@ -34,6 +34,7 @@ export const jobServiceServer = plugin((server) => {
     cancelJob: async ({ request, logger }) => {
 
       const { cluster, jobId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       await callOnOne(
         cluster,
@@ -49,6 +50,7 @@ export const jobServiceServer = plugin((server) => {
 
     listAccounts: async ({ request, logger }) => {
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -63,6 +65,7 @@ export const jobServiceServer = plugin((server) => {
 
     getJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -79,6 +82,7 @@ export const jobServiceServer = plugin((server) => {
     listJobTemplates: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -94,6 +98,8 @@ export const jobServiceServer = plugin((server) => {
 
     deleteJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }
@@ -107,6 +113,8 @@ export const jobServiceServer = plugin((server) => {
 
     renameJobTemplate: async ({ request, logger }) => {
       const { cluster, templateId, userId, jobName } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }
@@ -121,6 +129,7 @@ export const jobServiceServer = plugin((server) => {
     listRunningJobs: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -140,6 +149,7 @@ export const jobServiceServer = plugin((server) => {
 
     listAllJobs: async ({ request, logger }) => {
       const { cluster, userId, endTime, startTime } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const reply = await callOnOne(
         cluster,
@@ -163,7 +173,9 @@ export const jobServiceServer = plugin((server) => {
 
     submitJob: async ({ request, logger }) => {
       const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
-        nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = request;
+        nodeCount, partition, qos, account, comment, workingDirectory, output
+        , errorOutput, memory, scriptOutput } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);
@@ -195,6 +207,15 @@ export const jobServiceServer = plugin((server) => {
         }),
       );
 
+      // 保存作业脚本
+      if (scriptOutput) {
+        await sshConnect(host, userId, logger, async (ssh) => {
+          const sftp = await ssh.requestSFTP();
+          const scriptPath = join(workingDirectory, scriptOutput);
+          await sftpWriteFile(sftp)(scriptPath, reply.generatedScript);
+        });
+      }
+
       if (saveAsTemplate) {
         const jobInfo: JobTemplate = {
           jobName,
@@ -211,7 +232,9 @@ export const jobServiceServer = plugin((server) => {
           output,
           errorOutput,
           memory,
+          scriptOutput,
         };
+
 
         const clusterOps = getClusterOps(cluster);
         if (!clusterOps) { throw clusterNotFound(cluster); }
@@ -221,13 +244,13 @@ export const jobServiceServer = plugin((server) => {
           userId, jobId: reply.jobId, jobInfo,
         }, logger);
       }
-
       return [{ jobId: reply.jobId }];
     },
 
 
     submitFileAsJob: async ({ request, logger }) => {
       const { cluster, userId, filePath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }

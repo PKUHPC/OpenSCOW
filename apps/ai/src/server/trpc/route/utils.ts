@@ -32,3 +32,8 @@ export const pagination = z.object({
 export function clusterExist(clusterId: string) {
   return !!getSortedClusters(clusters).find((cluster) => cluster.id === clusterId);
 }
+
+export const booleanQueryParam =
+() => z.union([z.literal("true"), z.literal("false")]).transform((arg) =>
+  arg === "true",
+);

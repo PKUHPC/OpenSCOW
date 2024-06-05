@@ -25,7 +25,7 @@ import {
   getOperationResultTexts,
   getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
-  OperationResult } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder } from "src/models/operationLog";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
@@ -37,7 +37,7 @@ const WordBreakText = styled.div`
 
 interface FilterForm {
   operatorUserId?: string;
-  operationType?: OperationType;
+  operationType?: string;
   customEventType?: string
   operationTime?: [dayjs.Dayjs, dayjs.Dayjs],
   operationResult?: OperationResult;
@@ -54,6 +54,11 @@ interface Props {
   queryType: OperationLogQueryType;
   accountName?: string
   tenantName?: string;
+}
+
+interface Order {
+  field: OperationSortBy | undefined;
+  order: OperationSortOrder | undefined;
 }
 
 const today = dayjs().endOf("day");
@@ -87,7 +92,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
-  const operationType = Form.useWatch("operationType", form);
+  // 定义排序方式
+  const [sorter, setSorter] = useState<Order>({ field: undefined, order: undefined });
 
   const getOperatorUserIds = () => {
     if (queryType === OperationLogQueryType.USER) {
@@ -101,7 +107,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     return await api.getOperationLogs({ query: {
       type: queryType,
       operatorUserIds: getOperatorUserIds().join(","),
-      operationType: query.operationType,
+      operationType: query.operationType as OperationType,
       operationResult: query.operationResult,
       startTime: query.operationTime?.[0].toISOString(),
       endTime: query.operationTime?.[1].toISOString(),
@@ -110,8 +116,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       customEventType: query.customEventType,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
+      // 新增排序参数
+      sortBy: sorter.field,
+      sortOrder: sorter.order,
     } });
-  }, [query, pageInfo, queryType, accountName, tenantName]);
+  }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 
   const { data, isLoading } = useAsync({ promiseFn });
 
@@ -122,6 +131,27 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const { data: customEventTypes, isLoading : customEventTypesLoading } = useAsync({
     promiseFn: getCustomEventTypesPromise,
   });
+
+  const operationTypes = useMemo(() => {
+    const { customEvent, ...otherTypes } = OperationTypeTexts;
+    const standardTypeOptions = Object.keys(otherTypes).map((key) => ({
+      label: OperationTypeTexts[key],
+      value: key,
+    }));
+
+    if (customEventTypesLoading || !customEventTypes) {
+      return standardTypeOptions;
+    }
+
+    const customTypeOptions = customEventTypes.results.map((t) => ({
+      label: getI18nCurrentText(t.name, languageId),
+      value: `customEvent-${t.type}`, // 使用特殊格式标识自定义事件类型
+    }));
+
+    return [...standardTypeOptions, ...customTypeOptions];
+  }, [languageId, customEventTypes, customEventTypesLoading]);
+
+
 
   const getformatData = (results: OperationLog[] | undefined) => {
     if (!results) {
@@ -137,6 +167,14 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     });
   };
 
+  // 处理表格排序事件
+  const handleTableChange = (pagination, _, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field:sorter.field === "operationLogId" ? "id" : sorter.field,
+      order: sorter.order,
+    });
+  };
 
   const handleExport = async (columns: string[]) => {
     const total = data?.totalCount ?? 0;
@@ -189,9 +227,20 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           initialValues={query}
           onFinish={async () => {
             const { operationType, operatorUserId,
-              operationResult, operationTime, operationDetail, customEventType } = await form.validateFields();
+              operationResult, operationTime, operationDetail } = await form.validateFields();
+
+            let customEventType: string | undefined;
+            let formatOperationType: string | undefined;
+            if (operationType && operationType.startsWith("customEvent-")) {
+              formatOperationType = "customEvent";
+              customEventType = operationType.split("customEvent-")[1];
+            } else {
+              formatOperationType = operationType;
+              customEventType = undefined;
+            }
+
             setQuery({
-              operationType, operatorUserId, operationResult,
+              operationType: formatOperationType, operatorUserId, operationResult,
               operationTime, operationDetail, customEventType,
             });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
@@ -201,7 +250,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             <Select
               showSearch
               options={
-                Object.keys(OperationTypeTexts).map((key) => ({ value: key, label: OperationTypeTexts[key] }))
+                operationTypes
               }
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
@@ -210,26 +259,6 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               style={{ width: 180 }}
             />
           </Form.Item>
-          {operationType === "customEvent" && (
-            <Form.Item label={t(p("customEventType"))} name="customEventType">
-              <Select
-                showSearch
-                options={
-                  customEventTypes?.results?.map((t) => ({
-                    label: getI18nCurrentText(t.name, languageId),
-                    value: t.type,
-                  })) || []
-                }
-                filterOption={(input, option) =>
-                  (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-                }
-                allowClear
-                style={{ width: 180 }}
-                loading={customEventTypesLoading}
-              >
-              </Select>
-            </Form.Item>
-          )}
           <Form.Item label={t(p("operationResult"))} name="operationResult">
             <Select
               options={
@@ -267,6 +296,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       <Table
         dataSource={getformatData(data?.results)}
         loading={isLoading}
+        onChange={handleTableChange}
         pagination={{
           current: pageInfo.page,
           pageSize: pageInfo.pageSize,
@@ -276,7 +306,11 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
       >
-        <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
+        <Table.Column<OperationLog>
+          dataIndex="operationLogId"
+          title="ID"
+          sorter={true}
+        />
         <Table.Column
           dataIndex="operationCode"
           title={t(p("operationCode"))}
@@ -303,16 +337,19 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           dataIndex="operationResult"
           title={t(p("operationResult"))}
           render={(operationResult) => OperationResultTexts[operationResult] }
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operationTime"
           title={t(p("operationTime"))}
           render={formatDateTime}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorUserId"
           title={t(p("operatorUserId"))}
           render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorIp"
@@ -320,6 +357,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           render={(operatorIp) => (
             <WordBreakText>{operatorIp}</WordBreakText>
           )}
+          sorter={true}
         />
       </Table>
     </div>
