@@ -17,6 +17,7 @@ import { getLoginNode } from "@scow/config/build/cluster";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import { ensureEnabled, getDesktopConfig } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
 import { checkLoginNodeInCluster } from "src/utils/ssh";

@@ -17,6 +17,7 @@ import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
 import { FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
 import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 

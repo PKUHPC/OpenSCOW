@@ -13,7 +13,7 @@
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
 import { scowdClientNotFound } from "./errors";
@@ -29,8 +29,8 @@ export function getLoginNodeScowdUrl(cluster: string, host: string): string | un
   return config.SCOWD_SSL_ENABLED ? `https://${address}:${scowdPort}` : `http://${address}:${scowdPort}`;
 }
 
-const scowdClientForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
-  const clusterInfo = clusters[cluster];
+const scowdClientForClusters = Object.entries(configClusters).reduce((prev, [cluster]) => {
+  const clusterInfo = configClusters[cluster];
   const loginNode = getLoginNode(clusterInfo?.loginNodes?.[0]);
   const scowdUrl = getLoginNodeScowdUrl(cluster, loginNode.address);
   if (!clusterInfo.scowd?.enabled || !loginNode.scowdPort || !scowdUrl) {
@@ -50,7 +50,7 @@ export const getScowdClient = (cluster: string) => {
 };
 
 export function getLoginNodeFromAddress(cluster: string, address: string) {
-  const clusterInfo = clusters[cluster];
+  const clusterInfo = configClusters[cluster];
   const loginNodes = clusterInfo?.loginNodes.map(getLoginNode);
   const loginNode = loginNodes.find((loginNode) => loginNode.address === address);
 
