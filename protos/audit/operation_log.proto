@@ -506,7 +506,7 @@ message CopyDatasetVersion {
 
 message CreateAiTrain {
   string cluster_id = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
 }
 
 message CancelAiTrainOrApp {
@@ -516,6 +516,8 @@ message CancelAiTrainOrApp {
 
 message SaveImage {
   uint32 job_id = 1;
+  optional uint32 image_id = 2;
+  optional string tag = 3;
 }
 
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
@@ -598,6 +600,9 @@ message CreateOperationLogRequest {
     ShareDatasetVersion share_dataset_version = 75;
     DeleteDatasetVersion delete_dataset_version = 76;
     CopyDatasetVersion copy_dataset_version = 77;
+    CreateAiTrain create_ai_train = 78;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 79;
+    SaveImage save_image = 80;
   }
 }
 
@@ -683,6 +688,9 @@ message OperationLog {
     ShareDatasetVersion share_dataset_version = 77;
     DeleteDatasetVersion delete_dataset_version = 78;
     CopyDatasetVersion copy_dataset_version = 79;
+    CreateAiTrain create_ai_train = 80;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 81;
+    SaveImage save_image = 82;
   }
 }
 

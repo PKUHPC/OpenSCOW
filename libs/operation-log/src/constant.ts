@@ -98,4 +98,8 @@ export const OperationType: OperationTypeEnum = {
   shareDatasetVersion:"shareDatasetVersion",
   deleteDatasetVersion:"deleteDatasetVersion",
   copyDatasetVersion:"copyDatasetVersion",
+  createAiTrain:"createAiTrain",
+  cancelAiTrainOrApp:"cancelAiTrainOrApp",
+  saveImage :"saveImage",
+
 };

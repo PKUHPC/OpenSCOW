@@ -615,7 +615,7 @@ export const copyPublicDatasetVersion = procedure
     if (res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
         { sourceDatasetId:datasetId, sourceDatasetVersionId:datasetVersionId,
-          targetDatasetId:(res.data as any).newDatasetId as number,
+          targetDatasetId:(res.data as any).newDatasetId,
           targetDatasetVersionId:(res.data as any).newDatasetVersionId } },
       OperationResult.SUCCESS);
     }
