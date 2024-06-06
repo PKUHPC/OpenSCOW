@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Code, ConnectError } from "@connectrpc/connect";
+import { ServiceError, status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
@@ -55,4 +57,56 @@ export function getLoginNodeFromAddress(cluster: string, address: string) {
   const loginNode = loginNodes.find((loginNode) => loginNode.address === address);
 
   return loginNode;
+}
+
+// 映射 tRPC 状态码到 gRPC 状态码的函数
+function mapTRPCStatusToGRPC(statusCode: Code): status {
+  switch (statusCode) {
+  case Code.Canceled:
+    return status.CANCELLED;
+  case Code.Unknown:
+    return status.UNKNOWN;
+  case Code.InvalidArgument:
+    return status.INVALID_ARGUMENT;
+  case Code.DeadlineExceeded:
+    return status.DEADLINE_EXCEEDED;
+  case Code.NotFound:
+    return status.NOT_FOUND;
+  case Code.AlreadyExists:
+    return status.ALREADY_EXISTS;
+  case Code.PermissionDenied:
+    return status.PERMISSION_DENIED;
+  case Code.ResourceExhausted:
+    return status.RESOURCE_EXHAUSTED;
+  case Code.FailedPrecondition:
+    return status.FAILED_PRECONDITION;
+  case Code.Aborted:
+    return status.ABORTED;
+  case Code.OutOfRange:
+    return status.OUT_OF_RANGE;
+  case Code.Unimplemented:
+    return status.UNIMPLEMENTED;
+  case Code.Internal:
+    return status.INTERNAL;
+  case Code.Unavailable:
+    return status.UNAVAILABLE;
+  case Code.DataLoss:
+    return status.DATA_LOSS;
+  case Code.Unauthenticated:
+    return status.UNAUTHENTICATED;
+  default:
+    return status.OK;
+  }
+}
+
+// 映射 tRPC 异常到 gRPC 异常的函数
+export function mapTRPCExceptionToGRPC(err: any): ServiceError {
+  if (err instanceof ConnectError) {
+    return <ServiceError>{ code: mapTRPCStatusToGRPC(err.code), details: err.message };
+  }
+
+  return <ServiceError>{
+    code: status.UNKNOWN,
+    details: "An unknown error occurred.",
+  };
 }

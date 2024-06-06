@@ -16,92 +16,125 @@ import { FileInfo, fileInfo_FileTypeFromJSON } from "@scow/protos/build/portal/f
 import { FileType } from "@scow/scowd-protos/build/storage/file_pb";
 import { FileOps } from "src/clusterops/api/file";
 import { config } from "src/config/env";
+import { mapTRPCExceptionToGRPC } from "src/utils/scowd";
 
 export const scowdFileServices = (client: ScowdClient): FileOps => ({
   copy: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    await client.file.copy({ userId, fromPath, toPath });
-    return {};
-    
+    try {
+      await client.file.copy({ userId, fromPath, toPath });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   createFile: async (request) => {
 
     const { userId, path } = request;
 
-    await client.file.createFile({ userId, filePath: path });
-    return {};
-    
+    try {
+      await client.file.createFile({ userId, filePath: path });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   deleteDirectory: async (request) => {
     const { userId, path } = request;
 
-    await client.file.deleteDirectory({ userId, dirPath: path });
-    return {};
+    try {
+      await client.file.deleteDirectory({ userId, dirPath: path });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   deleteFile: async (request) => {
 
     const { userId, path } = request;
 
-    await client.file.deleteFile({ userId, filePath: path });
-    return {};
+    try {
+      await client.file.deleteFile({ userId, filePath: path });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   getHomeDirectory: async (request) => {
     const { userId } = request;
 
-    const res = await client.file.getHomeDirectory({ userId });
-    return { path: res.path };
+    try {
+      const res = await client.file.getHomeDirectory({ userId });
+      return { path: res.path };
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   makeDirectory: async (request) => {
     const { userId, path } = request;
 
-    await client.file.makeDirectory({ userId, dirPath: path });
-    return {};
+    try {
+      await client.file.makeDirectory({ userId, dirPath: path });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   move: async (request) => {
     const { userId, fromPath, toPath } = request;
 
-    await client.file.move({ userId, fromPath, toPath });
-    return {};
-    
+    try {
+      await client.file.move({ userId, fromPath, toPath });
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   readDirectory: async (request) => {
     const { userId, path } = request;
 
-    
-    const res = await client.file.readDirectory({ userId, dirPath: path });
+    try {
+      const res = await client.file.readDirectory({ userId, dirPath: path });
 
-    const results: FileInfo[] = res.filesInfo.map((info): FileInfo => {
-      return {
-        name: info.name,
-        type: fileInfo_FileTypeFromJSON(info.fileType),
-        mtime: info.modTime,
-        mode: info.mode,
-        size: Number(info.size),
-      };
-    });
-    return { results };
+      const results: FileInfo[] = res.filesInfo.map((info): FileInfo => {
+        return {
+          name: info.name,
+          type: fileInfo_FileTypeFromJSON(info.fileType),
+          mtime: info.modTime,
+          mode: info.mode,
+          size: Number(info.size),
+        };
+      });
+      return { results };
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   download: async (request) => {
     const { userId, path, call } = request;
 
-    const readStream = await client.file.download({
-      userId, path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
-    });
-
-    for await (const response of readStream) {
-      call.write(response);
+    try {
+      const readStream = await client.file.download({
+        userId, path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
+      });
+  
+      for await (const response of readStream) {
+        call.write(response);
+      }
+  
+      return {};
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
     }
-
-    return {};
   },
 
   upload: async (request, logger) => {
@@ -121,35 +154,50 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
 
     logger.info("Upload file started");
 
-    const res = await client.file.upload((async function* () {
-      yield { message: { case: "info", value: { path, userId } } };
-
-      for await (const data of call.iter()) {
-        if (data.message?.$case !== "chunk") {
-          throw new RequestError(
-            status.INVALID_ARGUMENT,
-            `Expect receive chunk but received message of type ${data.message?.$case}`,
-          );
+    try {
+      const res = await client.file.upload((async function* () {
+        yield { message: { case: "info", value: { path, userId } } };
+  
+        for await (const data of call.iter()) {
+          if (data.message?.$case !== "chunk") {
+            throw new RequestError(
+              status.INVALID_ARGUMENT,
+              `Expect receive chunk but received message of type ${data.message?.$case}`,
+            );
+          }
+          yield { message: { case: "chunk", value: data.message.chunk } };
         }
-        yield { message: { case: "chunk", value: data.message.chunk } };
-      }
-    })());
-    return { writtenBytes: Number(res.writtenBytes) };
+      })());
+      return { writtenBytes: Number(res.writtenBytes) };
+
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   getFileMetadata: async (request) => {
     const { userId, path } = request;
 
-    const res = await client.file.getFileMetadata({ userId, filePath: path });
+    try {
+      const res = await client.file.getFileMetadata({ userId, filePath: path });
 
-    return { size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" };
+      return { size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" };
+      
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 
   exists: async (request) => {
     const { userId, path } = request;
 
-    const res = await client.file.exists({ userId, path: path });
+    try {
+      const res = await client.file.exists({ userId, path: path });
 
-    return { exists: res.exists };
+      return { exists: res.exists };
+      
+    } catch (err) {
+      throw mapTRPCExceptionToGRPC(err);
+    }
   },
 });
