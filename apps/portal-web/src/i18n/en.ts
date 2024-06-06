@@ -184,12 +184,10 @@ export default {
         wdTooltip2: "2. If the specified directory is not accessible or cannot be operated on, "
         + "the job submission or execution will fail.",
         wdTooltip3: "2.This file is used to save the script returned by the adapter"
-        + "The default value refers to the output file. If it is empty, the script is not saved.",
+        + "The default value refers to the output file.",
         output: "Standard Output File",
         errorOutput: "Error Output File",
-        scriptOutput:"Script Output File",
-        scriptWillNotBeSaved:"Script Will Not Be Saved",
-        scriptWillBeSaved:"Script Will Be Saved",
+        saveJobSubmissionFile:"Save Job Submission File",
         totalNodeCount: "Total Nodes: ",
         totalGpuCount: "Total GPUs: ",
         totalCoreCount: "Total CPU Cores: ",

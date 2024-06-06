@@ -46,6 +46,7 @@ interface JobForm {
   scriptOutput: string;
   errorOutput: string;
   save: boolean;
+  showScriptOutput: boolean;
 }
 
 // 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
@@ -66,9 +67,10 @@ const initialValues = {
   gpuCount: 1,
   maxTime: 30,
   output: "job.%j.out",
-  scriptOutput:"job.%j.script",
+  scriptOutput:"job.%j.sh",
   errorOutput: "job.%j.err",
   save: false,
+  showScriptOutput:true,
 } as Partial<JobForm>;
 
 interface Props {
@@ -85,21 +87,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const [loading, setLoading] = useState(false);
   const t = useI18nTranslateToString();
 
-  // 脚本输出目录input的状态
-  const [scriptOutputStatus, setScriptOutputStatus] = useState<"success" | "warning">("success");
-
-  // 脚本输出目录input的提示文字
-  const [scriptOutputHelp, setScriptOutputHelp] = useState<string | undefined>(t(p("scriptWillBeSaved")));
-
-
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const submit = async () => {
-    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, scriptOutput, save,
-      maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
+    const formValues = await form.validateFields();
+    const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
+      maxTime, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
+    const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
 
-    setLoading(true);
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
@@ -135,8 +131,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
+  const showScriptOutput = Form.useWatch("showScriptOutput", form) as boolean;
+
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
+
+  const calculateScriptOutput = () => {
+    const parseName = parsePlaceholder("{{ name }}", { name: jobName }).trim();
+    return parseName ? parseName + ".sh" : "";
+  };
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -174,6 +177,14 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate, homePath?.path));
     }
   };
+  const setScriptOutputValue = () => {
+    form.setFieldValue("scriptOutput",
+      calculateScriptOutput());
+  };
+
+  useEffect(() => {
+    setScriptOutputValue();
+  }, [jobName]);
 
   useEffect(() => {
     setWorkingDirectoryValue();
@@ -216,17 +227,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const coreCountSum = currentPartitionInfo?.gpus
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     : nodeCount * coreCount;
-
-  const handleScriptOutputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const scriptOutputValue = e.target.value.trim();
-    if (!scriptOutputValue) {
-      setScriptOutputStatus("warning");
-      setScriptOutputHelp(t(p("scriptWillNotBeSaved")));
-    } else {
-      setScriptOutputStatus("success");
-      setScriptOutputHelp(t(p("scriptWillBeSaved")));
-    }
-  };
 
   return (
     <Form<JobForm>
@@ -364,7 +364,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
           </Form.Item>
         </Col>
-        <Col span={24} sm={9}>
+        <Col span={24} sm={12}>
           <Form.Item<JobForm>
             label={t(p("workingDirectory"))}
             name="workingDirectory"
@@ -392,34 +392,14 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             />
           </Form.Item>
         </Col>
-        <Col span={24} sm={5}>
+        <Col span={24} sm={6}>
           <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
-        <Col span={24} sm={5}>
+        <Col span={24} sm={6}>
           <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
             <Input />
-          </Form.Item>
-        </Col>
-        {/* 脚本文件 */}
-        <Col span={12} sm={5}>
-          <Form.Item<JobForm>
-            label={t(p("scriptOutput"))}
-            name="scriptOutput"
-            tooltip={(
-              <>
-                <span>{t(p("wdTooltip1"))}</span>
-                <br />
-                <span>{t(p("wdTooltip3"))}</span>
-              </>
-            )}
-            validateStatus={scriptOutputStatus}
-            help={scriptOutputHelp}
-          >
-            <Input
-              onChange={handleScriptOutputChange}
-            />
           </Form.Item>
         </Col>
         <Col className="ant-form-item" span={12} sm={6}>
@@ -443,9 +423,33 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       <Form.Item label={t(p("comment"))} name="comment">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item name="save" valuePropName="checked">
-        <Checkbox>{t(p("saveToTemplate"))}</Checkbox>
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12} sm={3}>
+          <Form.Item name="save" valuePropName="checked">
+            <Checkbox>{t(p("saveToTemplate"))}</Checkbox>
+          </Form.Item>
+        </Col>
+        <Form.Item name="showScriptOutput" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+        <Col span={12} sm={6}>
+          <Form.Item<JobForm>
+            label={t(p("saveJobSubmissionFile"))}
+            name="scriptOutput"
+            tooltip={(
+              <>
+                <span>{t(p("wdTooltip1"))}</span>
+                <br />
+                <span>{t(p("wdTooltip3"))}</span>
+              </>
+            )}
+          >
+            <Input
+              style={{ visibility: showScriptOutput ? "visible" : "hidden" }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
       <Button type="primary" htmlType="submit" loading={loading || isHomePathLoading}>
         {t("button.submitButton")}
       </Button>
