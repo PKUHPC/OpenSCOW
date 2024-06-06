@@ -28,6 +28,7 @@ interface Props {
   cpuInfo: InfoProps;
   gpuInfo: InfoProps;
   loading: boolean;
+  strokeColor: [string, string]
 }
 
 const Container = styled.div`
@@ -51,7 +52,7 @@ const ResourceContainer = styled.div`
   flex: 1;
 `;
 
-export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading }) => {
+export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading, strokeColor }) => {
 
   const cpuNotEmptyData = useMemo(() => {
     return cpuInfo.paneData.some((x) => x.num > 0);
@@ -97,9 +98,10 @@ export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading }) =
               {cpuNotEmptyData ? (
                 <PieChartCom
                   pieData={cpuInfo.paneData.map((item) => ({ value:item.num, color:item.color }))}
+                  strokeColor={strokeColor[0]}
                 ></PieChartCom>
               ) :
-                <PieChartCom pieData={[{ value:1, color:gray[4] }]}></PieChartCom>}
+                <PieChartCom pieData={[{ value:1, color:gray[4] }]} strokeColor={strokeColor[0]}></PieChartCom>}
             </PieChartContainer>
           </ResourceContainer>
           <ResourceContainer>
@@ -125,9 +127,10 @@ export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading }) =
               {gpuNotEmptyData ? (
                 <PieChartCom
                   pieData={gpuInfo.paneData.map((item) => ({ value:item.num, color:item.color }))}
+                  strokeColor={strokeColor[1]}
                 ></PieChartCom>
               ) :
-                <PieChartCom pieData={[{ value:1, color:gray[4] }]}></PieChartCom>}
+                <PieChartCom pieData={[{ value:1, color:gray[4] }]} strokeColor={strokeColor[1]}></PieChartCom>}
             </PieChartContainer>
           </ResourceContainer>
         </LowerContainer>

@@ -106,6 +106,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
   return (
     (isLoading || clusterInfo.length > 0) ? (
       <Container>
+        <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
         <Table
           title={() => t(p("title"))}
           tableLayout="fixed"
@@ -200,7 +201,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
             }
           />
         </Table>
-        <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
+
       </Container>
 
     ) : (

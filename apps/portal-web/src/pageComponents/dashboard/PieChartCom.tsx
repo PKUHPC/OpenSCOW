@@ -16,6 +16,7 @@ import { Cell, Pie, PieChart } from "recharts";
 
 interface Props {
   pieData: PieData[];
+  strokeColor: string;
 }
 
 interface PieData {
@@ -26,10 +27,22 @@ interface PieData {
 const Container = styled.div`
 `;
 
-export const PieChartCom: React.FC<Props> = ({ pieData }) => {
+export const PieChartCom: React.FC<Props> = ({ pieData, strokeColor }) => {
+  console.log(strokeColor + "Pie");
   return (
     <Container>
       <PieChart width={220} height={220}>
+        <Pie
+          data={[{ name:"test", value:100 }]}
+          cx={105}
+          cy={110}
+          innerRadius={40}
+          outerRadius={60}
+          dataKey="value"
+          stroke="none"
+        >
+          <Cell fill={strokeColor} stroke="none" />
+        </Pie>
         <Pie
           data={pieData}
           cx={105}
@@ -37,10 +50,21 @@ export const PieChartCom: React.FC<Props> = ({ pieData }) => {
           innerRadius={60}
           outerRadius={80}
           dataKey="value"
+          stroke="none"
         >
           {pieData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} />
+            <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
           ))}
+        </Pie>
+        <Pie
+          data={[{ name:"test", value:100 }]}
+          cx={105}
+          cy={110}
+          innerRadius={80}
+          outerRadius={100}
+          dataKey="value"
+        >
+          <Cell fill={strokeColor} stroke="none" />
         </Pie>
       </PieChart>
     </Container>

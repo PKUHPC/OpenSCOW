@@ -46,64 +46,129 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const { publicConfigClusters, currentClusters } = useStore(ClusterInfoStore);
 
+  // const { data, isLoading } = useAsync({
+  //   promiseFn: useCallback(async () => {
+
+  //     const rawClusterInfoPromises = currentClusters.map((x) =>
+  //       api.getClusterRunningInfo({ query: { clusterId: x.id } })
+  //         .httpError(500, () => {}),
+  //     );
+
+
+
+  //     const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+  //     // 处理成功的结果
+  //     const successfulResults = rawClusterInfoResults
+  //     // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
+  //       .map((result, idx) => {
+  //         if (result.status === "fulfilled") {
+  //           return {
+  //             ...result,
+  //             value:{
+  //               clusterInfo:{ clusterName: currentClusters[idx].id,
+  //                 partitions:result.value.clusterInfo.partitions },
+  //             },
+  //           } as PromiseSettledResult<FulfilledResult>;
+  //         }
+
+  //         return result;
+  //       })
+  //       .filter(
+  //         (result): result is PromiseFulfilledResult<FulfilledResult> =>
+  //           result.status === "fulfilled")
+  //       .map((result) => result.value);
+
+
+  //     // 处理失败的结果
+  //     const failedClusters = currentClusters.filter((x) =>
+  //       !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+  //     );
+
+  //     const clustersInfo = successfulResults
+  //       .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
+  //         clusterName: currentClusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
+  //       .flatMap((cluster) =>
+  //         cluster.clusterInfo.partitions.map((x) => ({
+  //           clusterName: cluster.clusterInfo.clusterName,
+  //           ...x,
+  //           cpuUsage:((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
+  //           // 有些分区没有gpu就为空，前端显示'-'
+  //           ...x.gpuCoreCount ? { gpuUsage:((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) } : {},
+  //         })),
+  //       );
+
+  //     return {
+  //       clustersInfo,
+  //       failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
+  //     };
+
+  //   }, []),
+  // });
+
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-
-      const rawClusterInfoPromises = currentClusters.map((x) =>
-        api.getClusterRunningInfo({ query: { clusterId: x.id } })
-          .httpError(500, () => {}),
-      );
-
-
+      const rawClusterInfoPromises = currentClusters.map(async (x) => {
+        try {
+          const response = await fetch(`http://127.0.0.1:4523/m2/4389285-4033570-default/168305266?clusterId=${x.id}`);
+          const result = await response.json();
+          return {
+            clusterInfo: {
+              clusterName: x.id,
+              partitions: result.clusterInfo.partitions,
+            },
+          };
+        } catch (error) {
+          console.error(error);
+        }
+      });
 
       const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
 
-      // 处理成功的结果
       const successfulResults = rawClusterInfoResults
-      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
         .map((result, idx) => {
           if (result.status === "fulfilled") {
             return {
               ...result,
-              value:{
-                clusterInfo:{ clusterName: currentClusters[idx].id,
-                  partitions:result.value.clusterInfo.partitions },
+              value: {
+                clusterInfo: {
+                  clusterName: currentClusters[idx].id,
+                  partitions: result?.value?.clusterInfo.partitions,
+                },
               },
             } as PromiseSettledResult<FulfilledResult>;
           }
 
           return result;
         })
-        .filter(
-          (result): result is PromiseFulfilledResult<FulfilledResult> =>
-            result.status === "fulfilled")
+        .filter((result): result is PromiseFulfilledResult<FulfilledResult> => result.status === "fulfilled")
         .map((result) => result.value);
 
-
-      // 处理失败的结果
       const failedClusters = currentClusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
 
       const clustersInfo = successfulResults
-        .map((cluster) => ({ clusterInfo: { ...cluster.clusterInfo,
-          clusterName: currentClusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name } }))
+        .map((cluster) => ({
+          clusterInfo: {
+            ...cluster.clusterInfo,
+            clusterName: currentClusters.find((x) => x.id === cluster.clusterInfo.clusterName)?.name,
+          },
+        }))
         .flatMap((cluster) =>
           cluster.clusterInfo.partitions.map((x) => ({
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
-            cpuUsage:((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
-            // 有些分区没有gpu就为空，前端显示'-'
-            ...x.gpuCoreCount ? { gpuUsage:((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) } : {},
+            cpuUsage: ((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
+            gpuUsage: x.gpuCoreCount ? ((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) : undefined,
           })),
         );
 
       return {
         clustersInfo,
-        failedClusters:failedClusters.map((x) => ({ clusterName:x.name })),
+        failedClusters: failedClusters.map((x) => ({ clusterName: x.name })),
       };
-
-    }, []),
+    }, [currentClusters]),
   });
 
   return (

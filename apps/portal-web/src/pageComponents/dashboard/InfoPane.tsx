@@ -61,6 +61,7 @@ interface Props {
   tag: Tag;
   paneData: PaneData[];
   loading: boolean;
+  strokeColor: string;
 }
 
 const Container = styled.div`
@@ -86,11 +87,13 @@ export const PieChartContainer = styled.div`
   justify-content: center;
 `;
 
-export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => {
+export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading, strokeColor }) => {
 
   const notEmptyData = useMemo(() => {
     return paneData.some((x) => x.num > 0);
   }, [paneData]);
+
+  console.log(strokeColor + "Info");
 
   return (
     <Container>
@@ -120,11 +123,18 @@ export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => 
           }
         </div>
         <PieChartContainer>
-          {/* 数据全为空时,饼图置灰 */}
-          {notEmptyData ?
-            <PieChartCom pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom> :
-            <PieChartCom pieData={[{ value:1, color:gray[4] }]}></PieChartCom>}
-
+          {/* 数据全为空时,饼图不显示*/}
+          {notEmptyData ? (
+            <PieChartCom
+              pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}
+              strokeColor={strokeColor}
+            ></PieChartCom>
+          ) : (
+            <PieChartCom
+              pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}
+              strokeColor={strokeColor}
+            ></PieChartCom>
+          )}
         </PieChartContainer>
       </Card>
 
