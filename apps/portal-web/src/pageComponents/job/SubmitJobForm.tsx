@@ -38,7 +38,8 @@ interface JobForm {
   command: string;
   jobName: string;
   qos: string | undefined;
-  maxTime: number;
+  maxTimeValue: number;
+  maxTimeUnit: "minutes" | "hours";
   account: string;
   comment: string;
   workingDirectory: string;
@@ -65,7 +66,8 @@ const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
-  maxTime: 30,
+  maxTimeValue: 30,
+  maxTimeUnit:"minutes",
   output: "job.%j.out",
   scriptOutput:"job.%j.sh",
   errorOutput: "job.%j.err",
@@ -93,9 +95,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const submit = async () => {
     const formValues = await form.validateFields();
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
-      maxTime, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
+      maxTimeValue, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
     const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
-
+    const maxTime = maxTimeUnit === "hours" ? maxTimeValue * 60 : maxTimeValue;
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
@@ -359,9 +361,33 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             </Form.Item>
           )}
         </Col>
-        <Col span={24} sm={12}>
-          <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-            <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
+        <Col span={24} sm={6}>
+          <Form.Item label={t(p("maxTime"))} required>
+            <Input.Group compact style={{ display: "flex", minWidth: "120px" }}>
+              <Form.Item name="maxTimeValue" rules={[{ required: true }]} noStyle>
+                <InputNumber
+                  min={1}
+                  step={1}
+                  precision={0}
+                  formatter={(value) => value?.toString() ?? ""}
+                  parser={(value) => {
+                    const parsedValue = value ? value.replace(/[^\d]/g, "") : "";
+                    return parsedValue ? Number(parsedValue) as unknown as 1 : 0 as unknown as 1;
+                  }}
+                  style={{ flex: "1 0 80px" }}
+                />
+              </Form.Item>
+              <Form.Item name="maxTimeUnit" rules={[{ required: true }]} noStyle>
+                <Select
+                  popupMatchSelectWidth={false}
+                  style={{ flex: "0 1 auto" }}
+                >
+                  <Select.Option value="minutes">{t(p("minute"))}</Select.Option>
+                  <Select.Option value="hours">{t(p("hours"))}</Select.Option>
+                </Select>
+              </Form.Item>
+            </Input.Group>
+
           </Form.Item>
         </Col>
         <Col span={24} sm={12}>

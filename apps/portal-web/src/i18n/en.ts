@@ -178,6 +178,7 @@ export default {
         coreCount: "Number of CPU Cores per Node",
         maxTime: "Maximum Running Time",
         minute: "Minutes",
+        hours:"Hours",
         workingDirectory: "Working Directory",
         wdTooltip1: "1. Please enter the absolute path. If you enter a relative path, it will be "
         + "relative to the user's home directory.",
