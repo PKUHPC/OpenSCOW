@@ -177,6 +177,7 @@ export default {
         maxTime: "Maximum Running Time",
         minute: "Minutes",
         hours:"Hours",
+        days:"Days",
         workingDirectory: "Working Directory",
         wdTooltip1: "1. Please enter the absolute path. If you enter a relative path, it will be "
         + "relative to the user's home directory.",

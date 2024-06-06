@@ -91,13 +91,17 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
-
+  const timeUnitConversion = {
+    minutes: 1,
+    hours: 60,
+    days: 60 * 24,
+  };
   const submit = async () => {
     const formValues = await form.validateFields();
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
       maxTimeValue, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
     const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
-    const maxTime = maxTimeUnit === "hours" ? maxTimeValue * 60 : maxTimeValue;
+    const maxTime = maxTimeValue * (timeUnitConversion[maxTimeUnit] || 1);
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
@@ -369,11 +373,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                   min={1}
                   step={1}
                   precision={0}
-                  formatter={(value) => value?.toString() ?? ""}
-                  parser={(value) => {
-                    const parsedValue = value ? value.replace(/[^\d]/g, "") : "";
-                    return parsedValue ? Number(parsedValue) as unknown as 1 : 0 as unknown as 1;
-                  }}
                   style={{ flex: "1 0 80px" }}
                 />
               </Form.Item>
@@ -384,6 +383,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                 >
                   <Select.Option value="minutes">{t(p("minute"))}</Select.Option>
                   <Select.Option value="hours">{t(p("hours"))}</Select.Option>
+                  <Select.Option value="days">{t(p("days"))}</Select.Option>
                 </Select>
               </Form.Item>
             </Input.Group>

@@ -177,6 +177,7 @@ export default {
         maxTime: "最长运行时间",
         minute: "分钟",
         hours:"小时",
+        days:"天",
         workingDirectory: "工作目录",
         wdTooltip1: "1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；",
 
