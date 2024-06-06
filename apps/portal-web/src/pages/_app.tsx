@@ -147,6 +147,8 @@ interface ExtraProps {
   initialLanguage: string;
   clusterConfigs: { [clusterId: string]: ClusterConfigSchema };
   initialCurrentClusters: Cluster[];
+  // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件，需要通过SSR进行传递
+  initialPortalRuntimeDesktopEnabled: boolean;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -162,7 +164,11 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
   const clusterInfoStore = useConstant(() => {
-    return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialCurrentClusters);
+    return createStore(ClusterInfoStore,
+      extra.clusterConfigs,
+      extra.initialCurrentClusters,
+      extra.initialPortalRuntimeDesktopEnabled,
+    );
   });
 
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
@@ -233,6 +239,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     initialLanguage: "",
     clusterConfigs: {},
     initialCurrentClusters: [],
+    // 通过SSR获取门户系统配置文件中是否可用桌面功能
+    // enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能", default: true }),
+    initialPortalRuntimeDesktopEnabled: true,
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -264,6 +273,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
 
           extra.clusterConfigs = clusterConfigs;
+
+          extra.initialPortalRuntimeDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+
           const publicConfigClusters
                 = Object.values(getPublicConfigClusters(clusterConfigs));
 
