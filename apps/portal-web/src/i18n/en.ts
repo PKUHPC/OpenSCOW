@@ -577,6 +577,9 @@ export default {
         popoverContent9: "Edit a file",
         popoverContent10: "After entering the command ",
         popoverContent11: ", you will be redirected to a file editing page where you can edit the specified file. ",
+        popoverContent12: "Upload files ",
+        popoverContent13: "By entering this command, you can upload local files to the current directory.",
+
         command: "Command",
       },
       index: {
