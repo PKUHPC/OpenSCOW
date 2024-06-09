@@ -63,6 +63,14 @@ export const desktopServiceServer = plugin((server) => {
           throw <ServiceError> { code: Status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
         }
 
+        // start the remote desktop screencast script
+        const screencastScriptPath = "/root/screencast.sh";
+        const auditResp = await executeAsUser(ssh, userId, logger, true, screencastScriptPath, []);
+
+        if (auditResp.stderr) {
+          throw <ServiceError> { code: Status.FAILED_PRECONDITION, message: "Failed to start desktop auditing" };
+        }
+
         // start a session
 
         // explicitly set securitytypes to avoid requiring setting vnc passwd
