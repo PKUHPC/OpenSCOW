@@ -525,7 +525,7 @@ export const chargingServiceServer = plugin((server) => {
       }
 
       return [{
-        totalAmount: decimalToMoney(new Decimal(result.total_amount ?? result[0].total_amount)),
+        totalAmount: decimalToMoney(new Decimal(result.total_amount ?? result[0]?.total_amount ?? 0)),
         totalCount: result.total_count ?? result[0].total_count,
       }];
     },
