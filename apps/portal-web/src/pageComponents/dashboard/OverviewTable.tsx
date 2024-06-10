@@ -17,6 +17,7 @@ import { Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
+import { Cluster } from "src/utils/cluster";
 import { compareWithUndefined } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
@@ -32,6 +33,7 @@ export interface ClusterInfo extends PartitionInfo {
 interface Props {
   clusterInfo: ClusterInfo[];
   failedClusters: ({clusterName: I18nStringType})[];
+  currentClusters: Cluster[];
   isLoading: boolean;
 }
 
@@ -88,7 +90,7 @@ const Container = styled.div`
 
 const p = prefix("pageComp.dashboard.overviewTable.");
 
-export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, isLoading }) => {
+export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, currentClusters, isLoading }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -104,7 +106,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, is
   };
 
   return (
-    (isLoading || clusterInfo.length > 0) ? (
+    (isLoading || currentClusters.length > 0) ? (
       <Container>
         <Table
           title={() => t(p("title"))}

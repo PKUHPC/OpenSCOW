@@ -36,15 +36,14 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
     const query = useQuerystring();
 
     const cluster = queryToString(query.cluster);
+    const { currentClusters } = useStore(ClusterInfoStore);
+    const clusterObj = currentClusters.find((x) => x.id === cluster);
+
     const jobTemplateId = queryToString(query.jobTemplateId);
 
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
-
-          const { currentClusters } = useStore(ClusterInfoStore);
-
-          const clusterObj = currentClusters.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
           return api.getJobTemplate({ query: { cluster, id: jobTemplateId } })
             .then(({ template }) => ({
