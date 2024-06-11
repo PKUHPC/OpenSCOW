@@ -24,14 +24,13 @@ import { runtimeConfig } from "./config";
  * @returns {boolean} desktop login enable
  */
 export function getDesktopEnabled(
-  clusters: Record<string, ClusterConfigSchema>) {
-
+  clusters: Record<string, ClusterConfigSchema>,
+  portalRuntimeDesktopEnabled: boolean) {
   const clusterDesktopEnabled = Object.keys(clusters).reduce(
     ((pre, cur) => {
       const curClusterDesktopEnabled = clusters?.[cur]?.loginDesktop?.enabled !== undefined
         ? !!clusters[cur]?.loginDesktop?.enabled
-        : runtimeConfig.PORTAL_CONFIG?.loginDesktop?.enabled;
-
+        : portalRuntimeDesktopEnabled;
       return pre || curClusterDesktopEnabled;
     }), false,
   );
@@ -39,7 +38,19 @@ export function getDesktopEnabled(
   return clusterDesktopEnabled;
 }
 
+/**
+ * 当两个以上（含两个）集群下都配置了文件传输功能时，才开启
+ * @param {Record<String, import("@scow/config/build/cluster").ClusterConfigSchema>} clusters
+ * @returns {boolean} fileTransferEnabled
+ */
+export function getFileTransferEnabled(
+  clusters: Record<string, ClusterConfigSchema>) {
 
+  const fileTransferEnabled = Object.values(clusters).filter(
+    (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1;
+
+  return fileTransferEnabled;
+}
 
 export type Cluster = { id: string; name: I18nStringType; }
 
