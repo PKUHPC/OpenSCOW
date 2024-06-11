@@ -128,6 +128,9 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
                 <p><b>{t("pages.shell.loginNode.popoverContent1")}</b>：
                   <Text code>sopen</Text>{t("pages.shell.loginNode.popoverContent2")}
                 </p>
+                <p><b>{t("pages.shell.loginNode.popoverContent12")}</b>：
+                  <Text code>sup</Text>{t("pages.shell.loginNode.popoverContent13")}
+                </p>
                 <p><b>{t("pages.shell.loginNode.popoverContent3")}</b>：
                   <Text code>sdown [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
                   {t("pages.shell.loginNode.popoverContent4")}

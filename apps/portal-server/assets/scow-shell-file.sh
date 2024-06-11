@@ -64,3 +64,13 @@ sedit () {
     echo "SCOW is redirecting to the editor for the file $@ in directory `pwd`"
     echo  "This command is only valid for SCOW web shells."
 }
+
+sup () {
+    if [ "$1" == "-h" ]; then
+      echo "Usage: sup [-h]"
+      echo "Use the sup command to upload a file. (only valid in SCOW)."
+      return 0
+    fi
+    echo "SCOW is uploading files in directory `pwd`"
+    echo  "This command is only valid for SCOW web shells."
+}

@@ -579,6 +579,9 @@ export default {
         popoverContent10: "，输入",
         popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
 
+        popoverContent12: "文件上传",
+        popoverContent13: "，输入该命令后您可以将本地文件上传到当前路径下",
+
         command:"命令",
       },
       index: {
