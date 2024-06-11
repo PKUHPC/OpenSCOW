@@ -171,7 +171,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           )}
         >
           <Form.Item name="limitValue" noStyle>
-            <InputNumber min={1} step={1} addonAfter={selectAfter} />
+            <InputNumber min={1} step={1} addonAfter={selectAfter} precision={0} />
           </Form.Item>
         </Form.Item>
       </Form>
