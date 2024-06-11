@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Octokit } from "@octokit/rest";
 import fs, { existsSync } from "fs";
 import { chmod, unlink } from "fs/promises";
 import JSZip from "jszip";
@@ -19,9 +20,6 @@ import prompt from "prompts";
 import { createProxyAgent, proxyUrl } from "src/config/proxy";
 import { logger } from "src/log";
 import { pipeline } from "stream/promises";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Octokit } = require("octokit");
 
 interface Options {
   configPath: string;
@@ -47,7 +45,7 @@ function getArch() {
   return arch;
 }
 
-async function getBranchName(prNumber: number, octokit: typeof Octokit) {
+async function getBranchName(prNumber: number, octokit: Octokit) {
   const pr = await octokit.rest.pulls.get({ owner, repo, pull_number: prNumber });
 
   return pr.data.head.ref;
