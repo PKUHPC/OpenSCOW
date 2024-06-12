@@ -11,8 +11,6 @@ tags: [scow, scow-deployment]
 
 :::tip
 
-
-
 > **前提条件：**
 
 1. **slurm集群准备完毕，版本为`21.08.4`及以上，且开启了[Accounting](https://slurm.schedmd.com/accounting.html#database-configuration)功能**，部署slurm集群可参考[slurm集群部署实践](/docs/hpccluster)；
@@ -35,9 +33,9 @@ tags: [scow, scow-deployment]
 
 配置SCOW安装文件install.yaml；
 
-集群配置文件：{集群ID}.yaml
+集群配置文件：`{集群ID}`.yaml
 
-## 认证配置文件：auth.yaml
+认证配置文件：auth.yaml
 
 
 
