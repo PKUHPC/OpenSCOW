@@ -12,9 +12,10 @@
         <id>https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process</id>
         <link href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process"/>
         <updated>2024-06-12T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[- slurm集群准备完毕，且开启了Accounting功能，部署slurm集群可参考slurm集群部署实践；]]></summary>
-        <content type="html"><![CDATA[<ul>
-<li><strong>slurm集群准备完毕，且开启了<a href="https://slurm.schedmd.com/accounting.html#database-configuration" target="_blank" rel="noopener noreferrer">Accounting</a>功能</strong>，部署slurm集群可参考<a href="https://pkuhpc.github.io/SCOW/pr-preview/pr-1294/docs/hpccluster">slurm集群部署实践</a>；</li>
+        <summary type="html"><![CDATA[前提条件：]]></summary>
+        <content type="html"><![CDATA[<p><strong>前提条件：</strong></p>
+<ol>
+<li><strong>slurm集群准备完毕，版本为<code>21.08.4</code>及以上，且开启了<a href="https://slurm.schedmd.com/accounting.html#database-configuration" target="_blank" rel="noopener noreferrer">Accounting</a>功能</strong>，部署slurm集群可参考<a href="https://pkuhpc.github.io/SCOW/pr-preview/pr-1294/docs/hpccluster">slurm集群部署实践</a>；</li>
 <li><strong>slurm集群各节点实现了LDAP认证</strong>，提供两个基于CentOS7的脚本用来快速搭建和配置LDAP，修改两个文件开头部分的相关配置（<code>Start Configuratin Part</code>和<code>End Configuration Part</code>之间的变量），运行即可：<!-- -->
 <ul>
 <li><a href="https://github.com/PKUHPC/SCOW/blob/master/dev/ldap/provider.sh" target="_blank" rel="noopener noreferrer">provider.sh</a>: 用于配置LDAP服务器</li>
@@ -22,7 +23,7 @@
 </ul>
 </li>
 <li><strong>slurm集群挂载了并行文件系统</strong>，例如lustre、gpfs等，提供<a href="https://pkuhpc.github.io/SCOW/pr-preview/pr-1294/docs/hpccluster/nfs">NFS的搭建</a>供参考。</li>
-</ul>]]></content>
+</ol>]]></content>
         <author>
             <name>Huangjun</name>
             <uri>https://blog.csdn.net/huangjun0210?type=blog</uri>
