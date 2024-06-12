@@ -196,6 +196,10 @@ export const tenantServiceServer = plugin((server) => {
               new Decimal(moneyToNumber(blockThresholdAmount)),
             ).shouldBlockInCluster;
 
+            console.log("【确认当前阈值】", account.accountName, blockThresholdAmount);
+            console.log("【确认当前是否应在集群中封锁】", account.accountName, shouldBlockInCluster);
+            console.log("【确认当前账户在集群中状态】", account.accountName, account.blockedInCluster);
+
             if (shouldBlockInCluster) {
               logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
               + "Block the account.", account.accountName);

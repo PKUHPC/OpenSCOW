@@ -180,6 +180,7 @@ export async function blockAccount(
   logger: Logger,
 ): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
+  console.log("【执行封锁前】", account.accountName, account.blockedInCluster);
   if (account.blockedInCluster) { return "AlreadyBlocked"; }
 
   if (account.whitelist) {
@@ -187,12 +188,16 @@ export async function blockAccount(
   }
 
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
+
+    console.log("【执行封锁】", account.accountName, currentActivatedClusters);
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
     });
   });
 
   account.blockedInCluster = true;
+
+  console.log("【执行封锁后】", account.accountName);
 
   await callHook("accountBlocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
@@ -213,15 +218,18 @@ export async function unblockAccount(
   logger: Logger,
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
+  console.log("【执行解封前】", account.accountName, account.blockedInCluster);
   if (!account.blockedInCluster) { return "ALREADY_UNBLOCKED"; }
 
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
+    console.log("【执行解封】", account.accountName, currentActivatedClusters);
     await asyncClientCall(client.account, "unblockAccount", {
       accountName: account.accountName,
     });
   });
 
   account.blockedInCluster = false;
+  console.log("【执行封锁后】", account.accountName);
   await callHook("accountUnblocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
   return "OK";
