@@ -10,7 +10,7 @@
 
 #!/bin/sh
 
-### Start Configuration Part Start
+### Start Configuration Part
 
 # The host of the LDAP server
 ServHost="162.105.133.247"
@@ -19,7 +19,7 @@ ServHost="162.105.133.247"
 dn=pku
 ou=hpc
 
-### Start Configuration Part
+### End Configuration Part
 
 #  Install LDAP-client
 
