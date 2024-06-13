@@ -32,8 +32,6 @@ export const GetClustersRuntimeInfoSchema = typeboxRouteSchema({
     200: Type.Object({
       results: Type.Array(ClusterRuntimeInfoSchema),
     }),
-
-    403: Type.Null(),
   },
 });
 
@@ -44,7 +42,7 @@ export default route(GetClustersRuntimeInfoSchema,
     // when firstly used in getInitialProps, check the token
     // when logged in, use auth()
     const info = token ? await validateToken(token) : await auth(req, res);
-    if (!info) { return { 403: null }; }
+    if (!info) { return; }
 
     const reply = await libGetClustersRuntimeInfo(publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
     return {
