@@ -20,6 +20,7 @@ interface Props {
   runningJobs: string;
   pendingJobs: string;
   loading: boolean;
+  display: boolean;
 }
 
 const JobInfoContainer = styled.div`
@@ -56,8 +57,13 @@ margin: 0px 0;
 
 const p = prefix("pageComp.dashboard.nodeRange.");
 
-const JobInfo: React.FC<Props> = ({ runningJobs, pendingJobs, loading }) => {
+const JobInfo: React.FC<Props> = ({ runningJobs, pendingJobs, loading, display }) => {
   const t = useI18nTranslateToString();
+
+  // 没有数据时不显示
+  if (!display) {
+    return null;
+  }
 
   return (
     <Container>

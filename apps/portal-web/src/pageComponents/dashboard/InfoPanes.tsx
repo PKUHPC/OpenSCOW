@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import React, { useState } from "react";
+import React from "react";
 import { DoubleInfoPane } from "src/pageComponents/dashboard/DoubleInfoPane";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
@@ -69,42 +69,31 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
 
   const { currentClusters } = useStore(ClusterInfoStore);
 
-  const testClusterName = [
-    "linux",
-    "ubuntu",
-    "debian",
-    "fedora",
-    "centos",
-    "redhat",
-    "arch",
-    "suse",
-  ];
-
   // card的每一项
-  // const clusterCardsList = [
-  //   {
-  //     key:"platformOverview",
-  //     tab:"platformOverview",
-  //   }, ...currentClusters.map((x) => ({
-  //     key:x.id,
-  //     tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
-  //   })),
-  // ];
-
   const clusterCardsList = [
     {
       key:"platformOverview",
-      tab:t(p("platformOverview")),
-    }, ...testClusterName.map((x) => ({
-      key:x,
-      tab:x,
+      tab:
+      <div style={{ width:"120px", height:"40px",
+        textAlign: "center", lineHeight:"40px",
+        color:`${activeTabKey === "platformOverview" ? "#FFF" : "#000"}`,
+        background:`${activeTabKey === "platformOverview" ? "#9b0000" : "transparent"}`,
+        borderRadius:"5px",
+        fontWeight:"700",
+      }}
+      >
+        {t(p("platformOverview"))}
+      </div>,
+    }, ...currentClusters.map((x) => ({
+      key:x.id,
+      tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
     })),
   ];
 
+
   const { nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
-    gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount,
-    jobCount, runningJobCount, pendingJobCount,
+    gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount, runningJobCount, pendingJobCount,
   } = selectItem ?? {
     nodeCount: 0,
     runningNodeCount: 0,
@@ -169,7 +158,12 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
         </Col>
         <Col md={8} xl={6}>
           <InfoPaneContainer>
-            <JobInfo runningJobs={`${runningJobCount}`} pendingJobs={`${pendingJobCount}`} loading={loading} />
+            <JobInfo
+              runningJobs={`${runningJobCount}`}
+              pendingJobs={`${pendingJobCount}`}
+              loading={loading}
+              display={!(runningJobCount == 0 && pendingJobCount == 0)}
+            />
           </InfoPaneContainer>
         </Col>
       </Row>

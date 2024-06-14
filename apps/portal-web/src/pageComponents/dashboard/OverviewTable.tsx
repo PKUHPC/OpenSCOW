@@ -14,7 +14,7 @@ import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
 import { Progress, Table, Tag } from "antd";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterOverview, PlatformOverview } from "src/models/cluster";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
@@ -119,13 +119,21 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
 
   // 当activekey改变时表格数据显示的逻辑
   const filteredClusterInfo = useMemo(() => {
-    console.log(activeTabKey);
     if (activeTabKey === "platformOverview") {
       setSelectId(undefined);
       return clusterInfo;
     }
     return clusterInfo.filter((info) => info.clusterName === activeTabKey);
   }, [activeTabKey, clusterInfo, languageId]);
+
+  useEffect(() => {
+    if (activeTabKey !== "platformOverview") {
+      const selectedInfo = clusterInfo.find((info) => info.clusterName === activeTabKey);
+      if (selectedInfo) {
+        setSelectId(selectedInfo.id);
+      }
+    }
+  }, [activeTabKey, clusterInfo]);
 
 
   return (
@@ -138,7 +146,9 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
           onTabChange={setActiveTabKey}
         />
         <Table
-          title={() => t(p("title"))}
+          style={{
+            marginTop:"15px",
+          }}
           tableLayout="fixed"
           dataSource={(filteredClusterInfo.map((x) =>
             ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
@@ -258,7 +268,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             }
           />
         </Table>
-
       </Container>
 
     ) : (
