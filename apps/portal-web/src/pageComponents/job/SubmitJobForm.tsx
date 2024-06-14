@@ -21,12 +21,13 @@ import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AccountStatusFilter } from "src/models/job";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { Partition } from "src/pages/api/cluster";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { formatSize } from "src/utils/format";
 
 import { AccountListSelector } from "./AccountListSelector";
@@ -41,13 +42,16 @@ interface JobForm {
   command: string;
   jobName: string;
   qos: string | undefined;
-  maxTime: number;
+  maxTimeValue: number;
+  maxTimeUnit: "minutes" | "hours";
   account: string;
   comment: string;
   workingDirectory: string;
   output: string;
+  scriptOutput: string;
   errorOutput: string;
   save: boolean;
+  showScriptOutput: boolean;
 }
 
 // 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
@@ -66,10 +70,13 @@ const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
-  maxTime: 30,
+  maxTimeValue: 30,
+  maxTimeUnit:"minutes",
   output: "job.%j.out",
+  scriptOutput:"job.%j.sh",
   errorOutput: "job.%j.err",
   save: false,
+  showScriptOutput:true,
 } as Partial<JobForm>;
 
 interface Props {
@@ -85,21 +92,27 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const [form] = Form.useForm<JobForm>();
   const [loading, setLoading] = useState(false);
-
   const t = useI18nTranslateToString();
 
+
+  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
+  const timeUnitConversion = {
+    minutes: 1,
+    hours: 60,
+    days: 60 * 24,
+  };
   const submit = async () => {
+    const formValues = await form.validateFields();
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
-      maxTime, nodeCount, partition, qos, account, comment } = await form.validateFields();
-
-    setLoading(true);
-
+      maxTimeValue, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
+    const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
+    const maxTime = maxTimeValue * (timeUnitConversion[maxTimeUnit] || 1);
     await api.submitJob({ body: {
       cluster: cluster.id, command, jobName, account,
       coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
       gpuCount,
       maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory, output, errorOutput,
+      workingDirectory, save, memory, output, errorOutput, scriptOutput,
     } })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
@@ -128,7 +141,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       .finally(() => setLoading(false));
   };
 
-  const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
 
   const jobName = Form.useWatch("jobName", form) as string;
 
@@ -138,26 +150,40 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const gpuCount = Form.useWatch("gpuCount", form) as number;
 
+  const showScriptOutput = Form.useWatch("showScriptOutput", form) as boolean;
+
+  const calculateWorkingDirectory = (template: string, homePath: string = "") =>
+    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
+
+  const calculateScriptOutput = () => {
+    const parseName = parsePlaceholder("{{ name }}", { name: jobName }).trim();
+    return parseName ? parseName + ".sh" : "";
+  };
   // 获取集群信息
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
-      ? await api.getClusterInfo({ query: { cluster:  cluster?.id } }) : undefined, [cluster]),
-    onResolve: (data) => {
+      ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
+      : undefined, [cluster]),
+    onResolve: () => {
       const jobInitialName = genJobName();
       form.setFieldValue("jobName", jobInitialName);
 
       // TODO 调度器类别,K8S镜像
-      const schedulerName = data?.clusterInfo.scheduler.name;
+      // const schedulerName = data?.clusterInfo.scheduler.name;
 
     },
   });
 
-  const { defaultCluster: currentDefaultCluster } = useStore(DefaultClusterStore);
-  // 判断是使用template中的cluster还是系统默认cluster，
-  const defaultCluster = initial.cluster ?? currentDefaultCluster;
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
 
-  const calculateWorkingDirectory = (template: string, homePath: string = "") =>
-    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
+  // 没有可用集群的情况不再渲染
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
+  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
+    (defaultCluster ?? currentClusters[0]);
 
   const { data: homePath, isLoading: isHomePathLoading } = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -170,6 +196,14 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         calculateWorkingDirectory(clusterInfoQuery.data.clusterInfo.submitJobDirTemplate, homePath?.path));
     }
   };
+  const setScriptOutputValue = () => {
+    form.setFieldValue("scriptOutput",
+      calculateScriptOutput());
+  };
+
+  useEffect(() => {
+    setScriptOutputValue();
+  }, [jobName]);
 
   useEffect(() => {
     setWorkingDirectoryValue();
@@ -324,7 +358,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     form.setFieldValue("qos", partitionInfo?.qos?.[0]);
   };
 
-
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -342,7 +375,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       form={form}
       initialValues={{
         ...initialWithoutExcluded,
-        cluster: defaultCluster,
+        cluster: currentQueryCluster,
       }}
       onFinish={submit}
     >
@@ -474,12 +507,32 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             </Form.Item>
           )}
         </Col>
-        <Col span={24} sm={12}>
-          <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-            <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
+        <Col span={24} sm={6}>
+          <Form.Item label={t(p("maxTime"))} required>
+            <Input.Group compact style={{ display: "flex", minWidth: "120px" }}>
+              <Form.Item name="maxTimeValue" rules={[{ required: true }]} noStyle>
+                <InputNumber
+                  min={1}
+                  step={1}
+                  precision={0}
+                  style={{ flex: "1 0 80px" }}
+                />
+              </Form.Item>
+              <Form.Item name="maxTimeUnit" rules={[{ required: true }]} noStyle>
+                <Select
+                  popupMatchSelectWidth={false}
+                  style={{ flex: "0 1 auto" }}
+                >
+                  <Select.Option value="minutes">{t(p("minute"))}</Select.Option>
+                  <Select.Option value="hours">{t(p("hours"))}</Select.Option>
+                  <Select.Option value="days">{t(p("days"))}</Select.Option>
+                </Select>
+              </Form.Item>
+            </Input.Group>
+
           </Form.Item>
         </Col>
-        <Col span={24} sm={10}>
+        <Col span={24} sm={12}>
           <Form.Item<JobForm>
             label={t(p("workingDirectory"))}
             name="workingDirectory"
@@ -500,19 +553,19 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                       form.setFields([{ name: "workingDirectory", value: path, touched: true }]);
                       form.validateFields(["workingDirectory"]);
                     }}
-                    cluster={cluster || defaultCluster}
+                    cluster={cluster || currentQueryCluster}
                   />
                 )
               }
             />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={6}>
           <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
-        <Col span={24} sm={7}>
+        <Col span={24} sm={6}>
           <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
@@ -520,7 +573,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         <Col className="ant-form-item" span={12} sm={6}>
           {t(p("totalNodeCount"))}{nodeCount}
         </Col>
-
         {currentPartitionInfo?.gpus ? (
           <Col className="ant-form-item" span={12} sm={6}>
             {t(p("totalGpuCount"))}{nodeCount * gpuCount}
@@ -539,9 +591,33 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       <Form.Item label={t(p("comment"))} name="comment">
         <Input.TextArea />
       </Form.Item>
-      <Form.Item name="save" valuePropName="checked">
-        <Checkbox>{t(p("saveToTemplate"))}</Checkbox>
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={12} sm={3}>
+          <Form.Item name="save" valuePropName="checked">
+            <Checkbox>{t(p("saveToTemplate"))}</Checkbox>
+          </Form.Item>
+        </Col>
+        <Form.Item name="showScriptOutput" valuePropName="checked">
+          <Checkbox />
+        </Form.Item>
+        <Col span={12} sm={6}>
+          <Form.Item<JobForm>
+            label={t(p("saveJobSubmissionFile"))}
+            name="scriptOutput"
+            tooltip={(
+              <>
+                <span>{t(p("wdTooltip1"))}</span>
+                <br />
+                <span>{t(p("wdTooltip3"))}</span>
+              </>
+            )}
+          >
+            <Input
+              style={{ visibility: showScriptOutput ? "visible" : "hidden" }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
       <Button type="primary" htmlType="submit" loading={loading || isHomePathLoading}>
         {t("button.submitButton")}
       </Button>

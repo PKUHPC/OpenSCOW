@@ -23,10 +23,14 @@ message ExportAccountRequest {
   uint32 count = 1;
   optional string tenant_name = 2;
   optional string account_name = 3;
-  // 为true时表明账户被冻结，false则为所有账户
+  // 为true时表明账户被上级手动封锁，false则为所有账户
   optional bool blocked = 4;
-  // 为true时表明账户欠费，false则为所有账户
+  // 为true时表明账户余额小于等于封锁阈值，false则为所有账户
   optional bool debt = 5;
+  // 为true时表明账户为冻结状态，false则为所有账户
+  optional bool frozen = 6;
+  // 为true时表明账户在白名单中(状态不为冻结)或账户为未欠费账户即可以正常使用集群的账户，false则为所有账户
+  optional bool normal = 7;
 }
 
 message ExportAccountResponse {
@@ -62,13 +66,15 @@ message ExportChargeRecordRequest {
   uint32 count = 1;
   google.protobuf.Timestamp start_time = 2;
   google.protobuf.Timestamp end_time = 3;
-  optional string type = 4;
+  //当types设置时，以types为准，否则以type为准
+  optional string type = 4 [deprecated=true];
+  repeated string types = 12;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenantTarget account_of_tenant = 5;
-    // 返回这个租户（tenantName）下所有账户的消费记录
+    // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 6;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 7;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 8;
@@ -86,11 +92,11 @@ message ExportPayRecordRequest {
   uint32 count = 1;
   google.protobuf.Timestamp start_time = 2;
   google.protobuf.Timestamp end_time = 3;
-
+  repeated string types = 9;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
     AccountOfTenantTarget account_of_tenant = 4;
-    // 返回这个租户（tenantName）下所有账户的充值记录
+    // 返回这个租户（tenantName）下多个账户的充值记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
     // 返回这个租户（tenantName）的充值记录
     TenantTarget tenant = 6;

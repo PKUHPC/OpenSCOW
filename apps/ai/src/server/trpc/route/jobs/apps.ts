@@ -33,11 +33,17 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkAppExist, checkCreateAppEntity, getClusterAppConfigs } from "src/server/utils/app";
+import { checkAppExist, checkCreateAppEntity,
+  fetchJobInputParams, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
-import { commitContainerImage, createHarborImageUrl, pushImageToHarbor } from "src/server/utils/image";
+import {
+  commitContainerImage,
+  createHarborImageUrl,
+  formatContainerId,
+  pushImageToHarbor,
+} from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
@@ -45,6 +51,8 @@ import { isParentOrSameFolder } from "src/utils/file";
 import { isPortReachable } from "src/utils/isPortReachable";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
+
+import { booleanQueryParam } from "../utils";
 
 const ImageSchema = z.object({
   name: z.string(),
@@ -91,6 +99,7 @@ interface SessionMetadata {
 }
 
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/app/server_entry.sh", { encoding: "utf-8" });
+const VNC_ENTRY_COMMAND = fs.readFileSync("assets/app/vnc_entry.sh", { encoding: "utf-8" });
 
 const SESSION_METADATA_NAME = "session.json";
 
@@ -216,41 +225,50 @@ export const getAppMetadata = procedure
     return { appName: app.name, appImage: app.image, attributes, appComment: comment };
   });
 
+const CreateAppInputSchema = z.object({
+  clusterId: z.string(),
+  appId: z.string(),
+  appJobName: z.string(),
+  isAlgorithmPrivate: z.boolean().optional(),
+  algorithm: z.number().optional(),
+  image: z.number().optional(),
+  remoteImageUrl: z.string().optional(),
+  startCommand: z.string().optional(),
+  isDatasetPrivate: z.boolean().optional(),
+  dataset: z.number().optional(),
+  isModelPrivate: z.boolean().optional(),
+  model: z.number().optional(),
+  mountPoints: z.array(z.string()).optional(),
+  account: z.string(),
+  partition: z.string().optional(),
+  coreCount: z.number(),
+  nodeCount: z.number(),
+  gpuCount: z.number().optional(),
+  memory: z.number().optional(),
+  maxTime: z.number(),
+  workingDirectory: z.string().optional(),
+  customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
+});
+
+export type CreateAppInput = z.infer<typeof CreateAppInputSchema>;
+
 export const createAppSession = procedure
   .meta({
     openapi: {
       method: "POST",
       path: "/appSessions",
-      tags: ["app"],
+      tags: ["appSessions"],
       summary: "Create APP Session",
     },
   })
-  .input(z.object({
-    clusterId: z.string(),
-    appId: z.string(),
-    appJobName: z.string(),
-    algorithm: z.number().optional(),
-    image: z.number().optional(),
-    startCommand: z.string().optional(),
-    dataset: z.number().optional(),
-    model: z.number().optional(),
-    mountPoint: z.string().optional(),
-    account: z.string(),
-    partition: z.string().optional(),
-    coreCount: z.number(),
-    nodeCount: z.number(),
-    gpuCount: z.number().optional(),
-    memory: z.number().optional(),
-    maxTime: z.number(),
-    workingDirectory: z.string().optional(),
-    customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
-  }))
+  .input(CreateAppInputSchema)
   .output(z.object({
     jobId: z.number(),
   }))
   .mutation(async ({ input, ctx: { user } }) => {
-    const { clusterId, appId, appJobName, algorithm, image, startCommand,
-      dataset, model, mountPoint, account, partition, coreCount, nodeCount, gpuCount, memory,
+    const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
+      image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
+      model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
     const apps = getClusterAppConfigs(clusterId);
@@ -327,19 +345,36 @@ export const createAppSession = procedure
 
     const userId = user.identityId;
     return await sshConnect(host, userId, logger, async (ssh) => {
-
       const homeDir = await getUserHomedir(ssh, userId, logger);
 
       // 工作目录和挂载点必须在用户的homeDir下
 
-      if ((workingDirectory && !isParentOrSameFolder(homeDir, workingDirectory))
-        || (mountPoint && !isParentOrSameFolder(homeDir, mountPoint))) {
+      if ((workingDirectory && !isParentOrSameFolder(homeDir, workingDirectory))) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "workingDirectory and mountPoint should be in homeDir",
         });
       }
+
+      mountPoints.forEach((mountPoint) => {
+        if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "mountPoint should be in homeDir",
+          });
+        }
+      });
       const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
+
+      // 确保所有映射到容器的路径都不重复
+      validateUniquePaths([
+        workingDirectory ?? join(homeDir, appJobsDirectory),
+        isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
+        isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
+        isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+        ...mountPoints,
+      ]);
+
 
       // make sure appJobsDirectory exists.
       await ssh.mkdir(appJobsDirectory);
@@ -355,87 +390,180 @@ export const createAppSession = procedure
         customAttributesExport = customAttributesExport + envItem + "\n";
       }
 
+      // SVCPORT 是k8s集群中service的端口, 由适配器提供
+      let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":\"$SVCPORT\"`;
       if (app.type === "web") {
-        const runtimeVariables = getEnvVariables({
-          PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
-          SERVER_SESSION_INFO,
-        });
-        // SVCPORT 是k8s集群中service的端口, 由适配器提供
-        let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$SVCPORT`;
         for (const key in app.web!.connect.formData) {
           const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
           for (const i in texts) {
             customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
           }
         }
-        const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
+      }
+      const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO\n`;
 
+      let entryScript = "";
+      if (app.type === "web") {
+        const runtimeVariables = getEnvVariables({
+          PROXY_BASE_PATH: join(proxyBasePath, app.web!.proxyType),
+          SERVER_SESSION_INFO,
+        });
         const beforeScript = runtimeVariables + customAttributesExport + app.web!.beforeScript + sessionInfo;
         // 用户如果传了自定义的启动命令，则根据配置文件去替换默认的启动命令
         const webScript = startCommand ? app.web!.script.replace(app.web!.startCommand, startCommand) : app.web!.script;
-        const entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
-
-        // 将entry.sh写入后将路径传给适配器后启动容器
-        await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
-        const client = getAdapterClient(clusterId);
-        const reply = await asyncClientCall(client.job, "submitJob", {
-          userId,
-          jobName: appJobName,
-          image: existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`,
-          algorithm: algorithmVersion?.path,
-          dataset: datasetVersion?.path,
-          model: modelVersion?.path,
-          mountPoint,
-          account,
-          partition: partition!,
-          coreCount,
-          nodeCount,
-          gpuCount: gpuCount ?? 0,
-          memoryMb: memory,
-          timeLimitMinutes: maxTime,
-          // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
-          workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
-          script: remoteEntryPath,
-          // 约定第一个参数确定是创建应用or训练任务，第二个参数为创建应用时的appId
-          extraOptions: [JobType.APP, "web"],
-        }).catch((e) => {
-          const ex = e as ServiceError;
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: `submit job failed, ${ex.details}`,
-          });
+        entryScript = SERVER_ENTRY_COMMAND + beforeScript + webScript;
+      } else if (app.type === "vnc") {
+        const runtimeVariables = getEnvVariables({
+          SERVER_SESSION_INFO,
         });
+        // 对于vnc 的自定义镜像应用，用户需要传对应的运行镜像中启动脚本的命令
+        const xstartupScript = startCommand || app.vnc!.xstartup;
+        const beforeScript = app.vnc!.beforeScript || "";
 
-        const metadata: SessionMetadata = {
-          jobId: reply.jobId,
-          sessionId: appJobName,
-          submitTime: new Date().toISOString(),
-          appId,
-          image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
-          jobType: JobType.APP,
-        };
-        await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+        entryScript = VNC_ENTRY_COMMAND + runtimeVariables + customAttributesExport + beforeScript
+        + sessionInfo + xstartupScript;
 
-        return { jobId: reply.jobId };
       } else {
-        // TODO: if vnc apps
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Unknown app type ${app.type} of app id ${appId}`,
         });
       }
+
+      // 将entry.sh写入后将路径传给适配器后启动容器
+      await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
+      const client = getAdapterClient(clusterId);
+      const reply = await asyncClientCall(client.job, "submitJob", {
+        userId,
+        jobName: appJobName,
+        account,
+        partition: partition!,
+        coreCount,
+        nodeCount,
+        gpuCount: gpuCount ?? 0,
+        memoryMb: memory,
+        timeLimitMinutes: maxTime,
+        // 用户指定应用工作目录，如果不存在，则默认为用户的appJobsDirectory
+        workingDirectory: workingDirectory ?? join(homeDir, appJobsDirectory),
+        script: remoteEntryPath,
+        // 对于AI模块，需要传递的额外参数
+        // 第一个参数确定是创建应用or训练任务，
+        // 第二个参数为创建应用时的appId
+        // 第三个参数为镜像地址
+        // 第四个参数为算法版本地址
+        // 第五个参数为数据集版本地址
+        // 第六个参数为模型版本地址
+        // 第七个参数为多挂载点地址，以逗号分隔
+        extraOptions: [
+          JobType.APP,
+          app.type,
+          // 优先用户填写的远程镜像地址
+          (remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`)) || "",
+          algorithmVersion
+            ? isAlgorithmPrivate
+              ? algorithmVersion.privatePath
+              : algorithmVersion.path
+            : "",
+          datasetVersion
+            ? isDatasetPrivate
+              ? datasetVersion.privatePath
+              : datasetVersion.path
+            : "",
+          modelVersion
+            ? isModelPrivate
+              ? modelVersion.privatePath
+              : modelVersion.path
+            : "",
+          mountPoints.join(","),
+        ],
+      }).catch((e) => {
+        const ex = e as ServiceError;
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: `submit job failed, ${ex.details}`,
+        });
+      });
+
+      const metadata: SessionMetadata = {
+        jobId: reply.jobId,
+        sessionId: appJobName,
+        submitTime: new Date().toISOString(),
+        appId,
+        image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
+        jobType: JobType.APP,
+      };
+      await sftpWriteFile(sftp)(join(appJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
+
+      // 保存提交参数
+      await sftpWriteFile(sftp)(join(appJobsDirectory, `${reply.jobId}-input.json`), JSON.stringify(input));
+
+      return { jobId: reply.jobId };
     });
 
   });
 
+export const getCreateAppParams =
+  procedure
+    .meta({
+      openapi: {
+        method: "GET",
+        path: "/appSessions/{jobId}/submissionParameters",
+        tags: ["appSessions"],
+        summary: "Get Create App Session Parameters",
+      },
+    })
+    .input(z.object({
+      clusterId: z.string(),
+      jobId: z.number(),
+      jobName: z.string(),
+    }))
+    .output(CreateAppInputSchema)
+    .query(async ({ input, ctx: { user } }) => {
+
+      const { clusterId, jobId, jobName } = input;
+      const userId = user.identityId;
+      const host = getClusterLoginNode(clusterId);
+      if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
+
+      return await sshConnect(host, userId, logger, async (ssh) => {
+
+        const homeDir = await getUserHomedir(ssh, userId, logger);
+        const jobsDirectory = join(aiConfig.appJobsDir, jobName);
+
+        const sftp = await ssh.requestSFTP();
+
+        // 读取作业信息
+        const metadataPath = join(jobsDirectory, SESSION_METADATA_NAME);
+
+        if (!await sftpExists(sftp, metadataPath)) {
+          return {} as CreateAppInput;
+        }
+
+        const content = await sftpReadFile(sftp)(metadataPath);
+        const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
+
+        if (sessionMetadata.jobType !== JobType.APP) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `Job type of job ${jobId} is not APP`,
+          });
+        }
+
+        const inputParamsPath = join(homeDir, jobsDirectory, `${jobId}-input.json`);
+
+        return await fetchJobInputParams<CreateAppInput>(
+          inputParamsPath, sftp, CreateAppInputSchema, logger,
+        );
+      });
+    });
 
 export const saveImage =
   procedure
     .meta({
       openapi: {
         method: "POST",
-        path: "/apps/{jobId}/saveImage",
-        tags: ["app"],
+        path: "/appSessions/{jobId}/saveImage",
+        tags: ["appSessions"],
         summary: "Save Image From App Session",
       },
     })
@@ -464,10 +592,28 @@ export const saveImage =
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
         const client = getAdapterClient(clusterId);
 
-        const { node, containerId } = await asyncClientCall(client.app, "getRunningJobNodeInfo", {
+        const { job } = await asyncClientCall(client.job, "getJobById", {
+          fields: ["node", "container_id"],
           jobId,
         });
-        const formateContainerId = containerId.replace("docker://", "");
+
+        if (!job) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Can not find this running job",
+          });
+        }
+
+        const { node, containerId } = job;
+
+        if (!node || !containerId) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Can not find node or containerId of this running job",
+          });
+        }
+
+        const formateContainerId = formatContainerId(clusterId, containerId);
 
         // 连接到该节点
         return await sshConnect(node, "root", logger, async (ssh) => {
@@ -476,11 +622,19 @@ export const saveImage =
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // commit镜像
-            await commitContainerImage({ node, ssh, logger, formateContainerId, localImageUrl });
+            await commitContainerImage({
+              node,
+              ssh,
+              clusterId,
+              logger,
+              formateContainerId,
+              localImageUrl,
+            });
 
             // 保存镜像至harbor
             await pushImageToHarbor({
               ssh,
+              clusterId,
               logger,
               localImageUrl,
               harborImageUrl,
@@ -521,7 +675,11 @@ export const listAppSessions =
         summary: "List APP Sessions",
       },
     })
-    .input(z.object({ clusterId: z.string(), isRunning: z.boolean(), ...paginationSchema.shape }))
+    .input(z.object({
+      clusterId: z.string(),
+      isRunning: booleanQueryParam(),
+      ...paginationSchema.shape,
+    }))
     .output(z.object({ sessions: z.array(AppSessionSchema) }))
     .query(async ({ input, ctx: { user } }) => {
 
@@ -582,8 +740,11 @@ export const listAppSessions =
           // 如果是训练，不需要连接信息
           if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
 
-            const app = checkAppExist(apps, sessionMetadata.appId);
-
+            const app = apps[sessionMetadata.appId];
+            // 未找到该应用 不报错。
+            if (!app) {
+              return;
+            }
             // judge whether the app is ready
             if (runningJobInfo && runningJobInfo.state === "RUNNING") {
             // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
@@ -662,7 +823,7 @@ procedure
       method: "GET",
       path: "/appSessions/{jobId}/checkConnectivity",
       tags: ["appSessions"],
-      summary: "List App Sessions",
+      summary: "Check APP Session Connectivity",
     },
   })
   .input(z.object({
@@ -675,15 +836,20 @@ procedure
 
       const { jobId, clusterId } = input;
 
-      const client = getAdapterClient(clusterId);
-      const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+      try {
+        const client = getAdapterClient(clusterId);
 
-      if (connectionInfo?.response?.$case === "appConnectionInfo") {
-        const host = connectionInfo.response.appConnectionInfo.host;
-        const port = connectionInfo.response.appConnectionInfo.port;
-        const reachable = await isPortReachable(port, host, TIMEOUT_MS);
-        return { ok: reachable };
-      } else {
+        const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+
+        if (connectionInfo?.response?.$case === "appConnectionInfo") {
+          const host = connectionInfo.response.appConnectionInfo.host;
+          const port = connectionInfo.response.appConnectionInfo.port;
+          const reachable = await isPortReachable(port, host, TIMEOUT_MS);
+          return { ok: reachable };
+        } else {
+          return { ok: false };
+        }
+      } catch (_) {
         return { ok: false };
       }
     },
@@ -791,6 +957,15 @@ procedure
     }
 
     switch (app.type) {
+    case AppType.vnc:
+      return {
+        host: reply.host,
+        port: reply.port,
+        password: reply.password,
+        type: "vnc",
+        vnc: {},
+      };
+      break;
     case AppType.web:
       return {
         host: reply.host,

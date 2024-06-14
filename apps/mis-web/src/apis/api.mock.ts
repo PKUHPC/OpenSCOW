@@ -11,14 +11,16 @@
  */
 
 import { HttpError, JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import { numberToMoney } from "@scow/lib-decimal";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import type { RunningJob } from "@scow/protos/build/common/job";
-import type { Account } from "@scow/protos/build/server/account";
+import { type Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
 import { api } from "src/apis/api";
+import { ClusterConnectionStatus } from "src/models/cluster";
 import { OperationResult } from "src/models/operationLog";
-import { ClusterAccountInfo_ImportStatus, PlatformRole,
+import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
   TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
@@ -84,9 +86,13 @@ export const runningJob: RunningJob = {
 
 const mockAccounts: Required<Account>[] = [
   { accountName: "hpc123456", userCount: 3, blocked: true, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈", comment: "123", balance: numberToMoney(20) },
+    ownerId: "123", ownerName: "哈哈", comment: "123",
+    state: AccountState.NORMAL, isInWhitelist: false, displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
+    balance: numberToMoney(20), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
   { accountName: "hpc1234567", userCount: 10, blocked: false, tenantName: "default",
-    ownerId: "123", ownerName: "哈哈哈哈", comment: "123", balance: numberToMoney(30) },
+    ownerId: "123", ownerName: "哈哈哈哈", comment: "123",
+    state: AccountState.NORMAL, isInWhitelist: false, displayedState: DisplayedAccountState.DISPLAYED_NORMAL,
+    balance: numberToMoney(30), blockThresholdAmount: numberToMoney(0), defaultBlockThresholdAmount: numberToMoney(0) },
 ];
 
 const mockUsers = [
@@ -293,6 +299,8 @@ export const mockApi: MockApi<typeof api> = {
 
   getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
 
+  getUsersWithMostJobSubmissions: async () => ({ results: [{ userName: "name1", userId: "test1", count:10 }]}),
+
   getNewJobCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
 
   getTenantUsers: async () => ({ results: mockUsers }),
@@ -388,6 +396,8 @@ export const mockApi: MockApi<typeof api> = {
   unblockUserInAccount: async () => ({ executed: true }),
   blockAccount: async () => ({ executed: true }),
   unblockAccount: async () => ({ executed: true }),
+  setBlockThreshold: async () => ({ executed: true }),
+  setDefaultAccountBlockThreshold: async () => ({ executed: true }),
   getNewUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
   getActiveUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
   getTopChargeAccount: async () => ({ results: [{ accountName: "test", chargedAmount: numberToMoney(10) }]}),
@@ -443,6 +453,7 @@ export const mockApi: MockApi<typeof api> = {
       createdInAuth: false,
     }),
   createTenant: async () => ({ createdInAuth: true }),
+  createTenantWithExistingUserAsAdmin: async () => null,
   validateToken: async () => MOCK_USER_INFO,
 
   getOperationLogs: async () => ({ results: [{
@@ -454,6 +465,8 @@ export const mockApi: MockApi<typeof api> = {
     operationTime: "2020-04-23T23:49:50.000Z",
     operationEvent: { $case: "login", login: {} },
   }], totalCount: 1 }),
+
+  getCustomEventTypes: async () => ({ results: []}),
 
   getAlarmDbId: async () => ({
     id: 13,
@@ -471,6 +484,48 @@ export const mockApi: MockApi<typeof api> = {
     endsAt: 1702889670000,
   }]}),
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
+  changeTenant: async () => null,
+
+  getClusterConfigFiles: async () => ({ clusterConfigs: {
+    hpc01: {
+      displayName: "hpc01Name",
+      priority: 1,
+      adapterUrl: "0.0.0.0:0000",
+      proxyGateway: undefined,
+      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+      loginDesktop: undefined,
+      turboVncPath: undefined,
+      crossClusterFileTransfer: undefined,
+      hpc: { enabled: true },
+      ai: { enabled: false },
+      k8s: undefined,
+    },
+  } }),
+
+  getClustersConnectionInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    schedulerName: "hpc",
+    connectionStatus: ClusterConnectionStatus.AVAILABLE,
+    partitions: [],
+  }]}),
+
+  getClustersRuntimeInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    activationStatus: ClusterActivationStatus.ACTIVATED,
+    operatorId: undefined,
+    operatorName: undefined,
+    comment: "",
+  }]}),
+
+  activateCluster: async () => ({ executed: true }),
+  deactivateCluster: async () => ({ executed: true }),
+
+  exportAccount: null,
+  exportChargeRecord: null,
+  exportPayRecord: null,
+  exportUser: null,
+  exportOperationLog: null,
+
 };
 
 export const MOCK_USER_INFO = {

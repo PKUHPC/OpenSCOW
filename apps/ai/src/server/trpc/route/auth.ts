@@ -17,6 +17,7 @@ import { join } from "path";
 import { deleteUserToken, getUserToken, setUserTokenCookie } from "src/server/auth/cookie";
 import { getUserInfo } from "src/server/auth/server";
 import { validateToken } from "src/server/auth/token";
+import { commonConfig } from "src/server/config/common";
 import { config } from "src/server/config/env";
 import { router } from "src/server/trpc/def";
 import { authProcedure, baseProcedure } from "src/server/trpc/procedure/base";
@@ -70,7 +71,7 @@ export const auth = router({
     })
     .input(z.object({
       token:z.string(),
-      // fromAuth:z.boolean(),  //后续与audit集成时需使用
+      // fromAuth: booleanQueryParam(),  //后续与audit集成时需使用
     }))
     .output(z.void())
     .query(async ({ ctx: { res }, input }) => {
@@ -154,6 +155,14 @@ export const auth = router({
         throw new TRPCError({
           message: ErrorCode.OLD_PASSWORD_IS_WRONG,
           code: "CONFLICT",
+        });
+      }
+
+      const passwordPattern = commonConfig.passwordPattern?.regex && new RegExp(commonConfig.passwordPattern?.regex);
+      if (passwordPattern && !passwordPattern.test(newPassword)) {
+        throw new TRPCError({
+          message: "password is not valid",
+          code: "BAD_REQUEST",
         });
       }
 

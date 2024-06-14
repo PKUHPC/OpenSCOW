@@ -54,7 +54,7 @@ web:
 
   # 运行任务的脚本。可以使用准备脚本定义的变量
   script: |
-    jupyter-lab --ServerApp.ip='0.0.0.0' --ServerApp.port=${PORT} --ServerApp.port_retries=0 --PasswordIdentityProvider.hashed_password="sha1:${SALT}:${PASSWORD_SHA1}" --ServerApp.open_browser=False --ServerApp.base_url="${PROXY_BASE_PATH}/${HOST}/${SVCPORT}/" --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.root_dir="${workingDir}" --allow-root
+    jupyter-lab --ServerApp.ip='0.0.0.0' --ServerApp.port=${PORT} --ServerApp.port_retries=0 --ServerApp.password="sha1:${SALT}:${PASSWORD_SHA1}" --ServerApp.open_browser=False --ServerApp.base_url="${PROXY_BASE_PATH}/${HOST}/${SVCPORT}/" --ServerApp.allow_origin='*' --ServerApp.disable_check_xsrf=True --ServerApp.root_dir="${workingDir}" --allow-root
 
   # 如何连接应用
   connect:

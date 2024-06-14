@@ -1,5 +1,25 @@
 # @scow/demo-vagrant
 
+## 2.0.4
+
+### Patch Changes
+
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 6304074: 提交作业时，新增保留作业脚本的选项
+
+## 2.0.3
+
+### Patch Changes
+
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+
+## 2.0.2
+
+### Patch Changes
+
+- 7b9e0b6: 去掉 node-cron 表达式前秒的限制
+
 ## 2.0.1
 
 ### Patch Changes

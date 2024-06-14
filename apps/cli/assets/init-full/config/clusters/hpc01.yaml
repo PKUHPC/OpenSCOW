@@ -23,3 +23,11 @@ adapterUrl: localhost:8972
 
 #   # 是否在这个机器上自动配置nginx
 #   autoSetupNginx: true
+
+# 集群在HPC或是否启用，默认为true
+hpc:
+  enabled: true
+
+# 集群在AI或是否启用，默认为false
+ai:
+  enabled: false

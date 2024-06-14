@@ -11,11 +11,16 @@
  */
 
 import { Button, ButtonProps } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export interface CommonModalProps {
  open: boolean;
  onClose: () => void;
+}
+
+interface ExternalControlProps {
+  externalOpen?: boolean;
+  onToggle?: (open: boolean) => void;
 }
 
 export const ModalLink = <T,>(
@@ -46,13 +51,27 @@ export const ModalLink = <T,>(
 export const ModalButton = <T,>(
   ModalComponent: React.ComponentType<CommonModalProps & T>,
   buttonProps?: ButtonProps,
-) => (props: React.PropsWithChildren<Omit<T, keyof CommonModalProps>>) => {
+) => (props: React.PropsWithChildren<Omit<T, keyof CommonModalProps> & ExternalControlProps>) => {
     const [open, setOpen] = useState(false);
-    const { children, ...rest } = props;
+    const { children, externalOpen, onToggle, ...rest } = props;
+
+    useEffect(() => {
+      if (externalOpen !== undefined) {
+        setOpen(externalOpen);
+      }
+    }, [externalOpen]);
+
+    const handleToggle = () => {
+      const newState = !open;
+      setOpen(newState);
+      if (onToggle) {
+        onToggle(newState);
+      }
+    };
 
     return (
       <>
-        <Button onClick={() => setOpen(true)} {...buttonProps}>
+        <Button onClick={handleToggle} {...buttonProps}>
           {children}
         </Button>
         {/** @ts-ignore */}
@@ -60,6 +79,9 @@ export const ModalButton = <T,>(
           open={open}
           onClose={() => {
             setOpen(false);
+            if (onToggle) {
+              onToggle(false);
+            }
           }}
           {...rest}
         />

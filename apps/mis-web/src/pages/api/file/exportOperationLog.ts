@@ -18,7 +18,7 @@ import { ExportOperationLog, OperationLog } from "@scow/protos/build/audit/opera
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getT, getTArgs, prefix } from "src/i18n";
+import { getI18nCurrentText, getT, getTArgs, prefix } from "src/i18n";
 import { getOperationDetail, getOperationResultTexts, getOperationTypeTexts, OperationCodeMap, OperationLogQueryType,
   OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/User";
@@ -43,12 +43,13 @@ export const GetOperationLogFilter = Type.Object({
   operationResult: Type.Optional(Type.Enum(OperationResult)),
   operationDetail: Type.Optional(Type.String()),
   operationTargetAccountName: Type.Optional(Type.String()),
+  customEventType: Type.Optional(Type.String()),
 });
 
 export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
 
 
-export const GetOperationLogsSchema = typeboxRouteSchema({
+export const ExportOperationLogSchema = typeboxRouteSchema({
 
   method: "GET",
 
@@ -110,7 +111,7 @@ const getExportSource = (
   }
 };
 
-export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
+export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
   const auth = authenticate(() => true);
 
 
@@ -121,7 +122,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
 
   const {
     count, columns, type, operatorUserIds, startTime, endTime,
-    operationType, operationResult, operationDetail, operationTargetAccountName } = req.query;
+    operationType, operationResult, operationDetail, operationTargetAccountName, customEventType } = req.query;
 
 
   const logSource = getExportSource(type, info, operationTargetAccountName);
@@ -144,6 +145,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       startTime, endTime, operationType,
       operationResult, operationTargetAccountName,
       operationDetail,
+      customEventType,
     };
     // 用户请求
     if (type === OperationLogQueryType.USER) {
@@ -215,8 +217,14 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return {
         id: x.operationLogId,
         operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
-        operationType: OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
-        operationDetail: x.operationEvent ? getOperationDetail(x.operationEvent, t, tArgs) : "",
+        operationType: x.operationEvent?.["$case"] === "customEvent"
+          ? getI18nCurrentText(x.operationEvent.customEvent.name, languageId)
+          : OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
+        operationDetail: x.operationEvent ?
+          x.operationEvent?.["$case"] === "customEvent"
+            ? getI18nCurrentText(x.operationEvent.customEvent.content, languageId)
+            : getOperationDetail(x.operationEvent, t, tArgs, languageId)
+          : "",
         operationResult: OperationResultTexts[x.operationResult],
         operatorUserId: x.operatorUserId,
         operationTime: x.operationTime ? new Date(x.operationTime).toISOString() : "",

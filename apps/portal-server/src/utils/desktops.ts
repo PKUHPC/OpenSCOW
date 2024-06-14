@@ -24,7 +24,8 @@ import { Logger } from "ts-log";
 
 export function getDesktopConfig(cluster: string): LoginDeskopConfigSchema {
 
-  return { ...getPortalConfig().loginDesktop, ...getClusterConfigs()[cluster].loginDesktop };
+  return { ...getPortalConfig().loginDesktop,
+    ...getClusterConfigs(undefined, undefined, ["hpc"])[cluster].loginDesktop };
 }
 
 export function ensureEnabled(cluster: string) {

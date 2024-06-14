@@ -90,7 +90,7 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.createApp,
     operationTypePayload:{
-      accountName: account,
+      accountName: account, clusterId: cluster,
     },
   };
 
@@ -118,7 +118,7 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
   }).catch(async (e) => {
     await callLog({
       ...logInfo,
-      operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
+      operationTypePayload: { ... logInfo.operationTypePayload },
     }, OperationResult.FAIL);
     const ex = e as ServiceError;
     const errors = parseErrorDetails(ex.metadata);

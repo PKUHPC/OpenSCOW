@@ -11,6 +11,7 @@
  */
 
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
@@ -65,7 +66,7 @@ export const mockApi: MockApi<typeof api> = {
   getQuickEntries:async () => ({ quickEntries: [
     {
       id:"submitJob",
-      name:"提交作业",
+      name:"submitJob",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -76,7 +77,7 @@ export const mockApi: MockApi<typeof api> = {
     },
     {
       id:"runningJob",
-      name:"未结束的作业",
+      name:"runningJobs",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -87,7 +88,7 @@ export const mockApi: MockApi<typeof api> = {
     },
     {
       id:"allJobs",
-      name:"所有作业",
+      name:"allJobs",
       entry:{
         $case:"pageLink",
         pageLink:{
@@ -274,6 +275,29 @@ export const mockApi: MockApi<typeof api> = {
   checkTransferKey: null,
 
   getAvailablePartitionsForCluster: async () => ({ partitions: []}),
+  getClusterConfigFiles: async () => ({ clusterConfigs: {
+    hpc01: {
+      displayName: "hpc01Name",
+      priority: 1,
+      adapterUrl: "0.0.0.0:0000",
+      proxyGateway: undefined,
+      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+      loginDesktop: undefined,
+      turboVncPath: undefined,
+      crossClusterFileTransfer: undefined,
+      hpc: { enabled: true },
+      ai: { enabled: false },
+      k8s: undefined,
+    },
+  } }),
+
+  getClustersRuntimeInfo: async () => ({ results: [{
+    clusterId: "hpc01",
+    activationStatus: ClusterActivationStatus.ACTIVATED,
+    operatorId: undefined,
+    operatorName: undefined,
+    comment: "",
+  }]}),
 
 };
 

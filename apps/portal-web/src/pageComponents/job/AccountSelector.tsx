@@ -30,8 +30,10 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const { message } = App.useApp();
 
   const promiseFn = useCallback(async () => {
-    return cluster ? api.getAccounts({ query: { cluster } })
-      .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
+    return cluster ?
+      api.getAccounts({ query: { cluster } })
+        .httpError(404, (error) => { message.error(error.message); })
+      : { accounts: [] as string[] };
   }, [cluster, userStore.user]);
 
   const { data, isLoading, reload } = useAsync({

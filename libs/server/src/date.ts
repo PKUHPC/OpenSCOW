@@ -75,7 +75,7 @@ export function dayjsToDateMessage(dayjsObj: Dayjs): DateMessage {
   });
 }
 
-export function checktTimeZone(timeZone: string) {
+export function checkTimeZone(timeZone: string) {
   if (!isValidTimezone(timeZone)) {
     throw <ServiceError>{
       code: status.INVALID_ARGUMENT,

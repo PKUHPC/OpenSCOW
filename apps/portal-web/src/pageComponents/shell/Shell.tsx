@@ -11,6 +11,8 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
@@ -18,8 +20,6 @@ import { ShellInputData, ShellOutputData } from "src/server/setup/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
 
 const TerminalContainer = styled.div`
   background-color: black;
@@ -41,6 +41,7 @@ const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
 const DOWNLOAD_FILE_SUFFIX = " in directory ";
 const EDIT_FILE_PREFIX = "SCOW is redirecting to the editor for the file ";
 const EDIT_FILE_SUFFIX = " in directory ";
+const UPLOAD_FILE_PREFIX = "SCOW is uploading files in directory ";
 
 export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
@@ -123,6 +124,8 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
               const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
               const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
               window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
+            } else if (result.includes(UPLOAD_FILE_PREFIX)) {
+              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?uploadModalOpen=true"));
             }
           }
           term.write(data);

@@ -1,5 +1,24 @@
 # @scow/lib-operation-log
 
+## 2.1.5
+
+### Patch Changes
+
+- @scow/protos@1.0.11
+
+## 2.1.4
+
+### Patch Changes
+
+- @scow/protos@1.0.10
+
+## 2.1.3
+
+### Patch Changes
+
+- 24db413: 操作日志增加自定义操作类型
+  - @scow/protos@1.0.9
+
 ## 2.1.2
 
 ### Patch Changes

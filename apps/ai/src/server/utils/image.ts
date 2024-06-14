@@ -16,6 +16,7 @@ import { NodeSSH } from "node-ssh";
 import { Logger } from "ts-log";
 
 import { aiConfig } from "../config/ai";
+import { clusters } from "../config/clusters";
 
 const LOADED_IMAGE_REGEX = "Loaded image: ([\\w./-]+(?::[\\w.-]+)?)";
 
@@ -29,27 +30,52 @@ export function createHarborImageUrl(imageName: string, imageTag: string, userId
   return `${harborUrl}/${project}/${userId}/${imageName}:${imageTag}`;
 };
 
-
-export enum Container {
-  DOCKER = "DOCKER",
-  CONTAINER_D = "CONTAINER_D"
+export enum k8sRuntime {
+  docker = "docker",
+  containerd = "containerd"
 }
 
-// Container === Container.DOCKER的情况
-// TODO：其他容器的情况
+const runtimeCommands = {
+  [k8sRuntime.docker]: "docker",
+  // -n namespace，k8s集群相关的容器命令必须加上该参数才有对应数据
+  [k8sRuntime.containerd]: "nerdctl -n k8s.io",
+};
+
+const runtimeContainerIdPrefix = {
+  [k8sRuntime.docker]: "docker",
+  [k8sRuntime.containerd]: "containerd",
+};
+
+export function getK8sRuntime(clusterId: string): k8sRuntime {
+  const runtime = clusters[clusterId].k8s?.runtime;
+  return runtime ?? k8sRuntime.docker;
+}
+
+export function getRuntimeCommand(runtime: k8sRuntime): string {
+  return runtimeCommands[runtime];
+}
+
+function getContainerIdPrefix(runtime: k8sRuntime): string {
+  return runtimeContainerIdPrefix[runtime];
+}
 
 // 加载本地镜像
 export async function getLoadedImage({
   ssh,
   logger,
   sourcePath,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   sourcePath: string,
+  clusterId: string,
 }): Promise<string | undefined> {
 
-  const loadedResp = await loggedExec(ssh, logger, true, "docker", ["load", "-i", sourcePath]);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
+
+  const loadedResp = await loggedExec(ssh, logger, true, command, ["load", "-i", sourcePath]);
   const match = loadedResp.stdout.match(loadedImageRegex);
   return match && match.length > 1 ? match[1] : undefined;
 }
@@ -59,13 +85,19 @@ export async function getPulledImage({
   ssh,
   logger,
   sourcePath,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   sourcePath: string,
+  clusterId: string,
 }): Promise<string | undefined> {
 
-  const pulledResp = await loggedExec(ssh, logger, true, "docker", ["pull", sourcePath]);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
+
+  const pulledResp = await loggedExec(ssh, logger, true, command, ["pull", sourcePath]);
+
   return pulledResp ? sourcePath : undefined;
 }
 
@@ -75,25 +107,43 @@ export async function pushImageToHarbor({
   logger,
   localImageUrl,
   harborImageUrl,
+  clusterId,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   localImageUrl: string,
   harborImageUrl: string,
+  clusterId: string,
 }): Promise<void> {
 
-  // docker login harbor
-  await loggedExec(ssh, logger, true, "docker", ["login", harborUrl, "-u", harborUser, "-p", password]);
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
 
-  // docker tag
-  await loggedExec(ssh, logger, true, "docker", ["tag", localImageUrl, harborImageUrl]);
+  // login harbor
+  await loggedExec(ssh, logger, true, command, ["login", harborUrl, "-u", harborUser, "-p", password]);
+
+  // tag
+  await loggedExec(ssh, logger, true, command, ["tag", localImageUrl, harborImageUrl]);
 
   // push 镜像至harbor
-  await loggedExec(ssh, logger, true, "docker", ["push", harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["push", harborImageUrl])
+    .catch(async (e) => {
+
+      logger.error(e, "Can not push image to the external repository. "
+        + "Please verify if the image list includes unnecessary multi-platform image data.");
+      // 为了避免可能由于错误镜像缓存引起的问题，清除localImage,taggedImage
+      logger.info("Deleting the locally pulled image and the tagged image ...");
+      await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
+      await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `Can not push image to the external repository. : ${e}`,
+      });
+    }); ;
 
   // 清除本地镜像
-  await loggedExec(ssh, logger, true, "docker", ["rmi", harborImageUrl]);
-  await loggedExec(ssh, logger, true, "docker", ["rmi", localImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["rmi", harborImageUrl]);
+  await loggedExec(ssh, logger, true, command, ["rmi", localImageUrl]);
 }
 
 // commit制作本地镜像
@@ -103,16 +153,20 @@ export async function commitContainerImage({
   logger,
   formateContainerId,
   localImageUrl,
+  clusterId,
 }: {
   node: string,
   ssh: NodeSSH,
   logger: Logger,
   formateContainerId: string,
   localImageUrl: string,
+  clusterId: string,
 }): Promise<void> {
 
+  const runtime = getK8sRuntime(clusterId);
+  const command = getRuntimeCommand(runtime);
   const resp = await loggedExec(ssh, logger, true, "sh",
-    ["-c", `docker ps --no-trunc | grep ${formateContainerId}`]);
+    ["-c", `${command} ps --no-trunc | grep ${formateContainerId}`]);
   if (!resp.stdout) {
     throw new TRPCError({
       code: "NOT_FOUND",
@@ -121,6 +175,13 @@ export async function commitContainerImage({
   }
 
   // commit镜像
-  await loggedExec(ssh, logger, true, "docker",
+  await loggedExec(ssh, logger, true, command,
     ["commit", formateContainerId, localImageUrl]);
 }
+
+
+export const formatContainerId = (clusterId: string, containerId: string) => {
+  const runtime = getK8sRuntime(clusterId);
+  const prefix = getContainerIdPrefix(runtime);
+  return containerId.replace(`${prefix}://`, "");
+};

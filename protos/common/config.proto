@@ -13,6 +13,7 @@
 syntax = "proto3";
 
 package scow.common;
+import "common/i18n.proto";
 
 message GetClusterConfigRequest {
   string cluster = 1;
@@ -46,11 +47,118 @@ message GetAvailablePartitionsForClusterRequest {
 }
 
 message GetAvailablePartitionsForClusterResponse {
-  repeated Partition partitions = 2;
+  repeated Partition partitions = 1;
+}
+
+message ClusterConfigSchemaProto {
+  message ProxyGateway {
+    // 代理网关节点监听URL
+    string url = 1;
+    // 是否自动配置nginx
+    // default value is false
+    bool auto_setup_nginx = 2;
+  }
+  message LoginNodeConfigSchemaProto {
+    // 登录节点展示名
+    I18nStringProtoType name = 1;
+    // 集群的登录节点地址
+    string address = 2;
+  }
+  message LoginNodeConfigs {
+    repeated LoginNodeConfigSchemaProto login_node_configs_value = 1;
+  }
+  message LoginNodeAddresses {
+    repeated string login_node_addresses_value = 1;
+  }
+  message LoginNodesProtoType {
+    oneof value {
+      LoginNodeConfigs login_node_configs = 1;
+      // 集群的登录节点地址
+      // default value = []
+      LoginNodeAddresses login_node_addresses = 2;
+    }
+  }
+  message LoginDesktopConfigSchemaProto {
+    message Wm {
+      // 名称
+      string name = 1;
+      // wm值
+      string wm = 2;
+    }
+    // 是否启动登录节点上的桌面功能
+    bool enabled = 1;
+    repeated Wm wms = 2;
+    // 每个登录节点上最多创建多少个桌面
+    int32 max_desktops = 3;
+    // 将创建的登录节点桌面信息的保存到什么位置。相对于用户的家目录
+    string desktops_dir = 4;
+  }
+  message CrossClusterFileTransfer {
+    // 是否开启跨集群传输功能
+    // default value = false
+    bool enabled = 1;
+    // 跨集群传输文件的节点
+    optional string transfer_node = 2;
+  }
+  message Hpc {
+    // 集群在HPC中是否启用, 默认启用
+    // default value = true
+    bool enabled = 1;
+  }
+  message Ai {
+    // 集群在AI中是否启用, 默认不启用
+    // default value = false
+    bool enabled = 1;
+  }
+  enum K8sRuntime {
+    DOCKER = 0;
+    CONTAINERD = 1;
+  }
+  message Kubeconfig {
+    // 集群 kubeconfig 文件路径
+    string path = 1;
+  }
+  message K8s {
+    // k8s 集群运行时, ai系统的镜像功能的命令取决于该值, 可选 docker 或者 containerd
+    // default value = containerd
+    K8sRuntime runtime = 1;
+    // k8s 集群 kubeconfig 相关配置
+    Kubeconfig kubeconfig = 2;
+  }
+
+  // 集群ID
+  string cluster_id = 1;
+  // 集群的显示名称
+  I18nStringProtoType display_name = 2;
+  // 集群使用的优先级, 数字越小越先展示
+  // default value is Number.MAX_SAFE_INTEGER = 9007199254740991 2^53 − 1.
+  int64 priority = 3;
+  // 调度器适配器服务地址
+  string adapter_url = 4;
+  optional ProxyGateway proxy_gateway = 5;
+  LoginNodesProtoType login_nodes = 6;
+  optional LoginDesktopConfigSchemaProto login_desktop = 7;
+  // TurboVNC的安装路径
+  optional string turbo_vnc_path = 8;
+  optional CrossClusterFileTransfer cross_cluster_file_transfer = 9;
+  Hpc hpc = 10;
+  Ai ai = 11;
+  optional K8s k8s = 12;
+}
+
+message GetClusterConfigFilesRequest {
+
+}
+
+message GetClusterConfigFilesResponse {
+  repeated ClusterConfigSchemaProto cluster_configs = 1;
 }
 
 service ConfigService {
   rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
 
   rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest) returns (GetAvailablePartitionsForClusterResponse);
+
+  // 获取 SCOW 部署的集群配置文件中的集群信息
+  rpc GetClusterConfigFiles(GetClusterConfigFilesRequest) returns (GetClusterConfigFilesResponse);
 }

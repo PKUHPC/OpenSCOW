@@ -15,6 +15,9 @@ package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 import "common/money.proto";
+import "common/i18n.proto";
+
+import "common/sort_order.proto";
 
 
 enum OperationResult {
@@ -32,24 +35,44 @@ message Logout {
 
 message SubmitJob {
   string account_name = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message EndJob {
   uint32 job_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message AddJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message DeleteJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message UpdateJobTemplate {
   string job_template_id = 1;
   string new_job_template_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message ShellLogin {
@@ -60,16 +83,32 @@ message ShellLogin {
 message CreateDesktop {
   string desktop_name = 1;
   string wm = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string login_node = 4;
 }
 
 message DeleteDesktop {
   uint32 desktop_id = 1;
   string login_node = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateApp {
   string account_name = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateFile {
@@ -120,6 +159,10 @@ message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
   int64 limit_minutes = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 4;
 }
 
 message CreateUser {
@@ -300,6 +343,7 @@ message AccountOfTenantTarget {
 }
 message AccountsOfTenantTarget {
   string tenant_name = 1;
+  repeated string account_names = 2;
 }
 message TenantTarget {
   string tenant_name = 1;
@@ -307,13 +351,14 @@ message TenantTarget {
 message AllTenantsTarget {
 }
 message AccountsOfAllTenantsTarget {
+  repeated string account_names = 1;
 }
 
 message ExportPayRecord {
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
     AccountOfTenantTarget account_of_tenant = 1;
-    // 返回这个租户（tenantName）下所有账户的充值记录
+    // 返回这个租户（tenantName）下多个账户的充值记录
     AccountsOfTenantTarget accounts_of_tenant = 2;
     // 返回这个租户（tenantName）的充值记录
     TenantTarget tenant = 3;
@@ -326,9 +371,9 @@ message ExportChargeRecord {
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenantTarget account_of_tenant = 4;
-    // 返回这个租户（tenantName）下所有账户的消费记录
+    // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 7;
@@ -362,6 +407,40 @@ message ExportOperationLog {
   }
 }
 
+message SetAccountBlockThreshold {
+  string account_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+message SetAccountDefaultBlockThreshold {
+  string tenant_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+message UserChangeTenant {
+  string user_id = 1;
+  string previous_tenant_name = 2;
+  string new_tenant_name = 3;
+}
+
+message ActivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+message DeactivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+// 用户自定义操作类型，name和content将直接展示
+message CustomEvent {
+  string type = 1;
+  common.I18nObject name = 2;
+  common.I18nObject content = 3;
+}
+
+// INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -422,6 +501,12 @@ message CreateOperationLogRequest {
     ExportPayRecord export_pay_record = 56;
     ExportChargeRecord export_charge_record = 57;
     ExportOperationLog export_operation_log = 58;
+    SetAccountBlockThreshold set_account_block_threshold = 59;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
+    UserChangeTenant user_change_tenant = 61;
+    CustomEvent custom_event = 62;
+    ActivateCluster activate_cluster = 63;
+    DeactivateCluster deactivate_cluster = 64;
   }
 }
 
@@ -488,6 +573,12 @@ message OperationLog {
     ExportPayRecord export_pay_record = 58;
     ExportChargeRecord export_charge_record = 59;
     ExportOperationLog export_operation_log = 60;
+    SetAccountBlockThreshold set_account_block_threshold = 61;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
+    UserChangeTenant user_change_tenant = 63;
+    CustomEvent custom_event = 64;
+    ActivateCluster activate_cluster = 65;
+    DeactivateCluster deactivate_cluster = 66;
   }
 }
 
@@ -508,6 +599,9 @@ message OperationLogFilter {
 
   // 对operation_event里的信息进行搜索
   optional string operation_detail = 7;
+
+  // 对于customeEvent进行type筛选
+  optional string custom_event_type = 8;
 }
 
 message GetOperationLogsRequest {
@@ -515,6 +609,17 @@ message GetOperationLogsRequest {
   uint32 page = 2;
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 3;
+  enum SortBy{
+    UNKNOWN = 0;
+    ID = 1;
+    OPERATION_RESULT = 2;
+    OPERATION_TIME = 3;
+    OPERATOR_USER_ID = 4;
+    OPERATOR_IP = 5;
+  }
+  optional SortBy sort_by = 4;
+
+  optional common.SortOrder sort_order = 5;
 }
 
 message GetOperationLogsResponse {
@@ -531,9 +636,21 @@ message ExportOperationLogResponse {
   repeated OperationLog operation_logs = 1;
 }
 
+message GetCustomEventTypesRequest {
+
+}
+
+message GetCustomEventTypesResponse {
+  message CustomEventType {
+    string type = 1;
+    common.I18nObject name = 2;
+  }
+  repeated CustomEventType custom_event_types = 1;
+}
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
   rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
   rpc ExportOperationLog(ExportOperationLogRequest) returns (stream ExportOperationLogResponse);
+  rpc GetCustomEventTypes(GetCustomEventTypesRequest) returns (GetCustomEventTypesResponse);
 }

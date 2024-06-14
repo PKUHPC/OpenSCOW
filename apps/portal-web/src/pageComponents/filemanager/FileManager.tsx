@@ -44,7 +44,8 @@ import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
 import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
@@ -130,7 +131,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
-  const loginNode = loginNodes[cluster.id][0].name;
+  const loginNode = loginNodes[cluster.id][0].address;
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -360,6 +361,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   }, [editFile, files]);
 
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  useEffect(() => {
+    const uploadQuery = queryToString(router.query.uploadModalOpen);
+    if (uploadQuery === "true") {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadModalOpen(false);
+    }
+  }, []);
+
+
   return (
     <div>
       <TitleText>
@@ -396,6 +409,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       <OperationBar>
         <Space wrap>
           <UploadButton
+            externalOpen={isUploadModalOpen}
             cluster={cluster.id}
             path={path}
             reload={reload}
@@ -601,16 +615,24 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
-                          e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION" ? modal.error({
-                            title: t(p("tableInfo.submitFailedMessage")),
-                            content: e.message,
-                          }) : (() => { throw e; })();
+                          e.code === "SCHEDULER_FAILED" ||
+                          e.code === "FAILED_PRECONDITION"
+                          || e.code === "UNIMPLEMENTED" ? modal.error({
+                              title: t(p("tableInfo.submitFailedMessage")),
+                              content: e.message,
+                            }) : (() => {
+                              message.error(e.message);
+                              throw e;
+                            })();
                         })
                         .httpError(400, (e) => {
                           e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH" ? modal.error({
                             title: t(p("tableInfo.submitFailedMessage")),
                             content: e.message,
-                          }) : (() => { throw e; })();
+                          }) : (() => {
+                            message.error(e.message);
+                            throw e;
+                          })();
                         })
                         .then((result) => {
                           message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));

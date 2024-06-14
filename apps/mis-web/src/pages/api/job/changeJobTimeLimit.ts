@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceClient } from "@scow/protos/build/server/job";
@@ -21,6 +21,7 @@ import { checkJobAccessible } from "src/server/jobAccessible";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
+import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
@@ -57,7 +58,7 @@ export const ChangeJobTimeLimitSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default typeboxRoute(ChangeJobTimeLimitSchema,
+export default /* #__PURE__*/route(ChangeJobTimeLimitSchema,
   async (req, res) => {
     const info = await auth(req, res);
     if (!info) { return; }
@@ -93,7 +94,7 @@ export default typeboxRoute(ChangeJobTimeLimitSchema,
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.setJobTimeLimit,
       operationTypePayload:{
-        jobId: +jobId, accountName: job.account, limitMinutes,
+        jobId: +jobId, accountName: job.account, limitMinutes, clusterId: cluster,
       },
     };
 

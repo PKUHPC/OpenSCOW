@@ -13,6 +13,7 @@
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
@@ -22,6 +23,7 @@ import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+import { getAccountStateInfo, getUserStateInfo } from "src/utils/accountUserState";
 import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
@@ -33,8 +35,31 @@ interface PayRequest {
   operatorId: string;
 }
 
+export function checkShouldBlockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  const accountStateInfo =
+  getAccountStateInfo(account.whitelist?.id, account.state, account.balance, blockThresholdAmount);
+
+  return accountStateInfo.shouldBlockInCluster;
+}
+
+export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
+
+  const blockThresholdAmount =
+  account.blockThresholdAmount ?? account.tenant.$.defaultAccountBlockThreshold;
+
+  const accountStateInfo =
+  getAccountStateInfo(account.whitelist?.id, account.state, account.balance, blockThresholdAmount);
+
+  return !accountStateInfo.shouldBlockInCluster;
+}
+
 export async function pay(
   request: PayRequest, em: SqlEntityManager,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const {
@@ -64,15 +89,20 @@ export async function pay(
     await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount), type, comment }, logger);
   }
 
-  if (target instanceof Account && prevBalance.lte(0) && target.balance.gt(0)) {
+  if (
+    target instanceof Account
+    && checkShouldUnblockAccount(target)
+  ) {
     logger.info("Unblock account %s", target.accountName);
-    await unblockAccount(target, clusterPlugin.clusters, logger);
+    await unblockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
-  // 充值为负数时，要考虑封锁账户
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s", target.accountName);
-    await blockAccount(target, clusterPlugin.clusters, logger);
+    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -92,6 +122,7 @@ type ChargeRequest = {
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   logger: Logger, clusterPlugin: ClusterPlugin,
 ) {
   const { target, amount, comment, type, userId, metadata } = request;
@@ -111,9 +142,12 @@ export async function charge(
   const prevBalance = target.balance;
   target.balance = target.balance.minus(amount);
 
-  if (target instanceof Account && prevBalance.gt(0) && target.balance.lte(0)) {
+  if (
+    target instanceof Account
+    && checkShouldBlockAccount(target)
+  ) {
     logger.info("Block account %s due to out of balance.", target.accountName);
-    await blockAccount(target, clusterPlugin.clusters, logger);
+    await blockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
   }
 
   return {
@@ -124,30 +158,50 @@ export async function charge(
 
 export async function addJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
-  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+  charge: Decimal,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin,
+  logger: Logger,
 ) {
   if (ua.usedJobCharge && ua.jobChargeLimit) {
     ua.usedJobCharge = ua.usedJobCharge.plus(charge);
-    if (ua.usedJobCharge.gt(ua.jobChargeLimit)) {
-      await blockUserInAccount(ua, clusterPlugin, logger);
+
+    const shouldBlockUserInCluster = getUserStateInfo(
+      ua.state,
+      ua.jobChargeLimit,
+      ua.usedJobCharge,
+    ).shouldBlockInCluster;
+
+    if (shouldBlockUserInCluster) {
+      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, clusterPlugin, logger);
+      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     }
   }
 }
 
 export async function setJobCharge(
   ua: Loaded<UserAccount, "user" | "account">,
-  charge: Decimal, clusterPlugin: ClusterPlugin, logger: Logger,
+  charge: Decimal,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin,
+  logger: Logger,
 ) {
   ua.jobChargeLimit = charge;
   if (!ua.usedJobCharge) {
     ua.usedJobCharge = new Decimal(0);
   } else {
-    if (ua.jobChargeLimit.lt(ua.usedJobCharge)) {
-      await blockUserInAccount(ua, clusterPlugin, logger);
+
+    const shouldBlockUserInCluster = getUserStateInfo(
+      ua.state,
+      ua.jobChargeLimit,
+      ua.usedJobCharge,
+    ).shouldBlockInCluster;
+
+    if (shouldBlockUserInCluster) {
+      await blockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     } else {
-      await unblockUserInAccount(ua, clusterPlugin, logger);
+      await unblockUserInAccount(ua, currentActivatedClusters, clusterPlugin, logger);
     }
   }
 }

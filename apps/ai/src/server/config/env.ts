@@ -53,6 +53,8 @@ const specs = {
   DB_PASSWORD: str({ desc: "管理系统数据库密码，将会覆写配置文件", default: undefined }),
 
   DOWNLOAD_CHUNK_SIZE: num({ desc: "下载文件时，每个message中的chunk的大小。单位字节", default: 3 * 1024 * 1024 }),
+
+  NOVNC_CLIENT_URL: str({ desc: "novnc客户端的URL。如果和本系统域名相同，可以只写完整路径", default: "/vnc" }),
 };
 
 export const config = envConfig(specs);

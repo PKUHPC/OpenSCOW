@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:f4c96a28c0b2d8981664e03f461c2677152cd9a756012ffa8e2c6727427c2bda AS base
+FROM node:iron-alpine@sha256:f3d945e503328d76a54533ce1cbe8d6de03df16b00002f2ec1a890a28d1d6bd6 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -17,6 +17,7 @@ RUN corepack enable
 
 WORKDIR /app
 
+COPY package.json .
 COPY pnpm-lock.yaml .
 
 COPY patches ./patches

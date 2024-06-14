@@ -1,5 +1,66 @@
 # @scow/portal-web
 
+## 1.5.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.1
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- c178b72: xterm npm 包更名
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- 10956eb: 修复 token 失效后切换系统不跳转回登录页面的问题
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- 0ad604c: 仪表盘 cpu 和 gpu 利用率百分比显示错误
+- 02d6a18: 新增集群区分 AI 功能和 HPC 功能配置
+- 24db413: 操作日志增加自定义操作类型
+- 79d19be: 改进门户快捷方式的 UI
+- 25f9caf: 修复文件管理下在终端中打开连接失败及终端不显示登录节点名称的问题
+- bc743ad: 修复快捷方式的 icon 显示大小问题
+- d3d891a: 操作日志详细内容展示优化
+- 1e25062: 改进门户系统仪表盘各个模块的背景设计
+- Updated dependencies [02d6a18]
+- Updated dependencies [146e19f]
+- Updated dependencies [24db413]
+- Updated dependencies [d822db7]
+- Updated dependencies [850a7ee]
+  - @scow/config@1.4.3
+  - @scow/lib-web@1.3.1
+  - @scow/lib-operation-log@2.1.3
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+
 ## 1.4.3
 
 ### Patch Changes

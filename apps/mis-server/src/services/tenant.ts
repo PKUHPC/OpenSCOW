@@ -10,18 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
-import { decimalToMoney } from "@scow/lib-decimal";
+import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/server/tenant";
+import { blockAccount, unblockAccount } from "src/bl/block";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
+import { UserAccount } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { getAccountStateInfo } from "src/utils/accountUserState";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 
 
@@ -49,6 +53,7 @@ export const tenantServiceServer = plugin((server) => {
         admins: admins.map((a) => ({ userId: a.userId, userName: a.name })),
         userCount,
         balance: decimalToMoney(tenant.balance),
+        defaultAccountBlockThreshold: decimalToMoney(tenant.defaultAccountBlockThreshold),
         financialStaff: financialStaff.map((f) => ({ userId: f.userId, userName: f.name })),
       }];
     },
@@ -118,24 +123,25 @@ export const tenantServiceServer = plugin((server) => {
         });
 
         // 在数据库中创建user
-        const user = await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
-          .then(async (user) => {
-            user.tenantRoles = [TenantRole.TENANT_ADMIN];
-            await em.persistAndFlush(user);
-            return user;
-          }).catch((e) => {
-            if (e.code === Status.ALREADY_EXISTS) {
-              throw <ServiceError>{
-                code: Status.ALREADY_EXISTS,
-                message: `User with userId ${userId} already exists in scow.`,
-                details: "USER_ALREADY_EXISTS",
-              };
-            }
-            throw <ServiceError>{
-              code: Status.INTERNAL,
-              message: `Error creating user with userId ${userId} in database.`,
-            };
-          });
+        const user =
+         await createUserInDatabase(userId, userName, userEmail, tenantName, logger, em)
+           .then(async (user) => {
+             user.tenantRoles = [TenantRole.TENANT_ADMIN];
+             await em.persistAndFlush(user);
+             return user;
+           }).catch((e) => {
+             if (e.code === Status.ALREADY_EXISTS) {
+               throw <ServiceError>{
+                 code: Status.ALREADY_EXISTS,
+                 message: `User with userId ${userId} already exists in scow.`,
+                 details: "USER_ALREADY_EXISTS",
+               };
+             }
+             throw <ServiceError>{
+               code: Status.INTERNAL,
+               message: `Error creating user with userId ${userId} in database.`,
+             };
+           });
         // call auth
         const createdInAuth = await createUser(authUrl,
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
@@ -162,6 +168,103 @@ export const tenantServiceServer = plugin((server) => {
       },
       );
     },
-  });
 
+    setDefaultAccountBlockThreshold: async ({ request, em, logger }) => {
+
+      const { tenantName, blockThresholdAmount } = ensureNotUndefined(request, ["blockThresholdAmount"]);
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!tenant) {
+        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+      tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
+
+      // 判断租户下各账户是否使用该租户封锁阈值，使用后是否需要在集群中进行封锁
+      const accounts = await em.find(Account, { tenant: tenant, blockThresholdAmount : {} }, {
+        populate: ["tenant"],
+      });
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      if (accounts.length > 0) {
+        await Promise.allSettled(accounts
+          .map(async (account) => {
+            // 判断设置封锁阈值后是否应该在集群中封锁
+            const shouldBlockInCluster = getAccountStateInfo(
+              account.whitelist?.id,
+              account.state,
+              account.balance,
+              new Decimal(moneyToNumber(blockThresholdAmount)),
+            ).shouldBlockInCluster;
+
+            if (shouldBlockInCluster) {
+              logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
+              + "Block the account.", account.accountName);
+              await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+            }
+
+            if (!shouldBlockInCluster) {
+              logger.info("The balance of Account %s is greater than the default tenant block threshold amount. "
+              + "Unblock the account.", account.accountName);
+              await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+            }
+          }),
+        ).catch((e) => {
+          logger.error("Block or unblock account failed when set a new default tenant threshold amount.", e);
+        });
+      }
+
+      if (accounts.length > 0) {
+        await em.persistAndFlush([...accounts, tenant]);
+      } else {
+        await em.persistAndFlush(tenant);
+      }
+
+      return [{}];
+
+    },
+
+    createTenantWithExistingUserAsAdmin: async ({ request, em }) => {
+
+      const { tenantName, userId, userName } = request;
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (tenant) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
+        };
+      }
+
+      const newTenant = new Tenant({ name: tenantName });
+
+
+      const user = await em.findOne(User, { userId, name: userName });
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName} is not found.`,
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      // 修改该用户的租户， 并且作为租户管理员
+      em.assign(user, { tenant: newTenant });
+      user.tenantRoles = [TenantRole.TENANT_ADMIN];
+
+      await em.persistAndFlush([user, newTenant]);
+
+      return [{
+        tenantName: newTenant.name,
+        adminUserId: user.userId,
+      }];
+
+    },
+
+  });
 });

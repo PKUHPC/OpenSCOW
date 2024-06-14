@@ -16,6 +16,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { AmountStrategyDescriptionsItem } from "src/components/AmonutStrategyDescriptionsItem";
 import { CommonModalProps, ModalLink } from "src/components/ModalLink";
@@ -23,7 +24,9 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AmountStrategy, getAmountStrategyAlgorithmDescriptions,
   getAmountStrategyDescription,
   getAmountStrategyDescriptions, getAmountStrategyText } from "src/models/job";
-import { getClusterName, publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { getClusterName } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -67,6 +70,8 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
 
   const AmountStrategyText = getAmountStrategyText(t);
   const languageId = useI18n().currentLanguage.id;
+
+  const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   return (
     <Table
@@ -136,7 +141,7 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
         <Table.Column
           title={t(pCommon("cluster"))}
           dataIndex={"cluster"}
-          render={(cluster) => getClusterName(cluster, languageId)}
+          render={(cluster) => getClusterName(cluster, languageId, publicConfigClusters)}
         />
         <Table.Column title={t(pCommon("partition"))} dataIndex={"partition"} />
         <Table.Column title="QOS" dataIndex={"qos"} />
@@ -209,6 +214,8 @@ const EditPriceModal: React.FC<CommonModalProps & {
 
   const languageId = useI18n().currentLanguage.id;
 
+  const { publicConfigClusters } = useStore(ClusterInfoStore);
+
   const [form] = Form.useForm<{ price: number; amount: string; description: string }>();
   const [loading, setLoading] = useState(false);
 
@@ -239,7 +246,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <strong>{tenant ? (t(pCommon("tenant")) + tenant) : t(pCommon("platform"))}</strong>
         </Form.Item>
         <Form.Item label={t(p("priceItem"))}>
-          {t(pCommon("cluster"))} <strong>{getClusterName(cluster, languageId)}</strong>，
+          {t(pCommon("cluster"))} <strong>{getClusterName(cluster, languageId, publicConfigClusters)}</strong>，
           {t(pCommon("partition"))} <strong>{partition}</strong>，QOS <strong>{qos}</strong>
         </Form.Item>
         <Form.Item label={t(p("newItemId"))}>
@@ -276,7 +283,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           />
         </Form.Item>
         <Form.Item label={t(p("price"))} name="price" initialValue={0} rules={[{ required: true }]}>
-          <InputNumber precision={3} min={0} />
+          <InputNumber precision={2} min={0} />
         </Form.Item>
         <Form.Item label={t(pCommon("comment"))} name="description">
           <Input />

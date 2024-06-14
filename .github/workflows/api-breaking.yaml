@@ -1,0 +1,23 @@
+name: Check SCOW API Breaking Changes
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [master]
+
+
+jobs:
+  check-api-breaking-changes:
+    name: Check SCOW API Breaking Changes
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: bufbuild/buf-setup-action@v1
+
+      - name: Check API Compatibility
+        working-directory: protos
+        run: buf breaking --against '../.git#branch=origin/master,subdir=protos'

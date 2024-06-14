@@ -11,28 +11,16 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Button, Spin, Typography } from "antd";
+import { Button, Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Localized, prefix } from "src/i18n";
+import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { styled } from "styled-components";
-
-const ContentContainer = styled.div`
-  background-color: #fff;
-  padding: 20px;
-  padding-right: 0;
-  border-radius: 8px 8px 0 0;
-  margin-bottom: 20px;
-`;
-
-const TitleContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
 
 const CardsContainer = styled.div`
   display: flex;
@@ -47,7 +35,8 @@ export interface AppWithCluster {
 }
 
 interface Props {
-
+  currentClusters: Cluster[];
+  publicConfigClusters: Cluster[];
 }
 
 export const defaultEntry: Entry[] = [
@@ -98,18 +87,15 @@ export const defaultEntry: Entry[] = [
 ];
 const p = prefix("pageComp.dashboard.quickEntry.");
 
-export const QuickEntry: React.FC<Props> = () => {
-  const t = useI18nTranslateToString();
+export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClusters }) => {
 
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
 
-  const clusters = publicConfig.CLUSTERS;
-
   // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {
-    const appsInfo = await Promise.all(clusters.map((x) => {
+    const appsInfo = await Promise.all(currentClusters.map((x) => {
       return api.listAvailableApps({ query: { cluster: x.id } });
     }));
 
@@ -128,31 +114,35 @@ export const QuickEntry: React.FC<Props> = () => {
           appWithCluster[y.id].app.logoPath = y.logoPath;
         }
 
-        appWithCluster[y.id].clusters.push(clusters[idx]);
+        appWithCluster[y.id].clusters.push(currentClusters[idx]);
       });
     });
     return appWithCluster;
-  }, [clusters]) });
-
-  const { Title } = Typography;
+  }, [currentClusters]) });
 
   const [isEditable, setIsEditable] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
   return (
-    <ContentContainer>
-      <TitleContainer>
-        <Title level={5} style={{ marginBottom:0, lineHeight:"32px" }}>{t(p("quickEntry"))}</Title>
-        {isEditable ? (
+    <DashboardSection
+      style={{ marginBottom: "16px" }}
+      title={<Localized id={p("quickEntry")} />}
+      extra={
+        isEditable ? (
           <div>
             <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
-              {t(p("finish"))}
+              <Localized id={p("finish")} />
             </Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>{t(p("cancel"))}</Button>
+            <Button type="link" onClick={() => { setIsEditable(false); }}>
+              <Localized id={p("cancel")} />
+            </Button>
           </div>
-        ) :
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>{t(p("edit"))}</Button>}
-      </TitleContainer>
+        ) : (
+          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+            <Localized id={p("edit")} />
+          </Button>
+        )}
+    >
       <CardsContainer>
         {getQuickEntriesLoading || getAppsLoading ?
           <Spin /> : (
@@ -161,9 +151,11 @@ export const QuickEntry: React.FC<Props> = () => {
               isFinished={isFinished}
               quickEntryArray={data?.quickEntries.length ? data?.quickEntries : defaultEntry }
               apps={apps ?? {}}
+              currentClusters={currentClusters}
+              publicConfigClusters={publicConfigClusters}
             ></Sortable>
           )}
       </CardsContainer>
-    </ContentContainer>
+    </DashboardSection>
   );
 };

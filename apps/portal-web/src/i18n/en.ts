@@ -13,7 +13,7 @@
 export default {
   // baseLayout
   baseLayout: {
-    linkTextMis: "Management System",
+    linkTextMis: "Admin",
     linkTextAI: "SCOW AI",
   },
   // routes
@@ -28,14 +28,14 @@ export default {
     },
     desktop: "Desktop",
     apps: {
-      title: "Interactive Apps",
+      title: "Applications",
       appSessions: "Created Apps",
       createApp: "Create App",
     },
     file: {
-      fileManager: "File Manager",
+      fileManager: "Files",
       crossClusterFileTransfer: "File Transfer",
-      clusterFileManager: "Cluster File Manager",
+      clusterFileManager: "Clusters",
       transferProgress: "Transfer Progress",
     },
   },
@@ -158,13 +158,13 @@ export default {
           cores: "Cores",
           gpus: "GPUs",
           state: "State",
-          runningOrQueueTime: "Running/Queue Time",
+          runningOrQueueTime: "Running/Pending Time",
           nodesOrReason: "Reason",
-          timeLimit: "Job Time Limit",
+          timeLimit: "Time Limit",
           more: "More",
           linkToPath: "Go to Directory",
-          popConfirm: "Are you sure you want to terminate this task?",
-          successMessage: "Task termination request has been submitted!",
+          popConfirm: "Are you sure you want to cancel this job?",
+          successMessage: "Job cancellation request has been submitted!",
         },
       },
       // submitJobForm
@@ -172,7 +172,7 @@ export default {
         errorMessage: "Failed to submit job",
         successMessage: "Submitted successfully! Your new job ID is: ",
         cluster: "Cluster",
-        jobName: "Job Name",
+        jobName: "Name",
         command: "Command",
         account: "Account",
         partition: "Partition",
@@ -182,17 +182,22 @@ export default {
         coreCount: "Number of CPU Cores per Node",
         maxTime: "Maximum Running Time",
         minute: "Minutes",
+        hours:"Hours",
+        days: "Days",
         workingDirectory: "Working Directory",
         wdTooltip1: "1. Please enter the absolute path. If you enter a relative path, it will be "
         + "relative to the user's home directory.",
         wdTooltip2: "2. If the specified directory is not accessible or cannot be operated on, "
         + "the job submission or execution will fail.",
+        wdTooltip3: "2.This file is used to save the script returned by the adapter"
+        + "The default value refers to the output file.",
         output: "Standard Output File",
         errorOutput: "Error Output File",
+        saveJobSubmissionFile:"Save Job Submission File",
         totalNodeCount: "Total Nodes: ",
-        totalGpuCount: "Total GPU Cards: ",
+        totalGpuCount: "Total GPUs: ",
         totalCoreCount: "Total CPU Cores: ",
-        totalMemory: "Total Memory Capacity: ",
+        totalMemory: "Total Memory: ",
         comment: "Comment",
         saveToTemplate: "Save as Template",
       },
@@ -210,7 +215,7 @@ export default {
         placeholder: "Please select a cluster",
       },
       transferInfoTable: {
-        srcCluster: "Source Cluster",
+        srcCluster: "Origin Cluster",
         dstCluster: "Destination Cluster",
         file: "File",
         transferCount: "Transfer Count",
@@ -272,7 +277,7 @@ export default {
           otherErrorMessage: "Error occurred while performing delete operation",
         },
         tableInfo: {
-          title: "Cluster {} File Management",
+          title: "{} Files",
           uploadButton: "Upload File",
           deleteSelected: "Delete Selected",
           copySelected: "Copy Selected",
@@ -381,21 +386,21 @@ export default {
           submitTime: "Submission Time",
           state: "Status",
           remainingTime: "Remaining Time",
-          popFinishConfirmTitle: "Are you sure you want to end this task?",
-          popFinishConfirmMessage: "Task termination request has been submitted.",
-          popCancelConfirmTitle: "Are you sure you want to cancel this task?",
-          popCancelConfirmMessage: "Task cancellation request has been submitted.",
+          popFinishConfirmTitle: "Are you sure you want to cancel this job?",
+          popFinishConfirmMessage: "Job cancelation request has been submitted.",
+          popCancelConfirmTitle: "Are you sure you want to cancel this job?",
+          popCancelConfirmMessage: "Job cancellation request has been submitted.",
           linkToPath: "Enter Directory",
         },
         filterForm: {
           appJobName: "Job Name",
           autoRefresh: "Auto-refresh every 10s",
-          onlyNotEnded: "Show only unended tasks",
+          onlyNotEnded: "Show only running jobs",
         },
       },
       connectToAppLink: {
-        notFoundMessage: "This application session does not exist.",
-        notConnectableMessage: "This application cannot be connected at the moment.",
+        notFoundMessage: "Application session does not exist.",
+        notConnectableMessage: "Application cannot be connected now, please wait.",
         notReady: "Application is not ready yet.",
         connect: "Connect",
       },
@@ -425,50 +430,50 @@ export default {
     },
     dashboard:{
       addEntryModal:{
-        addQuickEntry:"addQuickEntry",
+        addQuickEntry:"Add links",
         cancel:"cancel",
       },
       changeClusterModal:{
-        selectCluster:"selectCluster",
+        selectCluster:"Select Cluster",
         cluster:"cluster",
-        loginNode:"loginNode",
+        loginNode:"Login node",
       },
       quickEntry:{
-        quickEntry:"quickEntry",
-        finish:"finish",
-        cancel:"cancel",
-        edit:"edit",
+        quickEntry:"Links",
+        finish:"Finish",
+        cancel:"Cancel",
+        edit:"Edit",
       },
       sortable:{
-        alreadyExist:"The quickEntry already exists",
+        alreadyExist:"Link already exists",
         exceedMaxSize:"Up to 10 quickEntries can be added",
-        saveFailed:"save Failed",
-        saveSuccessfully:"save Succeeded",
+        saveFailed:"Save failed",
+        saveSuccessfully:"Save succeeded",
       },
       overviewTable:{
-        title:"platform overview",
-        clusterName:"clusterName",
-        partitionName:"partitionName",
-        nodeCount:"nodeCount",
-        pendingJobCount:"pendingJobCount",
-        cpuUsage:"cpuUsage",
-        gpuUsage:"gpuUsage",
-        usageRatePercentage:"usageRatePercentage",
-        partitionStatus:"partitionStatus",
-        available:"available",
-        notAvailable:"notAvailable",
+        title:"Platform overview",
+        clusterName:"Cluster",
+        partitionName:"Partition",
+        nodeCount:"All nodes",
+        pendingJobCount:"Pending Jobs",
+        cpuUsage:"CPU",
+        gpuUsage:"GPU",
+        usageRatePercentage:"Nodes",
+        partitionStatus:"Status",
+        available:"Available",
+        notAvailable:"Error",
       },
       infoPanes:{
-        nodeInfo:"nodeInfo",
-        node:"node",
-        resourceInfo:"resourceInfo",
-        core:"core",
-        running:"running",
+        nodeInfo:"Nodes",
+        node:"Nodes",
+        resourceInfo:"CPU & GPU",
+        core:"Core",
+        running:"Running",
         idle:"idle",
-        notAvailable:"notAvailable",
-        card:"card",
-        job:"job",
-        pending:"pending",
+        notAvailable:"Error",
+        card:"Card",
+        job:"Job",
+        pending:"Pending",
       },
     },
   },
@@ -485,6 +490,8 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "The cluster you are currently accessing is unavailable or there are no available clusters. "
+      + " Please try again later or contact the administrator.",
     },
     others: {
       clusterSelector: "Please select a cluster.",
@@ -494,17 +501,17 @@ export default {
     apps: {
       create: {
         title: "Create ",
-        error404: "This app does not exist",
+        error404: "App does not exist",
       },
       createApps: {
         subTitle: "The requested cluster does not exist",
         title: "Create App",
-        pageTitle: "Create an App on {} Cluster",
+        pageTitle: "Create an App on {}",
       },
       sessions: {
         subTitle: "The requested cluster does not exist",
         title: "Interactive Apps",
-        pageTitle: "{} Cluster Interactive Apps",
+        pageTitle: "{} Interactive Apps",
       },
     },
     desktop: {
@@ -514,7 +521,7 @@ export default {
     files: {
       path: {
         subTitle: "The requested cluster does not exist",
-        title: "File Management",
+        title: "Files",
       },
       fileTransfer: {
         confirmTransferTitle: "Confirm to start transfer?",
@@ -529,16 +536,16 @@ export default {
     },
     jobs: {
       allJobs: {
-        title: "Historical Jobs",
-        pageTitle: "All Historical Jobs of this User",
+        title: "aLL Jobs",
+        pageTitle: "My Jobs",
       },
       runningJobs: {
         title: "Running Jobs",
-        pageTitle: "Unfinished Jobs of this User",
+        pageTitle: "My Running Jobs",
       },
       savedJobs: {
         title: "Job Templates",
-        pageTitle: "Job Template List",
+        pageTitle: "My Job Templates",
       },
       submit: {
         title: "Submit Job",
@@ -557,7 +564,7 @@ export default {
     shell: {
       loginNode: {
         title: "Terminal",
-        content: "Connected to {} cluster's {} node with ID: {}",
+        content: "Connected to {}  {} node with ID: {}",
         reloadButton: "Refresh and Reconnect",
         popoverTitle: "Commands",
         popoverContent1: "Navigate to the file system ",
@@ -574,6 +581,9 @@ export default {
         popoverContent9: "Edit a file",
         popoverContent10: "After entering the command ",
         popoverContent11: ", you will be redirected to a file editing page where you can edit the specified file. ",
+        popoverContent12: "Upload files ",
+        popoverContent13: "By entering this command, you can upload local files to the current directory.",
+
         command: "Command",
       },
       index: {
@@ -588,9 +598,18 @@ export default {
                         + "Please reduce unnecessary information output in files such as'~/. bashrc'!",
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
+      adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
+      + "Please try again after refreshing the page.",
+      noClusters: "Unable to find cluster configuration files. Please contact the system administrator.",
     },
     dashboard: {
       title: "Dashboard",
+    },
+    common: {
+      noAvailableClusters: "There are currently no available clusters."
+      + " Please try again later or contact the administrator.",
     },
   },
 };

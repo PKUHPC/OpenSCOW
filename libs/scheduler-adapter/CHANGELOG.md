@@ -1,5 +1,25 @@
 # @scow/lib-scheduler-adapter
 
+## 1.1.9
+
+### Patch Changes
+
+- @scow/protos@1.0.11
+
+## 1.1.8
+
+### Patch Changes
+
+- Updated dependencies [e312efb]
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/protos@1.0.10
+
+## 1.1.7
+
+### Patch Changes
+
+- @scow/protos@1.0.9
+
 ## 1.1.6
 
 ### Patch Changes

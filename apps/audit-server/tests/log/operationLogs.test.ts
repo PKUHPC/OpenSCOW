@@ -17,6 +17,7 @@ import {
   ExportOperationLogResponse,
   OperationLog as OperationLogProto,
   OperationLogServiceClient,
+  OperationResult as OperationResultProto,
   operationResultFromJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { createServer } from "src/app";
@@ -30,7 +31,10 @@ const operationLog = {
   operatorUserId: "testUserId",
   operatorIp: "127.0.0.1",
   operationResult: OperationResult.SUCCESS,
-  operationEvent: { "$case": "submitJob" as const, submitJob: { accountName: "testAccount", jobId: 123 } },
+  operationEvent: { "$case": "submitJob" as const, submitJob: {
+    accountName: "testAccount",
+    jobId: 123,
+    clusterId: "test" } },
 };
 
 const operationLog1 = new OperationLog({
@@ -51,6 +55,7 @@ const operationLog2 = new OperationLog({
   metaData: {
     $case: "endJob", endJob: {
       jobId:123,
+      clusterId: "test",
     },
   },
 });
@@ -82,6 +87,37 @@ const operationLog4 = new OperationLog({
       source: { $case: "admin", admin: {} },
     },
   },
+});
+
+// custom event
+const operationLog5 = new OperationLog({
+  operationLogId: 5,
+  operatorUserId: operationLog.operatorUserId,
+  operatorIp: operationLog.operatorIp,
+  operationResult: operationLog.operationResult,
+  operationTime: new Date("2023-12-05T02:15:02.648Z"),
+  customEventType: "test",
+  metaData: {
+    $case: "customEvent",
+    customEvent: {
+      type: "test",
+      name: {
+        i18n: {
+          default: "test",
+          en: "test",
+          zhCn: "测试",
+        },
+      },
+      content: {
+        i18n: {
+          default: "test content",
+          en: "test content",
+          zhCn: "测试内容",
+        },
+      },
+    },
+  },
+
 });
 
 async function collectOperationLog(stream: AsyncIterable<ExportOperationLogResponse>) {
@@ -159,10 +195,10 @@ it("create operation log with targetAccountName", async () => {
     operationEvent: {
       $case: "exportPayRecord" as const,
       exportPayRecord: { target:{
-        $case: "accountOfTenant" as const,
-        accountOfTenant: {
-          accountName: "testAccount",
+        $case: "accountsOfTenant" as const,
+        accountsOfTenant: {
           tenantName: "testTenant",
+          accountNames: [],
         },
       },
       },
@@ -209,7 +245,7 @@ it("create operation log with targetAccountName", async () => {
   expect(operationLogs[1].metaData?.[operationLogs[1].metaData?.$case])
     .toEqual(exportPayRecordLog.operationEvent.exportPayRecord);
   expect(operationLogs[1].metaData?.targetAccountName)
-    .toEqual(exportPayRecordLog.operationEvent.exportPayRecord.target.accountOfTenant.accountName);
+    .toEqual(exportPayRecordLog.operationEvent.exportPayRecord.target.accountsOfTenant.accountNames);
 
   expect(operationLogs[2].metaData?.$case).toEqual("exportChargeRecord");
   expect(operationLogs[2].metaData?.[operationLogs[2].metaData?.$case])
@@ -217,6 +253,53 @@ it("create operation log with targetAccountName", async () => {
   expect(operationLogs[2].metaData?.targetAccountName)
     .toEqual(exportChargeRecordLog.operationEvent.exportChargeRecord.target.accountOfTenant.accountName);
 });
+
+it("create operation log for custom event", async () => {
+
+  const em = server.ext.orm.em.fork();
+
+  const createCustomOperationLog = {
+    operatorUserId:  operationLog.operatorUserId,
+    operatorIp: operationLog.operatorIp,
+    operationResult:  OperationResultProto.SUCCESS,
+    operationEvent: {
+      $case: "customEvent" as const,
+      customEvent: {
+        type:"test",
+        name: {
+          i18n: {
+            default: "test",
+            en: "test",
+            zhCn: "测试",
+          },
+        },
+        content: {
+          i18n: {
+            default: "test content",
+            en: "test content",
+            zhCn: "测试内容",
+          },
+        },
+      },
+    },
+  };
+
+  await asyncClientCall(client, "createOperationLog", createCustomOperationLog);
+
+  const operationLogs = await em.find(OperationLog, { operatorUserId: operationLog.operatorUserId }, {
+    orderBy: { operationTime: "DESC" },
+    limit: 1,
+  });
+
+  expect(operationLogs[0].operatorUserId).toEqual(operationLog.operatorUserId);
+  expect(operationLogs[0].operatorIp).toEqual(operationLog.operatorIp);
+  expect(operationLogs[0].operationResult).toEqual(operationLog.operationResult);
+  expect(operationLogs[0].metaData?.$case).toEqual("customEvent");
+  expect(operationLogs[0].metaData?.[operationLogs[0].metaData?.$case]).toEqual(
+    createCustomOperationLog?.operationEvent?.customEvent,
+  );
+},
+);
 
 it("get operation logs", async () => {
 
@@ -249,11 +332,56 @@ it("get operation logs", async () => {
       operationEvent: {
         $case: "endJob", endJob: {
           jobId:123,
+          clusterId: "test",
         },
       },
     },
   ]);
 });
+
+it("get logs for custom event", async () => {
+
+  const em = server.ext.orm.em.fork();
+  await em.persistAndFlush([operationLog5]);
+
+  const resp = await asyncClientCall(client, "getOperationLogs", {
+    page: 1,
+    filter: { operatorUserIds: ["testUserId"]},
+  });
+
+  expect(resp.totalCount).toBe(1);
+
+  expect(resp.results).toIncludeSameMembers([
+    {
+      operationLogId: 5,
+      operatorUserId: operationLog.operatorUserId,
+      operatorIp: operationLog.operatorIp,
+      operationResult: operationResultFromJSON(operationLog.operationResult),
+      operationTime: operationLog5.operationTime?.toISOString(),
+      operationEvent: {
+        $case: "customEvent",
+        customEvent: {
+          type: "test",
+          name: {
+            i18n: {
+              default: "test",
+              en: "test",
+              zhCn: "测试",
+            },
+          },
+          content: {
+            i18n: {
+              default: "test content",
+              en: "test content",
+              zhCn: "测试内容",
+            },
+          },
+        },
+      },
+    },
+  ]);
+},
+);
 
 
 it("export operation logs", async () => {

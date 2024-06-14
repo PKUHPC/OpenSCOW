@@ -21,7 +21,7 @@ env:
 jobs:
   test-version-packages:
     name: Test and version packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     permissions:
       contents: write
@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: pnpm/action-setup@v3.0.0
+      - uses: pnpm/action-setup@v4.0.0
 
       - uses: actions/setup-node@v4
         with:
@@ -49,36 +49,43 @@ jobs:
         run: pnpm lint
 
       - name: Generate SSH key pairs for test
+        if: vars.RUN_TESTS == 'true'
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
+        if: vars.RUN_TESTS == 'true'
         run: pnpm devenv
 
       - name: Check running containers
+        if: vars.RUN_TESTS == 'true'
         run: docker ps
 
       - name: Prepare dev libs and code
+        if: vars.RUN_TESTS == 'true' || vars.RUN_RELEASE == 'true'
         run: pnpm prepareDev
 
       - name: Wait for ports
-        uses: ifaxity/wait-on-action@main
+        if: vars.RUN_TESTS == 'true'
+        uses: ifaxity/wait-on-action@v1.1.0
         with:
           log: true
           verbose: true
           resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
       - name: Run tests
+        if: vars.RUN_TESTS == 'true'
         run: pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4
+        if: vars.RUN_TESTS == 'true'
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
-        if: github.ref == 'refs/heads/master'
+        if: vars.RUN_RELEASE == 'true' && github.ref == 'refs/heads/master'
         with:
           version: pnpm ci:version
           publish: pnpm ci:publish
@@ -89,12 +96,12 @@ jobs:
 
   scow-cli:
     needs: test-version-packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3.0.0
+      - uses: pnpm/action-setup@v4.0.0
 
       - uses: actions/setup-node@v4
         with:
@@ -122,7 +129,7 @@ jobs:
 
   build-images:
     needs: test-version-packages
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     permissions:
       contents: read
@@ -149,7 +156,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@5139682d94efc37792e6b54386b5b470a68a4737
+        uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
@@ -171,12 +178,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
-          # only build arm64 in master commits
-          platforms: linux/amd64${{ github.ref_type == 'tag' && ',linux/arm64' || '' }}
+          # only build arm64 in tag commits or branches with name starting with `arm-`
+          platforms: linux/amd64${{ (github.ref_type == 'tag' || startsWith(github.ref_name, 'arm-')) && ',linux/arm64' || '' }}
 
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     needs:
       - scow-cli
       - build-images
@@ -206,7 +213,7 @@ jobs:
         working-directory: release
 
       - name: Create release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: SCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
           body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) || null }}

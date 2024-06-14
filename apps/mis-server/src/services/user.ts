@@ -19,10 +19,10 @@ import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabil
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
-import { checktTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
-  GetAccountUsersResponse,
+  accountUserInfo_UserStateInAccountFromJSON, GetAccountUsersResponse,
   platformRoleFromJSON,
   platformRoleToJSON,
   QueryIsUserInAccountResponse,
@@ -32,12 +32,14 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
-import { clusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
+import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
-import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { UserAccount, UserRole, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { getUserStateInfo } from "src/utils/accountUserState";
 import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
@@ -54,19 +56,27 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["user", "user.storageQuotas"]});
 
       return [GetAccountUsersResponse.fromPartial({
-        results: accountUsers.map((x) => ({
-          userId: x.user.$.userId,
-          name: x.user.$.name,
-          email: x.user.$.email,
-          role: PFUserRole[x.role],
-          status: PFUserStatus[x.status],
-          jobChargeLimit: x.jobChargeLimit ? decimalToMoney(x.jobChargeLimit) : undefined,
-          usedJobChargeLimit: x.usedJobCharge ? decimalToMoney(x.usedJobCharge) : undefined,
-          storageQuotas: x.user.$.storageQuotas.getItems().reduce((prev, curr) => {
-            prev[curr.cluster] = curr.storageQuota;
-            return prev;
-          }, {}),
-        })),
+        results: accountUsers.map((x) => {
+
+          const displayedState = x.state ?
+            getUserStateInfo(x.state, x.jobChargeLimit, x.usedJobCharge).displayedState : undefined;
+          return {
+            userId: x.user.$.userId,
+            name: x.user.$.name,
+            email: x.user.$.email,
+            role: PFUserRole[x.role],
+            status: PFUserStatus[x.blockedInCluster],
+            jobChargeLimit: x.jobChargeLimit ? decimalToMoney(x.jobChargeLimit) : undefined,
+            usedJobChargeLimit: x.usedJobCharge ? decimalToMoney(x.usedJobCharge) : undefined,
+            storageQuotas: x.user.$.storageQuotas.getItems().reduce((prev, curr) => {
+              prev[curr.cluster] = curr.storageQuota;
+              return prev;
+            }, {}),
+            userStateInAccount: accountUserInfo_UserStateInAccountFromJSON(x.state),
+            displayedUserState: displayedState,
+          };
+        },
+        ),
       })];
     },
 
@@ -96,15 +106,23 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (!tenant) {
+        throw <ServiceError>{ code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+      }
+
       return [{
         accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
           const account = curr.account.getEntity();
           prev[account.accountName] = {
-            userStatus: PFUserStatus[curr.status],
-            accountBlocked: Boolean(account.blocked),
+            accountBlocked: Boolean(account.blockedInCluster),
+            userStatus: PFUserStatus[curr.blockedInCluster],
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
+            isInWhitelist: Boolean(account.whitelist),
+            blockThresholdAmount:account.blockThresholdAmount ?
+              decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
           } as AccountStatus;
           return prev;
         }, {}),
@@ -170,12 +188,15 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS")
+           !== Object.keys(currentActivatedClusters).length) {
           throw e;
         }
       });
@@ -184,7 +205,7 @@ export const userServiceServer = plugin((server) => {
         account,
         user,
         role: UserRole.USER,
-        status: UserStatus.UNBLOCKED,
+        blockedInCluster: UserStatus.UNBLOCKED,
       });
 
       account.users.add(newUserAccount);
@@ -219,14 +240,17 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
       // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
-      if (userAccount.status === UserStatus.UNBLOCKED) {
-        await blockUserInAccount(userAccount, server.ext, logger);
+      if (userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
+        userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
+        await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
         await em.flush();
       }
 
       // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
       const jobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
         logger,
         async (client) => {
           const fields = ["job_id", "user", "state", "account"];
@@ -246,12 +270,14 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
       }).catch(async (e) => {
         // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
         // 除此以外，都抛出异常
-        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND") !== Object.keys(clusters).length) {
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+           !== Object.keys(currentActivatedClusters).length) {
           throw e;
         }
       });
@@ -280,15 +306,17 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      if (user.status === UserStatus.BLOCKED) {
+      // 如果已经在集群下为封锁，且状态值为被账户管理员或拥有者手动封锁
+      if (user.blockedInCluster === UserStatus.BLOCKED && user.state === UserStateInAccount.BLOCKED_BY_ADMIN) {
         throw <ServiceError> {
           code: Status.FAILED_PRECONDITION, message: `User ${userId}  is already blocked.`,
         };
       }
 
-      await blockUserInAccount(user, server.ext, logger);
-
-      user.status = UserStatus.BLOCKED;
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      await blockUserInAccount(user, currentActivatedClusters, server.ext, logger);
+      user.state = UserStateInAccount.BLOCKED_BY_ADMIN;
+      user.blockedInCluster = UserStatus.BLOCKED;
 
       await em.flush();
 
@@ -309,15 +337,25 @@ export const userServiceServer = plugin((server) => {
         };
       }
 
-      if (user.status === UserStatus.UNBLOCKED) {
+      if (user.blockedInCluster === UserStatus.UNBLOCKED) {
         throw <ServiceError> {
           code: Status.FAILED_PRECONDITION, message: `User ${userId}  is already unblocked.`,
         };
       }
 
-      await unblockUserInAccount(user, server.ext, logger);
+      // 判断如果限额和已用额度存在的情况是否可以解封
+      const stillBlockUserInCluster = getUserStateInfo(
+        UserStateInAccount.NORMAL,
+        user.jobChargeLimit,
+        user.usedJobCharge,
+      ).shouldBlockInCluster;
 
-      user.status = UserStatus.UNBLOCKED;
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      if (!stillBlockUserInCluster) {
+        await unblockUserInAccount(user, currentActivatedClusters, server.ext, logger);
+        user.blockedInCluster = UserStatus.UNBLOCKED;
+      }
+      user.state = UserStateInAccount.NORMAL;
 
       await em.flush();
 
@@ -382,7 +420,8 @@ export const userServiceServer = plugin((server) => {
      */
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+      const user =
+      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
             throw <ServiceError> {
@@ -434,19 +473,20 @@ export const userServiceServer = plugin((server) => {
      */
     addUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
-        .catch((e) => {
-          if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS,
-              message: `User with userId ${identityId} already exists in scow.`,
-              details: "EXISTS_IN_SCOW",
-            };
-          }
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: `Error creating user with userId ${identityId} in database.` };
-        });
+      const user
+       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+         .catch((e) => {
+           if (e.code === Status.ALREADY_EXISTS) {
+             throw <ServiceError> {
+               code: Status.ALREADY_EXISTS,
+               message: `User with userId ${identityId} already exists in scow.`,
+               details: "EXISTS_IN_SCOW",
+             };
+           }
+           throw <ServiceError> {
+             code: Status.INTERNAL,
+             message: `Error creating user with userId ${identityId} in database.` };
+         });
 
       await callHook("userAdded", { tenantName, userId: user.userId }, logger);
 
@@ -585,7 +625,7 @@ export const userServiceServer = plugin((server) => {
           name: x.name,
           email: x.email,
           availableAccounts: x.accounts.getItems()
-            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+            .filter((ua) => ua.blockedInCluster === UserStatus.UNBLOCKED)
             .map((ua) => {
               return ua.account.getProperty("accountName");
             }),
@@ -780,7 +820,7 @@ export const userServiceServer = plugin((server) => {
     getNewUserCount: async ({ request, em, logger }) => {
       const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      checktTimeZone(timeZone);
+      checkTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(User, "u");
       qb
@@ -801,5 +841,49 @@ export const userServiceServer = plugin((server) => {
         },
       ];
     },
+
+    changeTenant: async ({ request, em }) => {
+      const { userId, tenantName } = request;
+
+      const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
+
+      if (!user) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`, details: "USER_NOT_FOUND",
+        };
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw <ServiceError>{
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        };
+      }
+
+      const oldTenant = user.tenant.getEntity();
+
+      if (oldTenant.name === tenantName) {
+        throw <ServiceError>{
+          code: Status.ALREADY_EXISTS, message: `User ${userId} is already in tenant ${tenantName}.`,
+        };
+      }
+
+      const newTenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!newTenant) {
+        throw <ServiceError>{
+          code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.`, details: "TENANT_NOT_FOUND",
+        };
+      }
+
+      em.assign(user, { tenant: newTenant });
+
+      await em.persistAndFlush(user);
+
+      return [{}];
+
+    },
+
   });
 });

@@ -17,3 +17,19 @@ export function range(start = 1, end = 0, step = 1): number[] {
   }
   return r;
 }
+
+type ObjectTypeWithType = {
+  type: string;
+  [key: string]: any;
+};
+
+export function extractTypesFromObjects(array: ObjectTypeWithType[]): string[] {
+  const types = new Set<string>();
+  for (const item of array) {
+    if (item.type) {
+      types.add(item.type);
+    }
+  }
+  return Array.from(types);
+}
+

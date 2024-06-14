@@ -1,5 +1,41 @@
 # @scow/grpc-api
 
+## 1.9.0
+
+### Minor Changes
+
+- 89191ea: GetPaginatedChargeRecords 添加字段 user_id_or_name，将 GetChargeRecordsTotalCount 中的 userIds 改为 user_id_or_name.
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 6304074: JobTemplate 新增 script_output 可选字段，SubmitJobRequest 新增可选字段 script_output。
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- f534377: 为 getOperationLogs、 getPaginatedChargeRecords、 getJobs 三个 API 新增了 sortBy、sortOreder 参数，表示排序的列、排序方式（升序、降序、默认）
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
+## 1.8.1
+
+### Patch Changes
+
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+
+## 1.8.0
+
+### Minor Changes
+
+- a097dd1: server 增加 ChangeTenant 接口修改用户的所属租户，增加 CreateTenantWithExistingUserAsAdmin 接口允许创建租户时指定已有用户作为租户管理员
+- 63d1873: 新增 SetBlockThreshold， SetDefaultAccountBlockThreshold 以及 audit 新增以上接口的 operation_event
+
+### Patch Changes
+
+- 850a7ee: 在 getAccountUsers 接口中增加 userStateInAccount , displayedUserState 的返回值
+- 785de17: 修改 GetFileMetadataResponse 中文件大小 size 为 uint64
+- d3d891a: 门户系统部分操作类型增加 clusterId 及 loginNode 参数
+- 24db413: 增加 GetCustomEventTypes 接口获取自定义操作类型，增加 CustomEvent 保存自定义操作类型
+- 8dd8c0e: 在 GetAccounts 接口中增加账户状态，账户显示状态，账户白名单状态的返回值，exportAccounts 接口中增加欠费，冻结的查询参数
+
 ## 1.7.0
 
 ### Minor Changes

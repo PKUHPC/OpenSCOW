@@ -39,6 +39,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "string"
+        },
+        "expiration_time": {
+          "name": "expiration_time",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 0,
+          "mappedType": "datetime"
         }
       },
       "name": "account_whitelist",
@@ -153,6 +163,7 @@
           ],
           "composite": false,
           "keyName": "time",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -162,6 +173,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_tenant_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -171,6 +183,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_account_name_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -180,6 +193,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_user_id_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -189,6 +203,7 @@
           ],
           "composite": false,
           "keyName": "charge_record_type_index",
+          "constraint": false,
           "primary": false,
           "unique": false
         },
@@ -216,6 +231,98 @@
           "constraint": false,
           "primary": false,
           "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "cluster_id": {
+          "name": "cluster_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "string"
+        },
+        "activation_status": {
+          "name": "activation_status",
+          "type": "enum('ACTIVATED','DEACTIVATED')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'ACTIVATED'",
+          "enumItems": [
+            "ACTIVATED",
+            "DEACTIVATED"
+          ],
+          "comment": "ACTIVATED, DEACTIVATED",
+          "mappedType": "enum"
+        },
+        "last_activation_operation": {
+          "name": "last_activation_operation",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "json"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "cluster",
+      "indexes": [
+        {
+          "columnNames": [
+            "cluster_id"
+          ],
+          "composite": false,
+          "keyName": "cluster_cluster_id_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
         },
         {
           "keyName": "PRIMARY",
@@ -975,6 +1082,18 @@
           "default": "0.0000",
           "mappedType": "decimal"
         },
+        "default_account_block_threshold": {
+          "name": "default_account_block_threshold",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 19,
+          "scale": 4,
+          "default": "0.0000",
+          "mappedType": "decimal"
+        },
         "create_time": {
           "name": "create_time",
           "type": "DATETIME(6)",
@@ -1174,8 +1293,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "blocked": {
-          "name": "blocked",
+        "blocked_in_cluster": {
+          "name": "blocked_in_cluster",
           "type": "tinyint(1)",
           "unsigned": false,
           "autoincrement": false,
@@ -1213,6 +1332,33 @@
           "scale": 4,
           "default": "0.0000",
           "mappedType": "decimal"
+        },
+        "block_threshold_amount": {
+          "name": "block_threshold_amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "precision": 19,
+          "scale": 4,
+          "mappedType": "decimal"
+        },
+        "state": {
+          "name": "state",
+          "type": "enum('NORMAL','FROZEN','BLOCKED_BY_ADMIN')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'NORMAL'",
+          "enumItems": [
+            "NORMAL",
+            "FROZEN",
+            "BLOCKED_BY_ADMIN"
+          ],
+          "comment": "NORMAL, FROZEN, BLOCKED_BY_ADMIN",
+          "mappedType": "enum"
         },
         "create_time": {
           "name": "create_time",
@@ -1544,8 +1690,8 @@
           "nullable": false,
           "mappedType": "integer"
         },
-        "status": {
-          "name": "status",
+        "blocked_in_cluster": {
+          "name": "blocked_in_cluster",
           "type": "varchar(10)",
           "unsigned": false,
           "autoincrement": false,
@@ -1585,6 +1731,21 @@
           "precision": 19,
           "scale": 4,
           "mappedType": "decimal"
+        },
+        "state": {
+          "name": "state",
+          "type": "enum('NORMAL','BLOCKED_BY_ADMIN')",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'NORMAL'",
+          "enumItems": [
+            "NORMAL",
+            "BLOCKED_BY_ADMIN"
+          ],
+          "comment": "NORMAL, BLOCKED_BY_ADMIN",
+          "mappedType": "enum"
         }
       },
       "name": "user_account",

@@ -34,9 +34,12 @@ interface Props {
   reload: () => void;
 }
 
+// 过滤表单的结构
 interface FilterForm {
   accountName: string | undefined;
+  ownerIdOrName: string | undefined;
 }
+
 const p = prefix("pageComp.tenant.accountWhitelistTable.");
 const pCommon = prefix("common.");
 
@@ -44,22 +47,42 @@ export const AccountWhitelistTable: React.FC<Props> = ({
   data, isLoading, reload,
 }) => {
 
+  // 获取国际化翻译函数
   const t = useI18nTranslateToString();
 
   const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<FilterForm>();
+
+  // 创建过滤表单
   const [query, setQuery] = useState<FilterForm>({
     accountName: undefined,
+    ownerIdOrName: undefined,
   });
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
   const [currentSortInfo, setCurrentSortInfo] =
     useState<{ field: string | null | undefined, order: SortOrder }>({ field: null, order: null });
 
-  const filteredData = useMemo(() => data ? data.results.filter((x) => (
-    (!query.accountName || x.accountName.includes(query.accountName))
-  )) : undefined, [data, query]);
+  // 对数据进行过滤
+  const filteredData = useMemo(() => {
 
+    if (!data) return undefined;
+
+    const filtered = data.results.filter((x) => {
+      const dataMatchedAccount =
+          !query.accountName || x.accountName.includes(query.accountName);
+
+      const dataMatchedOwner =
+          !query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName);
+
+      return dataMatchedAccount && dataMatchedOwner;
+    });
+
+    return filtered;
+
+  }, [data, query]);
+
+  // 获取欠费总数
   const getTotalDebtAmount =
     (data: Static<typeof GetWhitelistedAccountsSchema["responses"]["200"]> | undefined): number => {
       const sum = data?.results.filter((acct) => !acct.balance?.positive)
@@ -70,6 +93,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
       return sum ? Math.abs(sum) : 0;
     };
 
+  // 处理表格变化事件
   const handleTableChange = (_, __, sortInfo) => {
     setCurrentSortInfo({ field: sortInfo.field, order: sortInfo.order });
   };
@@ -90,12 +114,16 @@ export const AccountWhitelistTable: React.FC<Props> = ({
           <Form.Item label={t(pCommon("account"))} name="accountName">
             <Input />
           </Form.Item>
+          <Form.Item label={t(p("ownerIdOrName"))} name="ownerIdOrName">
+            <Input />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
         </Form>
       </FilterFormContainer>
       <>
+        {/* 名单表格 */}
         <TableTitle justify="flex-start">
           {
             data ? (
@@ -106,7 +134,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                 <>
                   <Divider type="vertical" />
                   <span>
-                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(3)} {t(pCommon("unit"))}</strong>
+                    {t(p("debtSum"))}：<strong>{getTotalDebtAmount(data).toFixed(2)} {t(pCommon("unit"))}</strong>
                   </span>
                 </>
               </div>
@@ -150,6 +178,11 @@ export const AccountWhitelistTable: React.FC<Props> = ({
             dataIndex="addTime"
             title={t(p("joinTime"))}
             render={(time: string) => formatDateTime(time) }
+          />
+          <Table.Column<WhitelistedAccount>
+            dataIndex="expirationTime"
+            title={t(p("expirationTime"))}
+            render={(time: string | undefined) => time ? formatDateTime(time) : "永久有效"}
           />
           <Table.Column<WhitelistedAccount> dataIndex="comment" title={t(pCommon("comment"))} />
           <Table.Column<WhitelistedAccount> dataIndex="operatorId" title={t(p("operatorId"))} />

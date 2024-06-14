@@ -11,6 +11,7 @@
  */
 
 import { LinkOutlined } from "@ant-design/icons";
+import { join } from "path";
 import { defineExtensionRoute } from "src/extensions/routes";
 import { NavItemProps } from "src/layouts/base/types";
 import { NavIcon } from "src/layouts/icon";
@@ -64,7 +65,27 @@ export const fromNavItemProps = (props: NavItemProps[]): NavItem[] => {
   }));
 };
 
-export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]): NavItemProps[] => {
+function isUrl(input: string): boolean {
+  try {
+    new URL(input);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 将Extension API返回的导航栏转换为用于渲染的导航栏
+ * @param originalItems 传给Extension API的原始导航栏
+ * @param returnedItems Extension API返回的导航栏
+ * @param extensionName Extension名称，用于计算新的路径
+ * @returns 用于渲染的导航栏
+ */
+export const toNavItemProps = (
+  originalItems: NavItemProps[],
+  returnedItems: NavItem[],
+  extensionName?: string,
+): NavItemProps[] => {
 
   // create a map with original origin items paths
   const originalItemsMap = new Map<string, NavItemProps>();
@@ -74,12 +95,25 @@ export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]):
     navs.children?.forEach(convertToMap);
   };
 
+  const convertPath = (returnedPath: string) => {
+    // 如果这个路径是原始的导航栏中的一项，则路径不处理
+    if (originalItemsMap.has(returnedPath)) { return returnedPath; }
+
+    // 如果这个路径是一个正确的URL，则路径不处理
+
+    if (isUrl(returnedPath)) { return returnedPath; }
+    const parts = ["/extensions"];
+    if (extensionName) { parts.push(extensionName); }
+    parts.push(returnedPath);
+    return join(...parts);
+  };
+
   originalItems.forEach(convertToMap);
 
   const rec = (items: NavItem[]): NavItemProps[] => {
     return items.map((item) => ({
-      path: item.path,
-      clickToPath: item.clickToPath,
+      path: convertPath(item.path),
+      clickToPath: item.clickToPath ? convertPath(item.clickToPath) : undefined,
       text: item.text,
       openInNewPage: item.openInNewPage,
       Icon: (item.icon
@@ -91,6 +125,6 @@ export const toNavItemProps = (originalItems: NavItemProps[], items: NavItem[]):
     }));
   };
 
-  return rec(items);
+  return rec(returnedItems);
 
 };

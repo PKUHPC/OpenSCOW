@@ -1,5 +1,26 @@
 # @scow/lib-web
 
+## 1.3.3
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
+## 1.3.2
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+
+## 1.3.1
+
+### Patch Changes
+
+- 146e19f: 去掉导航栏多余的下划线
+- 850a7ee: 修改 UserAccount 实体中原 status 字段名为 blocked_in_cluster ,表示在集群中是否为封锁状态
+  增加字段 state ,允许写入的值为 "NORMAL" , "BLOCKED_BY_ADMIN" 的枚举值
+  页面增加用户在账户下的 限额 的状态的显示
+
 ## 1.3.0
 
 ### Minor Changes

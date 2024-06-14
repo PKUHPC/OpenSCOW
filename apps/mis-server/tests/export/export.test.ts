@@ -15,7 +15,7 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
-import { Account } from "@scow/protos/build/server/account";
+import { Account, Account_DisplayedAccountState as DisplayedAccountState } from "@scow/protos/build/server/account";
 import { ChargeRecord as ChargeRecordProto, PaymentRecord } from "@scow/protos/build/server/charging";
 import {
   ExportAccountResponse,
@@ -105,6 +105,7 @@ it("export accounts", async () => {
 
   const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
+
   const stream = asyncReplyStreamCall(client, "exportAccount", {
     count: 3,
     tenantName: data.tenant.name,
@@ -113,6 +114,7 @@ it("export accounts", async () => {
   const handleAccountResponse = (response: ExportAccountResponse): Account[] => {
     return response.accounts;
   };
+
   const accounts = await collectData(stream, handleAccountResponse);
 
   expect(accounts).toMatchObject([{
@@ -122,8 +124,9 @@ it("export accounts", async () => {
     ownerId: data.userA.userId,
     ownerName: data.userA.name,
     comment: data.accountA.comment,
-    blocked: data.accountA.blocked,
+    blocked: data.accountA.blockedInCluster,
     balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
   }, {
     accountName: data.accountB.accountName,
     tenantName: data.tenant.name,
@@ -131,8 +134,42 @@ it("export accounts", async () => {
     ownerId: data.userB.userId,
     ownerName: data.userB.name,
     comment: data.accountB.comment,
-    blocked: data.accountB.blocked,
+    blocked: data.accountB.blockedInCluster,
     balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
+  },
+  ]);
+
+});
+
+it("export dept accounts", async () => {
+
+  const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+
+
+  const stream = asyncReplyStreamCall(client, "exportAccount", {
+    count: 3,
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+    debt: true,
+  });
+
+  const handleAccountResponse = (response: ExportAccountResponse): Account[] => {
+    return response.accounts;
+  };
+
+  const accounts = await collectData(stream, handleAccountResponse);
+
+  expect(accounts).toMatchObject([{
+    accountName: data.accountA.accountName,
+    tenantName: data.tenant.name,
+    userCount: 2,
+    ownerId: data.userA.userId,
+    ownerName: data.userA.name,
+    comment: data.accountA.comment,
+    blocked: data.accountA.blockedInCluster,
+    balance: decimalToMoney(new Decimal(0)),
+    displayedState: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
   },
   ]);
 
@@ -157,7 +194,7 @@ it("export charge Records", async () => {
     id: 2,
     time: new Date("2023-12-07T07:21:47.000Z"),
     target: data.accountA,
-    type: "test",
+    type: "testB",
     comment: "test",
     amount,
     userId: data.userA.userId,
@@ -216,7 +253,7 @@ it("export charge Records", async () => {
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
     target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
-      tenantName: data.accountA.tenant.getProperty("name") } },
+      tenantName: data.accountA.tenant.getProperty("name") } }, types:[chargeRecord1.type],
     userIds: [data.userA.userId],
   });
 
@@ -225,7 +262,7 @@ it("export charge Records", async () => {
   };
   const records = await collectData(stream, handleChargeResponse);
 
-  expect(records).toHaveLength(3);
+  expect(records).toHaveLength(2);
 
   expect(records).toMatchObject([
     {
@@ -233,16 +270,6 @@ it("export charge Records", async () => {
       tenantName: data.accountA.tenant.getProperty("name"),
       accountName: data.accountA.accountName,
       time: chargeRecord1.time.toISOString(),
-      amount: decimalToMoney(amount),
-      type: "test",
-      comment: "test",
-      userId: data.userA.userId,
-    },
-    {
-      index: chargeRecord2.id,
-      tenantName: data.accountA.tenant.getProperty("name"),
-      accountName: data.accountA.accountName,
-      time: chargeRecord2.time.toISOString(),
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
@@ -283,7 +310,7 @@ it("export pay Records", async () => {
     id: 2,
     time: new Date("2023-12-07T07:21:47.000Z"),
     target: data.accountA,
-    type: "test",
+    type: "testB",
     comment: "test",
     amount,
     operatorId: "test",
@@ -326,8 +353,10 @@ it("export pay Records", async () => {
     count: 2,
     startTime: queryStartTime.toISOString(),
     endTime: queryEndTime.toISOString(),
-    target:{ $case:"accountOfTenant", accountOfTenant:{ accountName: data.accountA.accountName,
-      tenantName: data.accountA.tenant.getProperty("name") } },
+    target:{ $case:"accountsOfTenant", accountsOfTenant:{
+      accountNames: [data.accountA.accountName, data.accountB.accountName],
+      tenantName: data.accountA.tenant.getProperty("name"),
+    } }, types:[payRecord1.type],
   });
   const handlePaymentResponse = (response: ExportPayRecordResponse): PaymentRecord[] => {
     return response.payRecords;
@@ -349,15 +378,15 @@ it("export pay Records", async () => {
       ipAddress: payRecord1.ipAddress,
     },
     {
-      index: payRecord2.id,
-      tenantName: data.accountA.tenant.getProperty("name"),
-      accountName: data.accountA.accountName,
-      time: payRecord2.time.toISOString(),
+      index: payRecord3.id,
+      tenantName: data.accountB.tenant.getProperty("name"),
+      accountName: data.accountB.accountName,
+      time: payRecord3.time.toISOString(),
       amount: decimalToMoney(amount),
       type: "test",
       comment: "test",
-      operatorId: payRecord2.operatorId,
-      ipAddress: payRecord2.ipAddress,
+      operatorId: payRecord3.operatorId,
+      ipAddress: payRecord3.ipAddress,
     },
   ]);
 

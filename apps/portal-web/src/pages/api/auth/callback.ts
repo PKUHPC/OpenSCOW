@@ -11,12 +11,13 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { redirectToAuthLogin } from "@scow/lib-web/build/routes/auth/redirectToLogin";
 import { Type } from "@sinclair/typebox";
 import { setTokenCookie } from "src/auth/cookie";
 import { validateToken } from "src/auth/token";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 import { parseIp } from "src/utils/server";
 
@@ -57,8 +58,7 @@ export default route(AuthCallbackSchema, async (req, res) => {
     }
     res.redirect(publicConfig.BASE_PATH);
   } else {
-    return { 403: null };
-
+    redirectToAuthLogin(req, res, runtimeConfig.PROTOCOL, publicConfig.BASE_PATH, runtimeConfig.AUTH_EXTERNAL_URL);
   }
 
 });

@@ -63,8 +63,9 @@ db:
 
 # 获取作业相关配置
 fetchJobs:
-  # 从哪个时间点开始获取作业(日期格式ISO 8601)
-  # startDate: ""
+  # 从哪个时间点开始获取作业
+  # (日期格式ISO 8601,且需在末尾添加时区，推荐使用协调世界时(UTC))
+  # startDate: "2000-01-01T00:00:00Z"
 
   # 限制一次获取的作业数量
   # batchSize: 1000
@@ -74,7 +75,7 @@ fetchJobs:
     # 是否开启
     enabled: true
     # 周期的cron表达式
-    cron: "10 */10 * * * *"
+    cron: "*/10 * * * *"
 
 # 周期性同步scow与调度器(如slurm)账户用户封锁状态的配置
 periodicSyncUserAccountBlockStatus:

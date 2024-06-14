@@ -20,7 +20,7 @@ import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
 import { OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole } from "src/models/User";
+import { getDisplayedStateI18nTexts, PlatformRole, TenantRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -41,6 +41,8 @@ export const ExportAccountSchema = typeboxRouteSchema({
     tenantName: Type.Optional(Type.String()),
     blocked: Type.Optional(Type.Boolean()),
     debt: Type.Optional(Type.Boolean()),
+    frozen: Type.Optional(Type.Boolean()),
+    normal: Type.Optional(Type.Boolean()),
     // 是否来自平台管理页面
     isFromAdmin: Type.Boolean(),
   }),
@@ -63,8 +65,7 @@ const adminAuth = authenticate((info) =>
 export default route(ExportAccountSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, accountName, tenantName, blocked, debt, count, isFromAdmin } = query;
-
+  const { columns, accountName, tenantName, blocked, debt, frozen, normal, count, isFromAdmin } = query;
 
   const info = isFromAdmin ? await adminAuth(req, res) : await tenantAuth(req, res);
 
@@ -102,6 +103,8 @@ export default route(ExportAccountSchema, async (req, res) => {
       tenantName: isFromAdmin ? tenantName : info.tenant,
       blocked,
       debt,
+      frozen,
+      normal,
     });
 
     const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
@@ -109,13 +112,16 @@ export default route(ExportAccountSchema, async (req, res) => {
     const p = prefix("pageComp.accounts.accountTable.");
     const pCommon = prefix("common.");
 
+    const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
+
     const headerColumns = {
       accountName: t(p("accountName")),
       owner: t(p("owner")),
       userCount:  t(pCommon("userCount")),
       tenantName: t(p("tenant")),
       balance: t(pCommon("balance")),
-      blocked: t(p("status")),
+      blockThresholdAmount: t(p("blockThresholdAmount")),
+      displayedState: t(p("status")),
       comment: t(p("comment")),
     };
 
@@ -126,7 +132,8 @@ export default route(ExportAccountSchema, async (req, res) => {
         userCount: x.userCount,
         tenantName: x.tenantName,
         balance: nullableMoneyToString(x.balance) + t(p("unit")),
-        blocked: `${x.blocked ? t(p("block")) : t(p("normal"))}`,
+        blockThresholdAmount: `${nullableMoneyToString(x.blockThresholdAmount)} ${t(p("unit"))}`,
+        displayedState: DisplayedStateI18nTexts[x.displayedState],
         comment: x.comment,
       };
     };

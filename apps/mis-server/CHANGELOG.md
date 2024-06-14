@@ -1,5 +1,62 @@
 # @scow/mis-server
 
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-hook@1.0.11
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.5.1
+
+### Patch Changes
+
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-hook@1.0.10
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- 8dd8c0e: 修改 Account 实体中原 blocked 字段名为 blocked_in_cluster ，表示在集群中是否为封锁状态
+  增加字段 state ,字段值为 "NORMAL" , "FROZEN" , "BLOCKED_BY_ADMIN" 的枚举值，优化页面账户显示状态为正常、封锁、欠费
+- 6139fec: 修复导出账户和导出充值记录接口缺失 limit，offset 过滤的问题
+- 850a7ee: 修改 UserAccount 实体中原 status 字段名为 blocked_in_cluster ,表示在集群中是否为封锁状态
+  增加字段 state ,允许写入的值为 "NORMAL" , "BLOCKED_BY_ADMIN" 的枚举值
+  页面增加用户在账户下的 限额 的状态的显示
+- Updated dependencies [02d6a18]
+- Updated dependencies [63d1873]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/lib-server@1.2.0
+  - @scow/lib-hook@1.0.9
+  - @scow/protos@1.0.9
+  - @scow/lib-scheduler-adapter@1.1.7
+
 ## 1.4.3
 
 ### Patch Changes

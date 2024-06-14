@@ -26,19 +26,20 @@ message GetTenantInfoResponse {
   common.Money balance = 1;
   uint32 account_count = 2;
   uint32 user_count = 3;
+  common.Money default_account_block_threshold = 4;
 
   message AdminInfo {
     string user_id = 1;
     string user_name = 2;
   }
 
-  repeated AdminInfo admins = 4;
+  repeated AdminInfo admins = 5;
 
   message FinancialStaffInfo {
     string user_id = 1;
     string user_name = 2;
   }
-  repeated FinancialStaffInfo financial_staff = 5;
+  repeated FinancialStaffInfo financial_staff = 6;
 
 }
 
@@ -82,9 +83,34 @@ message CreateTenantResponse {
 
 }
 
+message SetDefaultAccountBlockThresholdRequest {
+  string tenant_name = 1;
+  common.Money block_threshold_amount = 2;
+}
+
+message SetDefaultAccountBlockThresholdResponse {
+
+}
+
+message CreateTenantWithExistingUserAsAdminRequest {
+  string tenant_name = 1;
+  string user_id = 2;
+  string user_name = 3;
+}
+
+// NOT_FOUND : user is not found
+// ALREADY_EXISTS: tenant already exists
+// FAILED_PRECONDITION: user still maintains account relationship
+message CreateTenantWithExistingUserAsAdminResponse {
+  string tenant_name = 1;
+  string admin_user_id = 2;
+}
+
 service TenantService {
   rpc GetTenantInfo(GetTenantInfoRequest) returns (GetTenantInfoResponse);
   rpc GetTenants(GetTenantsRequest) returns (GetTenantsResponse);
   rpc GetAllTenants(GetAllTenantsRequest) returns (GetAllTenantsResponse);
   rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse);
+  rpc SetDefaultAccountBlockThreshold(SetDefaultAccountBlockThresholdRequest) returns (SetDefaultAccountBlockThresholdResponse);
+  rpc CreateTenantWithExistingUserAsAdmin(CreateTenantWithExistingUserAsAdminRequest) returns (CreateTenantWithExistingUserAsAdminResponse);
 }

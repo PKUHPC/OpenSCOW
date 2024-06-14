@@ -1,5 +1,48 @@
 # @scow/audit-server
 
+## 2.3.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-operation-log@2.1.5
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+
+## 2.3.1
+
+### Patch Changes
+
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-operation-log@2.1.4
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+
+## 2.3.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- 24db413: 操作日志增加自定义操作类型
+- d3d891a: 操作日志详细内容展示优化
+- Updated dependencies [02d6a18]
+- Updated dependencies [63d1873]
+- Updated dependencies [24db413]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/lib-server@1.2.0
+  - @scow/lib-operation-log@2.1.3
+  - @scow/protos@1.0.9
+
 ## 2.2.2
 
 ### Patch Changes

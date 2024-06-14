@@ -10,12 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { useState } from "react";
-import { Cluster } from "src/utils/config";
+import { Card } from "antd";
+import { CSSProperties, PropsWithChildren } from "react";
 
+type Props = PropsWithChildren<{
+  title: React.ReactNode;
+  extra?: React.ReactNode;
+  style?: CSSProperties;
+}>;
 
-export function DefaultClusterStore(defaultCluster: Cluster) {
-  const [cluster, setCluster] = useState<Cluster>(defaultCluster);
+export const DashboardSection: React.FC<Props> = ({ title, extra, style, children }) => {
 
-  return { cluster, setCluster };
-}
+  return (
+    <Card style={style} title={title} extra={extra}>
+      {children}
+    </Card>
+  );
+};

@@ -10,13 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Cluster } from "@scow/config/build/type";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { SortOrder } from "antd/lib/table/interface";
 import { useI18nTranslateToString } from "src/i18n";
 import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
-
-import { publicConfig } from "./config";
-
 
 export const formatEntryId = (item: Entry) => {
 
@@ -51,26 +50,47 @@ export const entryNameMap = {
   desktop:"routes.desktop",
 } as const;
 
-export const getEntryName = (item: Entry) => {
-  const t = useI18nTranslateToString();
+export const getEntryBaseName = (item: Entry, t: ReturnType<typeof useI18nTranslateToString>) => {
+  const entry = item.entry;
 
-  if (item.entry?.$case === "pageLink" && entryNameMap[item.name]) {
+  if (!entry) { return ""; }
 
+  if (entry.$case === "pageLink" && entryNameMap[item.name]) {
     return t(entryNameMap[item.name]);
   }
 
   return item.name;
 };
 
-export const getEntryClusterName = (item: Entry & {entry: {$case: "app" | "shell"} }) => {
-  const clusters = publicConfig.CLUSTERS;
+export const getEntryExtraInfo = (item: Entry, currentLanguageId: string, publicConfigClusters: Cluster[]) => {
+  const entry = item.entry;
 
-  if (item.entry.$case === "shell") {
-    const clusterId = item.entry.shell.clusterId;
+  if (!entry) { return []; }
+
+
+  if (entry.$case === "app") {
+    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry, publicConfigClusters), currentLanguageId);
+    return [clusterName];
+  }
+
+  if (entry.$case === "shell") {
+    const clusterName = getI18nConfigCurrentText(getEntryClusterName(entry, publicConfigClusters), currentLanguageId);
+    return [clusterName, entry.shell.loginNode];
+  }
+
+  return [];
+};
+
+export const getEntryClusterName = (item: Entry["entry"] & {$case: "app" | "shell" }
+  , publicConfigClusters: Cluster[]) => {
+  const clusters = publicConfigClusters;
+
+  if (item.$case === "shell") {
+    const clusterId = item.shell.clusterId;
     return clusters.find((x) => x.id === clusterId)?.name;
   }
 
-  const clusterId = item.entry.app.clusterId;
+  const clusterId = item.app.clusterId;
   return clusters.find((x) => x.id === clusterId)?.name;
 
 };

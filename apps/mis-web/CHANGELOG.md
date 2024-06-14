@@ -1,5 +1,82 @@
 # @scow/mis-web
 
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- d080a8b: 修复在 common.yml 中自定义更改用户密码正则后在管理系统不生效的问题，
+  增加平台管理和租户管理下修改用户密码的后端校验
+- c7f2646: 操作日志文案修改：移动文件/文件夹改为移动或重命名文件/文件夹
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- 90217ac: 操作日志自定义操作类型合并至操作行为进行搜索查询
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 98a166f: 修复了平台数据统计图（折线图）溢出的问题.
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- f0b3162: 将白名单过期时间选择的最小日期调整至+1 天,将所选择日期的时分秒调整至 24:00:00(00:00:00).
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.1
+
+### Patch Changes
+
+- 93be965: 账户白名单、账户消费记录下都支持以用户 ID 和姓名搜索
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- e44340d: 修复了管理系统下消费记录总数金额显示错误以及翻页的问题
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- 10956eb: 修复 token 失效后切换系统不跳转回登录页面的问题
+- 16f4465: 初始化的用户管理新增前端搜索
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- a970dc7: 优化管理系统用户可见分区页面 Loading 样式
+- bd21171: 修改变更租户管理下用户列表中可用账户的列名为 关联账户
+- 8dd8c0e: 修改 Account 实体中原 blocked 字段名为 blocked_in_cluster ，表示在集群中是否为封锁状态
+  增加字段 state ,字段值为 "NORMAL" , "FROZEN" , "BLOCKED_BY_ADMIN" 的枚举值，优化页面账户显示状态为正常、封锁、欠费
+- 02d6a18: 新增集群区分 AI 功能和 HPC 功能配置
+- 24db413: 操作日志增加自定义操作类型
+- 0e3ff89: 统一修改规范用户及账户状态 正常和封锁 为 Available, Blocked；操作 封锁和解封 为 Block,Unblock
+- 850a7ee: 修改 UserAccount 实体中原 status 字段名为 blocked_in_cluster ,表示在集群中是否为封锁状态
+  增加字段 state ,允许写入的值为 "NORMAL" , "BLOCKED_BY_ADMIN" 的枚举值
+  页面增加用户在账户下的 限额 的状态的显示
+- d3d891a: 操作日志详细内容展示优化
+- Updated dependencies [02d6a18]
+- Updated dependencies [146e19f]
+- Updated dependencies [24db413]
+- Updated dependencies [d822db7]
+- Updated dependencies [850a7ee]
+  - @scow/config@1.4.3
+  - @scow/lib-web@1.3.1
+  - @scow/lib-operation-log@2.1.3
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+
 ## 1.4.3
 
 ### Patch Changes

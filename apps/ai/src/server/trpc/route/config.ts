@@ -31,7 +31,7 @@ import { z } from "zod";
 
 
 const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
-const clustersInit = getClusterConfigs(configPath, console);
+const clustersInit = getClusterConfigs(configPath, console, ["ai"]);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
 
 export const clusters = clustersInit;
@@ -99,6 +99,7 @@ const PublicConfigSchema = z.object({
   }),
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
+  NOVNC_CLIENT_URL: z.string(),
 });
 
 const UiConfigSchema = z.object({
@@ -192,6 +193,9 @@ export const config = router({
         SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
         LOGIN_NODES: parseKeyValue(envConfig.LOGIN_NODES),
+
+        NOVNC_CLIENT_URL: envConfig.NOVNC_CLIENT_URL,
+
       };
     }),
 
