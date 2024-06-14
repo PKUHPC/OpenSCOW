@@ -13,9 +13,10 @@
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
-import { Table, Tag } from "antd";
+import { Progress, Table, Tag } from "antd";
 import React, { useMemo, useState } from "react";
 import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { ClusterOverview, PlatformOverview } from "src/models/cluster";
 import { InfoPanes } from "src/pageComponents/dashboard/InfoPanes";
 import { Cluster } from "src/utils/cluster";
 import { compareWithUndefined } from "src/utils/dashboard";
@@ -35,6 +36,8 @@ interface Props {
   failedClusters: ({clusterName: I18nStringType})[];
   currentClusters: Cluster[];
   isLoading: boolean;
+  clustersOverview: ClusterOverview[];
+  platformOverview?: PlatformOverview | undefined;
 }
 
 interface InfoProps {
@@ -90,30 +93,57 @@ const Container = styled.div`
 
 const p = prefix("pageComp.dashboard.overviewTable.");
 
-export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, currentClusters, isLoading }) => {
+export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
+  currentClusters, isLoading, clustersOverview, platformOverview }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const [selectId, setSelectId] = useState(0);
+  const [selectId, setSelectId] = useState<number | undefined>(undefined);
 
-  const selectItem = useMemo(() => clusterInfo[selectId], [clusterInfo, selectId]);
+  const selectItem = useMemo(() => clusterInfo[selectId ?? 0], [clusterInfo, selectId]);
 
-  // 定义一个函数来获取颜色，根据给定的使用率
-  const getColorByUsage = (usage: number) => {
-    if (usage >= 90) return "red";
-    if (usage >= 70) return "orange";
-    return "green";
-  };
+  // 控制Tab切换
+  const [activeTabKey, setActiveTabKey] = useState("platformOverview");
+
+  // 找到对应平台概览
+  const selectedClusterOverview = useMemo(() => {
+    if (!selectItem?.clusterName) {
+      return undefined;
+    };
+    return clustersOverview.find(
+      (overview) =>
+        overview.clusterName === selectItem.clusterName,
+    );
+  }, [selectItem, clustersOverview, languageId]);
+
+
+  // 当activekey改变时表格数据显示的逻辑
+  const filteredClusterInfo = useMemo(() => {
+    console.log(activeTabKey);
+    if (activeTabKey === "platformOverview") {
+      setSelectId(undefined);
+      return clusterInfo;
+    }
+    return clusterInfo.filter((info) => info.clusterName === activeTabKey);
+  }, [activeTabKey, clusterInfo, languageId]);
+
 
   return (
     (isLoading || currentClusters.length > 0) ? (
       <Container>
-        <InfoPanes selectItem={selectItem ?? {}} loading={isLoading} />
+        <InfoPanes
+          selectItem={selectId == undefined ? platformOverview : selectedClusterOverview}
+          loading={isLoading}
+          activeTabKey={activeTabKey}
+          onTabChange={setActiveTabKey}
+        />
         <Table
           title={() => t(p("title"))}
           tableLayout="fixed"
-          dataSource={(clusterInfo.map((x) => ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
-            .concat(failedClusters)}
+          dataSource={(filteredClusterInfo.map((x) =>
+            ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
+            .concat(failedClusters)
+          }
           loading={isLoading}
           pagination={false}
           scroll={{ y:275 }}
@@ -123,6 +153,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, cu
               onClick() {
                 if (r.info?.id !== undefined) {
                   setSelectId(r.info?.id);
+                  setActiveTabKey(getI18nConfigCurrentText(r.clusterName, languageId));
                 }
               },
             };
@@ -132,10 +163,15 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, cu
             dataIndex="clusterName"
             width="15%"
             title={t(p("clusterName"))}
+            hidden={activeTabKey !== "platformOverview"}
             sorter={(a, b, sortOrder) =>
               compareWithUndefined(getI18nConfigCurrentText(a.clusterName, languageId),
                 getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
-            render={(clusterName) => getI18nConfigCurrentText(clusterName, languageId)}
+            render={(clusterName) => (
+              <span style={{ fontWeight:700 }}>
+                {getI18nConfigCurrentText(clusterName, languageId)}
+              </span>
+            )}
           />
           <Table.Column<TableProps>
             dataIndex="partitionName"
@@ -154,12 +190,19 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, cu
             title={t(p("usageRatePercentage"))}
             sorter={(a, b, sortOrder) =>
               compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
+            hidden={clusterInfo.every((item) => item.usageRatePercentage === undefined)}
             render={(_, r) => (
-              <span style={{ color: r.info?.usageRatePercentage ?
-                getColorByUsage(r.info?.usageRatePercentage) : "black" }}
-              >
-                {r.info?.usageRatePercentage ? `${r.info.usageRatePercentage}%` : "-"}
-              </span>
+              r.info?.usageRatePercentage ? (
+                <div>
+                  <Progress
+                    percent={Math.min(Number(r.info.usageRatePercentage.toFixed(2)), 100)}
+                    strokeLinecap='square'
+                    size={[120, 15]}
+                    status="normal"
+                    strokeColor={"#566DE5"}
+                  />
+                </div>
+              ) : "-"
             )}
           />
           <Table.Column<TableProps>
@@ -167,11 +210,17 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, cu
             title={t(p("cpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
             render={(_, r) => (
-              <span style={{ color: r.info?.cpuUsage ?
-                getColorByUsage(Number(r.info?.cpuUsage)) : "black" }}
-              >
-                {r.info?.cpuUsage !== undefined ? Number(r.info?.cpuUsage).toFixed(2) + "%" : "-"}
-              </span>
+              r.info?.cpuUsage ? (
+                <div>
+                  <Progress
+                    percent={Math.min(Number(Number(r.info.cpuUsage).toFixed(2)), 100)}
+                    strokeLinecap='square'
+                    size={[120, 15]}
+                    status="normal"
+                    strokeColor={"#566DE5"}
+                  />
+                </div>
+              ) : "-"
             )}
           />
           <Table.Column<TableProps>
@@ -179,11 +228,17 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters, cu
             title={t(p("gpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
             render={(_, r) => (
-              <span style={{ color: r.info?.gpuUsage ?
-                getColorByUsage(Number(r.info?.gpuUsage)) : "black" }}
-              >
-                {r.info?.gpuUsage !== undefined ? Number(r.info?.gpuUsage).toFixed(2) + "%" : "-"}
-              </span>
+              r.info?.gpuUsage ? (
+                <div>
+                  <Progress
+                    percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}
+                    strokeLinecap='square'
+                    size={[120, 15]}
+                    status="normal"
+                    strokeColor={"#566DE5"}
+                  />
+                </div>
+              ) : "-"
             )}
           />
           <Table.Column<TableProps>

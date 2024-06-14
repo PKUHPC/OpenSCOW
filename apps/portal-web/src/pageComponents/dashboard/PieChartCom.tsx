@@ -17,6 +17,8 @@ import { Cell, Pie, PieChart } from "recharts";
 interface Props {
   pieData: PieData[];
   strokeColor: string;
+  range: number;
+  display: boolean;
 }
 
 interface PieData {
@@ -25,19 +27,38 @@ interface PieData {
 }
 
 const Container = styled.div`
+  position:relative;
+  bottom:5.4em;
 `;
 
-export const PieChartCom: React.FC<Props> = ({ pieData, strokeColor }) => {
-  console.log(strokeColor + "Pie");
+const JobRange = styled.div`
+  font-weight:700;
+  position:relative;
+  width:max-content;
+  left:50%;
+  top:50%;
+  transform: translate(-52%,0);
+`;
+
+export const PieChartCom: React.FC<Props> = ({ pieData, range, strokeColor, display }) => {
+
+  // 没有值的时候不显示
+  if (!display) {
+    return null;
+  }
+
   return (
     <Container>
-      <PieChart width={220} height={220}>
+      <JobRange style={{ color:pieData[0].color, fontSize:"3.4em" }}>
+        {Math.min(range, 100) + "%"}
+      </JobRange>
+      <PieChart width={230} height={230}>
         <Pie
-          data={[{ name:"test", value:100 }]}
+          data={[{ name:"inner", value:100 }]}
           cx={105}
           cy={110}
-          innerRadius={40}
-          outerRadius={60}
+          innerRadius={70}
+          outerRadius={80}
           dataKey="value"
           stroke="none"
         >
@@ -47,8 +68,8 @@ export const PieChartCom: React.FC<Props> = ({ pieData, strokeColor }) => {
           data={pieData}
           cx={105}
           cy={110}
-          innerRadius={60}
-          outerRadius={80}
+          innerRadius={80}
+          outerRadius={90}
           dataKey="value"
           stroke="none"
         >
@@ -57,10 +78,10 @@ export const PieChartCom: React.FC<Props> = ({ pieData, strokeColor }) => {
           ))}
         </Pie>
         <Pie
-          data={[{ name:"test", value:100 }]}
+          data={[{ name:"outter", value:100 }]}
           cx={105}
           cy={110}
-          innerRadius={80}
+          innerRadius={90}
           outerRadius={100}
           dataKey="value"
         >

@@ -14,17 +14,18 @@ import React, { useState } from "react";
 import { DoubleInfoPane } from "src/pageComponents/dashboard/DoubleInfoPane";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled } from "styled-components"; ;
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { color } from "@uiw/react-codemirror";
 import { Card, Col, Row } from "antd";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
+import { ClusterOverview, PlatformOverview } from "src/models/cluster";
+import JobInfo from "src/pageComponents/dashboard/NodeRange";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 interface Props {
-  selectItem: ClusterInfo;
+  selectItem: ClusterOverview | PlatformOverview | undefined;
   loading: boolean;
+  activeTabKey: string;
+  onTabChange: (key: string) => void;
 }
 
 const InfoPaneContainer = styled.div`
@@ -61,40 +62,71 @@ const colors = {
   queuing:"#A58E74",
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
-export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
+export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, onTabChange }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const { currentClusters } = useStore(ClusterInfoStore);
 
+  const testClusterName = [
+    "linux",
+    "ubuntu",
+    "debian",
+    "fedora",
+    "centos",
+    "redhat",
+    "arch",
+    "suse",
+  ];
+
   // card的每一项
+  // const clusterCardsList = [
+  //   {
+  //     key:"platformOverview",
+  //     tab:"platformOverview",
+  //   }, ...currentClusters.map((x) => ({
+  //     key:x.id,
+  //     tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
+  //   })),
+  // ];
+
   const clusterCardsList = [
     {
       key:"platformOverview",
-      tab:"platformOverview",
-    }, ...currentClusters.map((x) => ({
-      key:x.id,
-      tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
+      tab:t(p("platformOverview")),
+    }, ...testClusterName.map((x) => ({
+      key:x,
+      tab:x,
     })),
   ];
 
-  const [activeTabKey, setActiveTabKey] = useState<string>(clusterCardsList[0].key);
-
-  const onTabChange = (key: string) => {
-    setActiveTabKey(key);
-  };
-
-
-  const { clusterName, partitionName, nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
+  const { nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
     gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount,
     jobCount, runningJobCount, pendingJobCount,
-  } = selectItem;
+  } = selectItem ?? {
+    nodeCount: 0,
+    runningNodeCount: 0,
+    idleNodeCount: 0,
+    notAvailableNodeCount: 0,
+    cpuCoreCount: 0,
+    runningCpuCount: 0,
+    idleCpuCount: 0,
+    notAvailableCpuCount: 0,
+    gpuCoreCount: 0,
+    runningGpuCount: 0,
+    idleGpuCount: 0,
+    notAvailableGpuCount: 0,
+    jobCount: 0,
+    runningJobCount: 0,
+    pendingJobCount: 0,
+  };
+
 
   return (
     <Card
-      style={{ width: "100%" }}
+      style={{ width:"100%" }}
       tabList={clusterCardsList}
       activeTabKey={activeTabKey}
       onTabChange={onTabChange}
@@ -105,10 +137,6 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
             <InfoPane
               strokeColor={colors.nodeUtilizationStroke}
               loading={loading}
-              title={{
-                title:t(p("nodeInfo")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-              }}
               tag={{ itemName:t(p("node")), num:nodeCount }}
               paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.nodeUtilizationAvailable },
                 { itemName:t(p("idle")), num:idleNodeCount, color:colors.nodeUtilizationNotavailable },
@@ -122,15 +150,11 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
               strokeColor={[colors.cpuStroke, colors.gpuStroke]}
               loading={loading}
               cpuInfo={{
-                title:{
-                  title:t(p("resourceInfo")),
-                  subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-                },
                 tag:{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) },
-                paneData: [{
-                  itemName:t(p("running")), num:runningCpuCount, color:colors.cpuAvailable },
-                { itemName:t(p("idle")), num:idleCpuCount, color:colors.cpunotAvailable },
-                { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.cpunotAvailable },
+                paneData: [
+                  { itemName:t(p("running")), num:runningCpuCount, color:colors.cpuAvailable },
+                  { itemName:t(p("idle")), num:idleCpuCount, color:colors.cpunotAvailable },
+                  { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.cpunotAvailable },
                 ]}}
               gpuInfo={{
                 title:{ title:"", subTitle:"" },
@@ -143,18 +167,9 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
             ></DoubleInfoPane>
           </DoubleInfoPaneContainer>
         </Col>
-
         <Col md={8} xl={6}>
           <InfoPaneContainer>
-            {/* <InfoPane
-              loading={loading}
-              title={{ title:t(p("job")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-              }}
-              tag={{ itemName:t(p("job")), num:jobCount }}
-              paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
-                { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
-            ></InfoPane> */}
+            <JobInfo runningJobs={`${runningJobCount}`} pendingJobs={`${pendingJobCount}`} loading={loading} />
           </InfoPaneContainer>
         </Col>
       </Row>
