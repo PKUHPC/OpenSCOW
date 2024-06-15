@@ -25,7 +25,7 @@
     "prism-react-renderer": "2.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "@cmfcmf/docusaurus-search-local": "1.1.0"
+    "@easyops-cn/docusaurus-search-local": "0.44.0"
   },
   "devDependencies": {
     "@adobe/jsonschema2md": "8.0.1",
