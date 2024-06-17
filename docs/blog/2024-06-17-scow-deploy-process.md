@@ -1,6 +1,6 @@
 ---
 slug: scow-deploy-process
-title: SCOW部署及运维
+title: SCOW部署及运维指引
 authors: [huangjun]
 tags: [scow, scow-deployment]
 ---
