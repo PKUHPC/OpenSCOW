@@ -69,46 +69,46 @@ docker-compose --version
 
 ## 1.3 配置SCOW
 
-下载`scow-cli`，[scow-cli使用参考](docs/deploy/install/scow-cli)。
+下载`scow-cli`，[scow-cli使用参考](/docs/deploy/install/scow-cli)。
 
 配置文件及说明：
 
 | 配置文件          | 功能说明                                                     | 说明                                                         | 备注                                       |
 | ----------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------ |
 | install.yaml      | SCOW安装文件                                                 | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/install.yaml) |                                            |
-| `{集群ID}`.yaml   | [集群配置文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/cluster-config) | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/clusters/hpc01.yaml) | 支持多集群，一个集群一个配置文件           |
-| auth.yaml         | [认证配置文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/ldap) | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/auth.yml) | 所有集群同一个认证系统                     |
-| mis.yaml          | [管理系统配置文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/mis/intro) | 可使用默认配置                                               |                                            |
-| portal.yaml       | [门户系统配置文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/portal/intro#编写门户服务配置) | 可使用默认配置                                               | 若登录节点不是安装的xfce，需要对应进行修改 |
-| audit.yaml        | [操作日志配置文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/audit/intro#编写后端服务配置) | 可使用默认配置                                               |                                            |
+| `{集群ID}`.yaml   | [集群配置文件](/docs/deploy/config/cluster-config)           | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/clusters/hpc01.yaml) | 支持多集群，一个集群一个配置文件           |
+| auth.yaml         | [认证配置文件](/docs/deploy/config/auth/ldap)                | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/auth.yml) | 所有集群同一个认证系统                     |
+| mis.yaml          | [管理系统配置文件](/docs/deploy/config/mis/intro)            | 可使用默认配置                                               |                                            |
+| portal.yaml       | [门户系统配置文件](/docs/deploy/config/portal/intro#编写门户服务配置) | 可使用默认配置                                               | 若登录节点不是安装的xfce，需要对应进行修改 |
+| audit.yaml        | [操作日志配置文件](/docs/deploy/config/audit/intro#编写后端服务配置) | 可使用默认配置                                               |                                            |
 | common.yaml       | 公共配置文件                                                 | 可使用默认配置                                               |                                            |
 | clusterTexts.yaml | 集群说明配置文件                                             | 可使用默认配置                                               |                                            |
 | ui.yaml           | ui配置文件                                                   | 可使用默认配置                                               |                                            |
 
 ## 1.4 其他配置(可选)
 
-- [交互式应用](docs/deploy/config/portal/apps/intro)
-- [为交互式应用配置图标](docs/deploy/config/portal/apps/configure-app-logo)
-- [多集群交互式应用配置](docs/deploy/config/portal/apps/configure-cluster-apps)
-- [自定义logo](docs/deploy/config/portal/customization/dashboard)
-- [跨集群文件传输功能](docs/deploy/config/portal/transfer-cross-clusters)
-- [代理网关节点](docs/deploy/config/portal/proxy-gateway)
-- [集群监控配置](docs/deploy/config/mis/cluster-monitor)
-- [网关配置](docs/deploy/config/gateway/config)
-- [自定义相对路径](docs/deploy/config/customization/basepath)
-- [自定义前端主题](docs/deploy/config/customization/webui)
-- [公共文件](docs/deploy/config/customization/public-files)
-- [自定义导航链接](docs/deploy/config/customization/custom-navlinks)
-- [自定义收费规则](docs/deploy/config/customization/custom-amount-strategies)
-- [自定义用户下拉菜单](docs/deploy/config/customization/custom-userlinks)
-- [自定义用户密码规则](docs/deploy/config/customization/password-pattern)
-- [自定义消费类型](docs/deploy/config/customization/custom-charge-types)
-- [消费记录中保存作业相关字段](docs/deploy/config/customization/custom-job-charge-metadata)
-- [国际化](docs/deploy/config/customization/custom-config-i18n)
-- [自定义系统语言](docs/deploy/config/customization/custom-system-language)
+- [交互式应用](/docs/deploy/config/portal/apps/intro)
+- [为交互式应用配置图标](/docs/deploy/config/portal/apps/configure-app-logo)
+- [多集群交互式应用配置](/docs/deploy/config/portal/apps/configure-cluster-apps)
+- [自定义logo](/docs/deploy/config/portal/customization/dashboard)
+- [跨集群文件传输功能](/docs/deploy/config/portal/transfer-cross-clusters)
+- [代理网关节点](/docs/deploy/config/portal/proxy-gateway)
+- [集群监控配置](/docs/deploy/config/mis/cluster-monitor)
+- [网关配置](/docs/deploy/config/gateway/config)
+- [自定义相对路径](/docs/deploy/config/customization/basepath)
+- [自定义前端主题](/docs/deploy/config/customization/webui)
+- [公共文件](/docs/deploy/config/customization/public-files)
+- [自定义导航链接](/docs/deploy/config/customization/custom-navlinks)
+- [自定义收费规则](/docs/deploy/config/customization/custom-amount-strategies)
+- [自定义用户下拉菜单](/docs/deploy/config/customization/custom-userlinks)
+- [自定义用户密码规则](/docs/deploy/config/customization/password-pattern)
+- [自定义消费类型](/docs/deploy/config/customization/custom-charge-types)
+- [消费记录中保存作业相关字段](/docs/deploy/config/customization/custom-job-charge-metadata)
+- [国际化](/docs/deploy/config/customization/custom-config-i18n)
+- [自定义系统语言](/docs/deploy/config/customization/custom-system-language)
 
 # 2. 运维
 
-- [cli常见命令](docs/deploy/install/scow-cli#常见命令的对照)
-- [运维技巧](docs/deploy/ops/admin-usage-tips)
+- [cli常见命令](/docs/deploy/install/scow-cli#常见命令的对照)
+- [运维技巧](/docs/deploy/ops/admin-usage-tips)
 
