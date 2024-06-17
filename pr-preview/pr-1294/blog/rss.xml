@@ -9,7 +9,7 @@
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh</language>
         <item>
-            <title><![CDATA[SCOW部署及运维]]></title>
+            <title><![CDATA[SCOW部署及运维指引]]></title>
             <link>https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process</link>
             <guid>https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process</guid>
             <pubDate>Mon, 17 Jun 2024 00:00:00 GMT</pubDate>

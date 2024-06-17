@@ -8,7 +8,7 @@
     <subtitle>SCOW Blog</subtitle>
     <icon>https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/img/favicon.ico</icon>
     <entry>
-        <title type="html"><![CDATA[SCOW部署及运维]]></title>
+        <title type="html"><![CDATA[SCOW部署及运维指引]]></title>
         <id>https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process</id>
         <link href="https://PKUHPC.github.io/SCOW/pr-preview/pr-1294/blog/scow-deploy-process"/>
         <updated>2024-06-17T00:00:00.000Z</updated>
