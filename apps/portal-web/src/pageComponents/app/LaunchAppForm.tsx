@@ -218,7 +218,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
                     qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
                     nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
-                    coreCount: setLastCoreCount ? lastNodeCount : initialValues.coreCount,
+                    coreCount: setLastCoreCount ? lastCoreCount : initialValues.coreCount,
                     gpuCount: setLastGpuCount ? lastGpuCount : initialValues.gpuCount,
                     maxTime: lastMaxTime ?? initialValues.maxTime,
                   };
