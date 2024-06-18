@@ -288,7 +288,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             // 如果第一次请求时模板值中分区存在，则填入模板值的分区及qos
             if (isFirstParQuery && initial.partition && initial.qos) {
               form.setFieldValue("partition", initial.partition);
-              form.setFieldValue("qos", initial.partition);
+              form.setFieldValue("qos", initial.qos);
               // 第一次请求已经处理过
               setIsFirstParQuery(false);
             } else {
@@ -606,8 +606,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             name="scriptOutput"
             tooltip={(
               <>
-                <span>{t(p("wdTooltip1"))}</span>
-                <br />
                 <span>{t(p("wdTooltip3"))}</span>
               </>
             )}
