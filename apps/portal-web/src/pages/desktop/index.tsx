@@ -16,9 +16,12 @@ import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/bu
 import { GetServerSideProps, NextPage } from "next";
 import { useStore } from "simstate";
 import { api } from "src/apis";
+import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
 import { requireAuth } from "src/auth/requireAuth";
+import { AuthResultError, ssrAuthenticate } from "src/auth/server";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
+import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
 import { DesktopTable } from "src/pageComponents/desktop/DesktopTable";
@@ -27,11 +30,17 @@ import { Cluster, getLoginDesktopEnabled } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 type Props = {
+  error: AuthResultError;
+} | {
   loginDesktopEnabledClusters: Cluster[];
 };
 
 export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
 ((props: Props) => {
+
+  if ("error" in props) {
+    return <UnifiedErrorPage code={props.error} />;
+  }
 
   const { enableLoginDesktop } = useStore(ClusterInfoStore);
   if (!enableLoginDesktop || props.loginDesktopEnabledClusters.length === 0) {
@@ -53,6 +62,23 @@ export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
 
   const languageId = getCurrentLanguageId(req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+
+  // Cannot directly call api routes here, so mock is not available directly.
+  // manually call mock
+  if (USE_MOCK) {
+    return {
+      props: {
+        loginDesktopEnabledClusters: [ { id: "hpc01", name: "hpc01Name" } ],
+      },
+    };
+  }
+
+  const auth = ssrAuthenticate(() => true);
+
+  const info = await auth(req);
+  if (typeof info === "number") {
+    return { props: { error: info } };
+  }
 
   const token = getTokenFromCookie({ req });
   const resp = await api.getClusterConfigFiles({ query: { token } });
