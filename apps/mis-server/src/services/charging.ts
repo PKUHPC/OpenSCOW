@@ -286,28 +286,35 @@ export const chargingServiceServer = plugin((server) => {
     getTopChargeAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const qb = em.createQueryBuilder(ChargeRecord, "cr");
-      qb
-        .select("cr.accountName")
-        .addSelect([raw("SUM(cr.amount) as `totalAmount`")])
-        .where({ time: { $gte: startTime } })
-        .andWhere({ time: { $lte: endTime } })
-        .andWhere({ accountName: { $ne: null } })
-        .groupBy("accountName")
-        .orderBy({ [raw("SUM(cr.amount)")]: QueryOrder.DESC })
-        .limit(topRank);
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
-        em,
-        queryKeys: ["get_top_charge_account", `${startTime}`, `${endTime}`, `${topRank}`],
-        queryQb: qb,
-      });
+      // 查询消费记录
+      const results: {account_name: string, user_name: string, chargedAmount: number}[] =
+      // 从pay_record表中查询
+      await knex("charge_record as cr")
+      // 选择account_name字段
+      // 选择user表中的name字段，并将其命名为user_name
+      // 计算amount字段的总和，并将其命名为totalAmount
+        .select(["cr.account_name", "u.name as user_name", knex.raw("SUM(amount) as chargedAmount")])
+        .join("user as u", "u.user_id", "=", "cr.user_id")
+        .where("cr.time", "<=", endTime)
+        .andWhere("cr.time", ">=", startTime)
+        // 过滤为空的情况
+        .whereNotNull("cr.account_name")
+        // 按account_name和user_name分组
+        .groupBy(["cr.account_name", "u.name"])
+      // 按totalAmount降序排序
+        .orderBy("chargedAmount", "desc")
+      // 限制结果的数量为topRank
+        .limit(topRank);
 
       return [
         {
           results: results.map((x) => ({
-            accountName: x.accountName,
-            chargedAmount: numberToMoney(x.totalAmount),
+            accountName: x.account_name,
+            userName:x.user_name,
+            chargedAmount: numberToMoney(x.chargedAmount),
           })),
         },
       ];
@@ -346,30 +353,44 @@ export const chargingServiceServer = plugin((server) => {
       }];
     },
 
+    // 获取指定时间段内支付金额最高的账户信息
     getTopPayAccount: async ({ request, em }) => {
+      // 从请求中获取开始时间、结束时间和前N名的数量，如果未提供topRank则默认为10
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const qb = em.createQueryBuilder(PayRecord, "p");
-      qb
-        .select("p.accountName")
-        .addSelect(raw("SUM(p.amount) as `totalAmount`"))
-        .where({ time: { $gte: startTime } })
-        .andWhere({ time: { $lte: endTime } })
-        .andWhere({ accountName: { $ne: null } })
-        .groupBy("accountName")
-        .orderBy({ [raw("SUM(p.amount)")]: QueryOrder.DESC })
-        .limit(topRank);
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
-        em,
-        queryKeys: ["get_top_pay_account", `${startTime}`, `${endTime}`, `${topRank}`],
-        queryQb: qb,
-      });
+      // 查询支付记录
+      const results: {account_name: string, user_name: string, totalAmount: number}[] =
+      // 从pay_record表中查询
+      await knex("pay_record as pr")
+      // 选择account_name字段
+      // 选择user表中的name字段，并将其命名为user_name
+      // 计算amount字段的总和，并将其命名为totalAmount
+        .select(["pr.account_name", "u.name as user_name", knex.raw("SUM(amount) as totalAmount")])
+        // 通过accountName字段与account表连接
+        .join("account as a", "a.account_name ", "=", "pr.account_name")
+        // 通过account_id字段与user_account表连接
+        .join("user_account as ua", "ua.account_id", "=", "a.id")
+        .where("role", "=", "OWNER")
+        .join("user as u", "u.id", "=", "ua.user_id")
+        .where("pr.time", "<=", endTime)
+        .andWhere("pr.time", ">=", startTime)
+        // 过滤为空的情况
+        .whereNotNull("pr.account_name")
+        // 按account_name和user_name分组
+        .groupBy(["pr.account_name", "u.name"])
+      // 按totalAmount降序排序
+        .orderBy("totalAmount", "desc")
+      // 限制结果的数量为topRank
+        .limit(topRank);
 
       return [
         {
           results: results.map((x) => ({
-            accountName: x.accountName,
+            accountName: x.account_name,
+            userName:x.user_name,
             payAmount: numberToMoney(x.totalAmount),
           })),
         },
