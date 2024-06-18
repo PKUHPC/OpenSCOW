@@ -58,10 +58,14 @@ beforeEach(async () => {
     tenant:tenant,
   });
 
-  // 建立UserAccout之间的关系
-  const createUserAccount = (account, user) => new UserAccount({
-    account, user, role: UserRole.OWNER, blockedInCluster: UserStatus.UNBLOCKED,
-  });
+  // 创建UserAccount并插入数据库
+  const users = accounts.map((_, index) => createUser(index + 1));
+  const userAccounts = users.map((user, index) => new UserAccount({
+    account: accounts[index],
+    user: user,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
+  }));
 
   const chargeRecords: ChargeRecord[] = [];
   const payRecords: PayRecord[] = [];
@@ -70,8 +74,6 @@ beforeEach(async () => {
   accounts.forEach((account, index) => {
     const topNumber = +account.accountName.replace("top", "");
     const curDate = date.clone().subtract((topNumber - 1), "day");
-    const user = createUser(index);
-    createUserAccount(account, user);
     chargeRecords.push(
       new ChargeRecord({
         time: curDate.toDate(),
@@ -79,6 +81,7 @@ beforeEach(async () => {
         type: "test",
         comment: "test",
         amount: new Decimal(100 * (11 - topNumber)),
+        userId: `${index + 1}`, // 确保 userId 正确设置
       }),
     );
     payRecords.push(
@@ -95,7 +98,7 @@ beforeEach(async () => {
   });
 
 
-  await em.persistAndFlush([tenant, ...accounts, ...chargeRecords, ...payRecords]);
+  await em.persistAndFlush([tenant, ...accounts, ...users, ...userAccounts, ...chargeRecords, ...payRecords]);
 
   await server.start();
 
@@ -119,7 +122,7 @@ it("correct get Top 10 Charge Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
-    userName:`top${i}UserName`,
+    userName:`top${i + 1}UserName`,
     chargedAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
@@ -168,7 +171,7 @@ it("correct get Top 10 Pay Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
-    userName:`top${i}UserName`,
+    userName:`top${i + 1}UserName`,
     payAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
