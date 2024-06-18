@@ -13,7 +13,7 @@
 import { getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema } from "src/i18n";
+import { createI18nStringSchema, I18nStringType } from "src/i18n";
 import { Logger } from "ts-log";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
@@ -23,18 +23,29 @@ export enum k8sRuntime {
   containerd = "containerd",
 }
 
-const LoginNodeConfigSchema =
-  Type.Object(
-    {
-      name: createI18nStringSchema({ description: "登录节点展示名" }), address: Type.String({ description: "集群的登录节点地址" }),
-    },
-  );
+const LoginNodeConfigSchema = Type.Object({
+  name: createI18nStringSchema({ description: "登录节点展示名" }),
+  address: Type.String({ description: "集群的登录节点地址" }),  
+  scowd: Type.Optional(Type.Object({
+    port: Type.Number({ description: "scowd 端口号" }),
+  }, { description: "scowd 相关配置" })),
+});
 
-export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
+export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>
+
+interface LoginNode {
+  name: I18nStringType;
+  address: string;
+  scowdPort?: number;
+}
 
 export const getLoginNode =
-  (loginNode: string | LoginNodeConfigSchema): LoginNodeConfigSchema => {
-    return typeof loginNode === "string" ? { name: loginNode, address: loginNode } : loginNode;
+  (loginNode: string | LoginNodeConfigSchema): LoginNode => {
+    if (typeof loginNode === "string") {
+      return { name: loginNode, address: loginNode, scowdPort: undefined };
+    }
+
+    return { ...loginNode, scowdPort: loginNode.scowd?.port };
   };
 
 export type Cluster = {
@@ -91,9 +102,12 @@ export const ClusterConfigSchema = Type.Object({
     url: Type.String({ description: "代理网关节点监听URL" }),
     autoSetupNginx: Type.Boolean({ description: "是否自动配置nginx", default: false }),
   })),
+  scowd: Type.Optional(Type.Object({
+    enabled: Type.Optional(Type.Boolean({ description: "是否开启 scowd", default: false })),
+  })),
   loginNodes: Type.Union([
-    Type.Array(LoginNodeConfigSchema),
     Type.Array(Type.String(), { description: "集群的登录节点地址", default: []}),
+    Type.Array(LoginNodeConfigSchema),
   ]),
   loginDesktop: Type.Optional(LoginDeskopConfigSchema),
   turboVNCPath: Type.Optional(TurboVncConfigSchema),
@@ -144,6 +158,7 @@ export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigS
     );
 
     // 检查所有集群配置下的登陆节点地址是否重复，如果重复扔出错误
+    // 检查当 scowd enabled 时, scowd port 是否配置
     const uniqueAddressesList = new Set();
     const allAddressesList: string[] = [];
     for (const cluster in config) {
@@ -155,9 +170,17 @@ export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigS
             if (typeof ln === "string") {
               uniqueAddressesList.add(ln);
               allAddressesList.push(ln);
+
+              if (clusterInfo.scowd?.enabled) {
+                throw new Error("If scowd is enabled, scowd port must be configured for each LoginNode.");
+              }
             } else {
               uniqueAddressesList.add(ln.address);
               allAddressesList.push(ln.address);
+
+              if (clusterInfo.scowd?.enabled && ln.scowd.port === undefined) {
+                throw new Error("If scowd is enabled, scowd port must be configured for each LoginNode.");
+              }
             }
           });
         }
@@ -167,7 +190,6 @@ export const getClusterConfigs: GetClusterConfigFn<Record<string, ClusterConfigS
     if (!isUnique) {
       throw new Error("login node address must be unique across all clusters and all login nodes.");
     }
-
 
     for (const cluster in config) {
       if (Object.hasOwnProperty.call(config, cluster)) {

@@ -10,14 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AppOps } from "src/clusterops/api/app";
-import { DesktopOps } from "src/clusterops/api/desktop";
-import { FileOps } from "src/clusterops/api/file";
-import { JobOps } from "src/clusterops/api/job";
-
-export interface ClusterOps {
-  app: AppOps;
-  job: JobOps;
-  desktop: DesktopOps;
-  file: FileOps;
-}
+export type { ScowdClient } from "./client";
+export { getScowdClient } from "./client";
+export { createScowdCertificates } from "./ssl";
