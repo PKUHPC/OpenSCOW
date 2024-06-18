@@ -17,7 +17,7 @@ import { Localized, prefix, useI18nTranslateToString } from "src/i18n";
 import { SelectClusterModal } from "src/pageComponents/dashboard/SelectClusterModal";
 import { Cluster } from "src/utils/cluster";
 import { getEntryBaseName, getEntryIcon } from "src/utils/dashboard";
-import { styled } from "styled-components";
+import { styled, useTheme } from "styled-components";
 
 import Bullet from "./Bullet";
 import { EntryItem } from "./EntryItem";
@@ -152,6 +152,9 @@ export const AddEntryModal: React.FC<Props> = ({
     }
 
   };
+
+  const theme = useTheme();
+
   return (
     <>
       <Modal
@@ -160,7 +163,7 @@ export const AddEntryModal: React.FC<Props> = ({
             <Bullet style={{
               width: "0.8em", /* 与字体大小相对应 */
               height:" 0.8em", /* 与字体大小相对应 */
-              backgroundColor:" #9B0000",
+              backgroundColor:theme.token.colorPrimary, /* 与主题颜色相对应*/
               marginRight:"1em",
             }}
             />
