@@ -439,7 +439,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   data={topChargeAccountData}
                   title={t(p("topTenChargedAccount"))}
                   isLoading={topChargeAccountLoading}
-                  xLabel={t(p("accountName"))}
+                  xLabel={t(p("userName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
