@@ -24,6 +24,8 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { User } from "src/entities/User";
+import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { dropDatabase } from "tests/data/helpers";
 
 dayjs.extend(utc);
@@ -48,13 +50,28 @@ beforeEach(async () => {
 
   const accounts = Array.from({ length: 10 }, (_, i) => createAccount(i + 1));
 
+  // 创建关联的USER
+  const createUser = (index: number) => new User({
+    userId:`${index}`,
+    name:`top${index}UserName`,
+    email:`user${index}@foxmail.com`,
+    tenant:tenant,
+  });
+
+  // 建立UserAccout之间的关系
+  const createUserAccount = (account, user) => new UserAccount({
+    account, user, role: UserRole.OWNER, blockedInCluster: UserStatus.UNBLOCKED,
+  });
+
   const chargeRecords: ChargeRecord[] = [];
   const payRecords: PayRecord[] = [];
   const date = dayjs().startOf("day");
 
-  accounts.forEach((account) => {
+  accounts.forEach((account, index) => {
     const topNumber = +account.accountName.replace("top", "");
     const curDate = date.clone().subtract((topNumber - 1), "day");
+    const user = createUser(index);
+    createUserAccount(account, user);
     chargeRecords.push(
       new ChargeRecord({
         time: curDate.toDate(),
@@ -102,6 +119,7 @@ it("correct get Top 10 Charge Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
+    userName:`top${i}UserName`,
     chargedAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
@@ -150,6 +168,7 @@ it("correct get Top 10 Pay Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
+    userName:`top${i}UserName`,
     payAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
