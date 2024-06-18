@@ -114,6 +114,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         isLoading={isLoading}
         clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
         failedClusters={data?.failedClusters ?? []}
+        currentClusters={currentClusters}
       />
     </DashboardPageContent>
   );

@@ -26,7 +26,7 @@
     "@changesets/cli": "2.27.1",
     "@commitlint/config-conventional": "19.1.0",
     "@ddadaal/eslint-config": "1.9.0",
-    "@pnpm/lockfile-file": "9.0.0",
+    "@pnpm/lockfile-file": "9.0.6",
     "@pnpm/logger": "5.0.0",
     "@types/jest": "29.5.12",
     "@types/node": "20.12.4",
@@ -56,13 +56,13 @@
     "ts-node": "10.9.2",
     "tsc-alias": "1.8.8",
     "tsconfig-paths": "4.2.0",
-    "turbo": "1.13.2",
+    "turbo": "2.0.3",
     "typescript": "5.4.3"
   },
   "volta": {
     "node": "20.12.1"
   },
-  "packageManager": "pnpm@8.15.6",
+  "packageManager": "pnpm@9.2.0",
   "pnpm": {
     "patchedDependencies": {
       "react-typed-i18n@2.3.0": "patches/react-typed-i18n@2.3.0.patch",

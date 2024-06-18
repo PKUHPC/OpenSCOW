@@ -33,7 +33,7 @@ RUN pnpm i --offline --frozen-lockfile
 
 RUN node scripts/createVersionFile.mjs version.json
 
-RUN pnpm build --filter="!docs"
+RUN pnpm build --filter="!@scow/docs"
 
 RUN node scripts/copyDist.mjs
 

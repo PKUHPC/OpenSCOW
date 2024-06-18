@@ -80,7 +80,7 @@
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",
     "@next/bundle-analyzer": "14.1.4",
     "@testing-library/jest-dom": "6.4.2",
-    "@testing-library/react": "15.0.2",
+    "@testing-library/react": "16.0.0",
     "@types/busboy": "1.5.3",
     "@types/google-protobuf": "3.15.12",
     "@types/http-proxy": "1.17.14",
