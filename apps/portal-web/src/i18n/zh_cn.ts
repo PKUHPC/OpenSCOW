@@ -449,6 +449,12 @@ export default {
         card:"卡",
         job:"作业",
         pending:"排队中",
+        platformOverview:"平台概览",
+      },
+      nodeRange:{
+        jobs:"作业",
+        running:"运行中",
+        pending:"排队中",
       },
       addEntryModal:{
         addQuickEntry:"添加快捷方式",
@@ -470,6 +476,16 @@ export default {
         exceedMaxSize:"最多只能添加10个快捷方式",
         saveFailed:"保存失败",
         saveSuccessfully:"保存成功",
+      },
+      infoPane:{
+        nodeUtilization:"节点使用率",
+      },
+      doubleInfoPane:{
+        CPUCoreUsage:"CPU核心使用率",
+        GPUCoreUsage:"GPU卡使用率",
+      },
+      titleContainer:{
+        available:"可用",
       },
     },
   },
@@ -578,6 +594,9 @@ export default {
         popoverContent9: "文件编辑",
         popoverContent10: "，输入",
         popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
+
+        popoverContent12: "文件上传",
+        popoverContent13: "，输入该命令后您可以将本地文件上传到当前路径下",
 
         command:"命令",
       },

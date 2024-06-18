@@ -154,8 +154,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   // 如果不选择全部添加白名单时，判断租户默认阈值选择是否在集群中封锁账户
   } else {
     const shouldBlockInCluster = tenant.defaultAccountBlockThreshold.gte(0);
+    // 只判断当前为未在集群中封锁的账户
     const shouldBlockAccounts = accounts.filter((a) => !a.blockedInCluster);
 
+    // 判断封锁阈值需要封锁时
     if (shouldBlockInCluster) {
       await Promise.allSettled(shouldBlockAccounts.map((acc) => {
         return em.transactional(async (em) => {

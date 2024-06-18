@@ -361,6 +361,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   }, [editFile, files]);
 
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  useEffect(() => {
+    const uploadQuery = queryToString(router.query.uploadModalOpen);
+    if (uploadQuery === "true") {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadModalOpen(false);
+    }
+  }, []);
+
+
   return (
     <div>
       <TitleText>
@@ -397,6 +409,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       <OperationBar>
         <Space wrap>
           <UploadButton
+            externalOpen={isUploadModalOpen}
             cluster={cluster.id}
             path={path}
             reload={reload}

@@ -12,9 +12,11 @@
 
 import { Card, Tag } from "antd";
 import React, { useMemo } from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PieChartCom } from "src/pageComponents/dashboard/PieChartCom";
-import { styled } from "styled-components"; ;
-import { gray } from "@ant-design/colors";
+import { styled } from "styled-components";
+
+import { TitleContainer } from "./TitleContainer";
 
 interface LineProps {
   itemName: string;
@@ -57,28 +59,14 @@ export interface PaneData {
   color: string;
 }
 interface Props {
-  title?: Title;
   tag: Tag;
   paneData: PaneData[];
   loading: boolean;
+  strokeColor: string;
 }
 
 const Container = styled.div`
-margin: 20px 0;
-`;
-
-export const TitleContainer = styled.div`
-  height: 45px;
-  font-size: 16px;
-  font-weight: 600;
-  padding-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: start;
-
-  span:nth-child(2) {
-    color: ${gray[5]};
-  }
+margin: 0px 0;
 `;
 
 export const PieChartContainer = styled.div`
@@ -86,45 +74,39 @@ export const PieChartContainer = styled.div`
   justify-content: center;
 `;
 
-export const InfoPane: React.FC<Props> = ({ title, tag, paneData, loading }) => {
+const p = prefix("pageComp.dashboard.infoPane.");
+
+export const InfoPane: React.FC<Props> = ({ paneData, loading, strokeColor }) => {
+
+  const t = useI18nTranslateToString();
 
   const notEmptyData = useMemo(() => {
     return paneData.some((x) => x.num > 0);
   }, [paneData]);
 
+
   return (
     <Container>
-      <Card bordered={false} loading={loading}>
-        {title ? (
-          <TitleContainer>
-            <span>{title.title}</span>
-            <span>{title.subTitle ? `[${title.subTitle}]` : " "} </span>
-          </TitleContainer>
-        )
-          : undefined}
-        <div>
-          <Tag
-            style={{ width:"100%", height: "24px", lineHeight:"24px", fontSize:"14px",
-              display:"flex", justifyContent:"center" }}
-            bordered={true}
-          >
-            {tag.itemName}
-            <b>&nbsp;{tag.num}</b>
-            {tag.unit}
-          </Tag>
-        </div>
-        <div style={{ height:"120px" }}>
-          {
-            paneData.map((item, idx) =>
-              <Line key={idx} itemName={item.itemName} num={item.num} color={item.color}></Line>)
-          }
-        </div>
+      <Card
+        loading={loading}
+        type="inner"
+        title={ (
+          <TitleContainer
+            name={t(p("nodeUtilization"))}
+            total={paneData.reduce((a, b) => a + b.num, 0)}
+            available={paneData[1].num}
+            display={notEmptyData}
+          ></TitleContainer>
+        )}
+        style={{ maxHeight:"310px", boxShadow: "0px 2px 10px 0px #1C01011A" }}
+      >
         <PieChartContainer>
-          {/* 数据全为空时,饼图置灰 */}
-          {notEmptyData ?
-            <PieChartCom pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}></PieChartCom> :
-            <PieChartCom pieData={[{ value:1, color:gray[4] }]}></PieChartCom>}
-
+          <PieChartCom
+            pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}
+            strokeColor={strokeColor}
+            range={Math.round((paneData[0].num / paneData.reduce((a, b) => a + b.num, 0)) * 100) }
+            display={notEmptyData}
+          ></PieChartCom>
         </PieChartContainer>
       </Card>
 

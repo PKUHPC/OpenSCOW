@@ -261,13 +261,27 @@ export const accountServiceServer = plugin((server) => {
             accountName, ownerUserId: ownerId,
           });
 
+          // 判断为需在集群中封锁时
           if (shouldBlockInCluster) {
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw <ServiceError>{
-                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. block failed`,
+                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Block failed`,
+                };
+              } else {
+                throw e;
+              }
+            });
+          // 判断为需在集群中解封时
+          } else {
+            await asyncClientCall(client.account, "unblockAccount", {
+              accountName,
+            }).catch((e) => {
+              if (e.code === Status.NOT_FOUND) {
+                throw <ServiceError>{
+                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
                 };
               } else {
                 throw e;
