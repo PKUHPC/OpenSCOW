@@ -16,7 +16,7 @@ import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin,
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import Router from "next/router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { PageTitle } from "src/components/PageTitle";
@@ -167,7 +167,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             let requiredInputObj = {};
 
             if (accountsResp && accountsResp.accounts.length) {
-
               setSelectableAccounts(accountsResp.accounts);
               const lastSub = lastData?.lastSubmissionInfo;
               const lastAccount = lastSub?.account;
@@ -313,7 +312,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   });
 
 
-  // 获取账户的可见分区
+  // 当已选择账户为可选账户且前端未缓存账户可用分区数据时，获取账户的可见分区
   const availablePartitionsForAccountQuery = useAsync({
     promiseFn: useCallback(async () => {
       if (account && selectableAccounts.includes(account) && !accountPartitionsCacheMap[account] && !loading) {
@@ -360,13 +359,15 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     setCurrentPartitionInfo(partitionInfo);
   };
 
-  useEffect(() => {
-    if (account && accountPartitionsCacheMap[account]) {
-      const cacheMap = accountPartitionsCacheMap[account];
+
+  // 账户手动变更时，如果账户可用分区已经存在于前端缓存，则重置分区和qos
+  const handleAccountChange = (account: string) => {
+    const cacheMap = accountPartitionsCacheMap[account];
+    if (cacheMap) {
       setCurrentPartitionInfo(cacheMap[0]);
       restPartitionInfo(cacheMap[0]);
     }
-  }, [account]);
+  };
 
 
   const customFormItems = useMemo(() => attributes.map((item, index) => {
@@ -447,6 +448,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
               selectableAccounts={ selectableAccounts ?? []}
               isLoading={unblockedAccountsQuery.isLoading}
               onReload={handleAccountsReload}
+              onChange={handleAccountChange}
             />
           </Form.Item>
 
