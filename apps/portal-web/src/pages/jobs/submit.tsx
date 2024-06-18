@@ -62,13 +62,13 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
               output: template.output,
               errorOutput: template.errorOutput,
               save: false,
-              scriptOutput:template.scriptOutput,
+              scriptOutput: template.scriptOutput,
+              maxTimeUnit: template.maxTimeUnit || "minutes",
             }));
         } else {
           return undefined;
         }
-      },
-      [cluster, jobTemplateId]),
+      }, [cluster, jobTemplateId]),
     });
 
     const t = useI18nTranslateToString();

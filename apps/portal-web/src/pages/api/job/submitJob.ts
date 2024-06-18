@@ -40,6 +40,7 @@ export const SubmitJobInfo = Type.Object({
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
   scriptOutput:Type.Optional(Type.String()),
+  maxTimeUnit:Type.Optional(Type.String()),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
@@ -73,7 +74,7 @@ export default route(SubmitJobSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, gpuCount, maxTime, save,
+  const { cluster, command, jobName, coreCount, gpuCount, maxTime, maxTimeUnit, save,
     nodeCount, partition, qos, account, comment
     , workingDirectory, output, errorOutput, scriptOutput, memory } = req.body;
 
@@ -94,6 +95,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     coreCount,
     gpuCount,
     maxTime,
+    maxTimeUnit,
     nodeCount,
     partition,
     qos,

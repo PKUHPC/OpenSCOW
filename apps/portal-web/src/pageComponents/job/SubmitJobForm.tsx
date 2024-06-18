@@ -38,8 +38,8 @@ interface JobForm {
   command: string;
   jobName: string;
   qos: string | undefined;
-  maxTimeValue: number;
-  maxTimeUnit: "minutes" | "hours";
+  maxTime: number;
+  maxTimeUnit: string;
   account: string;
   comment: string;
   workingDirectory: string;
@@ -66,13 +66,13 @@ const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
-  maxTimeValue: 30,
-  maxTimeUnit:"minutes",
+  maxTime: 30,
+  maxTimeUnit: "minutes",
   output: "job.%j.out",
-  scriptOutput:"job.%j.sh",
+  scriptOutput: "job.%j.sh",
   errorOutput: "job.%j.err",
   save: false,
-  showScriptOutput:true,
+  showScriptOutput: true,
 } as Partial<JobForm>;
 
 interface Props {
@@ -91,24 +91,22 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
-  const timeUnitConversion = {
-    minutes: 1,
-    hours: 60,
-    days: 60 * 24,
-  };
   const submit = async () => {
     const formValues = await form.validateFields();
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
-      maxTimeValue, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
+      maxTime, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
     const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
-    const maxTime = maxTimeValue * (timeUnitConversion[maxTimeUnit] || 1);
-    await api.submitJob({ body: {
-      cluster: cluster.id, command, jobName, account,
-      coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
-      gpuCount,
-      maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory, output, errorOutput, scriptOutput,
-    } })
+
+    await api.submitJob({
+      body: {
+        cluster: cluster.id, command, jobName, account,
+        coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores
+          / currentPartitionInfo!.gpus) : coreCount,
+        gpuCount,
+        maxTime, maxTimeUnit, nodeCount, partition, qos, comment,
+        workingDirectory, save, memory, output, errorOutput, scriptOutput,
+      },
+    })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
           modal.error({
@@ -149,7 +147,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
+      ? api.getClusterInfo({ query: { cluster: cluster?.id } })
       : undefined, [cluster]),
     onResolve: (data) => {
       if (data) {
@@ -199,8 +197,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const currentPartitionInfo = useMemo(() =>
     clusterInfoQuery.data
       ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
-      : undefined,
-  [clusterInfoQuery.data, partition],
+      : undefined, [clusterInfoQuery.data, partition],
   );
 
   useEffect(() => {
@@ -224,8 +221,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
-    * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
-    * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
+      * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+      * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
       nodeCount * coreCount * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
   const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
@@ -368,7 +365,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         <Col span={24} sm={6}>
           <Form.Item label={t(p("maxTime"))} required>
             <Input.Group compact style={{ display: "flex", minWidth: "120px" }}>
-              <Form.Item name="maxTimeValue" rules={[{ required: true }]} noStyle>
+              <Form.Item
+                name="maxTime"
+                rules={[{ required: true, message: `${t(p("requireMaxTime"))}` }]}
+                noStyle
+              >
                 <InputNumber
                   min={1}
                   step={1}

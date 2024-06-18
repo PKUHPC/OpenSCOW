@@ -172,7 +172,7 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
+      const { cluster, command, jobName, coreCount, gpuCount, maxTime, maxTimeUnit = "minutes", saveAsTemplate, userId,
         nodeCount, partition, qos, account, comment, workingDirectory, output
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
@@ -184,13 +184,18 @@ export const jobServiceServer = plugin((server) => {
         const sftp = await ssh.requestSFTP();
         await createDirectoriesRecursively(sftp, workingDirectory);
       });
-
+      const timeUnitConversion = {
+        minutes: 1,
+        hours: 60,
+        days: 60 * 24,
+      };
+      const maxTimeConversion = maxTime * (timeUnitConversion[maxTimeUnit]);
       const reply = await callOnOne(
         cluster,
         logger,
         async (client) => await asyncClientCall(client.job, "submitJob", {
           userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
-          memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
+          memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTimeConversion,
           script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
         }).catch((e) => {
           const ex = e as ServiceError;
@@ -233,6 +238,7 @@ export const jobServiceServer = plugin((server) => {
           errorOutput,
           memory,
           scriptOutput,
+          maxTimeUnit,
         };
 
 

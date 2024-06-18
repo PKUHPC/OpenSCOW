@@ -74,6 +74,7 @@ message JobTemplate {
   optional string error_output = 12;
   optional string comment = 13;
   optional string script_output = 14;
+  optional string max_time_unit=15;
 }
 
 message ListAllJobsResponse {
@@ -153,6 +154,7 @@ message SubmitJobRequest {
   optional string comment = 16;
   bool save_as_template = 17;
   optional string script_output=18;
+  optional string max_time_unit=19;
 }
 
 // NOT_FOUND: cluster is not found

@@ -30,6 +30,7 @@ export interface JobTemplate {
   memory?: string;
   comment?: string | undefined;
   scriptOutput?: string | undefined;
+  maxTimeUnit?: string | undefined;
 }
 
 export interface ListJobTemplatesRequest {
