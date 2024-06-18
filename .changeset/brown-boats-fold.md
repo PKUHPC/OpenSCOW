@@ -1,10 +1,8 @@
 ---
-"@scow/portal-server": patch
-"@scow/scowd-protos": patch
-"@scow/config": patch
-"@scow/lib-scowd": patch
-"@scow/cli": patch
-"@scow/grpc-api": patch
+"@scow/portal-server": minor
+"@scow/scowd-protos": minor
+"@scow/lib-scowd": minor
+"@scow/cli": minor
 ---
 
-scowd 一期改造，完成 HPC 部分文件和桌面支持接入 scowd
+增加 HPC 文件和桌面功能的 scowd 支持
