@@ -11,7 +11,7 @@
  */
 
 import { Entry } from "@scow/protos/build/portal/dashboard";
-import { Spin } from "antd";
+import { Button, Spin } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
@@ -29,11 +29,7 @@ const CardsContainer = styled.div`
   flex-wrap: wrap;
 `;
 
-const EditButton = styled.button`
-  border: #DEDEDF 1px solid;
-  background-color: #fafafa;
-  color: #262743;
-  border-radius:5px;
+const EditButton = styled(Button)`
 `;
 
 
@@ -154,21 +150,19 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
         isEditable ? (
           <div>
             <EditButton
-              type="button"
               style={{ marginRight:"20px" }}
               onClick={() => { setIsEditable(false); setIsFinished(true); }}
             >
               <Localized id={p("finish")} />
             </EditButton>
             <EditButton
-              type="button"
               onClick={() => { setIsEditable(false); }}
             >
               <Localized id={p("cancel")} />
             </EditButton>
           </div>
         ) : (
-          <EditButton type="button" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+          <EditButton onClick={() => { setIsEditable(true); setIsFinished(false); }}>
             <Localized id={p("edit")} />
           </EditButton>
         )}
