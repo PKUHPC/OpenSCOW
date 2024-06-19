@@ -33,8 +33,9 @@ jobs:
 
     - name: Send Deployment Request
       run: |
-        curl -X POST https://example.com/api/deploy \
+        curl -X POST http://47.96.27.236:8080/version \
         -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
         -d '{
           "time": "${{ github.event.inputs.time }}",
           "version": "${{ github.event.inputs.version }}",
