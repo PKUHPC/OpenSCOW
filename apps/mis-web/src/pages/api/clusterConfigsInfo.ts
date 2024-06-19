@@ -43,8 +43,6 @@ export const getClusterConfigFilesSchema = typeboxRouteSchema({
 
     200: Type.Object({
       clusterConfigs:  Type.Record(Type.String(), ClusterConfigSchema) }),
-
-    403: Type.Null(),
   },
 });
 
@@ -58,7 +56,7 @@ export default route(getClusterConfigFilesSchema,
     // when firstly used in getInitialProps, check the token
     // when logged in, use auth()
     const info = token ? await validateToken(token) : await auth(req, res);
-    if (!info) { return { 403: null }; }
+    if (!info) { return; }
 
     const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
 

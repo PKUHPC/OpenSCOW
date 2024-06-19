@@ -470,6 +470,22 @@ export default {
         card:"Card",
         job:"Job",
         pending:"Pending",
+        platformOverview:"Platform Overview",
+      },
+      nodeRange:{
+        jobs:"Jobs",
+        running:"Running",
+        pending:"Pending",
+      },
+      infoPane:{
+        nodeUtilization:"Node Utilization",
+      },
+      doubleInfoPane:{
+        CPUCoreUsage:"CPU Core Usage",
+        GPUCoreUsage:"GPU Core Usage",
+      },
+      titleContainer:{
+        available:"Available",
       },
     },
   },

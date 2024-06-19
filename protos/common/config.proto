@@ -49,11 +49,16 @@ message ClusterConfigSchemaProto {
     // default value is false
     bool auto_setup_nginx = 2;
   }
+  message LoginNodeScowdConfigs {
+    uint32 port = 1;
+  }
   message LoginNodeConfigSchemaProto {
     // 登录节点展示名
     I18nStringProtoType name = 1;
     // 集群的登录节点地址
     string address = 2;
+    // scowd 相关配置
+    optional LoginNodeScowdConfigs scowd = 3;
   }
   message LoginNodeConfigs {
     repeated LoginNodeConfigSchemaProto login_node_configs_value = 1;
@@ -117,6 +122,10 @@ message ClusterConfigSchemaProto {
     Kubeconfig kubeconfig = 2;
   }
 
+  message ScowdConfigs {
+    bool enabled = 1;
+  }
+
   // 集群ID
   string cluster_id = 1;
   // 集群的显示名称
@@ -135,6 +144,8 @@ message ClusterConfigSchemaProto {
   Hpc hpc = 10;
   Ai ai = 11;
   optional K8s k8s = 12;
+  // scowd 配置
+  ScowdConfigs scowd = 13;
 }
 
 message GetClusterConfigFilesRequest {
