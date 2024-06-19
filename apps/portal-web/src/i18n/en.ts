@@ -471,6 +471,9 @@ export default {
         job:"Job",
         pending:"Pending",
         platformOverview:"Platform Overview",
+        totalNodes:"Total Nodes",
+        totalCores:"Total Cores",
+        totalCards:"Total Cards",
       },
       nodeRange:{
         jobs:"Jobs",

@@ -11,9 +11,8 @@
  */
 
 import React from "react";
-import { DoubleInfoPane } from "src/pageComponents/dashboard/DoubleInfoPane";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
-import { styled } from "styled-components"; ;
+import { styled, useTheme } from "styled-components"; ;
 import { Card, Col, Row } from "antd";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -29,33 +28,23 @@ interface Props {
 }
 
 const InfoPaneContainer = styled.div`
-  min-width: 350px;
 `;
-const DoubleInfoPaneContainer = styled.div`
-  min-width: 700px;
-  padding: 0 80px;
-  /* 当该面板是第一个元素时不需要左右的padding */
-  @media (max-width: 768px) {
-  padding: 0;
-  }
-`;
-
 
 const colors = {
   // 节点使用率颜色
-  nodeUtilizationAvailable:"#6959CA",
+  nodeUtilizationAvailable:"#ABA2E1",
   nodeUtilizationNotavailable:"#CFCAEE",
-  nodeUtilizationStroke:"#E9E6F7",
+  nodeUtilizationRunning:"#6959CA",
 
   // CPU核心使用率颜色
-  cpuAvailable:"#4DA2AE",
+  cpuAvailable:"#78BAC3",
   cpunotAvailable:"#B0D6DC",
-  cpuStroke:"#DBECEF",
+  cpuRunning:"#4DA2AE",
 
   // GPU核心使用率颜色
-  gpuAvailable:"#CDE044",
-  gpunotAvailable:"#E1EC8F",
-  gpuStroke:"#F5F9DA",
+  gpuRunning:"#BED32A",
+  gpuAvailable:"#D2E269",
+  gpunotAvailable:"#EBF1BE",
 
   // 作业字体颜色
   runningJob:"#D1CB5B",
@@ -69,22 +58,27 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
 
   const { currentClusters } = useStore(ClusterInfoStore);
 
+  const theme = useTheme();
+
   // card的每一项
   const clusterCardsList = [
     {
       key:"platformOverview",
       tab:
-      <div style={{ width:"120px", height:"40px",
+      <div style={{ width:"max-content", height:"40px",
         textAlign: "center", lineHeight:"40px",
         color:`${activeTabKey === "platformOverview" ? "#FFF" : "#000"}`,
-        background:`${activeTabKey === "platformOverview" ? "#9b0000" : "transparent"}`,
+        background:`${activeTabKey === "platformOverview" ? theme.token.colorPrimary : "transparent"}`,
         borderRadius:"5px",
         fontWeight:"700",
+        paddingLeft:"20px",
+        paddingRight:"20px",
       }}
       >
         {t(p("platformOverview"))}
       </div>,
-    }, ...currentClusters.map((x) => ({
+    },
+    ...currentClusters.map((x) => ({
       key:x.id,
       tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
     })),
@@ -120,49 +114,53 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
       activeTabKey={activeTabKey}
       onTabChange={onTabChange}
     >
-      <Row justify="space-between">
-        <Col md={8} xl={6}>
+      <Row justify="space-between" wrap gutter={[50, 50]}>
+        <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
           <InfoPaneContainer>
             <InfoPane
-              strokeColor={colors.nodeUtilizationStroke}
               loading={loading}
-              tag={{ itemName:t(p("node")), num:nodeCount }}
-              paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.nodeUtilizationAvailable },
-                { itemName:t(p("idle")), num:idleNodeCount, color:colors.nodeUtilizationNotavailable },
+              tag={{ itemName:t(p("node")), num:nodeCount, subName:t(p("totalNodes")) }}
+              paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.nodeUtilizationRunning },
+                { itemName:t(p("idle")), num:idleNodeCount, color:colors.nodeUtilizationAvailable },
                 { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.nodeUtilizationNotavailable }]}
             ></InfoPane>
           </InfoPaneContainer>
         </Col>
-        <Col md={16} xl={12}>
-          <DoubleInfoPaneContainer>
-            <DoubleInfoPane
-              strokeColor={[colors.cpuStroke, colors.gpuStroke]}
+        <Col xs={24} md={12} xl={6}>
+          <InfoPaneContainer>
+            <InfoPane
               loading={loading}
-              cpuInfo={{
-                tag:{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) },
-                paneData: [
-                  { itemName:t(p("running")), num:runningCpuCount, color:colors.cpuAvailable },
-                  { itemName:t(p("idle")), num:idleCpuCount, color:colors.cpunotAvailable },
-                  { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.cpunotAvailable },
-                ]}}
-              gpuInfo={{
-                title:{ title:"", subTitle:"" },
-                tag:{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) },
-                paneData: [
-                  { itemName:t(p("running")), num:runningGpuCount, color:colors.gpuAvailable },
-                  { itemName:t(p("idle")), num:idleGpuCount, color:colors.gpunotAvailable },
-                  { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.gpunotAvailable },
-                ]}}
-            ></DoubleInfoPane>
-          </DoubleInfoPaneContainer>
+              tag={ { itemName:"CPU", num:cpuCoreCount, subName:t(p("totalCores")) } }
+              paneData={[
+                { itemName:t(p("running")), num:runningCpuCount, color:colors.cpuRunning },
+                { itemName:t(p("idle")), num:idleCpuCount, color:colors.cpuAvailable },
+                { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.cpunotAvailable },
+              ]}
+            ></InfoPane>
+          </InfoPaneContainer>
         </Col>
-        <Col md={8} xl={6}>
+        {gpuCoreCount > 0 && (
+          <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
+            <InfoPaneContainer>
+              <InfoPane
+                loading={loading}
+                tag={{ itemName: "GPU", num: gpuCoreCount, subName: t(p("totalCards")) }}
+                paneData={[
+                  { itemName: t(p("running")), num: runningGpuCount, color: colors.gpuRunning },
+                  { itemName: t(p("idle")), num: idleGpuCount, color: colors.gpuAvailable },
+                  { itemName: t(p("notAvailable")), num: notAvailableGpuCount, color: colors.gpunotAvailable },
+                ]}
+              ></InfoPane>
+            </InfoPaneContainer>
+          </Col>
+        )}
+        <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
           <InfoPaneContainer>
             <JobInfo
               runningJobs={`${runningJobCount}`}
               pendingJobs={`${pendingJobCount}`}
               loading={loading}
-              display={!(runningJobCount == 0 && pendingJobCount == 0)}
+              display={!(runningJobCount === undefined && pendingJobCount === undefined)}
             />
           </InfoPaneContainer>
         </Col>

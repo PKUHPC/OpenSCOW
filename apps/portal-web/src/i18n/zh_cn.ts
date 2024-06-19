@@ -450,6 +450,9 @@ export default {
         job:"作业",
         pending:"排队中",
         platformOverview:"平台概览",
+        totalNodes:"总数",
+        totalCores:"总核心数",
+        totalCards:"总卡数",
       },
       nodeRange:{
         jobs:"作业",
