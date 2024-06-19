@@ -52,7 +52,6 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
         theme={{ token: {
           colorPrimary: color,
           colorInfo: color,
-          colorBgBase: "#0B1D32",
         }, algorithm: dark ? theme.darkAlgorithm : undefined }}
       >
         <StyledComponentsThemeProvider color={color} locale={locale}>
