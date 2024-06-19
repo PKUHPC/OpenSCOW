@@ -42,6 +42,7 @@ const ContentPart = styled.div`
   flex-direction: column;
   width: 100%;
   overflow: hidden;
+
 `;
 
 const Content = styled(Layout.Content)`

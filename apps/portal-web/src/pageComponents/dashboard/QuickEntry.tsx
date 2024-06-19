@@ -20,12 +20,18 @@ import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection"
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
 import { Cluster } from "src/utils/cluster";
-import { styled } from "styled-components";
+import { styled, useTheme } from "styled-components";
+
+import Bullet from "./Bullet";
 
 const CardsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
 `;
+
+const EditButton = styled(Button)`
+`;
+
 
 export interface AppWithCluster {
   [appId: string]: {
@@ -69,7 +75,7 @@ export const defaultEntry: Entry[] = [
       $case:"pageLink",
       pageLink:{
         path: "/jobs/allJobs",
-        icon:"BookOutlined",
+        icon:"AllJobsOutlined",
       },
     },
   },
@@ -123,24 +129,42 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
   const [isEditable, setIsEditable] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
+  const theme = useTheme();
+
   return (
     <DashboardSection
       style={{ marginBottom: "16px" }}
-      title={<Localized id={p("quickEntry")} />}
+      title={ (
+        <>
+          <Bullet style={{
+            width: "0.8em", /* 与字体大小相对应 */
+            height:" 0.8em", /* 与字体大小相对应 */
+            backgroundColor:theme.token.colorPrimary, /* 与主题颜色相对应 */
+            marginRight:"1em",
+          }}
+          />
+          <Localized id={p("quickEntry")} />
+        </>
+      )}
       extra={
         isEditable ? (
           <div>
-            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
+            <EditButton
+              style={{ marginRight:"20px" }}
+              onClick={() => { setIsEditable(false); setIsFinished(true); }}
+            >
               <Localized id={p("finish")} />
-            </Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>
+            </EditButton>
+            <EditButton
+              onClick={() => { setIsEditable(false); }}
+            >
               <Localized id={p("cancel")} />
-            </Button>
+            </EditButton>
           </div>
         ) : (
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+          <EditButton onClick={() => { setIsEditable(true); setIsFinished(false); }}>
             <Localized id={p("edit")} />
-          </Button>
+          </EditButton>
         )}
     >
       <CardsContainer>
