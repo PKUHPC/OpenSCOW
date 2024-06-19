@@ -91,7 +91,7 @@ export const PieChartCom: React.FC<Props> = ({ pieData, display, total }) => {
 
   return (
     <Container>
-      <JobRange>
+      <JobRange style={{ display:`${total === 0 ? "none" : "unset"}` }}>
         <PieInfo
           percentage={Math.min(Math.round((hoveredValue / total) * 100), 100)}
           value={hoveredValue}
