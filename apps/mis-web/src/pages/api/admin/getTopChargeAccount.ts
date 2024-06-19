@@ -23,6 +23,7 @@ import { getClient } from "src/utils/client";
 export const GetTopChargeAccountResponse = Type.Object({
   results: Type.Array(Type.Object({
     accountName: Type.String(),
+    userName: Type.String(),
     chargedAmount: Money,
   })),
 });
