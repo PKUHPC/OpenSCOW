@@ -184,30 +184,33 @@ C27.25 7.69036 26.6904 8.25 26 8.25H2C1.30964 8.25 0.75 7.69036 0.75 7
 V2C0.75 1.30964 1.30964 0.75 2 0.75Z"
       strokeWidth="1.5"
       strokeLinecap="round"
+      stroke="currentColor"
     />
-    <ellipse cx="6.25" cy="4.50004" rx="1.25" ry="1.32353" />
-    <ellipse cx="10.25" cy="4.50004" rx="1.25" ry="1.32353" />
-    <ellipse cx="14.25" cy="4.50004" rx="1.25" ry="1.32353" />
+    <ellipse cx="6.25" cy="4.50004" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="10.25" cy="4.50004" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="14.25" cy="4.50004" rx="1.25" ry="1.32353" stroke="currentColor" />
     <path
       d="M2 10.25H26.5706C26.9458 10.25 27.25 10.5542 27.25 10.9294
 V14.7412V16.5C27.25 17.1904 26.6904 17.75 26 17.75H2C1.30964 17.75 0.75 17.1904 0.75 16.5V11.5
 C0.75 10.8096 1.30964 10.25 2 10.25Z"
       strokeWidth="1.5"
       strokeLinecap="round"
+      stroke="currentColor"
     />
-    <ellipse cx="6.25" cy="14" rx="1.25" ry="1.32353" />
-    <ellipse cx="10.25" cy="14" rx="1.25" ry="1.32353" />
-    <ellipse cx="14.25" cy="14" rx="1.25" ry="1.32353" />
+    <ellipse cx="6.25" cy="14" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="10.25" cy="14" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="14.25" cy="14" rx="1.25" ry="1.32353" stroke="currentColor" />
     <path
       d="M2 19.75H26.5706C26.9458 19.75 27.25 20.0542 27.25 20.4294
 V24.2412V26C27.25 26.6904 26.6904 27.25 26 27.25H2C1.30964 27.25 0.75 26.6904 0.75 26
 V21C0.75 20.3096 1.30964 19.75 2 19.75Z"
       strokeWidth="1.5"
       strokeLinecap="round"
+      stroke="currentColor"
     />
-    <ellipse cx="6.25" cy="23.5" rx="1.25" ry="1.32353" />
-    <ellipse cx="10.25" cy="23.5" rx="1.25" ry="1.32353" />
-    <ellipse cx="14.25" cy="23.5" rx="1.25" ry="1.32353" />
+    <ellipse cx="6.25" cy="23.5" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="10.25" cy="23.5" rx="1.25" ry="1.32353" stroke="currentColor" />
+    <ellipse cx="14.25" cy="23.5" rx="1.25" ry="1.32353" stroke="currentColor" />
   </svg>
 
 );
