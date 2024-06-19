@@ -44,13 +44,14 @@ export async function createServer() {
   }
 
   await server.register(appServiceServer);
-  await server.register(desktopServiceServer);
   await server.register(jobServiceServer);
-  await server.register(fileServiceServer);
   await server.register(shellServiceServer);
   await server.register(staticConfigServiceServer);
   await server.register(runtimeConfigServiceServer);
   await server.register(dashboardServiceServer);
+  await server.register(fileServiceServer);
+  await server.register(desktopServiceServer);
+  
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);

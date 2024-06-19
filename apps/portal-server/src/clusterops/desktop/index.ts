@@ -10,14 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AppOps } from "src/clusterops/api/app";
 import { DesktopOps } from "src/clusterops/api/desktop";
-import { FileOps } from "src/clusterops/api/file";
-import { JobOps } from "src/clusterops/api/job";
+import { configClusters } from "src/config/clusters";
 
-export interface ClusterOps {
-  app: AppOps;
-  job: JobOps;
-  desktop: DesktopOps;
-  file: FileOps;
-}
+import { scowdDesktopServices } from "./scowdDesktop";
+import { sshDesktopServices } from "./sshDesktop";
+
+
+export const desktopOps = (cluster: string): DesktopOps => {
+
+  const clusterInfo = configClusters[cluster];
+  if (clusterInfo.scowd?.enabled) {
+    return {
+      ...scowdDesktopServices(cluster),
+    };
+  } else {
+    return {
+      ...sshDesktopServices(cluster),
+    };
+  }
+};

@@ -243,7 +243,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const topChargeAccountData = useMemo(() => {
 
     return topChargeAccount?.results.map((r) => ({
-      x: r.accountName,
+      x: r.userName,
       y: moneyToNumber(r.chargedAmount).toFixed(2),
     })) || [];
   }, [query, topChargeAccount]);
@@ -251,7 +251,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const topPayAccountData = useMemo(() => {
 
     return topPayAccount?.results.map((r) => ({
-      x: r.accountName,
+      x: r.userName,
       y: moneyToNumber(r.payAmount).toFixed(2),
     })) || [];
   }, [query, topPayAccount]);
@@ -439,7 +439,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   data={topChargeAccountData}
                   title={t(p("topTenChargedAccount"))}
                   isLoading={topChargeAccountLoading}
-                  xLabel={t(p("accountName"))}
+                  xLabel={t(p("userName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
@@ -461,7 +461,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   data={topPayAccountData}
                   title={t(p("topTenPayAccount"))}
                   isLoading={topPayAccountLoading}
-                  xLabel={t(p("accountName"))}
+                  xLabel={t(p("userName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>

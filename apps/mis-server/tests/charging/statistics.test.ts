@@ -24,6 +24,8 @@ import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
+import { User } from "src/entities/User";
+import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { dropDatabase } from "tests/data/helpers";
 
 dayjs.extend(utc);
@@ -48,11 +50,28 @@ beforeEach(async () => {
 
   const accounts = Array.from({ length: 10 }, (_, i) => createAccount(i + 1));
 
+  // 创建关联的USER
+  const createUser = (index: number) => new User({
+    userId:`${index}`,
+    name:`top${index}UserName`,
+    email:`user${index}@foxmail.com`,
+    tenant:tenant,
+  });
+
+  // 创建UserAccount并插入数据库
+  const users = accounts.map((_, index) => createUser(index + 1));
+  const userAccounts = users.map((user, index) => new UserAccount({
+    account: accounts[index],
+    user: user,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
+  }));
+
   const chargeRecords: ChargeRecord[] = [];
   const payRecords: PayRecord[] = [];
   const date = dayjs().startOf("day");
 
-  accounts.forEach((account) => {
+  accounts.forEach((account, index) => {
     const topNumber = +account.accountName.replace("top", "");
     const curDate = date.clone().subtract((topNumber - 1), "day");
     chargeRecords.push(
@@ -62,6 +81,7 @@ beforeEach(async () => {
         type: "test",
         comment: "test",
         amount: new Decimal(100 * (11 - topNumber)),
+        userId: `${index + 1}`, // 确保 userId 正确设置
       }),
     );
     payRecords.push(
@@ -78,7 +98,7 @@ beforeEach(async () => {
   });
 
 
-  await em.persistAndFlush([tenant, ...accounts, ...chargeRecords, ...payRecords]);
+  await em.persistAndFlush([tenant, ...accounts, ...users, ...userAccounts, ...chargeRecords, ...payRecords]);
 
   await server.start();
 
@@ -102,6 +122,7 @@ it("correct get Top 10 Charge Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
+    userName:`top${i + 1}UserName`,
     chargedAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
@@ -150,6 +171,7 @@ it("correct get Top 10 Pay Account", async () => {
 
   const results = Array.from({ length: 10 }, (_, i) => ({
     accountName: `top${i + 1}`,
+    userName:`top${i + 1}UserName`,
     payAmount: decimalToMoney(new Decimal(100 * (11 - (i + 1)))),
   }));
 
