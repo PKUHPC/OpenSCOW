@@ -17,7 +17,7 @@ import { status } from "@grpc/grpc-js";
 import { getClusterConfigs } from "@scow/config/build/cluster";
 import { checkSchedulerApiVersion, convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-server";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
-import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/protos/build/common/config";
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
@@ -38,6 +38,31 @@ export const staticConfigServiceServer = plugin((server) => {
 
       return [reply];
     },
+
+    getAvailablePartitionsForCluster: async ({ request, logger }) => {
+
+      const { cluster, accountName, userId } = request;
+      let availablePartitions: Partition[];
+
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      try {
+        const resp = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
+            accountName, userId,
+          }),
+        );
+        availablePartitions = resp.partitions;
+      } catch (error) {
+        logger.error(`Error occured when query the available partitions of ${userId} in ${accountName}.`);
+        availablePartitions = [];
+      }
+
+      return [ { partitions: availablePartitions } ];
+    },
+
 
     getClusterConfigFiles: async ({ logger }) => {
 
