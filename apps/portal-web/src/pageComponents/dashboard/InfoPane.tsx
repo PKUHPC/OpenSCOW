@@ -90,16 +90,17 @@ export const InfoPane: React.FC<Props> = ({ tag, paneData, loading }) => {
             subName={tag.subName}
             total={paneData.reduce((a, b) => a + b.num, 0)}
             available={paneData[1].num}
-            display={notEmptyData}
+            display={tag.itemName == "GPU" ? notEmptyData : true}
           ></TitleContainer>
         )}
         style={{ maxHeight:"310px", boxShadow: "0px 2px 10px 0px #1C01011A" }}
       >
         <PieChartContainer>
           <PieChartCom
-            pieData={paneData.map((item) => ({ value:item.num, color:item.color, itemName:item.itemName }))}
+            pieData={paneData.map((item) => ({ value:isNaN(item.num) ? 0 : item.num,
+              color:item.color, itemName:item.itemName }))}
             range={Math.round((paneData[0].num / paneData.reduce((a, b) => a + b.num, 0)) * 100) }
-            display={notEmptyData}
+            display={tag.itemName == "GPU" ? notEmptyData : true}
             total={paneData.reduce((a, b) => a + b.num, 0)}
           ></PieChartCom>
         </PieChartContainer>
