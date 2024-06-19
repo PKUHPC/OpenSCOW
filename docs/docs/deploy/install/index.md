@@ -101,19 +101,16 @@ chmod +x scow-cli
 ./cli init
 ```
 
-配置文件及说明(根据以下顺序配置系统)：
+主要配置文件及说明(根据以下顺序配置系统)：
 
-| 顺序 | 配置文件          | 功能说明                                           | 是否必须 | 配置DEMO                                                     | 备注                                       |
-| ---- | ----------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------ | ------------------------------------------ |
-| 1    | install.yaml      | 安装文件                                           | 必须     | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/install.yaml) | 按照集群需求修改对应参数                   |
-| 2    | `{集群ID}`.yaml   | [集群配置文件](/docs/deploy/config/cluster-config) | 必须     | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/clusters/hpc01.yaml) | 支持多集群，一个集群一个配置文件           |
-| 3    | auth.yaml         | [认证系统](../config/auth/intro.md)                | 必须     | [最简配置参考](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/auth.yml) | 所有集群同一个认证系统                     |
-| 4    | mis.yaml          | [管理系统](../config/mis/intro.md)                 | 可选     | 可使用默认配置                                               |                                            |
-| 5    | portal.yaml       | [门户系统](../config/portal/intro.md)              | 可选     | 可使用默认配置                                               | 若登录节点不是安装的xfce，需要对应进行修改 |
-| 6    | audit.yaml        | [审计系统](../config/audit/intro.md)               | 可选     |                                                              |                                            |
-| 7    | common.yaml       | 公共配置文件                                       |          |                                                              |                                            |
-| 8    | clusterTexts.yaml | 集群说明配置文件                                   |          |                                                              |                                            |
-| 9    | ui.yaml           | ui配置文件                                         |          |                                                              |                                            |
+| 顺序 | 配置文件        | 功能说明                                           | 是否必须 | 配置DEMO                                                     | 备注                                       |
+| ---- | --------------- | -------------------------------------------------- | -------- | ------------------------------------------------------------ | ------------------------------------------ |
+| 1    | install.yaml    | 安装文件                                           | 必须     | [install.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/install.yaml) | 按照集群需求修改对应参数                   |
+| 2    | `{集群ID}`.yaml | [集群配置文件](/docs/deploy/config/cluster-config) | 必须     | [`{集群ID}`.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/clusters/hpc01.yaml) | 支持多集群，一个集群一个配置文件           |
+| 3    | auth.yaml       | [认证系统](../config/auth/intro.md)                | 必须     | [auth.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/auth.yml) | 所有集群同一个认证系统                     |
+| 4    | mis.yaml        | [管理系统](../config/mis/intro.md)                 | 可选     | [mis.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/mis.yaml) |                                            |
+| 5    | portal.yaml     | [门户系统](../config/portal/intro.md)              | 可选     | [portal.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/portal.yaml) | 若登录节点不是安装的xfce，需要对应进行修改 |
+| 6    | audit.yaml      | [审计系统](../config/audit/intro.md)               | 可选     | [audit.yaml](https://github.com/PKUHPC/SCOW/blob/master/apps/cli/assets/init/config/audit.yaml) |                                            |
 
 ####  3.3 其他配置(可选)
 
