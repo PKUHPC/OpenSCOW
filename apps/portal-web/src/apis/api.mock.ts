@@ -15,6 +15,7 @@ import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
+import { TimeUnit } from "src/models/job";
 export type MockApi<TApi extends Record<
   string,
  (...args: any[]) => JsonFetchResultPromiseLike<any>>
@@ -198,6 +199,7 @@ export const mockApi: MockApi<typeof api> = {
       output: "job.%j.out",
       errorOutput: "job.%j.err",
       workingDirectory: "/nfs/jobs/123",
+      maxTimeUnit:  TimeUnit.MINUTES,
     },
   }),
 
