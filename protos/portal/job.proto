@@ -89,7 +89,7 @@ message JobTemplate {
   optional string error_output = 12;
   optional string comment = 13;
   optional string script_output = 14;
-  optional TimeUnit max_time_unit = 15; // 最长运行时间单位
+  optional TimeUnit max_time_unit = 15; // 最长运行时间单位，默认为MINUTES
 }
 
 message ListAllJobsResponse {
@@ -169,7 +169,7 @@ message SubmitJobRequest {
   optional string comment = 16;
   bool save_as_template = 17;
   optional string script_output=18;
-  optional TimeUnit max_time_unit = 19; // 最长运行时间单位
+  optional TimeUnit max_time_unit = 19; // 最长运行时间单位，默认为MINUTES
 }
 
 // NOT_FOUND: cluster is not found
