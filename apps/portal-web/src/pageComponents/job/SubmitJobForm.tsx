@@ -11,6 +11,7 @@
  */
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
+import { TimeUnit } from "@scow/protos/build/portal/job";
 import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
@@ -43,7 +44,7 @@ interface JobForm {
   jobName: string;
   qos: string | undefined;
   maxTime: number;
-  maxTimeUnit: string;
+  maxTimeUnit: TimeUnit | undefined;
   account: string;
   comment: string;
   workingDirectory: string;
@@ -71,7 +72,7 @@ const initialValues = {
   coreCount: 1,
   gpuCount: 1,
   maxTime: 30,
-  maxTimeUnit: "minutes",
+  maxTimeUnit: TimeUnit.MINUTES,
   output: "job.%j.out",
   scriptOutput: "job.%j.sh",
   errorOutput: "job.%j.err",
@@ -249,7 +250,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         query: {
           cluster: cluster.id,
           statusFilter: AccountStatusFilter.UNBLOCKED_ONLY,
-        }
+        },
       })
         .httpError(404, (error) => { message.error(error.message); })
         : { accounts: [] as string[] };
@@ -283,7 +284,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           query: {
             cluster: cluster?.id,
             accountName: account,
-          }
+          },
         })
           .then((data) => {
             newPartitionsMap[account] = data.partitions;
@@ -529,9 +530,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                   popupMatchSelectWidth={false}
                   style={{ flex: "0 1 auto" }}
                 >
-                  <Select.Option value="minutes">{t(p("minute"))}</Select.Option>
-                  <Select.Option value="hours">{t(p("hours"))}</Select.Option>
-                  <Select.Option value="days">{t(p("days"))}</Select.Option>
+                  <Select.Option value={TimeUnit.MINUTES}>{t(p("minute"))}</Select.Option>
+                  <Select.Option value={TimeUnit.HOURS}>{t(p("hours"))}</Select.Option>
+                  <Select.Option value={TimeUnit.DAYS}>{t(p("days"))}</Select.Option>
                 </Select>
               </Form.Item>
             </Input.Group>
