@@ -74,18 +74,18 @@ export const PieChartCom: React.FC<Props> = ({ pieData, display, total }) => {
   console.log(pieData);
 
   // 鼠标激活index的value
-  const [hoveredValue, setHoveredValue] = useState<number>(pieData[0].value);
+  const [hoveredValue, setHoveredValue] = useState<number>(pieData[1].value);
 
   // 鼠标激活的index
-  const [activeIndex, setActiveIndex] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState<number>(1);
 
   // 饼图内文字颜色
   const pieInfoColor = "#6B747F";
 
   // 当 pieData 或 total 发生变化时，更新 hoveredValue 和 activeIndex
   useEffect(() => {
-    setHoveredValue(pieData[0].value);
-    setActiveIndex(0);
+    setHoveredValue(pieData[1].value);
+    setActiveIndex(1);
   }, [pieData, total]);
 
 
@@ -113,8 +113,8 @@ export const PieChartCom: React.FC<Props> = ({ pieData, display, total }) => {
             setActiveIndex(index);
           }}
           onMouseLeave={() => {
-            setHoveredValue(pieData[0].value);
-            setActiveIndex(0);
+            setHoveredValue(pieData[1].value);
+            setActiveIndex(1);
           }}
           activeIndex={activeIndex}
           activeShape={renderActiveShape}

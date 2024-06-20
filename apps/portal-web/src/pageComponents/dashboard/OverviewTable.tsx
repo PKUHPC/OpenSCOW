@@ -135,7 +135,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
     }
   }, [activeTabKey, clusterInfo]);
 
-  console.log(filteredClusterInfo);
   return (
     (isLoading || currentClusters.length > 0) ? (
       <Container>
@@ -153,7 +152,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
           dataSource={(filteredClusterInfo.map((x, index) =>
             ({ clusterName:x.clusterName, info:{ ...x, id:index
               , cpuUsage:(x.runningCpuCount / x.cpuCoreCount) * 100,
-              gpuUsage:(x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>)
+              gpuUsage:
+              x.gpuCoreCount === 0 ? undefined : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>)
             .concat(failedClusters)
           }
           loading={isLoading}
@@ -237,7 +237,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("gpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
             render={(_, r) => (
-              r.info?.gpuUsage ? (
+              r.info?.gpuUsage !== undefined ? (
                 <div>
                   <Progress
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}

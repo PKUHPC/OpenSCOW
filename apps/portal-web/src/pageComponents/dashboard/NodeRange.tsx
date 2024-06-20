@@ -69,7 +69,7 @@ const JobInfo: React.FC<Props> = ({ runningJobs, pendingJobs, loading, display }
     <Container>
       <Card
         type="inner"
-        title={<span style={{ fontSize:"16px" }}>{t(p("jobs"))}</span>}
+        title={<span style={{ fontSize:"1em" }}>{t(p("jobs"))}</span>}
         style={{ maxHeight:"310px", boxShadow: "0px 2px 10px 0px #1C01011A" }}
         loading={loading}
       >

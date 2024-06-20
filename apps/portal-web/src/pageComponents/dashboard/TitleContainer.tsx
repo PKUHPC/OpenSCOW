@@ -21,14 +21,14 @@ const Container = styled.div`
 `;
 // 标题
 const Title = styled.div`
-  font-size:1.14em;
+  font-size:1em;
   width:max-content;
 `;
 // 副标题容器
 const SubContainer = styled.div`
   display:flex;
   font-weight:400;
-  font-size:1.14em;
+  font-size:1em;
   width:max-content;
 `;
 
