@@ -13,7 +13,7 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
-import { JobInfo } from "@scow/protos/build/portal/job";
+import { JobInfo, TimeUnit } from "@scow/protos/build/portal/job";
 import { api } from "src/apis/api";
 export type MockApi<TApi extends Record<
   string,
@@ -198,7 +198,7 @@ export const mockApi: MockApi<typeof api> = {
       output: "job.%j.out",
       errorOutput: "job.%j.err",
       workingDirectory: "/nfs/jobs/123",
-      maxTimeUnit:"minutes",
+      maxTimeUnit:  TimeUnit.MINUTES,
     },
   }),
 

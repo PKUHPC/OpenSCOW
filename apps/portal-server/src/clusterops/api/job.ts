@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { TimeUnit } from "@scow/protos/build/portal/job";
 import { Logger } from "ts-log";
 
 
@@ -30,7 +31,7 @@ export interface JobTemplate {
   memory?: string;
   comment?: string | undefined;
   scriptOutput?: string | undefined;
-  maxTimeUnit?: string | undefined;
+  maxTimeUnit?: TimeUnit | undefined;
 }
 
 export interface ListJobTemplatesRequest {

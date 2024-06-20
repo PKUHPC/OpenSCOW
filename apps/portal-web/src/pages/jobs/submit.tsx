@@ -12,6 +12,7 @@
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { TimeUnit } from "@scow/protos/build/portal/job";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
@@ -63,7 +64,7 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
               errorOutput: template.errorOutput,
               save: false,
               scriptOutput: template.scriptOutput,
-              maxTimeUnit: template.maxTimeUnit || "minutes",
+              maxTimeUnit: template.maxTimeUnit || TimeUnit.MINUTES,
             }));
         } else {
           return undefined;

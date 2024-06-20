@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { JobServiceClient, TimeUnit } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -40,7 +40,7 @@ export const SubmitJobInfo = Type.Object({
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
   scriptOutput:Type.Optional(Type.String()),
-  maxTimeUnit:Type.Optional(Type.String()),
+  maxTimeUnit:Type.Optional(Type.Enum(TimeUnit)),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;

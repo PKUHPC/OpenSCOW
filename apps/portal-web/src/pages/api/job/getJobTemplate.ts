@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { JobServiceClient, TimeUnit } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
@@ -29,15 +29,14 @@ export const JobTemplate = Type.Object({
   nodeCount: Type.Number(),
   coreCount: Type.Number(),
   gpuCount: Type.Optional(Type.Number()),
-  /** in minutes */
-  maxTime: Type.Number(),
+  maxTime: Type.Number(), // 最长运行时间
   command: Type.String(),
   workingDirectory: Type.String(),
   output: Type.Optional(Type.String()),
   errorOutput: Type.Optional(Type.String()),
   comment: Type.Optional(Type.String()),
   scriptOutput:Type.Optional(Type.String()),
-  maxTimeUnit:Type.Optional(Type.String()),
+  maxTimeUnit: Type.Optional(Type.Enum(TimeUnit)), // 最长运行时间单位
 });
 export type JobTemplate = Static<typeof JobTemplate>;
 
