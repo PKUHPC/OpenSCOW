@@ -12,7 +12,6 @@
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-import { TimeUnit } from "@scow/protos/build/portal/job";
 import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
@@ -22,6 +21,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
+import { TimeUnit } from "src/models/job";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { getServerI18nConfigText, publicConfig } from "src/utils/config";

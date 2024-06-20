@@ -11,7 +11,6 @@
  */
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { TimeUnit } from "@scow/protos/build/portal/job";
 import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
@@ -24,7 +23,7 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { AccountStatusFilter } from "src/models/job";
+import { AccountStatusFilter, TimeUnit } from "src/models/job";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
 import { Partition } from "src/pages/api/cluster";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
