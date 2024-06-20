@@ -1,0 +1,44 @@
+name: Send release test notification
+
+on:
+  workflow_dispatch:
+    inputs:
+      time:
+        description: 'The deployment time (format: YYYY年MM月DD日)'
+        required: true
+      version:
+        description: 'The version to deploy (format: X.Y.Z)'
+        required: true
+      level:
+        description: 'The release level (options: PATCH, MINOR, MAJOR)'
+        required: true
+      feature_freeze:
+        description: 'Feature freeze period (format: start time--end time)'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Print Notification Details
+      run: |
+        echo "Deployment Time: ${{ github.event.inputs.time }}"
+        echo "Version: ${{ github.event.inputs.version }}"
+        echo "Release Level: ${{ github.event.inputs.level }}"
+        echo "Feature Freeze Period: ${{ github.event.inputs.feature_freeze }}"
+
+    - name: Send Notification Request
+      run: |
+        curl -X POST http://47.96.27.236:8080/version \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
+        -d '{
+          "time": "${{ github.event.inputs.time }}",
+          "version": "${{ github.event.inputs.version }}",
+          "level": "${{ github.event.inputs.level }}",
+          "feature_freeze": "${{ github.event.inputs.feature_freeze }}"
+        }'

@@ -82,6 +82,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         .map((result) => result.value);
 
 
+
       // 处理失败的结果
       const failedClusters = currentClusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),

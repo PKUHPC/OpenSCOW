@@ -12,7 +12,6 @@
 
 import { Card, Tag } from "antd";
 import React, { useMemo } from "react";
-import { prefix, useI18nTranslateToString } from "src/i18n";
 import { PieChartCom } from "src/pageComponents/dashboard/PieChartCom";
 import { styled } from "styled-components";
 
@@ -51,6 +50,7 @@ export interface Tag {
   itemName: string;
   num: number;
   unit?: string;
+  subName: string;
 }
 
 export interface PaneData {
@@ -62,7 +62,6 @@ interface Props {
   tag: Tag;
   paneData: PaneData[];
   loading: boolean;
-  strokeColor: string;
 }
 
 const Container = styled.div`
@@ -74,16 +73,11 @@ export const PieChartContainer = styled.div`
   justify-content: center;
 `;
 
-const p = prefix("pageComp.dashboard.infoPane.");
-
-export const InfoPane: React.FC<Props> = ({ paneData, loading, strokeColor }) => {
-
-  const t = useI18nTranslateToString();
+export const InfoPane: React.FC<Props> = ({ tag, paneData, loading }) => {
 
   const notEmptyData = useMemo(() => {
     return paneData.some((x) => x.num > 0);
   }, [paneData]);
-
 
   return (
     <Container>
@@ -92,20 +86,22 @@ export const InfoPane: React.FC<Props> = ({ paneData, loading, strokeColor }) =>
         type="inner"
         title={ (
           <TitleContainer
-            name={t(p("nodeUtilization"))}
+            name={tag.itemName}
+            subName={tag.subName}
             total={paneData.reduce((a, b) => a + b.num, 0)}
             available={paneData[1].num}
-            display={notEmptyData}
+            display={tag.itemName == "GPU" ? notEmptyData : true}
           ></TitleContainer>
         )}
         style={{ maxHeight:"310px", boxShadow: "0px 2px 10px 0px #1C01011A" }}
       >
         <PieChartContainer>
           <PieChartCom
-            pieData={paneData.map((item) => ({ value:item.num, color:item.color }))}
-            strokeColor={strokeColor}
+            pieData={paneData.map((item) => ({ value:isNaN(item.num) ? 0 : item.num,
+              color:item.color, itemName:item.itemName }))}
             range={Math.round((paneData[0].num / paneData.reduce((a, b) => a + b.num, 0)) * 100) }
-            display={notEmptyData}
+            display={tag.itemName == "GPU" ? notEmptyData : true}
+            total={paneData.reduce((a, b) => a + b.num, 0)}
           ></PieChartCom>
         </PieChartContainer>
       </Card>

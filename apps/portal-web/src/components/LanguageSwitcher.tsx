@@ -67,6 +67,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ initialLangu
   return (
     <Container>
       <Select
+        style={{ border: "1px solid #DEDEDE", borderRadius:"5px", backgroundColor:"#fafafa", fontWeight:700 }}
         value={selectedLanguage}
         onChange={(value) => {
           setLanguage(value);

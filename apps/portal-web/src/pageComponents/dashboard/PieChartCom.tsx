@@ -10,25 +10,27 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { styled } from "styled-components"; ;
-import { Cell, Pie, PieChart } from "recharts";
+import { Cell, Pie, PieChart, Sector } from "recharts";
+
+import PieInfo from "./PieInfo";
 
 interface Props {
   pieData: PieData[];
-  strokeColor: string;
   range: number;
   display: boolean;
+  total: number;
 }
 
 interface PieData {
   value: number;
   color: string;
+  itemName: string;
 }
 
 const Container = styled.div`
   position:relative;
-  bottom:5.4em;
 `;
 
 const JobRange = styled.div`
@@ -37,55 +39,93 @@ const JobRange = styled.div`
   width:max-content;
   left:50%;
   top:50%;
-  transform: translate(-52%,0);
 `;
 
-export const PieChartCom: React.FC<Props> = ({ pieData, range, strokeColor, display }) => {
+// 鼠标交互时cell 的渲染组件
+const renderActiveShape = (props: any) => {
+  const {
+    cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill,
+  } = props;
+
+  return (
+    <g>
+      <Sector
+        cx={cx}
+        cy={cy}
+        innerRadius={innerRadius - 5} // 缩小内半径
+        outerRadius={outerRadius + 5} // 增大外半径
+        startAngle={startAngle}
+        endAngle={endAngle}
+        fill={fill}
+        stroke="#fff"
+        strokeWidth={"2px"}
+      />
+    </g>
+  );
+};
+
+export const PieChartCom: React.FC<Props> = ({ pieData, display, total }) => {
 
   // 没有值的时候不显示
   if (!display) {
     return null;
   }
 
+  console.log(pieData);
+
+  // 鼠标激活index的value
+  const [hoveredValue, setHoveredValue] = useState<number>(pieData[0].value);
+
+  // 鼠标激活的index
+  const [activeIndex, setActiveIndex] = useState<number>(0);
+
+  // 饼图内文字颜色
+  const pieInfoColor = "#6B747F";
+
+  // 当 pieData 或 total 发生变化时，更新 hoveredValue 和 activeIndex
+  useEffect(() => {
+    setHoveredValue(pieData[0].value);
+    setActiveIndex(0);
+  }, [pieData, total]);
+
+
   return (
     <Container>
-      <JobRange style={{ color:pieData[0].color, fontSize:"3.4em" }}>
-        {Math.min(range, 100) + "%"}
+      <JobRange style={{ display:`${total === 0 ? "none" : "unset"}` }}>
+        <PieInfo
+          percentage={Math.min(Math.round((hoveredValue / total) * 100), 100)}
+          value={hoveredValue}
+          status={pieData[activeIndex].itemName}
+          color={pieInfoColor}
+        />
       </JobRange>
       <PieChart width={230} height={230}>
-        <Pie
-          data={[{ name:"inner", value:100 }]}
-          cx={105}
-          cy={110}
-          innerRadius={70}
-          outerRadius={80}
-          dataKey="value"
-          stroke="none"
-        >
-          <Cell fill={strokeColor} stroke="none" />
-        </Pie>
         <Pie
           data={pieData}
           cx={105}
           cy={110}
-          innerRadius={80}
-          outerRadius={90}
+          innerRadius={70}
+          outerRadius={95}
           dataKey="value"
           stroke="none"
+          onMouseEnter={(data, index) => {
+            setHoveredValue(data.value);
+            setActiveIndex(index);
+          }}
+          onMouseLeave={() => {
+            setHoveredValue(pieData[0].value);
+            setActiveIndex(0);
+          }}
+          activeIndex={activeIndex}
+          activeShape={renderActiveShape}
         >
           {pieData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.color}
+              stroke={"none"}
+            />
           ))}
-        </Pie>
-        <Pie
-          data={[{ name:"outter", value:100 }]}
-          cx={105}
-          cy={110}
-          innerRadius={90}
-          outerRadius={100}
-          dataKey="value"
-        >
-          <Cell fill={strokeColor} stroke="none" />
         </Pie>
       </PieChart>
     </Container>

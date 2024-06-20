@@ -76,6 +76,10 @@ export default {
         selectAccountPlaceholder: "Select Account",
         refreshAccountList: "Refresh Account List",
       },
+      partitionSelector: {
+        selectPartitionPlaceholder: "Select Partition",
+        refreshPartitionList: "Refresh Partition List",
+      },
       allJobsTable: {
         searchForm: {
           clusterLabel: "Cluster",
@@ -472,6 +476,9 @@ export default {
         job:"Job",
         pending:"Pending",
         platformOverview:"Platform Overview",
+        totalNodes:"Total Nodes",
+        totalCores:"Total Cores",
+        totalCards:"Total Cards",
       },
       nodeRange:{
         jobs:"Jobs",

@@ -10,26 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export interface UserInfo {
-  identityId: string;
-  name?: string;
-  token: string;
+// 小圆点组件
+import { styled } from "styled-components";
+
+const Dot = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: 50%;
+  display:inline-block;
+`;
+
+interface BulletProps {
+  style?: React.CSSProperties;
 }
 
-export interface NavItemProps {
-  path: string;
-  clickToPath?: string;
-  text: string;
-  Icon: React.ReactNode | React.ForwardRefExoticComponent<{}> ;
-  match?: (spec: string, pathname: string) => boolean;
-  children?: NavItemProps[];
-  clickable?: boolean
-  openInNewPage?: boolean;
-  handleClick?: () => void
-}
 
-export interface UserLink {
-  text: string;
-  url: string;
-  openInNewPage?: boolean;
-}
+const Bullet: React.FC<BulletProps> = ({ style }) => (
+  <Dot style={style}>
+  </Dot>
+);
+
+export default Bullet;

@@ -275,6 +275,7 @@ export const mockApi: MockApi<typeof api> = {
   terminateFileTransfer: null,
   checkTransferKey: null,
 
+  getAvailablePartitionsForCluster: async () => ({ partitions: []}),
   getClusterConfigFiles: async () => ({ clusterConfigs: {
     hpc01: {
       displayName: "hpc01Name",
@@ -300,4 +301,6 @@ export const mockApi: MockApi<typeof api> = {
   }]}),
 
 };
+
+
 
