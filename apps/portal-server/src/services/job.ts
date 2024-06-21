@@ -17,7 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
-import { AccountStatusFilter, JobServiceServer, JobServiceService } from "@scow/protos/build/portal/job";
+import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
 import path, { join } from "path";
@@ -228,8 +228,8 @@ export const jobServiceServer = plugin((server) => {
     },
 
     submitJob: async ({ request, logger }) => {
-      const { cluster, command, jobName, coreCount, gpuCount, maxTime, saveAsTemplate, userId,
-        nodeCount, partition, qos, account, comment, workingDirectory, output
+      const { cluster, command, jobName, coreCount, gpuCount, maxTime, maxTimeUnit = TimeUnit.MINUTES,
+        saveAsTemplate, userId, nodeCount, partition, qos, account, comment, workingDirectory, output
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
@@ -240,13 +240,18 @@ export const jobServiceServer = plugin((server) => {
         const sftp = await ssh.requestSFTP();
         await createDirectoriesRecursively(sftp, workingDirectory);
       });
-
+      const timeUnitConversion = {
+        [TimeUnit.MINUTES]: 1,
+        [TimeUnit.HOURS]: 60,
+        [TimeUnit.DAYS]: 60 * 24,
+      };
+      const maxTimeConversion = maxTime * (timeUnitConversion[maxTimeUnit]);
       const reply = await callOnOne(
         cluster,
         logger,
         async (client) => await asyncClientCall(client.job, "submitJob", {
           userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
-          memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTime,
+          memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTimeConversion,
           script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
         }).catch((e) => {
           const ex = e as ServiceError;
@@ -289,6 +294,7 @@ export const jobServiceServer = plugin((server) => {
           errorOutput,
           memory,
           scriptOutput,
+          maxTimeUnit,
         };
 
 

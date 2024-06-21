@@ -86,3 +86,8 @@ export enum AccountStatusFilter {
   UNBLOCKED_ONLY = 2,
 };
 
+export enum TimeUnit {
+  MINUTES = 0,
+  HOURS = 1,
+  DAYS = 2,
+}
