@@ -563,7 +563,7 @@ export const PlatformStatisticsPage: NextPage =
                     isLoading={portalUsageCountLoading}
                   />
                 </Col>
-                <Col xs={24} md={24} lg={12}>
+                <Col xs={24} md={24} lg={12} xl={12}>
                   <DataBarChart
                     data={misUsageCountData.slice(0, 10).map((d) => ({
                       x: OperationTypeTexts[d.operationType],
