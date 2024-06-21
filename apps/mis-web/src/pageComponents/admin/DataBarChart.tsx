@@ -62,8 +62,6 @@ export const DataBarChart: React.FC<Props> = ({
     return roundedValue.toString();
   };
 
-  console.log(title);
-
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -81,9 +79,8 @@ export const DataBarChart: React.FC<Props> = ({
                     padding={{ left: 20, right: 20 }}
                     label={{ value: xLabel, position: "insideBottom", offset: 0 }}
                     interval={0}
-                    height={(title.includes("系统使用功能次数") || title.includes("Feature Usage Count")) ? 80 : 40}
-                    tick={(title.includes("系统使用功能次数") || title.includes("Feature Usage Count")) ?
-                      <CustomizedAxisTick /> : true}
+                    height={ 80 }
+                    tick={<CustomizedAxisTick /> }
                   />
                   <YAxis padding={{ top: 20 }} tickFormatter={tickFormatter} />
                   <Tooltip
