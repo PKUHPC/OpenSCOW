@@ -369,6 +369,7 @@ export default {
         title: "Export Data",
         subTitle: "Select the fields to export",
         errorMsg: "Please select one field at least!",
+        encoding: "Encoding",
       },
       paymentTable: {
         total: "Total",
