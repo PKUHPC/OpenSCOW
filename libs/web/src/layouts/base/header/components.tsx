@@ -11,16 +11,13 @@
  */
 
 import { Typography } from "antd";
-import { join } from "path";
+import { useRef } from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
-import { UserInfo } from "src/layouts/base/types";
 import { styled } from "styled-components";
 
 export const HeaderItem = styled.div`
   padding: 0 16px;
-  /* justify-content: center; */
-  height: 100%;
-
+  justify-content: center;
 
   @media (max-width: ${antdBreakpoints.md}px) {
     padding-right: 4px;
@@ -28,38 +25,54 @@ export const HeaderItem = styled.div`
 
 `;
 
-export const HiddenOnSmallScreenSpan = styled.span`
+const LinkItem = styled(HeaderItem)`
+`;
+
+const Link = styled(Typography.Link)`
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  align-items: center;
+
+`;
+
+export const TextSpan = styled.span`
   @media (max-width: ${antdBreakpoints.md}px) {
     display: none;
   }
 `;
 
+export const IconContainer = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
 interface JumpToAnotherLinkProps {
-  user: UserInfo | undefined;
   icon: React.ReactNode;
-  link: string | undefined;
-  linkText: string;
-  inIcon?: React.ReactNode;
+  href: string;
+  text: string;
+  hideText?: boolean;
 }
 
-export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ user, link, icon, linkText, inIcon }) => {
-  if (!link) { return null; }
+export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon, text, hideText }) => {
+
+  const linkRef = useRef<HTMLAnchorElement>(null);
 
   return (
 
-    <HeaderItem>
+    <LinkItem>
       {/* Cannot use Link because links adds BASE_PATH, but MIS_URL already contains it */}
-      <Typography.Link href={user
-        ? join(link, "/api/auth/callback?token=" + user.token)
-        : link}
-      >
-        {icon}
-        <HiddenOnSmallScreenSpan>
-          {linkText}
-        </HiddenOnSmallScreenSpan>
-        {inIcon}
-      </Typography.Link>
-    </HeaderItem>
+      <Link href={href} ref={linkRef}>
+        <IconContainer>
+          {icon}
+        </IconContainer>
+        {hideText ? undefined : (
+          <TextSpan>
+            {text}
+          </TextSpan>
+        )}
+      </Link>
+    </LinkItem>
 
   );
 };
