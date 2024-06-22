@@ -91,7 +91,7 @@ SCOW将会在body中传入默认情况下SCOW将会显示的导航项。下表�
 | `navs[].text`          | 字符串                                 | 是       | 导航项的文本                                                                                                                                                                               |
 | `navs[].icon`          | 对象                                   | 否       | 导航项的图标信息。如果不填，将显示默认导航项中具有相同的path的导航项的图标。如果不存在具有相同path的导航项，将显示[Ant Design Icon](https://ant.design/components/icon-cn)的`LinkOutlined` |
 | `navs[].icon.src`      | 图标URL                                | 是       | 导航项的图标地址。必须是完整的、可公开访问的URL                                                                                                                                            |
-| `navs[].icon.alt`      | 布尔值                                 | 否       | 导航项的图标alt属性。可不填                                                                                                                                                                |
+| `navs[].icon.alt`      | 文本                                   | 否       | 导航项的图标alt属性。可不填                                                                                                                                                                |
 | `navs[].openInNewPage` | 布尔值                                 | 否       | 此导航项的页面是否在新窗口中打开，默认`false`                                                                                                                                              |
 | `navs[].children`      | 对象数组，类型与`navs`数组的每一项相同 | 否       | 此导航项的子项。                                                                                                                                                                           |
 
@@ -132,7 +132,7 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
 | `navbarLinks[].text`          | 字符串   | 是       | 导航项的文本                                                                                               |
 | `navbarLinks[].icon`          | 对象     | 否       | 导航项的图标信息。如果不填，将显示[Ant Design Icon](https://ant.design/components/icon-cn)的`LinkOutlined` |
 | `navbarLinks[].icon.src`      | 图标URL  | 是       | 导航项的图标地址。必须是完整的、可公开访问的URL                                                            |
-| `navbarLinks[].icon.alt`      | 布尔值   | 否       | 导航项的图标alt属性。可不填                                                                                |
+| `navbarLinks[].icon.alt`      | 文本     | 否       | 导航项的图标alt属性。可不填                                                                                |
 | `navbarLinks[].openInNewPage` | 布尔值   | 否       | 此导航项的页面是否在新窗口中打开，默认`true`                                                               |
 | `navbarLinks[].priority`      | 数字     | 是       | 此链接的优先级。默认为0.                                                                                   |
 
@@ -143,7 +143,7 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
   - 返回链接的UI扩展在配置中的顺序从前往后
   - 同一个UI扩展返回的链接在响应中的列表的顺序从前往后
 
-注意，当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏将会仅显示图标。
+注意，当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
 
 ## 注意事项
 

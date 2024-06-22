@@ -67,7 +67,7 @@ const IndicatorPart = styled(HeaderItem)`
 `;
 
 export type HeaderNavbarLink = {
-  icon?: React.ReactNode;
+  icon: React.ReactNode;
   href: string;
   text: string;
 }

@@ -12,6 +12,7 @@
 
 "use client";
 
+import { LinkOutlined } from "@ant-design/icons";
 import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
@@ -157,7 +158,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
       return filtered.map((x) => ({
         href: x.href,
         text: x.text,
-        icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : undefined,
+        icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : <LinkOutlined />,
       }) satisfies HeaderNavbarLink);
 
     }, [from, routeQuery, extensions]),
