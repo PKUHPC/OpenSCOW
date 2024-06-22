@@ -64,7 +64,7 @@ UI扩展的功能应实现为标准的网页。当访问SCOW的扩展路径时�
 }
 ```
 
-### 重写导航项：POST /api/{portal,mis}/rewriteNavigations
+### 重写导航项：POST /api/\{portal,mis\}/rewriteNavigations
 
 
 
@@ -111,7 +111,7 @@ SCOW将会在body中传入默认情况下SCOW将会显示的导航项。下表�
 
 如果配置了多个UI扩展，那么SCOW将会按照配置中的顺序依次调用每个需要重写导航项的UI扩展的此接口，并将上一个UI扩展的输出作为下一个UI扩展的输入，并将最终结果作为SCOW的导航项。
 
-### 增加导航栏链接：POST /api/{portal,mis}/navbarLinks
+### 增加导航栏链接：POST /api/\{portal,mis\}/navbarLinks
 
 :::note
 
