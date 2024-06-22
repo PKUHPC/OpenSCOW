@@ -143,6 +143,8 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
   - 返回链接的UI扩展在配置中的顺序从前往后
   - 同一个UI扩展返回的链接在响应中的列表的顺序从前往后
 
+注意，当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏将会仅显示图标。
+
 ## 注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
