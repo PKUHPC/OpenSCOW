@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Typography } from "antd";
-import { useRef } from "react";
+import { Tooltip, Typography } from "antd";
+import { useEffect, useRef, useState } from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { styled } from "styled-components";
 
@@ -37,9 +37,6 @@ const Link = styled(Typography.Link)`
 `;
 
 export const TextSpan = styled.span`
-  @media (max-width: ${antdBreakpoints.md}px) {
-    display: none;
-  }
 `;
 
 export const IconContainer = styled.span`
@@ -56,20 +53,42 @@ interface JumpToAnotherLinkProps {
 
 export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon, text, hideText }) => {
 
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
   const linkRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MediaQueryListEvent) => {
+      setIsSmallScreen(e.matches);
+    };
+    const media = window.matchMedia(`(max-width: ${antdBreakpoints.md}px)`);
+
+    media.addEventListener("change", handler);
+
+    return () => {
+      media.removeEventListener("change", handler);
+    };
+  }, []);
 
   return (
 
     <LinkItem>
-      {/* Cannot use Link because links adds BASE_PATH, but MIS_URL already contains it */}
       <Link href={href} ref={linkRef}>
-        <IconContainer>
-          {icon}
-        </IconContainer>
-        {hideText ? undefined : (
-          <TextSpan>
-            {text}
-          </TextSpan>
+        {(hideText || isSmallScreen) ? (
+          <Tooltip title={text}>
+            <IconContainer>
+              {icon}
+            </IconContainer>
+          </Tooltip>
+        ) : (
+          <>
+            <IconContainer>
+              {icon}
+            </IconContainer>
+            <TextSpan>
+              {text}
+            </TextSpan>
+          </>
         )}
       </Link>
     </LinkItem>
