@@ -16,7 +16,7 @@ import { antdBreakpoints } from "src/layouts/base/constants";
 import { styled } from "styled-components";
 
 export const HeaderItem = styled.div`
-  padding: 0 16px;
+  padding: 0 8px;
   justify-content: center;
 
   @media (max-width: ${antdBreakpoints.md}px) {
