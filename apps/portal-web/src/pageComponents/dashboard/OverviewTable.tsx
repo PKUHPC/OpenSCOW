@@ -38,6 +38,7 @@ interface Props {
   isLoading: boolean;
   clustersOverview: ClusterOverview[];
   platformOverview?: PlatformOverview | undefined;
+  successfulClusters?: Cluster[] | undefined
 }
 
 interface InfoProps {
@@ -94,7 +95,7 @@ const Container = styled.div`
 const p = prefix("pageComp.dashboard.overviewTable.");
 
 export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
-  currentClusters, isLoading, clustersOverview, platformOverview }) => {
+  currentClusters, isLoading, clustersOverview, platformOverview, successfulClusters }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -135,6 +136,14 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
     }
   }, [activeTabKey, clusterInfo]);
 
+  const dataSource = (filteredClusterInfo.map((x, index) =>
+    ({ clusterName: x.clusterName, info: { ...x, id: index, cpuUsage: (x.runningCpuCount / x.cpuCoreCount) * 100,
+      gpuUsage: x.gpuCoreCount === 0 ? undefined
+        : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>);
+
+  const finalDataSource = activeTabKey === "platformOverview" ? dataSource.concat(failedClusters) : dataSource;
+
+
   return (
     (isLoading || currentClusters.length > 0) ? (
       <Container>
@@ -143,19 +152,14 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
           loading={isLoading}
           activeTabKey={activeTabKey}
           onTabChange={setActiveTabKey}
+          successfulClusters={successfulClusters}
         />
         <Table
           style={{
             marginTop:"15px",
           }}
           tableLayout="fixed"
-          dataSource={(filteredClusterInfo.map((x, index) =>
-            ({ clusterName:x.clusterName, info:{ ...x, id:index
-              , cpuUsage:(x.runningCpuCount / x.cpuCoreCount) * 100,
-              gpuUsage:
-              x.gpuCoreCount === 0 ? undefined : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>)
-            .concat(failedClusters)
-          }
+          dataSource={finalDataSource}
           loading={isLoading}
           pagination={false}
           scroll={{ y:275 }}
@@ -205,15 +209,17 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
               compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
             hidden={clusterInfo.every((item) => item.usageRatePercentage === undefined)}
             render={(_, r) => (
-              <div>
-                <Progress
-                  percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
-                  strokeLinecap='square'
-                  size={[120, 15]}
-                  status="normal"
-                  strokeColor={"#566DE5"}
-                />
-              </div>
+              r.info?.usageRatePercentage !== undefined ? (
+                <div>
+                  <Progress
+                    percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
+                    strokeLinecap='square'
+                    size={[120, 15]}
+                    status="normal"
+                    strokeColor={"#566DE5"}
+                  />
+                </div>
+              ) : "-"
             )}
           />
           <Table.Column<TableProps>
@@ -221,15 +227,17 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("cpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
             render={(_, r) => (
-              <div>
-                <Progress
-                  percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
-                  strokeLinecap='square'
-                  size={[120, 15]}
-                  status="normal"
-                  strokeColor={"#566DE5"}
-                />
-              </div>
+              r.info?.cpuUsage !== undefined ? (
+                <div>
+                  <Progress
+                    percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
+                    strokeLinecap='square'
+                    size={[120, 15]}
+                    status="normal"
+                    strokeColor={"#566DE5"}
+                  />
+                </div>
+              ) : "-"
             )}
           />
           <Table.Column<TableProps>

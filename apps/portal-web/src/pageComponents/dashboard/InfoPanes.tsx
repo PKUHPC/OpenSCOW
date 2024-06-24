@@ -13,19 +13,19 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled, useTheme } from "styled-components"; ;
+import { Cluster } from "@scow/config/build/type";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Card, Col, Row } from "antd";
-import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterOverview, PlatformOverview } from "src/models/cluster";
 import JobInfo from "src/pageComponents/dashboard/NodeRange";
-import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 interface Props {
   selectItem: ClusterOverview | PlatformOverview | undefined;
   loading: boolean;
   activeTabKey: string;
   onTabChange: (key: string) => void;
+  successfulClusters?: Cluster[] | undefined;
 }
 
 const InfoPaneContainer = styled.div`
@@ -52,12 +52,11 @@ const colors = {
   queuing:"#A58E74",
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
-export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, onTabChange }) => {
+export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, onTabChange, successfulClusters }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { currentClusters } = useStore(ClusterInfoStore);
 
   const theme = useTheme();
 
@@ -79,10 +78,10 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
         {t(p("platformOverview"))}
       </div>,
     },
-    ...currentClusters.map((x) => ({
+    ...successfulClusters?.map((x) => ({
       key:x.id,
-      tab:typeof (x.name) === "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
-    })),
+      tab:getI18nConfigCurrentText(x.name, languageId),
+    })) ?? [],
   ];
 
 
