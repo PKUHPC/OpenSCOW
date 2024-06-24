@@ -26,10 +26,11 @@ import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { createEncodingTransform, getCsvObjTransform, getCsvStringify } from "src/utils/file";
+import { createEncodingTransform, getContentTypeWithCharset, getCsvObjTransform,
+  getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
-import { getContentType, parseIp } from "src/utils/server";
+import { parseIp } from "src/utils/server";
 import { emptyStringArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
@@ -115,15 +116,8 @@ export default route(ExportPayRecordSchema, async (req, res) => {
     const filename = `pay_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
-    // 获取 MIME 类型
-    const contentType = getContentType(filename, "application/octet-stream");
-    // 添加 charset 信息
-    let contentTypeWithCharset;
-    if (contentType.includes("charset=")) {
-      contentTypeWithCharset = contentType.replace(/charset=[^;]+/, `charset=${encoding}`);
-    } else {
-      contentTypeWithCharset = `${contentType}; charset=${encoding}`;
-    }
+    const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
+
     res.writeHead(200, {
       "Content-Type":contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
