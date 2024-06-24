@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -19,7 +18,7 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
-import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { useI18nTranslateToString } from "src/i18n";
 import { ClusterOverview, PlatformOverview } from "src/models/cluster";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
@@ -42,8 +41,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const userStore = useStore(UserStore);
   const router = useRouter();
-
-  const languageId = useI18n().currentLanguage.id;
 
   useEffect(() => {
     router.replace(router.asPath);
@@ -87,15 +84,14 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         .map((result) => result.value);
 
 
-      // 成功的集群名称
-      const successfulClusters = currentClusters.filter((cluster) =>
-        successfulResults.some((info) => getI18nConfigCurrentText(info.clusterInfo.clusterName, languageId)
-      === getI18nConfigCurrentText(cluster.name, languageId)));
-
-
       // 处理失败的结果
       const failedClusters = currentClusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+
+      // 成功的集群名称
+      const successfulClusters = currentClusters.filter((x) =>
+        successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
 
       const clustersInfo = successfulResults

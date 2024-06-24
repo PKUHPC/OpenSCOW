@@ -25,7 +25,7 @@ interface Props {
   loading: boolean;
   activeTabKey: string;
   onTabChange: (key: string) => void;
-  successfulClusters?: Cluster[] | undefined;
+  successfulClusters?: Cluster[] | undefined
 }
 
 const InfoPaneContainer = styled.div`
@@ -57,7 +57,6 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-
   const theme = useTheme();
 
   // card的每一项
@@ -80,7 +79,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
     },
     ...successfulClusters?.map((x) => ({
       key:x.id,
-      tab:getI18nConfigCurrentText(x.name, languageId),
+      tab:typeof (x.name) == "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
     })) ?? [],
   ];
 
