@@ -22,6 +22,7 @@ import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
@@ -36,8 +37,8 @@ interface FilterForm {
 }
 
 interface PageInfo {
-    page: number;
-    pageSize?: number;
+  page: number;
+  pageSize?: number;
 }
 
 interface SortInfo {
@@ -62,7 +63,7 @@ const pCommon = prefix("common.");
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
-  const [ query, setQuery ] = useState<FilterForm>(() => {
+  const [query, setQuery] = useState<FilterForm>(() => {
     return { idOrName: undefined };
   });
 
@@ -77,21 +78,23 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const promiseFn = useCallback(async () => {
 
-    return await api.getAllUsers({ query: {
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-      sortField: sortInfo.sortField,
-      sortOrder: sortInfo.sortOrder,
-      idOrName: query.idOrName,
-      platformRole: currentPlatformRole,
-    } });
+    return await api.getAllUsers({
+      query: {
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        sortField: sortInfo.sortField,
+        sortOrder: sortInfo.sortOrder,
+        idOrName: query.idOrName,
+        platformRole: currentPlatformRole,
+      },
+    });
   }, [query, pageInfo, sortInfo, currentPlatformRole]);
   const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
 
 
   const { data: platformUsersCounts, isLoading: isCountLoading, reload: reloadUsersCounts } = useAsync({
     promiseFn: useCallback(
-      async () => await api.getPlatformUsersCounts({ query:{ idOrName: query.idOrName } }), [query, refreshToken],
+      async () => await api.getPlatformUsersCounts({ query: { idOrName: query.idOrName } }), [query, refreshToken],
     ),
   });
 
@@ -121,7 +124,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     reloadUsersCounts();
   };
 
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
 
     let total = 0;
 
@@ -139,6 +142,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
       message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportUser",
         columns,
         count: total,
@@ -155,7 +159,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const exportOptions = useMemo(() => {
     return [
-      { label:  t(p("userId")), value: "userId" },
+      { label: t(p("userId")), value: "userId" },
       { label: t(p("name")), value: "name" },
       { label: t(p("tenant")), value: "tenantName" },
       { label: t(p("availableAccounts")), value: "availableAccounts" },
@@ -315,10 +319,12 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 userId={r.userId}
                 name={r.name}
                 onComplete={async (newPassword) => {
-                  await api.changePasswordAsPlatformAdmin({ body:{
-                    identityId: r.userId,
-                    newPassword: newPassword,
-                  } })
+                  await api.changePasswordAsPlatformAdmin({
+                    body: {
+                      identityId: r.userId,
+                      newPassword: newPassword,
+                    },
+                  })
                     .httpError(404, () => { message.error(t(p("notExist"))); })
                     .httpError(501, () => { message.error(t(p("notAvailable"))); })
                     .httpError(400, (e) => {
