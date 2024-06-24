@@ -14,6 +14,7 @@ import { Checkbox, Form, Modal, Select } from "antd";
 import { useState } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 
 interface Props {
   options: { label: string, value: string }[]
@@ -63,7 +64,7 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
         form={form}
         layout="vertical"
         preserve={false}
-        initialValues={{ columns: options.map((option) => option.value), encoding: "UTF-8" }}
+        initialValues={{ columns: options.map((option) => option.value), encoding: Encoding.GB18030 }}
       >
         <Form.Item
           rules={[{ required: true, message: t(p("errorMsg")) }]}
@@ -77,8 +78,8 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
           name="encoding"
         >
           <Select size="small" style={{ width: "100px" }}>
-            <Select.Option value="UTF-8">UTF-8</Select.Option>
-            <Select.Option value="GB18030">GB18030</Select.Option>
+            <Select.Option value={Encoding.GB18030}>GB18030</Select.Option>
+            <Select.Option value={Encoding.UTF8}>UTF-8</Select.Option>
           </Select>
         </Form.Item>
       </Form>

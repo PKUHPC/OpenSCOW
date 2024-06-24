@@ -19,13 +19,14 @@ import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { OperationType } from "src/models/operationLog";
 import { getDisplayedStateI18nTexts, PlatformRole, TenantRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
+import { createEncodingTransform, getCsvObjTransform, getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
 import { getContentType, parseIp } from "src/utils/server";
@@ -45,6 +46,7 @@ export const ExportAccountSchema = typeboxRouteSchema({
     normal: Type.Optional(Type.Boolean()),
     // 是否来自平台管理页面
     isFromAdmin: Type.Boolean(),
+    encoding: Type.Enum(Encoding),
   }),
 
   responses:{
@@ -65,7 +67,7 @@ const adminAuth = authenticate((info) =>
 export default route(ExportAccountSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, accountName, tenantName, blocked, debt, frozen, normal, count, isFromAdmin } = query;
+  const { columns, accountName, tenantName, blocked, debt, frozen, normal, count, isFromAdmin, encoding } = query;
 
   const info = isFromAdmin ? await adminAuth(req, res) : await tenantAuth(req, res);
 
@@ -77,7 +79,7 @@ export default route(ExportAccountSchema, async (req, res) => {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.exportAccount,
-    operationTypePayload:{
+    operationTypePayload: {
       tenantName: isFromAdmin ? tenantName : info.tenant,
     },
   };
@@ -92,8 +94,17 @@ export default route(ExportAccountSchema, async (req, res) => {
     const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
+    // 获取 MIME 类型
+    const contentType = getContentType(filename, "application/octet-stream");
+    // 添加 charset 信息
+    let contentTypeWithCharset;
+    if (contentType.includes("charset=")) {
+      contentTypeWithCharset = contentType.replace(/charset=[^;]+/, `charset=${encoding}`);
+    } else {
+      contentTypeWithCharset = `${contentType}; charset=${encoding}`;
+    }
     res.writeHead(200, {
-      "Content-Type": getContentType(filename, "application/octet-stream"),
+      "Content-Type":contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
@@ -117,7 +128,7 @@ export default route(ExportAccountSchema, async (req, res) => {
     const headerColumns = {
       accountName: t(p("accountName")),
       owner: t(p("owner")),
-      userCount:  t(pCommon("userCount")),
+      userCount: t(pCommon("userCount")),
       tenantName: t(p("tenant")),
       balance: t(pCommon("balance")),
       blockThresholdAmount: t(p("blockThresholdAmount")),
@@ -141,10 +152,12 @@ export default route(ExportAccountSchema, async (req, res) => {
     const csvStringify = getCsvStringify(headerColumns, columns);
 
     const transform = getCsvObjTransform("accounts", formatAccount);
+    const encodingTransform = createEncodingTransform(encoding); // 创建编码转换流
     pipeline(
       stream,
       transform,
       csvStringify,
+      encodingTransform, // 添加编码转换流到管道
       res,
       async (err) => {
         if (err) {

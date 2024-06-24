@@ -781,6 +781,9 @@ importers:
       http-proxy:
         specifier: 1.18.1
         version: 1.18.1(debug@4.3.4)
+      iconv-lite:
+        specifier: ^0.6.3
+        version: 0.6.3
       less:
         specifier: 4.2.0
         version: 4.2.0
@@ -3228,28 +3231,24 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@next/swc-linux-arm64-musl@14.1.4':
     resolution: {integrity: sha512-l/kMG+z6MB+fKA9KdtyprkTQ1ihlJcBh66cf0HvqGP+rXBbOXX0dpJatjZbHeunvEHoBBS69GYQG5ry78JMy3g==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@next/swc-linux-x64-gnu@14.1.4':
     resolution: {integrity: sha512-BapIFZ3ZRnvQ1uWbmqEGJuPT9cgLwvKtxhK/L2t4QYO7l+/DxXuIGjvp1x8rvfa/x1FFSsipERZK70pewbtJtw==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@next/swc-linux-x64-musl@14.1.4':
     resolution: {integrity: sha512-mqVxTwk4XuBl49qn2A5UmzFImoL1iLm0KQQwtdRJRKl21ylQwwGCxJtIYo2rbfkZHoSKlh/YgztY0qH3wG1xIg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@next/swc-win32-arm64-msvc@14.1.4':
     resolution: {integrity: sha512-xzxF4ErcumXjO2Pvg/wVGrtr9QQJLk3IyQX1ddAC/fi6/5jZCZ9xpuL9Tzc4KPWMFq8GGWFVDMshZOdHGdkvag==}
@@ -3310,28 +3309,24 @@ packages:
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [glibc]
 
   '@node-rs/jieba-linux-arm64-musl@1.10.0':
     resolution: {integrity: sha512-gxqoAVOQsn9sgYK6mFO9dsMZ/yOMvVecLZW5rGvLErjiugVvYUlESXIvCqxp2GSws8RtTqJj6p9u/lBmCCuvaw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
-    libc: [musl]
 
   '@node-rs/jieba-linux-x64-gnu@1.10.0':
     resolution: {integrity: sha512-rS5Shs8JITxJjFIjoIZ5a9O+GO21TJgKu03g2qwFE3QaN5ZOvXtz+/AqqyfT4GmmMhCujD83AGqfOGXDmItF9w==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [glibc]
 
   '@node-rs/jieba-linux-x64-musl@1.10.0':
     resolution: {integrity: sha512-BvSiF2rR8Birh2oEVHcYwq0WGC1cegkEdddWsPrrSmpKmukJE2zyjcxaOOggq2apb8fIRsjyeeUh6X3R5AgjvA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
-    libc: [musl]
 
   '@node-rs/jieba-wasm32-wasi@1.10.0':
     resolution: {integrity: sha512-EzeAAbRrFTdYw61rd8Mfwdp/fA21d58z9vLY06CDbI+dqANfMFn1IUdwzKWi8S5J/MRhvbzonbbh3yHlz6F43Q==}

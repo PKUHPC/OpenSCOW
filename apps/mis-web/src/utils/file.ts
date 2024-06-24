@@ -11,6 +11,8 @@
  */
 
 import { stringify } from "csv-stringify";
+import iconv from "iconv-lite";
+import { Encoding } from "src/models/exportFile";
 import { Transform } from "stream";
 
 /**
@@ -19,7 +21,7 @@ import { Transform } from "stream";
  * @param columns 需要导出的列
  * @returns
  */
-export const getCsvStringify = (headerColumns: {[key in string]: string}, columns: string[]) => {
+export const getCsvStringify = (headerColumns: { [key in string]: string }, columns: string[]) => {
 
   if (columns.length) {
     Object.keys(headerColumns).forEach((key) => {
@@ -36,6 +38,25 @@ export const getCsvStringify = (headerColumns: {[key in string]: string}, column
   const csvStringify = stringify(transformOptions);
 
   return csvStringify;
+};
+
+// 创建编码转换流到管道
+export const createEncodingTransform = (encoding: Encoding) => {
+  console.log("encoding.toLowerCase()", encoding);
+
+  return new Transform({
+    transform(chunk, _, callback) {
+      let encodedBuffer;
+      if (encoding.toLowerCase() === "gb18030") {
+        encodedBuffer = iconv.encode(chunk.toString(), "gb18030");
+      } else if (encoding.toLowerCase() === "utf-8") {
+        encodedBuffer = chunk.toString("utf-8");
+      } else {
+        encodedBuffer = chunk; // 默认情况下，不改变编码
+      }
+      callback(null, encodedBuffer);
+    },
+  });
 };
 
 type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "operationLogs";;
