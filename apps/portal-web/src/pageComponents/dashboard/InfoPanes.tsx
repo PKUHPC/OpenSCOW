@@ -83,6 +83,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
     })) ?? [],
   ];
 
+  console.log(successfulClusters);
 
   const { nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
