@@ -20,6 +20,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { getI18nCurrentText, prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import {
   getOperationDetail,
   getOperationResultTexts,
@@ -179,7 +180,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     });
   };
 
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
     const total = data?.totalCount ?? 0;
     if (total > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -187,6 +188,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportOperationLog",
         columns,
         count: total,
