@@ -1,5 +1,20 @@
 # @scow/ai
 
+## 0.2.3
+
+### Patch Changes
+
+- b8d1270: 同步操作日志服务中的日志类型，增加启用集群，停用集群
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/lib-web@1.4.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.10
+
 ## 0.2.2
 
 ### Patch Changes

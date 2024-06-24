@@ -1,8 +1,9 @@
 {
   "name": "@scow/scowd-protos",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "generate": "rimraf generated && buf generate --template buf.gen.yaml ./protos/api",
     "build": "rimraf build && tsc"
