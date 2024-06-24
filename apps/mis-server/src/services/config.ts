@@ -17,8 +17,9 @@ import { status } from "@grpc/grpc-js";
 import { getClusterConfigs } from "@scow/config/build/cluster";
 import { convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-server";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
-import { updateCluster } from "src/bl/clustersUtils";
+import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
 
 export const configServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
@@ -36,6 +37,24 @@ export const configServiceServer = plugin((server) => {
       return [reply];
     },
 
+    getAvailablePartitionsForCluster: async ({ request, em, logger }) => {
+
+      const { cluster, accountName, userId } = request;
+
+      // check cluster activation
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
+
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
+          accountName, userId,
+        }),
+      );
+      return [reply];
+
+    },
 
     getClusterConfigFiles: async ({ em, logger }) => {
 

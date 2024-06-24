@@ -12,7 +12,6 @@
 
 import { Card } from "antd";
 import React, { useMemo } from "react";
-import { PieChartCom } from "src/pageComponents/dashboard/PieChartCom";
 import { styled } from "styled-components"; ;
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
@@ -47,7 +46,7 @@ const ResourceContainer = styled.div`
 
 const p = prefix("pageComp.dashboard.doubleInfoPane.");
 
-export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading, strokeColor }) => {
+export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading }) => {
 
   const t = useI18nTranslateToString();
 
@@ -71,12 +70,14 @@ export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading, str
         title={(
           <div style={{ display:"flex", gap:"15px" }}>
             <TitleContainer
+              subName=""
               name={t(p("CPUCoreUsage"))}
               total={cpuInfo.paneData.reduce((a, b) => a + b.num, 0)}
               available={cpuInfo.paneData[1].num}
               display={cpuNotEmptyData}
             ></TitleContainer>
             <TitleContainer
+              subName=""
               name={t(p("GPUCoreUsage"))}
               total={gpuInfo.paneData.reduce((a, b) => a + b.num, 0)}
               available={gpuInfo.paneData[1].num}
@@ -88,22 +89,10 @@ export const DoubleInfoPane: React.FC<Props> = ({ cpuInfo, gpuInfo, loading, str
         <LowerContainer>
           <ResourceContainer>
             <PieChartContainer>
-              <PieChartCom
-                pieData={cpuInfo.paneData.map((item) => ({ value:item.num, color:item.color }))}
-                strokeColor={strokeColor[0]}
-                range={Math.round((cpuInfo.paneData[0].num / cpuInfo.paneData.reduce((a, b) => a + b.num, 0)) * 100) }
-                display={cpuNotEmptyData}
-              ></PieChartCom>
             </PieChartContainer>
           </ResourceContainer>
           <ResourceContainer>
             <PieChartContainer>
-              <PieChartCom
-                pieData={gpuInfo.paneData.map((item) => ({ value:item.num, color:item.color }))}
-                strokeColor={strokeColor[1]}
-                range={Math.round((gpuInfo.paneData[0].num / gpuInfo.paneData.reduce((a, b) => a + b.num, 0)) * 100) }
-                display={gpuNotEmptyData}
-              ></PieChartCom>
             </PieChartContainer>
           </ResourceContainer>
         </LowerContainer>

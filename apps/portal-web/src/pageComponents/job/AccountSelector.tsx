@@ -69,4 +69,3 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
     </Input.Group>
   );
 };
-

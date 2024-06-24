@@ -1,5 +1,27 @@
 # @scow/mis-web
 
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 5a707df: 修复门户系统桌面功能页面 token 过期不能跳转登录页面的问题, 修改获取集群数据 token 验证失败时的返回
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 5b6af87: 修改了 mis 系统下充值、消费账户前十的统计图的横坐标为 userName;修复了 mis 系统下系统使用量横坐标显示不全的问题。
+- f91ba34: 修正了 mis 系统下平台数据统计横坐标的表现形式
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-web@1.4.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.2
 
 ### Patch Changes

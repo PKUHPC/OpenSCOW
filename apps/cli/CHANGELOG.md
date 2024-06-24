@@ -1,5 +1,20 @@
 # @scow/cli
 
+## 1.6.0
+
+### Minor Changes
+
+- 806f778: 增加 HPC 文件和桌面功能的 scowd 支持
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 5f14ce8: 修复更新 octokit 依赖后导致 cli 命令执行失败的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+
 ## 1.5.2
 
 ### Patch Changes

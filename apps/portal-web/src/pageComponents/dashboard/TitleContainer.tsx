@@ -11,7 +11,6 @@
  */
 
 import React from "react";
-import { prefix, useI18nTranslateToString } from "src/i18n";
 import { styled } from "styled-components";
 
 // 标题容器
@@ -22,33 +21,32 @@ const Container = styled.div`
 `;
 // 标题
 const Title = styled.div`
-  font-weight:700;
-  font-size:1.14em;
+  font-size:1em;
   width:max-content;
 `;
 // 副标题容器
 const SubContainer = styled.div`
   display:flex;
-  font-weight:700;
-  font-size:1.14em;
+  font-weight:400;
+  font-size:1em;
   width:max-content;
 `;
 
 interface Props {
   // 总共节点
-  total: Number,
+  total: number,
   // 可用节点
-  available: Number,
+  available: number,
   // 标题名称
-  name: String,
+  name: string,
   // 是否显示
-  display: Boolean,
+  display: boolean,
+  // 副标题名称
+  subName: string
 }
 
-const p = prefix("pageComp.dashboard.titleContainer.");
 
-export const TitleContainer: React.FC<Props> = ({ total, available, name, display }) => {
-  const t = useI18nTranslateToString();
+export const TitleContainer: React.FC<Props> = ({ total, name, display, subName }) => {
 
   // 没有数据的时候不显示
   if (!display) {
@@ -57,12 +55,12 @@ export const TitleContainer: React.FC<Props> = ({ total, available, name, displa
 
   return (
     <Container>
-      <Title>{name}</Title>
+      <Title style={{ fontWeight:700 }}>{name}</Title>
 
       <SubContainer>
-        <Title style={{ marginRight:"0.35em" }}>{t(p("available"))}</Title>
-        <Title style={{ color:"#45A922" }}>{available.toFixed(0)}</Title>
-        <Title>/{total.toFixed(0)}</Title>
+        <Title style={{ marginRight:"0.35em" }}>{subName}</Title>
+        {/* <Title style={{ color:"#45A922" }}>{available.toFixed(0)}</Title> */}
+        <Title>{total.toFixed(0)}</Title>
       </SubContainer>
 
     </Container>

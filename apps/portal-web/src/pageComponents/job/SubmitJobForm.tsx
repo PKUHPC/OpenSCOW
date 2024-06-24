@@ -15,7 +15,7 @@ import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } fro
 import dayjs from "dayjs";
 import Router from "next/router";
 import { join } from "path";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -23,11 +23,15 @@ import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { CodeEditor } from "src/components/CodeEditor";
 import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { AccountSelector } from "src/pageComponents/job/AccountSelector";
+import { AccountStatusFilter, TimeUnit } from "src/models/job";
 import { FileSelectModal } from "src/pageComponents/job/FileSelectModal";
+import { Partition } from "src/pages/api/cluster";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { Cluster } from "src/utils/cluster";
 import { formatSize } from "src/utils/format";
+
+import { AccountListSelector } from "./AccountListSelector";
+import { PartitionSelector } from "./PartitionSelector";
 
 interface JobForm {
   cluster: Cluster;
@@ -38,8 +42,8 @@ interface JobForm {
   command: string;
   jobName: string;
   qos: string | undefined;
-  maxTimeValue: number;
-  maxTimeUnit: "minutes" | "hours";
+  maxTime: number;
+  maxTimeUnit: TimeUnit | undefined;
   account: string;
   comment: string;
   workingDirectory: string;
@@ -66,13 +70,13 @@ const initialValues = {
   nodeCount: 1,
   coreCount: 1,
   gpuCount: 1,
-  maxTimeValue: 30,
-  maxTimeUnit:"minutes",
+  maxTime: 30,
+  maxTimeUnit: TimeUnit.MINUTES,
   output: "job.%j.out",
-  scriptOutput:"job.%j.sh",
+  scriptOutput: "job.%j.sh",
   errorOutput: "job.%j.err",
   save: false,
-  showScriptOutput:true,
+  showScriptOutput: true,
 } as Partial<JobForm>;
 
 interface Props {
@@ -83,6 +87,7 @@ interface Props {
 const p = prefix("pageComp.job.submitJobForm.");
 
 export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submitJobPromptText }) => {
+
   const { message, modal } = App.useApp();
 
   const [form] = Form.useForm<JobForm>();
@@ -91,26 +96,34 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
 
   const cluster = Form.useWatch("cluster", form) as Cluster | undefined;
-  const timeUnitConversion = {
-    minutes: 1,
-    hours: 60,
-    days: 60 * 24,
-  };
   const submit = async () => {
     const formValues = await form.validateFields();
     const { cluster, command, jobName, coreCount, gpuCount, workingDirectory, output, errorOutput, save,
-      maxTimeValue, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
+      maxTime, maxTimeUnit, nodeCount, partition, qos, account, comment, showScriptOutput } = formValues;
     const scriptOutput = showScriptOutput ? formValues.scriptOutput : "";
-    const maxTime = maxTimeValue * (timeUnitConversion[maxTimeUnit] || 1);
-    await api.submitJob({ body: {
-      cluster: cluster.id, command, jobName, account,
-      coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) : coreCount,
-      gpuCount,
-      maxTime, nodeCount, partition, qos, comment,
-      workingDirectory, save, memory, output, errorOutput, scriptOutput,
-    } })
+
+    await api.submitJob({
+      body: {
+        cluster: cluster.id, command, jobName, account,
+        coreCount: gpuCount ? gpuCount * Math.floor(currentPartitionInfo!.cores
+          / currentPartitionInfo!.gpus) : coreCount,
+        gpuCount,
+        maxTime, maxTimeUnit, nodeCount, partition, qos, comment,
+        workingDirectory, save, memory, output, errorOutput, scriptOutput,
+      },
+    })
       .httpError(500, (e) => {
         if (e.code === "SCHEDULER_FAILED") {
+          modal.error({
+            title: t(p("errorMessage")),
+            content: e.message,
+          });
+        } else {
+          throw e;
+        }
+      })
+      .httpError(404, (e) => {
+        if (e.code === "NOT_FOUND") {
           modal.error({
             title: t(p("errorMessage")),
             content: e.message,
@@ -129,8 +142,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   const jobName = Form.useWatch("jobName", form) as string;
 
-  const partition = Form.useWatch("partition", form) as string;
-
   const nodeCount = Form.useWatch("nodeCount", form) as number;
 
   const coreCount = Form.useWatch("coreCount", form) as number;
@@ -146,31 +157,31 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     const parseName = parsePlaceholder("{{ name }}", { name: jobName }).trim();
     return parseName ? parseName + ".sh" : "";
   };
-
+  // 获取集群信息
   const clusterInfoQuery = useAsync({
     promiseFn: useCallback(async () => cluster
-      ? api.getClusterInfo({ query: { cluster:  cluster?.id } })
+      ? api.getClusterInfo({ query: { cluster: cluster?.id } })
       : undefined, [cluster]),
-    onResolve: (data) => {
-      if (data) {
-        // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的partition，若有，则将默认值设为模板值；
-        const setValueFromTemplate = initial.partition &&
-          data.clusterInfo.scheduler.partitions.some((item) => { return item.name === initial.partition; });
-        const partition = data.clusterInfo.scheduler.partitions[0];
-        const setInitialValues = setValueFromTemplate ? {
-          partition: initial.partition,
-          qos: initial.qos,
-        } : {
-          partition: partition.name,
-          qos: partition.qos?.[0],
-        };
-        form.setFieldsValue(setInitialValues);
-      }
-
+    onResolve: () => {
       const jobInitialName = genJobName();
       form.setFieldValue("jobName", jobInitialName);
+
+      // TODO 调度器类别,K8S镜像
+      // const schedulerName = data?.clusterInfo.scheduler.name;
+
     },
   });
+
+  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+
+  // 没有可用集群的情况不再渲染
+  if (!defaultCluster && currentClusters.length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
+  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
+    (defaultCluster ?? currentClusters[0]);
 
   const { data: homePath, isLoading: isHomePathLoading } = useAsync({
     promiseFn: useCallback(async () => cluster
@@ -196,36 +207,163 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     setWorkingDirectoryValue();
   }, [jobName, clusterInfoQuery.data, homePath?.path]);
 
-  const currentPartitionInfo = useMemo(() =>
-    clusterInfoQuery.data
-      ? clusterInfoQuery.data.clusterInfo.scheduler.partitions.find((x) => x.name === partition)
-      : undefined,
-  [clusterInfoQuery.data, partition],
+  // 集群，账户，分区，qos的模板值存在时, 手动控制模板值填入时机
+  const excludedFields = ["cluster", "account", "partition", "qos"];
+  const initialWithoutExcluded = Object.fromEntries(
+    Object.entries(initial).filter(([key]) => !excludedFields.includes(key)),
   );
 
-  useEffect(() => {
-    if (currentPartitionInfo) {
-      // 如果是从模板导入，则判断当前选中的分区中是否仍有模板中的qos，若有，则将默认值设为模板值；
-      const setValueFromTemplate = initial.partition && currentPartitionInfo.qos?.some((i) => i === initial.qos);
-      form.setFieldValue("qos", setValueFromTemplate ? initial.qos : currentPartitionInfo.qos?.[0]);
+  const [accountsReloadTrigger, setAccountsReloadTrigger] = useState<boolean>(false);
+  const [partitionsReloadTrigger, setPartitionsReloadTrigger] = useState<boolean>(false);
+  const [accountPartitionsCacheMap, setAccountPartitionsCacheMap] = useState<Record<string, Partition[]>>({});
+  const [selectableAccounts, setSelectableAccounts] = useState<string[]>([]);
+  const [selectablePartitions, setSelectablePartitions] = useState<string[]>([]);
+  const [isFirstAccountsQuery, setIsFirstAccountsQuery] = useState<boolean>(true);
+  const [isFirstParQuery, setIsFirstParQuery] = useState<boolean>(true);
+  const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+
+  const handleAccountsReload = () => {
+    setAccountsReloadTrigger((prev) => prev = !prev);
+  };
+
+  const handlePartitionsReload = () => {
+    const account = form.getFieldValue("account");
+    // 分区重新获取时，刷新已选择账户的分区信息
+    const newPartitionsMap = { ...accountPartitionsCacheMap };
+    if (accountPartitionsCacheMap[account]) {
+      delete newPartitionsMap[account];
     }
-  }, [currentPartitionInfo]);
+    setAccountPartitionsCacheMap(newPartitionsMap);
+    handlePartitionCacheMap(newPartitionsMap);
+    setPartitionsReloadTrigger((prev) => prev = !prev);
+  };
 
-  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+  // 获取未封锁账户
+  const unblockedAccountsQuery = useAsync({
+    promiseFn: useCallback(async () => {
+      // 每当账户重新获取时，就清除所有保存的账户分区缓存信息
+      setAccountPartitionsCacheMap({});
+      handlePartitionCacheMap({});
 
-  // 没有可用集群的情况不再渲染
-  if (!defaultCluster && currentClusters.length === 0) {
-    return <ClusterNotAvailablePage />;
-  }
+      return cluster ? await api.getAccounts({
+        query: {
+          cluster: cluster.id,
+          statusFilter: AccountStatusFilter.UNBLOCKED_ONLY,
+        },
+      })
+        .httpError(404, (error) => { message.error(error.message); })
+        : { accounts: [] as string[] };
+    }, [cluster, accountsReloadTrigger]),
+    onResolve: (data) => {
 
-  // 判断是使用template中的cluster还是系统默认cluster，防止系统配置文件更改时仍选改动前的cluster
-  const currentQueryCluster = currentClusters.find((x) => x.id === initial.cluster?.id) ??
-    (defaultCluster ?? currentClusters[0]);
+      if (isFirstAccountsQuery) {
+        // 如果第一次查询账户列表时模板值中账户存在，则填入模板值的账户，分区,qos
+        if (initial.account) {
+          form.setFieldValue("account", initial.account);
+          form.setFieldValue("partition", initial.partition ?? undefined);
+          form.setFieldValue("qos", initial.qos ?? undefined);
+        }
+        // 第一次请求已经处理过
+        setIsFirstAccountsQuery(false);
+      } else {
+        if (data.accounts && data.accounts.length > 0) {
+          setSelectableAccounts(data.accounts);
+        }
+      }
+    },
+  });
+
+  // 获取账户的可见分区
+  const availablePartitionsForAccountQuery = useAsync({
+    promiseFn: useCallback(async () => {
+      const account = form.getFieldValue("account");
+      if (cluster && account && selectableAccounts.includes(account) && !accountPartitionsCacheMap[account]) {
+        const newPartitionsMap = { ...accountPartitionsCacheMap };
+        return await api.getAvailablePartitionsForCluster({
+          query: {
+            cluster: cluster?.id,
+            accountName: account,
+          },
+        })
+          .then((data) => {
+            newPartitionsMap[account] = data.partitions;
+            // 如果第一次请求时模板值中分区存在，则填入模板值的分区及qos
+            if (isFirstParQuery && initial.partition && initial.qos) {
+              form.setFieldValue("partition", initial.partition);
+              form.setFieldValue("qos", initial.qos);
+              // 第一次请求已经处理过
+              setIsFirstParQuery(false);
+            } else {
+              if (data && data.partitions && data.partitions.length > 0) {
+                form.setFieldValue("partition", data.partitions[0].name);
+                form.setFieldValue("qos", data.partitions[0].qos?.[0]);
+              }
+            }
+
+            setAccountPartitionsCacheMap(newPartitionsMap);
+            handlePartitionCacheMap(newPartitionsMap);
+          });
+      };
+      return { partitions: [] as Partition[] };
+    }, [selectableAccounts, partitionsReloadTrigger]),
+  });
+
+
+  // 根据当前缓存的账户分区列表获取当前选择的分区信息
+  const handlePartitionCacheMap = (cacheMap: Record<string, Partition[]>) => {
+    const account = form.getFieldValue("account");
+    const partition = form.getFieldValue("partition");
+
+    if (account && Object.keys(cacheMap).length === 0) {
+      setCurrentPartitionInfo(undefined);
+    } else {
+      if (account && cacheMap[account]) {
+        setSelectablePartitions(cacheMap[account].map((x) => x.name));
+        if (partition && cacheMap[account].find((x) => x.name === partition)) {
+          setCurrentPartitionInfo(cacheMap[account].find((x) => x.name === partition));
+        } else {
+          setCurrentPartitionInfo(cacheMap[account][0]);
+        }
+      }
+    }
+  };
+
+  // 集群手动变更时
+  const handleClusterChange = () => {
+    handleAccountsReload();
+    form.setFieldValue("account", selectableAccounts[0]);
+    setAccountPartitionsCacheMap({});
+    handlePartitionCacheMap({});
+    setIsFirstAccountsQuery(false);
+    handleAccountChange(selectableAccounts[0]);
+  };
+
+  // 账户手动变更时
+  const handleAccountChange = (account: string) => {
+    const cacheMap = accountPartitionsCacheMap[account];
+    if (cacheMap) {
+      handlePartitionCacheMap(accountPartitionsCacheMap);
+      form.setFieldsValue({ partition: cacheMap[0].name, qos: cacheMap[0].qos?.[0] });
+    } else {
+      setIsFirstParQuery(false);
+      handlePartitionsReload();
+    }
+  };
+
+  // 分区手动变更时
+  const handlePartitionChange = (partition: string) => {
+    const account = form.getFieldValue("account");
+    const partitionInfo = accountPartitionsCacheMap[account]
+      ? accountPartitionsCacheMap[account].find((x) => x.name === partition)
+      : undefined;
+    setCurrentPartitionInfo(partitionInfo);
+    form.setFieldValue("qos", partitionInfo?.qos?.[0]);
+  };
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
-    * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
-    * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
+      * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
+      * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) :
       nodeCount * coreCount * Math.floor(currentPartitionInfo.memMb / currentPartitionInfo.cores) : 0);
   const memory = memorySize + "MB";
   const memoryDisplay = formatSize(memorySize, ["MB", "GB", "TB"]);
@@ -238,7 +376,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     <Form<JobForm>
       form={form}
       initialValues={{
-        ...initial,
+        ...initialWithoutExcluded,
         cluster: currentQueryCluster,
       }}
       onFinish={submit}
@@ -246,7 +384,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       <Row gutter={4}>
         <Col span={24} sm={12}>
           <Form.Item<JobForm> label={t(p("cluster"))} name="cluster" rules={[{ required: true }]}>
-            <SingleClusterSelector />
+            <SingleClusterSelector onChange={handleClusterChange} />
           </Form.Item>
         </Col>
         <Col span={24} sm={12}>
@@ -274,24 +412,29 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             dependencies={["cluster"]}
           >
             {/* 加载完集群后再加载账户，保证initial值能被赋值成功 */}
-            {cluster?.id && <AccountSelector cluster={cluster.id} />}
+            {cluster?.id && unblockedAccountsQuery?.data?.accounts &&
+              (
+                <AccountListSelector
+                  selectableAccounts={selectableAccounts ?? []}
+                  isLoading={unblockedAccountsQuery.isLoading}
+                  onReload={handleAccountsReload}
+                  onChange={handleAccountChange}
+                />
+              )}
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
           <Form.Item
             label={t(p("partition"))}
             name="partition"
-            dependencies={["cluster"]}
+            dependencies={["cluster", "account"]}
             rules={[{ required: true }]}
           >
-            <Select
-              loading={clusterInfoQuery.isLoading}
-              disabled={!currentPartitionInfo}
-              options={clusterInfoQuery.data
-                ? clusterInfoQuery.data.clusterInfo.scheduler.partitions
-                  .map((x) => ({ label: x.name, value: x.name }))
-                : []
-              }
+            <PartitionSelector
+              isLoading={availablePartitionsForAccountQuery.isLoading || unblockedAccountsQuery.isLoading}
+              selectablePartitions={selectablePartitions ?? []}
+              onReload={handlePartitionsReload}
+              onChange={handlePartitionChange}
             />
           </Form.Item>
         </Col>
@@ -299,12 +442,13 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           <Form.Item
             label={t(p("qos"))}
             name="qos"
-            dependencies={["cluster", "partition"]}
+            dependencies={["cluster", "account", "partition"]}
             rules={[{ required: true }]}
           >
             <Select
-              disabled={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+              loading={availablePartitionsForAccountQuery.isLoading || unblockedAccountsQuery.isLoading}
               options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
+
             />
           </Form.Item>
         </Col>
@@ -312,7 +456,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           <Form.Item
             label={t(p("nodeCount"))}
             name="nodeCount"
-            dependencies={["cluster", "partition"]}
+            dependencies={["cluster", "account", "partition"]}
             rules={[
               { required: true, type: "integer", max: currentPartitionInfo?.nodes },
             ]}
@@ -329,7 +473,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             <Form.Item
               label={t(p("gpuCount"))}
               name="gpuCount"
-              dependencies={["cluster", "partition"]}
+              dependencies={["cluster", "account", "partition"]}
               rules={[
                 {
                   required: true,
@@ -348,7 +492,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             <Form.Item
               label={t(p("coreCount"))}
               name="coreCount"
-              dependencies={["cluster", "partition"]}
+              dependencies={["cluster", "account", "partition"]}
               rules={[
                 {
                   required: true,
@@ -368,7 +512,11 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         <Col span={24} sm={6}>
           <Form.Item label={t(p("maxTime"))} required>
             <Input.Group compact style={{ display: "flex", minWidth: "120px" }}>
-              <Form.Item name="maxTimeValue" rules={[{ required: true }]} noStyle>
+              <Form.Item
+                name="maxTime"
+                rules={[{ required: true, message: `${t(p("requireMaxTime"))}` }]}
+                noStyle
+              >
                 <InputNumber
                   min={1}
                   step={1}
@@ -381,9 +529,9 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
                   popupMatchSelectWidth={false}
                   style={{ flex: "0 1 auto" }}
                 >
-                  <Select.Option value="minutes">{t(p("minute"))}</Select.Option>
-                  <Select.Option value="hours">{t(p("hours"))}</Select.Option>
-                  <Select.Option value="days">{t(p("days"))}</Select.Option>
+                  <Select.Option value={TimeUnit.MINUTES}>{t(p("minute"))}</Select.Option>
+                  <Select.Option value={TimeUnit.HOURS}>{t(p("hours"))}</Select.Option>
+                  <Select.Option value={TimeUnit.DAYS}>{t(p("days"))}</Select.Option>
                 </Select>
               </Form.Item>
             </Input.Group>
@@ -464,8 +612,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
             name="scriptOutput"
             tooltip={(
               <>
-                <span>{t(p("wdTooltip1"))}</span>
-                <br />
                 <span>{t(p("wdTooltip3"))}</span>
               </>
             )}

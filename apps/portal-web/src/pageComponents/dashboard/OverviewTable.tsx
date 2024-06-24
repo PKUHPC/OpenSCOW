@@ -121,7 +121,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
   const filteredClusterInfo = useMemo(() => {
     if (activeTabKey === "platformOverview") {
       setSelectId(undefined);
-      return clusterInfo;
+      return clustersOverview;
     }
     return clusterInfo.filter((info) => info.clusterName === activeTabKey);
   }, [activeTabKey, clusterInfo, languageId]);
@@ -134,7 +134,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
       }
     }
   }, [activeTabKey, clusterInfo]);
-
 
   return (
     (isLoading || currentClusters.length > 0) ? (
@@ -150,8 +149,11 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             marginTop:"15px",
           }}
           tableLayout="fixed"
-          dataSource={(filteredClusterInfo.map((x) =>
-            ({ clusterName:x.clusterName, info:{ ...x } })) as Array<TableProps>)
+          dataSource={(filteredClusterInfo.map((x, index) =>
+            ({ clusterName:x.clusterName, info:{ ...x, id:index
+              , cpuUsage:(x.runningCpuCount / x.cpuCoreCount) * 100,
+              gpuUsage:
+              x.gpuCoreCount === 0 ? undefined : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>)
             .concat(failedClusters)
           }
           loading={isLoading}
@@ -186,6 +188,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
           <Table.Column<TableProps>
             dataIndex="partitionName"
             title={t(p("partitionName"))}
+            hidden={activeTabKey === "platformOverview"}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.partitionName, b.info?.partitionName, sortOrder)}
             render={(_, r) => r.info?.partitionName ?? "-"}
           />
@@ -202,17 +205,15 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
               compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
             hidden={clusterInfo.every((item) => item.usageRatePercentage === undefined)}
             render={(_, r) => (
-              r.info?.usageRatePercentage ? (
-                <div>
-                  <Progress
-                    percent={Math.min(Number(r.info.usageRatePercentage.toFixed(2)), 100)}
-                    strokeLinecap='square'
-                    size={[120, 15]}
-                    status="normal"
-                    strokeColor={"#566DE5"}
-                  />
-                </div>
-              ) : "-"
+              <div>
+                <Progress
+                  percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
+                  strokeLinecap='square'
+                  size={[120, 15]}
+                  status="normal"
+                  strokeColor={"#566DE5"}
+                />
+              </div>
             )}
           />
           <Table.Column<TableProps>
@@ -220,17 +221,15 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("cpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
             render={(_, r) => (
-              r.info?.cpuUsage ? (
-                <div>
-                  <Progress
-                    percent={Math.min(Number(Number(r.info.cpuUsage).toFixed(2)), 100)}
-                    strokeLinecap='square'
-                    size={[120, 15]}
-                    status="normal"
-                    strokeColor={"#566DE5"}
-                  />
-                </div>
-              ) : "-"
+              <div>
+                <Progress
+                  percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
+                  strokeLinecap='square'
+                  size={[120, 15]}
+                  status="normal"
+                  strokeColor={"#566DE5"}
+                />
+              </div>
             )}
           />
           <Table.Column<TableProps>
@@ -238,7 +237,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("gpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
             render={(_, r) => (
-              r.info?.gpuUsage ? (
+              r.info?.gpuUsage !== undefined ? (
                 <div>
                   <Progress
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}
@@ -261,6 +260,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
           <Table.Column<TableProps>
             dataIndex="partitionStatus"
             title={t(p("partitionStatus"))}
+            hidden={activeTabKey === "platformOverview"}
             sorter={(a, b, sortOrder) =>
               compareWithUndefined(a.info?.partitionStatus, b.info?.partitionStatus, sortOrder)}
             render={(_, r) => r.info?.partitionStatus === 0 ?

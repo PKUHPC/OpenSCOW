@@ -76,6 +76,10 @@ export default {
         selectAccountPlaceholder: "请选择账户",
         refreshAccountList: "刷新账户列表",
       },
+      partitionSelector: {
+        selectPartitionPlaceholder: "请选择分区",
+        refreshPartitionList: "刷新分区列表",
+      },
       allJobsTable: {
         searchForm: {
           clusterLabel: "集群",
@@ -177,6 +181,7 @@ export default {
         gpuCount: "单节点GPU卡数",
         coreCount: "单节点核心数",
         maxTime: "最长运行时间",
+        requireMaxTime:"请输入最长运行时间",
         minute: "分钟",
         hours:"小时",
         days: "天",
@@ -185,7 +190,7 @@ export default {
 
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
 
-        wdTooltip3: "2.该文件用于保存适配器返回的脚本，默认值参考输出文件。",
+        wdTooltip3: "该文件用于保存适配器返回的脚本，默认值参考输出文件。",
 
         output: "标准输出文件",
         errorOutput: "错误输出文件",
@@ -444,12 +449,15 @@ export default {
         resourceInfo:"资源信息",
         core:"核",
         running:"运行中",
-        idle:"空闲",
+        idle:"可用",
         notAvailable:"不可用",
         card:"卡",
         job:"作业",
         pending:"排队中",
         platformOverview:"平台概览",
+        totalNodes:"总数",
+        totalCores:"总核心数",
+        totalCards:"总卡数",
       },
       nodeRange:{
         jobs:"作业",
