@@ -13,6 +13,7 @@
 import React from "react";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
 import { styled, useTheme } from "styled-components"; ;
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Card, Col, Row } from "antd";
 import { useStore } from "simstate";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -80,7 +81,7 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
     },
     ...currentClusters.map((x) => ({
       key:x.id,
-      tab:typeof (x.name) == "string" ? x.name : x.name.i18n[languageId],
+      tab:typeof (x.name) === "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
     })),
   ];
 
