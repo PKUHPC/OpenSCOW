@@ -20,6 +20,8 @@ import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Capabilities } from "@scow/lib-auth";
 import { apiAuthPlugin } from "@scow/lib-server";
 import { commonConfig } from "src/config/common";
+import { misConfig } from "src/config/mis";
+import { asyncOperationPlugin } from "src/plugins/asyncOperation";
 import { authServicePlugin } from "src/plugins/authService";
 import { ClearCachePlugin, clearCachePlugin } from "src/plugins/cachePlugin";
 import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
@@ -51,4 +53,8 @@ export const plugins = [
 
 if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));
+}
+
+if (misConfig.asyncOperation) {
+  plugins.push(asyncOperationPlugin(misConfig.asyncOperation));
 }
