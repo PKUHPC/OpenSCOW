@@ -6,15 +6,6 @@ on:
       time:
         description: 'The deployment time (format: YYYY年MM月DD日)'
         required: true
-      version:
-        description: 'The version to deploy (format: X.Y.Z)'
-        required: true
-      level:
-        description: 'The release level (options: PATCH, MINOR, MAJOR)'
-        required: true
-      feature_freeze:
-        description: 'Feature freeze period (format: start time--end time)'
-        required: true
 
 jobs:
   deploy:
@@ -33,12 +24,9 @@ jobs:
 
     - name: Send Notification Request
       run: |
-        curl -X POST http://47.96.27.236:8080/version \
+        curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
         -d '{
           "time": "${{ github.event.inputs.time }}",
-          "version": "${{ github.event.inputs.version }}",
-          "level": "${{ github.event.inputs.level }}",
-          "feature_freeze": "${{ github.event.inputs.feature_freeze }}"
         }'
