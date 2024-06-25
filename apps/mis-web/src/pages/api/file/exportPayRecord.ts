@@ -18,6 +18,7 @@ import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { SearchType } from "src/pageComponents/common/PaymentTable";
@@ -25,10 +26,11 @@ import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
+import { createEncodingTransform, getContentTypeWithCharset, getCsvObjTransform,
+  getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
-import { getContentType, parseIp } from "src/utils/server";
+import { parseIp } from "src/utils/server";
 import { emptyStringArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
@@ -46,6 +48,7 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     targetNames: Type.Optional(Type.Array(Type.String())),
     searchType: Type.Enum(SearchType),
     types:Type.Optional(Type.Array(Type.String())),
+    encoding: Type.Enum(Encoding),
   }),
 
   responses:{
@@ -59,7 +62,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   const { query } = req;
 
-  const { columns, startTime, endTime, searchType, count } = query;
+  const { columns, startTime, endTime, searchType, count, encoding } = query;
   let { targetNames, types } = query;
   // targetName为空字符串数组时视为初始态，即undefined
   targetNames = emptyStringArrayToUndefined(targetNames);
@@ -113,8 +116,10 @@ export default route(ExportPayRecordSchema, async (req, res) => {
     const filename = `pay_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
+    const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
+
     res.writeHead(200, {
-      "Content-Type": getContentType(filename, "application/octet-stream"),
+      "Content-Type":contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
@@ -159,11 +164,13 @@ export default route(ExportPayRecordSchema, async (req, res) => {
     const csvStringify = getCsvStringify(headerColumns, columns);
 
     const transform = getCsvObjTransform("payRecords", formatPayRecord);
+    const encodingTransform = createEncodingTransform(encoding); // 创建编码转换流
 
     pipeline(
       stream,
       transform,
       csvStringify,
+      encodingTransform, // 添加编码转换流到管道
       res,
       async (err) => {
         if (err) {
