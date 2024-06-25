@@ -27,9 +27,17 @@ const Container = styled.div`
   }
 
   width: 100%;
+  .ant-menu-item-icon svg{
+    font-size:1.42em
+  }
 
   .ant-menu-item {
     padding-left: 16px !important;
+  }
+
+  .ant-menu-title-content{
+    position:relative;
+    bottom:0.2em;
   }
 `;
 

@@ -83,11 +83,10 @@ const Container = styled.div`
   }
 
   .rowBgColor{
-    background-color: ${({ theme }) => theme.token.colorBorder};
     /* 去除鼠标经过默认的背景颜色 */
     td {
       background: none !important;
-  }
+    }
   }
 `;
 
