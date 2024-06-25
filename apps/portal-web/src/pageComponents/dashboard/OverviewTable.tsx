@@ -185,7 +185,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                 getI18nConfigCurrentText(b.clusterName, languageId), sortOrder)}
             render={(clusterName) => (
               <span style={{ fontWeight:700 }}>
-                {getI18nConfigCurrentText(clusterName, languageId)}
+                {getI18nConfigCurrentText(currentClusters.find((cluster) => cluster.id == clusterName)?.name
+                ?? clusterName, languageId)}
               </span>
             )}
           />
