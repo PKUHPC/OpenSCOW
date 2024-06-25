@@ -71,8 +71,6 @@ export const PieChartCom: React.FC<Props> = ({ pieData, display, total }) => {
     return null;
   }
 
-  console.log(pieData);
-
   // 鼠标激活index的value
   const [hoveredValue, setHoveredValue] = useState<number>(pieData[1].value);
 

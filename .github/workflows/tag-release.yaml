@@ -24,3 +24,13 @@ jobs:
 
       - name: Create tag if needed
         run: node scripts/tag.mjs
+  
+  send-version-success:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send Notification Request
+      run: |
+        curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version/success \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}"
