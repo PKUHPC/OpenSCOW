@@ -94,7 +94,7 @@ export const ShellIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((
 
 // 桌面图标
 const desktopSVG = () => (
-  <svg width="1em" height="1em" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="1em" height="1em" viewBox="0 0 30 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M7 7H3C1.89543 7 1 7.89543 1 9
     V26C1 27.1046 1.89543 28 3 28
@@ -219,25 +219,16 @@ export const MisIcon = (props) => <Icon component={misSVG} {...props} />;
 
 // 所有作业图标
 const allJobsSVG = () => (
-  <svg width="1em" height="1em" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect x="4.67856" y="5.57141" width="20.3214" height="19.4286" rx="1" stroke="currentColor" strokeWidth="2" />
+  <svg width="1em" height="1em" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4.67859" y="5.57141" width="20.3214" height="19.4286" rx="1" stroke="#262743" strokeWidth="2" />
+    <rect x="1.10718" y="1" width="7.82143" height="7.82143" rx="1" fill="white" stroke="#262743" strokeWidth="2" />
     <rect
       x="1.10718"
-      y="1"
-      width="7.82143"
-      height="7.82143"
-      rx="1"
-      fill="#F5EBEB"
-      stroke="currentColor"
-      strokeWidth="2"
-    />
-    <rect
-      x="1.10715"
       y="12.7142"
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="#F5EBEB"
+      fill="white"
       stroke="currentColor"
       strokeWidth="2"
     />
@@ -247,14 +238,15 @@ const allJobsSVG = () => (
       width="7.82143"
       height="7.82143"
       rx="1"
-      fill="#F5EBEB"
+      fill="white"
       stroke="currentColor"
       strokeWidth="2"
     />
-    <path d="M14.3929 15.2858H21.5357" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M14.3929 17.9642H19.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    <path d="M14.3929 20.6428H17.9643" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3928 15.2858H21.5357" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3928 17.9642H19.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M14.3928 20.6428H17.9643" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
   </svg>
+
 );
 export const AllJobsIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
   ref: LegacyRef<HTMLSpanElement> | undefined) => (
@@ -416,7 +408,7 @@ const appSessionsSVG = () => (
     <path
       d="M17 19.2857L18.4545 21
     L21 18"
-      stroke="currentColor"
+      stroke="#fff"
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -453,4 +445,65 @@ const inSVG = () => (
 export const InIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
   ref: LegacyRef<HTMLSpanElement> | undefined) => (
   <Icon component={inSVG} {...props} ref={ref} />
+));
+
+// 作业模板图标
+const templateJobSVG = () => (
+  <svg width="1em" height="1em" viewBox="0 0 23 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <mask id="path-1-inside-1_840_4698" fill="white">
+      <rect x="4" y="3" width="15" height="6" rx="1" />
+    </mask>
+    <rect
+      x="4"
+      y="3"
+      width="15"
+      height="6"
+      rx="1"
+      fill="white"
+      stroke="currentColor"
+      strokeWidth="3"
+      mask="url(#path-1-inside-1_840_4698)"
+    />
+    <rect x="4.5" y="11.5" width="6" height="1" rx="0.5" fill="white" stroke="currentColor" />
+    <rect x="4.5" y="14.5" width="6" height="1" rx="0.5" fill="white" stroke="currentColor" />
+    <mask id="path-4-inside-2_840_4698" fill="white">
+      <rect x="4" y="17" width="7" height="5" rx="1" />
+    </mask>
+    <rect
+      x="4"
+      y="17"
+      width="7"
+      height="5"
+      rx="1"
+      fill="white"
+      stroke="currentColor"
+      strokeWidth="3"
+      mask="url(#path-4-inside-2_840_4698)"
+    />
+    <mask id="path-5-inside-3_840_4698" fill="white">
+      <rect width="7" height="12" rx="1" transform="matrix(-1 0 0 1 19 10)" />
+    </mask>
+    <rect
+      width="7"
+      height="12"
+      rx="1"
+      transform="matrix(-1 0 0 1 19 10)"
+      fill="white"
+      stroke="currentColor"
+      strokeWidth="3"
+      mask="url(#path-5-inside-3_840_4698)"
+    />
+    <path
+      d="M2 1H21C21.5523 1 22 1.44771 22 2V3.97059V14.5588V23C22 23.5523 21.5523 24 21 24
+      H2C1.44771 24 1 23.5523 1 23V2C1 1.44772 1.44772 1 2 1Z"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+export const TemplateJobIcon: React.ForwardRefExoticComponent<{}> = React.forwardRef((props,
+  ref: LegacyRef<HTMLSpanElement> | undefined) => (
+  <Icon component={templateJobSVG} {...props} ref={ref} />
 ));
