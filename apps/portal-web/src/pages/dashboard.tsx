@@ -27,6 +27,8 @@ import { UserStore } from "src/stores/UserStore";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
+
+
 interface Props {
 }
 
@@ -82,10 +84,14 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         .map((result) => result.value);
 
 
-
       // 处理失败的结果
       const failedClusters = currentClusters.filter((x) =>
         !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      );
+
+      // 成功的集群名称
+      const successfulClusters = currentClusters.filter((x) =>
+        successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
 
       const clustersInfo = successfulResults
@@ -204,6 +210,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         failedClusters: failedClusters.map((x) => ({ clusterName: x.name })),
         clustersOverview,
         platformOverview,
+        successfulClusters,
       };
     }, [currentClusters]),
   });
@@ -219,6 +226,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         currentClusters={currentClusters}
         clustersOverview={data?.clustersOverview ?? []}
         platformOverview={data?.platformOverview }
+        successfulClusters={data?.successfulClusters}
       />
     </DashboardPageContent>
   );
