@@ -223,8 +223,6 @@ jobs:
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
 
-            send-version-success:
-
       - name: Send Notification Request
         run: |
           curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version/success \
