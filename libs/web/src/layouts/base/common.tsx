@@ -11,7 +11,7 @@
  */
 
 import { arrayContainsElement } from "@scow/utils";
-import { ItemType } from "antd/es/menu/hooks/useItems";
+import { ItemType } from "antd/es/menu/interface";
 import Link from "next/link";
 import Router from "next/router";
 import React from "react";
