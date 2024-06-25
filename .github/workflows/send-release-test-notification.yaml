@@ -24,7 +24,7 @@ jobs:
 
     - name: Send Notification Request
       run: |
-        curl -X POST http://47.96.27.236:8080/version \
+        curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version \
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
         -d '{
