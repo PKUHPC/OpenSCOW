@@ -20,7 +20,7 @@ import { join } from "path";
 import { checkCookie } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
-import { createAuditClient } from "src/server/shellAudit";
+import { createAuditClient, getAuditClient } from "src/server/shellAudit";
 import { getClient } from "src/utils/client";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parseIp } from "src/utils/server";
@@ -141,9 +141,10 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     },
   }, OperationResult.SUCCESS);
 
-  const { createShellSession, sessionEnd,
-    writeShellMsg } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+  const { createShellSession, sessionEnd } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
 
+  const auditClient = getAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+  const auditMsgStream = asyncDuplexStreamCall(auditClient, "writeTerminalMsg");
 
   const { sessionId: sessionAuditId } = await createShellSession({ session: {
     user: user.identityId,
@@ -170,7 +171,8 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     case "data":
       send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
       const msgStr: string = chunk.message.data.data.toString();
-      await writeShellMsg({
+
+      auditMsgStream.writeAsync({
         message: msgStr,
         cluster: cluster,
         node: loginNode.address,
@@ -179,6 +181,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
         time: new Date().toISOString(),
         remoteIp: parseIp(req) ?? "",
       });
+      
       break;
     case "exit":
       send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });

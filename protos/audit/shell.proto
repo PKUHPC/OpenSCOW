@@ -138,7 +138,7 @@ service AuditService {
   rpc CreateCommands(CreateCommandsRequest) returns (CreateCommandsResponse);
   rpc GetCommands(GetCommandsRequest) returns (GetCommandsResponse);
 
-  rpc WriteTerminalMsg(WriteTerminalMsgRequest) returns (WriteTerminalMsgResponse);
+  rpc WriteTerminalMsg(stream WriteTerminalMsgRequest) returns (stream WriteTerminalMsgResponse);
 
   rpc GetAppOperations(GetAppOperationsRequest) returns (GetAppOperationsResponse);
   rpc GetAppSessions(GetAppSessionsRequest) returns (GetAppSessionsResponse);
