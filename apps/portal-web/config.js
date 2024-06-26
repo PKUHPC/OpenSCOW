@@ -12,7 +12,7 @@
 
 // @ts-check
 
-const { envConfig, str, bool, parseKeyValue } = require("@scow/lib-config");
+const { envConfig, str, bool } = require("@scow/lib-config");
 const { join } = require("path");
 const { homedir } = require("os");
 const { PHASE_DEVELOPMENT_SERVER,
@@ -22,8 +22,6 @@ const { readVersionFile } = require("@scow/utils/build/version");
 const { getCapabilities } = require("@scow/lib-auth");
 const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
-const { getClusterConfigs, getLoginNode, getSortedClusters,
-  getSortedClusterIds } = require("@scow/config/build/cluster");
 const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
 const { getShellAuditConfig } = require("@scow/config/build/shellAudit");
@@ -43,35 +41,14 @@ async function queryCapabilities(authUrl, phase) {
   }
 }
 
-
-/**
- * 当所有集群下都关闭桌面登录功能时，才关闭。
- * @param {Record<String, import("@scow/config/build/cluster").ClusterConfigSchema>} clusters
- * @param {import("@scow/config/build/portal").PortalConfigSchema} portalConfig
- * @returns {boolean} desktop login enable
- */
-function getDesktopEnabled(clusters, portalConfig) {
-  const clusterDesktopEnabled = Object.keys(clusters).reduce(
-    ((pre, cur) => {
-
-      const curClusterDesktopEnabled = clusters?.[cur]?.loginDesktop?.enabled !== undefined
-        ? !!clusters[cur]?.loginDesktop?.enabled
-        : portalConfig.loginDesktop.enabled;
-
-      return pre || curClusterDesktopEnabled;
-    }), false,
-  );
-
-  return clusterDesktopEnabled;
-}
-
 const specs = {
 
   AUTH_EXTERNAL_URL: str({ desc: "认证系统的URL。如果和本系统域名相同，可以只写完整路径", default: "/auth" }),
 
   AUTH_INTERNAL_URL: str({ desc: "认证服务内网地址", default: "http://auth:5000" }),
 
-  LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
+  // 当前SCOW未使用覆写配置文件逻辑
+  // LOGIN_NODES: str({ desc: "集群的登录节点。将会覆写配置文件。格式：集群ID=登录节点,集群ID=登录节点", default: "" }),
 
   SSH_PRIVATE_KEY_PATH: str({ desc: "SSH私钥路径", default: join(homedir(), ".ssh", "id_rsa") }),
   SSH_PUBLIC_KEY_PATH: str({ desc: "SSH公钥路径", default: join(homedir(), ".ssh", "id_rsa.pub") }),
@@ -82,6 +59,7 @@ const specs = {
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
+  MIS_SERVER_URL: str({ desc: "如果部署了管理系统，管理系统后端的路径", default: "" }),
 
   AI_DEPLOYED: bool({ desc: "是否部署了AI系统", default: false }),
   AI_URL: str({ desc: "如果部署了AI系统，AI系统的URL。如果和本系统域名相同，可以只写完整路径。将会覆盖配置文件。空字符串等价于未部署AI系统", default: "" }),
@@ -131,9 +109,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  const clusters = getClusterConfigs(configPath, console, ["hpc"]);
-
-  Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
+  // Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
 
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
@@ -148,12 +124,12 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const serverRuntimeConfig = {
     AUTH_EXTERNAL_URL: config.AUTH_EXTERNAL_URL,
     AUTH_INTERNAL_URL: config.AUTH_INTERNAL_URL,
-    CLUSTERS_CONFIG: clusters,
     PORTAL_CONFIG: portalConfig,
     DEFAULT_PRIMARY_COLOR,
     MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
-    LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
+    // 当前SCOW未使用？
+    // LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
@@ -170,8 +146,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
 
-  const enableLoginDesktop = getDesktopEnabled(clusters, portalConfig);
-
   const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
   /**
@@ -185,17 +159,14 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     ENABLE_JOB_MANAGEMENT: portalConfig.jobManagement,
 
-    ENABLE_LOGIN_DESKTOP: enableLoginDesktop,
-
     ENABLE_APPS: portalConfig.apps,
 
     MIS_URL: config.MIS_DEPLOYED ? (config.MIS_URL || portalConfig.misUrl) : undefined,
 
+    MIS_DEPLOYED: config.MIS_DEPLOYED,
+    MIS_SERVER_URL: config.MIS_DEPLOYED ? config.MIS_SERVER_URL : undefined,
+
     AI_URL: config.AI_DEPLOYED ? (config.AI_URL || portalConfig.aiUrl) : undefined,
-
-    CLUSTERS: getSortedClusters(clusters).map((cluster) => ({ id: cluster.id, name: cluster.displayName })),
-
-    CLUSTER_SORTED_ID_LIST: getSortedClusterIds(clusters),
 
     NOVNC_CLIENT_URL: config.NOVNC_CLIENT_URL,
 
@@ -208,10 +179,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     FILE_EDIT_SIZE: portalConfig.file?.edit.limitSize,
 
     FILE_PREVIEW_SIZE: portalConfig.file?.preview.limitSize,
-
-    CROSS_CLUSTER_FILE_TRANSFER_ENABLED:
-      Object.values(clusters).filter(
-        (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1,
 
     PUBLIC_PATH: config.PUBLIC_PATH,
 

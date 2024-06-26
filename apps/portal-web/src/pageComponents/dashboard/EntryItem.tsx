@@ -15,7 +15,7 @@ import { join } from "path";
 import React, { CSSProperties, useState } from "react";
 import { ColoredIcon, isSupportedIconName } from "src/components/Icon";
 import { publicConfig } from "src/utils/config";
-import { styled } from "styled-components"; ;
+import { styled, useTheme } from "styled-components"; ;
 
 const ItemContainer = styled.div`
   display: flex;
@@ -35,7 +35,6 @@ const AvatarContainer = styled.div`
 const NameContainer = styled.div`
   text-align: center;
   white-space: nowrap;
-  margin-top: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
@@ -62,6 +61,8 @@ export const EntryItem: React.FC<Props> = ({ style,
     setImageErrorMap((prevMap) => ({ ...prevMap, [appId]: true }));
   };
 
+  const theme = useTheme();
+
   return (
     <ItemContainer style={style}>
       <AvatarContainer>
@@ -70,17 +71,29 @@ export const EntryItem: React.FC<Props> = ({ style,
             <img
               src={join(publicConfig.PUBLIC_PATH, logoPath)}
               onError={() => handleImageError(entryBaseName)}
-              style={{ maxWidth:"100px", objectFit:"contain" }}
+              style={{ maxWidth:"60px", objectFit:"contain",
+                position:"relative", top:`${(entryExtraInfo?.length ?? 0 - 0) * 8}px` }}
             />
           ) : (
-            icon && isSupportedIconName(icon) ?
-              <ColoredIcon name={icon} style={{ fontSize:"60px" }} />
+            icon && isSupportedIconName(icon) ? (
+              <ColoredIcon
+                name={icon}
+                style={{ fontSize:`${60 - (entryExtraInfo?.length ?? 0 - 0) * 4}px`,
+                  color:theme.token.colorPrimary,
+                  position:"relative", top:`${(entryExtraInfo?.length ?? 0 - 0) * 8}px`,
+                }}
+              />
+            )
               : <PictureOutlined style={{ fontSize:"52px" }} />
           )}
       </AvatarContainer>
       {
         [entryBaseName, ...entryExtraInfo ?? []].map((x, i) => (
-          <NameContainer key={i}>{x}</NameContainer>
+          <NameContainer
+            key={i}
+            style={{ fontWeight:`${((entryExtraInfo) && (i == 1)) ? "700"
+              : "500"}`, position:"relative", bottom:`${entryExtraInfo?.length ?? 0 > 0 ? "0px" : "18px"}` }}
+          >{x}</NameContainer>
         ))
       }
     </ItemContainer>

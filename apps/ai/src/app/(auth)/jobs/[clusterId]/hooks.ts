@@ -13,6 +13,7 @@
 import { UseQueryResult } from "@tanstack/react-query";
 import { Form, FormInstance } from "antd";
 import { useMemo } from "react";
+import { parseBooleanParam } from "src/utils/parse";
 
 import { AccessibilityType } from "./LaunchAppForm";
 
@@ -33,20 +34,20 @@ export function useDataOptions<T>(
   queryHook: QueryHookFunction<any, any, { items: T[] }>,
   clusterId: string,
   mapItemToOption: (item: T) => Option,
-): { dataOptions: Option[], isDataLoading: boolean } {
+): { data: T[], dataOptions: Option[], isDataLoading: boolean } {
   const typePath = [dataType, "type"];
   const itemType = Form.useWatch(typePath, form);
   const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
-
   const { data: items, isLoading: isDataLoading } = queryHook({
-    isPublic : isItemPublic, clusterId,
+    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
+    clusterId,
   }, { enabled: isItemPublic !== undefined });
 
   const dataOptions = useMemo(() => {
     return items?.items.map(mapItemToOption) || [];
   }, [items]);
 
-  return { dataOptions, isDataLoading: isDataLoading && isItemPublic !== undefined };
+  return { data: items?.items || [], dataOptions, isDataLoading: isDataLoading && isItemPublic !== undefined };
 }
 
 export function useDataVersionOptions<T>(
@@ -54,7 +55,7 @@ export function useDataVersionOptions<T>(
   dataType: DataType,
   queryHook: QueryHookFunction,
   mapItemToOption: (item: T) => Option,
-): { dataVersionOptions: Option[], isDataVersionsLoading: boolean } {
+): { dataVersions: T[], dataVersionOptions: Option[], isDataVersionsLoading: boolean } {
   const typePath = [dataType, "type"];
   const namePath = [dataType, "name"];
   const selectedItem = Form.useWatch(namePath, form);
@@ -62,12 +63,56 @@ export function useDataVersionOptions<T>(
   const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
 
   const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
-    [`${dataType}Id`]: selectedItem, isPublic : isItemPublic,
+    [`${dataType}Id`]: selectedItem,
+    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
   }, { enabled: selectedItem !== undefined });
 
   const dataVersionOptions = useMemo(() => {
     return versions?.items.map(mapItemToOption);
   }, [versions]);
 
-  return { dataVersionOptions, isDataVersionsLoading: isDataVersionsLoading && selectedItem !== undefined };
+  return {
+    dataVersions: versions?.items || [],
+    dataVersionOptions,
+    isDataVersionsLoading: isDataVersionsLoading && selectedItem !== undefined,
+  };
+}
+
+interface EntityWithVersions {
+  id: number;
+  versions: {
+    id: number,
+    path: string
+  }[];
+}
+
+interface Version {
+  id: number;
+}
+
+export function setEntityInitData<T extends Version, U extends EntityWithVersions>(
+  entityType: "algorithm" | "dataset" | "model",
+  entities: U[],
+  versions: T[],
+  entityId: number,
+  isPrivate: boolean,
+  form: FormInstance,
+  setShowKey: string,
+) {
+  form.setFieldValue(setShowKey, true);
+  form.setFieldValue([entityType, "type"], isPrivate ? AccessibilityType.PRIVATE : AccessibilityType.PUBLIC);
+
+  const foundEntity = entities.find((entity) =>
+    entity.versions.some((version) => version.id === entityId),
+  );
+
+  if (foundEntity) {
+    form.setFieldValue([entityType, "name"], foundEntity.id);
+    if (versions.length) {
+      const hasVersion = versions.some((version) => version.id === entityId);
+      if (hasVersion) {
+        form.setFieldValue([entityType, "version"], entityId);
+      }
+    }
+  }
 }

@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getLoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import httpProxy from "http-proxy";
 import { NextApiRequest } from "next";
 import { join } from "path";
 import { checkCookie } from "src/auth/server";
-import { publicConfig, runtimeConfig } from "src/utils/config";
+import { publicConfig } from "src/utils/config";
+
+import { getClusterConfigFiles } from "../clusterConfig";
 
 /**
  * Parse proxy target
@@ -24,7 +26,11 @@ import { publicConfig, runtimeConfig } from "src/utils/config";
  * @param urlIncludesBasePath whether url.req includes base path already
  * @returns Parsed proxy targe
  */
-export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): string | Error {
+export function parseProxyTarget(
+  url: string,
+  urlIncludesBasePath: boolean,
+  clusterConfigs: Record<string, ClusterConfigSchema>,
+): string | Error {
 
   const normalizedUrl = normalizePathnameWithQuery(url);
 
@@ -39,14 +45,14 @@ export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): str
 
   const [_empty, _api, _proxy, clusterId, type, node, port, ...path] = relativePath.split("/");
 
-  if (!runtimeConfig.CLUSTERS_CONFIG[clusterId]) {
+  if (!clusterConfigs[clusterId]) {
     return new Error("Invalid clusterId");
   }
 
   const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
 
-  const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
-  const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].loginNodes.map((x) => getLoginNode(x).address);
+  const proxyGateway = clusterConfigs[clusterId].proxyGateway;
+  const loginNodes = clusterConfigs[clusterId].loginNodes.map((x) => getLoginNode(x).address);
 
   // if node is login node, not proxy to proxy gateway node
   if (proxyGateway && !loginNodes.includes(node)) {
@@ -97,8 +103,10 @@ export const setupWssProxy = (req: NextApiRequest) => {
       return;
     }
 
+    const clusterConfigs = await getClusterConfigFiles();
+
     // req.url of raw node.js request object doesn't remove base path
-    const target = parseProxyTarget(req.url!, true);
+    const target = parseProxyTarget(req.url!, true, clusterConfigs);
 
     if (target instanceof Error) {
       writeError("400 Bad Request", target.message);

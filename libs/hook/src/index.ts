@@ -22,14 +22,33 @@ export const createHookClient = (
   config: ScowHookConfigSchema | undefined,
   logger: Logger,
 ) => {
-  const client = (config && config.enabled)
-    ? new HookServiceClient(config.url, ChannelCredentials.createInsecure())
-    : undefined;
 
-  if (config && client) {
-    logger.info("Hook configured to %s", config.url);
+  const hooks: {
+    name?: string;
+    client: HookServiceClient,
+  }[] = [];
+
+  const createHook = (url: string, name?: string) => {
+    return {
+      name: name ?? url,
+      client: new HookServiceClient(url, ChannelCredentials.createInsecure()),
+    };
+  };
+
+  if (!config) {
+    logger.info("Hook is not configured.");
+  } else if (!config.enabled) {
+    logger.info("Hook is explicitly disabled in config.");
+  } else if (config.hooks) {
+    for (const hook of config.hooks) {
+      hooks.push(createHook(hook.url, hook.name));
+    }
+    logger.info("Hooks are configured with %d hooks", hooks.length);
+  } else if (config.url) {
+    hooks.push(createHook(config.url));
+    logger.info("Hook %s is configured.", config.url);
   } else {
-    logger.info("Hook disabled");
+    logger.info("No hooks or url is provided in hook config. Hook is not configured.");
   }
 
   return {
@@ -39,22 +58,24 @@ export const createHookClient = (
       eventPayload: (Event & { $case: TEventName })[TEventName],
       logger: Logger,
     ) => {
-
-      if (!client) {
+      if (hooks.length === 0) {
         logger.debug("Attempt to call hook %s with %o", eventName, eventPayload);
         return;
       }
 
-      logger.info("Calling hook %s with %o", eventName, eventPayload);
+      logger.info("Calling hooks concurrently with event name %s and payload %o", eventName, eventPayload);
 
-      return await asyncUnaryCall(client, "onEvent", {
-        metadata: { time: new Date().toISOString() },
-        // @ts-ignore
-        event: { $case: eventName, [eventName]: eventPayload },
-      }).then(
-        () => { logger.debug("Hook call completed"); },
-        (e) => { logger.error(e, "Error when calling hook"); },
-      );
+      await Promise.all(hooks.map(async (hook) => {
+        logger.info("Calling hook %s", hook.name);
+        await asyncUnaryCall(hook.client, "onEvent", {
+          metadata: { time: new Date().toISOString() },
+          // @ts-ignore
+          event: { $case: eventName, [eventName]: eventPayload },
+        }).then(
+          () => { logger.debug("Hook call completed"); },
+          (e) => { logger.error(e, "Error when calling hook"); },
+        );
+      }));
     },
   };
 };

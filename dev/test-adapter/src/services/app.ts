@@ -19,12 +19,5 @@ export const appServiceServer = plugin((server) => {
       return [{}];
     },
 
-    getRunningJobNodeInfo: async () => {
-      return [{
-        node: "node1",
-        containerId: "docker://container1",
-      }];
-    },
-
   });
 });

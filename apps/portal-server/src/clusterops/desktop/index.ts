@@ -10,12 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MetadataValue } from "@grpc/grpc-js";
+import { DesktopOps } from "src/clusterops/api/desktop";
+import { configClusters } from "src/config/clusters";
 
-export const scowErrorMetadata = (code: string, extra?: Record<string, MetadataValue>) => {
-  return {
-    IS_SCOW_ERROR: "1",
-    SCOW_ERROR_CODE: code,
-    ...extra,
-  };
+import { scowdDesktopServices } from "./scowdDesktop";
+import { sshDesktopServices } from "./sshDesktop";
+
+
+export const desktopOps = (cluster: string): DesktopOps => {
+
+  const clusterInfo = configClusters[cluster];
+  if (clusterInfo.scowd?.enabled) {
+    return {
+      ...scowdDesktopServices(cluster),
+    };
+  } else {
+    return {
+      ...sshDesktopServices(cluster),
+    };
+  }
 };

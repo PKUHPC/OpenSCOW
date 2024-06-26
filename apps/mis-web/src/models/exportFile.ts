@@ -10,12 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MetadataValue } from "@grpc/grpc-js";
-
-export const scowErrorMetadata = (code: string, extra?: Record<string, MetadataValue | MetadataValue[]>) => {
-  return {
-    IS_SCOW_ERROR: "1",
-    SCOW_ERROR_CODE: code,
-    ...extra,
-  };
-};
+export enum Encoding {
+  GB18030 = "gb18030",
+  UTF8 = "utf-8",
+}

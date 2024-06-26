@@ -13,6 +13,7 @@
 "use client";
 
 import { LoadingOutlined } from "@ant-design/icons";
+import { useSearchParams } from "next/navigation";
 import { PageTitle } from "src/components/PageTitle";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
@@ -23,11 +24,30 @@ export default function Page({ params }: {params: {clusterId: string}}) {
 
   const { clusterId } = params;
 
+  const searchParams = useSearchParams();
+
+  const jobId = searchParams?.get("jobId");
+  const jobName = searchParams?.get("jobName");
+
+
   const { data: clusterInfo, isLoading: isClusterLoading, isError } =
   trpc.config.getClusterConfig.useQuery({ clusterId });
 
 
-  if (isClusterLoading || !clusterInfo) {
+  const parsedJobId = jobId ? parseInt(jobId, 10) : null;
+
+  const { data: submitTrainParams, isLoading: isSubmitTrainParamsLoading } = trpc.jobs.getSubmitTrainParams.useQuery(
+    { clusterId, jobId: parsedJobId!, jobName: jobName! }, {
+      enabled: (!!jobId && !!jobName),
+      retry: false,
+    });
+
+
+  if (
+    isClusterLoading
+    || !clusterInfo
+    || (!!jobId && !!jobName && (isSubmitTrainParamsLoading))) {
+
     return <LoadingOutlined />;
   }
 
@@ -44,6 +64,7 @@ export default function Page({ params }: {params: {clusterId: string}}) {
         clusterId={clusterId}
         clusterInfo={clusterInfo}
         isTraining={true}
+        trainJobInput={submitTrainParams}
       />
     </div>
   );

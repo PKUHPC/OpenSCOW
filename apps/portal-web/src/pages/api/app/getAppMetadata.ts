@@ -10,15 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { I18nStringType } from "@scow/config/build/i18n";
-import { appCustomAttribute_AttributeTypeToJSON,
-  AppServiceClient, I18nStringProtoType } from "@scow/protos/build/portal/app";
+import { getI18nTypeFormat } from "@scow/lib-web/src/utils/typeConversion";
+import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export const I18nStringSchemaType = Type.Union([
@@ -60,27 +60,6 @@ export const AppCustomAttribute = Type.Object({
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
 
-// protobuf中定义的grpc返回值的类型映射到前端I18nStringType
-const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined): I18nStringType => {
-
-  if (!i18nProtoType?.value) return "";
-
-  if (i18nProtoType.value.$case === "directString") {
-    return i18nProtoType.value.directString;
-  } else {
-    const i18nObj = i18nProtoType.value.i18nObject.i18n;
-    if (!i18nObj) return "";
-    return {
-      i18n: {
-        default: i18nObj.default,
-        en: i18nObj.en,
-        zh_cn: i18nObj.zhCn,
-      },
-    };
-  }
-
-};
-
 export const GetAppMetadataSchema = typeboxRouteSchema({
   method: "GET",
 
@@ -103,7 +82,7 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(GetAppMetadataSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAppMetadataSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

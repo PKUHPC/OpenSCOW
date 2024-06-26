@@ -1,5 +1,26 @@
 # @scow/docs
 
+## 1.4.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 7285809: 添加 SCOW 部署与运维指引文档
+- 383a8bd: 添加 web shell 文件上传功能
+
+## 1.3.3
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- a737493: jupyter 启动命令参数 PasswordIdentityProvider.hashed_password 改为 ServerApp.password
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- 640a599: 支持填写多个 hook 地址
+
 ## 1.3.2
 
 ### Patch Changes

@@ -17,9 +17,9 @@ import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
 import React, { PropsWithChildren, useCallback, useState } from "react";
 import { useAsync } from "react-async";
-import { ExtensionManifestsSchema } from "src/extensions/manifests";
 import { fromNavItemProps, rewriteNavigationsRoute, toNavItemProps } from "src/extensions/navigations";
 import { callExtensionRoute } from "src/extensions/routes";
+import { UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { Footer } from "src/layouts/base/Footer";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
@@ -42,6 +42,7 @@ const ContentPart = styled.div`
   flex-direction: column;
   width: 100%;
   overflow: hidden;
+
 `;
 
 const Content = styled(Layout.Content)`
@@ -66,16 +67,13 @@ type Props = PropsWithChildren<{
   userLinks?: UserLink[];
   languageId: string,
   from: "portal" | "mis";
-  extension?: {
-    manifests: ExtensionManifestsSchema;
-    url: string;
-  }
+  extensionStoreData?: UiExtensionStoreData;
 }>;
 
 export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
   children, footerText, versionTag, routes, user, logout,
   headerRightContent, basePath, userLinks, languageId,
-  extension, from,
+  extensionStoreData, from,
 }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
@@ -87,26 +85,35 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const { data: finalRoutesData } = useAsync({
     promiseFn: useCallback(async () => {
-      if (!extension || !extension.manifests[from]?.rewriteNavigations) { return routes; }
+      if (!extensionStoreData) { return routes; }
 
-      const resp = await callExtensionRoute(rewriteNavigationsRoute(from), {
-        scowDark: dark.dark ? "true" : "false",
-        scowLangId: languageId,
-        scowUserToken: user?.token,
-      }, {
-        navs: fromNavItemProps(routes),
-      }, extension.url).catch(() => {
-        console.warn("Failed to call extension rewriteNavigations.");
-        return { 200: { navs: routes } };
-      });
+      const extensions = Array.isArray(extensionStoreData)
+        ? extensionStoreData
+        : extensionStoreData ? [extensionStoreData] : [];
 
-      if (resp[200]) {
-        return toNavItemProps(routes, resp[200].navs);
-      } else {
-        return routes;
+      let newRoutes = routes;
+
+      for (const extension of extensions) {
+        if (!extension.manifests[from]?.rewriteNavigations) { continue; }
+
+        const resp = await callExtensionRoute(rewriteNavigationsRoute(from), {
+          scowDark: dark.dark ? "true" : "false",
+          scowLangId: languageId,
+          scowUserToken: user?.token,
+        }, {
+          navs: fromNavItemProps(newRoutes),
+        }, extension.url).catch(() => {
+          console.warn("Failed to call extension rewriteNavigations.");
+          return { 200: { navs: newRoutes } };
+        });
+
+        if (resp[200]) {
+          newRoutes = toNavItemProps(newRoutes, resp[200].navs, extension.name);
+        }
       }
 
-    }, [from, user, extension, routes]),
+      return newRoutes;
+    }, [from, user, extensionStoreData, routes]),
   });
 
   const finalRoutes = finalRoutesData ?? routes;

@@ -63,7 +63,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
             .httpError(400, (e) => {
               if (e.code === "PASSWORD_NOT_VALID") {
                 message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-              };
+              }
             })
             .then(() => {
               form.resetFields();

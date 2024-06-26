@@ -14,16 +14,16 @@ import { createWriterExtensions, ServiceError } from "@ddadaal/tsgrpc-common";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { QueryOrder, raw } from "@mikro-orm/core";
-import {
-  OperationLogServiceServer,
+import { OperationLogServiceServer,
   OperationLogServiceService,
   operationResultToJSON,
 } from "@scow/protos/build/audit/operation_log";
 import { I18nObject } from "@scow/protos/build/common/i18n";
 import { OperationLog, OperationResult } from "src/entities/OperationLog";
-import { checkCustomEventType, filterOperationLogs,
+import { addOperationLogAccountNames, checkCustomEventType, filterOperationLogs,
   getTargetAccountName, toGrpcOperationLog } from "src/utils/operationLogs";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateOperationOptions } from "src/utils/querryOptions";
 
 
 export const operationLogServiceServer = plugin((server) => {
@@ -59,23 +59,35 @@ export const operationLogServiceServer = plugin((server) => {
     },
 
     getOperationLogs: async ({ request, em, logger }) => {
-      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter", "page"]);
+      const { filter, page, pageSize, sortBy, sortOrder } =
+      ensureNotUndefined(request, ["filter", "page"]);
 
       const sqlFilter = await filterOperationLogs(filter);
 
       logger.info("getOperationLogs sqlFilter %s", JSON.stringify(sqlFilter));
 
-      const [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { operationTime: QueryOrder.DESC },
-      });
+
+
+      let operationLogs, count;
+
+      if (sortBy !== undefined && sortBy !== undefined) {
+        [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
+          ...generateOperationOptions(page, pageSize, sortBy, sortOrder),
+        });
+      } else {
+        [operationLogs, count] = await em.findAndCount(OperationLog, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        });
+      }
 
       const res = operationLogs.map(toGrpcOperationLog);
 
+      const addAccountNamesRes = res.map(addOperationLogAccountNames);
       return [{
-        results: res,
+        results: addAccountNamesRes,
         totalCount: count,
       }];
+
     },
 
     exportOperationLog: async (call) => {
@@ -98,8 +110,8 @@ export const operationLogServiceServer = plugin((server) => {
         });
 
         const records = operationLogs.map(toGrpcOperationLog);
-
-        if (records.length === 0) {
+        const addAccountNamesRecords = records.map(addOperationLogAccountNames);
+        if (addAccountNamesRecords.length === 0) {
           break;
         }
 
@@ -107,10 +119,10 @@ export const operationLogServiceServer = plugin((server) => {
         // 记录传输的总数量
         let writeTotal = 0;
 
-        for (const row of records) {
+        for (const row of addAccountNamesRecords) {
           data.push(row);
           writeTotal += 1;
-          if (data.length === 200 || writeTotal === records.length) {
+          if (data.length === 200 || writeTotal === addAccountNamesRecords.length) {
             await new Promise(async (resolve) => {
               await writeAsync({ operationLogs: data });
               // 清空暂存

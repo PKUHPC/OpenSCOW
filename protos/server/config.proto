@@ -14,6 +14,8 @@ syntax = "proto3";
 
 package scow.server;
 
+import "google/protobuf/timestamp.proto";
+
 message GetAvailablePartitionsRequest {
   option deprecated = true;
   string account_name = 1;
@@ -21,6 +23,7 @@ message GetAvailablePartitionsRequest {
 }
 
 message Partition {
+  option deprecated = true;
   string name = 1;
   // mem: memory size in M
   uint64 mem_mb = 2;
@@ -48,13 +51,63 @@ message GetAvailablePartitionsResponse {
 }
 
 message GetAvailablePartitionsForClusterRequest {
+  option deprecated = true;
   string cluster = 1;
   string account_name = 2;
   string user_id = 3;
 }
 
 message GetAvailablePartitionsForClusterResponse {
+  option deprecated = true;
   repeated Partition partitions = 1;
+}
+
+// get current clusters info from database
+message GetClustersRuntimeInfoRequest {
+}
+
+enum ClusterActivationStatus {
+  // status when cluster is activated
+  ACTIVATED = 0;
+  // status when cluster is deactivated
+  DEACTIVATED = 1;
+}
+
+message ClusterRuntimeInfo {
+  message LastActivationOperation {
+    optional string operator_id = 1;
+    optional string deactivation_comment = 2;
+  }
+  string cluster_id = 1;
+  ClusterActivationStatus activation_status = 14;
+  LastActivationOperation last_activation_operation = 15;
+  google.protobuf.Timestamp update_time = 16;
+}
+
+message GetClustersRuntimeInfoResponse {
+  repeated ClusterRuntimeInfo results = 1;
+}
+
+message ActivateClusterRequest {
+  string cluster_id = 1;
+  string operator_id = 2;
+}
+
+// NOT_FOUND: cluster is not found
+// FAILED_PRECONDITION: scheduler adapter can not be accessed
+message ActivateClusterResponse {
+  bool executed = 1;
+}
+
+message DeactivateClusterRequest {
+  string cluster_id = 1;
+  string operator_id = 2;
+  optional string deactivation_comment = 3;
+}
+
+// NOT_FOUND: cluster is not found
+message DeactivateClusterResponse {
+  bool executed = 1;
 }
 
 service ConfigService {
@@ -68,5 +121,19 @@ service ConfigService {
     option deprecated = true;
   };
 
-  rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest) returns (GetAvailablePartitionsForClusterResponse);
+  /**
+   * Depracated Notice
+   * This API funcition GetAvailablePartitionsForCluster has been deprecated.
+   * Use the new API function GetAvailablePartitionsForCluster From ../common/config.proto instead.
+   */
+  rpc GetAvailablePartitionsForCluster(GetAvailablePartitionsForClusterRequest)
+    returns (GetAvailablePartitionsForClusterResponse) {
+      option deprecated = true;
+    };
+
+  rpc GetClustersRuntimeInfo(GetClustersRuntimeInfoRequest) returns (GetClustersRuntimeInfoResponse);
+
+  rpc ActivateCluster(ActivateClusterRequest) returns (ActivateClusterResponse);
+
+  rpc DeactivateCluster(DeactivateClusterRequest) returns (DeactivateClusterResponse);
 }

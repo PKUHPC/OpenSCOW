@@ -13,16 +13,29 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
+import { GetOperationLogsRequest_SortBy as SortBy } from "@scow/protos/build/audit/operation_log";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationLog, OperationLogQueryType,
-  OperationResult, OperationType } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder, OperationType } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 
+export const mapOperationSortByType = {
+  "id":SortBy.ID,
+  "operationResult":SortBy.OPERATION_RESULT,
+  "operationTime":SortBy.OPERATION_TIME,
+  "operatorIp":SortBy.OPERATOR_IP,
+  "operatorUserId":SortBy.OPERATOR_USER_ID,
+} as { [key: string]: SortBy};
 
+export const mapOperationSortOrderType = {
+  "descend":SortOrder.DESCEND,
+  "ascend":SortOrder.ASCEND,
+} as { [key: string]: SortOrder };
 
 export const GetOperationLogFilter = Type.Object({
 
@@ -37,6 +50,7 @@ export const GetOperationLogFilter = Type.Object({
   operationDetail: Type.Optional(Type.String()),
   operationTargetAccountName: Type.Optional(Type.String()),
   customEventType: Type.Optional(Type.String()),
+
 });
 
 export type GetOperationLogFilter = Static<typeof GetOperationLogFilter>;
@@ -54,8 +68,11 @@ export const GetOperationLogsSchema = typeboxRouteSchema({
 
     page: Type.Integer({ minimum: 1 }),
 
-
     pageSize: Type.Optional(Type.Integer()),
+
+    sortBy: Type.Optional(OperationSortBy),
+
+    sortOrder: Type.Optional(OperationSortOrder),
   }),
 
   responses: {
@@ -79,7 +96,7 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
   const {
     type, operatorUserIds, startTime, endTime,
     operationType, operationResult, operationDetail,
-    operationTargetAccountName, customEventType, page, pageSize } = req.query;
+    operationTargetAccountName, customEventType, page, pageSize, sortBy, sortOrder } = req.query;
 
   const filter = {
     operatorUserIds: operatorUserIds ? operatorUserIds.split(",") : [],
@@ -129,14 +146,27 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return { 403: null };
     }
   }
+  const mapOperationSortBy = sortBy ? mapOperationSortByType[sortBy] : undefined;
+  const mapOperationSortOrder = sortOrder ? mapOperationSortOrderType[sortOrder] : undefined;
+
+  const client = getClient(UserServiceClient);
+
   const { getLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
-  const resp = await getLog({ filter, page, pageSize });
+  const resp = await getLog({
+    filter,
+    page,
+    pageSize,
+    sortBy:mapOperationSortBy,
+    sortOrder:mapOperationSortOrder,
+  });
+
+
 
   const { results, totalCount } = resp;
 
   const userIds = Array.from(new Set(results.map((x) => x.operatorUserId)));
 
-  const client = getClient(UserServiceClient);
+
   const { users } = await asyncClientCall(client, "getUsersByIds", {
     userIds,
   });

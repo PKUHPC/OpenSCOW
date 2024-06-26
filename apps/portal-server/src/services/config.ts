@@ -11,44 +11,97 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { checkSchedulerApiVersion } from "@scow/lib-server";
-import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { status } from "@grpc/grpc-js";
+import { getClusterConfigs } from "@scow/config/build/cluster";
+import { checkSchedulerApiVersion, convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-server";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/protos/build/common/config";
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
-import { getAdapterClient } from "src/utils/clusters";
-import { clusterNotFound } from "src/utils/errors";
+import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 
 export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
-    getClusterConfig: async ({ request }) => {
+
+    getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      const reply = await asyncClientCall(client.config, "getClusterConfig", {});
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
+      );
 
       return [reply];
     },
+
+    getAvailablePartitionsForCluster: async ({ request, logger }) => {
+
+      const { cluster, accountName, userId } = request;
+      let availablePartitions: Partition[];
+
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      try {
+        const resp = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.config, "getAvailablePartitions", {
+            accountName, userId,
+          }),
+        );
+        availablePartitions = resp.partitions;
+      } catch (error) {
+        logger.error(`Error occured when query the available partitions of ${userId} in ${accountName}.`);
+        availablePartitions = [];
+      }
+
+      return [ { partitions: availablePartitions } ];
+    },
+
+
+    getClusterConfigFiles: async ({ logger }) => {
+
+      const clusterConfigs = getClusterConfigs(undefined, logger, ["hpc"]);
+
+      const currentConfigClusterIds = Object.keys(clusterConfigs);
+      if (currentConfigClusterIds.length === 0) {
+        throw new ServiceError({
+          code: status.INTERNAL,
+          details: "Unable to find cluster configuration files. Please contact the system administrator.",
+          metadata: scowErrorMetadata(NO_CLUSTERS),
+        });
+      }
+
+      const clusterConfigsProto = convertClusterConfigsToServerProtoType(clusterConfigs);
+
+      return [{ clusterConfigs: clusterConfigsProto }];
+    },
+
   });
 });
 
 export const runtimeConfigServiceServer = plugin((server) => {
   return server.addService<runTimeConfigServiceServer>(runTimeConfigServiceService, {
-    getClusterInfo: async ({ request }) => {
+    getClusterInfo: async ({ request, logger }) => {
+
       const { cluster } = request;
 
-      const client = getAdapterClient(cluster);
-      if (!client) { throw clusterNotFound(cluster); }
-
-      // 当前接口要求的最低调度器接口版本
-      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
-      // 检验调度器的API版本是否符合要求，不符合要求报错
-      await checkSchedulerApiVersion(client, minRequiredApiVersion);
-
-      const reply = await asyncClientCall(client.config, "getClusterInfo", {});
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          // 当前接口要求的最低调度器接口版本
+          const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
+          // 检验调度器的API版本是否符合要求，不符合要求报错
+          await checkSchedulerApiVersion(client, minRequiredApiVersion);
+          return await asyncClientCall(client.config, "getClusterInfo", {});
+        },
+      );
 
       return [reply];
     },

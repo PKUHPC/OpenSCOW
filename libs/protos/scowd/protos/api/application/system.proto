@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package services.system;
+
+option go_package = "scowd/protos/gen/api/application;apiv1";
+
+message CheckHealthRequest {}
+message CheckHealthResponse {}
+
+
+service SystemService {
+    rpc CheckHealth(CheckHealthRequest) returns (CheckHealthResponse) {}
+}

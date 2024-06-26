@@ -176,13 +176,18 @@ export default {
         coreCount: "单节点核心数",
         maxTime: "最长运行时间",
         minute: "分钟",
+        hours:"小时",
+        days:"天",
         workingDirectory: "工作目录",
         wdTooltip1: "1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；",
 
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
 
+        wdTooltip3: "2.该文件用于保存适配器返回的脚本，默认值参考输出文件。",
+
         output: "标准输出文件",
         errorOutput: "错误输出文件",
+        saveJobSubmissionFile:"保存作业提交文件",
         totalNodeCount: "总节点数：",
         totalGpuCount: "总GPU卡数：",
         totalCoreCount: "总CPU核心数：",

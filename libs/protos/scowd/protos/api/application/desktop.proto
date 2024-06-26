@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package api.application;
+
+option go_package = "scowd/protos/gen/api/application;apiv1";
+
+import "google/protobuf/timestamp.proto";
+
+message CreateDesktopRequest {
+    string user_id = 1;
+    string vnc_server_bin_path = 2;
+    uint32 max_desktops = 3;
+    string wm = 4;
+    string desktop_name = 5;
+    string desktop_dir = 6;
+    string login_node = 7;
+}
+
+message CreateDesktopResponse {
+    string password = 1;
+    int32 display_id = 2;
+}
+
+message KillDesktopRequest {
+    string user_id = 1;
+    string vnc_server_bin_path = 2;
+    uint32 display_id = 3;
+    string login_node = 4;
+    string desktop_dir = 5;
+}
+
+message KillDesktopResponse {
+}
+
+message ConnectToDesktopRequest {
+    string user_id = 1;
+    uint32 display_id = 2;
+    string vnc_passwd_path = 3;
+}
+
+message ConnectToDesktopResponse {
+    string password = 1;
+}
+
+message ListUserDesktopsRequest {
+    string user_id = 1;
+    string vnc_server_bin_path = 2;
+    string desktop_dir = 3;
+    string login_node = 4;
+}
+
+message Desktop {
+    uint32 display_id = 1;
+    string desktop_name = 2;
+    string wm = 3;
+    google.protobuf.Timestamp create_time = 4;
+}
+
+// NOT_FOUND: cluster is not found
+message ListUserDesktopsResponse {
+    repeated Desktop user_desktops = 1;
+}
+
+service DesktopService {
+    rpc CreateDesktop(CreateDesktopRequest) returns (CreateDesktopResponse) {}
+    rpc KillDesktop(KillDesktopRequest) returns (KillDesktopResponse) {}
+    rpc ConnectToDesktop(ConnectToDesktopRequest) returns (ConnectToDesktopResponse) {}
+    rpc ListUserDesktops(ListUserDesktopsRequest) returns (ListUserDesktopsResponse) {}
+}

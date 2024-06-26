@@ -7,13 +7,14 @@ on:
 jobs:
   delete-scow-vagrant:
     name: Delete scow-vagrant PR branch
-    runs-on: ubuntu-latest
+    if: vars.PUSH_VAGRANT == 'true'
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     steps:
       - name: Delete scow-vagrant PR branch
         uses: dawidd6/action-delete-branch@v3
         with:
           github_token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
-          owner: PKUHPC
-          repository: scow-vagrant
+          owner: ${{ vars.VAGRANT_REPO_OWNER }}
+          repository: ${{ vars.VAGRANT_REPO_NAME }}
           branches: ${{ github.event.number }}/merge
           soft_fail: true

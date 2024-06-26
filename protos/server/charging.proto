@@ -18,6 +18,7 @@ import "google/type/date.proto";
 import "google/protobuf/struct.proto";
 
 import "common/money.proto";
+import "common/sort_order.proto";
 
 message PayRequest {
   common.Money amount = 1;
@@ -79,6 +80,7 @@ message AccountOfTenantTarget {
 }
 message AccountsOfTenantTarget {
   string tenant_name = 1;
+  repeated string account_names = 2;
 }
 message TenantTarget {
   string tenant_name = 1;
@@ -86,6 +88,7 @@ message TenantTarget {
 message AllTenantsTarget {
 }
 message AccountsOfAllTenantsTarget {
+  repeated string account_names = 1;
 }
 
 message GetChargeRecordsRequest {
@@ -98,7 +101,7 @@ message GetChargeRecordsRequest {
     AccountOfTenantTarget account_of_tenant = 4;
     // 返回这个租户（tenantName）下所有账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 7;
@@ -117,13 +120,15 @@ message GetChargeRecordsResponse {
 message GetPaginatedChargeRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-  optional string type = 3;
+  //当types设置时，以types为准，否则以type为准
+  optional string type = 3 [deprecated=true];
+  repeated string types = 13;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenantTarget account_of_tenant = 4;
-    // 返回这个租户（tenantName）下所有账户的消费记录
+    // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 7;
@@ -135,6 +140,21 @@ message GetPaginatedChargeRecordsRequest {
   optional uint32 page = 10;
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 11;
+
+  enum SortBy {
+    UNKNOWN = 0;
+    USER_ID = 1;
+    TIME = 2;
+    AMOUNT = 3;
+    TYPE = 4;
+  }
+
+  optional SortBy sort_by = 12;
+
+
+  optional common.SortOrder sort_order = 14;
+
+  repeated string user_ids_or_names = 15;
 }
 
 message GetPaginatedChargeRecordsResponse {
@@ -145,20 +165,23 @@ message GetPaginatedChargeRecordsResponse {
 message GetChargeRecordsTotalCountRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-  optional string type = 3;
+  //当types设置时，以types为准，否则以type为准
+  optional string type = 3 [deprecated=true];
+  repeated string types = 11;
   oneof target {
     // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
     AccountOfTenantTarget account_of_tenant = 4;
-    // 返回这个租户（tenantName）下所有账户的消费记录
+    // 返回这个租户（tenantName）下多个账户的消费记录
     AccountsOfTenantTarget accounts_of_tenant = 5;
-    // 返回所有租户下所有账户的消费记录
+    // 返回所有租户下多个账户的消费记录
     AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
     // 返回这个租户（tenantName）的租户消费记录
     TenantTarget tenant = 7;
     // 返回所有租户的租户消费记录
     AllTenantsTarget all_tenants = 8;
   }
-  repeated string user_ids = 9;
+
+  repeated string user_ids_or_names = 9;
 }
 
 message GetChargeRecordsTotalCountResponse {
@@ -181,11 +204,12 @@ message PaymentRecord {
 message GetPaymentRecordsRequest {
   google.protobuf.Timestamp start_time = 1;
   google.protobuf.Timestamp end_time = 2;
-
+  repeated string types = 8;
   oneof target {
-    // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
-    AccountOfTenantTarget account_of_tenant = 3;
-    // 返回这个租户（tenantName）下所有账户的充值记录
+     // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+     AccountOfTenantTarget account_of_tenant = 3;
+
+    // 返回这个租户（tenantName）下多个账户的充值记录
     AccountsOfTenantTarget accounts_of_tenant = 4;
     // 返回这个租户（tenantName）的充值记录
     TenantTarget tenant = 5;
@@ -219,6 +243,7 @@ message GetTopChargeAccountResponse {
   message ChargeAccount {
     string account_name = 1;
     common.Money charged_amount = 2;
+    string user_name = 3;
   }
   repeated ChargeAccount results = 1;
 }
@@ -253,6 +278,7 @@ message GetTopPayAccountResponse {
   message PayAccount {
     string account_name = 1;
     common.Money pay_amount = 2;
+    string user_name = 3;
   }
   repeated PayAccount results = 1;
 }

@@ -175,14 +175,25 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
 
   const { data: dailyPay, isLoading: dailyPayLoading } = useAsync({ promiseFn: getDailyPayFn });
 
-  const getTopSubmitJobUserFn = useCallback(async () => {
-    return await api.getTopSubmitJobUser({ query: {
+  // const getTopSubmitJobUserFn = useCallback(async () => {
+  //   return await api.getTopSubmitJobUser({ query: {
+  //     startTime: query.filterTime[0].startOf("day").toISOString(),
+  //     endTime: query.filterTime[1].endOf("day").toISOString(),
+  //   } });
+  // }, [query]);
+
+  // const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
+  // useAsync({ promiseFn: getTopSubmitJobUserFn });
+
+  const getUsersWithMostJobSubmissionsFn = useCallback(async () => {
+    return await api.getUsersWithMostJobSubmissions({ query: {
       startTime: query.filterTime[0].startOf("day").toISOString(),
       endTime: query.filterTime[1].endOf("day").toISOString(),
     } });
   }, [query]);
 
-  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } = useAsync({ promiseFn: getTopSubmitJobUserFn });
+  const { data: topSubmitJobUser, isLoading: topSubmitJobUserLoading } =
+  useAsync({ promiseFn: getUsersWithMostJobSubmissionsFn });
 
   const getNewJobCountFn = useCallback(async () => {
     return await api.getNewJobCount({ query: {
@@ -232,16 +243,16 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const topChargeAccountData = useMemo(() => {
 
     return topChargeAccount?.results.map((r) => ({
-      x: r.accountName,
-      y: moneyToNumber(r.chargedAmount),
+      x: r.userName,
+      y: moneyToNumber(r.chargedAmount).toFixed(2),
     })) || [];
   }, [query, topChargeAccount]);
 
   const topPayAccountData = useMemo(() => {
 
     return topPayAccount?.results.map((r) => ({
-      x: r.accountName,
-      y: moneyToNumber(r.payAmount),
+      x: r.userName,
+      y: moneyToNumber(r.payAmount).toFixed(2),
     })) || [];
   }, [query, topPayAccount]);
 
@@ -264,7 +275,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const topSubmitJobUserData = useMemo(() => {
 
     return topSubmitJobUser?.results.map((r) => ({
-      x: r.userId,
+      x: r.userName,
       y: r.count,
     })) || [];
   }, [query, topSubmitJobUser]);
@@ -372,6 +383,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"
+            precision={2}
           />
         </Col>
         <Col span={24}>
@@ -422,20 +434,20 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             bordered={false}
           >
             <Row>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataBarChart
                   data={topChargeAccountData}
                   title={t(p("topTenChargedAccount"))}
                   isLoading={topChargeAccountLoading}
-                  xLabel={t(p("accountName"))}
+                  xLabel={t(p("userName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataLineChart
                   data={dailyChargeData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count,
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
@@ -444,20 +456,20 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
               </Col>
             </Row>
             <Row>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataBarChart
                   data={topPayAccountData}
                   title={t(p("topTenPayAccount"))}
                   isLoading={topPayAccountLoading}
-                  xLabel={t(p("accountName"))}
+                  xLabel={t(p("userName"))}
                   toolTipFormatter={amountToolTipFormatter}
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataLineChart
                   data={dailyPayData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: d.count,
+                    y: Number(d.count.toFixed(2)),
                   }))}
                   title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}
@@ -480,7 +492,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             bordered={false}
           >
             <Row>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataBarChart
                   data={topSubmitJobUserData}
                   title={t(p("topTenSubmitJobUser"))}
@@ -489,7 +501,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
                   toolTipFormatter={(value) => [value, t(p("jobCount"))]}
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataLineChart
                   data={newJobCountData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
@@ -514,24 +526,24 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             bordered={false}
           >
             <Row>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataBarChart
-                  data={portalUsageCountData.map((d) => ({
+                  data={portalUsageCountData.slice(0, 10).map((d) => ({
                     x: OperationTypeTexts[d.operationType],
                     y: d.count,
                   }))}
-                  title={t(p("portalFeatureUsageCount"))}
+                  title={t(p("topTenPortalFeatureUsageCount"))}
                   toolTipFormatter={(value) => [value, t(p("usageCount"))]}
                   isLoading={portalUsageCountLoading}
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={24} lg={12}>
                 <DataBarChart
-                  data={misUsageCountData.map((d) => ({
+                  data={misUsageCountData.slice(0, 10).map((d) => ({
                     x: OperationTypeTexts[d.operationType],
                     y: d.count,
                   }))}
-                  title={t(p("misFeatureUsageCount"))}
+                  title={t(p("topTenMisFeatureUsageCount"))}
                   toolTipFormatter={(value) => [value, t(p("usageCount"))]}
                   isLoading={misUsageCountLoading}
                 />

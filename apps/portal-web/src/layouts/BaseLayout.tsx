@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DatabaseOutlined, RobotOutlined } from "@ant-design/icons";
+import { RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
@@ -18,8 +18,9 @@ import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { MisIcon } from "src/icons/headerIcons/headerIcons";
 import { userRoutes } from "src/layouts/routes";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
@@ -33,8 +34,12 @@ interface Props {
 export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }: PropsWithChildren<Props>) => {
 
   const userStore = useStore(UserStore);
+
+  const { currentClusters, defaultCluster, setDefaultCluster, removeDefaultCluster,
+    enableLoginDesktop, crossClusterFileTransferEnabled,
+  } = useStore(ClusterInfoStore);
+
   const { loginNodes } = useStore(LoginNodeStore);
-  const { defaultCluster, setDefaultCluster, removeDefaultCluster } = useStore(DefaultClusterStore);
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -42,10 +47,13 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
   const systemLanguageConfig = publicConfig.SYSTEM_LANGUAGE_CONFIG;
 
   const routes = userRoutes(
-    userStore.user, defaultCluster, loginNodes, setDefaultCluster,
+    userStore.user, currentClusters, defaultCluster, loginNodes,
+    enableLoginDesktop, crossClusterFileTransferEnabled,
+    setDefaultCluster,
   );
 
   const uiExtensionStore = useStore(UiExtensionStore);
+
 
   const logout = () => {
     removeDefaultCluster();
@@ -62,13 +70,13 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       basePath={publicConfig.BASE_PATH}
       userLinks={publicConfig.USER_LINKS}
       languageId={languageId}
-      extension={uiExtensionStore.config}
+      extensionStoreData={uiExtensionStore.data}
       from="portal"
       headerRightContent={(
         <>
           <JumpToAnotherLink
             user={userStore.user}
-            icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
+            icon={<MisIcon style={{ paddingRight: 2, stroke:"#9B0000", fill:"#9B0000" }} />}
             link={publicConfig.MIS_URL}
             linkText={t("baseLayout.linkTextMis")}
           />

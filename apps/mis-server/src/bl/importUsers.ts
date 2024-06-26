@@ -14,6 +14,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
@@ -34,7 +35,9 @@ export interface ImportUsersData {
 }
 
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
-  whitelistAll: boolean, clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
+  whitelistAll: boolean,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
@@ -129,7 +132,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
           failedUnblockAccounts.push(acc.accountName);
         } else {
           try {
-            await unblockAccount(account, clusterPlugin, logger);
+            await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger);
           } catch (e) {
             // 集群解锁账户失败，记录失败账户
             failedUnblockAccounts.push(account.accountName);
@@ -151,8 +154,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   // 如果不选择全部添加白名单时，判断租户默认阈值选择是否在集群中封锁账户
   } else {
     const shouldBlockInCluster = tenant.defaultAccountBlockThreshold.gte(0);
+    // 只判断当前为未在集群中封锁的账户
     const shouldBlockAccounts = accounts.filter((a) => !a.blockedInCluster);
 
+    // 判断封锁阈值需要封锁时
     if (shouldBlockInCluster) {
       await Promise.allSettled(shouldBlockAccounts.map((acc) => {
         return em.transactional(async (em) => {
@@ -162,7 +167,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             failedBlockAccounts.push(acc.accountName);
           } else {
             try {
-              await blockAccount(account, clusterPlugin, logger);
+              await blockAccount(account, currentActivatedClusters, clusterPlugin, logger);
             } catch (e) {
               // 集群封锁账户失败，记录失败账户
               failedBlockAccounts.push(account.accountName);

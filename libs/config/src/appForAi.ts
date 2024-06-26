@@ -18,6 +18,7 @@ import { createI18nStringSchema } from "src/i18n";
 
 export enum AppType {
   web = "web",
+  vnc = "vnc"
 }
 
 export const AppConnectPropsSchema = Type.Object({
@@ -44,6 +45,13 @@ export const WebAppConfigSchema = Type.Object({
 
 export type WebAppConfigSchema = Static<typeof WebAppConfigSchema>;
 
+export const VncAppConfigSchema = Type.Object({
+  beforeScript: Type.Optional(Type.String({ description: "启动应用之前的准备命令。具体参考文档" })),
+
+  xstartup: Type.String({ description: "启动此app的xstartup脚本" }),
+});
+
+export type VncAppConfigSchema = Static<typeof VncAppConfigSchema>;
 
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
@@ -54,6 +62,7 @@ export const AppConfigSchema = Type.Object({
   }),
   type: Type.Enum(AppType, { description: "应用类型" }),
   web: Type.Optional(WebAppConfigSchema),
+  vnc: Type.Optional(VncAppConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),

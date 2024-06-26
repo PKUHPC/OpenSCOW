@@ -17,6 +17,7 @@ import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { ExportServiceClient } from "@scow/protos/build/server/export";
 import { Type } from "@sinclair/typebox";
 import { getT, prefix } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { OperationResult, OperationType } from "src/models/operationLog";
 import { SearchType } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
@@ -24,10 +25,12 @@ import { buildChargesRequestTarget, getTenantOfAccount, getUserInfoForCharges } 
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
+import { createEncodingTransform, getContentTypeWithCharset, getCsvObjTransform,
+  getCsvStringify } from "src/utils/file";
 import { nullableMoneyToString } from "src/utils/money";
 import { route } from "src/utils/route";
-import { getContentType, parseIp } from "src/utils/server";
+import { parseIp } from "src/utils/server";
+import { emptyStringArrayToUndefined } from "src/utils/transformParams";
 import { pipeline } from "stream";
 
 export const ExportChargeRecordSchema = typeboxRouteSchema({
@@ -38,11 +41,12 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     count: Type.Number(),
     startTime: Type.String({ format: "date-time" }),
     endTime: Type.String({ format: "date-time" }),
-    type: Type.Optional(Type.String()),
-    accountName: Type.Optional(Type.String()),
+    types: Type.Optional(Type.Array(Type.String())),
+    accountNames: Type.Optional(Type.Array(Type.String())),
     isPlatformRecords: Type.Optional(Type.Boolean()),
     searchType: Type.Optional(Type.Enum(SearchType)),
     userIds: Type.Optional(Type.String()),
+    encoding: Type.Enum(Encoding),
   }),
 
   responses:{
@@ -57,15 +61,18 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, accountName, type, searchType, isPlatformRecords, count, userIds } = query;
+  const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds, encoding } = query;
+  let { accountNames, types } = query;
+  accountNames = emptyStringArrayToUndefined(accountNames);
+  types = emptyStringArrayToUndefined(types);
 
-  const info = await getUserInfoForCharges(accountName, req, res);
+  const info = await getUserInfoForCharges(accountNames, req, res);
 
   if (!info) { return; }
 
-  const tenantOfAccount = await getTenantOfAccount(accountName, info);
+  const tenantOfAccount = await getTenantOfAccount(accountNames, info);
 
-  const target = buildChargesRequestTarget(accountName, tenantOfAccount, searchType, isPlatformRecords);
+  const target = buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords);
 
   const logInfo = {
     operatorUserId: info.identityId,
@@ -87,8 +94,10 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
     const filename = `charge_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
+    const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
+
     res.writeHead(200, {
-      "Content-Type": getContentType(filename, "application/octet-stream"),
+      "Content-Type":contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
@@ -98,7 +107,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
       count,
       startTime,
       endTime,
-      type,
+      types:types ?? [],
       target,
       userIds: userIdArray,
     });
@@ -136,11 +145,13 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
     const csvStringify = getCsvStringify(headerColumns, columns);
 
     const transform = getCsvObjTransform("chargeRecords", formatChargeRecord);
+    const encodingTransform = createEncodingTransform(encoding); // 创建编码转换流
 
     pipeline(
       stream,
       transform,
       csvStringify,
+      encodingTransform, // 添加编码转换流到管道
       res,
       async (err) => {
         if (err) {

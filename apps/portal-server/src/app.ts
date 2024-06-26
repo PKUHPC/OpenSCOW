@@ -13,7 +13,7 @@
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
@@ -44,17 +44,18 @@ export async function createServer() {
   }
 
   await server.register(appServiceServer);
-  await server.register(desktopServiceServer);
   await server.register(jobServiceServer);
-  await server.register(fileServiceServer);
   await server.register(shellServiceServer);
   await server.register(staticConfigServiceServer);
   await server.register(runtimeConfigServiceServer);
   await server.register(dashboardServiceServer);
+  await server.register(fileServiceServer);
+  await server.register(desktopServiceServer);
+  
 
   if (process.env.NODE_ENV === "production") {
     await checkClustersRootUserLogin(server.logger);
-    await Promise.all(Object.entries(clusters).map(async ([id]) => {
+    await Promise.all(Object.entries(configClusters).map(async ([id]) => {
       await initShellFile(id, server.logger);
     }));
     await setupProxyGateway(server.logger);

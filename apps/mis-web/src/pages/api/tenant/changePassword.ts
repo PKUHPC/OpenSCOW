@@ -32,11 +32,12 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
   body: Type.Object({
     identityId: Type.String(),
     /**
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
+     *  CommonConfig.PASSWORD_PATTERN
+     *  OR
+     *  when CommonConfig.PASSWORD_PATTERN={} =>
+     *  use default value: ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
-    newPassword: Type.String({
-      pattern:  "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$",
-    }),
+    newPassword: Type.String(),
   }),
 
   responses: {
@@ -45,6 +46,11 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
 
     /** 用户未找到 */
     404: Type.Null(),
+
+    /** 密码正则校验失败 */
+    400: Type.Object({
+      code: Type.Literal("PASSWORD_NOT_VALID"),
+    }),
 
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
@@ -80,6 +86,13 @@ export default /* #__PURE__*/typeboxRoute(
     const info = await auth(req, res);
     if (!info) {
       return;
+    }
+
+    const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
+    if (passwordPattern && !passwordPattern.test(newPassword)) {
+      return { 400: {
+        code: "PASSWORD_NOT_VALID" as const,
+      } };
     }
 
     const logInfo = {

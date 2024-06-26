@@ -10,12 +10,25 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { useState } from "react";
-import { Cluster } from "src/utils/config";
+// 小圆点组件
+import { styled } from "styled-components";
 
+const Dot = styled.div`
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: 50%;
+  display:inline-block;
+`;
 
-export function DefaultClusterStore(defaultCluster: Cluster) {
-  const [cluster, setCluster] = useState<Cluster>(defaultCluster);
-
-  return { cluster, setCluster };
+interface BulletProps {
+  style?: React.CSSProperties;
 }
+
+
+const Bullet: React.FC<BulletProps> = ({ style }) => (
+  <Dot style={style}>
+  </Dot>
+);
+
+export default Bullet;

@@ -15,9 +15,11 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { LockMode, QueryOrder, raw } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber, numberToMoney } from "@scow/lib-decimal";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { ChargeRecord as ChargeRecordProto,
   ChargingServiceServer, ChargingServiceService } from "@scow/protos/build/server/charging";
 import { charge, pay } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
@@ -26,11 +28,14 @@ import { Tenant } from "src/entities/Tenant";
 import { queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
+  getChargesSearchTypes,
   getChargesTargetSearchParam,
+  getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
-import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { DEFAULT_PAGE_SIZE } from "src/utils/orm";
+import { mapChargesSortField } from "src/utils/queryOptions";
 
 export const chargingServiceServer = plugin((server) => {
 
@@ -87,6 +92,8 @@ export const chargingServiceServer = plugin((server) => {
 
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await pay({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -94,7 +101,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           ipAddress,
           operatorId,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -131,6 +138,8 @@ export const chargingServiceServer = plugin((server) => {
           }
         }
 
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
         return await charge({
           amount: new Decimal(moneyToNumber(amount)),
           comment,
@@ -138,7 +147,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           userId,
           metadata,
-        }, em, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext);
       });
 
       return [{
@@ -158,21 +167,21 @@ export const chargingServiceServer = plugin((server) => {
      *
      * case tenant:返回这个租户（tenantName）的充值记录
      * case allTenants: 返回该所有租户充值记录
-     * case accountOfTenant: 返回该这个租户（tenantName）下这个账户（accountName）的充值记录
-     * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的充值记录
+     * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的充值记录
      *
      * @returns
      */
     getPaymentRecords: async ({ request, em }) => {
 
-      const { endTime, startTime, target } =
-      ensureNotUndefined(request, ["startTime", "endTime", "target"]);
+      const { endTime, startTime, target, types } =
+      ensureNotUndefined(request, ["startTime", "endTime", "target", "types"]);
 
       const searchParam = getPaymentsTargetSearchParam(target);
-
+      const searchTypes = getPaymentsSearchType(types);
       const records = await em.find(PayRecord, {
         time: { $gte: startTime, $lte: endTime },
         ...searchParam,
+        ...searchTypes,
       }, { orderBy: { time: QueryOrder.DESC } });
 
       return [{
@@ -277,28 +286,35 @@ export const chargingServiceServer = plugin((server) => {
     getTopChargeAccount: async ({ request, em }) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const qb = em.createQueryBuilder(ChargeRecord, "cr");
-      qb
-        .select("cr.accountName")
-        .addSelect([raw("SUM(cr.amount) as `totalAmount`")])
-        .where({ time: { $gte: startTime } })
-        .andWhere({ time: { $lte: endTime } })
-        .andWhere({ accountName: { $ne: null } })
-        .groupBy("accountName")
-        .orderBy({ [raw("SUM(cr.amount)")]: QueryOrder.DESC })
-        .limit(topRank);
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
-        em,
-        queryKeys: ["get_top_charge_account", `${startTime}`, `${endTime}`, `${topRank}`],
-        queryQb: qb,
-      });
+      // 查询消费记录
+      const results: {account_name: string, user_name: string, chargedAmount: number}[] =
+      // 从pay_record表中查询
+      await knex("charge_record as cr")
+      // 选择account_name字段
+      // 选择user表中的name字段，并将其命名为user_name
+      // 计算amount字段的总和，并将其命名为totalAmount
+        .select(["cr.account_name", "u.name as user_name", knex.raw("SUM(amount) as chargedAmount")])
+        .join("user as u", "u.user_id", "=", "cr.user_id")
+        .where("cr.time", "<=", endTime)
+        .andWhere("cr.time", ">=", startTime)
+        // 过滤为空的情况
+        .whereNotNull("cr.account_name")
+        // 按account_name和user_name分组
+        .groupBy(["cr.account_name", "u.name"])
+      // 按totalAmount降序排序
+        .orderBy("chargedAmount", "desc")
+      // 限制结果的数量为topRank
+        .limit(topRank);
 
       return [
         {
           results: results.map((x) => ({
-            accountName: x.accountName,
-            chargedAmount: numberToMoney(x.totalAmount),
+            accountName: x.account_name,
+            userName:x.user_name,
+            chargedAmount: numberToMoney(x.chargedAmount),
           })),
         },
       ];
@@ -337,30 +353,44 @@ export const chargingServiceServer = plugin((server) => {
       }];
     },
 
+    // 获取指定时间段内支付金额最高的账户信息
     getTopPayAccount: async ({ request, em }) => {
+      // 从请求中获取开始时间、结束时间和前N名的数量，如果未提供topRank则默认为10
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
-      const qb = em.createQueryBuilder(PayRecord, "p");
-      qb
-        .select("p.accountName")
-        .addSelect(raw("SUM(p.amount) as `totalAmount`"))
-        .where({ time: { $gte: startTime } })
-        .andWhere({ time: { $lte: endTime } })
-        .andWhere({ accountName: { $ne: null } })
-        .groupBy("accountName")
-        .orderBy({ [raw("SUM(p.amount)")]: QueryOrder.DESC })
-        .limit(topRank);
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
 
-      const results: {accountName: string, totalAmount: number}[] = await queryWithCache({
-        em,
-        queryKeys: ["get_top_pay_account", `${startTime}`, `${endTime}`, `${topRank}`],
-        queryQb: qb,
-      });
+      // 查询支付记录
+      const results: {account_name: string, user_name: string, totalAmount: number}[] =
+      // 从pay_record表中查询
+      await knex("pay_record as pr")
+      // 选择account_name字段
+      // 选择user表中的name字段，并将其命名为user_name
+      // 计算amount字段的总和，并将其命名为totalAmount
+        .select(["pr.account_name", "u.name as user_name", knex.raw("SUM(amount) as totalAmount")])
+        // 通过accountName字段与account表连接
+        .join("account as a", "a.account_name ", "=", "pr.account_name")
+        // 通过account_id字段与user_account表连接
+        .join("user_account as ua", "ua.account_id", "=", "a.id")
+        .where("role", "=", "OWNER")
+        .join("user as u", "u.id", "=", "ua.user_id")
+        .where("pr.time", "<=", endTime)
+        .andWhere("pr.time", ">=", startTime)
+        // 过滤为空的情况
+        .whereNotNull("pr.account_name")
+        // 按account_name和user_name分组
+        .groupBy(["pr.account_name", "u.name"])
+      // 按totalAmount降序排序
+        .orderBy("totalAmount", "desc")
+      // 限制结果的数量为topRank
+        .limit(topRank);
 
       return [
         {
           results: results.map((x) => ({
-            accountName: x.accountName,
+            accountName: x.account_name,
+            userName:x.user_name,
             payAmount: numberToMoney(x.totalAmount),
           })),
         },
@@ -405,40 +435,63 @@ export const chargingServiceServer = plugin((server) => {
        * case tenant:返回这个租户（tenantName）的消费记录
        * case allTenants: 返回所有租户消费记录
        * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-       * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-       * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+       * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+       * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
        *
        * @returns
        */
     getPaginatedChargeRecords: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds, page, pageSize }
+      const { startTime, endTime, type, types, target, page, pageSize, sortBy, sortOrder, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
-
       const searchParam = getChargesTargetSearchParam(target);
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
-      const searchType = getChargesSearchType(type);
+      const qb = em.createQueryBuilder(ChargeRecord, "cr").select("*")
+        .where({
+          time: { $gte: startTime, $lte: endTime },
+          ...searchParam,
+          ...searchType,
+        })
+        .offset(((page ?? 1) - 1) * (pageSize ?? DEFAULT_PAGE_SIZE))
+        .limit(pageSize ?? DEFAULT_PAGE_SIZE);
 
-      const records = await em.find(ChargeRecord, {
-        time: { $gte: startTime, $lte: endTime },
-        ...searchType,
-        ...searchParam,
-        ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
-      }, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { time: QueryOrder.DESC },
-      });
+      // 排序
+      if (sortBy !== undefined && sortOrder !== undefined) {
+        const order = SortOrder[sortOrder] == "DESCEND" ? "desc" : "asc";
+        qb.orderBy({ [mapChargesSortField[sortBy]]: order });
+      }
+
+      let records;
+
+      // 如果存在userIdsOrNames字段，则用knex
+      if (userIdsOrNames && userIdsOrNames.length > 0) {
+        const sql = qb.getKnexQuery().andWhere(function() {
+          this.whereIn("cr.user_id", function() {
+            this.select("user_id")
+              .from("user");
+            for (const idOrName of userIdsOrNames) {
+              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+                .orWhereRaw("name like " + `'%${idOrName}%'`);
+            }
+          });
+        });
+
+        records = await em.getConnection().execute(sql);
+      } else {
+        records = await qb.getResult();
+      }
 
       return [{
         results: records.map((x) => {
           return {
-            tenantName: x.tenantName,
-            accountName: x.accountName,
-            amount: decimalToMoney(x.amount),
+            tenantName: x.tenantName ?? x.tenant_name,
+            accountName: x.accountName ?? x.account_name,
+            amount: decimalToMoney(new Decimal(x.amount)),
             comment: x.comment,
             index: x.id,
-            time: x.time.toISOString(),
+            time: typeof x.time === "string" ? x.time : x.time?.toISOString(),
             type: x.type,
-            userId: x.userId,
+            userId: x.userId ?? x.user_id,
             metadata: x.metadata as ChargeRecordProto["metadata"] ?? undefined,
           };
 
@@ -451,34 +504,50 @@ export const chargingServiceServer = plugin((server) => {
    * case tenant:返回这个租户（tenantName）的消费记录
    * case allTenants: 返回所有租户消费记录
    * case accountOfTenant: 返回这个租户（tenantName）下这个账户（accountName）的消费记录
-   * case accountsOfTenant: 返回这个租户（tenantName）下所有账户的消费记录
-   * case accountsOfAllTenants: 返回所有租户下所有账户的消费记录
+   * case accountsOfTenant: 返回这个租户（tenantName）下多个账户的消费记录
+   * case accountsOfAllTenants: 返回所有租户下多个账户的消费记录
    *
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, target, userIds }
+      const { startTime, endTime, type, types, target, userIdsOrNames }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
+      const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
 
-      const searchType = getChargesSearchType(type);
 
-      const { total_count, total_amount }: { total_count: number, total_amount: string }
-        = await em.createQueryBuilder(ChargeRecord, "c")
-          .select(raw("count(c.id) as total_count"))
-          .addSelect(raw("sum(c.amount) as total_amount"))
-          .where({
-            time: { $gte: startTime, $lte: endTime },
-            ...searchType,
-            ...searchParam,
-            ...(userIds.length > 0 ? { userId: { $in: userIds } } : {}),
-          })
-          .execute("get");
+      const qb = em.createQueryBuilder(ChargeRecord, "c")
+        .select([raw("count(c.id) as total_count"), raw("sum(c.amount) as total_amount")])
+        .where({
+          time: { $gte: startTime, $lte: endTime },
+          ...searchType,
+          ...searchParam,
+        });
+
+      let result;
+
+      // 如果存在userIdsOrNames字段，则用knex
+      if (userIdsOrNames && userIdsOrNames.length > 0) {
+        const sql = qb.getKnexQuery().andWhere(function() {
+          this.whereIn("c.user_id", function() {
+            this.select("user_id")
+              .from("user");
+            for (const idOrName of userIdsOrNames) {
+              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+                .orWhereRaw("name like " + `'%${idOrName}%'`);
+            }
+          });
+        });
+
+        result = await em.getConnection().execute(sql);
+      } else {
+        result = await qb.execute("get");
+      }
 
       return [{
-        totalAmount: decimalToMoney(new Decimal(total_amount)),
-        totalCount: total_count,
+        totalAmount: decimalToMoney(new Decimal(result.total_amount ?? result[0]?.total_amount ?? 0)),
+        totalCount: result.total_count ?? result[0].total_count,
       }];
     },
 

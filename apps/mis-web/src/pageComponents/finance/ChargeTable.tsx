@@ -21,7 +21,8 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { SearchType } from "src/models/User";
+import { Encoding } from "src/models/exportFile";
+import { ChargesSortBy, ChargesSortOrder, SearchType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { ChargeInfo } from "src/pages/api/finance/charges";
@@ -29,101 +30,132 @@ import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { formatMetadataDisplay } from "src/utils/metadata";
 
-import { AccountSelector } from "./AccountSelector";
+import { AccountMultiSelector } from "./AccountMultiSelector";
 
+// ChargeTable 组件的 Props 接口
 interface Props {
-  accountName?: string;
+  accountNames?: string[];
   showAccountName: boolean;
   showTenantName: boolean;
   isPlatformRecords?: boolean;
   searchType?: SearchType;
 }
 
+// 过滤充值记录的表单接口
 interface FilterForm {
-  name?: string;
+  names?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs];
-  type?: string;
+  types?: string[];
   userIds?: string;
 }
 
-const now = dayjs();
+interface Sorter {
+  field: ChargesSortBy | undefined;
+  order: ChargesSortOrder | undefined;
+}
 
+// 当前时间的 dayjs 对象
+const now = dayjs();
+// 国际化函数
 const p = prefix("pageComp.finance.chargeTable.");
 const pCommon = prefix("common.");
 
+// 将用户 ID 字符串转换为数组的函数
 const convertUserIdArray = (userIds: string | undefined) => {
   return userIds ? userIds.split(",").map((id) => id.trim()) : [];
 };
 
 export const ChargeTable: React.FC<Props> = ({
-  accountName, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
+  accountNames, showAccountName, showTenantName, isPlatformRecords, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
-  const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(accountName);
-  const [selectedType, setSelectedType] = useState<typeof filteredTypes[number] | undefined>(undefined);
+  const [selectedAccountNames, setSelectedAccountNames] = useState<string[] | undefined>(accountNames);
+  const [selectedTypes, setSelectedTypes] = useState<string[] | undefined>(undefined);
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
-    name: string | undefined,
-    time: [ dayjs.Dayjs, dayjs.Dayjs ]
-    type: string | undefined
-    userIds: string | undefined}>({
-      name: accountName,
-      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
-      userIds: undefined,
-    });
+    names: string[] | undefined,
+    time: [dayjs.Dayjs, dayjs.Dayjs]
+    types: string[] | undefined
+    userIds: string | undefined
+  }>({
+    names: accountNames,
+    time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+    types: undefined,
+    userIds: undefined,
+  });// 查询对象
 
+  // 定义排序状态
+  const [sorter, setSorter] = useState<Sorter>({ field: undefined, order: undefined });
+
+  const handleTableChange = (pagination, _, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field: sorter.field,
+      order: sorter.order,
+    });
+  };
+
+  // 过滤后的消费类型数组
   const filteredTypes = [...publicConfig.CHARGE_TYPE_LIST, CHARGE_TYPE_OTHERS];
 
   // 在账户管理下切换不同账户消费记录页面时
   useDidUpdateEffect(() => {
     form.setFieldsValue({
-      name: accountName,
+      names: accountNames,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
+      types: undefined,
       userIds: undefined,
     });
     setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
     setQuery({
-      name: accountName,
+      names: accountNames,
       time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      type: undefined,
+      types: undefined,
       userIds: undefined,
     });
-    setSelectedAccountName(accountName);
-  }, [accountName]);
+    setSelectedAccountNames(accountNames);
+  }, [accountNames]);
 
+  // 异步获取消费记录的函数
   const recordsPromiseFn = useCallback(async () => {
-    return await api.getCharges({ query: {
-      accountName: query.name,
-      startTime: query.time[0].clone().startOf("day").toISOString(),
-      endTime: query.time[1].clone().endOf("day").toISOString(),
-      type: query.type,
-      userIds: convertUserIdArray(query.userIds),
-      isPlatformRecords,
-      searchType,
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-    } });
+    const getChargesInfo = await api.getCharges({
+      query: {
+        accountNames: query.names,
+        startTime: query.time[0].clone().startOf("day").toISOString(),
+        endTime: query.time[1].clone().endOf("day").toISOString(),
+        types: query.types,
+        isPlatformRecords,
+        searchType,
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        sortBy: sorter.field,
+        sortOrder: sorter.order,
+        userIdsOrNames: convertUserIdArray(query.userIds),
+      },
+    });
+
+    return getChargesInfo;
   }, [query, pageInfo]);
+
 
   const totalResultPromiseFn = useCallback(async () => {
     return await api.getChargeRecordsTotalCount({
       query: {
-        accountName: query.name,
+        accountNames: query.names,
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
-        type: query.type,
+        types: query.types,
         isPlatformRecords,
         searchType,
-        userIds: convertUserIdArray(query.userIds),
+        userIdsOrNames: convertUserIdArray(query.userIds),
       },
     });
   }, [query]);
 
+  // 使用异步 hook 获取消费记录和总数
   const { data: recordsData, isLoading: isRecordsLoading } = useAsync({
     promiseFn: recordsPromiseFn,
   });
@@ -132,8 +164,8 @@ export const ChargeTable: React.FC<Props> = ({
     promiseFn: totalResultPromiseFn,
   });
 
-
-  const handleExport = async (columns: string[]) => {
+  // 处理消费记录导出的函数
+  const handleExport = async (columns: string[], encoding: Encoding) => {
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -141,14 +173,15 @@ export const ChargeTable: React.FC<Props> = ({
       message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportChargeRecord",
         columns,
         count: totalCount,
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),
-          accountName: query.name,
-          type: query.type,
+          accountNames: query.names,
+          types: query.types,
           searchType: searchType,
           isPlatformRecords: !!isPlatformRecords,
           userIds: query.userIds,
@@ -157,6 +190,7 @@ export const ChargeTable: React.FC<Props> = ({
     }
   };
 
+  // 导出按钮的选项
   const exportOptions = useMemo(() => {
     const common = [
       { label: t(pCommon("user")), value: "userId" },
@@ -176,24 +210,25 @@ export const ChargeTable: React.FC<Props> = ({
 
   return (
     <div>
-      <Spin spinning={isRecordsLoading || isTotalResultLoading }>
+      <Spin spinning={isRecordsLoading || isTotalResultLoading}>
         <FilterFormContainer>
           <Form<FilterForm>
             layout="inline"
             form={form}
             initialValues={query}
             onFinish={async () => {
-              const { name, userIds, time, type } = await form.validateFields();
-              setQuery({ name: selectedAccountName ?? name, userIds, time, type: selectedType ?? type });
+              const { names, userIds, time, types } = await form.validateFields();
+              setQuery({ names: selectedAccountNames ?? names, userIds, time, types: selectedTypes ?? types });
               setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             }}
           >
             {
               showAccountName && (
                 <Form.Item label={t("common.account")} name="name">
-                  <AccountSelector
+                  <AccountMultiSelector
+                    value={selectedAccountNames ?? []}
                     onChange={(value) => {
-                      setSelectedAccountName(value);
+                      setSelectedAccountNames(value);
                     }}
                     placeholder={t("common.selectAccount")}
                     fromAllTenants={showTenantName ? true : false}
@@ -201,18 +236,19 @@ export const ChargeTable: React.FC<Props> = ({
                 </Form.Item>
               )
             }
-            <Form.Item label={t("common.user")} name="userIds">
-              <Input style={{ width: 180 }} placeholder={t("common.userId")} />
+            <Form.Item label={t("common.ownerIdOrName")} name="userIds">
+              <Input style={{ width: 180 }} placeholder={t("common.ownerIdOrName")} />
             </Form.Item>
             <Form.Item label={t(pCommon("time"))} name="time">
               <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
             </Form.Item>
             <Form.Item label={t("common.type")} name="type">
               <Select
-                style={{ minWidth: "100px" }}
+                style={{ minWidth: "120px" }}
                 allowClear
+                mode="multiple"
                 onChange={(value) => {
-                  setSelectedType(value);
+                  setSelectedTypes(value);
                 }}
                 placeholder={t("common.selectType")}
               >
@@ -225,12 +261,12 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t("common.total")}>
               <strong>
-                {totalResultData ? totalResultData.totalCount : 0}
+                {totalResultData?.totalCount ?? 0}
               </strong>
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {totalResultData ? totalResultData.totalAmount.toFixed(3) : 0}
+                {totalResultData?.totalAmount?.toFixed(2) ?? 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -249,18 +285,19 @@ export const ChargeTable: React.FC<Props> = ({
         <Table
           tableLayout="fixed"
           dataSource={recordsData?.results}
+          onChange={handleTableChange}
           pagination={{
             showSizeChanger: true,
             current: pageInfo.page,
             pageSize: pageInfo.pageSize,
             defaultPageSize: DEFAULT_PAGE_SIZE,
-            total: totalResultData?.totalCount,
+            total: totalResultData?.totalCount ?? 0,
             onChange: (page, pageSize) => {
               // 页码切换时让页面显示的值为上一次query的查询条件
               form.setFieldsValue({
-                name: query.name,
+                names: query.names,
                 time: query.time,
-                type: query.type,
+                types: query.types,
               });
               setPageInfo({ page, pageSize });
             },
@@ -282,10 +319,25 @@ export const ChargeTable: React.FC<Props> = ({
             title={t(pCommon("user"))}
             width="15%"
             render={(_, r) => r.userId ? (`${r.userId} (${r.userName})`) : ""}
+            sorter={true}
           />
-          <Table.Column<ChargeInfo> dataIndex="time" title={t(p("time"))} render={(v) => formatDateTime(v)} />
-          <Table.Column<ChargeInfo> dataIndex="amount" title={t(p("amount"))} render={(v) => v.toFixed(3)} />
-          <Table.Column<ChargeInfo> dataIndex="type" title={t(pCommon("type"))} />
+          <Table.Column<ChargeInfo>
+            dataIndex="time"
+            title={t(p("time"))}
+            render={(v) => formatDateTime(v)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="amount"
+            title={t(p("amount"))}
+            render={(v) => v.toFixed(2)}
+            sorter={true}
+          />
+          <Table.Column<ChargeInfo>
+            dataIndex="type"
+            title={t(pCommon("type"))}
+            sorter={true}
+          />
           <Table.Column<ChargeInfo>
             dataIndex="comment"
             title={t(pCommon("comment"))}

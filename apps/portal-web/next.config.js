@@ -47,6 +47,20 @@ module.exports = async (phase) => {
           }
         }
       });
+
+      // // 添加SVG处理规则
+      // config.module.rules.push({
+      //   test: /\.svg$/,
+      //   use: [
+      //     {
+      //       loader: "@svgr/webpack",
+      //       options: {
+      //         icon: true,
+      //       },
+      //     },
+      //   ],
+      // });
+
       return config;
     },
     compiler: {
