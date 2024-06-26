@@ -10,36 +10,38 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Checkbox, Form, Modal } from "antd";
+import { Checkbox, Form, Modal, Select } from "antd";
 import { useState } from "react";
 import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 
 interface Props {
-    options: {label: string, value: string}[]
-    onClose: () => void;
-    onExport: (columns: string[]) => Promise<void>;
-    open: boolean;
+  options: { label: string, value: string }[]
+  onClose: () => void;
+  onExport: (columns: string[], encoding: string) => Promise<void>;
+  open: boolean;
 }
 
 interface FormProps {
-    columns: string[];
+  columns: string[];
+  encoding: string;
 }
+
 const p = prefix("pageComp.commonComponent.exportFileModal.");
 
 const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) => {
-
   const t = useI18nTranslateToString();
 
   const [form] = Form.useForm<FormProps>();
   const [loading, setLoading] = useState(false);
 
   const onOK = async () => {
-    const { columns } = await form.validateFields();
+    const { columns, encoding } = await form.validateFields();
 
     setLoading(true);
 
-    await onExport(columns).then(() => {
+    await onExport(columns, encoding).then(() => {
       onClose();
       form.resetFields();
     })
@@ -62,7 +64,7 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
         form={form}
         layout="vertical"
         preserve={false}
-        initialValues={{ columns: options.map((option) => option.value) }}
+        initialValues={{ columns: options.map((option) => option.value), encoding: Encoding.GB18030 }}
       >
         <Form.Item
           rules={[{ required: true, message: t(p("errorMsg")) }]}
@@ -71,9 +73,18 @@ const ExportFileModal: React.FC<Props> = ({ options, onClose, onExport, open }) 
         >
           <Checkbox.Group options={options} />
         </Form.Item>
-
+        <Form.Item
+          label={t(p("encoding"))}
+          name="encoding"
+        >
+          <Select size="small" style={{ width: "100px" }}>
+            <Select.Option value={Encoding.GB18030}>GB18030</Select.Option>
+            <Select.Option value={Encoding.UTF8}>UTF-8</Select.Option>
+          </Select>
+        </Form.Item>
       </Form>
     </Modal>
   );
 };
+
 export const ExportFileModaLButton = ModalButton(ExportFileModal, { type: "primary" });

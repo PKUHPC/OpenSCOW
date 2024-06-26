@@ -20,12 +20,14 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { getI18nCurrentText, prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import {
   getOperationDetail,
   getOperationResultTexts,
   getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
-  OperationResult, OperationSortBy, OperationSortOrder } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder,
+} from "src/models/operationLog";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
@@ -77,7 +79,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const { message } = App.useApp();
 
-  const [ query, setQuery ] = useState<FilterForm>(() => {
+  const [query, setQuery] = useState<FilterForm>(() => {
     return {
       operatorUserId: undefined,
       operationType: undefined,
@@ -104,22 +106,24 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   };
 
   const promiseFn = useCallback(async () => {
-    return await api.getOperationLogs({ query: {
-      type: queryType,
-      operatorUserIds: getOperatorUserIds().join(","),
-      operationType: query.operationType as OperationType,
-      operationResult: query.operationResult,
-      startTime: query.operationTime?.[0].toISOString(),
-      endTime: query.operationTime?.[1].toISOString(),
-      operationTargetAccountName: accountName,
-      operationDetail: query.operationDetail,
-      customEventType: query.customEventType,
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-      // 新增排序参数
-      sortBy: sorter.field,
-      sortOrder: sorter.order,
-    } });
+    return await api.getOperationLogs({
+      query: {
+        type: queryType,
+        operatorUserIds: getOperatorUserIds().join(","),
+        operationType: query.operationType as OperationType,
+        operationResult: query.operationResult,
+        startTime: query.operationTime?.[0].toISOString(),
+        endTime: query.operationTime?.[1].toISOString(),
+        operationTargetAccountName: accountName,
+        operationDetail: query.operationDetail,
+        customEventType: query.customEventType,
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        // 新增排序参数
+        sortBy: sorter.field,
+        sortOrder: sorter.order,
+      },
+    });
   }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 
   const { data, isLoading } = useAsync({ promiseFn });
@@ -128,7 +132,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     return await api.getCustomEventTypes({});
   }, []);
 
-  const { data: customEventTypes, isLoading : customEventTypesLoading } = useAsync({
+  const { data: customEventTypes, isLoading: customEventTypesLoading } = useAsync({
     promiseFn: getCustomEventTypesPromise,
   });
 
@@ -171,12 +175,12 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
-      field:sorter.field === "operationLogId" ? "id" : sorter.field,
+      field: sorter.field === "operationLogId" ? "id" : sorter.field,
       order: sorter.order,
     });
   };
 
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
     const total = data?.totalCount ?? 0;
     if (total > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -184,6 +188,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
       message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportOperationLog",
         columns,
         count: total,
@@ -207,7 +212,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const exportOptions = useMemo(() => {
     return [
-      { label:  t(p("operationCode")), value: "operationCode" },
+      { label: t(p("operationCode")), value: "operationCode" },
       { label: t(p("operationType")), value: "operationType" },
       { label: t(p("operationDetail")), value: "operationDetail" },
       { label: t(p("operationResult")), value: "operationResult" },
@@ -336,7 +341,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         <Table.Column<OperationLog>
           dataIndex="operationResult"
           title={t(p("operationResult"))}
-          render={(operationResult) => OperationResultTexts[operationResult] }
+          render={(operationResult) => OperationResultTexts[operationResult]}
           sorter={true}
         />
         <Table.Column<OperationLog>

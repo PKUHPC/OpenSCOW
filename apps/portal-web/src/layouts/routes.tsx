@@ -15,7 +15,7 @@ import {
   CloudSyncOutlined,
   ClusterOutlined,
   LinkOutlined,
-  SaveOutlined } from "@ant-design/icons";
+} from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
@@ -25,7 +25,7 @@ import { AllJobsIcon, ApplicationIcon
   , AppSessionsIcon, ClusterFileManagerIcon
   , CreateAppIcon, DashBoardIcon, DesktopIcon
   , FileManagerIcon, JobIcon, RunningJobsIcon
-  , ShellClusterIcon, ShellIcon, SubmitJobIcon } from "src/icons/headerIcons/headerIcons";
+  , ShellClusterIcon, ShellIcon, SubmitJobIcon, TemplateJobIcon } from "src/icons/headerIcons/headerIcons";
 import { User } from "src/stores/UserStore";
 import { Cluster, LoginNode } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
@@ -74,7 +74,7 @@ export const userRoutes: (
           path: "/jobs/submit",
         },
         {
-          Icon: SaveOutlined,
+          Icon: TemplateJobIcon,
           text: t("routes.job.jobTemplates"),
           path: "/jobs/savedJobs",
         },

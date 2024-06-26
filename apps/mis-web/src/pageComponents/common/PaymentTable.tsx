@@ -20,6 +20,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { AccountMultiSelector } from "src/pageComponents/finance/AccountMultiSelector";
@@ -110,7 +111,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
     setSelectedNames(accountNames);
   }, [accountNames]);
 
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
 
     const total = data?.results?.length ?? 0;
 
@@ -121,6 +122,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
     } else {
 
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportPayRecord",
         columns,
         count: total,
