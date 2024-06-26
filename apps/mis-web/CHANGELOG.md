@@ -1,5 +1,12 @@
 # @scow/mis-web
 
+## 1.6.1
+
+### Patch Changes
+
+- 4ab2cec: 导出数据时增加编码选项
+- be61c74: 所有 Input.group compact 组件替换成 Space.Compact
+
 ## 1.6.0
 
 ### Minor Changes
