@@ -76,7 +76,7 @@ export const AccountMultiSelector: React.FC<Props> = ({
     setInputValue(""); // 清空输入框
   };
   return (
-    <Space.Compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         showSearch
         loading={isLoading}
