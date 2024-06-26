@@ -181,7 +181,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
         time: new Date().toISOString(),
         remoteIp: parseIp(req) ?? "",
       });
-      
+
       break;
     case "exit":
       send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });
@@ -202,6 +202,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     case "disconnect":
       stream.write({ message: { $case: "disconnect", disconnect: {} } });
       stream.end();
+      auditMsgStream.end();
       break;
     }
 
@@ -219,6 +220,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }, OperationResult.FAIL);
     stream.write({ message: { $case: "disconnect", disconnect: {} } });
     stream.end();
+    auditMsgStream.end();
   });
 
   ws.on("close", async () => {
@@ -226,6 +228,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       sessionId: sessionAuditId,
       dateEnd: new Date().toISOString(),
     });
+    auditMsgStream.end();
   });
 });
 
