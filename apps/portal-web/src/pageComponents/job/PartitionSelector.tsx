@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip } from "antd";
 import { useEffect } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
@@ -36,7 +36,7 @@ export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
   const p = prefix("pageComp.job.partitionSelector.");
 
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={selectablePartitions ? selectablePartitions.map((x) => ({ label: x, value: x })) : []}
@@ -46,9 +46,13 @@ export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
         onChange={(v) => onChange?.(v)}
       />
       <Tooltip title={t(p("refreshPartitionList"))}>
-        <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => onReload?.()} loading={isLoading} />
+        <Button
+          icon={<ReloadOutlined spin={isLoading} />}
+          onClick={() => onReload?.()}
+          loading={isLoading}
+        />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
 
