@@ -13,7 +13,7 @@
 import { MenuOutlined } from "@ant-design/icons";
 import { arrayContainsElement } from "@scow/utils";
 import { Button, Dropdown } from "antd";
-import { ItemType } from "antd/es/menu/hooks/useItems";
+import { ItemType } from "antd/es/menu/interface";
 import Link from "next/link";
 import React from "react";
 import { createMenuItems } from "src/layouts/base/common";

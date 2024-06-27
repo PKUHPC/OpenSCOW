@@ -18,6 +18,7 @@ import { ExportedUser, ExportServiceClient } from "@scow/protos/build/server/exp
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getT, prefix } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { OperationResult } from "src/models/operationLog";
 import {
   PlatformRole,
@@ -29,9 +30,10 @@ import { mapSortDirectionType, mapUsersSortFieldType } from "src/pages/api/admin
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
-import { getCsvObjTransform, getCsvStringify } from "src/utils/file";
+import { createEncodingTransform, getContentTypeWithCharset, getCsvObjTransform,
+  getCsvStringify } from "src/utils/file";
 import { route } from "src/utils/route";
-import { getContentType, parseIp } from "src/utils/server";
+import { parseIp } from "src/utils/server";
 import { pipeline } from "stream";
 
 export const ExportUserSchema = typeboxRouteSchema({
@@ -55,6 +57,7 @@ export const ExportUserSchema = typeboxRouteSchema({
 
     // true表示只导出自己租户的用户
     selfTenant: Type.Optional(Type.Boolean()),
+    encoding: Type.Enum(Encoding),
   }),
 
   responses:{
@@ -69,7 +72,7 @@ const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLA
 export default route(ExportUserSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, sortField, sortOrder, idOrName, platformRole, tenantRole, selfTenant, count } = query;
+  const { columns, sortField, sortOrder, idOrName, platformRole, tenantRole, selfTenant, count, encoding } = query;
 
   const info = await auth(req, res);
   if (!info) {
@@ -98,8 +101,10 @@ export default route(ExportUserSchema, async (req, res) => {
     const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
+    const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
+
     res.writeHead(200, {
-      "Content-Type": getContentType(filename, "application/octet-stream"),
+      "Content-Type":contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
 
@@ -156,11 +161,13 @@ export default route(ExportUserSchema, async (req, res) => {
     const csvStringify = getCsvStringify(headerColumns, columns);
 
     const transform = getCsvObjTransform("users", formatUser);
+    const encodingTransform = createEncodingTransform(encoding); // 创建编码转换流
 
     pipeline(
       stream,
       transform,
       csvStringify,
+      encodingTransform, // 添加编码转换流到管道
       res,
       async (err) => {
         if (err) {

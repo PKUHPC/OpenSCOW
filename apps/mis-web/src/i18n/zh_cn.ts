@@ -368,6 +368,7 @@ export default {
         title: "导出数据",
         subTitle: "请选择需要导出的字段",
         errorMsg: "请至少选择一项进行导出",
+        encoding: "编码",
       },
       paymentTable:{
         total:"总数",
@@ -1105,8 +1106,8 @@ export default {
         topTenSubmitJobUser: "作业提交用户Top10",
         newJobCount: "新增作业数",
         systemFeatureUsageCount: "系统使用量",
-        portalFeatureUsageCount: "门户系统使用功能次数",
-        misFeatureUsageCount: "管理系统使用功能次数",
+        topTenPortalFeatureUsageCount: "门户系统使用功能次数Top10",
+        topTenMisFeatureUsageCount: "管理系统使用功能次数Top10",
         jobCount: "作业数",
         usageCount:"次数",
         userName: "用户名",

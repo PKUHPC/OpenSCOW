@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-hook",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -17,7 +17,7 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@grpc/grpc-js": "1.10.6",
+    "@grpc/grpc-js": "1.10.9",
     "@scow/protos": "workspace:*",
     "bignumber.js": "9.1.2"
   },

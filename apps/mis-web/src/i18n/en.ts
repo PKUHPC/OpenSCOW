@@ -368,6 +368,7 @@ export default {
         title: "Export Data",
         subTitle: "Select the fields to export",
         errorMsg: "Please select one field at least!",
+        encoding: "Encoding",
       },
       paymentTable: {
         total: "Total",
@@ -1106,8 +1107,8 @@ export default {
         topTenSubmitJobUser: "Top 10 Submit Job User",
         newJobCount: "New Job Count",
         systemFeatureUsageCount: "System Feature Usage Count",
-        portalFeatureUsageCount: "Portal Feature Usage Count",
-        misFeatureUsageCount: "MIS Feature Usage Count",
+        topTenPortalFeatureUsageCount: "Portal Feature Usage Count Top Ten",
+        topTenMisFeatureUsageCount: "MIS Feature Usage Count Top Ten",
         jobCount: "Job Count",
         usageCount:"count",
         userName: "User Name",

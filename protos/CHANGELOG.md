@@ -1,5 +1,16 @@
 # @scow/grpc-api
 
+## 1.10.0
+
+### Minor Changes
+
+- 5b6af87: 将 mis-server 中 getTopChargeAccount、getTopPayAccount 返回值新增 userName
+- 3558bd4: JobTemplate 与 ListAllJobsResponse 增加 max_time_unit 可选字段
+- b8d1270: 新增集群停用功能 api: getClustersRuntimeInfo, activateCluster, deactivateCluster
+  新增获取集群配置信息 api： getClusterConfigFiles
+- 0a43348: 在 common/config 下新增 getAvailablePartitionsForCluster 作为门户/管理系统共用 proto,管理系统下原 proto 标记为已过时；在 listAccounts 下新增可选 AccountStatusFilter 查询参数
+- 806f778: 获取配置时返回 scowd 的配置
+
 ## 1.9.0
 
 ### Minor Changes

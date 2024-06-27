@@ -1,5 +1,41 @@
 # @scow/portal-web
 
+## 1.6.1
+
+### Patch Changes
+
+- a047082: 调整门户快捷入口文字过多时图标高度不一致的问题；略微了门户系统 header 图标的样式；取消了门户系统表格默认选中的状态
+- be61c74: 所有 Input.group compact 组件替换成 Space.Compact
+- 4dfd5df: 修复了门户表格显示不正确的问题
+
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- fec0a57: 修复了本地开发环境出现 Hydration 报错的问题
+- f21f3e0: 修改了 portal 部分 UI 的样式
+- eacda16: 修复集群未停用但数据无法获取时的仪表盘页面显示
+- 5a707df: 修复门户系统桌面功能页面 token 过期不能跳转登录页面的问题, 修改获取集群数据 token 验证失败时的返回
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 383a8bd: 添加 web shell 文件上传功能
+- 9709d45: 修复选择模板来提交作业时没有获取到正确的模板数据的问题
+- 3558bd4: 提交作业保存作业模板时最长运行时间的单位也保存入模板中
+- 49b31cf: 修改了门户系统下仪表盘的样式和交互逻辑
+- a0e9199: 修正了门户系统 GPU 显示不正确的问题，修复了门户系统图标大小不一样的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-web@1.4.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+
 ## 1.5.2
 
 ### Patch Changes

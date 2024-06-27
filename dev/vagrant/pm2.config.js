@@ -12,9 +12,9 @@
 
 const interpreter = "node";
 const interpreter_args = [
-  "--watch",
   "-r ts-node/register",
   "-r tsconfig-paths/register",
+  "--watch",
 ].join(" ");
 
 const PRODUCTION_ENV = {

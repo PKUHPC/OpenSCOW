@@ -62,6 +62,8 @@ const p = prefix("pageComp.dashboard.sortable.");
 
 const ItemContainer = styled.div`
   position: relative;
+  box-shadow: 0px 2px 10px 0px #1C01011A;
+  border-radius: 10px;
 `;
 
 const DeleteIconContainer = styled.div`
@@ -214,7 +216,9 @@ export const Sortable: FC<Props> = ({
         <SortableContext items={temItems} strategy={rectSortingStrategy}>
           <ItemsContainer>
             {temItems.map((x) => (
-              <ItemContainer key={x.id}>
+              <ItemContainer
+                key={x.id}
+              >
                 {(isEditable && activeItem === undefined) ? (
                   <DeleteIconContainer>
                     <MinusOutlined

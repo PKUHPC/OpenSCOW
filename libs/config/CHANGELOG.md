@@ -1,5 +1,15 @@
 # @scow/config
 
+## 1.5.0
+
+### Minor Changes
+
+- 806f778: 增加 scowd 配置
+
+### Patch Changes
+
+- b8d1270: 增加集群停用功能通用类型
+
 ## 1.4.5
 
 ### Patch Changes

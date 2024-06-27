@@ -10,12 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Octokit } from "@octokit/rest";
 import fs, { existsSync } from "fs";
 import { chmod, unlink } from "fs/promises";
 import JSZip from "jszip";
 // node-fetch is esm only
 import fetch from "node-fetch-commonjs";
-import { Octokit } from "octokit";
 import prompt from "prompts";
 import { createProxyAgent, proxyUrl } from "src/config/proxy";
 import { logger } from "src/log";

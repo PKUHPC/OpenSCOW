@@ -12,6 +12,8 @@
 
 import { ClusterOps } from "src/clusterops/api";
 import { appOps } from "src/clusterops/app";
+import { desktopOps } from "src/clusterops/desktop";
+import { fileOps } from "src/clusterops/file";
 import { jobOps } from "src/clusterops/job";
 import { configClusters } from "src/config/clusters";
 
@@ -21,6 +23,8 @@ const opsForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
   prev[cluster] = {
     app: appOps(cluster),
     job: jobOps(cluster),
+    desktop: desktopOps(cluster),
+    file: fileOps(cluster),
   } as ClusterOps;
   return prev;
 }, {} as Record<string, ClusterOps>);

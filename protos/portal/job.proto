@@ -26,9 +26,18 @@ message CancelJobRequest {
 // NOT_FOUND: cluster is not found
 message CancelJobResponse {}
 
+// BLOCKED_ACCOUNTS_ONLY: account's status is blocked or user's status is blocked under unblocked accounts
+// UNBLOCKED_ACCOUNTS_ONLY: account's status and user's status are unblocked
+enum AccountStatusFilter {
+  ALL = 0;
+  BLOCKED_ONLY = 1;
+  UNBLOCKED_ONLY = 2;
+}
+
 message ListAccountsRequest {
   string user_id = 1;
   string cluster = 2;
+  optional AccountStatusFilter status_filter = 3;
 }
 
 message ListAccountsResponse {
@@ -59,6 +68,12 @@ message JobInfo {
   optional string end_time = 13;
 }
 
+enum TimeUnit {
+  MINUTES = 0;
+  HOURS = 1;
+  DAYS = 2;
+}
+
 message JobTemplate {
   string job_name = 1;
   string account = 2;
@@ -67,13 +82,14 @@ message JobTemplate {
   uint32 node_count = 5;
   uint32 core_count = 6;
   optional uint32 gpu_count = 7;
-  uint32 max_time = 8; // in minutes
+  uint32 max_time = 8; // 最长运行时间
   string command = 9;
   string working_directory = 10;
   optional string output = 11;
   optional string error_output = 12;
   optional string comment = 13;
   optional string script_output = 14;
+  optional TimeUnit max_time_unit = 15; // 最长运行时间单位，默认为MINUTES
 }
 
 message ListAllJobsResponse {
@@ -144,7 +160,7 @@ message SubmitJobRequest {
   string command = 7;
   string job_name = 8;
   optional string qos = 9;
-  uint32 max_time = 10; // in minutes
+  uint32 max_time = 10; // 最长运行时间
   string account = 11;
   string working_directory = 12;
   string output = 13;
@@ -153,6 +169,7 @@ message SubmitJobRequest {
   optional string comment = 16;
   bool save_as_template = 17;
   optional string script_output=18;
+  optional TimeUnit max_time_unit = 19; // 最长运行时间单位，默认为MINUTES
 }
 
 // NOT_FOUND: cluster is not found
@@ -174,6 +191,7 @@ message SubmitFileAsJobResponse {
   uint32 job_id = 1;
 }
 
+
 service JobService {
   rpc CancelJob(CancelJobRequest) returns (CancelJobResponse);
 
@@ -194,4 +212,5 @@ service JobService {
   rpc SubmitJob(SubmitJobRequest) returns (SubmitJobResponse);
 
   rpc SubmitFileAsJob(SubmitFileAsJobRequest) returns (SubmitFileAsJobResponse);
+
 }

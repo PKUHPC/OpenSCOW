@@ -11,114 +11,158 @@
  */
 
 import React from "react";
-import { DoubleInfoPane } from "src/pageComponents/dashboard/DoubleInfoPane";
 import { InfoPane } from "src/pageComponents/dashboard/InfoPane";
-import { styled } from "styled-components"; ;
-import { cyan, geekblue, red } from "@ant-design/colors";
+import { styled, useTheme } from "styled-components"; ;
+import { Cluster } from "@scow/config/build/type";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { Col, Row } from "antd";
+import { Card, Col, Row } from "antd";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterInfo } from "src/pageComponents/dashboard/OverviewTable";
+import { ClusterOverview, PlatformOverview } from "src/models/cluster";
+import JobInfo from "src/pageComponents/dashboard/NodeRange";
 
 interface Props {
-  selectItem: ClusterInfo;
+  selectItem: ClusterOverview | PlatformOverview | undefined;
   loading: boolean;
+  activeTabKey: string;
+  onTabChange: (key: string) => void;
+  successfulClusters?: Cluster[] | undefined
 }
 
-const Container = styled.div`
-
-`;
-
 const InfoPaneContainer = styled.div`
-  min-width: 350px;
 `;
-const DoubleInfoPaneContainer = styled.div`
-  min-width: 700px;
-  padding: 0 80px;
-  /* 当该面板是第一个元素时不需要左右的padding */
-  @media (max-width: 768px) {
-  padding: 0;
-  }
-`;
-
 
 const colors = {
-  running:cyan[5],
-  idle:geekblue[5],
-  notAvailable:red[8],
+  // 节点使用率颜色
+  nodeUtilizationAvailable:"#ABA2E1",
+  nodeUtilizationNotavailable:"#CFCAEE",
+  nodeUtilizationRunning:"#6959CA",
+
+  // CPU核心使用率颜色
+  cpuAvailable:"#78BAC3",
+  cpunotAvailable:"#B0D6DC",
+  cpuRunning:"#4DA2AE",
+
+  // GPU核心使用率颜色
+  gpuRunning:"#BED32A",
+  gpuAvailable:"#D2E269",
+  gpunotAvailable:"#EBF1BE",
+
+  // 作业字体颜色
+  runningJob:"#D1CB5B",
+  queuing:"#A58E74",
 };
 const p = prefix("pageComp.dashboard.infoPanes.");
-export const InfoPanes: React.FC<Props> = ({ selectItem, loading }) => {
+export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, onTabChange, successfulClusters }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
-  const { clusterName, partitionName, nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
+  const theme = useTheme();
+
+  // card的每一项
+  const clusterCardsList = [
+    {
+      key:"platformOverview",
+      tab:
+      <div style={{ width:"max-content", height:"40px",
+        textAlign: "center", lineHeight:"40px",
+        color:`${activeTabKey === "platformOverview" ? "#FFF" : "#000"}`,
+        background:`${activeTabKey === "platformOverview" ? theme.token.colorPrimary : "transparent"}`,
+        borderRadius:"5px",
+        fontWeight:"700",
+        paddingLeft:"20px",
+        paddingRight:"20px",
+      }}
+      >
+        {t(p("platformOverview"))}
+      </div>,
+    },
+    ...successfulClusters?.map((x) => ({
+      key:x.id,
+      tab:typeof (x.name) == "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
+    })) ?? [],
+  ];
+
+  const { nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
-    gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount,
-    jobCount, runningJobCount, pendingJobCount,
-  } = selectItem;
+    gpuCoreCount, runningGpuCount, idleGpuCount, notAvailableGpuCount, runningJobCount, pendingJobCount,
+  } = selectItem ?? {
+    nodeCount: 0,
+    runningNodeCount: 0,
+    idleNodeCount: 0,
+    notAvailableNodeCount: 0,
+    cpuCoreCount: 0,
+    runningCpuCount: 0,
+    idleCpuCount: 0,
+    notAvailableCpuCount: 0,
+    gpuCoreCount: 0,
+    runningGpuCount: 0,
+    idleGpuCount: 0,
+    notAvailableGpuCount: 0,
+    jobCount: 0,
+    runningJobCount: 0,
+    pendingJobCount: 0,
+  };
+
 
   return (
-    <Container>
-      <Row justify="space-between">
-        <Col md={8} xl={6}>
+    <Card
+      style={{ width:"100%" }}
+      tabList={clusterCardsList}
+      activeTabKey={activeTabKey}
+      onTabChange={onTabChange}
+    >
+      <Row justify="space-between" wrap gutter={[50, 50]}>
+        <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
-              title={{
-                title:t(p("nodeInfo")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-              }}
-              tag={{ itemName:t(p("node")), num:nodeCount }}
-              paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.running },
-                { itemName:t(p("idle")), num:idleNodeCount, color:colors.idle },
-                { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.notAvailable }]}
+              tag={{ itemName:t(p("node")), num:nodeCount, subName:t(p("totalNodes")) }}
+              paneData={ [{ itemName:t(p("running")), num:runningNodeCount, color:colors.nodeUtilizationRunning },
+                { itemName:t(p("idle")), num:idleNodeCount, color:colors.nodeUtilizationAvailable },
+                { itemName:t(p("notAvailable")), num:notAvailableNodeCount, color:colors.nodeUtilizationNotavailable }]}
             ></InfoPane>
           </InfoPaneContainer>
         </Col>
-        <Col md={16} xl={12}>
-          <DoubleInfoPaneContainer>
-            <DoubleInfoPane
-              loading={loading}
-              cpuInfo={{
-                title:{
-                  title:t(p("resourceInfo")),
-                  subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-                },
-                tag:{ itemName:"CPU", num:cpuCoreCount, unit:t(p("core")) },
-                paneData: [{
-                  itemName:t(p("running")), num:runningCpuCount, color:colors.running },
-                { itemName:t(p("idle")), num:idleCpuCount, color:colors.idle },
-                { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.notAvailable },
-                ]}}
-              gpuInfo={{
-                title:{ title:"", subTitle:"" },
-                tag:{ itemName:"GPU", num:gpuCoreCount, unit:t(p("card")) },
-                paneData: [
-                  { itemName:t(p("running")), num:runningGpuCount, color:colors.running },
-                  { itemName:t(p("idle")), num:idleGpuCount, color:colors.idle },
-                  { itemName:t(p("notAvailable")), num:notAvailableGpuCount, color:colors.notAvailable },
-                ]}}
-            ></DoubleInfoPane>
-          </DoubleInfoPaneContainer>
-        </Col>
-
-        <Col md={8} xl={6}>
+        <Col xs={24} md={12} xl={6}>
           <InfoPaneContainer>
             <InfoPane
               loading={loading}
-              title={{ title:t(p("job")),
-                subTitle:`${getI18nConfigCurrentText(clusterName, languageId)}-${partitionName ?? ""}`,
-              }}
-              tag={{ itemName:t(p("job")), num:jobCount }}
-              paneData={ [{ itemName:t(p("running")), num:runningJobCount, color:colors.running },
-                { itemName:t(p("pending")), num:pendingJobCount, color:colors.notAvailable }]}
+              tag={ { itemName:"CPU", num:cpuCoreCount, subName:t(p("totalCores")) } }
+              paneData={[
+                { itemName:t(p("running")), num:runningCpuCount, color:colors.cpuRunning },
+                { itemName:t(p("idle")), num:idleCpuCount, color:colors.cpuAvailable },
+                { itemName:t(p("notAvailable")), num:notAvailableCpuCount, color:colors.cpunotAvailable },
+              ]}
             ></InfoPane>
+          </InfoPaneContainer>
+        </Col>
+        {gpuCoreCount > 0 && (
+          <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
+            <InfoPaneContainer>
+              <InfoPane
+                loading={loading}
+                tag={{ itemName: "GPU", num: gpuCoreCount, subName: t(p("totalCards")) }}
+                paneData={[
+                  { itemName: t(p("running")), num: runningGpuCount, color: colors.gpuRunning },
+                  { itemName: t(p("idle")), num: idleGpuCount, color: colors.gpuAvailable },
+                  { itemName: t(p("notAvailable")), num: notAvailableGpuCount, color: colors.gpunotAvailable },
+                ]}
+              ></InfoPane>
+            </InfoPaneContainer>
+          </Col>
+        )}
+        <Col xs={24} md={12} xl={gpuCoreCount > 0 ? 6 : 8}>
+          <InfoPaneContainer>
+            <JobInfo
+              runningJobs={`${runningJobCount}`}
+              pendingJobs={`${pendingJobCount}`}
+              loading={loading}
+              display={!(runningJobCount === undefined && pendingJobCount === undefined)}
+            />
           </InfoPaneContainer>
         </Col>
       </Row>
-    </Container>
-
+    </Card>
   );
 };

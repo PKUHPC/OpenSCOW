@@ -14,7 +14,7 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { useLocalStorage } from "@scow/lib-web/build/utils/hooks";
 import { useEffect, useState } from "react";
-import { Cluster, getDesktopEnabled, getPublicConfigClusters } from "src/utils/cluster";
+import { Cluster, getDesktopEnabled, getFileTransferEnabled, getPublicConfigClusters } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
@@ -22,6 +22,8 @@ const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
 export function ClusterInfoStore(
   clusterConfigs: {[clusterId: string]: ClusterConfigSchema},
   initialCurrentClusters: Cluster[],
+  // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件
+  portalRuntimeDesktopEnabled: boolean,
 ) {
 
   // 配置文件集群信息
@@ -57,13 +59,41 @@ export function ClusterInfoStore(
     }
   };
 
+  // ENABLE_LOGIN_DESKTOP
+  const initialEnableLoginDesktop = getDesktopEnabled(clusterConfigs, portalRuntimeDesktopEnabled);
+  const [enableLoginDesktop, setEnableLoginDesktop] = useState<boolean>(initialEnableLoginDesktop);
+
+
+  // CROSS_CLUSTER_FILE_TRANSFER_ENABLED
+  const initialEnableFileTransfer = getFileTransferEnabled(clusterConfigs);
+  const [crossClusterFileTransferEnabled, setCrossClusterFileTransferEnabled]
+   = useState<boolean>(initialEnableFileTransfer);
+
+
   useEffect(() => {
 
     if (publicConfig.MIS_DEPLOYED) {
       // 可用集群不存在时
       if (currentClusters.length === 0) {
         setDefaultCluster(undefined);
+        setEnableLoginDesktop(false);
+        setCrossClusterFileTransferEnabled(false);
       } else {
+
+        const currentClusterIds = currentClusters.map((x) => x.id);
+        const specifiedClusterConfigs = Object.fromEntries(
+          Object.entries(clusterConfigs).filter(([clusterId]) => currentClusterIds.includes(clusterId)),
+        );
+
+        // set桌面功能是否可用
+        const currentEnableLoginDesktop = getDesktopEnabled(clusterConfigs, portalRuntimeDesktopEnabled);
+        setEnableLoginDesktop(currentEnableLoginDesktop);
+
+        // set文件传输功能是否可用
+        const currentCrossClusterFileTransferEnabled = getFileTransferEnabled(specifiedClusterConfigs);
+        setCrossClusterFileTransferEnabled(currentCrossClusterFileTransferEnabled);
+
+        // set默认集群
         // 上一次记录的集群为undefined的情况，使用可用集群中的某一个集群作为新的默认集群
         if (!defaultCluster?.id) {
           setDefaultCluster(currentClusters[0]);
@@ -78,14 +108,7 @@ export function ClusterInfoStore(
       }
     }
 
-  }, [currentClusters]);
-
-  // ENABLE_LOGIN_DESKTOP
-  const enableLoginDesktop = getDesktopEnabled(clusterConfigs);
-
-  // CROSS_CLUSTER_FILE_TRANSFER_ENABLED
-  const crossClusterFileTransferEnabled = Object.values(clusterConfigs).filter(
-    (cluster) => cluster.crossClusterFileTransfer?.enabled).length > 1;
+  }, [currentClusters, clusterConfigs, portalRuntimeDesktopEnabled]);
 
   return {
     publicConfigClusters,

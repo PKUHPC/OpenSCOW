@@ -11,6 +11,7 @@
  */
 
 import { join } from "path";
+import { Encoding } from "src/models/exportFile";
 import { publicConfig } from "src/utils/config";
 
 // 文件允许的最大导出行数
@@ -21,11 +22,13 @@ export const urlToExport = ({
   columns,
   count,
   query,
+  encoding,
 }: {
     exportApi: string
     columns: string[],
     count: number,
     query: {[key: string]: string | number | boolean | string[] | undefined}
+    encoding: Encoding
   },
 ) => {
   const params = new URLSearchParams();
@@ -50,6 +53,7 @@ export const urlToExport = ({
     }
   });
   params.append("count", count.toString());
+  params.append("encoding", encoding);
   const queryString = params.toString();
   const fullPath = join(publicConfig.BASE_PATH, `/api/file/${exportApi}?${queryString}`);
   return fullPath;

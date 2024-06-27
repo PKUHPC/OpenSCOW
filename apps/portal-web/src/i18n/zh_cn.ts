@@ -76,6 +76,10 @@ export default {
         selectAccountPlaceholder: "请选择账户",
         refreshAccountList: "刷新账户列表",
       },
+      partitionSelector: {
+        selectPartitionPlaceholder: "请选择分区",
+        refreshPartitionList: "刷新分区列表",
+      },
       allJobsTable: {
         searchForm: {
           clusterLabel: "集群",
@@ -177,19 +181,20 @@ export default {
         gpuCount: "单节点GPU卡数",
         coreCount: "单节点核心数",
         maxTime: "最长运行时间",
+        requireMaxTime:"请输入最长运行时间",
         minute: "分钟",
+        hours:"小时",
+        days: "天",
         workingDirectory: "工作目录",
         wdTooltip1: "1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；",
 
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
 
-        wdTooltip3: "2.该文件用于保存适配器返回的脚本，默认值参考输出文件，若为空则不保存脚本。",
+        wdTooltip3: "该文件用于保存适配器返回的脚本，默认值参考输出文件。",
 
         output: "标准输出文件",
         errorOutput: "错误输出文件",
-        scriptOutput:"脚本输出文件",
-        scriptWillNotBeSaved:"本次作业脚本不会被保存为文件",
-        scriptWillBeSaved:"本次作业脚本会被保存为文件",
+        saveJobSubmissionFile:"保存作业提交文件",
         totalNodeCount: "总节点数：",
         totalGpuCount: "总GPU卡数：",
         totalCoreCount: "总CPU核心数：",
@@ -444,10 +449,19 @@ export default {
         resourceInfo:"资源信息",
         core:"核",
         running:"运行中",
-        idle:"空闲",
+        idle:"可用",
         notAvailable:"不可用",
         card:"卡",
         job:"作业",
+        pending:"排队中",
+        platformOverview:"平台概览",
+        totalNodes:"总数",
+        totalCores:"总核心数",
+        totalCards:"总卡数",
+      },
+      nodeRange:{
+        jobs:"作业",
+        running:"运行中",
         pending:"排队中",
       },
       addEntryModal:{
@@ -470,6 +484,16 @@ export default {
         exceedMaxSize:"最多只能添加10个快捷方式",
         saveFailed:"保存失败",
         saveSuccessfully:"保存成功",
+      },
+      infoPane:{
+        nodeUtilization:"节点使用率",
+      },
+      doubleInfoPane:{
+        CPUCoreUsage:"CPU核心使用率",
+        GPUCoreUsage:"GPU卡使用率",
+      },
+      titleContainer:{
+        available:"可用",
       },
     },
   },
@@ -578,6 +602,9 @@ export default {
         popoverContent9: "文件编辑",
         popoverContent10: "，输入",
         popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
+
+        popoverContent12: "文件上传",
+        popoverContent13: "，输入该命令后您可以将本地文件上传到当前路径下",
 
         command:"命令",
       },
