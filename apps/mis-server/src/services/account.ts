@@ -17,11 +17,13 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { getAccountSpecifiedPartitions } from "@scow/lib-server";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -256,15 +258,25 @@ export const accountServiceServer = plugin((server) => {
       await server.ext.clusters.callOnAll(
         currentActivatedClusters,
         logger,
-        async (client) => {
+        async (client, cluster) => {
           await asyncClientCall(client.account, "createAccount", {
             accountName, ownerUserId: ownerId,
           });
 
+          const assignedPartitions = await getAccountSpecifiedPartitions(
+            cluster,
+            account.accountName,
+            commonConfig.scowResourceManagement,
+            logger,
+            server.ext.partitions?.getAssignedPartitions,
+          );
+
           // 判断为需在集群中封锁时
           if (shouldBlockInCluster) {
+
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
+              blockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw <ServiceError>{
@@ -276,17 +288,39 @@ export const accountServiceServer = plugin((server) => {
             });
           // 判断为需在集群中解封时
           } else {
-            await asyncClientCall(client.account, "unblockAccount", {
-              accountName,
-            }).catch((e) => {
-              if (e.code === Status.NOT_FOUND) {
-                throw <ServiceError>{
-                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
-                };
-              } else {
-                throw e;
-              }
-            });
+
+            if (assignedPartitions && assignedPartitions.length === 0) {
+              // 已部署资源分区管理但是实际创建账户时没有授权分区时
+              // 实行一次封锁确保未来不产生冲突，代表账户没有授权分区
+              await asyncClientCall(client.account, "blockAccount", {
+                accountName,
+                blockedPartitions: [],
+              }).catch((e) => {
+                if (e.code === Status.NOT_FOUND) {
+                  throw <ServiceError>{
+                    code: Status.INTERNAL, message: `Account ${accountName} hasn't been created.`,
+                  };
+                } else {
+                  throw e;
+                }
+              });
+
+            } else {
+              await asyncClientCall(client.account, "unblockAccount", {
+                accountName,
+                unblockedPartitions: assignedPartitions ?? [],
+              }).catch((e) => {
+                if (e.code === Status.NOT_FOUND) {
+                  throw <ServiceError>{
+                    code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
+                  };
+                } else {
+                  throw e;
+                }
+              });
+            }
+
+
           }
 
         },
