@@ -22,6 +22,7 @@ import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { AccountState, DisplayedAccountState, getDisplayedStateI18nTexts } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
@@ -97,7 +98,7 @@ export const AccountTable: React.FC<Props> = ({
 
       const dataMatchedState =
         rangeSearchStatus === FilteredTypes.ALL ||
-         (rangeSearchStatus !== FilteredTypes.ALL &&
+        (rangeSearchStatus !== FilteredTypes.ALL &&
           x.displayedState === FilteredTypes[rangeSearchStatus]);
 
       return dataMatchedAccount && dataMatchedOwner && dataMatchedState;
@@ -109,18 +110,19 @@ export const AccountTable: React.FC<Props> = ({
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
     (!query.accountName || x.accountName.includes(query.accountName))
-      && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
+    && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
   )) : undefined, [data, query]);
 
   const accountStatusCount = useMemo(() => {
     if (!searchData) return {
-      DISPLAYED_BLOCKED : 0,
-      DISPLAYED_FROZEN : 0,
+      DISPLAYED_BLOCKED: 0,
+      DISPLAYED_FROZEN: 0,
       DISPLAYED_BELOW_BLOCK_THRESHOLD: 0,
       DISPLAYED_NORMAL: 0,
-      ALL : 0 };
+      ALL: 0,
+    };
     const counts = {
-      DISPLAYED_FROZEN:  searchData.filter((account) =>
+      DISPLAYED_FROZEN: searchData.filter((account) =>
         account.displayedState === DisplayedAccountState.DISPLAYED_FROZEN).length,
       DISPLAYED_BLOCKED: searchData.filter((account) =>
         account.displayedState === DisplayedAccountState.DISPLAYED_BLOCKED).length,
@@ -143,7 +145,7 @@ export const AccountTable: React.FC<Props> = ({
     setCurrentSortInfo({ field: null, order: null });
   };
 
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
 
     const total = filteredData?.length || 0;
 
@@ -157,6 +159,7 @@ export const AccountTable: React.FC<Props> = ({
         exportApi: "exportAccount",
         columns,
         count: total,
+        encoding,
         query: {
           accountName: query.accountName,
           blocked: rangeSearchStatus === "DISPLAYED_BLOCKED",
@@ -181,8 +184,8 @@ export const AccountTable: React.FC<Props> = ({
     ] : [];
     const remaining = [
       { label: t(pCommon("balance")), value: "balance" },
-      { label:  t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
-      { label:  t(p("status")), value: "displayedState" },
+      { label: t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
+      { label: t(p("status")), value: "displayedState" },
       { label: t(p("comment")), value: "comment" },
     ];
     return [...common, ...tenant, ...remaining];
@@ -281,13 +284,13 @@ export const AccountTable: React.FC<Props> = ({
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
-          render={(b: Money) => moneyToString(b) + t(p("unit")) }
+          render={(b: Money) => moneyToString(b) + t(p("unit"))}
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="blockThresholdAmount"
           title={(
             <Space>
-              { t(pCommon("blockThresholdAmount"))}
+              {t(pCommon("blockThresholdAmount"))}
               <Tooltip title={t(p("blockThresholdAmountTooltip"))}>
                 <ExclamationCircleOutlined />
               </Tooltip>
@@ -300,7 +303,7 @@ export const AccountTable: React.FC<Props> = ({
           width="7%"
           title={(
             <Space>
-              { t(p("status"))}
+              {t(p("status"))}
               <Popover
                 title={t(p("statusTooltip"))}
                 content={(
@@ -326,7 +329,8 @@ export const AccountTable: React.FC<Props> = ({
               <Tag color={s === DisplayedAccountState.DISPLAYED_NORMAL ? "green" : "red"}>
                 {DisplayedStateI18nTexts[s]}
               </Tag>
-            ); }
+            );
+          }
           }
         />
         <Table.Column<AdminAccountInfo>

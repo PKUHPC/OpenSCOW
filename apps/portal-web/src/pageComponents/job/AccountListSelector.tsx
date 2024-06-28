@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip } from "antd";
 import { useEffect } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
@@ -36,7 +36,7 @@ export const AccountListSelector: React.FC<Props> = ({ selectableAccounts, isLoa
   const p = prefix("pageComp.job.accountSelector.");
 
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={selectableAccounts ? selectableAccounts.map((x) => ({ label: x, value: x })) : []}
@@ -48,7 +48,7 @@ export const AccountListSelector: React.FC<Props> = ({ selectableAccounts, isLoa
       <Tooltip title={t(p("refreshAccountList"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => onReload?.()} loading={isLoading} />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
 

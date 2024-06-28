@@ -11,7 +11,7 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { App, Button, Form, Input, InputNumber, Select } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Space } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { useStore } from "simstate";
@@ -129,7 +129,7 @@ const StorageForm: React.FC = () => {
         </DisabledA>
       </Form.Item>
       <Form.Item<FormProps> label={t(p("storageChange"))} rules={[{ required: true }]}>
-        <Input.Group compact>
+        <Space.Compact style={{ width: "100%" }}>
           <Form.Item name="mode" noStyle>
             <Select placeholder={t(p("selectSetTo"))}>
               {Object.entries(changeModeText).map(([key, value]) => (
@@ -140,7 +140,7 @@ const StorageForm: React.FC = () => {
           <Form.Item name="value" noStyle>
             <InputNumber min={1} step={1} addonAfter={"TB"} />
           </Form.Item>
-        </Input.Group>
+        </Space.Compact>
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>

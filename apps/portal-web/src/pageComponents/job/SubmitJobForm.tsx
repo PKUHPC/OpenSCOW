@@ -11,7 +11,7 @@
  */
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
-import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select } from "antd";
+import { App, Button, Checkbox, Col, Form, Input, InputNumber, Row, Select, Space } from "antd";
 import dayjs from "dayjs";
 import Router from "next/router";
 import { join } from "path";
@@ -511,7 +511,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         </Col>
         <Col span={24} sm={6}>
           <Form.Item label={t(p("maxTime"))} required>
-            <Input.Group compact style={{ display: "flex", minWidth: "120px" }}>
+            <Space.Compact style={{ display: "flex", minWidth: "120px" }}>
               <Form.Item
                 name="maxTime"
                 rules={[{ required: true, message: `${t(p("requireMaxTime"))}` }]}
@@ -527,14 +527,14 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
               <Form.Item name="maxTimeUnit" rules={[{ required: true }]} noStyle>
                 <Select
                   popupMatchSelectWidth={false}
-                  style={{ flex: "0 1 auto" }}
+                  style={{ flex: "0 1 0" }}
                 >
                   <Select.Option value={TimeUnit.MINUTES}>{t(p("minute"))}</Select.Option>
                   <Select.Option value={TimeUnit.HOURS}>{t(p("hours"))}</Select.Option>
                   <Select.Option value={TimeUnit.DAYS}>{t(p("days"))}</Select.Option>
                 </Select>
               </Form.Item>
-            </Input.Group>
+            </Space.Compact>
 
           </Form.Item>
         </Col>

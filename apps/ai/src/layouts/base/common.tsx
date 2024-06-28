@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ItemType } from "antd/es/menu/hooks/useItems";
+import { ItemType } from "antd/es/menu/interface";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { match } from "src/layouts/base/matchers";
