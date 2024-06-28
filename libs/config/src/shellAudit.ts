@@ -15,23 +15,32 @@ import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 
 
-export const ShellAuditConfigSchema = Type.Object({
+export const AuditServiceConfigSchema = Type.Object({
+  auditService: Type.Object({
+    shellAudit: Type.Optional(Type.Object({
+      enabled: Type.Optional(Type.Boolean({ description: "是否开启shell审计", default: false })),
+    })),
+    appAudit: Type.Optional(Type.Object({
+      enabled: Type.Optional(Type.Boolean({ description: "是否开启app审计", default: false })),
+    })),
+    remoteDesktopAudit: Type.Optional(Type.Object({
+      enabled: Type.Optional(Type.Boolean({ description: "是否开启远程桌面审计", default: false })),
+    })),
+  }),
 
-  auditShell: Type.Boolean({ description: "Enable audit shell", default: false }),
-
-  url: Type.String({
+  auditServiceUrl: Type.String({
     description: "Shell Audit Server的URL, 默认为0.0.0.0:50051", default: "0.0.0.0:50051",
   }),
 
 });
 
-const SHELL_AUDIT_CONFIG_NAME = "shellAudit";
+const SHELL_AUDIT_CONFIG_NAME = "auditService";
 
-export type ShellAuditConfigSchema = Static<typeof ShellAuditConfigSchema>;
+export type AuditServiceConfigSchema = Static<typeof AuditServiceConfigSchema>;
 
-export const getShellAuditConfig: GetConfigFn<ShellAuditConfigSchema> = (baseConfigPath) => {
+export const getAuditServiceConfig: GetConfigFn<AuditServiceConfigSchema> = (baseConfigPath) => {
   const config =
-    getConfigFromFile(ShellAuditConfigSchema, SHELL_AUDIT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+    getConfigFromFile(AuditServiceConfigSchema, SHELL_AUDIT_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
 
   return config;
 

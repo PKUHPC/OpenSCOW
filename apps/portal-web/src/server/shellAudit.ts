@@ -12,18 +12,18 @@
 
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ChannelCredentials } from "@grpc/grpc-js";
-import { ShellAuditConfigSchema } from "@scow/config/build/shellAudit";
+import { AuditServiceConfigSchema } from "@scow/config/build/shellAudit";
 import { AuditServiceClient, CreateSessionRequest, CreateSessionResponse,
   SessionEndRequest, SessionEndResponse,
   WriteAppProxyRequest, WriteAppProxyResponse } from "@scow/protos/build/audit/shell";
 import { Logger } from "ts-log";
 
 export const createAuditClient = (
-  config: ShellAuditConfigSchema | undefined,
+  config: AuditServiceConfigSchema | undefined,
   logger: Logger | Console,
 ) => {
-  const client = config && config.url
-    ? new AuditServiceClient(config.url, ChannelCredentials.createInsecure())
+  const client = config && config.auditServiceUrl
+    ? new AuditServiceClient(config.auditServiceUrl, ChannelCredentials.createInsecure())
     : undefined;
   if (!config || !client) {
     logger.debug("Audit Server disabled");
@@ -57,14 +57,14 @@ export const createAuditClient = (
 
 
 export const getAuditClient = (
-  config: ShellAuditConfigSchema | undefined,
+  config: AuditServiceConfigSchema | undefined,
   logger: Logger | Console,
 ): AuditServiceClient => {
-  if (!config || !config.url) {
+  if (!config || !config.auditServiceUrl) {
     logger.debug("Audit Server configuration is missing or incomplete.");
     throw new Error("Audit Server configuration is missing or incomplete.");
   }
 
-  const client = new AuditServiceClient(config.url, ChannelCredentials.createInsecure());
+  const client = new AuditServiceClient(config.auditServiceUrl, ChannelCredentials.createInsecure());
   return client;
 };

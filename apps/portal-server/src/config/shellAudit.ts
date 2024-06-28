@@ -10,6 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getShellAuditConfig } from "@scow/config/build/shellAudit";
+import { getAuditServiceConfig } from "@scow/config/build/shellAudit";
 
-export const shellAuditConfig = getShellAuditConfig();
+export const auditServiceConfig = getAuditServiceConfig();
