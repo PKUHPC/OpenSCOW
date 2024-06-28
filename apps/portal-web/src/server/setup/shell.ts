@@ -22,7 +22,7 @@ import { OperationResult, OperationType } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { createAuditClient, getAuditClient } from "src/server/shellAudit";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { parseIp } from "src/utils/server";
 import { parse } from "url";
 import { WebSocket, WebSocketServer } from "ws";
