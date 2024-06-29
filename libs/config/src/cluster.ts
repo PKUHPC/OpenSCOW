@@ -25,7 +25,7 @@ export enum k8sRuntime {
 
 const LoginNodeConfigSchema = Type.Object({
   name: createI18nStringSchema({ description: "登录节点展示名" }),
-  address: Type.String({ description: "集群的登录节点地址" }),  
+  address: Type.String({ description: "集群的登录节点地址" }),
   scowd: Type.Optional(Type.Object({
     port: Type.Number({ description: "scowd 端口号" }),
   }, { description: "scowd 相关配置" })),
@@ -33,7 +33,7 @@ const LoginNodeConfigSchema = Type.Object({
 
 export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>
 
-interface LoginNode {
+export interface LoginNode {
   name: I18nStringType;
   address: string;
   scowdPort?: number;

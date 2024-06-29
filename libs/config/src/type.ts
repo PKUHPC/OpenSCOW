@@ -32,11 +32,3 @@ export const ClusterRuntimeInfoSchema = Type.Object({
 });
 
 export type ClusterRuntimeInfo = Static<typeof ClusterRuntimeInfoSchema>;
-
-
-export type LoginNodesType = string[] |
-  {
-    name: I18nStringType,
-    address: string,
-  }[]
-
