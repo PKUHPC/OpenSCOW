@@ -30,6 +30,10 @@ export const createAuditClient = (
   }
   return {
     createShellSession: async (request: CreateSessionRequest): Promise<CreateSessionResponse> => {
+      if (config?.auditService.shellAudit?.enabled !== true) {
+        logger.debug("Shell audit service disabled");
+        return { sessionId: "" };
+      }
       if (!client) {
         logger.debug("Attempt to audit with %o", request);
         return { sessionId: "" };
@@ -38,6 +42,10 @@ export const createAuditClient = (
     },
 
     sessionEnd: async (request: SessionEndRequest): Promise<SessionEndResponse> => {
+      if (config?.auditService.shellAudit?.enabled !== true) {
+        logger.debug("Shell audit service disabled");
+        return {};
+      }
       if (!client) {
         logger.debug("Attempt to audit with %o", request);
         return {};
@@ -46,6 +54,10 @@ export const createAuditClient = (
     },
 
     writeAppProxy: async (request: WriteAppProxyRequest): Promise<WriteAppProxyResponse> => {
+      if (config?.auditService.appAudit?.enabled !== true) {
+        logger.debug("App audit service disabled");
+        return {};
+      }
       if (!client) {
         logger.debug("Attempt to audit with %o", request);
         return {};
@@ -59,7 +71,11 @@ export const createAuditClient = (
 export const getAuditClient = (
   config: AuditServiceConfigSchema | undefined,
   logger: Logger | Console,
-): AuditServiceClient => {
+): AuditServiceClient | undefined => {
+  if (config?.auditService.shellAudit?.enabled !== true) {
+    logger.debug("Shell audit service disabled");
+    return undefined;
+  }
   if (!config || !config.auditServiceUrl) {
     logger.debug("Audit Server configuration is missing or incomplete.");
     throw new Error("Audit Server configuration is missing or incomplete.");

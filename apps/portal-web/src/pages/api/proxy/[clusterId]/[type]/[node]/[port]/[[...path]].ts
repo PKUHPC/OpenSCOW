@@ -39,27 +39,30 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return;
   }
 
-  const { writeAppProxy } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
-  const headers = Object.entries(req.headers).map(([key, value]) => `${key}: ${value}`);
-  const bodyAsString = req.body !== undefined
-    ? (
-      typeof req.body === "string"
-        ? req.body
-        : JSON.stringify(req.body)
-    )
-    : "";
-  await writeAppProxy({
-    user: user.identityId,
-    target: target,
-    request: {
-      method: req.method ?? "",
-      url: req.url ?? "",
-      headers: headers,
-      clientIp: req.socket.remoteAddress ?? "",
-      body: bodyAsString,
-      timestamp: new Date().toISOString(),
-    },
-  });
+  if (runtimeConfig.SHELL_AUDIT_CONFIG?.auditService.appAudit?.enabled === true) {
+    const { writeAppProxy } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
+    const headers = Object.entries(req.headers).map(([key, value]) => `${key}: ${value}`);
+    const bodyAsString = req.body !== undefined
+      ? (
+        typeof req.body === "string"
+          ? req.body
+          : JSON.stringify(req.body)
+      )
+      : "";
+    await writeAppProxy({
+      user: user.identityId,
+      target: target,
+      request: {
+        method: req.method ?? "",
+        url: req.url ?? "",
+        headers: headers,
+        clientIp: req.socket.remoteAddress ?? "",
+        body: bodyAsString,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
 
   proxy.web(req, res, {
     target,

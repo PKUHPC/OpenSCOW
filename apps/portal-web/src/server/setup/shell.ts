@@ -148,7 +148,10 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   const { createShellSession, sessionEnd } = createAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
 
   const auditClient = getAuditClient(runtimeConfig.SHELL_AUDIT_CONFIG, console);
-  const auditMsgStream = asyncDuplexStreamCall(auditClient, "writeTerminalMsg");
+  let auditMsgStream;
+  if (auditClient) {
+    auditMsgStream = asyncDuplexStreamCall(auditClient, "writeTerminalMsg");
+  }
 
   const { sessionId: sessionAuditId } = await createShellSession({ session: {
     user: user.identityId,
@@ -176,15 +179,18 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
       const msgStr: string = chunk.message.data.data.toString();
 
-      auditMsgStream.writeAsync({
-        message: msgStr,
-        cluster: cluster,
-        node: loginNode.address,
-        user: user.identityId,
-        session: sessionAuditId,
-        time: new Date().toISOString(),
-        remoteIp: parseIp(req) ?? "",
-      });
+      if (auditMsgStream) {
+        auditMsgStream.writeAsync({
+          message: msgStr,
+          cluster: cluster,
+          node: loginNode.address,
+          user: user.identityId,
+          session: sessionAuditId,
+          time: new Date().toISOString(),
+          remoteIp: parseIp(req) ?? "",
+        });
+      }
+
 
       break;
     case "exit":
@@ -206,7 +212,9 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     case "disconnect":
       stream.write({ message: { $case: "disconnect", disconnect: {} } });
       stream.end();
-      auditMsgStream.end();
+      if (auditMsgStream) {
+        auditMsgStream.end();
+      }
       break;
     }
 
@@ -224,7 +232,9 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     }, OperationResult.FAIL);
     stream.write({ message: { $case: "disconnect", disconnect: {} } });
     stream.end();
-    auditMsgStream.end();
+    if (auditMsgStream) {
+      auditMsgStream.end();
+    }
   });
 
   ws.on("close", async () => {
@@ -232,7 +242,9 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
       sessionId: sessionAuditId,
       dateEnd: new Date().toISOString(),
     });
-    auditMsgStream.end();
+    if (auditMsgStream) {
+      auditMsgStream.end();
+    }
   });
 });
 

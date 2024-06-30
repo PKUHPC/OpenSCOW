@@ -24,7 +24,7 @@ const { DEFAULT_PRIMARY_COLOR, getUiConfig } = require("@scow/config/build/ui");
 const { getPortalConfig } = require("@scow/config/build/portal");
 const { getCommonConfig, getSystemLanguageConfig } = require("@scow/config/build/common");
 const { getAuditConfig } = require("@scow/config/build/audit");
-const { getShellAuditConfig } = require("@scow/config/build/shellAudit");
+const { getAuditServiceConfig } = require("@scow/config/build/shellAudit");
 
 /**
  * Get auth capabilities
@@ -115,7 +115,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
   const auditConfig = getAuditConfig(configPath, console);
-  const shellAuditConfig = getShellAuditConfig(configPath, console);
+  const auditServiceConfig = getAuditServiceConfig(configPath, console);
 
   const versionTag = readVersionFile()?.tag;
   /**
@@ -134,7 +134,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
     SCOW_API_AUTH_TOKEN: commonConfig.scowApi?.auth?.token,
     AUDIT_CONFIG: config.AUDIT_DEPLOYED ? auditConfig : undefined,
-    SHELL_AUDIT_CONFIG: shellAuditConfig,
+    SHELL_AUDIT_CONFIG: auditServiceConfig,
 
     SERVER_I18N_CONFIG_TEXTS: {
       submitJopPromptText: portalConfig.submitJobPromptText,
