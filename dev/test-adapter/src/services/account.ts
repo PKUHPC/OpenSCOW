@@ -73,22 +73,6 @@ export const accountServiceServer = plugin((server) => {
       }];
     },
 
-    blockAccounts: async () => {
-      return [
-        {
-          failedResults: [],
-        },
-      ];
-    },
-
-    unblockAccounts: async () => {
-      return [
-        {
-          failedResults: [],
-        },
-      ];
-    },
-
 
   });
 });

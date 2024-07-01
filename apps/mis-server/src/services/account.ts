@@ -17,7 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
-import { getAccountSpecifiedPartitions } from "@scow/lib-server";
+import { getAccountSpecifiedPartitions, libCheckActivatedClusters } from "@scow/lib-server";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -37,7 +37,63 @@ export const accountServiceServer = plugin((server) => {
 
   server.addService<AccountServiceServer>(AccountServiceService, {
     blockAccount: async ({ request, em, logger }) => {
-      const { accountName } = request;
+      const { accountName, unassignedClusterPartition } = request;
+
+      // 当 unassignedClusterPartition 的值存在时，代表需要在某一分区中取消对账户的授权
+      // 当前只应用在资源分区管理的扩展功能中
+      if (unassignedClusterPartition) {
+        return await em.transactional(async (em) => {
+          const account = await em.findOne(Account, {
+            accountName,
+          }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
+
+          if (!account) {
+            throw <ServiceError>{
+              code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+            };
+          }
+
+          // 确认当前需要取消授权分区的集群是否可用
+          const currentActivatedClusters = await getActivatedClusters(em, logger);
+          libCheckActivatedClusters({ clusterIds: unassignedClusterPartition.clusterId,
+            activatedClusters: currentActivatedClusters, logger });
+
+          // 如果有正在运行的作业暂时不允许取消授权
+          const jobsResp = await server.ext.clusters.callOnOne(
+            unassignedClusterPartition.clusterId,
+            logger,
+            async (client) => {
+              const fields = [
+                "job_id", "user", "state", "account",
+              ];
+
+              return await asyncClientCall(client.job, "getJobs", {
+                fields,
+                filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+              });
+            },
+          );
+
+          if (jobsResp.jobs.length > 0) {
+            throw <ServiceError>{
+              code: Status.FAILED_PRECONDITION,
+              message: `Account ${accountName}  has jobs running and cannot be unassigned. `,
+            };
+          }
+
+          // 直接对指定分区进行封锁，但是不更改scow中的任何数据
+          await server.ext.clusters.callOnOne(
+            unassignedClusterPartition.clusterId, logger, async (client) => {
+              await asyncClientCall(client.account, "blockAccount", {
+                accountName: account.accountName,
+                blockedPartitions: [ unassignedClusterPartition.partition ],
+              });
+            });
+
+          return [{ result: BlockAccountResponse_Result.OK }];
+        });
+      }
+
 
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
@@ -83,6 +139,7 @@ export const accountServiceServer = plugin((server) => {
         if (result === "AlreadyBlocked") {
 
           // 如果账户已被手动冻结，提示账户已被冻结
+          // 当前scow暂未使用AccountState.FROZEN
           if (account.state === AccountState.FROZEN) {
             throw <ServiceError>{
               code: Status.FAILED_PRECONDITION,
