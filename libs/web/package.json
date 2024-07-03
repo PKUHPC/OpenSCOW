@@ -34,6 +34,7 @@
     "react-dom": ">=18.2.0",
     "react-is": "18.3.1",
     "nookies": "2.5.2",
+    "@ant-design/cssinjs": "1.21.0",
     "react-async": "10.0.1"
   },
   "devDependencies": {
