@@ -38,6 +38,6 @@ export class QueryCache {
     }
     this.queryKey = init.queryKey;
     this.queryResult = init.queryResult;
-    this.timestamp = new Date();
+    this.timestamp = init.timestamp ?? new Date();
   }
 }
