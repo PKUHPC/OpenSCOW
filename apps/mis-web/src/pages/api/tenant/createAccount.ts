@@ -14,6 +14,7 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
+import { joinWithUrl } from "@scow/utils";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -53,6 +54,7 @@ export const CreateAccountSchema = typeboxRouteSchema({
     /** ownerId不存在 */
     404: Type.Null(),
     409: Type.Null(),
+    500: Type.Null(),
   },
 });
 
@@ -97,19 +99,54 @@ export default route(CreateAccountSchema,
       },
     };
 
-    const client = getClient(AccountServiceClient);
+    if (publicConfig.ASYNC_OPERATION.enabled) {
+      const address = publicConfig.ASYNC_OPERATION.asyncHub.address;
 
-    return await asyncClientCall(client, "createAccount", {
-      accountName, ownerId, comment, tenantName: info.tenant,
-    })
-      .then(async (x) => {
-        await callLog(logInfo, OperationResult.SUCCESS);
-        return { 200: x };
+      if (!address) return { 500: null };
+      try {
+        const res = await fetch(joinWithUrl(address, "api/longRunningOperation"),
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              type: "CreateAccount",
+              status: "creating_clusters_account",
+              params: {
+                accountName, ownerId, comment, tenantName: info.tenant,
+              },
+              progress: {},
+            }),
+          },
+        );
+
+        if (res.ok) {
+          return { 200: {} };
+        } else {
+          const errorMsg = await res.text();
+          console.log(errorMsg);
+          return { [res.status]: null };
+        }
+      } catch (err) {
+        console.log("Fetch error:", err);
+        return { 500: null };
+      }
+    } else {
+      const client = getClient(AccountServiceClient);
+
+      return await asyncClientCall(client, "createAccount", {
+        accountName, ownerId, comment, tenantName: info.tenant,
       })
-      .catch(handlegRPCError({
-        [Status.ALREADY_EXISTS]: () => ({ 409: null }),
-        [Status.NOT_FOUND]: () => ({ 404: null }),
-      },
-      async () => await callLog(logInfo, OperationResult.FAIL),
-      ));
+        .then(async (x) => {
+          await callLog(logInfo, OperationResult.SUCCESS);
+          return { 200: x };
+        })
+        .catch(handlegRPCError({
+          [Status.ALREADY_EXISTS]: () => ({ 409: null }),
+          [Status.NOT_FOUND]: () => ({ 404: null }),
+        },
+        async () => await callLog(logInfo, OperationResult.FAIL),
+        ));
+    }
   });

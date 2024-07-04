@@ -14,11 +14,9 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
 import { readVersionFile } from "@scow/utils/build/version";
 import { config } from "src/config/env";
-import { misConfig } from "src/config/mis";
 import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
-import { asyncAccountServiceServer } from "src/services/asyncServices/account";
 import { chargingServiceServer } from "src/services/charging";
 import { configServiceServer } from "src/services/config";
 import { exportServiceServer } from "src/services/export";
@@ -55,12 +53,7 @@ export async function createServer() {
   await server.register(configServiceServer);
   await server.register(misConfigServiceServer);
   await server.register(exportServiceServer);
-
-  if (misConfig.asyncOperation) {
-    server.register(asyncAccountServiceServer);
-  } else {
-    await server.register(accountServiceServer);
-  }
+  await server.register(accountServiceServer);
 
   await server.ext.syncBlockStatus.sync();
 
