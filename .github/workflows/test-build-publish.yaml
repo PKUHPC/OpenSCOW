@@ -178,7 +178,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64/v8
+          # only build arm64 in tag commits or branches with name starting with `arm-`
+          platforms: linux/amd64${{ (github.ref_type == 'tag' || startsWith(github.ref_name, 'arm-')) && ',linux/arm64' || '' }}
 
 
   release:
