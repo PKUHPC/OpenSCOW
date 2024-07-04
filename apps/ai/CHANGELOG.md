@@ -1,5 +1,11 @@
 # @scow/ai
 
+## 0.2.4
+
+### Patch Changes
+
+- be61c74: 所有 Input.group compact 组件替换成 Space.Compact
+
 ## 0.2.3
 
 ### Patch Changes

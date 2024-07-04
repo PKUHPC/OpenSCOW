@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip } from "antd";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -46,7 +46,7 @@ export const TenantSelector: React.FC<Props> = ({
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
-    return api.getTenants({ query: { } });
+    return api.getTenants({ query: {} });
   }, [userStore.user]);
 
   const { data, isLoading, reload } = useAsync({
@@ -60,7 +60,7 @@ export const TenantSelector: React.FC<Props> = ({
   });
 
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         showSearch
         loading={isLoading}
@@ -75,7 +75,7 @@ export const TenantSelector: React.FC<Props> = ({
       <Tooltip title={t(p("fresh"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
 

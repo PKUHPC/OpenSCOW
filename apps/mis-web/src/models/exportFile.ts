@@ -10,21 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Input, Space } from "antd";
-
-type Props = React.PropsWithChildren<{
-  value?: string;
-  onChange?: (value: string) => void;
-  deltaWidth: string;
-}>;
-
-export const InputGroupFormItem: React.FC<Props> = ({ children, deltaWidth, value, onChange }) => (
-  <Space.Compact style={{ width: "100%" }}>
-    <Input
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      style={{ width: `calc(100% - ${deltaWidth})` }}
-    />
-    {children}
-  </Space.Compact>
-);
+export enum Encoding {
+  GB18030 = "gb18030",
+  UTF8 = "utf-8",
+}

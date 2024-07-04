@@ -20,7 +20,7 @@
     "@bufbuild/protobuf": "^1.8.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-node": "^1.4.0",
-    "@grpc/grpc-js": "1.9.14",
+    "@grpc/grpc-js": "1.10.9",
     "@scow/scowd-protos": "workspace:*"
   }
 }
