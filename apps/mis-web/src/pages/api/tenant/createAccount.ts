@@ -13,8 +13,8 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { createLongRunningOperation } from "@scow/asynchub";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
-import { joinWithUrl } from "@scow/utils";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -54,7 +54,10 @@ export const CreateAccountSchema = typeboxRouteSchema({
     /** ownerId不存在 */
     404: Type.Null(),
     409: Type.Null(),
-    500: Type.Null(),
+    500: Type.Union([
+      Type.Null(),
+      Type.String(),
+    ]),
   },
 });
 
@@ -99,38 +102,19 @@ export default route(CreateAccountSchema,
       },
     };
 
-    if (publicConfig.ASYNC_OPERATION.enabled) {
+    if (publicConfig.ASYNC_OPERATION.enabled && publicConfig.ASYNC_OPERATION.asyncHub.address) {
       const address = publicConfig.ASYNC_OPERATION.asyncHub.address;
 
       if (!address) return { 500: null };
       try {
-        const res = await fetch(joinWithUrl(address, "api/longRunningOperation"),
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              type: "CreateAccount",
-              status: "creating_clusters_account",
-              params: {
-                accountName, ownerId, comment, tenantName: info.tenant,
-              },
-              progress: {},
-            }),
-          },
-        );
+        await createLongRunningOperation(address, "CreateAccount", "creating_clusters_account", {
+          accountName, ownerId, comment, tenantName: info.tenant,
+        }, {});
 
-        if (res.ok) {
-          return { 200: {} };
-        } else {
-          const errorMsg = await res.text();
-          console.log(errorMsg);
-          return { [res.status]: null };
-        }
+        return { 200: {} };
       } catch (err) {
         console.log("Fetch error:", err);
-        return { 500: null };
+        return { 500: err };
       }
     } else {
       const client = getClient(AccountServiceClient);

@@ -24,6 +24,8 @@ services:
       # in a sub-folder, so you will mount '..'. You would then reference this path as the
       # 'workspaceFolder' in '.devcontainer/devcontainer.json' so VS Code starts here.
       - ..:/workspace/SCOW:cached
+    networks:
+      - scow-dev-network
 
   db:
     image: mysql:8
@@ -66,36 +68,45 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://scow-dev:389
       PHPLDAPADMIN_HTTPS: false
 
-  test-adapter-hpc00:
-    image: test-adapter
-    build:
-      context: ..
-      dockerfile: dev/test-adapter/Dockerfile
-    network_mode: service:scow-dev
-    environment:
-      CLUSTER_ID: hpc00
-      PORT: 6000
+  novnc-client:
+    image: ghcr.io/pkuhpc/novnc-client-docker:master
+    ports:
+      - 6080:80
 
-  test-adapter-hpc01:
-    image: test-adapter
-    build:
-      context: ..
-      dockerfile: dev/test-adapter/Dockerfile
-    network_mode: service:scow-dev
-    environment:
-      CLUSTER_ID: hpc01
-      PORT: 6001
+  # test-adapter-hpc00:
+  #   image: test-adapter
+  #   build:
+  #     context: ..
+  #     dockerfile: dev/test-adapter/Dockerfile
+  #   network_mode: service:scow-dev
+  #   environment:
+  #     CLUSTER_ID: hpc00
+  #     PORT: 6000
 
-  test-adapter-hpc02:
-    image: test-adapter
-    build:
-      context: ..
-      dockerfile: dev/test-adapter/Dockerfile
-    network_mode: service:scow-dev
-    environment:
-      CLUSTER_ID: hpc02
-      PORT: 6002
+  # test-adapter-hpc01:
+  #   image: test-adapter
+  #   build:
+  #     context: ..
+  #     dockerfile: dev/test-adapter/Dockerfile
+  #   network_mode: service:scow-dev
+  #   environment:
+  #     CLUSTER_ID: hpc01
+  #     PORT: 6001
+
+  # test-adapter-hpc02:
+  #   image: test-adapter
+  #   build:
+  #     context: ..
+  #     dockerfile: dev/test-adapter/Dockerfile
+  #   network_mode: service:scow-dev
+  #   environment:
+  #     CLUSTER_ID: hpc02
+  #     PORT: 6002
 
 volumes:
   db:
   ldap:
+
+networks:
+  scow-dev-network:
+    external: true
