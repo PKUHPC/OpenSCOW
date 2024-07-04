@@ -1,5 +1,22 @@
 # @scow/config
 
+## 1.5.0
+
+### Minor Changes
+
+- 806f778: 增加 scowd 配置
+
+### Patch Changes
+
+- b8d1270: 增加集群停用功能通用类型
+
+## 1.4.5
+
+### Patch Changes
+
+- d080a8b: 修复在 common.yml 中自定义更改用户密码正则后在管理系统不生效的问题，
+  增加平台管理和租户管理下修改用户密码的后端校验
+
 ## 1.4.4
 
 ### Patch Changes

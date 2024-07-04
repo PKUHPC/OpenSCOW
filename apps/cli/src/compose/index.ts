@@ -241,7 +241,16 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   // PORTAL
   if (config.portal) {
 
+    const configPath = "/etc/scow";
+
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
+
+    const scowdSslCaCertPath = config.scowd?.ssl?.caCertPath ?
+      join(configPath, config.scowd.ssl.caCertPath) : "";
+    const scowdSslScowCertPath = config.scowd?.ssl?.scowCertPath ?
+      join(configPath, config.scowd.ssl.scowCertPath) : "";
+    const scowdSslScowPrivateKeyPath = config.scowd?.ssl?.scowPrivateKeyPath ?
+      join(configPath, config.scowd.ssl.scowPrivateKeyPath) : "";
 
     composeSpec.volumes["portal_data"] = {};
 
@@ -250,13 +259,19 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
+        SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enabled ?? false),
+        SCOWD_SSL_CA_CERT_PATH: scowdSslCaCertPath,
+        SCOWD_SSL_SCOW_CERT_PATH: scowdSslScowCertPath,
+        SCOWD_SSL_SCOW_PRIVATE_KEY_PATH: scowdSslScowPrivateKeyPath,
+        MIS_DEPLOYED: config.mis ? "true" : "false",
+        MIS_SERVER_URL: config.mis ? "mis-server:5000" : "",
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
       ports: config.portal.portMappings?.portalServer ? { [config.portal.portMappings.portalServer]: 5000 } : {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
-        "./config": "/etc/scow",
+        "./config": configPath,
         "~/.ssh": "/root/.ssh",
         "portal_data":"/var/lib/scow/portal",
       },
@@ -269,6 +284,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "BASE_PATH": portalBasePath,
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "MIS_SERVER_URL": config.mis ? "mis-server:5000" : "",
         "AI_URL": join(BASE_PATH, AI_PATH),
         "AI_DEPLOYED": config.ai ? "true" : "false",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
@@ -283,7 +299,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       ports: {},
       volumes: {
         "/etc/hosts": "/etc/hosts",
-        "./config": "/etc/scow",
+        "./config": configPath,
       },
     });
 

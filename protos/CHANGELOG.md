@@ -1,5 +1,31 @@
 # @scow/grpc-api
 
+## 1.10.0
+
+### Minor Changes
+
+- 5b6af87: 将 mis-server 中 getTopChargeAccount、getTopPayAccount 返回值新增 userName
+- 3558bd4: JobTemplate 与 ListAllJobsResponse 增加 max_time_unit 可选字段
+- b8d1270: 新增集群停用功能 api: getClustersRuntimeInfo, activateCluster, deactivateCluster
+  新增获取集群配置信息 api： getClusterConfigFiles
+- 0a43348: 在 common/config 下新增 getAvailablePartitionsForCluster 作为门户/管理系统共用 proto,管理系统下原 proto 标记为已过时；在 listAccounts 下新增可选 AccountStatusFilter 查询参数
+- 806f778: 获取配置时返回 scowd 的配置
+
+## 1.9.0
+
+### Minor Changes
+
+- 89191ea: GetPaginatedChargeRecords 添加字段 user_id_or_name，将 GetChargeRecordsTotalCount 中的 userIds 改为 user_id_or_name.
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 6304074: JobTemplate 新增 script_output 可选字段，SubmitJobRequest 新增可选字段 script_output。
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- f534377: 为 getOperationLogs、 getPaginatedChargeRecords、 getJobs 三个 API 新增了 sortBy、sortOreder 参数，表示排序的列、排序方式（升序、降序、默认）
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
 ## 1.8.1
 
 ### Patch Changes

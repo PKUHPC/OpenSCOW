@@ -34,11 +34,23 @@ const config: Config = {
     locales: ["zh"],
   },
 
-  plugins: [
-    [require.resolve("@cmfcmf/docusaurus-search-local"), {
-      language: "zh",
-    }],
+  themes: [
+    [
+      require.resolve("@easyops-cn/docusaurus-search-local"),
+      /** @type {import("@easyops-cn/docusaurus-search-local").PluginOptions} */
+      ({
+        // ... Your options.
+        // `hashed` is recommended as long-term-cache of index file is possible.
+        hashed: true,
+        // For Docs using Chinese, The `language` is recommended to set to:
+        // ```
+        language: ["en", "zh"],
+        // ```
+      }),
+    ],
+  ],
 
+  plugins: [
     // make webpack resolve react from docs node_modules
     // https://github.com/facebook/docusaurus/issues/8091#issuecomment-1269112001
     () => ({

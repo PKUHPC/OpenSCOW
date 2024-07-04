@@ -42,6 +42,7 @@ it("generate correct paths", async () => {
   const composeConfig = createComposeSpec(config);
 
   expect(composeConfig.services["portal-web"].environment).toContain("MIS_URL=/mis");
+  expect(composeConfig.services["portal-web"].environment).toContain("MIS_SERVER_URL=mis-server:5000");
   expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
   expect(composeConfig.services["ai"].environment).toContain("MIS_URL=/mis");
 });

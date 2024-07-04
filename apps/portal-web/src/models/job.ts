@@ -13,7 +13,7 @@
 import { parseTime } from "@scow/lib-web/build/utils/datetime";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import dayjs from "dayjs";
-import type { Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/cluster";
 
 
 export type RunningJobInfo = RunningJob & { cluster: Cluster; runningOrQueueTime: string };
@@ -80,4 +80,14 @@ export function formatTime(milliseconds: number) {
   return text;
 }
 
+export enum AccountStatusFilter {
+  ALL = 0,
+  BLOCKED_ONLY = 1,
+  UNBLOCKED_ONLY = 2,
+};
 
+export enum TimeUnit {
+  MINUTES = 0,
+  HOURS = 1,
+  DAYS = 2,
+}

@@ -76,6 +76,10 @@ export default {
         selectAccountPlaceholder: "Select Account",
         refreshAccountList: "Refresh Account List",
       },
+      partitionSelector: {
+        selectPartitionPlaceholder: "Select Partition",
+        refreshPartitionList: "Refresh Partition List",
+      },
       allJobsTable: {
         searchForm: {
           clusterLabel: "Cluster",
@@ -177,14 +181,20 @@ export default {
         gpuCount: "Number of GPU Cards per Node",
         coreCount: "Number of CPU Cores per Node",
         maxTime: "Maximum Running Time",
+        requireMaxTime: "Please enter the maximum runtime",
         minute: "Minutes",
+        hours:"Hours",
+        days: "Days",
         workingDirectory: "Working Directory",
         wdTooltip1: "1. Please enter the absolute path. If you enter a relative path, it will be "
         + "relative to the user's home directory.",
         wdTooltip2: "2. If the specified directory is not accessible or cannot be operated on, "
         + "the job submission or execution will fail.",
+        wdTooltip3: "2.This file is used to save the script returned by the adapter"
+        + "The default value refers to the output file.",
         output: "Standard Output File",
         errorOutput: "Error Output File",
+        saveJobSubmissionFile:"Save Job Submission File",
         totalNodeCount: "Total Nodes: ",
         totalGpuCount: "Total GPUs: ",
         totalCoreCount: "Total CPU Cores: ",
@@ -465,6 +475,25 @@ export default {
         card:"Card",
         job:"Job",
         pending:"Pending",
+        platformOverview:"Platform Overview",
+        totalNodes:"Total Nodes",
+        totalCores:"Total Cores",
+        totalCards:"Total Cards",
+      },
+      nodeRange:{
+        jobs:"Jobs",
+        running:"Running",
+        pending:"Pending",
+      },
+      infoPane:{
+        nodeUtilization:"Node Utilization",
+      },
+      doubleInfoPane:{
+        CPUCoreUsage:"CPU Core Usage",
+        GPUCoreUsage:"GPU Core Usage",
+      },
+      titleContainer:{
+        available:"Available",
       },
     },
   },
@@ -481,6 +510,8 @@ export default {
       pageNotExist: "The page you requested does not exist.",
       serverWrong: "Server Error",
       sorry: "Sorry, there was a server error. Please refresh and try again.",
+      clusterNotAvailable: "The cluster you are currently accessing is unavailable or there are no available clusters. "
+      + " Please try again later or contact the administrator.",
     },
     others: {
       clusterSelector: "Please select a cluster.",
@@ -570,6 +601,9 @@ export default {
         popoverContent9: "Edit a file",
         popoverContent10: "After entering the command ",
         popoverContent11: ", you will be redirected to a file editing page where you can edit the specified file. ",
+        popoverContent12: "Upload files ",
+        popoverContent13: "By entering this command, you can upload local files to the current directory.",
+
         command: "Command",
       },
       index: {
@@ -585,9 +619,17 @@ export default {
       sftpError: "SFTP operation failed. Please confirm if you have the necessary permissions.",
       otherError: "Server encountered an error!",
       adapterConnectionError: "The {} cluster is currently unreachable. Please try again later. ",
+      noActivatedClusters: "No available clusters. Please try again after refreshing the page.",
+      notExistInActivatedClusters: "The cluster(s) being queried may have been deactivated. "
+      + "Please try again after refreshing the page.",
+      noClusters: "Unable to find cluster configuration files. Please contact the system administrator.",
     },
     dashboard: {
       title: "Dashboard",
+    },
+    common: {
+      noAvailableClusters: "There are currently no available clusters."
+      + " Please try again later or contact the administrator.",
     },
   },
 };

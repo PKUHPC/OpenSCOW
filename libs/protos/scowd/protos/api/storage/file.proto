@@ -1,0 +1,204 @@
+syntax = "proto3";
+
+package api.storage;
+
+option go_package = "scowd/protos/gen/api/storage;apiv1";
+
+enum FileType {
+  FILE = 0;
+  DIR = 1;
+}
+
+message FileInfo {
+  FileType file_type = 1;
+  string name = 2;
+  string mod_time = 3;
+  uint64 size = 4;
+  uint32 mode = 5;
+}
+
+message ReadDirectoryRequest {
+  string user_id = 1;
+  string dir_path = 2;
+}
+
+message ReadDirectoryResponse {
+  repeated FileInfo files_info = 1;
+}
+
+message CreateFileRequest {
+  string user_id = 1;
+  string file_path = 2;
+}
+
+message CreateFileResponse {
+}
+
+message MakeDirectoryRequest {
+  string user_id = 1;
+  string dir_path = 2;
+}
+
+message MakeDirectoryResponse {
+}
+
+message DeleteDirectoryRequest {
+  string user_id = 1;
+  string dir_path = 2;
+}
+
+message DeleteDirectoryResponse {
+}
+
+message DeleteFileRequest {
+  string user_id = 1;
+  string file_path = 2;
+}
+
+message DeleteFileResponse {
+}
+
+message GetFileMetadataRequest {
+  string user_id = 1;
+  string file_path = 2;
+}
+
+message GetFileMetadataResponse {
+  uint64 size = 1;
+  FileType type = 2;
+}
+
+message GetHomeDirectoryRequest {
+  string user_id = 1;
+}
+
+message GetHomeDirectoryResponse {
+  string path = 1;
+}
+
+message MoveRequest {
+  string user_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message MoveResponse {
+}
+
+message ExistsRequest {
+  string user_id = 1;
+  string path = 2;
+}
+
+message ExistsResponse {
+  bool exists = 1;
+}
+
+message CopyRequest {
+  string user_id = 1;
+  string from_path = 2;
+  string to_path = 3;
+}
+
+message CopyResponse {
+}
+
+message UploadRequest {
+
+  message Info {
+    string user_id = 1;
+    string path = 2;
+  }
+
+  oneof message {
+    Info info = 1;
+    bytes chunk = 2;
+  };
+}
+
+message UploadResponse {
+  uint64 written_bytes = 1;
+}
+
+message DownloadRequest {
+  string user_id = 1;
+  string path = 2;
+  uint32 chunk_size = 3;
+}
+
+message DownloadResponse {
+  bytes chunk = 1;
+}
+
+message TransferInfo {
+  string to_cluster = 1;
+  string file_path = 2;
+  uint64 transfer_size_kb = 3; // 单位为KB，B：Byte
+  uint32 progress = 4;
+  float speed_k_bps = 5;
+  uint64 remaining_time_seconds = 6;
+}
+
+message StartFileTransferRequest {
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string to_transfer_node_port = 3;
+  string from_path = 4;
+  string to_path = 5;
+}
+
+message StartFileTransferResponse {
+
+}
+
+message QueryFileTransferRequest {
+  string user_id = 1;
+}
+
+message QueryFileTransferResponse {
+  repeated TransferInfo transfer_infos = 1;
+}
+
+message TerminateFileTransferRequest {
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string from_path = 3;
+}
+
+message TerminateFileTransferResponse {
+
+}
+
+message CheckTransferKeyRequest {
+  string user_id = 1;
+  string to_transfer_node_host = 2;
+  string to_transfer_node_port = 3;
+}
+
+message CheckTransferKeyResponse {
+
+}
+
+service FileService {
+  rpc Copy(CopyRequest) returns (CopyResponse) {}
+  rpc Move(MoveRequest) returns (MoveResponse) {}
+  rpc Exists(ExistsRequest) returns (ExistsResponse) {}
+
+  rpc ReadDirectory(ReadDirectoryRequest) returns (ReadDirectoryResponse) {}
+  rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse) {}
+  rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse) {}
+
+  rpc CreateFile(CreateFileRequest) returns (CreateFileResponse) {}
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
+
+  rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc Upload(stream UploadRequest) returns (UploadResponse);
+
+  rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
+  rpc GetHomeDirectory(GetHomeDirectoryRequest) returns (GetHomeDirectoryResponse);
+
+  rpc StartFileTransfer(StartFileTransferRequest) returns (StartFileTransferResponse);
+  rpc QueryFileTransfer(QueryFileTransferRequest) returns (QueryFileTransferResponse);
+  rpc TerminateFileTransfer(TerminateFileTransferRequest) returns (TerminateFileTransferResponse);
+  rpc CheckTransferKey(CheckTransferKeyRequest) returns (CheckTransferKeyResponse);
+}

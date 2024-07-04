@@ -76,6 +76,10 @@ export default {
         selectAccountPlaceholder: "请选择账户",
         refreshAccountList: "刷新账户列表",
       },
+      partitionSelector: {
+        selectPartitionPlaceholder: "请选择分区",
+        refreshPartitionList: "刷新分区列表",
+      },
       allJobsTable: {
         searchForm: {
           clusterLabel: "集群",
@@ -177,14 +181,20 @@ export default {
         gpuCount: "单节点GPU卡数",
         coreCount: "单节点核心数",
         maxTime: "最长运行时间",
+        requireMaxTime:"请输入最长运行时间",
         minute: "分钟",
+        hours:"小时",
+        days: "天",
         workingDirectory: "工作目录",
         wdTooltip1: "1. 请填写绝对路径，如填写相对路径，则相对于该用户家目录；",
 
         wdTooltip2: "2. 填写目录不可访问或者不可操作时，提交作业或者作业运行将失败；",
 
+        wdTooltip3: "该文件用于保存适配器返回的脚本，默认值参考输出文件。",
+
         output: "标准输出文件",
         errorOutput: "错误输出文件",
+        saveJobSubmissionFile:"保存作业提交文件",
         totalNodeCount: "总节点数：",
         totalGpuCount: "总GPU卡数：",
         totalCoreCount: "总CPU核心数：",
@@ -439,10 +449,19 @@ export default {
         resourceInfo:"资源信息",
         core:"核",
         running:"运行中",
-        idle:"空闲",
+        idle:"可用",
         notAvailable:"不可用",
         card:"卡",
         job:"作业",
+        pending:"排队中",
+        platformOverview:"平台概览",
+        totalNodes:"总数",
+        totalCores:"总核心数",
+        totalCards:"总卡数",
+      },
+      nodeRange:{
+        jobs:"作业",
+        running:"运行中",
         pending:"排队中",
       },
       addEntryModal:{
@@ -466,6 +485,16 @@ export default {
         saveFailed:"保存失败",
         saveSuccessfully:"保存成功",
       },
+      infoPane:{
+        nodeUtilization:"节点使用率",
+      },
+      doubleInfoPane:{
+        CPUCoreUsage:"CPU核心使用率",
+        GPUCoreUsage:"GPU卡使用率",
+      },
+      titleContainer:{
+        available:"可用",
+      },
     },
   },
   component:{
@@ -481,6 +510,8 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
+      clusterNotAvailable: "当前正在访问的集群不可用或没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
     others:{
       clusterSelector: "请选择集群",
@@ -572,6 +603,9 @@ export default {
         popoverContent10: "，输入",
         popoverContent11: "命令后跳转到文件编辑页面， 您可以编辑指定的文件",
 
+        popoverContent12: "文件上传",
+        popoverContent13: "，输入该命令后您可以将本地文件上传到当前路径下",
+
         command:"命令",
       },
       index: {
@@ -585,9 +619,17 @@ export default {
       sftpError:"SFTP操作失败，请确认您是否有操作的权限",
       otherError:"服务器出错啦！",
       adapterConnectionError: "{} 集群无法连接，请稍后重试 ",
+      noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
+      notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
+
+      noClusters: "无法找到集群的配置文件，请联系管理员。",
     },
     dashboard: {
       title: "仪表盘",
+    },
+    common: {
+      noAvailableClusters: "当前没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
   },
 };

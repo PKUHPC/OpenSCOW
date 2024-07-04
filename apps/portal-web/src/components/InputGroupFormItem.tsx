@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Input } from "antd";
+import { Input, Space } from "antd";
 
 type Props = React.PropsWithChildren<{
   value?: string;
@@ -19,12 +19,12 @@ type Props = React.PropsWithChildren<{
 }>;
 
 export const InputGroupFormItem: React.FC<Props> = ({ children, deltaWidth, value, onChange }) => (
-  <Input.Group compact>
+  <Space.Compact style={{ width: "100%" }}>
     <Input
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       style={{ width: `calc(100% - ${deltaWidth})` }}
     />
     {children}
-  </Input.Group>
+  </Space.Compact>
 );

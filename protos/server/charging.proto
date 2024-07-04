@@ -153,6 +153,8 @@ message GetPaginatedChargeRecordsRequest {
 
 
   optional common.SortOrder sort_order = 14;
+
+  repeated string user_ids_or_names = 15;
 }
 
 message GetPaginatedChargeRecordsResponse {
@@ -178,7 +180,8 @@ message GetChargeRecordsTotalCountRequest {
     // 返回所有租户的租户消费记录
     AllTenantsTarget all_tenants = 8;
   }
-  repeated string user_ids = 9;
+
+  repeated string user_ids_or_names = 9;
 }
 
 message GetChargeRecordsTotalCountResponse {
@@ -240,6 +243,7 @@ message GetTopChargeAccountResponse {
   message ChargeAccount {
     string account_name = 1;
     common.Money charged_amount = 2;
+    string user_name = 3;
   }
   repeated ChargeAccount results = 1;
 }
@@ -274,6 +278,7 @@ message GetTopPayAccountResponse {
   message PayAccount {
     string account_name = 1;
     common.Money pay_amount = 2;
+    string user_name = 3;
   }
   repeated PayAccount results = 1;
 }

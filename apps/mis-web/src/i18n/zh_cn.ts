@@ -112,6 +112,8 @@ export default {
     exportNoDataErrorMsg: "导出为空，请重新选择",
     blockThresholdAmount: "封锁阈值",
     other: "其他",
+    noAvailableClusters: "当前没有可用集群。"
+    + "请稍后再试或联系管理员。",
   },
   dashboard: {
     title: "仪表盘",
@@ -179,6 +181,8 @@ export default {
         systemDebug: "平台调试",
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
+        resourceManagement: "资源管理",
+        clusterManagement: "集群管理",
         accountList: "账户列表",
         clusterMonitor: "集群监控",
         resourceStatus: "资源状态",
@@ -364,6 +368,7 @@ export default {
         title: "导出数据",
         subTitle: "请选择需要导出的字段",
         errorMsg: "请至少选择一项进行导出",
+        encoding: "编码",
       },
       paymentTable:{
         total:"总数",
@@ -764,6 +769,8 @@ export default {
       pageNotExist:"您所请求的页面不存在。",
       serverWrong:"服务器出错",
       sorry:"对不起，服务器出错。请刷新重试。",
+      clusterNotAvailable: "当前正在访问的集群不可用或没有可用集群。"
+      + "请稍后再试或联系管理员。",
     },
     others:{
       seeDetails:"细节请查阅文档",
@@ -809,6 +816,10 @@ export default {
 
       adapterConnErrorContent: "{} 集群无法连接，请稍后重试 ",
       effectErrorMessage: "服务器出错啦！",
+      noActivatedClusters: "现在没有可用的集群，请在页面刷新后重试。",
+      notExistInActivatedClusters: "正在查询的集群可能已被停用，请在页面刷新后重试。",
+
+      noClusters: "无法找到集群的配置文件，请联系管理员。",
     },
     profile: {
       index: {
@@ -989,7 +1000,6 @@ export default {
       systemDebug: {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
-
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
 
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
@@ -1023,6 +1033,49 @@ export default {
           syncJobNow: "立刻同步作业",
         },
       },
+      resourceManagement: {
+        clusterManagement: {
+          title: "集群管理",
+          clusterFilter: "集群",
+          table: {
+            clusterName: "集群名称",
+            nodesCount: "节点总数",
+            cpusCount: "CPU总核数",
+            gpusCount: "GPU总卡数",
+            totalMemMb: "内存总容量",
+            clusterState: "集群状态",
+            errorState: "异常",
+            deactivatedState: "停用",
+            normalState: "正常",
+            operator: "操作员",
+            lastOperatedTime: "上次启用/停用时间",
+            comment: "备注",
+            operation: "操作",
+            activate: "启用",
+            deactivate: "停用",
+          },
+          activateModal: {
+            title: "启用集群",
+            content: "请确认是否启用集群ID是 {}，集群名称是 {} 的集群？",
+            contentAttention: "注意：启用后请手动同步平台数据！",
+            successMessage: "集群已启用",
+            failureMessage: "集群启用失败，集群可能已被启用",
+          },
+          deactivateModal: {
+            title: "停用集群",
+            content: "请确认是否停用集群ID是 {}，集群名称是 {} 的集群？",
+            contentInputNotice: "如果确认停用集群，请在下面重复输入上述集群ID和集群名称",
+
+            contentAttention: "注意：停用后集群将不可用，集群所有数据不再更新！",
+
+            clusterNameForm: "集群名称",
+            clusterIdForm: "集群ID",
+            comment: "停用备注",
+            successMessage: "集群已停用",
+            failureMessage: "集群停用失败，集群可能已被停用",
+          },
+        },
+      },
       finance: {
         pay: {
           tenantCharge: "租户充值",
@@ -1053,8 +1106,8 @@ export default {
         topTenSubmitJobUser: "作业提交用户Top10",
         newJobCount: "新增作业数",
         systemFeatureUsageCount: "系统使用量",
-        portalFeatureUsageCount: "门户系统使用功能次数",
-        misFeatureUsageCount: "管理系统使用功能次数",
+        topTenPortalFeatureUsageCount: "门户系统使用功能次数Top10",
+        topTenMisFeatureUsageCount: "管理系统使用功能次数Top10",
         jobCount: "作业数",
         usageCount:"次数",
         userName: "用户名",
@@ -1112,7 +1165,7 @@ export default {
       uploadFile: "上传文件",
       createDirectory: "新建文件夹",
       deleteDirectory: "删除文件夹",
-      moveFileItem: "移动文件/文件夹",
+      moveFileItem: "移动或重命名文件/文件夹",
       copyFileItem: "复制文件/文件夹",
       setJobTimeLimit: "设置作业时限",
       createUser: "创建用户",
@@ -1155,6 +1208,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
       userChangeTenant: "用户切换租户",
       customEvent: "自定义操作行为",
+      activateCluster: "启用集群",
+      deactivateCluster: "停用集群",
     },
     operationDetails: {
       login: "用户登录",
@@ -1173,7 +1228,7 @@ export default {
       uploadFile: "上传文件：{}",
       createDirectory: "新建文件夹：{}",
       deleteDirectory: "删除文件夹：{}",
-      moveFileItem: "移动文件/文件夹：{}至{}",
+      moveFileItem: "移动或重命名文件/文件夹：{}至{}",
       copyFileItem: "复制文件/文件夹：{}至{}",
       setJobTimeLimit: "设置作业(集群：{}, ID: {})时限 {} 分钟",
       createUser: "创建用户{}",
@@ -1233,6 +1288,8 @@ export default {
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
+      activateCluster: "用户{}启用集群：{}",
+      deactivateCluster: "用户{}停用集群：{}",
     },
   },
   userRoles: {

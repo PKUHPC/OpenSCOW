@@ -34,7 +34,7 @@ export const CommonConfigSchema = Type.Object({
   passwordPattern: Type.Object({
     regex: Type.String({
       description: "用户密码的正则规则",
-      default: "^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:\"<>?]).{8,}$",
+      default: "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$",
     }),
     errorMessage: createI18nStringSchema({
       description: "如果密码不符合规则显示什么",

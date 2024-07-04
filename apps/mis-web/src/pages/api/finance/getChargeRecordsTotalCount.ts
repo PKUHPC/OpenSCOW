@@ -39,9 +39,6 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     // 消费类型
     types: Type.Optional(Type.Array(Type.String())),
 
-    // 消费的用户id
-    userIds: Type.Optional(Type.Array(Type.String())),
-
     accountNames: Type.Optional(Type.Array(Type.String())),
 
     // 是否为平台管理下的记录：如果是则需查询所有租户，如果不是只查询当前租户
@@ -49,6 +46,10 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
 
     // 查询消费记录种类：平台账户消费记录或租户消费记录
     searchType: Type.Optional(Type.Enum(SearchType)),
+
+    // 消费的用户id或姓名
+    userIdsOrNames: Type.Optional(Type.Array(Type.String())),
+
   }),
 
   responses: {
@@ -60,7 +61,7 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
 });
 
 export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) => {
-  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIds } = req.query;
+  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIdsOrNames } = req.query;
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
 
@@ -72,8 +73,8 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     startTime,
     endTime,
     types:types ?? [],
-    userIds: userIds ?? [],
     target: buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords),
+    userIdsOrNames:userIdsOrNames ?? [],
   }), ["totalAmount", "totalCount"]);
 
   return {

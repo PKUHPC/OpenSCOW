@@ -312,12 +312,11 @@ export const shareDatasetVersion = procedure
   .input(z.object({
     datasetVersionId: z.number(),
     datasetId: z.number(),
-    sourceFilePath: z.string(),
   }))
   .output(z.void())
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
-    const { datasetVersionId, datasetId, sourceFilePath } = input;
+    const { datasetVersionId, datasetId } = input;
     const datasetVersion = await em.findOne(DatasetVersion, { id: datasetVersionId });
     if (!datasetVersion)
       throw new TRPCError({ code: "NOT_FOUND", message: `DatasetVersion ${datasetVersionId} not found` });
@@ -338,7 +337,7 @@ export const shareDatasetVersion = procedure
 
     const homeTopDir = await sshConnect(host, user.identityId, logger, async (ssh) => {
       // 确认是否具有分享权限
-      await checkSharePermission({ ssh, logger, sourcePath: sourceFilePath, userId: user.identityId });
+      await checkSharePermission({ ssh, logger, sourcePath: datasetVersion.privatePath, userId: user.identityId });
       // 获取分享路径的上级路径
       const userHomeDir = await getUserHomedir(ssh, user.identityId, logger);
       return dirname(dirname(userHomeDir));
@@ -359,7 +358,7 @@ export const shareDatasetVersion = procedure
       if (!dataset)
         throw new TRPCError({ code: "NOT_FOUND", message: `Dataset ${datasetId} not found` });
 
-      const versionPath = join(targetFullPath, path.basename(sourceFilePath));
+      const versionPath = join(targetFullPath, path.basename(datasetVersion.privatePath));
       datasetVersion.sharedStatus = SharedStatus.SHARED;
       datasetVersion.path = versionPath;
       if (!dataset.isShared) { dataset.isShared = true; };
@@ -380,7 +379,7 @@ export const shareDatasetVersion = procedure
 
     shareFileOrDir({
       clusterId: dataset.clusterId,
-      sourceFilePath: sourceFilePath,
+      sourceFilePath: datasetVersion.privatePath,
       userId: user.identityId,
       sharedTarget: SHARED_TARGET.DATASET,
       targetName: dataset.name,

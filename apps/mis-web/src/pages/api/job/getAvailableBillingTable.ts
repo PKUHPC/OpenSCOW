@@ -12,11 +12,12 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ConfigServiceClient as MisConfigServerClient } from "@scow/protos/build/server/config";
+import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { JobBillingItem } from "@scow/protos/build/server/job";
 import { UserStatus } from "@scow/protos/build/server/user";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { Partition } from "src/models/cluster";
 import { getBillingItems } from "src/pages/api/job/getBillingItems";
 import { getClient } from "src/utils/client";
 import { moneyToString } from "src/utils/money";
@@ -53,17 +54,6 @@ export const JobBillingTableItem = Type.Object({
 });
 export type JobBillingTableItem = Static<typeof JobBillingTableItem>;
 
-export const Partition = Type.Object({
-  name: Type.String(),
-  memMb: Type.Number(),
-  cores: Type.Number(),
-  gpus: Type.Number(),
-  nodes: Type.Number(),
-  qos: Type.Optional(Type.Array(Type.String())),
-  comment: Type.Optional(Type.String()),
-});
-export type Partition = Static<typeof Partition>;
-
 export const ClusterPartitions = Type.Object({
   cluster: Type.String(),
   partitions: Type.Array(Partition),
@@ -90,7 +80,7 @@ export const GetAvailableBillingTableSchema = typeboxRouteSchema({
 export async function getAvailablePartitionForItems(
   cluster: string, userId: string, tenantName: string): Promise<Partition[]> {
 
-  const client = getClient(MisConfigServerClient);
+  const client = getClient(ConfigServiceClient);
 
   const statuses = await getUserStatus(userId, tenantName);
 

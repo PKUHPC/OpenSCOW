@@ -1,5 +1,28 @@
 # @scow/audit-server
 
+## 2.3.3
+
+### Patch Changes
+
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/protos@1.0.12
+
+## 2.3.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-operation-log@2.1.5
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+
 ## 2.3.1
 
 ### Patch Changes

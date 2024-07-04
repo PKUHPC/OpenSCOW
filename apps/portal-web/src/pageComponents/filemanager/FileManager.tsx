@@ -44,7 +44,8 @@ import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
 import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
@@ -360,6 +361,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   }, [editFile, files]);
 
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  useEffect(() => {
+    const uploadQuery = queryToString(router.query.uploadModalOpen);
+    if (uploadQuery === "true") {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadModalOpen(false);
+    }
+  }, []);
+
+
   return (
     <div>
       <TitleText>
@@ -396,6 +409,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       <OperationBar>
         <Space wrap>
           <UploadButton
+            externalOpen={isUploadModalOpen}
             cluster={cluster.id}
             path={path}
             reload={reload}

@@ -5,7 +5,7 @@
   "private": true,
   "main": "build/index.js",
   "scripts": {
-    "dev": "node --watch -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "dev": "node -r ts-node/register -r tsconfig-paths/register --watch src/index.ts",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "serve": "node build/index.js"
   },
@@ -21,7 +21,7 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-server": "0.19.5",
-    "@grpc/grpc-js": "1.10.6",
+    "@grpc/grpc-js": "1.10.9",
     "@scow/lib-config": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*"
   },

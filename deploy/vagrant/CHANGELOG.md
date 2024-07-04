@@ -1,5 +1,13 @@
 # @scow/demo-vagrant
 
+## 2.0.4
+
+### Patch Changes
+
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 6304074: 提交作业时，新增保留作业脚本的选项
+
 ## 2.0.3
 
 ### Patch Changes

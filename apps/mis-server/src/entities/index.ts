@@ -24,6 +24,8 @@ import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount } from "src/entities/UserAccount";
 
+import { Cluster } from "./Cluster";
+
 export const entities = [
   UserAccount,
   AccountWhitelist,
@@ -38,4 +40,5 @@ export const entities = [
   ChargeRecord,
   SystemState,
   QueryCache,
+  Cluster,
 ];
