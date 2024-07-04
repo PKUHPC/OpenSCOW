@@ -368,6 +368,7 @@ export default {
         title: "导出数据",
         subTitle: "请选择需要导出的字段",
         errorMsg: "请至少选择一项进行导出",
+        encoding: "编码",
       },
       paymentTable:{
         total:"总数",

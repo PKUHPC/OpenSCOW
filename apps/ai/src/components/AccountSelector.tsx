@@ -13,7 +13,7 @@
 "use client";
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip } from "antd";
 import { useEffect } from "react";
 import { trpc } from "src/utils/trpc";
 
@@ -37,7 +37,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   }, [data, value]);
 
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
@@ -49,7 +49,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
       <Tooltip title="刷新账户列表">
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => { refetch(); }} loading={isLoading} />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
 

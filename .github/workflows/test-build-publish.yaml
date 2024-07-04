@@ -66,7 +66,7 @@ jobs:
 
       - name: Wait for ports
         if: vars.RUN_TESTS == 'true'
-        uses: ifaxity/wait-on-action@v1.1.0
+        uses: ifaxity/wait-on-action@v1.2.1
         with:
           log: true
           verbose: true
@@ -222,3 +222,9 @@ jobs:
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
+
+      - name: Send Notification Request
+        run: |
+          curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version/success \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}"
