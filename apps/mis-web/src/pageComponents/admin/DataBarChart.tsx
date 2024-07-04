@@ -38,6 +38,18 @@ export const StatisticTitle = styled.div<{ justify?: string }>`
   margin: 8px 0;
 `;
 
+
+const CustomizedAxisTick = (props) => {
+  const { x, y, payload } = props;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666" transform="rotate(-35)">
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
 export const DataBarChart: React.FC<Props> = ({
   title,
   data,
@@ -49,6 +61,7 @@ export const DataBarChart: React.FC<Props> = ({
     const roundedValue = Number.isInteger(value) ? value : parseFloat(value.toFixed(2));
     return roundedValue.toString();
   };
+
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -65,7 +78,9 @@ export const DataBarChart: React.FC<Props> = ({
                     dataKey="x"
                     padding={{ left: 20, right: 20 }}
                     label={{ value: xLabel, position: "insideBottom", offset: 0 }}
-                    height={40}
+                    interval={0}
+                    height={ 80 }
+                    tick={<CustomizedAxisTick /> }
                   />
                   <YAxis padding={{ top: 20 }} tickFormatter={tickFormatter} />
                   <Tooltip

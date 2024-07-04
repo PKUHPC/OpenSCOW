@@ -11,7 +11,7 @@
  */
 
 import { FormLayout } from "@scow/lib-web/build/layouts/FormLayout";
-import { App, Button, Form, Input, InputNumber, Select } from "antd";
+import { App, Button, Form, Input, InputNumber, Select, Space } from "antd";
 import { NextPage } from "next";
 import React, { useState } from "react";
 import { useStore } from "simstate";
@@ -19,12 +19,13 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { DisabledA } from "src/components/DisabledA";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TenantRole } from "src/models/User";
 import type { ChangeStorageMode } from "src/pages/api/admin/changeStorage";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { Cluster } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { Cluster } from "src/utils/cluster";
 import { Head } from "src/utils/head";
 
 const p = prefix("page.tenant.storage.");
@@ -48,10 +49,15 @@ const StorageForm: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const [current, setCurent] = useState<number | undefined>(undefined);
+  const [current, setCurrent] = useState<number | undefined>(undefined);
   const [currentLoading, setCurrentLoading] = useState(false);
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
+  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  const currentDefaultCluster = defaultCluster ?? Object.values(activatedClusters)[0];
 
   const t = useI18nTranslateToString();
 
@@ -66,7 +72,7 @@ const StorageForm: React.FC = () => {
       .httpError(400, () => { message.error(t(p("balanceChangeIllegal"))); })
       .then(({ currentQuota }) => {
         message.success(t(p("editSuccess")));
-        setCurent(currentQuota);
+        setCurrent(currentQuota);
       })
       .finally(() => setLoading(false));
   };
@@ -82,7 +88,7 @@ const StorageForm: React.FC = () => {
     await api.queryStorageQuota({ query: { cluster: cluster.id, userId } })
       .httpError(404, () => { message.error(t(p("userNotFound"))); })
       .then(({ currentQuota }) => {
-        setCurent(currentQuota);
+        setCurrent(currentQuota);
       })
       .finally(() => setCurrentLoading(false));
   };
@@ -107,7 +113,7 @@ const StorageForm: React.FC = () => {
         name="cluster"
         label={t("common.cluster")}
         rules={[{ required: true }]}
-        initialValue={defaultClusterStore.cluster}
+        initialValue={currentDefaultCluster}
       >
         <SingleClusterSelector />
       </Form.Item>
@@ -123,7 +129,7 @@ const StorageForm: React.FC = () => {
         </DisabledA>
       </Form.Item>
       <Form.Item<FormProps> label={t(p("storageChange"))} rules={[{ required: true }]}>
-        <Input.Group compact>
+        <Space.Compact style={{ width: "100%" }}>
           <Form.Item name="mode" noStyle>
             <Select placeholder={t(p("selectSetTo"))}>
               {Object.entries(changeModeText).map(([key, value]) => (
@@ -134,7 +140,7 @@ const StorageForm: React.FC = () => {
           <Form.Item name="value" noStyle>
             <InputNumber min={1} step={1} addonAfter={"TB"} />
           </Form.Item>
-        </Input.Group>
+        </Space.Compact>
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>
         <Button type="primary" htmlType="submit" loading={loading}>

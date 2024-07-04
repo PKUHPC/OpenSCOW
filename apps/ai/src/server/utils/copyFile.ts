@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { loggedExec } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { logger } from "src/server/utils/logger";
 
@@ -26,7 +27,7 @@ export const copyFile = async ({ host, userIdentityId, fromPath, toPath }: CopyF
   await sshConnect(host, userIdentityId, logger, async (ssh) => {
     // the SFTPWrapper doesn't supprt copy
     // Use command to do it
-    const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
+    const resp = await loggedExec(ssh, logger, false, "cp", ["-r", fromPath, toPath]);
 
     if (resp.code !== 0) {
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "cp command failed", cause: resp.stderr });

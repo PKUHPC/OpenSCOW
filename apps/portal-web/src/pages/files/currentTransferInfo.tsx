@@ -11,12 +11,13 @@
  */
 
 import { NextPage } from "next";
+import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { Redirect } from "src/components/Redirect";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { TransferInfoTable } from "src/pageComponents/filemanager/TransferInfoTable";
-import { publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 const p = prefix("pages.files.currentTransferInfo.");
 
@@ -24,7 +25,9 @@ export const FileTransferPage: NextPage = requireAuth(() => true)(() => {
 
   const t = useI18nTranslateToString();
 
-  if (!publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED) {
+  const { crossClusterFileTransferEnabled } = useStore(ClusterInfoStore);
+
+  if (!crossClusterFileTransferEnabled) {
     return <Redirect url={"/dashboard"} />;
   }
 

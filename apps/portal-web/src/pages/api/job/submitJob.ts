@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { JobServiceClient, TimeUnit } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { OperationResult, OperationType } from "src/models/operationLog";
@@ -40,6 +40,7 @@ export const SubmitJobInfo = Type.Object({
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
   scriptOutput:Type.Optional(Type.String()),
+  maxTimeUnit:Type.Optional(Type.Enum(TimeUnit)),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
@@ -58,6 +59,11 @@ export const SubmitJobSchema = typeboxRouteSchema({
       message: Type.String(),
     }),
 
+    404: Type.Object({
+      code: Type.Literal("NOT_FOUND"),
+      message: Type.String(),
+    }),
+
     500: Type.Object({
       code: Type.Literal("SCHEDULER_FAILED"),
       message: Type.String(),
@@ -73,7 +79,7 @@ export default route(SubmitJobSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, gpuCount, maxTime, save,
+  const { cluster, command, jobName, coreCount, gpuCount, maxTime, maxTimeUnit, save,
     nodeCount, partition, qos, account, comment
     , workingDirectory, output, errorOutput, scriptOutput, memory } = req.body;
 
@@ -94,6 +100,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     coreCount,
     gpuCount,
     maxTime,
+    maxTimeUnit,
     nodeCount,
     partition,
     qos,
@@ -128,6 +135,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
+      [status.NOT_FOUND]: (err) => ({ 404: { code: "NOT_FOUND", message: err.details } } as const),
     },
     async () => await callLog(
       { ...logInfo,

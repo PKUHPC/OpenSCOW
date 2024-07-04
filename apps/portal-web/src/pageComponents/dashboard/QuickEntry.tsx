@@ -19,13 +19,19 @@ import { Localized, prefix } from "src/i18n";
 import { DashboardSection } from "src/pageComponents/dashboard/DashboardSection";
 import { Sortable } from "src/pageComponents/dashboard/Sortable";
 import { App } from "src/pages/api/app/listAvailableApps";
-import { Cluster, publicConfig } from "src/utils/config";
-import { styled } from "styled-components";
+import { Cluster } from "src/utils/cluster";
+import { styled, useTheme } from "styled-components";
+
+import Bullet from "./Bullet";
 
 const CardsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
 `;
+
+const EditButton = styled(Button)`
+`;
+
 
 export interface AppWithCluster {
   [appId: string]: {
@@ -35,7 +41,8 @@ export interface AppWithCluster {
 }
 
 interface Props {
-
+  currentClusters: Cluster[];
+  publicConfigClusters: Cluster[];
 }
 
 export const defaultEntry: Entry[] = [
@@ -68,7 +75,7 @@ export const defaultEntry: Entry[] = [
       $case:"pageLink",
       pageLink:{
         path: "/jobs/allJobs",
-        icon:"BookOutlined",
+        icon:"AllJobsOutlined",
       },
     },
   },
@@ -86,16 +93,15 @@ export const defaultEntry: Entry[] = [
 ];
 const p = prefix("pageComp.dashboard.quickEntry.");
 
-export const QuickEntry: React.FC<Props> = () => {
+export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClusters }) => {
+
   const { data, isLoading:getQuickEntriesLoading } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getQuickEntries({});
   }, []) });
 
-  const clusters = publicConfig.CLUSTERS;
-
   // apps包含在哪些集群上可以创建app
   const { data:apps, isLoading:getAppsLoading } = useAsync({ promiseFn: useCallback(async () => {
-    const appsInfo = await Promise.all(clusters.map((x) => {
+    const appsInfo = await Promise.all(currentClusters.map((x) => {
       return api.listAvailableApps({ query: { cluster: x.id } });
     }));
 
@@ -114,33 +120,51 @@ export const QuickEntry: React.FC<Props> = () => {
           appWithCluster[y.id].app.logoPath = y.logoPath;
         }
 
-        appWithCluster[y.id].clusters.push(clusters[idx]);
+        appWithCluster[y.id].clusters.push(currentClusters[idx]);
       });
     });
     return appWithCluster;
-  }, [clusters]) });
+  }, [currentClusters]) });
 
   const [isEditable, setIsEditable] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
 
+  const theme = useTheme();
+
   return (
     <DashboardSection
       style={{ marginBottom: "16px" }}
-      title={<Localized id={p("quickEntry")} />}
+      title={ (
+        <>
+          <Bullet style={{
+            width: "0.8em", /* 与字体大小相对应 */
+            height:" 0.8em", /* 与字体大小相对应 */
+            backgroundColor:theme.token.colorPrimary, /* 与主题颜色相对应 */
+            marginRight:"1em",
+          }}
+          />
+          <Localized id={p("quickEntry")} />
+        </>
+      )}
       extra={
         isEditable ? (
           <div>
-            <Button type="link" onClick={() => { setIsEditable(false); setIsFinished(true); }}>
+            <EditButton
+              style={{ marginRight:"20px" }}
+              onClick={() => { setIsEditable(false); setIsFinished(true); }}
+            >
               <Localized id={p("finish")} />
-            </Button>
-            <Button type="link" onClick={() => { setIsEditable(false); }}>
+            </EditButton>
+            <EditButton
+              onClick={() => { setIsEditable(false); }}
+            >
               <Localized id={p("cancel")} />
-            </Button>
+            </EditButton>
           </div>
         ) : (
-          <Button type="link" onClick={() => { setIsEditable(true); setIsFinished(false); }}>
+          <EditButton onClick={() => { setIsEditable(true); setIsFinished(false); }}>
             <Localized id={p("edit")} />
-          </Button>
+          </EditButton>
         )}
     >
       <CardsContainer>
@@ -151,6 +175,8 @@ export const QuickEntry: React.FC<Props> = () => {
               isFinished={isFinished}
               quickEntryArray={data?.quickEntries.length ? data?.quickEntries : defaultEntry }
               apps={apps ?? {}}
+              currentClusters={currentClusters}
+              publicConfigClusters={publicConfigClusters}
             ></Sortable>
           )}
       </CardsContainer>

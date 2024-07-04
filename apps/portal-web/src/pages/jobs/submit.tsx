@@ -16,11 +16,14 @@ import { Spin } from "antd";
 import { GetServerSideProps, NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
+import { TimeUnit } from "src/models/job";
 import { SubmitJobForm } from "src/pageComponents/job/SubmitJobForm";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { getServerI18nConfigText, publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 
@@ -34,12 +37,14 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
     const query = useQuerystring();
 
     const cluster = queryToString(query.cluster);
+    const { currentClusters } = useStore(ClusterInfoStore);
+    const clusterObj = currentClusters.find((x) => x.id === cluster);
+
     const jobTemplateId = queryToString(query.jobTemplateId);
 
     const { data, isLoading } = useAsync({
       promiseFn: useCallback(async () => {
         if (cluster && jobTemplateId) {
-          const clusterObj = publicConfig.CLUSTERS.find((x) => x.id === cluster);
           if (!clusterObj) { return undefined; }
           return api.getJobTemplate({ query: { cluster, id: jobTemplateId } })
             .then(({ template }) => ({
@@ -58,13 +63,13 @@ export const SubmitJobPage: NextPage<Props> = requireAuth(() => true)(
               output: template.output,
               errorOutput: template.errorOutput,
               save: false,
-              scriptOutput:template.scriptOutput,
+              scriptOutput: template.scriptOutput,
+              maxTimeUnit: template.maxTimeUnit || TimeUnit.MINUTES,
             }));
         } else {
           return undefined;
         }
-      },
-      [cluster, jobTemplateId]),
+      }, [cluster, jobTemplateId]),
     });
 
     const t = useI18nTranslateToString();

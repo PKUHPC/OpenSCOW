@@ -1,5 +1,45 @@
 # @scow/portal-server
 
+## 1.6.1
+
+## 1.6.0
+
+### Minor Changes
+
+- 806f778: 增加 HPC 文件和桌面功能的 scowd 支持
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 383a8bd: 添加 web shell 文件上传功能
+- 3558bd4: 提交作业保存作业模板时最长运行时间的单位也保存入模板中
+- Updated dependencies [806f778]
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/scowd-protos@0.2.0
+  - @scow/lib-scowd@1.1.0
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.10
+
+## 1.5.2
+
+### Patch Changes
+
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.9
+
 ## 1.5.1
 
 ### Patch Changes

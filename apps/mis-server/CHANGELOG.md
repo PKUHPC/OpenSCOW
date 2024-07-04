@@ -1,5 +1,44 @@
 # @scow/mis-server
 
+## 1.6.1
+
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能，在数据库中新增 Cluster 表单
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- d427530: 修复创建账户且判断为需要解封时未在集群中执行解封操作的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/lib-hook@1.0.12
+  - @scow/protos@1.0.12
+  - @scow/lib-scheduler-adapter@1.1.10
+
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-hook@1.0.11
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/lib-scheduler-adapter@1.1.9
+
 ## 1.5.1
 
 ### Patch Changes

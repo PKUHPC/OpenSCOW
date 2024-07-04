@@ -48,7 +48,9 @@ export type SSRProps<T, TExtraErrorCode = never> = {
 
 export const ssrAuthenticate = (check: Check) =>
   async (req: NextPageContext["req"]) => {
-    return await checkCookie(check, req);
+    // return await checkCookie(check, req);
+    const result = await checkCookie(check, req);
+    return result;
   };
 
 export const authenticate = (check: Check) =>

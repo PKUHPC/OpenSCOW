@@ -11,124 +11,129 @@
  */
 
 import {
-  BookOutlined,
   CloudServerOutlined,
   CloudSyncOutlined,
   ClusterOutlined,
-  DashboardOutlined,
-  DesktopOutlined,
-  EyeOutlined,
-  FolderOutlined,
   LinkOutlined,
-  Loading3QuartersOutlined,
-  MacCommandOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
-  SaveOutlined } from "@ant-design/icons";
+} from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
 import { useI18n, useI18nTranslateToString } from "src/i18n";
+import { AllJobsIcon, ApplicationIcon
+  , AppSessionsIcon, ClusterFileManagerIcon
+  , CreateAppIcon, DashBoardIcon, DesktopIcon
+  , FileManagerIcon, JobIcon, RunningJobsIcon
+  , ShellClusterIcon, ShellIcon, SubmitJobIcon, TemplateJobIcon } from "src/icons/headerIcons/headerIcons";
 import { User } from "src/stores/UserStore";
-import { Cluster, LoginNode, publicConfig } from "src/utils/config";
+import { Cluster, LoginNode } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 export const userRoutes: (
   user: User | undefined,
-  defaultCluster: Cluster,
+  currentClusters: Cluster[],
+  defaultCluster: Cluster | undefined,
   LoginNodes: Record<string, LoginNode[]>,
-  setDefaultCluster: (cluster: Cluster) => void,
-) => NavItemProps[] = (user, defaultCluster, loginNodes, setDefaultCluster) => {
+  enableLoginDesktop: boolean,
+  crossClusterFileTransferEnabled: boolean,
+  setDefaultCluster: (cluster: Cluster | undefined) => void,
+) => NavItemProps[] = (
+  user, currentClusters, defaultCluster, loginNodes,
+  enableLoginDesktop, crossClusterFileTransfer, setDefaultCluster) => {
 
   if (!user) { return []; }
   const t = useI18nTranslateToString();
 
   const languageId = useI18n().currentLanguage.id;
 
-
   return [
     {
-      Icon: DashboardOutlined,
+      Icon: DashBoardIcon,
       text: t("routes.dashboard"),
       path: "/dashboard",
     },
     ...(publicConfig.ENABLE_JOB_MANAGEMENT ? [{
-      Icon: BookOutlined,
+      Icon: JobIcon,
       text: t("routes.job.title"),
       path: "/jobs",
       clickToPath: "/jobs/runningJobs",
       children: [
         {
-          Icon: BookOutlined,
+          Icon: RunningJobsIcon,
           text: t("routes.job.runningJobs"),
           path: "/jobs/runningJobs",
         },
         {
-          Icon: BookOutlined,
+          Icon: AllJobsIcon,
           text: t("routes.job.allJobs"),
           path: "/jobs/allJobs",
         },
         {
-          Icon: PlusCircleOutlined,
+          Icon: SubmitJobIcon,
           text: t("routes.job.submitJob"),
           path: "/jobs/submit",
         },
         {
-          Icon: SaveOutlined,
+          Icon: TemplateJobIcon,
           text: t("routes.job.jobTemplates"),
           path: "/jobs/savedJobs",
         },
       ],
     }] : []),
-    ...(publicConfig.ENABLE_SHELL ? [{
-      Icon: MacCommandOutlined,
-      text: "Shell",
-      path: "/shell",
-      clickToPath:
-        join(publicConfig.BASE_PATH, "shell", defaultCluster.id, loginNodes[defaultCluster.id]?.[0]?.address),
-      openInNewPage: true,
-      clickable: true,
-      children: publicConfig.CLUSTERS.map(({ name, id }) => ({
+    ...(publicConfig.ENABLE_SHELL && currentClusters.length > 0 ?
+      [{
+        Icon: ShellIcon,
+        text: "Shell",
+        path: "/shell",
+        clickToPath:
+        join(publicConfig.BASE_PATH,
+          "shell",
+          defaultCluster?.id ?? currentClusters[0].id,
+          loginNodes[defaultCluster?.id ?? currentClusters[0].id]?.[0]?.address),
         openInNewPage: true,
-        Icon: CloudServerOutlined,
-        text: getI18nConfigCurrentText(name, languageId),
-        path: `/shell/${id}`,
-        clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.address),
-        handleClick: () => { setDefaultCluster({ name, id }); },
-        children: loginNodes[id]?.map((loginNode) => ({
+        clickable: true,
+        children: currentClusters.map(({ name, id }) => ({
           openInNewPage: true,
-          Icon: CloudServerOutlined,
-          text: loginNode.name,
-          path: `/shell/${id}/${loginNode.address}`,
+          Icon: ShellClusterIcon,
+          text: getI18nConfigCurrentText(name, languageId),
+          path: `/shell/${id}`,
+          clickToPath: join(publicConfig.BASE_PATH, "shell", id, loginNodes[id]?.[0]?.address),
           handleClick: () => { setDefaultCluster({ name, id }); },
-        })),
-      } as NavItemProps)),
-    } as NavItemProps] : []),
-    ...(publicConfig.ENABLE_LOGIN_DESKTOP ? [{
-      Icon: DesktopOutlined,
+          children: loginNodes[id]?.map((loginNode) => ({
+            openInNewPage: true,
+            Icon: CloudServerOutlined,
+            text: loginNode.name,
+            path: `/shell/${id}/${loginNode.address}`,
+            handleClick: () => { setDefaultCluster({ name, id }); },
+          })),
+        } as NavItemProps)),
+      } as NavItemProps] : []),
+    ...(enableLoginDesktop && currentClusters.length > 0 ? [{
+      Icon: DesktopIcon,
       text: t("routes.desktop"),
       path: "/desktop",
     }] : []),
-    ...(publicConfig.ENABLE_APPS && publicConfig.CLUSTERS.length > 0 ? [{
-      Icon: EyeOutlined,
+    ...(publicConfig.ENABLE_APPS && currentClusters.length > 0 ? [{
+      Icon: ApplicationIcon,
       text: t("routes.apps.title"),
       path: "/apps",
-      clickToPath: `/apps/${defaultCluster.id}/sessions`,
+      clickToPath: `/apps/${defaultCluster?.id ?? currentClusters[0].id}/sessions`,
       clickable: true,
-      children: publicConfig.CLUSTERS.map((cluster) => ({
-        Icon: FolderOutlined,
+      children: currentClusters.map((cluster) => ({
+        Icon: FileManagerIcon,
         text: getI18nConfigCurrentText(cluster.name, languageId),
         path: `/apps/${cluster.id}`,
         clickToPath: `/apps/${cluster.id}/sessions`,
         handleClick: () => { setDefaultCluster(cluster); },
         children: [
           {
-            Icon: Loading3QuartersOutlined,
+            Icon: AppSessionsIcon,
             text: t("routes.apps.appSessions"),
             path: `/apps/${cluster.id}/sessions`,
             handleClick: () => { setDefaultCluster(cluster); },
           },
           {
-            Icon: PlusOutlined,
+            Icon: CreateAppIcon,
             text: t("routes.apps.createApp"),
             clickable: false,
             path: `/apps/${cluster.id}/createApps`,
@@ -137,19 +142,19 @@ export const userRoutes: (
         ],
       } as NavItemProps)),
     } as NavItemProps] : []),
-    ...(publicConfig.CLUSTERS.length > 0 ? [{
-      Icon: FolderOutlined,
+    ...(currentClusters.length > 0 ? [{
+      Icon: FileManagerIcon,
       text: t("routes.file.fileManager"),
       path: "/files",
-      clickToPath: `/files/${defaultCluster.id}/~`,
+      clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
       clickable: true,
       children: [
         {
-          Icon: FolderOutlined,
+          Icon: ClusterFileManagerIcon,
           text: t("routes.file.clusterFileManager"),
           path: "/files/",
-          clickToPath: `/files/${defaultCluster.id}/~`,
-          children: publicConfig.CLUSTERS.map((cluster) => ({
+          clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
+          children: currentClusters.map((cluster) => ({
             Icon: ClusterOutlined,
             text: getI18nConfigCurrentText(cluster.name, languageId),
             path: `/files/${cluster.id}`,
@@ -157,14 +162,14 @@ export const userRoutes: (
             handleClick: () => { setDefaultCluster(cluster); },
           } as NavItemProps)),
         },
-        ...(publicConfig.CROSS_CLUSTER_FILE_TRANSFER_ENABLED ? [
+        ...(crossClusterFileTransfer ? [
           {
             Icon: CloudSyncOutlined,
             text: t("routes.file.crossClusterFileTransfer"),
             path: "/files/fileTransfer",
           },
           {
-            Icon: CloudServerOutlined,
+            Icon: ShellClusterIcon,
             text: t("routes.file.transferProgress"),
             path: "/files/currentTransferInfo",
           },

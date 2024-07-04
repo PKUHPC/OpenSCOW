@@ -10,224 +10,145 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir, sftpReaddir,
-  sftpReadFile, sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
-import { FileInfo, FileInfo_FileType,
-  FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
-import { join } from "path";
-import { clusters } from "src/config/clusters";
-import { config } from "src/config/env";
+import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
+  sftpReadFile, sftpRealPath, sshRmrf } from "@scow/lib-ssh";
+import { FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+import { getClusterOps } from "src/clusterops";
+import { configClusters } from "src/config/clusters";
+import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
-import { pipeline } from "src/utils/pipeline";
 import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
-import { once } from "stream";
 
 export const fileServiceServer = plugin((server) => {
 
   server.addService<FileServiceServer>(FileServiceService, {
     copy: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        // the SFTPWrapper doesn't supprt copy
-        // Use command to do it
-        const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
+      const clusterops = getClusterOps(cluster);
 
-        if (resp.code !== 0) {
-          throw <ServiceError> { code: status.INTERNAL, message: "cp command failed", details: resp.stderr };
-        }
+      await clusterops.file.copy({ userId, fromPath, toPath }, logger);
 
-        return [{}];
-      });
+      return [{}];
     },
 
     createFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const clusterops = getClusterOps(cluster);
 
-        const sftp = await ssh.requestSFTP();
+      await clusterops.file.createFile({ userId, path }, logger);
 
-        if (await sftpExists(sftp, path)) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${path} already exists` };
-        }
-
-        await sftpWriteFile(sftp)(path, Buffer.alloc(0));
-
-        return [{}];
-      });
+      return [{}];
     },
 
     deleteDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const clusterops = getClusterOps(cluster);
 
-        await sshRmrf(ssh, path);
+      await clusterops.file.deleteDirectory({ userId, path }, logger);
 
-        return [{}];
-      });
+      return [{}];
     },
 
     deleteFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const clusterops = getClusterOps(cluster);
 
-        const sftp = await ssh.requestSFTP();
+      await clusterops.file.deleteFile({ userId, path }, logger);
 
-        await sftpUnlink(sftp)(path);
-
-        return [{}];
-      });
+      return [{}];
     },
 
     getHomeDirectory: async ({ request, logger }) => {
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      const clusterops = getClusterOps(cluster);
 
-        const path = await sftpRealPath(sftp)(".");
+      const reply = await clusterops.file.getHomeDirectory({ userId }, logger);
 
-        return [{ path }];
-      });
+      return [{ ...reply }];
     },
 
     makeDirectory: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const clusterops = getClusterOps(cluster);
 
-        const sftp = await ssh.requestSFTP();
+      await clusterops.file.makeDirectory({ userId, path }, logger);
 
-        if (await sftpExists(sftp, path)) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, details: `${path} already exists` };
-        }
-
-        await sftpMkdir(sftp)(path);
-
-        return [{}];
-      });
-
+      return [{}];
     },
 
     move: async ({ request, logger }) => {
       const { userId, cluster, fromPath, toPath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
-        if (error) {
-          throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
-        }
+      const clusterops = getClusterOps(cluster);
 
-        return [{}];
-      });
+      await clusterops.file.move({ userId, fromPath, toPath }, logger);
+
+      return [{}];
     },
 
     readDirectory: async ({ request, logger }) => {
       const { userId, cluster, path, updateAccessTime } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      const clusterops = getClusterOps(cluster);
 
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, userId);
-          throw <ServiceError> {
-            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
-          };
-        });
+      const reply = await clusterops.file.readDirectory({ userId, path, updateAccessTime }, logger);
 
-        if (!stat.isDirectory()) {
-          throw <ServiceError> {
-            code: status.INVALID_ARGUMENT,
-            message: `${path} is not directory or not exists` };
-        }
-
-        const files = await sftpReaddir(sftp)(path);
-        const list: FileInfo[] = [];
-
-        // 通过touch -a命令实现共享文件系统的缓存刷新
-        const pureFiles = files.filter((file) => !file.longname.startsWith("d"));
-
-        if (pureFiles.length > 0 && updateAccessTime) {
-
-          // 避免目录下文件过多导致 touch -a 命令报错，采用分批异步执行的方式
-          // 一次执行 500 个文件是根据经验设置的安全值，可修改
-          // 根据一般系统 getconf ARG_MAX 的值为 2097152 字节，linux 下带有文件路径的文件名最长 4096 字节 设置安全值为500
-          const TOUCH_FILES_COUNT = 500;
-          const execFilePathsList: string[][] = [];
-
-          for (let i = 0; i < pureFiles.length; i += TOUCH_FILES_COUNT) {
-            const slicedExecFiles = pureFiles.slice(i, i + TOUCH_FILES_COUNT);
-            const slicedExecFilesPaths = slicedExecFiles.map((file) => join(path, file.filename));
-            execFilePathsList.push(slicedExecFilesPaths);
-          }
-
-          await Promise.allSettled(execFilePathsList.map(async (execFilePaths) => {
-            return loggedExec(ssh, logger, false, "touch -a", execFilePaths).catch((err) => {
-              logger.error(err, "touch -a %s failed as %s", execFilePaths, userId);
-            });
-          }));
-
-        }
-
-        for (const file of files) {
-
-          const isDir = file.longname.startsWith("d");
-
-          list.push({
-            type: isDir ? FileInfo_FileType.DIR : FileInfo_FileType.FILE,
-            name: file.filename,
-            mtime: new Date(file.attrs.mtime * 1000).toISOString(),
-            size: file.attrs.size,
-            mode: file.attrs.mode,
-          });
-        }
-        return [{ results: list }];
-      });
+      return [{ ...reply }];
     },
 
     download: async (call) => {
       const { logger, request: { cluster, path, userId } } = call;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
@@ -236,32 +157,9 @@ export const fileServiceServer = plugin((server) => {
       const subLogger = logger.child({ userId, path, cluster });
       subLogger.info("Download file started");
 
-      await sshConnect(host, userId, subLogger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const readStream = sftp.createReadStream(path, { highWaterMark: config.DOWNLOAD_CHUNK_SIZE });
+      const clusterops = getClusterOps(cluster);
 
-        // cannot use pipeline because it forwards error
-        // we don't want to forwards error
-        // because the error has code property, conflicting with gRPC'S ServiceError
-        await pipeline(
-          readStream,
-          async (chunk) => {
-            return { chunk: Buffer.from(chunk) };
-          },
-          call,
-        ).catch((e) => {
-          throw <ServiceError> {
-            code: status.INTERNAL,
-            message: "Error when reading file",
-            details: e?.message,
-          };
-        }).finally(async () => {
-          readStream.close(() => {});
-          await once(readStream, "close");
-          // await promisify(readStream.close.bind(readStream))();
-        });
-
-      });
+      await clusterops.file.download({ userId, path, call }, logger);
 
     },
 
@@ -283,114 +181,53 @@ export const fileServiceServer = plugin((server) => {
 
       const logger = call.logger.child({ upload: { userId, path, cluster, host } });
 
+      await checkActivatedClusters({ clusterIds: cluster });
+
       logger.info("Upload file started");
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      const clusterops = getClusterOps(cluster);
 
-        class RequestError {
-          constructor(
-            public code: ServiceError["code"],
-            public message: ServiceError["message"],
-            public details?: ServiceError["details"],
-          ) {}
+      const reply = await clusterops.file.upload({ userId, path, call }, logger);
 
-          toServiceError(): ServiceError {
-            return <ServiceError> { code: this.code, message: this.message, details: this.details };
-          }
-        }
-
-        try {
-          const writeStream = sftp.createWriteStream(path);
-
-          const { writeAsync } = createWriterExtensions(writeStream);
-
-          let writtenBytes = 0;
-
-          for await (const req of call.iter()) {
-            if (!req.message) {
-              throw new RequestError(
-                status.INVALID_ARGUMENT,
-                "Request is received but message is undefined",
-              );
-            }
-
-            if (req.message.$case !== "chunk") {
-              throw new RequestError(
-                status.INVALID_ARGUMENT,
-                `Expect receive chunk but received message of type ${req.message.$case}`,
-              );
-            }
-            await writeAsync(req.message.chunk);
-            writtenBytes += req.message.chunk.length;
-          }
-
-          // ensure the data is written
-          // if (!writeStream.destroyed) {
-          //   await new Promise<void>((res, rej) => writeStream.end((e) => e ? rej(e) : res()));
-          // }
-          writeStream.end();
-          await once(writeStream, "close");
-
-          logger.info("Upload complete. Received %d bytes", writtenBytes);
-
-          return [{ writtenBytes }];
-        } catch (e: any) {
-          if (e instanceof RequestError) {
-            throw e.toServiceError();
-          } else {
-            throw new RequestError(
-              status.INTERNAL,
-              "Error when writing file",
-              e.message,
-            ).toServiceError();
-          }
-
-        }
-
-      });
-
+      return [{ ...reply }];
 
     },
 
     getFileMetadata: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
+      const clusterops = getClusterOps(cluster);
 
-        const stat = await sftpStat(sftp)(path).catch((e) => {
-          logger.error(e, "stat %s as %s failed", path, userId);
-          throw <ServiceError> {
-            code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
-          };
-        });
+      const reply = await clusterops.file.getFileMetadata({ userId, path }, logger);
 
-        return [{ size: stat.size, type: stat.isDirectory() ? "dir" : "file" }];
-      });
+      return [{ ...reply }];
     },
 
     exists: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
 
       if (!host) { throw clusterNotFound(cluster); }
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
-        const sftp = await ssh.requestSFTP();
-        const exists = await sftpExists(sftp, path);
-        return [{ exists }];
-      });
+      const clusterops = getClusterOps(cluster);
+
+      const reply = await clusterops.file.exists({ userId, path }, logger);
+
+      return [{ ...reply }];
     },
 
     startFileTransfer: async ({ request, logger }) => {
 
       const { fromCluster, toCluster, userId, fromPath, toPath } = request;
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
+
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const {
         host: toTransferNodeHost,
@@ -430,6 +267,7 @@ export const fileServiceServer = plugin((server) => {
     queryFileTransfer: async ({ request, logger }) => {
 
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const transferNodeAddress = getClusterTransferNode(cluster).address;
 
@@ -459,6 +297,7 @@ export const fileServiceServer = plugin((server) => {
         const transferInfos: TransferInfo[] = [];
 
         // 根据host确定clusterId
+        const clusters = configClusters;
         transferInfosJsons.forEach((info) => {
           let toCluster = info.recvAddress;
           for (const key in clusters) {
@@ -513,6 +352,8 @@ export const fileServiceServer = plugin((server) => {
 
     terminateFileTransfer: async ({ request, logger }) => {
       const { fromCluster, toCluster, userId, fromPath } = request;
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
+
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
       const toTransferNodeHost = getClusterTransferNode(toCluster).host;
 
@@ -542,6 +383,7 @@ export const fileServiceServer = plugin((server) => {
     checkTransferKey: async ({ request, logger }) => {
 
       const { fromCluster, toCluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: [fromCluster, toCluster]});
 
       const fromTransferNodeAddress = getClusterTransferNode(fromCluster).address;
 

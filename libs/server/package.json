@@ -1,6 +1,6 @@
 {
   "name": "@scow/lib-server",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Server libraries",
   "private": true,
   "main": "build/index.js",
@@ -19,11 +19,11 @@
   "dependencies": {
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@grpc/grpc-js": "1.10.6",
+    "@grpc/grpc-js": "1.10.9",
     "nookies": "2.5.2",
     "@scow/config": "workspace:*",
     "@scow/protos": "workspace:*",
-    "dayjs": "1.11.10",
+    "dayjs": "1.11.11",
     "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",

@@ -36,7 +36,7 @@
 }
 
 html[data-theme='dark'] .docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(29, 29, 29, 0.3);
 }
 
 html[data-theme='dark']  .alert--success {

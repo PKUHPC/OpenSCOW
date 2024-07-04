@@ -23,6 +23,7 @@ import { getClient } from "src/utils/client";
 export const GetTopPayAccountResponse = Type.Object({
   results: Type.Array(Type.Object({
     accountName: Type.String(),
+    userName:Type.String(),
     payAmount: Money,
   })),
 });

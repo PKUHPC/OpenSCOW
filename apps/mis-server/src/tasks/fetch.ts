@@ -13,20 +13,20 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
-import { SqlEntityManager } from "@mikro-orm/mysql";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
-import { clusters } from "src/config/clusters";
+import { createPriceMap } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
-import { PricePlugin } from "src/plugins/price";
 import { toGrpc } from "src/utils/job";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
@@ -63,10 +63,9 @@ const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
 export let lastFetched: Date | null = null;
 
 export async function fetchJobs(
-  em: SqlEntityManager,
+  em: SqlEntityManager<MySqlDriver>,
   logger: Logger,
   clusterPlugin: ClusterPlugin,
-  pricePlugin: PricePlugin,
 ) {
   logger.info("Start fetching.");
 
@@ -76,10 +75,13 @@ export async function fetchJobs(
 
   const accountTenantMap = new Map(accounts.map((x) => [x.accountName, x.tenant.$.name]));
 
-  const priceMap = await pricePlugin.price.createPriceMap();
+  const priceMap = await createPriceMap(em, clusterPlugin["clusters"], logger);
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];
       let pricedJob: JobInfo;
@@ -145,7 +147,7 @@ export async function fetchJobs(
             target: account,
             userId: pricedJob.user,
             metadata: metadataMap,
-          }, em, logger, clusterPlugin);
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           // charge tenant
           await charge({
@@ -155,7 +157,7 @@ export async function fetchJobs(
             target: account.tenant.$,
             userId: pricedJob.user,
             metadata: metadataMap,
-          }, em, logger, clusterPlugin);
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           const ua = await em.findOne(UserAccount, {
             account: { accountName: pricedJob.account },
@@ -169,7 +171,7 @@ export async function fetchJobs(
               "User %s in account %s is not found.", pricedJob.user, pricedJob.account);
           } else {
             // 用户限额及相关操作
-            await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+            await addJobCharge(ua, pricedJob.accountPrice, currentActivatedClusters, clusterPlugin, logger);
           }
 
         }
@@ -188,9 +190,12 @@ export async function fetchJobs(
     return result.length;
   };
 
+  const clusters = await getActivatedClusters(em, logger);
+
   try {
     let newJobsCount = 0;
     for (const cluster of Object.keys(clusters)) {
+
       logger.info(`fetch jobs from cluster ${cluster}`);
 
       const latestDate = await getClusterLatestDate(em, cluster, logger);

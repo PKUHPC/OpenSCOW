@@ -21,6 +21,7 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { ChargesSortBy, ChargesSortOrder, SearchType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
@@ -33,7 +34,7 @@ import { AccountMultiSelector } from "./AccountMultiSelector";
 
 // ChargeTable 组件的 Props 接口
 interface Props {
-  accountNames?: string [];
+  accountNames?: string[];
   showAccountName: boolean;
   showTenantName: boolean;
   isPlatformRecords?: boolean;
@@ -76,22 +77,23 @@ export const ChargeTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
   const [query, setQuery] = useState<{
     names: string[] | undefined,
-    time: [ dayjs.Dayjs, dayjs.Dayjs ]
+    time: [dayjs.Dayjs, dayjs.Dayjs]
     types: string[] | undefined
-    userIds: string | undefined}>({
-      names: accountNames,
-      time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      types: undefined,
-      userIds: undefined,
-    });// 查询对象
+    userIds: string | undefined
+  }>({
+    names: accountNames,
+    time: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
+    types: undefined,
+    userIds: undefined,
+  });// 查询对象
 
   // 定义排序状态
-  const [sorter, setSorter] = useState<Sorter>({ field: undefined, order:undefined });
+  const [sorter, setSorter] = useState<Sorter>({ field: undefined, order: undefined });
 
   const handleTableChange = (pagination, _, sorter) => {
     setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
     setSorter({
-      field:sorter.field,
+      field: sorter.field,
       order: sorter.order,
     });
   };
@@ -119,24 +121,22 @@ export const ChargeTable: React.FC<Props> = ({
 
   // 异步获取消费记录的函数
   const recordsPromiseFn = useCallback(async () => {
-    const getChargesInfo = await api.getCharges({ query: {
-      accountNames: query.names,
-      startTime: query.time[0].clone().startOf("day").toISOString(),
-      endTime: query.time[1].clone().endOf("day").toISOString(),
-      types: query.types,
-      isPlatformRecords,
-      searchType,
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-      sortBy: sorter.field,
-      sortOrder: sorter.order,
-    } });
-    // 对返回数据进行过滤，筛选出符合搜索结果的userID或userName
-    if (query.userIds) {
-      getChargesInfo.results = getChargesInfo.results.filter((v) => {
-        return v.userId == query.userIds || v.userName == query.userIds;
-      });
-    }
+    const getChargesInfo = await api.getCharges({
+      query: {
+        accountNames: query.names,
+        startTime: query.time[0].clone().startOf("day").toISOString(),
+        endTime: query.time[1].clone().endOf("day").toISOString(),
+        types: query.types,
+        isPlatformRecords,
+        searchType,
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        sortBy: sorter.field,
+        sortOrder: sorter.order,
+        userIdsOrNames: convertUserIdArray(query.userIds),
+      },
+    });
+
     return getChargesInfo;
   }, [query, pageInfo]);
 
@@ -150,7 +150,7 @@ export const ChargeTable: React.FC<Props> = ({
         types: query.types,
         isPlatformRecords,
         searchType,
-        userIds: convertUserIdArray(query.userIds),
+        userIdsOrNames: convertUserIdArray(query.userIds),
       },
     });
   }, [query]);
@@ -165,7 +165,7 @@ export const ChargeTable: React.FC<Props> = ({
   });
 
   // 处理消费记录导出的函数
-  const handleExport = async (columns: string[]) => {
+  const handleExport = async (columns: string[], encoding: Encoding) => {
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -173,6 +173,7 @@ export const ChargeTable: React.FC<Props> = ({
       message.error(t(pCommon("exportNoDataErrorMsg")));
     } else {
       window.location.href = urlToExport({
+        encoding,
         exportApi: "exportChargeRecord",
         columns,
         count: totalCount,
@@ -209,7 +210,7 @@ export const ChargeTable: React.FC<Props> = ({
 
   return (
     <div>
-      <Spin spinning={isRecordsLoading || isTotalResultLoading }>
+      <Spin spinning={isRecordsLoading || isTotalResultLoading}>
         <FilterFormContainer>
           <Form<FilterForm>
             layout="inline"
@@ -322,14 +323,14 @@ export const ChargeTable: React.FC<Props> = ({
           />
           <Table.Column<ChargeInfo>
             dataIndex="time"
-            title={t(p("time")) }
+            title={t(p("time"))}
             render={(v) => formatDateTime(v)}
             sorter={true}
           />
           <Table.Column<ChargeInfo>
             dataIndex="amount"
             title={t(p("amount"))}
-            render={(v) => v.toFixed(3)}
+            render={(v) => v.toFixed(2)}
             sorter={true}
           />
           <Table.Column<ChargeInfo>

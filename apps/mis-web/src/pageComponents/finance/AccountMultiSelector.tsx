@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { Button, Input, Select, Tooltip } from "antd";
+import { Button, Select, Space, Tooltip } from "antd";
 import { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -53,7 +53,7 @@ export const AccountMultiSelector: React.FC<Props> = ({
   const userStore = useStore(UserStore);
 
   const promiseFn = useCallback(async () => {
-    return fromAllTenants ? api.getAllAccounts({ query: { } }) : api.getAccounts({ query: { } });
+    return fromAllTenants ? api.getAllAccounts({ query: {} }) : api.getAccounts({ query: {} });
   }, [userStore.user]);
 
   const { data, isLoading, reload } = useAsync({
@@ -66,7 +66,7 @@ export const AccountMultiSelector: React.FC<Props> = ({
     },
   });
 
-  const options = data ? data.results.map((i) => ({ label: i.accountName, value:  i.accountName })) : [];
+  const options = data ? data.results.map((i) => ({ label: i.accountName, value: i.accountName })) : [];
 
   const onBlur = () => {
     const match = options.find((option) => option.value === inputValue);
@@ -76,7 +76,7 @@ export const AccountMultiSelector: React.FC<Props> = ({
     setInputValue(""); // 清空输入框
   };
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         showSearch
         loading={isLoading}
@@ -87,16 +87,21 @@ export const AccountMultiSelector: React.FC<Props> = ({
         style={{ width: "calc(100% - 32px)", minWidth: "200px" }}
         onChange={(v) => {
           onChange?.(v);
-        } }
+        }}
         onBlur={onBlur}
         onSearch={setInputValue}
         allowClear
         mode="multiple"
       />
       <Tooltip title={t(p("freshList"))}>
-        <Button icon={<ReloadOutlined spin={isLoading} />} disabled={disabled} onClick={reload} loading={isLoading} />
+        <Button
+          icon={<ReloadOutlined spin={isLoading} />}
+          disabled={disabled}
+          onClick={reload}
+          loading={isLoading}
+        />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
 
