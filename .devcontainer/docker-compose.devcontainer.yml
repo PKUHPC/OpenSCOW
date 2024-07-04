@@ -68,40 +68,35 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: ldap://scow-dev:389
       PHPLDAPADMIN_HTTPS: false
 
-  novnc-client:
-    image: ghcr.io/pkuhpc/novnc-client-docker:master
-    ports:
-      - 6080:80
+  test-adapter-hpc00:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc00
+      PORT: 6000
 
-  # test-adapter-hpc00:
-  #   image: test-adapter
-  #   build:
-  #     context: ..
-  #     dockerfile: dev/test-adapter/Dockerfile
-  #   network_mode: service:scow-dev
-  #   environment:
-  #     CLUSTER_ID: hpc00
-  #     PORT: 6000
+  test-adapter-hpc01:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc01
+      PORT: 6001
 
-  # test-adapter-hpc01:
-  #   image: test-adapter
-  #   build:
-  #     context: ..
-  #     dockerfile: dev/test-adapter/Dockerfile
-  #   network_mode: service:scow-dev
-  #   environment:
-  #     CLUSTER_ID: hpc01
-  #     PORT: 6001
-
-  # test-adapter-hpc02:
-  #   image: test-adapter
-  #   build:
-  #     context: ..
-  #     dockerfile: dev/test-adapter/Dockerfile
-  #   network_mode: service:scow-dev
-  #   environment:
-  #     CLUSTER_ID: hpc02
-  #     PORT: 6002
+  test-adapter-hpc02:
+    image: test-adapter
+    build:
+      context: ..
+      dockerfile: dev/test-adapter/Dockerfile
+    network_mode: service:scow-dev
+    environment:
+      CLUSTER_ID: hpc02
+      PORT: 6002
 
 volumes:
   db:
