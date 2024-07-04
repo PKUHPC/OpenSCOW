@@ -171,8 +171,49 @@ export const accountServiceServer = plugin((server) => {
     },
 
     unblockAccount: async ({ request, em, logger }) => {
-      const { accountName } = request;
+      const { accountName, assignedClusterPartition } = request;
 
+      // 当 assignedClusterPartition 的值存在时，代表需要在某一分区中增加对账户的授权
+      // 当前只应用在资源分区管理的扩展功能中
+      if (assignedClusterPartition) {
+        return await em.transactional(async (em) => {
+          const account = await em.findOne(Account, {
+            accountName,
+          }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
+
+          if (!account) {
+            throw <ServiceError>{
+              code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+            };
+          }
+
+          // 如果当前账户在集群中为封锁状态，不需要做任何处理
+          if (account.blockedInCluster) {
+            logger.info(`Currently, there are no clusters available for account ${accountName} to use.
+              Any immediate unlocking will not be executed for the time being.`);
+            return [{ executed: true }];
+          }
+
+          // 如果当前账户在集群中为解封状态
+          // 确认当前需要取消授权分区的集群是否可用
+          const currentActivatedClusters = await getActivatedClusters(em, logger);
+          libCheckActivatedClusters({ clusterIds: assignedClusterPartition.clusterId,
+            activatedClusters: currentActivatedClusters, logger });
+
+          // 直接对指定分区进行封锁，但是不更改scow中的任何数据
+          await server.ext.clusters.callOnOne(
+            assignedClusterPartition.clusterId, logger, async (client) => {
+              await asyncClientCall(client.account, "unblockAccount", {
+                accountName: account.accountName,
+                unblockedPartitions: [ assignedClusterPartition.partition ],
+              });
+            });
+
+          return [{ executed: true }];
+        });
+      }
+
+      // assignedClusterPartition 的值不存在时的原始逻辑
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
