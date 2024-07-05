@@ -51,9 +51,12 @@ const FeatureList: FeatureItem[] = [
         通过
         <Link href="/docs/integration/scow-api-hook/api">SCOW API</Link>
         调用SCOW API，<br/>
-        或者通过
+        通过
         <Link href="/docs/integration/scow-api-hook/hook">SCOW Hook</Link>
-        监听SCOW事件
+        监听SCOW事件，<br/>
+        使用
+        <Link href="/docs/integration/ui-extension">UI扩展</Link>
+        将您的系统集成进SCOW。
       </p>
     ),
   },
