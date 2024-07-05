@@ -250,6 +250,7 @@ const CreateAppInputSchema = z.object({
   maxTime: z.number(),
   workingDirectory: z.string().optional(),
   customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
+  gpuType: z.string().optional(),
 });
 
 export type CreateAppInput = z.infer<typeof CreateAppInputSchema>;
@@ -271,7 +272,7 @@ export const createAppSession = procedure
     const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
       image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
       model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
-      maxTime, workingDirectory, customAttributes } = input;
+      maxTime, workingDirectory, customAttributes, gpuType } = input;
 
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
@@ -456,6 +457,7 @@ export const createAppSession = procedure
         // 第五个参数为数据集版本地址
         // 第六个参数为模型版本地址
         // 第七个参数为多挂载点地址，以逗号分隔
+        // 第八个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
         extraOptions: [
           JobType.APP,
           app.type,
@@ -477,6 +479,7 @@ export const createAppSession = procedure
               : modelVersion.path
             : "",
           mountPoints.join(","),
+          gpuType || "",
         ],
       }).catch((e) => {
         const ex = e as ServiceError;

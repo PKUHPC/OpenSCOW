@@ -35,12 +35,14 @@ import { z } from "zod";
 const SESSION_METADATA_NAME = "session.json";
 
 // 分布式训练框架
-const Framework = z.union([
+export const Framework = z.union([
   z.literal("tensorflow"),
   z.literal("pytorch"),
+  z.literal("mindspore"),
 ]);
 
 export type FrameworkType = z.infer<typeof Framework>;
+
 
 const ImageSchema = z.object({
   name: z.string(),
@@ -99,7 +101,7 @@ procedure
     jobId: z.number(),
   })).mutation(
     async ({ input, ctx: { user } }) => {
-      const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, image, remoteImageUrl, framework,
+      const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, image, framework, remoteImageUrl,
         isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType } = input;
       const userId = user.identityId;
@@ -126,6 +128,7 @@ procedure
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
+
 
         mountPoints.forEach((mountPoint) => {
           if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
@@ -199,9 +202,9 @@ procedure
               : "",
             mountPoints.join(","),
             gpuType || "",
-            // 如果是单机训练,则训练框架为空，表明为普通训练
+            // 如果是单机训练,则训练框架为空，表明为普通训练，华为的卡单机训练也要传框架
             // 如果nodeCount不为1但同时选定镜像又没有框架标签，该接口会报错
-            nodeCount === 1 ? "" : framework || "",
+            (nodeCount === 1 && !gpuType?.startsWith("huawei.com")) ? "" : framework || "",
           ],
         }).catch((e) => {
           const ex = e as ServiceError;

@@ -132,7 +132,16 @@ export const LaunchAppForm = (props: Props) => {
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
 
-
+  const [frameworkOptions, setFrameworkOptions] = useState<{value: FrameworkType, label: string}[]>([
+    {
+      value: "tensorflow",
+      label: "TensorFlow",
+    },
+    {
+      value: "pytorch",
+      label: "PyTorch",
+    },
+  ]);
 
   const showAlgorithm = Form.useWatch("showAlgorithm", form);
   const showDataset = Form.useWatch("showDataset", form);
@@ -255,10 +264,26 @@ export const LaunchAppForm = (props: Props) => {
     } else {
       form.setFieldValue("coreCount", 1);
     }
+
+    form.setFieldValue("framework", undefined);
+
     setCurrentPartitionInfo(partitionInfo);
 
   };
 
+  useEffect(() => {
+    // 特殊处理，如果是华为Ascend910，则增加MindSpore选项
+    if (currentPartitionInfo?.gpuType === "huawei.com/Ascend910") {
+      setFrameworkOptions((prevOptions) => {
+        return prevOptions.find((item) => item.value === "mindspore") ?
+          prevOptions : [...prevOptions, { value: "mindspore", label: "MindSpore" }];
+      });
+    } else {
+      setFrameworkOptions((prevOptions) => {
+        return prevOptions.filter((item) => item.value !== "mindspore");
+      });
+    }
+  }, [currentPartitionInfo]);
   const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
       ? [{ type: "integer" }, { required: item.required }]
@@ -560,6 +585,7 @@ export const LaunchAppForm = (props: Props) => {
             memory: memorySize,
             workingDirectory,
             customAttributes: customFormKeyValue.customFields,
+            gpuType: currentPartitionInfo!.gpuType,
           });
         }
       }
@@ -665,8 +691,8 @@ export const LaunchAppForm = (props: Props) => {
               >
                 <Input placeholder="请输入远程镜像地址" />
               </Form.Item>
-              {/* 分布式训练时，需要指定训练框架 */}
-              {(isTraining && nodeCount > 1) ? (
+              {/* 分布式训练或者华为的卡训练，需要指定训练框架 */}
+              {(isTraining && (nodeCount > 1 || currentPartitionInfo?.gpuType === "huawei.com/Ascend910")) ? (
                 <>
                   {/* 手动选择算法框架，下拉框只有 tensorflow, pytorch */}
                   <Form.Item
@@ -674,19 +700,7 @@ export const LaunchAppForm = (props: Props) => {
                     name="framework"
                     rules={[{ required: true }]}
                   >
-                    <Select options={
-                      [
-                        {
-                          value: "tensorflow",
-                          label: "Tensorflow",
-                        },
-                        {
-                          value: "pytorch",
-                          label: "Pytorch",
-                        },
-                      ]
-                    }
-                    >
+                    <Select options={frameworkOptions}>
                     </Select>
                   </Form.Item>
                 </>
