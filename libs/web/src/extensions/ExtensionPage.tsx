@@ -24,15 +24,12 @@ const FrameContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
-  min-height: calc(100vh - 123px);
 `;
 
-// min-height的高度通过计算全屏高度去掉footer及header及外层padding得来
 const IFrame = styled.iframe`
   display: flex;
   border: none;
   flex: 1;
-  min-height: calc(100vh - 123px);
 `;
 
 interface Props {
