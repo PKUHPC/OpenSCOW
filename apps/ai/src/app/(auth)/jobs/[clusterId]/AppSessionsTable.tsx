@@ -87,7 +87,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       title: "作业ID",
       dataIndex: "jobId",
       width: "8%",
-      defaultSortOrder: 'descend',
+      defaultSortOrder: "descend",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
     },
     {
@@ -269,7 +269,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       ...x,
       remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
         x.state === "PENDING" ? "" : x.timeLimit,
-    }))
+    }));
   }, [data, query]);
 
   return (
