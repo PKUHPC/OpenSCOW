@@ -12,7 +12,7 @@
 
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { IframeHTMLAttributes, useEffect } from "react";
 import { Head } from "src/components/head";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
@@ -24,12 +24,15 @@ const FrameContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  min-height: calc(100vh - 123px);
 `;
 
+// min-height的高度通过计算全屏高度去掉footer及header及外层padding得来
 const IFrame = styled.iframe`
   display: flex;
   border: none;
   flex: 1;
+  min-height: calc(100vh - 123px);
 `;
 
 interface Props {
@@ -88,11 +91,28 @@ export const ExtensionPage: React.FC<Props> = ({
   const url = joinWithUrl(config.url, "extensions", ...pathParts)
     + "?" + query.toString();
 
+  useEffect(() => {
+    const messageHandler = (ev) => {
+      const iframe = document.getElementById("extensionIframe");
+      if (ev.data.type === "resize-iframe" && iframe) {
+        console.log(ev.data.payload);
+        iframe.style.width = ev.data.payload.width + "px";
+        iframe.style.height = ev.data.payload.height + "px";
+      }
+    };
+    window.addEventListener("message", messageHandler, false);
+    // 清理函数
+    return () => {
+      window.removeEventListener("message", messageHandler, false);
+    };
+  }, []);
+
   return (
     <>
       <Head title={config?.name ?? "Extension"} />
       <FrameContainer>
         <IFrame
+          id="extensionIframe"
           src={url}
         />
       </FrameContainer>
