@@ -87,6 +87,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       title: "作业ID",
       dataIndex: "jobId",
       width: "8%",
+      defaultSortOrder: 'descend',
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
     },
     {
@@ -258,6 +259,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const filteredData = useMemo(() => {
     if (!data) { return []; }
+
     return data.sessions.filter((x) => {
       if (query.appJobName) {
         return x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase());
@@ -267,7 +269,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       ...x,
       remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
         x.state === "PENDING" ? "" : x.timeLimit,
-    }));
+    }))
   }, [data, query]);
 
   return (
