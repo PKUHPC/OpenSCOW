@@ -60,6 +60,7 @@ export default route(getClusterConfigFilesSchema,
     if (!info) { return; }
 
     const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
+
     return {
       200: { clusterConfigs: modifiedClusters },
     };

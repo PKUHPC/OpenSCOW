@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema, LoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, LoginNodeConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { ClusterConfigSchemaProto, clusterConfigSchemaProto_K8sRuntimeToJSON,
   ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
@@ -39,22 +39,24 @@ export const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined
 
 // protobuf中定义的grpc返回值的loginNodes类型映射到前端loginNode
 export const getLoginNodesTypeFormat = (
-  protoType: ClusterConfigSchemaProto_LoginNodesProtoType | undefined): LoginNode[] => {
+  protoType: ClusterConfigSchemaProto_LoginNodesProtoType | undefined): LoginNodeConfigSchema[] => {
 
   if (!protoType?.value) return [];
   if (protoType.value.$case === "loginNodeAddresses") {
     return protoType.value.loginNodeAddresses.loginNodeAddressesValue.map((item) => ({
       name: item,
       address: item,
-      scowdPort: undefined,
+      scowd: undefined,
     }));
   } else {
     const loginNodeConfigs = protoType.value.loginNodeConfigs;
+
     return loginNodeConfigs.loginNodeConfigsValue.map((x) => ({
       name: getI18nTypeFormat(x.name),
       address: x.address,
-      scowdPort: x.scowd?.port,
+      scowd: x.scowd,
     }));
+
   }
 
 };

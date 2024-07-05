@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema, LoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, LoginNodeConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { ClusterConfigSchemaProto, clusterConfigSchemaProto_K8sRuntimeFromJSON,
   ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
@@ -42,7 +42,7 @@ export const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringPr
   }
 };
 
-export const getLoginNodesSeverTypeFormat = (loginNodes: string[] | LoginNode[]):
+export const getLoginNodesSeverTypeFormat = (loginNodes: string[] | LoginNodeConfigSchema[]):
 ClusterConfigSchemaProto_LoginNodesProtoType | undefined => {
 
   if (!loginNodes) return undefined;
@@ -52,10 +52,10 @@ ClusterConfigSchemaProto_LoginNodesProtoType | undefined => {
       loginNodeAddresses: { loginNodeAddressesValue: loginNodes as string[] } } };
   } else {
     return { value: { $case: "loginNodeConfigs",
-      loginNodeConfigs: { loginNodeConfigsValue: (loginNodes as LoginNode[]).map((node) => ({
+      loginNodeConfigs: { loginNodeConfigsValue: loginNodes.map((node) => ({
         name: getI18nSeverTypeFormat(node.name) as I18nStringProtoType,
         address: node.address,
-        scowd: node.scowdPort ? { port: node.scowdPort } : undefined,
+        scowd: node.scowd,
       })) },
     } };
   }
@@ -81,7 +81,7 @@ export const convertClusterConfigsToServerProtoType = (
           url: item.proxyGateway.url || "",
           autoSetupNginx: item.proxyGateway.autoSetupNginx,
         } : undefined,
-      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes) as ClusterConfigSchemaProto_LoginNodesProtoType,
+      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes),
       loginDesktop: item.loginDesktop ?
         {
           enabled: item.loginDesktop.enabled,
