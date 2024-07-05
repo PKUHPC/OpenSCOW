@@ -18,11 +18,11 @@ export const queryWithCache = async ({ em, queryKeys, queryQb, cacheOptions }: {
   queryKeys: string[],
   queryQb: QueryBuilder<any>,
   cacheOptions?: {
-    maxAge?: number,
+    maxAgeMilliseconds?: number,
     enabled?: boolean,
   },
 }) => {
-  const { maxAge = 5 * 60 * 1000, enabled = true } = cacheOptions || {};
+  const { maxAgeMilliseconds = 5 * 60 * 1000, enabled = true } = cacheOptions || {};
 
   if (!enabled) {
     return await queryQb.execute();
@@ -41,7 +41,7 @@ export const queryWithCache = async ({ em, queryKeys, queryQb, cacheOptions }: {
     return newResult;
   }
 
-  if ((now.getTime() - queryCache.timestamp.getTime()) > maxAge) {
+  if ((now.getTime() - queryCache.timestamp.getTime()) > maxAgeMilliseconds) {
     const newResult = await queryQb.execute();
     queryCache.queryResult = newResult;
     queryCache.timestamp = now;
