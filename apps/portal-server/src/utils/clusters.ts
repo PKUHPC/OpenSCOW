@@ -64,7 +64,7 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
       clusterId: cluster,
       details: errorDetail,
     }];
-    const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail;
+    const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail.toString();
 
     // 统一错误处理
     if (e instanceof Error) {
@@ -83,7 +83,7 @@ export const callOnOne: CallOnOne = async (cluster, logger, call) => {
 
 export const checkActivatedClusters
 = async (
-  { clusterIds }: {clusterIds: string[] | string},
+  { clusterIds }: { clusterIds: string[] | string },
 ) => {
 
   if (!config.MIS_DEPLOYED) {

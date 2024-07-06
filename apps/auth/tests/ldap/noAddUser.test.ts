@@ -15,7 +15,6 @@ authConfig.ldap!.addUser = undefined;
 
 import { FastifyInstance } from "fastify";
 import { buildApp } from "src/app";
-import { Capabilities } from "src/routes/capabilities";
 
 let server: FastifyInstance;
 
@@ -35,6 +34,6 @@ it("should report no createUser capability", async () => {
     url: "/capabilities",
   });
 
-  const body = await resp.json() as Capabilities;
+  const body = await resp.json();
   expect(body.createUser).toBeFalse();
 });

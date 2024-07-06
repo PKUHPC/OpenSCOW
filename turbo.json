@@ -90,18 +90,11 @@
         "build/**"
       ]
     },
-    "//#lint:ts": {
-      "inputs": [
-        "**/*.tsx",
-        "**/*.ts"
-      ],
-      "outputs": [
-        ".eslintcache"
-      ]
-    },
     "lint": {
       "inputs": [
-        "**/*.proto"
+        "**/*.proto",
+        "**/*.tsx",
+        "**/*.ts"
       ]
     }
   }

@@ -35,43 +35,43 @@ export const sftpExists = (sftp: SFTPWrapper, path: string) =>
   });
 
 export const sftpWriteFile = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.writeFile.bind(sftp) as typeof sftp["writeFile"]));
+  handleSftpError(promisify(sftp.writeFile.bind(sftp)));
 
 export const sftpReadFile = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.readFile.bind(sftp) as typeof sftp["readFile"]));
+  handleSftpError(promisify(sftp.readFile.bind(sftp)));
 
 export const sftpReaddir = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.readdir.bind(sftp) as typeof sftp["readdir"]));
+  handleSftpError(promisify(sftp.readdir.bind(sftp)));
 
 export const sftpChmod = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.chmod.bind(sftp) as typeof sftp["chmod"]));
+  handleSftpError(promisify(sftp.chmod.bind(sftp)));
 
 export const sftpChown = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.chown.bind(sftp) as typeof sftp["chown"]));
+  handleSftpError(promisify(sftp.chown.bind(sftp)));
 
 export const sftpRealPath = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.realpath.bind(sftp) as typeof sftp["realpath"]));
+  handleSftpError(promisify(sftp.realpath.bind(sftp)));
 
 export const sftpStat = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.stat.bind(sftp) as typeof sftp["stat"]));
+  handleSftpError(promisify(sftp.stat.bind(sftp)));
 
 export const sftpStatOrUndefined = (sftp: SFTPWrapper) => (path: string) =>
   sftpStat(sftp)(path).catch(() => undefined);
 
 export const sftpUnlink = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.unlink.bind(sftp) as typeof sftp["unlink"]));
+  handleSftpError(promisify(sftp.unlink.bind(sftp)));
 
 export const sftpRmdir = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.rmdir.bind(sftp) as typeof sftp["rmdir"]));
+  handleSftpError(promisify(sftp.rmdir.bind(sftp)));
 
 export const sftpRename = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.rename.bind(sftp) as typeof sftp["rename"]));
+  handleSftpError(promisify(sftp.rename.bind(sftp)));
 
 export const sftpMkdir = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.mkdir.bind(sftp) as typeof sftp["mkdir"]));
+  handleSftpError(promisify(sftp.mkdir.bind(sftp)));
 
 export const sftpAppendFile = (sftp: SFTPWrapper) =>
-  handleSftpError(promisify(sftp.appendFile.bind(sftp) as typeof sftp["appendFile"]));
+  handleSftpError(promisify(sftp.appendFile.bind(sftp)));
 
 
 export const createDirectoriesRecursively = async (sftp: SFTPWrapper, directory: string) => {

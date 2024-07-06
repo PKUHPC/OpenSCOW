@@ -29,7 +29,7 @@ export const getClusterAppConfigs = (cluster: string) => {
 
   const clusterAppsConfigs = getAppConfigs(join(DEFAULT_CONFIG_BASE_PATH, "clusters/", cluster));
 
-  const apps = {};
+  const apps = {} as Record<string, typeof commonApps[number]>;
 
   for (const [key, value] of Object.entries(commonApps)) {
     apps[key] = value;

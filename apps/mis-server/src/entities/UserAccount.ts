@@ -40,29 +40,29 @@ export enum UserRole {
 @Entity()
 export class UserAccount {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
-    user: Ref<User>;
+  user: Ref<User>;
 
   @ManyToOne(() => Account, { deleteRule: "cascade", ref: true, nullable: false })
-    account: Ref<Account>;
+  account: Ref<Account>;
 
   @Property({ columnType: "varchar(10)", comment: Object.values(UserStatus).join(", ") })
-    blockedInCluster: UserStatus;
+  blockedInCluster: UserStatus;
 
   @Property({ columnType: "varchar(10)", comment: Object.values(UserRole).join(", ") })
-    role: UserRole;
+  role: UserRole;
 
   @Property({ type: DecimalType, nullable: true })
-    usedJobCharge?: Decimal;
+  usedJobCharge?: Decimal;
 
   @Property({ type: DecimalType, nullable: true })
-    jobChargeLimit?: Decimal;
+  jobChargeLimit?: Decimal;
 
   @Enum({ items: () => UserStateInAccount,
     default: UserStateInAccount.NORMAL, comment: Object.values(UserStateInAccount).join(", ") })
-    state?: UserStateInAccount;
+  state?: UserStateInAccount;
 
   constructor(init: {
     user: EntityOrRef<User>,
@@ -79,6 +79,6 @@ export class UserAccount {
     this.role = init.role;
     this.jobChargeLimit = init.jobChargeLimit;
     this.usedJobCharge = init.usedJobCharge;
-    this.state = init.state || UserStateInAccount.NORMAL;
+    this.state = init.state ?? UserStateInAccount.NORMAL;
   }
 }

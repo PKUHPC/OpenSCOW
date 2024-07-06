@@ -28,7 +28,7 @@ import { toRef } from "src/utils/orm";
 export interface ImportUsersData {
   accounts: {
     accountName: string;
-    users: {userId: string; userName: string; blocked: boolean}[];
+    users: { userId: string; userName: string; blocked: boolean }[];
     owner: string;
     blocked: boolean;
   }[];
@@ -56,9 +56,9 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   const existingUsers = await em.find(User, { userId: { $in: Object.keys(usersMap) } }, { populate: ["tenant"]});
   existingUsers.forEach((u) => {
     if (u.tenant.$.name !== DEFAULT_TENANT_NAME) {
-      throw <ServiceError> {
+      throw {
         code: Status.INVALID_ARGUMENT, message: `user ${u.userId} has existing and belongs to ${u.tenant.$.name}`,
-      };
+      } as ServiceError;
     }
     usersMap[u.userId] = u;
   });
@@ -69,7 +69,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     // 导入账户时，如果在集群中的账户状态为正常，则scow同步正常状态
     accountMap[account.accountName] = new Account({
       accountName: account.accountName, comment: "", blockedInCluster: Boolean(account.blocked),
-      tenant, state: Boolean(account.blocked) ? AccountState.BLOCKED_BY_ADMIN : AccountState.NORMAL,
+      tenant, state: account.blocked ? AccountState.BLOCKED_BY_ADMIN : AccountState.NORMAL,
     });
   });
   const existingAccounts = await em.find(Account,
@@ -78,10 +78,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   );
   existingAccounts.forEach((a) => {
     if (a.tenant.$.name !== DEFAULT_TENANT_NAME) {
-      throw <ServiceError> {
+      throw {
         code: Status.INVALID_ARGUMENT,
         message: `account ${a.accountName} has existing and belongs to ${a.tenant.$.name}`,
-      };
+      } as ServiceError;
     }
     accountMap[a.accountName] = a;
   });

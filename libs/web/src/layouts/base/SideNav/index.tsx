@@ -92,7 +92,7 @@ export const SideNav: React.FC<Props> = ({
      * 仅在账户管理页面有效，且用户管理的账户数量超过三个
      */
     //
-    menuFocusedRef.current = parentKeys.length > 3 && /^\/accounts/.test(parentKeys[0]);
+    menuFocusedRef.current = parentKeys.length > 3 && parentKeys[0].startsWith("/accounts");
 
     if (menuFocusedRef.current) setOpenKeys([parentKeys[0]]);
     else setOpenKeys(parentKeys);
@@ -106,9 +106,9 @@ export const SideNav: React.FC<Props> = ({
 
   const onOpenChange = useCallback((keys) => {
     if (menuFocusedRef.current) {
-      const latestOpenKey = keys.find((key) => openKeys.indexOf(key) === -1);
+      const latestOpenKey = keys.find((key) => !openKeys.includes(key));
 
-      if (parentKeys.indexOf(latestOpenKey!) === -1) {
+      if (!parentKeys.includes(latestOpenKey)) {
         setOpenKeys(keys);
       } else {
         setOpenKeys(latestOpenKey ? [latestOpenKey] : []);

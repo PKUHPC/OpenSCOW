@@ -54,9 +54,9 @@ export interface GetJobTemplateRequest {
   id: string;
 }
 
-export type GetJobTemplateReply = {
+export interface GetJobTemplateReply {
   template: JobTemplate;
-}
+};
 
 export interface SaveJobTemplateRequest {
   userId: string;

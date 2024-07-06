@@ -241,7 +241,7 @@ export async function remoteValidateOtpCode(userId: string, logger: FastifyBaseL
       userId: userId,
     }),
   }).then(async (response) => {
-    const result: {result: boolean} = await response.json();
+    const result: { result: boolean } = await response.json();
     return result.result;
   }).catch((e) => {
     logger.error(e, "error in verifying otp code in remote");

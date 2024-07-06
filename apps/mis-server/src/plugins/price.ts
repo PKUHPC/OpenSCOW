@@ -34,6 +34,6 @@ export const pricePlugin = plugin(async (s) => {
     logger.info("Platform price items are complete. ");
   }
 
-  s.addExtension("price", <PricePlugin["price"]>{});
+  s.addExtension("price", ({} as PricePlugin["price"]));
 
 });

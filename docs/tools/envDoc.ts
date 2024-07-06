@@ -28,8 +28,6 @@ const docNames = {
   [regex.name]: "正则表达式",
 };
 
-debugger;
-
 export function getDocFromSpec(spec: Record<string, Validator<any>>) {
 
   let docs = `
@@ -45,7 +43,8 @@ export function getDocFromSpec(spec: Record<string, Validator<any>>) {
     `\`${key}\``,
     docNames[func.name],
     // @ts-ignore
-    // eslint-disable-next-line max-len
+
+    // eslint-disable-next-line @stylistic/max-len
     `${spec.desc ? spec.desc.replaceAll("\n", "<br/>") : ""}${spec.choices ? "<br/>可选项：" + spec.choices.join(",") : ""}${spec.example ? "<br/>示例：" + spec.example : ""}`,
     "default" in spec ?
       (spec.default === undefined
@@ -65,8 +64,9 @@ export function genConfigTable(pack: string, configFile = "src/config/env") {
   const appPath = resolve(join("../apps", pack));
   dotenv.config({ path: join(appPath, "env/.env.dev") });
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+
   const { config } = require(join(appPath, configFile));
+
 
   const docs = getDocFromSpec(config._specs);
 

@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
@@ -47,13 +46,15 @@ const data = {
   accounts: [
     {
       accountName: "a_user1",
-      users: [{ userId: "user1", userName: "user1Name", blocked: false }, { userId: "user2", userName: "user2", blocked: true }],
+      users: [{ userId: "user1", userName: "user1Name", blocked: false },
+        { userId: "user2", userName: "user2", blocked: true }],
       owner: "user1",
       blocked: false,
     },
     {
       accountName: "account2",
-      users: [{ userId: "user2", userName: "user2", blocked: false }, { userId: "user3", userName: "user3", blocked: true }],
+      users: [{ userId: "user2", userName: "user2", blocked: false },
+        { userId: "user3", userName: "user3", blocked: true }],
       owner: "user2",
       blocked: false,
     },

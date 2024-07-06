@@ -250,18 +250,18 @@ export const jobServiceServer = plugin((server) => {
         cluster,
         logger,
         async (client) => await asyncClientCall(client.job, "submitJob", {
-          userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount || 0,
+          userId, jobName, account, partition: partition, qos, nodeCount, gpuCount: gpuCount ?? 0,
           memoryMb: Number(memory?.split("M")[0]), coreCount, timeLimitMinutes: maxTimeConversion,
           script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
         }).catch((e) => {
           const ex = e as ServiceError;
           const errors = parseErrorDetails(ex.metadata);
           if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
-            throw <ServiceError> {
+            throw {
               code: Status.INTERNAL,
               message: "sbatch failed",
-              details: e.details,
-            };
+              details: ex.details,
+            } as ServiceError;
           } else {
             throw e;
           }
@@ -324,25 +324,25 @@ export const jobServiceServer = plugin((server) => {
         // 判断文件操作权限
         const stat = await sftpStat(sftp)(filePath).catch((e) => {
           logger.error(e, "stat %s as %s failed", filePath, userId);
-          throw <ServiceError> {
+          throw {
             code: Status.PERMISSION_DENIED, message: `${filePath} is not accessible`,
-          };
+          } as ServiceError;
         });
         // 文件SIZE大于1M不能提交sbatch执行
         if (stat.size / (1024 * 1024) > 1) {
-          throw <ServiceError> {
+          throw {
             code: Status.INVALID_ARGUMENT, message: `${filePath} is too large. Maximum file size is 1M`,
-          };
+          } as ServiceError;
         }
 
         const isTextFile = await ssh.exec("file", [filePath]).then((res) => {
-          return res.match(/text/);
+          return /text/.exec(res);
         });
         // 文件不是文本文件不能提交Sbatch执行
         if (!isTextFile) {
-          throw <ServiceError> {
+          throw {
             code: Status.INVALID_ARGUMENT, message: `${filePath} is not a text file`,
-          };
+          } as ServiceError;
         }
 
         return await sftpReadFile(sftp)(filePath)
@@ -370,11 +370,11 @@ export const jobServiceServer = plugin((server) => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
             if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
-              throw <ServiceError> {
+              throw {
                 code: Status.INTERNAL,
                 message: "sbatch failed",
-                details: e.details,
-              };
+                details: ex.details,
+              } as ServiceError;
             } else {
               throw e;
             }

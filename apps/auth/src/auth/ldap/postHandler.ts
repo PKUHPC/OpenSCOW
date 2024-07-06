@@ -23,7 +23,7 @@ import { authConfig, LdapConfigSchema } from "src/config/auth";
 
 export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSchema) {
 
-  f.register(formBody);
+  void f.register(formBody);
 
   const bodySchema = Type.Object({
     username: Type.String(),

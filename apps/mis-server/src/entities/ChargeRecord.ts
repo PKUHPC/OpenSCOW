@@ -22,36 +22,36 @@ import { type AnyJson } from "src/utils/types";
 @Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class ChargeRecord {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Index({ name: "time" })
   @Property()
-    time: Date;
+  time: Date;
 
   @Index()
   @Property()
-    tenantName: string;
+  tenantName: string;
 
   @Index()
   @Property({ nullable: true })
-    accountName?: string;
+  accountName?: string;
 
   @Index()
   @Property({ nullable: true })
-    userId?: string;
+  userId?: string;
 
   @Index()
   @Property()
-    type: string;
+  type: string;
 
   @Property({ type: DecimalType })
-    amount: Decimal = new Decimal(0);
+  amount: Decimal = new Decimal(0);
 
   @Property()
-    comment: string;
+  comment: string;
 
   @Property({ type: "json", nullable: true })
-    metadata?: AnyJson;
+  metadata?: AnyJson;
 
   constructor(init: {
     id?: number;

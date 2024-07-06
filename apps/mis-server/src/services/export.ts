@@ -124,17 +124,17 @@ export const exportServiceServer = plugin((server) => {
           writeTotal += 1;
           // 每两百条传一次
           if (data.length === 200 || writeTotal === records.length) {
-            await new Promise(async (resolve) => {
-              await writeAsync({ users: data });
+            await new Promise((resolve) => {
+              void writeAsync({ users: data });
               // 清空暂存
               data = [];
               resolve("done");
             }).catch((e) => {
-              throw <ServiceError>{
+              throw {
                 code: status.INTERNAL,
                 message: "Error when exporting file",
                 details: e?.message,
-              };
+              } as ServiceError;
             });
           }
         }
@@ -160,9 +160,9 @@ export const exportServiceServer = plugin((server) => {
         const owner = x.users.getItems().find((x) => x.role === UserRole.OWNER);
 
         if (!owner) {
-          throw <ServiceError>{
+          throw {
             code: status.INTERNAL, message: `Account ${x.accountName} does not have an owner`,
-          };
+          } as ServiceError;
         }
 
         const ownerUser = owner.user.getEntity();
@@ -199,30 +199,30 @@ export const exportServiceServer = plugin((server) => {
         .leftJoinAndSelect("a.tenant", "t");
 
       if (tenantName !== undefined) {
-        qb.andWhere({ "t.name": tenantName });
+        void qb.andWhere({ "t.name": tenantName });
       }
 
       if (accountName !== undefined) {
-        qb.andWhere({ "a.accountName": { $like: `%${accountName}%` } });
+        void qb.andWhere({ "a.accountName": { $like: `%${accountName}%` } });
       }
 
       if (blocked) {
-        qb.andWhere({ "a.state": AccountState.BLOCKED_BY_ADMIN, "a.blockedInCluster": true });
+        void qb.andWhere({ "a.state": AccountState.BLOCKED_BY_ADMIN, "a.blockedInCluster": true });
       }
 
       if (debt) {
-        qb.andWhere({ "a.state": AccountState.NORMAL })
+        void qb.andWhere({ "a.state": AccountState.NORMAL })
           .andWhere("a.whitelist_id IS NULL")
           .andWhere("CASE WHEN a.block_threshold_amount IS NOT NULL"
             + " THEN a.balance <= a.block_threshold_amount ELSE a.balance <= t.default_account_block_threshold END");
       }
 
       if (frozen) {
-        qb.andWhere({ "a.state": AccountState.FROZEN });
+        void qb.andWhere({ "a.state": AccountState.FROZEN });
       }
 
       if (normal) {
-        qb.andWhere({ "a.blockedInCluster": false });
+        void qb.andWhere({ "a.blockedInCluster": false });
       }
 
       while (offset < count) {
@@ -248,17 +248,17 @@ export const exportServiceServer = plugin((server) => {
           writeTotal += 1;
           // 每两百条传一次
           if (data.length === 200 || writeTotal === records.length) {
-            await new Promise(async (resolve) => {
-              await writeAsync({ accounts: data });
+            await new Promise((resolve) => {
+              void writeAsync({ accounts: data });
               // 清空暂存
               data = [];
               resolve("done");
             }).catch((e) => {
-              throw <ServiceError>{
+              throw {
                 code: status.INTERNAL,
                 message: "Error when exporting file",
                 details: e?.message,
-              };
+              } as ServiceError;
             });
           }
         }
@@ -323,17 +323,17 @@ export const exportServiceServer = plugin((server) => {
           writeTotal += 1;
           // 每两百条传一次
           if (data.length === 200 || writeTotal === records.length) {
-            await new Promise(async (resolve) => {
-              await writeAsync({ chargeRecords: data });
+            await new Promise((resolve) => {
+              void writeAsync({ chargeRecords: data });
               // 清空暂存
               data = [];
               resolve("done");
             }).catch((e) => {
-              throw <ServiceError>{
+              throw {
                 code: status.INTERNAL,
                 message: "Error when exporting file",
                 details: e?.message,
-              };
+              } as ServiceError;
             });
           }
         }
@@ -353,7 +353,7 @@ export const exportServiceServer = plugin((server) => {
       const searchParam = getPaymentsTargetSearchParam(target);
       const searchTypes = getPaymentsSearchType(types);
       const query: { time: { $gte: string; $lte: string }; [key: string]: any } = {
-        time: { $gte: startTime as string, $lte: endTime as string },
+        time: { $gte: startTime!, $lte: endTime! },
         ...searchParam,
         ...searchTypes,
       };
@@ -394,17 +394,17 @@ export const exportServiceServer = plugin((server) => {
           data.push(row);
           writeTotal += 1;
           if (data.length === 200 || writeTotal === records.length) {
-            await new Promise(async (resolve) => {
-              await writeAsync({ payRecords: data });
+            await new Promise((resolve) => {
+              void writeAsync({ payRecords: data });
               // 清空暂存
               data = [];
               resolve("done");
             }).catch((e) => {
-              throw <ServiceError>{
+              throw {
                 code: status.INTERNAL,
                 message: "Error when exporting file",
                 details: e?.message,
-              };
+              } as ServiceError;
             });
           }
         }

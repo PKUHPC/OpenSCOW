@@ -79,7 +79,7 @@ server {
 
 export const parseIp = (stdout: string): string => {
   const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
-  return stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
+  return (ipReg.exec(stdout.split("\n")[0]))?.[0] ?? "";
 };
 
 export const getIpFromProxyGateway

@@ -18,7 +18,7 @@ import { AuthType } from "./AuthType";
 
 export enum NewUserGroupStrategy {
   "newGroupPerUser" = "newGroupPerUser",
-  "oneGroupForAllUsers" = "oneGroupForAllUsers"
+  "oneGroupForAllUsers" = "oneGroupForAllUsers",
 }
 
 export enum OtpStatusOptions {
@@ -32,7 +32,9 @@ export enum ScowLogoType {
 }
 
 // 创建配置文件中显示文字项的配置类型
-export const createI18nStringSchema = ({ description, defaultValue }: {description: string, defaultValue?: string}) => {
+export const createI18nStringSchema = ({ description, defaultValue }: {
+  description: string, defaultValue?: string
+}) => {
   return Type.Union([
     Type.String(),
     Type.Object({
@@ -246,7 +248,7 @@ export const getAuthConfig = () => {
   const config = getConfigFromFile(AuthConfigSchema, AUTH_CONFIG_FILE, DEFAULT_CONFIG_BASE_PATH);
 
   // validate
-  if (config.authType === "ldap") {
+  if (config.authType === AuthType.ldap) {
     if (!config.ldap) {
       throw new Error("authType is set to ldap, but ldap config is not set");
     }

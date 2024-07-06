@@ -18,20 +18,21 @@ interface VersionJsonInfo {
   commit: string;
 }
 
-export interface VersionInfo extends VersionJsonInfo {}
+export type VersionInfo = VersionJsonInfo;
 
 export function readVersionFile(versionJsonFileName = "version.json") {
 
-  const jsonInfo: VersionJsonInfo = existsSync(versionJsonFileName)
-    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8"))
+  const jsonInfo = existsSync(versionJsonFileName)
+    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8")) as VersionInfo
     : {};
 
-  return jsonInfo; }
+  return jsonInfo;
+}
 
 
 // SemVer类型version
-export type ApiVersion = {
+export interface ApiVersion {
   major: number;
   minor: number;
   patch: number;
-}
+};

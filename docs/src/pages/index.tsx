@@ -31,7 +31,7 @@ function HomepageHeader() {
           <Link
             className="button button--secondary button--lg"
             to={useBaseUrl("docs/info")}>
-              简介
+            简介
           </Link>
         </div>
       </div>

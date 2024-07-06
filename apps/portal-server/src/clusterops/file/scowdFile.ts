@@ -123,14 +123,14 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
     const { userId, path, call } = request;
 
     try {
-      const readStream = await client.file.download({
+      const readStream = client.file.download({
         userId, path, chunkSize: config.DOWNLOAD_CHUNK_SIZE,
       });
-  
+
       for await (const response of readStream) {
         call.write(response);
       }
-  
+
       return {};
     } catch (err) {
       throw mapTRPCExceptionToGRPC(err);
@@ -140,15 +140,17 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
   upload: async (request, logger) => {
     const { call, userId, path } = request;
 
-    class RequestError {
+    class RequestError extends Error {
       constructor(
         public code: ServiceError["code"],
         public message: ServiceError["message"],
         public details?: ServiceError["details"],
-      ) {}
+      ) {
+        super(message);
+      }
 
       toServiceError(): ServiceError {
-        return <ServiceError> { code: this.code, message: this.message, details: this.details };
+        return { code: this.code, message: this.message, details: this.details } as ServiceError;
       }
     }
 
@@ -157,7 +159,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
     try {
       const res = await client.file.upload((async function* () {
         yield { message: { case: "info", value: { path, userId } } };
-  
+
         for await (const data of call.iter()) {
           if (data.message?.$case !== "chunk") {
             throw new RequestError(
@@ -182,7 +184,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
       const res = await client.file.getFileMetadata({ userId, filePath: path });
 
       return { size: Number(res.size), type: res.type === FileType.DIR ? "dir" : "file" };
-      
+
     } catch (err) {
       throw mapTRPCExceptionToGRPC(err);
     }
@@ -195,7 +197,7 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
       const res = await client.file.exists({ userId, path: path });
 
       return { exists: res.exists };
-      
+
     } catch (err) {
       throw mapTRPCExceptionToGRPC(err);
     }

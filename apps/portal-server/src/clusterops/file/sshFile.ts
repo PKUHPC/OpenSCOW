@@ -12,7 +12,7 @@
 
 import { createWriterExtensions } from "@ddadaal/tsgrpc-common";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { loggedExec, sftpExists, sftpMkdir, sftpReaddir, 
+import { loggedExec, sftpExists, sftpMkdir, sftpReaddir,
   sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf } from "@scow/lib-ssh";
 import { FileInfo, FileInfo_FileType } from "@scow/protos/build/portal/file";
 import { join } from "path";
@@ -32,7 +32,7 @@ export const sshFileServices = (host: string): FileOps => ({
       const resp = await ssh.exec("cp", ["-r", fromPath, toPath], { stream: "both" });
 
       if (resp.code !== 0) {
-        throw <ServiceError> { code: status.INTERNAL, message: "cp command failed", details: resp.stderr };
+        throw { code: status.INTERNAL, message: "cp command failed", details: resp.stderr } as ServiceError;
       }
 
       return {};
@@ -48,7 +48,7 @@ export const sshFileServices = (host: string): FileOps => ({
       const sftp = await ssh.requestSFTP();
 
       if (await sftpExists(sftp, path)) {
-        throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${path} already exists` };
+        throw { code: status.ALREADY_EXISTS, message: `${path} already exists` } as ServiceError;
       }
 
       await sftpWriteFile(sftp)(path, Buffer.alloc(0));
@@ -102,7 +102,7 @@ export const sshFileServices = (host: string): FileOps => ({
       const sftp = await ssh.requestSFTP();
 
       if (await sftpExists(sftp, path)) {
-        throw <ServiceError>{ code: status.ALREADY_EXISTS, details: `${path} already exists` };
+        throw { code: status.ALREADY_EXISTS, details: `${path} already exists` } as ServiceError;
       }
 
       await sftpMkdir(sftp)(path);
@@ -117,10 +117,10 @@ export const sshFileServices = (host: string): FileOps => ({
 
     return await sshConnect(host, userId, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
-      const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
-      if (error) {
-        throw <ServiceError>{ code: status.INTERNAL, message: "rename failed", details: error };
-      }
+      await sftpRename(sftp)(fromPath, toPath).catch((e: unknown) => {
+        logger.error(e, "rename %s to %s as %s failed", fromPath, toPath, userId);
+        throw { code: status.INTERNAL, message: "rename failed", details: e } as ServiceError;
+      });
 
       return [{}];
     });
@@ -134,15 +134,15 @@ export const sshFileServices = (host: string): FileOps => ({
 
       const stat = await sftpStat(sftp)(path).catch((e) => {
         logger.error(e, "stat %s as %s failed", path, userId);
-        throw <ServiceError> {
+        throw {
           code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
-        };
+        } as ServiceError;
       });
 
       if (!stat.isDirectory()) {
-        throw <ServiceError> {
+        throw {
           code: status.INVALID_ARGUMENT,
-          message: `${path} is not directory or not exists` };
+          message: `${path} is not directory or not exists` } as ServiceError;
       }
 
       const files = await sftpReaddir(sftp)(path);
@@ -199,23 +199,28 @@ export const sshFileServices = (host: string): FileOps => ({
       // cannot use pipeline because it forwards error
       // we don't want to forwards error
       // because the error has code property, conflicting with gRPC'S ServiceError
-      await pipeline(
-        readStream,
-        async (chunk) => {
-          return { chunk: Buffer.from(chunk) };
-        },
-        call,
-      ).catch((e) => {
-        throw <ServiceError> {
+      try {
+
+        await pipeline(
+          readStream,
+          async (chunk) => {
+
+            return { chunk: Buffer.from(chunk) };
+          },
+          call,
+        );
+      } catch (e) {
+        const ex = e as { message: string };
+        throw {
           code: status.INTERNAL,
           message: "Error when reading file",
-          details: e?.message,
-        };
-      }).finally(async () => {
+          details: ex?.message,
+        } as ServiceError;
+      } finally {
         readStream.close(() => {});
         await once(readStream, "close");
         // await promisify(readStream.close.bind(readStream))();
-      });
+      }
 
       return {};
     });
@@ -227,15 +232,17 @@ export const sshFileServices = (host: string): FileOps => ({
     return await sshConnect(host, userId, logger, async (ssh) => {
       const sftp = await ssh.requestSFTP();
 
-      class RequestError {
+      class RequestError extends Error {
         constructor(
           public code: ServiceError["code"],
           public message: ServiceError["message"],
           public details?: ServiceError["details"],
-        ) {}
+        ) {
+          super(message);
+        }
 
         toServiceError(): ServiceError {
-          return <ServiceError> { code: this.code, message: this.message, details: this.details };
+          return { code: this.code, message: this.message, details: this.details } as ServiceError;
         }
       }
 
@@ -296,9 +303,9 @@ export const sshFileServices = (host: string): FileOps => ({
 
       const stat = await sftpStat(sftp)(path).catch((e) => {
         logger.error(e, "stat %s as %s failed", path, userId);
-        throw <ServiceError> {
+        throw {
           code: status.PERMISSION_DENIED, message: `${path} is not accessible`,
-        };
+        } as ServiceError;
       });
 
       return { size: stat.size, type: stat.isDirectory() ? "dir" : "file" };

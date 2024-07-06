@@ -122,7 +122,7 @@ it("cannot write to db when activated a cluster has already been activated", asy
     clusterId: "hpc01",
   });
 
-  expect(activatedCluster.lastActivationOperation).toBeUndefined;
+  expect(activatedCluster.lastActivationOperation).toBeUndefined();
 });
 
 it("activates a cluster", async () => {

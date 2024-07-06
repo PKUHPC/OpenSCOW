@@ -29,12 +29,13 @@ function checkLoginNode(sshConfig: SshConfigSchema) {
     if (Object.keys(clusters).length === 0) {
       throw new Error("No cluster has been set in clusters config");
     }
-    const clusterConfig = Object.values(clusters)[0];
+    const clusterId = Object.keys(clusters)[0];
+    const clusterConfig = clusters[clusterId];
 
     loginNode = getLoginNode(clusterConfig.loginNodes[0]).address;
 
     if (!loginNode) {
-      throw new Error(`Cluster ${clusterConfig.displayName} has no login node.`);
+      throw new Error(`Cluster ${clusterId} has no login node.`);
     }
   }
 
