@@ -22,7 +22,7 @@ import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 const _modes = ["system", "dark", "light"] as const;
 
 
-export type DarkMode = typeof modes[number];
+export type DarkMode = typeof _modes[number];
 
 const DarkModeContext = React.createContext<{
   mode: DarkMode;

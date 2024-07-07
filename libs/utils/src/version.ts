@@ -22,8 +22,8 @@ export type VersionInfo = VersionJsonInfo;
 
 export function readVersionFile(versionJsonFileName = "version.json") {
 
-  const jsonInfo = existsSync(versionJsonFileName)
-    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8")) as VersionInfo
+  const jsonInfo: VersionInfo = existsSync(versionJsonFileName)
+    ? JSON.parse(readFileSync(versionJsonFileName, "utf-8"))
     : {};
 
   return jsonInfo;
