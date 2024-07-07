@@ -10,16 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-
- 
-
 import ConfigParser from "@webantic/nginx-config-parser";
 import { join } from "path";
 import { config } from "src/env";
 import { getNginxConfig } from "src/parse";
 
-const parser = new ConfigParser() as any;
+const parser = new ConfigParser();
 
 function parseNginxConfig(envConfig: typeof config) {
   const nginxConf = getNginxConfig(envConfig);
