@@ -53,7 +53,7 @@ export const callExtensionRoute = async <
   query: TQuery,
   body: TBody,
   extensionUrl: string,
-): Promise<Partial<{ [code in keyof TResponses & number]: z.infer<TResponses[code]> }>> => {
+): Promise<Partial<{[code in keyof TResponses & number]: z.infer<TResponses[code]> }>> => {
 
   let url = joinWithUrl(extensionUrl, "api", route.path);
 

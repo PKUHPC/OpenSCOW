@@ -66,11 +66,11 @@ const IndicatorPart = styled(HeaderItem)`
   flex-wrap: nowrap;
 `;
 
-export type HeaderNavbarLink = {
+export interface HeaderNavbarLink {
   icon: React.ReactNode;
   href: string;
   text: string;
-}
+};
 
 interface Props {
   hasSidebar: boolean;

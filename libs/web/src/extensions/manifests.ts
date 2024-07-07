@@ -39,6 +39,6 @@ export async function fetchExtensionManifests(url: string) {
   if (resp[200]) {
     return resp[200];
   } else {
-    throw new Error(`Cannot fetch extension manifests. ${resp}`);
+    throw new Error(`Cannot fetch extension manifests. ${JSON.stringify(resp)}`);
   }
 }

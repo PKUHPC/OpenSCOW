@@ -4,4 +4,7 @@
   "compilerOptions": {
     "baseUrl": ".",
   },
+  "include": [
+    "tools/envDoc.ts"
+  ]
 }

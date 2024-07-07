@@ -21,31 +21,31 @@ import { DATETIME_TYPE } from "src/utils/orm";
 @Index({ name: "static_info", properties: ["time", "accountName", "amount"] })
 export class PayRecord {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property({ columnType: DATETIME_TYPE })
-    time: Date;
+  time: Date;
 
   @Property()
-    tenantName: string;
+  tenantName: string;
 
   @Property({ nullable: true })
-    accountName?: string;
+  accountName?: string;
 
   @Property()
-    type: string;
+  type: string;
 
   @Property({ type: DecimalType })
-    amount: Decimal = new Decimal(0);
+  amount: Decimal = new Decimal(0);
 
   @Property()
-    operatorId: string;
+  operatorId: string;
 
   @Property()
-    ipAddress: string;
+  ipAddress: string;
 
   @Property()
-    comment: string;
+  comment: string;
 
   constructor(init: {
     id?: number;

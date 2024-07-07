@@ -51,15 +51,15 @@ export const initServiceServer = plugin((server) => {
        await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
          .catch((e) => {
            if (e.code === Status.ALREADY_EXISTS) {
-             throw <ServiceError> {
+             throw {
                code: Status.ALREADY_EXISTS,
                message:`User with userId ${userId} already exists in scow.`,
                details: "EXISTS_IN_SCOW",
-             };
+             } as ServiceError;
            }
-           throw <ServiceError> {
+           throw {
              code: Status.INTERNAL,
-             message: `Error creating user with userId ${userId} in database.` };
+             message: `Error creating user with userId ${userId} in database.` } as ServiceError;
          });
 
       user.platformRoles.push(PlatformRole.PLATFORM_ADMIN);
@@ -83,9 +83,9 @@ export const initServiceServer = plugin((server) => {
             return false;
           }
           // 回滚数据库
-          await em.removeAndFlush(user),
+          await em.removeAndFlush(user);
           server.logger.error("Error creating user in auth.", e);
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+          throw { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` } as ServiceError;
         });
 
       return [{ createdInAuth: createdInAuth }];
@@ -99,10 +99,10 @@ export const initServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError> {
+        throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,
-        };
+        } as ServiceError;
       }
 
       if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
@@ -125,10 +125,10 @@ export const initServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError> {
+        throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,
-        };
+        } as ServiceError;
       }
 
       user.platformRoles = user.platformRoles.filter((x) => x !== PlatformRole.PLATFORM_ADMIN);
@@ -151,9 +151,9 @@ export const initServiceServer = plugin((server) => {
         await em.persistAndFlush(initializationTime);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> {
+          throw {
             code: status.ALREADY_EXISTS, message: "already initialized",
-          };
+          } as ServiceError;
         } else {
           throw e;
         }

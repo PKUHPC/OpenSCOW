@@ -42,7 +42,7 @@ export const createOperationLogClient = (
   config: AuditConfigSchema | undefined,
   logger: Logger | Console,
 ) => {
-  const client = config && config.url
+  const client = config?.url
     ? new OperationLogServiceClient(config.url, ChannelCredentials.createInsecure())
     : undefined;
 

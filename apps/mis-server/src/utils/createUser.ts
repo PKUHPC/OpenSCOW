@@ -33,7 +33,7 @@ export async function createUserInDatabase(
   // get default tenant
   const tenant = await em.findOne(Tenant, { name: tenantName });
   if (!tenant) {
-    throw <ServiceError> { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+    throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
   }
 
   // new the user
@@ -44,17 +44,17 @@ export async function createUserInDatabase(
   user.storageQuotas.add(Object.keys(configClusters).map((x) => new StorageQuota({
     cluster: x,
     storageQuota: 0,
-    user: user!,
+    user: user,
   })));
   try {
     await em.persistAndFlush(user);
   } catch (e) {
     if (e instanceof UniqueConstraintViolationException) {
-      throw <ServiceError> {
+      throw {
         code: Status.ALREADY_EXISTS,
         message:`User with userId ${userId} already exists.`,
         details: "EXISTS_IN_SCOW",
-      };
+      } as ServiceError;
     } else {
       throw e;
     }

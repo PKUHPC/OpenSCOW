@@ -17,7 +17,7 @@ import { logger } from "src/log";
 
 export enum AuthCustomType {
   external = "external",
-  image = "image"
+  image = "image",
 }
 
 export const InstallConfigSchema = Type.Object({

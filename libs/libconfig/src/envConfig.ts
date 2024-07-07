@@ -49,11 +49,11 @@ export const num = make(envalid.num, "num");
 export const bool = make(envalid.bool, "bool");
 
 export const envConfig = <T extends object>(
-  specs: { [K in keyof T]: Validator<T[K]> },
+  specs: {[K in keyof T]: Validator<T[K]> },
   envObject = process.env,
 ) => {
 
-  const envalidSpecs = {} as { [ K in keyof T]: ValidatorSpec<T[K]> };
+  const envalidSpecs = {} as {[ K in keyof T]: ValidatorSpec<T[K]> };
 
   for (const k in specs) {
     const [func, spec] = specs[k];

@@ -79,10 +79,10 @@ export const NO_CLUSTERS = "NO_CLUSTERS";
  */
 export const libCheckActivatedClusters
 = ({ clusterIds, activatedClusters, logger }:
-  { clusterIds: string[] | string,
-    activatedClusters: Record<string, ClusterConfigSchema>,
-    logger: Logger
-  }) => {
+{ clusterIds: string[] | string,
+  activatedClusters: Record<string, ClusterConfigSchema>,
+  logger: Logger
+}) => {
 
   const idsToCheck = Array.isArray(clusterIds) ? clusterIds : [clusterIds];
 

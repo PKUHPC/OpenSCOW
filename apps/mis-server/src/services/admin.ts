@@ -32,7 +32,7 @@ import { UserAccount, UserRole } from "src/entities/UserAccount";
 export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
-    changeStorageQuota: async ({ }) => {
+    changeStorageQuota: async () => {
       // const { cluster, mode, userId, value } = request;
 
       // const quota = await em.findOne(StorageQuota, {
@@ -80,9 +80,9 @@ export const adminServiceServer = plugin((server) => {
       });
 
       if (!quota) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
-        };
+        } as ServiceError;
       }
 
       return [{ currentQuota: quota.storageQuota }];
@@ -92,17 +92,17 @@ export const adminServiceServer = plugin((server) => {
       const { data, whitelist } = request;
 
       if (!data) {
-        throw <ServiceError>{
+        throw {
           code: Status.INVALID_ARGUMENT, message: "Submitted data is empty",
-        };
+        } as ServiceError;
       }
 
       const ownerNotInAccount = data.accounts.find((x) => x.owner && !x.users.find((user) => user.userId === x.owner));
       if (ownerNotInAccount) {
-        throw <ServiceError>{
+        throw {
           code: Status.INVALID_ARGUMENT,
           message: `Owner ${ownerNotInAccount.owner} is not in ${ownerNotInAccount.accountName}`,
-        };
+        } as ServiceError;
       }
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);

@@ -11,22 +11,22 @@
  */
 
 export declare const antdBreakpoints: {
-    xxs: number;
-    xs: number;
-    sm: number;
-    md: number;
-    lg: number;
-    xl: number;
-    xxl: number;
+  xxs: number;
+  xs: number;
+  sm: number;
+  md: number;
+  lg: number;
+  xl: number;
+  xxl: number;
 };
 export type Breakpoint = keyof typeof antdBreakpoints;
 export declare const layoutConstants: {
-    paddingBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-    menuBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-    headerHeight: number;
-    sidebarBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-    headerIconColor: string;
-    headerIconBackgroundColor: string;
-    headerBackgrounColor: string;
-    maxWidth: number;
+  paddingBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
+  menuBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
+  headerHeight: number;
+  sidebarBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
+  headerIconColor: string;
+  headerIconBackgroundColor: string;
+  headerBackgrounColor: string;
+  maxWidth: number;
 };

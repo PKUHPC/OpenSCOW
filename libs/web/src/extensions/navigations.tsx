@@ -31,10 +31,10 @@ export const BaseNavItem = z.object({
 
 export type NavItem = z.infer<typeof BaseNavItem> & {
   children?: NavItem[];
-}
+};
 
 export const NavItem = BaseNavItem.extend({
-  children: z.lazy(() => NavItem).array().optional(),
+  children: z.lazy(() => NavItem as NavItem).array().optional(),
 });
 
 export const rewriteNavigationsRoute = (from: "portal" | "mis") => defineExtensionRoute({

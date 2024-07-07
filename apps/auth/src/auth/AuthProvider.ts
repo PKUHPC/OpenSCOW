@@ -12,7 +12,7 @@
 
 import type { FastifyReply, FastifyRequest } from "fastify";
 
-export type ValidationResult = "" | string;
+export type ValidationResult = string | undefined;
 
 export interface CreateUserInfo {
   mail: string;
@@ -43,7 +43,7 @@ export interface AuthProvider {
   createUser: undefined | ((info: CreateUserInfo, req: FastifyRequest) => Promise<CreateUserResult>);
   changePassword: undefined | ((id: string, newPassword: string, req: FastifyRequest) => Promise<ChangePasswordResult>);
   checkPassword: undefined | ((identityId: string, password: string, req: FastifyRequest)
-    => Promise<CheckPasswordResult>);
+  => Promise<CheckPasswordResult>);
   changeEmail: undefined | ((id: string, newEmail: string,
     req: FastifyRequest) => Promise<ChangeEmailResult>);
 }

@@ -252,7 +252,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     const scowdSslScowPrivateKeyPath = config.scowd?.ssl?.scowPrivateKeyPath ?
       join(configPath, config.scowd.ssl.scowPrivateKeyPath) : "";
 
-    composeSpec.volumes["portal_data"] = {};
+    composeSpec.volumes.portal_data = {};
 
     addService("portal-server", {
       image: scowImage,
@@ -353,7 +353,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
     });
 
-    composeSpec.volumes["db_data"] = {};
+    composeSpec.volumes.db_data = {};
 
     addService("db", {
       image: config.mis.mysqlImage,
@@ -386,7 +386,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
     });
 
-    composeSpec.volumes["audit_db_data"] = {};
+    composeSpec.volumes.audit_db_data = {};
 
     addService("audit-db", {
       image: config.audit.mysqlImage,
@@ -429,7 +429,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
     });
 
-    composeSpec.volumes["ai_db_data"] = {};
+    composeSpec.volumes.ai_db_data = {};
 
     addService("ai-db", {
       image: config.ai.mysqlImage,

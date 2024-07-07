@@ -92,7 +92,7 @@ export async function createUser(
         gidNumber: id,
       };
 
-      userEntry["gidNumber"] = id;
+      userEntry.gidNumber = id;
 
       if (config.extraProps) {
         applyExtraProps(groupEntry, config.extraProps, userEntry);
@@ -115,7 +115,7 @@ export async function createUser(
       req.log.info("ldap.addUser.groupStrategy is one-group-for-all-users.");
       req.log.info("Using existing group %s for the user", config.gidNumber);
 
-      userEntry["gidNumber"] = config.gidNumber;
+      userEntry.gidNumber = config.gidNumber;
     }
 
     req.log.info("Adding people %s with entry info %o", userDn, userEntry);
@@ -152,9 +152,13 @@ export async function createUser(
 
       if (!members) {
         req.log.error("Didn't find LDAP group %s", addUserToLdapGroup);
-        throw { code: "INTERNAL_ERROR" };
+        class RequestError extends Error {
+          constructor(public code: string, message: string) {
+            super(message);
+          }
+        }
+        throw new RequestError("INTERNAL_ERROR", "Didn't find LDAP group " + addUserToLdapGroup);
       }
-
       // add the dn of the new user to the value
       const modify = promisify(client.modify.bind(client));
       await modify(addUserToLdapGroup, new ldapjs.Change({

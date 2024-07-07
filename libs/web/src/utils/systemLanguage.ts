@@ -27,12 +27,12 @@ export function getI18nConfigCurrentText(
     // 当语言id或者对应的配置文本中某种语言不存在时，显示default的值
     if (!languageId) return i18nConfigText.i18n.default;
     switch (languageId) {
-    case SYSTEM_VALID_LANGUAGES.EN:
-      return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
-    case SYSTEM_VALID_LANGUAGES.ZH_CN:
-      return i18nConfigText.i18n.zh_cn || i18nConfigText.i18n.default;
-    default:
-      return i18nConfigText.i18n.default;
+      case SYSTEM_VALID_LANGUAGES.EN:
+        return i18nConfigText.i18n.en || i18nConfigText.i18n.default;
+      case SYSTEM_VALID_LANGUAGES.ZH_CN:
+        return i18nConfigText.i18n.zh_cn || i18nConfigText.i18n.default;
+      default:
+        return i18nConfigText.i18n.default;
     }
   }
 };
@@ -53,7 +53,7 @@ export function getCurrentLanguageId(req: IncomingMessage | undefined,
 
   const cookies = parseCookies({ req });
   // 如果cookie设置了而且有效，就使用cookie
-  if (cookies && cookies.language) {
+  if (cookies?.language) {
     const currentCookieLang = cookies.language;
     if (Object.values(SYSTEM_VALID_LANGUAGES).includes(currentCookieLang)) {
       return currentCookieLang;
@@ -71,14 +71,14 @@ export function getCurrentLanguageId(req: IncomingMessage | undefined,
           // 判断偏好语言中的语言是否合法
           if (Object.values(HEADER_ACCEPT_VALID_LANGUAGES).includes(preferredLanguage)) {
             switch (preferredLanguage) {
-            case HEADER_ACCEPT_VALID_LANGUAGES.ZH_CN:
-            case HEADER_ACCEPT_VALID_LANGUAGES.ZH:
-              return SYSTEM_VALID_LANGUAGES.ZH_CN;
-            case HEADER_ACCEPT_VALID_LANGUAGES.EN_US:
-            case HEADER_ACCEPT_VALID_LANGUAGES.EN:
-              return SYSTEM_VALID_LANGUAGES.EN;
-            default:
-              break;
+              case HEADER_ACCEPT_VALID_LANGUAGES.ZH_CN:
+              case HEADER_ACCEPT_VALID_LANGUAGES.ZH:
+                return SYSTEM_VALID_LANGUAGES.ZH_CN;
+              case HEADER_ACCEPT_VALID_LANGUAGES.EN_US:
+              case HEADER_ACCEPT_VALID_LANGUAGES.EN:
+                return SYSTEM_VALID_LANGUAGES.EN;
+              default:
+                break;
             }
           }
         }
