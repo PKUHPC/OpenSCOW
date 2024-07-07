@@ -99,7 +99,7 @@ export function encodeErrorDetails(details: ErrorDetail[]): Any[] {
 
     return Any.fromPartial({
       typeUrl: `type.googleapis.com/${value.$type}`,
-      value: messageType.encode(value).finish(),
+      value: messageType.encode(value as any).finish(),
     });
   });
 }
