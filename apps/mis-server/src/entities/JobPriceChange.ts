@@ -19,31 +19,31 @@ import { DATETIME_TYPE } from "src/utils/orm";
 @Entity()
 export class JobPriceChange {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property({
     type: "json",
     comment: "{ biJobIndex: number; tenantPrice: tenantPrice.toFixed(4), accountPrice: accountPrice.toFixed(4) }[]",
   })
-    jobs: { biJobIndex: number; tenantPrice: string; accountPrice: string; }[];
+  jobs: { biJobIndex: number; tenantPrice: string; accountPrice: string; }[];
 
   @Property()
-    reason: string;
+  reason: string;
 
   @Property({ type: DecimalType, nullable: true })
-    newTenantPrice?: Decimal;
+  newTenantPrice?: Decimal;
 
   @Property({ type: DecimalType, nullable: true })
-    newAccountPrice?: Decimal;
+  newAccountPrice?: Decimal;
 
   @Property()
-    operatorId: string;
+  operatorId: string;
 
   @Property()
-    ipAddress: string;
+  ipAddress: string;
 
   @Property({ columnType: DATETIME_TYPE })
-    time: Date;
+  time: Date;
 
   constructor(init: {
     jobs: JobInfo[];

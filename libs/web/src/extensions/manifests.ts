@@ -15,6 +15,7 @@ import { z } from "zod";
 
 export const CommonExtensionManifestsSchema = z.object({
   rewriteNavigations: z.boolean().default(false),
+  navbarLinks: z.boolean().default(false),
 });
 
 export const ExtensionManifestsSchema = z.object({
@@ -38,6 +39,6 @@ export async function fetchExtensionManifests(url: string) {
   if (resp[200]) {
     return resp[200];
   } else {
-    throw new Error(`Cannot fetch extension manifests. ${resp}`);
+    throw new Error(`Cannot fetch extension manifests. ${JSON.stringify(resp)}`);
   }
 }

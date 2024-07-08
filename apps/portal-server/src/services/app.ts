@@ -53,35 +53,35 @@ export const appServiceServer = plugin((server) => {
       const app = apps[reply.appId];
 
       if (!app) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${reply.appId} is not found` };
+        throw { code: Status.NOT_FOUND, message: `app id ${reply.appId} is not found` } as ServiceError;
       }
 
       let appProps: ConnectToAppResponse["appProps"];
 
       switch (app.type) {
-      case AppType.vnc:
-        appProps = {
-          $case: "vnc",
-          vnc: {},
-        };
-        break;
-      case AppType.web:
-        appProps = {
-          $case: "web",
-          web: {
-            formData: app.web!.connect.formData ?? {},
-            query: app.web!.connect.query ?? {},
-            method: app.web!.connect.method,
-            path: app.web!.connect.path,
-            proxyType: app.web!.proxyType === "absolute"
-              ? WebAppProps_ProxyType.ABSOLUTE
-              : WebAppProps_ProxyType.RELATIVE,
-            customFormData: reply.customFormData ?? {},
-          },
-        };
-        break;
-      default:
-        throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
+        case AppType.vnc:
+          appProps = {
+            $case: "vnc",
+            vnc: {},
+          };
+          break;
+        case AppType.web:
+          appProps = {
+            $case: "web",
+            web: {
+              formData: app.web!.connect.formData ?? {},
+              query: app.web!.connect.query ?? {},
+              method: app.web!.connect.method,
+              path: app.web!.connect.path,
+              proxyType: app.web!.proxyType === "absolute"
+                ? WebAppProps_ProxyType.ABSOLUTE
+                : WebAppProps_ProxyType.RELATIVE,
+              customFormData: reply.customFormData ?? {},
+            },
+          };
+          break;
+        default:
+          throw new Error(`Unknown app type ${app.type as string} of app id ${reply.appId}`);
       }
 
       return [{
@@ -120,40 +120,40 @@ export const appServiceServer = plugin((server) => {
         }
 
         switch (attribute.type) {
-        case "number":
-          if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-            throw new DetailedError({
-              code: Status.INVALID_ARGUMENT,
-              message: `
+          case "number":
+            if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
+              throw new DetailedError({
+                code: Status.INVALID_ARGUMENT,
+                message: `
                 custom form attribute ${attribute.name} should be of type number,
                 but of type ${typeof customAttributes[attribute.name]}`,
-              details: [errorInfo("INVALID ARGUMENT")],
-            });
-          }
-          break;
+                details: [errorInfo("INVALID ARGUMENT")],
+              });
+            }
+            break;
 
-        case "text":
-          break;
+          case "text":
+            break;
 
-        case "select":
+          case "select":
           // check the option selected by user is in select attributes as the config defined
-          if (customAttributes[attribute.name]
+            if (customAttributes[attribute.name]
             && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-            throw new DetailedError({
-              code: Status.INVALID_ARGUMENT,
-              message: `
+              throw new DetailedError({
+                code: Status.INVALID_ARGUMENT,
+                message: `
                 the option value of ${attribute.name} selected by user should be
                 one of select attributes as the ${appId} config defined,
                 but is ${customAttributes[attribute.name]}`,
-              details: [errorInfo("INVALID ARGUMENT")],
-            });
-          }
-          break;
+                details: [errorInfo("INVALID ARGUMENT")],
+              });
+            }
+            break;
 
-        default:
-          throw new Error(`
+          default:
+            throw new Error(`
           the custom form attributes type in ${appId} config should be one of number, text or select,
-          but the type of ${attribute.name} is ${attribute.type}`);
+          but the type of ${attribute.name} is ${attribute.type as string}`);
         }
       });
 
@@ -204,7 +204,7 @@ export const appServiceServer = plugin((server) => {
       const app = apps[appId];
 
       if (!app) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+        throw { code: Status.NOT_FOUND, message: `app id ${appId} is not found` } as ServiceError;
       }
       const attributes: AppCustomAttribute[] = [];
 
@@ -225,7 +225,7 @@ export const appServiceServer = plugin((server) => {
             name: item.name,
             required: item.required,
             defaultInput: defaultInput,
-            placeholder: getI18nSeverTypeFormat(item.placeholder),
+            placeholder: item.placeholder ? getI18nSeverTypeFormat(item.placeholder) : undefined,
             options: item.select?.map((x) => {
               return {
                 value: x.value,
@@ -251,8 +251,7 @@ export const appServiceServer = plugin((server) => {
 
       return [{
         apps: Object.keys(apps)
-          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
-      }];
+          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath })) }];
     },
 
     getAppLastSubmission: async ({ request, logger }) => {

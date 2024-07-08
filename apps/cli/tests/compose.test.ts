@@ -44,7 +44,7 @@ it("generate correct paths", async () => {
   expect(composeConfig.services["portal-web"].environment).toContain("MIS_URL=/mis");
   expect(composeConfig.services["portal-web"].environment).toContain("MIS_SERVER_URL=mis-server:5000");
   expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
-  expect(composeConfig.services["ai"].environment).toContain("MIS_URL=/mis");
+  expect(composeConfig.services.ai.environment).toContain("MIS_URL=/mis");
 });
 
 it("sets proxy_read_timeout", async () => {
@@ -53,7 +53,7 @@ it("sets proxy_read_timeout", async () => {
 
   const composeSpec = createComposeSpec(config);
 
-  expect(composeSpec.services["gateway"].environment)
+  expect(composeSpec.services.gateway.environment)
     .toInclude(`PROXY_READ_TIMEOUT=${config.gateway.proxyReadTimeout}`);
 });
 
@@ -77,7 +77,7 @@ describe("sets custom auth environment", () => {
 
     const spec = createComposeSpec(getInstallConfig(configPath));
 
-    expect(spec.services["auth"].environment)
+    expect(spec.services.auth.environment)
       .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
   });
 
@@ -98,7 +98,7 @@ describe("sets custom auth environment", () => {
 
     const spec = createComposeSpec(getInstallConfig(configPath));
 
-    expect(spec.services["auth"].environment)
+    expect(spec.services.auth.environment)
       .toInclude("CUSTOM_AUTH_KEY=CUSTOM_AUTH_VALUE");
   });
 });

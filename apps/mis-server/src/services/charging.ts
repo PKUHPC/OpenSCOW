@@ -50,13 +50,13 @@ export const chargingServiceServer = plugin((server) => {
 
       if (!entity) {
         if (accountName === undefined) {
-          throw <ServiceError>{
+          throw {
             code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found`,
-          };
+          } as ServiceError;
         } else {
-          throw <ServiceError>{
+          throw {
             code: status.NOT_FOUND, message: `Tenant ${tenantName} or account  ${accountName} is not found`,
-          };
+          } as ServiceError;
         }
       }
 
@@ -81,13 +81,13 @@ export const chargingServiceServer = plugin((server) => {
 
         if (!target) {
           if (accountName === undefined) {
-            throw <ServiceError>{
+            throw {
               code: status.NOT_FOUND, message: `Tenant  ${tenantName} is not found`,
-            };
+            } as ServiceError;
           } else {
-            throw <ServiceError>{
+            throw {
               code: status.NOT_FOUND, message: `Account ${accountName} or tenant ${tenantName} is not found`,
-            };
+            } as ServiceError;
           }
 
         }
@@ -128,13 +128,13 @@ export const chargingServiceServer = plugin((server) => {
 
         if (!target) {
           if (accountName === undefined) {
-            throw <ServiceError>{
+            throw {
               code: status.NOT_FOUND, message: `Tenant  ${tenantName} is not found`,
-            };
+            } as ServiceError;
           } else {
-            throw <ServiceError>{
+            throw {
               code: status.NOT_FOUND, message: `Account  ${accountName} or tenant  ${tenantName} is not found`,
-            };
+            } as ServiceError;
           }
         }
 
@@ -221,27 +221,27 @@ export const chargingServiceServer = plugin((server) => {
       switch (target?.$case)
       {
       // 当前租户的租户消费记录
-      case "tenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
-        break;
+        case "tenant":
+          searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
+          break;
         // 所有租户的租户消费记录
-      case "allTenants":
-        searchParam = { accountName: undefined };
-        break;
+        case "allTenants":
+          searchParam = { accountName: undefined };
+          break;
         // 当前租户下当前账户的消费记录
-      case "accountOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
-        break;
+        case "accountOfTenant":
+          searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
+          break;
         // 当前租户下所有账户的消费记录
-      case "accountsOfTenant":
-        searchParam = { tenantName: target[target.$case].tenantName, accountName: { $ne:null } };
-        break;
+        case "accountsOfTenant":
+          searchParam = { tenantName: target[target.$case].tenantName, accountName: { $ne:null } };
+          break;
         // 所有租户下所有账户的消费记录
-      case "accountsOfAllTenants":
-        searchParam = { accountName: { $ne:null } };
-        break;
-      default:
-        searchParam = {};
+        case "accountsOfAllTenants":
+          searchParam = { accountName: { $ne:null } };
+          break;
+        default:
+          searchParam = {};
       }
 
       // 可查询的types类型
@@ -290,7 +290,7 @@ export const chargingServiceServer = plugin((server) => {
       const knex = em.getKnex();
 
       // 查询消费记录
-      const results: {account_name: string, user_name: string, chargedAmount: number}[] =
+      const results: { account_name: string, user_name: string, chargedAmount: number }[] =
       // 从pay_record表中查询
       await knex("charge_record as cr")
       // 选择account_name字段
@@ -328,7 +328,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(ChargeRecord, "cr");
 
-      qb
+      void qb
         .select([
           raw("DATE(CONVERT_TZ(cr.time, 'UTC', ?)) as date", [timeZone]),
           raw("SUM(cr.amount) as totalAmount"),
@@ -339,7 +339,7 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+      const records: { date: string, totalAmount: number }[] = await queryWithCache({
         em,
         queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`, `${timeZone}`],
         queryQb: qb,
@@ -362,7 +362,7 @@ export const chargingServiceServer = plugin((server) => {
       const knex = em.getKnex();
 
       // 查询支付记录
-      const results: {account_name: string, user_name: string, totalAmount: number}[] =
+      const results: { account_name: string, user_name: string, totalAmount: number }[] =
       // 从pay_record表中查询
       await knex("pay_record as pr")
       // 选择account_name字段
@@ -405,7 +405,7 @@ export const chargingServiceServer = plugin((server) => {
 
       const qb = em.createQueryBuilder(PayRecord, "pr");
 
-      qb
+      void qb
         .select([
           raw("DATE(CONVERT_TZ(pr.time, 'UTC', ?)) as date", [timeZone]),
           raw("SUM(pr.amount) as totalAmount"),
@@ -416,7 +416,7 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const records: {date: string, totalAmount: number}[] = await queryWithCache({
+      const records: { date: string, totalAmount: number }[] = await queryWithCache({
         em,
         queryKeys: ["get_daily_pay", `${startTime}`, `${endTime}`, `${timeZone}`],
         queryQb: qb,
@@ -458,28 +458,29 @@ export const chargingServiceServer = plugin((server) => {
       // 排序
       if (sortBy !== undefined && sortOrder !== undefined) {
         const order = SortOrder[sortOrder] == "DESCEND" ? "desc" : "asc";
-        qb.orderBy({ [mapChargesSortField[sortBy]]: order });
+        void qb.orderBy({ [mapChargesSortField[sortBy]]: order });
       }
 
-      let records;
+      const records = await (async () => {
 
-      // 如果存在userIdsOrNames字段，则用knex
-      if (userIdsOrNames && userIdsOrNames.length > 0) {
-        const sql = qb.getKnexQuery().andWhere(function() {
-          this.whereIn("cr.user_id", function() {
-            this.select("user_id")
-              .from("user");
-            for (const idOrName of userIdsOrNames) {
-              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
-                .orWhereRaw("name like " + `'%${idOrName}%'`);
-            }
+        // 如果存在userIdsOrNames字段，则用knex
+        if (userIdsOrNames && userIdsOrNames.length > 0) {
+          const sql = qb.getKnexQuery().andWhere(function() {
+            void this.whereIn("cr.user_id", function() {
+              void this.select("user_id")
+                .from("user");
+              for (const idOrName of userIdsOrNames) {
+                void this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+                  .orWhereRaw("name like " + `'%${idOrName}%'`);
+              }
+            });
           });
-        });
 
-        records = await em.getConnection().execute(sql);
-      } else {
-        records = await qb.getResult();
-      }
+          return await em.getConnection().execute(sql);
+        } else {
+          return await qb.getResult();
+        }
+      })();
 
       return [{
         results: records.map((x) => {
@@ -530,11 +531,11 @@ export const chargingServiceServer = plugin((server) => {
       // 如果存在userIdsOrNames字段，则用knex
       if (userIdsOrNames && userIdsOrNames.length > 0) {
         const sql = qb.getKnexQuery().andWhere(function() {
-          this.whereIn("c.user_id", function() {
-            this.select("user_id")
+          void this.whereIn("c.user_id", function() {
+            void this.select("user_id")
               .from("user");
             for (const idOrName of userIdsOrNames) {
-              this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
+              void this.orWhereRaw("user_id like " + `'%${idOrName}%'`)
                 .orWhereRaw("name like " + `'%${idOrName}%'`);
             }
           });

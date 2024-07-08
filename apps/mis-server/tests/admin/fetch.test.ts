@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";

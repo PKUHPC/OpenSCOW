@@ -37,8 +37,8 @@ export function getClient<TService extends ServiceType>(
 }
 
 export const getScowdClient = (scowdUrl: string, certificates?: SslConfig) => {
-  return <ScowdClient>{
+  return {
     file: getClient(scowdUrl, FileService, certificates),
     desktop: getClient(scowdUrl, DesktopService, certificates),
-  };
+  } as ScowdClient;
 };

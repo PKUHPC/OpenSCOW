@@ -19,4 +19,4 @@ async function main() {
   await server.start();
 }
 
-main();
+void main();

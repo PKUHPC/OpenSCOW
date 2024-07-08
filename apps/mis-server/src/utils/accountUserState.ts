@@ -96,7 +96,7 @@ export const getUserStateInfo = (
   }
 
   // 限额与已用额度存在且不为时，显示状态为封锁，表示用户不可以使用集群资源
-  if (currentLimit && currentUsed && currentUsed.gte(currentLimit)) {
+  if (currentLimit && currentUsed?.gte(currentLimit)) {
     return {
       displayedState: DisplayedUserState.DISPLAYED_QUOTA_EXCEEDED,
       shouldBlockInCluster: true,

@@ -35,6 +35,6 @@ it("should report no createUser capability", async () => {
     url: "/capabilities",
   });
 
-  const body = await resp.json() as Capabilities;
+  const body: Capabilities = await resp.json();
   expect(body.createUser).toBeFalse();
 });

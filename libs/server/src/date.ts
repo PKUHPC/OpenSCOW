@@ -59,7 +59,7 @@ export function isValidTimezone(timezoneStr: string) {
       // 如果 dayjs 能够正确解析时区名称，函数将正常运行并返回 true
       return true;
     }
-  } catch (e) {
+  } catch {
     // 如果发生错误，说明时区字符串无效
     return false;
   }
@@ -77,9 +77,9 @@ export function dayjsToDateMessage(dayjsObj: Dayjs): DateMessage {
 
 export function checkTimeZone(timeZone: string) {
   if (!isValidTimezone(timeZone)) {
-    throw <ServiceError>{
+    throw {
       code: status.INVALID_ARGUMENT,
       message: "Invalid timezone",
-    };
+    } as ServiceError;
   }
 }

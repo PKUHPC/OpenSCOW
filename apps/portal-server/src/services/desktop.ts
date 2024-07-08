@@ -34,7 +34,7 @@ export const desktopServiceServer = plugin((server) => {
       const availableWms = getDesktopConfig(cluster).wms;
 
       if (availableWms.find((x) => x.wm === wm) === undefined) {
-        throw <ServiceError>{ code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` };
+        throw { code: Status.INVALID_ARGUMENT, message: `${wm} is not a acceptable wm.` } as ServiceError;
       }
 
       checkLoginNodeInCluster(cluster, host);
@@ -44,7 +44,7 @@ export const desktopServiceServer = plugin((server) => {
       const reply = await clusterops.desktop.createDesktop({ loginNode: host, wm, userId, desktopName }, logger);
 
       return [{ ...reply }];
-      
+
     },
 
     killDesktop: async ({ request, logger }) => {

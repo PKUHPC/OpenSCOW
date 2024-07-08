@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 // @ts-check
 
 const withPlugins = require("next-compose-plugins");
