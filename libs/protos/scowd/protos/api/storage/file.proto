@@ -120,6 +120,15 @@ message UploadResponse {
   uint64 written_bytes = 1;
 }
 
+message MergeFileChunksRequest {
+  string path = 1;
+  string md5 = 2;
+  string name = 3;
+}
+
+message MergeFileChunksResponse {
+}
+
 message DownloadRequest {
   string user_id = 1;
   string path = 2;
@@ -193,6 +202,7 @@ service FileService {
 
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
+  rpc MergeFileChunks(MergeFileChunksRequest) returns (MergeFileChunksResponse);
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
   rpc GetHomeDirectory(GetHomeDirectoryRequest) returns (GetHomeDirectoryResponse);
