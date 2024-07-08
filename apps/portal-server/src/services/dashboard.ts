@@ -42,10 +42,10 @@ export const dashboardServiceServer = plugin((server) => {
 
         // 其他错误则抛错
         logger.info("Read file failed with %o", error);
-        throw <ServiceError> {
+        throw {
           code: status.INTERNAL,
           message: `read file ${userId}'s quickEntries.json failed`,
-        };
+        } as ServiceError;
       }
 
       return [{
@@ -76,10 +76,10 @@ export const dashboardServiceServer = plugin((server) => {
           : "";
 
         logger.info("Saving file failed with %o", err);
-        throw <ServiceError> {
+        throw {
           code: status.INTERNAL,
           message: errorMessage || `An error occurred while saving quick entry for user ${userId}`,
-        };
+        } as ServiceError;
       }
     },
   });

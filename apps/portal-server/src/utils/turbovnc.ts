@@ -24,6 +24,7 @@ export function getTurboVNCPath(cluster: string) {
 
   const clusterTurboVNCPath = getClusterConfigs(undefined, undefined, ["hpc"])[cluster].turboVNCPath;
 
+
   return clusterTurboVNCPath || commonTurboVNCPath;
 
 }
@@ -69,7 +70,7 @@ export function parseDisplayId(stdout: string): number {
   const lines = stdout.split("\n");
 
   for (const line of lines) {
-    const matches = line.match(regex);
+    const matches = regex.exec(line);
     if (!matches) { continue; }
 
     return +matches[1];

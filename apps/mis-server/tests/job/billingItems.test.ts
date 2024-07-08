@@ -114,10 +114,10 @@ it("creates billing items in db", async () => {
 
 const anyDate = () => expect.any(String);
 
-const priceItemToJobBillingItem = (x: PriceItem) => <JobBillingItem>({
+const priceItemToJobBillingItem = (x: PriceItem) => ({
   id: x.itemId, path: x.path.join("."), tenantName: x.tenant, price: decimalToMoney(x.price),
   createTime: anyDate(), amountStrategy: expect.any(String),
-});
+} as JobBillingItem);
 
 it("returns all default billing items", async () => {
   const reply = await asyncClientCall(client, "getBillingItems", { activeOnly: false });
@@ -249,7 +249,8 @@ it("calculates price", async () => {
     accountPrice: { expected: number; actual: number | undefined }
   }[];
 
-  testData.forEach(async (t) => {
+  for (const t of testData) {
+
     const price = await priceMap.calculatePrice({
       jobId: t.jobId,
       cluster: t.cluster,
@@ -269,7 +270,7 @@ it("calculates price", async () => {
         accountPrice: { expected: t.accountPrice, actual: price.account?.price.toNumber() },
       });
     }
-  });
+  };
 
   expect(wrongPrices).toBeArrayOfSize(0);
 

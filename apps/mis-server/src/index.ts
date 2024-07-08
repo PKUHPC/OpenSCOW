@@ -31,20 +31,20 @@ async function main() {
 
     switch (command) {
 
-    case "fetchJobs":
-      await fetchJobs(em, logger, server.ext);
-      break;
+      case "fetchJobs":
+        await fetchJobs(em, logger, server.ext);
+        break;
 
-    case "createPriceItems":
-      await createPriceItems(em, logger);
-      break;
+      case "createPriceItems":
+        await createPriceItems(em, logger);
+        break;
 
-    case "migrationUp":
-      await migrationUp(server.ext.orm);
-      break;
-    default:
-      logger.error("Unexpected task name %s", command);
-      process.exit(1);
+      case "migrationUp":
+        await migrationUp(server.ext.orm);
+        break;
+      default:
+        logger.error("Unexpected task name %s", command);
+        process.exit(1);
     }
 
     process.exit(0);
@@ -53,4 +53,4 @@ async function main() {
   await server.start();
 }
 
-main();
+void main();

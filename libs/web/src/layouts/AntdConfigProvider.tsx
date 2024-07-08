@@ -12,6 +12,7 @@
 
 import "dayjs/locale/zh-cn";
 
+import { legacyLogicalPropertiesTransformer, StyleProvider } from "@ant-design/cssinjs";
 import { App, ConfigProvider, theme } from "antd";
 import enUSlocale from "antd/locale/en_US";
 import zhCNlocale from "antd/locale/zh_CN";
@@ -40,15 +41,17 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
   const { dark } = useDarkMode();
 
   return (
-    <ConfigProvider
-      locale={locale === "zh_cn" ? zhCNlocale : enUSlocale}
-      theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
-    >
-      <StyledComponentsThemeProvider color={color} locale={locale}>
-        <App>
-          {children}
-        </App>
-      </StyledComponentsThemeProvider>
-    </ConfigProvider>
+    <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+      <ConfigProvider
+        locale={locale === "zh_cn" ? zhCNlocale : enUSlocale}
+        theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
+      >
+        <StyledComponentsThemeProvider color={color} locale={locale}>
+          <App>
+            {children}
+          </App>
+        </StyledComponentsThemeProvider>
+      </ConfigProvider>
+    </StyleProvider>
   );
 };

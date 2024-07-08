@@ -18,7 +18,7 @@ import { createI18nStringSchema } from "src/i18n";
 
 export enum AppType {
   web = "web",
-  vnc = "vnc"
+  vnc = "vnc",
 }
 
 export const AppConnectPropsSchema = Type.Object({

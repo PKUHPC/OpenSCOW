@@ -13,21 +13,38 @@
 import { MySqlDriver, QueryBuilder, SqlEntityManager } from "@mikro-orm/mysql";
 import { QueryCache } from "src/entities/QueryCache";
 
-export const queryWithCache = async ({ em, queryKeys, queryQb }: {
+export const queryWithCache = async ({ em, queryKeys, queryQb, cacheOptions }: {
   em: SqlEntityManager<MySqlDriver>
   queryKeys: string[],
   queryQb: QueryBuilder<any>,
+  cacheOptions?: {
+    maxAgeMilliseconds?: number,
+    enabled?: boolean,
+  },
 }) => {
+  const { maxAgeMilliseconds = 5 * 60 * 1000, enabled = true } = cacheOptions || {};
+
+  if (!enabled) {
+    return await queryQb.execute();
+  }
 
   const queryKey = queryKeys.join(":");
 
-  const queryCache = await em.findOne(QueryCache, {
-    queryKey,
-  });
+  const queryCache = await em.findOne(QueryCache, { queryKey });
+
+  const now = new Date();
 
   if (!queryCache) {
     const newResult = await queryQb.execute();
-    const queryCache = new QueryCache({ queryKey, queryResult: newResult });
+    const newQueryCache = new QueryCache({ queryKey, queryResult: newResult, timestamp: now });
+    await em.persistAndFlush(newQueryCache);
+    return newResult;
+  }
+
+  if ((now.getTime() - queryCache.timestamp.getTime()) > maxAgeMilliseconds) {
+    const newResult = await queryQb.execute();
+    queryCache.queryResult = newResult;
+    queryCache.timestamp = now;
     await em.persistAndFlush(queryCache);
     return newResult;
   } else {

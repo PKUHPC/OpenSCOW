@@ -15,7 +15,9 @@ import { Type } from "@sinclair/typebox";
 import { CommonConfigSchema } from "./common";
 
 // 创建配置文件中支持国际化文本文字项的配置类型
-export const createI18nStringSchema = ({ description, defaultValue }: {description: string, defaultValue?: string}) => {
+export const createI18nStringSchema = ({ description, defaultValue }: {
+  description: string, defaultValue?: string
+}) => {
   return Type.Union([
     Type.String(),
     Type.Object({
@@ -45,12 +47,16 @@ export const SYSTEM_VALID_LANGUAGES = {
 // 系统合法语言枚举值
 export enum SYSTEM_VALID_LANGUAGE_ENUM {
   "zh_cn" = "zh_cn",
-  "en" = "en"
+  "en" = "en",
 }
 
 export type SystemLanguage = CommonConfigSchema["systemLanguage"];
 
-export type SystemLanguageConfig = {defaultLanguage: string, isUsingI18n: boolean, autoDetectWhenUserNotSet?: boolean}
+export interface SystemLanguageConfig {
+  defaultLanguage: string,
+  isUsingI18n: boolean,
+  autoDetectWhenUserNotSet?: boolean
+};
 
 
 // 配置项文本国际化类型
@@ -60,7 +66,7 @@ export type I18nStringType = string | {
     en?: string,
     zh_cn?: string,
   }
-}
+};
 
 export interface I18nObject {
   i18n?: I18nObject_I18n | undefined;

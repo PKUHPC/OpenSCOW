@@ -499,7 +499,7 @@ it("manage platform role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(true);
+  expect(setUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(true);
 
   await asyncClientCall(client, "unsetPlatformRole", {
     userId: data.userA.userId,
@@ -507,7 +507,7 @@ it("manage platform role", async () => {
   });
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(unsetUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(false);
+  expect(unsetUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(false);
 });
 
 it("manage tenant role", async () => {
@@ -520,7 +520,7 @@ it("manage tenant role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.tenantRoles.includes(tRole["TENANT_FINANCE"])).toBe(true);
+  expect(setUser?.tenantRoles.includes(tRole.TENANT_FINANCE)).toBe(true);
 
   await asyncClientCall(client, "unsetTenantRole", {
     userId: data.userA.userId,
@@ -528,7 +528,7 @@ it("manage tenant role", async () => {
   });
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(unsetUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(false);
+  expect(unsetUser?.tenantRoles.includes(tRole.TENANT_ADMIN)).toBe(false);
 });
 
 it("get platform role users Count", async () => {

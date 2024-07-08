@@ -36,7 +36,9 @@ export const useLdap = (
     return await (async () => {
       await promisify(client.bind.bind(client))(user.dn, user.password);
       return await consume(client);
-    })().finally(unbind);
+    })().finally(() => {
+      void unbind();
+    });
   };
 };
 
@@ -51,7 +53,7 @@ export const searchOne = async <T>(
 
     client.search(searchBase, searchOptions, (err, res) => {
 
-      if (err) { rej(err); return; }
+      if (err) { rej(err as Error); return; }
       logger.info("Search started");
 
       let found = false;
@@ -82,7 +84,7 @@ export const searchOne = async <T>(
 
       res.on("error", (err) => {
         logger.error("Error. %o", err);
-        rej(err);
+        rej(err as Error);
       });
 
       res.on("end", (result) => {
@@ -90,7 +92,7 @@ export const searchOne = async <T>(
         if (result?.status === 0) {
           resolve(undefined);
         } else {
-          rej(result?.errorMessage);
+          rej(new Error(result?.errorMessage));
         }
       });
     });

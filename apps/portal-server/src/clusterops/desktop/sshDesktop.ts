@@ -37,7 +37,7 @@ export const sshDesktopServices = (cluster: string): DesktopOps => ({
       const ids = parseListOutput(resp.stdout);
 
       if (ids.length >= maxDesktops) {
-        throw <ServiceError> { code: status.RESOURCE_EXHAUSTED, message: "Too many desktops" };
+        throw { code: status.RESOURCE_EXHAUSTED, message: "Too many desktops" } as ServiceError;
       }
 
       // start a session

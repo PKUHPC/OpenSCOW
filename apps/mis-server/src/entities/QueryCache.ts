@@ -16,16 +16,16 @@ import { DATETIME_TYPE } from "src/utils/orm";
 @Entity()
 export class QueryCache {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property()
-    queryKey: string;
+  queryKey: string;
 
   @Property({ type: "json" })
-    queryResult: any;
+  queryResult: any;
 
   @Property({ columnType: DATETIME_TYPE })
-    timestamp: Date;
+  timestamp: Date;
 
   constructor(init: {
     id?: number;
@@ -38,6 +38,6 @@ export class QueryCache {
     }
     this.queryKey = init.queryKey;
     this.queryResult = init.queryResult;
-    this.timestamp = new Date();
+    this.timestamp = init.timestamp ?? new Date();
   }
 }

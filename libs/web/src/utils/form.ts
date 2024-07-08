@@ -18,7 +18,7 @@ import { getCurrentLangLibWebText } from "./libWebI18n/libI18n";
 
 export const confirmPasswordFormItemProps = <
   PasswordFieldName extends string,
-  T extends { [key in PasswordFieldName]: string }
+  T extends {[key in PasswordFieldName]: string },
 >(form: FormInstance<T>, passwordFieldName: PasswordFieldName, languageId: string) => {
   return {
     dependencies: [passwordFieldName],
@@ -50,7 +50,7 @@ export const positiveNumberRule = (_: RuleObject, value: any, languageId: string
 
   if ((value && parseFloat(value) < 0) || value === 0) {
     const errorMessage = getCurrentLangLibWebText(languageId, "notPositiveNumberError");
-    return Promise.reject(errorMessage);
+    return Promise.reject(new Error(errorMessage));
   }
   return Promise.resolve();
 };
@@ -61,14 +61,14 @@ export const compareUsedChargeRule =
 
     if (usedCharge && value < usedCharge) {
       const errorMessage = getCurrentLangLibWebText(languageId, "compareUsedChargeError");
-      return Promise.reject(errorMessage);
+      return Promise.reject(new Error(errorMessage));
     }
     return Promise.resolve();
   };
 
 // check consistency of the compared value and the input value
 export const validateDataConsistency = <InputFieldName extends string>
-  (inputFieldName: InputFieldName, comparedValue: string, languageId: string) => {
+(inputFieldName: InputFieldName, comparedValue: string, languageId: string) => {
   return {
     dependencies: [inputFieldName],
     validateFirst: true,

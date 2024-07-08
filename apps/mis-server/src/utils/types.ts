@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
+// @ts-ignore
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export type AnyJson = boolean | number | string | null | JsonArray | JsonMap;
-export interface JsonMap { [key: string]: AnyJson; }
+// @ts-ignore
+export type JsonMap = Record<string, AnyJson>;
 interface JsonArray extends Array<AnyJson> {}
 
 export type ValueOf<T> = T[keyof T];

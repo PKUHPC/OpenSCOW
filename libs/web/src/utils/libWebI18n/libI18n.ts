@@ -16,7 +16,7 @@ import libWebZhCn from "./libWebZhCn";
 export type LibWebTextsType = typeof libWebEn;
 export type LibWebTextsKeys = keyof LibWebTextsType;
 
-export const libWebLanguages: { [id: string]: LibWebTextsType } = {
+export const libWebLanguages: Record<string, LibWebTextsType> = {
   en: libWebEn,
   zh_cn: libWebZhCn,
 };

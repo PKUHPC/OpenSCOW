@@ -26,98 +26,98 @@ export interface JobPriceInfo {
 export class JobInfo {
 
   @PrimaryKey()
-    biJobIndex!: number;
+  biJobIndex!: number;
 
   @Property({ index: "idJob" })
-    idJob!: number;
+  idJob!: number;
 
   @Property({ length: 255, comment: "账户", index: "account" })
-    account!: string;
+  account!: string;
 
   @Property({ length: 127, comment: "用户名", index: "user" })
-    user!: string;
+  user!: string;
 
   @Property({ length: 255, columnType: "tinytext", comment: "分区" })
-    partition!: string;
+  partition!: string;
 
   @Property({ columnType: "text", comment: "使用节点列表" })
-    nodelist!: string;
+  nodelist!: string;
 
   @Property({ length: 255, columnType: "tinytext", comment: "作业名" })
-    jobName!: string;
+  jobName!: string;
 
   // 这里存的是scow中的集群名
   @Property({ length: 50, comment: "集群名" })
-    cluster!: string;
+  cluster!: string;
 
   @Index({ name: "time_submit" })
   @Property({ comment: "提交时间" })
-    timeSubmit!: Date;
+  timeSubmit!: Date;
 
   @Index({ name: "time_start" })
   @Property({ comment: "开始时间" })
-    timeStart!: Date;
+  timeStart!: Date;
 
   @Property({ comment: "结束时间", index: "time_end" })
-    timeEnd!: Date;
+  timeEnd!: Date;
 
   @Property({ columnType: "int(10)", comment: "使用GPU数。来自gres_req字段" })
-    gpu!: number;
+  gpu!: number;
 
   @Property({ columnType: "int unsigned", comment: "申请CPU数tres_req" })
-    cpusReq!: number;
+  cpusReq!: number;
 
   @Property({ columnType: "int unsigned", comment: "申请的内存，单位MB，来自tres_req" })
-    memReq!: number;
+  memReq!: number;
 
   @Property({ columnType: "int unsigned", comment: "申请节点数,tres_req" })
-    nodesReq!: number;
+  nodesReq!: number;
 
   @Property({ columnType: "int unsigned", comment: "分配CPU数tres_alloc" })
-    cpusAlloc!: number;
+  cpusAlloc!: number;
 
   @Property({ columnType: "int unsigned", comment: "分配的内存，单位MB，来自tres_alloc" })
-    memAlloc!: number;
+  memAlloc!: number;
 
   @Property({ columnType: "int unsigned", comment: "分配节点数tres_alloc" })
-    nodesAlloc!: number;
+  nodesAlloc!: number;
 
   @Property({ columnType: "int unsigned", comment: "作业时间限制" })
-    timelimit!: number;
+  timelimit!: number;
 
   @Index({ name: "time_used" })
   @Property({ columnType: "bigint unsigned", comment: "作业执行时间" })
-    timeUsed!: number;
+  timeUsed!: number;
 
   @Index({ name: "time_wait" })
   @Property({ columnType: "bigint unsigned", comment: "作业等待时间" })
-    timeWait!: number;
+  timeWait!: number;
 
   @Property({ length: 255, comment: "QOS" })
-    qos!: string;
+  qos!: string;
 
   @Index({ name: "record_time" })
   @Property({ columnType: "timestamp", defaultRaw: "CURRENT_TIMESTAMP", comment: "记录时间" })
-    recordTime!: Date;
+  recordTime!: Date;
 
   @Property()
-    tenant: string;
+  tenant: string;
 
   @Property({ default: UNKNOWN_PRICE_ITEM })
-    accountBillingItemId: string;
+  accountBillingItemId: string;
 
   @Property({ default: UNKNOWN_PRICE_ITEM })
-    tenantBillingItemId: string;
+  tenantBillingItemId: string;
 
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
-    tenantPrice: Decimal = new Decimal(0);
+  tenantPrice: Decimal = new Decimal(0);
 
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
-    accountPrice: Decimal = new Decimal(0);
+  accountPrice: Decimal = new Decimal(0);
 
 
   constructor(
-    job: {cluster: string} & ClusterJobInfo,
+    job: { cluster: string } & ClusterJobInfo,
     tenant: string | undefined,
     jobPriceInfo: JobPriceInfo,
   ) {

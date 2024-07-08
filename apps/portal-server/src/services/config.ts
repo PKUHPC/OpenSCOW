@@ -56,7 +56,10 @@ export const staticConfigServiceServer = plugin((server) => {
         );
         availablePartitions = resp.partitions;
       } catch (error) {
-        logger.error(`Error occured when query the available partitions of ${userId} in ${accountName}.`);
+        logger.error(
+          "Error occured when query the available partitions of %s in %s. Error %o",
+          userId, accountName, error,
+        );
         availablePartitions = [];
       }
 

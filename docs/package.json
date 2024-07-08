@@ -15,7 +15,8 @@
     "typecheck": "tsc",
     "genDocs": "pnpm writeEnvDocs && pnpm writeConfigDocs",
     "writeEnvDocs": "ts-node tools/envDoc.ts",
-    "writeConfigDocs": "node tools/configDoc.mjs"
+    "writeConfigDocs": "node tools/configDoc.mjs",
+    "lint": "eslint -c ../eslint.config.js ."
   },
   "dependencies": {
     "@docusaurus/core": "3.4.0",

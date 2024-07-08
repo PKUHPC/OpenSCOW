@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { FilterQuery, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { FilterQuery, Loaded, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
@@ -78,7 +78,7 @@ export const jobServiceServer = plugin((server) => {
       const sqlFilter = filterJobs(filter);
 
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
-      let jobs, count;
+      let jobs: Loaded<JobInfoEntity, never, "*", never>[], count: number;
 
       // 处理排序参数
       if (sortBy !== undefined && sortOrder !== undefined) {
@@ -156,10 +156,10 @@ export const jobServiceServer = plugin((server) => {
           const account = accountMap[x.account];
 
           if (!account) {
-            throw <ServiceError> {
+            throw {
               code: status.INTERNAL,
               message: `Unknown account ${x.account} of job ${x.biJobIndex}`,
-            };
+            } as ServiceError;
           }
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
@@ -226,9 +226,9 @@ export const jobServiceServer = plugin((server) => {
       const job = await em.findOne(JobInfoEntity, { biJobIndex: +biJobIndex });
 
       if (!job) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `Job ${biJobIndex} is not found`,
-        };
+        } as ServiceError;
       }
 
       return [{ info: toGrpc(job) }];
@@ -325,7 +325,7 @@ export const jobServiceServer = plugin((server) => {
         tenant = await em.findOne(Tenant, { name: tenantName });
 
         if (!tenant) {
-          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+          throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
         }
       }
 
@@ -335,14 +335,14 @@ export const jobServiceServer = plugin((server) => {
           orderBy: { createTime: "ASC" },
         });
       logger.info("billingItems ：%o", billingItems);
-      const priceItemToGrpc = (item: JobPriceItem) => <JobBillingItem>({
+      const priceItemToGrpc = (item: JobPriceItem) => ({
         id: item.itemId,
         path: item.path.join("."),
         tenantName: item.tenant?.getProperty("name"),
         price: decimalToMoney(item.price),
         createTime: item.createTime.toISOString(),
         amountStrategy: item.amount,
-      });
+      } as JobBillingItem);
 
       const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
 
@@ -376,16 +376,16 @@ export const jobServiceServer = plugin((server) => {
         tenant = await em.findOne(Tenant, { name: tenantName }) ?? undefined;
 
         if (!tenant) {
-          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+          throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
         }
       }
 
       const customAmountStrategies = misConfig.customAmountStrategies?.map((i) => i.id) || [];
       if (![...(Object.values(AmountStrategy) as string[]), ...customAmountStrategies].includes(amountStrategy)) {
-        throw <ServiceError>{
+        throw {
           code: status.INVALID_ARGUMENT,
           message: `Amount strategy ${amountStrategy} is not valid.`,
-        };
+        } as ServiceError;
       }
 
       const item = new JobPriceItem({
@@ -402,7 +402,7 @@ export const jobServiceServer = plugin((server) => {
         return [{}];
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${itemId} already exists.` };
+          throw { code: status.ALREADY_EXISTS, message: `${itemId} already exists.` } as ServiceError;
         } else {
           throw e;
         }
@@ -414,7 +414,8 @@ export const jobServiceServer = plugin((server) => {
       const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
-      qb
+
+      void qb
         .select([raw("j.user as userId"), raw("COUNT(*) as count")])
         .where({ timeSubmit: { $gte: startTime } })
         .andWhere({ timeSubmit: { $lte: endTime } })
@@ -422,7 +423,7 @@ export const jobServiceServer = plugin((server) => {
         .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
         .limit(topRank);
 
-      const results: {userId: string, count: number}[] = await queryWithCache({
+      const results: { userId: string, count: number }[] = await queryWithCache({
         em,
         queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
         queryQb: qb,
@@ -441,12 +442,12 @@ export const jobServiceServer = plugin((server) => {
 
       // 控制topNUsers的数量
       if (typeof topNUsers == "number" && (topNUsers > 10 || topNUsers < 0)) {
-        throw <ServiceError> { code: status.INVALID_ARGUMENT, message:"topNUsers must be between 0 and 10" };
+        throw { code: status.INVALID_ARGUMENT, message:"topNUsers must be between 0 and 10" } as ServiceError;
       }
       // 直接使用Knex查询构建器
       const knex = em.getKnex();
 
-      const results: {userName: string, userId: string, count: number}[] = await knex("job_info as j")
+      const results: { userName: string, userId: string, count: number }[] = await knex("job_info as j")
         .select([
           "u.name as userName",
           "j.user as userId",
@@ -474,7 +475,7 @@ export const jobServiceServer = plugin((server) => {
       checkTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(JobInfoEntity, "j");
-      qb
+      void qb
         .select([
           raw("DATE(CONVERT_TZ(j.time_submit, 'UTC', ?)) as date", [timeZone]),
           raw("COUNT(*) as count")])
@@ -483,7 +484,7 @@ export const jobServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const results: {date: string, count: number}[] = await queryWithCache({
+      const results: { date: string, count: number }[] = await queryWithCache({
         em,
         queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
         queryQb: qb,
