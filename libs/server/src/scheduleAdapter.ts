@@ -40,14 +40,14 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
     } else if (((e as any).code === status.CANCELLED)) {
       throw e;
     } else {
-      throw <ServiceError> {
+      throw {
         code: Status.UNIMPLEMENTED,
         message: "unimplemented",
         details: "The scheduler API version can not be confirmed."
           + "To use this method, the scheduler adapter must be upgraded to the version "
           + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
           + "or higher.",
-      };
+      } as ServiceError;
     }
   }
 
@@ -64,14 +64,14 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
     }
 
     if (!geMinVersion) {
-      throw <ServiceError> {
+      throw {
         code: Status.FAILED_PRECONDITION,
         message: "precondition failed",
         details: "The method is not supported with the current scheduler adapter version. "
           + "To use this method, the scheduler adapter must be upgraded to the version "
           + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
           + "or higher.",
-      };
+      } as ServiceError;
     }
   }
 

@@ -37,7 +37,7 @@ export const tenantServiceServer = plugin((server) => {
 
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (!tenant) {
-        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+        throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
       const accountCount = await em.count(Account, { tenant });
       const userCount = await em.count(User, { tenant });
@@ -104,9 +104,9 @@ export const tenantServiceServer = plugin((server) => {
 
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (tenant) {
-        throw <ServiceError>{
+        throw {
           code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
-        };
+        } as ServiceError;
       }
       logger.info(`start to create tenant: ${tenantName} `);
       const newTenant = new Tenant({ name: tenantName });
@@ -115,11 +115,11 @@ export const tenantServiceServer = plugin((server) => {
         // 在数据库中创建租户
         await em.persistAndFlush(newTenant).catch((e) => {
           if (e instanceof UniqueConstraintViolationException) {
-            throw <ServiceError>{
+            throw {
               code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
-            };
+            } as ServiceError;
           }
-          throw <ServiceError>{ code: Status.INTERNAL, message: "Error creating tenant in database." };
+          throw { code: Status.INTERNAL, message: "Error creating tenant in database." } as ServiceError;
         });
 
         // 在数据库中创建user
@@ -131,16 +131,16 @@ export const tenantServiceServer = plugin((server) => {
              return user;
            }).catch((e) => {
              if (e.code === Status.ALREADY_EXISTS) {
-               throw <ServiceError>{
+               throw {
                  code: Status.ALREADY_EXISTS,
                  message: `User with userId ${userId} already exists in scow.`,
                  details: "USER_ALREADY_EXISTS",
-               };
+               } as ServiceError;
              }
-             throw <ServiceError>{
+             throw {
                code: Status.INTERNAL,
                message: `Error creating user with userId ${userId} in database.`,
-             };
+             } as ServiceError;
            });
         // call auth
         const createdInAuth = await createUser(authUrl,
@@ -157,10 +157,10 @@ export const tenantServiceServer = plugin((server) => {
               return false;
             } else {
               logger.error("Error creating user in auth.", e);
-              throw <ServiceError>{
+              throw {
                 code: Status.INTERNAL,
                 message: `Error creating user with userId ${userId} in auth.`,
-              };
+              } as ServiceError;
             }
           });
         await callHook("userCreated", { tenantName, userId: user.userId }, logger);
@@ -175,7 +175,7 @@ export const tenantServiceServer = plugin((server) => {
       const tenant = await em.findOne(Tenant, { name: tenantName });
 
       if (!tenant) {
-        throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+        throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
       tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
 
@@ -229,9 +229,9 @@ export const tenantServiceServer = plugin((server) => {
 
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (tenant) {
-        throw <ServiceError>{
+        throw {
           code: Status.ALREADY_EXISTS, message: "The tenant already exists", details: "TENANT_ALREADY_EXISTS",
-        };
+        } as ServiceError;
       }
 
       const newTenant = new Tenant({ name: tenantName });
@@ -240,17 +240,17 @@ export const tenantServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId, name: userName });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName} is not found.`,
-        };
+        } as ServiceError;
       }
 
       const userAccount = await em.findOne(UserAccount, { user: user });
 
       if (userAccount) {
-        throw <ServiceError>{
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
-        };
+        } as ServiceError;
       }
 
       // 修改该用户的租户， 并且作为租户管理员

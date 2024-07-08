@@ -10,7 +10,8 @@
     "build:next": "cross-env BUILDING=1 next build",
     "test": "jest --passWithNoTests",
     "client": "ntar client",
-    "prepareDev": "node scripts/copyMonacoToPublic.js"
+    "prepareDev": "node scripts/copyMonacoToPublic.js",
+    "lint": "eslint ."
   },
   "files": [
     ".next",

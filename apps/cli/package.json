@@ -8,7 +8,8 @@
   "scripts": {
     "dev": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json && pkg --compress GZip --no-bytecode --public-packages \"*\" --public .",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint -c ../../eslint.config.js ."
   },
   "dependencies": {
     "@scow/lib-config": "workspace:*",

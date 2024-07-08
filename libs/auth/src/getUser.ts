@@ -39,7 +39,7 @@ export async function getUser(
   });
 
   if (resp.status === 200) {
-    return (await resp.json()).user;
+    return (await resp.json()).user as AuthUserInfo;
   } else if (resp.status === 404) {
     const json = await resp.json().catch(() => undefined);
 

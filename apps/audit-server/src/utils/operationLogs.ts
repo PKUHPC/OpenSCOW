@@ -79,14 +79,14 @@ export const getTargetAccountName = (operationEvent: OperationEvent): string | u
   const operationType = operationEvent?.$case;
   if (operationType === "exportChargeRecord" || operationType === "exportPayRecord") {
     switch (operationEvent[operationType].target.$case) {
-    case "accountOfTenant" :
-      return operationEvent[operationType].target.accountOfTenant.accountName;
-    case "accountsOfTenant" :
-      return operationEvent[operationType].target.accountsOfTenant.accountNames;
-    case "accountsOfAllTenants":
-      return operationEvent[operationType].target.accountsOfAllTenants.accountNames;
-    default:
-      return;
+      case "accountOfTenant" :
+        return operationEvent[operationType].target.accountOfTenant.accountName;
+      case "accountsOfTenant" :
+        return operationEvent[operationType].target.accountsOfTenant.accountNames;
+      case "accountsOfAllTenants":
+        return operationEvent[operationType].target.accountsOfAllTenants.accountNames;
+      default:
+        return;
     }
   } else if (operationType === "exportOperationLog") {
     const source = operationEvent[operationType].source;
@@ -129,9 +129,7 @@ export const checkCustomEventType = async (em: SqlEntityManager<MySqlDriver>, op
     || !existTypeLog.metaData
     || !existTypeLog.metaData.$case
     || existTypeLog.metaData.$case !== "customEvent"
-    || !existTypeLog.metaData.customEvent
-    || !existTypeLog.metaData.customEvent.name
-    || !existTypeLog.metaData.customEvent.name.i18n
+    || !existTypeLog.metaData.customEvent?.name?.i18n
   ) {
     return;
   }
@@ -172,10 +170,10 @@ export const addOperationLogAccountNames = (operationLog: OperationLog): Operati
     return logCopy;
   };
   switch (targetCase) {
-  case "accountsOfTenant" :
-  case "accountsOfAllTenants":
-    return caseObject.accountNames ? operationLog : addLogAccountNames();
-  default:
-    return operationLog;
+    case "accountsOfTenant" :
+    case "accountsOfAllTenants":
+      return caseObject.accountNames ? operationLog : addLogAccountNames();
+    default:
+      return operationLog;
   }
 };

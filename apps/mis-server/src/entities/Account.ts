@@ -31,39 +31,39 @@ export enum AccountState {
 @Entity()
 export class Account {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property({ unique: true })
-    accountName: string;
+  accountName: string;
 
   @ManyToOne(() => Tenant, { ref: true })
-    tenant: Ref<Tenant>;
+  tenant: Ref<Tenant>;
 
   @Property()
-    blockedInCluster: boolean;
+  blockedInCluster: boolean;
 
   @OneToMany(() => UserAccount, (u) => u.account)
-    users = new Collection<UserAccount>(this);
+  users = new Collection<UserAccount>(this);
 
   @OneToOne(() => AccountWhitelist, (u) => u.account, {
     nullable: true, ref: true, unique: true, owner: true,
   })
-    whitelist?: Ref<AccountWhitelist>;
+  whitelist?: Ref<AccountWhitelist>;
 
   @Property({ default: "" })
-    comment: string;
+  comment: string;
 
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
-    balance: Decimal = new Decimal(0);
+  balance: Decimal = new Decimal(0);
 
   @Property({ type: DecimalType, nullable: true })
-    blockThresholdAmount: Decimal | undefined;
+  blockThresholdAmount: Decimal | undefined;
 
   @Enum({ items: () => AccountState, default: AccountState.NORMAL, comment: Object.values(AccountState).join(", ") })
-    state: AccountState;
+  state: AccountState;
 
   @Property({ columnType: DATETIME_TYPE, nullable: true })
-    createTime: Date;
+  createTime: Date;
 
   constructor(init: {
     accountName: string;
@@ -80,8 +80,8 @@ export class Account {
     if (init.whitelist) {
       this.whitelist = toRef(init.whitelist);
     }
-    this.comment = init.comment || "";
-    this.state = init.state || AccountState.NORMAL;
+    this.comment = init.comment ?? "";
+    this.state = init.state ?? AccountState.NORMAL;
     this.createTime = init.createTime ?? new Date();
   }
 }

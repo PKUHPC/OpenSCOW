@@ -45,6 +45,9 @@ jobs:
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
+      - name: Prepare dev libs and code
+        run: pnpm prepareDev
+
       - name: Lint code
         run: pnpm lint
 
@@ -59,10 +62,6 @@ jobs:
       - name: Check running containers
         if: vars.RUN_TESTS == 'true'
         run: docker ps
-
-      - name: Prepare dev libs and code
-        if: vars.RUN_TESTS == 'true' || vars.RUN_RELEASE == 'true'
-        run: pnpm prepareDev
 
       - name: Wait for ports
         if: vars.RUN_TESTS == 'true'

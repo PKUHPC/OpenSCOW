@@ -66,7 +66,7 @@ export const getClusterConfigsTypeFormat = (
       ...rest,
       displayName: getI18nTypeFormat(cluster.displayName),
       loginNodes: getLoginNodesTypeFormat(
-      cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
+        cluster.loginNodes),
       k8s: cluster.k8s ? {
         k8sRuntime: clusterConfigSchemaProto_K8sRuntimeToJSON(cluster.k8s.runtime).toLowerCase(),
         kubeconfig: cluster.k8s.kubeconfig,

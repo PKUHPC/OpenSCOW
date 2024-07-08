@@ -123,17 +123,18 @@ export const operationLogServiceServer = plugin((server) => {
           data.push(row);
           writeTotal += 1;
           if (data.length === 200 || writeTotal === addAccountNamesRecords.length) {
-            await new Promise(async (resolve) => {
-              await writeAsync({ operationLogs: data });
-              // 清空暂存
-              data = [];
-              resolve("done");
+            await new Promise((resolve) => {
+              void writeAsync({ operationLogs: data }).then(() => {
+                // 清空暂存
+                data = [];
+                resolve("done");
+              });
             }).catch((e) => {
-              throw <ServiceError>{
+              throw {
                 code: status.INTERNAL,
                 message: "Error when exporting file",
                 details: e?.message,
-              };
+              } as ServiceError;
             });
           }
         }
@@ -144,7 +145,7 @@ export const operationLogServiceServer = plugin((server) => {
     getCustomEventTypes: async ({ em }) => {
 
       const qb = em.createQueryBuilder(OperationLog, "o");
-      qb
+      void qb
         .select([
           raw("DISTINCT o.custom_event_type as customType"),
           raw("JSON_UNQUOTE(JSON_EXTRACT(meta_data, '$.customEvent.name')) AS name"),

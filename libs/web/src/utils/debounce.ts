@@ -26,7 +26,7 @@ export function debounce<F extends(...args: any[]) => any>(
         () => {
           const resp = func(...args);
           if (resp instanceof Promise) {
-            resp.then((v) => resolve(v));
+            void resp.then((v) => resolve(v));
           } else {
             resolve(resp);
           }
