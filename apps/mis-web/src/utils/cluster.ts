@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
+import { SimpleClusterSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 
@@ -47,7 +47,7 @@ export const getPublicConfigClusters =
     Object.keys(configClusters).forEach((clusterId) => {
       const cluster = {
         id: clusterId,
-        name: configClusters[clusterId].displayName!!,
+        name: configClusters[clusterId].displayName!,
       };
       publicConfigClusters[clusterId] = cluster;
     });
