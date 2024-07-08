@@ -10,29 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-const path = require("path");
+import { z } from "zod";
 
-module.exports = {
-  "extends": "@ddadaal",
-  "plugins": [
-    "license-header",
-  ],
-  "rules": {
-    "license-header/header": [
-      "error",
-      path.join(__dirname, "license-header"),
-    ],
-  },
-  "overrides": [
-    {
-      "files": ["**/*.js", "apps/**/*.js"],
-      "rules": {
-        "@typescript-eslint/no-var-requires": "off",
-      },
-    },
-    {
-      "files": ["./license-header"],
-      "rules": { "license-header/header": "off" },
-    },
-  ],
-};
+export const ScowExtensionRouteContext = z.object({
+  scowUserToken: z.string().optional(),
+  scowDark: z.enum(["true", "false"]),
+  scowLangId: z.string(),
+});
+
+export type ScowExtensionRouteContext = z.infer<typeof ScowExtensionRouteContext>;
+
+export function isUrl(input: string): boolean {
+  try {
+    new URL(input);
+    return true;
+  } catch {
+    return false;
+  }
+}
+

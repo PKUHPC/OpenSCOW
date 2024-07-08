@@ -19,16 +19,16 @@ import React, { PropsWithChildren, useEffect, useState } from "react";
 import { addBasePathToImage } from "src/utils/image";
 import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 
-const modes = ["system", "dark", "light"] as const;
+const _modes = ["system", "dark", "light"] as const;
 
 
-export type DarkMode = typeof modes[number];
+export type DarkMode = typeof _modes[number];
 
 const DarkModeContext = React.createContext<{
-   mode: DarkMode;
-   dark: boolean;
-   setMode: (mode: DarkMode) => void;
-     }>(undefined!);
+  mode: DarkMode;
+  dark: boolean;
+  setMode: (mode: DarkMode) => void;
+}>(undefined!);
 
 export const useDarkMode = () => React.useContext(DarkModeContext);
 

@@ -15,7 +15,7 @@ import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 
 export function toGrpc(x: JobInfoEntity) {
-  return <JobInfo>{
+  return {
     account: x.account,
     biJobIndex: x.biJobIndex,
     cluster: x.cluster,
@@ -41,5 +41,5 @@ export function toGrpc(x: JobInfoEntity) {
     user: x.user,
     tenantPrice: decimalToMoney(x.tenantPrice),
     accountPrice: decimalToMoney(x.accountPrice),
-  };
+  } as JobInfo;
 }

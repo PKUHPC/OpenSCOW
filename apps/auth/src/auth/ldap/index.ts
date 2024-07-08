@@ -29,7 +29,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
   registerPostHandler(f, ldap);
 
   registerOtpBindPostHandler(f, ldap);
-  return <AuthProvider>{
+  return {
     serveLoginHtml: (callbackUrl, req, rep) => serveLoginHtml(false, callbackUrl, req, rep),
     fetchAuthTokenInfo: async () => undefined,
     getUser: async (identityId, req) => useLdap(req.log, ldap)(async (client) => (
@@ -70,6 +70,6 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         return result ? "OK" : "Wrong";
       });
     },
-  };
+  } as AuthProvider;
 
 };

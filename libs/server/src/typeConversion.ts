@@ -49,11 +49,11 @@ ClusterConfigSchemaProto_LoginNodesProtoType | undefined => {
 
   if (loginNodes instanceof Array && loginNodes.every((node) => typeof node === "string")) {
     return { value: { $case: "loginNodeAddresses",
-      loginNodeAddresses: { loginNodeAddressesValue: loginNodes as string[] } } };
+      loginNodeAddresses: { loginNodeAddressesValue: loginNodes } } };
   } else {
     return { value: { $case: "loginNodeConfigs",
       loginNodeConfigs: { loginNodeConfigsValue: loginNodes.map((node) => ({
-        name: getI18nSeverTypeFormat(node.name) as I18nStringProtoType,
+        name: getI18nSeverTypeFormat(node.name)!,
         address: node.address,
         scowd: node.scowd,
       })) },
@@ -73,7 +73,7 @@ export const convertClusterConfigsToServerProtoType = (
 
     const protoItem: ClusterConfigSchemaProto = {
       clusterId: key,
-      displayName: getI18nSeverTypeFormat(item.displayName) as I18nStringProtoType,
+      displayName: getI18nSeverTypeFormat(item.displayName)!,
       adapterUrl: item.adapterUrl,
       priority: item.priority,
       proxyGateway: item.proxyGateway ?
@@ -81,7 +81,7 @@ export const convertClusterConfigsToServerProtoType = (
           url: item.proxyGateway.url || "",
           autoSetupNginx: item.proxyGateway.autoSetupNginx,
         } : undefined,
-      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes),
+      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes)!,
       loginDesktop: item.loginDesktop ?
         {
           enabled: item.loginDesktop.enabled,

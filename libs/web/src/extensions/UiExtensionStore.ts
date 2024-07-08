@@ -20,10 +20,10 @@ const fetchManifestsWithErrorHandling = (url: string, name?: string): Promise<Ex
     .then((x) => ({ url, manifests: x, name }))
     .catch((e) => { console.error(`Error fetching extension manifests. ${e}`); return undefined; });
 
-export type ExtensionManifestWithUrl = {
+export interface ExtensionManifestWithUrl {
   url: string; manifests: Awaited<ReturnType<typeof fetchExtensionManifests>>
   name?: string;
-};
+}
 
 export const UiExtensionStore = (uiExtensionConfig?: UiExtensionConfigSchema) => {
 

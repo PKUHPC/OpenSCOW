@@ -40,12 +40,12 @@ export function getClient<TClient>(
 }
 
 export const getSchedulerAdapterClient = (address: string) => {
-  return <SchedulerAdapterClient>{
+  return {
     account: getClient(address, AccountServiceClient),
     user: getClient(address, UserServiceClient),
     job: getClient(address, JobServiceClient),
     config: getClient(address, ConfigServiceClient),
     version: getClient(address, VersionServiceClient),
     app: getClient(address, AppServiceClient),
-  };
+  } as SchedulerAdapterClient;
 };

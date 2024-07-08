@@ -167,13 +167,13 @@ export const fileServiceServer = plugin((server) => {
       const info = await call.readAsync();
 
       if (info?.message?.$case !== "info") {
-        throw <ServiceError> {
+        throw {
           code: status.INVALID_ARGUMENT,
           message: "The first message is not file info",
-        };
+        } as ServiceError;
       }
 
-      const { cluster, path, userId } = info.message?.info;
+      const { cluster, path, userId } = info.message.info;
 
       const host = getClusterLoginNode(cluster);
 
@@ -254,11 +254,11 @@ export const fileServiceServer = plugin((server) => {
 
         const resp = await loggedExec(ssh, logger, true, cmd, args);
         if (resp.code !== 0) {
-          throw <ServiceError> {
+          throw {
             code: status.INTERNAL,
             message: "scow-sync-start command failed",
             details: resp.stderr,
-          };
+          } as ServiceError;
         }
         return [{}];
       });
@@ -276,11 +276,11 @@ export const fileServiceServer = plugin((server) => {
 
         const resp = await loggedExec(ssh, logger, true, cmd, []);
         if (resp.code !== 0) {
-          throw <ServiceError> {
+          throw {
             code: status.INTERNAL,
             message: "scow-sync-query command failed",
             details: resp.stderr,
-          };
+          } as ServiceError;
         }
 
         interface TransferInfosJson {
@@ -293,7 +293,7 @@ export const fileServiceServer = plugin((server) => {
         }
 
         // 解析scow-sync-query返回的json数组
-        const transferInfosJsons: TransferInfosJson[] = JSON.parse(resp.stdout);
+        const transferInfosJsons = JSON.parse(resp.stdout) as TransferInfosJson[];
         const transferInfos: TransferInfo[] = [];
 
         // 根据host确定clusterId
@@ -315,22 +315,22 @@ export const fileServiceServer = plugin((server) => {
 
           // 将json数组中的string类型解析成protos中定义的格式
           let speedInKB = 0;
-          const speedMatch = info.speed.match(/([\d\.]+)([kMGB]?B\/s)/);
+          const speedMatch = /([\d.]+)([kMGB]?B\/s)/.exec(info.speed);
           if (speedMatch) {
             const speed = Number(speedMatch[1]);
             switch (speedMatch[2]) {
-            case "B/s":
-              speedInKB = speed / 1024;
-              break;
-            case "kB/s":
-              speedInKB = speed;
-              break;
-            case "MB/s":
-              speedInKB = speed * 1024;
-              break;
-            case "GB/s":
-              speedInKB = speed * 1024 * 1024;
-              break;
+              case "B/s":
+                speedInKB = speed / 1024;
+                break;
+              case "kB/s":
+                speedInKB = speed;
+                break;
+              case "MB/s":
+                speedInKB = speed * 1024;
+                break;
+              case "GB/s":
+                speedInKB = speed * 1024 * 1024;
+                break;
             }
           }
 
@@ -369,11 +369,11 @@ export const fileServiceServer = plugin((server) => {
         const resp = await loggedExec(ssh, logger, true, cmd, args);
 
         if (resp.code !== 0) {
-          throw <ServiceError> {
+          throw {
             code: status.INTERNAL,
             message: "scow-sync-terminate command failed",
             details: resp.stderr,
-          };
+          } as ServiceError;
         }
 
         return [{}];
@@ -415,11 +415,11 @@ export const fileServiceServer = plugin((server) => {
           const resp = await loggedExec(ssh, logger, true, cmd, args);
 
           if (resp.code !== 0) {
-            throw <ServiceError> {
+            throw {
               code: status.INTERNAL,
               message: "check the key of transferring cross clusters failed",
               details: resp.stderr,
-            };
+            } as ServiceError;
           }
           const lines = resp.stdout.trim().split("\n");
           const keyConfigured = lines[lines.length - 1] === "true";
@@ -452,8 +452,8 @@ export const fileServiceServer = plugin((server) => {
             "-C", "for scow-sync",
             "-f", privateKeyPath,
           ];
-          // eslint-disable-next-line quotes
-          const genKeyCmd = `ssh-keygen -N ""`;
+
+          const genKeyCmd = "ssh-keygen -N \"\"";
           await loggedExec(ssh, logger, true, genKeyCmd, genKeyArgs);
 
           // 读公钥

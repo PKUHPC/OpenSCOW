@@ -60,7 +60,7 @@ export const clearCachePlugin = plugin(async (f) => {
 
   const task = cron.schedule(
     schedule,
-    trigger,
+    () => { void trigger(); },
     {
       timezone: "Asia/Shanghai",
       scheduled: true,
@@ -74,7 +74,7 @@ export const clearCachePlugin = plugin(async (f) => {
     logger.info("Cache clear scheduled task stopped.");
   });
 
-  f.addExtension("cache", <ClearCachePlugin["cache"]>{
+  f.addExtension("cache", ({
     start: () => {
       if (cacheClearStarted) {
         logger.info("Cache clear task is requested to start but already started");
@@ -95,5 +95,5 @@ export const clearCachePlugin = plugin(async (f) => {
     },
     schedule,
     clear: trigger,
-  });
+  } as ClearCachePlugin["cache"]));
 });

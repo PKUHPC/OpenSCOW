@@ -19,19 +19,19 @@ import { createServer } from "src/app";
 import { getI18nTypeFormat } from "tests/file/utils";
 
 export interface SelectOption {
-    value: string;
-    label: I18nStringType;
+  value: string;
+  label: I18nStringType;
 }
 
 interface AppCustomAttribute {
-    type: "NUMBER" | "SELECT" | "TEXT";
-    label: I18nStringType;
-    name: string;
-    required: boolean;
-    placeholder?: I18nStringType | undefined;
-    default?: string | number | undefined;
-    select: SelectOption[];
-  }
+  type: "NUMBER" | "SELECT" | "TEXT";
+  label: I18nStringType;
+  name: string;
+  required: boolean;
+  placeholder?: I18nStringType | undefined;
+  default?: string | number | undefined;
+  select: SelectOption[];
+}
 
 // import { actualPath, cluster, connectToTestServer,
 //   createTestItems, expectGrpcThrow, resetTestServer, TestSshServer, userId } from "./utils";

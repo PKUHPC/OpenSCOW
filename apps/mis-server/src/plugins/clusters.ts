@@ -24,7 +24,7 @@ import { rootKeyPair } from "src/config/env";
 type CallOnAllResult<T> = {
   cluster: string;
   result: T
-}[]
+}[];
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
@@ -40,12 +40,12 @@ type CallOnOne = <T>(
   call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<T>;
 
-export type ClusterPlugin = {
+export interface ClusterPlugin {
   clusters: {
     callOnAll: CallOnAll;
     callOnOne: CallOnOne;
   }
-}
+};
 
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
@@ -98,7 +98,7 @@ export const clustersPlugin = plugin(async (f) => {
 
   const clustersPlugin = {
 
-    callOnOne: <CallOnOne>(async (cluster, logger, call) => {
+    callOnOne: (async (cluster, logger, call) => {
 
       const client = getAdapterClient(cluster);
 
@@ -113,7 +113,7 @@ export const clustersPlugin = plugin(async (f) => {
 
         const errorDetail = e instanceof Error ? e : JSON.stringify(e);
 
-        const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail;
+        const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail.toString();
         const clusterErrorDetails = [{
           clusterId: cluster,
           details: errorDetail,
@@ -133,10 +133,10 @@ export const clustersPlugin = plugin(async (f) => {
         }
 
       });
-    }),
+    }) as CallOnOne,
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (clusters, logger, call) => {
+    callOnAll: (async (clusters, logger, call) => {
 
       const adapterClientForActivatedClusters = getAdapterClientForActivatedClusters(clusters);
 
@@ -151,8 +151,8 @@ export const clustersPlugin = plugin(async (f) => {
           });
         }));
 
-      type SuccessResponse<T> = { cluster: string; success: boolean; result: T; };
-      type ErrorResponse = { cluster: string; success: boolean; error: any; };
+      interface SuccessResponse<T> { cluster: string; success: boolean; result: T; }
+      interface ErrorResponse { cluster: string; success: boolean; error: any; }
 
       function isSuccessResponse<T>(response: SuccessResponse<T> | ErrorResponse): response is SuccessResponse<T> {
         return response.success === true;
@@ -183,7 +183,7 @@ export const clustersPlugin = plugin(async (f) => {
 
       return results;
 
-    }),
+    }) as CallOnAll,
   };
 
   f.addExtension("clusters", clustersPlugin);

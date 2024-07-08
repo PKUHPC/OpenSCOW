@@ -45,7 +45,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
 
   const task = cron.schedule(
     synchronizeCron,
-    trigger,
+    () => { void trigger(); },
     {
       timezone: "Asia/Shanghai",
       scheduled: misConfig.periodicSyncUserAccountBlockStatus?.enabled,
@@ -59,7 +59,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     logger.info("Sync block status stopped.");
   });
 
-  f.addExtension("syncBlockStatus", <SyncBlockStatusPlugin["syncBlockStatus"]>{
+  f.addExtension("syncBlockStatus", ({
     started: () => synchronizeStarted,
     start: () => {
       if (synchronizeStarted) {
@@ -82,5 +82,5 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     schedule: synchronizeCron,
     lastSyncTime: () => lastSyncTime,
     sync: trigger,
-  });
+  } as SyncBlockStatusPlugin["syncBlockStatus"]));
 });

@@ -25,5 +25,5 @@ export const enterDb = async (options: Options) => {
     throw new Error("MIS is not deployed. db is not deployed");
   }
 
-  runComposeCommand(config, ["exec", "db", "mysql", "-uroot", `-p'${config.mis.dbPassword}'`]);
+  await runComposeCommand(config, ["exec", "db", "mysql", "-uroot", `-p'${config.mis.dbPassword}'`]);
 };

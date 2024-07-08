@@ -70,6 +70,7 @@ async function removeEvenNotExist(client: Client, dn: string) {
         if (err instanceof NoSuchObjectError) {
           console.log("No entity with dn " + dn);
         } else {
+          // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
           rej(err);
         }
       }

@@ -18,17 +18,17 @@ import { EntityOrRef, toRef } from "src/utils/orm";
 @Entity()
 export class StorageQuota {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @ManyToOne(() => User, { deleteRule: "cascade", ref: true, nullable: false })
-    user: Ref<User>;
+  user: Ref<User>;
 
   @Property()
-    cluster: string;
+  cluster: string;
 
   // 和后台统一，为B。1PB=10^15B，应该一个int就够用了
   @Property({ columnType: "int" })
-    storageQuota: number;
+  storageQuota: number;
 
   constructor(init: {
     user: EntityOrRef<User>,

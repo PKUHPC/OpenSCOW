@@ -8,7 +8,8 @@
     "serve": "next start",
     "build": "npm run build:next",
     "build:next": "cross-env BUILDING=1 next build",
-    "client": "ntar client"
+    "client": "ntar client",
+    "lint": "eslint ."
   },
   "files": [
     ".next",

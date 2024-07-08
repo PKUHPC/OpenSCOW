@@ -76,12 +76,8 @@ export async function modifyPassword(
   userDn: string,
   newPassword: string,
 ): Promise<boolean> {
-  try {
-    return await useLdap(log, ldap, { dn: ldap.bindDN, password: ldap.bindPassword })(async (client) => {
-      await modifyPasswordBase(userDn, undefined, newPassword, client);
-      return true;
-    });
-  } catch (e: any) {
-    throw e;
-  }
+  return await useLdap(log, ldap, { dn: ldap.bindDN, password: ldap.bindPassword })(async (client) => {
+    await modifyPasswordBase(userDn, undefined, newPassword, client);
+    return true;
+  });
 }

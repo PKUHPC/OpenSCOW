@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
 import { Server } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal } from "@scow/lib-decimal";
@@ -67,10 +66,13 @@ it("fetches the data", async () => {
 
   expect(jobs).toBeArrayOfSize(testData.length);
 
-  const wrongPrices = [] as { tenantPrice: { expected: number; actual: number }; accountPrice: { expected: number; actual: number } }[];
+  const wrongPrices = [] as {
+    tenantPrice: { expected: number; actual: number }; accountPrice: { expected: number; actual: number }
+  }[];
 
   testData.forEach((t) => {
-    const job = jobs.find((x) => x.cluster === t.cluster && x.idJob === t.jobId) ?? { accountPrice: new Decimal(-1), tenantPrice: new Decimal(-1) };
+    const job = jobs.find((x) => x.cluster === t.cluster && x.idJob === t.jobId)
+    ?? { accountPrice: new Decimal(-1), tenantPrice: new Decimal(-1) };
     if (job.tenantPrice.toNumber() !== t.tenantPrice || job.accountPrice.toNumber() !== t.accountPrice) {
       wrongPrices.push({
         tenantPrice: { expected: t.tenantPrice, actual: job.tenantPrice.toNumber() },
@@ -82,7 +84,10 @@ it("fetches the data", async () => {
   expect(wrongPrices).toBeArrayOfSize(0);
 
   // check account balances
-  let accountACharges = new Decimal(0), accountBCharges = new Decimal(0), defaultTenantCharges = new Decimal(0), anotherTenantCharges = new Decimal(0);
+  let accountACharges = new Decimal(0),
+    accountBCharges = new Decimal(0),
+    defaultTenantCharges = new Decimal(0),
+    anotherTenantCharges = new Decimal(0);
   jobs.forEach((x) => {
     if (x.tenant === data.tenant.name) {
       defaultTenantCharges = defaultTenantCharges.plus(x.tenantPrice);

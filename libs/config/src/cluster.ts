@@ -31,7 +31,7 @@ const LoginNodeConfigSchema = Type.Object({
   }, { description: "scowd 相关配置" })),
 });
 
-export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>
+export type LoginNodeConfigSchema = Static<typeof LoginNodeConfigSchema>;
 
 export interface LoginNode {
   name: I18nStringType;
@@ -50,7 +50,7 @@ export const getLoginNode =
 
 export type Cluster = {
   id: string
-} & ClusterConfigSchema
+} & ClusterConfigSchema;
 
 export const getSortedClusters = (clusters: Record<string, ClusterConfigSchema>): Cluster[] => {
   return Object.keys(clusters)
