@@ -12,7 +12,7 @@
 
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
@@ -91,15 +91,18 @@ export const ExtensionPage: React.FC<Props> = ({
   const url = joinWithUrl(config.url, "extensions", ...pathParts)
     + "?" + query.toString();
 
+  const ref = useRef<HTMLIFrameElement>(null);
+
   // 监听来自iframe内部网页发送的信息，设置iframe的height
   useEffect(() => {
-    const messageHandler = (e) => {
-      const iframe = document.getElementById("extensionIframe");
-      if (e.data.type === "resizeExtensionIframe" && iframe) {
-        iframe.style.height = e.data.payload.height + "px";
+    const messageHandler = (e: MessageEvent<any>) => {
+
+      if (e.data.type === "resizeExtensionIframe" && ref.current) {
+        ref.current.style.height = e.data.payload.height + "px";
       }
     };
     window.addEventListener("message", messageHandler, false);
+
     return () => {
       window.removeEventListener("message", messageHandler, false);
     };
@@ -110,7 +113,7 @@ export const ExtensionPage: React.FC<Props> = ({
       <Head title={config?.name ?? "Extension"} />
       <FrameContainer>
         <IFrame
-          id="extensionIframe"
+          ref={ref}
           src={url}
         />
       </FrameContainer>
