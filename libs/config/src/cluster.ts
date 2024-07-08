@@ -18,6 +18,13 @@ import { Logger } from "ts-log";
 
 const CLUSTER_CONFIG_BASE_PATH = "clusters";
 
+export const SimpleClusterSchema = Type.Object({
+  clusterId: Type.String(),
+  displayName: createI18nStringSchema({ description: "集群名称" }),
+  priority: Type.Number(),
+});
+export type SimpleClusterSchema = Static<typeof SimpleClusterSchema>;
+
 export enum k8sRuntime {
   docker = "docker",
   containerd = "containerd",
@@ -25,7 +32,7 @@ export enum k8sRuntime {
 
 const LoginNodeConfigSchema = Type.Object({
   name: createI18nStringSchema({ description: "登录节点展示名" }),
-  address: Type.String({ description: "集群的登录节点地址" }),  
+  address: Type.String({ description: "集群的登录节点地址" }),
   scowd: Type.Optional(Type.Object({
     port: Type.Number({ description: "scowd 端口号" }),
   }, { description: "scowd 相关配置" })),
