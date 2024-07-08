@@ -12,7 +12,7 @@
 
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
-import React, { IframeHTMLAttributes, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Head } from "src/components/head";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
@@ -91,17 +91,15 @@ export const ExtensionPage: React.FC<Props> = ({
   const url = joinWithUrl(config.url, "extensions", ...pathParts)
     + "?" + query.toString();
 
+  // 监听来自iframe内部网页发送的信息，设置iframe的height
   useEffect(() => {
-    const messageHandler = (ev) => {
+    const messageHandler = (e) => {
       const iframe = document.getElementById("extensionIframe");
-      if (ev.data.type === "resize-iframe" && iframe) {
-        console.log(ev.data.payload);
-        iframe.style.width = ev.data.payload.width + "px";
-        iframe.style.height = ev.data.payload.height + "px";
+      if (e.data.type === "resizeExtensionIframe" && iframe) {
+        iframe.style.height = e.data.payload.height + "px";
       }
     };
     window.addEventListener("message", messageHandler, false);
-    // 清理函数
     return () => {
       window.removeEventListener("message", messageHandler, false);
     };
