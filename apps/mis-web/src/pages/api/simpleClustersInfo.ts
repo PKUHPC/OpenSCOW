@@ -23,45 +23,46 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { Type } from "@sinclair/typebox";
-import { authenticate } from "src/auth/server";
-import { validateToken } from "src/auth/token";
 import { getClusterConfigFiles } from "src/server/clusterConfig";
-import { queryIfInitialized } from "src/utils/init";
+import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
 import { route } from "src/utils/route";
+import { Type } from "@sinclair/typebox";
+import { queryIfInitialized } from "src/utils/init";
+import { authenticate } from "src/auth/server";
 
-
-export const GetClusterConfigFilesSchema = typeboxRouteSchema({
+export const GetSimpleClustersInfoFromConfigFilesSchema = typeboxRouteSchema({
   method: "GET",
-
-  // only set the query value when firstly used in getInitialProps
-  query: Type.Object({
-    token: Type.Optional(Type.String()),
-  }),
 
   responses: {
 
     200: Type.Object({
-      clusterConfigs:  Type.Record(Type.String(), ClusterConfigSchema) }),
+      clustersInfo:  Type.Record(Type.String(), SimpleClusterSchema) }),
   },
 });
 
 const auth = authenticate(() => true);
-
-export default route(GetClusterConfigFilesSchema,
+export default route(GetSimpleClustersInfoFromConfigFilesSchema,
   async (req, res) => {
 
-    const { token } = req.query;
+    // if not initialized, every one can getSimpleClusterInfo which includes clusterId, displayedName and priority
+    if (await queryIfInitialized()) {
+      const info = await auth(req, res);
+      if (!info) { return; }
+    }
 
-    // when firstly used in getInitialProps, check the token
-    // when logged in, use auth()
-    const info = token ? await validateToken(token) : await auth(req, res);
-    if (!info) { return; }
+    const clustersFullInfo: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
 
-    const modifiedClusters: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
+    const clustersInfo: Record<string, SimpleClusterSchema> = {};
+
+    Object.keys(clustersFullInfo).forEach(key => {
+      clustersInfo[key] = {
+        clusterId: key,
+        displayName: clustersFullInfo[key].displayName,
+        priority: clustersFullInfo[key].priority,
+       };
+  });
 
     return {
-      200: { clusterConfigs: modifiedClusters },
+      200: { clustersInfo },
     };
   });

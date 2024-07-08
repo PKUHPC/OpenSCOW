@@ -503,6 +503,16 @@ export const mockApi: MockApi<typeof api> = {
     },
   } }),
 
+  getSimpleClustersInfoFromConfigFiles: async () => ({
+    clustersInfo: {
+      hpc01: {
+        displayName: "hpc01Name",
+        priority: 1,
+        clusterId: "hpc01",
+      },
+    },
+  }),
+
   getClustersConnectionInfo: async () => ({ results: [{
     clusterId: "hpc01",
     schedulerName: "hpc",
