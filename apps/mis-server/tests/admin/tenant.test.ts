@@ -115,7 +115,7 @@ it("create a new tenant", async () => {
   const user = await em.findOneOrFail(User, { userId: "userIdTest" });
   expect(user.name).toBe("userNameTest");
 
-  expect(user.tenantRoles.includes(TenantRole["TENANT_ADMIN"])).toBe(true);
+  expect(user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).toBe(true);
 
   expect(createUser).toHaveBeenNthCalledWith(
     1,

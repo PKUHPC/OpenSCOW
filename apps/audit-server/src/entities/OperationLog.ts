@@ -25,37 +25,37 @@ export enum OperationResult {
 export class OperationLog {
 
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property()
-    operatorUserId!: string;
+  operatorUserId!: string;
 
   @Property()
-    operatorIp!: string;
+  operatorIp!: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    operationTime?: Date;
+  operationTime?: Date;
 
   @Enum({ items: () => OperationResult, comment: Object.values(OperationResult).join(", ") })
-    operationResult: OperationResult;
+  operationResult: OperationResult;
 
   @Property({ type: "json", nullable: true })
-    metaData?: OperationEvent & { targetAccountName?: string };
+  metaData?: OperationEvent & { targetAccountName?: string };
 
   // 用户自定义操作类型
   @Index({ name: "custom_event" })
   @Property({ nullable: true })
-    customEventType?: string;
+  customEventType?: string;
 
   constructor(init: {
-      operationLogId?: number;
-      operatorUserId: string;
-      operatorIp: string;
-      operationTime?: Date;
-      operationResult: OperationResult;
-      metaData: OperationEvent & { targetAccountName?: string };
-      customEventType?: string;
-    }) {
+    operationLogId?: number;
+    operatorUserId: string;
+    operatorIp: string;
+    operationTime?: Date;
+    operationResult: OperationResult;
+    metaData: OperationEvent & { targetAccountName?: string };
+    customEventType?: string;
+  }) {
     if (init.operationLogId) {
       this.id = init.operationLogId;
     }

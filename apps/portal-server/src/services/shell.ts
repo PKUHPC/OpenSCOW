@@ -28,10 +28,10 @@ export const shellServiceServer = plugin((server) => {
       const firstMessage = await call.readAsync();
 
       if (firstMessage?.message?.$case !== "connect") {
-        throw <ServiceError> {
+        throw {
           code: status.INVALID_ARGUMENT,
           message: "The first message is not connect",
-        };
+        } as ServiceError;
       }
 
       const { message: { connect } } = firstMessage;
@@ -85,10 +85,10 @@ export const shellServiceServer = plugin((server) => {
               async function(req) {
 
                 if (!req.message) {
-                  throw <ServiceError> {
+                  throw {
                     code: status.INVALID_ARGUMENT,
                     message: "Received a request without message",
-                  };
+                  } as ServiceError;
                 }
 
                 if (req.message.$case === "resize") {
@@ -108,10 +108,10 @@ export const shellServiceServer = plugin((server) => {
                   return req.message.data.data;
                 }
 
-                throw <ServiceError> {
+                throw {
                   code: status.INVALID_ARGUMENT,
                   message: `Received unexpected message type ${req.message.$case}`,
-                };
+                } as ServiceError;
               },
               channel,
             ),

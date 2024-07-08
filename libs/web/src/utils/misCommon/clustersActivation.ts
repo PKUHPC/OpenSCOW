@@ -29,13 +29,13 @@ export function formatActivatedClusters({
   misDeployed = true,
 }: {
   clustersRuntimeInfo?: ClusterRuntimeInfo[],
-  misConfigClusters?: {[clusterId: string]: Cluster},
+  misConfigClusters?: Record<string, Cluster>,
   configClusters?: Cluster[],
   misDeployed?: boolean,
 }): {
-  misActivatedClusters?: {[clusterId: string]: Cluster},
-  activatedClusters?: Cluster[],
-} {
+    misActivatedClusters?: Record<string, Cluster>,
+    activatedClusters?: Cluster[],
+  } {
 
   // for system except mis, if mis is not deployed, using config clusters
   if (!misDeployed) {
@@ -57,7 +57,7 @@ export function formatActivatedClusters({
 
 
   } else {
-    const misActivatedClusters: {[clusterId: string]: Cluster} = {};
+    const misActivatedClusters: Record<string, Cluster> = {};
 
     if (!misConfigClusters) {
       console.warn("No available clusters in Mis");

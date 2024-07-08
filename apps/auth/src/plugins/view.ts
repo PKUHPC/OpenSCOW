@@ -21,7 +21,7 @@ export const viewPlugin = fp(async (f) => {
   });
 
 
-  f.register(view, {
+  await f.register(view, {
     engine: { liquid },
     root: "views",
   });

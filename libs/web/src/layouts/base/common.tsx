@@ -45,8 +45,11 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
-                ? window.location.href = target : Router.push(target);
+              if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+                window.location.href = target;
+              } else {
+                void Router.push(target);
+              }
             }
           }
           : undefined,

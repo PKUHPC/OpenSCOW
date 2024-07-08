@@ -18,7 +18,7 @@ export function range(start = 1, end = 0, step = 1): number[] {
   return r;
 }
 
-export function flatten<T>(nestedArray: Array<T | Array<T>>): T[] {
+export function flatten<T>(nestedArray: (T | T[])[]): T[] {
   const result = [] as T[];
   for (const item of nestedArray) {
     if (Array.isArray(item)) {

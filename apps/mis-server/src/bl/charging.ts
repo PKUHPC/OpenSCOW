@@ -111,14 +111,14 @@ export async function pay(
   };
 }
 
-type ChargeRequest = {
+interface ChargeRequest {
   target: Loaded<Account, "tenant"> | Tenant;
   amount: Decimal;
   comment: string;
   type: string;
   userId?: string;
   metadata?: AnyJson;
-};
+}
 
 export async function charge(
   request: ChargeRequest, em: SqlEntityManager,

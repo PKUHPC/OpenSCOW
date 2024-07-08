@@ -25,5 +25,5 @@ export const enterAiDb = async (options: Options) => {
     throw new Error("ai is not deployed. db is not deployed");
   }
 
-  runComposeCommand(config, ["exec", "ai-db", "mysql", "-uroot", `-p'${config.ai.dbPassword}'`]);
+  await runComposeCommand(config, ["exec", "ai-db", "mysql", "-uroot", `-p'${config.ai.dbPassword}'`]);
 };

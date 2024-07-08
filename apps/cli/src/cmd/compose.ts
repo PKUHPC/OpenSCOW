@@ -22,5 +22,5 @@ export const runCompose = async (options: Options, ...baseCommands: string[]) =>
 
   const config = getInstallConfig(options.configPath);
 
-  runComposeCommand(config, [...baseCommands, ...options._.slice(1).map((x) => String(x))]);
+  await runComposeCommand(config, [...baseCommands, ...options._.slice(1).map((x) => String(x))]);
 };

@@ -29,7 +29,7 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const scowdUrl = getLoginNodeScowdUrl(cluster, host);
 
     if (!scowdUrl) {
-      throw <ServiceError>{ code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` };
+      throw { code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` } as ServiceError;
     }
 
     const client = getScowdClient(scowdUrl, certificates);
@@ -59,7 +59,7 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const scowdUrl = getLoginNodeScowdUrl(cluster, host);
 
     if (!scowdUrl) {
-      throw <ServiceError>{ code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` };
+      throw { code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` } as ServiceError;
     }
 
     const client = getScowdClient(scowdUrl, certificates);
@@ -87,7 +87,7 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const scowdUrl = getLoginNodeScowdUrl(cluster, host);
 
     if (!scowdUrl) {
-      throw <ServiceError>{ code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` };
+      throw { code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` } as ServiceError;
     }
 
     const client = getScowdClient(scowdUrl, certificates);
@@ -115,7 +115,7 @@ export const scowdDesktopServices = (cluster: string): DesktopOps => ({
     const scowdUrl = getLoginNodeScowdUrl(cluster, host);
 
     if (!scowdUrl) {
-      throw <ServiceError>{ code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` };
+      throw { code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${host}` } as ServiceError;
     }
 
     const client = getScowdClient(scowdUrl, certificates);

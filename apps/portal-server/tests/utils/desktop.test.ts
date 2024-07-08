@@ -64,6 +64,7 @@ const addedDesktopInfo: DesktopInfo = {
 jest.mock("@scow/lib-ssh", () => {
   const originalModule = jest.requireActual("@scow/lib-ssh");
 
+
   return {
     __esModule: true,
     ...originalModule,
@@ -203,9 +204,10 @@ it("return cluster logindesktop enabled when setting enabled both in portal and 
   try {
     ensureEnabled(testCluster);
     expect("").fail("not enabled");
-  } catch (e: any) {
-    expect(e.code).toBe(Status.UNAVAILABLE);
-    expect(e.message).toContain("Login desktop is not enabled");
+  } catch (e: unknown) {
+    const ex = e as { code: Status; message: string };
+    expect(ex.code).toBe(Status.UNAVAILABLE);
+    expect(ex.message).toContain("Login desktop is not enabled");
   }
 });
 

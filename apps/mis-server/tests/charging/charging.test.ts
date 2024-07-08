@@ -49,7 +49,7 @@ beforeEach(async () => {
     comment: "test",
   });
 
-  const user = new User({
+  const _user = new User({
     userId: "tester",
     tenant,
     name: "Tester",
@@ -188,9 +188,9 @@ it("returns NOT_FOUND if account is not found", async () => {
 
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
-  const ret = await asyncClientCall(client, "pay", request).catch((e) => e);
+  const ret = await asyncClientCall(client, "pay", request).catch((e) => e as { code: number });
 
-  expect(ret.code).toBe(grpc.status.NOT_FOUND);
+  expect((ret as { code: number }).code).toBe(grpc.status.NOT_FOUND);
 });
 
 it("gets account balance", async () => {
@@ -454,7 +454,7 @@ it("returns payment records", async () => {
       ipAddress: request1.ipAddress,
       amount: request1.amount,
     },
-  ]as Partial<PaymentRecord>);
+  ] as Partial<PaymentRecord>);
 
   expect(reply6.total).toStrictEqual(numberToMoney(40));
 });
@@ -754,7 +754,7 @@ it("returns charge records with query of accountsOfTenant", async () => {
       amount: request2.amount,
       type: request2.type,
     },
-  ]as Partial<ChargeRecord>);
+  ] as Partial<ChargeRecord>);
 
   em.clear();
 });
@@ -874,7 +874,7 @@ it("returns charge records with query allAccountOfAllTenants", async () => {
         "idJob":  9,
       },
     },
-  ]as Partial<ChargeRecord>);
+  ] as Partial<ChargeRecord>);
 
   em.clear();
 });
@@ -1158,7 +1158,7 @@ it("returns charge records with query of accounts", async () => {
     accountName: request3.accountName,
     comment: request3.comment,
     amount: request3.amount,
-  } ]as Partial<ChargeRecord>);
+  } ] as Partial<ChargeRecord>);
 
   const reply2 = await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime: queryStartTime.toISOString(),
@@ -1199,7 +1199,7 @@ it("returns charge records with query of accounts", async () => {
     accountName: request4.accountName,
     comment: request4.comment,
     amount: request4.amount,
-  } ]as Partial<ChargeRecord>);
+  } ] as Partial<ChargeRecord>);
 
   em.clear();
 });

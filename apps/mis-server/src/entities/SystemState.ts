@@ -15,10 +15,10 @@ import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
 @Entity()
 export class SystemState {
   @PrimaryKey()
-    key: string;
+  key: string;
 
   @Property()
-    value: string;
+  value: string;
 
   public static KEYS = {
     INITIALIZATION_TIME: "INITIALIZATION_TIME",
