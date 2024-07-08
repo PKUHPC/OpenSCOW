@@ -143,12 +143,13 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
   - 返回链接的UI扩展在配置中的顺序从前往后
   - 同一个UI扩展返回的链接在响应中的列表的顺序从前往后
 
-注意，当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
+注意:
+- 当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
+- 如果您开发的导航栏拓展页面高度接近浏览器视窗高度，您需要增加设置iframe高度的代码，同时**隐藏iframe中的滚动条**，具体请参考[示例项目中的`feat: 增加设置iframe高度的demo`](https://github.com/PKUHPC/scow-ui-extension-demo/pull/2)。
 
 ## 注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
 - 如果您的扩展站和SCOW部署地址非同源，请注意使得您的扩展站的所有路径均支持CORS访问。
     - Next.js项目可以参考[示例项目中的`src/middleware.ts`](https://github.com/PKUHPC/scow-ui-extension-demo/blob/main/src/middleware.ts)
-
 
