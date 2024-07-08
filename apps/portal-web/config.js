@@ -108,8 +108,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   const configPath = mockEnv ? join(__dirname, "config") : undefined;
 
-  // Object.keys(clusters).map((id) => clusters[id].loginNodes = clusters[id].loginNodes.map(getLoginNode));
-
   const uiConfig = getUiConfig(configPath, console);
   const portalConfig = getPortalConfig(configPath, console);
   const commonConfig = getCommonConfig(configPath, console);
@@ -126,7 +124,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
     DEFAULT_PRIMARY_COLOR,
     MOCK_USER_ID: config.MOCK_USER_ID,
     UI_CONFIG: uiConfig,
-    // 当前SCOW未使用？
+    // 当前SCOW未使用
     // LOGIN_NODES: parseKeyValue(config.LOGIN_NODES),
     SERVER_URL: config.SERVER_URL,
     SUBMIT_JOB_WORKING_DIR: portalConfig.submitJobDefaultPwd,
