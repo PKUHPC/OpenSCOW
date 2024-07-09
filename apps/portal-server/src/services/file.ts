@@ -195,7 +195,7 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
-    mergeFileChunks: async ({ request, logger }) => {
+    mergeFileChunks: async ({ request }) => {
       const { cluster, userId, path, md5 } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
@@ -207,11 +207,11 @@ export const fileServiceServer = plugin((server) => {
       if (clusterInfo.scowd?.enabled) {
         const client = getScowdClient(cluster);
 
-        client.file.mergeFileChunks({ userId, path, md5 });
+        await client.file.mergeFileChunks({ userId, path, md5 });
       } else {
         throw {
           code: Status.UNIMPLEMENTED,
-          message: "The mergeFileChunks interface is not implemented"
+          message: "The mergeFileChunks interface is not implemented",
         } as ServiceError;
       }
 
