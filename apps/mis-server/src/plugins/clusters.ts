@@ -17,7 +17,7 @@ import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { updateCluster } from "src/bl/clustersUtils";
+import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 
@@ -52,8 +52,16 @@ export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
 
+  // initial clusters database
+  const configClusterIds = Object.keys(configClusters);
+  await updateCluster(f.ext.orm.em.fork(), configClusterIds, f.logger);
+
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(configClusters).map(async ({ displayName, loginNodes }) => {
+
+    // only check activated clusters' root user login when system is starting
+    const activatedClusters = await getActivatedClusters(f.ext.orm.em.fork(), f.logger);
+
+    await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
       const address = loginNode.address;
       const node = loginNode.name;
@@ -67,10 +75,6 @@ export const clustersPlugin = plugin(async (f) => {
       }
     }));
   }
-
-  // initial clusters database
-  const configClusterIds = Object.keys(configClusters);
-  await updateCluster(f.ext.orm.em.fork(), configClusterIds, f.logger);
 
   // adapterClient of all config clusters
   const adapterClientForClusters = Object.entries(configClusters).reduce((prev, [cluster, c]) => {
