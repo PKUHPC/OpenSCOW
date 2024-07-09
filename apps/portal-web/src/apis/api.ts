@@ -1,21 +1,8 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 /* eslint-disable max-len */
 
 import { apiClient } from "src/apis/client";
-import type { GetClusterInfoSchema } from "src/pages/api//cluster";
-import type { getClusterConfigFilesSchema } from "src/pages/api//getClusterConfigFiles";
-import type { GetClustersRuntimeInfoSchema } from "src/pages/api//getClustersRuntimeInfo";
+
+
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
@@ -26,6 +13,7 @@ import type { ListAvailableAppsSchema } from "src/pages/api/app/listAvailableApp
 import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
+import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { GetClusterRunningInfoSchema } from "src/pages/api/dashboard/getClusterInfo";
 import type { GetQuickEntriesSchema } from "src/pages/api/dashboard/getQuickEntries";
 import type { SaveQuickEntriesSchema } from "src/pages/api/dashboard/saveQuickEntries";
@@ -45,12 +33,15 @@ import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { ListAvailableTransferClustersSchema } from "src/pages/api/file/listAvailableTransferClusters";
+import type { MergeFileChunksSchema } from "src/pages/api/file/mergeFileChunks";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFileTransferProgress";
 import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
 import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
+import type { getClusterConfigFilesSchema } from "src/pages/api//getClusterConfigFiles";
+import type { GetClustersRuntimeInfoSchema } from "src/pages/api//getClustersRuntimeInfo";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -97,6 +88,7 @@ export const api = {
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
   listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
   listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
+  mergeFileChunks: apiClient.fromTypeboxRoute<typeof MergeFileChunksSchema>("POST", "/api/file/mergeFileChunks"),
   mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
   queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
@@ -119,3 +111,4 @@ export const api = {
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
 };
+  

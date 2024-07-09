@@ -126,6 +126,13 @@ message UploadFile {
   string path = 2;
 }
 
+message MergeFileChunks {
+  string cluster_id = 1;
+  string path = 2;
+  string name = 3;
+  string md5 = 4;
+}
+
 message CreateDirectory {
   string cluster_id = 1;
   string path = 2;
@@ -507,6 +514,7 @@ message CreateOperationLogRequest {
     CustomEvent custom_event = 62;
     ActivateCluster activate_cluster = 63;
     DeactivateCluster deactivate_cluster = 64;
+    MergeFileChunks merge_file_chunks =  65;
   }
 }
 
@@ -579,6 +587,7 @@ message OperationLog {
     CustomEvent custom_event = 64;
     ActivateCluster activate_cluster = 65;
     DeactivateCluster deactivate_cluster = 66;
+    MergeFileChunks merge_file_chunks = 67;
   }
 }
 

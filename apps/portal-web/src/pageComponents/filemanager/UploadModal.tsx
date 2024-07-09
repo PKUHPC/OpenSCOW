@@ -13,11 +13,12 @@
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
+import { generateMD5FromFileName, getFileChunkSize } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
 
 interface Props {
@@ -28,7 +29,18 @@ interface Props {
   path: string;
 }
 
+interface FileChunk {
+  file: Blob;
+  fileName: string;
+}
+
+interface UploadProgressEvent {
+  percent: number;
+}
+
 const p = prefix("pageComp.fileManagerComp.uploadModal.");
+
+type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => void);
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
 
@@ -37,9 +49,105 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const t = useI18nTranslateToString();
 
+  const enabled = true;
+
+  // 关闭modal框时，用于停止所有后续文件上传
+  const isUploadingCancelled = useRef(false);
+
   const onModalClose = () => {
+    isUploadingCancelled.current = true;
     setUploadFileList([]);
     onClose();
+  };
+
+  useEffect(() => {
+  // 每次打开模态框时，重置取消上传的状态
+    if (open) {
+      isUploadingCancelled.current = false;
+    }
+  }, [open]);
+
+
+  const startBreakpointUpload = async (file: File, onProgress: OnProgressCallback) => {
+    // 获取文件唯一标识
+    const { md5, suffix } = generateMD5FromFileName(file);
+
+    const { items } = await api.listFile({ query: { cluster, path: join(path, md5) }});
+
+    const uploadedChunks = items.sort((a, b) => {
+      const reg = /_(\d+)/;
+      const matchA = reg.exec(a.name);
+      const matchB = reg.exec(b.name);
+
+      if (matchA && matchB) {
+        return parseInt(matchA[1]) - parseInt(matchB[1]);
+      } else {
+        return 0;
+      }
+    }).map((item) => item.name);
+
+    // 给文件按块大小算出每块大小和总数
+    const { chunkSize, totalCount } = getFileChunkSize(file);
+
+    // 并发上传数
+    const concurrentChunks = 5;
+
+    // 跟踪已上传的块数
+    let uploadedCount = uploadedChunks.length;
+
+    onProgress?.({ percent:Number(((uploadedCount / totalCount) * 100).toFixed(2)) });
+
+    // 更新进度条
+    const updateProgress = () => {
+      uploadedCount++;
+      onProgress?.({ percent: Number((uploadedCount / totalCount * 100).toFixed(2)) });
+    };
+
+    for (let i = 0; i < totalCount; i += concurrentChunks) {
+      if (isUploadingCancelled.current) {
+        throw new Error("Upload cancelled");
+      }
+
+      const chunks: FileChunk[] = [];
+      for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {
+        const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
+        const fileName = `${md5}_${start + 1}.${suffix}`;
+
+        if (!uploadedChunks.includes(fileName)) {
+          chunks.push({
+            file: chunk,
+            fileName,
+          });
+        }
+      }
+
+      const formDataArray = chunks.map((chunk) => {
+        const formData = new FormData();
+        formData.append("file", chunk.file);
+        formData.append("fileMd5Name", chunk.fileName);
+        return formData;
+      });
+
+      const uploadPromises = formDataArray.map((formData) =>
+        fetch(urlToUpload(cluster, path), {
+          method: "POST",
+          body: formData,
+        }).then((response) => {
+          if (!response.ok) {
+            return Promise.reject(response.statusText);
+          }
+          updateProgress();
+          return response;
+        }).catch((error) => {
+          message.error("报错错误", error);
+        })
+      );
+
+      // 等待当前批次上传完成
+      await Promise.all(uploadPromises);
+    }
+
+    await api.mergeFileChunks({ body: { cluster, path, md5, name: file.name } });
   };
 
   return (
@@ -64,7 +172,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       <Upload.Dragger
         name="file"
         multiple
-        action={async (file) => urlToUpload(cluster, join(path, file.name))}
+        {...(enabled ? {
+          customRequest: ({ file, onSuccess, onError, onProgress }) => {
+            startBreakpointUpload(file as File, onProgress).then(onSuccess).catch(onError);
+          },
+        } : {
+          action: async (file) => urlToUpload(cluster, join(path, file.name))
+        })}
         withCredentials
         showUploadList={{
           removeIcon: (file) => {

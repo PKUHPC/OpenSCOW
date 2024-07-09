@@ -15,6 +15,8 @@ import { join } from "path";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { styled } from "styled-components";
+import CryptoJS from "crypto-js";
+
 
 
 export type FileInfoKey = React.Key;
@@ -49,4 +51,26 @@ export const nodeModeToString = (mode: number) => {
 
 export const openPreviewLink = (href: string) => {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
+};
+
+export const generateMD5FromFileName = (file: File) => {
+  const filename = file.name;
+  const md5 = CryptoJS.MD5(filename).toString();
+
+  // 通过正则获取文件后缀
+  const reg = /\.([a-zA-Z0-9]+)$/.exec(filename);
+  const suffix = reg ? reg[1] : "";
+
+  return { md5, suffix };
+};
+
+// 获取文件的块数
+export const getFileChunkSize = (file: File) => {
+  const singleChunkSize = 10; // 10 MB
+  let chunkSize = singleChunkSize * 1024 * 1024;
+
+  const count = Math.ceil(file.size / chunkSize);
+
+
+  return { chunkSize, totalCount: count };
 };

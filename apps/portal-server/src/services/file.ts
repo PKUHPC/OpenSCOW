@@ -12,6 +12,7 @@
 
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
   sftpReadFile, sftpRealPath, sshRmrf } from "@scow/lib-ssh";
 import { FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
@@ -19,6 +20,7 @@ import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
+import { getScowdClient } from "src/utils/scowd";
 import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 
 export const fileServiceServer = plugin((server) => {
@@ -192,6 +194,30 @@ export const fileServiceServer = plugin((server) => {
       return [{ ...reply }];
 
     },
+
+    mergeFileChunks: async ({ request, logger }) => {
+      const { cluster, userId, path, md5 } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const clusterInfo = configClusters[cluster];
+      if (clusterInfo.scowd?.enabled) {
+        const client = getScowdClient(cluster);
+
+        client.file.mergeFileChunks({ userId, path, md5 });
+      } else {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "The mergeFileChunks interface is not implemented"
+        } as ServiceError;
+      }
+
+      return [{}];
+    },
+
 
     getFileMetadata: async ({ request, logger }) => {
       const { userId, cluster, path } = request;
