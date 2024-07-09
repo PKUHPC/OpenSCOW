@@ -83,5 +83,6 @@ export const OperationType: OperationTypeEnum = {
   activateCluster: "activateCluster",
   deactivateCluster: "deactivateCluster",
   customEvent: "customEvent",
+  mergeFileChunks: "mergeFileChunks"
 };
 
