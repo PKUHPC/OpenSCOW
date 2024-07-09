@@ -628,7 +628,6 @@ export default {
         oneMonth:"One Month",
         oneYear:"One Year",
         permanent:"Permanent",
-
       },
       adminJobTable: {
         batch: "Batch Search",
@@ -1161,6 +1160,9 @@ export default {
       createDesktop: "Create Desktop",
       deleteDesktop: "Delete Desktop",
       createApp: "Create Application",
+      createAiTrain: "Create Train Job",
+      cancelAiTrainOrApp: "Cancel Train Or App",
+      saveImage: "Save Image",
       createFile: "Create File",
       deleteFile: "Delete File",
       uploadFile: "Upload File",
@@ -1237,6 +1239,9 @@ export default {
       createDesktop: "Create Desktop (Cluster: {}, Login Node: {}, Desktop name: {}, Desktop type: {})",
       deleteDesktop: "Delete Desktop (Cluster: {}, Login Node: {}, Desktop ID: {})",
       createApp: "Create application (Cluster: {}, ID: {})",
+      createAiTrain: "Create Train (Cluster: {}, ID: {})",
+      cancelAiTrainOrApp: "Cancel Train Or App (Cluster: {}, ID: {})",
+      saveImage: "Save The Job(ID: {}) as an image (Image: {}, Tag: {})",
       createFile: "Create File: {}",
       deleteFile: "Delete File: {}",
       uploadFile: "Upload File: {}",

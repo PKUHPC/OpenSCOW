@@ -601,7 +601,31 @@ export const saveImage =
       imageTag: z.string(),
       imageDesc: z.string().optional(),
     }))
-    .output(z.void())
+    .output(z.object({imageId:z.number()}))
+    .use(async ({ input:{ jobId,imageTag }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.saveImage,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:(res.data as any).imageId,tag:imageTag } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:0, tag:"-" } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
     .mutation(
       async ({ input, ctx: { user } }) => {
         const userId = user.identityId;
@@ -679,6 +703,8 @@ export const saveImage =
               sourcePath: harborImageUrl,
             });
             await em.persistAndFlush(newImage);
+
+            return { imageId:newImage.id }
           } catch (e) {
             const ex = e as ServiceError;
             throw new TRPCError({

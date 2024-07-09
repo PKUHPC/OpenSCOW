@@ -315,7 +315,31 @@ procedure
     jobId: z.number(),
   }))
   .output(z.void())
+  .use(async ({ input:{ cluster,jobId }, ctx, next }) => {
+    const res = await next({ ctx });
 
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.cancelAiTrainOrApp,
+
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId:cluster,jobId } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId:cluster,jobId } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
 
     const { cluster, jobId } = input;

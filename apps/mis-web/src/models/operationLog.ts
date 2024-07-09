@@ -93,6 +93,9 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
     createDesktop: t(pTypes("createDesktop")),
     deleteDesktop: t(pTypes("deleteDesktop")),
     createApp: t(pTypes("createApp")),
+    createAiTrain: t(pTypes("createAiTrain")),
+    cancelAiTrainOrApp: t(pTypes("cancelAiTrainOrApp")),
+    saveImage: t(pTypes("saveImage")),
     createFile: t(pTypes("createFile")),
     deleteFile: t(pTypes("deleteFile")),
     uploadFile: t(pTypes("uploadFile")),
@@ -172,6 +175,9 @@ export const OperationCodeMap: { [key in LibOperationType]: string } = {
   createDesktop: "010301",
   deleteDesktop: "010302",
   createApp: "010401",
+  createAiTrain: "010402",
+  cancelAiTrainOrApp: "010403",
+  saveImage: "010404",
   createFile: "010501",
   createDirectory: "010502",
   uploadFile: "010503",
@@ -295,6 +301,13 @@ export const getOperationDetail = (
         ]);
     case "createApp":
       return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+    case "createAiTrain":
+      return t(pDetails("createAiTrain"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+    case "cancelAiTrainOrApp":
+      return t(pDetails("cancelAiTrainOrApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
+    case "saveImage":
+      return t(pDetails("saveImage"), [operationEvent[logEvent].jobId, operationEvent[logEvent].imageId || "-",
+      operationEvent[logEvent].tag || "-" ]);
     case "createFile":
       return t(pDetails("createFile"), [operationEvent[logEvent].path]);
     case "deleteFile":
