@@ -22,10 +22,16 @@ export function ClusterInfoStore(
   initialSimpleClusters: Record<string, SimpleClusterSchema>,
 ) {
 
-  const publicConfigClusters = getPublicConfigClusters(clusterConfigs)
-    ?? getPublicConfigClusters(initialSimpleClusters) ?? {};
+  let publicConfigClusters: Record<string, Cluster> = {};
+  let clusterSortedIdList: string[] = [];
 
-  const clusterSortedIdList = getSortedClusterIds(clusterConfigs) ?? getSortedClusterIds(initialSimpleClusters) ?? [];
+  if (Object.keys(clusterConfigs).length > 0) {
+    clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+    publicConfigClusters = getPublicConfigClusters(clusterConfigs);
+  } else {
+    clusterSortedIdList = getSortedClusterIds(initialSimpleClusters ?? {});
+    publicConfigClusters = getPublicConfigClusters(initialSimpleClusters ?? {});
+  }
 
   const [activatedClusters, setActivatedClusters]
    = useState<Record<string, Cluster>>(initialActivatedClusters);
