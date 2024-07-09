@@ -17,23 +17,23 @@ import { EntityOrRef, toRef } from "src/utils/orm";
 @Entity()
 export class AccountWhitelist {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @OneToOne(() => Account, (a) => a.whitelist, { ref: true, nullable: false, unique: true })
-    account: Ref<Account>;
+  account: Ref<Account>;
 
   @Property()
-    time: Date;
+  time: Date;
 
   @Property()
-    comment: string;
+  comment: string;
 
   @Property()
-    operatorId: string;
+  operatorId: string;
 
   // 当expirationTime为undefined时，即为永久有效
   @Property({ nullable: true })
-    expirationTime?: Date;
+  expirationTime?: Date;
 
   constructor(init: {
     account: EntityOrRef<Account>,

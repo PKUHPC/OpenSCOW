@@ -38,39 +38,39 @@ export const getChargesTargetSearchParam = (
 ): { tenantName?: string | { $ne: null }, accountName?: string | { $ne: null } | { $in: string[] } } => {
 
   let searchParam: { tenantName?: string | { $ne: null },
-  accountName?: string | { $ne: null } | { $in: string[] } } = {};
+    accountName?: string | { $ne: null } | { $in: string[] } } = {};
   switch (target?.$case)
   {
   // 当前租户的租户消费记录
-  case "tenant":
-    searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
-    break;
-  // 所有租户的租户消费记录
-  case "allTenants":
-    searchParam = { tenantName: { $ne:null }, accountName: undefined };
-    break;
-  // 当前租户下当前账户的消费记录
-  case "accountOfTenant":
-    searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
-    break;
-  // 当前租户下多个账户的消费记录
-  case "accountsOfTenant":
-    {
-      const { accountNames } = target.accountsOfTenant;
-      searchParam = { tenantName: target[target.$case].tenantName,
-        accountName:accountNames.length ? { $in: accountNames } : { $ne:null } };
+    case "tenant":
+      searchParam = { tenantName: target[target.$case].tenantName, accountName: undefined };
       break;
-    } ;
-  // 所有租户下多个账户的消费记录
-  case "accountsOfAllTenants":
-    {
-      const { accountNames } = target.accountsOfAllTenants;
-      searchParam = { tenantName: { $ne: null }, accountName:accountNames.length ?
-        { $in: accountNames } : { $ne:null } };
+      // 所有租户的租户消费记录
+    case "allTenants":
+      searchParam = { tenantName: { $ne:null }, accountName: undefined };
       break;
-    };
-  default:
-    searchParam = {};
+      // 当前租户下当前账户的消费记录
+    case "accountOfTenant":
+      searchParam = { tenantName: target[target.$case].tenantName, accountName: target[target.$case].accountName };
+      break;
+      // 当前租户下多个账户的消费记录
+    case "accountsOfTenant":
+      {
+        const { accountNames } = target.accountsOfTenant;
+        searchParam = { tenantName: target[target.$case].tenantName,
+          accountName:accountNames.length ? { $in: accountNames } : { $ne:null } };
+        break;
+      } ;
+      // 所有租户下多个账户的消费记录
+    case "accountsOfAllTenants":
+      {
+        const { accountNames } = target.accountsOfAllTenants;
+        searchParam = { tenantName: { $ne: null }, accountName:accountNames.length ?
+          { $in: accountNames } : { $ne:null } };
+        break;
+      };
+    default:
+      searchParam = {};
   }
   return searchParam;
 };
@@ -120,25 +120,29 @@ export const getPaymentsTargetSearchParam = (target:
 | { $case: "accountsOfTenant"; accountsOfTenant: AccountsOfTenantTarget }
 | { $case: "tenant"; tenant: TenantTarget }
 | { $case: "allTenants"; allTenants: AllTenantsTarget }):
- { tenantName?: string | { $ne: null }, accountName?: { $in: string[] } | string | { $ne: null }} => {
+{ tenantName?: string | { $ne: null }, accountName?: { $in: string[] } | string | { $ne: null } } => {
 
-  let searchParam: { tenantName?: string | { $ne: null },
-   accountName?: { $in: string[] } | string | { $ne: null }} = {};
+  let searchParam: {
+    tenantName?: string | { $ne: null },
+    accountName?: { $in: string[] } | string | { $ne: null }
+  } = {};
+
   const { accountNames, tenantName } = target[target.$case];
   switch (target?.$case)
   {
-  case "tenant":
-    searchParam = { tenantName, accountName:undefined };
-    break;
-  case "allTenants":
-    searchParam = { accountName:undefined };
-    break;
-  case "accountsOfTenant":
-    const accountName = accountNames.length === 0 ? { $ne:null } : { $in:accountNames };
-    searchParam = { tenantName, accountName };
-    break;
-  default:
-    break;
+    case "tenant":
+      searchParam = { tenantName, accountName:undefined };
+      break;
+    case "allTenants":
+      searchParam = { accountName:undefined };
+      break;
+    case "accountsOfTenant": {
+      const accountName = accountNames.length === 0 ? { $ne:null } : { $in:accountNames };
+      searchParam = { tenantName, accountName };
+      break;
+    }
+    default:
+      break;
   }
   return searchParam;
 };

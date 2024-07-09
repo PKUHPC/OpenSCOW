@@ -10,11 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, LoginNodeConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
-import { LoginNodesType } from "@scow/config/build/type";
 import { ClusterConfigSchemaProto, clusterConfigSchemaProto_K8sRuntimeFromJSON,
-  ClusterConfigSchemaProto_LoginNodeConfigSchemaProto,
   ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
 import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
 
@@ -44,20 +42,21 @@ export const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringPr
   }
 };
 
-export const getLoginNodesSeverTypeFormat = (loginNodes: LoginNodesType):
+export const getLoginNodesSeverTypeFormat = (loginNodes: string[] | LoginNodeConfigSchema[]):
 ClusterConfigSchemaProto_LoginNodesProtoType | undefined => {
 
   if (!loginNodes) return undefined;
 
   if (loginNodes instanceof Array && loginNodes.every((node) => typeof node === "string")) {
     return { value: { $case: "loginNodeAddresses",
-      loginNodeAddresses: { loginNodeAddressesValue: loginNodes as string[] } } };
+      loginNodeAddresses: { loginNodeAddressesValue: loginNodes } } };
   } else {
     return { value: { $case: "loginNodeConfigs",
       loginNodeConfigs: { loginNodeConfigsValue: loginNodes.map((node) => ({
-        name: getI18nSeverTypeFormat(node.name) as I18nStringProtoType,
+        name: getI18nSeverTypeFormat(node.name)!,
         address: node.address,
-      })) as ClusterConfigSchemaProto_LoginNodeConfigSchemaProto[] },
+        scowd: node.scowd,
+      })) },
     } };
   }
 };
@@ -74,7 +73,7 @@ export const convertClusterConfigsToServerProtoType = (
 
     const protoItem: ClusterConfigSchemaProto = {
       clusterId: key,
-      displayName: getI18nSeverTypeFormat(item.displayName) as I18nStringProtoType,
+      displayName: getI18nSeverTypeFormat(item.displayName)!,
       adapterUrl: item.adapterUrl,
       priority: item.priority,
       proxyGateway: item.proxyGateway ?
@@ -82,7 +81,7 @@ export const convertClusterConfigsToServerProtoType = (
           url: item.proxyGateway.url || "",
           autoSetupNginx: item.proxyGateway.autoSetupNginx,
         } : undefined,
-      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes) as ClusterConfigSchemaProto_LoginNodesProtoType,
+      loginNodes: getLoginNodesSeverTypeFormat(item.loginNodes)!,
       loginDesktop: item.loginDesktop ?
         {
           enabled: item.loginDesktop.enabled,

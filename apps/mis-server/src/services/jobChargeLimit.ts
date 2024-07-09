@@ -35,17 +35,17 @@ export const jobChargeLimitServer = plugin((server) => {
         }, { populate: ["user", "account"]});
 
         if (!userAccount) {
-          throw <ServiceError>{
+          throw {
             code: Status.NOT_FOUND,
             details: `User ${userId} is not found in account`,
-          };
+          } as ServiceError;
         }
 
         if (!userAccount.jobChargeLimit) {
-          throw <ServiceError> {
+          throw {
             code: Status.NOT_FOUND,
             details: `The user ${userId} in account ${accountName} has no limit`,
-          };
+          } as ServiceError;
         }
 
         logger.info("Job Charge Limit %s/%s of user %s account %s has been canceled.",
@@ -92,20 +92,20 @@ export const jobChargeLimitServer = plugin((server) => {
         const limitNumber = moneyToNumber(limit);
         // 如果设置的限额小于等于0或者小于当前已用额度则报错
         if (limitNumber <= 0 ||
-        (userAccount?.usedJobCharge && userAccount.usedJobCharge.isGreaterThan(limitNumber))) {
-          throw <ServiceError> {
+        (userAccount?.usedJobCharge?.isGreaterThan(limitNumber))) {
+          throw {
             code: Status.INVALID_ARGUMENT, message: userAccount?.usedJobCharge ?
               `The set quota ${limitNumber} is invalid ,
-              it must be greater than or equal to the used job charge ${userAccount?.usedJobCharge}` :
+              it must be greater than or equal to the used job charge ${userAccount?.usedJobCharge.toNumber()}` :
               `The set quota ${limitNumber} is invalid , it must be greater than 0`,
-          };
+          } as ServiceError;
         }
 
         if (!userAccount) {
-          throw <ServiceError>{
+          throw {
             code: Status.NOT_FOUND,
             details: `User ${userId} is not found in account.`,
-          };
+          } as ServiceError;
         }
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);

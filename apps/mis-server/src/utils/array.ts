@@ -18,10 +18,10 @@ export function range(start = 1, end = 0, step = 1): number[] {
   return r;
 }
 
-type ObjectTypeWithType = {
+interface ObjectTypeWithType {
   type: string;
   [key: string]: any;
-};
+}
 
 export function extractTypesFromObjects(array: ObjectTypeWithType[]): string[] {
   const types = new Set<string>();

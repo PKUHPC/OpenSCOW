@@ -32,7 +32,7 @@ import yargs from "yargs/yargs";
 
 const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8")).version;
 
-yargs(hideBin(process.argv))
+void yargs(hideBin(process.argv))
   .options({
     configPath: {
       alias: "c",
@@ -86,7 +86,7 @@ yargs(hideBin(process.argv))
       },
     });
   }, (argv) => {
-    init(argv);
+    void init(argv);
   })
   .command("update", "Update cli", (yargs) => {
     return yargs.options({
@@ -112,7 +112,7 @@ yargs(hideBin(process.argv))
       },
     });
   }, (argv) => {
-    updateCli(argv);
+    void updateCli(argv);
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs
@@ -135,13 +135,13 @@ yargs(hideBin(process.argv))
     generateDockerComposeYml(argv);
   })
   .command("db", "Enter mis db", (y) => y, (argv) => {
-    enterDb(argv);
+    void enterDb(argv);
   })
   .command("audit-db", "Enter audit db", (y) => y, (argv) => {
-    enterAuditDb(argv);
+    void enterAuditDb(argv);
   })
   .command("ai-db", "Enter ai db", (y) => y, (argv) => {
-    enterAiDb(argv);
+    void enterAiDb(argv);
   })
   .command("compose", "Run  arbitrary compose commands", (y) => {
     return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });

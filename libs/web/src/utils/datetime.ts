@@ -77,12 +77,12 @@ export enum TimeUnits {
 export const parseMinutes = (time: number, unit: TimeUnits): number => {
 
   switch (unit) {
-  case TimeUnits.MINUTE:
-    return time;
-  case TimeUnits.HOUR:
-    return time * 60;
-  case TimeUnits.DAY:
-    return time * 60 * 24;
+    case TimeUnits.MINUTE:
+      return time;
+    case TimeUnits.HOUR:
+      return time * 60;
+    case TimeUnits.DAY:
+      return time * 60 * 24;
   }
 
 };

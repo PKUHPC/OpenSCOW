@@ -21,7 +21,7 @@ type ExtractCases<T> = T extends { $case: infer U } ? U : never;
 
 export type OperationType = ExtractCases<OperationLog["operationEvent"]>;
 
-export type OperationTypeEnum = { [K in OperationType]: K };
+export type OperationTypeEnum = {[K in OperationType]: K };
 
 export const OperationType: OperationTypeEnum = {
   login: "login",

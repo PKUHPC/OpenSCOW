@@ -18,9 +18,6 @@ import { ClusterRuntimeInfo_LastActivationOperation,
 import { getActivatedClusters, getClustersRuntimeInfo } from "src/bl/clustersUtils";
 import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
 
-/**
- * @deprecated Use the new API function GetAvailablePartitionsForCluster From configServiceServer instead.
- */
 export const misConfigServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
 
@@ -81,9 +78,9 @@ export const misConfigServiceServer = plugin((server) => {
       const cluster = await em.findOne(Cluster, { clusterId });
 
       if (!cluster) {
-        throw <ServiceError>{
+        throw {
           code: status.NOT_FOUND, message: `Cluster（ Cluster ID: ${clusterId}） is not found`,
-        };
+        } as ServiceError;
       }
 
       // check current scheduler adapter connection state
@@ -94,10 +91,10 @@ export const misConfigServiceServer = plugin((server) => {
         async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
       ).catch((e) => {
         logger.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
-        throw <ServiceError>{
+        throw {
           code: status.FAILED_PRECONDITION,
           message: `Activate cluster failed, Cluster（ Cluster ID: ${clusterId}） is currently unreachable.`,
-        };
+        } as ServiceError;
       });
 
       // when the cluster has already been activated
@@ -113,7 +110,7 @@ export const misConfigServiceServer = plugin((server) => {
       // save operator userId in lastActivationOperation
       const lastActivationOperationMap: ClusterRuntimeInfo_LastActivationOperation = {};
 
-      lastActivationOperationMap["operatorId"] = operatorId;
+      lastActivationOperationMap.operatorId = operatorId;
       cluster.lastActivationOperation = lastActivationOperationMap;
 
       await em.persistAndFlush(cluster);
@@ -133,9 +130,9 @@ export const misConfigServiceServer = plugin((server) => {
       const cluster = await em.findOne(Cluster, { clusterId });
 
       if (!cluster) {
-        throw <ServiceError>{
+        throw {
           code: status.NOT_FOUND, message: `Cluster（ Cluster ID: ${clusterId}） is not found`,
-        };
+        } as ServiceError;
       }
 
       if (cluster.activationStatus === ClusterActivationStatus.DEACTIVATED) {
@@ -149,10 +146,10 @@ export const misConfigServiceServer = plugin((server) => {
 
       // save operator userId and deactivation in lastActivationOperation
       const lastActivationOperationMap: ClusterRuntimeInfo_LastActivationOperation = {};
-      lastActivationOperationMap["operatorId"] = operatorId;
+      lastActivationOperationMap.operatorId = operatorId;
 
       if (deactivationComment) {
-        lastActivationOperationMap["deactivationComment"] = deactivationComment;
+        lastActivationOperationMap.deactivationComment = deactivationComment;
       }
       cluster.lastActivationOperation = lastActivationOperationMap;
 
