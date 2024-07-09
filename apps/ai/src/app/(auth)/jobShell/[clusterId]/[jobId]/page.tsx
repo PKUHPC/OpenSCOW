@@ -14,7 +14,7 @@
 
 import "@xterm/xterm/css/xterm.css";
 
-import { getI18nConfigCurrentText } from "@scow/lib-server";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Space } from "antd";
 import dynamic from "next/dynamic";
 import { usePublicConfig } from "src/app/(auth)/context";
