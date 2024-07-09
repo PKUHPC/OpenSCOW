@@ -301,6 +301,8 @@ export const mockApi: MockApi<typeof api> = {
     comment: "",
   }]}),
 
+  mergeFileChunks: null,
+
 };
 
 

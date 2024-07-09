@@ -33,7 +33,7 @@ export const MergeFileChunksSchema = typeboxRouteSchema({
   }),
 
   responses: {
-    200: Type.Null(),
+    204: Type.Null(),
     409: Type.Object({ code: Type.Literal("ALREADY_EXISTS") }),
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
   },
@@ -64,7 +64,7 @@ export default route(MergeFileChunksSchema, async (req, res) => {
     cluster, path, userId: info.identityId, md5, name,
   }).then(async () => {
     await callLog(logInfo, OperationResult.SUCCESS);
-    return { 200: null };
+    return { 204: null };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
