@@ -64,10 +64,10 @@ export class User {
   platformRoles: PlatformRole[];
 
   @Enum({ items: () => UserState, default: UserState.NORMAL, comment: Object.values(UserState).join(", ") })
-    state: UserState = UserState.NORMAL;
+  state: UserState = UserState.NORMAL;
 
   @Property({ nullable: true })
-    deleteRemark?: string;
+  deleteRemark?: string;
 
   constructor(init: {
     userId: string;

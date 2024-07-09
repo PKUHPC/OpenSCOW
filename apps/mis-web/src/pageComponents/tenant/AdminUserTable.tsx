@@ -17,7 +17,9 @@ import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
+import { CannotDeleteModalLink } from "src/components/CannotDeleteModal";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
+import { DeleteUserModalLink } from "src/components/DeleteUserModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -243,7 +245,7 @@ export const AdminUserTable: React.FC<Props> = ({
           render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
         />
         <Table.Column<FullUserInfo>
-          dataIndex="changePassword"
+          dataIndex="operation"
           title={t(pCommon("operation"))}
           width="8%"
           fixed="right"
@@ -272,6 +274,33 @@ export const AdminUserTable: React.FC<Props> = ({
               >
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
+              { user.identityId !== r.id ? <DeleteUserModalLink
+                userId={r.id}
+                name={r.name}
+                onComplete={async (newPassword) => {
+                  await api.changePasswordAsTenantAdmin({
+                    body: {
+                      identityId: r.id,
+                      newPassword: newPassword,
+                    },
+                  })
+                    .httpError(404, () => { message.error(t(p("notExist"))); })
+                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .httpError(400, (e) => {
+                      if (e.code === "PASSWORD_NOT_VALID") {
+                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                      };
+                    })
+                    .then(() => { message.success(t(p("changeSuccess"))); })
+                    .catch(() => { message.error(t(p("changeFail"))); });
+                }}
+              >
+                {t(p("deleteUser"))}
+              </DeleteUserModalLink>:
+              <CannotDeleteModalLink
+              >
+                {t(p("deleteUser"))}
+              </CannotDeleteModalLink>}
             </Space>
           )}
         />
