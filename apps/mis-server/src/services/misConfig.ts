@@ -79,8 +79,7 @@ export const misConfigServiceServer = plugin((server) => {
     activateCluster: async ({ request, em, logger }) => {
       const { clusterId, operatorId } = request;
 
-
-      await em.transactional(async (em) => {
+      return await em.transactional(async (em) => {
         const cluster = await em.findOne(Cluster, { clusterId });
 
         if (!cluster) {
@@ -147,9 +146,10 @@ export const misConfigServiceServer = plugin((server) => {
           operatorId,
         );
 
-      });
 
-      return [{ executed: true }];
+        return [{ executed: true }];
+
+      });
 
     },
 
