@@ -1212,6 +1212,7 @@ export default {
       customEvent: "Custom Operation Event",
       activateCluster: "Activate Cluster",
       deactivateCluster: "Deactivate Cluster",
+      mergeFileChunks: "Merge and upload temporary file blocks",
     },
     operationDetails: {
       login: "User Login",
