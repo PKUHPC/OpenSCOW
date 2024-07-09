@@ -14,9 +14,11 @@ import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
 import { useEffect, useRef, useState } from "react";
+import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
+import { getScowdEnabled } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 import { generateMD5FromFileName, getFileChunkSize } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
@@ -46,10 +48,15 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
+  const [ scowdEnabled, setScowdEnabled ] = useState<boolean>();
 
   const t = useI18nTranslateToString();
 
-  const enabled = true;
+  const { isLoading } = useAsync({
+    promiseFn: async () => {
+      return await api.getClusterConfigFiles({ query: {}})
+      .then((data) => setScowdEnabled(getScowdEnabled(cluster, data.clusterConfigs)));
+  }});
 
   // 关闭modal框时，用于停止所有后续文件上传
   const isUploadingCancelled = useRef(false);
@@ -153,6 +160,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   return (
     <Modal
       open={open}
+      loading={isLoading}
       title={t(p("title"))}
       onCancel={onModalClose}
       destroyOnClose={true}
@@ -172,7 +180,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       <Upload.Dragger
         name="file"
         multiple
-        {...(enabled ? {
+        {...(scowdEnabled ? {
           customRequest: ({ file, onSuccess, onError, onProgress }) => {
             startBreakpointUpload(file as File, onProgress).then(onSuccess).catch(onError);
           },

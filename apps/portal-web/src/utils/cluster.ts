@@ -64,6 +64,12 @@ export const getLoginDesktopEnabled = (
   return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
 };
 
+export const getScowdEnabled = (
+  cluster: string, clusterConfigs: Record<string, ClusterConfigSchema>): boolean => {
+
+  return clusterConfigs[cluster]?.scowd?.enabled ?? false;
+};
+
 export type LoginNode = { name: string, address: string }
 
 export const getClusterName = (clusterId: string, languageId: string, publicConfigClusters: Cluster[]) => {
