@@ -20,7 +20,7 @@ import { trpc } from "src/utils/trpc";
 
 import { LaunchAppForm } from "../LaunchAppForm";
 
-export default function Page({ params }: {params: {clusterId: string}}) {
+export default function Page({ params }: { params: { clusterId: string } }) {
 
   const { clusterId } = params;
 

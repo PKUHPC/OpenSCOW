@@ -68,13 +68,14 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
-        case "data":
-          const data = Buffer.from(message.data.data);
-          term.write(data);
-          break;
-        case "exit":
-          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
-          break;
+          case "data": {
+            const data = Buffer.from(message.data.data);
+            term.write(data);
+            break;
+          }
+          case "exit":
+            term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+            break;
         }
       };
 

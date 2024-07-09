@@ -36,7 +36,7 @@ export function parseKeyValue(input: string): Record<string, string> {
  * @returns replaced string
  */
 export function parsePlaceholder(str: string, valueObj: Record<string, string>) {
-  return str.replace(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g, (_, p1: string) => valueObj[p1] ?? "");
+  return str.replace(/\{\{ ([a-zA-Z0-9_]+) \}\}/g, (_, p1: string) => valueObj[p1] ?? "");
 }
 
 /**

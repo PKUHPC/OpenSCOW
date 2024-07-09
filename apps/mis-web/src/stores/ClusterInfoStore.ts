@@ -22,7 +22,8 @@ export function ClusterInfoStore(
   initialSimpleClusters: Record<string, SimpleClusterSchema>,
 ) {
 
-  const publicConfigClusters = getPublicConfigClusters(clusterConfigs) ?? getPublicConfigClusters(initialSimpleClusters) ?? {};
+  const publicConfigClusters = getPublicConfigClusters(clusterConfigs)
+    ?? getPublicConfigClusters(initialSimpleClusters) ?? {};
 
   const clusterSortedIdList = getSortedClusterIds(clusterConfigs) ?? getSortedClusterIds(initialSimpleClusters) ?? [];
 
@@ -32,6 +33,7 @@ export function ClusterInfoStore(
   const initialDefaultClusterId = clusterSortedIdList.find((x) => {
     return Object.keys(initialActivatedClusters).find((c) => c === x);
   });
+
   const initialDefaultCluster
    = initialDefaultClusterId ? activatedClusters[initialDefaultClusterId] : undefined;
 

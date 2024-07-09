@@ -29,6 +29,7 @@ export const languageInfo = {
   en: { name: "US English" },
 };
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 export const { Localized, Provider, id, prefix, useI18n } = createI18n(languages);
 
 export type TextId = TextIdFromLangDict<typeof languages>;

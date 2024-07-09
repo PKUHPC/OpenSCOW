@@ -96,13 +96,16 @@ export const InitAdminForm: React.FC = () => {
                 });
             })
             .then((createdInAuth) => {
-              !createdInAuth.createdInAuth ?
+              if (createdInAuth.createdInAuth) {
+                message.success(t(p("addFinish")));
+              } else {
                 modal.info({
                   title: t(p("addSuccess")),
                   content: t(p("addDb")),
                   okText: t(pCommon("ok")),
-                })
-                : message.success(t(p("addFinish"))); })
+                });
+              }
+            })
             .catch(() => {
               modal.error({
                 title:  t(p("addFail")),

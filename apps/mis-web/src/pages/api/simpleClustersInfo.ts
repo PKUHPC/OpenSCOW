@@ -23,12 +23,12 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
-import { route } from "src/utils/route";
 import { Type } from "@sinclair/typebox";
-import { queryIfInitialized } from "src/utils/init";
 import { authenticate } from "src/auth/server";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
+import { queryIfInitialized } from "src/utils/init";
+import { route } from "src/utils/route";
 
 export const GetSimpleClustersInfoFromConfigFilesSchema = typeboxRouteSchema({
   method: "GET",
@@ -54,13 +54,13 @@ export default route(GetSimpleClustersInfoFromConfigFilesSchema,
 
     const clustersInfo: Record<string, SimpleClusterSchema> = {};
 
-    Object.keys(clustersFullInfo).forEach(key => {
+    Object.keys(clustersFullInfo).forEach((key) => {
       clustersInfo[key] = {
         clusterId: key,
         displayName: clustersFullInfo[key].displayName,
         priority: clustersFullInfo[key].priority,
-       };
-  });
+      };
+    });
 
     return {
       200: { clustersInfo },

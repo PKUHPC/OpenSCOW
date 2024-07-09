@@ -101,19 +101,24 @@ export const CreateEditDSVersionModal: React.FC<Props> = (
   const onOk = async () => {
     form.validateFields();
     const { versionName, versionDescription, path } = await form.validateFields();
-    isEdit && editData ? editMutation.mutate({
-      datasetVersionId: editData.id,
-      versionName,
-      versionDescription,
-      datasetId: editData.datasetId,
-    })
-      : createMutation.mutate({
+
+    if (isEdit && editData) {
+      editMutation.mutate({
+        datasetVersionId: editData.id,
+        versionName,
+        versionDescription,
+        datasetId: editData.datasetId,
+      });
+    } else {
+      createMutation.mutate({
         versionName,
         versionDescription,
         path,
         datasetId,
       });
+    }
   };
+
 
   return (
     <Modal

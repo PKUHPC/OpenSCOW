@@ -20,9 +20,9 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
-type DrawerProps = {
+interface DrawerProps {
   children: React.ReactNode;
-}
+};
 
 const Title = styled(Centered)`
   position: relative;

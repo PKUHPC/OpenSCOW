@@ -68,7 +68,7 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
         <Form.Item label={t(p("fileDirectory"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label={t(p("fileName"))} name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label={t(p("fileName"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

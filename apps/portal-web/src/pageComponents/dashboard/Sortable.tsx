@@ -147,29 +147,31 @@ export const Sortable: FC<Props> = ({
     (item: Entry) => {
       if (!isEditable) {
         switch (item.entry?.$case) {
-        case "pageLink":
-          router.push(item.entry.pageLink.path);
-          break;
+          case "pageLink":
+            router.push(item.entry.pageLink.path);
+            break;
 
-        case "shell":
-          const savedShellClusterId = item.entry.shell.clusterId;
-          router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
-          if (!currentClusters.some((x) => x.id === savedShellClusterId)) {
-            return <ClusterNotAvailablePage />;
+          case "shell": {
+            const savedShellClusterId = item.entry.shell.clusterId;
+            router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
+            if (!currentClusters.some((x) => x.id === savedShellClusterId)) {
+              return <ClusterNotAvailablePage />;
+            }
+            break;
           }
-          break;
-        case "app":
-          const savedAppClusterId = item.entry.app.clusterId;
-          router.push(
-            join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
-          );
-          if (!currentClusters.some((x) => x.id === savedAppClusterId)) {
-            return <ClusterNotAvailablePage />;
-          }
-          break;
+          case "app": {
 
-        default:
-          break;
+            const savedAppClusterId = item.entry.app.clusterId;
+            router.push(
+              join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
+            );
+            if (!currentClusters.some((x) => x.id === savedAppClusterId)) {
+              return <ClusterNotAvailablePage />;
+            }
+            break;
+          }
+          default:
+            break;
         }
       }
     },

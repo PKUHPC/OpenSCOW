@@ -33,12 +33,10 @@ const EditButton = styled(Button)`
 `;
 
 
-export interface AppWithCluster {
-  [appId: string]: {
-    app: App;
-    clusters: Cluster[];
-  };
-}
+export type AppWithCluster = Record<string, {
+  app: App;
+  clusters: Cluster[];
+}>;
 
 interface Props {
   currentClusters: Cluster[];

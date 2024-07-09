@@ -15,16 +15,16 @@ import { SharedStatus } from "src/models/common";
 export const getSharedStatusText = (status: SharedStatus) => {
   switch (status) {
 
-  case SharedStatus.SHARED:
-    return "取消分享";
+    case SharedStatus.SHARED:
+      return "取消分享";
 
-  case SharedStatus.UNSHARING:
-    return "取消分享中";
+    case SharedStatus.UNSHARING:
+      return "取消分享中";
 
-  case SharedStatus.SHARING:
-    return "分享中";
+    case SharedStatus.SHARING:
+      return "分享中";
 
-  default:
-    return "分享";
+    default:
+      return "分享";
   }
 };

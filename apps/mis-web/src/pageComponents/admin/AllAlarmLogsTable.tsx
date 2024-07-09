@@ -14,7 +14,7 @@ import { Static } from "@sinclair/typebox";
 import { Table, Tag } from "antd";
 import dayjs from "dayjs";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { GetAlarmLogsSchema } from "src/pages/api/admin/monitor/getAlarmLogs";
+import { type GetAlarmLogsSchema } from "src/pages/api/admin/monitor/getAlarmLogs";
 
 interface Pagination {
   current: number;
@@ -73,7 +73,7 @@ export const AllAlarmLogsTable: React.FC<Props> = ({ data, isLoading, pagination
           return (current - 1) * (pageSize || 0) + index + 1;
         }}
       />
-      <Table.Column<AlarmLog> dataIndex="fingerprint" title={t(p("fingerPrint"))} />
+      <Table.Column dataIndex="fingerprint" title={t(p("fingerPrint"))} />
       <Table.Column<AlarmLog>
         dataIndex="status"
         title={t(p("status"))}
@@ -84,7 +84,7 @@ export const AllAlarmLogsTable: React.FC<Props> = ({ data, isLoading, pagination
         title={t(p("alarmLevel"))}
         render={(s: string) => severityTexts[s]}
       />
-      <Table.Column<AlarmLog> dataIndex="description" title={t(p("description"))} />
+      <Table.Column dataIndex="description" title={t(p("description"))} />
       <Table.Column<AlarmLog>
         dataIndex="startsAt"
         title={t(p("firingTime"))}

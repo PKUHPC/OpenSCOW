@@ -14,9 +14,11 @@
 
 import "@xterm/xterm/css/xterm.css";
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Space } from "antd";
 import dynamic from "next/dynamic";
 import { usePublicConfig } from "src/app/(auth)/context";
+import { useI18n } from "src/i18n";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -62,19 +64,23 @@ const JobShellComponent = dynamic(
     loading: Black,
   });
 
-export default function Page({ params }: {params: {clusterId: string, jobId: string}}) {
+export default function Page({ params }: { params: { clusterId: string, jobId: string } }) {
 
   const { clusterId, jobId } = params;
   const { publicConfig, user } = usePublicConfig();
 
   const clusterName = publicConfig.CLUSTERS.find((x) => x.id === clusterId)?.name || clusterId;
 
+  const i18n = useI18n();
+
+  const i18nClusterName = getI18nConfigCurrentText(clusterName, i18n.currentLanguage.id);
+
   return (
     <Container>
       <Head title={`${clusterId}的终端`} />
       <Header>
         <h2>
-          {`用户 ${user.identityId} 连接到集群 ${clusterName} 的作业 ${jobId}`}
+          {`用户 ${user.identityId} 连接到集群 ${i18nClusterName} 的作业 ${jobId}`}
         </h2>
         <Space wrap>
           <Button onClick={() => window.location.reload()}>

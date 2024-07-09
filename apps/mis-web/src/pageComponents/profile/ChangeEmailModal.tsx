@@ -52,7 +52,7 @@ export const ChangeEmailModal: React.FC<Props> = ({
     const { newEmail } = await form.validateFields();
     setLoading(true);
 
-    await api.changeEmail({ body: { userId:userStore.user?.identityId as string, newEmail } })
+    await api.changeEmail({ body: { userId: userStore.user!.identityId, newEmail } })
       .httpError(404, () => { message.error(t(p("userNotExist"))); })
       .httpError(500, () => { message.error(t(p("changeEmailFail"))); })
       .httpError(501, () => { message.error(t(p("unavailable"))); })

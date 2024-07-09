@@ -43,9 +43,9 @@ interface FormFields {
   sourcePath: string,
 }
 
-export const CreateEditImageModal: React.FC<Props> = (
-  { open, onClose, refetch, isEdit, editData, clusters },
-) => {
+export const CreateEditImageModal: React.FC<Props> = ({
+  open, onClose, refetch, isEdit, editData, clusters,
+}: Props) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
@@ -56,12 +56,15 @@ export const CreateEditImageModal: React.FC<Props> = (
   }, []);
 
   const resetForm = () => {
-    isEdit && editData ?
+    if (isEdit && editData) {
       form.setFieldsValue({
         source: editData.source,
-      }) : form.setFieldsValue({
+      });
+    } else {
+      form.setFieldsValue({
         source: Source.INTERNAL,
       });
+    }
   };
 
   const cluster = Form.useWatch("cluster", form);
@@ -109,11 +112,13 @@ export const CreateEditImageModal: React.FC<Props> = (
   const onOk = async () => {
     form.validateFields();
     const { name, cluster, tag, description, source, sourcePath } = await form.validateFields();
-    isEdit && editData ? editMutation.mutate({
-      id: editData.id,
-      description,
-    })
-      : createMutation.mutate({
+    if (isEdit && editData) {
+      editMutation.mutate({
+        id: editData.id,
+        description,
+      });
+    } else {
+      createMutation.mutate({
         name,
         clusterId: source === Source.INTERNAL ? cluster?.id : undefined,
         tag,
@@ -121,6 +126,7 @@ export const CreateEditImageModal: React.FC<Props> = (
         source,
         sourcePath,
       });
+    };
   };
 
   return (
