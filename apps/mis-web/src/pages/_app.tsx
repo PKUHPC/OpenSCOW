@@ -14,7 +14,7 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -46,6 +46,7 @@ import {
 } from "src/stores/UserStore";
 import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { queryIfInitialized } from "src/utils/init";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -137,8 +138,9 @@ interface ExtraProps {
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
-  clusterConfigs: { [clusterId: string]: ClusterConfigSchema; };
-  initialActivatedClusters: {[clusterId: string]: Cluster};
+  clusterConfigs: Record<string, ClusterConfigSchema>;
+  initialActivatedClusters: Record<string, Cluster>;
+  initialSimpleClustersInfo: Record<string, SimpleClusterSchema>;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -153,7 +155,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
   const clusterInfoStore = useConstant(() => {
-    return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialActivatedClusters);
+    return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialActivatedClusters, extra.initialSimpleClustersInfo);
   });
 
   const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
@@ -216,6 +218,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     initialLanguage: "",
     clusterConfigs: {},
     initialActivatedClusters: {},
+    initialSimpleClustersInfo: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -246,23 +249,30 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
         const clusterConfigs = data?.clusterConfigs;
         if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
-
           extra.clusterConfigs = clusterConfigs;
-          const publicConfigClusters
-          = getPublicConfigClusters(clusterConfigs);
-          // get initial activated clusters
-          const clustersRuntimeInfo =
-            await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
-
-          const activatedClusters
-            = formatActivatedClusters({
-              clustersRuntimeInfo: clustersRuntimeInfo?.results,
-              misConfigClusters: publicConfigClusters });
-          extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
-
         }
       }
     }
+
+    const clustersRuntimeInfo = token ?
+      await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined)
+      : await api.getClustersRuntimeInfo({ query: { } }).then((x) => x, () => undefined);
+
+    // get deployed clusters' simple info (only clusterId, displayName and priority)
+    const simpleClustersInfo
+      = await api.getSimpleClustersInfoFromConfigFiles({}).then((x) => x, () => ({ clustersInfo: {} }));
+
+    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo;
+
+    const publicConfigClusters = Object.keys(extra.clusterConfigs).length > 0 ?
+      getPublicConfigClusters(extra.clusterConfigs) : getPublicConfigClusters(extra.initialSimpleClustersInfo) ?? {};
+
+    const activatedClusters
+    = formatActivatedClusters({
+      clustersRuntimeInfo: clustersRuntimeInfo?.results,
+      misConfigClusters: publicConfigClusters });
+
+    extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
 
     const hostname = getHostname(appContext.ctx.req);
 

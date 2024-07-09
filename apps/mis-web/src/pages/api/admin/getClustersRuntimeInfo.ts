@@ -20,6 +20,7 @@ import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
 import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { getClient } from "src/utils/client";
+import { queryIfInitialized } from "src/utils/init";
 import { route } from "src/utils/route";
 
 export const GetClustersRuntimeInfoSchema = typeboxRouteSchema({
@@ -43,11 +44,14 @@ const auth = authenticate(() => true);
 export default route(GetClustersRuntimeInfoSchema,
   async (req, res) => {
 
-    const { token } = req.query;
-    // when firstly used in getInitialProps, check the token
-    // when logged in, use auth()
-    const info = token ? await validateToken(token) : await auth(req, res);
-    if (!info) { return; }
+    // if not initialized, every one can get clustersRuntimeInfo
+    if (await queryIfInitialized()) {
+      const { token } = req.query;
+      // when firstly used in getInitialProps, check the token
+      // when logged in, use auth()
+      const info = token ? await validateToken(token) : await auth(req, res);
+      if (!info) { return; }
+    }
 
     const client = getClient(ConfigServiceClient);
     const result = await asyncClientCall(client, "getClustersRuntimeInfo", {});
