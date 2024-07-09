@@ -97,7 +97,7 @@ export const ExtensionPage: React.FC<Props> = ({
   useEffect(() => {
     const messageHandler = (e: MessageEvent<any>) => {
 
-      if (e.data.type === "resizeExtensionIframe" && ref.current) {
+      if (e.data.type === "scow.extensionPageHeightChanged" && ref.current) {
         ref.current.style.height = e.data.payload.height + "px";
       }
     };
