@@ -269,7 +269,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
     <div>
       <TitleText>
         <span>
-        集群{getI18nConfigCurrentText(cluster.name, undefined)}文件管理
+          集群{getI18nConfigCurrentText(cluster.name, undefined)}文件管理
         </span>
       </TitleText>
       <TopBar>
@@ -280,7 +280,13 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
         <PathBar
           path={path}
           loading={filesQuery.isFetching}
-          onPathChange={(curPath) => { curPath === path ? reload() : router.push(fullUrl(curPath)); }}
+          onPathChange={(curPath) => {
+            if (curPath === path) {
+              reload();
+            } else {
+              router.push(fullUrl(curPath));
+            }
+          }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>

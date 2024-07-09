@@ -12,16 +12,18 @@
 
 "use client";
 
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { useRouter } from "next/navigation";
 import { join } from "path";
 import { useEffect, useMemo } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { FileManager } from "src/app/(auth)/files/FileManager";
+import { useI18n } from "src/i18n";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 import { Head } from "src/utils/head";
 import { trpc } from "src/utils/trpc";
 
-export default function Page({ params }: { params: { cluster: string; resourceId: string; path: string[] }}) {
+export default function Page({ params }: { params: { cluster: string; resourceId: string; path: string[] } }) {
 
   const router = useRouter();
 
@@ -55,9 +57,13 @@ export default function Page({ params }: { params: { cluster: string; resourceId
 
   const clusterObj = clusters.find((x) => x.id === cluster);
 
+  const i18n = useI18n();
+
+  const i18nClusterName = getI18nConfigCurrentText(clusterObj?.name ?? cluster, i18n.currentLanguage.id);
+
   return (
     <>
-      <Head title={`${clusters.find((x) => x.id === cluster)?.name ?? cluster}文件管理`} />
+      <Head title={`${i18nClusterName}文件管理`} />
       {
         clusterObj ? (
           <FileManager

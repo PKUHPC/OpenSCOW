@@ -138,7 +138,7 @@ export const createDataset = procedure
 
     const em = await forkEntityManager();
 
-    const datesetExist = await em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    const datesetExist = await em.findOne(Dataset, { name:input.name, owner: user.identityId });
     if (datesetExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -146,7 +146,7 @@ export const createDataset = procedure
       });
     }
 
-    const dataset = new Dataset({ ...input, owner: user!.identityId });
+    const dataset = new Dataset({ ...input, owner: user.identityId });
     await em.persistAndFlush(dataset);
     return dataset.id;
   });

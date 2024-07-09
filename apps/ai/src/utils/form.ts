@@ -35,7 +35,7 @@ export const validateNoChinese = (_: RuleObject, value: any) => {
 
 export const imageNameValidation = (_: RuleObject, value: any) => {
   // 由字母（小写）、数字、"_"、"-"和"."组成，不能以符号开始或结束， 小于128字符
-  if (/^[a-z0-9]([a-z0-9_\-\.]{0,126}[a-z0-9])?$/.test(value)) {
+  if (/^[a-z0-9]([a-z0-9_\-.]{0,126}[a-z0-9])?$/.test(value)) {
     return Promise.resolve();
 
   }
@@ -44,7 +44,7 @@ export const imageNameValidation = (_: RuleObject, value: any) => {
 
 export const imageTagValidation = (_: RuleObject, value: any) => {
   // 由字母、数字、"_"、"-"和"."组成，不能以符号开始或结束， 小于128字符
-  if (/^[a-zA-Z0-9]([a-zA-Z0-9_\-\.]{0,126}[a-zA-Z0-9])?$/.test(value)) {
+  if (/^[a-zA-Z0-9]([a-zA-Z0-9_\-.]{0,126}[a-zA-Z0-9])?$/.test(value)) {
     return Promise.resolve();
 
   }
