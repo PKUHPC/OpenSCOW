@@ -39,7 +39,7 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const clusterops = getClusterOps(cluster);
+      const clusterops = getClusterOps(cluster, host);
 
       const reply = await clusterops.desktop.createDesktop({ loginNode: host, wm, userId, desktopName }, logger);
 
@@ -56,7 +56,7 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const clusterops = getClusterOps(cluster);
+      const clusterops = getClusterOps(cluster, host);
 
       await clusterops.desktop.killDesktop({ loginNode: host, userId, displayId }, logger);
 
@@ -72,7 +72,7 @@ export const desktopServiceServer = plugin((server) => {
 
       checkLoginNodeInCluster(cluster, host);
 
-      const clusterops = getClusterOps(cluster);
+      const clusterops = getClusterOps(cluster, host);
 
       const reply = await clusterops.desktop.connectToDesktop({ loginNode: host, userId, displayId }, logger);
 
@@ -86,7 +86,7 @@ export const desktopServiceServer = plugin((server) => {
 
       ensureEnabled(cluster);
 
-      const clusterops = getClusterOps(cluster);
+      const clusterops = getClusterOps(cluster, host);
 
       if (host) {
         checkLoginNodeInCluster(cluster, host);

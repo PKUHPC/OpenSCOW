@@ -19,16 +19,16 @@ import { configClusters } from "src/config/clusters";
 
 const clusters = configClusters;
 
-const opsForClusters = Object.entries(clusters).reduce((prev, [cluster]) => {
-  prev[cluster] = {
-    app: appOps(cluster),
-    job: jobOps(cluster),
-    desktop: desktopOps(cluster),
-    file: fileOps(cluster),
-  } as ClusterOps;
-  return prev;
-}, {} as Record<string, ClusterOps>);
+export const getClusterOps = (cluster: string, host?: string) => {
+  const opsForClusters = Object.entries(clusters).reduce((prev, [c]) => {
+    prev[c] = {
+      app: appOps(c),
+      job: jobOps(c),
+      desktop: desktopOps(c, host),
+      file: fileOps(c),
+    } as ClusterOps;
+    return prev;
+  }, {} as Record<string, ClusterOps>);
 
-export const getClusterOps = (cluster: string) => {
   return opsForClusters[cluster];
 };
