@@ -21,7 +21,7 @@ import React, { useCallback } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
+import { type GetAllTenantsSchema } from "src/pages/api/admin/getAllTenants";
 import { moneyToString } from "src/utils/money";
 
 interface Props {

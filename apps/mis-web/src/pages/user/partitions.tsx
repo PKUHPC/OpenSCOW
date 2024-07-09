@@ -62,7 +62,7 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
   const { text } = props;
 
   const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
-  const [renderData, setRenderData] = useState<{ [cluster: string]: JobBillingTableItem[] }>({});
+  const [renderData, setRenderData] = useState<Record<string, JobBillingTableItem[]>>({});
 
   const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
 

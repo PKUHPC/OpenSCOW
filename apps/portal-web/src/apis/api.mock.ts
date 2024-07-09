@@ -14,19 +14,19 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import { ClusterActivationStatus } from "@scow/config/build/type";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { JobInfo } from "@scow/protos/build/portal/job";
-import { api } from "src/apis/api";
+import { type api } from "src/apis/api";
 import { TimeUnit } from "src/models/job";
 export type MockApi<TApi extends Record<
   string,
- (...args: any[]) => JsonFetchResultPromiseLike<any>>
- > = { [key in keyof TApi]: null | (
+  (...args: any[]) => JsonFetchResultPromiseLike<any>>,
+> = {[key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<
       ReturnType<TApi[key]> extends PromiseLike<infer TSuc>
-      ? TSuc
-      : never
+        ? TSuc
+        : never
     >)
-  };
+};
 
 export const runningJob: RunningJob = {
   jobId: "123",

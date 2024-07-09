@@ -15,7 +15,7 @@ import { createOperationLogClient,
 import { runtimeConfig } from "src/utils/config";
 
 interface PartialLogCallParams<TName extends OperationEvent["$case"]>
- extends Omit<LogCallParams<TName>, "operationResult" | "logger"> {}
+  extends Omit<LogCallParams<TName>, "operationResult" | "logger"> {}
 
 export const callLog = async <TName extends OperationEvent["$case"]>(
   {

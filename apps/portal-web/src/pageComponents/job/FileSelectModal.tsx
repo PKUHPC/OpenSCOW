@@ -143,7 +143,11 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
               path={formatPath(path)}
               loading={isLoading}
               onPathChange={(curPath) => {
-                curPath === path ? reload() : setPath(join("/", curPath));
+                if (curPath === path) {
+                  reload();
+                } else {
+                  setPath(join("/", curPath));
+                }
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0

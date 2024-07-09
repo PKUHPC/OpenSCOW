@@ -271,18 +271,18 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         tableLayout="fixed"
         scroll={{ x: data?.jobs?.length ? 1800 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
-        <Table.Column<JobInfo> dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
-        <Table.Column<JobInfo> dataIndex="account" ellipsis title={t(pCommon("account"))} />
-        <Table.Column<JobInfo> dataIndex="user" ellipsis title={t(pCommon("user"))} />
+        <Table.Column dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column dataIndex="account" ellipsis title={t(pCommon("account"))} />
+        <Table.Column dataIndex="user" ellipsis title={t(pCommon("user"))} />
         <Table.Column<JobInfo>
           dataIndex="cluster"
           ellipsis
           title={t(pCommon("cluster"))}
           render={(cluster) => getClusterName(cluster, languageId, publicConfigClusters)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" width="6.7%" ellipsis title="QOS" />
+        <Table.Column dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column dataIndex="qos" width="6.7%" ellipsis title="QOS" />
         <Table.Column<JobInfo>
           dataIndex="timeSubmit"
           width="8.9%"

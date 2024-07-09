@@ -17,11 +17,11 @@ import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18n, useI18nTranslate } from "src/i18n";
 
 interface Props {
-    clusterId: string;
-    clusterName: string;
-    onClose: () => void;
-    onComplete: (confirmedClusterId: string, comment: string) => Promise<void>;
-    open: boolean;
+  clusterId: string;
+  clusterName: string;
+  onClose: () => void;
+  onComplete: (confirmedClusterId: string, comment: string) => Promise<void>;
+  open: boolean;
 }
 
 interface FormProps {

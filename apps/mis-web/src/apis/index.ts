@@ -47,7 +47,7 @@ class MockPromise<T> implements PromiseLike<T> {
   }
 
   catch<TResult = T>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | null | undefined):
-    PromiseLike<T | TResult> {
+  PromiseLike<T | TResult> {
     return this.then(undefined, onrejected);
   }
 

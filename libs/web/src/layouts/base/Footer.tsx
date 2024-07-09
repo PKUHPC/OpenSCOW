@@ -51,7 +51,8 @@ export const Footer: React.FC<Props> = ({ text, versionTag }) => {
           <>
             <Divider style={{ marginTop: 0, marginBottom: 10 }} />
             <FooterContainer
-              dangerouslySetInnerHTML={{ __html: text }} />
+              dangerouslySetInnerHTML={{ __html: text }}
+            />
           </>
         )
       }

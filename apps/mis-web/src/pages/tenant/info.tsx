@@ -35,75 +35,75 @@ import { handlegRPCError } from "src/utils/server";
 
 type Info = GetTenantInfoResponse & { tenantName: string };
 
-type Props = SSRProps<Info, 404>
+type Props = SSRProps<Info, 404>;
 
 const p = prefix("page.tenant.info.");
 
-export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))
-((props: Props) => {
+export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.includes(TenantRole.TENANT_ADMIN))(
+  (props: Props) => {
 
-  const router = useRouter();
+    const router = useRouter();
 
-  const t = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
-  if ("error" in props) {
-    return <UnifiedErrorPage code={props.error} />;
-  }
+    if ("error" in props) {
+      return <UnifiedErrorPage code={props.error} />;
+    }
 
-  const { balance, accountCount, admins,
-    userCount, tenantName, financialStaff, defaultAccountBlockThreshold } =
+    const { balance, accountCount, admins,
+      userCount, tenantName, financialStaff, defaultAccountBlockThreshold } =
     ensureNotUndefined(props, ["balance", "defaultAccountBlockThreshold"]);
 
-  return (
-    <div>
-      <Head title={t("common.tenantInfo")} />
-      <PageTitle titleText={t("common.tenantInfo")} />
-      <Descriptions bordered column={1}>
-        <Descriptions.Item label={t("common.tenantName")}>
-          {tenantName}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("common.admin")}>
-          {
-            admins.map(({ userId, userName }) => (
-              <Tag key={userId}>
-                {userName} (ID: {userId})
-              </Tag>
-            ))
-          }
-        </Descriptions.Item>
-        <Descriptions.Item label={t(p("tenantFinanceOfficer"))}>
-          {
-            financialStaff.map(({ userId, userName }) => (
-              <Tag key={userId}>
-                {userName} (ID: {userId})
-              </Tag>
-            ))
-          }
-        </Descriptions.Item>
-        <Descriptions.Item label={t("common.accountCount")}>
-          {accountCount}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("common.userCount")}>
-          {userCount}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("common.tenantBalance")}>
-          {moneyToNumber(balance).toFixed(2)} {t("common.unit")}
-        </Descriptions.Item>
-        <Descriptions.Item label={t("common.defaultAccountBlockThreshold")}>
-          <Space>
-            <span>
-              {moneyToNumber(defaultAccountBlockThreshold).toFixed(2)} {t("common.unit")}
-            </span>
-            <ChangeDefaultAccountBlockThresholdLink
-              tenantName={tenantName}
-              currentAmount={defaultAccountBlockThreshold}
-              reload={() => { router.reload(); }}
-            >修改</ChangeDefaultAccountBlockThresholdLink></Space>
-        </Descriptions.Item>
-      </Descriptions>
-    </div>
-  );
-});
+    return (
+      <div>
+        <Head title={t("common.tenantInfo")} />
+        <PageTitle titleText={t("common.tenantInfo")} />
+        <Descriptions bordered column={1}>
+          <Descriptions.Item label={t("common.tenantName")}>
+            {tenantName}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("common.admin")}>
+            {
+              admins.map(({ userId, userName }) => (
+                <Tag key={userId}>
+                  {userName} (ID: {userId})
+                </Tag>
+              ))
+            }
+          </Descriptions.Item>
+          <Descriptions.Item label={t(p("tenantFinanceOfficer"))}>
+            {
+              financialStaff.map(({ userId, userName }) => (
+                <Tag key={userId}>
+                  {userName} (ID: {userId})
+                </Tag>
+              ))
+            }
+          </Descriptions.Item>
+          <Descriptions.Item label={t("common.accountCount")}>
+            {accountCount}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("common.userCount")}>
+            {userCount}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("common.tenantBalance")}>
+            {moneyToNumber(balance).toFixed(2)} {t("common.unit")}
+          </Descriptions.Item>
+          <Descriptions.Item label={t("common.defaultAccountBlockThreshold")}>
+            <Space>
+              <span>
+                {moneyToNumber(defaultAccountBlockThreshold).toFixed(2)} {t("common.unit")}
+              </span>
+              <ChangeDefaultAccountBlockThresholdLink
+                tenantName={tenantName}
+                currentAmount={defaultAccountBlockThreshold}
+                reload={() => { router.reload(); }}
+              >修改</ChangeDefaultAccountBlockThresholdLink></Space>
+          </Descriptions.Item>
+        </Descriptions>
+      </div>
+    );
+  });
 
 export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 

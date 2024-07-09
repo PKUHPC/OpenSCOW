@@ -26,7 +26,7 @@ import { Encoding } from "src/models/exportFile";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
-import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
+import { type GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 
@@ -283,7 +283,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
+        <Table.Column dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
           width="25%"

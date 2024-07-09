@@ -52,7 +52,7 @@ export const ImportUsersTable: React.FC = () => {
     return <ClusterNotAvailablePage />;
   }
 
-  const [form] = Form.useForm<{ whitelist: boolean}>();
+  const [form] = Form.useForm<{ whitelist: boolean }>();
 
   const [loading, setLoading] = useState(false);
 
@@ -177,7 +177,7 @@ export const ImportUsersTable: React.FC = () => {
           rowKey="accountName"
           bordered
         >
-          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title={t(pCommon("accountName"))} />
+          <Table.Column dataIndex="accountName" title={t(pCommon("accountName"))} />
           <Table.Column<ClusterAccountInfo>
             dataIndex="owner"
             title={t(pCommon("owner"))}
@@ -234,7 +234,7 @@ export const ImportUsersTable: React.FC = () => {
           <Table
             dataSource={usersList}
           >
-            <Table.Column<UserInAccount> dataIndex="userId" title={t(pCommon("userId"))} />
+            <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
           </Table>
         </Drawer>
       </Form>

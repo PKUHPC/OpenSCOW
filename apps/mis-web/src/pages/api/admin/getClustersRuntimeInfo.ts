@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ClusterRuntimeInfo, ClusterRuntimeInfoSchema } from "@scow/config/build/type";
-import { ClusterRuntimeInfo_LastActivationOperation, ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ConfigServiceClient } from "@scow/protos/build/server/config";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -56,11 +56,11 @@ export default route(GetClustersRuntimeInfoSchema,
     const client = getClient(ConfigServiceClient);
     const result = await asyncClientCall(client, "getClustersRuntimeInfo", {});
     const operatorIds = Array.from(new Set(result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation;
+      const lastActivationOperation = x.lastActivationOperation!;
       return lastActivationOperation?.operatorId ?? undefined;
     })));
 
-    const userIds = operatorIds.filter((id) => typeof id === "string" && id !== undefined && id !== null) as string[];
+    const userIds = operatorIds.filter((id) => typeof id === "string" && id !== undefined && id !== null);
 
     const userClient = getClient(UserServiceClient);
     const { users } = await asyncClientCall(userClient, "getUsersByIds", {
@@ -72,7 +72,7 @@ export default route(GetClustersRuntimeInfoSchema,
     const clusterConfigs = await getClusterConfigFiles();
 
     const clustersDatabaseInfo: ClusterRuntimeInfo[] = result.results.map((x) => {
-      const lastActivationOperation = x.lastActivationOperation as ClusterRuntimeInfo_LastActivationOperation;
+      const lastActivationOperation = x.lastActivationOperation!;
       return {
         ...x,
         operatorId: lastActivationOperation?.operatorId ?? "",

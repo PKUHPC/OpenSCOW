@@ -21,12 +21,10 @@ import { DEFAULT_GRAFANA_URL } from "src/utils/constants";
 import { route } from "src/utils/route";
 
 interface GrafanaApiResponse {
-  results: {
-    [key: string]: {
-      status: number;
-      frames: GrafanaFrame[];
-    };
-  };
+  results: Record<string, {
+    status: number;
+    frames: GrafanaFrame[];
+  }>;
 }
 
 interface GrafanaFrame {
@@ -173,7 +171,7 @@ export default /* #__PURE__*/route(GetAlarmLogsSchema, async (req, res) => {
     .then((response) => response.json())
     .then((data: GrafanaApiResponse) => {
       // 检查数据是否存在或为空
-      if (!data || !data.results || !data.results.A || data.results.A.status !== 200) {
+      if (!data?.results?.A || data.results.A.status !== 200) {
         return { 400: null };
       }
       return { 200: {

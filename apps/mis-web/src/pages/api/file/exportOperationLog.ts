@@ -83,34 +83,34 @@ const getExportSource = (
   accountName: string | undefined): ExportOperationLog["source"] => {
 
   switch (type) {
-  case OperationLogQueryType.USER:
-    return {
-      $case: "user",
-      user: {
-        userId: info.identityId,
-      },
-    };
-  case OperationLogQueryType.ACCOUNT:
-    return accountName
-      ? {
-        $case: "account",
-        account: {
-          accountName,
+    case OperationLogQueryType.USER:
+      return {
+        $case: "user",
+        user: {
+          userId: info.identityId,
         },
-      }
-      : undefined;
-  case OperationLogQueryType.TENANT:
-    return {
-      $case: "tenant",
-      tenant: {
-        tenantName: info.tenant,
-      },
-    };
-  default:
-    return {
-      $case: "admin",
-      admin: {},
-    };
+      };
+    case OperationLogQueryType.ACCOUNT:
+      return accountName
+        ? {
+          $case: "account",
+          account: {
+            accountName,
+          },
+        }
+        : undefined;
+    case OperationLogQueryType.TENANT:
+      return {
+        $case: "tenant",
+        tenant: {
+          tenantName: info.tenant,
+        },
+      };
+    default:
+      return {
+        $case: "admin",
+        admin: {},
+      };
   }
 };
 
@@ -221,12 +221,12 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
     const formatOperationLog = (x: OperationLog) => {
       return {
         id: x.operationLogId,
-        operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
-        operationType: x.operationEvent?.["$case"] === "customEvent"
+        operationCode: x.operationEvent?.$case ? OperationCodeMap[x.operationEvent?.$case] : "000000",
+        operationType: x.operationEvent?.$case === "customEvent"
           ? getI18nCurrentText(x.operationEvent.customEvent.name, languageId)
-          : OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
+          : OperationTypeTexts[x.operationEvent?.$case || "unknown"],
         operationDetail: x.operationEvent ?
-          x.operationEvent?.["$case"] === "customEvent"
+          x.operationEvent?.$case === "customEvent"
             ? getI18nCurrentText(x.operationEvent.customEvent.content, languageId)
             : getOperationDetail(x.operationEvent, t, tArgs, languageId)
           : "",

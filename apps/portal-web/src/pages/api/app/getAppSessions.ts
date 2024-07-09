@@ -33,7 +33,7 @@ export const AppSession = Type.Object({
   host: Type.Optional(Type.String()),
   port: Type.Optional(Type.Number()),
 });
-export type AppSession = Static<typeof AppSession>
+export type AppSession = Static<typeof AppSession>;
 
 export const GetAppSessionsSchema = typeboxRouteSchema({
   method: "GET",
