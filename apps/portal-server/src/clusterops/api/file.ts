@@ -127,14 +127,14 @@ export interface UploadReply {
   writtenBytes: number;
 }
 
-export interface MergeFileChunksRequest {
-  userId: string;
-  path: string;
-  md5: string;
-}
+// export interface MergeFileChunksRequest {
+//   userId: string;
+//   path: string;
+//   md5: string;
+// }
 
-export interface MergeFileChunksReply {
-}
+// export interface MergeFileChunksReply {
+// }
 
 export interface GetFileMetadataRequest {
   userId: string;
@@ -161,7 +161,7 @@ export interface FileOps {
 
   upload(req: UploadRequest, logger: Logger): Promise<UploadReply>;
   download(req: DownloadRequest, logger: Logger): Promise<DownloadReply>;
-  mergeFileChunks(req: MergeFileChunksRequest, logger: Logger): Promise<MergeFileChunksReply>;
+  // mergeFileChunks(req: MergeFileChunksRequest, logger: Logger): Promise<MergeFileChunksReply>;
 
   getFileMetadata(req: GetFileMetadataRequest, logger: Logger): Promise<GetFileMetadataReply>;
 
