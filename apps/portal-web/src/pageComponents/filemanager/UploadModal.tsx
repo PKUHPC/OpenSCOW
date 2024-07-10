@@ -44,7 +44,7 @@ const p = prefix("pageComp.fileManagerComp.uploadModal.");
 type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => void);
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster, scowdEnabled }) => {
-
+  console.log("456", scowdEnabled);
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
 
@@ -67,7 +67,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   }, [open]);
 
 
-  const startBreakpointUpload = async (file: File, onProgress: OnProgressCallback) => {
+  const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
     // 获取文件唯一标识
     const { md5, suffix } = generateMD5FromFileName(file);
 
@@ -173,7 +173,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         multiple
         {...(scowdEnabled ? {
           customRequest: ({ file, onSuccess, onError, onProgress }) => {
-            startBreakpointUpload(file as File, onProgress).then(onSuccess).catch(onError);
+            startMultipartUpload(file as File, onProgress).then(onSuccess).catch(onError);
           },
         } : {
           action: async (file) => urlToUpload(cluster, join(path, file.name)),

@@ -45,7 +45,9 @@ export const FileManagerPage: NextPage<Props> = requireAuth(() => true)((props: 
   const pathParts = queryToArray(router.query.path);
 
   const cluster = queryToString(router.query.cluster);
+  console.log("234", props.scowdEnabledClusters, cluster);
   const [ scowdEnabled, _ ] = useState<boolean>(!!props.scowdEnabledClusters?.includes(cluster));
+  console.log("345", scowdEnabled);
 
   const t = useI18nTranslateToString();
 
@@ -81,6 +83,13 @@ export const FileManagerPage: NextPage<Props> = requireAuth(() => true)((props: 
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
 
+  const auth = ssrAuthenticate(() => true);
+
+  const info = await auth(req);
+  if (typeof info === "number") {
+    return { props: { error: info } };
+  }
+
   // Cannot directly call api routes here, so mock is not available directly.
   // manually call mock
   if (USE_MOCK) {
@@ -91,19 +100,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
     };
   }
 
-  const auth = ssrAuthenticate(() => true);
-
-  const info = await auth(req);
-  if (typeof info === "number") {
-    return { props: { error: info } };
-  }
-
   const token = getTokenFromCookie({ req });
   const resp = await api.getClusterConfigFiles({ query: { token } });
 
   const scowdEnabledClusters: string[] = Object.entries(resp.clusterConfigs)
     .filter(([_, config]) => !!config.scowd?.enabled)
     .map(([cluster, _]) => cluster);
+
+  console.log("123", scowdEnabledClusters);
 
   return {
     props: {
