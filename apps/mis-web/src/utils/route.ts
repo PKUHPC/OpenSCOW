@@ -28,7 +28,7 @@ export const route: typeof typeboxRoute = (schema, handler) => {
 
         const SCOW_ERROR = e.metadata.get("IS_SCOW_ERROR");
         if (!SCOW_ERROR) { throw e; }
-        const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
+        const code = e.metadata.get("SCOW_ERROR_CODE")?.[0]?.toString();
         const details = e.details;
 
         // 如果包含集群详细错误信息

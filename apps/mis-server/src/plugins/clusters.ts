@@ -59,7 +59,11 @@ export const clustersPlugin = plugin(async (f) => {
   if (process.env.NODE_ENV === "production") {
 
     // only check activated clusters' root user login when system is starting
-    const activatedClusters = await getActivatedClusters(f.ext.orm.em.fork(), f.logger);
+    const activatedClusters = await getActivatedClusters(f.ext.orm.em.fork(), f.logger).catch((e) => {
+      f.logger.info("!!![important] No available activated clusters.This will skip root ssh login check in cluster!!!");
+      f.logger.info(e);
+      return {};
+    });
 
     await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
@@ -74,6 +78,7 @@ export const clustersPlugin = plugin(async (f) => {
         f.logger.info("Root can login to %s by login node %s", displayName, node);
       }
     }));
+
   }
 
   // adapterClient of all config clusters

@@ -80,7 +80,11 @@ export async function fetchJobs(
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
 
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+        logger.info("!!![important] No available activated clusters.This will skip fetchJobs in cluster!!!");
+        logger.info(e);
+        return {};
+      }); ;
 
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];
