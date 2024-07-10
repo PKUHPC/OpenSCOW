@@ -117,6 +117,14 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     shareDatasetVersion:t(pTypes("shareDatasetVersion")),
     copyDatasetVersion:t(pTypes("copyDatasetVersion")),
     deleteDatasetVersion:t(pTypes("deleteDatasetVersion")),
+    createAlgorithm:t(pTypes("createAlgorithm")),
+    updateAlgorithm:t(pTypes("updateAlgorithm")),
+    deleteAlgorithm:t(pTypes("deleteAlgorithm")),
+    createAlgorithmVersion:t(pTypes("createAlgorithmVersion")),
+    updateAlgorithmVersion:t(pTypes("updateAlgorithmVersion")),
+    shareAlgorithmVersion:t(pTypes("shareAlgorithmVersion")),
+    deleteAlgorithmVersion:t(pTypes("deleteAlgorithmVersion")),
+    copyAlgorithmVersion:t(pTypes("copyAlgorithmVersion")),
     createUser: t(pTypes("createUser")),
     addUserToAccount: t(pTypes("addUserToAccount")),
     removeUserFromAccount: t(pTypes("removeUserFromAccount")),
@@ -200,6 +208,14 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   shareDatasetVersion:"010806",
   copyDatasetVersion:"010807",
   deleteDatasetVersion:"010808",
+  createAlgorithm:"010901",
+  updateAlgorithm:"010902",
+  deleteAlgorithm:"010903",
+  createAlgorithmVersion:"010904",
+  updateAlgorithmVersion:"010905",
+  shareAlgorithmVersion:"010906",
+  deleteAlgorithmVersion:"010907",
+  copyAlgorithmVersion:"010908",
   createUser: "020201",
   addUserToAccount: "020202",
   removeUserFromAccount: "020203",
@@ -371,6 +387,33 @@ export const getOperationDetail = (
       case "deleteDatasetVersion":
         return t(pDetails("deleteDatasetVersion"),
           [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "createAlgorithm":
+        return t(pDetails("createAlgorithm"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].algorithmId || "-"]);
+      case "updateAlgorithm":
+        return t(pDetails("updateAlgorithm"),
+          [operationEvent[logEvent].algorithmId]);
+      case "deleteAlgorithm":
+        return t(pDetails("deleteAlgorithm"),
+          [operationEvent[logEvent].algorithmId ]);
+      case "createAlgorithmVersion":
+        return t(pDetails("createAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId || "-"]);
+      case "updateAlgorithmVersion":
+        return t(pDetails("updateAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "shareAlgorithmVersion":
+        return t(pDetails("shareAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "copyAlgorithmVersion":
+        return t(pDetails("copyAlgorithmVersion"),
+          [operationEvent[logEvent].sourceAlgorithmId, operationEvent[logEvent].sourceAlgorithmVersionId,
+            operationEvent[logEvent].targetAlgorithmId || "-", operationEvent[logEvent].targetAlgorithmVersionId || "-",
+          ]);
+      case "deleteAlgorithmVersion":
+        return t(pDetails("deleteAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
       case "createUser":
         return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
       case "addUserToAccount":

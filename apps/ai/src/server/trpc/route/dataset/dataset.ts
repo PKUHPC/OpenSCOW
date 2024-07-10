@@ -139,9 +139,8 @@ export const createDataset = procedure
       operatorIp: parseIp(req) ?? "",
       operationTypeName: OperationType.createDataset,
     };
-    console.log(111);
+
     if (res.ok) {
-      console.log(222);
       await callLog({ ...logInfo, operationTypePayload:{ clusterId, datasetId:res.data as number } },
         OperationResult.SUCCESS);
     }

@@ -101,5 +101,12 @@ export const OperationType: OperationTypeEnum = {
   createAiTrain:"createAiTrain",
   cancelAiTrainOrApp:"cancelAiTrainOrApp",
   saveImage :"saveImage",
-
+  createAlgorithm:"createAlgorithm",
+  updateAlgorithm:"updateAlgorithm",
+  deleteAlgorithm:"deleteAlgorithm",
+  createAlgorithmVersion:"createAlgorithmVersion",
+  updateAlgorithmVersion:"updateAlgorithmVersion",
+  shareAlgorithmVersion:"shareAlgorithmVersion",
+  deleteAlgorithmVersion:"deleteAlgorithmVersion",
+  copyAlgorithmVersion:"copyAlgorithmVersion",
 };

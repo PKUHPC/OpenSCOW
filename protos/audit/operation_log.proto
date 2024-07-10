@@ -111,6 +111,22 @@ message CreateApp {
   optional string cluster_id = 3;
 }
 
+message CreateAiTrain {
+  string cluster_id = 1;
+  optional uint32 job_id = 2;
+}
+
+message CancelAiTrainOrApp {
+  string cluster_id = 1;
+  uint32 job_id = 2;
+}
+
+message SaveImage {
+  uint32 job_id = 1;
+  optional uint32 image_id = 2;
+  optional string tag = 3;
+}
+
 message CreateFile {
   string cluster_id = 1;
   string path = 2;
@@ -504,21 +520,47 @@ message CopyDatasetVersion {
   optional uint32 target_dataset_version_id = 4;
 }
 
-message CreateAiTrain {
+message CreateAlgorithm {
   string cluster_id = 1;
-  optional uint32 job_id = 2;
+  optional uint32 algorithm_id = 2;
 }
 
-message CancelAiTrainOrApp {
-  string cluster_id = 1;
-  uint32 job_id = 2;
+message UpdateAlgorithm {
+  uint32 algorithm_id = 1;
 }
 
-message SaveImage {
-  uint32 job_id = 1;
-  optional uint32 image_id = 2;
-  optional string tag = 3;
+message DeleteAlgorithm {
+  uint32 algorithm_id = 12;
 }
+
+message CreateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyAlgorithmVersion {
+  uint32 source_algorithm_id = 1;
+  uint32 source_algorithm_version_id = 2;
+  optional uint32 target_algorithm_id = 3;
+  optional uint32 target_algorithm_version_id = 4;
+}
+
+
 
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
@@ -603,6 +645,14 @@ message CreateOperationLogRequest {
     CreateAiTrain create_ai_train = 78;
     CancelAiTrainOrApp cancel_ai_train_or_app = 79;
     SaveImage save_image = 80;
+    CreateAlgorithm create_algorithm = 81;
+    UpdateAlgorithm update_algorithm = 82;
+    DeleteAlgorithm delete_algorithm = 83;
+    CreateAlgorithmVersion create_algorithm_version = 84;
+    UpdateAlgorithmVersion update_algorithm_version = 85;
+    ShareAlgorithmVersion share_algorithm_version = 86;
+    DeleteAlgorithmVersion delete_algorithm_version = 87;
+    CopyAlgorithmVersion copy_algorithm_version = 88;
   }
 }
 
@@ -691,6 +741,14 @@ message OperationLog {
     CreateAiTrain create_ai_train = 80;
     CancelAiTrainOrApp cancel_ai_train_or_app = 81;
     SaveImage save_image = 82;
+    CreateAlgorithm create_algorithm = 83;
+    UpdateAlgorithm update_algorithm = 84;
+    DeleteAlgorithm delete_algorithm = 85;
+    CreateAlgorithmVersion create_algorithm_version = 86;
+    UpdateAlgorithmVersion update_algorithm_version = 87;
+    ShareAlgorithmVersion share_algorithm_version = 88;
+    DeleteAlgorithmVersion delete_algorithm_version = 89;
+    CopyAlgorithmVersion copy_algorithm_version = 90;
   }
 }
 
