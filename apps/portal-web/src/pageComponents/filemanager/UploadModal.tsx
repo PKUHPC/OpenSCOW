@@ -14,16 +14,24 @@ import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
 import { useEffect, useRef, useState } from "react";
-import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
-import { getScowdEnabled } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 import { generateMD5FromFileName, getFileChunkSize } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
+import { getTokenFromCookie } from "src/auth/cookie";
+import { GetServerSideProps } from "next";
+import { USE_MOCK } from "src/apis/useMock";
+import { AuthResultError, ssrAuthenticate } from "src/auth/server";
+import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 
-interface Props {
+interface ServerSideProps {
+  error?: AuthResultError;
+  scowdEnabledClusters?: string[];
+}
+
+interface Props extends ServerSideProps {
   open: boolean;
   onClose: () => void;
   reload: () => void;
@@ -44,19 +52,17 @@ const p = prefix("pageComp.fileManagerComp.uploadModal.");
 
 type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => void);
 
-export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
+export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster, error, scowdEnabledClusters }) => {
+
+  if (!!error) {
+    return <UnifiedErrorPage code={error} />;
+  }
 
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
-  const [ scowdEnabled, setScowdEnabled ] = useState<boolean>();
+  const [ scowdEnabled, _ ] = useState<boolean>(!!scowdEnabledClusters?.includes(cluster));
 
   const t = useI18nTranslateToString();
-
-  const { isLoading } = useAsync({
-    promiseFn: async () => {
-      return await api.getClusterConfigFiles({ query: {}})
-      .then((data) => setScowdEnabled(getScowdEnabled(cluster, data.clusterConfigs)));
-  }});
 
   // 关闭modal框时，用于停止所有后续文件上传
   const isUploadingCancelled = useRef(false);
@@ -160,7 +166,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   return (
     <Modal
       open={open}
-      loading={isLoading}
       title={t(p("title"))}
       onCancel={onModalClose}
       destroyOnClose={true}
@@ -253,3 +258,37 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     </Modal>
   );
 };
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async ({ req }) => {
+
+  // Cannot directly call api routes here, so mock is not available directly.
+  // manually call mock
+  if (USE_MOCK) {
+    return {
+      props: {
+        scowdEnabledClusters: [ "hpc01" ],
+      },
+    };
+  }
+
+  const auth = ssrAuthenticate(() => true);
+
+  const info = await auth(req);
+  if (typeof info === "number") {
+    return { props: { error: info } };
+  }
+
+  const token = getTokenFromCookie({ req });
+  const resp = await api.getClusterConfigFiles({ query: { token } });
+
+  const scowdEnabledClusters: string[] = Object.entries(resp.clusterConfigs)
+  .filter(([_, config]) => !!config.scowd?.enabled)
+  .map(([cluster, _]) => cluster);
+
+  return {
+    props: {
+      scowdEnabledClusters,
+    },
+  };
+};
+
