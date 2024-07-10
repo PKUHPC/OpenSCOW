@@ -22,9 +22,9 @@ export async function isPortReachable(port: number, host: string, timeout: numbe
   const promise = new Promise<void>((resolve, reject) => {
     const socket = new net.Socket();
 
-    const onError = () => {
+    const onError = (error: Error) => {
       socket.destroy();
-      reject();
+      reject(error);
     };
 
     socket.setTimeout(timeout);

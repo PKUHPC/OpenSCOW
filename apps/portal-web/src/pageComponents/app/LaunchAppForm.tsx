@@ -94,7 +94,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     const allFormFields = await form.validateFields();
     const { appJobName, nodeCount, coreCount, gpuCount, partition, qos, account, maxTime } = allFormFields;
 
-    const customFormKeyValue: {[key: string]: string} = {};
+    const customFormKeyValue: Record<string, string> = {};
     attributes.forEach((customFormAttribute) => {
       const customFormKey = customFormAttribute.name;
       customFormKeyValue[customFormKey] = allFormFields[customFormKey];
@@ -117,13 +117,25 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       customAttributes: customFormKeyValue,
     } })
       .httpError(409, (e) => {
-        e.code === "SBATCH_FAILED" ? createErrorModal(e.message) : (() => { throw e; })();
+        if (e.code === "SBATCH_FAILED") {
+          createErrorModal(e.message);
+        } else {
+          throw e;
+        }
       })
       .httpError(404, (e) => {
-        e.code === "APP_NOT_FOUND" ? createErrorModal(e.message) : (() => { throw e; })();
+        if (e.code === "APP_NOT_FOUND") {
+          createErrorModal(e.message);
+        } else {
+          throw e;
+        }
       })
       .httpError(400, (e) => {
-        e.code === "INVALID_INPUT" ? createErrorModal(e.message) : (() => { throw e; })();
+        if (e.code === "INVALID_INPUT") {
+          createErrorModal(e.message);
+        } else {
+          throw e;
+        }
       })
       .then(() => {
         message.success(t(p("successMessage")));
@@ -139,13 +151,13 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const [accountPartitionsCacheMap, setAccountPartitionsCacheMap] = useState<Record<string, Partition[]>>({});
   const [selectableAccounts, setSelectableAccounts] = useState<string[]>([]);
 
-  const account = Form.useWatch("account", form) as string;
+  const account = Form.useWatch("account", form);
 
-  const nodeCount = Form.useWatch("nodeCount", form) as number;
+  const nodeCount = Form.useWatch("nodeCount", form);
 
-  const coreCount = Form.useWatch("coreCount", form) as number;
+  const coreCount = Form.useWatch("coreCount", form);
 
-  const gpuCount = Form.useWatch("gpuCount", form) as number;
+  const gpuCount = Form.useWatch("gpuCount", form)!;
 
   useAsync({ promiseFn: useCallback(async () => {
 
@@ -166,7 +178,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             // 保存配置表单以外必填项的对象
             let requiredInputObj = {};
 
-            if (accountsResp && accountsResp.accounts.length) {
+            if (accountsResp?.accounts.length) {
               setSelectableAccounts(accountsResp.accounts);
               const lastSub = lastData?.lastSubmissionInfo;
               const lastAccount = lastSub?.account;
@@ -190,14 +202,14 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                 accountName: firstInputAccount,
               } }).then((partitionsResp) => {
 
-                if (partitionsResp && partitionsResp.partitions.length) {
+                if (partitionsResp?.partitions.length) {
                   // 如果上一次提交信息中的分区存在于当前账户可见分区列表,则填入上一次提交记录的分区,否则填入当前列表分区的第一项
                   const resPartitions = partitionsResp.partitions;
                   const setLastPartition = !!lastPartition &&
                     resPartitions.some((item) => item.name === lastPartition);
 
                   const firstPartitionInfo: Partition = setLastPartition ?
-                    resPartitions.filter((item) => item.name === lastPartition)[0]
+                    resPartitions.find((item) => item.name === lastPartition)!
                     : resPartitions[0];
 
                   setCurrentPartitionInfo(firstPartitionInfo);
@@ -228,36 +240,36 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     attributes.forEach((attribute) => {
                       if (attribute.name in lastAttributes) {
                         switch (attribute.type) {
-                        case "NUMBER":
-                          attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
-                          break;
-                        case "TEXT":
-                          attributesInputObj[attribute.name] = lastAttributes[attribute.name];
-                          break;
-                        case "SELECT":
+                          case "NUMBER":
+                            attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
+                            break;
+                          case "TEXT":
+                            attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                            break;
+                          case "SELECT":
                           // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
-                          if (!firstPartitionInfo.gpus) {
+                            if (!firstPartitionInfo.gpus) {
                             // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
-                            const selectOptions = attribute.select.filter((x) =>
-                              !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
+                              const selectOptions = attribute.select.filter((x) =>
+                                !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
 
-                            if (selectOptions.some((optionItem) =>
-                              optionItem.value === lastAttributes[attribute.name]))
-                            {
-                              attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                              if (selectOptions.some((optionItem) =>
+                                optionItem.value === lastAttributes[attribute.name]))
+                              {
+                                attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                              }
                             }
-                          }
-                          else {
-                            if (attribute.select!.some((optionItem) =>
-                              optionItem.value === lastAttributes[attribute.name]))
-                            {
-                              attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                            else {
+                              if (attribute.select.some((optionItem) =>
+                                optionItem.value === lastAttributes[attribute.name]))
+                              {
+                                attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                              }
                             }
-                          }
 
-                          break;
-                        default:
-                          break;
+                            break;
+                          default:
+                            break;
                         }
                       }
                     });
@@ -338,7 +350,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       partition: partitionInfo.name,
       qos: partitionInfo.qos?.[0],
     });
-    if (!!partitionInfo?.gpus) {
+    if (partitionInfo?.gpus) {
       form.setFieldValue("gpuCount", 1);
     } else {
       form.setFieldValue("coreCount", 1);
@@ -351,7 +363,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       ? accountPartitionsCacheMap[account].find((x) => x.name === partition)
       : undefined;
     form.setFieldValue("qos", partitionInfo?.qos?.[0]);
-    if (!!partitionInfo?.gpus) {
+    if (partitionInfo?.gpus) {
       form.setFieldValue("gpuCount", 1);
     } else {
       form.setFieldValue("coreCount", 1);

@@ -21,7 +21,7 @@ export enum Source {
 export enum Status {
   CREATED = "CREATED",
   CREATING = "CREATING",
-  FAILURE = "FAILURE"
+  FAILURE = "FAILURE",
 }
 
 export class Image {

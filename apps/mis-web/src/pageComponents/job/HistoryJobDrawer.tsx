@@ -68,7 +68,7 @@ export const HistoryJobDrawer: React.FC<Props> = (props) => {
       moneyToString, (pr: Props) => pr.showedPrices.includes("tenant")],
   ] as (
   | [string | ((pr: Props) => string), keyof JobInfo, (v: any) => string, (pr: Props) => boolean]
-)[];
+  )[];
 
 
   const { item, onClose, open } = props;

@@ -39,7 +39,7 @@ interface FormFields {
 }
 
 interface FormFieldsConfirm {
-  unblock: Boolean;
+  unblock: boolean;
 }
 
 const p = prefix("pageComp.user.jobChargeLimitModal.");

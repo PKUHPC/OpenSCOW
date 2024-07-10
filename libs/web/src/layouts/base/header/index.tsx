@@ -122,7 +122,7 @@ export const Header: React.FC<Props> = ({
                 {React.createElement(
                   sidebarCollapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
               </a>
-            ) : <span/>
+            ) : <span />
           }
           <Logo basePath={basePath} />
         </Space>
@@ -140,7 +140,7 @@ export const Header: React.FC<Props> = ({
         </LinksPart>
         {right}
         <IndicatorPart>
-          <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId}/>
+          <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId} />
         </IndicatorPart>
       </RightContentPart>
     </Container>

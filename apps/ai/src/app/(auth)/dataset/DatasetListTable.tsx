@@ -41,7 +41,7 @@ interface Props {
 const FilterType = {
   ALL: "全部",
   ...DatasetTypeText,
-} as { [key: string]: string };
+} as Record<string, string>;
 
 type FilterTypeKeys = Extract<keyof typeof FilterType, string>;
 
@@ -52,8 +52,8 @@ interface FilterForm {
 }
 
 interface PageInfo {
-    page: number;
-    pageSize?: number;
+  page: number;
+  pageSize?: number;
 }
 
 const CreateDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "primary", icon: <PlusOutlined /> });

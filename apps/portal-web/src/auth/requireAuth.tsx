@@ -43,7 +43,7 @@ export const requireAuth = (
     }
 
     if (extraCheck) {
-      const node = extraCheck(userStore.user!);
+      const node = extraCheck(userStore.user);
       if (node) {
         return node;
       }

@@ -28,7 +28,7 @@ export interface Operation {
 export const OperationContext = React.createContext<{
   operation: Operation | undefined,
   setOperation: Dispatch<SetStateAction<Operation | undefined>>;
-    }>(undefined!);
+}>(undefined!);
 
 export const useOperation = () => {
   return useContext(OperationContext);

@@ -119,11 +119,11 @@ export const RunningJobQueryTable: React.FC<Props> = ({
   );
 };
 
-type JobInfoTableProps = {
+interface JobInfoTableProps {
   data: RunningJobInfo[] | undefined;
   isLoading: boolean;
   reload: () => void;
-};
+}
 
 export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, reload,

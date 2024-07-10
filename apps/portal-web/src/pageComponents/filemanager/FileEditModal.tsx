@@ -256,6 +256,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
       body: formData,
     }).then((response) => {
       if (!response.ok) {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         return Promise.reject(response.statusText);
       }
       message.success(t(p("saveFileSuccess")));
@@ -418,7 +419,11 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
                   options={options}
                   value={fileContent}
                   onMount={(editor) => { editorRef.current = editor; }}
-                  onChange={(content) => { !downloading && handleEdit(content); }}
+                  onChange={(content) => {
+                    if (!downloading) {
+                      handleEdit(content);
+                    }
+                  }}
                 />
               </Spin>
             ),

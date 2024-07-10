@@ -17,12 +17,12 @@ import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
-    tenantName: string;
-    name: String
-    userId: string;
-    open: boolean;
-    onClose: () => void;
-    reload: () => void;
+  tenantName: string;
+  name: string
+  userId: string;
+  open: boolean;
+  onClose: () => void;
+  reload: () => void;
 }
 
 interface FormProps {
@@ -49,20 +49,20 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
     } })
       .httpError(404, (e) => {
         switch (e.code) {
-        case "USER_NOT_FOUND":
-          message.error(t(p("userNotFound")));
-          break;
-        case "TENANT_NOT_FOUND":
-          message.error(t(p("tenantNotFound")));
-          break;
-        case "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP":
-          message.error(t(p("userStillMaintainsAccountRelationship")));
-          break;
-        case "USER_ALREADY_EXIST_IN_THIS_TENANT":
-          message.error(t(p("userAlreadyExistInThisTenant")));
-          break;
-        default:
-          message.error(t(pCommon("changeFail")));
+          case "USER_NOT_FOUND":
+            message.error(t(p("userNotFound")));
+            break;
+          case "TENANT_NOT_FOUND":
+            message.error(t(p("tenantNotFound")));
+            break;
+          case "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP":
+            message.error(t(p("userStillMaintainsAccountRelationship")));
+            break;
+          case "USER_ALREADY_EXIST_IN_THIS_TENANT":
+            message.error(t(p("userAlreadyExistInThisTenant")));
+            break;
+          default:
+            message.error(t(pCommon("changeFail")));
         } })
       .then(() => {
         message.success(t(pCommon("changeSuccess")));

@@ -24,6 +24,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
+    "@ant-design/cssinjs": "1.21.0",
     "@ant-design/icons": "5.3.7",
     "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.7",
@@ -37,10 +38,11 @@
     "@scow/lib-web": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
+    "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.32.34",
     "antd": "5.18.3",
+    "csv-stringify": "6.5.0",
     "dayjs": "1.11.11",
-    "@scow/utils": "workspace:*",
     "google-protobuf": "3.21.2",
     "http-proxy": "1.18.1",
     "iconv-lite": "^0.6.3",
@@ -54,14 +56,12 @@
     "react-async": "10.0.1",
     "react-dom": "18.3.1",
     "react-is": "18.3.1",
+    "react-typed-i18n": "2.3.0",
     "recharts": "^2.7.3",
     "simstate": "3.0.1",
     "styled-components": "6.1.11",
     "tslib": "2.6.3",
-    "typescript": "5.5.2",
-    "@ant-design/cssinjs": "1.21.0",
-    "react-typed-i18n": "2.3.0",
-    "csv-stringify": "6.5.0"
+    "typescript": "5.5.2"
   },
   "devDependencies": {
     "@ddadaal/next-typed-api-routes-cli": "0.9.1",

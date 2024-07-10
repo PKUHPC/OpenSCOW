@@ -61,7 +61,7 @@ export default function Page() {
     <Container>
       <Head title="账号信息" />
       <TitleText>
-      用户信息
+        用户信息
       </TitleText>
       <Part title>
         <Descriptions

@@ -175,7 +175,7 @@ export const JobTable: React.FC<Props> = ({
                           }
                           placeholder={t("common.selectAccount")}
                           filterOption={(inputValue, option) =>
-                            option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                            option!.value.toUpperCase().includes(inputValue.toUpperCase())
                           }
                           onChange={(value) => {
                             setSelectedAccountName(value || undefined);

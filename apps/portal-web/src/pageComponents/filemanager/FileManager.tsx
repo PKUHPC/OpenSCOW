@@ -224,7 +224,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
         const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
         if (exists.result) {
-          await new Promise<void>(async (res) => {
+          await new Promise<void>((res) => {
             modal.confirm({
               title: t(p("moveCopy.existModalTitle")),
               content: t(p("moveCopy.existModalContent"), [x.name]),
@@ -233,24 +233,16 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
                 await deleteOperation({ query: { cluster: cluster.id, path: join(path, x.name) } });
-                try {
-                  await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-                  successfulCount++;
-                } catch (e) {
-                  throw e;
-                }
+                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+                successfulCount++;
                 res();
               },
               onCancel: async () => { abandonCount++; res(); },
             });
           });
         } else {
-          try {
-            await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-            successfulCount++;
-          } catch (e) {
-            throw e;
-          }
+          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+          successfulCount++;
         }
       } catch (e) {
         console.error(e);
@@ -295,7 +287,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               message.success(t(p("delete.successMessage"), [allCount]));
               resetSelectedAndOperation();
             } else {
-              message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount])),
+              message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount]));
               setOperation((o) => o && ({ ...o, started: false }));
             }
           }).catch((e) => {
@@ -388,7 +380,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <PathBar
           path={path}
           loading={loading}
-          onPathChange={(curPath) => { curPath === path ? reload() : router.push(fullUrl(curPath)); }}
+          onPathChange={(curPath) => {
+            if (curPath === path) {
+              reload();
+            } else {
+              router.push(fullUrl(curPath));
+            }
+          }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
@@ -615,24 +613,27 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
-                          e.code === "SCHEDULER_FAILED" ||
-                          e.code === "FAILED_PRECONDITION"
-                          || e.code === "UNIMPLEMENTED" ? modal.error({
+                          if (e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION"
+                            || e.code === "UNIMPLEMENTED") {
+                            modal.error({
                               title: t(p("tableInfo.submitFailedMessage")),
                               content: e.message,
-                            }) : (() => {
-                              message.error(e.message);
-                              throw e;
-                            })();
-                        })
-                        .httpError(400, (e) => {
-                          e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH" ? modal.error({
-                            title: t(p("tableInfo.submitFailedMessage")),
-                            content: e.message,
-                          }) : (() => {
+                            });
+                          } else {
                             message.error(e.message);
                             throw e;
-                          })();
+                          }
+                        })
+                        .httpError(400, (e) => {
+                          if (e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH") {
+                            modal.error({
+                              title: t(p("tableInfo.submitFailedMessage")),
+                              content: e.message,
+                            });
+                          } else {
+                            message.error(e.message);
+                            throw e;
+                          }
                         })
                         .then((result) => {
                           message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));

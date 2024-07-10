@@ -180,8 +180,8 @@ export const userRoutes: (
           clickable: true,
           openInNewPage: link.openInNewPage,
           children: link.children?.length ? link.children?.map((childLink: Omit<NavLink, "children" | "url"> & {
-          url: string;
-      }) => ({
+            url: string;
+          }) => ({
             Icon: !childLink.iconPath ? LinkOutlined : (
               <NavIcon
                 src={join(publicConfig.PUBLIC_PATH, childLink.iconPath)}

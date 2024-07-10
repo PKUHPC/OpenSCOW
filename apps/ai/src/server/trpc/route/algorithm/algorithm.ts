@@ -63,7 +63,7 @@ export const getAlgorithms = procedure
     const [items, count] = await em.findAndCount(Algorithm, {
       $and:[
         isPublic ? { isShared:true } :
-          { owner: user!.identityId },
+          { owner: user.identityId },
         framework ? { framework } : {},
         clusterId ? { clusterId } : {},
         nameOrDesc ?
@@ -123,7 +123,7 @@ export const createAlgorithm = procedure
     }
 
     const em = await forkEntityManager();
-    const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user!.identityId });
+    const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user.identityId });
     if (algorithmExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -131,7 +131,7 @@ export const createAlgorithm = procedure
       });
     }
 
-    const algorithm = new Algorithm({ ...input, owner: user!.identityId });
+    const algorithm = new Algorithm({ ...input, owner: user.identityId });
     await em.persistAndFlush(algorithm);
     return algorithm.id;
   });
