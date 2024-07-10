@@ -103,6 +103,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const token = getTokenFromCookie({ req });
   const resp = await api.getClusterConfigFiles({ query: { token } });
 
+  console.log("567",resp.clusterConfigs);
   const scowdEnabledClusters: string[] = Object.entries(resp.clusterConfigs)
     .filter(([_, config]) => !!config.scowd?.enabled)
     .map(([cluster, _]) => cluster);

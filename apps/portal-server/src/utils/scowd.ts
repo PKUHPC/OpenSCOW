@@ -22,13 +22,25 @@ import { scowdClientNotFound } from "./errors";
 
 export const certificates = createScowdCertificates(config);
 
+function extractIP(address: string): string {
+  const ipPortPattern = /(\d{1,3}\.){3}\d{1,3}/;
+  const match = ipPortPattern.exec(address);
+  if (match) {
+    return match[0];
+  } else {
+    throw new Error("Invalid address format");
+  }
+}
+
 export function getLoginNodeScowdUrl(cluster: string, host: string): string | undefined {
   const loginNode = getLoginNodeFromAddress(cluster, host);
 
   if (!loginNode) return undefined;
 
   const { address, scowdPort } = loginNode;
-  return config.SCOWD_SSL_ENABLED ? `https://${address}:${scowdPort}` : `http://${address}:${scowdPort}`;
+
+  return config.SCOWD_SSL_ENABLED
+    ? `https://${extractIP(address)}:${scowdPort}` : `http://${extractIP(address)}:${scowdPort}`;
 }
 
 const scowdClientForClusters = Object.entries(configClusters).reduce((prev, [cluster]) => {
