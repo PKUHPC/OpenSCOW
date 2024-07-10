@@ -256,22 +256,20 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       }
     }
 
-    const clustersRuntimeInfo = token ?
-      await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined)
-      : await api.getClustersRuntimeInfo({ query: { } }).then((x) => x, () => undefined);
+    const clustersRuntimeInfo = await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
 
     // get deployed clusters' simple info (only clusterId, displayName and priority)
     const simpleClustersInfo
       = await api.getSimpleClustersInfoFromConfigFiles({}).then((x) => x, () => ({ clustersInfo: {} }));
 
-    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo;
+    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo ?? {};
 
-    const publicConfigClusters = Object.keys(extra.clusterConfigs).length > 0 ?
+    const publicConfigClusters = extra.clusterConfigs && Object.keys(extra.clusterConfigs).length > 0 ?
       getPublicConfigClusters(extra.clusterConfigs) : getPublicConfigClusters(extra.initialSimpleClustersInfo) ?? {};
 
     const activatedClusters
     = formatActivatedClusters({
-      clustersRuntimeInfo: clustersRuntimeInfo?.results,
+      clustersRuntimeInfo: clustersRuntimeInfo?.results ?? [],
       misConfigClusters: publicConfigClusters });
 
     extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};

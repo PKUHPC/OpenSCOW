@@ -36,6 +36,8 @@ export const GetClustersRuntimeInfoSchema = typeboxRouteSchema({
     200: Type.Object({
       results: Type.Array(ClusterRuntimeInfoSchema),
     }),
+
+    403: Type.Null(),
   },
 });
 
@@ -46,11 +48,12 @@ export default route(GetClustersRuntimeInfoSchema,
 
     // if not initialized, every one can get clustersRuntimeInfo
     if (await queryIfInitialized()) {
+
       const { token } = req.query;
       // when firstly used in getInitialProps, check the token
       // when logged in, use auth()
       const info = token ? await validateToken(token) : await auth(req, res);
-      if (!info) { return; }
+      if (!info) { return { 403: null }; }
     }
 
     const client = getClient(ConfigServiceClient);

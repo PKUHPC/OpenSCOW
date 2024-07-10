@@ -16,8 +16,7 @@ export const getSortedClusterIds = (clusters: Record<string, Partial<SimpleClust
   return Object.keys(clusters)
     .sort(
       (a, b) => {
-        return (clusters[a].priority ?? Number.MAX_SAFE_INTEGER)
-          - (clusters[b].priority ?? Number.MIN_SAFE_INTEGER);
+        return clusters[a].priority! - clusters[b].priority!;
       },
     );
 };
