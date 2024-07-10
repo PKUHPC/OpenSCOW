@@ -20,6 +20,7 @@ import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { ClusterPlugin } from "src/plugins/clusters";
+import { getActivatedClusters } from "./clustersUtils";
 
 export interface JobInfo {
   // cluster job id
@@ -91,12 +92,18 @@ export async function createPriceMap(
   // partitions info for all clusters
   const partitionsForClusters: Record<string, Partition[]> = {};
 
-  // call for all config clusters
+  // call for all activated clusters
+  const activatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+    logger.info("!!![important] No available activated clusters.This will skip creating price map in cluster!!!");
+    logger.info(e);
+    return {};
+  });
   const reply = await clusterPlugin.callOnAll(
-    configClusters,
+    activatedClusters,
     logger,
     async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
   );
+  
   reply.forEach((x) => {
     partitionsForClusters[x.cluster] = x.result.partitions;
   });

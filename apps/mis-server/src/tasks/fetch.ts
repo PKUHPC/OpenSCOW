@@ -81,7 +81,7 @@ export async function fetchJobs(
     const result = await em.transactional(async (em) => {
 
       const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
-        logger.info("!!![important] No available activated clusters.This will skip fetchJobs in cluster!!!");
+        logger.info("!!![important] No available activated clusters.This will skip fetching Jobs in cluster!!!");
         logger.info(e);
         return {};
       }); ;
