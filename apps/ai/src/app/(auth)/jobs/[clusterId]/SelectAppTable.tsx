@@ -48,9 +48,7 @@ interface Props {
   isTraining?: boolean,
 }
 
-interface ImageErrorMap {
-  [appId: string]: boolean;
-}
+type ImageErrorMap = Record<string, boolean>;
 
 
 export const SelectAppTable: React.FC<Props> = ({ publicPath, clusterId, apps, isTraining = false }) => {

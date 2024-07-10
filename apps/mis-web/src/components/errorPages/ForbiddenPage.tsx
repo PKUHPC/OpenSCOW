@@ -15,7 +15,7 @@ import React from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 
 interface Props {
   title?: "notAllowedPage";

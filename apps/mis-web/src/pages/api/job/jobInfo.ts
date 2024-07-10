@@ -34,12 +34,12 @@ export const mapJobSortByType = {
   "timeEnd":SortBy.TIME_END,
   "timeSubmit":SortBy.TIME_SUBMIT,
   "user":SortBy.USER,
-}as { [key: string]: SortBy};
+} as Record<string, SortBy>;
 
 export const mapJobSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-}as { [key: string]: SortOrder};
+} as Record<string, SortOrder>;
 
 export const GetJobFilter = Type.Object({
 

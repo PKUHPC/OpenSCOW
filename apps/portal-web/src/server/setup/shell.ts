@@ -29,23 +29,23 @@ import { WebSocket, WebSocketServer } from "ws";
 
 import { getClusterConfigFiles } from "../clusterConfig";
 
-export type ShellQuery = {
+export interface ShellQuery {
   cluster: string;
   loginNode: string;
   path?: string;
 
   cols?: string;
   rows?: string;
-}
+};
 
 export type ShellInputData =
   | { $case: "resize", resize: { cols: number; rows: number } }
-  | { $case: "data", data: { data: string }}
+  | { $case: "data", data: { data: string } }
   | { $case: "disconnect" }
 ;
 export type ShellOutputData =
   | { $case: "data", data: { data: string } }
-  | { $case: "exit", exit: { code?: number; signal?: string }}
+  | { $case: "exit", exit: { code?: number; signal?: string } }
 ;
 export const config = {
   api: {
@@ -157,29 +157,32 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   stream.on("data", (chunk: ShellResponse) => {
     switch (chunk.message?.$case) {
-    case "data":
-      send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
-      break;
-    case "exit":
-      send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });
-      break;
+      case "data":
+        send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
+        break;
+      case "exit":
+        send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });
+        break;
     }
   });
 
   ws.on("message", (data) => {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     const message = JSON.parse(data.toString()) as ShellInputData;
 
     switch (message.$case) {
-    case "data":
-      stream.write({ message:  { $case :"data", data: { data: Buffer.from(message.data.data) } } });
-      break;
-    case "resize":
-      stream.write({ message: { $case: "resize", resize: { cols: message.resize.cols, rows: message.resize.rows } } });
-      break;
-    case "disconnect":
-      stream.write({ message: { $case: "disconnect", disconnect: {} } });
-      stream.end();
-      break;
+      case "data":
+        stream.write({ message:  { $case :"data", data: { data: Buffer.from(message.data.data) } } });
+        break;
+      case "resize":
+        stream.write({ message: { $case: "resize", resize: {
+          cols: message.resize.cols, rows: message.resize.rows,
+        } } });
+        break;
+      case "disconnect":
+        stream.write({ message: { $case: "disconnect", disconnect: {} } });
+        stream.end();
+        break;
     }
 
   });
@@ -202,7 +205,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 export const setupShellServer = (req: NextApiRequest) => {
 
   (req.socket as any).server.on("upgrade", (request, socket, head) => {
-    const url = normalizePathnameWithQuery(request.url!);
+    const url = normalizePathnameWithQuery(request.url);
     if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/shell"))) {
       return;
     }

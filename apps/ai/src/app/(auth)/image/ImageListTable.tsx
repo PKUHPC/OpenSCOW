@@ -44,8 +44,8 @@ interface FilterForm {
 }
 
 interface PageInfo {
-    page: number;
-    pageSize?: number;
+  page: number;
+  pageSize?: number;
 }
 
 const CreateImageModalButton = ModalButton(CreateEditImageModal, { type: "primary", icon: <PlusOutlined /> });
@@ -164,12 +164,12 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
           { dataIndex: "status", title: "状态",
             render: (_, r) => {
               switch (r.status) {
-              case Status.CREATING:
-                return <Tag color="processing">创建中</Tag>;
-              case Status.CREATED:
-                return <Tag color="success">已创建</Tag>;
-              default:
-                return <Tag color="error">创建失败</Tag>;
+                case Status.CREATING:
+                  return <Tag color="processing">创建中</Tag>;
+                case Status.CREATED:
+                  return <Tag color="success">已创建</Tag>;
+                default:
+                  return <Tag color="error">创建失败</Tag>;
               }
             },
           },

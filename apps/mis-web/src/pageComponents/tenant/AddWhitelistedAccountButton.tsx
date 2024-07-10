@@ -70,34 +70,34 @@ const PickExpDate: React.FC<PickExpDateProps> = (props) => {
     let newDate: dayjs.Dayjs | string;
     switch (selectedOption) {
 
-    // 一周
-    case "oneWeek":
-      newDate = dayjs().add(1, "week").endOf("day");
-      break;
+      // 一周
+      case "oneWeek":
+        newDate = dayjs().add(1, "week").endOf("day");
+        break;
 
       // 一个礼拜
-    case "oneMonth":
-      newDate = dayjs().add(1, "month").endOf("day");
-      break;
+      case "oneMonth":
+        newDate = dayjs().add(1, "month").endOf("day");
+        break;
 
-    // 一年
-    case "oneYear":
-      newDate = dayjs().add(1, "year").endOf("day");
-      break;
+        // 一年
+      case "oneYear":
+        newDate = dayjs().add(1, "year").endOf("day");
+        break;
 
       // 永久生效
-    case "permanent":
-      newDate = dayjs("2099-12-31").endOf("day");
-      break;
+      case "permanent":
+        newDate = dayjs("2099-12-31").endOf("day");
+        break;
 
       // 自定义时间
-    case "custom":
-      newDate = expirationTime ?? dayjs().add(1, "day").endOf("day");
-      break;
+      case "custom":
+        newDate = expirationTime ?? dayjs().add(1, "day").endOf("day");
+        break;
 
-    default:
-      newDate = dayjs().add(1, "day").endOf("day");
-      break;
+      default:
+        newDate = dayjs().add(1, "day").endOf("day");
+        break;
     }
     // 传递值
     onChange?.(newDate);

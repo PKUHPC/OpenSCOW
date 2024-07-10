@@ -13,9 +13,9 @@
 import { TRPCError } from "@trpc/server";
 
 export const clusterNotFound = (cluster: string) => {
-  return <TRPCError> { code: "NOT_FOUND", message: `cluster ${cluster} is not found` };
+  return { code: "NOT_FOUND", message: `cluster ${cluster} is not found` } as TRPCError;
 };
 
 export const loginNodeNotFound = (loginNode: string) => {
-  return <TRPCError>{ code: "NOT_FOUND", message: `login node ${loginNode} is not found` };
+  return { code: "NOT_FOUND", message: `login node ${loginNode} is not found` } as TRPCError;
 };

@@ -20,7 +20,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { AdminAccountInfo } from "src/pages/api/tenant/getAccounts";
 import { UserStore } from "src/stores/UserStore";
 
-type Props = {
+interface Props {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -40,7 +40,7 @@ type Props = {
    * 如果为真，则从所有租户下获取账户
    */
   fromAllTenants?: boolean;
-}
+};
 
 const p = prefix("pageComp.finance.AccountSelector.");
 

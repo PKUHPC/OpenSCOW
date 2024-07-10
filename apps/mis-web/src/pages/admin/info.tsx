@@ -25,13 +25,13 @@ import { PlatformRole } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { Head } from "src/utils/head";
 
-type Info = GetAdminInfoResponse
+type Info = GetAdminInfoResponse;
 
-type Props = SSRProps<Info, 500>
+type Props = SSRProps<Info, 500>;
 
-export const PlatformInfoPage: NextPage<Props> =
-requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
-((props: Props) => {
+export const PlatformInfoPage: NextPage<Props> = requireAuth(
+  (u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+)((props: Props) => {
 
   const t = useI18nTranslateToString();
 

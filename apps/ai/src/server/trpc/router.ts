@@ -36,6 +36,6 @@ export const appRouter = trpc.router({
   jobs: jobsRouter,
 });
 
-export type AppRouter = typeof appRouter
+export type AppRouter = typeof appRouter;
 
-export type Caller = ReturnType<typeof appRouter.createCaller>
+export type Caller = ReturnType<typeof appRouter.createCaller>;

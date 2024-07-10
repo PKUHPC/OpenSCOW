@@ -424,7 +424,7 @@ export const deleteImage = procedure
       }
       try {
         const errorBody = JSON.parse(errorText); // 尝试解析为 JSON
-        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        const errorMessage = errorBody.errors.map((i: { message?: string }) => i.message).join();
         logger.error("Failed to get image reference url %s: %s", getReferenceUrl, errorMessage);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -479,7 +479,7 @@ export const deleteImage = procedure
       if (!deleteArtifact.ok) {
         const errorBody = await deleteArtifact.json();
         // 来自harbor的错误信息
-        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        const errorMessage = errorBody.errors.map((i: { message?: string }) => i.message).join();
         logger.error("Failed to delete image artifact url %s", deleteArtifactUrl);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -505,7 +505,7 @@ export const deleteImage = procedure
       if (!deleteRes.ok) {
         const errorBody = await deleteRes.json();
         // 来自harbor的错误信息
-        const errorMessage = errorBody.errors.map((i: {message?: string}) => i.message).join();
+        const errorMessage = errorBody.errors.map((i: { message?: string }) => i.message).join();
         logger.error("Failed to delete image tag url %s", deleteUrl);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

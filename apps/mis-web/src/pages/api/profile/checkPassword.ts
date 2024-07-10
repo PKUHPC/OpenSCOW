@@ -61,10 +61,10 @@ export default typeboxRoute(CheckPasswordSchema, async (req, res) => {
     })
     .catch((e) => {
       switch (e.status) {
-      case "NOT_SUPPORTED":
-        return { 501: null };
-      default:
-        throw e;
+        case "NOT_SUPPORTED":
+          return { 501: null };
+        default:
+          throw e;
       }
     });
 });

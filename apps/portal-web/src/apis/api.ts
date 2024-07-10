@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 
 import { apiClient } from "src/apis/client";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";

@@ -31,7 +31,7 @@ interface Props {
 
 enum FileType {
   FILE = "file",
-  DIR = "dir"
+  DIR = "dir",
 }
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
@@ -101,31 +101,31 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             return Upload.LIST_IGNORE;
           }
 
-          return new Promise(async (resolve, reject) => {
-            const checkExistRes = await checkFileExist.mutateAsync({ path:join(path, file.name), clusterId });
+          return new Promise((resolve, reject) => {
+            checkFileExist.mutateAsync({ path:join(path, file.name), clusterId }).then(({ exists }) => {
+              if (exists) {
+                modal.confirm({
+                  title: "文件已存在",
+                  content: `文件: ${file.name}已存在，是否覆盖？`,
+                  okText: "确认",
+                  onOk: async () => {
+                    const fileType = await getFileType.mutateAsync({ path:join(path, file.name), clusterId });
 
-            if (checkExistRes.exists) {
-              modal.confirm({
-                title: "文件已存在",
-                content: `文件: ${file.name}已存在，是否覆盖？`,
-                okText: "确认",
-                onOk: async () => {
-                  const fileType = await getFileType.mutateAsync({ path:join(path, file.name), clusterId });
+                    if (fileType.type) {
+                      await deleteFileMutation.mutateAsync({
+                        target: fileType.type === FileType.DIR ? "DIR" : "FILE",
+                        clusterId: clusterId,
+                        path: join(path, file.name),
+                      }).then(() => resolve(file));
+                    }
 
-                  if (fileType.type) {
-                    await deleteFileMutation.mutateAsync({
-                      target: fileType.type === FileType.DIR ? "DIR" : "FILE",
-                      clusterId: clusterId,
-                      path: join(path, file.name),
-                    }).then(() => resolve(file));
-                  }
-
-                },
-                onCancel: () => { reject(file); },
-              });
-            } else {
-              resolve(file);
-            }
+                  },
+                  onCancel: () => { reject(file); },
+                });
+              } else {
+                resolve(file);
+              }
+            });
 
           });
         }}

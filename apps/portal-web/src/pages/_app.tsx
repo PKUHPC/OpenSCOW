@@ -96,7 +96,7 @@ const FailEventHandler: React.FC = () => {
           (publicConfigClusters.find((c) => c.id === clusterId)?.name ?? clusterId) : undefined;
 
         message.error(`${tArgs("pages._app.adapterConnectionError",
-          [getI18nConfigCurrentText(clusterName, languageId)])}(${
+          [getI18nConfigCurrentText(clusterName, languageId)]) as string}(${
           e.data.details
         })`);
         return;
@@ -123,7 +123,7 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
-      message.error(`${tArgs("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
+      message.error(`${tArgs("pages._app.otherError") as string}(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 
@@ -145,7 +145,7 @@ interface ExtraProps {
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
-  clusterConfigs: { [clusterId: string]: ClusterConfigSchema };
+  clusterConfigs: Record<string, ClusterConfigSchema>;
   initialCurrentClusters: Cluster[];
   // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件，需要通过SSR进行传递
   initialPortalRuntimeDesktopEnabled: boolean;
@@ -284,7 +284,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
             await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
           const initialActivatedClusters = formatActivatedClusters({
             clustersRuntimeInfo: currentClusters?.results,
-            configClusters: publicConfigClusters as Cluster[],
+            configClusters: publicConfigClusters,
             misDeployed: publicConfig.MIS_DEPLOYED });
           extra.initialCurrentClusters = initialActivatedClusters.activatedClusters ?? [];
 

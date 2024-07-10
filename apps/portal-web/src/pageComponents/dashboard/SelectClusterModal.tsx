@@ -71,7 +71,7 @@ export const SelectClusterModal: React.FC<Props> = ({
           $case:"shell",
           shell:{
             clusterId:cluster,
-            loginNode:loginNode as string,
+            loginNode:loginNode!,
             icon:"MacCommandOutlined",
           },
         } });

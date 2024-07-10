@@ -18,7 +18,7 @@ export const AppFloatButtons = ({ darkModeButtonProps }: {
 }) => {
   return (
     <FloatButton.Group shape="circle" style={{ right: 24 }}>
-      <DarkModeButton {...darkModeButtonProps}/>
+      <DarkModeButton {...darkModeButtonProps} />
       <FloatButton.BackTop />
     </FloatButton.Group>
   );

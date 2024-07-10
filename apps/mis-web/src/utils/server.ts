@@ -23,15 +23,15 @@ export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: Ser
   logHandle?: () => Promise<void>,
   // @ts-ignore
 ) => async (e: ServiceError): ReturnType<ValueOf<THandlers>> => {
-    await logHandle?.();
-    const handler = handlers[e.code];
-    if (handler) {
-      // @ts-ignore
-      return handler(e) as ReturnType<ValueOf<THandlers>>;
-    } else {
-      throw e;
-    }
-  };
+  await logHandle?.();
+  const handler = handlers[e.code];
+  if (handler) {
+    // @ts-ignore
+    return handler(e) as ReturnType<ValueOf<THandlers>>;
+  } else {
+    throw e;
+  }
+};
 export const parseIp = (req: NextApiRequest): string | undefined => {
 
   let forwardedFor = req.headers["x-forwarded-for"];

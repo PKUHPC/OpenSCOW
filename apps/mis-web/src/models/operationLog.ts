@@ -25,7 +25,7 @@ export const OperationResult = {
   FAIL: 2,
 } as const;
 
-export type OperationResult = ValueOf<typeof OperationResult>
+export type OperationResult = ValueOf<typeof OperationResult>;
 
 export const OperationLog = Type.Object({
   operationLogId: Type.Number(),
@@ -54,13 +54,13 @@ export const OperationSortBy = Type.Union(
     Type.Literal("operatorIp"),
     Type.Literal("operatorUserId")],
 );
-export type OperationSortBy = Static<typeof OperationSortBy>
+export type OperationSortBy = Static<typeof OperationSortBy>;
 
 export const OperationSortOrder = Type.Union([
   Type.Literal("descend"),
   Type.Literal("ascend"),
 ]);
-export type OperationSortOrder = Static<typeof OperationSortOrder>
+export type OperationSortOrder = Static<typeof OperationSortOrder>;
 
 
 
@@ -79,7 +79,7 @@ export const getOperationResultTexts = (t: OperationTextsTransType) => {
 
 };
 
-export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in LibOperationType]: string } => {
+export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibOperationType]: string } => {
 
   return {
     login: t(pTypes("login")),
@@ -163,7 +163,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): { [key in Lib
 
 };
 
-export const OperationCodeMap: { [key in LibOperationType]: string } = {
+export const OperationCodeMap: {[key in LibOperationType]: string } = {
   login: "000001",
   logout: "000002",
   submitJob: "010101",
@@ -260,248 +260,250 @@ export const getOperationDetail = (
     const logEvent = operationEvent.$case;
 
     switch (logEvent) {
-    case "login":
-      return t(pDetails("login"));
-    case "logout":
-      return t(pDetails("logout"));
-    case "submitJob":
-      return t(pDetails("submitJob"), [operationEvent[logEvent].clusterId || "unknown",
-        operationEvent[logEvent].jobId || "-"]);
-    case "endJob":
-      return t(pDetails("endJob"), [operationEvent[logEvent].clusterId || "unknown",
-        operationEvent[logEvent].jobId || "-"]);
-    case "addJobTemplate":
-      return t(pDetails("addJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
-        operationEvent[logEvent].jobTemplateId]);
-    case "deleteJobTemplate":
-      return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
-        operationEvent[logEvent].jobTemplateId]);
-    case "updateJobTemplate":
-      return t(pDetails("updateJobTemplate"),
-        [
+      case "login":
+        return t(pDetails("login"));
+      case "logout":
+        return t(pDetails("logout"));
+      case "submitJob":
+        return t(pDetails("submitJob"), [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobId || "-"]);
+      case "endJob":
+        return t(pDetails("endJob"), [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobId || "-"]);
+      case "addJobTemplate":
+        return t(pDetails("addJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobTemplateId]);
+      case "deleteJobTemplate":
+        return t(pDetails("deleteJobTemplate"), [operationEvent[logEvent].clusterId || "unknown",
+          operationEvent[logEvent].jobTemplateId]);
+      case "updateJobTemplate":
+        return t(pDetails("updateJobTemplate"),
+          [
+            operationEvent[logEvent].clusterId || "unknown",
+            operationEvent[logEvent].jobTemplateId,
+            operationEvent[logEvent].newJobTemplateId,
+          ]);
+      case "shellLogin":
+        return t(pDetails("shellLogin"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].loginNode]);
+      case "createDesktop":
+        return t(pDetails("createDesktop"), [
           operationEvent[logEvent].clusterId || "unknown",
-          operationEvent[logEvent].jobTemplateId,
-          operationEvent[logEvent].newJobTemplateId,
+          operationEvent[logEvent].loginNode || "unknown",
+          operationEvent[logEvent].desktopName,
+          operationEvent[logEvent].wm,
         ]);
-    case "shellLogin":
-      return t(pDetails("shellLogin"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].loginNode]);
-    case "createDesktop":
-      return t(pDetails("createDesktop"), [
-        operationEvent[logEvent].clusterId || "unknown",
-        operationEvent[logEvent].loginNode || "unknown",
-        operationEvent[logEvent].desktopName,
-        operationEvent[logEvent].wm,
-      ]);
-    case "deleteDesktop":
-      return t(pDetails("deleteDesktop"),
-        [
-          operationEvent[logEvent].clusterId || "unknown",
-          operationEvent[logEvent].loginNode,
-          operationEvent[logEvent].desktopId,
-        ]);
-    case "createApp":
-      return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
-    case "createAiTrain":
-      return t(pDetails("createAiTrain"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
-    case "cancelAiTrainOrApp":
-      return t(pDetails("cancelAiTrainOrApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
-    case "saveImage":
-      return t(pDetails("saveImage"), [operationEvent[logEvent].jobId, operationEvent[logEvent].imageId || "-",
-      operationEvent[logEvent].tag || "-" ]);
-    case "createFile":
-      return t(pDetails("createFile"), [operationEvent[logEvent].path]);
-    case "deleteFile":
-      return t(pDetails("deleteFile"), [operationEvent[logEvent].path]);
-    case "uploadFile":
-      return t(pDetails("uploadFile"), [operationEvent[logEvent].path]);
-    case "createDirectory":
-      return t(pDetails("createDirectory"), [operationEvent[logEvent].path]);
-    case "deleteDirectory":
-      return t(pDetails("deleteDirectory"), [operationEvent[logEvent].path]);
-    case "moveFileItem":
-      return t(pDetails("moveFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
-    case "copyFileItem":
-      return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
-    case "setJobTimeLimit":
-      return t(pDetails("setJobTimeLimit"),
-        [operationEvent[logEvent].clusterId || "unknown",
-          operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
-    case "createImage":
-      return t(pDetails("createImage"),
-        [operationEvent[logEvent].clusterId || "-",
-          operationEvent[logEvent].imageId || "-", operationEvent[logEvent].tag || "-"]);
-    case "updateImage":
-      return t(pDetails("updateImage"),
-        [operationEvent[logEvent].imageId]);
-    case "shareImage":
-      return t(pDetails("shareImage"),
-        [operationEvent[logEvent].imageId]);
-    case "deleteImage":
-      return t(pDetails("deleteImage"),
-        [operationEvent[logEvent].imageId]);
-    case "copyImage":
-      return t(pDetails("copyImage"),
-        [operationEvent[logEvent].sourceImageId,
-          operationEvent[logEvent].targetImageId || "-", operationEvent[logEvent].targetImageTag || "-"]);
-    case "createDataset":
-      return t(pDetails("createDataset"),
-        [operationEvent[logEvent].clusterId || "-",
-          operationEvent[logEvent].datasetId || "-"]);
-    case "updateDataset":
-      return t(pDetails("updateDataset"),
-        [operationEvent[logEvent].datasetId]);
-    case "deleteDataset":
-      return t(pDetails("deleteDataset"),
-        [operationEvent[logEvent].datasetId ]);
-    case "createDatasetVersion":
-      return t(pDetails("createDatasetVersion"),
-        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId || "-"]);
-    case "updateDatasetVersion":
-      return t(pDetails("updateDatasetVersion"),
-        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
-    case "shareDatasetVersion":
-      return t(pDetails("shareDatasetVersion"),
-        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
-    case "copyDatasetVersion":
-      return t(pDetails("copyDatasetVersion"),
-        [operationEvent[logEvent].sourceDatasetId, operationEvent[logEvent].sourceDatasetVersionId,
-          operationEvent[logEvent].targetDatasetId || "-", operationEvent[logEvent].targetDatasetVersionId || "-",
-        ]);
-    case "deleteDatasetVersion":
-      return t(pDetails("deleteDatasetVersion"),
-        [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
-    case "createUser":
-      return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
-    case "addUserToAccount":
-      return t(pDetails("addUserToAccount"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
-    case "removeUserFromAccount":
-      return t(pDetails("removeUserFromAccount"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
-    case "setAccountAdmin":
-      return t(pDetails("setAccountAdmin"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
-    case "unsetAccountAdmin":
-      return t(pDetails("unsetAccountAdmin"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
-    case "blockUser":
-      return t(pDetails("blockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
-    case "unblockUser":
-      return t(pDetails("unblockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
-    case "accountSetChargeLimit":
-      return t(pDetails("accountSetChargeLimit"),
-        [operationEvent[logEvent].accountName,
-          operationEvent[logEvent].userId,
-          nullableMoneyToString(operationEvent[logEvent].limit)]);
-    case "accountUnsetChargeLimit":
-      return t(pDetails("accountUnsetChargeLimit"),
-        [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
-    case "setTenantBilling":
-      return t(pDetails("setTenantBilling"),
-        [operationEvent[logEvent].tenantName,
-          operationEvent[logEvent].path,
-          nullableMoneyToString(operationEvent[logEvent].price)]);
-    case "setTenantAdmin":
-      return t(pDetails("setTenantAdmin"), [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
-    case "unsetTenantAdmin":
-      return t(pDetails("unsetTenantAdmin"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
-    case "setTenantFinance":
-      return t(pDetails("setTenantFinance"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
-    case "unsetTenantFinance":
-      return t(pDetails("unsetTenantFinance"),
-        [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
-    case "tenantChangePassword":
-      return t(pDetails("tenantChangePassword"), [operationEvent[logEvent].userId]);
-    case "createAccount":
-      return t(pDetails("createAccount"),
-        [operationEvent[logEvent].accountName, operationEvent[logEvent].accountOwner]);
-    case "addAccountToWhitelist":
-      return t(pDetails("addAccountToWhitelist"),
-        [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
-    case "removeAccountFromWhitelist":
-      return t(pDetails("removeAccountFromWhitelist"),
-        [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
-    case "accountPay":
-      return t(pDetails("accountPay"),
-        [operationEvent[logEvent].accountName, nullableMoneyToString(operationEvent[logEvent].amount)]);
-    case "blockAccount":
-      return t(pDetails("blockAccount"),
-        [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
-    case "unblockAccount":
-      return t(pDetails("unblockAccount"),
-        [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
-    case "importUsers":
-      return `${t(pDetails("importUsers1"),
-        [operationEvent[logEvent].tenantName])}${operationEvent[logEvent].importAccounts.map(
-        (account: { accountName: string; userIds: string[]; }) =>
-          (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
-      ).join(", ")}`;
-    case "setPlatformAdmin":
-      return t(pDetails("setPlatformAdmin"), [operationEvent[logEvent].userId]);
-    case "unsetPlatformAdmin":
-      return t(pDetails("unsetPlatformAdmin"), [operationEvent[logEvent].userId]);
-    case "setPlatformFinance":
-      return t(pDetails("setPlatformFinance"), [operationEvent[logEvent].userId]);
-    case "unsetPlatformFinance":
-      return t(pDetails("unsetPlatformFinance"), [operationEvent[logEvent].userId]);
-    case "platformChangePassword":
-      return t(pDetails("platformChangePassword"), [operationEvent[logEvent].userId]);
-    case "createTenant":
-      return t(pDetails("createTenant"),
-        [operationEvent[logEvent].tenantName, operationEvent[logEvent].tenantAdmin]);
-    case "tenantPay":
-      return t(pDetails("tenantPay"),
-        [operationEvent[logEvent].tenantName, nullableMoneyToString(operationEvent[logEvent].amount)]);
-    case "setPlatformBilling":
-      return t(pDetails("setPlatformBilling"),
-        [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
-    case "submitFileItemAsJob":
-      return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
-    case "exportUser":
-      return operationEvent[logEvent].tenantName
-        ? t(pDetails("tenantExportUser"), [operationEvent[logEvent].tenantName])
-        : t(pDetails("adminExportUser"));
-    case "exportAccount":
-      return operationEvent[logEvent].tenantName
-        ? t(pDetails("tenantExportAccount"), [operationEvent[logEvent].tenantName])
-        : t(pDetails("adminExportUser"));
-    case "exportChargeRecord":
-      return getExportChargeRecordDetail(operationEvent[logEvent], t);
-    case "exportPayRecord":
-      return getExportPayRecordDetail(operationEvent[logEvent], t);
-    case "exportOperationLog":
-      return getExportOperationLogDetail(operationEvent[logEvent], t);
-    case "setAccountBlockThreshold":
-      return operationEvent[logEvent].thresholdAmount
-        ? t(pDetails("setAccountBlockThreshold"),
-          [operationEvent[logEvent].accountName, moneyToString(operationEvent[logEvent].thresholdAmount!) ])
-        : t(pDetails("unsetAccountBlockThreshold"), [operationEvent[logEvent].accountName]);
-    case "setAccountDefaultBlockThreshold":
-      return t(pDetails("setAccountDefaultBlockThreshold"),
-        [operationEvent[logEvent].tenantName,
-          nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
-    case "userChangeTenant":
-      return t(pDetails("userChangeTenant"),
-        [operationEvent[logEvent].userId,
-          operationEvent[logEvent].previousTenantName,
-          operationEvent[logEvent].newTenantName]);
-    case "activateCluster":
-      return t(pDetails("activateCluster"),
-        [operationEvent[logEvent].userId,
-          operationEvent[logEvent].clusterId]);
-    case "deactivateCluster":
-      return t(pDetails("deactivateCluster"),
-        [operationEvent[logEvent].userId,
-          operationEvent[logEvent].clusterId]);
-    case "customEvent":
-      const c = operationEvent[logEvent]?.content;
-      return getI18nCurrentText(c, languageId);
-    default:
-      return "-";
+      case "deleteDesktop":
+        return t(pDetails("deleteDesktop"),
+          [
+            operationEvent[logEvent].clusterId || "unknown",
+            operationEvent[logEvent].loginNode,
+            operationEvent[logEvent].desktopId,
+          ]);
+      case "createApp":
+        return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+      case "createAiTrain":
+        return t(pDetails("createAiTrain"),
+          [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+      case "cancelAiTrainOrApp":
+        return t(pDetails("cancelAiTrainOrApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
+      case "saveImage":
+        return t(pDetails("saveImage"), [operationEvent[logEvent].jobId, operationEvent[logEvent].imageId || "-",
+          operationEvent[logEvent].tag || "-" ]);
+      case "createFile":
+        return t(pDetails("createFile"), [operationEvent[logEvent].path]);
+      case "deleteFile":
+        return t(pDetails("deleteFile"), [operationEvent[logEvent].path]);
+      case "uploadFile":
+        return t(pDetails("uploadFile"), [operationEvent[logEvent].path]);
+      case "createDirectory":
+        return t(pDetails("createDirectory"), [operationEvent[logEvent].path]);
+      case "deleteDirectory":
+        return t(pDetails("deleteDirectory"), [operationEvent[logEvent].path]);
+      case "moveFileItem":
+        return t(pDetails("moveFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
+      case "copyFileItem":
+        return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
+      case "setJobTimeLimit":
+        return t(pDetails("setJobTimeLimit"),
+          [operationEvent[logEvent].clusterId || "unknown",
+            operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
+      case "createImage":
+        return t(pDetails("createImage"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].imageId || "-", operationEvent[logEvent].tag || "-"]);
+      case "updateImage":
+        return t(pDetails("updateImage"),
+          [operationEvent[logEvent].imageId]);
+      case "shareImage":
+        return t(pDetails("shareImage"),
+          [operationEvent[logEvent].imageId]);
+      case "deleteImage":
+        return t(pDetails("deleteImage"),
+          [operationEvent[logEvent].imageId]);
+      case "copyImage":
+        return t(pDetails("copyImage"),
+          [operationEvent[logEvent].sourceImageId,
+            operationEvent[logEvent].targetImageId || "-", operationEvent[logEvent].targetImageTag || "-"]);
+      case "createDataset":
+        return t(pDetails("createDataset"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].datasetId || "-"]);
+      case "updateDataset":
+        return t(pDetails("updateDataset"),
+          [operationEvent[logEvent].datasetId]);
+      case "deleteDataset":
+        return t(pDetails("deleteDataset"),
+          [operationEvent[logEvent].datasetId ]);
+      case "createDatasetVersion":
+        return t(pDetails("createDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId || "-"]);
+      case "updateDatasetVersion":
+        return t(pDetails("updateDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "shareDatasetVersion":
+        return t(pDetails("shareDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "copyDatasetVersion":
+        return t(pDetails("copyDatasetVersion"),
+          [operationEvent[logEvent].sourceDatasetId, operationEvent[logEvent].sourceDatasetVersionId,
+            operationEvent[logEvent].targetDatasetId || "-", operationEvent[logEvent].targetDatasetVersionId || "-",
+          ]);
+      case "deleteDatasetVersion":
+        return t(pDetails("deleteDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "createUser":
+        return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
+      case "addUserToAccount":
+        return t(pDetails("addUserToAccount"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
+      case "removeUserFromAccount":
+        return t(pDetails("removeUserFromAccount"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
+      case "setAccountAdmin":
+        return t(pDetails("setAccountAdmin"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
+      case "unsetAccountAdmin":
+        return t(pDetails("unsetAccountAdmin"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].accountName]);
+      case "blockUser":
+        return t(pDetails("blockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
+      case "unblockUser":
+        return t(pDetails("unblockUser"), [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
+      case "accountSetChargeLimit":
+        return t(pDetails("accountSetChargeLimit"),
+          [operationEvent[logEvent].accountName,
+            operationEvent[logEvent].userId,
+            nullableMoneyToString(operationEvent[logEvent].limit)]);
+      case "accountUnsetChargeLimit":
+        return t(pDetails("accountUnsetChargeLimit"),
+          [operationEvent[logEvent].accountName, operationEvent[logEvent].userId]);
+      case "setTenantBilling":
+        return t(pDetails("setTenantBilling"),
+          [operationEvent[logEvent].tenantName,
+            operationEvent[logEvent].path,
+            nullableMoneyToString(operationEvent[logEvent].price)]);
+      case "setTenantAdmin":
+        return t(pDetails("setTenantAdmin"), [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
+      case "unsetTenantAdmin":
+        return t(pDetails("unsetTenantAdmin"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
+      case "setTenantFinance":
+        return t(pDetails("setTenantFinance"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
+      case "unsetTenantFinance":
+        return t(pDetails("unsetTenantFinance"),
+          [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
+      case "tenantChangePassword":
+        return t(pDetails("tenantChangePassword"), [operationEvent[logEvent].userId]);
+      case "createAccount":
+        return t(pDetails("createAccount"),
+          [operationEvent[logEvent].accountName, operationEvent[logEvent].accountOwner]);
+      case "addAccountToWhitelist":
+        return t(pDetails("addAccountToWhitelist"),
+          [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
+      case "removeAccountFromWhitelist":
+        return t(pDetails("removeAccountFromWhitelist"),
+          [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);
+      case "accountPay":
+        return t(pDetails("accountPay"),
+          [operationEvent[logEvent].accountName, nullableMoneyToString(operationEvent[logEvent].amount)]);
+      case "blockAccount":
+        return t(pDetails("blockAccount"),
+          [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
+      case "unblockAccount":
+        return t(pDetails("unblockAccount"),
+          [operationEvent[logEvent].tenantName, operationEvent[logEvent].accountName]);
+      case "importUsers":
+        return `${t(pDetails("importUsers1"),
+          [operationEvent[logEvent].tenantName])}${operationEvent[logEvent].importAccounts.map(
+          (account: { accountName: string; userIds: string[]; }) =>
+            (tArgs(pDetails("importUsers2"), [account.accountName, account.userIds.join("、")])),
+        ).join(", ")}`;
+      case "setPlatformAdmin":
+        return t(pDetails("setPlatformAdmin"), [operationEvent[logEvent].userId]);
+      case "unsetPlatformAdmin":
+        return t(pDetails("unsetPlatformAdmin"), [operationEvent[logEvent].userId]);
+      case "setPlatformFinance":
+        return t(pDetails("setPlatformFinance"), [operationEvent[logEvent].userId]);
+      case "unsetPlatformFinance":
+        return t(pDetails("unsetPlatformFinance"), [operationEvent[logEvent].userId]);
+      case "platformChangePassword":
+        return t(pDetails("platformChangePassword"), [operationEvent[logEvent].userId]);
+      case "createTenant":
+        return t(pDetails("createTenant"),
+          [operationEvent[logEvent].tenantName, operationEvent[logEvent].tenantAdmin]);
+      case "tenantPay":
+        return t(pDetails("tenantPay"),
+          [operationEvent[logEvent].tenantName, nullableMoneyToString(operationEvent[logEvent].amount)]);
+      case "setPlatformBilling":
+        return t(pDetails("setPlatformBilling"),
+          [operationEvent[logEvent].path, nullableMoneyToString(operationEvent[logEvent].price)]);
+      case "submitFileItemAsJob":
+        return t(pDetails("submitFileItemAsJob"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].path]);
+      case "exportUser":
+        return operationEvent[logEvent].tenantName
+          ? t(pDetails("tenantExportUser"), [operationEvent[logEvent].tenantName])
+          : t(pDetails("adminExportUser"));
+      case "exportAccount":
+        return operationEvent[logEvent].tenantName
+          ? t(pDetails("tenantExportAccount"), [operationEvent[logEvent].tenantName])
+          : t(pDetails("adminExportUser"));
+      case "exportChargeRecord":
+        return getExportChargeRecordDetail(operationEvent[logEvent], t);
+      case "exportPayRecord":
+        return getExportPayRecordDetail(operationEvent[logEvent], t);
+      case "exportOperationLog":
+        return getExportOperationLogDetail(operationEvent[logEvent], t);
+      case "setAccountBlockThreshold":
+        return operationEvent[logEvent].thresholdAmount
+          ? t(pDetails("setAccountBlockThreshold"),
+            [operationEvent[logEvent].accountName, moneyToString(operationEvent[logEvent].thresholdAmount) ])
+          : t(pDetails("unsetAccountBlockThreshold"), [operationEvent[logEvent].accountName]);
+      case "setAccountDefaultBlockThreshold":
+        return t(pDetails("setAccountDefaultBlockThreshold"),
+          [operationEvent[logEvent].tenantName,
+            nullableMoneyToString(operationEvent[logEvent].thresholdAmount)]);
+      case "userChangeTenant":
+        return t(pDetails("userChangeTenant"),
+          [operationEvent[logEvent].userId,
+            operationEvent[logEvent].previousTenantName,
+            operationEvent[logEvent].newTenantName]);
+      case "activateCluster":
+        return t(pDetails("activateCluster"),
+          [operationEvent[logEvent].userId,
+            operationEvent[logEvent].clusterId]);
+      case "deactivateCluster":
+        return t(pDetails("deactivateCluster"),
+          [operationEvent[logEvent].userId,
+            operationEvent[logEvent].clusterId]);
+      case "customEvent": {
+        const c = operationEvent[logEvent]?.content;
+        return getI18nCurrentText(c, languageId);
+      }
+      default:
+        return "-";
     }
-  } catch (e) {
+  } catch {
     return "-";
   }
 };
@@ -513,47 +515,50 @@ const getExportChargeRecordDetail = (exportChargeRecord: ExportChargeRecord, t: 
   }
   const exportChargeCase = exportChargeTarget.$case;
   switch (exportChargeCase) {
-  case "accountOfTenant":
-    const accountOfTenant = exportChargeTarget[exportChargeCase];
-    return t(pDetails("exportAccountChargeRecordOfTenant"),
-      [accountOfTenant.tenantName, accountOfTenant.accountName]);
-  case "accountsOfTenant":
-  {
-    const accountsOfTenant = exportChargeTarget[exportChargeCase];
-    const { accountNames } = accountsOfTenant;
-    if (accountNames.length === 0) {
-      return t(pDetails("exportAllAccountsChargeRecordOfTenant"),
-        [accountsOfTenant.tenantName]);
-    } else if (accountNames.length === 1) {
+    case "accountOfTenant": {
+      const accountOfTenant = exportChargeTarget[exportChargeCase];
       return t(pDetails("exportAccountChargeRecordOfTenant"),
-        [accountsOfTenant.tenantName, accountNames[0]]);
-    } else {
-      const accountStr = accountNames.join("、");
-      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
-      return t(pDetails("exportAccountsChargeRecordOfTenant"),
-        [accountsOfTenant.tenantName, resultStr]);
+        [accountOfTenant.tenantName, accountOfTenant.accountName]);
     }
-  }
-  case "accountsOfAllTenants":
-    const accountsOfAllTenants = exportChargeTarget[exportChargeCase];
-    const { accountNames } = accountsOfAllTenants;
-    if (accountNames.length === 0) {
-      return t(pDetails("exportAllAccountsChargeRecordOfAdmin"));
-    } else if (accountNames.length === 1) {
-      return t(pDetails("exportAccountChargeRecordOfAdmin"), accountNames);
-    } else {
-      const accountStr = accountNames.join("、");
-      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
-      return t(pDetails("exportAccountsChargeRecordOfAdmin"),
-        [resultStr]);
+    case "accountsOfTenant":
+    {
+      const accountsOfTenant = exportChargeTarget[exportChargeCase];
+      const { accountNames } = accountsOfTenant;
+      if (accountNames.length === 0) {
+        return t(pDetails("exportAllAccountsChargeRecordOfTenant"),
+          [accountsOfTenant.tenantName]);
+      } else if (accountNames.length === 1) {
+        return t(pDetails("exportAccountChargeRecordOfTenant"),
+          [accountsOfTenant.tenantName, accountNames[0]]);
+      } else {
+        const accountStr = accountNames.join("、");
+        const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+        return t(pDetails("exportAccountsChargeRecordOfTenant"),
+          [accountsOfTenant.tenantName, resultStr]);
+      }
     }
-  case "tenant":
-    const tenant = exportChargeTarget[exportChargeCase];
-    return t(pDetails("exportTenantChargeRecord"), [tenant.tenantName]);
-  case "allTenants":
-    return t(pDetails("exportTenantsChargeRecordOfAdmin"));
-  default:
-    return "-";
+    case "accountsOfAllTenants": {
+      const accountsOfAllTenants = exportChargeTarget[exportChargeCase];
+      const { accountNames } = accountsOfAllTenants;
+      if (accountNames.length === 0) {
+        return t(pDetails("exportAllAccountsChargeRecordOfAdmin"));
+      } else if (accountNames.length === 1) {
+        return t(pDetails("exportAccountChargeRecordOfAdmin"), accountNames);
+      } else {
+        const accountStr = accountNames.join("、");
+        const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+        return t(pDetails("exportAccountsChargeRecordOfAdmin"),
+          [resultStr]);
+      }
+    }
+    case "tenant": {
+      const tenant = exportChargeTarget[exportChargeCase];
+      return t(pDetails("exportTenantChargeRecord"), [tenant.tenantName]);
+    }
+    case "allTenants":
+      return t(pDetails("exportTenantsChargeRecordOfAdmin"));
+    default:
+      return "-";
   }
 };
 
@@ -565,28 +570,30 @@ const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: Operation
   }
   const exportPayCase = exportPayTarget.$case;
   switch (exportPayCase) {
-  case "accountsOfTenant":
-    const accountsOfTenant = exportPayTarget[exportPayCase];
-    const { accountNames } = accountsOfTenant;
-    if (accountNames.length === 0) {
-      return t(pDetails("exportAllAccountsPayRecordOfTenant"),
-        [accountsOfTenant.tenantName]);
-    } else if (accountNames.length === 1) {
-      return t(pDetails("exportAccountPayRecordOfTenant"),
-        [accountsOfTenant.tenantName, accountNames[0]]);
-    } else {
-      const accountStr = accountNames.join("、");
-      const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
-      return t(pDetails("exportAccountsPayRecordOfTenant"),
-        [accountsOfTenant.tenantName, resultStr]);
+    case "accountsOfTenant": {
+      const accountsOfTenant = exportPayTarget[exportPayCase];
+      const { accountNames } = accountsOfTenant;
+      if (accountNames.length === 0) {
+        return t(pDetails("exportAllAccountsPayRecordOfTenant"),
+          [accountsOfTenant.tenantName]);
+      } else if (accountNames.length === 1) {
+        return t(pDetails("exportAccountPayRecordOfTenant"),
+          [accountsOfTenant.tenantName, accountNames[0]]);
+      } else {
+        const accountStr = accountNames.join("、");
+        const resultStr = accountStr.length > 25 ? accountStr.slice(0, 25) + "…" : accountStr;
+        return t(pDetails("exportAccountsPayRecordOfTenant"),
+          [accountsOfTenant.tenantName, resultStr]);
+      }
     }
-  case "tenant":
-    const tenant = exportPayTarget[exportPayCase];
-    return t(pDetails("exportTenantPayRecord"), [tenant.tenantName]);
-  case "allTenants":
-    return t(pDetails("exportTenantsPayRecordOfAdmin"));
-  default:
-    return "-";
+    case "tenant": {
+      const tenant = exportPayTarget[exportPayCase];
+      return t(pDetails("exportTenantPayRecord"), [tenant.tenantName]);
+    }
+    case "allTenants":
+      return t(pDetails("exportTenantsPayRecordOfAdmin"));
+    default:
+      return "-";
   }
 };
 
@@ -597,22 +604,25 @@ const getExportOperationLogDetail = (exportOperationLog: ExportOperationLog, t: 
   }
   const sourceCase = exportOperationLogSource.$case;
   switch (sourceCase) {
-  case "user":
-    const user = exportOperationLogSource.user;
-    return t(pDetails("exportOperationLogFromUser"),
-      [user.userId]);
-  case "account":
-    const account = exportOperationLogSource.account;
-    return t(pDetails("exportOperationLogFromAccount"),
-      [account.accountName]);
-  case "tenant":
-    const tenant = exportOperationLogSource.tenant;
-    return t(pDetails("exportOperationLogFromTenant"),
-      [tenant.tenantName]);
-  case "admin":
-    return t(pDetails("exportOperationLogFromAdmin"));
-  default:
-    return "-";
+    case "user": {
+      const user = exportOperationLogSource.user;
+      return t(pDetails("exportOperationLogFromUser"),
+        [user.userId]);
+    }
+    case "account": {
+      const account = exportOperationLogSource.account;
+      return t(pDetails("exportOperationLogFromAccount"),
+        [account.accountName]);
+    }
+    case "tenant": {
+      const tenant = exportOperationLogSource.tenant;
+      return t(pDetails("exportOperationLogFromTenant"),
+        [tenant.tenantName]);
+    }
+    case "admin":
+      return t(pDetails("exportOperationLogFromAdmin"));
+    default:
+      return "-";
   }
 
 };

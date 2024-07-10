@@ -33,7 +33,7 @@ interface Props {
 }
 
 interface FulfilledResult {
-  clusterInfo: {clusterName: string, partitions: PartitionInfo[]}
+  clusterInfo: { clusterName: string, partitions: PartitionInfo[] }
 }
 
 

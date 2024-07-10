@@ -29,13 +29,13 @@ export type GetAllUsersResponse = Static<typeof GetAllUsersResponse>;
 export const mapSortDirectionType = {
   "ascend": SortDirection.ASC,
   "descend": SortDirection.DESC,
-} as { [key: string]: SortDirection };
+} as Record<string, SortDirection>;
 
 export const mapUsersSortFieldType = {
   "userId": GetAllUsersRequest_UsersSortField.USER_ID,
   "name": GetAllUsersRequest_UsersSortField.NAME,
   "createTime": GetAllUsersRequest_UsersSortField.CREATE_TIME,
-} as { [key: string]: GetAllUsersRequest_UsersSortField };
+} as Record<string, GetAllUsersRequest_UsersSortField>;
 
 
 export const GetAllUsersSchema = typeboxRouteSchema({

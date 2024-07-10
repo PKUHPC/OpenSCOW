@@ -37,12 +37,13 @@ import { z } from "zod";
 
 const SESSION_METADATA_NAME = "session.json";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ImageSchema = z.object({
   name: z.string(),
   tag: z.string().optional(),
 });
 
-export type Image = z.infer<typeof ImageSchema>
+export type Image = z.infer<typeof ImageSchema>;
 
 interface SessionMetadata {
   sessionId: string;

@@ -146,7 +146,7 @@ export const DatasetVersionList: React.FC<Props> = (
                   editData={r}
                   refetch={refetch}
                 >
-                编辑
+                  编辑
                 </CreateEditVersionModalButton>
                 <Button
                   type="link"
@@ -171,16 +171,17 @@ export const DatasetVersionList: React.FC<Props> = (
                       title: "分享数据集版本",
                       content: `确认${getSharedStatusText(r.sharedStatus)}数据集版本 ${r.versionName}?`,
                       onOk: async () => {
-                        r.sharedStatus === SharedStatus.SHARED ?
+                        if (r.sharedStatus === SharedStatus.SHARED) {
                           await unShareMutation.mutateAsync({
                             datasetVersionId: r.id,
                             datasetId: r.datasetId,
-                          })
-                          :
+                          });
+                        } else {
                           await shareMutation.mutateAsync({
                             datasetVersionId: r.id,
                             datasetId: r.datasetId,
                           });
+                        }
                       },
                     });
                   }}
