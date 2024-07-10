@@ -118,7 +118,7 @@ import type { SetAdminSchema } from "src/pages/api/users/setAsAdmin";
 import type { QueryStorageUsageSchema } from "src/pages/api/users/storageUsage";
 import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAccount";
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
-
+import type { DeleteUserSchema } from "src/pages/api/users/delete";
 
 export const api = {
   activateCluster: apiClient.fromTypeboxRoute<typeof ActivateClusterSchema>("PUT", "/api/admin/activateCluster"),
@@ -226,4 +226,5 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
 };

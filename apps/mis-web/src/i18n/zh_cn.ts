@@ -815,6 +815,9 @@ export default {
       deleteUserWarning3: "3、无法查看作业和消费记录",
       confirmDeleteUserPrompt: "如果确认删除用户，请在下面输入用户ID和姓名",
       cannotDeleteSelf:"不允许删除当前用户本身",
+      userIdRequired:"请输入用户ID",
+      userNameRequired:"请输入用户姓名",
+      incorrectUserIdOrName:"您输入的用户ID或姓名不匹配",
     },
   },
   page: {

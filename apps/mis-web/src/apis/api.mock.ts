@@ -456,7 +456,7 @@ export const mockApi: MockApi<typeof api> = {
   createTenant: async () => ({ createdInAuth: true }),
   createTenantWithExistingUserAsAdmin: async () => null,
   validateToken: async () => MOCK_USER_INFO,
-
+  deleteUser: async () => null,
   getOperationLogs: async () => ({ results: [{
     operationLogId: 99,
     operatorUserId: "testUser",

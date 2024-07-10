@@ -817,6 +817,9 @@ export default {
       deleteUserWarning3: "3. Unable to view assignments and consumption records",
       confirmDeleteUserPrompt: "If you confirm the deletion of the user, please enter the user ID and name below",
       cannotDeleteSelf: "Deleting the current user is not allowed",
+      userIdRequired: "Please enter the user ID",
+      userNameRequired: "Please enter the user name",
+      incorrectUserIdOrName: "The user ID or name you entered does not match",
     },
   },
   page: {

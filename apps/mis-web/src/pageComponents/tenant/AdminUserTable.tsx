@@ -277,22 +277,34 @@ export const AdminUserTable: React.FC<Props> = ({
               { user.identityId !== r.id ? <DeleteUserModalLink
                 userId={r.id}
                 name={r.name}
-                onComplete={async (newPassword) => {
-                  await api.changePasswordAsTenantAdmin({
-                    body: {
-                      identityId: r.id,
-                      newPassword: newPassword,
-                    },
+                onComplete={async (inputUserId, inputUserName, comments) => {
+                  await api.deleteUser({ query: {
+                    userId:inputUserId,
+                    userName:inputUserName,
+                    comments: comments,
+                  } })
+                  .httpError(400, (e) => {
+                    message.destroy("removeUser");
+                    message.error({
+                      content: `${t("page._app.multiClusterOpErrorContent")}(${
+                        e.message
+                      })`,
+                      duration: 4,
+                    });
                   })
-                    .httpError(404, () => { message.error(t(p("notExist"))); })
-                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                    .httpError(400, (e) => {
-                      if (e.code === "PASSWORD_NOT_VALID") {
-                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-                      };
-                    })
-                    .then(() => { message.success(t(p("changeSuccess"))); })
-                    .catch(() => { message.error(t(p("changeFail"))); });
+                  .httpError(409, () => {
+                    message.destroy("removeUser");
+                    message.error({
+                      content: "删除有问题",
+                      duration: 4,
+                    });
+                    reload();
+                  })
+                  .then(() => {
+                    message.destroy("removeUser");
+                    reload();
+                  })
+                  .catch(() => { message.error(t(p("changeFail"))); });
                 }}
               >
                 {t(p("deleteUser"))}

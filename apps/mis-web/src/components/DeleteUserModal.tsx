@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, Modal } from "antd";
+import { Form, Input, Modal, message } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
-import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
   name: string;
@@ -38,14 +38,22 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
   const [loading, setLoading] = useState(false);
 
   const onOK = async () => {
-    const { userId, userName, comments } = await form.validateFields();
-    setLoading(true);
-    await onComplete(userId, userName, comments)
-      .then(() => {
-        form.resetFields();
-        onClose();
-      })
-      .finally(() => setLoading(false));
+    try {
+      const { userId: inputUserId, userName: inputUserName, comments } = await form.validateFields();
+      if (inputUserId !== userId || inputUserName !== name) {
+        message.error(t(p("incorrectUserIdOrName")));
+        return;
+      }
+      setLoading(true);
+      await onComplete(inputUserId, inputUserName, comments)
+        .then(() => {
+          form.resetFields();
+          onClose();
+        })
+        .finally(() => setLoading(false));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -59,7 +67,7 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
     >
       <br />
       <div>
-        {t(p("confirmPermanentDeleteUser"), [ name, userId ])}<br />
+        {t(p("confirmPermanentDeleteUser"), [name, userId])}<br />
         {t(p("deleteUserWarning1"))}<br />
         {t(p("deleteUserWarning2"))}<br />
         {t(p("deleteUserWarning3"))}
@@ -75,7 +83,7 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
         <Form.Item
           label={t(p("userId"))}
           name="userId"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: t(p("userIdRequired")) }]}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           style={{ marginBottom: 16 }}
@@ -86,7 +94,7 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
         <Form.Item
           label={t(p("userName"))}
           name="userName"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: t(p("userNameRequired")) }]}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 20 }}
           style={{ marginBottom: 16 }}
