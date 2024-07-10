@@ -262,14 +262,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     const simpleClustersInfo
       = await api.getSimpleClustersInfoFromConfigFiles({}).then((x) => x, () => ({ clustersInfo: {} }));
 
-    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo;
+    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo ?? {};
 
     const publicConfigClusters = extra.clusterConfigs && Object.keys(extra.clusterConfigs).length > 0 ?
       getPublicConfigClusters(extra.clusterConfigs) : getPublicConfigClusters(extra.initialSimpleClustersInfo) ?? {};
 
     const activatedClusters
     = formatActivatedClusters({
-      clustersRuntimeInfo: clustersRuntimeInfo?.results,
+      clustersRuntimeInfo: clustersRuntimeInfo?.results ?? [],
       misConfigClusters: publicConfigClusters });
 
     extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};

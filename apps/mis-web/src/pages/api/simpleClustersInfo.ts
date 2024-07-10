@@ -37,6 +37,8 @@ export const GetSimpleClustersInfoFromConfigFilesSchema = typeboxRouteSchema({
 
     200: Type.Object({
       clustersInfo:  Type.Record(Type.String(), SimpleClusterSchema) }),
+
+    403: Type.Null(),
   },
 });
 
@@ -47,7 +49,7 @@ export default route(GetSimpleClustersInfoFromConfigFilesSchema,
     // if not initialized, every one can getSimpleClusterInfo which includes clusterId, displayedName and priority
     if (await queryIfInitialized()) {
       const info = await auth(req, res);
-      if (!info) { return; }
+      if (!info) { return { 403: null }; }
     }
 
     const clustersFullInfo: Record<string, ClusterConfigSchema> = await getClusterConfigFiles();
