@@ -23,7 +23,6 @@ import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 
-
 interface Props {
   footerText: string;
   versionTag: string | undefined;
