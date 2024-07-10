@@ -20,6 +20,7 @@ import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { ClusterPlugin } from "src/plugins/clusters";
+
 import { getActivatedClusters } from "./clustersUtils";
 
 export interface JobInfo {
