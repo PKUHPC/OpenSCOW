@@ -65,7 +65,7 @@ export enum AmountStrategy {
   MAX_CPUSALLOC_MEM = "max-cpusAlloc-mem",
   MAX_GPU_CPUSALLOC = "max-gpu-cpusAlloc",
   GPU = "gpu",
-  CPUS_ALLOC = "cpusAlloc"
+  CPUS_ALLOC = "cpusAlloc",
 }
 
 // export const AmountStrategyText = "计量方式";
@@ -113,7 +113,7 @@ export const JobSortOrder = Type.Union([
   Type.Literal("descend"),
   Type.Literal("ascend"),
 ]);
-export type JobSortOrder = Static<typeof JobSortOrder>
+export type JobSortOrder = Static<typeof JobSortOrder>;
 
 export const JobSortBy = Type.Union(
   [ Type.Literal("idJob"),
@@ -128,4 +128,4 @@ export const JobSortBy = Type.Union(
     Type.Literal("Price"),
   ],
 );
-export type JobSortBy = Static<typeof JobSortBy>
+export type JobSortBy = Static<typeof JobSortBy>;

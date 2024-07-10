@@ -31,7 +31,7 @@ import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { route } from "src/utils/route";
 
 
-export const getClusterConfigFilesSchema = typeboxRouteSchema({
+export const GetClusterConfigFilesSchema = typeboxRouteSchema({
   method: "GET",
 
   // only set the query value when firstly used in getInitialProps
@@ -48,7 +48,7 @@ export const getClusterConfigFilesSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(getClusterConfigFilesSchema,
+export default route(GetClusterConfigFilesSchema,
   async (req, res) => {
 
     const { token } = req.query;

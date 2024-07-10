@@ -17,7 +17,7 @@ import { JobInfo } from "@scow/protos/build/common/ended_job";
 import type { RunningJob } from "@scow/protos/build/common/job";
 import { type Account } from "@scow/protos/build/server/account";
 import type { AccountUserInfo, GetUserStatusResponse } from "@scow/protos/build/server/user";
-import { api } from "src/apis/api";
+import { type api } from "src/apis/api";
 import { ClusterConnectionStatus } from "src/models/cluster";
 import { OperationResult } from "src/models/operationLog";
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
@@ -26,15 +26,15 @@ import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
   string,
- (...args: any[]) => JsonFetchResultPromiseLike<any>>
- > = { [key in keyof TApi]: null | (
+  (...args: any[]) => JsonFetchResultPromiseLike<any>>,
+> = {[key in keyof TApi]: null | (
     (...args: Parameters<TApi[key]>) =>
     Promise<
       ReturnType<TApi[key]> extends PromiseLike<infer TSuc>
-      ? TSuc
-      : never
+        ? TSuc
+        : never
     >)
-  };
+};
 
 
 
@@ -502,6 +502,16 @@ export const mockApi: MockApi<typeof api> = {
       k8s: undefined,
     },
   } }),
+
+  getSimpleClustersInfoFromConfigFiles: async () => ({
+    clustersInfo: {
+      hpc01: {
+        displayName: "hpc01Name",
+        priority: 1,
+        clusterId: "hpc01",
+      },
+    },
+  }),
 
   getClustersConnectionInfo: async () => ({ results: [{
     clusterId: "hpc01",

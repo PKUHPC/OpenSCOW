@@ -809,7 +809,8 @@ export default {
       userId:"用户ID",
       userName:"用户姓名",
       comments:"备注",
-      confirmPermanentDeleteUser:"请确认是否永久删除用户{}（ID：{}）？删除后，该用户将无法使用，包括但不限于：",
+      confirmPermanentDeleteUser:"请确认是否永久删除用户{}（ID：{}）？"
+      + "删除后，该用户将无法使用，包括但不限于：",
       deleteUserWarning1: "1、无法使用和登录该账号",
       deleteUserWarning2: "2、删除该用户的所有个人信息",
       deleteUserWarning3: "3、无法查看作业和消费记录",

@@ -16,10 +16,10 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 
 import { TenantSelector } from "../tenant/TenantSelector";
 
-type Props = {
+interface Props {
   value?: string | null; // value will be null when selecting platform
   onChange?: (value: string | null) => void;
-}
+};
 
 const pCommon = prefix("common.");
 

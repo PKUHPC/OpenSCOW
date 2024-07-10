@@ -37,7 +37,7 @@ export const FileManagerPage: NextPage = requireAuth(() => true)(() => {
 
   const clusterObj = currentClusters.find((x) => x.id === cluster);
 
-  const fullPath = "/" + pathParts?.join("/") ?? "";
+  const fullPath = "/" + (pathParts?.join("/") ?? "");
 
   if (!clusterObj) {
     return (

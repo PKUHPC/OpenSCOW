@@ -69,7 +69,7 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         <Form.Item label="要重命名的文件">
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label="新文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label="新文件名" name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

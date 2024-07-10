@@ -34,7 +34,7 @@ type Props = SSRProps<{
   blocked: boolean;
   displayedState: DisplayedAccountState;
   blockThresholdAmount: number
-}, 404>
+}, 404>;
 
 export const AccountInfoPage: NextPage<Props> = requireAuth(
   (u) => u.accountAffiliations.length > 0,

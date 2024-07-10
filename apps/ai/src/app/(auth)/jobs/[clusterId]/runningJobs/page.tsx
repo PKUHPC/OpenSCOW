@@ -18,7 +18,7 @@ import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 
 import { AppSessionsTable, AppTableStatus } from "../AppSessionsTable";
 
-export default function Page({ params }: {params: {clusterId: string}}) {
+export default function Page({ params }: { params: { clusterId: string } }) {
   const { clusterId } = params;
 
   const { publicConfig } = usePublicConfig();

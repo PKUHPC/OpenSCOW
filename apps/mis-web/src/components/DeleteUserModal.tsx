@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, Modal, message } from "antd";
+import { Form, Input, message,Modal } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
@@ -63,7 +63,7 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
-      width={'620px'}  // 设置Modal宽度
+      width={"620px"} // 设置Modal宽度
     >
       <br />
       <div>
@@ -78,7 +78,7 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
         initialValues={undefined}
         preserve={false}
         layout="horizontal"
-        style={{ maxWidth: '100%' }}
+        style={{ maxWidth: "100%" }}
       >
         <Form.Item
           label={t(p("userId"))}

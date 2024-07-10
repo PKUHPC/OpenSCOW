@@ -811,7 +811,8 @@ export default {
       userId:"User ID",
       userName:"User Name",
       comments:"Comments",
-      confirmPermanentDeleteUser: "Please confirm if you want to permanently delete the user {} (ID: {}). After deletion, the user will not be able to use it, including but not limited to:",
+      confirmPermanentDeleteUser: "Please confirm if you want to permanently delete the user {} (ID: {}). " +
+    "After deletion, the user will not be able to use it, including but not limited to:",
       deleteUserWarning1: "1. Unable to use and log in to the account",
       deleteUserWarning2: "2. Delete all personal information of the user",
       deleteUserWarning3: "3. Unable to view assignments and consumption records",

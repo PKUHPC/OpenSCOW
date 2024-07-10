@@ -11,17 +11,8 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { Status } from "@grpc/grpc-js/build/src/constants";
-import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
-import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
-import { callLog } from "src/server/operationLog";
-import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
-import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const DeleteUserSchema = typeboxRouteSchema({
   method: "DELETE",
@@ -48,7 +39,7 @@ export const DeleteUserSchema = typeboxRouteSchema({
   },
 });
 
-export default /* #__PURE__*/route(DeleteUserSchema, async (req, res) => {
+export default /* #__PURE__*/route(DeleteUserSchema, async (req) => {
   const { userId, userName , comments } = req.query;
   console.log("这里是访问到了DeleteUserSchema内部",userId, userName , comments);
   // const auth = authenticate((u) => {

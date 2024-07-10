@@ -10,10 +10,10 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 
 import { apiClient } from "src/apis/client";
-import type { getClusterConfigFilesSchema } from "src/pages/api//clusterConfigsInfo";
+import type { GetClusterConfigFilesSchema } from "src/pages/api//clusterConfigsInfo";
 import type { ActivateClusterSchema } from "src/pages/api/admin/activateCluster";
 import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
@@ -93,6 +93,7 @@ import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLog";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
+import type { GetSimpleClustersInfoFromConfigFilesSchema } from "src/pages/api/simpleClustersInfo";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";
@@ -110,6 +111,7 @@ import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { ChangeTenantSchema } from "src/pages/api/users/changeTenant";
 import type { CreateUserSchema } from "src/pages/api/users/create";
+import type { DeleteUserSchema } from "src/pages/api/users/delete";
 import type { GetAccountUsersSchema } from "src/pages/api/users/index";
 import type { CancelJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/cancel";
 import type { SetJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/set";
@@ -118,7 +120,6 @@ import type { SetAdminSchema } from "src/pages/api/users/setAsAdmin";
 import type { QueryStorageUsageSchema } from "src/pages/api/users/storageUsage";
 import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAccount";
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
-import type { DeleteUserSchema } from "src/pages/api/users/delete";
 
 export const api = {
   activateCluster: apiClient.fromTypeboxRoute<typeof ActivateClusterSchema>("PUT", "/api/admin/activateCluster"),
@@ -167,7 +168,7 @@ export const api = {
   authCallback: apiClient.fromTypeboxRoute<typeof AuthCallbackSchema>("GET", "/api/auth/callback"),
   logout: apiClient.fromTypeboxRoute<typeof LogoutSchema>("DELETE", "/api/auth/logout"),
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
-  getClusterConfigFiles: apiClient.fromTypeboxRoute<typeof getClusterConfigFilesSchema>("GET", "/api//clusterConfigsInfo"),
+  getClusterConfigFiles: apiClient.fromTypeboxRoute<typeof GetClusterConfigFilesSchema>("GET", "/api//clusterConfigsInfo"),
   getUserStatus: apiClient.fromTypeboxRoute<typeof GetUserStatusSchema>("GET", "/api/dashboard/status"),
   exportAccount: apiClient.fromTypeboxRoute<typeof ExportAccountSchema>("GET", "/api/file/exportAccount"),
   exportChargeRecord: apiClient.fromTypeboxRoute<typeof ExportChargeRecordSchema>("GET", "/api/file/exportChargeRecord"),
@@ -226,5 +227,6 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  getSimpleClustersInfoFromConfigFiles: apiClient.fromTypeboxRoute<typeof GetSimpleClustersInfoFromConfigFilesSchema>("GET", "/api//simpleClustersInfo"),
   deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
 };

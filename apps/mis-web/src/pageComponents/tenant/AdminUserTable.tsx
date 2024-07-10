@@ -27,7 +27,7 @@ import { Encoding } from "src/models/exportFile";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
-import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
+import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 
@@ -87,15 +87,15 @@ export const AdminUserTable: React.FC<Props> = ({
   const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
-    case "TENANT_ADMIN":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
-    case "TENANT_FINANCE":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
-    case "ALL_USERS":
-    default:
-      return searchData ? searchData.length : 0;
+      case "TENANT_ADMIN":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      case "TENANT_FINANCE":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      case "ALL_USERS":
+      default:
+        return searchData ? searchData.length : 0;
     }
   }, [searchData]);
 
@@ -274,45 +274,47 @@ export const AdminUserTable: React.FC<Props> = ({
               >
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
-              { user.identityId !== r.id ? <DeleteUserModalLink
-                userId={r.id}
-                name={r.name}
-                onComplete={async (inputUserId, inputUserName, comments) => {
-                  await api.deleteUser({ query: {
-                    userId:inputUserId,
-                    userName:inputUserName,
-                    comments: comments,
-                  } })
-                  .httpError(400, (e) => {
-                    message.destroy("removeUser");
-                    message.error({
-                      content: `${t("page._app.multiClusterOpErrorContent")}(${
-                        e.message
-                      })`,
-                      duration: 4,
-                    });
-                  })
-                  .httpError(409, () => {
-                    message.destroy("removeUser");
-                    message.error({
-                      content: "删除有问题",
-                      duration: 4,
-                    });
-                    reload();
-                  })
-                  .then(() => {
-                    message.destroy("removeUser");
-                    reload();
-                  })
-                  .catch(() => { message.error(t(p("changeFail"))); });
-                }}
-              >
-                {t(p("deleteUser"))}
-              </DeleteUserModalLink>:
-              <CannotDeleteModalLink
-              >
-                {t(p("deleteUser"))}
-              </CannotDeleteModalLink>}
+              { user.identityId !== r.id ? (
+                <DeleteUserModalLink
+                  userId={r.id}
+                  name={r.name}
+                  onComplete={async (inputUserId, inputUserName, comments) => {
+                    await api.deleteUser({ query: {
+                      userId:inputUserId,
+                      userName:inputUserName,
+                      comments: comments,
+                    } })
+                      .httpError(400, (e) => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: `${t("page._app.multiClusterOpErrorContent")}(${
+                            e.message
+                          })`,
+                          duration: 4,
+                        });
+                      })
+                      .httpError(409, () => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: "删除有问题",
+                          duration: 4,
+                        });
+                        reload();
+                      })
+                      .then(() => {
+                        message.destroy("removeUser");
+                        reload();
+                      })
+                      .catch(() => { message.error(t(p("changeFail"))); });
+                  }}
+                >
+                  {t(p("deleteUser"))}
+                </DeleteUserModalLink>
+              ) : (
+                <CannotDeleteModalLink>
+                  {t(p("deleteUser"))}
+                </CannotDeleteModalLink>
+              )}
             </Space>
           )}
         />

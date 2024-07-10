@@ -95,26 +95,29 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             return Upload.LIST_IGNORE;
           }
 
-          return new Promise(async (resolve, reject) => {
+          return new Promise((resolve, reject) => {
 
-            const exists = await api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } });
+            api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } }).then(({ result }) => {
+              if (result) {
+                modal.confirm({
+                  title: t(p("existedModalTitle")),
+                  content: t(p("existedModalContent"), [file.name]),
+                  okText: t(p("existedModalOk")),
+                  onOk: async () => {
+                    const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
+                    const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                    await deleteOperation({ query: { cluster: cluster, path: join(path, file.name) } })
+                      .then(() => resolve(file));
+                  },
+                  // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+                  onCancel: () => { reject(file); },
+                });
+              } else {
+                resolve(file);
+              }
 
-            if (exists.result) {
-              modal.confirm({
-                title: t(p("existedModalTitle")),
-                content: t(p("existedModalContent"), [file.name]),
-                okText: t(p("existedModalOk")),
-                onOk: async () => {
-                  const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
-                  const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                  await deleteOperation({ query: { cluster: cluster, path: join(path, file.name) } })
-                    .then(() => resolve(file));
-                },
-                onCancel: () => { reject(file); },
-              });
-            } else {
-              resolve(file);
-            }
+            });
+
 
           });
         }}

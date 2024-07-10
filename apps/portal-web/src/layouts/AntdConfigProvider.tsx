@@ -66,10 +66,10 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
 
 function getAntdLocale(langId: string): Locale {
   switch (langId) {
-  case SYSTEM_VALID_LANGUAGES.ZH_CN:
-    return zhCNlocale;
-  case SYSTEM_VALID_LANGUAGES.EN:
-  default:
-    return enUSlocale;
+    case SYSTEM_VALID_LANGUAGES.ZH_CN:
+      return zhCNlocale;
+    case SYSTEM_VALID_LANGUAGES.EN:
+    default:
+      return enUSlocale;
   }
 }

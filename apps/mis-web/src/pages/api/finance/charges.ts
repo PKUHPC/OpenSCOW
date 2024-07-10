@@ -42,12 +42,12 @@ export const mapChargesSortByType = {
   "time":SortBy.TIME,
   "amount":SortBy.AMOUNT,
   "type":SortBy.TYPE,
-} as { [key: string]: SortBy};
+} as Record<string, SortBy>;
 
 export const mapChargesSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-} as { [key: string]: SortOrder};
+} as Record<string, SortOrder>;
 
 export const ChargeInfo = Type.Object({
   index: Type.Number(),

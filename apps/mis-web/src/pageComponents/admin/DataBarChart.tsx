@@ -20,7 +20,7 @@ import { styled } from "styled-components";
 interface Props {
   isLoading: boolean
   title: string
-  data: {x: string, y: string | number}[]
+  data: { x: string, y: string | number }[]
   xLabel?: string
   toolTipFormatter?: Formatter<number | string, string>
 }

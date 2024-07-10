@@ -75,12 +75,12 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
     .then(() => ({ 204: null }))
     .catch((e) => {
       switch (e.status) {
-      case "NOT_FOUND":
-        return { 404: null };
-      case "NOT_SUPPORTED":
-        return { 501: null };
-      default:
-        throw e;
+        case "NOT_FOUND":
+          return { 404: null };
+        case "NOT_SUPPORTED":
+          return { 501: null };
+        default:
+          throw e;
       }
     });
 
