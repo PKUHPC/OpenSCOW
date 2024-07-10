@@ -24,12 +24,12 @@ export const urlToExport = ({
   query,
   encoding,
 }: {
-    exportApi: string
-    columns: string[],
-    count: number,
-    query: {[key: string]: string | number | boolean | string[] | undefined}
-    encoding: Encoding
-  },
+  exportApi: string
+  columns: string[],
+  count: number,
+  query: Record<string, string | number | boolean | string[] | undefined>
+  encoding: Encoding
+},
 ) => {
   const params = new URLSearchParams();
   columns.forEach((column) => {

@@ -68,7 +68,7 @@ export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, clust
         <Form.Item label={t(p("mkdirLabel"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label={t(p("dirName"))} name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label={t(p("dirName"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

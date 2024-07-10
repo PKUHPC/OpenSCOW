@@ -25,7 +25,7 @@ const useClusterAppConfigQuery = (clusterId: string) => {
   return trpc.jobs.listAvailableApps.useQuery({ clusterId });
 };
 
-export default function Page({ params }: {params: {clusterId: string}}) {
+export default function Page({ params }: { params: { clusterId: string } }) {
   const { clusterId } = params;
 
   const { publicConfig } = usePublicConfig();

@@ -32,7 +32,7 @@ export function createHarborImageUrl(imageName: string, imageTag: string, userId
 
 export enum k8sRuntime {
   docker = "docker",
-  containerd = "containerd"
+  containerd = "containerd",
 }
 
 const runtimeCommands = {
@@ -76,7 +76,7 @@ export async function getLoadedImage({
   const command = getRuntimeCommand(runtime);
 
   const loadedResp = await loggedExec(ssh, logger, true, command, ["load", "-i", sourcePath]);
-  const match = loadedResp.stdout.match(loadedImageRegex);
+  const match = loadedImageRegex.exec(loadedResp.stdout);
   return match && match.length > 1 ? match[1] : undefined;
 }
 

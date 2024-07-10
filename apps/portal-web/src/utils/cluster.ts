@@ -52,7 +52,7 @@ export function getFileTransferEnabled(
   return fileTransferEnabled;
 }
 
-export type Cluster = { id: string; name: I18nStringType; }
+export interface Cluster { id: string; name: I18nStringType; };
 
 export const getLoginDesktopEnabled = (
   cluster: string, clusterConfigs: Record<string, ClusterConfigSchema>): boolean => {
@@ -64,7 +64,7 @@ export const getLoginDesktopEnabled = (
   return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
 };
 
-export type LoginNode = { name: string, address: string }
+export interface LoginNode { name: string, address: string };
 
 export const getClusterName = (clusterId: string, languageId: string, publicConfigClusters: Cluster[]) => {
 

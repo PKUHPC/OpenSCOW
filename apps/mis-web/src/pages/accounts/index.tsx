@@ -18,10 +18,10 @@ import { useI18nTranslateToString } from "src/i18n";
 import { accountAdminRoutes } from "src/layouts/routes";
 import { AccountAffiliation, UserRole } from "src/models/User";
 
-type Props = {
+interface Props {
   error: AuthResultError;
   adminAccounts?: AccountAffiliation[]
-};
+}
 
 export const FinanceIndexPage: NextPage<Props> = ({ error, adminAccounts }) => {
 

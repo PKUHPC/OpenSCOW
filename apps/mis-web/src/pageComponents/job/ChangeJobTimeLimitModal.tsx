@@ -197,7 +197,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
             <Form.Item label={t(p("modifyWork"))}>
-              <strong>{completionStatus.current!.failed.map((x) => x.jobId).join(", ")}</strong>
+              <strong>{completionStatus.current.failed.map((x) => x.jobId).join(", ")}</strong>
             </Form.Item>
           ) : undefined
       }

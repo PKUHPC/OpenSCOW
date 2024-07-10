@@ -80,13 +80,16 @@ const CreateUserPageForm: React.FC = () => {
               throw e;
             })
             .then((createdInAuth) => {
-              !createdInAuth.createdInAuth ?
+              if (createdInAuth.createdInAuth) {
+                message.success(t(p("addCompleted")));
+              } else {
                 modal.info({
                   title: t("common.addSuccess"),
                   content: t(p("userExistAndAddToSCOWDatabaseMessage")),
                   okText: t("common.ok"),
-                })
-                : message.success(t(p("addCompleted"))); })
+                });
+              }
+            })
             .catch(() => {
               modal.error({
                 title: t("common.addFail"),

@@ -30,12 +30,12 @@ export const mapOperationSortByType = {
   "operationTime":SortBy.OPERATION_TIME,
   "operatorIp":SortBy.OPERATOR_IP,
   "operatorUserId":SortBy.OPERATOR_USER_ID,
-} as { [key: string]: SortBy};
+} as Record<string, SortBy>;
 
 export const mapOperationSortOrderType = {
   "descend":SortOrder.DESCEND,
   "ascend":SortOrder.ASCEND,
-} as { [key: string]: SortOrder };
+} as Record<string, SortOrder>;
 
 export const GetOperationLogFilter = Type.Object({
 

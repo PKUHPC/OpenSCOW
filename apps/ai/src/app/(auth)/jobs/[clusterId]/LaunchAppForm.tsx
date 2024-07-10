@@ -74,7 +74,7 @@ interface FixedFormFields {
 }
 
 interface CustomFormFields {
-  customFields: {[key: string]: number | string | undefined};
+  customFields: Record<string, number | string | undefined>;
 }
 type FormFields = CustomFormFields & FixedFormFields;
 
@@ -226,9 +226,9 @@ export const LaunchAppForm = (props: Props) => {
   // 暂时写死为1
   const nodeCount = 1;
 
-  const coreCount = Form.useWatch("coreCount", form) as number;
+  const coreCount = Form.useWatch("coreCount", form);
 
-  const gpuCount = Form.useWatch("gpuCount", form) as number;
+  const gpuCount = Form.useWatch("gpuCount", form)!;
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -246,7 +246,7 @@ export const LaunchAppForm = (props: Props) => {
     const partitionInfo = clusterInfo
       ? clusterInfo.partitions.find((x) => x.name === partition)
       : undefined;
-    if (!!partitionInfo?.gpus) {
+    if (partitionInfo?.gpus) {
       form.setFieldValue("gpuCount", 1);
     } else {
       form.setFieldValue("coreCount", 1);
@@ -332,7 +332,7 @@ export const LaunchAppForm = (props: Props) => {
   useEffect(() => {
     // 处理算法相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams && inputParams.algorithm !== undefined
+    if (inputParams?.algorithm !== undefined
       && inputParams.isAlgorithmPrivate !== undefined) {
       const { isAlgorithmPrivate, algorithm: algorithmId } = inputParams;
       // 如果用户修改表单值，则不再初始化数据
@@ -355,7 +355,7 @@ export const LaunchAppForm = (props: Props) => {
   useEffect(() => {
     // 处理数据集相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams && inputParams.dataset !== undefined
+    if (inputParams?.dataset !== undefined
       && inputParams.isDatasetPrivate !== undefined) {
       const { isDatasetPrivate, dataset: datasetId } = inputParams;
       // 如果用户修改表单值，则不再初始化数据
@@ -378,7 +378,7 @@ export const LaunchAppForm = (props: Props) => {
   useEffect(() => {
     // 处理模型相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams && inputParams.model !== undefined
+    if (inputParams?.model !== undefined
       && inputParams.isModelPrivate !== undefined) {
       const { isModelPrivate, model: modelId } = inputParams;
       // 如果用户修改表单值，则不再初始化数据
@@ -414,7 +414,7 @@ export const LaunchAppForm = (props: Props) => {
         if ("startCommand" in inputParams) {
           form.setFieldValue("startCommand", inputParams.startCommand);
         }
-        if (!!images?.items?.length) {
+        if (images?.items?.length) {
           form.setFieldValue(["image", "name"], inputParams.image);
         } else {
           if (inputParams.remoteImageUrl) {
@@ -731,7 +731,7 @@ export const LaunchAppForm = (props: Props) => {
                   onClick={() => add()}
                   icon={<PlusOutlined />}
                 >
-          添加挂载点
+                  添加挂载点
                 </Button>
               </Form.Item>
             </>
@@ -748,7 +748,7 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ algorithm: { type: undefined, name: undefined, version: undefined } })}
               >
-            算法
+                算法
               </Checkbox>
             </Form.Item>
             <Form.Item
@@ -759,7 +759,7 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ dataset: { type: undefined, name: undefined, version: undefined } })}
               >
-            数据集
+                数据集
               </Checkbox>
             </Form.Item>
             <Form.Item
@@ -770,7 +770,7 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ model: { type: undefined, name: undefined, version: undefined } })}
               >
-            模型
+                模型
               </Checkbox>
             </Form.Item>
           </div>

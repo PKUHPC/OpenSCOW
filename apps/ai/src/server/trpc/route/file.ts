@@ -237,7 +237,7 @@ export const file = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: `${path} is not accessible` });
         });
 
-        if (!stat || !stat.isDirectory()) {
+        if (!stat?.isDirectory()) {
           throw new TRPCError({ code: "UNPROCESSABLE_CONTENT", message: `${path} is not directory or not exists` });
         }
 
@@ -406,7 +406,7 @@ export const file = router({
         }
       };
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(filePath).catch((e) => {

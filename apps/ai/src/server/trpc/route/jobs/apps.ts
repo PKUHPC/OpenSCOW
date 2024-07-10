@@ -59,7 +59,7 @@ const ImageSchema = z.object({
   tag: z.string().optional(),
 });
 
-export type Image = z.infer<typeof ImageSchema>
+export type Image = z.infer<typeof ImageSchema>;
 
 const JobTypeSchema = z.nativeEnum(JobType);
 
@@ -146,6 +146,7 @@ const AppCustomAttributeSchema = z.object({
 
 export type AppCustomAttribute = z.infer<typeof AppCustomAttributeSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AttributeTypeSchema = z.enum(["TEXT", "NUMBER", "SELECT"]);
 
 export type AttributeType = z.infer<typeof AttributeTypeSchema>;
@@ -286,39 +287,39 @@ export const createAppSession = procedure
       }
 
       switch (attribute.type) {
-      case "number":
-        if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `custom form attribute ${
-              attribute.name} should be of type number, but of type ${typeof customAttributes[attribute.name]}`,
-          });
-        }
-        break;
+        case "number":
+          if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `custom form attribute ${
+                attribute.name} should be of type number, but of type ${typeof customAttributes[attribute.name]}`,
+            });
+          }
+          break;
 
-      case "text":
-        break;
+        case "text":
+          break;
 
-      case "select":
+        case "select":
         // check the option selected by user is in select attributes as the config defined
-        if (customAttributes[attribute.name]
+          if (customAttributes[attribute.name]
           && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: `
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: `
               the option value of ${attribute.name} selected by user should be
               one of select attributes as the ${appId} config defined,
               but is ${customAttributes[attribute.name]}`,
-          });
-        }
-        break;
+            });
+          }
+          break;
 
-      default:
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: `the custom form attributes type in ${appId} config should be one of number, text or select,
-          but the type of ${attribute.name} is ${attribute.type}`,
-        });
+        default:
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `the custom form attributes type in ${appId} config should be one of number, text or select,
+          but the type of ${attribute.name} is ${attribute.type as string}`,
+          });
       }
     });
 
@@ -395,8 +396,8 @@ export const createAppSession = procedure
       if (app.type === "web") {
         for (const key in app.web!.connect.formData) {
           const texts = getPlaceholderKeys(app.web!.connect.formData[key]);
-          for (const i in texts) {
-            customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
+          for (const i of texts) {
+            customForm += `,\\"${i}\\":\\"$${i}\\"`;
           }
         }
       }
@@ -426,7 +427,7 @@ export const createAppSession = procedure
       } else {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: `Unknown app type ${app.type} of app id ${appId}`,
+          message: `Unknown app type ${app.type as string} of app id ${appId}`,
         });
       }
 
@@ -849,7 +850,7 @@ procedure
         } else {
           return { ok: false };
         }
-      } catch (_) {
+      } catch {
         return { ok: false };
       }
     },
@@ -957,36 +958,36 @@ procedure
     }
 
     switch (app.type) {
-    case AppType.vnc:
-      return {
-        host: reply.host,
-        port: reply.port,
-        password: reply.password,
-        type: "vnc",
-        vnc: {},
-      };
-      break;
-    case AppType.web:
-      return {
-        host: reply.host,
-        port: reply.port,
-        password: reply.password,
-        type: "web",
-        connect : {
-          method:app.web!.connect.method,
-          query: app.web!.connect.query ?? {},
-          formData: app.web!.connect.formData ?? {},
-          path: app.web!.connect.path,
-        },
-        proxyType: app.web!.proxyType === "absolute"
-          ? "absolute"
-          : "relative",
-      };
-    default:
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `Unknown app type ${app.type} of app id ${reply.appId}`,
-      });
+      case AppType.vnc:
+        return {
+          host: reply.host,
+          port: reply.port,
+          password: reply.password,
+          type: "vnc",
+          vnc: {},
+        };
+        break;
+      case AppType.web:
+        return {
+          host: reply.host,
+          port: reply.port,
+          password: reply.password,
+          type: "web",
+          connect : {
+            method:app.web!.connect.method,
+            query: app.web!.connect.query ?? {},
+            formData: app.web!.connect.formData ?? {},
+            path: app.web!.connect.path,
+          },
+          proxyType: app.web!.proxyType === "absolute"
+            ? "absolute"
+            : "relative",
+        };
+      default:
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Unknown app type ${app.type as string} of app id ${reply.appId}`,
+        });
     }
 
   });

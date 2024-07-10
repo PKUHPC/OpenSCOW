@@ -26,8 +26,8 @@ export const PublicConfigContext = React.createContext<{
     defaultCluster: Cluster;
     setDefaultCluster: (cluster: Cluster) => void;
     removeDefaultCluster: () => void;
-      }
-      }>(undefined!);
+  }
+}>(undefined!);
 
 export const usePublicConfig = () => {
   return useContext(PublicConfigContext);

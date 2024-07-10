@@ -532,7 +532,7 @@ export const copyPublicAlgorithmVersion = procedure
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Copy Error ${err}`,
+        message: `Copy Error ${err as any}`,
       });
     }
 
