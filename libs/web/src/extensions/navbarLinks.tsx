@@ -15,7 +15,7 @@ import { defineExtensionRoute } from "src/extensions/routes";
 import { z } from "zod";
 
 export const NavbarLink = z.object({
-  href: z.string({ description: "链接的目标路径，将会被直接填入<a>标签的href" }),
+  path: z.string({ description: "链接的目标路径。如果是一个完整的URL，将会直接作为a标签的href；如果不是，将会为UI扩展内部的路径。" }),
   text: z.string(),
   icon: z.optional(z.object({
     src: z.string(),
