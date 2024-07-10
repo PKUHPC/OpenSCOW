@@ -128,7 +128,7 @@ const StorageForm: React.FC = () => {
           }
         </DisabledA>
       </Form.Item>
-      <Form.Item<FormProps> label={t(p("storageChange"))} rules={[{ required: true }]}>
+      <Form.Item label={t(p("storageChange"))} rules={[{ required: true }]}>
         <Space.Compact style={{ width: "100%" }}>
           <Form.Item name="mode" noStyle>
             <Select placeholder={t(p("selectSetTo"))}>

@@ -12,19 +12,19 @@
 
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
+import { GetServerSideProps } from "next";
 import { join } from "path";
 import { useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
+import { USE_MOCK } from "src/apis/useMock";
+import { getTokenFromCookie } from "src/auth/cookie";
+import { AuthResultError, ssrAuthenticate } from "src/auth/server";
+import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
 import { generateMD5FromFileName, getFileChunkSize } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
-import { getTokenFromCookie } from "src/auth/cookie";
-import { GetServerSideProps } from "next";
-import { USE_MOCK } from "src/apis/useMock";
-import { AuthResultError, ssrAuthenticate } from "src/auth/server";
-import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 
 interface ServerSideProps {
   error?: AuthResultError;
@@ -54,7 +54,7 @@ type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => v
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster, error, scowdEnabledClusters }) => {
 
-  if (!!error) {
+  if (error) {
     return <UnifiedErrorPage code={error} />;
   }
 
@@ -85,7 +85,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     // 获取文件唯一标识
     const { md5, suffix } = generateMD5FromFileName(file);
 
-    const { items } = await api.listFile({ query: { cluster, path: join(path, md5) }});
+    const { items } = await api.listFile({ query: { cluster, path: join(path, md5) } });
 
     const uploadedChunks = items.sort((a, b) => {
       const reg = /_(\d+)/;
@@ -147,13 +147,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           body: formData,
         }).then((response) => {
           if (!response.ok) {
-            return Promise.reject(response.statusText);
+            return new Error(response.statusText);
           }
           updateProgress();
           return response;
         }).catch((error) => {
           message.error("报错错误", error);
-        })
+        }),
       );
 
       // 等待当前批次上传完成
@@ -190,7 +190,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             startBreakpointUpload(file as File, onProgress).then(onSuccess).catch(onError);
           },
         } : {
-          action: async (file) => urlToUpload(cluster, join(path, file.name))
+          action: async (file) => urlToUpload(cluster, join(path, file.name)),
         })}
         withCredentials
         showUploadList={{
@@ -222,26 +222,29 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             return Upload.LIST_IGNORE;
           }
 
-          return new Promise(async (resolve, reject) => {
+          return new Promise((resolve, reject) => {
 
-            const exists = await api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } });
+            api.fileExist({ query:{ cluster: cluster, path: join(path, file.name) } }).then(({ result }) => {
+              if (result) {
+                modal.confirm({
+                  title: t(p("existedModalTitle")),
+                  content: t(p("existedModalContent"), [file.name]),
+                  okText: t(p("existedModalOk")),
+                  onOk: async () => {
+                    const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
+                    const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
+                    await deleteOperation({ query: { cluster: cluster, path: join(path, file.name) } })
+                      .then(() => resolve(file));
+                  },
+                  // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
+                  onCancel: () => { reject(file); },
+                });
+              } else {
+                resolve(file);
+              }
 
-            if (exists.result) {
-              modal.confirm({
-                title: t(p("existedModalTitle")),
-                content: t(p("existedModalContent"), [file.name]),
-                okText: t(p("existedModalOk")),
-                onOk: async () => {
-                  const fileType = await api.getFileType({ query:{ cluster: cluster, path: join(path, file.name) } });
-                  const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                  await deleteOperation({ query: { cluster: cluster, path: join(path, file.name) } })
-                    .then(() => resolve(file));
-                },
-                onCancel: () => { reject(file); },
-              });
-            } else {
-              resolve(file);
-            }
+            });
+
 
           });
         }}
@@ -282,8 +285,8 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async ({ 
   const resp = await api.getClusterConfigFiles({ query: { token } });
 
   const scowdEnabledClusters: string[] = Object.entries(resp.clusterConfigs)
-  .filter(([_, config]) => !!config.scowd?.enabled)
-  .map(([cluster, _]) => cluster);
+    .filter(([_, config]) => !!config.scowd?.enabled)
+    .map(([cluster, _]) => cluster);
 
   return {
     props: {

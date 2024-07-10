@@ -12,7 +12,7 @@
 
 import { normalize } from "path";
 
-export const toHref = ({ pathname = "", query }: { pathname?: string, query?: Record<string, string>}) => {
+export const toHref = ({ pathname = "", query }: { pathname?: string, query?: Record<string, string> }) => {
 
   if (!query) { return pathname; }
 

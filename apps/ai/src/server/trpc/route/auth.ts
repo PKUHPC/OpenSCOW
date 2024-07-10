@@ -151,7 +151,7 @@ export const auth = router({
         password: oldPassword,
       }, console);
 
-      if (!checkRes || !checkRes.success) {
+      if (!checkRes?.success) {
         throw new TRPCError({
           message: ErrorCode.OLD_PASSWORD_IS_WRONG,
           code: "CONFLICT",

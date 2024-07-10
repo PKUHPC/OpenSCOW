@@ -97,13 +97,13 @@ export interface PublicRuntimeConfig {
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
-export type NavLink = {
+export interface NavLink {
   text: string;
   url?: string;
   openInNewPage?: boolean;
   iconPath?: string;
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
-}
+};
 
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
 // 获取ServerConfig中相关字符串配置的对应语言的字符串
@@ -137,7 +137,7 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>(
  * @returns string | undefined
  * i18n语言文本
  */
-export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
+export const getI18nText = <TObject extends object, TKey extends keyof TObject>(
   obj: TObject, key: TKey, languageId: string,
 ): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
   const value = obj[key];

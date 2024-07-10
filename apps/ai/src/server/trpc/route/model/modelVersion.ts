@@ -110,7 +110,7 @@ export const createModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.modelId} not accessible` });
     }
 
@@ -163,7 +163,7 @@ export const updateModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
     }
 
@@ -203,7 +203,7 @@ export const updateModelVersion = procedure
 
     modelVersion.versionName = versionName;
     modelVersion.versionDescription = versionDescription;
-    modelVersion.algorithmVersion = algorithmVersion,
+    modelVersion.algorithmVersion = algorithmVersion;
 
     await em.flush();
     return { id: modelVersion.id };
@@ -237,7 +237,7 @@ export const deleteModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.modelId} not accessible` });
     }
 
@@ -551,7 +551,7 @@ export const copyPublicModelVersion = procedure
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Copy Error ${err}`,
+        message: `Copy Error ${err as any}`,
       });
     }
 

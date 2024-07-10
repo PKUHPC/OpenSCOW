@@ -143,12 +143,12 @@ export const AllJobQueryTable: React.FC<Props> = ({
   );
 };
 
-type JobInfoTableProps = {
+interface JobInfoTableProps {
   data: JobInfo[] | undefined;
   isLoading: boolean;
   reload: () => void;
   cluster: Cluster;
-};
+}
 
 export const JobInfoTable: React.FC<JobInfoTableProps> = ({
   data, isLoading, cluster,

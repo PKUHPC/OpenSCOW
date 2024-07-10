@@ -39,7 +39,7 @@ export async function getUserInfo(req: RequestType, res?: NextApiResponse): Prom
   const result = await validateToken(token);
 
 
-  if (!result || !result.identityId) {
+  if (!result?.identityId) {
     deleteUserToken(res);
     return;
   }

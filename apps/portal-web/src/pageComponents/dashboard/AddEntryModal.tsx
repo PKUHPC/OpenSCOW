@@ -25,7 +25,7 @@ import { AppWithCluster, defaultEntry } from "./QuickEntry";
 
 export enum EntryCase {
   shell,
-  app
+  app,
 }
 export interface IncompleteEntryInfo {
   id: string;
@@ -137,7 +137,7 @@ export const AddEntryModal: React.FC<Props> = ({
     }
     else if ((item as IncompleteEntryInfo).case === EntryCase.app) {
       setNeedLoginNode(false);
-      setClustersToSelectedApp(apps![item.id].clusters);
+      setClustersToSelectedApp(apps[item.id].clusters);
       setSelectClusterOpen(true);
       setIncompleteEntryInfo({
         id:item.id,

@@ -75,10 +75,10 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
         <Form.Item label={t(p("jobNumber"))}>
           <strong>{jobCount}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label={`${t(p("newJob"))}${text[target]}`} name="price" rules={[{ required: true }]}>
+        <Form.Item label={`${t(p("newJob"))}${text[target]}`} name="price" rules={[{ required: true }]}>
           <InputNumber min={0} step={0.01} addonAfter={t(pCommon("unit"))} />
         </Form.Item>
-        <Form.Item<FormProps> name="reason" label={t(p("reason"))} rules={[{ required: true }]}>
+        <Form.Item name="reason" label={t(p("reason"))} rules={[{ required: true }]}>
           <Input.TextArea />
         </Form.Item>
       </Form>

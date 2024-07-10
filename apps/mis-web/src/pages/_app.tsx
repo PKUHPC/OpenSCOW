@@ -46,7 +46,6 @@ import {
 } from "src/stores/UserStore";
 import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
 import { publicConfig, runtimeConfig } from "src/utils/config";
-import { queryIfInitialized } from "src/utils/init";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -73,7 +72,7 @@ const FailEventHandler: React.FC = () => {
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
           title: tArgs("page._app.multiClusterOpErrorTitle"),
-          content: `${tArgs("page._app.multiClusterOpErrorContent")}(${
+          content: `${tArgs("page._app.multiClusterOpErrorContent") as string}(${
             e.data.details
           })`,
         });
@@ -85,7 +84,7 @@ const FailEventHandler: React.FC = () => {
           (publicConfigClusters[clusterId]?.name ?? clusterId) : undefined;
 
         message.error(`${tArgs("page._app.adapterConnErrorContent",
-          [getI18nConfigCurrentText(clusterName, languageId)])}(${
+          [getI18nConfigCurrentText(clusterName, languageId)]) as string}(${
           e.data.details
         })`);
         return;
@@ -101,7 +100,7 @@ const FailEventHandler: React.FC = () => {
         message.error(tArgs("page._app.notExistInActivatedClusters"));
 
         const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
-        const newActivatedClusters: {[clusterId: string]: Cluster} = {};
+        const newActivatedClusters: Record<string, Cluster> = {};
         currentActivatedClusterIds.forEach((id: string) => {
           if (publicConfigClusters[id]) {
             newActivatedClusters[id] = publicConfigClusters[id];
@@ -116,7 +115,7 @@ const FailEventHandler: React.FC = () => {
         return;
       }
 
-      message.error(`${tArgs("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
+      message.error(`${tArgs("page._app.effectErrorMessage") as string}(${e.status}, ${e.data?.code}))`);
 
     });
   }, []);
@@ -155,7 +154,10 @@ function MyApp({ Component, pageProps, extra }: Props) {
   });
 
   const clusterInfoStore = useConstant(() => {
-    return createStore(ClusterInfoStore, extra.clusterConfigs, extra.initialActivatedClusters, extra.initialSimpleClustersInfo);
+    return createStore(
+      ClusterInfoStore,
+      extra.clusterConfigs, extra.initialActivatedClusters, extra.initialSimpleClustersInfo,
+    );
   });
 
   const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));

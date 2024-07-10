@@ -19,7 +19,7 @@ export const OperationResult = {
   FAIL: 2,
 } as const;
 
-export type OperationResult = ValueOf<typeof OperationResult>
+export type OperationResult = ValueOf<typeof OperationResult>;
 
 export const OperationType: OperationTypeEnum = {
   login: "login",
@@ -83,6 +83,6 @@ export const OperationType: OperationTypeEnum = {
   activateCluster: "activateCluster",
   deactivateCluster: "deactivateCluster",
   customEvent: "customEvent",
-  mergeFileChunks: "mergeFileChunks"
+  mergeFileChunks: "mergeFileChunks",
 };
 

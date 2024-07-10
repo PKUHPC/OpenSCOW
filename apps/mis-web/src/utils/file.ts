@@ -22,7 +22,7 @@ import { Transform } from "stream";
  * @param columns 需要导出的列
  * @returns
  */
-export const getCsvStringify = (headerColumns: { [key in string]: string }, columns: string[]) => {
+export const getCsvStringify = (headerColumns: {[key in string]: string }, columns: string[]) => {
 
   if (columns.length) {
     Object.keys(headerColumns).forEach((key) => {

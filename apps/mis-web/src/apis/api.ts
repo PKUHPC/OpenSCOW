@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable max-len */
+/* eslint-disable @stylistic/max-len */
 
 import { apiClient } from "src/apis/client";
 import type { GetClusterConfigFilesSchema } from "src/pages/api//clusterConfigsInfo";
@@ -93,7 +93,7 @@ import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLog";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
-import { GetSimpleClustersInfoFromConfigFilesSchema } from "src/pages/api/simpleClustersInfo";
+import type { GetSimpleClustersInfoFromConfigFilesSchema } from "src/pages/api/simpleClustersInfo";
 import type { DewhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/dewhitelistAccount";
 import type { GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
 import type { WhitelistAccountSchema } from "src/pages/api/tenant/accountWhitelist/whitelistAccount";

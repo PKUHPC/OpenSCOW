@@ -15,7 +15,7 @@ import { AppRouter } from "src/server/trpc/router";
 
 export type ImageInterface = inferRouterOutputs<AppRouter>["image"]["list"]["items"][0];
 
-export const SourceText: { [key: string]: string } = {
+export const SourceText: Record<string, string> = {
   INTERNAL: "本地文件",
   EXTERNAL: "远程镜像",
 };
@@ -28,5 +28,5 @@ export enum Source {
 export enum Status {
   CREATING = "CREATING",
   CREATED = "CREATED",
-  FAILURE = "FAILURE"
+  FAILURE = "FAILURE",
 }

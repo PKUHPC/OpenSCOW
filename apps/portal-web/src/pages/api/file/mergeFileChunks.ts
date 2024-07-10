@@ -56,7 +56,7 @@ export default route(MergeFileChunksSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.mergeFileChunks,
     operationTypePayload:{
-      clusterId: cluster, path, md5, name
+      clusterId: cluster, path, md5, name,
     },
   };
 

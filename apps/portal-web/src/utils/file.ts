@@ -11,11 +11,11 @@
  */
 
 import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
+import CryptoJS from "crypto-js";
 import { join } from "path";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { styled } from "styled-components";
-import CryptoJS from "crypto-js";
 
 
 
@@ -67,7 +67,7 @@ export const generateMD5FromFileName = (file: File) => {
 // 获取文件的块数
 export const getFileChunkSize = (file: File) => {
   const singleChunkSize = 10; // 10 MB
-  let chunkSize = singleChunkSize * 1024 * 1024;
+  const chunkSize = singleChunkSize * 1024 * 1024;
 
   const count = Math.ceil(file.size / chunkSize);
 
