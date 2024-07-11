@@ -61,6 +61,9 @@ it("get cluster configs info", async () => {
     const newCluster = {
       ...rest,
       displayName: getI18nTypeFormat(cluster.displayName),
+      scowd: {
+        enabled: cluster.scowd?.enabled ?? false,
+      },
       loginNodes: !cluster.loginNodes ? [] :
         getLoginNodesTypeFormat(cluster.loginNodes),
       k8s: cluster.k8s ? {
