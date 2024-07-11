@@ -430,6 +430,33 @@ export const getOperationDetail = (
       case "deleteAlgorithmVersion":
         return t(pDetails("deleteAlgorithmVersion"),
           [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "createModel":
+        return t(pDetails("createModel"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].modelId || "-"]);
+      case "updateModel":
+        return t(pDetails("updateModel"),
+          [operationEvent[logEvent].modelId]);
+      case "deleteModel":
+        return t(pDetails("deleteModel"),
+          [operationEvent[logEvent].modelId ]);
+      case "createModelVersion":
+        return t(pDetails("createModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId || "-"]);
+      case "updateModelVersion":
+        return t(pDetails("updateModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
+      case "shareModelVersion":
+        return t(pDetails("shareModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
+      case "copyModelVersion":
+        return t(pDetails("copyModelVersion"),
+          [operationEvent[logEvent].sourceModelId, operationEvent[logEvent].sourceModelVersionId,
+            operationEvent[logEvent].targetModelId || "-", operationEvent[logEvent].targetModelVersionId || "-",
+          ]);
+      case "deleteModelVersion":
+        return t(pDetails("deleteModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
       case "createUser":
         return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
       case "addUserToAccount":
