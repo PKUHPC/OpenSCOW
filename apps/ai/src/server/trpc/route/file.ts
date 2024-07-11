@@ -244,7 +244,7 @@ export const file = router({
 
       return res;
     })
-    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -297,7 +297,7 @@ export const file = router({
 
       return res;
     })
-    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
+    .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
