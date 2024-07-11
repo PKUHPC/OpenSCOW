@@ -74,8 +74,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     const hiddenMd5 = "." + md5;
 
     // 如果不存在则忽略
-    const { items } = await api.listFile({ query: { cluster, path: join(path, hiddenMd5) } })
-      .httpError(412, () => {});
+    const { items } = await api.listFile({ query: {
+      cluster, path: join(path, hiddenMd5), checkFileChunks: true,
+    } });
 
     const uploadedChunks = items.sort((a, b) => {
       const reg = /_(\d+)/;
