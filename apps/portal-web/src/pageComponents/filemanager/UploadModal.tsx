@@ -71,7 +71,11 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     // 获取文件唯一标识
     const { md5, suffix } = generateMD5FromFileName(file);
 
-    const { items } = await api.listFile({ query: { cluster, path: join(path, md5) } });
+    const hiddenMd5 = "." + md5;
+
+    // 如果不存在则忽略
+    const { items } = await api.listFile({ query: { cluster, path: join(path, hiddenMd5) } })
+      .httpError(412, () => {});
 
     const uploadedChunks = items.sort((a, b) => {
       const reg = /_(\d+)/;
