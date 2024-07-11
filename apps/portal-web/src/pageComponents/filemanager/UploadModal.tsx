@@ -125,15 +125,11 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         }
       }
 
-      const formDataArray = chunks.map((chunk) => {
+      const uploadPromises = chunks.map((chunk) => {
         const formData = new FormData();
         formData.append("file", chunk.file);
-        formData.append("fileMd5Name", chunk.fileName);
-        return formData;
-      });
 
-      const uploadPromises = formDataArray.map((formData) =>
-        fetch(urlToUpload(cluster, path), {
+        return fetch(urlToUpload(cluster, join(path, hiddenMd5, chunk.fileName)), {
           method: "POST",
           body: formData,
         }).then((response) => {
@@ -144,8 +140,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           return response;
         }).catch((error) => {
           message.error("报错错误", error);
-        }),
-      );
+        });
+      });
 
       // 等待当前批次上传完成
       await Promise.all(uploadPromises);
