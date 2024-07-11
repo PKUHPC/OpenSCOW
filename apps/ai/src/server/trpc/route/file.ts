@@ -139,8 +139,6 @@ export const file = router({
 
       }
     }),
-
-
   copyOrMove: authProcedure
     .meta({
       openapi: {
@@ -223,11 +221,10 @@ export const file = router({
     })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.void())
-    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
-      const host = getClusterLoginNode(clusterId);
+    .use(async ({ input:{ clusterId,path }, ctx, next }) => {
+      const res = await next({ ctx });
 
-      if (!host) { throw clusterNotFound(clusterId); }
-
+      const { user, req } = ctx;
       const logInfo = {
         operatorUserId: user.identityId,
         operatorIp: parseIp(req) ?? "",
@@ -237,29 +234,33 @@ export const file = router({
         },
       };
 
-      try {
-        await sshConnect(host, user.identityId, logger, async (ssh) => {
-
-          const sftp = await ssh.requestSFTP();
-
-          if (await sftpExists(sftp, path)) {
-            throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
-          }
-
-          await sftpMkdir(sftp)(path);
-
-          return;
-        });
-
+      if (res.ok) {
         await callLog(logInfo, OperationResult.SUCCESS);
-
-        return;
-      } catch (error) {
-        await callLog(logInfo, OperationResult.FAIL);
-
-        throw error;
       }
 
+      if (!res.ok) {
+        await callLog(logInfo, OperationResult.FAIL);
+      }
+
+      return res;
+    })
+    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        if (await sftpExists(sftp, path)) {
+          throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
+        }
+
+        await sftpMkdir(sftp)(path);
+
+        return;
+      });
     }),
 
   createFile: authProcedure
@@ -273,11 +274,10 @@ export const file = router({
     })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.void())
-    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
-      const host = getClusterLoginNode(clusterId);
+    .use(async ({ input:{ clusterId,path }, ctx, next }) => {
+      const res = await next({ ctx });
 
-      if (!host) { throw clusterNotFound(clusterId); }
-
+      const { user, req } = ctx;
       const logInfo = {
         operatorUserId: user.identityId,
         operatorIp: parseIp(req) ?? "",
@@ -286,28 +286,34 @@ export const file = router({
           clusterId, path,
         },
       };
-      try {
-        await sshConnect(host, user.identityId, logger, async (ssh) => {
 
-          const sftp = await ssh.requestSFTP();
-
-          if (await sftpExists(sftp, path)) {
-            throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
-          }
-
-          await sftpWriteFile(sftp)(path, Buffer.alloc(0));
-
-          return;
-        });
-
+      if (res.ok) {
         await callLog(logInfo, OperationResult.SUCCESS);
+      }
+
+      if (!res.ok) {
+        await callLog(logInfo, OperationResult.FAIL);
+      }
+
+      return res;
+    })
+    .mutation(async ({ input: { clusterId, path }, ctx: { user, req } }) => {
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
+
+        const sftp = await ssh.requestSFTP();
+
+        if (await sftpExists(sftp, path)) {
+          throw new TRPCError({ code: "CONFLICT", message: `${path} already exists` });
+        }
+
+        await sftpWriteFile(sftp)(path, Buffer.alloc(0));
 
         return;
-      } catch (error) {
-        await callLog(logInfo, OperationResult.FAIL);
-
-        throw error;
-      }
+      });
     }),
 
   listDirectory: authProcedure
