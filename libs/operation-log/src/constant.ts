@@ -109,4 +109,12 @@ export const OperationType: OperationTypeEnum = {
   shareAlgorithmVersion:"shareAlgorithmVersion",
   deleteAlgorithmVersion:"deleteAlgorithmVersion",
   copyAlgorithmVersion:"copyAlgorithmVersion",
+  createModel:"createModel",
+  updateModel:"updateModel",
+  deleteModel:"deleteModel",
+  createModelVersion:"createModelVersion",
+  updateModelVersion:"updateModelVersion",
+  shareModelVersion:"shareModelVersion",
+  deleteModelVersion:"deleteModelVersion",
+  copyModelVersion:"copyModelVersion",
 };

@@ -560,6 +560,45 @@ message CopyAlgorithmVersion {
   optional uint32 target_algorithm_version_id = 4;
 }
 
+message CreateModel {
+  string cluster_id = 1;
+  optional uint32 model_id = 2;
+}
+
+message UpdateModel {
+  uint32 model_id = 1;
+}
+
+message DeleteModel {
+  uint32 model_id = 12;
+}
+
+message CreateModelVersion {
+  uint32 model_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyModelVersion {
+  uint32 source_model_id = 1;
+  uint32 source_model_version_id = 2;
+  optional uint32 target_model_id = 3;
+  optional uint32 target_model_version_id = 4;
+}
 
 
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
@@ -653,6 +692,14 @@ message CreateOperationLogRequest {
     ShareAlgorithmVersion share_algorithm_version = 86;
     DeleteAlgorithmVersion delete_algorithm_version = 87;
     CopyAlgorithmVersion copy_algorithm_version = 88;
+    CreateModel create_model = 89;
+    UpdateModel update_model = 90;
+    DeleteModel delete_model = 91;
+    CreateModelVersion create_model_version = 92;
+    UpdateModelVersion update_model_version = 93;
+    ShareModelVersion share_model_version = 94;
+    DeleteModelVersion delete_model_version = 95;
+    CopyModelVersion copy_model_version = 96;
   }
 }
 
@@ -749,6 +796,14 @@ message OperationLog {
     ShareAlgorithmVersion share_algorithm_version = 88;
     DeleteAlgorithmVersion delete_algorithm_version = 89;
     CopyAlgorithmVersion copy_algorithm_version = 90;
+    CreateModel create_model = 91;
+    UpdateModel update_model = 92;
+    DeleteModel delete_model = 93;
+    CreateModelVersion create_model_version = 94;
+    UpdateModelVersion update_model_version = 95;
+    ShareModelVersion share_model_version = 96;
+    DeleteModelVersion delete_model_version = 97;
+    CopyModelVersion copy_model_version = 98;
   }
 }
 
