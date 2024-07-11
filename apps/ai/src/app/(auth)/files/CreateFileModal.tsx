@@ -72,7 +72,7 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
         <Form.Item label="要创建的文件的目录">
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label="文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label="文件名" name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

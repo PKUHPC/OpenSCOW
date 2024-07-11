@@ -153,7 +153,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         versionDescription:r.versionDescription,
                       }}
                     >
-                    编辑
+                      编辑
                     </EditVersionModalButton>
                     <Button
                       type="link"
@@ -168,7 +168,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         }
                       }}
                     >
-                    查看文件
+                      查看文件
                     </Button>
                     <Button
                       type="link"
@@ -178,16 +178,17 @@ export const AlgorithmVersionList: React.FC<Props> = (
                           title: "分享算法版本",
                           content: `确认${getSharedStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
                           onOk: async () => {
-                            r.sharedStatus === SharedStatus.SHARED ?
+                            if (r.sharedStatus === SharedStatus.SHARED) {
                               await unShareMutation.mutateAsync({
                                 algorithmVersionId: r.id,
                                 algorithmId,
-                              })
-                              :
+                              });
+                            } else {
                               await shareMutation.mutateAsync({
                                 algorithmVersionId: r.id,
                                 algorithmId,
                               });
+                            }
                           },
                         });
                       }}
@@ -201,7 +202,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         deleteAlgorithmVersion(r.id);
                       }}
                     >
-                    删除
+                      删除
                     </Button>
                   </>
                 );

@@ -31,6 +31,7 @@ export const languageInfo = {
   en: { name: "US English" },
 };
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 export const { Localized, Provider, id, prefix, useI18n } = createI18n(languages);
 
 export type TextId = TextIdFromLangDict<typeof languages>;
@@ -73,17 +74,17 @@ export async function getTArgs(languageId: string) {
 
 export function getI18nCurrentText(
   i18nObject: I18nObject | undefined, languageId: string | undefined): string {
-  if (!i18nObject || !i18nObject.i18n) {
+  if (!i18nObject?.i18n) {
     return "";
   }
   // 当语言id或者对应的配置文本中某种语言不存在时，显示default的值
   if (!languageId) return i18nObject.i18n.default;
   switch (languageId) {
-  case SYSTEM_VALID_LANGUAGES.EN:
-    return i18nObject.i18n.en || i18nObject.i18n.default;
-  case SYSTEM_VALID_LANGUAGES.ZH_CN:
-    return i18nObject.i18n.zhCn || i18nObject.i18n.default;
-  default:
-    return i18nObject.i18n.default;
+    case SYSTEM_VALID_LANGUAGES.EN:
+      return i18nObject.i18n.en || i18nObject.i18n.default;
+    case SYSTEM_VALID_LANGUAGES.ZH_CN:
+      return i18nObject.i18n.zhCn || i18nObject.i18n.default;
+    default:
+      return i18nObject.i18n.default;
   }
 };

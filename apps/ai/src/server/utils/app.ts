@@ -156,7 +156,7 @@ export const fetchJobInputParams = async<T> (
     return schema.parse(parsedContent);
   } catch (e) {
 
-    logger.error(`Failed to parse input params file ${inputParamsPath}: ${e}`);
+    logger.error(`Failed to parse input params file ${inputParamsPath}: ${e as any}`);
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",
       message: `Failed to parse input params file ${inputParamsPath}`,
@@ -167,7 +167,7 @@ export const fetchJobInputParams = async<T> (
 export const validateUniquePaths = (paths: (string | undefined)[]) => {
 
   // 移除尾随斜杠并返回规范化的路径
-  const normalizedPaths = paths.map((path) => path && path.replace(/\/+$/, ""));
+  const normalizedPaths = paths.map((path) => path?.replace(/\/+$/, ""));
   const pathSet = new Set();
 
   for (const path of normalizedPaths) {

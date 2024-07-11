@@ -164,8 +164,8 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     return results.map((data) => {
       return {
         ...data,
-        operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
-        operationType: data.operationEvent?.["$case"] || "unknown",
+        operationCode: data.operationEvent?.$case ? OperationCodeMap[data.operationEvent?.$case] : "000000",
+        operationType: data.operationEvent?.$case || "unknown",
         operationDetail: getOperationDetail(data.operationEvent, t, tArgs, languageId),
       };
     });
@@ -236,7 +236,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
             let customEventType: string | undefined;
             let formatOperationType: string | undefined;
-            if (operationType && operationType.startsWith("customEvent-")) {
+            if (operationType?.startsWith("customEvent-")) {
               formatOperationType = "customEvent";
               customEventType = operationType.split("customEvent-")[1];
             } else {

@@ -20,6 +20,7 @@ import moon from "src/components/icons/moon.svg";
 import sun from "src/components/icons/sun.svg";
 import sunMoon from "src/components/icons/sun-moon.svg";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const modes = ["system", "dark", "light"] as const;
 
 const icons = {
@@ -34,7 +35,7 @@ const DarkModeContext = React.createContext<{
   mode: DarkMode;
   dark: boolean;
   setMode: (mode: DarkMode) => void;
-    }>(undefined!);
+}>(undefined!);
 
 export const useDarkMode = () => React.useContext(DarkModeContext);
 

@@ -37,13 +37,13 @@ interface Props {
   loginDesktopEnabledClusters: Cluster[]
 }
 
-export type DesktopItem = {
+export interface DesktopItem {
   desktopId: number,
   desktopName: string,
   wm: string,
   createTime?: string,
   addr: string,
-}
+};
 
 const p = prefix("pageComp.desktop.desktopTable.");
 

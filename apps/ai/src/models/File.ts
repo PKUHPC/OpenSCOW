@@ -12,10 +12,10 @@
 
 export type FileType = "FILE" | "DIR";
 
-export type FileInfo = {
+export interface FileInfo {
   name: string,
   type: FileType,
   mtime: string,
   mode: number,
   size: number,
-};
+}

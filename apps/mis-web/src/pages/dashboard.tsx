@@ -27,7 +27,7 @@ import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { useI18nTranslateToString } from "src/i18n";
 import { AccountInfoSection } from "src/pageComponents/dashboard/AccountInfoSection";
 import { JobsSection } from "src/pageComponents/dashboard/JobsSection";
-import { getUserStatus, GetUserStatusSchema } from "src/pages/api/dashboard/status";
+import { getUserStatus, type GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import { UserStore } from "src/stores/UserStore";
 import { ensureNotUndefined } from "src/utils/checkNull";
 
@@ -38,7 +38,7 @@ export type AccountInfo = Omit<AccountStatus, "balance" | "jobChargeLimit" | "us
   jobChargeLimit: Money | null;
   usedJobCharge: Money | null;
   blockThresholdAmount: number
-}
+};
 
 type Props = {
   error: AuthResultError;

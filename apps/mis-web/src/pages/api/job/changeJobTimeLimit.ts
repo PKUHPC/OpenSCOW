@@ -26,7 +26,7 @@ import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
   | "INCREASE"
-  | "DECREASE"
+  | "DECREASE";
 
 // 修改作业运行时限。
 // 只有平台管理员、租户管理员、或者作业发起者本人、或者作业发起者所在账户的管理员或者拥有者可以修改

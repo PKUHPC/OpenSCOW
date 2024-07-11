@@ -73,13 +73,17 @@ export const UserIndicator: React.FC<Props> = ({
                 ...userLinks ? userLinks.map((link) => {
                   return ({
                     key: link.text,
-                    label: EXTERNAL_URL_PREFIX.some((pref) => link.url.startsWith(pref)) ? <Typography.Link
-                      href={`${link.url}?token=${user.token}`}
-                      target={link.openInNewPage ? "_blank" : "_self"}
-                    >{link.text}</Typography.Link> : <Link
-                      href={`${link.url}?token=${user.token}`}
-                      target={link.openInNewPage ? "_blank" : "_self"}
-                    >{link.text}</Link>,
+                    label: EXTERNAL_URL_PREFIX.some((pref) => link.url.startsWith(pref)) ? (
+                      <Typography.Link
+                        href={`${link.url}?token=${user.token}`}
+                        target={link.openInNewPage ? "_blank" : "_self"}
+                      >{link.text}</Typography.Link>
+                    ) : (
+                      <Link
+                        href={`${link.url}?token=${user.token}`}
+                        target={link.openInNewPage ? "_blank" : "_self"}
+                      >{link.text}</Link>
+                    ),
                   });
                 }) : [],
                 { key: "logout",

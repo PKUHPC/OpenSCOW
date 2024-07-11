@@ -14,7 +14,7 @@ import { SimpleClusterSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 
-export type Cluster = { id: string; name: I18nStringType; }
+export interface Cluster { id: string; name: I18nStringType; };
 
 export const getClusterName = (
   clusterId: string,

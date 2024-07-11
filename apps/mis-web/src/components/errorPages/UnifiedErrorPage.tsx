@@ -21,7 +21,7 @@ import { ServerErrorPage } from "./ServerErrorPage";
 
 interface Props {
   code: number;
-  customComponents?: { [code: number]: React.ReactElement };
+  customComponents?: Record<number, React.ReactElement>;
 }
 
 export const UnifiedErrorPage: React.FC<Props> = ({
@@ -38,13 +38,13 @@ export const UnifiedErrorPage: React.FC<Props> = ({
   }, []);
 
   switch (code) {
-  case 401:
-    return customComponents[401] ?? <NotAuthorizedPage />;
-  case 403:
-    return customComponents[403] ?? <ForbiddenPage />;
-  case 404:
-    return customComponents[404] ?? <NotFoundPage />;
-  default:
-    return customComponents[code] ?? <ServerErrorPage />;
+    case 401:
+      return customComponents[401] ?? <NotAuthorizedPage />;
+    case 403:
+      return customComponents[403] ?? <ForbiddenPage />;
+    case 404:
+      return customComponents[404] ?? <NotFoundPage />;
+    default:
+      return customComponents[code] ?? <ServerErrorPage />;
   }
 };

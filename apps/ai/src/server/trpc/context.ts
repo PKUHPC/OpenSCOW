@@ -15,16 +15,16 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { ClientUserInfo } from "src/server/trpc/route/auth";
 
 
-export type Context = object
+export type Context = object;
 
 export type SSRContext<R = any> = Context & {
   req: NextApiRequest
   res: NextApiResponse<R>
   user?: ClientUserInfo
   [key: string]: unknown
-}
+};
 
-export type GlobalContext = SSRContext
+export type GlobalContext = SSRContext;
 
 export function isSSRContext(
   ctx: GlobalContext,

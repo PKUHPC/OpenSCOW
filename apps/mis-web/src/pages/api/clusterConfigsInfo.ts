@@ -28,7 +28,6 @@ import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
 import { getClusterConfigFiles } from "src/server/clusterConfig";
-import { queryIfInitialized } from "src/utils/init";
 import { route } from "src/utils/route";
 
 

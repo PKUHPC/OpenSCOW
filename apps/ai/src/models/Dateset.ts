@@ -26,7 +26,7 @@ export enum SceneType {
   OTHER = "OTHER",
 }
 
-export const DatasetTypeText: { [key: string]: string } = {
+export const DatasetTypeText: Record<string, string> = {
   IMAGE: "图像",
   TEXT: "文本",
   VIDEO: "视频",
@@ -34,7 +34,7 @@ export const DatasetTypeText: { [key: string]: string } = {
   OTHER: "其他",
 };
 
-export const SceneTypeText: { [key: string]: string } = {
+export const SceneTypeText: Record<string, string> = {
   CWS: "中文分词",
   DA: "数据增强",
   IC: "图像分类",

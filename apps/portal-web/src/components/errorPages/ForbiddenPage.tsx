@@ -15,15 +15,14 @@ import React from "react";
 import { useI18nTranslate, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 
 interface Props {
   title?: React.ReactNode;
   subTitle?: React.ReactNode;
 }
 
-export const ForbiddenPage: React.FC<Props> = ({
-}) => {
+export const ForbiddenPage: React.FC<Props> = () => {
 
   const tArgs = useI18nTranslate();
   const t = useI18nTranslateToString();

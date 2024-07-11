@@ -35,28 +35,28 @@ type Props = {
   loginDesktopEnabledClusters: Cluster[];
 };
 
-export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)
-((props: Props) => {
+export const DesktopIndexPage: NextPage<Props> = requireAuth(() => true)(
+  (props: Props) => {
 
-  if ("error" in props) {
-    return <UnifiedErrorPage code={props.error} />;
-  }
+    if ("error" in props) {
+      return <UnifiedErrorPage code={props.error} />;
+    }
 
-  const { enableLoginDesktop } = useStore(ClusterInfoStore);
-  if (!enableLoginDesktop || props.loginDesktopEnabledClusters.length === 0) {
-    return <NotFoundPage />;
-  }
+    const { enableLoginDesktop } = useStore(ClusterInfoStore);
+    if (!enableLoginDesktop || props.loginDesktopEnabledClusters.length === 0) {
+      return <NotFoundPage />;
+    }
 
-  const t = useI18nTranslateToString();
+    const t = useI18nTranslateToString();
 
-  return (
-    <div>
-      <Head title={t("pages.desktop.title")} />
-      <PageTitle titleText={t("pages.desktop.pageTitle")} />
-      <DesktopTable loginDesktopEnabledClusters={props.loginDesktopEnabledClusters} />
-    </div>
-  );
-});
+    return (
+      <div>
+        <Head title={t("pages.desktop.title")} />
+        <PageTitle titleText={t("pages.desktop.pageTitle")} />
+        <DesktopTable loginDesktopEnabledClusters={props.loginDesktopEnabledClusters} />
+      </div>
+    );
+  });
 
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {

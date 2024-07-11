@@ -40,8 +40,11 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
-                ? window.location.href = target : router.push(target);
+              if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+                window.location.href = target;
+              } else {
+                router.push(target);
+              }
             }
           }
           : undefined,

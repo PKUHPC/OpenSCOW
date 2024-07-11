@@ -45,9 +45,7 @@ interface Props {
   clusterId: string;
 }
 
-interface ImageErrorMap {
-  [appId: string]: boolean;
-}
+type ImageErrorMap = Record<string, boolean>;
 
 const p = prefix("pageComp.app.createApps.");
 
