@@ -21,7 +21,7 @@ const CLUSTER_CONFIG_BASE_PATH = "clusters";
 export const SimpleClusterSchema = Type.Object({
   clusterId: Type.String(),
   displayName: createI18nStringSchema({ description: "集群名称" }),
-  priority: Type.Number(),
+  priority: Type.Number({ description: "集群使用的优先级, 数字越小越先展示", default: Number.MAX_SAFE_INTEGER }),
 });
 export type SimpleClusterSchema = Static<typeof SimpleClusterSchema>;
 
