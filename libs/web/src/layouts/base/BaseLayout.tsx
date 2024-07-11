@@ -195,7 +195,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
           <Content>
             {children}
           </Content>
-          <Footer text={footerText} versionTag={versionTag}/>
+          <Footer text={footerText} versionTag={versionTag} />
         </ContentPart>
       </StyledLayout>
     </Root>

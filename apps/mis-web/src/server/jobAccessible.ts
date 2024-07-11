@@ -20,11 +20,11 @@ import { getClient } from "src/utils/client";
 
 type JobAccessible = "OK" | "NotFound" | "NotAllowed" | "LimitNotValid";
 
-type Result = {
+interface Result {
   job: RunningJob, jobAccessible: JobAccessible
-}
+};
 
-type ActionType = "cancelJob" | "changeJobLimit" | "queryJobLimit"
+type ActionType = "cancelJob" | "changeJobLimit" | "queryJobLimit";
 
 interface Props {
   actionType: ActionType
@@ -90,7 +90,8 @@ export async function checkJobAccessible({
       tenantName: info.tenant,
     });
 
-    results.length !== 0 ? result.jobAccessible = "OK" : result.jobAccessible = "NotAllowed";
+    result.jobAccessible = results.length === 0 ? "NotAllowed" : "OK";
+
     return result;
   }
 

@@ -34,6 +34,8 @@ import { z } from "zod";
 
 const SESSION_METADATA_NAME = "session.json";
 
+
+
 // 分布式训练框架
 export const Framework = z.union([
   z.literal("tensorflow"),
@@ -44,12 +46,13 @@ export const Framework = z.union([
 export type FrameworkType = z.infer<typeof Framework>;
 
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const ImageSchema = z.object({
   name: z.string(),
   tag: z.string().optional(),
 });
 
-export type Image = z.infer<typeof ImageSchema>
+export type Image = z.infer<typeof ImageSchema>;
 
 interface SessionMetadata {
   sessionId: string;

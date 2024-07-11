@@ -75,9 +75,6 @@ export default async () => {
       // });
       return config;
     },
-    compiler: {
-      styledComponents: true,
-    },
     skipTrailingSlashRedirect: true,
     transpilePackages: ["antd", "@ant-design/icons"],
   };

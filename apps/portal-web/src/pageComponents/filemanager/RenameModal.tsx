@@ -70,7 +70,7 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           <Form.Item label={t(p("renameLabel"))}>
             <strong>{path}</strong>
           </Form.Item>
-          <Form.Item<FormProps> label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
+          <Form.Item label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Form>

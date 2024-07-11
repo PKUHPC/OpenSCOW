@@ -20,7 +20,7 @@ import { User, UserStore } from "src/stores/UserStore";
 type UserStoreType = ReturnType<typeof UserStore>;
 
 export interface RequireAuthProps {
-  userStore: UserStoreType & { user: User },
+  userStore: UserStoreType & { user: User }
 }
 
 export type Check = (info: UserInfo) => boolean;
@@ -43,7 +43,7 @@ export const requireAuth = (
     }
 
     if (extraCheck) {
-      const node = extraCheck(userStore.user!);
+      const node = extraCheck(userStore.user);
       if (node) {
         return node;
       }

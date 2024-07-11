@@ -53,14 +53,17 @@ export const CreateEditDatasetModal: React.FC<Props> = (
   }, []);
 
   const resetForm = () => {
-    isEdit && editData ?
+    if (isEdit && editData) {
       form.setFieldsValue({
         type: editData.type,
         scene: editData.scene,
-      }) : form.setFieldsValue({
+      });
+    } else {
+      form.setFieldsValue({
         type: DatasetType.IMAGE,
         scene: SceneType.CWS,
       });
+    }
   };
 
   const createMutation = trpc.dataset.createDataset.useMutation({
@@ -117,20 +120,24 @@ export const CreateEditDatasetModal: React.FC<Props> = (
 
   const onOk = async () => {
     const { name, type, description, scene, cluster } = await form.validateFields();
-    (isEdit && editData) ? editMutation.mutate({
-      id: editData.id,
-      name,
-      type,
-      scene,
-      description,
-    })
-      : createMutation.mutate({
+    if (isEdit && editData) {
+
+      editMutation.mutate({
+        id: editData.id,
+        name,
+        type,
+        scene,
+        description,
+      });
+    } else {
+      createMutation.mutate({
         name,
         clusterId: cluster.id,
         type,
         description,
         scene,
       });
+    }
   };
 
   return (

@@ -29,7 +29,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
 
   useEffect(() => {
 
-    if (data && data.accounts.length) {
+    if (data?.accounts.length) {
       if (!value || !data.accounts.includes(value)) {
         onChange?.(data.accounts[0]);
       }

@@ -21,9 +21,9 @@ export interface ErrorBoundaryContentProps {
 
 type Props = PropsWithChildren<{ Component: React.ComponentType<ErrorBoundaryContentProps>; pathname: string }>;
 
-type State = {
- error?: Error;
-}
+interface State {
+  error?: Error;
+};
 
 export class ErrorBoundary extends React.Component<Props, State> {
 

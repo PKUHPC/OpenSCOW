@@ -19,7 +19,7 @@ import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
 
-type Props = {
+interface Props {
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -34,7 +34,7 @@ type Props = {
    * @param tenants all tenants
    */
   onTenantsFetched?: (tenants: string[]) => void;
-}
+};
 const p = prefix("pageComp.tenant.tenantSelector.");
 
 export const TenantSelector: React.FC<Props> = ({

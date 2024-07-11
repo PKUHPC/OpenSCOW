@@ -244,7 +244,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
       </FilterFormContainer>
       <Table
         tableLayout="fixed"
-        dataSource={data?.results as Array<TableProps>}
+        dataSource={data?.results as TableProps[]}
         loading={isLoading}
         pagination={{
           showSizeChanger: true,

@@ -57,7 +57,7 @@ export const ClusterManagementPage: NextPage =
       ]);
 
       const combinedClusterList: CombinedClusterInfo[] = [];
-      const currentActivatedClusters: {[clusterId: string]: Cluster} = {};
+      const currentActivatedClusters: Record<string, Cluster> = {};
       // sort by cluster's priority
       const sortedConnectionClustersData = connectionClustersData.results.sort((a, b) => {
         const sortedIds = clusterSortedIdList;

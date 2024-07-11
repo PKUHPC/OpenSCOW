@@ -71,22 +71,22 @@ export const getPaymentRecordTarget = (
   targetNames: string[] | undefined,
 ) => {
   switch (searchType) {
-  case SearchType.tenant:
-    return targetNames
-      ? { $case:"tenant" as const, tenant:{ tenantName:targetNames[0] } }
-      : { $case:"allTenants" as const, allTenants:{ } };
-  case SearchType.selfTenant:
-    return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
-  case SearchType.selfAccount:
-    return { $case:"accountsOfTenant" as const,
-      accountsOfTenant:{ tenantName:user.tenant, accountNames:targetNames ?? []} };
-  case SearchType.account:
-    return targetNames
-      ? { $case:"accountsOfTenant" as const,
-        accountsOfTenant:{ tenantName:tenantOfAccount, accountNames:targetNames } }
-      : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant, accountNames:[]} };
-  default:
-    break;
+    case SearchType.tenant:
+      return targetNames
+        ? { $case:"tenant" as const, tenant:{ tenantName:targetNames[0] } }
+        : { $case:"allTenants" as const, allTenants:{ } };
+    case SearchType.selfTenant:
+      return { $case:"tenant" as const, tenant:{ tenantName:user.tenant } };
+    case SearchType.selfAccount:
+      return { $case:"accountsOfTenant" as const,
+        accountsOfTenant:{ tenantName:user.tenant, accountNames:targetNames ?? []} };
+    case SearchType.account:
+      return targetNames
+        ? { $case:"accountsOfTenant" as const,
+          accountsOfTenant:{ tenantName:tenantOfAccount, accountNames:targetNames } }
+        : { $case:"accountsOfTenant" as const, accountsOfTenant:{ tenantName:user.tenant, accountNames:[]} };
+    default:
+      break;
   }
 };
 

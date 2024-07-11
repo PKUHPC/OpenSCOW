@@ -33,11 +33,11 @@ import { SaveImageModal } from "./SaveImageModal";
 
 interface FilterForm {
   appJobName: string | undefined
- }
+}
 
 export enum AppTableStatus {
   UNFINISHED = "UNFINISHED",
-  FINISHED = "FINISHED"
+  FINISHED = "FINISHED",
 }
 
 interface Props {
@@ -262,7 +262,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
     return data.sessions.filter((x) => {
       if (query.appJobName) {
-        return x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase());
+        return x.sessionId.toLowerCase().includes(query.appJobName.toLowerCase());
       }
       return true;
     }).map((x) => ({
@@ -304,7 +304,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                 checked={checked}
                 onChange={(e) => { setChecked(e.target.checked); }}
               >
-              10s自动刷新
+                10s自动刷新
               </Checkbox>
             </Form.Item>
           ) }
