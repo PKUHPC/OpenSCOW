@@ -23,14 +23,22 @@ import { scowdClientNotFound } from "./errors";
 export const certificates = createScowdCertificates(config);
 
 function extractIP(address: string): string {
-  const ipPortPattern = /(\d{1,3}\.){3}\d{1,3}/;
-  const match = ipPortPattern.exec(address);
-  if (match) {
-    return match[0];
-  } else {
-    throw new Error("Invalid address format");
+  const ipv4Pattern = /(\d{1,3}\.){3}\d{1,3}/;
+  const ipv6Pattern = /([0-9a-fA-F]{1,4}:){1,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:([0-9a-fA-F]{1,4}:){1,7}|::/;
+
+  const ipv4Match = ipv4Pattern.exec(address);
+  if (ipv4Match) {
+    return ipv4Match[0];
   }
+
+  const ipv6Match = ipv6Pattern.exec(address);
+  if (ipv6Match) {
+    return ipv6Match[0];
+  }
+
+  return address;
 }
+
 
 export function getLoginNodeScowdUrl(cluster: string, host: string): string | undefined {
   const loginNode = getLoginNodeFromAddress(cluster, host);
