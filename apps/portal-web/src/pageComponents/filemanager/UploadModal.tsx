@@ -114,15 +114,17 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       const chunks: FileChunk[] = [];
       for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {
-        const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
         const fileName = `${md5}_${start + 1}.${suffix}`;
-
-        if (!uploadedChunks.includes(fileName)) {
-          chunks.push({
-            file: chunk,
-            fileName,
-          });
+        if (uploadedChunks.includes(fileName)) {
+          continue;
         }
+
+        const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
+
+        chunks.push({
+          file: chunk,
+          fileName,
+        });
       }
 
       const uploadPromises = chunks.map((chunk) => {
