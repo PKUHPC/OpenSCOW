@@ -196,7 +196,7 @@ export const fileServiceServer = plugin((server) => {
     },
 
     mergeFileChunks: async ({ request }) => {
-      const { cluster, userId, path, md5 } = request;
+      const { cluster, userId, path, md5, name } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
@@ -207,7 +207,7 @@ export const fileServiceServer = plugin((server) => {
       if (clusterInfo.scowd?.enabled) {
         const client = getScowdClient(cluster);
 
-        await client.file.mergeFileChunks({ userId, path, md5 });
+        await client.file.mergeFileChunks({ userId, path, md5, name });
       } else {
         throw {
           code: Status.UNIMPLEMENTED,
