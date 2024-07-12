@@ -129,6 +129,19 @@ message MakeDirectoryRequest {
 message MakeDirectoryResponse {
 }
 
+message InitMultipartUploadRequest {
+  string cluster = 1;
+  string user_id = 2;
+  string path = 3;
+  string name = 4;
+}
+
+message InitMultipartUploadResponse {
+  string temp_file_dir = 1;
+  uint64 chunk_size = 2;
+  repeated FileInfo files_info = 4;
+}
+
 message UploadRequest {
 
   message Info {
@@ -154,6 +167,7 @@ message MergeFileChunksRequest {
   string path = 3;
   string md5 = 4;
   string name = 5;
+  uint64 size = 6;
 }
 
 message MergeFileChunksResponse {
@@ -245,6 +259,7 @@ service FileService {
 
   rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse);
 
+  rpc InitMultipartUpload(InitMultipartUploadRequest) returns (InitMultipartUploadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
   rpc MergeFileChunks(MergeFileChunksRequest) returns (MergeFileChunksResponse);
 

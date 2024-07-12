@@ -103,6 +103,18 @@ message CopyRequest {
 message CopyResponse {
 }
 
+message InitMultipartUploadRequest {
+  string user_id = 1;
+  string path = 2;
+  string name = 3;
+}
+
+message InitMultipartUploadResponse {
+  string temp_file_dir = 1;
+  uint64 chunk_size = 2;
+  repeated FileInfo files_info = 4;
+}
+
 message UploadRequest {
 
   message Info {
@@ -125,6 +137,7 @@ message MergeFileChunksRequest {
   string path = 2;
   string md5 = 3;
   string name = 4;
+  uint64 size = 5;
 }
 
 message MergeFileChunksResponse {
@@ -202,6 +215,7 @@ service FileService {
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
 
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc InitMultipartUpload(InitMultipartUploadRequest) returns (InitMultipartUploadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
   rpc MergeFileChunks(MergeFileChunksRequest) returns (MergeFileChunksResponse);
 
