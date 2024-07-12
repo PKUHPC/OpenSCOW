@@ -233,6 +233,26 @@ export const jobServiceServer = plugin((server) => {
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
+      // 检查是否存在同名的作业
+      const existedJobName = await callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.job, "getJobs", {
+          fields: ["job_id"],
+          filter: {
+            users: [userId], accounts: [], states: [],jobName,
+          },
+        }),
+      ).then((resp) => resp.jobs);
+
+      if (existedJobName.length) {
+        throw {
+          code: Status.ALREADY_EXISTS,
+          message: "already exists",
+          details: `jobName ${jobName} is already existed`,
+        } as ServiceError;
+      }
+
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);
       if (!host) { throw clusterNotFound(cluster); }
