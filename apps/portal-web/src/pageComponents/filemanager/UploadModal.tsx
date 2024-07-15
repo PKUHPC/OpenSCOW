@@ -89,7 +89,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     const totalCount = Math.ceil(file.size / chunkSize);
 
     // 并发上传数
-    const concurrentChunks = 5;
+    const concurrentChunks = 3;
 
     // 跟踪已上传的块数
     let uploadedCount = uploadedChunks.length;
