@@ -84,7 +84,7 @@ export async function fetchJobs(
         logger.info("!!![important] No available activated clusters.This will skip fetching Jobs in cluster!!!");
         logger.info(e);
         return {};
-      }); ;
+      });
 
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];

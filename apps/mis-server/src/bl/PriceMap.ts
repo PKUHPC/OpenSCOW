@@ -89,8 +89,7 @@ export async function createPriceMap(
     return price;
   };
 
-  // partitions info for all clusters
-  const partitionsForClusters: Record<string, Partition[]> = {};
+
 
   // call for all activated clusters
   const activatedClusters = await getActivatedClusters(em, logger).catch((e) => {
@@ -98,15 +97,22 @@ export async function createPriceMap(
     logger.info(e);
     return {};
   });
-  const reply = await clusterPlugin.callOnAll(
-    activatedClusters,
-    logger,
-    async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-  );
   
-  reply.forEach((x) => {
-    partitionsForClusters[x.cluster] = x.result.partitions;
-  });
+  // partitions info for all clusters
+  const partitionsForClusters: Record<string, Partition[]> = {};
+
+  await Promise.allSettled(Object.keys(activatedClusters).map(async (cluster) => {
+    try {
+      const result = await clusterPlugin.callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),      
+      );
+      partitionsForClusters[cluster] = result.partitions;
+    } catch (error) { 
+      logger.info(`Can not get cluster's (clusterId: ${cluster}) config info from adapter.`, error);
+    };
+  }));
 
   return {
 
