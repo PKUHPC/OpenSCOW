@@ -11,13 +11,11 @@
  */
 
 import { CloseOutlined, FileOutlined, FolderOutlined } from "@ant-design/icons";
-import CryptoJS from "crypto-js";
+import * as crypto from "crypto";
 import { join } from "path";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { FileInfo, FileType } from "src/pages/api/file/list";
 import { styled } from "styled-components";
-
-
 
 export type FileInfoKey = React.Key;
 
@@ -53,24 +51,13 @@ export const openPreviewLink = (href: string) => {
   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
 };
 
-export const generateMD5FromFileName = (file: File) => {
-  const filename = file.name;
-  const md5 = CryptoJS.MD5(filename).toString();
+export async function calculateBlobSHA256(blob: Blob): Promise<string> {
+  const arrayBuffer = await blob.arrayBuffer();
 
-  // 通过正则获取文件后缀
-  const reg = /\.([a-zA-Z0-9]+)$/.exec(filename);
-  const suffix = reg ? reg[1] : "";
+  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
-  return { md5, suffix };
-};
+  return hashHex;
+}
 
-// 获取文件的块数
-export const getFileChunkSize = (file: File) => {
-  const singleChunkSize = 10; // 10 MB
-  const chunkSize = singleChunkSize * 1024 * 1024;
-
-  const count = Math.ceil(file.size / chunkSize);
-
-
-  return { chunkSize, totalCount: count };
-};

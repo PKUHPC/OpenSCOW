@@ -90,6 +90,7 @@ export const OperationType: OperationTypeEnum = {
   deactivateCluster: "deactivateCluster",
   customEvent: "customEvent",
   mergeFileChunks: "mergeFileChunks",
+  initMultipartUpload: "initMultipartUpload",
 };
 
 export const OperationLog = Type.Object({
@@ -209,6 +210,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     deactivateCluster: t(pTypes("deactivateCluster")),
     customEvent: t(pTypes("customEvent")),
     mergeFileChunks: t(pTypes("mergeFileChunks")),
+    initMultipartUpload: t(pTypes("initMultipartUpload")),
   };
 
 };
@@ -234,6 +236,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   copyFileItem: "010507",
   submitFileItemAsJob: "010508",
   mergeFileChunks: "010509",
+  initMultipartUpload: "010510",
   setJobTimeLimit: "010601",
   createUser: "020201",
   addUserToAccount: "020202",

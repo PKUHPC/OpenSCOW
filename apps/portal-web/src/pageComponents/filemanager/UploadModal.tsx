@@ -18,7 +18,7 @@ import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
-import { generateMD5FromFileName, getFileChunkSize } from "src/utils/file";
+import { calculateBlobSHA256 } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
 
 interface Props {
@@ -68,17 +68,12 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
 
   const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
-    // 获取文件唯一标识
-    const { md5, suffix } = generateMD5FromFileName(file);
 
-    const hiddenMd5 = "." + md5;
+    const { tempFileDir, chunkSize, filesInfo } = await api.initMultipartUpload({
+      body: { cluster, path, name: file.name },
+    });
 
-    // 如果不存在则忽略
-    const { items } = await api.listFile({ query: {
-      cluster, path: join(path, hiddenMd5), checkFileChunks: true,
-    } });
-
-    const uploadedChunks = items.sort((a, b) => {
+    const uploadedChunks = filesInfo.sort((a, b) => {
       const reg = /_(\d+)/;
       const matchA = reg.exec(a.name);
       const matchB = reg.exec(b.name);
@@ -90,8 +85,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       }
     }).map((item) => item.name);
 
-    // 给文件按块大小算出每块大小和总数
-    const { chunkSize, totalCount } = getFileChunkSize(file);
+    // 文件分块总数
+    const totalCount = Math.ceil(file.size / chunkSize);
 
     // 并发上传数
     const concurrentChunks = 5;
@@ -114,24 +109,31 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       const chunks: FileChunk[] = [];
       for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {
-        const fileName = `${md5}_${start + 1}.${suffix}`;
-        if (uploadedChunks.includes(fileName)) {
-          continue;
-        }
-
         const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
 
-        chunks.push({
-          file: chunk,
-          fileName,
-        });
+        try {
+          const hash = await calculateBlobSHA256(chunk);
+
+          const fileName = `${hash}_${start + 1}.scowuploadtemp`;
+          if (uploadedChunks.includes(fileName)) {
+            continue;
+          }
+
+          chunks.push({
+            file: chunk,
+            fileName,
+          });
+        } catch (err) {
+          message.error(`Error calculating hash: ${err.message}`);
+          return;
+        }
       }
 
       const uploadPromises = chunks.map((chunk) => {
         const formData = new FormData();
         formData.append("file", chunk.file);
 
-        return fetch(urlToUpload(cluster, join(path, hiddenMd5, chunk.fileName)), {
+        return fetch(urlToUpload(cluster, join(tempFileDir, chunk.fileName)), {
           method: "POST",
           body: formData,
         }).then((response) => {
@@ -149,7 +151,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       await Promise.all(uploadPromises);
     }
 
-    await api.mergeFileChunks({ body: { cluster, path, md5, name: file.name } });
+    await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } });
   };
 
   return (

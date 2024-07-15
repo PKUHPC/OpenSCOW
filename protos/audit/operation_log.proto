@@ -121,6 +121,12 @@ message DeleteFile {
   string path = 2;
 }
 
+message InitMultipartUpload {
+  string cluster_id = 1;
+  string path = 2;
+  string name = 3;
+}
+
 message UploadFile {
   string cluster_id = 1;
   string path = 2;
@@ -130,7 +136,7 @@ message MergeFileChunks {
   string cluster_id = 1;
   string path = 2;
   string name = 3;
-  string md5 = 4;
+  uint64 size = 4;
 }
 
 message CreateDirectory {
@@ -515,6 +521,7 @@ message CreateOperationLogRequest {
     ActivateCluster activate_cluster = 63;
     DeactivateCluster deactivate_cluster = 64;
     MergeFileChunks merge_file_chunks =  65;
+    InitMultipartUpload init_multipart_upload = 66;
   }
 }
 
@@ -588,6 +595,7 @@ message OperationLog {
     ActivateCluster activate_cluster = 65;
     DeactivateCluster deactivate_cluster = 66;
     MergeFileChunks merge_file_chunks = 67;
+    InitMultipartUpload init_multipart_upload = 68;
   }
 }
 

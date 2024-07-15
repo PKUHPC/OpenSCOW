@@ -35,6 +35,7 @@ export const OperationType: OperationTypeEnum = {
   createApp: "createApp",
   createFile: "createFile",
   deleteFile: "deleteFile",
+  initMultipartUpload: "initMultipartUpload",
   uploadFile: "uploadFile",
   mergeFileChunks: "mergeFileChunks",
   createDirectory: "createDirectory",

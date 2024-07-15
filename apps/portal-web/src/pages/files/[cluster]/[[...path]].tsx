@@ -45,9 +45,7 @@ export const FileManagerPage: NextPage<Props> = requireAuth(() => true)((props: 
   const pathParts = queryToArray(router.query.path);
 
   const cluster = queryToString(router.query.cluster);
-  console.log("234", props.scowdEnabledClusters, cluster);
   const [ scowdEnabled, _ ] = useState<boolean>(!!props.scowdEnabledClusters?.includes(cluster));
-  console.log("345", scowdEnabled);
 
   const t = useI18nTranslateToString();
 
@@ -107,8 +105,6 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => 
   const scowdEnabledClusters: string[] = Object.entries(resp.clusterConfigs)
     .filter(([_, config]) => !!config.scowd?.enabled)
     .map(([cluster, _]) => cluster);
-
-  console.log("123", scowdEnabledClusters);
 
   return {
     props: {

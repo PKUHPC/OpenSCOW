@@ -56,7 +56,7 @@ export const ListFileSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-const mapType = {
+export const mapType = {
   [FileInfo_FileType.DIR]: "DIR",
   [FileInfo_FileType.FILE]: "FILE",
 } as const;

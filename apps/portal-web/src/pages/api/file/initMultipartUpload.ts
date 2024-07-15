@@ -22,18 +22,23 @@ import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError, parseIp } from "src/utils/server";
 
-export const MergeFileChunksSchema = typeboxRouteSchema({
+import { FileInfo, mapType } from "./list";
+
+export const InitMultipartUploadSchema = typeboxRouteSchema({
   method: "POST",
 
   body: Type.Object({
     cluster: Type.String(),
     path: Type.String(),
     name: Type.String(),
-    size: Type.Number(),
   }),
 
   responses: {
-    204: Type.Null(),
+    200: Type.Object({
+      tempFileDir: Type.String(),
+      chunkSize: Type.Number(),
+      filesInfo: Type.Array(FileInfo),
+    }),
     409: Type.Object({ code: Type.Literal("ALREADY_EXISTS") }),
     400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
   },
@@ -41,30 +46,35 @@ export const MergeFileChunksSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(MergeFileChunksSchema, async (req, res) => {
+export default route(InitMultipartUploadSchema, async (req, res) => {
 
   const info = await auth(req, res);
 
   if (!info) { return; }
 
-  const { cluster, path, name, size } = req.body;
+  const { cluster, path, name } = req.body;
 
   const client = getClient(FileServiceClient);
 
   const logInfo = {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
-    operationTypeName: OperationType.mergeFileChunks,
+    operationTypeName: OperationType.initMultipartUpload,
     operationTypePayload:{
-      clusterId: cluster, path, name, size,
+      clusterId: cluster, path, name,
     },
   };
 
-  return asyncUnaryCall(client, "mergeFileChunks", {
-    cluster, path, userId: info.identityId, name, size,
-  }).then(async () => {
+  return asyncUnaryCall(client, "initMultipartUpload", {
+    cluster, path, userId: info.identityId, name,
+  }).then(async (res) => {
     await callLog(logInfo, OperationResult.SUCCESS);
-    return { 204: null };
+    return { 200: {
+      ...res,
+      filesInfo: res.filesInfo.map(({ mode, mtime, name, size, type }) => ({
+        mode, mtime, name, size, type: mapType[type],
+      })),
+    } };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
     [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),

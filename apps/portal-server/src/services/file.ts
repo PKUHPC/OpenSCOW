@@ -15,7 +15,9 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { loggedExec, sftpAppendFile, sftpExists, sftpMkdir,
   sftpReadFile, sftpRealPath, sshRmrf } from "@scow/lib-ssh";
-import { FileServiceServer, FileServiceService, TransferInfo } from "@scow/protos/build/portal/file";
+import {
+  FileInfo, fileInfo_FileTypeFromJSON, FileServiceServer, FileServiceService, TransferInfo,
+} from "@scow/protos/build/portal/file";
 import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
 import { checkActivatedClusters } from "src/utils/clusters";
@@ -195,8 +197,8 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
-    mergeFileChunks: async ({ request }) => {
-      const { cluster, userId, path, md5, name } = request;
+    initMultipartUpload: async ({ request }) => {
+      const { cluster, userId, path, name } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
@@ -207,7 +209,41 @@ export const fileServiceServer = plugin((server) => {
       if (clusterInfo.scowd?.enabled) {
         const client = getScowdClient(cluster);
 
-        await client.file.mergeFileChunks({ userId, path, md5, name });
+        const initData = await client.file.initMultipartUpload({ userId, path, name });
+        return [{
+          ...initData,
+          chunkSize: Number(initData.chunkSize),
+          filesInfo: initData.filesInfo.map((info): FileInfo => {
+            return {
+              name: info.name,
+              type: fileInfo_FileTypeFromJSON(info.fileType),
+              mtime: info.modTime,
+              mode: info.mode,
+              size: Number(info.size),
+            };
+          }),
+        }];
+      } else {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "The mergeFileChunks interface is not implemented",
+        } as ServiceError;
+      }
+    },
+
+    mergeFileChunks: async ({ request }) => {
+      const { cluster, userId, path, name, size } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const clusterInfo = configClusters[cluster];
+      if (clusterInfo.scowd?.enabled) {
+        const client = getScowdClient(cluster);
+
+        await client.file.mergeFileChunks({ userId, path, name, size: BigInt(size) });
       } else {
         throw {
           code: Status.UNIMPLEMENTED,

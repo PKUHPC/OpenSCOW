@@ -135,9 +135,8 @@ message UploadResponse {
 message MergeFileChunksRequest {
   string user_id = 1;
   string path = 2;
-  string md5 = 3;
-  string name = 4;
-  uint64 size = 5;
+  string name = 3;
+  uint64 size = 4;
 }
 
 message MergeFileChunksResponse {
