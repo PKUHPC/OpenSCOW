@@ -111,14 +111,14 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       return;
     }
 
+    const controller = new AbortController();
+
     for (let i = 0; i < totalCount; i += concurrentChunks) {
 
-      const controller = new AbortController();
-      if (!uploadControllers.current.get(uploadFile.uid)) {
+      if (!uploadControllers.current.get(uploadFile.uid) && !controller.signal.aborted) {
         uploadControllers.current.set(uploadFile.uid, controller);
-      } else if (uploadControllers.current.get(uploadFile.uid)?.signal.aborted) {
+      } else if (controller.signal.aborted) {
         message.info(`文件 ${file.name} 上传已取消`);
-        uploadControllers.current.delete(uploadFile.uid);
         return;
       }
 

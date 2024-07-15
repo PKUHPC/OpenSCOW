@@ -112,7 +112,7 @@ message InitMultipartUploadRequest {
 message InitMultipartUploadResponse {
   string temp_file_dir = 1;
   uint64 chunk_size = 2;
-  repeated FileInfo files_info = 4;
+  repeated FileInfo files_info = 3;
 }
 
 message UploadRequest {
