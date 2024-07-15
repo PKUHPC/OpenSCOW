@@ -111,6 +111,22 @@ message CreateApp {
   optional string cluster_id = 3;
 }
 
+message CreateAiTrain {
+  string cluster_id = 1;
+  optional uint32 job_id = 2;
+}
+
+message CancelAiTrainOrApp {
+  string cluster_id = 1;
+  uint32 job_id = 2;
+}
+
+message SaveImage {
+  uint32 job_id = 1;
+  optional uint32 image_id = 2;
+  optional string tag = 3;
+}
+
 message CreateFile {
   string cluster_id = 1;
   string path = 2;
@@ -453,6 +469,151 @@ message CustomEvent {
   common.I18nObject content = 3;
 }
 
+message CreateImage {
+  string cluster_id = 1;
+  optional string tag = 2;
+  optional uint32 image_id = 3;
+}
+
+message UpdateImage {
+  uint32 image_id = 1;
+}
+
+message ShareImage {
+  uint32 image_id = 1;
+}
+
+message DeleteImage {
+  uint32 image_id = 1;
+}
+
+message CopyImage {
+  uint32 source_image_id = 1;
+  optional uint32 target_image_id = 2;
+  optional string target_image_tag = 3;
+}
+
+message CreateDataset {
+  string cluster_id = 1;
+  optional uint32 dataset_id = 2;
+}
+
+message UpdateDataset {
+  uint32 dataset_id = 1;
+}
+
+message DeleteDataset {
+  uint32 dataset_id = 12;
+}
+
+message CreateDatasetVersion {
+  uint32 dataset_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyDatasetVersion {
+  uint32 source_dataset_id = 1;
+  uint32 source_dataset_version_id = 2;
+  optional uint32 target_dataset_id = 3;
+  optional uint32 target_dataset_version_id = 4;
+}
+
+message CreateAlgorithm {
+  string cluster_id = 1;
+  optional uint32 algorithm_id = 2;
+}
+
+message UpdateAlgorithm {
+  uint32 algorithm_id = 1;
+}
+
+message DeleteAlgorithm {
+  uint32 algorithm_id = 12;
+}
+
+message CreateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyAlgorithmVersion {
+  uint32 source_algorithm_id = 1;
+  uint32 source_algorithm_version_id = 2;
+  optional uint32 target_algorithm_id = 3;
+  optional uint32 target_algorithm_version_id = 4;
+}
+
+message CreateModel {
+  string cluster_id = 1;
+  optional uint32 model_id = 2;
+}
+
+message UpdateModel {
+  uint32 model_id = 1;
+}
+
+message DeleteModel {
+  uint32 model_id = 12;
+}
+
+message CreateModelVersion {
+  uint32 model_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyModelVersion {
+  uint32 source_model_id = 1;
+  uint32 source_model_version_id = 2;
+  optional uint32 target_model_id = 3;
+  optional uint32 target_model_version_id = 4;
+}
+
+
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
@@ -520,8 +681,40 @@ message CreateOperationLogRequest {
     CustomEvent custom_event = 62;
     ActivateCluster activate_cluster = 63;
     DeactivateCluster deactivate_cluster = 64;
-    MergeFileChunks merge_file_chunks =  65;
-    InitMultipartUpload init_multipart_upload = 66;
+    CreateImage create_image = 65;
+    UpdateImage update_image = 66;
+    ShareImage share_image = 67;
+    DeleteImage delete_image = 68;
+    CopyImage copy_image = 69;
+    CreateDataset create_dataset = 70;
+    UpdateDataset update_dataset = 71;
+    DeleteDataset delete_dataset = 72;
+    CreateDatasetVersion create_dataset_version = 73;
+    UpdateDatasetVersion update_dataset_version = 74;
+    ShareDatasetVersion share_dataset_version = 75;
+    DeleteDatasetVersion delete_dataset_version = 76;
+    CopyDatasetVersion copy_dataset_version = 77;
+    CreateAiTrain create_ai_train = 78;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 79;
+    SaveImage save_image = 80;
+    CreateAlgorithm create_algorithm = 81;
+    UpdateAlgorithm update_algorithm = 82;
+    DeleteAlgorithm delete_algorithm = 83;
+    CreateAlgorithmVersion create_algorithm_version = 84;
+    UpdateAlgorithmVersion update_algorithm_version = 85;
+    ShareAlgorithmVersion share_algorithm_version = 86;
+    DeleteAlgorithmVersion delete_algorithm_version = 87;
+    CopyAlgorithmVersion copy_algorithm_version = 88;
+    CreateModel create_model = 89;
+    UpdateModel update_model = 90;
+    DeleteModel delete_model = 91;
+    CreateModelVersion create_model_version = 92;
+    UpdateModelVersion update_model_version = 93;
+    ShareModelVersion share_model_version = 94;
+    DeleteModelVersion delete_model_version = 95;
+    CopyModelVersion copy_model_version = 96;
+    MergeFileChunks merge_file_chunks =  97;
+    InitMultipartUpload init_multipart_upload = 98;
   }
 }
 
@@ -594,8 +787,40 @@ message OperationLog {
     CustomEvent custom_event = 64;
     ActivateCluster activate_cluster = 65;
     DeactivateCluster deactivate_cluster = 66;
-    MergeFileChunks merge_file_chunks = 67;
-    InitMultipartUpload init_multipart_upload = 68;
+    CreateImage create_image = 67;
+    UpdateImage update_image = 68;
+    ShareImage share_image = 69;
+    DeleteImage delete_image = 70;
+    CopyImage copy_image = 71;
+    CreateDataset create_dataset = 72;
+    UpdateDataset update_dataset = 73;
+    DeleteDataset delete_dataset = 74;
+    CreateDatasetVersion create_dataset_version = 75;
+    UpdateDatasetVersion update_dataset_version = 76;
+    ShareDatasetVersion share_dataset_version = 77;
+    DeleteDatasetVersion delete_dataset_version = 78;
+    CopyDatasetVersion copy_dataset_version = 79;
+    CreateAiTrain create_ai_train = 80;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 81;
+    SaveImage save_image = 82;
+    CreateAlgorithm create_algorithm = 83;
+    UpdateAlgorithm update_algorithm = 84;
+    DeleteAlgorithm delete_algorithm = 85;
+    CreateAlgorithmVersion create_algorithm_version = 86;
+    UpdateAlgorithmVersion update_algorithm_version = 87;
+    ShareAlgorithmVersion share_algorithm_version = 88;
+    DeleteAlgorithmVersion delete_algorithm_version = 89;
+    CopyAlgorithmVersion copy_algorithm_version = 90;
+    CreateModel create_model = 91;
+    UpdateModel update_model = 92;
+    DeleteModel delete_model = 93;
+    CreateModelVersion create_model_version = 94;
+    UpdateModelVersion update_model_version = 95;
+    ShareModelVersion share_model_version = 96;
+    DeleteModelVersion delete_model_version = 97;
+    CopyModelVersion copy_model_version = 98;
+    MergeFileChunks merge_file_chunks = 99;
+    InitMultipartUpload init_multipart_upload = 100;
   }
 }
 

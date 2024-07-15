@@ -14,6 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
@@ -32,6 +33,7 @@ import { quote } from "shell-quote";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkAppExist, checkCreateAppEntity,
   fetchJobInputParams, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
@@ -49,6 +51,7 @@ import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { isParentOrSameFolder } from "src/utils/file";
 import { isPortReachable } from "src/utils/isPortReachable";
+import { parseIp } from "src/utils/parse";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
@@ -266,11 +269,53 @@ export const createAppSession = procedure
   .output(z.object({
     jobId: z.number(),
   }))
+  .use(async ({ input:{ clusterId, account }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createApp,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId, jobId:(res.data as any).jobId, accountName:account } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId, accountName:account } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
       image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
       model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
+
+    const userId = user.identityId;
+    const client = getAdapterClient(clusterId);
+
+    // 检查是否存在同名的作业
+    const existedJobName = await asyncClientCall(client.job, "getJobs", {
+      fields: ["job_id"],
+      filter: {
+        users: [userId], accounts: [],states: [],jobName:appJobName,
+      },
+    }).then((resp) => resp.jobs);
+
+    if (existedJobName.length) {
+      throw new TRPCError({
+        code: "CONFLICT",
+        message: `appJobName ${appJobName} is already existed`,
+      });
+    }
 
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
@@ -344,7 +389,7 @@ export const createAppSession = procedure
       throw clusterNotFound(clusterId);
     }
 
-    const userId = user.identityId;
+
     return await sshConnect(host, userId, logger, async (ssh) => {
       const homeDir = await getUserHomedir(ssh, userId, logger);
 
@@ -433,7 +478,7 @@ export const createAppSession = procedure
 
       // 将entry.sh写入后将路径传给适配器后启动容器
       await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
-      const client = getAdapterClient(clusterId);
+
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId,
         jobName: appJobName,
@@ -575,7 +620,31 @@ export const saveImage =
       imageTag: z.string(),
       imageDesc: z.string().optional(),
     }))
-    .output(z.void())
+    .output(z.object({ imageId:z.number() }))
+    .use(async ({ input:{ jobId,imageTag }, ctx, next }) => {
+      const res = await next({ ctx });
+
+      const { user, req } = ctx;
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.saveImage,
+      };
+
+      if (res.ok) {
+        await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:(res.data as any).imageId,tag:imageTag } },
+        OperationResult.SUCCESS);
+      }
+
+      if (!res.ok) {
+        await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:0, tag:"-" } },
+        OperationResult.FAIL);
+      }
+
+      return res;
+    })
     .mutation(
       async ({ input, ctx: { user } }) => {
         const userId = user.identityId;
@@ -653,6 +722,8 @@ export const saveImage =
               sourcePath: harborImageUrl,
             });
             await em.persistAndFlush(newImage);
+
+            return { imageId:newImage.id };
           } catch (e) {
             const ex = e as ServiceError;
             throw new TRPCError({

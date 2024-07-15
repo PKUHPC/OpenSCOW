@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { OperationType } from "@scow/lib-operation-log";
 import { JobServiceClient, TimeUnit } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
@@ -61,6 +62,11 @@ export const SubmitJobSchema = typeboxRouteSchema({
 
     404: Type.Object({
       code: Type.Literal("NOT_FOUND"),
+      message: Type.String(),
+    }),
+
+    409: Type.Object({
+      code: Type.Literal("ALREADY_EXISTS"),
       message: Type.String(),
     }),
 
@@ -136,6 +142,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
       [status.NOT_FOUND]: (err) => ({ 404: { code: "NOT_FOUND", message: err.details } } as const),
+      [status.ALREADY_EXISTS]: (err) => ({ 409: { code: "ALREADY_EXISTS", message: err.details } } as const),
     },
     async () => await callLog(
       { ...logInfo,
