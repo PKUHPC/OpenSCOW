@@ -22,20 +22,13 @@ import { scowdClientNotFound } from "./errors";
 
 export const certificates = createScowdCertificates(config);
 
-function extractIP(address: string): string {
-  const ipv4Pattern = /(\d{1,3}\.){3}\d{1,3}/;
-  const ipv6Pattern = /([0-9a-fA-F]{1,4}:){1,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|:([0-9a-fA-F]{1,4}:){1,7}|::/;
-
-  const ipv4Match = ipv4Pattern.exec(address);
-  if (ipv4Match) {
-    return ipv4Match[0];
+function removePort(address: string): string {
+  // 正则表达式匹配 ip:port 或者 host:port 的情况
+  const regex = /^(.*):\d+$/;
+  const match = regex.exec(address);
+  if (match?.[1]) {
+    return match[1];
   }
-
-  const ipv6Match = ipv6Pattern.exec(address);
-  if (ipv6Match) {
-    return ipv6Match[0];
-  }
-
   return address;
 }
 
@@ -48,7 +41,7 @@ export function getLoginNodeScowdUrl(cluster: string, host: string): string | un
   const { address, scowdPort } = loginNode;
 
   return config.SCOWD_SSL_ENABLED
-    ? `https://${extractIP(address)}:${scowdPort}` : `http://${extractIP(address)}:${scowdPort}`;
+    ? `https://${removePort(address)}:${scowdPort}` : `http://${removePort(address)}:${scowdPort}`;
 }
 
 const scowdClientForClusters = Object.entries(configClusters).reduce((prev, [cluster]) => {
