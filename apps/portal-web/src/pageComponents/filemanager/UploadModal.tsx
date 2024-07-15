@@ -13,7 +13,7 @@
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
@@ -46,12 +46,28 @@ type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => v
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster, scowdEnabled }) => {
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
+  const uploadControllers = useRef(new Map<string, AbortController>());
 
   const t = useI18nTranslateToString();
 
   const onModalClose = () => {
-    setUploadFileList([]);
+    uploadFileList.forEach((file) => handleRemove(file));
     onClose();
+  };
+
+  const handleRemove = (file: UploadFile) => {
+    const controller = uploadControllers.current.get(file.uid);
+    if (controller) {
+      controller.abort();
+      uploadControllers.current.delete(file.uid);
+    }
+
+    setUploadFileList((prevList) => {
+      const newList = prevList.filter((item) => item.uid !== file.uid);
+      return newList;
+    });
+
+    return true;
   };
 
   const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
@@ -89,7 +105,22 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       onProgress?.({ percent: Number((uploadedCount / totalCount * 100).toFixed(2)) });
     };
 
+    const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
+    if (!uploadFile) {
+      message.error(`上传文件列表中不存在: ${file.name}`);
+      return;
+    }
+
     for (let i = 0; i < totalCount; i += concurrentChunks) {
+
+      const controller = new AbortController();
+      if (!uploadControllers.current.get(uploadFile.uid)) {
+        uploadControllers.current.set(uploadFile.uid, controller);
+      } else if (uploadControllers.current.get(uploadFile.uid)?.signal.aborted) {
+        message.info(`文件 ${file.name} 上传已取消`);
+        uploadControllers.current.delete(uploadFile.uid);
+        return;
+      }
 
       const chunks: FileChunk[] = [];
       for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {
@@ -120,6 +151,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         return fetch(urlToUpload(cluster, join(tempFileDir, chunk.fileName)), {
           method: "POST",
           body: formData,
+          signal: controller.signal,
         }).then((response) => {
           if (!response.ok) {
             return new Error(response.statusText);
@@ -135,7 +167,12 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       await Promise.all(uploadPromises);
     }
 
-    await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } });
+    await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } }).finally(() => {
+      const controller = uploadControllers.current.get(uploadFile.uid);
+      if (controller) {
+        uploadControllers.current.delete(uploadFile.uid);
+      }
+    });
   };
 
   return (
@@ -171,9 +208,14 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         showUploadList={{
           removeIcon: (file) => {
             return (
-              <DeleteOutlined
-                title={file.status === "uploading" ? t(p("cancelUpload")) : t(p("deleteUploadRecords"))}
-              />
+              file.status === "uploading"
+                ? (
+                  <DeleteOutlined
+                    onClick={scowdEnabled ? () => handleRemove(file) : undefined}
+                    title={t(p("cancelUpload"))}
+                  />
+                )
+                : <DeleteOutlined title={t(p("deleteUploadRecords"))} />
             );
           },
         }}
