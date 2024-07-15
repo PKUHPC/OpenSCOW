@@ -13,7 +13,7 @@
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import { join } from "path";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
@@ -44,28 +44,15 @@ const p = prefix("pageComp.fileManagerComp.uploadModal.");
 type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => void);
 
 export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, cluster, scowdEnabled }) => {
-  console.log("456", scowdEnabled);
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
 
   const t = useI18nTranslateToString();
 
-  // 关闭modal框时，用于停止所有后续文件上传
-  const isUploadingCancelled = useRef(false);
-
   const onModalClose = () => {
-    isUploadingCancelled.current = true;
     setUploadFileList([]);
     onClose();
   };
-
-  useEffect(() => {
-  // 每次打开模态框时，重置取消上传的状态
-    if (open) {
-      isUploadingCancelled.current = false;
-    }
-  }, [open]);
-
 
   const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
 
@@ -103,9 +90,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     };
 
     for (let i = 0; i < totalCount; i += concurrentChunks) {
-      if (isUploadingCancelled.current) {
-        throw new Error("Upload cancelled");
-      }
 
       const chunks: FileChunk[] = [];
       for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {

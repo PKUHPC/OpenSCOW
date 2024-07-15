@@ -22,7 +22,7 @@ import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
-import { getScowdClient } from "src/utils/scowd";
+import { getScowdClient, mapTRPCExceptionToGRPC } from "src/utils/scowd";
 import { getClusterLoginNode, getClusterTransferNode, sshConnect, tryGetClusterTransferNode } from "src/utils/ssh";
 
 export const fileServiceServer = plugin((server) => {
@@ -209,20 +209,26 @@ export const fileServiceServer = plugin((server) => {
       if (clusterInfo.scowd?.enabled) {
         const client = getScowdClient(cluster);
 
-        const initData = await client.file.initMultipartUpload({ userId, path, name });
-        return [{
-          ...initData,
-          chunkSize: Number(initData.chunkSize),
-          filesInfo: initData.filesInfo.map((info): FileInfo => {
-            return {
-              name: info.name,
-              type: fileInfo_FileTypeFromJSON(info.fileType),
-              mtime: info.modTime,
-              mode: info.mode,
-              size: Number(info.size),
-            };
-          }),
-        }];
+        try {
+          const initData = await client.file.initMultipartUpload({ userId, path, name });
+
+          return [{
+            ...initData,
+            chunkSize: Number(initData.chunkSize),
+            filesInfo: initData.filesInfo.map((info): FileInfo => {
+              return {
+                name: info.name,
+                type: fileInfo_FileTypeFromJSON(info.fileType),
+                mtime: info.modTime,
+                mode: info.mode,
+                size: Number(info.size),
+              };
+            }),
+          }];
+
+        } catch (err) {
+          throw mapTRPCExceptionToGRPC(err);
+        }
       } else {
         throw {
           code: Status.UNIMPLEMENTED,
@@ -243,15 +249,21 @@ export const fileServiceServer = plugin((server) => {
       if (clusterInfo.scowd?.enabled) {
         const client = getScowdClient(cluster);
 
-        await client.file.mergeFileChunks({ userId, path, name, size: BigInt(size) });
+        try {
+          await client.file.mergeFileChunks({ userId, path, name, size: BigInt(size) });
+
+          return [{}];
+
+        } catch (err) {
+          throw mapTRPCExceptionToGRPC(err);
+        }
+
       } else {
         throw {
           code: Status.UNIMPLEMENTED,
           message: "The mergeFileChunks interface is not implemented",
         } as ServiceError;
       }
-
-      return [{}];
     },
 
 

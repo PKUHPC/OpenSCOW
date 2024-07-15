@@ -202,15 +202,4 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
       throw mapTRPCExceptionToGRPC(err);
     }
   },
-
-  // mergeFileChunks: async (request) => {
-  //   const { userId, path, md5 } = request;
-
-  //   try {
-  //     await client.file.mergeFileChunks({ userId, path, md5 });
-  //     return {};
-  //   } catch (err) {
-  //     throw mapTRPCExceptionToGRPC(err);
-  //   }
-  // },
 });
