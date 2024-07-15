@@ -343,6 +343,9 @@ export default {
         existedModalOk: "Confirm",
         dragText: "Click or drag files here",
         hintText: "Supports uploading single or multiple files",
+        cancelUploadText: "Upload of file {} canceled",
+        calculateHashError: "Error calculating hash: {}",
+        uploadFileListNotExist: "The uploaded file list does not exist: {}",
       },
     },
     // desktop

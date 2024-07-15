@@ -343,6 +343,9 @@ export default {
         existedModalOk: "确认",
         dragText: "点击或者将文件拖动到这里",
         hintText: "支持上传单个或者多个文件",
+        cancelUploadText: "文件 {} 上传已取消",
+        calculateHashError: "计算哈希值错误: {}",
+        uploadFileListNotExist: "上传文件列表中不存在: {}",
       },
     },
     // desktop

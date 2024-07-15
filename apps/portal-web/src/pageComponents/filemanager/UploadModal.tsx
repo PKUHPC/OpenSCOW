@@ -63,10 +63,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     }
 
     setUploadFileList((prevList) => {
-      const newList = prevList.filter((item) => item.uid !== file.uid);
-      return newList;
+      return prevList.map((item) => {
+        if (item.uid === file.uid) {
+          item.status = "removed";
+        }
+        return item;
+      }).filter((item) => item.uid !== file.uid);
     });
-
     return true;
   };
 
@@ -107,7 +110,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
     const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
     if (!uploadFile) {
-      message.error(`上传文件列表中不存在: ${file.name}`);
+      message.error(t(p("uploadFileListNotExist"), [file.name]));
       return;
     }
 
@@ -118,7 +121,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       if (!uploadControllers.current.get(uploadFile.uid) && !controller.signal.aborted) {
         uploadControllers.current.set(uploadFile.uid, controller);
       } else if (controller.signal.aborted) {
-        message.info(`文件 ${file.name} 上传已取消`);
+        message.info(t(p("cancelUploadText"), [file.name]));
         return;
       }
 
@@ -139,7 +142,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
             fileName,
           });
         } catch (err) {
-          message.error(`Error calculating hash: ${err.message}`);
+          message.error(t(p("calculateHashError"), [err.message]));
           return;
         }
       }
@@ -158,8 +161,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
           updateProgress();
           return response;
-        }).catch(() => {
-          message.error("上传文件失败，请重新上传");
         });
       });
 
