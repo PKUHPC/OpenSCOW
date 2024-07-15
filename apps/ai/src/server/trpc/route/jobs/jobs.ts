@@ -128,23 +128,6 @@ procedure
         throw clusterNotFound(clusterId);
       }
 
-      const client = getAdapterClient(clusterId);
-
-      // 检查是否存在同名的作业
-      const existedJobName = await asyncClientCall(client.job, "getJobs", {
-        fields: ["job_id"],
-        filter: {
-          users: [userId], accounts: [],states: [],jobName:trainJobName,
-        },
-      }).then((resp) => resp.jobs);
-
-      if (existedJobName.length) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: `trainJobName ${trainJobName} is already existed`,
-        });
-      }
-
       const em = await forkEntityManager();
       const {
         datasetVersion,
@@ -191,6 +174,7 @@ procedure
         const entryScript = command;
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
+        const client = getAdapterClient(clusterId);
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: trainJobName,
