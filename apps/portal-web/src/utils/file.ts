@@ -52,12 +52,19 @@ export const openPreviewLink = (href: string) => {
 };
 
 export async function calculateBlobSHA256(blob: Blob): Promise<string> {
-  const arrayBuffer = await blob.arrayBuffer();
 
-  const hashBuffer = await crypto.subtle.digest("SHA-256", arrayBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  try {
 
-  return hashHex;
+    const arrayBuffer = await blob.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const hash = crypto.createHash("sha256");
+    hash.update(buffer);
+    const hashHex = hash.digest("hex");
+
+    return hashHex;
+  } catch (error) {
+
+    throw new Error(`Failed to calculate hash: ${error.message}`);
+  }
 }
 
