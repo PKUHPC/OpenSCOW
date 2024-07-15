@@ -98,7 +98,7 @@ export async function createPriceMap(
     return {};
   });
   
-  // partitions info for all clusters
+  // partitions info for activated clusters
   const partitionsForClusters: Record<string, Partition[]> = {};
 
   await Promise.allSettled(Object.keys(activatedClusters).map(async (cluster) => {
@@ -123,6 +123,13 @@ export async function createPriceMap(
       const missingPaths = [] as string[];
 
       for (const cluster in activatedClusters) {
+
+        if (!partitionsForClusters[cluster]) {
+          logger.info(
+            `Can not get missing default price items from partitions of cluster (clusterId: ${cluster}) currently.`);
+          continue;
+        }
+
         for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
           const { qos } = partition;
