@@ -299,24 +299,6 @@ export const createAppSession = procedure
       model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes } = input;
 
-    const userId = user.identityId;
-    const client = getAdapterClient(clusterId);
-
-    // 检查是否存在同名的作业
-    const existedJobName = await asyncClientCall(client.job, "getJobs", {
-      fields: ["job_id"],
-      filter: {
-        users: [userId], accounts: [],states: [],jobName:appJobName,
-      },
-    }).then((resp) => resp.jobs);
-
-    if (existedJobName.length) {
-      throw new TRPCError({
-        code: "CONFLICT",
-        message: `appJobName ${appJobName} is already existed`,
-      });
-    }
-
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
 
@@ -389,7 +371,7 @@ export const createAppSession = procedure
       throw clusterNotFound(clusterId);
     }
 
-
+    const userId = user.identityId;
     return await sshConnect(host, userId, logger, async (ssh) => {
       const homeDir = await getUserHomedir(ssh, userId, logger);
 
@@ -478,7 +460,7 @@ export const createAppSession = procedure
 
       // 将entry.sh写入后将路径传给适配器后启动容器
       await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
-
+      const client = getAdapterClient(clusterId);
       const reply = await asyncClientCall(client.job, "submitJob", {
         userId,
         jobName: appJobName,

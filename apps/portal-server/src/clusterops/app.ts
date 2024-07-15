@@ -78,26 +78,6 @@ export const appOps = (cluster: string): AppOps => {
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes, appJobName } = request;
 
-      // 检查是否存在同名的作业
-      const existedJobName = await callOnOne(
-        cluster,
-        logger,
-        async (client) => await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id"],
-          filter: {
-            users: [userId], accounts: [], states: [],jobName:appJobName,
-          },
-        }),
-      ).then((resp) => resp.jobs);
-
-      if (existedJobName.length) {
-        throw new DetailedError({
-          code: Status.ALREADY_EXISTS,
-          message: `appJobName ${appJobName} is already existed`,
-          details: [errorInfo("ALREADY EXISTS")],
-        });
-      }
-
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
 
