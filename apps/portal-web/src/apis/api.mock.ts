@@ -302,7 +302,11 @@ export const mockApi: MockApi<typeof api> = {
   }]}),
 
   mergeFileChunks: null,
-
+  initMultipartUpload: async () => ({
+    tempFileDir: "home/user/scow/tempDir",
+    chunkSize: 5 * 1024 * 1024,
+    filesInfo: [],
+  }),
 };
 
 

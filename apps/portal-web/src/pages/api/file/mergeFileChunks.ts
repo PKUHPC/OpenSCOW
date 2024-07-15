@@ -35,8 +35,9 @@ export const MergeFileChunksSchema = typeboxRouteSchema({
 
   responses: {
     204: Type.Null(),
-    409: Type.Object({ code: Type.Literal("ALREADY_EXISTS") }),
-    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+    403: Type.Object({ code: Type.Literal("PERMISSION_DENIED") }),
+    404: Type.Object({ code: Type.Literal("FILE_NOT_EXISTS") }),
+    520: Type.Object({ code: Type.Literal("MERGE_CHUNKS_FAILED") }),
   },
 });
 
@@ -67,8 +68,9 @@ export default route(MergeFileChunksSchema, async (req, res) => {
     await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
   }, handlegRPCError({
-    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
-    [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
+    [status.NOT_FOUND]: () => ({ 404: { code: "FILE_NOT_EXISTS" as const } }),
+    [status.PERMISSION_DENIED]: () => ({ 403: { code: "PERMISSION_DENIED" as const } }),
+    [status.UNKNOWN]: () => ({ 520: { code: "MERGE_CHUNKS_FAILED" as const } }),
   },
   async () => await callLog(logInfo, OperationResult.FAIL),
   ));

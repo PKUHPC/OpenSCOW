@@ -142,8 +142,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           }
           updateProgress();
           return response;
-        }).catch((error) => {
-          message.error("报错错误", error);
+        }).catch(() => {
+          message.error("上传文件失败，请重新上传");
         });
       });
 

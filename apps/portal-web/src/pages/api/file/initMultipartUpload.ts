@@ -40,8 +40,9 @@ export const InitMultipartUploadSchema = typeboxRouteSchema({
       chunkSize: Type.Number(),
       filesInfo: Type.Array(FileInfo),
     }),
-    409: Type.Object({ code: Type.Literal("ALREADY_EXISTS") }),
-    400: Type.Object({ code: Type.Literal("INVALID_CLUSTER") }),
+    403: Type.Object({ code: Type.Literal("PERMISSION_DENIED") }),
+    500: Type.Object({ code: Type.Literal("INITIAL_UPLOAD_FAILED") }),
+    520: Type.Object({ code: Type.Literal("UNKNOWN_ERROR") }),
   },
 });
 
@@ -77,8 +78,9 @@ export default route(InitMultipartUploadSchema, async (req, res) => {
       })),
     } };
   }, handlegRPCError({
-    [status.NOT_FOUND]: () => ({ 400: { code: "INVALID_CLUSTER" as const } }),
-    [status.ALREADY_EXISTS]: () => ({ 409: { code: "ALREADY_EXISTS" as const } }),
+    [status.INTERNAL]: () => ({ 500: { code: "INITIAL_UPLOAD_FAILED" as const } }),
+    [status.PERMISSION_DENIED]: () => ({ 403: { code: "PERMISSION_DENIED" as const } }),
+    [status.UNKNOWN]: () => ({ 520: { code: "UNKNOWN_ERROR" as const } }),
   },
   async () => await callLog(logInfo, OperationResult.FAIL),
   ));
