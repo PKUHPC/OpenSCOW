@@ -47,7 +47,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const onModalClose = () => {
     setUploadFileList([]);
-    for (const controller of uploadControllers.current.values()) {
+    for (const controller of Array.from(uploadControllers.current.values())) {
       controller.abort();
     }
 
