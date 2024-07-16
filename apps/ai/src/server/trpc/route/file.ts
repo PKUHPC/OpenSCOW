@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import {
   sftpExists, sftpMkdir, sftpReaddir,
   sftpRealPath, sftpRename, sftpStat, sftpUnlink, sftpWriteFile, sshRmrf,
@@ -19,12 +20,14 @@ import { contentType } from "mime-types";
 import { basename } from "path";
 import { FileInfo } from "src/models/File";
 import { config } from "src/server/config/env";
+import { callLog } from "src/server/setup/operationLog";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 export const FileType = z.union([z.literal("FILE"), z.literal("DIR")]);
@@ -81,32 +84,61 @@ export const file = router({
     })
     .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
     .output(z.void())
-    .mutation(async ({ input: { target, clusterId, path }, ctx: { user } }) => {
+    .mutation(async ({ input: { target, clusterId, path }, ctx: { user, req } }) => {
 
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
 
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypePayload:{
+          clusterId, path,
+        },
+      };
+
       if (target === "FILE") {
-        return await sshConnect(host, user.identityId, logger, async (ssh) => {
+        try {
+          await sshConnect(host, user.identityId, logger, async (ssh) => {
 
-          const sftp = await ssh.requestSFTP();
+            const sftp = await ssh.requestSFTP();
 
-          await sftpUnlink(sftp)(path);
+            await sftpUnlink(sftp)(path);
+
+            return;
+          });
+
+          await callLog({ ...logInfo, operationTypeName:OperationType.deleteFile }, OperationResult.SUCCESS);
 
           return;
-        });
+        } catch (error) {
+          await callLog({ ...logInfo, operationTypeName:OperationType.deleteFile }, OperationResult.FAIL);
+
+          throw error;
+        }
+
       } else {
-        return await sshConnect(host, user.identityId, logger, async (ssh) => {
 
-          await sshRmrf(ssh, path);
+        try {
+          await sshConnect(host, user.identityId, logger, async (ssh) => {
+
+            await sshRmrf(ssh, path);
+
+            return;
+          });
+
+          await callLog({ ...logInfo, operationTypeName:OperationType.deleteDirectory }, OperationResult.SUCCESS);
 
           return;
-        });
+        } catch (error) {
+          await callLog({ ...logInfo, operationTypeName:OperationType.deleteDirectory }, OperationResult.FAIL);
+
+          throw error;
+        }
+
       }
     }),
-
-
   copyOrMove: authProcedure
     .meta({
       openapi: {
@@ -123,32 +155,58 @@ export const file = router({
       toPath: z.string(),
     }))
     .output(z.void())
-    .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user } }) => {
+    .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user, req } }) => {
 
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
 
-      if (op === "copy") {
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypePayload:{
+          clusterId, fromPath, toPath,
+        },
+      };
 
-        return await copyFile({ host, userIdentityId: user.identityId, fromPath, toPath });
+      if (op === "copy") {
+        try {
+          await copyFile({ host, userIdentityId: user.identityId, fromPath, toPath });
+          await callLog({ ...logInfo, operationTypeName: OperationType.copyFileItem }, OperationResult.SUCCESS);
+
+        } catch (error) {
+          await callLog({ ...logInfo, operationTypeName: OperationType.copyFileItem }, OperationResult.FAIL);
+          throw error;
+
+        }
+
+        return;
 
       } else {
+        try {
+          await sshConnect(host, user.identityId, logger, async (ssh) => {
+            const sftp = await ssh.requestSFTP();
 
-        return await sshConnect(host, user.identityId, logger, async (ssh) => {
-          const sftp = await ssh.requestSFTP();
+            if (await sftpExists(sftp, toPath)) {
+              throw new TRPCError({ code: "CONFLICT", message: `${toPath} already exists` });
+            }
 
-          if (await sftpExists(sftp, toPath)) {
-            throw new TRPCError({ code: "CONFLICT", message: `${toPath} already exists` });
-          }
+            const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
+            if (error) {
+              throw new TRPCError({ code: "CONFLICT", message: "Rename or move failed. " + error });
+            }
 
-          const error = await sftpRename(sftp)(fromPath, toPath).catch((e) => e);
-          if (error) {
-            throw new TRPCError({ code: "CONFLICT", message: "Rename or move failed. " + error });
-          }
+            await callLog({ ...logInfo, operationTypeName: OperationType.moveFileItem }, OperationResult.SUCCESS);
+
+            return;
+          });
 
           return;
-        });
+        } catch (error) {
+          await callLog({ ...logInfo, operationTypeName: OperationType.moveFileItem }, OperationResult.FAIL);
+
+          throw error;
+        }
       }
     }),
 
@@ -163,6 +221,29 @@ export const file = router({
     })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.void())
+    .use(async ({ input:{ clusterId,path }, ctx, next }) => {
+      const res = await next({ ctx });
+
+      const { user, req } = ctx;
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.createDirectory,
+        operationTypePayload:{
+          clusterId, path,
+        },
+      };
+
+      if (res.ok) {
+        await callLog(logInfo, OperationResult.SUCCESS);
+      }
+
+      if (!res.ok) {
+        await callLog(logInfo, OperationResult.FAIL);
+      }
+
+      return res;
+    })
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
@@ -193,6 +274,29 @@ export const file = router({
     })
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.void())
+    .use(async ({ input:{ clusterId,path }, ctx, next }) => {
+      const res = await next({ ctx });
+
+      const { user, req } = ctx;
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.createFile,
+        operationTypePayload:{
+          clusterId, path,
+        },
+      };
+
+      if (res.ok) {
+        await callLog(logInfo, OperationResult.SUCCESS);
+      }
+
+      if (!res.ok) {
+        await callLog(logInfo, OperationResult.FAIL);
+      }
+
+      return res;
+    })
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
       const host = getClusterLoginNode(clusterId);
 
@@ -210,7 +314,6 @@ export const file = router({
 
         return;
       });
-
     }),
 
   listDirectory: authProcedure
@@ -237,7 +340,7 @@ export const file = router({
           throw new TRPCError({ code: "PRECONDITION_FAILED", message: `${path} is not accessible` });
         });
 
-        if (!stat || !stat.isDirectory()) {
+        if (!stat?.isDirectory()) {
           throw new TRPCError({ code: "UNPROCESSABLE_CONTENT", message: `${path} is not directory or not exists` });
         }
 
@@ -406,7 +509,7 @@ export const file = router({
         }
       };
 
-      return await sshConnect(host, user!.identityId, logger, async (ssh) => {
+      return await sshConnect(host, user.identityId, logger, async (ssh) => {
         const sftp = await ssh.requestSFTP();
 
         const stat = await sftpStat(sftp)(filePath).catch((e) => {

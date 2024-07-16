@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cluster as ClusterWithConfig, ClusterConfigSchema } from "@scow/config/build/cluster";
+import { Cluster as ClusterWithConfig, ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
 
-export const getSortedClusterIds = (clusters: Record<string, ClusterConfigSchema>): string[] => {
+export const getSortedClusterIds = (clusters: Record<string, Partial<SimpleClusterSchema>>): string[] => {
   return Object.keys(clusters)
     .sort(
       (a, b) => {
-        return clusters[a].priority - clusters[b].priority;
+        return clusters[a].priority! - clusters[b].priority!;
       },
     );
 };

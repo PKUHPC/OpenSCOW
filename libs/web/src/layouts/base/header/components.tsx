@@ -10,7 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Tooltip, Typography } from "antd";
+import { Tooltip } from "antd";
+import NextLink from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { styled } from "styled-components";
@@ -28,12 +29,11 @@ export const HeaderItem = styled.div`
 const LinkItem = styled(HeaderItem)`
 `;
 
-const Link = styled(Typography.Link)`
+const Link = styled(NextLink)`
   display: flex;
   flex-wrap: wrap;
   overflow: hidden;
   align-items: center;
-
 `;
 
 export const TextSpan = styled.span`

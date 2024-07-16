@@ -43,15 +43,15 @@ export class Algorithm {
   updateTime?: Date;
 
   constructor(init: {
-      name: string;
-      owner: string;
-      framework: Framework;
-      isShared?: boolean;
-      description?: string;
-      clusterId: string;
-      createTime?: Date;
-      updateTime?: Date;
-    }) {
+    name: string;
+    owner: string;
+    framework: Framework;
+    isShared?: boolean;
+    description?: string;
+    clusterId: string;
+    createTime?: Date;
+    updateTime?: Date;
+  }) {
 
     this.name = init.name;
     this.owner = init.owner;

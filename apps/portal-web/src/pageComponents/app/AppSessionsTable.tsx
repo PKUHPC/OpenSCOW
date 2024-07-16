@@ -29,7 +29,7 @@ import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
 import { Cluster } from "src/utils/cluster";
 
 interface FilterForm {
- appJobName: string | undefined
+  appJobName: string | undefined
 }
 
 interface Props {

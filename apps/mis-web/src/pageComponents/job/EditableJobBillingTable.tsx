@@ -106,8 +106,8 @@ export const EditableJobBillingTable: React.FC<Props> = ({ data, loading, tenant
 
   const { publicConfigClusters } = useStore(ClusterInfoStore);
 
-  const clusterTotalQosCounts = data && data.length ?
-    data.reduce((totalQosCounts: { [cluster: string]: number }, item) => {
+  const clusterTotalQosCounts = data?.length ?
+    data.reduce((totalQosCounts: Record<string, number>, item) => {
       const { cluster } = item;
       if (!totalQosCounts[cluster]) {
         totalQosCounts[cluster] = 1;

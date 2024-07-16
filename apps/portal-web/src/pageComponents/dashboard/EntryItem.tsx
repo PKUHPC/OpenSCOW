@@ -48,9 +48,7 @@ interface Props {
   style?: CSSProperties
 }
 
-interface ImageErrorMap {
-  [appId: string]: boolean;
-}
+type ImageErrorMap = Record<string, boolean>;
 
 export const EntryItem: React.FC<Props> = ({ style,
   entryBaseName, entryExtraInfo, icon, logoPath }) => {

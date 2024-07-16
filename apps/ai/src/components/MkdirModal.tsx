@@ -69,7 +69,7 @@ export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, clust
         <Form.Item label="要创建的目录的目录">
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item<FormProps> label="目录名" name="newDirName" rules={[{ required: true }]}>
+        <Form.Item label="目录名" name="newDirName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

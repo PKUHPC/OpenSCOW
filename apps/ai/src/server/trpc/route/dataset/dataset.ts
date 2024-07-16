@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { TRPCError } from "@trpc/server";
 import { basename, dirname, join } from "path";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -22,6 +24,7 @@ import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { booleanQueryParam, clusterExist } from "../utils";
@@ -127,6 +130,28 @@ export const createDataset = procedure
     description: z.string().optional(),
   }))
   .output(z.number())
+  .use(async ({ input:{ clusterId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createDataset,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId, datasetId:res.data as number } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
 
     if (!clusterExist(input.clusterId)) {
@@ -138,7 +163,7 @@ export const createDataset = procedure
 
     const em = await forkEntityManager();
 
-    const datesetExist = await em.findOne(Dataset, { name:input.name, owner: user!.identityId });
+    const datesetExist = await em.findOne(Dataset, { name:input.name, owner: user.identityId });
     if (datesetExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -146,7 +171,7 @@ export const createDataset = procedure
       });
     }
 
-    const dataset = new Dataset({ ...input, owner: user!.identityId });
+    const dataset = new Dataset({ ...input, owner: user.identityId });
     await em.persistAndFlush(dataset);
     return dataset.id;
   });
@@ -168,6 +193,28 @@ export const updateDataset = procedure
     description: z.string().optional(),
   }))
   .output(z.number())
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.updateDataset,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ datasetId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ datasetId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -255,6 +302,28 @@ export const deleteDataset = procedure
   })
   .input(z.object({ id: z.number() }))
   .output(z.void())
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.deleteDataset,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ datasetId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ datasetId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
     const dataset = await em.findOne(Dataset, { id: input.id });

@@ -22,11 +22,10 @@ interface Option {
   value: number;
 }
 
-type DataType = "dataset" | "algorithm" | "model"
+type DataType = "dataset" | "algorithm" | "model";
 
-interface QueryHookFunction<TQueryFnData = any, TError = any, TData = any> {
-  (args: TQueryFnData, options?: any): UseQueryResult<TData, TError>;
-}
+type QueryHookFunction<TQueryFnData = any, TError = any, TData = any> =
+  (args: TQueryFnData, options?: any) => UseQueryResult<TData, TError>;
 
 export function useDataOptions<T>(
   form: FormInstance,

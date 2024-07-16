@@ -16,9 +16,10 @@ import { LinkOutlined } from "@ant-design/icons";
 import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
+import { join } from "path";
 import React, { PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
-import { ScowExtensionRouteContext } from "src/extensions/common";
+import { isUrl, ScowExtensionRouteContext } from "src/extensions/common";
 import { NavbarLink, navbarLinksRoute } from "src/extensions/navbarLinks";
 import { fromNavItemProps, rewriteNavigationsRoute, toNavItemProps } from "src/extensions/navigations";
 import { callExtensionRoute } from "src/extensions/routes";
@@ -140,11 +141,25 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         const resp = await callExtensionRoute(navbarLinksRoute(from), routeQuery, {}, extension.url)
           .catch((e) => {
             console.warn(`Failed to call navbarLinks of extension ${extension.name ?? extension.url}. Error: `, e);
-            return { 200: { navbarLinks: []} };
+            return { 200: { navbarLinks: [] as NavbarLink[] } };
           });
 
         if (resp[200]) {
-          return resp[200].navbarLinks;
+          return resp[200].navbarLinks?.map((x) => {
+
+            if (!isUrl(x.path)) {
+              const parts = ["/extensions"];
+
+              if (extension.name) {
+                parts.push(extension.name);
+              }
+
+              parts.push(x.path);
+              x.path = join(...parts);
+            }
+
+            return x;
+          });
         }
       }));
 
@@ -156,10 +171,10 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
       });
 
       return filtered.map((x) => ({
-        href: x.href,
+        href: x.path,
         text: x.text,
         icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : <LinkOutlined />,
-      }) satisfies HeaderNavbarLink);
+      }satisfies HeaderNavbarLink));
 
     }, [from, routeQuery, extensions]),
   });
@@ -195,7 +210,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
           <Content>
             {children}
           </Content>
-          <Footer text={footerText} versionTag={versionTag}/>
+          <Footer text={footerText} versionTag={versionTag} />
         </ContentPart>
       </StyledLayout>
     </Root>

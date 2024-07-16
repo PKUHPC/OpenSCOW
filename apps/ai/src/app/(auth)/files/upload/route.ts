@@ -47,26 +47,24 @@ export async function POST(request: NextRequest) {
 
   const host = getClusterLoginNode(clusterId);
 
-  if (!host) { return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 }); }
+  if (!host) {
+    return NextResponse.json({ code: "INVALID_CLUSTER" }, { status: 400 });
+  }
 
 
   return await sshConnect(host, user.identityId, logger, async (ssh) => {
     const sftp = await ssh.requestSFTP();
 
-    try {
-      const writeStream = sftp.createWriteStream(path);
+    const writeStream = sftp.createWriteStream(path);
 
-      const pipelineAsync = promisify(pipeline);
+    const pipelineAsync = promisify(pipeline);
 
-      const readableStream = uploadedFile.stream();
-      const nodeReadableStream = readableStreamToNodeReadable(readableStream);
-      await pipelineAsync(nodeReadableStream, writeStream);
+    const readableStream = uploadedFile.stream();
+    const nodeReadableStream = readableStreamToNodeReadable(readableStream);
+    await pipelineAsync(nodeReadableStream, writeStream);
 
-      return NextResponse.json({ message: "success" }, { status: 200 });
+    return NextResponse.json({ message: "success" }, { status: 200 });
 
-    } catch (e: any) {
-
-    }
   });
 
 }

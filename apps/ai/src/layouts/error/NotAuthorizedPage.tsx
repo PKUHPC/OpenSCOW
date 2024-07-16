@@ -14,7 +14,7 @@ import { Button, Result } from "antd";
 import Link from "next/link";
 import { Head } from "src/utils/head";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export const NotAuthorizedPage = () => {
 
   return (

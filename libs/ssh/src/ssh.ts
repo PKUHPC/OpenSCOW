@@ -210,7 +210,6 @@ export async function executeAsUser(
  */
 export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logger: Logger) {
   return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
-
 }
 
 /**

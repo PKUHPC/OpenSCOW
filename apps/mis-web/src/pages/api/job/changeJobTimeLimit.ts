@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationType } from "@scow/lib-operation-log";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { checkJobAccessible } from "src/server/jobAccessible";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -26,7 +27,7 @@ import { handlegRPCError, parseIp } from "src/utils/server";
 
 export type ChangeMode =
   | "INCREASE"
-  | "DECREASE"
+  | "DECREASE";
 
 // 修改作业运行时限。
 // 只有平台管理员、租户管理员、或者作业发起者本人、或者作业发起者所在账户的管理员或者拥有者可以修改

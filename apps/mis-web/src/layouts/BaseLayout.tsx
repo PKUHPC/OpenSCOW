@@ -14,6 +14,7 @@ import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { HeaderNavbarLink } from "@scow/lib-web/build/layouts/base/header";
+import { join } from "path";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
@@ -21,7 +22,6 @@ import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-
 
 interface Props {
   footerText: string;
@@ -44,7 +44,7 @@ export const BaseLayout =
   const uiExtensionStore = useStore(UiExtensionStore);
 
   const toCallbackPage = (url: string) => userStore.user
-    ? `${url}/api/auth/callback?token=${userStore.user.token}`
+    ? join(url,`/api/auth/callback?token=${userStore.user.token}`)
     : url;
 
   const navbarLinks: HeaderNavbarLink[] = [];

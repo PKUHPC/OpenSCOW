@@ -22,7 +22,7 @@ import { DisabledA } from "src/components/DisabledA";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { DisplayedUserState, UserRole, UserStateInAccount } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
-import { GetAccountUsersSchema } from "src/pages/api/users";
+import { type GetAccountUsersSchema } from "src/pages/api/users";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -69,8 +69,8 @@ export const UserTable: React.FC<Props> = ({
         defaultPageSize: DEFAULT_PAGE_SIZE,
       }}
     >
-      <Table.Column<AccountUserInfo> dataIndex="userId" title={t(pCommon("userId"))} />
-      <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("name"))} />
+      <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
+      <Table.Column dataIndex="name" title={t(pCommon("name"))} />
       <Table.Column<AccountUserInfo>
         dataIndex="role"
         title={t(p("role"))}

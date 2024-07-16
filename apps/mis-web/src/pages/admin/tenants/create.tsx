@@ -141,13 +141,16 @@ const CreateTenantPageForm: React.FC = () => {
               })
               .httpError(501, () => { message.error(t(p("unavailable"))); })
               .then((createdInAuth) => {
-                !createdInAuth.createdInAuth ?
+                if (createdInAuth.createdInAuth) {
+                  message.success(t(p("addCompleted")));
+                } else {
+
                   modal.info({
                     title: t("common.addSuccess"),
                     content: t(p("createTenantSuccessMessage")),
                     okText: t("common.ok"),
-                  })
-                  : message.success(t(p("addCompleted")));
+                  });
+                }
               })
               .catch(() => {
                 modal.error({

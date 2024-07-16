@@ -12,7 +12,7 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { createOperationLogClient } from "@scow/lib-operation-log/build/index";
+import { createOperationLogClient, OperationType } from "@scow/lib-operation-log";
 import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
 import { ExportOperationLog, OperationLog } from "@scow/protos/build/audit/operation_log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
@@ -21,7 +21,7 @@ import { authenticate } from "src/auth/server";
 import { getI18nCurrentText, getT, getTArgs, prefix } from "src/i18n";
 import { Encoding } from "src/models/exportFile";
 import { getOperationDetail, getOperationResultTexts, getOperationTypeTexts, OperationCodeMap, OperationLogQueryType,
-  OperationResult, OperationType } from "src/models/operationLog";
+  OperationResult } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/User";
 import { MAX_EXPORT_COUNT } from "src/pageComponents/file/apis";
 import { callLog } from "src/server/operationLog";
@@ -83,34 +83,34 @@ const getExportSource = (
   accountName: string | undefined): ExportOperationLog["source"] => {
 
   switch (type) {
-  case OperationLogQueryType.USER:
-    return {
-      $case: "user",
-      user: {
-        userId: info.identityId,
-      },
-    };
-  case OperationLogQueryType.ACCOUNT:
-    return accountName
-      ? {
-        $case: "account",
-        account: {
-          accountName,
+    case OperationLogQueryType.USER:
+      return {
+        $case: "user",
+        user: {
+          userId: info.identityId,
         },
-      }
-      : undefined;
-  case OperationLogQueryType.TENANT:
-    return {
-      $case: "tenant",
-      tenant: {
-        tenantName: info.tenant,
-      },
-    };
-  default:
-    return {
-      $case: "admin",
-      admin: {},
-    };
+      };
+    case OperationLogQueryType.ACCOUNT:
+      return accountName
+        ? {
+          $case: "account",
+          account: {
+            accountName,
+          },
+        }
+        : undefined;
+    case OperationLogQueryType.TENANT:
+      return {
+        $case: "tenant",
+        tenant: {
+          tenantName: info.tenant,
+        },
+      };
+    default:
+      return {
+        $case: "admin",
+        admin: {},
+      };
   }
 };
 
@@ -221,12 +221,12 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
     const formatOperationLog = (x: OperationLog) => {
       return {
         id: x.operationLogId,
-        operationCode: x.operationEvent?.["$case"] ? OperationCodeMap[x.operationEvent?.["$case"]] : "000000",
-        operationType: x.operationEvent?.["$case"] === "customEvent"
+        operationCode: x.operationEvent?.$case ? OperationCodeMap[x.operationEvent?.$case] : "000000",
+        operationType: x.operationEvent?.$case === "customEvent"
           ? getI18nCurrentText(x.operationEvent.customEvent.name, languageId)
-          : OperationTypeTexts[x.operationEvent?.["$case"] || "unknown"],
+          : OperationTypeTexts[x.operationEvent?.$case || "unknown"],
         operationDetail: x.operationEvent ?
-          x.operationEvent?.["$case"] === "customEvent"
+          x.operationEvent?.$case === "customEvent"
             ? getI18nCurrentText(x.operationEvent.customEvent.content, languageId)
             : getOperationDetail(x.operationEvent, t, tArgs, languageId)
           : "",

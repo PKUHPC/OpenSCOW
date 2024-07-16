@@ -103,37 +103,38 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
-        case "data":
-          const data = Buffer.from(message.data.data);
+          case "data": {
+            const data = Buffer.from(message.data.data);
 
-          const dataString = data.toString();
-          if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
-            const result = dataString.split("\r\n")[0];
-            const pathStartIndex = result.search("/");
-            const path = result.substring(pathStartIndex);
+            const dataString = data.toString();
+            if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
+              const result = dataString.split("\r\n")[0];
+              const pathStartIndex = result.search("/");
+              const path = result.substring(pathStartIndex);
 
-            if (result.includes(OPEN_EXPLORER_PREFIX)) {
-              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
-            } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
-              const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
-              const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
-              const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
-              window.location.href = urlToDownload(cluster, join(path, file), true);
-            } else if (result.includes(EDIT_FILE_PREFIX)) {
-              const fileStartIndex = result.search(EDIT_FILE_PREFIX);
-              const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
-              const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
-              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
-            } else if (result.includes(UPLOAD_FILE_PREFIX)) {
-              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?uploadModalOpen=true"));
+              if (result.includes(OPEN_EXPLORER_PREFIX)) {
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
+              } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
+                const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
+                const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
+                const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
+                window.location.href = urlToDownload(cluster, join(path, file), true);
+              } else if (result.includes(EDIT_FILE_PREFIX)) {
+                const fileStartIndex = result.search(EDIT_FILE_PREFIX);
+                const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
+                const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
+              } else if (result.includes(UPLOAD_FILE_PREFIX)) {
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?uploadModalOpen=true"));
+              }
             }
-          }
-          term.write(data);
+            term.write(data);
 
-          break;
-        case "exit":
-          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
-          break;
+            break;
+          }
+          case "exit":
+            term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+            break;
         }
       };
 

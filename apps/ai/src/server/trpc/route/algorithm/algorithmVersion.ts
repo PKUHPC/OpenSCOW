@@ -10,11 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { getUserHomedir, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { basename, dirname, join } from "path";
 import { Algorithm } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
@@ -27,6 +29,7 @@ import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET,
   shareFileOrDir, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { booleanQueryParam } from "../utils";
@@ -96,6 +99,28 @@ export const createAlgorithmVersion = procedure
     algorithmId: z.number(),
   }))
   .output(z.object({ id: z.number() }))
+  .use(async ({ input:{ algorithmId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createAlgorithmVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:(res.data as any).id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id: input.algorithmId });
@@ -147,6 +172,28 @@ export const updateAlgorithmVersion = procedure
     versionDescription: z.string().optional(),
   }))
   .output(z.object({ id: z.number() }))
+  .use(async ({ input:{ algorithmId,algorithmVersionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.updateAlgorithmVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -209,6 +256,28 @@ export const deleteAlgorithmVersion = procedure
   })
   .input(z.object({ algorithmVersionId: z.number(), algorithmId:z.number() }))
   .output(z.void())
+  .use(async ({ input:{ algorithmId,algorithmVersionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.deleteAlgorithmVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input:{ algorithmVersionId, algorithmId }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const algorithmVersion = await em.findOne(AlgorithmVersion, { id:algorithmVersionId });
@@ -287,6 +356,28 @@ export const shareAlgorithmVersion = procedure
     algorithmVersionId: z.number(),
   }))
   .output(z.void())
+  .use(async ({ input:{ algorithmId,algorithmVersionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.shareAlgorithmVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId,versionId:algorithmVersionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input:{ algorithmId, algorithmVersionId }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const algorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithmVersionId });
@@ -473,7 +564,35 @@ export const copyPublicAlgorithmVersion = procedure
     versionDescription: z.string(),
     path: z.string(),
   }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.object({ targetAlgorithmId:z.number(),targetAlgorithmVersionId:z.number() }))
+  .use(async ({ input:{ algorithmId,algorithmVersionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.copyAlgorithmVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ sourceAlgorithmId:algorithmId,
+        sourceAlgorithmVersionId:algorithmVersionId,
+        targetAlgorithmId: (res.data as any).targetAlgorithmId,
+        targetAlgorithmVersionId: (res.data as any).targetAlgorithmVersionId,
+      } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ sourceAlgorithmId:algorithmId,
+        sourceAlgorithmVersionId:algorithmVersionId,
+      } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -532,9 +651,9 @@ export const copyPublicAlgorithmVersion = procedure
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Copy Error ${err}`,
+        message: `Copy Error ${err as any}`,
       });
     }
 
-    return { success: true };
+    return { targetAlgorithmId:newAlgorithm.id, targetAlgorithmVersionId:newAlgorithmVersion.id };
   });

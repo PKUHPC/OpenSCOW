@@ -118,7 +118,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="comment" label={t(p("remark"))}>
+      <Form.Item name="comment" label={t(p("remark"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>

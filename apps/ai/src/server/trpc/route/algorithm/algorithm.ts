@@ -10,10 +10,12 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { TRPCError } from "@trpc/server";
 import { basename, dirname, join } from "path";
 import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -21,6 +23,7 @@ import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { booleanQueryParam, clusterExist } from "../utils";
@@ -63,7 +66,7 @@ export const getAlgorithms = procedure
     const [items, count] = await em.findAndCount(Algorithm, {
       $and:[
         isPublic ? { isShared:true } :
-          { owner: user!.identityId },
+          { owner: user.identityId },
         framework ? { framework } : {},
         clusterId ? { clusterId } : {},
         nameOrDesc ?
@@ -113,6 +116,28 @@ export const createAlgorithm = procedure
     description: z.string().optional(),
   }))
   .output(z.number())
+  .use(async ({ input:{ clusterId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createAlgorithm,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId, algorithmId:res.data as number } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
 
     if (!clusterExist(input.clusterId)) {
@@ -123,7 +148,7 @@ export const createAlgorithm = procedure
     }
 
     const em = await forkEntityManager();
-    const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user!.identityId });
+    const algorithmExist = await em.findOne(Algorithm, { name:input.name, owner: user.identityId });
     if (algorithmExist) {
       throw new TRPCError({
         code: "CONFLICT",
@@ -131,7 +156,7 @@ export const createAlgorithm = procedure
       });
     }
 
-    const algorithm = new Algorithm({ ...input, owner: user!.identityId });
+    const algorithm = new Algorithm({ ...input, owner: user.identityId });
     await em.persistAndFlush(algorithm);
     return algorithm.id;
   });
@@ -152,6 +177,28 @@ export const updateAlgorithm = procedure
     description: z.string().optional(),
   }))
   .output(z.void())
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.updateAlgorithm,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input:{ name, framework, description, id }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id });
@@ -232,6 +279,28 @@ export const deleteAlgorithm = procedure
   })
   .input(z.object({ id: z.number() }))
   .output(z.void())
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.deleteAlgorithm,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ algorithmId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input:{ id }, ctx:{ user } }) => {
     const em = await forkEntityManager();
     const algorithm = await em.findOne(Algorithm, { id });

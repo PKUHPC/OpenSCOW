@@ -13,12 +13,13 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@grpc/grpc-js";
+import { OperationType } from "@scow/lib-operation-log";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { Type } from "@sinclair/typebox";
 import { join } from "path";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { publicConfig } from "src/utils/config";
@@ -124,14 +125,14 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
     const errors = parseErrorDetails(ex.metadata);
     if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo") {
       switch (errors[0].reason) {
-      case "SBATCH_FAILED":
-        return { 409: { code: "SBATCH_FAILED" as const, message: ex.details } };
-      case "NOT FOUND":
-        return { 404: { code: "APP_NOT_FOUND" as const, message: ex.details } };
-      case "INVALID ARGUMENT":
-        return { 400: { code: "INVALID_INPUT" as const, message: ex.details } };
-      default:
-        return e;
+        case "SBATCH_FAILED":
+          return { 409: { code: "SBATCH_FAILED" as const, message: ex.details } };
+        case "NOT FOUND":
+          return { 404: { code: "APP_NOT_FOUND" as const, message: ex.details } };
+        case "INVALID ARGUMENT":
+          return { 400: { code: "INVALID_INPUT" as const, message: ex.details } };
+        default:
+          return e;
       }
     } else {
       throw e;

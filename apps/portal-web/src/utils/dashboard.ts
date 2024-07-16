@@ -14,7 +14,7 @@ import { Cluster } from "@scow/config/build/type";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { SortOrder } from "antd/lib/table/interface";
-import { useI18nTranslateToString } from "src/i18n";
+import { type useI18nTranslateToString } from "src/i18n";
 import { AppWithCluster } from "src/pageComponents/dashboard/QuickEntry";
 
 export const formatEntryId = (item: Entry) => {
@@ -81,7 +81,7 @@ export const getEntryExtraInfo = (item: Entry, currentLanguageId: string, public
   return [];
 };
 
-export const getEntryClusterName = (item: Entry["entry"] & {$case: "app" | "shell" }
+export const getEntryClusterName = (item: Entry["entry"] & { $case: "app" | "shell" }
   , publicConfigClusters: Cluster[]) => {
   const clusters = publicConfigClusters;
 
@@ -107,7 +107,7 @@ export const getEntryLogoPath = (item: Entry, apps: AppWithCluster) => {
 };
 
 export const compareWithUndefined = <T extends number | string | undefined>
-  (a: T, b: T, sortOrder?: SortOrder): number => {
+(a: T, b: T, sortOrder?: SortOrder): number => {
   if (a === undefined && b === undefined) {
     // 两者均为 undefined，视为相等
     return 0;

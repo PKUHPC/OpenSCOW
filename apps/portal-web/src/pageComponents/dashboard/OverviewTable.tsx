@@ -33,7 +33,7 @@ export interface ClusterInfo extends PartitionInfo {
 
 interface Props {
   clusterInfo: ClusterInfo[];
-  failedClusters: ({clusterName: I18nStringType})[];
+  failedClusters: ({ clusterName: I18nStringType })[];
   currentClusters: Cluster[];
   isLoading: boolean;
   clustersOverview: ClusterOverview[];
@@ -138,7 +138,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
   const dataSource = (filteredClusterInfo.map((x, index) =>
     ({ clusterName: x.clusterName, info: { ...x, id: index, cpuUsage: (x.runningCpuCount / x.cpuCoreCount) * 100,
       gpuUsage: x.gpuCoreCount === 0 ? undefined
-        : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as Array<TableProps>);
+        : (x.runningGpuCount / x.gpuCoreCount) * 100 } })) as TableProps[]);
 
   const finalDataSource = activeTabKey === "platformOverview" ? dataSource.concat(failedClusters) : dataSource;
 
