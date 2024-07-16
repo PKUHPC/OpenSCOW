@@ -135,6 +135,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     try {
       const uploadPromises: Promise<void>[] = [];
       for (let i = 0; i < totalCount; i++) {
+        if (controller.signal.aborted) {
+          break;
+        }
         uploadPromises.push(limit(() => uploadChunk(i)));
       }
 
