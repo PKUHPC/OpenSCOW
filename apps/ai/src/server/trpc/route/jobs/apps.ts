@@ -12,10 +12,10 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
+import { JobInfo } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { OperationResult, OperationType } from "@scow/lib-operation-log";
-import { formatTime } from "@scow/lib-scheduler-adapter";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
@@ -25,7 +25,6 @@ import {
   sftpRealPath,
   sftpWriteFile,
 } from "@scow/lib-ssh";
-import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { TRPCError } from "@trpc/server";
 import fs from "fs";
 import { join } from "path";
@@ -49,6 +48,7 @@ import {
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { formatTime } from "src/utils/datetime";
 import { isParentOrSameFolder } from "src/utils/file";
 import { isPortReachable } from "src/utils/isPortReachable";
 import { parseIp } from "src/utils/parse";
