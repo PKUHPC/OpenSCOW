@@ -42,12 +42,15 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
   const uploadControllers = useRef(new Map<string, AbortController>());
+  const isModalClosing = useRef(false);
 
   const t = useI18nTranslateToString();
 
   const onModalClose = () => {
+    isModalClosing.current = true;
     uploadFileList.forEach((file) => handleRemove(file));
     onClose();
+    setUploadFileList([]);
   };
 
   const handleRemove = (file: UploadFile) => {
@@ -96,7 +99,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
     const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
     if (!uploadFile) {
-      message.error(t(p("uploadFileListNotExist"), [file.name]));
+      if (!isModalClosing.current) {
+        message.error(t(p("uploadFileListNotExist"), [file.name]));
+      }
       return;
     }
 
@@ -120,16 +125,16 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       const formData = new FormData();
       formData.append("file", chunk);
 
-      await fetch(urlToUpload(cluster, join(tempFileDir, fileName)), {
+      const response = await fetch(urlToUpload(cluster, join(tempFileDir, fileName)), {
         method: "POST",
         body: formData,
         signal: controller.signal,
-      }).then((response) => {
-        if (!response.ok) {
-          throw new Error(response.statusText);
-        }
-        updateProgress();
       });
+
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      updateProgress();
     };
 
     try {
@@ -145,7 +150,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } });
     } catch (err) {
-      message.error(t(p("multipartUploadError"), [err.message]));
+      if (!isModalClosing.current) {
+        message.error(t(p("multipartUploadError"), [err.message]));
+      }
     } finally {
       uploadControllers.current.delete(uploadFile.uid);
     }
@@ -202,10 +209,14 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           setUploadFileList(updatedFileList);
 
           if (file.status === "done") {
-            message.success(`${file.name}${t(p("successMessage"))}`);
+            if (!isModalClosing.current) {
+              message.success(`${file.name}${t(p("successMessage"))}`);
+            }
             reload();
           } else if (file.status === "error") {
-            message.error(`${file.name}${t(p("errorMessage"))}`);
+            if (!isModalClosing.current) {
+              message.error(`${file.name}${t(p("errorMessage"))}`);
+            }
           }
         }}
         beforeUpload={(file) => {
