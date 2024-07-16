@@ -101,8 +101,9 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     }
 
     const controller = new AbortController();
-    const limit = pLimit(concurrentChunks);
+    uploadControllers.current.set(uploadFile.uid, controller);
 
+    const limit = pLimit(concurrentChunks);
     const uploadChunk = async (start: number): Promise<void> => {
       if (controller.signal.aborted) {
         return;
