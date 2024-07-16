@@ -55,6 +55,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const handleRemove = (file: UploadFile) => {
     const controller = uploadControllers.current.get(file.uid);
+    console.log("has controller:", controller);
     if (controller) {
       controller.abort();
       uploadControllers.current.delete(file.uid);
@@ -110,6 +111,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
     const limit = pLimit(concurrentChunks);
     const uploadChunk = async (start: number): Promise<void> => {
+      console.log("check controller:", controller.signal.aborted);
       if (controller.signal.aborted) {
         return;
       }
@@ -119,6 +121,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       const fileName = `${hash}_${start + 1}.scowuploadtemp`;
 
       if (uploadedChunks.includes(fileName)) {
+        console.log("is uploaded:", fileName);
         return;
       }
 
