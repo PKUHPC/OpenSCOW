@@ -12,6 +12,7 @@
 
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
+import pLimit from "p-limit";
 import { join } from "path";
 import { useRef, useState } from "react";
 import { api } from "src/apis";
@@ -20,7 +21,6 @@ import { urlToUpload } from "src/pageComponents/filemanager/api";
 import { publicConfig } from "src/utils/config";
 import { calculateBlobSHA256 } from "src/utils/file";
 import { convertToBytes } from "src/utils/format";
-
 interface Props {
   open: boolean;
   onClose: () => void;
@@ -28,11 +28,6 @@ interface Props {
   cluster: string;
   path: string;
   scowdEnabled: boolean;
-}
-
-interface FileChunk {
-  file: Blob;
-  fileName: string;
 }
 
 interface UploadProgressEvent {
@@ -74,7 +69,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   };
 
   const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
-
     const { tempFileDir, chunkSize, filesInfo } = await api.initMultipartUpload({
       body: { cluster, path, name: file.name },
     });
@@ -91,21 +85,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       }
     }).map((item) => item.name);
 
-    // 文件分块总数
     const totalCount = Math.ceil(file.size / chunkSize);
-
-    // 并发上传数
     const concurrentChunks = 3;
-
-    // 跟踪已上传的块数
     let uploadedCount = uploadedChunks.length;
 
-    onProgress?.({ percent:Number(((uploadedCount / totalCount) * 100).toFixed(2)) });
-
-    // 更新进度条
     const updateProgress = () => {
       uploadedCount++;
-      onProgress?.({ percent: Number((uploadedCount / totalCount * 100).toFixed(2)) });
+      onProgress?.({ percent: Number(((uploadedCount / totalCount) * 100).toFixed(2)) });
     };
 
     const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
@@ -115,66 +101,52 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     }
 
     const controller = new AbortController();
+    const limit = pLimit(concurrentChunks);
 
-    for (let i = 0; i < totalCount; i += concurrentChunks) {
-
-      if (!uploadControllers.current.get(uploadFile.uid) && !controller.signal.aborted) {
-        uploadControllers.current.set(uploadFile.uid, controller);
-      } else if (controller.signal.aborted) {
-        message.info(t(p("cancelUploadText"), [file.name]));
+    const uploadChunk = async (start: number): Promise<void> => {
+      if (controller.signal.aborted) {
         return;
       }
 
-      const chunks: FileChunk[] = [];
-      for (let start = i; start < totalCount && start < i + concurrentChunks; start++) {
-        const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
+      const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
+      const hash = await calculateBlobSHA256(chunk);
+      const fileName = `${hash}_${start + 1}.scowuploadtemp`;
 
-        try {
-          const hash = await calculateBlobSHA256(chunk);
+      if (uploadedChunks.includes(fileName)) {
+        return;
+      }
 
-          const fileName = `${hash}_${start + 1}.scowuploadtemp`;
-          if (uploadedChunks.includes(fileName)) {
-            continue;
-          }
+      const formData = new FormData();
+      formData.append("file", chunk);
 
-          chunks.push({
-            file: chunk,
-            fileName,
-          });
-        } catch (err) {
-          message.error(t(p("calculateHashError"), [err.message]));
-          return;
+      await fetch(urlToUpload(cluster, join(tempFileDir, fileName)), {
+        method: "POST",
+        body: formData,
+        signal: controller.signal,
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error(response.statusText);
         }
-      }
-
-      const uploadPromises = chunks.map((chunk) => {
-        const formData = new FormData();
-        formData.append("file", chunk.file);
-
-        return fetch(urlToUpload(cluster, join(tempFileDir, chunk.fileName)), {
-          method: "POST",
-          body: formData,
-          signal: controller.signal,
-        }).then((response) => {
-          if (!response.ok) {
-            return new Error(response.statusText);
-          }
-          updateProgress();
-          return response;
-        });
+        updateProgress();
       });
+    };
 
-      // 等待当前批次上传完成
-      await Promise.all(uploadPromises);
-    }
-
-    await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } }).finally(() => {
-      const controller = uploadControllers.current.get(uploadFile.uid);
-      if (controller) {
-        uploadControllers.current.delete(uploadFile.uid);
+    try {
+      const uploadPromises: Promise<void>[] = [];
+      for (let i = 0; i < totalCount; i++) {
+        uploadPromises.push(limit(() => uploadChunk(i)));
       }
-    });
+
+      await Promise.all(uploadPromises);
+
+      await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } });
+    } catch (err) {
+      message.error(t(p("multipartUploadError"), [err.message]));
+    } finally {
+      uploadControllers.current.delete(uploadFile.uid);
+    }
   };
+
 
   return (
     <Modal
