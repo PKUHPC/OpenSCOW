@@ -212,12 +212,10 @@ export const fileServiceServer = plugin((server) => {
         try {
           const initData = await client.file.initMultipartUpload({ userId, path, name });
 
-          console.log("1231231231", initData);
           return [{
             ...initData,
             chunkSize: Number(initData.chunkSize),
             filesInfo: initData.filesInfo.map((info): FileInfo => {
-              console.log(11231231, info);
               return {
                 name: info.name,
                 type: fileInfo_FileTypeFromJSON(info.fileType),

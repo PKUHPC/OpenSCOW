@@ -121,7 +121,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       const fileName = `${hash}_${start + 1}.scowuploadtemp`;
 
       if (uploadedChunks.includes(fileName)) {
-        console.log("is uploaded:", fileName);
         return;
       }
 
