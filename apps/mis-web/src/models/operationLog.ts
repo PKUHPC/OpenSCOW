@@ -62,6 +62,7 @@ export const OperationType: OperationTypeEnum = {
   setTenantFinance: "setTenantFinance",
   unsetTenantFinance: "unsetTenantFinance",
   tenantChangePassword: "tenantChangePassword",
+  deleteUser:"deleteUser",
   createAccount: "createAccount",
   addAccountToWhitelist: "addAccountToWhitelist",
   removeAccountFromWhitelist: "removeAccountFromWhitelist",
@@ -180,6 +181,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     setTenantFinance: t(pTypes("setTenantFinance")),
     unsetTenantFinance: t(pTypes("unsetTenantFinance")),
     tenantChangePassword: t(pTypes("tenantChangePassword")),
+    deleteUser: t(pTypes("deleteUser")),
     createAccount: t(pTypes("createAccount")),
     addAccountToWhitelist: t(pTypes("addAccountToWhitelist")),
     removeAccountFromWhitelist: t(pTypes("removeAccountFromWhitelist")),
@@ -247,6 +249,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   setTenantFinance: "030204",
   unsetTenantFinance: "030205",
   tenantChangePassword: "030206",
+  deleteUser:"030207",
   createAccount: "030301",
   addAccountToWhitelist: "030302",
   removeAccountFromWhitelist: "030303",
@@ -395,6 +398,8 @@ export const getOperationDetail = (
           [operationEvent[logEvent].userId, operationEvent[logEvent].tenantName]);
       case "tenantChangePassword":
         return t(pDetails("tenantChangePassword"), [operationEvent[logEvent].userId]);
+      case "deleteUser":
+        return t(pDetails("deleteUser"), [operationEvent[logEvent].userId]);
       case "createAccount":
         return t(pDetails("createAccount"),
           [operationEvent[logEvent].accountName, operationEvent[logEvent].accountOwner]);

@@ -100,6 +100,8 @@ export const userServiceServer = plugin((server) => {
         populate: ["storageQuotas", "accounts", "accounts.account"],
       });
 
+      console.log("现在是getUserStatus的user",user);
+
       if (!user) {
         throw {
           code: Status.NOT_FOUND, message: `User ${userId}, tenant ${tenantName} is not found`,
@@ -110,26 +112,31 @@ export const userServiceServer = plugin((server) => {
       if (!tenant) {
         throw { code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
+      const accountStatuses = user.accounts.getItems().reduce((prev, curr) => {
+        const account = curr.account.getEntity();
+        prev[account.accountName] = {
+          accountBlocked: Boolean(account.blockedInCluster),
+          userStatus: PFUserStatus[curr.blockedInCluster],
+          jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
+          usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
+          balance: decimalToMoney(curr.account.getEntity().balance),
+          isInWhitelist: Boolean(account.whitelist),
+          blockThresholdAmount:account.blockThresholdAmount ?
+            decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
+        } as AccountStatus;
+        return prev;
+      }, {});
 
+      const storageQuotas = user.storageQuotas.getItems().reduce((prev, curr) => {
+        prev[curr.cluster] = curr.storageQuota;
+        return prev;
+      }, {});
+
+      console.log("这是返回的accountStatuses,storageQuotas",accountStatuses,
+        storageQuotas);
       return [{
-        accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
-          const account = curr.account.getEntity();
-          prev[account.accountName] = {
-            accountBlocked: Boolean(account.blockedInCluster),
-            userStatus: PFUserStatus[curr.blockedInCluster],
-            jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
-            usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
-            balance: decimalToMoney(curr.account.getEntity().balance),
-            isInWhitelist: Boolean(account.whitelist),
-            blockThresholdAmount:account.blockThresholdAmount ?
-              decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
-          } as AccountStatus;
-          return prev;
-        }, {}),
-        storageQuotas: user.storageQuotas.getItems().reduce((prev, curr) => {
-          prev[curr.cluster] = curr.storageQuota;
-          return prev;
-        }, {}),
+        accountStatuses,
+        storageQuotas,
       }];
     },
 
@@ -495,28 +502,92 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    deleteUser: async ({ request, em }) => {
-      const { userId, tenantName } = request;
+    deleteUser: async ({ request, em, logger }) => {
+      const { userId, tenantName, deleteRemark } = ensureNotUndefined(request, ["userId", "tenantName"]);
 
-      const user = await em.findOne(User, { userId, tenant: { name: tenantName } });
+      const user = await em.findOne(User, { userId, tenant: { name: tenantName } }, {
+        populate: ["accounts", "accounts.account"],
+      });
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+
       if (!user) {
         throw { code: Status.NOT_FOUND, message:`User ${userId} is not found.` } as ServiceError;
       }
 
-      // find if the user is an owner of any account
-      const accountUser = await em.findOne(UserAccount, {
-        user,
-        role: UserRole.OWNER,
-      });
-
-      if (accountUser) {
-        throw {
-          code: Status.FAILED_PRECONDITION,
-          details: `User ${userId} is an owner of an account.`,
-        } as ServiceError;
+      if (!tenant) {
+        throw { code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
 
-      await em.removeAndFlush(user);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      // 查询用户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
+      const jobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
+        logger,
+        async (client) => {
+          const fields = ["job_id", "user", "state", "account"];
+
+          return await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: [userId], accounts: [], states: ["RUNNING", "PENDING"]},
+          });
+        },
+      );
+      // 这个记得最后解除注释
+      // if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+      //   throw {
+      //     code: Status.FAILED_PRECONDITION,
+      //     message: `User ${userId} has jobs running or pending and cannot remove.
+      //     Please wait for the job to end or end the job manually before moving out.`,
+      //   } as ServiceError;
+      // };
+      const processAccountStatuses = async () => {
+        const accountItems = user.accounts.getItems();
+
+        for (const item of accountItems) {
+          const account = item.account.getEntity();
+          const { accountName } = account;
+
+          const userAccount = await em.findOne(UserAccount, {
+            user: { userId, tenant: { name: tenantName } },
+            account: { accountName, tenant: { name: tenantName } },
+          }, { populate: ["user", "account"]});
+
+          if (userAccount && userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
+            userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
+            await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
+            await em.flush();
+          }
+        }
+      };
+
+      // 删除过程中封锁用户
+      processAccountStatuses().catch((error) => {
+        console.error("Error processing blockUserInAccount:", error);
+      });
+
+
+      // // find if the user is an owner of any account
+      // const accountUser = await em.findOne(UserAccount, {
+      //   user,
+      //   role: UserRole.OWNER,
+      // });
+
+      // if (userAccount.role === UserRole.OWNER) {
+      //   throw {
+      //     code: Status.OUT_OF_RANGE,
+      //     message: `User ${userId} is the owner of the account ${accountName}。`,
+      //   } as ServiceError;
+      // }
+
+      // if (accountUser) {
+      //   throw {
+      //     code: Status.FAILED_PRECONDITION,
+      //     details: `User ${userId} is an owner of an account.`,
+      //   } as ServiceError;
+      // }
+
+      // await em.removeAndFlush(user);
       return [{}];
     },
 

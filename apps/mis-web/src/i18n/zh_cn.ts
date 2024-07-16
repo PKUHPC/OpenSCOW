@@ -1226,6 +1226,7 @@ export default {
       customEvent: "自定义操作行为",
       activateCluster: "启用集群",
       deactivateCluster: "停用集群",
+      deleteUser:"删除用户",
     },
     operationDetails: {
       login: "用户登录",
@@ -1306,6 +1307,7 @@ export default {
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
       activateCluster: "用户{}启用集群：{}",
       deactivateCluster: "用户{}停用集群：{}",
+      deleteUser:"删除用户{}",
     },
   },
   userRoles: {

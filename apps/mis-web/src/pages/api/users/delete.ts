@@ -11,8 +11,17 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
+import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
+import { authenticate } from "src/auth/server";
+import { OperationResult, OperationType } from "src/models/operationLog";
+import { PlatformRole, TenantRole } from "src/models/User";
+import { callLog } from "src/server/operationLog";
+import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 export const DeleteUserSchema = typeboxRouteSchema({
   method: "DELETE",
@@ -26,61 +35,50 @@ export const DeleteUserSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
     // 用户不存在
-    404: Type.Null(),
-
-    // 操作集群失败
-    400: Type.Object({ message: Type.String() }),
-
-    // 不能移出账户拥有者
-    406: Type.Null(),
-
+    404: Type.Object({ message: Type.String() }),
     // 不能移出有正在运行作业的用户，只能先封锁
-    409: Type.Null(),
+    409: Type.Object({ message: Type.String() }),
+    // 操作由于其他中止条件被中止
+    410: Type.Null(),
   },
 });
 
-export default /* #__PURE__*/route(DeleteUserSchema, async (req) => {
-  const { userId, userName , comments } = req.query;
-  console.log("这里是访问到了DeleteUserSchema内部",userId, userName , comments);
-  // const auth = authenticate((u) => {
-  //   const acccountBelonged = u.accountAffiliations.find((x) => x.accountName === accountName);
+export default /* #__PURE__*/route(DeleteUserSchema, async (req,res) => {
+  const { userId, comments } = req.query;
+  const auth = authenticate((u) =>
+    (u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
+    u.tenantRoles.includes(TenantRole.TENANT_ADMIN)) && u.identityId !== userId);
+  const info = await auth(req, res);
+  if (!info) { return; }
 
-  //   return u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ||
-  //         (acccountBelonged && acccountBelonged.role !== UserRole.USER) ||
-  //         u.tenantRoles.includes(TenantRole.TENANT_ADMIN);
-  // });
+  // call ua service to add user
+  const client = getClient(UserServiceClient);
 
-  // const info = await auth(req, res);
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.deleteUser,
+    operationTypePayload:{
+      userId,
+    },
+  };
 
-  // if (!info) { return; }
+  console.log("这里测试的是delete内部", req);
 
-  // // call ua service to add user
-  // const client = getClient(UserServiceClient);
-
-  // const logInfo = {
-  //   operatorUserId: info.identityId,
-  //   operatorIp: parseIp(req) ?? "",
-  //   operationTypeName: OperationType.removeUserFromAccount,
-  //   operationTypePayload:{
-  //     accountName, userId: identityId,
-  //   },
-  // };
-
-  // return await asyncClientCall(client, "removeUserFromAccount", {
-  //   tenantName: info.tenant,
-  //   accountName,
-  //   userId: identityId,
-  // })
-  //   .then(async () => {
-  //     await callLog(logInfo, OperationResult.SUCCESS);
-  //     return { 204: null };
-  //   })
-  //   .catch(handlegRPCError({
-  //     [Status.INTERNAL]: (e) => ({ 400: { message: e.details } }),
-  //     [Status.NOT_FOUND]: () => ({ 404: null }),
-  //     [Status.OUT_OF_RANGE]: () => ({ 406: null }),
-  //     [Status.FAILED_PRECONDITION]: () => ({ 409: null }),
-  //   },
-  //   async () => await callLog(logInfo, OperationResult.FAIL),
-  //   ));
+  return await asyncClientCall(client, "deleteUser", {
+    tenantName: info.tenant,
+    userId,
+    deleteRemark:comments,
+  })
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 204: null };
+    })
+    .catch(handlegRPCError({
+      [status.NOT_FOUND]: (e) => ({ 404: { message: e.details } }),
+      [status.FAILED_PRECONDITION]: (e) => ({ 409: { message: e.details } }),
+      [status.ABORTED]: () => ({ 410: null }),
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

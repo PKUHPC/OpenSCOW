@@ -283,20 +283,18 @@ export const AdminUserTable: React.FC<Props> = ({
                       userId:inputUserId,
                       userName:inputUserName,
                       comments: comments,
-                    } })
-                      .httpError(400, (e) => {
+                    } })// 待完善
+                      .httpError(404, (e) => {
                         message.destroy("removeUser");
                         message.error({
-                          content: `${t("page._app.multiClusterOpErrorContent")}(${
-                            e.message
-                          })`,
+                          content: e.message,
                           duration: 4,
                         });
                       })
-                      .httpError(409, () => {
+                      .httpError(409, (e) => {
                         message.destroy("removeUser");
                         message.error({
-                          content: "删除有问题",
+                          content: e.message,
                           duration: 4,
                         });
                         reload();

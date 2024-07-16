@@ -1228,6 +1228,7 @@ export default {
       customEvent: "Custom Operation Event",
       activateCluster: "Activate Cluster",
       deactivateCluster: "Deactivate Cluster",
+      deleteUser:"Delete User",
     },
     operationDetails: {
       login: "User Login",
@@ -1264,6 +1265,7 @@ export default {
       setTenantFinance: "Set user {} as finance personnel of tenant {}",
       unsetTenantFinance: "Unset user {} as finance personnel of tenant {}",
       tenantChangePassword: "Reset login password for user {}",
+      deleteUser:"Delete User {}",
       createAccount: "Create account {}, owner {}",
       addAccountToWhitelist: "Add account {} to tenant {} whitelist",
       removeAccountFromWhitelist: "Remove account {} from tenant {} whitelist",
