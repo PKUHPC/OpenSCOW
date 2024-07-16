@@ -346,6 +346,7 @@ export default {
         multipartUploadError: "Upload file failed: {}",
         calculateHashError: "Error calculating hash: {}",
         uploadFileListNotExist: "The uploaded file list does not exist: {}",
+        mergeFileChunksErrorText: "Failed to merge file {}, please try again",
       },
     },
     // desktop

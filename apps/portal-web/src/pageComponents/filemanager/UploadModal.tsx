@@ -42,33 +42,25 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   const { message, modal } = App.useApp();
   const [ uploadFileList, setUploadFileList ] = useState<UploadFile[]>([]);
   const uploadControllers = useRef(new Map<string, AbortController>());
-  const isModalClosing = useRef(false);
 
   const t = useI18nTranslateToString();
 
   const onModalClose = () => {
-    isModalClosing.current = true;
-    uploadFileList.forEach((file) => handleRemove(file));
-    onClose();
     setUploadFileList([]);
+    for (const controller of uploadControllers.current.values()) {
+      controller.abort();
+    }
+
+    onClose();
   };
 
   const handleRemove = (file: UploadFile) => {
     const controller = uploadControllers.current.get(file.uid);
-    console.log("has controller:", controller);
     if (controller) {
       controller.abort();
       uploadControllers.current.delete(file.uid);
     }
 
-    setUploadFileList((prevList) => {
-      return prevList.map((item) => {
-        if (item.uid === file.uid) {
-          item.status = "removed";
-        }
-        return item;
-      }).filter((item) => item.uid !== file.uid);
-    });
     return true;
   };
 
@@ -93,18 +85,16 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     const concurrentChunks = 3;
     let uploadedCount = uploadedChunks.length;
 
+    const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
+    if (!uploadFile) {
+      message.error(t(p("uploadFileListNotExist"), [file.name]));
+      return;
+    }
+
     const updateProgress = () => {
       uploadedCount++;
       onProgress?.({ percent: Number(((uploadedCount / totalCount) * 100).toFixed(2)) });
     };
-
-    const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
-    if (!uploadFile) {
-      if (!isModalClosing.current) {
-        message.error(t(p("uploadFileListNotExist"), [file.name]));
-      }
-      return;
-    }
 
     const controller = new AbortController();
     uploadControllers.current.set(uploadFile.uid, controller);
@@ -136,6 +126,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       if (!response.ok) {
         throw new Error(response.statusText);
       }
+
       updateProgress();
     };
 
@@ -150,11 +141,14 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       await Promise.all(uploadPromises);
 
-      await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } });
+      await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } })
+        .httpError(520, (err) => {
+          message.error(t(p("mergeFileChunksErrorText"), [file.name]));
+          throw err;
+        });
     } catch (err) {
-      if (!isModalClosing.current) {
-        message.error(t(p("multipartUploadError"), [err.message]));
-      }
+      message.error(t(p("multipartUploadError"), [err.message]));
+      throw err;
     } finally {
       uploadControllers.current.delete(uploadFile.uid);
     }
@@ -211,14 +205,10 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           setUploadFileList(updatedFileList);
 
           if (file.status === "done") {
-            if (!isModalClosing.current) {
-              message.success(`${file.name}${t(p("successMessage"))}`);
-            }
+            message.success(`${file.name}${t(p("successMessage"))}`);
             reload();
           } else if (file.status === "error") {
-            if (!isModalClosing.current) {
-              message.error(`${file.name}${t(p("errorMessage"))}`);
-            }
+            message.error(`${file.name}${t(p("errorMessage"))}`);
           }
         }}
         beforeUpload={(file) => {
