@@ -10,12 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { TRPCError } from "@trpc/server";
 import { basename, dirname, join } from "path";
 import { Framework } from "src/models/Algorithm";
 import { SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -23,6 +25,7 @@ import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
 import { getUpdatedSharedPath, unShareFileOrDir } from "src/server/utils/share";
 import { getClusterLoginNode } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { booleanQueryParam, clusterExist } from "../utils";
@@ -121,6 +124,28 @@ export const createModel = procedure
     clusterId: z.string(),
   }))
   .output(z.number())
+  .use(async ({ input:{ clusterId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createModel,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId, modelId:res.data as number } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ clusterId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     if (!clusterExist(input.clusterId)) {
       throw new TRPCError({
@@ -159,6 +184,28 @@ export const updateModel = procedure
     description: z.string().optional(),
   }))
   .output(z.number())
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.updateModel,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -242,6 +289,28 @@ export const deleteModel = procedure
   })
   .input(z.object({ id: z.number() }))
   .output(z.object({ success: z.boolean() }))
+  .use(async ({ input:{ id }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.deleteModel,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId:id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId:id } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
     const model = await em.findOne(Model, { id: input.id });
