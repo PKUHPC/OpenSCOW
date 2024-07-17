@@ -37,6 +37,7 @@ const Link = styled(NextLink)`
 `;
 
 const TypographyLink = styled(Typography.Link)`
+  font-size: 18px !important;
   display: flex;
   flex-wrap: wrap;
   overflow: hidden;
