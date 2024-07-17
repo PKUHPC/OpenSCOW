@@ -809,12 +809,11 @@ export default {
       userId:"用户ID",
       userName:"用户姓名",
       comments:"备注",
-      confirmPermanentDeleteUser:"请确认是否永久删除用户{}（ID：{}）？"
-      + "删除后，该用户将无法使用，包括但不限于：",
-      deleteUserWarning1: "1、无法使用和登录该账号",
-      deleteUserWarning2: "2、删除该用户的所有个人信息",
-      deleteUserWarning3: "3、无法查看作业和消费记录",
-      confirmDeleteUserPrompt: "如果确认删除用户，请在下面输入用户ID和姓名",
+      confirmPermanentDeleteUser:"请确认是否删除ID是<b>{}</b>，姓名是<b>{}</b>的用户？",
+      confirmDeleteUserPrompt1: "如果删除用户，请确认该用户在所有账户中已处于封锁状态，并在下方输入用户ID和姓名。",
+
+      confirmDeleteUserPrompt2: "<span style='color:red'>注意：删除后不可恢复，用户将不可用！</span>",
+
       cannotDeleteSelf:"不允许删除当前用户本身",
       userIdRequired:"请输入用户ID",
       userNameRequired:"请输入用户姓名",

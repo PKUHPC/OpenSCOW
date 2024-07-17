@@ -36,7 +36,7 @@ import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
-import { PlatformRole, TenantRole, User } from "src/entities/User";
+import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { UserAccount, UserRole, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { getUserStateInfo } from "src/utils/accountUserState";
@@ -100,8 +100,6 @@ export const userServiceServer = plugin((server) => {
         populate: ["storageQuotas", "accounts", "accounts.account"],
       });
 
-      console.log("现在是getUserStatus的user",user);
-
       if (!user) {
         throw {
           code: Status.NOT_FOUND, message: `User ${userId}, tenant ${tenantName} is not found`,
@@ -132,8 +130,6 @@ export const userServiceServer = plugin((server) => {
         return prev;
       }, {});
 
-      console.log("这是返回的accountStatuses,storageQuotas",accountStatuses,
-        storageQuotas);
       return [{
         accountStatuses,
         storageQuotas,
@@ -504,7 +500,7 @@ export const userServiceServer = plugin((server) => {
 
     deleteUser: async ({ request, em, logger }) => {
       const { userId, tenantName, deleteRemark } = ensureNotUndefined(request, ["userId", "tenantName"]);
-
+      console.log("deleteUser后端 userId, tenantName, deleteRemark ", userId, tenantName, deleteRemark);
       const user = await em.findOne(User, { userId, tenant: { name: tenantName } }, {
         populate: ["accounts", "accounts.account"],
       });
@@ -516,7 +512,7 @@ export const userServiceServer = plugin((server) => {
       }
 
       if (!tenant) {
-        throw { code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
+        throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
@@ -533,16 +529,19 @@ export const userServiceServer = plugin((server) => {
           });
         },
       );
-      // 这个记得最后解除注释
-      // if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
-      //   throw {
-      //     code: Status.FAILED_PRECONDITION,
-      //     message: `User ${userId} has jobs running or pending and cannot remove.
-      //     Please wait for the job to end or end the job manually before moving out.`,
-      //   } as ServiceError;
-      // };
+
+      if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} has jobs running or pending and cannot remove.
+            Please wait for the job to end or end the job manually before moving out.`,
+        } as ServiceError;
+      }
+
+      // 查看是否用户有未封锁的账户
+      const accountItems = user.accounts.getItems();
       const processAccountStatuses = async () => {
-        const accountItems = user.accounts.getItems();
+        const unblockedAccounts: string[] = [];
 
         for (const item of accountItems) {
           const account = item.account.getEntity();
@@ -554,42 +553,67 @@ export const userServiceServer = plugin((server) => {
           }, { populate: ["user", "account"]});
 
           if (userAccount && userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
-            userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
-            await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
-            await em.flush();
+            // 收集未被封锁的账户
+            unblockedAccounts.push(accountName);
+            // userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN; //封锁当前用户账户
+            // await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
+            // await em.flush();
           }
         }
+        return unblockedAccounts;
       };
 
-      // 删除过程中封锁用户
-      processAccountStatuses().catch((error) => {
+      const unblockedAccounts = await processAccountStatuses().catch((error) => {
         console.error("Error processing blockUserInAccount:", error);
+        return []; // 处理错误时返回空数组
       });
 
+      console.log("这里是unblockedAccounts", unblockedAccounts);
 
-      // // find if the user is an owner of any account
-      // const accountUser = await em.findOne(UserAccount, {
-      //   user,
-      //   role: UserRole.OWNER,
-      // });
+      if (unblockedAccounts.length > 0) {
+        const accountsString = unblockedAccounts.join(", ");
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} has unblocked accounts: ${accountsString}.
+             Please block the user in these accounts first.`,
+        } as ServiceError;
+      }
 
-      // if (userAccount.role === UserRole.OWNER) {
-      //   throw {
-      //     code: Status.OUT_OF_RANGE,
-      //     message: `User ${userId} is the owner of the account ${accountName}。`,
-      //   } as ServiceError;
-      // }
+      // 表示用户为删除状态，记得取消注释
+      // user.state = UserState.DELETED;
 
-      // if (accountUser) {
-      //   throw {
-      //     code: Status.FAILED_PRECONDITION,
-      //     details: `User ${userId} is an owner of an account.`,
-      //   } as ServiceError;
-      // }
+      console.log("开始删除的是user", user);
 
-      // await em.removeAndFlush(user);
+      // 处理用户账户关系表，删除用户与所有账户的关系
+      const hasCapabilities = server.ext.capabilities.accountUserRelation;
+      console.log("hasCapabilities",hasCapabilities);
+
+      for (const userAccount of accountItems) {
+        const accountName = userAccount.account.getEntity().accountName;
+        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+          return await asyncClientCall(client.user, "removeUserFromAccount",
+            { userId, accountName });
+        }).catch(async (e) => {
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
+          // 除此以外，都抛出异常
+          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+            throw e;
+          }
+        });
+        await em.removeAndFlush(userAccount);
+        if (hasCapabilities) {
+          await removeUserFromAccount(authUrl, { accountName, userId }, logger);
+        }
+      }
+
+
+      await em.flush();
+
       return [{}];
+
     },
+
 
     checkUserNameMatch: async ({ request, em }) => {
       const { userId, name } = request;

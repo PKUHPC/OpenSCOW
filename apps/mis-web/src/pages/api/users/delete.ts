@@ -63,8 +63,6 @@ export default /* #__PURE__*/route(DeleteUserSchema, async (req,res) => {
     },
   };
 
-  console.log("这里测试的是delete内部", req);
-
   return await asyncClientCall(client, "deleteUser", {
     tenantName: info.tenant,
     userId,

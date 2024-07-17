@@ -811,12 +811,11 @@ export default {
       userId:"User ID",
       userName:"User Name",
       comments:"Comments",
-      confirmPermanentDeleteUser: "Please confirm if you want to permanently delete the user {} (ID: {}). " +
-    "After deletion, the user will not be able to use it, including but not limited to:",
-      deleteUserWarning1: "1. Unable to use and log in to the account",
-      deleteUserWarning2: "2. Delete all personal information of the user",
-      deleteUserWarning3: "3. Unable to view assignments and consumption records",
-      confirmDeleteUserPrompt: "If you confirm the deletion of the user, please enter the user ID and name below",
+      confirmPermanentDeleteUser: "Please confirm if you want to delete the user with ID <b>{}</b> and name <b>{}</b>?",
+      confirmDeleteUserPrompt1: "If deleting a user, please ensure that the user is blocked in all accounts " +
+      "and enter the user ID and name below.",
+      confirmDeleteUserPrompt2: "<span style='color:red'>Warning: This action is irreversible, and the user " +
+      "will be unavailable!</span>",
       cannotDeleteSelf: "Deleting the current user is not allowed",
       userIdRequired: "Please enter the user ID",
       userNameRequired: "Please enter the user name",

@@ -66,13 +66,9 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
       width={"620px"} // 设置Modal宽度
     >
       <br />
-      <div>
-        {t(p("confirmPermanentDeleteUser"), [name, userId])}<br />
-        {t(p("deleteUserWarning1"))}<br />
-        {t(p("deleteUserWarning2"))}<br />
-        {t(p("deleteUserWarning3"))}
-      </div><br />
-      <p><b>{t(p("confirmDeleteUserPrompt"))}</b></p><br />
+      <div dangerouslySetInnerHTML={{ __html: t(p("confirmPermanentDeleteUser"), [userId, name]) }} /><br />
+      <div dangerouslySetInnerHTML={{ __html: t(p("confirmDeleteUserPrompt1")) }} /><br />
+      <p><b dangerouslySetInnerHTML={{ __html: t(p("confirmDeleteUserPrompt2")) }} /></p><br />
       <Form
         form={form}
         initialValues={undefined}
