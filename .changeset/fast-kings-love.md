@@ -4,4 +4,4 @@
 "@scow/lib-web": patch
 ---
 
-右上角 nav 跳转 portal 及 mis 时生成的 a 标签不添加 base path
+右上角nav在生成portal及mis的 a 标签时不添加base path
