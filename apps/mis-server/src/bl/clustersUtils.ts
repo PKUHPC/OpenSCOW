@@ -84,7 +84,7 @@ export async function getClustersRuntimeInfo(
   });
 
   const clusterDatabaseList = clustersFromDb.map((x) => {
-    return `(Cluster ID: ${x.clusterId}) : ${x.activationStatus}`;
+    return `Cluster ID: ${x.clusterId}, Current Status: ${x.activationStatus}`;
   }).join("; ");
 
   logger.info("Current clusters list: %s", clusterDatabaseList);

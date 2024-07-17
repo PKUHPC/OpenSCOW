@@ -12,6 +12,7 @@
 
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
+import { libGetCurrentActivatedClusters } from "@scow/lib-server";
 import { readVersionFile } from "@scow/utils/build/version";
 import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
@@ -27,6 +28,8 @@ import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
+
+import { commonConfig } from "./config/common";
 
 export async function createServer() {
 
@@ -51,17 +54,20 @@ export async function createServer() {
   await server.register(dashboardServiceServer);
   await server.register(fileServiceServer);
   await server.register(desktopServiceServer);
-  
 
   if (process.env.NODE_ENV === "production") {
-    await checkClustersRootUserLogin(server.logger);
-    await Promise.all(Object.entries(configClusters).map(async ([id]) => {
+    const activatedClusters = await libGetCurrentActivatedClusters(
+      server.logger,
+      configClusters,
+      config.MIS_SERVER_URL,
+      commonConfig.scowApi?.auth?.token);
+
+    await checkClustersRootUserLogin(server.logger, activatedClusters);
+    await Promise.all(Object.entries(activatedClusters).map(async ([id]) => {
       await initShellFile(id, server.logger);
     }));
-    await setupProxyGateway(server.logger);
+    await setupProxyGateway(server.logger, activatedClusters);
   }
-
-
 
   return server;
 }

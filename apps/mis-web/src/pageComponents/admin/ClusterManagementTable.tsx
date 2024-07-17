@@ -188,7 +188,6 @@ export const ClusterManagementTable: React.FC<Props> = ({
                 }
                 {
                   r.hpcEnabled && r.activationStatus === ClusterActivationStatus.DEACTIVATED
-                && r.connectionStatus === ClusterConnectionStatus.AVAILABLE
                   && (
                     <>
                       <a onClick={() => {
