@@ -145,6 +145,9 @@ importers:
       '@mikro-orm/seeder':
         specifier: 6.2.9
         version: 6.2.9(@mikro-orm/core@6.2.9)
+      '@scow/ai-scheduler-adapter-protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/ai-scheduler-adapter
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -160,9 +163,6 @@ importers:
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
-      '@scow/lib-scheduler-adapter':
-        specifier: workspace:*
-        version: link:../../libs/scheduler-adapter
       '@scow/lib-server':
         specifier: workspace:*
         version: link:../../libs/server
@@ -175,9 +175,6 @@ importers:
       '@scow/rich-error-model':
         specifier: workspace:*
         version: link:../../libs/rich-error-model
-      '@scow/scheduler-adapter-protos':
-        specifier: workspace:*
-        version: link:../../libs/protos/scheduler-adapter
       '@scow/utils':
         specifier: workspace:*
         version: link:../../libs/utils
@@ -1349,6 +1346,22 @@ importers:
       ts-log:
         specifier: 2.2.5
         version: 2.2.5
+
+  libs/protos/ai-scheduler-adapter:
+    dependencies:
+      '@grpc/grpc-js':
+        specifier: 1.10.9
+        version: 1.10.9
+      long:
+        specifier: 5.2.3
+        version: 5.2.3
+      protobufjs:
+        specifier: 7.3.2
+        version: 7.3.2
+    devDependencies:
+      ts-proto:
+        specifier: 1.180.0
+        version: 1.180.0
 
   libs/protos/scheduler-adapter:
     dependencies:
