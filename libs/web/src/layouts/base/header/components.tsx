@@ -36,6 +36,13 @@ const Link = styled(NextLink)`
   align-items: center;
 `;
 
+const TypographyLink = styled(Typography.Link)`
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  align-items: center;
+`;
+
 export const TextSpan = styled.span`
 `;
 
@@ -98,9 +105,9 @@ export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon
     <LinkItem>
       {
         crossSystem ? (
-          <Typography.Link href={href} ref={linkRef}>
+          <TypographyLink href={href} ref={linkRef}>
             {content()}
-          </Typography.Link>
+          </TypographyLink>
         ) : (
           <Link href={href} ref={linkRef}>
             {content()}
