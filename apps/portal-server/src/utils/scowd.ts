@@ -15,6 +15,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
+import { removePort } from "@scow/utils";
 import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
@@ -28,7 +29,8 @@ export function getLoginNodeScowdUrl(cluster: string, host: string): string | un
   if (!loginNode) return undefined;
 
   const { address, scowdPort } = loginNode;
-  return config.SCOWD_SSL_ENABLED ? `https://${address}:${scowdPort}` : `http://${address}:${scowdPort}`;
+  return config.SCOWD_SSL_ENABLED
+    ? `https://${removePort(address)}:${scowdPort}` : `http://${removePort(address)}:${scowdPort}`;
 }
 
 const scowdClientForClusters = Object.entries(configClusters).reduce((prev, [cluster]) => {
