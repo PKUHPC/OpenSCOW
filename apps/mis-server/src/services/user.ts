@@ -515,9 +515,41 @@ export const userServiceServer = plugin((server) => {
         throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
 
+      const accountItems = user.accounts.getItems();
+      // 这里商量是不要管有没有封锁直接删，但要不要先封锁了再删？
+
+      // 如果用户为账户拥有者，提示管理员需要先删除拥有的账户再删除用户
+      const countAccountOwner = async () => {
+        const ownedAccounts: string[] = [];
+
+        for (const userAccount of accountItems) {
+          if (PFUserRole[userAccount.role] === PFUserRole.OWNER) {
+            const account = userAccount.account.getEntity();
+            const { accountName } = account;
+            ownedAccounts.push(accountName);
+          }
+        }
+        return ownedAccounts;
+      };
+
+      const needDeleteAccounts = await countAccountOwner().catch((error) => {
+        console.error("Error processing countAccountOwner:", error);
+        return [];
+      });
+
+      if (needDeleteAccounts.length > 0) {
+        const accountsString = needDeleteAccounts.join(", ");
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} owns the following accounts: ${accountsString}. Please delete these accounts first.`,
+        } as ServiceError;
+      }
+
+      user.state = UserState.DELETED;
+
       const currentActivatedClusters = await getActivatedClusters(em, logger);
       // 查询用户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
-      const jobs = await server.ext.clusters.callOnAll(
+      const runningJobs = await server.ext.clusters.callOnAll(
         currentActivatedClusters,
         logger,
         async (client) => {
@@ -530,7 +562,7 @@ export const userServiceServer = plugin((server) => {
         },
       );
 
-      if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+      if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
         throw {
           code: Status.FAILED_PRECONDITION,
           message: `User ${userId} has jobs running or pending and cannot remove.
@@ -538,57 +570,11 @@ export const userServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
-      // 查看是否用户有未封锁的账户
-      const accountItems = user.accounts.getItems();
-      const processAccountStatuses = async () => {
-        const unblockedAccounts: string[] = [];
-
-        for (const item of accountItems) {
-          const account = item.account.getEntity();
-          const { accountName } = account;
-
-          const userAccount = await em.findOne(UserAccount, {
-            user: { userId, tenant: { name: tenantName } },
-            account: { accountName, tenant: { name: tenantName } },
-          }, { populate: ["user", "account"]});
-
-          if (userAccount && userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
-            // 收集未被封锁的账户
-            unblockedAccounts.push(accountName);
-            // userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN; //封锁当前用户账户
-            // await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
-            // await em.flush();
-          }
-        }
-        return unblockedAccounts;
-      };
-
-      const unblockedAccounts = await processAccountStatuses().catch((error) => {
-        console.error("Error processing blockUserInAccount:", error);
-        return []; // 处理错误时返回空数组
-      });
-
-      console.log("这里是unblockedAccounts", unblockedAccounts);
-
-      if (unblockedAccounts.length > 0) {
-        const accountsString = unblockedAccounts.join(", ");
-        throw {
-          code: Status.FAILED_PRECONDITION,
-          message: `User ${userId} has unblocked accounts: ${accountsString}.
-             Please block the user in these accounts first.`,
-        } as ServiceError;
-      }
-
-      // 表示用户为删除状态，记得取消注释
-      // user.state = UserState.DELETED;
-
-      console.log("开始删除的是user", user);
-
       // 处理用户账户关系表，删除用户与所有账户的关系
       const hasCapabilities = server.ext.capabilities.accountUserRelation;
-      console.log("hasCapabilities",hasCapabilities);
 
       for (const userAccount of accountItems) {
+        console.log("单个userAccount",PFUserRole[userAccount.role] === PFUserRole.OWNER);
         const accountName = userAccount.account.getEntity().accountName;
         await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
           return await asyncClientCall(client.user, "removeUserFromAccount",
@@ -606,7 +592,6 @@ export const userServiceServer = plugin((server) => {
           await removeUserFromAccount(authUrl, { accountName, userId }, logger);
         }
       }
-
 
       await em.flush();
 
