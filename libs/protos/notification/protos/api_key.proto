@@ -1,0 +1,54 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow_notification;
+
+import "protos/common.proto";
+
+message ApiKey {
+  uint64 id = 1;
+  string app_id = 2;
+  string name = 3;
+  string key = 4;
+  string create_at = 5;
+  string updated_at = 6;
+}
+
+message ListApiKeysRequest {
+  optional string app_id = 1;
+}
+
+message ListApiKeysResponse {
+  uint32 totalCount = 1;
+  repeated ApiKey api_keys = 2;
+}
+
+message CreateApiKeyRequest {
+  NoticeType notice_type = 1;
+  string message_type = 2;
+  bool enabled = 3;
+  bool can_user_modify = 4;
+}
+
+message CreateApiKeyResponse {
+  string name = 1;
+  string app_id = 2;
+}
+
+
+service ApiKeyService {
+  rpc ListApiKeys(ListApiKeysRequest) returns (ListApiKeysResponse);
+
+  rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse);
+}

@@ -1,0 +1,63 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow_notification;
+
+message MessageType {
+  string type = 1;
+  map<string, string> title_template = 2;
+  map<string, string> content_template = 3;
+  string category = 4;
+  map<string, string> category_template = 5;
+}
+
+message CreateCustomMessageTypeRequest {
+  string type = 1;
+  map<string, string> title_template = 2;
+  map<string, string> content_template = 3;
+  string category = 4;
+  map<string, string> category_template = 5;
+}
+
+message CreateCustomMessageTypeResponse {
+}
+
+message EditCustomMessageTypeRequest {
+  string type = 1;
+  map<string, string> title_template = 2;
+  map<string, string> content_template = 3;
+  string category = 4;
+  map<string, string> category_template = 5;
+}
+
+message EditCustomMessageTypeResponse {
+}
+
+message ListMessageTypesRequest {
+  optional string type = 1;
+  optional string category = 2;
+}
+
+message ListMessageTypesResponse {
+  uint64 total_count = 1;
+  repeated MessageType message_types = 2;
+}
+
+
+service MessageTypeService {
+  rpc CreateCustomMessageType(CreateCustomMessageTypeRequest) returns (CreateCustomMessageTypeResponse);
+  rpc EditCustomMessageType(EditCustomMessageTypeRequest) returns (EditCustomMessageTypeResponse);
+
+  rpc ListMessageTypes(ListMessageTypesRequest) returns (ListMessageTypesResponse);
+}

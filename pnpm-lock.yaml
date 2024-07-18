@@ -1363,6 +1363,24 @@ importers:
         specifier: 1.180.0
         version: 1.180.0
 
+  libs/protos/notification:
+    dependencies:
+      '@bufbuild/buf':
+        specifier: 1.34.0
+        version: 1.34.0
+      '@bufbuild/protobuf':
+        specifier: 1.8.0
+        version: 1.8.0
+      '@bufbuild/protoc-gen-es':
+        specifier: 1.8.0
+        version: 1.8.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/connect':
+        specifier: ^1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/protoc-gen-connect-es':
+        specifier: 1.4.0
+        version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
+
   libs/protos/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
@@ -1404,16 +1422,16 @@ importers:
         specifier: 1.34.0
         version: 1.34.0
       '@bufbuild/protobuf':
-        specifier: ^1.8.0
+        specifier: 1.8.0
         version: 1.8.0
       '@bufbuild/protoc-gen-es':
-        specifier: ^1.8.0
+        specifier: 1.8.0
         version: 1.8.0(@bufbuild/protobuf@1.8.0)
       '@connectrpc/connect':
         specifier: ^1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.8.0)
       '@connectrpc/protoc-gen-connect-es':
-        specifier: ^1.4.0
+        specifier: 1.4.0
         version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
 
   libs/rich-error-model:

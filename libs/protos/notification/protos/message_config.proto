@@ -1,0 +1,62 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package scow_notification;
+
+import "protos/common.proto";
+
+message CreateMessageConfigRequest {
+  NoticeType notice_type = 1;
+  string message_type = 2;
+  bool enabled = 3;
+  bool can_user_modify = 4;
+}
+
+message CreateMessageConfigResponse {
+}
+
+message ModifyMessageConfigRequest {
+  NoticeType notice_type = 1;
+  string message_type = 2;
+  bool enabled = 3;
+  bool can_user_modify = 4;
+}
+
+message ModifyMessageConfigResponse {
+}
+
+message ListMessageConfigsRequest {
+}
+
+message MessageConfig {
+  NoticeType notice_type = 1;
+  string message_type = 2;
+  optional string message_custom_type = 3;
+  bool enabled = 4;
+  bool can_user_modify = 5;
+}
+
+message ListMessageConfigsResponse {
+  uint32 totalCount = 1;
+  repeated MessageConfig configs = 2;
+}
+
+service MessageConfigService {
+
+  rpc CreateMessageConfig(CreateMessageConfigRequest) returns (CreateMessageConfigResponse);
+
+  rpc ModifyMessageConfig(ModifyMessageConfigRequest) returns (ModifyMessageConfigResponse);
+
+  rpc ListMessageConfigs(ListMessageConfigsRequest) returns (ListMessageConfigsResponse);
+}

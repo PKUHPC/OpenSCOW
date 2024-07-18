@@ -1,11 +1,11 @@
 {
-  "name": "@scow/notification-protos",
+  "name": "@scow/scowd-protos",
   "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "scripts": {
-    "generate": "rimraf generated && buf generate --template buf.gen.yaml ./protos/api",
+    "generate": "rimraf generated && buf generate --template buf.gen.yaml --path ./protos",
     "build": "rimraf build && tsc"
   },
   "files": [
