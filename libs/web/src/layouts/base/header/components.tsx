@@ -11,6 +11,7 @@
  */
 
 import { Tooltip, Typography } from "antd";
+import NextLink from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { styled } from "styled-components";
@@ -28,12 +29,19 @@ export const HeaderItem = styled.div`
 const LinkItem = styled(HeaderItem)`
 `;
 
-const Link = styled(Typography.Link)`
+const Link = styled(NextLink)`
   display: flex;
   flex-wrap: wrap;
   overflow: hidden;
   align-items: center;
+`;
 
+const TypographyLink = styled(Typography.Link)`
+  font-size: 18px !important;
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  align-items: center;
 `;
 
 export const TextSpan = styled.span`
@@ -49,9 +57,10 @@ interface JumpToAnotherLinkProps {
   href: string;
   text: string;
   hideText?: boolean;
+  crossSystem?: boolean;
 }
 
-export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon, text, hideText }) => {
+export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon, text, hideText, crossSystem }) => {
 
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -70,10 +79,9 @@ export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon
     };
   }, []);
 
-  return (
-
-    <LinkItem>
-      <Link href={href} ref={linkRef}>
+  const content = () => {
+    return (
+      <>
         {(hideText || isSmallScreen) ? (
           <Tooltip title={text}>
             <IconContainer>
@@ -89,8 +97,23 @@ export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon
               {text}
             </TextSpan>
           </>
-        )}
-      </Link>
+        )}</>
+    );
+  };
+
+  return (
+
+    <LinkItem>
+      {
+        crossSystem ? (
+          <TypographyLink href={href} ref={linkRef}>
+            {content()}
+          </TypographyLink>
+        ) : (
+          <Link href={href} ref={linkRef}>
+            {content()}
+          </Link>
+        ) }
     </LinkItem>
 
   );

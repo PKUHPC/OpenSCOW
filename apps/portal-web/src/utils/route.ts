@@ -30,7 +30,7 @@ export const route: typeof typeboxRoute = (schema, handler) => {
         const SCOW_CAUSE = (e.metadata as Metadata).get("cause");
         if (SCOW_ERROR.length === 0) { throw e; }
 
-        const code = e.metadata.get("SCOW_ERROR_CODE")[0].toString();
+        const code = e.metadata.get("SCOW_ERROR_CODE")?.[0]?.toString();
         const details = e.details;
         const message = SCOW_CAUSE[0];
 

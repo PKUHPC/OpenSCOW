@@ -12,7 +12,7 @@
 
 import { execSync } from "child_process";
 import { cpSync, existsSync, rmdirSync } from "fs";
-import replaceInFile from "replace-in-file";
+import { replaceInFileSync } from "replace-in-file";
 
 const BACKUP_DIR = ".next.backup";
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -37,7 +37,7 @@ const options = {
   to: basePath,
 };
 
-replaceInFile.sync(options);
+replaceInFileSync(options);
 
 // Run serve:next
 execSync("npm run serve:next", { stdio: "inherit", env: {

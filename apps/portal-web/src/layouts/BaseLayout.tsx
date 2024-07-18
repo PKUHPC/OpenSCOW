@@ -14,6 +14,7 @@ import { RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { HeaderNavbarLink } from "@scow/lib-web/build/layouts/base/header";
+import { join } from "path";
 import { PropsWithChildren } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
@@ -61,7 +62,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
   };
 
   const toCallbackPage = (url: string) => userStore.user
-    ? `${url}/api/auth/callback?token=${userStore.user.token}`
+    ? join(url,`/api/auth/callback?token=${userStore.user.token}`)
     : url;
 
   const navbarLinks: HeaderNavbarLink[] = [];
@@ -71,6 +72,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       icon: <MisIcon style={{ paddingRight: 2 }} />,
       href: toCallbackPage(publicConfig.MIS_URL),
       text: t("baseLayout.linkTextMis"),
+      crossSystem: true,
     });
   }
 
@@ -79,6 +81,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       icon: <RobotOutlined style={{ paddingRight: 2 }} />,
       href: publicConfig.AI_URL,
       text: t("baseLayout.linkTextAI"),
+      crossSystem: true,
     });
   }
 

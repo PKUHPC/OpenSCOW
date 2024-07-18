@@ -12,9 +12,10 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
+import { JobInfo } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
-import { formatTime } from "@scow/lib-scheduler-adapter";
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
@@ -25,7 +26,6 @@ import {
   sftpWriteFile,
 } from "@scow/lib-ssh";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { JobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { TRPCError } from "@trpc/server";
 import fs from "fs";
 import { join } from "path";
@@ -33,6 +33,7 @@ import { quote } from "shell-quote";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { allApps, checkAppExist, checkCreateAppEntity,
   fetchJobInputParams, getAllTags, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
@@ -48,8 +49,10 @@ import {
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { formatTime } from "src/utils/datetime";
 import { isParentOrSameFolder } from "src/utils/file";
 import { isPortReachable } from "src/utils/isPortReachable";
+import { parseIp } from "src/utils/parse";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
@@ -269,6 +272,30 @@ export const createAppSession = procedure
   .output(z.object({
     jobId: z.number(),
   }))
+  .use(async ({ input:{ clusterId, account }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createApp,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId, jobId:(res.data as any).jobId, accountName:account } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:
+        { clusterId, accountName:account } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
       image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
@@ -580,7 +607,31 @@ export const saveImage =
       imageTag: z.string(),
       imageDesc: z.string().optional(),
     }))
-    .output(z.void())
+    .output(z.object({ imageId:z.number() }))
+    .use(async ({ input:{ jobId,imageTag }, ctx, next }) => {
+      const res = await next({ ctx });
+
+      const { user, req } = ctx;
+      const logInfo = {
+        operatorUserId: user.identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.saveImage,
+      };
+
+      if (res.ok) {
+        await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:(res.data as any).imageId,tag:imageTag } },
+        OperationResult.SUCCESS);
+      }
+
+      if (!res.ok) {
+        await callLog({ ...logInfo, operationTypePayload:
+        { jobId, imageId:0, tag:"-" } },
+        OperationResult.FAIL);
+      }
+
+      return res;
+    })
     .mutation(
       async ({ input, ctx: { user } }) => {
         const userId = user.identityId;
@@ -658,6 +709,8 @@ export const saveImage =
               sourcePath: harborImageUrl,
             });
             await em.persistAndFlush(newImage);
+
+            return { imageId:newImage.id };
           } catch (e) {
             const ex = e as ServiceError;
             throw new TRPCError({

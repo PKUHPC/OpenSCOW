@@ -52,3 +52,14 @@ export function normalizePathnameWithQuery(pathnameWithQuery: string) {
 
   return normalize(pathname) + qs;
 }
+
+/**
+ * Remove port from address
+ * @param address IP address or hostname possibly with port
+ * @returns address without port
+ */
+export function removePort(address: string): string {
+  // Remove :port if present
+  return address.replace(/:\d+$/, "");
+}
+

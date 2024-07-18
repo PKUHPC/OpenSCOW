@@ -95,7 +95,7 @@ SCOW将会在body中传入默认情况下SCOW将会显示的导航项。下表�
 | `navs[].openInNewPage` | 布尔值                                 | 否       | 此导航项的页面是否在新窗口中打开，默认`false`                                                                                                                                              |
 | `navs[].children`      | 对象数组，类型与`navs`数组的每一项相同 | 否       | 此导航项的子项。                                                                                                                                                                           |
 
-关于返回的路径的说明：
+#### 关于返回的路径的说明
 
 - 如果
   - 返回的路径在调用这个扩展的此接口之前已经存在（即在调用此扩展的此接口时的某个已有的导航项具有和返回的路径相同的路径），或者
@@ -128,7 +128,7 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
 | JSON属性路径                  | 类型     | 是否必须 | 解释                                                                                                       |
 | ----------------------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
 | `navbarLinks`                 | 对象数组 | 是       | 导航项                                                                                                     |
-| `navbarLinks[].href`          | 字符串   | 是       | 点击此导链接跳转的href，将会被直接填入`<a>`元素的`href`属性                                                |
+| `navbarLinks[].path`          | 字符串   | 是       | 此导航项的路径，请参考上文**关于返回的路径的的说明**                                                       |
 | `navbarLinks[].text`          | 字符串   | 是       | 导航项的文本                                                                                               |
 | `navbarLinks[].icon`          | 对象     | 否       | 导航项的图标信息。如果不填，将显示[Ant Design Icon](https://ant.design/components/icon-cn)的`LinkOutlined` |
 | `navbarLinks[].icon.src`      | 图标URL  | 是       | 导航项的图标地址。必须是完整的、可公开访问的URL                                                            |
@@ -143,12 +143,75 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
   - 返回链接的UI扩展在配置中的顺序从前往后
   - 同一个UI扩展返回的链接在响应中的列表的顺序从前往后
 
-注意，当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
+注意:
+- 当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
 
 ## 注意事项
+
+### 通过发送消息控制扩展页面的高度
+
+您的扩展页面将会通过一个`iframe`组件嵌入到SCOW的页面中。由于浏览器的限制，SCOW无法自动根据您网页的高度调整SCOW页面承载您的页面的高度，在默认情况下，您的页面在SCOW中会出现滚动条，影响用户体验。
+
+为了解决这个问题，SCOW需要您在您的页面中，通过给父页面发送消息(`postMessage()`, [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage))的方式，在您的页面高度变化时，将您的页面的高度报告给SCOW。
+
+具体来说，当SCOW接手到由`iframe`发出的如下格式的消息时，SCOW将会修改`iframe`组件的高度为`payload.height`的值，单位为px。
+
+```json
+{
+  "type": "scow.extensionPageHeightChanged",
+  "payload": {
+    "height": 20, // 您的页面高度，单位为px
+  }
+}
+```
+
+如果您的扩展页面为React实现，您可以在您页面的根布局中增加以下代码。此代码使用[ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver)监控`html`组件的高度，并在`html`组件高度变化的时候，给父组件发送消息。
+
+```tsx
+const useReportHeightToScow = () => {
+
+  useEffect(()=>{
+    // postIframeMessage();
+    const sendMessage = (height: number) => {
+      window.parent?.postMessage({
+        type: "scow.extensionPageHeightChanged",  // 发送信息的类型，不允许更改
+        payload: {
+          height: height
+        }
+      }, '*')
+    }
+
+    const observer = new ResizeObserver((entries) => {
+
+      const e = entries[0];
+      sendMessage(e.contentRect.height);
+    });
+
+    const htmlElement = document.querySelector("html")!;
+
+    sendMessage(htmlElement.getBoundingClientRect().height);
+
+    observer.observe(htmlElement);
+
+    return () => {
+      observer.disconnect();
+    }
+
+  }, []);
+}
+
+export const RootLayout = () => {
+  // 使用此Hook
+  useReportHeightToScow();
+
+  // ...
+}
+```
+
+您可以参考此PR[PKUHPC/scow-ui-extension-demo#2](https://github.com/PKUHPC/scow-ui-extension-demo/pull/2)实现。
+
+### 其他注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
 - 如果您的扩展站和SCOW部署地址非同源，请注意使得您的扩展站的所有路径均支持CORS访问。
     - Next.js项目可以参考[示例项目中的`src/middleware.ts`](https://github.com/PKUHPC/scow-ui-extension-demo/blob/main/src/middleware.ts)
-
-
