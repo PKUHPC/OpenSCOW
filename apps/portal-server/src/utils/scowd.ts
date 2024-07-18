@@ -15,23 +15,13 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
+import { removePort } from "@scow/utils";
 import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
 import { scowdClientNotFound } from "./errors";
 
 export const certificates = createScowdCertificates(config);
-
-function removePort(address: string): string {
-  // 正则表达式匹配 ip:port 或者 host:port 的情况
-  const regex = /^(.*):\d+$/;
-  const match = regex.exec(address);
-  if (match?.[1]) {
-    return match[1];
-  }
-  return address;
-}
-
 
 export function getLoginNodeScowdUrl(cluster: string, host: string): string | undefined {
   const loginNode = getLoginNodeFromAddress(cluster, host);

@@ -70,6 +70,7 @@ export interface HeaderNavbarLink {
   icon: React.ReactNode;
   href: string;
   text: string;
+  crossSystem?: boolean;
 };
 
 interface Props {
@@ -107,6 +108,7 @@ export const Header: React.FC<Props> = ({
         icon={x.icon}
         href={x.href}
         text={x.text}
+        crossSystem={x.crossSystem}
         hideText={hideLinkText}
       />
     );

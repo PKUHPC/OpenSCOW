@@ -15,7 +15,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
-import { getLoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { insertKeyAsUser } from "@scow/lib-ssh";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
@@ -66,11 +66,12 @@ export async function insertKeyToNewUser(
   userId: string,
   password: string,
   logger: Logger,
+  currentClusters: Record<string, ClusterConfigSchema>,
 ) {
   // Making an ssh Request to the login node as the user created.
   if (process.env.NODE_ENV === "production") {
 
-    await Promise.all(Object.values(configClusters).map(async ({ displayName, loginNodes }) => {
+    await Promise.all(Object.values(currentClusters).map(async ({ displayName, loginNodes }) => {
       const node = getLoginNode(loginNodes[0]);
       logger.info("Checking if user can login to %s by login node %s", displayName, node.name);
 

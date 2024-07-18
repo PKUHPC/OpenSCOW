@@ -20,6 +20,7 @@ import { TenantServiceServer, TenantServiceService } from "@scow/protos/build/se
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { configClusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User } from "src/entities/User";
@@ -147,7 +148,9 @@ export const tenantServiceServer = plugin((server) => {
           { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password: userPassword },
           logger)
           .then(async () => {
-            await insertKeyToNewUser(userId, userPassword, logger)
+            // 插入公钥失败也认为是创建用户成功
+            // 在所有集群下执行
+            await insertKeyToNewUser(userId, userPassword, logger, configClusters)
               .catch(() => { });
             return true;
           })
