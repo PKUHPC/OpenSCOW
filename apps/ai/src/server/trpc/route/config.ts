@@ -127,7 +127,7 @@ export type NavLink = z.infer<typeof NavLinkSchema>;
 export type UiConfig = z.infer<typeof UiConfigSchema>;
 
 
-const PartitionSchema = z.object({
+export const PartitionSchema = z.object({
   name: z.string(),
   memMb: z.number(),
   cores: z.number(),
@@ -139,7 +139,7 @@ const PartitionSchema = z.object({
   vramMb: z.number().optional(),
 });
 
-export const ClusterConfigSchema = z.object({
+const ClusterConfigSchema = z.object({
   schedulerName: z.string(),
   partitions: z.array(PartitionSchema),
 });

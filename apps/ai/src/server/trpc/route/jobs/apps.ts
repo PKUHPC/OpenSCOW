@@ -56,7 +56,7 @@ import { parseIp } from "src/utils/parse";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
-import { ClusterConfigSchema, clusters } from "../config";
+import { clusters, PartitionSchema } from "../config";
 import { booleanQueryParam } from "../utils";
 
 const ImageSchema = z.object({
@@ -155,6 +155,12 @@ export type AppCustomAttribute = z.infer<typeof AppCustomAttributeSchema>;
 const AttributeTypeSchema = z.enum(["TEXT", "NUMBER", "SELECT"]);
 
 export type AttributeType = z.infer<typeof AttributeTypeSchema>;
+
+const ClusterConfig = z.object({
+  schedulerName: z.string(),
+  clusterId: z.string(),
+  partitions: z.array(PartitionSchema),
+});
 
 
 export const listAvailableApps = procedure
@@ -1133,7 +1139,7 @@ export const listClusters = procedure
   .input(z.object({
     appId: z.string(),
   }))
-  .output(z.object({ clusterConfigs: z.array(ClusterConfigSchema) }))
+  .output(z.object({ clusterConfigs: z.array(ClusterConfig) }))
   .query(async ({ input }) => {
     const { appId } = input;
     const allClusterIds = Object.keys(clusters);
@@ -1141,12 +1147,13 @@ export const listClusters = procedure
     // 获取集群ids
     // common app
     if (!allApps[appId].clusterSpecificConfigs) {
-      clusterIds.concat(allClusterIds);
+      clusterIds.push(...allClusterIds);
     } else {
       allApps[appId].clusterSpecificConfigs?.map((config) => {
         clusterIds.push(config.cluster);
       });
     }
+
     const configs = await Promise.all(clusterIds
       .map(async (clusterId) => {
         const client = getAdapterClient(clusterId);
@@ -1160,7 +1167,7 @@ export const listClusters = procedure
       }));
 
     return {
-      clusterConfigs: configs,
+      clusterConfigs: configs.map((config,idx) => ({ ...config,clusterId:clusterIds[idx] })),
     };
 
   })

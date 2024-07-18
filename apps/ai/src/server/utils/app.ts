@@ -75,6 +75,10 @@ export const getAllAppConfigs = (clusters: Record<string, ClusterConfigSchema>) 
         cluster,
         config: value,
       };
+
+      // 集群独有的应用，直接用集群配置
+      if (!apps[key]) apps[key] = value;
+
       if (apps[key].clusterSpecificConfigs) {
         apps[key].clusterSpecificConfigs?.push(specificConfig);
       } else {
