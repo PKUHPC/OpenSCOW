@@ -35,15 +35,11 @@ message ListApiKeysResponse {
 }
 
 message CreateApiKeyRequest {
-  NoticeType notice_type = 1;
-  string message_type = 2;
-  bool enabled = 3;
-  bool can_user_modify = 4;
+  string name = 1;
+  string app_id = 2;
 }
 
 message CreateApiKeyResponse {
-  string name = 1;
-  string app_id = 2;
 }
 
 
