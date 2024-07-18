@@ -1,5 +1,5 @@
 {
-  "name": "@scow/scowd-protos",
+  "name": "@scow/notification-protos",
   "version": "0.2.0",
   "description": "",
   "main": "index.js",
