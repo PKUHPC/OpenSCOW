@@ -30,7 +30,7 @@ import { SyncBlockStatusPlugin, syncBlockStatusPlugin } from "src/plugins/syncBl
 
 declare module "@ddadaal/tsgrpc-server" {
   interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin,
-  SyncBlockStatusPlugin, ScowPartitionsPlugin, ClearCachePlugin {
+    SyncBlockStatusPlugin, ScowPartitionsPlugin, ClearCachePlugin {
     orm: MikroORM<MySqlDriver>;
     capabilities: Capabilities;
   }

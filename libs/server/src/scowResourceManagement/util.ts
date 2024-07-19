@@ -30,14 +30,15 @@ export const getAccountSpecifiedPartitions = async (
   logger: Logger,
   getAssignedPartitions?: (params: { accountName: string; clusterId: string }) => Promise<string[] | undefined>,
 ) => {
-  if (config && config.scowPartitionsEnabled) {
-    if (getAssignedPartitions) {
-      return await getAssignedPartitions({ accountName, clusterId });
-    } else {
-      logger.error("SCOW Partitions Plugin is enabled but not available.");
-      throw new Error("SCOW Partitions Plugin is enabled but not available.");
-    }
-  } else {
+
+  if (!config?.scowPartitionsEnabled) {
     return undefined;
-  }
+  };
+
+  if (!getAssignedPartitions) {
+    logger.error("SCOW Partitions Plugin is enabled but not available.");
+    throw new Error("SCOW Partitions Plugin is enabled but not available.");
+  };
+  
+  return await getAssignedPartitions({ accountName, clusterId });
 };

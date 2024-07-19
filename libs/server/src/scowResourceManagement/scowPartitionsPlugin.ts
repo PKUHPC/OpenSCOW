@@ -14,16 +14,16 @@ import { Plugin, plugin } from "@ddadaal/tsgrpc-server";
 import { ScowResourceManagementSchema } from "@scow/config/build/common";
 import { Logger } from "ts-log";
 
-export type AssignedPartition = {
-  clusterId: string,
-  partition: string,
-}
+export interface AssignedPartition {
+  clusterId: string;
+  partition: string;
+};
 
 export interface AccountPartitionsList {
   tenantName: string;
   assignedPartitions: AssignedPartition[];
   assignedTotalCount: number;
-}
+};
 
 const applicationJsonHeaders = {
   "Content-Type": "application/json",
@@ -54,11 +54,11 @@ const getAccountAssignedPartitionsFromSRM = async (
 };
 
 
-export type ScowPartitionsPlugin = {
-    partitions: {
-      getAssignedPartitions: (params: { accountName: string; clusterId: string }) => Promise<string[]>;
-    }
-}
+export interface ScowPartitionsPlugin {
+  partitions: {
+    getAssignedPartitions: (params: { accountName: string; clusterId: string }) => Promise<string[]>;
+  }
+};
 
 export const scowPartitionsPlugin = (
   config: ScowResourceManagementSchema,
@@ -66,7 +66,7 @@ export const scowPartitionsPlugin = (
 
   const logger = f.logger.child({ plugin: "scow-partitions" });
 
-  if (!config || !config.scowPartitionsEnabled) {
+  if (!config?.scowPartitionsEnabled) {
     logger.info("No scow-partitions related configuration.");
     return;
   }
