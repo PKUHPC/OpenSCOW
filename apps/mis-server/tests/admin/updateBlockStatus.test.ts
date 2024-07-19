@@ -29,7 +29,7 @@ beforeEach(async () => {
   server = await createServer();
 
   const em = server.ext.orm.em.fork();
-
+  await server.ext.syncBlockStatus.sync();
   data = await insertBlockedData(em);
 
   await server.start();
