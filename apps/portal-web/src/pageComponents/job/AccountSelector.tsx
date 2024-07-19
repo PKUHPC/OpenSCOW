@@ -11,7 +11,7 @@
  */
 
 import { ReloadOutlined } from "@ant-design/icons";
-import { App, Button, Input, Select, Tooltip } from "antd";
+import { App, Button, Select, Space, Tooltip } from "antd";
 import { useCallback, useEffect } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -30,8 +30,10 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const { message } = App.useApp();
 
   const promiseFn = useCallback(async () => {
-    return cluster ? api.getAccounts({ query: { cluster } })
-      .httpError(404, (error) => { message.error(error.message); }) : { accounts: [] as string[] };
+    return cluster ?
+      api.getAccounts({ query: { cluster } })
+        .httpError(404, (error) => { message.error(error.message); })
+      : { accounts: [] as string[] };
   }, [cluster, userStore.user]);
 
   const { data, isLoading, reload } = useAsync({
@@ -41,7 +43,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
 
   useEffect(() => {
 
-    if (data && data.accounts.length) {
+    if (data?.accounts.length) {
       if (!value || !data.accounts.includes(value)) {
         onChange?.(data.accounts[0]);
       }
@@ -52,7 +54,7 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
   const p = prefix("pageComp.job.accountSelector.");
 
   return (
-    <Input.Group compact>
+    <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
@@ -64,7 +66,6 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
       <Tooltip title={t(p("refreshAccountList"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={reload} loading={isLoading} />
       </Tooltip>
-    </Input.Group>
+    </Space.Compact>
   );
 };
-

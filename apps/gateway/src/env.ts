@@ -26,10 +26,13 @@ export const config = envConfig({
   MIS_PATH: str({ desc: "管理系统路径", default: "/mis" }),
   MIS_PATH_INTERNAL_URL: str({ desc: "管理系统内部路径", default: "http://mis-web:3000" }),
 
+  AI_PATH: str({ desc: "AI系统路径", default: "/ai" }),
+  AI_PATH_INTERNAL_URL: str({ desc: "门户系统内部路径", default: "http://ai:3000" }),
+
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 
-  AUTH_INTERNAL_URL: str({ desc: "认证服务内部地址", default: "http://auth:5000" }),
+  AUTH_URL: str({ desc: "认证服务地址", default: "http://auth:5000" }),
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
 

@@ -12,17 +12,17 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import type { AccountUserInfo } from "@scow/protos/build/server/user";
+import { type AccountUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
-import { App, Divider, Space, Table, Tag } from "antd";
+import { App, Divider, Popover, Space, Table, Tag } from "antd";
 import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { UserRole, UserStatus } from "src/models/User";
+import { DisplayedUserState, UserRole, UserStateInAccount } from "src/models/User";
 import { SetJobChargeLimitLink } from "src/pageComponents/users/JobChargeLimitModal";
-import { GetAccountUsersSchema } from "src/pages/api/users";
+import { type GetAccountUsersSchema } from "src/pages/api/users";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -43,10 +43,12 @@ export const UserTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
-  const statusTexts = {
-    [UserStatus.BLOCKED]: <Tag color="error">{t(p("block"))}</Tag>,
-    [UserStatus.UNBLOCKED]: <Tag color="success">{t(p("normal"))}</Tag>,
+  const DisplayedUserStateTexts = {
+    [DisplayedUserState.DISPLAYED_NORMAL]: <Tag color="success">{t(p("normal"))}</Tag>,
+    [DisplayedUserState.DISPLAYED_QUOTA_EXCEEDED]: <Tag color="error">{t(p("quotaExceeded"))}</Tag>,
+    [DisplayedUserState.DISPLAYED_BLOCKED]: <Tag color="error">{t(p("blocked"))}</Tag>,
   };
+
 
   const roleTags = {
     [UserRole.OWNER]: <Tag color="gold">{t(pCommon("owner"))}</Tag>,
@@ -67,17 +69,35 @@ export const UserTable: React.FC<Props> = ({
         defaultPageSize: DEFAULT_PAGE_SIZE,
       }}
     >
-      <Table.Column<AccountUserInfo> dataIndex="userId" title={t(pCommon("userId"))} />
-      <Table.Column<AccountUserInfo> dataIndex="name" title={t(pCommon("name"))} />
+      <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
+      <Table.Column dataIndex="name" title={t(pCommon("name"))} />
       <Table.Column<AccountUserInfo>
         dataIndex="role"
         title={t(p("role"))}
         render={(r: UserRole) => roleTags[r]}
       />
       <Table.Column<AccountUserInfo>
-        dataIndex="status"
-        title={t(pCommon("status"))}
-        render={(s) => statusTexts[s]}
+        dataIndex="displayedUserState"
+        title={(
+          <Space>
+            {t(pCommon("status"))}
+            <Popover
+              title={t(p("statusExplanation"))}
+              content={(
+                <>
+                  <span>{t(p("blockedExplanation"))}</span>
+                  <br />
+                  <span>{t(p("quotaExceededExplanation"))}</span>
+                  <br />
+                  <span>{t(p("normalExplanation"))}</span>
+                </>
+              )}
+            >
+              <ExclamationCircleOutlined />
+            </Popover>
+          </Space>
+        )}
+        render={(s) => DisplayedUserStateTexts[s]}
       />
       <Table.Column<AccountUserInfo>
         dataIndex="jobChargeLimit"
@@ -102,7 +122,7 @@ export const UserTable: React.FC<Props> = ({
               {t(p("limitManage"))}
             </SetJobChargeLimitLink>
             {
-              r.status === UserStatus.BLOCKED
+              r.userStateInAccount === UserStateInAccount.BLOCKED_BY_ADMIN
                 ? (
                   <a onClick={() => {
                     modal.confirm({
@@ -218,6 +238,15 @@ export const UserTable: React.FC<Props> = ({
                       identityId: r.userId,
                       accountName: accountName,
                     } })
+                      .httpError(400, (e) => {
+                        message.destroy("removeUser");
+                        message.error({
+                          content: `${t("page._app.multiClusterOpErrorContent")}(${
+                            e.message
+                          })`,
+                          duration: 4,
+                        });
+                      })
                       .httpError(409, () => {
                         message.destroy("removeUser");
                         message.error({

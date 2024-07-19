@@ -12,12 +12,12 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { getLoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { scowErrorMetadata } from "src/utils/error";
 import { Logger } from "ts-log";
 
 import { clusterNotFound, loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "./errors";
@@ -28,14 +28,21 @@ interface NodeNetInfo {
   port: number,
 }
 
+// 获取配置文件集群中各节点信息
+export function getConfigClusterLoginNode(cluster: string): string | undefined {
+  const loginNode = getLoginNode(configClusters[cluster]?.loginNodes?.[0]);
+  return loginNode?.address;
+}
+
+// 获取集群中各节点信息
 export function getClusterLoginNode(cluster: string): string | undefined {
-  const loginNode = getLoginNode(clusters[cluster]?.loginNodes?.[0]);
+  const loginNode = getLoginNode(configClusters[cluster]?.loginNodes?.[0]);
   return loginNode?.address;
 }
 
 export function getClusterTransferNode(cluster: string): NodeNetInfo {
-  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
+  const enabled = configClusters[cluster]?.crossClusterFileTransfer?.enabled;
+  const transferNode = configClusters[cluster]?.crossClusterFileTransfer?.transferNode;
   if (!enabled) {
     throw transferNotEnabled(cluster);
   }
@@ -55,8 +62,8 @@ export function getClusterTransferNode(cluster: string): NodeNetInfo {
 }
 
 export function tryGetClusterTransferNode(cluster: string): NodeNetInfo | undefined {
-  const enabled = clusters[cluster]?.crossClusterFileTransfer?.enabled;
-  const transferNode = clusters[cluster]?.crossClusterFileTransfer?.transferNode;
+  const enabled = configClusters[cluster]?.crossClusterFileTransfer?.enabled;
+  const transferNode = configClusters[cluster]?.crossClusterFileTransfer?.transferNode;
   if (!enabled) {
     return undefined;
   }
@@ -88,7 +95,11 @@ export async function sshConnect<T>(
         code: status.INTERNAL,
         details: e.message,
         message: e.message,
-        metadata: scowErrorMetadata(SSH_ERROR_CODE, typeof e.cause === "string" ? { cause:e.cause } : undefined),
+        metadata: scowErrorMetadata(SSH_ERROR_CODE, typeof e.cause === "string"
+          ? e.cause.length > 150
+            ? { cause: encodeURIComponent(e.cause.substring(0, 150) + "...") }
+            : { cause: encodeURIComponent(e.cause) }
+          : undefined),
       });
     }
 
@@ -108,8 +119,11 @@ export async function sshConnect<T>(
 /**
  * Check whether all clusters can be logged in as root user
  */
-export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
+export async function checkClustersRootUserLogin(
+  logger: Logger,
+  activatedClusters: Record<string, ClusterConfigSchema>,
+) {
+  await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
     const node = getLoginNode(loginNodes[0]);
     logger.info("Checking if root can login to %s by login node %s", displayName, node.name);
     const error = await testRootUserSshLogin(node.address, rootKeyPair, console);
@@ -125,8 +139,8 @@ export async function checkClustersRootUserLogin(logger: Logger) {
 /**
  * Check whether login node is in current cluster
  */
-export async function checkLoginNodeInCluster(cluster: string, loginNode: string) {
-  const loginNodes = clusters[cluster]?.loginNodes.map(getLoginNode);
+export function checkLoginNodeInCluster(cluster: string, loginNode: string) {
+  const loginNodes = configClusters[cluster]?.loginNodes.map(getLoginNode);
   if (!loginNodes) {
     throw clusterNotFound(cluster);
   }

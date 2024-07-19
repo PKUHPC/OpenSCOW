@@ -10,21 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { loggedExec, sftpWriteFile } from "@scow/lib-ssh";
 import { dirname } from "path";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { sshConnect } from "src/utils/ssh";
 import { Logger } from "ts-log";
 
-export const setupProxyGateway = async (logger: Logger) => {
+export const setupProxyGateway = async (logger: Logger, activatedClusters: Record<string, ClusterConfigSchema>) => {
 
   let portalBasePath = config.PORTAL_BASE_PATH;
   if (!portalBasePath.endsWith("/")) { portalBasePath += "/"; }
 
-  for (const id of Object.keys(clusters)) {
+  for (const id of Object.keys(activatedClusters)) {
 
-    const proxyGatewayConfig = clusters[id].proxyGateway;
+    const proxyGatewayConfig = configClusters[id].proxyGateway;
 
     if (!proxyGatewayConfig?.autoSetupNginx) { continue; }
 
@@ -79,13 +80,13 @@ server {
 
 export const parseIp = (stdout: string): string => {
   const ipReg = /(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/;
-  return stdout.split("\n")[0]?.match(ipReg)?.[0] || "";
+  return (ipReg.exec(stdout.split("\n")[0]))?.[0] ?? "";
 };
 
 export const getIpFromProxyGateway
   = async (clusterId: string, hostName: string, logger: Logger): Promise<string> => {
 
-    const proxyGatewayConfig = clusters?.[clusterId]?.proxyGateway;
+    const proxyGatewayConfig = configClusters?.[clusterId]?.proxyGateway;
 
     if (!proxyGatewayConfig) return "";
     const url = new URL(proxyGatewayConfig.url);

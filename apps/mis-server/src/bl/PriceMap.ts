@@ -15,11 +15,12 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Partition } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { calculateJobPrice } from "src/bl/jobPrice";
-import { clusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { JobPriceInfo } from "src/entities/JobInfo";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { ClusterPlugin } from "src/plugins/clusters";
+
+import { getActivatedClusters } from "./clustersUtils";
 
 export interface JobInfo {
   // cluster job id
@@ -88,15 +89,30 @@ export async function createPriceMap(
     return price;
   };
 
-  // partitions info for all clusters
-  const partitionsForClusters: Record<string, Partition[]> = {};
-  const reply = await clusterPlugin.callOnAll(
-    logger,
-    async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),
-  );
-  reply.forEach((x) => {
-    partitionsForClusters[x.cluster] = x.result.partitions;
+
+
+  // call for all activated clusters
+  const activatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+    logger.info("!!![important] No available activated clusters.This will skip creating price map in cluster!!!");
+    logger.info(e);
+    return {};
   });
+  
+  // partitions info for activated clusters
+  const partitionsForClusters: Record<string, Partition[]> = {};
+
+  await Promise.allSettled(Object.keys(activatedClusters).map(async (cluster) => {
+    try {
+      const result = await clusterPlugin.callOnOne(
+        cluster,
+        logger,
+        async (client) => await asyncClientCall(client.config, "getClusterConfig", {}),      
+      );
+      partitionsForClusters[cluster] = result.partitions;
+    } catch (error) { 
+      logger.info(`Can not get cluster's (clusterId: ${cluster}) config info from adapter.`, error);
+    };
+  }));
 
   return {
 
@@ -106,10 +122,16 @@ export async function createPriceMap(
 
       const missingPaths = [] as string[];
 
-      for (const cluster in clusters) {
+      for (const cluster in activatedClusters) {
+
+        if (!partitionsForClusters[cluster]) {
+          logger.info(
+            `Can not get missing default price items from partitions of cluster (clusterId: ${cluster}) currently.`);
+          continue;
+        }
+
         for (const partition of partitionsForClusters[cluster]) {
           const path = [cluster, partition.name];
-
           const { qos } = partition;
 
           if (path.join(".") in defaultPrices) {

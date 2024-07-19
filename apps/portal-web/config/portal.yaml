@@ -83,3 +83,6 @@ shell: true
 #     # openInNewPage: true
 #     children: []
 
+uiExtension:
+  - name: test1
+    url: http://localhost:16566

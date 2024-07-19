@@ -25,5 +25,5 @@ export const enterAuditDb = async (options: Options) => {
     throw new Error("audit is not deployed. db is not deployed");
   }
 
-  runComposeCommand(config, ["exec", "audit-db", "mysql", "-uroot", `-p'${config.audit.dbPassword}'`]);
+  await runComposeCommand(config, ["exec", "audit-db", "mysql", "-uroot", `-p'${config.audit.dbPassword}'`]);
 };

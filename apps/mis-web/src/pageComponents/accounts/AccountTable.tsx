@@ -15,15 +15,21 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { App, Button, Divider, Form, Input, Space, Table, Tag } from "antd";
+import { App, Button, Divider, Form, Input, Popover, Space, Table, Tag, Tooltip } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
+import { AccountState, DisplayedAccountState, getDisplayedStateI18nTexts } from "src/models/User";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import { moneyToString } from "src/utils/money";
+
+import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
 
 type ShowedTab = "PLATFORM" | "TENANT";
 interface Props {
@@ -35,12 +41,23 @@ interface Props {
 
 interface FilterForm {
   accountName: string | undefined;
+  ownerIdOrName: string | undefined;
 }
+
+const FilteredTypes = {
+  ALL: "ALL",
+  DISPLAYED_NORMAL: DisplayedAccountState.DISPLAYED_NORMAL,
+  DISPLAYED_FROZEN: DisplayedAccountState.DISPLAYED_FROZEN,
+  DISPLAYED_BLOCKED: DisplayedAccountState.DISPLAYED_BLOCKED,
+  DISPLAYED_BELOW_BLOCK_THRESHOLD: DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD,
+};
 
 const filteredStatuses = {
   "ALL": "pageComp.accounts.accountTable.allAccount",
-  "DEBT": "pageComp.accounts.accountTable.debtAccount",
-  "BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
+  "DISPLAYED_NORMAL": "pageComp.accounts.accountTable.normalAccount",
+  "DISPLAYED_FROZEN": "pageComp.accounts.accountTable.frozenAccount",
+  "DISPLAYED_BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
+  "DISPLAYED_BELOW_BLOCK_THRESHOLD": "pageComp.accounts.accountTable.debtAccount",
 };
 type FilteredStatus = keyof typeof filteredStatuses;
 
@@ -56,6 +73,8 @@ export const AccountTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
+  const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
+
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
   const [currentSortInfo, setCurrentSortInfo] =
@@ -63,22 +82,54 @@ export const AccountTable: React.FC<Props> = ({
 
   const [query, setQuery] = useState<FilterForm>({
     accountName: undefined,
+    ownerIdOrName: undefined,
   });
 
-  const filteredData = useMemo(() => data ? data.results.filter((x) => (
-    (!query.accountName || x.accountName.includes(query.accountName))
-      && (rangeSearchStatus === "ALL" || (rangeSearchStatus === "BLOCKED" ? x.blocked : !x.balance.positive))
-  )) : undefined, [data, query, rangeSearchStatus]);
+  const filteredData = useMemo(() => {
+
+    if (!data) return undefined;
+
+    const filtered = data.results.filter((x) => {
+      const dataMatchedAccount =
+        !query.accountName || x.accountName.includes(query.accountName);
+
+      const dataMatchedOwner =
+        !query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName);
+
+      const dataMatchedState =
+        rangeSearchStatus === FilteredTypes.ALL ||
+        (rangeSearchStatus !== FilteredTypes.ALL &&
+          x.displayedState === FilteredTypes[rangeSearchStatus]);
+
+      return dataMatchedAccount && dataMatchedOwner && dataMatchedState;
+    });
+
+    return filtered;
+
+  }, [data, query, rangeSearchStatus]);
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
-    !query.accountName || x.accountName.includes(query.accountName)
+    (!query.accountName || x.accountName.includes(query.accountName))
+    && (!query.ownerIdOrName || x.ownerId.includes(query.ownerIdOrName) || x.ownerName.includes(query.ownerIdOrName))
   )) : undefined, [data, query]);
 
-  const usersStatusCount = useMemo(() => {
-    if (!searchData) return { BLOCKED : 0, DEBT : 0, ALL : 0 };
+  const accountStatusCount = useMemo(() => {
+    if (!searchData) return {
+      DISPLAYED_BLOCKED: 0,
+      DISPLAYED_FROZEN: 0,
+      DISPLAYED_BELOW_BLOCK_THRESHOLD: 0,
+      DISPLAYED_NORMAL: 0,
+      ALL: 0,
+    };
     const counts = {
-      BLOCKED: searchData.filter((user) => user.blocked).length,
-      DEBT: searchData.filter((user) => !user.balance.positive).length,
+      DISPLAYED_FROZEN: searchData.filter((account) =>
+        account.displayedState === DisplayedAccountState.DISPLAYED_FROZEN).length,
+      DISPLAYED_BLOCKED: searchData.filter((account) =>
+        account.displayedState === DisplayedAccountState.DISPLAYED_BLOCKED).length,
+      DISPLAYED_BELOW_BLOCK_THRESHOLD: searchData.filter((account) =>
+        account.displayedState === DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD).length,
+      DISPLAYED_NORMAL: searchData.filter((account) =>
+        account.displayedState === DisplayedAccountState.DISPLAYED_NORMAL).length,
       ALL: searchData.length,
     };
     return counts;
@@ -93,6 +144,52 @@ export const AccountTable: React.FC<Props> = ({
     setCurrentPageNum(1);
     setCurrentSortInfo({ field: null, order: null });
   };
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+
+    const total = filteredData?.length || 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+
+      window.location.href = urlToExport({
+        exportApi: "exportAccount",
+        columns,
+        count: total,
+        encoding,
+        query: {
+          accountName: query.accountName,
+          blocked: rangeSearchStatus === "DISPLAYED_BLOCKED",
+          debt: rangeSearchStatus === "DISPLAYED_BELOW_BLOCK_THRESHOLD",
+          frozen: rangeSearchStatus === "DISPLAYED_FROZEN",
+          normal: rangeSearchStatus === "DISPLAYED_NORMAL",
+          isFromAdmin: showedTab === "PLATFORM",
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("accountName")), value: "accountName" },
+      { label: t(p("owner")), value: "owner" },
+      { label: t(pCommon("userCount")), value: "userCount" },
+    ];
+
+    const tenant = showedTab === "PLATFORM" ? [
+      { label: t(p("tenant")), value: "tenantName" },
+    ] : [];
+    const remaining = [
+      { label: t(pCommon("balance")), value: "balance" },
+      { label: t(p("blockThresholdAmount")), value: "blockThresholdAmount" },
+      { label: t(p("status")), value: "displayedState" },
+      { label: t(p("comment")), value: "comment" },
+    ];
+    return [...common, ...tenant, ...remaining];
+  }, [showedTab, t]);
 
   return (
     <div>
@@ -110,16 +207,31 @@ export const AccountTable: React.FC<Props> = ({
           <Form.Item label={t(p("account"))} name="accountName">
             <Input />
           </Form.Item>
+          <Form.Item label={t(p("ownerIdOrName"))} name="ownerIdOrName">
+            <Input />
+          </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
           <FilterFormTabs
-            tabs={Object.keys(filteredStatuses).map((status) => ({
-              title: `${t(filteredStatuses[status])}(${usersStatusCount[status as FilteredStatus]})`,
-              key: status,
-            }))}
+            tabs={Object.keys(filteredStatuses)
+              /** 以下为暂时过滤掉冻结状态的页面展示 */
+              .filter((status) => status !== "DISPLAYED_FROZEN")
+              /** 以上为暂时过滤掉冻结状态的页面展示 */
+              .map((status) => ({
+                title: `${t(filteredStatuses[status])}(${accountStatusCount[status as FilteredStatus]})`,
+                key: status,
+              }))}
             onChange={(value) => handleFilterStatusChange(value as FilteredStatus)}
           />
         </Space>
@@ -148,7 +260,7 @@ export const AccountTable: React.FC<Props> = ({
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="ownerName"
-          width="25%"
+          width="20%"
           title={t(p("owner"))}
           render={(_, r) => `${r.ownerName}（ID: ${r.ownerId}）`}
         />
@@ -172,17 +284,54 @@ export const AccountTable: React.FC<Props> = ({
           sorter={(a, b) => (moneyToNumber(a.balance)) - (moneyToNumber(b.balance))}
           sortDirections={["ascend", "descend"]}
           sortOrder={currentSortInfo.field === "balance" ? currentSortInfo.order : null}
-          render={(b: Money) => moneyToString(b) + t(p("unit")) }
+          render={(b: Money) => moneyToString(b) + t(p("unit"))}
         />
         <Table.Column<AdminAccountInfo>
-          dataIndex="blocked"
+          dataIndex="blockThresholdAmount"
+          title={(
+            <Space>
+              {t(pCommon("blockThresholdAmount"))}
+              <Tooltip title={t(p("blockThresholdAmountTooltip"))}>
+                <ExclamationCircleOutlined />
+              </Tooltip>
+            </Space>
+          )}
+          render={(_, r) => `${moneyToString(r.blockThresholdAmount ?? r.defaultBlockThresholdAmount)} ${t(p("unit"))}`}
+        />
+        <Table.Column<AdminAccountInfo>
+          dataIndex="displayedState"
           width="7%"
-          title={t(p("status"))}
-          sorter={(a, b) => (a.blocked ? 1 : 0) - (b.blocked ? 1 : 0)}
-          sortDirections={["ascend", "descend"]}
-          sortOrder={currentSortInfo.field === "blocked" ? currentSortInfo.order : null}
-          render={(blocked) => blocked ? <Tag color="red">{t(p("block"))}</Tag> :
-            <Tag color="green">{t(p("normal"))}</Tag>}
+          title={(
+            <Space>
+              {t(p("status"))}
+              <Popover
+                title={t(p("statusTooltip"))}
+                content={(
+                  <>
+                    {/* 以下为暂时过滤掉冻结状态的页面展示，描述需要后期再次确认修改 */}
+                    {/* <span>{t(p("statusFrozenTooltip"))}</span>
+                    <br /> */}
+                    {/* 以上为暂时过滤掉冻结状态的页面展示，描述需要后期再次确认修改 */}
+                    <span>{t(p("statusBlockedTooltip"))}</span>
+                    <br />
+                    <span>{t(p("statusDebtTooltip"))}</span>
+                    <br />
+                    <span>{t(p("statusNormalTooltip"))}</span>
+                  </>
+                )}
+              >
+                <ExclamationCircleOutlined />
+              </Popover>
+            </Space>
+          )}
+          render={(s) => {
+            return (
+              <Tag color={s === DisplayedAccountState.DISPLAYED_NORMAL ? "green" : "red"}>
+                {DisplayedStateI18nTexts[s]}
+              </Tag>
+            );
+          }
+          }
         />
         <Table.Column<AdminAccountInfo>
           dataIndex="comment"
@@ -195,75 +344,82 @@ export const AccountTable: React.FC<Props> = ({
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              {/* 只在租户管理下的账户列表中显示管理成员 */}
+              {/* 只在租户管理下的账户列表中显示管理成员和封锁阈值 */}
               {showedTab === "TENANT" && (
-                <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
-                  {t(p("mangerMember"))}
-                </Link>
+                <>
+                  <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
+                    {t(p("mangerMember"))}
+                  </Link>
+                  <SetBlockThresholdAmountLink
+                    accountName={r.accountName}
+                    balance={r.balance}
+                    reload={reload}
+                    currentAmount={r.blockThresholdAmount}
+                    defaultBlockThresholdAmount={r.defaultBlockThresholdAmount}
+                  >
+                    {t(p("blockThresholdAmount"))}
+                  </SetBlockThresholdAmountLink>
+                </>
               )}
               {
-                r.blocked
-                  ? (
-                    <a onClick={() => {
-                      if (moneyToNumber(r.balance) > 0) {
-                        modal.confirm({
-                          title: t(p("unblockConfirmTitle")),
-                          icon: <ExclamationCircleOutlined />,
-                          content: t(p("unblockConfirmContent"), [r.tenantName, r.accountName]),
-                          onOk: async () => {
-                            await api.unblockAccount({
-                              body: {
-                                tenantName: r.tenantName,
-                                accountName: r.accountName,
-                              },
-                            })
-                              .then((res) => {
-                                if (res.executed) {
-                                  message.success(t(p("unblockSuccess")));
-                                  reload();
-                                } else {
-                                  message.error(res.reason || t(p("unblockFail")));
-                                }
-                              });
+                r.state === AccountState.BLOCKED_BY_ADMIN && (
+                  <a onClick={() => {
+                    modal.confirm({
+                      title: t(p("unblockConfirmTitle")),
+                      icon: <ExclamationCircleOutlined />,
+                      content: t(p("unblockConfirmContent"), [r.tenantName, r.accountName]),
+                      onOk: async () => {
+                        await api.unblockAccount({
+                          body: {
+                            tenantName: r.tenantName,
+                            accountName: r.accountName,
                           },
-                        });
-                      } else {
-                        message.error(t(p("unblockError"), [r.accountName]));
-                      }
+                        })
+                          .then((res) => {
+                            if (res.executed) {
+                              message.success(t(p("unblockSuccess")));
+                              reload();
+                            } else {
+                              message.error(res.reason || t(p("unblockFail")));
+                            }
+                          });
+                      },
+                    });
 
-                    }}
-                    >
-                      {t(p("unblock"))}
-                    </a>
-                  ) : (
-                    <a onClick={() => {
-                      modal.confirm({
-                        title: t(p("blockConfirmTitle")),
-                        icon: <ExclamationCircleOutlined />,
-                        content: t(p("blockConfirmContent"), [r.tenantName, r.accountName]),
-                        onOk: async () => {
-                          await api.blockAccount({
-                            body: {
-                              tenantName: r.tenantName,
-                              accountName: r.accountName,
-                            },
-                          })
-                            .then((res) => {
-                              if (res.executed) {
-                                message.success(t(p("blockSuccess")));
-                                reload();
-                              } else {
-                                message.error(res.reason || t(p("blockFail")));
-                              }
-                            });
-                        },
-                      });
-                    }}
-                    >
-                      {t(p("block"))}
-                    </a>
-                  )
-              }
+                  }}
+                  >
+                    {t(p("unblock"))}
+                  </a>
+                )}
+              {
+                !r.isInWhitelist && (r.state === AccountState.NORMAL || r.state === AccountState.FROZEN) && (
+                  <a onClick={() => {
+                    modal.confirm({
+                      title: t(p("blockConfirmTitle")),
+                      icon: <ExclamationCircleOutlined />,
+                      content: t(p("blockConfirmContent"), [r.tenantName, r.accountName]),
+                      onOk: async () => {
+                        await api.blockAccount({
+                          body: {
+                            tenantName: r.tenantName,
+                            accountName: r.accountName,
+                          },
+                        })
+                          .then((res) => {
+                            if (res.executed) {
+                              message.success(t(p("blockSuccess")));
+                              reload();
+                            } else {
+                              message.error(res.reason || t(p("blockFail")));
+                            }
+                          });
+                      },
+                    });
+                  }}
+                  >
+                    {t(p("block"))}
+                  </a>
+                )}
             </Space>
           )}
         />

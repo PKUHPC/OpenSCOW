@@ -10,8 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 // @ts-check
 
 const withPlugins = require("next-compose-plugins");
@@ -47,6 +45,20 @@ module.exports = async (phase) => {
           }
         }
       });
+
+      // // 添加SVG处理规则
+      // config.module.rules.push({
+      //   test: /\.svg$/,
+      //   use: [
+      //     {
+      //       loader: "@svgr/webpack",
+      //       options: {
+      //         icon: true,
+      //       },
+      //     },
+      //   ],
+      // });
+
       return config;
     },
     compiler: {

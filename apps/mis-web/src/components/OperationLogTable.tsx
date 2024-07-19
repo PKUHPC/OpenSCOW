@@ -13,24 +13,34 @@
 import { OperationType } from "@scow/lib-operation-log/build/index";
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, DatePicker, Form, Input, Select, Table } from "antd";
+import { App, Button, DatePicker, Form, Input, Select, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
-import { prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { getI18nCurrentText, prefix, useI18n, useI18nTranslate, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import {
   getOperationDetail,
   getOperationResultTexts,
   getOperationTypeTexts, OperationCodeMap, OperationLog,
   OperationLogQueryType,
-  OperationResult } from "src/models/operationLog";
+  OperationResult, OperationSortBy, OperationSortOrder,
+} from "src/models/operationLog";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { User } from "src/stores/UserStore";
+import { styled } from "styled-components";
+
+const WordBreakText = styled.div`
+  word-wrap: break-word;
+  word-break: break-all;`;
 
 interface FilterForm {
   operatorUserId?: string;
-  operationType?: OperationType;
+  operationType?: string;
+  customEventType?: string
   operationTime?: [dayjs.Dayjs, dayjs.Dayjs],
   operationResult?: OperationResult;
   operationDetail?: string;
@@ -48,6 +58,11 @@ interface Props {
   tenantName?: string;
 }
 
+interface Order {
+  field: OperationSortBy | undefined;
+  order: OperationSortOrder | undefined;
+}
+
 const today = dayjs().endOf("day");
 
 const p = prefix("component.others.");
@@ -62,19 +77,25 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   const OperationResultTexts = getOperationResultTexts(t);
   const OperationTypeTexts = getOperationTypeTexts(t);
 
-  const [ query, setQuery ] = useState<FilterForm>(() => {
+  const { message } = App.useApp();
+
+  const [query, setQuery] = useState<FilterForm>(() => {
     return {
       operatorUserId: undefined,
       operationType: undefined,
       operationTime: [today.clone().subtract(30, "day"), today],
       operationResult: undefined,
       operationDetail: undefined,
+      customEventType: undefined,
     };
   });
 
   const [form] = Form.useForm<FilterForm>();
 
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
+
+  // 定义排序方式
+  const [sorter, setSorter] = useState<Order>({ field: undefined, order: undefined });
 
   const getOperatorUserIds = () => {
     if (queryType === OperationLogQueryType.USER) {
@@ -85,21 +106,56 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
   };
 
   const promiseFn = useCallback(async () => {
-    return await api.getOperationLogs({ query: {
-      type: queryType,
-      operatorUserIds: getOperatorUserIds().join(","),
-      operationType: query.operationType,
-      operationResult: query.operationResult,
-      startTime: query.operationTime?.[0].toISOString(),
-      endTime: query.operationTime?.[1].toISOString(),
-      operationTargetAccountName: accountName,
-      operationDetail: query.operationDetail,
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-    } });
-  }, [query, pageInfo, queryType, accountName, tenantName]);
+    return await api.getOperationLogs({
+      query: {
+        type: queryType,
+        operatorUserIds: getOperatorUserIds().join(","),
+        operationType: query.operationType as OperationType,
+        operationResult: query.operationResult,
+        startTime: query.operationTime?.[0].toISOString(),
+        endTime: query.operationTime?.[1].toISOString(),
+        operationTargetAccountName: accountName,
+        operationDetail: query.operationDetail,
+        customEventType: query.customEventType,
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        // 新增排序参数
+        sortBy: sorter.field,
+        sortOrder: sorter.order,
+      },
+    });
+  }, [query, pageInfo, queryType, accountName, tenantName, sorter]);
 
   const { data, isLoading } = useAsync({ promiseFn });
+
+  const getCustomEventTypesPromise = useCallback(async () => {
+    return await api.getCustomEventTypes({});
+  }, []);
+
+  const { data: customEventTypes, isLoading: customEventTypesLoading } = useAsync({
+    promiseFn: getCustomEventTypesPromise,
+  });
+
+  const operationTypes = useMemo(() => {
+    const { customEvent, ...otherTypes } = OperationTypeTexts;
+    const standardTypeOptions = Object.keys(otherTypes).map((key) => ({
+      label: OperationTypeTexts[key],
+      value: key,
+    }));
+
+    if (customEventTypesLoading || !customEventTypes) {
+      return standardTypeOptions;
+    }
+
+    const customTypeOptions = customEventTypes.results.map((t) => ({
+      label: getI18nCurrentText(t.name, languageId),
+      value: `customEvent-${t.type}`, // 使用特殊格式标识自定义事件类型
+    }));
+
+    return [...standardTypeOptions, ...customTypeOptions];
+  }, [languageId, customEventTypes, customEventTypesLoading]);
+
+
 
   const getformatData = (results: OperationLog[] | undefined) => {
     if (!results) {
@@ -108,12 +164,64 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
     return results.map((data) => {
       return {
         ...data,
-        operationCode: data.operationEvent?.["$case"] ? OperationCodeMap[data.operationEvent?.["$case"]] : "000000",
-        operationType: data.operationEvent?.["$case"] || "unknown",
-        operationDetail: getOperationDetail(data.operationEvent, t, tArgs),
+        operationCode: data.operationEvent?.$case ? OperationCodeMap[data.operationEvent?.$case] : "000000",
+        operationType: data.operationEvent?.$case || "unknown",
+        operationDetail: getOperationDetail(data.operationEvent, t, tArgs, languageId),
       };
     });
   };
+
+  // 处理表格排序事件
+  const handleTableChange = (pagination, _, sorter) => {
+    setPageInfo({ page: pagination.current, pageSize: pagination.pageSize });
+    setSorter({
+      field: sorter.field === "operationLogId" ? "id" : sorter.field,
+      order: sorter.order,
+    });
+  };
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+    const total = data?.totalCount ?? 0;
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportOperationLog",
+        columns,
+        count: total,
+        query: {
+          type: queryType,
+          operatorUserIds: getOperatorUserIds().join(","),
+          operationType: query.operationType,
+          customEventType: query.customEventType,
+          operationResult: query.operationResult,
+          startTime: query.operationTime?.[0].toISOString(),
+          endTime: query.operationTime?.[1].toISOString(),
+          operationTargetAccountName: accountName,
+          operationDetail: query.operationDetail,
+          page: pageInfo.page,
+          pageSize: pageInfo.pageSize,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label: t(p("operationCode")), value: "operationCode" },
+      { label: t(p("operationType")), value: "operationType" },
+      { label: t(p("operationDetail")), value: "operationDetail" },
+      { label: t(p("operationResult")), value: "operationResult" },
+      { label: t(p("operationTime")), value: "operationTime" },
+      { label: t(p("operatorUserId")), value: "operatorUserId" },
+      { label: t(p("operatorIp")), value: "operatorIp" },
+    ];
+  }, [t]);
+
 
   return (
     <div>
@@ -125,7 +233,21 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           onFinish={async () => {
             const { operationType, operatorUserId,
               operationResult, operationTime, operationDetail } = await form.validateFields();
-            setQuery({ operationType, operatorUserId, operationResult, operationTime, operationDetail });
+
+            let customEventType: string | undefined;
+            let formatOperationType: string | undefined;
+            if (operationType?.startsWith("customEvent-")) {
+              formatOperationType = "customEvent";
+              customEventType = operationType.split("customEvent-")[1];
+            } else {
+              formatOperationType = operationType;
+              customEventType = undefined;
+            }
+
+            setQuery({
+              operationType: formatOperationType, operatorUserId, operationResult,
+              operationTime, operationDetail, customEventType,
+            });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
@@ -133,7 +255,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
             <Select
               showSearch
               options={
-                Object.keys(OperationTypeTexts).map((key) => ({ value: key, label: OperationTypeTexts[key] }))
+                operationTypes
               }
               filterOption={(input, option) =>
                 (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
@@ -157,7 +279,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
               <Input style={{ width: 150 }} />
             </Form.Item>
           )}
-          <Form.Item label="操作内容" name="operationDetail">
+          <Form.Item label={t(p("operationDetail"))} name="operationDetail">
             <Input style={{ width: 150 }} />
           </Form.Item>
           <Form.Item label={t(p("operationTime"))} name="operationTime">
@@ -166,11 +288,20 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table
         dataSource={getformatData(data?.results)}
         loading={isLoading}
+        onChange={handleTableChange}
         pagination={{
           current: pageInfo.page,
           pageSize: pageInfo.pageSize,
@@ -180,36 +311,59 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         }}
       >
-        <Table.Column<OperationLog> dataIndex="operationLogId" title="ID" />
+        <Table.Column<OperationLog>
+          dataIndex="operationLogId"
+          title="ID"
+          sorter={true}
+        />
         <Table.Column
           dataIndex="operationCode"
           title={t(p("operationCode"))}
         />
-        <Table.Column
+        <Table.Column<OperationLog>
           dataIndex="operationType"
           title={t(p("operationType"))}
-          render={(operationType) => OperationTypeTexts[operationType]}
+          render={(operationType, r) => {
+            return r.operationEvent.$case === "customEvent"
+              ? getI18nCurrentText(r.operationEvent.customEvent.name, languageId)
+              : OperationTypeTexts[operationType];
+          }
+          }
         />
         <Table.Column
           dataIndex="operationDetail"
           title={t(p("operationDetail"))}
+          width="30%"
+          render={(operationDetail) => (
+            <WordBreakText>{operationDetail}</WordBreakText>
+          )}
         />
         <Table.Column<OperationLog>
           dataIndex="operationResult"
           title={t(p("operationResult"))}
-          render={(operationResult) => OperationResultTexts[operationResult] }
+          render={(operationResult) => OperationResultTexts[operationResult]}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operationTime"
           title={t(p("operationTime"))}
           render={formatDateTime}
+          sorter={true}
         />
         <Table.Column<OperationLog>
           dataIndex="operatorUserId"
           title={t(p("operatorUserId"))}
           render={(_, r) => (`${r.operatorUserId} (${r.operatorUserName})`)}
+          sorter={true}
         />
-        <Table.Column<OperationLog> dataIndex="operatorIp" title={t(p("operatorIp"))} />
+        <Table.Column<OperationLog>
+          dataIndex="operatorIp"
+          title={t(p("operatorIp"))}
+          render={(operatorIp) => (
+            <WordBreakText>{operatorIp}</WordBreakText>
+          )}
+          sorter={true}
+        />
       </Table>
     </div>
   );

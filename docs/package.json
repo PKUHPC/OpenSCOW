@@ -1,6 +1,6 @@
 {
   "name": "@scow/docs",
-  "version": "1.1.2",
+  "version": "1.4.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
@@ -15,29 +15,30 @@
     "typecheck": "tsc",
     "genDocs": "pnpm writeEnvDocs && pnpm writeConfigDocs",
     "writeEnvDocs": "ts-node tools/envDoc.ts",
-    "writeConfigDocs": "node tools/configDoc.mjs"
+    "writeConfigDocs": "node tools/configDoc.mjs",
+    "lint": "eslint -c ../eslint.config.js ."
   },
   "dependencies": {
-    "@docusaurus/core": "3.0.0",
-    "@docusaurus/preset-classic": "3.0.0",
+    "@docusaurus/core": "3.4.0",
+    "@docusaurus/preset-classic": "3.4.0",
     "@mdx-js/react": "3.0.0",
-    "clsx": "2.0.0",
+    "clsx": "2.1.1",
     "prism-react-renderer": "2.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "@cmfcmf/docusaurus-search-local": "1.1.0"
+    "@easyops-cn/docusaurus-search-local": "0.44.2"
   },
   "devDependencies": {
-    "@adobe/jsonschema2md": "7.1.5",
-    "@algolia/client-search": "4.20.0",
-    "@docusaurus/module-type-aliases": "3.0.0",
+    "@adobe/jsonschema2md": "8.0.2",
+    "@algolia/client-search": "4.23.3",
+    "@docusaurus/module-type-aliases": "3.4.0",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.31.26",
-    "@tsconfig/docusaurus": "2.0.2",
-    "@docusaurus/types": "3.0.0",
+    "@sinclair/typebox": "0.32.34",
+    "@tsconfig/docusaurus": "2.0.3",
+    "@docusaurus/types": "3.4.0",
     "@types/react": "18.2.37",
-    "typescript": "5.2.2",
-    "@node-rs/jieba": "1.7.2",
+    "typescript": "5.5.2",
+    "@node-rs/jieba": "1.10.3",
     "unist-util-visit": "5.0.0"
   },
   "browserslist": {

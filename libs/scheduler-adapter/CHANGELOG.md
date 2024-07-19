@@ -1,5 +1,59 @@
 # @scow/lib-scheduler-adapter
 
+## 1.1.10
+
+### Patch Changes
+
+- @scow/protos@1.0.12
+
+## 1.1.9
+
+### Patch Changes
+
+- @scow/protos@1.0.11
+
+## 1.1.8
+
+### Patch Changes
+
+- Updated dependencies [e312efb]
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/protos@1.0.10
+
+## 1.1.7
+
+### Patch Changes
+
+- @scow/protos@1.0.9
+
+## 1.1.6
+
+### Patch Changes
+
+- @scow/protos@1.0.8
+
+## 1.1.5
+
+### Patch Changes
+
+- @scow/protos@1.0.7
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [26bd8e7]
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/protos@1.0.5
+
 ## 1.1.2
 
 ### Patch Changes

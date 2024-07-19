@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { JobServiceClient } from "@scow/protos/build/portal/job";
+import { OperationType } from "@scow/lib-operation-log";
+import { JobServiceClient, TimeUnit } from "@scow/protos/build/portal/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
@@ -39,6 +40,8 @@ export const SubmitJobInfo = Type.Object({
   memory: Type.Optional(Type.String()),
   comment: Type.Optional(Type.String()),
   save: Type.Boolean(),
+  scriptOutput:Type.Optional(Type.String()),
+  maxTimeUnit:Type.Optional(Type.Enum(TimeUnit)),
 });
 
 export type SubmitJobInfo = Static<typeof SubmitJobInfo>;
@@ -57,6 +60,11 @@ export const SubmitJobSchema = typeboxRouteSchema({
       message: Type.String(),
     }),
 
+    404: Type.Object({
+      code: Type.Literal("NOT_FOUND"),
+      message: Type.String(),
+    }),
+
     500: Type.Object({
       code: Type.Literal("SCHEDULER_FAILED"),
       message: Type.String(),
@@ -72,8 +80,9 @@ export default route(SubmitJobSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, command, jobName, coreCount, gpuCount, maxTime, save,
-    nodeCount, partition, qos, account, comment, workingDirectory, output, errorOutput, memory } = req.body;
+  const { cluster, command, jobName, coreCount, gpuCount, maxTime, maxTimeUnit, save,
+    nodeCount, partition, qos, account, comment
+    , workingDirectory, output, errorOutput, scriptOutput, memory } = req.body;
 
   const client = getClient(JobServiceClient);
 
@@ -82,6 +91,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypePayload:{
       accountName: account,
+      clusterId: cluster,
     },
   };
 
@@ -91,6 +101,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     coreCount,
     gpuCount,
     maxTime,
+    maxTimeUnit,
     nodeCount,
     partition,
     qos,
@@ -101,6 +112,7 @@ export default route(SubmitJobSchema, async (req, res) => {
     workingDirectory,
     output,
     errorOutput,
+    scriptOutput:scriptOutput === undefined || scriptOutput.trim() === "" ? undefined : scriptOutput.trim(),
     saveAsTemplate: save,
   })
     .then(async ({ jobId }) => {
@@ -124,11 +136,12 @@ export default route(SubmitJobSchema, async (req, res) => {
     })
     .catch(handlegRPCError({
       [status.INTERNAL]: (err) => ({ 500: { code: "SCHEDULER_FAILED", message: err.details } } as const),
+      [status.NOT_FOUND]: (err) => ({ 404: { code: "NOT_FOUND", message: err.details } } as const),
     },
     async () => await callLog(
       { ...logInfo,
         operationTypeName: OperationType.submitJob,
-        operationTypePayload: { ... logInfo.operationTypePayload, jobId: -1 },
+        operationTypePayload: { ... logInfo.operationTypePayload },
       },
       OperationResult.FAIL,
     )));

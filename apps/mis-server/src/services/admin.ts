@@ -14,12 +14,14 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import {
   AdminServiceServer, AdminServiceService,
   ClusterAccountInfo,
   ClusterAccountInfo_ImportStatus,
 } from "@scow/protos/build/server/admin";
 import { updateBlockStatusInSlurm } from "src/bl/block";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
@@ -30,7 +32,7 @@ import { UserAccount, UserRole } from "src/entities/UserAccount";
 export const adminServiceServer = plugin((server) => {
 
   server.addService<AdminServiceServer>(AdminServiceService, {
-    changeStorageQuota: async ({ }) => {
+    changeStorageQuota: async () => {
       // const { cluster, mode, userId, value } = request;
 
       // const quota = await em.findOne(StorageQuota, {
@@ -78,9 +80,9 @@ export const adminServiceServer = plugin((server) => {
       });
 
       if (!quota) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} or cluster ${cluster} is not found`,
-        };
+        } as ServiceError;
       }
 
       return [{ currentQuota: quota.storageQuota }];
@@ -90,20 +92,26 @@ export const adminServiceServer = plugin((server) => {
       const { data, whitelist } = request;
 
       if (!data) {
-        throw <ServiceError>{
+        throw {
           code: Status.INVALID_ARGUMENT, message: "Submitted data is empty",
-        };
+        } as ServiceError;
       }
 
       const ownerNotInAccount = data.accounts.find((x) => x.owner && !x.users.find((user) => user.userId === x.owner));
       if (ownerNotInAccount) {
-        throw <ServiceError>{
+        throw {
           code: Status.INVALID_ARGUMENT,
           message: `Owner ${ownerNotInAccount.owner} is not in ${ownerNotInAccount.accountName}`,
-        };
+        } as ServiceError;
       }
 
-      const reply = await importUsers(data as ImportUsersData, em, whitelist, server.ext.clusters, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+      const reply = await importUsers(data as ImportUsersData,
+        em,
+        whitelist,
+        currentActivatedClusters,
+        server.ext.clusters, logger);
 
       return [reply];
 
@@ -111,6 +119,9 @@ export const adminServiceServer = plugin((server) => {
 
     getClusterUsers: async ({ request, em, logger }) => {
       const { cluster } = request;
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const result = await server.ext.clusters.callOnOne(
         cluster,
@@ -215,7 +226,10 @@ export const adminServiceServer = plugin((server) => {
       return [{}];
     },
 
-    syncBlockStatus: async () => {
+    syncBlockStatus: async ({ em, logger }) => {
+      // check whether there is activated cluster in SCOW
+      // cause syncBlockStatus in plugin will skip the check
+      await getActivatedClusters(em, logger);
       const reply = await server.ext.syncBlockStatus.sync();
       return [reply];
     },
@@ -239,6 +253,22 @@ export const adminServiceServer = plugin((server) => {
         tenantCount,
         accountCount,
         userCount,
+      }];
+    },
+
+    getStatisticInfo: async ({ request, em }) => {
+      const { startTime, endTime } = request;
+
+      const totalUser = await em.count(User, {});
+      const totalAccount = await em.count(Account, {});
+      const totalTenant = await em.count(Tenant, {});
+
+      const newUser = await em.count(User, { createTime: { $gte: startTime, $lte: endTime } });
+      const newAccount = await em.count(Account, { createTime: { $gte: startTime, $lte: endTime, $ne: null } });
+      const newTenant = await em.count(Tenant, { createTime: { $gte: startTime, $lte: endTime } });
+
+      return [{
+        totalUser, totalAccount, totalTenant, newUser, newAccount, newTenant,
       }];
     },
   });

@@ -15,6 +15,9 @@ package scow.audit;
 
 import "google/protobuf/timestamp.proto";
 import "common/money.proto";
+import "common/i18n.proto";
+
+import "common/sort_order.proto";
 
 
 enum OperationResult {
@@ -32,24 +35,44 @@ message Logout {
 
 message SubmitJob {
   string account_name = 1;
-  uint32 job_id = 2;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message EndJob {
   uint32 job_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message AddJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message DeleteJobTemplate {
   string job_template_id = 1;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 2;
 }
 
 message UpdateJobTemplate {
   string job_template_id = 1;
   string new_job_template_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message ShellLogin {
@@ -60,16 +83,48 @@ message ShellLogin {
 message CreateDesktop {
   string desktop_name = 1;
   string wm = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string login_node = 4;
 }
 
 message DeleteDesktop {
   uint32 desktop_id = 1;
   string login_node = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
 }
 
 message CreateApp {
   string account_name = 1;
+  optional uint32 job_id = 2;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 3;
+}
+
+message CreateAiTrain {
+  string cluster_id = 1;
+  optional uint32 job_id = 2;
+}
+
+message CancelAiTrainOrApp {
+  string cluster_id = 1;
   uint32 job_id = 2;
+}
+
+message SaveImage {
+  uint32 job_id = 1;
+  optional uint32 image_id = 2;
+  optional string tag = 3;
 }
 
 message CreateFile {
@@ -120,6 +175,10 @@ message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
   int64 limit_minutes = 3;
+
+  // Optional field. Although currently optional, it is strongly recommended to provide this information.
+  // Please note, we plan to make this field required in the next major version update.
+  optional string cluster_id = 4;
 }
 
 message CreateUser {
@@ -282,6 +341,267 @@ message TenantPay {
   common.Money amount = 2;
 }
 
+message ExportUser {
+  // 不传则是导出平台所有的用户
+  optional string tenant_name = 1;
+}
+
+message ExportAccount {
+  // 不传则是导出平台所有的账户
+  optional string tenant_name = 1;
+}
+
+
+// 充值记录及消费记录请求target
+message AccountOfTenantTarget {
+  string account_name = 1;
+  string tenant_name = 2;
+}
+message AccountsOfTenantTarget {
+  string tenant_name = 1;
+  repeated string account_names = 2;
+}
+message TenantTarget {
+  string tenant_name = 1;
+}
+message AllTenantsTarget {
+}
+message AccountsOfAllTenantsTarget {
+  repeated string account_names = 1;
+}
+
+message ExportPayRecord {
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的充值记录
+    AccountOfTenantTarget account_of_tenant = 1;
+    // 返回这个租户（tenantName）下多个账户的充值记录
+    AccountsOfTenantTarget accounts_of_tenant = 2;
+    // 返回这个租户（tenantName）的充值记录
+    TenantTarget tenant = 3;
+    // 返回所有租户充值记录
+    AllTenantsTarget all_tenants = 4;
+  }
+}
+
+message ExportChargeRecord {
+  oneof target {
+    // 返回这个租户（tenantName）下这个账户（accountName）的消费记录
+    AccountOfTenantTarget account_of_tenant = 4;
+    // 返回这个租户（tenantName）下多个账户的消费记录
+    AccountsOfTenantTarget accounts_of_tenant = 5;
+    // 返回所有租户下多个账户的消费记录
+    AccountsOfAllTenantsTarget accounts_of_all_tenants = 6;
+    // 返回这个租户（tenantName）的租户消费记录
+    TenantTarget tenant = 7;
+    // 返回所有租户的租户消费记录
+    AllTenantsTarget all_tenants = 8;
+  }
+}
+
+message ExportOperationLog {
+  message User {
+    string user_id = 1;
+  }
+  message Account {
+    string account_name = 2;
+  }
+  message Tenant {
+    string tenant_name = 3;
+  }
+  message Admin {
+
+  }
+  oneof source {
+    // 导出用户的操作记录
+    User user = 1;
+    // 导出账户的操作记录
+    Account account = 2;
+    // 导出租户的操作记录
+    Tenant tenant = 3;
+    // 导出平台的操作记录
+    Admin admin = 4;
+  }
+}
+
+message SetAccountBlockThreshold {
+  string account_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+message SetAccountDefaultBlockThreshold {
+  string tenant_name = 1;
+  common.Money threshold_amount = 2;
+}
+
+message UserChangeTenant {
+  string user_id = 1;
+  string previous_tenant_name = 2;
+  string new_tenant_name = 3;
+}
+
+message ActivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+message DeactivateCluster {
+  string user_id = 1;
+  string cluster_id = 2;
+}
+
+// 用户自定义操作类型，name和content将直接展示
+message CustomEvent {
+  string type = 1;
+  common.I18nObject name = 2;
+  common.I18nObject content = 3;
+}
+
+message CreateImage {
+  string cluster_id = 1;
+  optional string tag = 2;
+  optional uint32 image_id = 3;
+}
+
+message UpdateImage {
+  uint32 image_id = 1;
+}
+
+message ShareImage {
+  uint32 image_id = 1;
+}
+
+message DeleteImage {
+  uint32 image_id = 1;
+}
+
+message CopyImage {
+  uint32 source_image_id = 1;
+  optional uint32 target_image_id = 2;
+  optional string target_image_tag = 3;
+}
+
+message CreateDataset {
+  string cluster_id = 1;
+  optional uint32 dataset_id = 2;
+}
+
+message UpdateDataset {
+  uint32 dataset_id = 1;
+}
+
+message DeleteDataset {
+  uint32 dataset_id = 12;
+}
+
+message CreateDatasetVersion {
+  uint32 dataset_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteDatasetVersion {
+  uint32 dataset_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyDatasetVersion {
+  uint32 source_dataset_id = 1;
+  uint32 source_dataset_version_id = 2;
+  optional uint32 target_dataset_id = 3;
+  optional uint32 target_dataset_version_id = 4;
+}
+
+message CreateAlgorithm {
+  string cluster_id = 1;
+  optional uint32 algorithm_id = 2;
+}
+
+message UpdateAlgorithm {
+  uint32 algorithm_id = 1;
+}
+
+message DeleteAlgorithm {
+  uint32 algorithm_id = 12;
+}
+
+message CreateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteAlgorithmVersion {
+  uint32 algorithm_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyAlgorithmVersion {
+  uint32 source_algorithm_id = 1;
+  uint32 source_algorithm_version_id = 2;
+  optional uint32 target_algorithm_id = 3;
+  optional uint32 target_algorithm_version_id = 4;
+}
+
+message CreateModel {
+  string cluster_id = 1;
+  optional uint32 model_id = 2;
+}
+
+message UpdateModel {
+  uint32 model_id = 1;
+}
+
+message DeleteModel {
+  uint32 model_id = 12;
+}
+
+message CreateModelVersion {
+  uint32 model_id = 1;
+  optional uint32 version_id = 2;
+}
+
+message UpdateModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message ShareModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message DeleteModelVersion {
+  uint32 model_id = 1;
+  uint32 version_id = 2;
+}
+
+message CopyModelVersion {
+  uint32 source_model_id = 1;
+  uint32 source_model_version_id = 2;
+  optional uint32 target_model_id = 3;
+  optional uint32 target_model_version_id = 4;
+}
+
+
+// INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
   string operator_user_id = 1;
   string operator_ip = 2;
@@ -337,6 +657,49 @@ message CreateOperationLogRequest {
     CreateTenant create_tenant = 51;
     TenantPay tenant_pay = 52;
     SubmitFileItemAsJob submit_file_item_as_job = 53;
+    ExportUser export_user = 54;
+    ExportAccount export_account = 55;
+    ExportPayRecord export_pay_record = 56;
+    ExportChargeRecord export_charge_record = 57;
+    ExportOperationLog export_operation_log = 58;
+    SetAccountBlockThreshold set_account_block_threshold = 59;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 60;
+    UserChangeTenant user_change_tenant = 61;
+    CustomEvent custom_event = 62;
+    ActivateCluster activate_cluster = 63;
+    DeactivateCluster deactivate_cluster = 64;
+    CreateImage create_image = 65;
+    UpdateImage update_image = 66;
+    ShareImage share_image = 67;
+    DeleteImage delete_image = 68;
+    CopyImage copy_image = 69;
+    CreateDataset create_dataset = 70;
+    UpdateDataset update_dataset = 71;
+    DeleteDataset delete_dataset = 72;
+    CreateDatasetVersion create_dataset_version = 73;
+    UpdateDatasetVersion update_dataset_version = 74;
+    ShareDatasetVersion share_dataset_version = 75;
+    DeleteDatasetVersion delete_dataset_version = 76;
+    CopyDatasetVersion copy_dataset_version = 77;
+    CreateAiTrain create_ai_train = 78;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 79;
+    SaveImage save_image = 80;
+    CreateAlgorithm create_algorithm = 81;
+    UpdateAlgorithm update_algorithm = 82;
+    DeleteAlgorithm delete_algorithm = 83;
+    CreateAlgorithmVersion create_algorithm_version = 84;
+    UpdateAlgorithmVersion update_algorithm_version = 85;
+    ShareAlgorithmVersion share_algorithm_version = 86;
+    DeleteAlgorithmVersion delete_algorithm_version = 87;
+    CopyAlgorithmVersion copy_algorithm_version = 88;
+    CreateModel create_model = 89;
+    UpdateModel update_model = 90;
+    DeleteModel delete_model = 91;
+    CreateModelVersion create_model_version = 92;
+    UpdateModelVersion update_model_version = 93;
+    ShareModelVersion share_model_version = 94;
+    DeleteModelVersion delete_model_version = 95;
+    CopyModelVersion copy_model_version = 96;
   }
 }
 
@@ -398,6 +761,49 @@ message OperationLog {
     CreateTenant create_tenant = 53;
     TenantPay tenant_pay = 54;
     SubmitFileItemAsJob submit_file_item_as_job = 55;
+    ExportUser export_user = 56;
+    ExportAccount export_account = 57;
+    ExportPayRecord export_pay_record = 58;
+    ExportChargeRecord export_charge_record = 59;
+    ExportOperationLog export_operation_log = 60;
+    SetAccountBlockThreshold set_account_block_threshold = 61;
+    SetAccountDefaultBlockThreshold set_account_default_block_threshold = 62;
+    UserChangeTenant user_change_tenant = 63;
+    CustomEvent custom_event = 64;
+    ActivateCluster activate_cluster = 65;
+    DeactivateCluster deactivate_cluster = 66;
+    CreateImage create_image = 67;
+    UpdateImage update_image = 68;
+    ShareImage share_image = 69;
+    DeleteImage delete_image = 70;
+    CopyImage copy_image = 71;
+    CreateDataset create_dataset = 72;
+    UpdateDataset update_dataset = 73;
+    DeleteDataset delete_dataset = 74;
+    CreateDatasetVersion create_dataset_version = 75;
+    UpdateDatasetVersion update_dataset_version = 76;
+    ShareDatasetVersion share_dataset_version = 77;
+    DeleteDatasetVersion delete_dataset_version = 78;
+    CopyDatasetVersion copy_dataset_version = 79;
+    CreateAiTrain create_ai_train = 80;
+    CancelAiTrainOrApp cancel_ai_train_or_app = 81;
+    SaveImage save_image = 82;
+    CreateAlgorithm create_algorithm = 83;
+    UpdateAlgorithm update_algorithm = 84;
+    DeleteAlgorithm delete_algorithm = 85;
+    CreateAlgorithmVersion create_algorithm_version = 86;
+    UpdateAlgorithmVersion update_algorithm_version = 87;
+    ShareAlgorithmVersion share_algorithm_version = 88;
+    DeleteAlgorithmVersion delete_algorithm_version = 89;
+    CopyAlgorithmVersion copy_algorithm_version = 90;
+    CreateModel create_model = 91;
+    UpdateModel update_model = 92;
+    DeleteModel delete_model = 93;
+    CreateModelVersion create_model_version = 94;
+    UpdateModelVersion update_model_version = 95;
+    ShareModelVersion share_model_version = 96;
+    DeleteModelVersion delete_model_version = 97;
+    CopyModelVersion copy_model_version = 98;
   }
 }
 
@@ -418,6 +824,9 @@ message OperationLogFilter {
 
   // 对operation_event里的信息进行搜索
   optional string operation_detail = 7;
+
+  // 对于customeEvent进行type筛选
+  optional string custom_event_type = 8;
 }
 
 message GetOperationLogsRequest {
@@ -425,6 +834,17 @@ message GetOperationLogsRequest {
   uint32 page = 2;
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 3;
+  enum SortBy{
+    UNKNOWN = 0;
+    ID = 1;
+    OPERATION_RESULT = 2;
+    OPERATION_TIME = 3;
+    OPERATOR_USER_ID = 4;
+    OPERATOR_IP = 5;
+  }
+  optional SortBy sort_by = 4;
+
+  optional common.SortOrder sort_order = 5;
 }
 
 message GetOperationLogsResponse {
@@ -432,9 +852,30 @@ message GetOperationLogsResponse {
   uint32 total_count = 2;
 }
 
+message ExportOperationLogRequest {
+  uint32 count = 2;
+  OperationLogFilter filter = 3;
+}
+
+message ExportOperationLogResponse {
+  repeated OperationLog operation_logs = 1;
+}
+
+message GetCustomEventTypesRequest {
+
+}
+
+message GetCustomEventTypesResponse {
+  message CustomEventType {
+    string type = 1;
+    common.I18nObject name = 2;
+  }
+  repeated CustomEventType custom_event_types = 1;
+}
 
 service OperationLogService {
   rpc CreateOperationLog(CreateOperationLogRequest) returns (CreateOperationLogResponse);
   rpc GetOperationLogs(GetOperationLogsRequest) returns (GetOperationLogsResponse);
-
+  rpc ExportOperationLog(ExportOperationLogRequest) returns (stream ExportOperationLogResponse);
+  rpc GetCustomEventTypes(GetCustomEventTypesRequest) returns (GetCustomEventTypesResponse);
 }

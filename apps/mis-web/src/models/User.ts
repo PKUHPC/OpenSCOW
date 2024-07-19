@@ -13,6 +13,8 @@
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
+import { TransType } from "./job";
+
 // Redefine to avoid importing non client packages
 export const TenantRole = {
   TENANT_ADMIN: 0,
@@ -54,6 +56,19 @@ export enum UserStatus {
   UNBLOCKED = 0,
   BLOCKED = 1,
 }
+
+export const UserStateInAccount = {
+  NORMAL: 0,
+  BLOCKED_BY_ADMIN: 1,
+} as const;
+export type UserStateInAccount = ValueOf<typeof UserStateInAccount>;
+
+export const DisplayedUserState = {
+  DISPLAYED_NORMAL: 0,
+  DISPLAYED_QUOTA_EXCEEDED: 1,
+  DISPLAYED_BLOCKED: 2,
+} as const;
+export type DisplayedUserState = ValueOf<typeof DisplayedUserState>;
 
 export enum ClusterAccountInfo_ImportStatus {
   EXISTING = 0,
@@ -115,3 +130,45 @@ export enum SearchType {
   TENANT = "TENANT",
 }
 
+export const AccountState = {
+  NORMAL: 0,
+  FROZEN: 1,
+  BLOCKED_BY_ADMIN: 2,
+} as const;
+
+export type AccountState = ValueOf<typeof AccountState>;
+
+export const DisplayedAccountState = {
+  DISPLAYED_NORMAL: 0,
+  DISPLAYED_FROZEN: 1,
+  DISPLAYED_BLOCKED: 2,
+  DISPLAYED_BELOW_BLOCK_THRESHOLD: 3,
+} as const;
+
+export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
+
+
+export const getDisplayedStateI18nTexts = (t: TransType) => {
+  return {
+    [DisplayedAccountState.DISPLAYED_NORMAL]: t("pageComp.accounts.accountTable.normal"),
+    [DisplayedAccountState.DISPLAYED_FROZEN]: t("pageComp.accounts.accountTable.frozen"),
+    [DisplayedAccountState.DISPLAYED_BLOCKED]: t("pageComp.accounts.accountTable.blocked"),
+    [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t("pageComp.accounts.accountTable.debt"),
+  };
+};
+
+export const ChargesSortBy = Type.Union([
+  Type.Literal("userId"),
+  Type.Literal("time"),
+  Type.Literal("amount"),
+  Type.Literal("type"),
+]);
+
+export type ChargesSortBy = Static<typeof ChargesSortBy>;
+
+export const ChargesSortOrder = Type.Union([
+  Type.Literal("descend"),
+  Type.Literal("ascend"),
+]);
+
+export type ChargesSortOrder = Static<typeof ChargesSortOrder>;

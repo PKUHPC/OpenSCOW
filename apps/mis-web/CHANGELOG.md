@@ -1,5 +1,180 @@
 # @scow/mis-web
 
+## 1.6.1
+
+### Patch Changes
+
+- 4ab2cec: 导出数据时增加编码选项
+- be61c74: 所有 Input.group compact 组件替换成 Space.Compact
+
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 5a707df: 修复门户系统桌面功能页面 token 过期不能跳转登录页面的问题, 修改获取集群数据 token 验证失败时的返回
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 5b6af87: 修改了 mis 系统下充值、消费账户前十的统计图的横坐标为 userName;修复了 mis 系统下系统使用量横坐标显示不全的问题。
+- f91ba34: 修正了 mis 系统下平台数据统计横坐标的表现形式
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-web@1.4.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- d080a8b: 修复在 common.yml 中自定义更改用户密码正则后在管理系统不生效的问题，
+  增加平台管理和租户管理下修改用户密码的后端校验
+- c7f2646: 操作日志文案修改：移动文件/文件夹改为移动或重命名文件/文件夹
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- 90217ac: 操作日志自定义操作类型合并至操作行为进行搜索查询
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 98a166f: 修复了平台数据统计图（折线图）溢出的问题.
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- f0b3162: 将白名单过期时间选择的最小日期调整至+1 天,将所选择日期的时分秒调整至 24:00:00(00:00:00).
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.1
+
+### Patch Changes
+
+- 93be965: 账户白名单、账户消费记录下都支持以用户 ID 和姓名搜索
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- e44340d: 修复了管理系统下消费记录总数金额显示错误以及翻页的问题
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- 10956eb: 修复 token 失效后切换系统不跳转回登录页面的问题
+- 16f4465: 初始化的用户管理新增前端搜索
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- a970dc7: 优化管理系统用户可见分区页面 Loading 样式
+- bd21171: 修改变更租户管理下用户列表中可用账户的列名为 关联账户
+- 8dd8c0e: 修改 Account 实体中原 blocked 字段名为 blocked_in_cluster ，表示在集群中是否为封锁状态
+  增加字段 state ,字段值为 "NORMAL" , "FROZEN" , "BLOCKED_BY_ADMIN" 的枚举值，优化页面账户显示状态为正常、封锁、欠费
+- 02d6a18: 新增集群区分 AI 功能和 HPC 功能配置
+- 24db413: 操作日志增加自定义操作类型
+- 0e3ff89: 统一修改规范用户及账户状态 正常和封锁 为 Available, Blocked；操作 封锁和解封 为 Block,Unblock
+- 850a7ee: 修改 UserAccount 实体中原 status 字段名为 blocked_in_cluster ,表示在集群中是否为封锁状态
+  增加字段 state ,允许写入的值为 "NORMAL" , "BLOCKED_BY_ADMIN" 的枚举值
+  页面增加用户在账户下的 限额 的状态的显示
+- d3d891a: 操作日志详细内容展示优化
+- Updated dependencies [02d6a18]
+- Updated dependencies [146e19f]
+- Updated dependencies [24db413]
+- Updated dependencies [d822db7]
+- Updated dependencies [850a7ee]
+  - @scow/config@1.4.3
+  - @scow/lib-web@1.3.1
+  - @scow/lib-operation-log@2.1.3
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.3
+
+### Patch Changes
+
+- efcd9a8: 修改集群监控 iframe 高度自适应
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- a56ec73: 修复平台管理页面账户消费记录搜索账户名时传参错误问题
+- 2df6de8: 创建用户，账户，租户或添加用户，白名单账户时，对 input 框输入的 用户/账户/租户名称 去掉前后空格
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- 68447f7: mis 增加控制添加用户至账户相关配置
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- d1c2e74: UI 扩展
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+- abb7e84: 管理系统新增集群监控功能
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- e6efacf: 修复解封账户时错误提示是变量的问题
+- 5144723: 管理系统的租户管理和平台管理中的账户列表新增拥有者姓名或 id 搜索项
+- Updated dependencies [081fbcf]
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/lib-operation-log@2.1.0
+  - @scow/config@1.4.0
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes

@@ -19,7 +19,7 @@ import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { PlatformRole } from "src/models/User";
-import { CreateTenantForm, CreateTenantFormFields } from "src/pageComponents/admin/CreateTenantForm";
+import { CreateTenantForm, CreateTenantFormFields, UserType } from "src/pageComponents/admin/CreateTenantForm";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 import { getUserIdRule, useBuiltinCreateUser } from "src/utils/createUser";
 import { Head } from "src/utils/head";
@@ -37,95 +37,140 @@ const CreateTenantPageForm: React.FC = () => {
   const userIdRule = getUserIdRule(languageId);
 
   const onOk = async () => {
-    const { tenantName, userId, userName, userEmail, userPassword } = await form.validateFields();
+    const { tenantName, userId, userName, userEmail, userPassword, userType } = await form.validateFields();
     setLoading(true);
 
-    const result = await api.userExists({ body: { identityId: userId } });
-    if (result.existsInScow) {
-      modal.error({
-        title: t(p("adminExist")),
-        content: t(p("adminExistMessage")),
-        okText: t("common.ok"),
-        onOk: async () => {
-          setLoading(false);
+    // 新建租户的租户管理员为已存在的用户
+    if (userType === UserType.Existing) {
+      await api.createTenantWithExistingUserAsAdmin({
+        body: {
+          tenantName: tenantName.trim(),
+          userId,
+          userName: userName.trim(),
         },
-      });
-    } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
-      // 用户不不存在于scow,且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持内置创建用户
-      modal.confirm({
-        title: t(p("adminNotExistAuth")),
-        content: t(p("adminNotExistAuthMessage")),
-        okText: t("common.ok"),
-        onOk: async () => {
+      })
+        .httpError(409, () => {
+          message.error({
+            content: t(p("tenantExist")),
+          });
+        })
+        .httpError(404, () => {
+          message.error({
+            content: t(p("userNotFound")),
+          });
+        })
+        .httpError(400, () => {
+          message.error({
+            content: t(p("userStillMaintainsAccountRelationship")),
+          });
+        })
+        .then(() => {
+          message.info({ content:t(p("addCompleted")) });
+          form.resetFields();
+        })
+        .catch(() => {
+          message.error({ content: t(p("createTenantFailMessage")) });
+        })
+        .finally(() => {
           setLoading(false);
-        },
-        onCancel: async () => {
-          setLoading(false);
-        },
-      });
+        });
     } else {
-      modal.confirm({
-        title: t("common.prompt"),
-        content: result.existsInAuth !== undefined ?
-          // 认证系统支持查询
-          result.existsInAuth ? t(p("adminExistAuthMessage"))
-            : t(p("adminNotExistAuthAndConfirmCreateMessage"))
-          : // 认证系统不支持查询
-          useBuiltinCreateUser() ?
-            t(p("unableConfirmAdminExistInAuthMessage"))
-            : t(p("unableConfirmAdminExistInAuthAndUnableCreateMessage")),
+      // 新建租户的租户管理员为新创建用户
+      const result = await api.userExists({ body: { identityId: userId } });
+      if (result.existsInScow) {
+        modal.error({
+          title: t(p("adminExist")),
+          content: t(p("adminExistMessage")),
+          okText: t("common.ok"),
+          onOk: async () => {
+            setLoading(false);
+          },
+        });
+      } else if (!result.existsInAuth && result.existsInAuth !== undefined && !useBuiltinCreateUser()) {
+        // 用户不不存在于scow,且认证系统支持查询，且查询结果不存在于认证系统，且当前系统不支持内置创建用户
+        modal.confirm({
+          title: t(p("adminNotExistAuth")),
+          content: t(p("adminNotExistAuthMessage")),
+          okText: t("common.ok"),
+          onOk: async () => {
+            setLoading(false);
+          },
+          onCancel: async () => {
+            setLoading(false);
+          },
+        });
+      } else {
+        modal.confirm({
+          title: t("common.prompt"),
+          content: result.existsInAuth !== undefined ?
+            // 认证系统支持查询
+            result.existsInAuth ? t(p("adminExistAuthMessage"))
+              : t(p("adminNotExistAuthAndConfirmCreateMessage"))
+            : // 认证系统不支持查询
+            useBuiltinCreateUser() ?
+              t(p("unableConfirmAdminExistInAuthMessage"))
+              : t(p("unableConfirmAdminExistInAuthAndUnableCreateMessage")),
 
-        okText: t("common.ok"),
-        onOk: async () => {
-          await api.createTenant({
-            body: {
-              tenantName,
-              userId,
-              userName,
-              userEmail,
-              userPassword,
-            },
-          }).httpError(409, (e) => {
-            modal.error({
-              title: t("common.addFail"),
-              content: t(p("existInSCOWDatabase"),
-                [e.code === "TENANT_ALREADY_EXISTS" ? t("common.tenant") : t("common.user")]),
-              okText: t("common.ok"),
-            });
-          }).httpError(400, (e) => {
-            if (e.code === "USERID_NOT_VALID") {
-              message.error(userIdRule?.message);
-            };
-            if (e.code === "PASSWORD_NOT_VALID") {
-              message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-            };
-            throw e;
-          })
-            .then((createdInAuth) => {
-              !createdInAuth.createdInAuth ?
-                modal.info({
-                  title: t("common.addSuccess"),
-                  content: t(p("createTenantSuccessMessage")),
+          okText: t("common.ok"),
+          onOk: async () => {
+            await api.createTenant({
+              body: {
+                tenantName: tenantName.trim(),
+                userId,
+                userName: userName.trim(),
+                userEmail,
+                userPassword,
+              },
+            })
+              .httpError(409, (e) => {
+                modal.error({
+                  title: t("common.addFail"),
+                  content: t(p("existInSCOWDatabase"),
+                    [e.code === "TENANT_ALREADY_EXISTS" ? t("common.tenant") : t("common.user")]),
                   okText: t("common.ok"),
-                })
-                : message.success(t(p("addCompleted")));
-            })
-            .catch(() => {
-              modal.error({
-                title: t("common.addFail"),
-                content: t(p("createTenantFailMessage")),
+                });
+              })
+              .httpError(400, (e) => {
+                if (e.code === "USERID_NOT_VALID") {
+                  message.error(userIdRule?.message);
+                };
+                if (e.code === "PASSWORD_NOT_VALID") {
+                  message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                };
+                throw e;
+              })
+              .httpError(501, () => { message.error(t(p("unavailable"))); })
+              .then((createdInAuth) => {
+                if (createdInAuth.createdInAuth) {
+                  message.success(t(p("addCompleted")));
+                } else {
+
+                  modal.info({
+                    title: t("common.addSuccess"),
+                    content: t(p("createTenantSuccessMessage")),
+                    okText: t("common.ok"),
+                  });
+                }
+              })
+              .catch(() => {
+                modal.error({
+                  title: t("common.addFail"),
+                  content: t(p("createTenantFailMessage")),
+                });
+              })
+              .finally(() => {
+                form.resetFields();
+                setLoading(false);
               });
-            })
-            .finally(() => {
-              form.resetFields();
-              setLoading(false);
-            });
-        },
-        onCancel: async () => {
-          setLoading(false);
-        },
-      });
+          },
+          onCancel: async () => {
+            setLoading(false);
+          },
+        });
+      }
     }
+
+
   };
 
   return (

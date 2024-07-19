@@ -1,13 +1,14 @@
 {
   "name": "@scow/lib-web",
-  "version": "1.2.3",
+  "version": "1.4.0",
   "description": "",
   "main": "index.js",
   "private": true,
   "sideEffects": false,
   "scripts": {
     "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
-    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "lint": "eslint ."
   },
   "files": [
     "build",
@@ -16,36 +17,40 @@
   ],
   "dependencies": {
     "@scow/utils": "workspace:*",
-    "zod": "3.22.4",
+    "zod": "3.23.8",
     "mime-types": "2.1.35",
-    "nookies": "2.5.2"
+    "nookies": "2.5.2",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@scow/protos": "workspace:*",
+    "@scow/config": "workspace:*",
+    "@grpc/grpc-js": "1.10.9"
   },
   "peerDependencies": {
-    "antd": "5.11.2",
-    "next": "14.0.3",
-    "styled-components": "6.1.1",
-    "@ant-design/icons": "5.2.6",
-    "dayjs": "1.11.10",
+    "antd": "5.18.3",
+    "next": "14.2.4",
+    "styled-components": "6.1.11",
+    "@ant-design/icons": "5.3.7",
+    "dayjs": "1.11.11",
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
-    "react-is": "18.2.0",
-    "nookies": "2.5.2"
+    "react-is": "18.3.1",
+    "nookies": "2.5.2",
+    "@ant-design/cssinjs": "1.21.0",
+    "react-async": "10.0.1"
   },
   "devDependencies": {
-    "antd": "5.11.2",
-    "next": "14.0.3",
-    "@scow/config": "workspace:*",
-    "styled-components": "6.1.1",
-    "@grpc/grpc-js": "1.9.11",
+    "antd": "5.18.3",
+    "next": "14.2.4",
+    "styled-components": "6.1.11",
     "@types/mime-types": "2.1.4",
-    "react": "18.2.0",
-    "@types/react": "18.2.37",
-    "react-dom": "18.2.0",
-    "@types/react-dom": "18.2.15",
-    "react-is": "18.2.0",
-    "@ant-design/icons": "5.2.6",
-    "dayjs": "1.11.10",
-    "@types/styled-components": "5.1.30"
+    "react": "18.3.1",
+    "@types/react": "18.3.3",
+    "react-dom": "18.3.1",
+    "@types/react-dom": "18.3.0",
+    "react-is": "18.3.1",
+    "@ant-design/icons": "5.3.7",
+    "dayjs": "1.11.11",
+    "@types/styled-components": "5.1.34"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

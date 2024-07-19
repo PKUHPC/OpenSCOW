@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
+import { OperationType } from "@scow/lib-operation-log";
 import { JobServiceClient } from "@scow/protos/build/server/job";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { checkJobAccessible } from "src/server/jobAccessible";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -50,7 +51,12 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
 
   const { cluster, jobId } = req.query;
 
-  const { job, jobAccessible } = await checkJobAccessible(jobId, cluster, info);
+  const { job, jobAccessible } = await checkJobAccessible({
+    actionType: "cancelJob",
+    jobId,
+    cluster,
+    info,
+  });
 
   if (jobAccessible === "NotAllowed") {
     return { 403: null };
@@ -65,7 +71,7 @@ export default /* #__PURE__*/route(CancelJobSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.endJob,
     operationTypePayload: {
-      jobId: +jobId, accountName: job.account,
+      jobId: +jobId, accountName: job.account, clusterId: cluster,
     },
   };
 

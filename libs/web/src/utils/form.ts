@@ -11,13 +11,14 @@
  */
 
 import { FormInstance } from "antd";
+import { RuleObject } from "antd/es/form";
 
 import { getCurrentLangLibWebText } from "./libWebI18n/libI18n";
 
 
 export const confirmPasswordFormItemProps = <
   PasswordFieldName extends string,
-  T extends { [key in PasswordFieldName]: string }
+  T extends {[key in PasswordFieldName]: string },
 >(form: FormInstance<T>, passwordFieldName: PasswordFieldName, languageId: string) => {
   return {
     dependencies: [passwordFieldName],
@@ -42,3 +43,47 @@ export const getEmailRule = (languageId: string) => ({
   type: "email",
   message: getCurrentLangLibWebText(languageId, "confirmPasswordEmailError"),
 }) as const;
+
+
+// 正数校验
+export const positiveNumberRule = (_: RuleObject, value: any, languageId: string) => {
+
+  if ((value && parseFloat(value) < 0) || value === 0) {
+    const errorMessage = getCurrentLangLibWebText(languageId, "notPositiveNumberError");
+    return Promise.reject(new Error(errorMessage));
+  }
+  return Promise.resolve();
+};
+
+// 用户限额大于等于已用额度校验
+export const compareUsedChargeRule =
+  (_: RuleObject, value: any, usedCharge: number | undefined, languageId: string) => {
+
+    if (usedCharge && value < usedCharge) {
+      const errorMessage = getCurrentLangLibWebText(languageId, "compareUsedChargeError");
+      return Promise.reject(new Error(errorMessage));
+    }
+    return Promise.resolve();
+  };
+
+// check consistency of the compared value and the input value
+export const validateDataConsistency = <InputFieldName extends string>
+(inputFieldName: InputFieldName, comparedValue: string, languageId: string) => {
+  return {
+    dependencies: [inputFieldName],
+    validateFirst: true,
+    rules: [
+      {
+        required: true,
+        message: getCurrentLangLibWebText(languageId, "validateDataConsistencyMessage"),
+      },
+      {
+        validator: async (_, value: string) => {
+          if (value && comparedValue && comparedValue !== value) {
+            throw new Error(getCurrentLangLibWebText(languageId, "validateDataConsistencyError"));
+          }
+        },
+      },
+    ],
+  };
+};

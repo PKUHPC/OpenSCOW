@@ -31,8 +31,8 @@ export const JobBillingManagementTable: React.FC<Props> = ({ data, loading }) =>
   return (
     <Table dataSource={data} loading={loading} rowKey="id">
       <Table.Column title={t(p("priceId"))} dataIndex={"id"} />
-      <Table.Column<JobBillingItem> title={t(p("path"))} dataIndex={"path"} />
-      <Table.Column<JobBillingItem> title={t(p("tenant"))} dataIndex={"tenant"} />
+      <Table.Column title={t(p("path"))} dataIndex={"path"} />
+      <Table.Column title={t(p("tenant"))} dataIndex={"tenant"} />
       <Table.Column<JobBillingItem>
         title={t(pCommon("createTime"))}
         dataIndex={"createTime"}

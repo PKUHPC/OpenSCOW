@@ -22,17 +22,17 @@ export interface CreateAppRequest {
   coreCount: number;
   /** in minutes */
   maxTime: number;
-  customAttributes: { [key: string]: string };
+  customAttributes: Record<string, string>;
   proxyBasePath: string;
   nodeCount: number;
   gpuCount?: number;
   memory?: string;
 }
 
-export type CreateAppReply = {
+export interface CreateAppReply {
   sessionId: string;
   jobId: number;
-}
+};
 
 export interface GetAppSessionsRequest {
   userId: string;
@@ -62,13 +62,13 @@ export interface ConnectToAppRequest {
   sessionId: string;
 }
 
-export type ConnectToAppReply = {
+export interface ConnectToAppReply {
   appId: string;
   host: string;
   port: number;
   password: string;
-  customFormData?: {[key: string]: string};
-};
+  customFormData?: Record<string, string>;
+}
 
 export interface SubmissionInfo {
   userId: string;
@@ -83,7 +83,7 @@ export interface SubmissionInfo {
   gpuCount?: number;
   maxTime: number;
   submitTime?: string;
-  customAttributes: { [key: string]: string };
+  customAttributes: Record<string, string>;
 }
 
 export interface GetAppLastSubmissionRequest {
@@ -91,9 +91,9 @@ export interface GetAppLastSubmissionRequest {
   appId: string;
 }
 
-export type GetAppLastSubmissionReply = {
+export interface GetAppLastSubmissionReply {
   lastSubmissionInfo?: SubmissionInfo;
-}
+};
 
 export interface AppOps {
   createApp(req: CreateAppRequest, logger: Logger): Promise<CreateAppReply>;

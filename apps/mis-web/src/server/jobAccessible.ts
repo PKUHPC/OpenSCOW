@@ -20,12 +20,24 @@ import { getClient } from "src/utils/client";
 
 type JobAccessible = "OK" | "NotFound" | "NotAllowed" | "LimitNotValid";
 
-type Result = {
+interface Result {
   job: RunningJob, jobAccessible: JobAccessible
+};
+
+type ActionType = "cancelJob" | "changeJobLimit" | "queryJobLimit";
+
+interface Props {
+  actionType: ActionType
+  jobId: string
+  cluster: string
+  info: UserInfo
+  limitMinutes?: number
+  allowUser?: boolean
 }
 
-export async function checkJobAccessible(
-  jobId: string, cluster: string, info: UserInfo, limitMinutes?: number,
+export async function checkJobAccessible({
+  actionType, jobId, cluster, info, limitMinutes, allowUser = true,
+}: Props,
 ): Promise<Result> {
 
   const client = getClient(JobServiceClient);
@@ -58,7 +70,9 @@ export async function checkJobAccessible(
     return result;
   }
   // 用户发起了这个作业
-  if (job.user === info.identityId) {
+  // 如果是取消作业和查询作业时限，返回"OK"
+  // 如果是修改作业时限，需要allowUser 为true时返回"OK"
+  if (job.user === info.identityId && (actionType !== "changeJobLimit" || allowUser)) {
     result.jobAccessible = "OK";
     return result;
   }
@@ -76,7 +90,8 @@ export async function checkJobAccessible(
       tenantName: info.tenant,
     });
 
-    results.length !== 0 ? result.jobAccessible = "OK" : result.jobAccessible = "NotAllowed";
+    result.jobAccessible = results.length === 0 ? "NotAllowed" : "OK";
+
     return result;
   }
 

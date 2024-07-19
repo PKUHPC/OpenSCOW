@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { JobServiceClient } from "@scow/protos/build/server/job";
@@ -19,6 +19,7 @@ import { authenticate } from "src/auth/server";
 import { TenantRole } from "src/models/User";
 import { checkJobAccessible } from "src/server/jobAccessible";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
 export const QueryJobTimeLimitSchema = typeboxRouteSchema({
@@ -44,7 +45,7 @@ export const QueryJobTimeLimitSchema = typeboxRouteSchema({
 
 const auth = authenticate((info) => info.tenantRoles.includes(TenantRole.TENANT_ADMIN));
 
-export default typeboxRoute(QueryJobTimeLimitSchema,
+export default /* #__PURE__*/route(QueryJobTimeLimitSchema,
   async (req, res) => {
 
     const info = await auth(req, res);
@@ -54,7 +55,7 @@ export default typeboxRoute(QueryJobTimeLimitSchema,
 
     const { cluster, jobId } = req.query;
 
-    const { jobAccessible } = await checkJobAccessible(jobId, cluster, info);
+    const { jobAccessible } = await checkJobAccessible({ actionType: "queryJobLimit", jobId, cluster, info });
 
     if (jobAccessible === "NotAllowed") {
       return { 403: null };

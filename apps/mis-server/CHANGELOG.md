@@ -1,5 +1,155 @@
 # @scow/mis-server
 
+## 1.6.1
+
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能，在数据库中新增 Cluster 表单
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- d427530: 修复创建账户且判断为需要解封时未在集群中执行解封操作的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/lib-hook@1.0.12
+  - @scow/protos@1.0.12
+  - @scow/lib-scheduler-adapter@1.1.10
+
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 89191ea: 解决了 mis 系统中消费记录查询用户输入筛选条件后分页不正确的问题。
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-hook@1.0.11
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.5.1
+
+### Patch Changes
+
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-hook@1.0.10
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- 8dd8c0e: 修改 Account 实体中原 blocked 字段名为 blocked_in_cluster ，表示在集群中是否为封锁状态
+  增加字段 state ,字段值为 "NORMAL" , "FROZEN" , "BLOCKED_BY_ADMIN" 的枚举值，优化页面账户显示状态为正常、封锁、欠费
+- 6139fec: 修复导出账户和导出充值记录接口缺失 limit，offset 过滤的问题
+- 850a7ee: 修改 UserAccount 实体中原 status 字段名为 blocked_in_cluster ,表示在集群中是否为封锁状态
+  增加字段 state ,允许写入的值为 "NORMAL" , "BLOCKED_BY_ADMIN" 的枚举值
+  页面增加用户在账户下的 限额 的状态的显示
+- Updated dependencies [02d6a18]
+- Updated dependencies [63d1873]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/lib-server@1.2.0
+  - @scow/lib-hook@1.0.9
+  - @scow/protos@1.0.9
+  - @scow/lib-scheduler-adapter@1.1.7
+
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 443187e: 修复数据统计相关功能时区转换问题
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-hook@1.0.8
+  - @scow/lib-scheduler-adapter@1.1.6
+
+## 1.4.2
+
+### Patch Changes
+
+- 448f6bf: 之前升级 mikroORM 时 cascade: [Cascade.ALL]属性会在删除 UserAccount 时把 User 和 Account 也删掉
+
+## 1.4.1
+
+### Patch Changes
+
+- 186c359: 适配 mikro-orm 更新会修改 ref 字段默认为 null
+- afc3350: charge_record 表增加字段 user_id 及 metadata, 以及增加了 time,tenant,account,user_id,type 各字段的索引
+- afc3350: 增加消费记录中用户的显示、筛选及导出功能
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-hook@1.0.7
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/lib-scheduler-adapter@1.1.5
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 408816f: 增加对用户及账户关系的错误兼容，如果适配器的报错都是已存在，视为添加成功，如果都是不存在，视为移除成功
+- 9059919: 添加外部自定义认证系统
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-hook@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-hook@1.0.5
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+
 ## 1.2.3
 
 ### Patch Changes

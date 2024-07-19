@@ -26,9 +26,11 @@ export function UserStore(initialUser: User | undefined = undefined) {
   const loggedIn = !!user;
 
   const logout = useCallback(() => {
-    api.logout({}).catch((e) => { console.log("Error when logout", e); });
-    setUser(undefined);
-    destroyUserInfoCookie(null);
+    api.logout({}).catch((e) => { console.log("Error when logout", e); })
+      .finally(() => {
+        setUser(undefined);
+        destroyUserInfoCookie(null);
+      });
   }, []);
 
   return { loggedIn, user, logout };

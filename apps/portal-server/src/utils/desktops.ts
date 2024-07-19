@@ -24,14 +24,15 @@ import { Logger } from "ts-log";
 
 export function getDesktopConfig(cluster: string): LoginDeskopConfigSchema {
 
-  return { ...getPortalConfig().loginDesktop, ...getClusterConfigs()[cluster].loginDesktop };
+  return { ...getPortalConfig().loginDesktop,
+    ...getClusterConfigs(undefined, undefined, ["hpc"])[cluster].loginDesktop };
 }
 
 export function ensureEnabled(cluster: string) {
   const enabled = getDesktopConfig(cluster).enabled;
 
   if (!enabled) {
-    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };
+    throw { code: Status.UNAVAILABLE, message: "Login desktop is not enabled" } as ServiceError;
   }
 }
 
@@ -48,12 +49,12 @@ export type DesktopInfo = Desktop & { host: string };
  */
 export async function getUserDesktopsFilePath(
   ssh: NodeSSH,
-  cluser: string,
+  cluster: string,
   userId: string,
   logger: Logger,
 ): Promise<string> {
   const userHomeDir = await getUserHomedir(ssh, userId, logger);
-  const desktopDir = getDesktopConfig(cluser).desktopsDir;
+  const desktopDir = getDesktopConfig(cluster).desktopsDir;
   const userDesktopDir = join(userHomeDir, desktopDir);
   // make sure desktopsDir exists
   await executeAsUser(ssh, userId, logger, true, "mkdir", ["-p", userDesktopDir]);

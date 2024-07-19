@@ -14,26 +14,31 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { FilterQuery, QueryOrder, UniqueConstraintViolationException } from "@mikro-orm/core";
+import { FilterQuery, Loaded, QueryOrder, raw, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
+import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
+import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import {
   GetJobsResponse,
   JobBillingItem,
   JobFilter,
-  JobServiceServer, JobServiceService,
-} from "@scow/protos/build/server/job";
+  JobServiceServer, JobServiceService } from "@scow/protos/build/server/job";
 import { charge, pay } from "src/bl/charging";
-import { getActiveBillingItems } from "src/bl/PriceMap";
+import { getActivatedClusters } from "src/bl/clustersUtils";
+import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
+import { queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
+import { generateGetJobsOptions } from "src/utils/queryOptions";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
@@ -67,21 +72,30 @@ export const jobServiceServer = plugin((server) => {
 
     getJobs: async ({ request, em, logger }) => {
 
-      const { filter, page, pageSize } = ensureNotUndefined(request, ["filter"]);
+      const { filter, page, pageSize, sortBy, sortOrder } =
+      ensureNotUndefined(request, ["filter"]);
 
       const sqlFilter = filterJobs(filter);
 
       logger.info("getJobs sqlFilter %s", JSON.stringify(sqlFilter));
+      let jobs: Loaded<JobInfoEntity, never, "*", never>[], count: number;
 
-      const [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
-        ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
-        orderBy: { timeEnd: QueryOrder.DESC },
-      });
+      // 处理排序参数
+      if (sortBy !== undefined && sortOrder !== undefined) {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...generateGetJobsOptions(page, pageSize, sortBy, sortOrder),
+        });
+      } else {
+        [jobs, count] = await em.findAndCount(JobInfoEntity, sqlFilter, {
+          ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
+        });
+      }
+
 
       const { total_account_price, total_tenant_price }: { total_account_price: string, total_tenant_price: string } =
        await em.createQueryBuilder(JobInfoEntity, "j")
          .where(sqlFilter)
-         .select("sum(j.account_price) as total_account_price, sum(j.tenant_price) as total_tenant_price")
+         .select([raw("sum(j.account_price) as total_account_price"), raw("sum(j.tenant_price) as total_tenant_price")])
          .execute("get");
 
       const reply = {
@@ -128,6 +142,9 @@ export const jobServiceServer = plugin((server) => {
           return prev;
         }, {});
 
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
+
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
 
         await Promise.all(jobs.map(async (x) => {
           logger.info("Change the prices of job %s from %s(tenant), $s(account) -> %s(tenant), %s(account)",
@@ -139,13 +156,18 @@ export const jobServiceServer = plugin((server) => {
           const account = accountMap[x.account];
 
           if (!account) {
-            throw <ServiceError> {
+            throw {
               code: status.INTERNAL,
               message: `Unknown account ${x.account} of job ${x.biJobIndex}`,
-            };
+            } as ServiceError;
           }
 
           const comment = `Record id ${record.id}, job biJobIndex ${x.biJobIndex}`;
+
+          const metadataMap: ChargeRecord["metadata"] = {};
+          savedFields?.forEach((field) => {
+            metadataMap[field] = x[field];
+          });
 
           if (newTenantPrice) {
             if (x.tenantPrice.lt(newTenantPrice)) {
@@ -154,7 +176,8 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newTenantPrice.minus(x.tenantPrice),
-              }, em, logger, server.ext);
+                metadata: metadataMap,
+              }, em, currentActivatedClusters, logger, server.ext);
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
                 target: account.tenant.$,
@@ -163,7 +186,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             }
             x.tenantPrice = newTenantPrice;
           }
@@ -175,7 +198,9 @@ export const jobServiceServer = plugin((server) => {
                 comment,
                 type,
                 amount: newAccountPrice.minus(x.accountPrice),
-              }, em, logger, server.ext);
+                userId: x.user,
+                metadata: metadataMap,
+              }, em, currentActivatedClusters, logger, server.ext);
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({
                 target: account,
@@ -184,7 +209,7 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, logger, server.ext);
+              }, em, currentActivatedClusters, logger, server.ext);
             }
             x.accountPrice = newAccountPrice;
           }
@@ -201,9 +226,9 @@ export const jobServiceServer = plugin((server) => {
       const job = await em.findOne(JobInfoEntity, { biJobIndex: +biJobIndex });
 
       if (!job) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `Job ${biJobIndex} is not found`,
-        };
+        } as ServiceError;
       }
 
       return [{ info: toGrpc(job) }];
@@ -224,6 +249,9 @@ export const jobServiceServer = plugin((server) => {
         ? [accountName]
         : tenantName !== undefined
           ? tenantAccounts : [];
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -253,8 +281,11 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    changeJobTimeLimit: async ({ request, logger }) => {
+    changeJobTimeLimit: async ({ request, em, logger }) => {
       const { cluster, limitMinutes, jobId } = request;
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,
@@ -270,9 +301,12 @@ export const jobServiceServer = plugin((server) => {
       return [{}];
     },
 
-    queryJobTimeLimit: async ({ request, logger }) => {
+    queryJobTimeLimit: async ({ request, em, logger }) => {
 
       const { cluster, jobId } = request;
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       const reply = await server.ext.clusters.callOnOne(
         cluster,
@@ -291,7 +325,7 @@ export const jobServiceServer = plugin((server) => {
         tenant = await em.findOne(Tenant, { name: tenantName });
 
         if (!tenant) {
-          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+          throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
         }
       }
 
@@ -301,14 +335,14 @@ export const jobServiceServer = plugin((server) => {
           orderBy: { createTime: "ASC" },
         });
       logger.info("billingItems ：%o", billingItems);
-      const priceItemToGrpc = (item: JobPriceItem) => <JobBillingItem>({
+      const priceItemToGrpc = (item: JobPriceItem) => ({
         id: item.itemId,
         path: item.path.join("."),
         tenantName: item.tenant?.getProperty("name"),
         price: decimalToMoney(item.price),
         createTime: item.createTime.toISOString(),
         amountStrategy: item.amount,
-      });
+      } as JobBillingItem);
 
       const { defaultPrices, tenantSpecificPrices } = getActiveBillingItems(billingItems);
 
@@ -324,10 +358,10 @@ export const jobServiceServer = plugin((server) => {
         historyItems: activeOnly ? [] : billingItems.filter((x) => !activePrices.includes(x)).map(priceItemToGrpc) }];
     },
 
-    getMissingDefaultPriceItems: async () => {
+    getMissingDefaultPriceItems: async ({ em }) => {
 
       // check price map completeness
-      const priceMap = await server.ext.price.createPriceMap();
+      const priceMap = await createPriceMap(em, server.ext.clusters, logger);
       const missingItems = priceMap.getMissingDefaultPriceItems();
 
       return [{ items: missingItems }];
@@ -342,16 +376,16 @@ export const jobServiceServer = plugin((server) => {
         tenant = await em.findOne(Tenant, { name: tenantName }) ?? undefined;
 
         if (!tenant) {
-          throw <ServiceError>{ code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` };
+          throw { code: status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
         }
       }
 
       const customAmountStrategies = misConfig.customAmountStrategies?.map((i) => i.id) || [];
       if (![...(Object.values(AmountStrategy) as string[]), ...customAmountStrategies].includes(amountStrategy)) {
-        throw <ServiceError>{
+        throw {
           code: status.INVALID_ARGUMENT,
           message: `Amount strategy ${amountStrategy} is not valid.`,
-        };
+        } as ServiceError;
       }
 
       const item = new JobPriceItem({
@@ -368,7 +402,7 @@ export const jobServiceServer = plugin((server) => {
         return [{}];
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError>{ code: status.ALREADY_EXISTS, message: `${itemId} already exists.` };
+          throw { code: status.ALREADY_EXISTS, message: `${itemId} already exists.` } as ServiceError;
         } else {
           throw e;
         }
@@ -376,8 +410,105 @@ export const jobServiceServer = plugin((server) => {
 
     },
 
-    cancelJob: async ({ request, logger }) => {
+    getTopSubmitJobUsers: async ({ request, em }) => {
+      const { startTime, endTime, topRank = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+
+      void qb
+        .select([raw("j.user as userId"), raw("COUNT(*) as count")])
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy("j.user")
+        .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
+        .limit(topRank);
+
+      const results: { userId: string, count: number }[] = await queryWithCache({
+        em,
+        queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+    // 返回用户名，需要联表查询
+    getUsersWithMostJobSubmissions: async ({ request, em }) => {
+      // topNUsers不传默认为10，最大限制为10
+      const { startTime, endTime, topNUsers = 10 } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      // 控制topNUsers的数量
+      if (typeof topNUsers == "number" && (topNUsers > 10 || topNUsers < 0)) {
+        throw { code: status.INVALID_ARGUMENT, message:"topNUsers must be between 0 and 10" } as ServiceError;
+      }
+      // 直接使用Knex查询构建器
+      const knex = em.getKnex();
+
+      const results: { userName: string, userId: string, count: number }[] = await knex("job_info as j")
+        .select([
+          "u.name as userName",
+          "j.user as userId",
+          knex.raw("COUNT(*) as count"),
+        ])
+        .join("user as u", "u.user_id", "=", "j.user")
+        .where("j.time_submit", ">=", startTime)
+        .andWhere("j.time_submit", "<=", endTime)
+        .groupBy("j.user")
+        .orderBy("count", "desc")
+        .limit(Math.min(topNUsers, 10));
+
+      // 直接返回构建的结果
+      return [
+        {
+          results,
+        },
+      ];
+    },
+
+
+    getNewJobCount: async ({ request, em }) => {
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checkTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(JobInfoEntity, "j");
+      void qb
+        .select([
+          raw("DATE(CONVERT_TZ(j.time_submit, 'UTC', ?)) as date", [timeZone]),
+          raw("COUNT(*) as count")])
+        .where({ timeSubmit: { $gte: startTime } })
+        .andWhere({ timeSubmit: { $lte: endTime } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const results: { date: string, count: number }[] = await queryWithCache({
+        em,
+        queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
+        queryQb: qb,
+      });
+      return [
+        {
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
+        },
+      ];
+    },
+
+    getJobTotalCount: async ({ em }) => {
+      const count = await em.count(JobInfoEntity, {});
+      return [{ count }];
+    },
+
+    cancelJob: async ({ request, em, logger }) => {
       const { cluster, userId, jobId } = request;
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      libCheckActivatedClusters({ clusterIds: cluster, activatedClusters: currentActivatedClusters, logger });
 
       await server.ext.clusters.callOnOne(
         cluster,

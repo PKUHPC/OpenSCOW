@@ -20,11 +20,11 @@ import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ClusterAccountInfo_ImportStatus } from "src/models/User";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
-import { publicConfig } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 
 const p = prefix("pageComp.admin.ImportUsersTable.");
 const pCommon = prefix("common.");
@@ -37,14 +37,22 @@ export const ImportUsersTable: React.FC = () => {
 
   const qs = useQuerystring();
 
-  const defaultClusterStore = useStore(DefaultClusterStore);
+  const { activatedClusters, defaultCluster } = useStore(ClusterInfoStore);
+
+  if (!defaultCluster && Object.keys(activatedClusters).length === 0) {
+    return <ClusterNotAvailablePage />;
+  }
 
   const clusterParam = queryToString(qs.cluster);
-  const cluster = (publicConfig.CLUSTERS[clusterParam]
-    ? publicConfig.CLUSTERS[clusterParam]
-    : defaultClusterStore.cluster);
+  const cluster = (activatedClusters[clusterParam]
+    ? activatedClusters[clusterParam]
+    : defaultCluster);
 
-  const [form] = Form.useForm<{ whitelist: boolean}>();
+  if (!cluster) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  const [form] = Form.useForm<{ whitelist: boolean }>();
 
   const [loading, setLoading] = useState(false);
 
@@ -169,7 +177,7 @@ export const ImportUsersTable: React.FC = () => {
           rowKey="accountName"
           bordered
         >
-          <Table.Column<ClusterAccountInfo> dataIndex="accountName" title={t(pCommon("accountName"))} />
+          <Table.Column dataIndex="accountName" title={t(pCommon("accountName"))} />
           <Table.Column<ClusterAccountInfo>
             dataIndex="owner"
             title={t(pCommon("owner"))}
@@ -226,7 +234,7 @@ export const ImportUsersTable: React.FC = () => {
           <Table
             dataSource={usersList}
           >
-            <Table.Column<UserInAccount> dataIndex="userId" title={t(pCommon("userId"))} />
+            <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
           </Table>
         </Drawer>
       </Form>

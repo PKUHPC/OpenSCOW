@@ -17,7 +17,9 @@ package scow.server;
 import "common/job.proto";
 import "common/money.proto";
 import "common/ended_job.proto";
+import "common/sort_order.proto";
 import "google/protobuf/timestamp.proto";
+import "google/type/date.proto";
 
 message JobFilter {
   // if neither account_name and user_id is set, query the account from tenant
@@ -34,9 +36,28 @@ message JobFilter {
 
 message GetJobsRequest {
   JobFilter filter = 1;
+
   uint32 page = 2;
+
   // if undefined or 0, page_size is 10
   optional uint64 page_size = 3;
+
+  enum SortBy {
+    UNKNOWN = 0;
+    ID_JOB = 1;
+    JOB_NAME = 2;
+    ACCOUNT = 3;
+    USER = 4;
+    CLUSTER = 5;
+    PARTITION = 6;
+    QOS = 7;
+    TIME_SUBMIT = 8;
+    TIME_END = 9;
+    PRICE = 10;
+  }
+  optional SortBy sort_by = 4;
+
+  optional common.SortOrder sort_order = 5;
 }
 
 message GetJobsResponse {
@@ -150,6 +171,65 @@ message GetMissingDefaultPriceItemsResponse {
   repeated string items = 1;
 }
 
+message GetTopSubmitJobUsersRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+
+  //需要获取top 多少
+  //如果不传，默认取top10的用户
+  optional uint32 top_rank = 3;
+}
+
+message GetTopSubmitJobUsersResponse {
+  message SubmitJobUser {
+    string user_id = 1;
+    uint32 count = 2;
+  }
+  repeated SubmitJobUser results = 1;
+}
+
+message GetUsersWithMostJobSubmissionsRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+
+  //需要获取top 多少
+  //最大为10
+  optional uint32 top_n_users = 3;
+}
+
+message GetUsersWithMostJobSubmissionsResponse {
+  message UserInfo {
+    string user_name = 1;
+    string user_id = 2;
+    uint32 count = 3;
+  }
+  repeated UserInfo results = 1;
+}
+
+message GetNewJobCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+    optional string time_zone = 3;
+}
+
+message GetNewJobCountResponse {
+  message DailyJobCount {
+    google.type.Date date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyJobCount results = 1;
+}
+
+message GetJobTotalCountRequest {
+
+}
+
+message GetJobTotalCountResponse {
+  uint64 count = 1;
+}
+
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);
@@ -170,4 +250,12 @@ service JobService {
   rpc AddBillingItem(AddBillingItemRequest) returns (AddBillingItemResponse);
 
   rpc GetMissingDefaultPriceItems(GetMissingDefaultPriceItemsRequest) returns (GetMissingDefaultPriceItemsResponse);
+
+  rpc GetTopSubmitJobUsers(GetTopSubmitJobUsersRequest) returns (GetTopSubmitJobUsersResponse);
+
+  rpc GetUsersWithMostJobSubmissions(GetUsersWithMostJobSubmissionsRequest) returns (GetUsersWithMostJobSubmissionsResponse);
+
+  rpc GetNewJobCount(GetNewJobCountRequest) returns (GetNewJobCountResponse);
+
+  rpc GetJobTotalCount(GetJobTotalCountRequest) returns (GetJobTotalCountResponse);
 }

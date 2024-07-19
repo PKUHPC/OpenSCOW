@@ -14,18 +14,29 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { Loaded } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
-import { GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
-  SortDirection, TenantRole, UserServiceClient } from "@scow/protos/build/server/user";
+import { dayjsToDateMessage } from "@scow/lib-server/build/date";
+import { AccountUserInfo_DisplayedUserState as DisplayedUserState,
+  AccountUserInfo_UserStateInAccount as UserStateInAccount,
+  GetAllUsersRequest_UsersSortField, PlatformRole, platformRoleFromJSON,
+  SortDirection, TenantRole, UserRole as UserRoleProtoType, UserServiceClient,
+  UserStatus as UserStatusProtoType } from "@scow/protos/build/server/user";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
 import { createServer } from "src/app";
-import { misConfig } from "src/config/mis";
+import { authUrl } from "src/config";
+import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { range } from "src/utils/array";
+import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { reloadEntity } from "src/utils/orm";
 import { insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
+dayjs.extend(utc);
 
 const anotherTenant = "anotherTenant";
 
@@ -69,7 +80,7 @@ it("creates user", async () => {
 
   expect(createUser).toHaveBeenNthCalledWith(
     1,
-    misConfig.authUrl,
+    authUrl,
     {
       identityId: userId,
       id: user.id,
@@ -124,6 +135,58 @@ it("cannot remove owner from account", async () => {
   expect(reply.code).toBe(Status.OUT_OF_RANGE);
 });
 
+it("cannot remove a user from account,when user has jobs running or pending", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const reply = await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+    userId: data.userB.userId,
+  }).catch((e) => e);
+
+  expect(reply.code).toBe(Status.FAILED_PRECONDITION);
+});
+
+it("when removing a user from an account, the account and user cannot be deleted", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+
+  const account = new Account({
+    accountName: "account_remove",
+    comment: "",
+    blockedInCluster: false,
+    tenant:data.tenant,
+  }) as Loaded<Account, "tenant">;
+
+  const uaA = new UserAccount({
+    account,
+    user: data.userA,
+    role: UserRole.OWNER,
+    blockedInCluster: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  const uaB = new UserAccount({
+    account,
+    user: data.userB,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.UNBLOCKED,
+  }) as Loaded<UserAccount, "account" | "user">;
+
+  await em.persistAndFlush([account, uaA, uaB]);
+
+  await asyncClientCall(client, "removeUserFromAccount", {
+    tenantName: data.tenant.name,
+    accountName: account.accountName,
+    userId: data.userB.userId,
+  });
+
+  const accountA = await em.findOneOrFail(Account, { id:account.id });
+  const userB = await em.findOneOrFail(User, { id:data.userB.id });
+
+  expect(accountA).toBeTruthy();
+  expect(userB).toBeTruthy();
+});
+
 it("deletes user", async () => {
   const em = server.ext.orm.em.fork();
   const data = await insertInitialData(em);
@@ -133,7 +196,10 @@ it("deletes user", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);
@@ -197,7 +263,7 @@ it("get all users", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -223,7 +289,10 @@ it("get all users with idOrName", async () => {
     tenant: data.tenant,
   });
   data.accountA.users.add(new UserAccount({
-    user, account: data.accountA, role: UserRole.USER, status: UserStatus.BLOCKED,
+    user,
+    account: data.accountA,
+    role: UserRole.USER,
+    blockedInCluster: UserStatus.BLOCKED,
   }));
 
   await em.persistAndFlush([user]);
@@ -274,7 +343,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -308,7 +377,7 @@ it("get all users with idOrName", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -362,7 +431,7 @@ it("get all users with sorter", async () => {
     {
       userId: data.userB.userId,
       name: data.userB.name,
-      availableAccounts: [data.accountA.accountName, data.accountB.accountName],
+      availableAccounts: expect.toIncludeSameMembers([data.accountA.accountName, data.accountB.accountName]),
       tenantName: data.userB.tenant.getProperty("name"),
       createTime: data.userB.createTime.toISOString(),
       platformRoles: data.userB.platformRoles,
@@ -430,7 +499,7 @@ it("manage platform role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(true);
+  expect(setUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(true);
 
   await asyncClientCall(client, "unsetPlatformRole", {
     userId: data.userA.userId,
@@ -438,7 +507,7 @@ it("manage platform role", async () => {
   });
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(unsetUser?.platformRoles.includes(pRole["PLATFORM_ADMIN"])).toBe(false);
+  expect(unsetUser?.platformRoles.includes(pRole.PLATFORM_ADMIN)).toBe(false);
 });
 
 it("manage tenant role", async () => {
@@ -451,7 +520,7 @@ it("manage tenant role", async () => {
   });
 
   const setUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(setUser?.tenantRoles.includes(tRole["TENANT_FINANCE"])).toBe(true);
+  expect(setUser?.tenantRoles.includes(tRole.TENANT_FINANCE)).toBe(true);
 
   await asyncClientCall(client, "unsetTenantRole", {
     userId: data.userA.userId,
@@ -459,7 +528,7 @@ it("manage tenant role", async () => {
   });
 
   const unsetUser = await em.findOne(User, { userId: data.userA.userId });
-  expect(unsetUser?.tenantRoles.includes(tRole["TENANT_ADMIN"])).toBe(false);
+  expect(unsetUser?.tenantRoles.includes(tRole.TENANT_ADMIN)).toBe(false);
 });
 
 it("get platform role users Count", async () => {
@@ -512,4 +581,98 @@ it("change an inexistent user email", async () => {
   }).catch((e) => e);
 
   expect(reply.code).toBe(Status.NOT_FOUND);
+});
+
+it("get new user count in UTC+8 timezone", async () => {
+
+  const em = server.ext.orm.em.fork();
+  const today = dayjs();
+  const yesterday = today.clone().subtract(1, "day");
+  const twoDaysBefore = today.clone().subtract(2, "day");
+  const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
+
+  const todayNewUsers = range(0, 30).map((i) => new User({
+    name: `user0${i}`,
+    userId: `user0${i}`,
+    email: `user0${i}@gmail.com`,
+    tenant,
+    createTime: today.toDate(),
+  }));
+
+  const yesterdayNewUsers = range(0, 20).map((i) => new User({
+    name: `user1${i}`,
+    userId: `user1${i}`,
+    email: `user1${i}@gmail.com`,
+    tenant,
+    createTime: yesterday.toDate(),
+  }));
+
+  const twoDaysBeforeNewUsers = range(0, 10).map((i) => new User({
+    name: `user2${i}`,
+    userId: `user2${i}`,
+    email: `user2${i}@gmail.com`,
+    tenant,
+    createTime: twoDaysBefore.toDate(),
+  }));
+
+  await em.persistAndFlush([
+    ...todayNewUsers,
+    ...yesterdayNewUsers,
+    ...twoDaysBeforeNewUsers,
+  ]);
+
+  const info = await asyncClientCall(client, "getNewUserCount", {
+    startTime: twoDaysBefore.startOf("day").toISOString(),
+    endTime: today.endOf("day").toISOString(),
+    timeZone: "Asia/Shanghai",
+  });
+
+  const todyInUtcPlus8 = today.utcOffset(8);
+
+  const yesterdayInUtcPlus8 = yesterday.utcOffset(8);
+
+  const twoDaysBeforeInUtcPlus8 = twoDaysBefore.utcOffset(8);
+
+  expect(info.results).toMatchObject([
+    { date: dayjsToDateMessage(todyInUtcPlus8), count: 30 },
+    { date:dayjsToDateMessage(yesterdayInUtcPlus8), count: 20 },
+    { date:dayjsToDateMessage(twoDaysBeforeInUtcPlus8), count: 10 },
+  ]);
+
+});
+
+it("get account users", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+
+  const reply = await asyncClientCall(client, "getAccountUsers", {
+    tenantName: data.tenant.name,
+    accountName: data.accountA.accountName,
+  }).catch((e) => e);
+
+  expect(reply.results).toIncludeSameMembers([
+    {
+      userId: "a",
+      name: "AName",
+      email: "a@a.com",
+      role: UserRoleProtoType.OWNER,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+    {
+      userId: "b",
+      name: "BName",
+      email: "b@b.com",
+      role: UserRoleProtoType.ADMIN,
+      status: UserStatusProtoType.UNBLOCKED,
+      jobChargeLimit: undefined,
+      usedJobChargeLimit: undefined,
+      storageQuotas: {},
+      userStateInAccount: UserStateInAccount.NORMAL,
+      displayedUserState: DisplayedUserState.DISPLAYED_NORMAL,
+    },
+  ]);
 });

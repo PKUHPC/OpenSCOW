@@ -11,6 +11,8 @@
  */
 
 import { debounce } from "@scow/lib-web/build/utils/debounce";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import { join } from "path";
 import { useEffect, useRef } from "react";
 import { urlToDownload } from "src/pageComponents/filemanager/api";
@@ -18,8 +20,6 @@ import { ShellInputData, ShellOutputData } from "src/server/setup/shell";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { styled } from "styled-components";
-import { Terminal } from "xterm";
-import { FitAddon } from "xterm-addon-fit";
 
 const TerminalContainer = styled.div`
   background-color: black;
@@ -39,6 +39,9 @@ const OPEN_FILE = "This command is only valid for SCOW web shells";
 const OPEN_EXPLORER_PREFIX = "SCOW is opening the file system";
 const DOWNLOAD_FILE_PREFIX = "SCOW is downloading file ";
 const DOWNLOAD_FILE_SUFFIX = " in directory ";
+const EDIT_FILE_PREFIX = "SCOW is redirecting to the editor for the file ";
+const EDIT_FILE_SUFFIX = " in directory ";
+const UPLOAD_FILE_PREFIX = "SCOW is uploading files in directory ";
 
 export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
 
@@ -95,33 +98,43 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
         });
       };
 
+
+
       socket.onmessage = (e) => {
         const message = JSON.parse(e.data) as ShellOutputData;
         switch (message.$case) {
-        case "data":
-          const data = Buffer.from(message.data.data);
+          case "data": {
+            const data = Buffer.from(message.data.data);
 
-          const dataString = data.toString();
-          if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
-            const result = dataString.split("\r\n")[0];
-            const pathStartIndex = result.search("/");
-            const path = result.substring(pathStartIndex);
+            const dataString = data.toString();
+            if (dataString.includes(OPEN_FILE) && !dataString.includes("pwd")) {
+              const result = dataString.split("\r\n")[0];
+              const pathStartIndex = result.search("/");
+              const path = result.substring(pathStartIndex);
 
-            if (result.includes(OPEN_EXPLORER_PREFIX)) {
-              window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
-            } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
-              const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
-              const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
-              const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
-              window.location.href = urlToDownload(cluster, join(path, file), true);
+              if (result.includes(OPEN_EXPLORER_PREFIX)) {
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path));
+              } else if (result.includes(DOWNLOAD_FILE_PREFIX)) {
+                const fileStartIndex = result.search(DOWNLOAD_FILE_PREFIX);
+                const fileEndIndex = result.search(DOWNLOAD_FILE_SUFFIX);
+                const file = result.substring(fileStartIndex + DOWNLOAD_FILE_PREFIX.length, fileEndIndex);
+                window.location.href = urlToDownload(cluster, join(path, file), true);
+              } else if (result.includes(EDIT_FILE_PREFIX)) {
+                const fileStartIndex = result.search(EDIT_FILE_PREFIX);
+                const fileEndIndex = result.search(EDIT_FILE_SUFFIX);
+                const file = result.substring(fileStartIndex + EDIT_FILE_PREFIX.length, fileEndIndex);
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?edit=" + file));
+              } else if (result.includes(UPLOAD_FILE_PREFIX)) {
+                window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?uploadModalOpen=true"));
+              }
             }
-          }
-          term.write(data);
+            term.write(data);
 
-          break;
-        case "exit":
-          term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
-          break;
+            break;
+          }
+          case "exit":
+            term.write(`Process exited with code ${message.exit.code} and signal ${message.exit.signal}.`);
+            break;
         }
       };
 

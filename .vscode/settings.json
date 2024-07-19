@@ -5,5 +5,18 @@
       "--proto_path=./protos"
     ],
   },
-  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf"
+  "buf.binaryPath": "node_modules/@bufbuild/buf/bin/buf",
+  "cSpell.words": [
+    "trpc"
+  ],
+  "jest.runMode": "on-demand",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
 }

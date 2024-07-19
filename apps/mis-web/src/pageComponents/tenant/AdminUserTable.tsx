@@ -20,10 +20,14 @@ import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { FullUserInfo, TenantRole } from "src/models/User";
-import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
+import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
+import { getRuntimeI18nConfigText } from "src/utils/config";
 
 interface Props {
   data: Static<typeof GetTenantUsersSchema["responses"]["200"]> | undefined;
@@ -53,6 +57,7 @@ export const AdminUserTable: React.FC<Props> = ({
 }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
   const [form] = Form.useForm<FilterForm>();
@@ -68,8 +73,8 @@ export const AdminUserTable: React.FC<Props> = ({
 
   const filteredData = useMemo(() => data ? data.results.filter((x) => (
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
-      && (rangeSearchRole === "ALL_USERS" || x.tenantRoles.includes(
-        rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
+    && (rangeSearchRole === "ALL_USERS" || x.tenantRoles.includes(
+      rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
   )) : undefined, [data, query, rangeSearchRole]);
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
@@ -80,15 +85,15 @@ export const AdminUserTable: React.FC<Props> = ({
   const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
-    case "TENANT_ADMIN":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
-    case "TENANT_FINANCE":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
-    case "ALL_USERS":
-    default:
-      return searchData ? searchData.length : 0;
+      case "TENANT_ADMIN":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      case "TENANT_FINANCE":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      case "ALL_USERS":
+      default:
+        return searchData ? searchData.length : 0;
     }
   }, [searchData]);
 
@@ -102,6 +107,45 @@ export const AdminUserTable: React.FC<Props> = ({
     setCurrentPageNum(1);
     setCurrentSortInfo({ field: null, order: null });
   };
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+
+
+    const total = filteredData?.length ?? 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportUser",
+        columns,
+        count: total,
+        query: {
+          idOrName: query.idOrName,
+          selfTenant: true,
+          tenantRole: rangeSearchRole === "TENANT_ADMIN"
+            ? TenantRole.TENANT_ADMIN
+            : rangeSearchRole === "TENANT_FINANCE"
+              ? TenantRole.TENANT_FINANCE : undefined,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label: t(pCommon("userId")), value: "userId" },
+      { label: t(p("name")), value: "name" },
+      { label: t(pCommon("email")), value: "email" },
+      { label: t(p("tenantRole")), value: "tenantRoles" },
+      { label: t(pCommon("createTime")), value: "createTime" },
+      { label: t(p("affiliatedAccountName")), value: "availableAccounts" },
+    ];
+  }, [t]);
 
   return (
     <div>
@@ -122,6 +166,14 @@ export const AdminUserTable: React.FC<Props> = ({
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
@@ -201,12 +253,19 @@ export const AdminUserTable: React.FC<Props> = ({
                 userId={r.id}
                 name={r.name}
                 onComplete={async (newPassword) => {
-                  await api.changePasswordAsTenantAdmin({ body:{
-                    identityId: r.id,
-                    newPassword: newPassword,
-                  } })
+                  await api.changePasswordAsTenantAdmin({
+                    body: {
+                      identityId: r.id,
+                      newPassword: newPassword,
+                    },
+                  })
                     .httpError(404, () => { message.error(t(p("notExist"))); })
                     .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .httpError(400, (e) => {
+                      if (e.code === "PASSWORD_NOT_VALID") {
+                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                      };
+                    })
                     .then(() => { message.success(t(p("changeSuccess"))); })
                     .catch(() => { message.error(t(p("changeFail"))); });
                 }}

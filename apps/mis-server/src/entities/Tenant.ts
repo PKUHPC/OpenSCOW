@@ -19,16 +19,19 @@ import { CURRENT_TIMESTAMP, DATETIME_TYPE } from "src/utils/orm";
 export class Tenant {
 
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property({ unique: true })
-    name: string;
+  name: string;
 
   @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
-    balance: Decimal = new Decimal(0);
+  balance: Decimal = new Decimal(0);
+
+  @Property({ type: DecimalType, defaultRaw: DECIMAL_DEFAULT_RAW })
+  defaultAccountBlockThreshold: Decimal = new Decimal(0);
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime: Date;
+  createTime: Date;
 
   constructor(init: {
     name: string,

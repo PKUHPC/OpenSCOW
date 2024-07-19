@@ -29,34 +29,34 @@ export enum TenantRole {
 @Entity()
 export class User {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true })
-    tenant: Ref<Tenant>;
+  @ManyToOne(() => Tenant, { ref: true })
+  tenant: Ref<Tenant>;
 
   @Property({ unique: true })
-    userId: string;
+  userId: string;
 
   @OneToMany(() => StorageQuota, (u) => u.user)
-    storageQuotas = new Collection<StorageQuota>(this);
+  storageQuotas = new Collection<StorageQuota>(this);
 
   @Property()
-    name: string;
+  name: string;
 
   @Property()
-    email: string;
+  email: string;
 
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
-    createTime: Date;
+  createTime: Date;
 
   @OneToMany(() => UserAccount, (u) => u.user)
-    accounts = new Collection<UserAccount>(this);
+  accounts = new Collection<UserAccount>(this);
 
   @Enum({ items: () => TenantRole, array: true, comment: Object.values(TenantRole).join(", ") })
-    tenantRoles: TenantRole[];
+  tenantRoles: TenantRole[];
 
   @Enum({ items: () => PlatformRole, array: true, comment: Object.values(PlatformRole).join(", ") })
-    platformRoles: PlatformRole[];
+  platformRoles: PlatformRole[];
 
   constructor(init: {
     userId: string;

@@ -1,5 +1,67 @@
 # @scow/config
 
+## 1.5.0
+
+### Minor Changes
+
+- 806f778: 增加 scowd 配置
+
+### Patch Changes
+
+- b8d1270: 增加集群停用功能通用类型
+
+## 1.4.5
+
+### Patch Changes
+
+- d080a8b: 修复在 common.yml 中自定义更改用户密码正则后在管理系统不生效的问题，
+  增加平台管理和租户管理下修改用户密码的后端校验
+
+## 1.4.4
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- e312efb: AI 模块支持创建 vnc 类型应用
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- 640a599: 支持填写多个 hook 地址
+
+## 1.4.3
+
+### Patch Changes
+
+- 02d6a18: 集群配置新增 hpc 和 ai enabled 属性 区分 Ai 集群和 HPC 集群或者是融合集群
+- d822db7: 集群配置增加 k8s 选项指明容器运行时
+
+## 1.4.2
+
+### Patch Changes
+
+- 3242957: 在 aiConfig 下的 harborConfig 配置中增加 protocol 配置，默认值为 "http"
+
+## 1.4.1
+
+### Patch Changes
+
+- afc3350: 在 mis.yaml 中增加 jobChargeMetadata 可选配置可记录需要存储的扣费作业的字段信息
+- 8d417ba: mis 增加 allowUserChangeJobTimeLimit 参数控制普通用户是否可以修改作业时限
+- 68447f7: mis 配置文件增加 addUserToAccount 相关参数
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
+## 1.4.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+- abb7e84: 管理系统新增集群监控功能
+
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
 ## 1.2.1
 
 ### Patch Changes

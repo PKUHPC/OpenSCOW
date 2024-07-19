@@ -11,16 +11,18 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { QueryOrder, raw } from "@mikro-orm/core";
 import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
+import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
   AccountStatus,
-  GetAccountUsersResponse,
+  accountUserInfo_UserStateInAccountFromJSON, GetAccountUsersResponse,
   platformRoleFromJSON,
   platformRoleToJSON,
   QueryIsUserInAccountResponse,
@@ -30,11 +32,16 @@ import {
   UserServiceService,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
-import { misConfig } from "src/config/mis";
+import { getActivatedClusters } from "src/bl/clustersUtils";
+import { authUrl } from "src/config";
+import { configClusters } from "src/config/clusters";
 import { Account } from "src/entities/Account";
+import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
-import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
+import { UserAccount, UserRole, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
+import { getUserStateInfo } from "src/utils/accountUserState";
+import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { generateAllUsersQueryOptions } from "src/utils/queryOptions";
 
@@ -50,19 +57,27 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["user", "user.storageQuotas"]});
 
       return [GetAccountUsersResponse.fromPartial({
-        results: accountUsers.map((x) => ({
-          userId: x.user.$.userId,
-          name: x.user.$.name,
-          email: x.user.$.email,
-          role: PFUserRole[x.role],
-          status: PFUserStatus[x.status],
-          jobChargeLimit: x.jobChargeLimit ? decimalToMoney(x.jobChargeLimit) : undefined,
-          usedJobChargeLimit: x.usedJobCharge ? decimalToMoney(x.usedJobCharge) : undefined,
-          storageQuotas: x.user.$.storageQuotas.getItems().reduce((prev, curr) => {
-            prev[curr.cluster] = curr.storageQuota;
-            return prev;
-          }, {}),
-        })),
+        results: accountUsers.map((x) => {
+
+          const displayedState = x.state ?
+            getUserStateInfo(x.state, x.jobChargeLimit, x.usedJobCharge).displayedState : undefined;
+          return {
+            userId: x.user.$.userId,
+            name: x.user.$.name,
+            email: x.user.$.email,
+            role: PFUserRole[x.role],
+            status: PFUserStatus[x.blockedInCluster],
+            jobChargeLimit: x.jobChargeLimit ? decimalToMoney(x.jobChargeLimit) : undefined,
+            usedJobChargeLimit: x.usedJobCharge ? decimalToMoney(x.usedJobCharge) : undefined,
+            storageQuotas: x.user.$.storageQuotas.getItems().reduce((prev, curr) => {
+              prev[curr.cluster] = curr.storageQuota;
+              return prev;
+            }, {}),
+            userStateInAccount: accountUserInfo_UserStateInAccountFromJSON(x.state),
+            displayedUserState: displayedState,
+          };
+        },
+        ),
       })];
     },
 
@@ -87,20 +102,28 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId}, tenant ${tenantName} is not found`,
-        };
+        } as ServiceError;
+      }
+
+      const tenant = await em.findOne(Tenant, { name: tenantName });
+      if (!tenant) {
+        throw { code:Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
       }
 
       return [{
         accountStatuses: user.accounts.getItems().reduce((prev, curr) => {
           const account = curr.account.getEntity();
           prev[account.accountName] = {
-            userStatus: PFUserStatus[curr.status],
-            accountBlocked: Boolean(account.blocked),
+            accountBlocked: Boolean(account.blockedInCluster),
+            userStatus: PFUserStatus[curr.blockedInCluster],
             jobChargeLimit: curr.jobChargeLimit ? decimalToMoney(curr.jobChargeLimit) : undefined,
             usedJobCharge: curr.usedJobCharge ? decimalToMoney(curr.usedJobCharge) : undefined,
             balance: decimalToMoney(curr.account.getEntity().balance),
+            isInWhitelist: Boolean(account.whitelist),
+            blockThresholdAmount:account.blockThresholdAmount ?
+              decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
           } as AccountStatus;
           return prev;
         }, {}),
@@ -111,7 +134,7 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    queryUsedStorageQuota: async ({}) => {
+    queryUsedStorageQuota: async () => {
       // const { cluster, userId } = request;
 
       // const reply = await server.ext.clusters.callOnOne(
@@ -145,38 +168,45 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND,
           message: `User ${userId} or tenant ${tenantName} is not found.`,
           details:"USER_OR_TENANT_NOT_FOUND",
-        };
+        } as ServiceError;
       }
 
       if (!account) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND,
           message: `Account ${accountName} or tenant ${tenantName} is not found.`,
           details:"ACCOUNT_OR_TENANT_NOT_FOUND",
-        };
+        } as ServiceError;
       }
 
       if (account.users.getItems().some((x) => x.user.getEntity().userId === userId)) {
-        throw <ServiceError>{
+        throw {
           code: Status.ALREADY_EXISTS, message: `User ${userId} already in the account ${accountName}.`,
-        };
+        } as ServiceError;
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "addUserToAccount", { userId, accountName });
       }).catch(async (e) => {
-        throw e;
+        // 如果每个适配器返回的Error都是ALREADY_EXISTS，说明所有集群均已添加成功，可以在scow数据库及认证系统中加入该条关系，
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 6 ALREADY_EXISTS")
+           !== Object.keys(currentActivatedClusters).length) {
+          throw e;
+        }
       });
 
       const newUserAccount = new UserAccount({
         account,
         user,
         role: UserRole.USER,
-        status: UserStatus.UNBLOCKED,
+        blockedInCluster: UserStatus.UNBLOCKED,
       });
 
       account.users.add(newUserAccount);
@@ -184,7 +214,7 @@ export const userServiceServer = plugin((server) => {
       await em.persistAndFlush([account, user, newUserAccount]);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await addUserToAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await addUserToAccount(authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -199,26 +229,29 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["user", "account"]});
 
       if (!userAccount) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message:`User ${userId} or account ${accountName}  is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (userAccount.role === UserRole.OWNER) {
-        throw <ServiceError>{
+        throw {
           code: Status.OUT_OF_RANGE,
           message: `User ${userId} is the owner of the account ${accountName}。`,
-        };
+        } as ServiceError;
       }
 
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
       // 如果要从账户中移出用户，先封锁，先将用户封锁，保证用户无法提交作业
-      if (userAccount.status === UserStatus.UNBLOCKED) {
-        await blockUserInAccount(userAccount, server.ext, logger);
+      if (userAccount.blockedInCluster === UserStatus.UNBLOCKED) {
+        userAccount.state = UserStateInAccount.BLOCKED_BY_ADMIN;
+        await blockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
         await em.flush();
       }
 
       // 查询用户是否有RUNNING、PENDING的作业，如果有，抛出异常
       const jobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
         logger,
         async (client) => {
           const fields = ["job_id", "user", "state", "account"];
@@ -231,21 +264,29 @@ export const userServiceServer = plugin((server) => {
       );
 
       if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
-        throw <ServiceError>{
+        throw {
           code: Status.FAILED_PRECONDITION,
           message: `User ${userId} has jobs running or pending and cannot remove.
           Please wait for the job to end or end the job manually before moving out.`,
-        };
+        } as ServiceError;
       }
 
-      await server.ext.clusters.callOnAll(logger, async (client) => {
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.user, "removeUserFromAccount", { userId, accountName });
+      }).catch(async (e) => {
+        // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+           !== Object.keys(currentActivatedClusters).length) {
+          throw e;
+        }
       });
 
       await em.removeAndFlush(userAccount);
 
       if (server.ext.capabilities.accountUserRelation) {
-        await removeUserFromAccount(misConfig.authUrl, { accountName, userId }, logger);
+        await removeUserFromAccount(authUrl, { accountName, userId }, logger);
       }
 
       return [{}];
@@ -261,20 +302,22 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["user", "account"]});
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} or account ${accountName} is not found.`,
-        };
+        } as ServiceError;
       }
 
-      if (user.status === UserStatus.BLOCKED) {
-        throw <ServiceError> {
+      // 如果已经在集群下为封锁，且状态值为被账户管理员或拥有者手动封锁
+      if (user.blockedInCluster === UserStatus.BLOCKED && user.state === UserStateInAccount.BLOCKED_BY_ADMIN) {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId}  is already blocked.`,
-        };
+        } as ServiceError;
       }
 
-      await blockUserInAccount(user, server.ext, logger);
-
-      user.status = UserStatus.BLOCKED;
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      await blockUserInAccount(user, currentActivatedClusters, server.ext, logger);
+      user.state = UserStateInAccount.BLOCKED_BY_ADMIN;
+      user.blockedInCluster = UserStatus.BLOCKED;
 
       await em.flush();
 
@@ -290,20 +333,30 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["user", "account"]});
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message:`User ${userId} or account ${accountName}  is not found.`,
-        };
+        } as ServiceError;
       }
 
-      if (user.status === UserStatus.UNBLOCKED) {
-        throw <ServiceError> {
+      if (user.blockedInCluster === UserStatus.UNBLOCKED) {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId}  is already unblocked.`,
-        };
+        } as ServiceError;
       }
 
-      await unblockUserInAccount(user, server.ext, logger);
+      // 判断如果限额和已用额度存在的情况是否可以解封
+      const stillBlockUserInCluster = getUserStateInfo(
+        UserStateInAccount.NORMAL,
+        user.jobChargeLimit,
+        user.usedJobCharge,
+      ).shouldBlockInCluster;
 
-      user.status = UserStatus.UNBLOCKED;
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      if (!stillBlockUserInCluster) {
+        await unblockUserInAccount(user, currentActivatedClusters, server.ext, logger);
+        user.blockedInCluster = UserStatus.UNBLOCKED;
+      }
+      user.state = UserStateInAccount.NORMAL;
 
       await em.flush();
 
@@ -319,15 +372,15 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message:`User ${userId} or account ${accountName}  is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (user.role === UserRole.ADMIN) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already admin.`,
-        };
+        } as ServiceError;
       }
 
       user.role = UserRole.ADMIN;
@@ -345,15 +398,15 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message:`User ${userId} or account ${accountName}  is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (user.role === UserRole.USER) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not admin.`,
-        };
+        } as ServiceError;
       }
 
       user.role = UserRole.USER;
@@ -368,26 +421,29 @@ export const userServiceServer = plugin((server) => {
      */
     createUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId, password } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+      const user =
+      await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
         .catch((e) => {
           if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
+            throw {
               code: Status.ALREADY_EXISTS,
               message: `User with userId ${identityId} already exists in scow.`,
               details: "EXISTS_IN_SCOW",
-            };
+            } as ServiceError;
           }
-          throw <ServiceError> {
+          throw {
             code: Status.INTERNAL,
-            message: `Error creating user with userId ${identityId} in database.` };
+            message: `Error creating user with userId ${identityId} in database.` } as ServiceError;
         });
       // call auth
-      const createdInAuth = await createUser(misConfig.authUrl,
+      const createdInAuth = await createUser(authUrl,
         { identityId: user.userId, id: user.id, mail: user.email, name: user.name, password },
         server.logger)
         .then(async () => {
           // insert public key
-          await insertKeyToNewUser(identityId, password, server.logger)
+          // 插入公钥失败也认为是创建用户成功
+          // 在所有集群下执行
+          await insertKeyToNewUser(identityId, password, server.logger, configClusters)
             .catch(() => {});
           return true;
         })
@@ -400,9 +456,9 @@ export const userServiceServer = plugin((server) => {
             // 回滚数据库
             await em.removeAndFlush(user);
             server.logger.error("Error creating user in auth.", e);
-            throw <ServiceError> {
+            throw {
               code: Status.INTERNAL,
-              message: `Error creating user with userId ${identityId} in auth.` };
+              message: `Error creating user with userId ${identityId} in auth.` } as ServiceError;
           }
         });
 
@@ -420,19 +476,20 @@ export const userServiceServer = plugin((server) => {
      */
     addUser: async ({ request, em, logger }) => {
       const { name, tenantName, email, identityId } = request;
-      const user = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
-        .catch((e) => {
-          if (e.code === Status.ALREADY_EXISTS) {
-            throw <ServiceError> {
-              code: Status.ALREADY_EXISTS,
-              message: `User with userId ${identityId} already exists in scow.`,
-              details: "EXISTS_IN_SCOW",
-            };
-          }
-          throw <ServiceError> {
-            code: Status.INTERNAL,
-            message: `Error creating user with userId ${identityId} in database.` };
-        });
+      const user
+       = await createUserInDatabase(identityId, name, email, tenantName, server.logger, em)
+         .catch((e) => {
+           if (e.code === Status.ALREADY_EXISTS) {
+             throw {
+               code: Status.ALREADY_EXISTS,
+               message: `User with userId ${identityId} already exists in scow.`,
+               details: "EXISTS_IN_SCOW",
+             } as ServiceError;
+           }
+           throw {
+             code: Status.INTERNAL,
+             message: `Error creating user with userId ${identityId} in database.` } as ServiceError;
+         });
 
       await callHook("userAdded", { tenantName, userId: user.userId }, logger);
 
@@ -446,7 +503,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId, tenant: { name: tenantName } });
       if (!user) {
-        throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
+        throw { code: Status.NOT_FOUND, message:`User ${userId} is not found.` } as ServiceError;
       }
 
       // find if the user is an owner of any account
@@ -456,10 +513,10 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (accountUser) {
-        throw <ServiceError>{
+        throw {
           code: Status.FAILED_PRECONDITION,
           details: `User ${userId} is an owner of an account.`,
-        };
+        } as ServiceError;
       }
 
       await em.removeAndFlush(user);
@@ -471,10 +528,10 @@ export const userServiceServer = plugin((server) => {
 
       // query auth
       if (server.ext.capabilities.getUser) {
-        const authUser = await getUser(misConfig.authUrl, { identityId: userId }, server.logger);
+        const authUser = await getUser(authUrl, { identityId: userId }, server.logger);
 
         if (!authUser) {
-          throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found from auth` };
+          throw { code: Status.NOT_FOUND, message:`User ${userId} is not found from auth` } as ServiceError;
         }
 
         if (authUser.name !== undefined) {
@@ -487,7 +544,7 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId }, { fields: ["name"]});
 
       if (!user) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message:`User ${userId} is not found in mis db` };
+        throw { code: Status.NOT_FOUND, message:`User ${userId} is not found in mis db` } as ServiceError;
       }
 
       return [{ match: user.name === name }];
@@ -524,7 +581,7 @@ export const userServiceServer = plugin((server) => {
       }, { populate: ["accounts", "accounts.account", "tenant", "email"]});
 
       if (!user) {
-        throw <ServiceError>{ code: Status.NOT_FOUND, message:`User ${userId} is not found.` };
+        throw { code: Status.NOT_FOUND, message:`User ${userId} is not found.` } as ServiceError;
       }
 
       return [{
@@ -571,7 +628,7 @@ export const userServiceServer = plugin((server) => {
           name: x.name,
           email: x.email,
           availableAccounts: x.accounts.getItems()
-            .filter((ua) => ua.status === UserStatus.UNBLOCKED)
+            .filter((ua) => ua.blockedInCluster === UserStatus.UNBLOCKED)
             .map((ua) => {
               return ua.account.getProperty("accountName");
             }),
@@ -627,15 +684,15 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: userId });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (user.platformRoles.includes(dbRoleType)) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
-        };
+        } as ServiceError;
       }
 
       user.platformRoles.push(dbRoleType);
@@ -651,15 +708,15 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: userId });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (!user.platformRoles.includes(dbRoleType)) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
-        };
+        } as ServiceError;
       }
 
       user.platformRoles = user.platformRoles.filter((item) =>
@@ -676,15 +733,15 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: userId });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (user.tenantRoles.includes(dbRoleType)) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already this role.`,
-        };
+        } as ServiceError;
       }
 
       user.tenantRoles.push(dbRoleType);
@@ -700,15 +757,15 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: userId });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-        };
+        } as ServiceError;
       }
 
       if (!user.tenantRoles.includes(dbRoleType)) {
-        throw <ServiceError> {
+        throw {
           code: Status.FAILED_PRECONDITION, message: `User ${userId} is already not this role.`,
-        };
+        } as ServiceError;
       }
 
       user.tenantRoles = user.tenantRoles.filter((item) =>
@@ -723,30 +780,113 @@ export const userServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: userId });
 
       if (!user) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-        };
+        } as ServiceError;
       }
 
       user.email = newEmail;
       await em.flush();
 
-      const ldapCapabilities = await getCapabilities(misConfig.authUrl);
+      const ldapCapabilities = await getCapabilities(authUrl);
 
       // 看LDAP是否有修改邮箱的权限
       if (ldapCapabilities.changeEmail) {
-        await libChangeEmail(misConfig.authUrl, {
+        await libChangeEmail(authUrl, {
           identityId: userId,
           newEmail,
         }, logger)
-          .catch(async () => {
-            throw <ServiceError> {
-              code: Status.UNKNOWN, message: "LDAP failed to change email",
-            };
+          .catch(async (e) => {
+            switch (e.status) {
+
+              case "NOT_FOUND":
+                throw {
+                  code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+                } as ServiceError;
+
+              case "NOT_SUPPORTED":
+                throw {
+                  code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+                } as ServiceError;
+
+              default:
+                throw {
+                  code: Status.UNKNOWN, message: "LDAP failed to change email",
+                } as ServiceError;
+            }
           });
       }
 
       return [{}];
     },
+
+    getNewUserCount: async ({ request, em, logger }) => {
+      const { startTime, endTime, timeZone = "UTC" } = ensureNotUndefined(request, ["startTime", "endTime"]);
+
+      checkTimeZone(timeZone);
+
+      const qb = em.createQueryBuilder(User, "u");
+      void qb
+        .select([raw("DATE(CONVERT_TZ(u.create_time, 'UTC', ?)) as date", [timeZone]), raw("count(*) as count")])
+        .where({ createTime: { $gte: startTime } })
+        .andWhere({ createTime: { $lte: endTime } })
+        .groupBy(raw("date"))
+        .orderBy({ [raw("date")]: QueryOrder.DESC });
+
+      const results: { date: string, count: number }[] = await qb.execute();
+
+      return [
+        {
+          results: results.map((record) => ({
+            date: convertToDateMessage(record.date, logger),
+            count: record.count,
+          })),
+        },
+      ];
+    },
+
+    changeTenant: async ({ request, em }) => {
+      const { userId, tenantName } = request;
+
+      const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
+
+      if (!user) {
+        throw {
+          code: Status.NOT_FOUND, message: `User ${userId} is not found.`, details: "USER_NOT_FOUND",
+        } as ServiceError;
+      }
+
+      const userAccount = await em.findOne(UserAccount, { user: user });
+
+      if (userAccount) {
+        throw {
+          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+        } as ServiceError;
+      }
+
+      const oldTenant = user.tenant.getEntity();
+
+      if (oldTenant.name === tenantName) {
+        throw {
+          code: Status.ALREADY_EXISTS, message: `User ${userId} is already in tenant ${tenantName}.`,
+        } as ServiceError;
+      }
+
+      const newTenant = await em.findOne(Tenant, { name: tenantName });
+
+      if (!newTenant) {
+        throw {
+          code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.`, details: "TENANT_NOT_FOUND",
+        } as ServiceError;
+      }
+
+      em.assign(user, { tenant: newTenant });
+
+      await em.persistAndFlush(user);
+
+      return [{}];
+
+    },
+
   });
 });

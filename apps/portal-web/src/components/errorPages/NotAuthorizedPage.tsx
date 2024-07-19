@@ -15,7 +15,7 @@ import Link from "next/link";
 import { useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 export const NotAuthorizedPage = () => {
 
   const t = useI18nTranslateToString();

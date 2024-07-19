@@ -1,5 +1,61 @@
 # @scow/docs
 
+## 1.4.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 7285809: 添加 SCOW 部署与运维指引文档
+- 383a8bd: 添加 web shell 文件上传功能
+
+## 1.3.3
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- a737493: jupyter 启动命令参数 PasswordIdentityProvider.hashed_password 改为 ServerApp.password
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- 640a599: 支持填写多个 hook 地址
+
+## 1.3.2
+
+### Patch Changes
+
+- abda3b2: 修改用户模型文档中账户状态及用户在账户中的状态描述的文字错误
+- d822db7: ai 系统新增支持 k8s 集群的 containerd 运行时
+- 7b9e0b6: 去掉 node-cron 表达式前秒的限制
+
+## 1.3.1
+
+### Patch Changes
+
+- 2f7590a: 优化 AI 配置介绍的文档中部分格式与文字
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+
+## 1.3.0
+
+### Minor Changes
+
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+
+## 1.2.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- f03e821342: vagrant 部署方式优化,文档网站修改
+
 ## 1.1.2
 
 ### Patch Changes

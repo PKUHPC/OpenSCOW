@@ -1,5 +1,98 @@
 # @scow/cli
 
+## 1.6.1
+
+## 1.6.0
+
+### Minor Changes
+
+- 806f778: 增加 HPC 文件和桌面功能的 scowd 支持
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 5f14ce8: 修复更新 octokit 依赖后导致 cli 命令执行失败的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+
+## 1.5.2
+
+### Patch Changes
+
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+
+## 1.5.1
+
+### Patch Changes
+
+- e312efb: AI 模块支持创建 vnc 类型应用
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+
+## 1.5.0
+
+### Patch Changes
+
+- 4a32bd7: 兼容旧版本自定义认证系统配置
+- 7b9e0b6: 去掉 node-cron 表达式前秒的限制
+- Updated dependencies [02d6a18]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+
+## 1.4.3
+
+### Patch Changes
+
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- 8d417ba: 增加配置项控制普通用户是否可以修改作业时限
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+
+## 1.4.0
+
+### Minor Changes
+
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- 9059919: 添加外部自定义认证系统
+- abb7e84: 管理系统新增集群监控功能
+
+### Patch Changes
+
+- 2e69338: SCOW CLI 初始化配置文件分为简化版本和全版本
+- b342df5: 修复 cli 由于 @sinclair/typebox 更新导致的编译问题
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+
+## 1.3.0
+
+### Minor Changes
+
+- 2302a4639e: install.yaml 文件增加 mis.nodeOptions 参数，可传递给所有 node 服务参数，如“--max-old-space-size=8192”
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+
 ## 1.2.3
 
 ### Patch Changes

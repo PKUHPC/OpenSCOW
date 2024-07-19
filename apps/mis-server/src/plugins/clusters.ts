@@ -13,20 +13,23 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
-import { getLoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
-import { clusters } from "src/config/clusters";
+import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
+import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
-import { scowErrorMetadata } from "src/utils/error";
 
 type CallOnAllResult<T> = {
   cluster: string;
   result: T
-}[]
+}[];
 
 // Throw ServiceError if failed.
 type CallOnAll = <T>(
+  // clusters for calling to connect to adapter client
+  clusters: Record<string, ClusterConfigSchema>,
   logger: Logger,
   call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<CallOnAllResult<T>>;
@@ -37,19 +40,32 @@ type CallOnOne = <T>(
   call: (client: SchedulerAdapterClient) => Promise<T>,
 ) => Promise<T>;
 
-export type ClusterPlugin = {
+export interface ClusterPlugin {
   clusters: {
     callOnAll: CallOnAll;
     callOnOne: CallOnOne;
   }
-}
+};
 
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
+export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
 export const clustersPlugin = plugin(async (f) => {
 
+  // initial clusters database
+  const configClusterIds = Object.keys(configClusters);
+  await updateCluster(f.ext.orm.em.fork(), configClusterIds, f.logger);
+
   if (process.env.NODE_ENV === "production") {
-    await Promise.all(Object.values(clusters).map(async ({ displayName, loginNodes }) => {
+
+    // only check activated clusters' root user login when system is starting
+    const activatedClusters = await getActivatedClusters(f.ext.orm.em.fork(), f.logger).catch((e) => {
+      f.logger.info("!!![important] No available activated clusters.This will skip root ssh login check in cluster!!!");
+      f.logger.info(e);
+      return {};
+    });
+
+    await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
       const address = loginNode.address;
       const node = loginNode.name;
@@ -62,9 +78,11 @@ export const clustersPlugin = plugin(async (f) => {
         f.logger.info("Root can login to %s by login node %s", displayName, node);
       }
     }));
+
   }
 
-  const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
+  // adapterClient of all config clusters
+  const adapterClientForClusters = Object.entries(configClusters).reduce((prev, [cluster, c]) => {
     const client = getSchedulerAdapterClient(c.adapterUrl);
 
     prev[cluster] = client;
@@ -72,13 +90,25 @@ export const clustersPlugin = plugin(async (f) => {
     return prev;
   }, {} as Record<string, SchedulerAdapterClient>);
 
+  // adapterClients of activated clusters
+  const getAdapterClientForActivatedClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
+    return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
+      const client = getSchedulerAdapterClient(c.adapterUrl);
+      prev[cluster] = client;
+      return prev;
+    }, {} as Record<string, SchedulerAdapterClient>);
+  };
+
   const getAdapterClient = (cluster: string) => {
     return adapterClientForClusters[cluster];
   };
 
+  f.logger.child({ plugin: "cluster" });
+
   const clustersPlugin = {
 
-    callOnOne: <CallOnOne>(async (cluster, logger, call) => {
+    callOnOne: (async (cluster, logger, call) => {
+
       const client = getAdapterClient(cluster);
 
       if (!client) {
@@ -86,13 +116,40 @@ export const clustersPlugin = plugin(async (f) => {
       }
 
       logger.info("Calling actions on cluster " + cluster);
-      return await call(client);
-    }),
+
+      return await call(client).catch((e) => {
+        logger.error("Cluster ops fails at %o", e);
+
+        const errorDetail = e instanceof Error ? e : JSON.stringify(e);
+
+        const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail.toString();
+        const clusterErrorDetails = [{
+          clusterId: cluster,
+          details: errorDetail,
+        }];
+
+        // 统一错误处理
+        if (e instanceof Error) {
+          throw new ServiceError({
+            code: status.INTERNAL,
+            details: reason,
+            metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR,
+              { clusterErrors: JSON.stringify(clusterErrorDetails) }),
+          });
+        // 如果是已经封装过的grpc error, 直接抛出错误
+        } else {
+          throw e;
+        }
+
+      });
+    }) as CallOnOne,
 
     // throws error if failed.
-    callOnAll: <CallOnAll>(async (logger, call) => {
+    callOnAll: (async (clusters, logger, call) => {
 
-      const responses = await Promise.all(Object.entries(adapterClientForClusters)
+      const adapterClientForActivatedClusters = getAdapterClientForActivatedClusters(clusters);
+
+      const responses = await Promise.all(Object.entries(adapterClientForActivatedClusters)
         .map(async ([cluster, client]) => {
           return call(client).then((result) => {
             logger.info("Executing on %s success", cluster);
@@ -103,8 +160,8 @@ export const clustersPlugin = plugin(async (f) => {
           });
         }));
 
-      type SuccessResponse<T> = { cluster: string; success: boolean; result: T; };
-      type ErrorResponse = { cluster: string; success: boolean; error: any; };
+      interface SuccessResponse<T> { cluster: string; success: boolean; result: T; }
+      interface ErrorResponse { cluster: string; success: boolean; error: any; }
 
       function isSuccessResponse<T>(response: SuccessResponse<T> | ErrorResponse): response is SuccessResponse<T> {
         return response.success === true;
@@ -119,17 +176,23 @@ export const clustersPlugin = plugin(async (f) => {
 
       if (failed.length > 0) {
         logger.error("Cluster ops fails at clusters %o", failed);
-        const reason = failed.map((x) => clusters[x.cluster].displayName + ": " + x.error).join("; ");
+        const reason = failed.map((x) => "Cluster ID : " + x.cluster + ", Details : " + x.error).join("; ");
+
+        const clusterErrorDetails = failed.map((x) => ({
+          clusterId: x.cluster,
+          details: x.error,
+        }));
+
         throw new ServiceError({
           code: status.INTERNAL,
           details: reason,
-          metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE),
+          metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, { clusterErrors: JSON.stringify(clusterErrorDetails) }),
         });
       }
 
       return results;
 
-    }),
+    }) as CallOnAll,
   };
 
   f.addExtension("clusters", clustersPlugin);

@@ -17,7 +17,7 @@ import { useState } from "react";
 import { requireAuth } from "src/auth/requireAuth";
 import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { useI18nTranslateToString } from "src/i18n";
 import { PlatformRole, TenantRole } from "src/models/User";
 import { ChangeEmailModal } from "src/pageComponents/profile/ChangeEmailModal";
 import { ChangePasswordModal } from "src/pageComponents/profile/ChangePasswordModal";
@@ -59,8 +59,6 @@ const TitleText = styled(Typography.Title)`
 const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link" });
 const ChangeEmailModalButton = ModalButton(ChangeEmailModal, { type: "link" });
 
-const p = prefix("page.profile.index.");
-
 export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { user } }) => {
 
   const [email, setEmail] = useState(user.email);
@@ -79,7 +77,7 @@ export const ProfilePage: NextPage = requireAuth(() => true)(({ userStore: { use
   return (
     <>
       <Container>
-        <Head title={t(p("accountInfo"))} />
+        <Head title={t("common.userInfo")} />
         <TitleText>{t("common.userInfo")}</TitleText>
         <Part title>
           <Descriptions

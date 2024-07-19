@@ -10,14 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { ServiceError, status } from "@grpc/grpc-js";
-import { Status } from "@grpc/grpc-js/build/src/constants";
+import { ServiceError } from "@ddadaal/tsgrpc-common";
+import { status } from "@grpc/grpc-js";
 import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { parseErrorDetails } from "@scow/rich-error-model";
-import { ApiVersion } from "@scow/utils/build/version";
-import { clusters } from "src/config/clusters";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
+import { libCheckActivatedClusters,
+  libGetCurrentActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
+import { configClusters } from "src/config/clusters";
+import { commonConfig } from "src/config/common";
+import { config } from "src/config/env";
+import { logger as pinoLogger } from "src/utils/logger";
+import { Logger } from "ts-log";
 
+
+const clusters = configClusters;
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
   const client = getSchedulerAdapterClient(c.adapterUrl);
   prev[cluster] = client;
@@ -28,58 +34,69 @@ export const getAdapterClient = (cluster: string) => {
   return adapterClientForClusters[cluster];
 };
 
-/**
- * 判断当前集群下的调度器API版本对比传入的接口是否已过时
- * @param client
- * @param minVersion
- */
-export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
-  minVersion: ApiVersion): Promise<void> {
 
-  let scheduleApiVersion: ApiVersion | null;
-  try {
-    scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
-  } catch (e) {
-    const ex = e as ServiceError;
-    const errors = parseErrorDetails(ex.metadata);
-    // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
-    if (((e as any).code === status.UNIMPLEMENTED) ||
-    (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
-      scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
-    } else {
-      throw <ServiceError> {
-        code: Status.UNIMPLEMENTED,
-        message: "unimplemented",
-        details: "The scheduler API version can not be confirmed."
-          + "To use this method, the scheduler adapter must be upgraded to the version "
-          + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
-          + "or higher.",
-      };
-    }
+type CallOnOne = <T>(
+  cluster: string,
+  logger: Logger,
+  call: (client: SchedulerAdapterClient) => Promise<T>,
+) => Promise<T>;
+
+export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
+
+export const callOnOne: CallOnOne = async (cluster, logger, call) => {
+
+  await checkActivatedClusters({ clusterIds: cluster });
+
+  const client = getAdapterClient(cluster);
+
+  if (!client) {
+    throw new Error("Calling actions on non-existing cluster " + cluster);
   }
 
-  if (scheduleApiVersion) {
+  logger.info("Calling actions on cluster " + cluster);
 
-    // 检查调度器接口版本是否大于等于最低要求版本
-    let geMinVersion: boolean;
-    if (scheduleApiVersion.major !== minVersion.major) {
-      geMinVersion = (scheduleApiVersion.major > minVersion.major);
-    } else if (scheduleApiVersion.minor !== minVersion.minor) {
-      geMinVersion = (scheduleApiVersion.minor > minVersion.minor);
+  return await call(client).catch((e) => {
+    logger.error("Cluster ops fails at %o", e);
+
+    const errorDetail = e instanceof Error ? e : JSON.stringify(e);
+
+    const clusterErrorDetails = [{
+      clusterId: cluster,
+      details: errorDetail,
+    }];
+    const reason = "Cluster ID : " + cluster + ", Details : " + errorDetail.toString();
+
+    // 统一错误处理
+    if (e instanceof Error) {
+      throw new ServiceError({
+        code: status.INTERNAL,
+        details: reason,
+        metadata: scowErrorMetadata(ADAPTER_CALL_ON_ONE_ERROR, { clusterErrors: JSON.stringify(clusterErrorDetails) }),
+      });
+    // 如果是已经封装过的grpc error, 直接抛出错误
     } else {
-      geMinVersion = true;
+      throw e;
     }
 
-    if (!geMinVersion) {
-      throw <ServiceError> {
-        code: Status.FAILED_PRECONDITION,
-        message: "precondition failed",
-        details: "The method is not supported with the current scheduler adapter version. "
-          + "To use this method, the scheduler adapter must be upgraded to the version "
-          + `${minVersion.major}.${minVersion.minor}.${minVersion.patch} `
-          + "or higher.",
-      };
-    }
+  });
+};
+
+export const checkActivatedClusters
+= async (
+  { clusterIds }: { clusterIds: string[] | string },
+) => {
+
+  if (!config.MIS_DEPLOYED) {
+    return;
   }
+
+  const activatedClusters = await libGetCurrentActivatedClusters(
+    pinoLogger,
+    configClusters,
+    config.MIS_SERVER_URL,
+    commonConfig.scowApi?.auth?.token);
+
+  return libCheckActivatedClusters({ clusterIds, activatedClusters, logger: pinoLogger });
 
 };
+

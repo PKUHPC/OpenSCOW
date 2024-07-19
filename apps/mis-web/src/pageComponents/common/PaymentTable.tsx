@@ -13,28 +13,31 @@
 import { formatDateTime, getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
 import { useDidUpdateEffect } from "@scow/lib-web/build/utils/hooks";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import { Button, DatePicker, Form, Table } from "antd";
+import { App, Button, DatePicker, Form, Input, Table } from "antd";
 import dayjs from "dayjs";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { AccountSelector } from "src/pageComponents/finance/AccountSelector";
+import { Encoding } from "src/models/exportFile";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
+import { AccountMultiSelector } from "src/pageComponents/finance/AccountMultiSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
 
 export enum SearchType {
-    account = "account",
-    tenant = "tenant",
-    // 仅搜索自己账户
-    selfAccount = "selfAccount",
-    // 仅搜索自己租户
-    selfTenant = "selfTenant",
+  account = "account",
+  tenant = "tenant",
+  // 仅搜索自己账户
+  selfAccount = "selfAccount",
+  // 仅搜索自己租户
+  selfTenant = "selfTenant",
 }
 
 interface Props {
   // 账户充值记录专用项
-  accountName?: string;
+  accountNames?: string[];
   // 搜索类型, self前缀表示只搜索用户自身的账户或租户
   searchType: SearchType;
 }
@@ -54,8 +57,9 @@ interface TableProps {
 
 interface FilterForm {
   // 账户名或租户名
-  name?: string;
+  names?: string[];
   time: [dayjs.Dayjs, dayjs.Dayjs],
+  type?: string;
 }
 
 const today = dayjs().endOf("day");
@@ -63,38 +67,103 @@ const today = dayjs().endOf("day");
 const p = prefix("pageComp.commonComponent.paymentTable.");
 const pCommon = prefix("common.");
 
-export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
+export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FilterForm>();
 
-  const [selectedName, setSelectedName] = useState<string | undefined>(accountName);
+  const [selectedNames, setSelectedNames] = useState<string[] | undefined>(accountNames);
 
-  const [query, setQuery] = useState(() => ({
-    name: accountName,
+  const [query, setQuery] = useState<{
+    names: string[] | undefined,
+    time: [dayjs.Dayjs, dayjs.Dayjs]
+    types: string[]
+  }>(() => ({
+    // name作为账户名时可能为 undefined 、长度不定的的数组
+    // name作为租户名时可能为 undefined 、长度为1的的数组
+    names: accountNames,
     time: [today.subtract(1, "year"), today],
+    types: [],
   }));
+
+  const { message } = App.useApp();
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       const param = {
         startTime: query.time[0].clone().startOf("day").toISOString(),
         endTime: query.time[1].clone().endOf("day").toISOString(),
+        types: query.types,
       };
       // 平台管理下的租户充值记录
       if (searchType === SearchType.tenant) {
-        return api.getTenantPayments({ query: { ...param, tenantName:query.name } });
+        return api.getTenantPayments({ query: { ...param, tenantName: query.names ? query.names[0] : undefined } });
+
       } else {
-        return api.getPayments({ query: { ...param, accountName: query.name, searchType } });
+        return api.getPayments({ query: { ...param, accountNames: query.names, searchType } });
       }
     }, [query]),
   });
 
   useDidUpdateEffect(() => {
-    setQuery((q) => ({ ...q, name: accountName }));
-    setSelectedName(accountName);
-  }, [accountName]);
+    setQuery((q) => ({ ...q, name: accountNames }));
+    setSelectedNames(accountNames);
+  }, [accountNames]);
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+
+    const total = data?.results?.length ?? 0;
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportPayRecord",
+        columns,
+        count: total,
+        query: {
+          startTime: query.time[0].clone().startOf("day").toISOString(),
+          endTime: query.time[1].clone().endOf("day").toISOString(),
+          targetNames: query.names,
+          searchType: searchType,
+          types: query.types,
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    const common = [
+      { label: t(p("paymentDate")), value: "time" },
+      { label: t(p("paymentAmount")), value: "amount" },
+      { label: t(pCommon("type")), value: "type" },
+
+    ];
+    const account = searchType === SearchType.account ? [
+      { label: t(pCommon("account")), value: "accountName" },
+    ] : [];
+    const tenant = searchType === SearchType.tenant ? [
+      { label: t(pCommon("tenant")), value: "tenantName" },
+    ] : [];
+    const ipAndOperator = searchType !== SearchType.selfAccount ? [
+      {
+        label: t(p("ipAddress")),
+        value: "ipAddress",
+      },
+      {
+        label: t(p("operatorId")),
+        value: "operatorId",
+      },
+    ] : [];
+    const comment = [{ label: t(pCommon("comment")), value: "comment" }];
+    return [...account, ...tenant, ...common, ...ipAndOperator, ...comment];
+  }, [searchType, t]);
+
 
   return (
     <div>
@@ -104,27 +173,38 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const { name, time } = await form.validateFields();
-            setQuery({ name: selectedName ?? name, time });
+            const { names, time, type } = await form.validateFields();
+            let trimmedTypes: string[];
+            if (Array.isArray(type) && type.length === 0) {
+              trimmedTypes = [];
+            } else {
+              trimmedTypes = type ? type.split(/,|，/).map((item) => item.trim()) : [];
+            }
+            setQuery({
+              names: selectedNames ?? names,
+              time,
+              types: trimmedTypes,
+            });
           }}
         >
-          { (searchType === SearchType.account || searchType === SearchType.tenant) ? (
+          {(searchType === SearchType.account || searchType === SearchType.tenant) ? (
             <Form.Item
               label={searchType === SearchType.account ?
                 t(pCommon("account")) : t(pCommon("tenant"))}
               name="name"
             >
               {searchType === SearchType.account ? (
-                <AccountSelector
+                <AccountMultiSelector
+                  value={selectedNames ?? []}
                   onChange={(item) => {
-                    setSelectedName(item);
+                    setSelectedNames(item);
                   }}
                   placeholder={t(pCommon("selectAccount"))}
                 />
               ) : (
                 <TenantSelector
                   onChange={(item) => {
-                    setSelectedName(item);
+                    setSelectedNames([item]);
 
                   }}
                   placeholder={t(pCommon("selectTenant"))}
@@ -136,6 +216,9 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           <Form.Item label={t(pCommon("time"))} name="time">
             <DatePicker.RangePicker allowClear={false} presets={getDefaultPresets(languageId)} />
           </Form.Item>
+          <Form.Item label={t("common.type")} name="type">
+            <Input style={{ width: 180 }} placeholder={t(p("searchTypePlaceholder"))} />
+          </Form.Item>
           <Form.Item label={t(p("total"))}>
             <strong>
               {data ? data.results.length : 0}
@@ -143,17 +226,25 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
           </Form.Item>
           <Form.Item label={t(p("sum"))}>
             <strong>
-              {data ? data.total.toFixed(3) : 0}
+              {data ? data.total.toFixed(2) : 0}
             </strong>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
           </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
+          </Form.Item>
         </Form>
       </FilterFormContainer>
       <Table
         tableLayout="fixed"
-        dataSource={data?.results as Array<TableProps>}
+        dataSource={data?.results as TableProps[]}
         loading={isLoading}
         pagination={{
           showSizeChanger: true,
@@ -171,7 +262,7 @@ export const PaymentTable: React.FC<Props> = ({ accountName, searchType }) => {
             : undefined
         }
         <Table.Column dataIndex="time" title={t(p("paymentDate"))} width="13.5%" render={(v) => formatDateTime(v)} />
-        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(3)} />
+        <Table.Column dataIndex="amount" title={t(p("paymentAmount"))} width="10%" render={(v) => v.toFixed(2)} />
         <Table.Column
           dataIndex="type"
           title={t(pCommon("type"))}

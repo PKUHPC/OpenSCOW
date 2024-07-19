@@ -1,5 +1,176 @@
 # @scow/portal-web
 
+## 1.6.1
+
+### Patch Changes
+
+- a047082: 调整门户快捷入口文字过多时图标高度不一致的问题；略微了门户系统 header 图标的样式；取消了门户系统表格默认选中的状态
+- be61c74: 所有 Input.group compact 组件替换成 Space.Compact
+- 4dfd5df: 修复了门户表格显示不正确的问题
+
+## 1.6.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- fec0a57: 修复了本地开发环境出现 Hydration 报错的问题
+- f21f3e0: 修改了 portal 部分 UI 的样式
+- eacda16: 修复集群未停用但数据无法获取时的仪表盘页面显示
+- 5a707df: 修复门户系统桌面功能页面 token 过期不能跳转登录页面的问题, 修改获取集群数据 token 验证失败时的返回
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 383a8bd: 添加 web shell 文件上传功能
+- 9709d45: 修复选择模板来提交作业时没有获取到正确的模板数据的问题
+- 3558bd4: 提交作业保存作业模板时最长运行时间的单位也保存入模板中
+- 49b31cf: 修改了门户系统下仪表盘的样式和交互逻辑
+- a0e9199: 修正了门户系统 GPU 显示不正确的问题，修复了门户系统图标大小不一样的问题
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-web@1.4.0
+  - @scow/lib-operation-log@2.1.6
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.2
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+- Updated dependencies [f534377]
+  - @scow/config@1.4.5
+  - @scow/lib-web@1.3.3
+  - @scow/lib-operation-log@2.1.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.1
+
+### Patch Changes
+
+- 94aa24c: 支持同时配置多个 UI 扩展。UI 扩展的实现有破坏性变更，请参考文档。
+- c178b72: xterm npm 包更名
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- 5c34421: 优化集群适配器访问异常时的页面错误信息展示
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-web@1.3.2
+  - @scow/lib-operation-log@2.1.4
+  - @scow/protos@1.0.10
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- 10956eb: 修复 token 失效后切换系统不跳转回登录页面的问题
+- a097dd1: 新增无账户关系的用户修改所属租户且可以作为新增租户的管理员功能
+- 0ad604c: 仪表盘 cpu 和 gpu 利用率百分比显示错误
+- 02d6a18: 新增集群区分 AI 功能和 HPC 功能配置
+- 24db413: 操作日志增加自定义操作类型
+- 79d19be: 改进门户快捷方式的 UI
+- 25f9caf: 修复文件管理下在终端中打开连接失败及终端不显示登录节点名称的问题
+- bc743ad: 修复快捷方式的 icon 显示大小问题
+- d3d891a: 操作日志详细内容展示优化
+- 1e25062: 改进门户系统仪表盘各个模块的背景设计
+- Updated dependencies [02d6a18]
+- Updated dependencies [146e19f]
+- Updated dependencies [24db413]
+- Updated dependencies [d822db7]
+- Updated dependencies [850a7ee]
+  - @scow/config@1.4.3
+  - @scow/lib-web@1.3.1
+  - @scow/lib-operation-log@2.1.3
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- 410fb0e: 修复只需在文件传输时使用 touch -a 来更新时间戳，修复 touch -a 执行时 ssh 关闭报错，文件名特殊字符报错等问题
+- 2f687c5: 仪表盘返回的监控数据替换 clusterId
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/lib-operation-log@2.1.2
+  - @scow/lib-web@1.3.0
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- a41c45b: 修复文件管理列表连续双击文件名导致进入错误目录的问题
+- f126469: 仪表盘处集群无法获取运行时不报 500 的错误提示和快捷方式跳转去掉 basePath
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-operation-log@2.1.1
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+
+## 1.4.0
+
+### Minor Changes
+
+- 081fbcf: 管理系统新增用户列表，账户列表，消费记录，充值记录，操作记录的数据导出 csv 文件功能
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- d1c2e74: UI 扩展
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+- 3ef7762: 回退 codemirror 版本，解决提交作业界面崩溃问题
+- 43c52ee: 优化文件编辑功能
+- 26bd8e7: 优化文件系统直接提交脚本任务时如果没有在脚本内指定工作目录，使脚本文件所在的绝对路径作为作业工作目录，并在确认提交对话框中给出提示
+- Updated dependencies [081fbcf]
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/lib-operation-log@2.1.0
+  - @scow/config@1.4.0
+  - @scow/lib-web@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- 6a0c73a972: 修复用户删除无权限目录时导致的崩溃问题
+- c18479df2c: 修复了仪表盘信息面板 title 过长时折行问题和调整响应式样式
+- 1a0b45131c: 修改终端登录欢迎语过长会报错的提示
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-operation-log@2.0.5
+  - @scow/lib-web@1.2.3
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes

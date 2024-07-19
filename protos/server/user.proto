@@ -17,6 +17,8 @@ package scow.server;
 import "common/money.proto";
 import "google/protobuf/timestamp.proto";
 
+import "google/type/date.proto";
+
 enum UserStatus {
   UNBLOCKED = 0;
   BLOCKED = 1;
@@ -33,6 +35,8 @@ message AccountStatus {
   optional common.Money job_charge_limit = 3;
   optional common.Money used_job_charge = 4;
   common.Money balance = 5;
+  optional bool is_in_whitelist = 6;
+  common.Money block_threshold_amount = 7;
 }
 
 message GetUserStatusResponse {
@@ -58,15 +62,35 @@ message GetAccountUsersRequest {
 }
 
 message AccountUserInfo {
+  enum UserStateInAccount {
+    // 用户未被账户管理员或拥有者手动封锁，或用户被手动解封
+    NORMAL = 0;
+    // 用户被账户管理员或拥有者手动封锁
+    BLOCKED_BY_ADMIN = 1;
+  }
+  // 页面展示的用户在账户中的状态
+  enum DisplayedUserState {
+    // 正常: 用户未被封锁，且用户已用额度<用户限额，在集群中状态为正常
+    DISPLAYED_NORMAL = 0;
+    // 限额：用户未被封锁，但用户已用额度>=用户限额，在集群中状态为封锁
+    DISPLAYED_QUOTA_EXCEEDED = 1;
+    // 封锁：用户已被账户管理员或账户拥有者封锁，在集群中状态为封锁
+    DISPLAYED_BLOCKED = 2;
+  }
   string user_id = 1;
   string name = 2;
   string email = 3;
+  // 账户下用户在集群中的状态
+  // BLOCKED: 账户下的用户在集群中为封锁状态
+  // UNBLOCKED：账户下的用户在集群中为未封锁状态
   UserStatus status = 4;
   UserRole role = 5;
   // cluster and quota
   map<string, uint64> storage_quotas = 6;
   optional common.Money job_charge_limit = 7;
   optional common.Money used_job_charge_limit = 8;
+  UserStateInAccount user_state_in_account = 9;
+  DisplayedUserState displayed_user_state = 10;
 }
 
 message GetAccountUsersResponse {
@@ -370,6 +394,35 @@ message ChangeEmailResponse {
 }
 
 
+message GetNewUserCountRequest {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  // 以什么时区作为统计的基准，如果不传，默认为UTC
+  // 可选时区根据mysql的时区确定，具体可参考：https://dev.mysql.com/doc/refman/8.0/en/time-zone-support.html
+  optional string time_zone = 3;
+}
+
+message GetNewUserCountResponse {
+  message DailyUserCount {
+    google.type.Date date = 1;
+    uint64 count = 2;
+  }
+  repeated DailyUserCount results = 1;
+}
+
+message ChangeTenantRequest {
+  string user_id = 1;
+  string tenant_name = 2;
+
+}
+
+// NOT_FOUND: user is not found.
+// NOT_FOUND: tenant is not found.
+// ALREADY_EXISTS: user is already in the tenant
+// FAILED_PRECONDITION: user still maintains account relationship
+message ChangeTenantResponse {
+
+}
 
 service UserService {
 
@@ -414,4 +467,8 @@ service UserService {
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
   rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
+
+  rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
+
+  rpc ChangeTenant(ChangeTenantRequest) returns (ChangeTenantResponse);
 }

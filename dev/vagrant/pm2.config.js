@@ -12,9 +12,9 @@
 
 const interpreter = "node";
 const interpreter_args = [
-  "--watch",
   "-r ts-node/register",
   "-r tsconfig-paths/register",
+  "--watch",
 ].join(" ");
 
 const PRODUCTION_ENV = {
@@ -54,8 +54,11 @@ module.exports = {
         NEXT_PUBLIC_USE_MOCK: 0,
         SERVER_URL: "localhost:5002",
         MIS_DEPLOYED: 1,
-        AUDIT_DEPLOYED: 1,
         MIS_URL: "localhost:5003",
+        MIS_SERVER_URL: "localhost:5004",
+        AUDIT_DEPLOYED: 1,
+        AI_DEPLOYED: 1,
+        AI_URL: "localhost:5006",
         NOVNC_CLIENT_URL: "http://localhost:6080",
         ...SCOW_CONFIG_PATH_ENV,
       },
@@ -69,6 +72,8 @@ module.exports = {
       interpreter_args,
       env: {
         PORT: "5002",
+        MIS_DEPLOYED: 1,
+        MIS_SERVER_URL: "localhost:5004",
         ...PRODUCTION_ENV,
         ...SCOW_CONFIG_PATH_ENV,
       },
@@ -88,6 +93,8 @@ module.exports = {
         PORTAL_DEPLOYED: 1,
         AUDIT_DEPLOYED: 1,
         PORTAL_URL: "localhost:5001",
+        AI_DEPLOYED: 1,
+        AI_URL: "localhost:5006",
         ...SCOW_CONFIG_PATH_ENV,
       },
     },
@@ -114,6 +121,26 @@ module.exports = {
       env: {
         PORT: "5005",
         ...PRODUCTION_ENV,
+        ...SCOW_CONFIG_PATH_ENV,
+      },
+    },
+    {
+      name: "ai",
+      script: "npm",
+      args: "run dev:server",
+      cwd: "./apps/ai",
+      interpreter: "pnpm",
+      env: {
+        PORT: "5006",
+        AUTH_EXTERNAL_URL: "http://localhost:5000",
+        AUTH_INTERNAL_URL: "http://localhost:5000",
+        NEXT_PUBLIC_USE_MOCK: 0,
+        SERVER_URL: "localhost:5004",
+        PORTAL_DEPLOYED: 1,
+        AUDIT_DEPLOYED: 1,
+        PORTAL_URL: "localhost:5001",
+        MIS_DEPLOYED: 1,
+        MIS_URL: "localhost:5003",
         ...SCOW_CONFIG_PATH_ENV,
       },
     },

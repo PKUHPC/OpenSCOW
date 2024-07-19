@@ -14,13 +14,15 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
-// import { getInitialLanguage, getLanguageCookie } from "@scow/lib-web/build/utils/systemLanguage";
+import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/clustersActivation";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import App from "next/app";
@@ -32,16 +34,17 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { Provider, useI18nTranslateToString } from "src/i18n";
+import { Provider, useI18n, useI18nTranslate } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
+import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 const languagesMap = {
@@ -49,11 +52,14 @@ const languagesMap = {
   "en": en,
 };
 
+
 const FailEventHandler: React.FC = () => {
   const { message, modal } = AntdApp.useApp();
   const userStore = useStore(UserStore);
+  const { publicConfigClusters, setActivatedClusters } = useStore(ClusterInfoStore);
 
-  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+  const tArgs = useI18nTranslate();
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
@@ -63,18 +69,53 @@ const FailEventHandler: React.FC = () => {
         userStore.logout();
         return;
       }
-      console.log(e);
       if (e.data?.code === "CLUSTEROPS_ERROR") {
         modal.error({
-          title: t("page._app.clusterOpErrorTitle"),
-          content: `${t("page._app.clusterOpErrorContent")}(${
+          title: tArgs("page._app.multiClusterOpErrorTitle"),
+          content: `${tArgs("page._app.multiClusterOpErrorContent") as string}(${
             e.data.details
           })`,
         });
         return;
       }
+      if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
+        const clusterId = e.data.clusterErrorsArray[0].clusterId;
+        const clusterName = clusterId ?
+          (publicConfigClusters[clusterId]?.name ?? clusterId) : undefined;
 
-      message.error(`${t("page._app.effectErrorMessage")}(${e.status}, ${e.data?.code}))`);
+        message.error(`${tArgs("page._app.adapterConnErrorContent",
+          [getI18nConfigCurrentText(clusterName, languageId)]) as string}(${
+          e.data.details
+        })`);
+        return;
+      }
+
+      if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("page._app.noActivatedClusters"));
+        setActivatedClusters({});
+        return;
+      }
+
+      if (e.data?.code === "NOT_EXIST_IN_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("page._app.notExistInActivatedClusters"));
+
+        const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
+        const newActivatedClusters: Record<string, Cluster> = {};
+        currentActivatedClusterIds.forEach((id: string) => {
+          if (publicConfigClusters[id]) {
+            newActivatedClusters[id] = publicConfigClusters[id];
+          }
+        });
+        setActivatedClusters(newActivatedClusters);
+        return;
+      }
+
+      if (e.data?.code === "NO_CLUSTERS") {
+        message.error(tArgs("page._app.noClusters"));
+        return;
+      }
+
+      message.error(`${tArgs("page._app.effectErrorMessage") as string}(${e.status}, ${e.data?.code}))`);
 
     });
   }, []);
@@ -96,6 +137,9 @@ interface ExtraProps {
   footerText: string;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
+  clusterConfigs: Record<string, ClusterConfigSchema>;
+  initialActivatedClusters: Record<string, Cluster>;
+  initialSimpleClustersInfo: Record<string, SimpleClusterSchema>;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -109,10 +153,14 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
-  const defaultClusterStore = useConstant(() => {
-    const store = createStore(DefaultClusterStore, publicConfig.CLUSTERS[publicConfig.CLUSTER_SORTED_ID_LIST[0]]);
-    return store;
+  const clusterInfoStore = useConstant(() => {
+    return createStore(
+      ClusterInfoStore,
+      extra.clusterConfigs, extra.initialActivatedClusters, extra.initialSimpleClustersInfo,
+    );
   });
+
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   return (
     <>
@@ -141,7 +189,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, defaultClusterStore]}>
+        <StoreProvider stores={[userStore, clusterInfoStore, uiExtensionStore]}>
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={extra.initialLanguage}>
               <FloatButtons languageId={extra.initialLanguage} />
@@ -170,6 +218,9 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     primaryColor: "",
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     initialLanguage: "",
+    clusterConfigs: {},
+    initialActivatedClusters: {},
+    initialSimpleClustersInfo: {},
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -193,8 +244,35 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...result,
           token: token,
         };
+
+        // get cluster configs from config file
+        const data = await api.getClusterConfigFiles({ query: { token } })
+          .then((x) => x, () => ({ clusterConfigs: {} }));
+
+        const clusterConfigs = data?.clusterConfigs;
+        if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
+          extra.clusterConfigs = clusterConfigs;
+        }
       }
     }
+
+    const clustersRuntimeInfo = await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
+
+    // get deployed clusters' simple info (only clusterId, displayName and priority)
+    const simpleClustersInfo
+      = await api.getSimpleClustersInfoFromConfigFiles({}).then((x) => x, () => ({ clustersInfo: {} }));
+
+    extra.initialSimpleClustersInfo = simpleClustersInfo?.clustersInfo ?? {};
+
+    const publicConfigClusters = extra.clusterConfigs && Object.keys(extra.clusterConfigs).length > 0 ?
+      getPublicConfigClusters(extra.clusterConfigs) : getPublicConfigClusters(extra.initialSimpleClustersInfo) ?? {};
+
+    const activatedClusters
+    = formatActivatedClusters({
+      clustersRuntimeInfo: clustersRuntimeInfo?.results ?? [],
+      misConfigClusters: publicConfigClusters });
+
+    extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
 
     const hostname = getHostname(appContext.ctx.req);
 
@@ -208,7 +286,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   }
 
   const appProps = await App.getInitialProps(appContext);
-
   return { ...appProps, extra } as Props;
 };
 

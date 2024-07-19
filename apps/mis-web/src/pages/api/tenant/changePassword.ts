@@ -12,11 +12,12 @@
 
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
-import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { changePassword as libChangePassword, getCapabilities } from "@scow/lib-auth";
+import { OperationType } from "@scow/lib-operation-log";
 import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -32,11 +33,12 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
   body: Type.Object({
     identityId: Type.String(),
     /**
-     * @pattern ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
+     *  CommonConfig.PASSWORD_PATTERN
+     *  OR
+     *  when CommonConfig.PASSWORD_PATTERN={} =>
+     *  use default value: ^(?=.*\d)(?=.*[a-zA-Z])(?=.*[`~!@#\$%^&*()_+\-[\];',./{}|:"<>?]).{8,}$
      */
-    newPassword: Type.String({
-      pattern:  "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[`~!@#\\$%^&*()_+\\-[\\];',./{}|:\"<>?]).{8,}$",
-    }),
+    newPassword: Type.String(),
   }),
 
   responses: {
@@ -45,6 +47,11 @@ export const ChangePasswordAsTenantAdminSchema = typeboxRouteSchema({
 
     /** 用户未找到 */
     404: Type.Null(),
+
+    /** 密码正则校验失败 */
+    400: Type.Object({
+      code: Type.Literal("PASSWORD_NOT_VALID"),
+    }),
 
     /** 本功能在当前配置下不可用。 */
     501: Type.Null(),
@@ -56,6 +63,11 @@ export default /* #__PURE__*/typeboxRoute(
   ChangePasswordAsTenantAdminSchema, async (req, res) => {
 
     if (!publicConfig.ENABLE_CHANGE_PASSWORD) {
+      return { 501: null };
+    }
+
+    const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+    if (!ldapCapabilities.changePassword) {
       return { 501: null };
     }
 
@@ -75,6 +87,13 @@ export default /* #__PURE__*/typeboxRoute(
     const info = await auth(req, res);
     if (!info) {
       return;
+    }
+
+    const passwordPattern = publicConfig.PASSWORD_PATTERN && new RegExp(publicConfig.PASSWORD_PATTERN);
+    if (passwordPattern && !passwordPattern.test(newPassword)) {
+      return { 400: {
+        code: "PASSWORD_NOT_VALID" as const,
+      } };
     }
 
     const logInfo = {

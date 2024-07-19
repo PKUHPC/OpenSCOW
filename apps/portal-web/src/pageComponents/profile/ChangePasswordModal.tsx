@@ -46,6 +46,12 @@ export const ChangePasswordModal: React.FC<Props> = ({
     const { oldPassword, newPassword } = await form.validateFields();
     setLoading(true);
     api.checkPassword({ query: { password: oldPassword } })
+      .httpError(404, () => {
+        message.error(t(p("userNotExist")));
+      })
+      .httpError(501, () => {
+        message.error(t(p("unavailable")));
+      })
       .then((result) => {
         if (result.success) {
           return api.changePassword({ body: { newPassword } })
@@ -53,7 +59,12 @@ export const ChangePasswordModal: React.FC<Props> = ({
               if (e.code === "PASSWORD_NOT_VALID") {
                 message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
               };
-              throw e;
+            })
+            .httpError(404, () => {
+              message.error(t(p("userNotExist")));
+            })
+            .httpError(501, () => {
+              message.error(t(p("unavailable")));
             })
             .then(() => {
               form.resetFields();

@@ -11,10 +11,10 @@
  */
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
-import type { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { PortalConfigSchema } from "@scow/config/build/portal";
 import type { UiConfigSchema } from "@scow/config/build/ui";
+import { UiExtensionConfigSchema } from "@scow/config/build/uiExtensions";
 import { UserLink } from "@scow/lib-web/build/layouts/base/types";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import getConfig from "next/config";
@@ -25,8 +25,6 @@ export interface ServerRuntimeConfig {
 
   AUTH_INTERNAL_URL: string;
 
-  CLUSTERS_CONFIG: {[cluster: string]: ClusterConfigSchema};
-
   UI_CONFIG?: UiConfigSchema;
 
   PORTAL_CONFIG: PortalConfigSchema;
@@ -35,13 +33,7 @@ export interface ServerRuntimeConfig {
 
   MOCK_USER_ID: string | undefined;
 
-  LOGIN_NODES: Record<string, string>;
-
   SERVER_URL: string;
-
-  HOME_TEXTS: {[hostname: string]: string };
-
-  HOME_TITLES: {[hostname: string]: string };
 
   SUBMIT_JOB_WORKING_DIR: string;
 
@@ -50,8 +42,6 @@ export interface ServerRuntimeConfig {
   AUDIT_CONFIG: AuditConfigSchema | undefined;
 
   SERVER_I18N_CONFIG_TEXTS: {
-    defaultHomeTitle: I18nStringType,
-    defaultHomeText: I18nStringType,
     submitJopPromptText?: I18nStringType,
   }
 
@@ -63,17 +53,17 @@ export interface PublicRuntimeConfig {
 
   ENABLE_SHELL: boolean;
 
-  ENABLE_LOGIN_DESKTOP: boolean;
-
   ENABLE_JOB_MANAGEMENT: boolean;
 
   ENABLE_APPS: boolean;
 
   MIS_URL: string | undefined;
 
-  CLUSTERS: Cluster[];
+  MIS_DEPLOYED: boolean;
 
-  CLUSTER_SORTED_ID_LIST: string[];
+  MIS_SERVER_URL: string | undefined;
+
+  AI_URL: string | undefined;
 
   NOVNC_CLIENT_URL: string;
 
@@ -95,42 +85,24 @@ export interface PublicRuntimeConfig {
 
   VERSION_TAG: string | undefined;
 
-  CROSS_CLUSTER_FILE_TRANSFER_ENABLED: boolean;
-
   RUNTIME_I18N_CONFIG_TEXTS: {
     passwordPatternMessage: I18nStringType | undefined,
   }
 
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
+  UI_EXTENSION?: UiExtensionConfigSchema;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
 
-export type Cluster = { id: string; name: I18nStringType; }
-export type NavLink = {
+export interface NavLink {
   text: string;
   url?: string;
   openInNewPage?: boolean;
   iconPath?: string;
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
-}
-
-export const getLoginDesktopEnabled = (cluster: string): boolean => {
-
-  const clusterLoginDesktopEnabled = runtimeConfig.CLUSTERS_CONFIG[cluster]?.loginDesktop?.enabled;
-
-  const commonLoginDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
-
-  return clusterLoginDesktopEnabled === undefined ? commonLoginDesktopEnabled : clusterLoginDesktopEnabled;
-};
-
-export type LoginNode = { name: string, address: string }
-
-export const getClusterName = (clusterId: string, languageId: string) => {
-  return getI18nConfigCurrentText(publicConfig.CLUSTERS.find((cluster) => cluster.id === clusterId)?.name, languageId)
-   || clusterId;
 };
 
 type ServerI18nConfigKeys = keyof typeof runtimeConfig.SERVER_I18N_CONFIG_TEXTS;
@@ -165,7 +137,7 @@ export const getRuntimeI18nConfigText = <TKey extends RuntimeI18nConfigKeys>(
  * @returns string | undefined
  * i18n语言文本
  */
-export const getI18nText = <TObject extends Object, TKey extends keyof TObject>(
+export const getI18nText = <TObject extends object, TKey extends keyof TObject>(
   obj: TObject, key: TKey, languageId: string,
 ): (TObject[TKey] extends I18nStringType ? string : (string | undefined)) => {
   const value = obj[key];

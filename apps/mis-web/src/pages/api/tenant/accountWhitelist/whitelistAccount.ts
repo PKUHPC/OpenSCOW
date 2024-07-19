@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationType } from "@scow/lib-operation-log";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { TenantRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -29,6 +30,7 @@ export const WhitelistAccountSchema = typeboxRouteSchema({
   body: Type.Object({
     accountName: Type.String(),
     comment: Type.String(),
+    expirationTime:Type.String({ format: "date-time" }),
   }),
 
   responses: {
@@ -47,7 +49,7 @@ export default route(WhitelistAccountSchema,
       return;
     }
 
-    const { accountName, comment } = req.body;
+    const { accountName, comment, expirationTime } = req.body;
 
     const logInfo = {
       operatorUserId: info.identityId,
@@ -65,6 +67,7 @@ export default route(WhitelistAccountSchema,
       accountName,
       operatorId: info.identityId,
       comment,
+      expirationTime,
     })
       .then(async () => {
         await callLog(logInfo, OperationResult.SUCCESS);

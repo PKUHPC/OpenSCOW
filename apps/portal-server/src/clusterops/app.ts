@@ -13,26 +13,26 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
+import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { ApiVersion } from "@scow/utils/build/version";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
 import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
-import { checkSchedulerApiVersion, getAdapterClient } from "src/utils/clusters";
+import { callOnOne } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
-import { Logger } from "ts-log";
 
 interface SessionMetadata {
   sessionId: string;
@@ -65,27 +65,6 @@ const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 const errorInfo = (reason: string) =>
   ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
 
-const getAppConnectionInfoFromAdapter = async (cluster: string, jobId: number, logger: Logger) => {
-  const client = getAdapterClient(cluster);
-  const minRequiredApiVersion: ApiVersion = { major: 1, minor: 3, patch: 0 };
-  try {
-    await checkSchedulerApiVersion(client, minRequiredApiVersion);
-    // get connection info
-    // for apps running in containers, it can provide real ip and port info
-    const connectionInfo = await asyncClientCall(client.app, "getAppConnectionInfo", {
-      jobId: jobId,
-    });
-    return connectionInfo;
-  } catch (e: any) {
-    if (e.code === Status.UNIMPLEMENTED || e.code === Status.FAILED_PRECONDITION) {
-      logger.warn(e.details);
-    } else {
-      throw e;
-    }
-  }
-
-};
-
 export const appOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -102,8 +81,8 @@ export const appOps = (cluster: string): AppOps => {
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
 
-      const userSbatchOptions = customAttributes["sbatchOptions"]
-        ? splitSbatchArgs(customAttributes["sbatchOptions"])
+      const userSbatchOptions = customAttributes.sbatchOptions
+        ? splitSbatchArgs(customAttributes.sbatchOptions)
         : [];
 
       // prepare script file
@@ -132,29 +111,29 @@ export const appOps = (cluster: string): AppOps => {
 
         const sftp = await ssh.requestSFTP();
 
-        const getEnvVariables = (env: Record<string, string>) =>
-          Object.keys(env).map((x) => `export ${x}=${quote([env[x] ?? ""])}\n`).join("");
-
         const submitAndWriteMetadata = async (request: SubmitJobRequest) => {
           const remoteEntryPath = join(workingDirectory, "entry.sh");
 
           // submit entry.sh
-          const client = getAdapterClient(cluster);
-          const reply = await asyncClientCall(client.job, "submitJob", request).catch((e) => {
+          const reply = await callOnOne(
+            cluster,
+            logger,
+            async (client) => await asyncClientCall(client.job, "submitJob", request),
+          ).catch((e) => {
             const ex = e as ServiceError;
             const errors = parseErrorDetails(ex.metadata);
             if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
               && errors[0].reason === "SBATCH_FAILED") {
               throw new DetailedError({
                 code: Status.INTERNAL,
-                message: e.details,
+                message: ex.details,
                 details: [errorInfo("SBATCH_FAILED")],
               });
             }
             else {
               throw new DetailedError({
-                code: e.code,
-                message: e.details,
+                code: ex.code,
+                message: ex.details,
                 details: [errorInfo("SBATCH_FAILED")],
               });
             }
@@ -205,12 +184,12 @@ export const appOps = (cluster: string): AppOps => {
           customAttributesExport = customAttributesExport + envItem + "\n";
         }
 
-        if (appConfig.type === "web") {
+        if (appConfig.type === AppType.web) {
           let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
           for (const key in appConfig.web!.connect.formData) {
             const texts = getPlaceholderKeys(appConfig.web!.connect.formData[key]);
-            for (const i in texts) {
-              customForm += `,\\\"${texts[i]}\\\":\\\"$${texts[i]}\\\"`;
+            for (const i of texts) {
+              customForm += `,\\"${i}\\":\\"$${i}\\"`;
             }
           }
           const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
@@ -290,15 +269,17 @@ export const appOps = (cluster: string): AppOps => {
       return await sshConnect(host, "root", logger, async (ssh) => {
 
         // If a job is not running, it cannot be ready
-        const client = getAdapterClient(cluster);
-        const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
-          filter: {
-            users: [userId], accounts: [],
-            states: ["RUNNING", "PENDING"],
-          },
-        }).then((resp) => resp.jobs);
-
+        const runningJobsInfo = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.job, "getJobs", {
+            fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
+            filter: {
+              users: [userId], accounts: [],
+              states: ["RUNNING", "PENDING"],
+            },
+          }),
+        ).then((resp) => resp.jobs);
 
         const runningJobInfoMap = runningJobsInfo.reduce((prev, curr) => {
           prev[curr.jobId] = curr;
@@ -341,7 +322,7 @@ export const appOps = (cluster: string): AppOps => {
             // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
             await sftpReaddir(sftp)(jobDir);
 
-            if (app.type === "web") {
+            if (app.type === AppType.web) {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
@@ -362,18 +343,21 @@ export const appOps = (cluster: string): AppOps => {
                   const content = (await sftpReadFile(sftp)(outputFilePath)).toString();
                   try {
                     const displayId = parseDisplayId(content);
-                    port = displayIdToPort(displayId!);
+                    port = displayIdToPort(displayId);
                   } catch {
                   // ignored if displayId cannot be parsed
                   }
                 }
 
                 host = (await sftpReadFile(sftp)(vncSessionInfoPath)).toString().trim();
-                port = port;
               }
             }
 
-            const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+            const connectionInfo = await callOnOne(
+              cluster,
+              logger,
+              async (client) => await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger),
+            );
             if (connectionInfo?.response?.$case === "appConnectionInfo") {
               host = connectionInfo.response.appConnectionInfo.host;
               port = connectionInfo.response.appConnectionInfo.port;
@@ -419,7 +403,7 @@ export const appOps = (cluster: string): AppOps => {
         const jobDir = join(userHomeDir, portalConfig.appJobsDir, sessionId);
 
         if (!await sftpExists(sftp, jobDir)) {
-          throw <ServiceError>{ code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` };
+          throw { code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` } as ServiceError;
         }
 
         const metadataPath = join(jobDir, SESSION_METADATA_NAME);
@@ -428,7 +412,12 @@ export const appOps = (cluster: string): AppOps => {
 
         const app = apps[sessionMetadata.appId];
 
-        const connectionInfo = await getAppConnectionInfoFromAdapter(cluster, sessionMetadata.jobId, logger);
+        const connectionInfo = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger),
+        );
+
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           return {
             appId: sessionMetadata.appId,
@@ -438,13 +427,13 @@ export const appOps = (cluster: string): AppOps => {
           };
         }
 
-        if (app.type === "web") {
+        if (app.type === AppType.web) {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
-            const customFormData = rest as {[key: string]: string};
+            const customFormData = rest as Record<string, string>;
             const ip = await getIpFromProxyGateway(cluster, HOST, logger);
             return {
               appId: sessionMetadata.appId,
@@ -480,6 +469,7 @@ export const appOps = (cluster: string): AppOps => {
               if (displayId) {
                 // the server is run at the compute node
 
+                const clusters = configClusters;
                 // if proxyGateway configured, connect to compute node by proxyGateway and get ip of compute node
                 const proxyGatewayConfig = clusters?.[cluster]?.proxyGateway;
                 if (proxyGatewayConfig) {
@@ -487,11 +477,11 @@ export const appOps = (cluster: string): AppOps => {
                   return await sshConnect(url.hostname, "root", logger, async (proxyGatewaySsh) => {
                     logger.info(`Connecting to compute node ${host} via proxy gateway ${url.hostname}`);
                     const { password, ip } =
-                      await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId!);
+                      await refreshPasswordByProxyGateway(proxyGatewaySsh, cluster, host, userId, logger, displayId);
                     return {
                       appId: sessionMetadata.appId,
                       host: ip || host,
-                      port: displayIdToPort(displayId!),
+                      port: displayIdToPort(displayId),
                       password,
                     };
                   });
@@ -501,11 +491,11 @@ export const appOps = (cluster: string): AppOps => {
                 // connect as user so that
                 // the service node doesn't need to be able to connect to compute nodes with public key
                 return await sshConnect(host, userId, logger, async (computeNodeSsh) => {
-                  const password = await refreshPassword(computeNodeSsh, cluster, null, logger, displayId!);
+                  const password = await refreshPassword(computeNodeSsh, cluster, null, logger, displayId);
                   return {
                     appId: sessionMetadata.appId,
                     host,
-                    port: displayIdToPort(displayId!),
+                    port: displayIdToPort(displayId),
                     password,
                   };
                 });
@@ -514,7 +504,7 @@ export const appOps = (cluster: string): AppOps => {
           }
         }
 
-        throw <ServiceError>{ code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` };
+        throw { code: Status.UNAVAILABLE, message: `session id ${sessionId} cannot be connected` } as ServiceError;
 
       });
     },

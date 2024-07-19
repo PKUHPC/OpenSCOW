@@ -12,7 +12,7 @@
 
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { compareNumber } from "@scow/lib-web/build/utils/math";
+import { compareNumber, compareTimeAsSeconds } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import type { AppSession } from "@scow/protos/build/portal/app";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
@@ -26,10 +26,10 @@ import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { calculateAppRemainingTime, compareState } from "src/models/job";
 import { ConnectTopAppLink } from "src/pageComponents/app/ConnectToAppLink";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 
 interface FilterForm {
- appJobName: string | undefined
+  appJobName: string | undefined
 }
 
 interface Props {
@@ -87,6 +87,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
       dataIndex: "sessionId",
       width: "25%",
       ellipsis: true,
+      sorter: (a, b) => a.sessionId.localeCompare(b.sessionId),
     },
     {
       title: t(p("table.jobId")),
@@ -98,13 +99,14 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
       title: t(p("table.appId")),
       dataIndex: "appId",
       render: (appId: string, record) => record.appName ?? appId,
-      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
+      sorter: (a, b) => a.appId.localeCompare(b.appId),
     },
     {
       title: t(p("table.submitTime")),
       dataIndex: "submitTime",
       width: "15%",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
+      sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
       title: t(p("table.state")),
@@ -126,13 +128,17 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
         ? compareState (a.state, b.state) :
         compareNumber(a.jobId, b.jobId),
       defaultSortOrder: "descend",
-
     },
     {
       title: t(p("table.remainingTime")),
       dataIndex: "remainingTime",
+      sorter:(a, b) => compareTimeAsSeconds(
+        a.state === "PENDING" ?
+          a.timeLimit : calculateAppRemainingTime(a.runningTime, a.timeLimit),
+        b.state === "PENDING" ?
+          b.timeLimit : calculateAppRemainingTime(b.runningTime, b.timeLimit),
+      ),
     },
-
     {
       title: t("button.actionButton"),
       key: "action",

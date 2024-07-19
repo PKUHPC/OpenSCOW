@@ -10,14 +10,48 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Cluster, publicConfig } from "./config";
+import { SimpleClusterSchema } from "@scow/config/build/cluster";
+import { I18nStringType } from "@scow/config/build/i18n";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 
-export const getSortedClusterValues = (): Cluster[] => {
+export interface Cluster { id: string; name: I18nStringType; };
 
-  const sortedClusters: Cluster[] = [];
-  publicConfig.CLUSTER_SORTED_ID_LIST.forEach((clusterId) => {
-    sortedClusters.push(publicConfig.CLUSTERS[clusterId]);
-  });
-
-  return sortedClusters;
+export const getClusterName = (
+  clusterId: string,
+  languageId: string,
+  publicConfigClusters: Record<string, Cluster>,
+) => {
+  return getI18nConfigCurrentText(publicConfigClusters[clusterId]?.name, languageId) || clusterId;
 };
+
+export const getSortedClusterValues =
+  (publicConfigClusters: Record<string, Cluster>,
+    clusterSortedIdList: string[],
+  ): Cluster[] => {
+
+    const sortedClusters: Cluster[] = [];
+    clusterSortedIdList.forEach((clusterId) => {
+      sortedClusters.push(publicConfigClusters[clusterId]);
+    });
+
+    return sortedClusters;
+  };
+
+
+export const getPublicConfigClusters =
+  (configClusters: Record<string, Partial<SimpleClusterSchema>>):
+  Record<string, Cluster> => {
+
+    const publicConfigClusters: Record<string, Cluster> = {};
+
+    Object.keys(configClusters).forEach((clusterId) => {
+      const cluster = {
+        id: clusterId,
+        name: configClusters[clusterId].displayName!,
+      };
+      publicConfigClusters[clusterId] = cluster;
+    });
+
+    return publicConfigClusters;
+  };
+

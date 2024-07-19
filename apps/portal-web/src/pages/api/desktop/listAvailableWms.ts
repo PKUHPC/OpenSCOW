@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { DesktopServiceClient } from "@scow/protos/build/portal/desktop";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { getClusterConfigFiles } from "src/server/clusterConfig";
 import { getClient } from "src/utils/client";
-import { getLoginDesktopEnabled } from "src/utils/config";
+import { getLoginDesktopEnabled } from "src/utils/cluster";
+import { route } from "src/utils/route";
 
 // Cannot use AvailableWm from protos
 export const AvailableWm = Type.Object({
@@ -44,12 +46,13 @@ export const ListAvailableWmsSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(ListAvailableWmsSchema, async (req, res) => {
+export default /* #__PURE__*/route(ListAvailableWmsSchema, async (req, res) => {
 
 
   const { cluster } = req.query;
 
-  const loginDesktopEnabled = getLoginDesktopEnabled(cluster);
+  const clusterConfigs = await getClusterConfigFiles();
+  const loginDesktopEnabled = getLoginDesktopEnabled(cluster, clusterConfigs);
 
   if (!loginDesktopEnabled) {
     return { 501: { code: "CLUSTER_LOGIN_DESKTOP_NOT_ENABLED" as const } };

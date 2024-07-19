@@ -13,19 +13,20 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
-import { SqlEntityManager } from "@mikro-orm/mysql";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
+import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { emptyJobPriceInfo } from "src/bl/jobPrice";
-import { clusters } from "src/config/clusters";
+import { createPriceMap } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
-import { PricePlugin } from "src/plugins/price";
 import { toGrpc } from "src/utils/job";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
@@ -37,13 +38,13 @@ async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logge
 
   const { timeEnd = undefined } = (await query.execute("get")) ?? {};
 
-  logger.info(`Latest fetched job's end_time is ${timeEnd}.`);
+  logger.info(`Latest fetched job's end_time is ${timeEnd?.toISOString() ?? "undefined"}.`);
 
   return timeEnd;
 }
 
 const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
-  const jobs: ({cluster: string} & ClusterJobInfo)[] = [];
+  const jobs: ({ cluster: string } & ClusterJobInfo)[] = [];
   result.jobs.forEach((job) => {
     jobs.push({ cluster, ...job });
   });
@@ -62,10 +63,9 @@ const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
 export let lastFetched: Date | null = null;
 
 export async function fetchJobs(
-  em: SqlEntityManager,
+  em: SqlEntityManager<MySqlDriver>,
   logger: Logger,
   clusterPlugin: ClusterPlugin,
-  pricePlugin: PricePlugin,
 ) {
   logger.info("Start fetching.");
 
@@ -75,10 +75,17 @@ export async function fetchJobs(
 
   const accountTenantMap = new Map(accounts.map((x) => [x.accountName, x.tenant.$.name]));
 
-  const priceMap = await pricePlugin.price.createPriceMap();
+  const priceMap = await createPriceMap(em, clusterPlugin.clusters, logger);
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
+
+      const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+        logger.info("!!![important] No available activated clusters.This will skip fetching Jobs in cluster!!!");
+        logger.info(e);
+        return {};
+      });
+
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];
       let pricedJob: JobInfo;
@@ -129,6 +136,12 @@ export async function fetchJobs(
 
         const comment = parsePlaceholder(misConfig.jobChargeComment, pricedJob);
 
+        const metadataMap: ChargeRecord["metadata"] = {};
+        const savedFields = misConfig.jobChargeMetadata?.savedFields;
+        savedFields?.forEach((field) => {
+          metadataMap[field] = pricedJob[field];
+        });
+
         if (account) {
           // charge account
           await charge({
@@ -136,7 +149,9 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account,
-          }, em, logger, clusterPlugin);
+            userId: pricedJob.user,
+            metadata: metadataMap,
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           // charge tenant
           await charge({
@@ -144,7 +159,9 @@ export async function fetchJobs(
             type: misConfig.jobChargeType,
             comment,
             target: account.tenant.$,
-          }, em, logger, clusterPlugin);
+            userId: pricedJob.user,
+            metadata: metadataMap,
+          }, em, currentActivatedClusters, logger, clusterPlugin);
 
           const ua = await em.findOne(UserAccount, {
             account: { accountName: pricedJob.account },
@@ -158,7 +175,7 @@ export async function fetchJobs(
               "User %s in account %s is not found.", pricedJob.user, pricedJob.account);
           } else {
             // 用户限额及相关操作
-            await addJobCharge(ua, pricedJob.accountPrice, clusterPlugin, logger);
+            await addJobCharge(ua, pricedJob.accountPrice, currentActivatedClusters, clusterPlugin, logger);
           }
 
         }
@@ -177,9 +194,12 @@ export async function fetchJobs(
     return result.length;
   };
 
+  const clusters = await getActivatedClusters(em, logger);
+
   try {
     let newJobsCount = 0;
     for (const cluster of Object.keys(clusters)) {
+
       logger.info(`fetch jobs from cluster ${cluster}`);
 
       const latestDate = await getClusterLatestDate(em, cluster, logger);
@@ -191,7 +211,8 @@ export async function fetchJobs(
         ? (nextDate > configDate ? nextDate : configDate)
         : (nextDate || configDate);
       const endFetchDate = new Date();
-      logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
+      logger.info(`Fetching new info which end_time is from
+          ${startFetchDate?.toISOString()} to ${endFetchDate.toISOString()}`);
 
       const fields: string[] = [
         "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
@@ -228,7 +249,7 @@ export async function fetchJobs(
           let savedJobsCount = 0;
 
           for (const job of jobsInfo) {
-            if (job.endTime! === previousDate) {
+            if (job.endTime === previousDate) {
               currentJobsGroup.push(job);
             } else {
               savedJobsCount += await persistJobAndCharge(currentJobsGroup);

@@ -14,11 +14,15 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { BlockedFailedUserAccount } from "@scow/protos/build/server/admin";
 import { Account } from "src/entities/Account";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+
+import { getActivatedClusters } from "./clustersUtils";
+
 
 /**
  * Update block status of accounts and users in the slurm.
@@ -31,7 +35,25 @@ export async function updateBlockStatusInSlurm(
 ) {
   const blockedAccounts: string[] = [];
   const blockedFailedAccounts: string[] = [];
-  const accounts = await em.find(Account, { blocked: true });
+  const blockedUserAccounts: [string, string][] = [];
+  const blockedFailedUserAccounts: BlockedFailedUserAccount[] = [];
+
+  const accounts = await em.find(Account, { blockedInCluster: true });
+
+  const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+    logger.info(e);
+    return {};
+  });
+
+  if (Object.keys(currentActivatedClusters).length === 0) {
+    logger.info("No available activated clusters in SCOW.");
+    return {
+      blockedAccounts,
+      blockedFailedAccounts,
+      blockedUserAccounts,
+      blockedFailedUserAccounts,
+    };
+  }
 
   for (const account of accounts) {
     if (account.whitelist) {
@@ -39,26 +61,26 @@ export async function updateBlockStatusInSlurm(
     }
 
     try {
-      await clusterPlugin.callOnAll(logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "blockAccount", {
           accountName: account.accountName,
         }),
       );
       blockedAccounts.push(account.accountName);
     } catch (error) {
+      logger.warn("Failed to block account %s in slurm: %o", account.accountName, error);
       blockedFailedAccounts.push(account.accountName);
     }
   }
 
-  const blockedUserAccounts: [string, string][] = [];
-  const blockedFailedUserAccounts: BlockedFailedUserAccount[] = [];
+
   const userAccounts = await em.find(UserAccount, {
-    status: UserStatus.BLOCKED,
+    blockedInCluster: UserStatus.BLOCKED,
   }, { populate: ["user", "account"]});
 
   for (const ua of userAccounts) {
     try {
-      await clusterPlugin.callOnAll(logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.user, "blockUserInAccount", {
           accountName: ua.account.$.accountName,
           userId: ua.user.$.userId,
@@ -66,6 +88,8 @@ export async function updateBlockStatusInSlurm(
       );
       blockedUserAccounts.push([ua.user.getProperty("userId"), ua.account.getProperty("accountName")]);
     } catch (error) {
+      logger.warn("Failed to block user accounts (userid: %s, account_name: %s) in slurm: %o",
+        ua.user.$.userId, ua.account.$.accountName, error);
       blockedFailedUserAccounts.push({
         userId: ua.user.$.userId,
         accountName: ua.account.$.accountName,
@@ -100,7 +124,7 @@ export async function updateUnblockStatusInSlurm(
 ) {
   const accounts = await em.find(Account, {
     $or: [
-      { blocked: false },
+      { blockedInCluster: false },
       { whitelist: { $ne: null } },
     ],
   });
@@ -108,15 +132,29 @@ export async function updateUnblockStatusInSlurm(
   const unblockedAccounts: string[] = [];
   const unblockedFailedAccounts: string[] = [];
 
+  const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+    logger.info(e);
+    return {};
+  });
+
+  if (Object.keys(currentActivatedClusters).length === 0) {
+    logger.info("No available activated clusters in SCOW.");
+    return {
+      unblockedAccounts,
+      unblockedFailedAccounts,
+    };
+  }
+
   for (const account of accounts) {
     try {
-      await clusterPlugin.callOnAll(logger, async (client) =>
+      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "unblockAccount", {
           accountName: account.accountName,
         }),
       );
       unblockedAccounts.push(account.accountName);
     } catch (error) {
+      logger.warn("Failed to unblock account %s in slurm: %o", account.accountName, error);
       unblockedFailedAccounts.push(account.accountName);
     }
   }
@@ -140,22 +178,25 @@ export async function updateUnblockStatusInSlurm(
  * @returns Operation result
 **/
 export async function blockAccount(
-  account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+  account: Loaded<Account, "tenant">,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin["clusters"],
+  logger: Logger,
 ): Promise<"AlreadyBlocked" | "Whitelisted" | "OK"> {
 
-  if (account.blocked) { return "AlreadyBlocked"; }
+  if (account.blockedInCluster) { return "AlreadyBlocked"; }
 
   if (account.whitelist) {
     return "Whitelisted";
   }
 
-  await clusterPlugin.callOnAll(logger, async (client) => {
+  await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
     });
   });
 
-  account.blocked = true;
+  account.blockedInCluster = true;
 
   await callHook("accountBlocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
@@ -170,18 +211,21 @@ export async function blockAccount(
  * @returns Operation result
 **/
 export async function unblockAccount(
-  account: Loaded<Account, "tenant">, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+  account: Loaded<Account, "tenant">,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
+  clusterPlugin: ClusterPlugin["clusters"],
+  logger: Logger,
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
-  if (!account.blocked) { return "ALREADY_UNBLOCKED"; }
+  if (!account.blockedInCluster) { return "ALREADY_UNBLOCKED"; }
 
-  await clusterPlugin.callOnAll(logger, async (client) => {
+  await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "unblockAccount", {
       accountName: account.accountName,
     });
   });
 
-  account.blocked = false;
+  account.blockedInCluster = false;
   await callHook("accountUnblocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);
 
   return "OK";
@@ -193,23 +237,24 @@ export async function unblockAccount(
  * */
 export async function blockUserInAccount(
   ua: Loaded<UserAccount, "user" | "account">,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
-  if (ua.status === UserStatus.BLOCKED) {
+  if (ua.blockedInCluster == UserStatus.BLOCKED) {
     return;
   }
 
   const accountName = ua.account.$.accountName;
   const userId = ua.user.$.userId;
 
-  await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+  await clusterPlugin.clusters.callOnAll(currentActivatedClusters, logger, async (client) =>
     await asyncClientCall(client.user, "blockUserInAccount", {
       accountName,
       userId,
     }),
   );
 
-  ua.status = UserStatus.BLOCKED;
+  ua.blockedInCluster = UserStatus.BLOCKED;
 
   await callHook("userBlockedInAccount", {
     accountName,
@@ -222,23 +267,24 @@ export async function blockUserInAccount(
  * */
 export async function unblockUserInAccount(
   ua: Loaded<UserAccount, "user" | "account">,
+  currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin, logger: Logger,
 ) {
-  if (ua.status === UserStatus.UNBLOCKED) {
+  if (ua.blockedInCluster === UserStatus.UNBLOCKED) {
     return;
   }
 
   const accountName = ua.account.getProperty("accountName");
   const userId = ua.user.getProperty("userId");
 
-  await clusterPlugin.clusters.callOnAll(logger, async (client) =>
+  await clusterPlugin.clusters.callOnAll(currentActivatedClusters, logger, async (client) =>
     await asyncClientCall(client.user, "unblockUserInAccount", {
       accountName,
       userId,
     }),
   );
 
-  ua.status = UserStatus.UNBLOCKED;
+  ua.blockedInCluster = UserStatus.UNBLOCKED;
 
   await callHook("userUnblockedInAccount", {
     accountName, userId,

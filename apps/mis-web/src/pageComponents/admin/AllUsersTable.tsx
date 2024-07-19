@@ -21,18 +21,24 @@ import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
 import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
-import { GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
+import { type GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
+import { getRuntimeI18nConfigText } from "src/utils/config";
+
+import { ChangeTenantModalLink } from "./ChangeTenantModal";
 
 interface FilterForm {
   idOrName: string | undefined;
 }
 
 interface PageInfo {
-    page: number;
-    pageSize?: number;
+  page: number;
+  pageSize?: number;
 }
 
 interface SortInfo {
@@ -57,11 +63,12 @@ const pCommon = prefix("common.");
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
-  const [ query, setQuery ] = useState<FilterForm>(() => {
+  const [query, setQuery] = useState<FilterForm>(() => {
     return { idOrName: undefined };
   });
 
   const t = useI18nTranslateToString();
+  const { message } = App.useApp();
 
   const [form] = Form.useForm<FilterForm>();
 
@@ -71,21 +78,23 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
   const promiseFn = useCallback(async () => {
 
-    return await api.getAllUsers({ query: {
-      page: pageInfo.page,
-      pageSize: pageInfo.pageSize,
-      sortField: sortInfo.sortField,
-      sortOrder: sortInfo.sortOrder,
-      idOrName: query.idOrName,
-      platformRole: currentPlatformRole,
-    } });
+    return await api.getAllUsers({
+      query: {
+        page: pageInfo.page,
+        pageSize: pageInfo.pageSize,
+        sortField: sortInfo.sortField,
+        sortOrder: sortInfo.sortOrder,
+        idOrName: query.idOrName,
+        platformRole: currentPlatformRole,
+      },
+    });
   }, [query, pageInfo, sortInfo, currentPlatformRole]);
   const { data, isLoading, reload: reloadAllUsers } = useAsync({ promiseFn, watch: refreshToken });
 
 
   const { data: platformUsersCounts, isLoading: isCountLoading, reload: reloadUsersCounts } = useAsync({
     promiseFn: useCallback(
-      async () => await api.getPlatformUsersCounts({ query:{ idOrName: query.idOrName } }), [query, refreshToken],
+      async () => await api.getPlatformUsersCounts({ query: { idOrName: query.idOrName } }), [query, refreshToken],
     ),
   });
 
@@ -115,6 +124,51 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
     reloadUsersCounts();
   };
 
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+
+    let total = 0;
+
+    if (currentPlatformRole === undefined) {
+      total = platformUsersCounts?.totalCount ?? 0;
+    } else if (currentPlatformRole === PlatformRole.PLATFORM_ADMIN) {
+      total = platformUsersCounts?.totalAdminCount ?? 0;
+    } else {
+      total = platformUsersCounts?.totalFinanceCount ?? 0;
+    }
+
+    if (total > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (total <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportUser",
+        columns,
+        count: total,
+        query: {
+          sortField: sortInfo.sortField,
+          sortOrder: sortInfo.sortOrder,
+          idOrName: query.idOrName,
+          platformRole: currentPlatformRole,
+        },
+      });
+    }
+
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label: t(p("userId")), value: "userId" },
+      { label: t(p("name")), value: "name" },
+      { label: t(p("tenant")), value: "tenantName" },
+      { label: t(p("availableAccounts")), value: "availableAccounts" },
+      { label: t(pCommon("createTime")), value: "createTime" },
+      { label: t(p("roles")), value: "platformRoles" },
+    ];
+  }, [t]);
+
+
   return (
     <div>
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
@@ -134,6 +188,14 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
+          </Form.Item>
+          <Form.Item>
+            <ExportFileModaLButton
+              options={exportOptions}
+              onExport={handleExport}
+            >
+              {t(pCommon("export"))}
+            </ExportFileModaLButton>
           </Form.Item>
         </Form>
         <Space style={{ marginBottom: "-16px" }}>
@@ -177,6 +239,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 }) => {
 
   const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
 
   const { message } = App.useApp();
 
@@ -204,7 +267,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           onChange: (page, pageSize) => setPageInfo({ page, pageSize }),
         } : false}
         onChange={handleTableChange}
-        scroll={{ x: data?.platformUsers?.length ? 1200 : true }}
+        scroll={{ x: true }}
       >
         <Table.Column<PlatformUserInfo>
           dataIndex="userId"
@@ -220,7 +283,7 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           sortDirections={["ascend", "descend"]}
           sortOrder={sortInfo.sortField === "name" ? sortInfo.sortOrder : null}
         />
-        <Table.Column<PlatformUserInfo> dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
+        <Table.Column dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
           width="25%"
@@ -246,8 +309,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         />
 
         <Table.Column<PlatformUserInfo>
-          dataIndex="changePassword"
-          width="7.5%"
+          dataIndex="operation"
+          width="10%"
           fixed="right"
           title={t(pCommon("operation"))}
           render={(_, r) => (
@@ -256,18 +319,33 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
                 userId={r.userId}
                 name={r.name}
                 onComplete={async (newPassword) => {
-                  await api.changePasswordAsPlatformAdmin({ body:{
-                    identityId: r.userId,
-                    newPassword: newPassword,
-                  } })
+                  await api.changePasswordAsPlatformAdmin({
+                    body: {
+                      identityId: r.userId,
+                      newPassword: newPassword,
+                    },
+                  })
                     .httpError(404, () => { message.error(t(p("notExist"))); })
                     .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                    .httpError(400, (e) => {
+                      if (e.code === "PASSWORD_NOT_VALID") {
+                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                      };
+                    })
                     .then(() => { message.success(t(p("success"))); })
                     .catch(() => { message.error(t(p("fail"))); });
                 }}
               >
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
+              <ChangeTenantModalLink
+                tenantName={r.tenantName}
+                name={r.name}
+                userId={r.userId}
+                reload={reload}
+              >
+                {t(p("changeTenant"))}
+              </ChangeTenantModalLink>
             </Space>
           )}
         />

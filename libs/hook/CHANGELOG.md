@@ -1,5 +1,54 @@
 # @scow/lib-hook
 
+## 1.0.12
+
+### Patch Changes
+
+- @scow/protos@1.0.12
+
+## 1.0.11
+
+### Patch Changes
+
+- @scow/protos@1.0.11
+
+## 1.0.10
+
+### Patch Changes
+
+- 640a599: 支持填写多个 hook 地址
+  - @scow/protos@1.0.10
+
+## 1.0.9
+
+### Patch Changes
+
+- @scow/protos@1.0.9
+
+## 1.0.8
+
+### Patch Changes
+
+- @scow/protos@1.0.8
+
+## 1.0.7
+
+### Patch Changes
+
+- @scow/protos@1.0.7
+
+## 1.0.6
+
+### Patch Changes
+
+- @scow/protos@1.0.6
+
+## 1.0.5
+
+### Patch Changes
+
+- @scow/protos@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

@@ -14,19 +14,19 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
-import { I18nStringType } from "@scow/config/build/i18n";
+import { getI18nSeverTypeFormat } from "@scow/lib-server";
 import {
   AppCustomAttribute,
   appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
-  I18nStringProtoType,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { getClusterAppConfigs } from "src/utils/app";
+import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
 const errorInfo = (reason: string) =>
@@ -38,6 +38,7 @@ export const appServiceServer = plugin((server) => {
     connectToApp: async ({ request, logger }) => {
 
       const { cluster, sessionId, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -52,35 +53,35 @@ export const appServiceServer = plugin((server) => {
       const app = apps[reply.appId];
 
       if (!app) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${reply.appId} is not found` };
+        throw { code: Status.NOT_FOUND, message: `app id ${reply.appId} is not found` } as ServiceError;
       }
 
       let appProps: ConnectToAppResponse["appProps"];
 
       switch (app.type) {
-      case AppType.vnc:
-        appProps = {
-          $case: "vnc",
-          vnc: {},
-        };
-        break;
-      case AppType.web:
-        appProps = {
-          $case: "web",
-          web: {
-            formData: app.web!.connect.formData ?? {},
-            query: app.web!.connect.query ?? {},
-            method: app.web!.connect.method,
-            path: app.web!.connect.path,
-            proxyType: app.web!.proxyType === "absolute"
-              ? WebAppProps_ProxyType.ABSOLUTE
-              : WebAppProps_ProxyType.RELATIVE,
-            customFormData: reply.customFormData ?? {},
-          },
-        };
-        break;
-      default:
-        throw new Error(`Unknown app type ${app.type} of app id ${reply.appId}`);
+        case AppType.vnc:
+          appProps = {
+            $case: "vnc",
+            vnc: {},
+          };
+          break;
+        case AppType.web:
+          appProps = {
+            $case: "web",
+            web: {
+              formData: app.web!.connect.formData ?? {},
+              query: app.web!.connect.query ?? {},
+              method: app.web!.connect.method,
+              path: app.web!.connect.path,
+              proxyType: app.web!.proxyType === "absolute"
+                ? WebAppProps_ProxyType.ABSOLUTE
+                : WebAppProps_ProxyType.RELATIVE,
+              customFormData: reply.customFormData ?? {},
+            },
+          };
+          break;
+        default:
+          throw new Error(`Unknown app type ${app.type as string} of app id ${reply.appId}`);
       }
 
       return [{
@@ -95,6 +96,8 @@ export const appServiceServer = plugin((server) => {
 
       const { account, appId, appJobName, cluster, coreCount, nodeCount, gpuCount, memory, maxTime,
         proxyBasePath, partition, qos, userId, customAttributes } = request;
+
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
@@ -117,40 +120,40 @@ export const appServiceServer = plugin((server) => {
         }
 
         switch (attribute.type) {
-        case "number":
-          if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
-            throw new DetailedError({
-              code: Status.INVALID_ARGUMENT,
-              message: `
+          case "number":
+            if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
+              throw new DetailedError({
+                code: Status.INVALID_ARGUMENT,
+                message: `
                 custom form attribute ${attribute.name} should be of type number,
                 but of type ${typeof customAttributes[attribute.name]}`,
-              details: [errorInfo("INVALID ARGUMENT")],
-            });
-          }
-          break;
+                details: [errorInfo("INVALID ARGUMENT")],
+              });
+            }
+            break;
 
-        case "text":
-          break;
+          case "text":
+            break;
 
-        case "select":
+          case "select":
           // check the option selected by user is in select attributes as the config defined
-          if (customAttributes[attribute.name]
+            if (customAttributes[attribute.name]
             && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
-            throw new DetailedError({
-              code: Status.INVALID_ARGUMENT,
-              message: `
+              throw new DetailedError({
+                code: Status.INVALID_ARGUMENT,
+                message: `
                 the option value of ${attribute.name} selected by user should be
                 one of select attributes as the ${appId} config defined,
                 but is ${customAttributes[attribute.name]}`,
-              details: [errorInfo("INVALID ARGUMENT")],
-            });
-          }
-          break;
+                details: [errorInfo("INVALID ARGUMENT")],
+              });
+            }
+            break;
 
-        default:
-          throw new Error(`
+          default:
+            throw new Error(`
           the custom form attributes type in ${appId} config should be one of number, text or select,
-          but the type of ${attribute.name} is ${attribute.type}`);
+          but the type of ${attribute.name} is ${attribute.type as string}`);
         }
       });
 
@@ -179,7 +182,9 @@ export const appServiceServer = plugin((server) => {
     },
 
     listAppSessions: async ({ request, logger }) => {
+
       const { cluster, userId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const clusterops = getClusterOps(cluster);
 
@@ -193,31 +198,15 @@ export const appServiceServer = plugin((server) => {
     getAppMetadata: async ({ request }) => {
 
       const { appId, cluster } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const apps = getClusterAppConfigs(cluster);
       const app = apps[appId];
 
       if (!app) {
-        throw <ServiceError> { code: Status.NOT_FOUND, message: `app id ${appId} is not found` };
+        throw { code: Status.NOT_FOUND, message: `app id ${appId} is not found` } as ServiceError;
       }
       const attributes: AppCustomAttribute[] = [];
-
-      // config中的文本映射到protobuf中定义的grpc返回值的类型
-      const getI18nSeverTypeFormat = (i18nConfig: I18nStringType): I18nStringProtoType | undefined => {
-
-        if (!i18nConfig) return undefined;
-
-        if (typeof i18nConfig === "string") {
-          return { value: { $case: "directString", directString: i18nConfig } };
-        } else {
-          return { value: { $case: "i18nObject", i18nObject: {
-            i18n: {
-              default: i18nConfig.i18n.default,
-              en: i18nConfig.i18n.en,
-              zhCn: i18nConfig.i18n.zh_cn,
-            },
-          } } };
-        }
-      };
 
       if (app.attributes) {
         app.attributes.forEach((item) => {
@@ -236,7 +225,7 @@ export const appServiceServer = plugin((server) => {
             name: item.name,
             required: item.required,
             defaultInput: defaultInput,
-            placeholder: getI18nSeverTypeFormat(item.placeholder),
+            placeholder: item.placeholder ? getI18nSeverTypeFormat(item.placeholder) : undefined,
             options: item.select?.map((x) => {
               return {
                 value: x.value,
@@ -256,18 +245,20 @@ export const appServiceServer = plugin((server) => {
     listAvailableApps: async ({ request }) => {
 
       const { cluster } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
 
       const apps = getClusterAppConfigs(cluster);
 
       return [{
         apps: Object.keys(apps)
-          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath || undefined })),
-      }];
+          .map((x) => ({ id: x, name: apps[x].name, logoPath: apps[x].logoPath })) }];
     },
 
     getAppLastSubmission: async ({ request, logger }) => {
 
       const { userId, cluster, appId } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
       const clusterops = getClusterOps(cluster);
 
       if (!clusterops) { throw clusterNotFound(cluster); }

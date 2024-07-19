@@ -49,7 +49,10 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
     <LibAntdConfigProvider color={color} locale={locale}>
       <ConfigProvider
         locale={localizedLang}
-        theme={{ token: { colorPrimary: color, colorInfo: color }, algorithm: dark ? theme.darkAlgorithm : undefined }}
+        theme={{ token: {
+          colorPrimary: color,
+          colorInfo: color,
+        }, algorithm: dark ? theme.darkAlgorithm : undefined }}
       >
         <StyledComponentsThemeProvider color={color} locale={locale}>
           <App>
@@ -63,10 +66,10 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color, locale })
 
 function getAntdLocale(langId: string): Locale {
   switch (langId) {
-  case SYSTEM_VALID_LANGUAGES.ZH_CN:
-    return zhCNlocale;
-  case SYSTEM_VALID_LANGUAGES.EN:
-  default:
-    return enUSlocale;
+    case SYSTEM_VALID_LANGUAGES.ZH_CN:
+      return zhCNlocale;
+    case SYSTEM_VALID_LANGUAGES.EN:
+    default:
+      return enUSlocale;
   }
 }

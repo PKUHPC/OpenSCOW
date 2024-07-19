@@ -57,8 +57,7 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpCon
         if (action === "backToLoginUI") {
           const loginUrl = joinWithUrl(otp.ldap!.scowHost, config.BASE_PATH, config.AUTH_BASE_PATH,
             `/public/auth?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-          res.redirect(loginUrl);
-          return;
+          return res.redirect(loginUrl);
         }
       }
       if (otp.type === OtpStatusOptions.remote) {
@@ -66,8 +65,7 @@ export function bindRedirectLoinUIAndBindUIRoute(f: FastifyInstance, otp: OtpCon
           if (!otp.remote!.redirectUrl) {
             throw new Error("otp.remote!.redirectUrl is undefined");
           }
-          res.redirect(otp.remote!.redirectUrl);
-          return;
+          return res.redirect(otp.remote!.redirectUrl);
         }
       }
       return;
@@ -123,7 +121,7 @@ export function bindClickRequestBindingLinkRoute(
     emailAddress: Type.String(),
     callbackUrl: Type.String(),
   });
-  f.post<{Body: Static<typeof bodySchema>}>(
+  f.post<{ Body: Static<typeof bodySchema> }>(
     "/public/otp/sendEmail",
     {
       schema: {
@@ -152,63 +150,63 @@ export function bindClickAuthLinkInEmailRoute(
 
   // 用于处理用户在邮箱中点击确认链接
   f.get<{
-      Querystring: Static<typeof QuerystringSchema>
-    }>(
-      "/public/otp/email/validation",
-      {
-        schema: {
-          querystring: QuerystringSchema,
-        },
+    Querystring: Static<typeof QuerystringSchema>
+  }>(
+    "/public/otp/email/validation",
+    {
+      schema: {
+        querystring: QuerystringSchema,
       },
-      async (req, res) => {
-        const { token, callbackUrl } = req.query;
-        const logger = req.log;
-        const ivAndKey = await getIvAndKey(f);
-        if (!ivAndKey) {
-          // 返回用户信息过期
-          await renderBindOtpHtml(false, req, res, callbackUrl,
-            { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true });
-          return;
-        }
-        const decryptedOtpSessionToken = decryptData(ivAndKey, token);
-        const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
-        if (!otpSession) {
-          // 信息过期
-          await renderBindOtpHtml(false, req, res, callbackUrl,
-            { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true });
-          return;
-        }
-        // 将secret信息存入ldap;
-        const secret = speakeasy.generateSecret({ length: 20 }).base32;
-        await useLdap(logger, ldapConfig)(async (client) => {
-          logger.info("Binding as %s successful.", otpSession.dn);
-          const modify = promisify(client.modify.bind(client));
-          await modify(otpSession.dn, new ldapjs.Change({
-            operation: "replace",
-            modification: {
-              [otpLdap.secretAttributeName]: secret,
-            },
-          }),
-          );
-        });
-        const uid = otpSession.dn.match(/uid=([^,]+)/i)?.[1];
-        const url = speakeasy.otpauthURL({
-          secret: secret,
-          label: `${uid}@${otpLdap.label}`,
-          issuer: uid as string,
-          digits: 6,
-          period: 30,
-          algorithm: "sha1",
-          encoding: "base32",
-        });
-        const urlImg = await QRCode.toDataURL(url);
-        await f.redis.del(decryptedOtpSessionToken);
-        const renderedFile = await renderLiquidFile("qrcode", {
-          contentText: otpLdap.qrcodeDescription,
-          urlImg,
-          callbackUrl: callbackUrl,
-        });
-        await res.header("Content-Type", "text/html; charset=utf-8").send(renderedFile);
+    },
+    async (req, res) => {
+      const { token, callbackUrl } = req.query;
+      const logger = req.log;
+      const ivAndKey = await getIvAndKey(f);
+      if (!ivAndKey) {
+        // 返回用户信息过期
+        await renderBindOtpHtml(false, req, res, callbackUrl,
+          { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true });
+        return;
+      }
+      const decryptedOtpSessionToken = decryptData(ivAndKey, token);
+      const otpSession = await getOtpSession(decryptedOtpSessionToken, f);
+      if (!otpSession) {
+        // 信息过期
+        await renderBindOtpHtml(false, req, res, callbackUrl,
+          { bindLimitMinutes: otpLdap.bindLimitMinutes, tokenNotFound: true });
+        return;
+      }
+      // 将secret信息存入ldap;
+      const secret = speakeasy.generateSecret({ length: 20 }).base32;
+      await useLdap(logger, ldapConfig)(async (client) => {
+        logger.info("Binding as %s successful.", otpSession.dn);
+        const modify = promisify(client.modify.bind(client));
+        await modify(otpSession.dn, new ldapjs.Change({
+          operation: "replace",
+          modification: {
+            [otpLdap.secretAttributeName]: secret,
+          },
+        }),
+        );
       });
+      const uid = (/uid=([^,]+)/i.exec(otpSession.dn))?.[1];
+      const url = speakeasy.otpauthURL({
+        secret: secret,
+        label: `${uid}@${otpLdap.label}`,
+        issuer: uid!,
+        digits: 6,
+        period: 30,
+        algorithm: "sha1",
+        encoding: "base32",
+      });
+      const urlImg = await QRCode.toDataURL(url);
+      await f.redis.del(decryptedOtpSessionToken);
+      const renderedFile = await renderLiquidFile("qrcode", {
+        contentText: otpLdap.qrcodeDescription,
+        urlImg,
+        callbackUrl: callbackUrl,
+      });
+      await res.header("Content-Type", "text/html; charset=utf-8").send(renderedFile);
+    });
 }
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "pipeline": {
+  "tasks": {
     "dev": {
       "persistent": true,
       "cache": false
@@ -52,7 +52,7 @@
     },
     "@scow/protos#generate": {
       "inputs": [
-        "node_modules/@scow/grpc-api/**/*.proto",
+        "../../../protos/**/*.proto",
         "buf.gen.yaml"
       ],
       "outputs": [
@@ -61,7 +61,7 @@
     },
     "@scow/protos#build": {
       "dependsOn": [
-        "^@scow/protos#generate"
+        "generate"
       ],
       "inputs": [
         "generated/**"
@@ -81,7 +81,7 @@
     },
     "@scow/scheduler-adapter-protos#build": {
       "dependsOn": [
-        "^@scow/scheduler-adapter-protos#generate"
+        "generate"
       ],
       "inputs": [
         "generated/**"
@@ -90,18 +90,11 @@
         "build/**"
       ]
     },
-    "//#lint:ts": {
-      "inputs": [
-        "**/*.tsx",
-        "**/*.ts"
-      ],
-      "outputs": [
-        ".eslintcache"
-      ]
-    },
     "lint": {
       "inputs": [
-        "**/*.proto"
+        "**/*.proto",
+        "**/*.tsx",
+        "**/*.ts"
       ]
     }
   }

@@ -11,10 +11,11 @@
  */
 
 import type { RunningJob } from "@scow/protos/build/common/job";
+import { Static, Type } from "@sinclair/typebox";
 import dayjs from "dayjs";
 import { Lang } from "react-typed-i18n";
 import en from "src/i18n/en";
-import type { Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/cluster";
 
 
 export type RunningJobInfo = RunningJob & { cluster: Cluster; runningOrQueueTime: string };
@@ -64,7 +65,7 @@ export enum AmountStrategy {
   MAX_CPUSALLOC_MEM = "max-cpusAlloc-mem",
   MAX_GPU_CPUSALLOC = "max-gpu-cpusAlloc",
   GPU = "gpu",
-  CPUS_ALLOC = "cpusAlloc"
+  CPUS_ALLOC = "cpusAlloc",
 }
 
 // export const AmountStrategyText = "计量方式";
@@ -108,3 +109,23 @@ export const getAmountStrategyAlgorithmDescriptions = (t: TransType): Record<Amo
   };
 };
 
+export const JobSortOrder = Type.Union([
+  Type.Literal("descend"),
+  Type.Literal("ascend"),
+]);
+export type JobSortOrder = Static<typeof JobSortOrder>;
+
+export const JobSortBy = Type.Union(
+  [ Type.Literal("idJob"),
+    Type.Literal("jobName"),
+    Type.Literal("account"),
+    Type.Literal("user"),
+    Type.Literal("cluster"),
+    Type.Literal("partition"),
+    Type.Literal("qos"),
+    Type.Literal("timeSubmit"),
+    Type.Literal("timeEnd"),
+    Type.Literal("Price"),
+  ],
+);
+export type JobSortBy = Static<typeof JobSortBy>;

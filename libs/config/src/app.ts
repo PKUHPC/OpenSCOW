@@ -28,7 +28,7 @@ export type AppConnectPropsSchema = Static<typeof AppConnectPropsSchema>;
 
 export enum AppType {
   web = "web",
-  vnc = "vnc"
+  vnc = "vnc",
 }
 
 export const WebAppConfigSchema = Type.Object({

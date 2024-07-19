@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "xterm/css/xterm.css";
+import "@xterm/xterm/css/xterm.css";
 
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Button, Popover, Space, Typography } from "antd";
@@ -18,9 +18,13 @@ import { NextPage } from "next";
 import dynamic from "next/dynamic";
 import Router, { useRouter } from "next/router";
 import { useRef } from "react";
+import { useStore } from "simstate";
 import { requireAuth } from "src/auth/requireAuth";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { Localized, useI18n, useI18nTranslateToString } from "src/i18n";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
@@ -83,10 +87,19 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
   const loginNode = router.query.loginNode as string;
   const paths = router.query.path as (string[] | undefined);
 
+  const { currentClusters } = useStore(ClusterInfoStore);
+
+  if (!currentClusters.find((x) => x.id === cluster)) {
+    return <ClusterNotAvailablePage />;
+  }
+
+  const { loginNodes } = useStore(LoginNodeStore);
+  const currentLoginNodeName = loginNodes[cluster].find((x) => x.address === loginNode)?.name ?? loginNode;
+
   const headerRef = useRef<HTMLDivElement>(null);
 
   const clusterName =
-    getI18nConfigCurrentText(publicConfig.CLUSTERS.find((x) => x.id === cluster)?.name || cluster, languageId);
+    getI18nConfigCurrentText(currentClusters.find((x) => x.id === cluster)?.name || cluster, languageId);
 
   const t = useI18nTranslateToString();
 
@@ -97,7 +110,7 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
         <h2>
           <Localized
             id="pages.shell.loginNode.content"
-            args={[userStore.user.identityId, clusterName, loginNode]}
+            args={[userStore.user.identityId, clusterName, currentLoginNodeName]}
           />
         </h2>
         <Space wrap>
@@ -112,18 +125,30 @@ export const ShellPage: NextPage = requireAuth(() => true)(({ userStore }) => {
             getPopupContainer={() => headerRef.current || document.body}
             content={() => (
               <div>
-                {/* {t("pages.shell.loginNode.popoverContent1")} */}
                 <p><b>{t("pages.shell.loginNode.popoverContent1")}</b>：
                   <Text code>sopen</Text>{t("pages.shell.loginNode.popoverContent2")}
+                </p>
+                <p><b>{t("pages.shell.loginNode.popoverContent12")}</b>：
+                  <Text code>sup</Text>{t("pages.shell.loginNode.popoverContent13")}
                 </p>
                 <p><b>{t("pages.shell.loginNode.popoverContent3")}</b>：
                   <Text code>sdown [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
                   {t("pages.shell.loginNode.popoverContent4")}
                   <Text code>sdown [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
                   {t("pages.shell.loginNode.popoverContent5")}<br />
+                  {t("pages.shell.loginNode.popoverContent8")}<Text code>sdown hello.txt</Text>
+                </p>
+                <p><b>{t("pages.shell.loginNode.popoverContent9")}</b>：
+                  <Text code>sedit [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
+                  {t("pages.shell.loginNode.popoverContent10")}
+                  <Text code>sedit [{t("pages.shell.loginNode.popoverContentFile")}]</Text>
+                  {t("pages.shell.loginNode.popoverContent11")}<br />
+                  {t("pages.shell.loginNode.popoverContent8")}<Text code>sedit hello.txt</Text>
+                </p>
+                <p>
                   {t("pages.shell.loginNode.popoverContent6")}<Text code>sopen</Text>
-                  {t("pages.shell.loginNode.popoverContent7")}<br />
-                  {t("pages.shell.loginNode.popoverContent8")}<Text code>sdown hello.txt</Text></p>
+                  {t("pages.shell.loginNode.popoverContent7")}
+                </p>
               </div>
             )}
           >

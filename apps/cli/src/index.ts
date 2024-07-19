@@ -18,6 +18,7 @@ import { join } from "path";
 import { checkConfig } from "src/cmd/checkConfig";
 import { runCompose } from "src/cmd/compose";
 import { enterDb } from "src/cmd/db";
+import { enterAiDb } from "src/cmd/enterAiDb";
 import { enterAuditDb } from "src/cmd/enterAuditDb";
 import { generateDockerComposeYml } from "src/cmd/generate";
 import { init } from "src/cmd/init";
@@ -28,9 +29,10 @@ import { hideBin } from "yargs/helpers";
 import yargs from "yargs/yargs";
 
 
+
 const version = JSON.parse(readFileSync(join(__dirname, "../package.json"), "utf-8")).version;
 
-yargs(hideBin(process.argv))
+void yargs(hideBin(process.argv))
   .options({
     configPath: {
       alias: "c",
@@ -76,9 +78,15 @@ yargs(hideBin(process.argv))
         description: "output path",
         default: ".",
       },
+      full: {
+        alias: "f",
+        type: "boolean",
+        description: "Extract full config files",
+        default: false,
+      },
     });
   }, (argv) => {
-    init(argv);
+    void init(argv);
   })
   .command("update", "Update cli", (yargs) => {
     return yargs.options({
@@ -104,7 +112,7 @@ yargs(hideBin(process.argv))
       },
     });
   }, (argv) => {
-    updateCli(argv);
+    void updateCli(argv);
   })
   .command("generate", "Generate docker-compose.yml", (yargs) => {
     return yargs
@@ -127,10 +135,13 @@ yargs(hideBin(process.argv))
     generateDockerComposeYml(argv);
   })
   .command("db", "Enter mis db", (y) => y, (argv) => {
-    enterDb(argv);
+    void enterDb(argv);
   })
   .command("audit-db", "Enter audit db", (y) => y, (argv) => {
-    enterAuditDb(argv);
+    void enterAuditDb(argv);
+  })
+  .command("ai-db", "Enter ai db", (y) => y, (argv) => {
+    void enterAiDb(argv);
   })
   .command("compose", "Run  arbitrary compose commands", (y) => {
     return y.strict(false).parserConfiguration({ "unknown-options-as-args": true });

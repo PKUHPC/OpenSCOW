@@ -11,7 +11,7 @@
  */
 
 import { arrayContainsElement } from "@scow/utils";
-import { ItemType } from "antd/es/menu/hooks/useItems";
+import { ItemType } from "antd/es/menu/interface";
 import Link from "next/link";
 import Router from "next/router";
 import React from "react";
@@ -45,8 +45,11 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
-                ? window.location.href = target : Router.push(target);
+              if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+                window.location.href = target;
+              } else {
+                void Router.push(target);
+              }
             }
           }
           : undefined,
@@ -58,7 +61,11 @@ export function createMenuItems(
       icon: iconToNode(route.Icon),
       key: route.path,
       label: (
-        <Link href={route.clickToPath ?? route.path} {...route.openInNewPage ? { target: "_blank" } : {}}>
+        <Link
+          href={route.clickToPath ?? route.path}
+          {...route.openInNewPage ? { target: "_blank" } : {}}
+          style={{ textDecoration:"none" }}
+        >
           {route.text}
         </Link>
       ),

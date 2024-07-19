@@ -15,7 +15,7 @@ import { moneyToNumber } from "@scow/lib-decimal";
 import { Alert, Col, Row, Statistic, StatisticProps } from "antd";
 import React from "react";
 import { Section } from "src/components/Section";
-import { StatCard } from "src/components/StatCard";
+import { AccountStatCard } from "src/components/StatCard";
 import { useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
@@ -27,6 +27,7 @@ interface Props {
   info: Record<string, AccountInfo>;
 }
 
+// max-width: calc(100%/2 - 8px); 考虑换行后限制最大宽度
 const CardContainer = styled.div`
   flex: 1;
   min-width: 300px;
@@ -39,7 +40,7 @@ const Container = styled.div`
 `;
 
 const Info: React.FC<StatisticProps> = (props) => (
-  <Col span={8}>
+  <Col span={24}>
     <Statistic {...props} />
   </Col>
 );
@@ -52,9 +53,8 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
   const t = useI18nTranslateToString();
 
   const statusTexts = {
-    blocked: [t("dashboard.account.status.blocked"), "red", LockOutlined],
-    normal: [t("dashboard.account.status.normal"), "green", UnlockOutlined],
-
+    blocked: ["red", LockOutlined, "1"],
+    normal: ["green", UnlockOutlined, "0"],
   } as const;
 
   return (
@@ -67,37 +67,29 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
             {
               accounts.map(([accountName, {
                 accountBlocked, userStatus, balance,
-                jobChargeLimit, usedJobCharge,
+                jobChargeLimit, usedJobCharge, isInWhitelist, blockThresholdAmount,
               }]) => {
 
-                const [text, textColor, Icon] = accountBlocked || userStatus === UserStatus.BLOCKED
-                  ? statusTexts.blocked
-                  : statusTexts.normal;
-
+                const isBlocked = accountBlocked || userStatus === UserStatus.BLOCKED;
+                const [ textColor, Icon, opacity] = isBlocked ? statusTexts.blocked : statusTexts.normal;
                 const availableLimit = jobChargeLimit && usedJobCharge
-                  ? moneyToNumber(jobChargeLimit) - moneyToNumber(usedJobCharge)
+                  ? (moneyToNumber(jobChargeLimit) - moneyToNumber(usedJobCharge)).toFixed(2)
                   : undefined;
-
-                const minOne = availableLimit ? Math.min(availableLimit, balance) : balance;
-
+                const whitelistCharge = isInWhitelist ? "不限" : undefined;
+                const normalCharge = (balance - blockThresholdAmount).toFixed(2);
+                const showAvailableBalance = availableLimit ?? whitelistCharge ?? normalCharge;
                 return (
                   <CardContainer key={accountName}>
-                    <StatCard title={`${accountName}`}>
+                    <AccountStatCard title={`${accountName}`} icon={<Icon style={{ color:textColor, opacity }} />}>
                       <Row style={{ flex: 1, width: "100%" }}>
                         <Info
-                          title={t("dashboard.account.state")}
-                          valueStyle={{ color: textColor }}
-                          prefix={<Icon />}
-                          value={text}
-                        />
-                        <Info
                           title={t("dashboard.account.balance")}
-                          valueStyle={{ color: minOne < 0 ? "red" : undefined }}
-                          prefix={"￥"}
-                          value={minOne.toFixed(3)}
+                          valueStyle={{ color:textColor }}
+                          prefix={isBlocked ? "" : <span>￥</span>}
+                          value={isBlocked ? "-" : showAvailableBalance}
                         />
                       </Row>
-                    </StatCard>
+                    </AccountStatCard>
                   </CardContainer>
                 );
               })

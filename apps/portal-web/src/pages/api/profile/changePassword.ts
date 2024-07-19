@@ -11,7 +11,7 @@
  */
 
 import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as libChangePassword } from "@scow/lib-auth";
+import { changePassword as libChangePassword, getCapabilities } from "@scow/lib-auth";
 import { authenticate } from "src/auth/server";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
@@ -49,6 +49,11 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
     return { 501: null };
   }
 
+  const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
+  if (!ldapCapabilities.changePassword) {
+    return { 501: null };
+  }
+
   const auth = authenticate(() => true);
 
   const info = await auth(req, res);
@@ -70,12 +75,12 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
     .then(() => ({ 204: null }))
     .catch((e) => {
       switch (e.status) {
-      case "NOT_FOUND":
-        return { 404: null };
-      case "NOT_SUPPORTED":
-        return { 501: null };
-      default:
-        throw e;
+        case "NOT_FOUND":
+          return { 404: null };
+        case "NOT_SUPPORTED":
+          return { 501: null };
+        default:
+          throw e;
       }
     });
 

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+"use client";
 import AntdIcon from "@ant-design/icons";
 
 import { useDarkMode } from "./darkMode";
@@ -31,7 +32,6 @@ export function NavIcon({ src, alt = "" }: Props) {
         <img
           src={src}
           alt={altName}
-
           style={{
             ...style,
             filter: dark ? "invert(100%)" : "none",

@@ -55,7 +55,7 @@ const NewUserModal: React.FC<ModalProps> = ({
       onOk={async () => {
         const { identityId, name } = await form.validateFields();
         setLoading(true);
-        onAddingUser(identityId, name).finally(() => setLoading(false));
+        onAddingUser(identityId, name.trim()).finally(() => setLoading(false));
       }}
       confirmLoading={loading}
     >
@@ -82,9 +82,11 @@ interface Props {
   accountName: string;
   refresh: () => void;
   token: string;
+  // 添加用户不存在时是否可以创建用户
+  canCreateUserIfNotExist?: boolean;
 }
 
-export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) => {
+export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, canCreateUserIfNotExist = true }) => {
 
   const t = useI18nTranslateToString();
 
@@ -109,7 +111,9 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
           message.error(t(p("notExist")));
         }
         else if (code === "USER_NOT_FOUND") {
-          if (useBuiltinCreateUser()) {
+          if (!canCreateUserIfNotExist) {
+            message.error(t(p("createFirst")));
+          } else if (useBuiltinCreateUser()) {
             setModalShow(false);
             setNewUserInfo({ identityId, name });
           } else if (publicConfig.CREATE_USER_CONFIG.misConfig.type === "external") {
@@ -124,10 +128,10 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
               </>
             ), TIMEOUT_SECONDS, () => {
               window.open(
-                  publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
+                publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
                   accountName, identityId, name, token,
                 ),
-                  "_blank",
+                "_blank",
               );
               setModalShow(false);
             });
@@ -161,7 +165,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token }) 
         open={!!newUserInfo}
         newUserInfo={newUserInfo}
         onCreated={({ identityId, name }) => {
-          return onAddUser(identityId, name);
+          return onAddUser(identityId, name.trim());
         }}
         onClose={() => {
           setNewUserInfo(undefined);

@@ -19,6 +19,7 @@ import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } f
 import dayjs from "dayjs";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
@@ -27,9 +28,9 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
-import { getSortedClusterValues } from "src/utils/cluster";
-import type { Cluster } from "src/utils/config";
-import { getClusterName } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import type { Cluster } from "src/utils/cluster";
+import { getClusterName, getSortedClusterValues } from "src/utils/cluster";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface PageInfo {
@@ -70,6 +71,11 @@ export const AdminJobTable: React.FC<Props> = () => {
 
   const rangeSearch = useRef(true);
 
+  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+  const sortedClusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
+    .filter((x) => Object.keys(activatedClusters).includes(x.id));
+
+
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
@@ -77,7 +83,7 @@ export const AdminJobTable: React.FC<Props> = () => {
       userId: "",
       accountName: "",
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
-      clusters: getSortedClusterValues(),
+      clusters: sortedClusters,
     };
   });
   const [form] = Form.useForm<FilterForm>();
@@ -215,6 +221,7 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+  const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
 
@@ -264,18 +271,18 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         tableLayout="fixed"
         scroll={{ x: data?.jobs?.length ? 1800 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
-        <Table.Column<JobInfo> dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
-        <Table.Column<JobInfo> dataIndex="account" ellipsis title={t(pCommon("account"))} />
-        <Table.Column<JobInfo> dataIndex="user" ellipsis title={t(pCommon("user"))} />
+        <Table.Column dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
+        <Table.Column dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column dataIndex="account" ellipsis title={t(pCommon("account"))} />
+        <Table.Column dataIndex="user" ellipsis title={t(pCommon("user"))} />
         <Table.Column<JobInfo>
           dataIndex="cluster"
           ellipsis
           title={t(pCommon("cluster"))}
-          render={(cluster) => getClusterName(cluster, languageId)}
+          render={(cluster) => getClusterName(cluster, languageId, publicConfigClusters)}
         />
-        <Table.Column<JobInfo> dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" width="6.7%" ellipsis title="QOS" />
+        <Table.Column dataIndex="partition" width="6.7%" ellipsis title={t(pCommon("partition"))} />
+        <Table.Column dataIndex="qos" width="6.7%" ellipsis title="QOS" />
         <Table.Column<JobInfo>
           dataIndex="timeSubmit"
           width="8.9%"

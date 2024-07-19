@@ -21,16 +21,18 @@ import { App, AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumbe
 import dayjs from "dayjs";
 import React, { useCallback, useRef, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { JobSortBy, JobSortOrder } from "src/models/job";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
-import { getSortedClusterValues } from "src/utils/cluster";
-import type { Cluster } from "src/utils/config";
-import { getClusterName } from "src/utils/config";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
+import type { Cluster } from "src/utils/cluster";
+import { getClusterName, getSortedClusterValues } from "src/utils/cluster";
 import { moneyToString, nullableMoneyToString } from "src/utils/money";
 
 interface FilterForm {
@@ -52,6 +54,11 @@ interface Props {
   priceTexts?: { tenant?: string; account?: string };
 }
 
+interface Sorter {
+  field: JobSortBy | undefined,
+  order: JobSortOrder | undefined,
+}
+
 const p = prefix("pageComp.job.historyJobTable.");
 const pCommon = prefix("common.");
 
@@ -70,12 +77,16 @@ export const JobTable: React.FC<Props> = ({
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(undefined);
 
+  const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+  const sortedClusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
+    .filter((x) => Object.keys(activatedClusters).includes(x.id));
+
   const [query, setQuery] = useState<FilterForm>(() => {
     const now = dayjs();
     return {
       jobEndTime: [now.subtract(1, "week").startOf("day"), now.endOf("day")],
       jobId: undefined,
-      clusters: getSortedClusterValues(),
+      clusters: sortedClusters,
       accountName: typeof accountNames === "string" ? accountNames : undefined,
     };
   });
@@ -90,6 +101,9 @@ export const JobTable: React.FC<Props> = ({
   }, [accountNames]);
 
   const [form] = Form.useForm<FilterForm>();
+
+  // 定义排序状态
+  const [sorter, setSorter] = useState<Sorter>({ field:undefined, order:undefined });
 
 
   const promiseFn = useCallback(async () => {
@@ -107,6 +121,8 @@ export const JobTable: React.FC<Props> = ({
     };
     return await api.getJobInfo({ query: {
       ...diffQuery,
+      sortBy: sorter.field,
+      sortOrder: sorter.order,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
       clusters: query.clusters?.map((x) => x.id),
@@ -118,7 +134,7 @@ export const JobTable: React.FC<Props> = ({
         throw e;
       }
     });
-  }, [pageInfo, query]);
+  }, [pageInfo, query, sorter]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
 
@@ -159,7 +175,7 @@ export const JobTable: React.FC<Props> = ({
                           }
                           placeholder={t("common.selectAccount")}
                           filterOption={(inputValue, option) =>
-                            option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                            option!.value.toUpperCase().includes(inputValue.toUpperCase())
                           }
                           onChange={(value) => {
                             setSelectedAccountName(value || undefined);
@@ -205,6 +221,7 @@ export const JobTable: React.FC<Props> = ({
         isLoading={isLoading}
         pageInfo={pageInfo}
         setPageInfo={setPageInfo}
+        setSorter={setSorter}
         showAccount={showAccount}
         showUser={showUser}
         showedPrices={showedPrices}
@@ -220,7 +237,7 @@ interface JobInfoTableProps {
   pageInfo: { page: number, pageSize: number };
   setPageInfo?: (info: { page: number, pageSize: number }) => void;
   isLoading: boolean;
-
+  setSorter: (sorter: Sorter) => void;
   showAccount: boolean;
   showUser: boolean;
   showedPrices: ("tenant" | "account")[];
@@ -234,14 +251,22 @@ const priceText = {
 
 
 export const JobInfoTable: React.FC<JobInfoTableProps> = ({
-  data, pageInfo, setPageInfo, isLoading,
+  data, pageInfo, setPageInfo, setSorter, isLoading,
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
+  const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
+
+  const handleTableChange = (pagination, filters, sorter) => {
+    setSorter({
+      field: sorter.field,
+      order: sorter.order,
+    });
+  };
 
   const finalPriceText = {
     tenant: priceTexts?.tenant ?? t(p(priceText.tenant)),
@@ -284,6 +309,7 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         }
       </TableTitle>
       <Table
+        onChange={handleTableChange}
         rowKey={(i) => i.cluster + i.biJobIndex + i.idJob}
         dataSource={data?.jobs}
         loading={isLoading}
@@ -298,16 +324,38 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         tableLayout="fixed"
         scroll={{ x: data?.jobs?.length ? 1450 : true }}
       >
-        <Table.Column<JobInfo> dataIndex="idJob" width="7%" title={t(pCommon("clusterWorkId"))} />
-        <Table.Column<JobInfo> dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
+        <Table.Column<JobInfo>
+          dataIndex="idJob"
+          width="7%"
+          title={t(pCommon("clusterWorkId"))}
+          sorter={true}
+        />
+        <Table.Column<JobInfo>
+          dataIndex="jobName"
+          ellipsis
+          title={t(pCommon("workName"))}
+          sorter={true}
+        />
         {
           showAccount ? (
-            <Table.Column<JobInfo> dataIndex="account" width="13%" ellipsis title={t(pCommon("account"))} />
+            <Table.Column<JobInfo>
+              dataIndex="account"
+              width="13%"
+              ellipsis
+              title={t(pCommon("account"))}
+              sorter={true}
+            />
           ) : undefined
         }
         {
           showUser ? (
-            <Table.Column<JobInfo> dataIndex="user" width="12%" ellipsis title={t(pCommon("user"))} />
+            <Table.Column<JobInfo>
+              dataIndex="user"
+              width="12%"
+              ellipsis
+              title={t(pCommon("user"))}
+              sorter={true}
+            />
           ) : undefined
         }
         <Table.Column<JobInfo>
@@ -315,21 +363,36 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
           title={t(pCommon("clusterName"))}
           width="12%"
           ellipsis
-          render={(cluster) => getClusterName(cluster, languageId)}
+          render={(cluster) => getClusterName(cluster, languageId, publicConfigClusters)}
+          sorter={true}
         />
-        <Table.Column<JobInfo> dataIndex="partition" width="8.5%" ellipsis title={t(pCommon("partition"))} />
-        <Table.Column<JobInfo> dataIndex="qos" width="8.5%" ellipsis title="QOS" />
+        <Table.Column<JobInfo>
+          dataIndex="partition"
+          width="8.5%"
+          ellipsis
+          title={t(pCommon("partition"))}
+          sorter={true}
+        />
+        <Table.Column<JobInfo>
+          dataIndex="qos"
+          width="8.5%"
+          ellipsis
+          title="QOS"
+          sorter={true}
+        />
         <Table.Column
           dataIndex="timeSubmit"
           width="11.5%"
           title={t(pCommon("timeSubmit"))}
           render={(time: string) => formatDateTime(time)}
+          sorter={true}
         />
         <Table.Column<JobInfo>
           dataIndex="timeEnd"
           width="11.5%"
           title={t(pCommon("timeEnd"))}
           render={(time: string) => formatDateTime(time)}
+          sorter={true}
         />
         {
           showedPrices.map((v, i) => (

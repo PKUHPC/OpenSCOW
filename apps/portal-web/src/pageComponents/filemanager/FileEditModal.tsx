@@ -13,16 +13,16 @@
 import { CloseOutlined, FullscreenExitOutlined, FullscreenOutlined } from "@ant-design/icons";
 import Editor, { loader } from "@monaco-editor/react";
 import { App, Badge, Button, Modal, Space, Spin, Tabs, Tooltip } from "antd";
+import { editor } from "monaco-editor";
 import { join } from "path";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { api } from "src/apis";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
 import { getLanguage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
 
-import { urlToUpload } from "./api";
+import { urlToDownload, urlToUpload } from "./api";
 
 const StyledTabs = styled(Tabs)`
   .ant-tabs-nav {
@@ -150,7 +150,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const { open, filename, fileSize, filePath, clusterId } = previewFile;
 
   const [mode, setMode] = useState<Mode>(Mode.PREVIEW);
-  const [fileContent, setFileContent] = useState("");
+  const [fileContent, setFileContent] = useState<string | undefined>(undefined);
   const [isEdit, setIsEdit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -158,6 +158,8 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const [confirm, setConfirm] = useState(false);
   const [exitType, setExitType] = useState<ExitType>(ExitType.CLOSE);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [abortController, setAbortController] = useState(new AbortController());
 
   const [options, setOptions] = useState({
     readOnly: true,
@@ -170,20 +172,29 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     }
   }, [open]);
 
+  useEffect(() => {
+    if (editorRef.current) {
+      const editorInstance = editorRef.current.getModel();
+
+      // 设置换行符为 LF (\n)
+      editorInstance?.setEOL(0); // 0 代表 LF，1 代表 CRLF
+    }
+  }, [editorRef.current]);
+
   const { message } = App.useApp();
 
   const handleEdit = (content) => {
-    if (content && !downloading) {
+    if (mode === Mode.EDIT) {
       setIsEdit(true);
-      setFileContent(content);
     }
+    setFileContent(content);
   };
 
   const closeProcess = () => {
     setConfirm(false);
     setIsEdit(false);
     setMode(Mode.PREVIEW);
-    setFileContent("");
+    setFileContent(undefined);
     setOptions({
       ...options,
       readOnly: true,
@@ -196,6 +207,9 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   };
 
   const handleClose = () => {
+    if (downloading) {
+      abortController.abort();
+    }
     if (!isEdit) {
       closeProcess();
       return;
@@ -227,6 +241,9 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   };
 
   const handleSave = async () => {
+    if (fileContent === undefined) {
+      return;
+    }
 
     setSaving(true);
     const blob = new Blob([fileContent], { type: "text/plain" });
@@ -239,6 +256,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
       body: formData,
     }).then((response) => {
       if (!response.ok) {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         return Promise.reject(response.statusText);
       }
       message.success(t(p("saveFileSuccess")));
@@ -258,53 +276,60 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
 
     setLoading(true);
     setDownloading(true);
-    api.downloadFile({
-      query: { download: false, path: filePath, cluster: clusterId },
-    }).then((json) => {
-      setFileContent(JSON.stringify(json, null, 2));
-    }).catch(async (res: Response) => {
 
-      if (!res.ok) {
-        message.error(t(p("failedGetFile"), [filename]));
-        return;
-      }
-
-      const reader = res.body?.getReader();
-      if (reader) {
-        let accumulatedChunks = "";
-        let accumulatedSize = 0;
-        const CHUNK_SIZE = 3 * 1024 * 1024;
-        const decoder = new TextDecoder();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) {
-            setFileContent(() => {
-              return accumulatedChunks;
-            });
-            break;
-          }
-          const chunk = decoder.decode(value, { stream: true });
-          accumulatedChunks += chunk;
-          accumulatedSize += chunk.length;
-
-          if (accumulatedSize > CHUNK_SIZE) {
-            setFileContent(() => {
-              return accumulatedChunks;
-            });
-            accumulatedSize = 0;
-            setLoading(false);
-          }
+    const newAbortController = new AbortController();
+    setAbortController(newAbortController);
+    fetch(urlToDownload(clusterId, filePath, false), { signal: newAbortController.signal })
+      .then((res) => {
+        if (!res.ok) {
+          message.error(t(p("failedGetFile"), [filename]));
+          return;
         }
-      } else {
-        message.error(t(p("cantReadFile"), [filename]));
-      }
+        return res.body?.getReader();
+      })
+      .then(async (reader) => {
+        if (reader) {
+          let accumulatedChunks = "";
+          let accumulatedSize = 0;
+          const CHUNK_SIZE = 3 * 1024 * 1024;
+          const decoder = new TextDecoder();
 
-    }).finally(() => {
-      setLoading(false);
-      setDownloading(false);
-    });
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) {
+              setFileContent(() => {
+                return accumulatedChunks;
+              });
+              break;
+            }
 
+            const chunk = decoder.decode(value, { stream: true });
+            accumulatedChunks += chunk;
+            accumulatedSize += chunk.length;
+
+            if (accumulatedSize > CHUNK_SIZE) {
+              setFileContent(() => {
+                return accumulatedChunks;
+              });
+              accumulatedSize = 0;
+              setLoading(false);
+            }
+          }
+        } else {
+          message.error(t(p("cantReadFile"), [filename]));
+        }
+      })
+      .catch((error) => {
+        if (error.name === "AbortError") {
+          message.info(t(p("fileFetchAbortPrompt"), [filename]));
+        } else {
+          message.error(t(p("cantReadFile"), [filename]));
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+        setDownloading(false);
+      });
   };
 
   const modalTitle = (
@@ -332,7 +357,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     const fileEditLimitSize = publicConfig.FILE_EDIT_SIZE || DEFAULT_FILE_EDIT_LIMIT_SIZE;
     return (
       mode === Mode.PREVIEW ? (
-        fileSize <= convertToBytes(fileEditLimitSize)
+        fileSize <= convertToBytes(fileEditLimitSize) && !downloading
           ? (
             <Button
               type="primary"
@@ -393,7 +418,12 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
                   defaultLanguage={getLanguage(filename)}
                   options={options}
                   value={fileContent}
-                  onChange={handleEdit}
+                  onMount={(editor) => { editorRef.current = editor; }}
+                  onChange={(content) => {
+                    if (!downloading) {
+                      handleEdit(content);
+                    }
+                  }}
                 />
               </Spin>
             ),

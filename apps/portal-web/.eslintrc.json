@@ -1,7 +1,0 @@
-{
-  "extends": [
-    "@ddadaal/eslint-config/react",
-    "../../.eslintrc.js"
-  ],
-  "ignorePatterns": ["public/monaco-assets/**"]
-}

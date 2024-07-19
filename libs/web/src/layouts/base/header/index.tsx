@@ -15,7 +15,7 @@ import { Space } from "antd";
 import React from "react";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
-import { HeaderItem } from "src/layouts/base/header/components";
+import { HeaderItem, JumpToAnotherLink } from "src/layouts/base/header/components";
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
@@ -32,6 +32,9 @@ const Container = styled.header<ComponentProps>`
   z-index: 50;
   align-items: center;
   background-color: ${({ theme }) => theme.token.colorBgContainer};
+  font-weight:700;
+  font-size:18px;
+  width: 100%;
 `;
 
 
@@ -47,12 +50,28 @@ const MenuPartPlaceholder = styled.div`
   }
 `;
 
+const LinksPart = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const RightContentPart = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-grow: 0;
+  align-items: center;
+`;
+
 const IndicatorPart = styled(HeaderItem)`
-  justify-self: flex-end;
   flex-wrap: nowrap;
 `;
 
-
+export interface HeaderNavbarLink {
+  icon: React.ReactNode;
+  href: string;
+  text: string;
+  crossSystem?: boolean;
+};
 
 interface Props {
   hasSidebar: boolean;
@@ -62,19 +81,38 @@ interface Props {
   user: UserInfo | undefined;
   logout: (() => void) | undefined;
   pathname: string;
-  right?: React.ReactNode;
   basePath: string;
   userLinks?: UserLink[];
   languageId: string;
+  right?: React.ReactNode;
+  navbarLinks?: HeaderNavbarLink[];
 }
+
 
 export const Header: React.FC<Props> = ({
   hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
-  right, basePath, userLinks,
+  basePath, userLinks,
   languageId,
+  navbarLinks, right,
 }) => {
+
+  const hideLinkText = navbarLinks && navbarLinks.length >= 5;
+
+  const navbarLinkComponents = navbarLinks?.map((x, i) => {
+
+    return (
+      <JumpToAnotherLink
+        key={i}
+        icon={x.icon}
+        href={x.href}
+        text={x.text}
+        crossSystem={x.crossSystem}
+        hideText={hideLinkText}
+      />
+    );
+  }, [navbarLinks]);
 
   return (
     <Container>
@@ -86,7 +124,7 @@ export const Header: React.FC<Props> = ({
                 {React.createElement(
                   sidebarCollapsed ? MenuUnfoldOutlined : MenuFoldOutlined)}
               </a>
-            ) : <span/>
+            ) : <span />
           }
           <Logo basePath={basePath} />
         </Space>
@@ -98,10 +136,15 @@ export const Header: React.FC<Props> = ({
         />
         <MenuPartPlaceholder />
       </MenuPart>
-      {right}
-      <IndicatorPart>
-        <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId}/>
-      </IndicatorPart>
+      <RightContentPart>
+        <LinksPart>
+          {navbarLinkComponents}
+        </LinksPart>
+        {right}
+        <IndicatorPart>
+          <UserIndicator user={user} logout={logout} userLinks={userLinks} languageId={languageId} />
+        </IndicatorPart>
+      </RightContentPart>
     </Container>
   );
 };

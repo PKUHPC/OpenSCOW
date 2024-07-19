@@ -18,7 +18,7 @@ import { useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RunningJobInfo } from "src/models/job";
-import type { Cluster } from "src/utils/config";
+import type { Cluster } from "src/utils/cluster";
 
 interface Props {
   open: boolean;
@@ -171,7 +171,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
           )}
         >
           <Form.Item name="limitValue" noStyle>
-            <InputNumber min={1} step={1} addonAfter={selectAfter} />
+            <InputNumber min={1} step={1} addonAfter={selectAfter} precision={0} />
           </Form.Item>
         </Form.Item>
       </Form>
@@ -197,7 +197,7 @@ export const ChangeJobTimeLimitModal: React.FC<Props> = ({ open, onClose, data, 
         arrayContainsElement(completionStatus?.current?.failed)
           ? (
             <Form.Item label={t(p("modifyWork"))}>
-              <strong>{completionStatus.current!.failed.map((x) => x.jobId).join(", ")}</strong>
+              <strong>{completionStatus.current.failed.map((x) => x.jobId).join(", ")}</strong>
             </Form.Item>
           ) : undefined
       }

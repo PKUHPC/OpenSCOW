@@ -14,12 +14,16 @@ import "nprogress/nprogress.css";
 import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
+import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
+import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { getHostname } from "@scow/lib-web/build/utils/getHostname";
 import { useConstant } from "@scow/lib-web/build/utils/hooks";
 import { isServer } from "@scow/lib-web/build/utils/isServer";
-import { getCurrentLanguageId } from "@scow/lib-web/build/utils/systemLanguage";
+import { formatActivatedClusters } from "@scow/lib-web/build/utils/misCommon/clustersActivation";
+import { getCurrentLanguageId, getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App as AntdApp } from "antd";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
@@ -31,18 +35,19 @@ import { createStore, StoreProvider, useStore } from "simstate";
 import { api } from "src/apis";
 import { USE_MOCK } from "src/apis/useMock";
 import { getTokenFromCookie } from "src/auth/cookie";
-import { Provider, useI18nTranslateToString } from "src/i18n";
+import { Provider, useI18n, useI18nTranslate } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
-import { DefaultClusterStore } from "src/stores/DefaultClusterStore";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
   User, UserStore,
 } from "src/stores/UserStore";
-import { LoginNode, publicConfig, runtimeConfig } from "src/utils/config";
+import { Cluster, getPublicConfigClusters, LoginNode } from "src/utils/cluster";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 
 const languagesMap = {
   "zh_cn": zh_cn,
@@ -52,12 +57,15 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const t = useI18nTranslateToString();
+  const { publicConfigClusters, setCurrentClusters } = useStore(ClusterInfoStore);
+  const tArgs = useI18nTranslate();
+  const languageId = useI18n().currentLanguage.id;
 
   // 登出过程需要调用的几个方法（logout, useState等）都是immutable的
   // 所以不需要每次userStore变化时来重新注册handler
   useEffect(() => {
     failEvent.register((e) => {
+
       if (e.status === 401) {
         userStore.logout();
         return;
@@ -66,22 +74,56 @@ const FailEventHandler: React.FC = () => {
       const regex = /exceeds max length/;
       // 如果终端登录欢迎语过长会报错：Packet length xxxx exceeds max length of 262144
       if (regex.test(e.data?.message)) {
-        message.error(t("pages._app.textExceedsLength"));
+        message.error(tArgs("pages._app.textExceedsLength"));
         return;
       }
 
       if (e.data?.code === "SSH_ERROR") {
-        message.error(t("pages._app.sshError"));
-        return;
-      }
-      
-      if (e.data?.code === "SFTP_ERROR") {
-        message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
-          e.data?.details || t("pages._app.sftpError"));
+        message.error(tArgs("pages._app.sshError"));
         return;
       }
 
-      message.error(`${t("pages._app.otherError")}(${e.status}, ${e.data?.code}))`);
+      if (e.data?.code === "SFTP_ERROR") {
+        message.error(e.data?.details.length > 150 ? e.data?.details.substring(0, 150) + "..." :
+          e.data?.details || tArgs("pages._app.sftpError"));
+        return;
+      }
+
+      if (e.data?.code === "ADAPTER_CALL_ON_ONE_ERROR") {
+
+        const clusterId = e.data.clusterErrorsArray[0].clusterId;
+        const clusterName = clusterId ?
+          (publicConfigClusters.find((c) => c.id === clusterId)?.name ?? clusterId) : undefined;
+
+        message.error(`${tArgs("pages._app.adapterConnectionError",
+          [getI18nConfigCurrentText(clusterName, languageId)]) as string}(${
+          e.data.details
+        })`);
+        return;
+      }
+
+
+      if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("pages._app.noActivatedClusters"));
+        setCurrentClusters([]);
+        return;
+      }
+
+      if (e.data?.code === "NOT_EXIST_IN_ACTIVATED_CLUSTERS") {
+        message.error(tArgs("pages._app.notExistInActivatedClusters"));
+
+        const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
+        const activatedClusters = publicConfigClusters.filter((x) => currentActivatedClusterIds.includes(x.id));
+        setCurrentClusters(activatedClusters);
+        return;
+      }
+
+      if (e.data?.code === "NO_CLUSTERS") {
+        message.error(tArgs("pages._app.noClusters"));
+        return;
+      }
+
+      message.error(`${tArgs("pages._app.otherError") as string}(${e.status}, ${e.data?.code}))`);
     });
   }, []);
 
@@ -103,6 +145,10 @@ interface ExtraProps {
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
   initialLanguage: string;
+  clusterConfigs: Record<string, ClusterConfigSchema>;
+  initialCurrentClusters: Cluster[];
+  // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件，需要通过SSR进行传递
+  initialPortalRuntimeDesktopEnabled: boolean;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -117,10 +163,18 @@ function MyApp({ Component, pageProps, extra }: Props) {
     return store;
   });
 
+  const clusterInfoStore = useConstant(() => {
+    return createStore(ClusterInfoStore,
+      extra.clusterConfigs,
+      extra.initialCurrentClusters,
+      extra.initialPortalRuntimeDesktopEnabled,
+    );
+  });
+
   const loginNodeStore = useConstant(() => createStore(LoginNodeStore, loginNodes,
     extra.initialLanguage));
 
-  const defaultClusterStore = useConstant(() => createStore(DefaultClusterStore));
+  const uiExtensionStore = useConstant(() => createStore(UiExtensionStore, publicConfig.UI_EXTENSION));
 
   // Use the layout defined at the page level, if available
   return (
@@ -150,7 +204,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
         definitions: languagesMap[extra.initialLanguage],
       }}
       >
-        <StoreProvider stores={[userStore, defaultClusterStore, loginNodeStore]}>
+        <StoreProvider
+          stores={[userStore, clusterInfoStore, loginNodeStore, uiExtensionStore]}
+        >
           <DarkModeProvider initial={extra.darkModeCookieValue}>
             <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}>
               <FloatButtons languageId={ extra.initialLanguage } />
@@ -181,6 +237,11 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
     initialLanguage: "",
+    clusterConfigs: {},
+    initialCurrentClusters: [],
+    // 通过SSR获取门户系统配置文件中是否可用桌面功能
+    // enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能", default: true }),
+    initialPortalRuntimeDesktopEnabled: true,
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -203,6 +264,39 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           ...userInfo,
           token: token,
         };
+
+        // get cluster configs from config file
+        const data = await api.getClusterConfigFiles({ query: { token } })
+          .then((x) => x, () => ({ clusterConfigs: {} }));
+
+        const clusterConfigs = data?.clusterConfigs;
+        if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
+
+          extra.clusterConfigs = clusterConfigs;
+
+          extra.initialPortalRuntimeDesktopEnabled = runtimeConfig.PORTAL_CONFIG.loginDesktop.enabled;
+
+          const publicConfigClusters
+                = Object.values(getPublicConfigClusters(clusterConfigs));
+
+          // get current initial activated clusters
+          const currentClusters =
+            await api.getClustersRuntimeInfo({ query: { token } }).then((x) => x, () => undefined);
+          const initialActivatedClusters = formatActivatedClusters({
+            clustersRuntimeInfo: currentClusters?.results,
+            configClusters: publicConfigClusters,
+            misDeployed: publicConfig.MIS_DEPLOYED });
+          extra.initialCurrentClusters = initialActivatedClusters.activatedClusters ?? [];
+
+          // use all clusters in config files
+          const clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+          extra.loginNodes = clusterSortedIdList.reduce((acc, cluster) => {
+            acc[cluster] = clusterConfigs[cluster].loginNodes;
+            return acc;
+          }, {});
+
+        }
+
       }
 
     }
@@ -215,18 +309,12 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
 
-    extra.loginNodes = publicConfig.CLUSTER_SORTED_ID_LIST.reduce((acc, cluster) => {
-      acc[cluster] = runtimeConfig.CLUSTERS_CONFIG[cluster].loginNodes;
-      return acc;
-    }, {});
-
     // 从Cookies或header中获取语言id
     extra.initialLanguage = getCurrentLanguageId(appContext.ctx.req, publicConfig.SYSTEM_LANGUAGE_CONFIG);
+
   }
 
   const appProps = await NextApp.getInitialProps(appContext);
-
-  // getAvailable
 
   return { ...appProps, extra } as Props;
 };

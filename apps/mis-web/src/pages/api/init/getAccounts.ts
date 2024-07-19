@@ -38,7 +38,7 @@ export default typeboxRoute(InitGetAccountsSchema, async () => {
   if (result) { return { 409: { code: "ALREADY_INITIALIZED" as const } }; }
 
   const client = getClient(AccountServiceClient);
-
+ 
   const reply = await asyncClientCall(client, "getAccounts", {
     tenantName: DEFAULT_TENANT_NAME,
   });

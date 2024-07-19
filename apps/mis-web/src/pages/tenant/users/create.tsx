@@ -62,7 +62,7 @@ const CreateUserPageForm: React.FC = () => {
           : t(p("userNotExistAuthMessage")),
         okText: t("common.ok"),
         onOk: async () => {
-          await api.createUser({ body: { email, identityId, name, password } })
+          await api.createUser({ body: { email, identityId, name: name.trim(), password } })
             .httpError(409, () => {
               modal.error({
                 title: t("common.addFail"),
@@ -80,13 +80,16 @@ const CreateUserPageForm: React.FC = () => {
               throw e;
             })
             .then((createdInAuth) => {
-              !createdInAuth.createdInAuth ?
+              if (createdInAuth.createdInAuth) {
+                message.success(t(p("addCompleted")));
+              } else {
                 modal.info({
                   title: t("common.addSuccess"),
                   content: t(p("userExistAndAddToSCOWDatabaseMessage")),
                   okText: t("common.ok"),
-                })
-                : message.success(t(p("addCompleted"))); })
+                });
+              }
+            })
             .catch(() => {
               modal.error({
                 title: t("common.addFail"),

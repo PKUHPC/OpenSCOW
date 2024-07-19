@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { Cluster, LoginNode } from "src/utils/config";
+import { Cluster, LoginNode } from "src/utils/cluster";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {

@@ -1,13 +1,14 @@
 {
   "name": "@scow/lib-config",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "private": true,
   "main": "build/index.js",
   "scripts": {
     "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint -c ../../eslint.config.js ."
   },
   "files": [
     "build",
@@ -17,9 +18,9 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@sinclair/typebox": "0.31.26",
-    "ajv": "8.12.0",
-    "ajv-formats": "2.1.1",
+    "@sinclair/typebox": "0.32.34",
+    "ajv": "8.16.0",
+    "ajv-formats": "3.0.1",
     "envalid": "8.0.0",
     "js-yaml": "4.1.0"
   },

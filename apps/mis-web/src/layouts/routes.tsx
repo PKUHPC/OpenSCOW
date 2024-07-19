@@ -11,9 +11,11 @@
  */
 
 import {
-  AccountBookOutlined, BookOutlined, CloudServerOutlined,
+  AccountBookOutlined, AlertOutlined, BookOutlined, CloudServerOutlined,
+  ClusterOutlined,
+  ControlOutlined,
   DashboardOutlined,
-  InfoOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, PartitionOutlined,
+  InfoOutlined, LineChartOutlined, LinkOutlined, LockOutlined, MoneyCollectOutlined, MonitorOutlined, PartitionOutlined,
   PlusOutlined, PlusSquareOutlined, ProfileOutlined,
   StarOutlined, ToolOutlined, UserAddOutlined,
   UserOutlined } from "@ant-design/icons";
@@ -48,13 +50,13 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
         text: t(pPlatform("info")),
         path: "/admin/info",
       },
-      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
-        Icon: MoneyCollectOutlined,
-        text: t(pPlatform("jobBillingTable")),
-        path: "/admin/jobBilling",
-      }] : [])
-      ,
+
       ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
+        {
+          Icon: MoneyCollectOutlined,
+          text: t(pPlatform("jobBillingTable")),
+          path: "/admin/jobBilling",
+        },
         {
           Icon: CloudServerOutlined,
           text: t(pPlatform("tenantsManagement")),
@@ -131,11 +133,49 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       },
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [{
+        Icon: ControlOutlined,
+        text: t(pPlatform("resourceManagement")),
+        path: "/admin/resource",
+        clickable: false,
+        children: [
+          {
+            Icon: ClusterOutlined,
+            text: t("layouts.route.platformManagement.clusterManagement"),
+            path: "/admin/resource/clusterManagement",
+          },
+        ],
+      }] : []),
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) &&
+      (publicConfig.CLUSTER_MONITOR.resourceStatus.enabled || publicConfig.CLUSTER_MONITOR.alarmLogs.enabled) ? [{
+          Icon: MonitorOutlined,
+          text: t(pPlatform("clusterMonitor")),
+          path: "/admin/monitor",
+          clickable: false,
+          children: [
+            ...(publicConfig.CLUSTER_MONITOR.resourceStatus.enabled) ? [{
+              Icon: LineChartOutlined,
+              text: t(pPlatform("resourceStatus")),
+              path: "/admin/monitor/resourceStatus",
+            }] : [],
+            ...(publicConfig.CLUSTER_MONITOR.alarmLogs.enabled) ? [{
+              Icon: AlertOutlined,
+              text: t(pPlatform("alarmLog")),
+              path: "/admin/monitor/alarmLog",
+            }] : [],
+          ],
+        }] : []),
       ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{
           Icon: BookOutlined,
           text: t("layouts.route.common.operationLog"),
           path: "/admin/operationLogs",
+        }] : []),
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
+        [{
+          Icon: LineChartOutlined,
+          text: t("layouts.route.common.statistic"),
+          path: "/admin/statistic",
         }] : []),
     ],
   },

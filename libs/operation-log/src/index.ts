@@ -10,11 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
-import { ChannelCredentials } from "@grpc/grpc-js";
+import { asyncReplyStreamCall, asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { ChannelCredentials, ClientReadableStream } from "@grpc/grpc-js";
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import {
   CreateOperationLogRequest,
+  ExportOperationLogRequest,
+  ExportOperationLogResponse,
+  GetCustomEventTypesResponse,
   GetOperationLogsRequest,
   GetOperationLogsResponse,
   OperationLogServiceClient,
@@ -39,7 +42,7 @@ export const createOperationLogClient = (
   config: AuditConfigSchema | undefined,
   logger: Logger | Console,
 ) => {
-  const client = config && config.url
+  const client = config?.url
     ? new OperationLogServiceClient(config.url, ChannelCredentials.createInsecure())
     : undefined;
 
@@ -56,6 +59,24 @@ export const createOperationLogClient = (
       }
 
       return await asyncUnaryCall(client, "getOperationLogs", request);
+    },
+    getCustomEventTypes: async (): Promise<GetCustomEventTypesResponse> => {
+
+      if (!client) {
+        return { customEventTypes: []};
+      }
+
+      return await asyncUnaryCall(client, "getCustomEventTypes", {});
+
+    },
+    exportLog: async (request: ExportOperationLogRequest): Promise<ClientReadableStream<ExportOperationLogResponse>> =>
+    {
+      if (!client) {
+        logger.debug("Attempt to export Log with %o", request);
+        return Promise.reject(new Error("Client is not initialized"));
+      }
+
+      return asyncReplyStreamCall(client, "exportOperationLog", request);
     },
     callLog: async <TName extends OperationEvent["$case"]>({
       operatorUserId,

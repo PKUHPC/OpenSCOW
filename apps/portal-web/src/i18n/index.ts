@@ -17,7 +17,7 @@ const zh_cn = () => import("./zh_cn").then((x) => x.default);
 const en = () => import("./en").then((x) => x.default);
 
 // return language type
-type LangType = Awaited<ReturnType<typeof zh_cn>>;
+export type LangType = Awaited<ReturnType<typeof zh_cn>>;
 
 export const languages = languageDictionary({
   zh_cn,
@@ -29,6 +29,7 @@ export const languageInfo = {
   en: { name: "US English" },
 };
 
+// eslint-disable-next-line @typescript-eslint/unbound-method
 export const { Localized, Provider, id, prefix, useI18n } = createI18n(languages);
 
 export type TextId = TextIdFromLangDict<typeof languages>;

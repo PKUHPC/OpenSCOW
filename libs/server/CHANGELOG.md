@@ -1,5 +1,96 @@
 # @scow/lib-server
 
+## 1.3.0
+
+### Minor Changes
+
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.10
+
+## 1.2.2
+
+### Patch Changes
+
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.2.1
+
+### Patch Changes
+
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+  - @scow/rich-error-model@2.0.0
+
+## 1.2.0
+
+### Minor Changes
+
+- 63d1873: 账户新增封锁阈值，租户新增默认账户默认阈值以
+
+### Patch Changes
+
+- Updated dependencies [02d6a18]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.7
+
+## 1.1.5
+
+### Patch Changes
+
+- 443187e: 修复数据统计相关功能时区转换问题
+- 850bbcd: lib-server @scow/protos 从 devDependencies 移动到 dependencies
+- Updated dependencies [3242957]
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.6
+
+## 1.1.4
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/config@1.4.1
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+
 ## 1.1.1
 
 ### Patch Changes

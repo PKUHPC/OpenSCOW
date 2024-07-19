@@ -33,8 +33,8 @@ export function parseKeyValue(input: string): Record<string, string> {
  * @param valueObj the object containing keys and values
  * @returns replaced string
  */
-export function parsePlaceholder(str: string, valueObj: object) {
-  return str.replace(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g, (_, p1: string) => valueObj[p1] ?? "");
+export function parsePlaceholder(str: string, valueObj: object, showUndefined: boolean = false) {
+  return str.replace(/\{\{ ([a-zA-Z0-9_]+) \}\}/g, (_, p1: string) => valueObj[p1] ?? (showUndefined ? "-" : ""));
 }
 
 /**
@@ -57,7 +57,7 @@ export function parseArray(str: string): string[] {
  */
 export function getPlaceholderKeys(str: string): string[] {
 
-  const matchValues = str.match(/\{\{\ ([a-zA-Z0-9_]+)\ \}\}/g);
+  const matchValues = str.match(/\{\{ ([a-zA-Z0-9_]+) \}\}/g);
 
   if (matchValues) {
     const texts = matchValues.map(function(val) {

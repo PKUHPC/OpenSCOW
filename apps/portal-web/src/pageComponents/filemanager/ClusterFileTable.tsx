@@ -21,7 +21,7 @@ import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SingleCrossClusterTransferSelector } from "src/pageComponents/filemanager/SingleCrossClusterTransferSelector";
 import { FileInfo } from "src/pages/api/file/list";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { FileInfoKey, fileInfoKey, fileTypeIcons, nodeModeToString, openPreviewLink, TopBar } from "src/utils/file";
 import { formatSize } from "src/utils/format";
 import { styled } from "styled-components";
@@ -71,8 +71,8 @@ export const ClusterFileTable: React.FC<Props> = ({
     setLoading(true);
     // 清空SelectedKeys
     setSelectedKeys([]);
-    selectedCluster ? (
-      await api.listFile({ query: { cluster: selectedCluster.id, path: path } })
+    if (selectedCluster) {
+      await api.listFile({ query: { cluster: selectedCluster.id, path: path, updateAccessTime: true } })
         .then((d) => {
           setFiles(d.items);
         })
@@ -81,8 +81,10 @@ export const ClusterFileTable: React.FC<Props> = ({
         })
         .finally(() => {
           setLoading(false);
-        })
-    ) : (setLoading(false));
+        });
+    } else {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -141,7 +143,13 @@ export const ClusterFileTable: React.FC<Props> = ({
         <PathBar
           path={path ?? ""}
           loading={loading}
-          onPathChange={(curPath) => { curPath === path ? reload() : setNewPath(curPath); }}
+          onPathChange={(curPath) => {
+            if (curPath === path) {
+              reload();
+            } else {
+              setNewPath(curPath);
+            }
+          }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <DatabaseOutlined onClick={toHome} />

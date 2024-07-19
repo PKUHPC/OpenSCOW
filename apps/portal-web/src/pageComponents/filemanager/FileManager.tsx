@@ -19,10 +19,11 @@ import {
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
+import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Space } from "antd";
 import Link from "next/link";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { useStore } from "simstate";
@@ -43,7 +44,8 @@ import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
-import { Cluster, publicConfig } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
+import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
 import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
@@ -93,6 +95,8 @@ const p = prefix("pageComp.fileManagerComp.fileManager.");
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
+  const router = useRouter();
+
   const t = useI18nTranslateToString();
 
   const operationTexts = {
@@ -127,7 +131,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
-  const loginNode = loginNodes[cluster.id][0].name;
+  const loginNode = loginNodes[cluster.id][0].address;
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -148,15 +152,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     const newPath = paths.length === 1
       ? path : "/" + paths.slice(0, paths.length - 1).join("/");
 
-    Router.push(fullUrl(newPath));
+    router.push(fullUrl(newPath));
   };
 
   const toHome = () => {
-    Router.push(fullUrl("~"));
+    router.push(fullUrl("~"));
   };
 
   const back = () => {
-    Router.back();
+    router.back();
   };
 
   const forward = () => {
@@ -175,7 +179,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       .then(() => { prevPathRef.current = path; })
       .catch(() => {
         if (prevPathRef.current !== path) {
-          Router.push(fullUrl(prevPathRef.current));
+          router.push(fullUrl(prevPathRef.current));
         }
       });
   }, [path]);
@@ -220,7 +224,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
 
         const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
         if (exists.result) {
-          await new Promise<void>(async (res) => {
+          await new Promise<void>((res) => {
             modal.confirm({
               title: t(p("moveCopy.existModalTitle")),
               content: t(p("moveCopy.existModalContent"), [x.name]),
@@ -229,24 +233,16 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                 const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
                 await deleteOperation({ query: { cluster: cluster.id, path: join(path, x.name) } });
-                try {
-                  await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-                  successfulCount++;
-                } catch (e) {
-                  throw e;
-                }
+                await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+                successfulCount++;
                 res();
               },
               onCancel: async () => { abandonCount++; res(); },
             });
           });
         } else {
-          try {
-            await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
-            successfulCount++;
-          } catch (e) {
-            throw e;
-          }
+          await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
+          successfulCount++;
         }
       } catch (e) {
         console.error(e);
@@ -291,7 +287,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
               message.success(t(p("delete.successMessage"), [allCount]));
               resetSelectedAndOperation();
             } else {
-              message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount])),
+              message.error(t(p("delete.errorMessage"), [(allCount - failedCount), failedCount]));
               setOperation((o) => o && ({ ...o, started: false }));
             }
           }).catch((e) => {
@@ -346,6 +342,29 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
     }
   };
 
+  const editFile = queryToString(router.query.edit);
+
+  useEffect(() => {
+    if (editFile !== "") {
+      const foundFile = files.find((file) => file.name === editFile);
+      if (foundFile && foundFile.type !== "DIR") {
+        handlePreview(editFile, foundFile.size);
+      }
+    }
+  }, [editFile, files]);
+
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  useEffect(() => {
+    const uploadQuery = queryToString(router.query.uploadModalOpen);
+    if (uploadQuery === "true") {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadModalOpen(false);
+    }
+  }, []);
+
+
   return (
     <div>
       <TitleText>
@@ -361,7 +380,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         <PathBar
           path={path}
           loading={loading}
-          onPathChange={(curPath) => { curPath === path ? reload() : Router.push(fullUrl(curPath)); }}
+          onPathChange={(curPath) => {
+            if (curPath === path) {
+              reload();
+            } else {
+              router.push(fullUrl(curPath));
+            }
+          }}
           breadcrumbItemRender={(pathSegment, index, path) =>
             (index === 0 ? (
               <Link href={fullUrl("/")} title="/" onClick={(e) => e.stopPropagation()}>
@@ -382,6 +407,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
       <OperationBar>
         <Space wrap>
           <UploadButton
+            externalOpen={isUploadModalOpen}
             cluster={cluster.id}
             path={path}
             reload={reload}
@@ -494,8 +520,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
             setSelectedKeys([fileInfoKey(r, path)]);
           },
           onDoubleClick: () => {
-            if (r.type === "DIR") {
-              Router.push(fullUrl(join(path, r.name)));
+            if (!loading && r.type === "DIR") {
+              setLoading(true);
+              router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
               handlePreview(r.name, r.size);
             }
@@ -503,9 +530,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
         })}
         fileNameRender={(_, r) => (
           r.type === "DIR" ? (
-            <Link href={join(urlPrefix, cluster.id, path, r.name)} passHref>
+            <a onClick={() => {
+              if (!loading) {
+                setLoading(true);
+                router.push(fullUrl(join(path, r.name)));
+              }
+            }}
+            >
               {r.name}
-            </Link>
+            </a>
           ) : (
             <a onClick={() => {
               handlePreview(r.name, r.size);
@@ -562,8 +595,15 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                   const fullPath = join(path, i.name);
                   modal.confirm({
                     title: t(p("tableInfo.submitConfirmTitle")),
-                    content: t(p("tableInfo.submitConfirmContent"),
-                      [i.name, getI18nConfigCurrentText(cluster.name, languageId)]),
+                    content: (
+                      <>
+                        <p>{t(p("tableInfo.submitConfirmNotice"))}</p>
+                        <p>
+                          {t(p("tableInfo.submitConfirmContent"),
+                            [i.name, getI18nConfigCurrentText(cluster.name, languageId)])}
+                        </p>
+                      </>
+                    ),
                     okText: t(p("tableInfo.submitConfirmOk")),
                     onOk: async () => {
                       await api.submitFileAsJob({
@@ -573,16 +613,27 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
                         },
                       })
                         .httpError(500, (e) => {
-                          e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION" ? modal.error({
-                            title: t(p("tableInfo.submitFailedMessage")),
-                            content: e.message,
-                          }) : (() => { throw e; })();
+                          if (e.code === "SCHEDULER_FAILED" || e.code === "FAILED_PRECONDITION"
+                            || e.code === "UNIMPLEMENTED") {
+                            modal.error({
+                              title: t(p("tableInfo.submitFailedMessage")),
+                              content: e.message,
+                            });
+                          } else {
+                            message.error(e.message);
+                            throw e;
+                          }
                         })
                         .httpError(400, (e) => {
-                          e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH" ? modal.error({
-                            title: t(p("tableInfo.submitFailedMessage")),
-                            content: e.message,
-                          }) : (() => { throw e; })();
+                          if (e.code === "INVALID_ARGUMENT" || e.code === "INVALID_PATH") {
+                            modal.error({
+                              title: t(p("tableInfo.submitFailedMessage")),
+                              content: e.message,
+                            });
+                          } else {
+                            message.error(e.message);
+                            throw e;
+                          }
                         })
                         .then((result) => {
                           message.success(t(p("tableInfo.submitSuccessMessage"), [result.jobId]));

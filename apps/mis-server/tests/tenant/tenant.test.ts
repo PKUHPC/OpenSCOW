@@ -48,6 +48,7 @@ it("gets tenant info", async () => {
     accountCount: 2,
     userCount: 2,
     balance: decimalToMoney(data.tenant.balance),
+    defaultAccountBlockThreshold: decimalToMoney(data.tenant.defaultAccountBlockThreshold),
     admins: [data.userA].map((x) => ({ userId: x.userId, userName: x.name })),
     financialStaff:[],
   } as GetTenantInfoResponse);

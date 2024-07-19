@@ -37,13 +37,13 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
-          "default": "current_timestamp(0)",
+          "length": 6,
+          "default": "current_timestamp(6)",
           "mappedType": "datetime"
         },
         "operation_result": {
           "name": "operation_result",
-          "type": "enum('UNKNOWN', 'SUCCESS', 'FAIL')",
+          "type": "enum('UNKNOWN','SUCCESS','FAIL')",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
@@ -64,22 +64,44 @@
           "primary": false,
           "nullable": true,
           "mappedType": "json"
+        },
+        "custom_event_type": {
+          "name": "custom_event_type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "string"
         }
       },
       "name": "operation_log",
       "indexes": [
+        {
+          "columnNames": [
+            "custom_event_type"
+          ],
+          "composite": false,
+          "keyName": "custom_event",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
           ],
           "composite": false,
+          "constraint": true,
           "primary": true,
           "unique": true
         }
       ],
       "checks": [],
-      "foreignKeys": {}
+      "foreignKeys": {},
+      "nativeEnums": {}
     }
-  ]
+  ],
+  "nativeEnums": {}
 }

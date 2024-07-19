@@ -86,7 +86,7 @@ export const InitAdminForm: React.FC = () => {
         },
         onOk: async () => {
           await api.createInitAdmin(
-            { body: { email, identityId, name, password } })
+            { body: { email, identityId, name: name.trim(), password } })
             .httpError(409, (e) => {
               if (e.code === "ALREADY_EXISTS_IN_SCOW")
                 modal.error({
@@ -96,13 +96,16 @@ export const InitAdminForm: React.FC = () => {
                 });
             })
             .then((createdInAuth) => {
-              !createdInAuth.createdInAuth ?
+              if (createdInAuth.createdInAuth) {
+                message.success(t(p("addFinish")));
+              } else {
                 modal.info({
                   title: t(p("addSuccess")),
                   content: t(p("addDb")),
                   okText: t(pCommon("ok")),
-                })
-                : message.success(t(p("addFinish"))); })
+                });
+              }
+            })
             .catch(() => {
               modal.error({
                 title:  t(p("addFail")),

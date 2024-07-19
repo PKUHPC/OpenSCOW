@@ -14,22 +14,26 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { Menu } from "antd";
+import Router from "next/router";
 import React, { useMemo } from "react";
-import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
+import { calcSelectedKeys, createMenuItems, EXTERNAL_URL_PREFIX } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
 import { styled } from "styled-components";
 
 const Container = styled.div`
-
   @media (max-width: ${antdBreakpoints.md}px) {
     display: none;
   }
 
   width: 100%;
+  .ant-menu-item-icon svg{
+    font-size:1.42em;
+  }
 
-  .ant-menu-item {
-    padding-left: 16px !important;
+  .ant-menu-title-content{
+    position:relative;
+    bottom:0.2em;
   }
 `;
 
@@ -38,6 +42,7 @@ interface Props {
   className?: string;
   pathname: string;
 }
+
 export const BigScreenMenu: React.FC<Props> = ({
   routes, className, pathname,
 }) => {
@@ -47,6 +52,23 @@ export const BigScreenMenu: React.FC<Props> = ({
       ? calcSelectedKeys(routes, pathname)
       : []
   , [routes, pathname]);
+
+  const handleMenuClick = (e: any) => {
+    const clickedRoute = routes?.find((route) => route.path === e.key);
+    if (clickedRoute) {
+      clickedRoute.handleClick?.();
+      const target = clickedRoute.clickToPath ?? clickedRoute.path;
+      if (clickedRoute.openInNewPage) {
+        window.open(target);
+      } else {
+        if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+          window.location.href = target;
+        } else {
+          void Router.push(target);
+        }
+      }
+    }
+  };
 
   return (
     <Container className={className}>
@@ -58,7 +80,7 @@ export const BigScreenMenu: React.FC<Props> = ({
               theme="light"
               mode="horizontal"
               selectedKeys={selectedKeys}
-              // forceSubMenuRender
+              onClick={handleMenuClick}
               items={createMenuItems(routes, true)}
             />
           ) : undefined

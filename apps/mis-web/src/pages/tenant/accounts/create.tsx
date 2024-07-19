@@ -55,7 +55,11 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       content: t("common.waitingMessage"),
       duration: 0,
       key: "createAccount" });
-    await api.createAccount({ body: { accountName, ownerId, ownerName, comment } })
+    await api.createAccount({ body: {
+      accountName: accountName.trim(),
+      ownerId,
+      ownerName: ownerName.trim(),
+      comment } })
       .httpError(404, () => { message.error(t(p("tenantNotExistUser"), [tenantName, ownerId])); })
       .httpError(409, () => { message.error(t(p("accountNameOccupied"))); })
       .httpError(400, () => { message.error(t(p("userIdAndNameNotMatch"))); })
@@ -109,7 +113,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       >
         <Input />
       </Form.Item>
-      <Form.Item<FormProps> name="comment" label={t(p("remark"))}>
+      <Form.Item name="comment" label={t(p("remark"))}>
         <Input.TextArea />
       </Form.Item>
       <Form.Item wrapperCol={{ span: 6, offset: 4 }}>

@@ -12,7 +12,8 @@
 
 import { Static, Type } from "@sinclair/typebox";
 
-import { ClusterAccountInfo_ImportStatus, PlatformRole, TenantRole, UserRole, UserStatus } from "./User";
+import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, DisplayedUserState, PlatformRole,
+  TenantRole, UserRole, UserStateInAccount, UserStatus } from "./User";
 
 // 这个Model重新用typebox定义了
 // 定义Schema时无法复用的@scow/protos/build/server中的interface
@@ -82,6 +83,8 @@ export const AccountStatus = Type.Object({
   jobChargeLimit: Type.Optional(Money),
   usedJobCharge: Type.Optional(Money),
   balance: Type.Optional(Money),
+  isInWhitelist: Type.Optional(Type.Boolean()),
+  blockThresholdAmount:Type.Optional(Money),
 });
 export type AccountStatus = Static<typeof AccountStatus>;
 
@@ -90,10 +93,15 @@ export const Account = Type.Object({
   accountName: Type.String(),
   userCount: Type.Number(),
   blocked: Type.Boolean(),
+  state: Type.Optional(Type.Enum(AccountState)),
+  displayedState: Type.Optional(Type.Enum(DisplayedAccountState)),
+  isInWhitelist: Type.Optional(Type.Boolean()),
   ownerId: Type.String(),
   ownerName: Type.String(),
   comment: Type.String(),
   balance: Type.Optional(Money),
+  blockThresholdAmount: Type.Optional(Money),
+  defaultBlockThresholdAmount: Type.Optional(Money),
 });
 export type Account = Static<typeof Account>;
 
@@ -123,6 +131,7 @@ export const WhitelistedAccount = Type.Object({
   operatorId: Type.String(),
   comment: Type.String(),
   balance: Type.Optional(Money),
+  expirationTime:Type.Optional(Type.String({ format: "date-time" })),
 });
 export type WhitelistedAccount = Static<typeof WhitelistedAccount>;
 
@@ -136,6 +145,8 @@ export const AccountUserInfo = Type.Object({
   storageQuotas: Type.Record(Type.String(), Type.Number()),
   jobChargeLimit:Type.Optional(Money),
   usedJobChargeLimit: Type.Optional(Money),
+  userStateInAccount: Type.Optional(Type.Enum(UserStateInAccount)),
+  displayedUserState: Type.Optional(Type.Enum(DisplayedUserState)),
 });
 export type AccountUserInfo = Static<typeof AccountUserInfo>;
 

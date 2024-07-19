@@ -1,5 +1,34 @@
 # @scow/test-adapter
 
+## 1.1.4
+
+### Patch Changes
+
+- e312efb: ai 增加 vnc 功能，以 shell 方式进入容器功能和提交作业的优化
+- Updated dependencies [e312efb]
+  - @scow/scheduler-adapter-protos@1.3.1
+
+## 1.1.3
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+  - @scow/lib-config@1.0.1
+
+## 1.1.2
+
+### Patch Changes
+
+- Updated dependencies [26bd8e7]
+  - @scow/scheduler-adapter-protos@1.3.0
+
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+
 ## 1.1.0
 
 ### Minor Changes

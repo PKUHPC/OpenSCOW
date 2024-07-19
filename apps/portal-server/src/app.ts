@@ -12,12 +12,14 @@
 
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
+import { libGetCurrentActivatedClusters } from "@scow/lib-server";
 import { readVersionFile } from "@scow/utils/build/version";
-import { clusters } from "src/config/clusters";
+import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
-import { configServiceServer } from "src/services/config";
+import { runtimeConfigServiceServer, staticConfigServiceServer } from "src/services/config";
+import { dashboardServiceServer } from "src/services/dashboard";
 import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
@@ -26,6 +28,8 @@ import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
+
+import { commonConfig } from "./config/common";
 
 export async function createServer() {
 
@@ -43,21 +47,27 @@ export async function createServer() {
   }
 
   await server.register(appServiceServer);
-  await server.register(desktopServiceServer);
   await server.register(jobServiceServer);
-  await server.register(fileServiceServer);
   await server.register(shellServiceServer);
-  await server.register(configServiceServer);
+  await server.register(staticConfigServiceServer);
+  await server.register(runtimeConfigServiceServer);
+  await server.register(dashboardServiceServer);
+  await server.register(fileServiceServer);
+  await server.register(desktopServiceServer);
 
   if (process.env.NODE_ENV === "production") {
-    await checkClustersRootUserLogin(server.logger);
-    await Promise.all(Object.entries(clusters).map(async ([id]) => {
+    const activatedClusters = await libGetCurrentActivatedClusters(
+      server.logger,
+      configClusters,
+      config.MIS_SERVER_URL,
+      commonConfig.scowApi?.auth?.token);
+
+    await checkClustersRootUserLogin(server.logger, activatedClusters);
+    await Promise.all(Object.entries(activatedClusters).map(async ([id]) => {
       await initShellFile(id, server.logger);
     }));
-    await setupProxyGateway(server.logger);
+    await setupProxyGateway(server.logger, activatedClusters);
   }
-
-
 
   return server;
 }

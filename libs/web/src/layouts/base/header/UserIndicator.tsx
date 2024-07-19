@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { DownOutlined } from "@ant-design/icons";
 import { Dropdown, Typography } from "antd";
 import Link from "next/link";
 import React from "react";
@@ -20,6 +20,7 @@ import { styled } from "styled-components";
 
 import { EXTERNAL_URL_PREFIX } from "../common";
 import { UserInfo, UserLink } from "../types";
+import { USerIcon } from "./UserIcon";
 
 interface Props {
   user: UserInfo | undefined;
@@ -36,6 +37,7 @@ const InlineBlockA = styled.a`
   cursor: pointer;
   line-height: 45px;
   display: inline-block;
+  font-size:16px
 `;
 
 const HiddenOnSmallScreen = styled.span`
@@ -71,13 +73,17 @@ export const UserIndicator: React.FC<Props> = ({
                 ...userLinks ? userLinks.map((link) => {
                   return ({
                     key: link.text,
-                    label: EXTERNAL_URL_PREFIX.some((pref) => link.url.startsWith(pref)) ? <Typography.Link
-                      href={`${link.url}?token=${user.token}`}
-                      target={link.openInNewPage ? "_blank" : "_self"}
-                    >{link.text}</Typography.Link> : <Link
-                      href={`${link.url}?token=${user.token}`}
-                      target={link.openInNewPage ? "_blank" : "_self"}
-                    >{link.text}</Link>,
+                    label: EXTERNAL_URL_PREFIX.some((pref) => link.url.startsWith(pref)) ? (
+                      <Typography.Link
+                        href={`${link.url}?token=${user.token}`}
+                        target={link.openInNewPage ? "_blank" : "_self"}
+                      >{link.text}</Typography.Link>
+                    ) : (
+                      <Link
+                        href={`${link.url}?token=${user.token}`}
+                        target={link.openInNewPage ? "_blank" : "_self"}
+                      >{link.text}</Link>
+                    ),
                   });
                 }) : [],
                 { key: "logout",
@@ -87,7 +93,7 @@ export const UserIndicator: React.FC<Props> = ({
             }}
           >
             <InlineBlockA>
-              <UserOutlined />
+              <USerIcon />
               <HiddenOnSmallScreen>
                 {user.name ?? user.identityId}
               </HiddenOnSmallScreen>

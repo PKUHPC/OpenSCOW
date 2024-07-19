@@ -1,5 +1,90 @@
 # @scow/auth
 
+## 1.6.1
+
+## 1.6.0
+
+### Patch Changes
+
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+
+## 1.5.2
+
+### Patch Changes
+
+- daf3885: mis 系统下，管理员添加白名单新增白名单账户过期字段
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-server@1.2.2
+
+## 1.5.1
+
+### Patch Changes
+
+- 37fdf7e: 修改了 portal 中的部分 UI 样式,bannerTop 导航文字
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/lib-server@1.2.1
+
+## 1.5.0
+
+### Patch Changes
+
+- Updated dependencies [02d6a18]
+- Updated dependencies [63d1873]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/lib-server@1.2.0
+
+## 1.4.3
+
+### Patch Changes
+
+- 08359cb: 使用外部认证系统时，外部系统未实现的功能在用户使用时提示用户功能未实现
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-server@1.1.4
+
+## 1.4.0
+
+### Patch Changes
+
+- Updated dependencies [d1c2e74]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/lib-server@1.1.3
+
+## 1.3.0
+
+### Patch Changes
+
+- Updated dependencies [ec06733f9f]
+  - @scow/config@1.3.0
+  - @scow/lib-server@1.1.2
+
 ## 1.2.3
 
 ### Patch Changes

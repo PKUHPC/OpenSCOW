@@ -19,12 +19,14 @@ import { moneyToNumber } from "@scow/lib-decimal/build/convertion";
 import { JobChargeLimitServiceServer, JobChargeLimitServiceService } from "@scow/protos/build/server/job_charge_limit";
 import { unblockUserInAccount } from "src/bl/block";
 import { setJobCharge } from "src/bl/charging";
+import { getActivatedClusters } from "src/bl/clustersUtils";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
+import { getUserStateInfo } from "src/utils/accountUserState";
 
 export const jobChargeLimitServer = plugin((server) => {
   server.addService<JobChargeLimitServiceServer>(JobChargeLimitServiceService, {
     cancelJobChargeLimit: async ({ request, em, logger }) => {
-      const { accountName, userId, tenantName, unblock } = request;
+      const { accountName, userId, tenantName } = request;
 
       await em.transactional(async (em) => {
         const userAccount = await em.findOne(UserAccount, {
@@ -33,17 +35,17 @@ export const jobChargeLimitServer = plugin((server) => {
         }, { populate: ["user", "account"]});
 
         if (!userAccount) {
-          throw <ServiceError>{
+          throw {
             code: Status.NOT_FOUND,
             details: `User ${userId} is not found in account`,
-          };
+          } as ServiceError;
         }
 
         if (!userAccount.jobChargeLimit) {
-          throw <ServiceError> {
+          throw {
             code: Status.NOT_FOUND,
             details: `The user ${userId} in account ${accountName} has no limit`,
-          };
+          } as ServiceError;
         }
 
         logger.info("Job Charge Limit %s/%s of user %s account %s has been canceled.",
@@ -56,9 +58,18 @@ export const jobChargeLimitServer = plugin((server) => {
         userAccount.jobChargeLimit = undefined;
         userAccount.usedJobCharge = undefined;
 
-        if (UserStatus.BLOCKED && unblock) {
-          await unblockUserInAccount(userAccount, server.ext, logger);
-          userAccount.status = UserStatus.UNBLOCKED;
+        const shouldBlockUserInCluster = getUserStateInfo(
+          userAccount.state,
+          userAccount.jobChargeLimit,
+          userAccount.usedJobCharge,
+        ).shouldBlockInCluster;
+
+
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+        if (!shouldBlockUserInCluster) {
+          await unblockUserInAccount(userAccount, currentActivatedClusters, server.ext, logger);
+          userAccount.blockedInCluster = UserStatus.UNBLOCKED;
         }
 
       });
@@ -78,14 +89,29 @@ export const jobChargeLimitServer = plugin((server) => {
           lockMode: LockMode.PESSIMISTIC_WRITE,
         });
 
-        if (!userAccount) {
-          throw <ServiceError>{
-            code: Status.NOT_FOUND,
-            details: `User ${userId} is not found in account.`,
-          };
+        const limitNumber = moneyToNumber(limit);
+        // 如果设置的限额小于等于0或者小于当前已用额度则报错
+        if (limitNumber <= 0 ||
+        (userAccount?.usedJobCharge?.isGreaterThan(limitNumber))) {
+          throw {
+            code: Status.INVALID_ARGUMENT, message: userAccount?.usedJobCharge ?
+              `The set quota ${limitNumber} is invalid ,
+              it must be greater than or equal to the used job charge ${userAccount?.usedJobCharge.toNumber()}` :
+              `The set quota ${limitNumber} is invalid , it must be greater than 0`,
+          } as ServiceError;
         }
 
-        await setJobCharge(userAccount, new Decimal(moneyToNumber(limit)), server.ext, logger);
+        if (!userAccount) {
+          throw {
+            code: Status.NOT_FOUND,
+            details: `User ${userId} is not found in account.`,
+          } as ServiceError;
+        }
+
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+        await setJobCharge(userAccount,
+          new Decimal(moneyToNumber(limit)), currentActivatedClusters, server.ext, logger);
 
         logger.info("Set %s job charge limit to user %s account %s. Current used %s",
           userAccount.jobChargeLimit!.toFixed(2),

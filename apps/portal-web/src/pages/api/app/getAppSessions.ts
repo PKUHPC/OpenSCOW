@@ -10,12 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
+import { route } from "src/utils/route";
 
 // Cannot use AppSession from protos
 export const AppSession = Type.Object({
@@ -32,7 +33,7 @@ export const AppSession = Type.Object({
   host: Type.Optional(Type.String()),
   port: Type.Optional(Type.Number()),
 });
-export type AppSession = Static<typeof AppSession>
+export type AppSession = Static<typeof AppSession>;
 
 export const GetAppSessionsSchema = typeboxRouteSchema({
   method: "GET",
@@ -50,7 +51,7 @@ export const GetAppSessionsSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default /* #__PURE__*/typeboxRoute(GetAppSessionsSchema, async (req, res) => {
+export default /* #__PURE__*/route(GetAppSessionsSchema, async (req, res) => {
 
 
   const info = await auth(req, res);

@@ -17,16 +17,16 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { confirmPasswordFormItemProps, passwordRule } from "src/utils/form";
 
 interface Props {
-    name: string;
-    userId: string;
-    onClose: () => void;
-    onComplete: (newPassword: string) => Promise<void>;
-    open: boolean;
+  name: string;
+  userId: string;
+  onClose: () => void;
+  onComplete: (newPassword: string) => Promise<void>;
+  open: boolean;
 }
 
 interface FormProps {
-    newPassword: string;
-    confirm: string;
+  newPassword: string;
+  confirm: string;
 }
 const p = prefix("component.others.");
 

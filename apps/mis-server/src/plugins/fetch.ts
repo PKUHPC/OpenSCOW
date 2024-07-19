@@ -37,12 +37,12 @@ export const fetchPlugin = plugin(async (f) => {
     if (fetchIsRunning) return;
 
     fetchIsRunning = true;
-    return fetchJobs(f.ext.orm.em.fork(), logger, f.ext, f.ext).finally(() => { fetchIsRunning = false; });
+    return fetchJobs(f.ext.orm.em.fork(), logger, f.ext).finally(() => { fetchIsRunning = false; });
   };
 
   const task = cron.schedule(
     misConfig.fetchJobs.periodicFetch.cron,
-    trigger,
+    () => { void trigger(); },
     {
       timezone: "Asia/Shanghai",
       scheduled: misConfig.fetchJobs.periodicFetch.enabled,
@@ -56,7 +56,7 @@ export const fetchPlugin = plugin(async (f) => {
     logger.info("Fetch info stopped.");
   });
 
-  f.addExtension("fetch", <FetchPlugin["fetch"]>{
+  f.addExtension("fetch", ({
     started: () => fetchStarted,
     start: () => {
       if (fetchStarted) {
@@ -79,5 +79,5 @@ export const fetchPlugin = plugin(async (f) => {
     schedule: misConfig.fetchJobs.periodicFetch.cron,
     lastFetched: () => lastFetched,
     fetch: trigger,
-  });
+  } as FetchPlugin["fetch"]));
 });

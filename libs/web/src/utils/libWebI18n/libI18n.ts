@@ -16,12 +16,15 @@ import libWebZhCn from "./libWebZhCn";
 export type LibWebTextsType = typeof libWebEn;
 export type LibWebTextsKeys = keyof LibWebTextsType;
 
-export const libWebLanguages: { [id: string]: LibWebTextsType } = {
+export const libWebLanguages: Record<string, LibWebTextsType> = {
   en: libWebEn,
   zh_cn: libWebZhCn,
 };
 
-export const getCurrentLangLibWebText = (languageId: string, key: LibWebTextsKeys): string | undefined => {
+export const getCurrentLangLibWebText = (
+  languageId: string,
+  key: LibWebTextsKeys,
+): string | undefined => {
 
   const currentLibWebTexts = libWebLanguages[languageId];
   const value = currentLibWebTexts[key];
@@ -33,3 +36,6 @@ export const getCurrentLangLibWebText = (languageId: string, key: LibWebTextsKey
   }
 
 };
+
+
+

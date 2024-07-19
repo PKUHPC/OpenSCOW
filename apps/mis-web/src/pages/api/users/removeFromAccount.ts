@@ -13,10 +13,11 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { OperationType } from "@scow/lib-operation-log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { OperationResult, OperationType } from "src/models/operationLog";
+import { OperationResult } from "src/models/operationLog";
 import { PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
@@ -35,6 +36,9 @@ export const RemoveUserFromAccountSchema = typeboxRouteSchema({
     204: Type.Null(),
     // 用户不存在
     404: Type.Null(),
+
+    // 操作集群失败
+    400: Type.Object({ message: Type.String() }),
 
     // 不能移出账户拥有者
     406: Type.Null(),
@@ -81,6 +85,7 @@ export default /* #__PURE__*/route(RemoveUserFromAccountSchema, async (req, res)
       return { 204: null };
     })
     .catch(handlegRPCError({
+      [Status.INTERNAL]: (e) => ({ 400: { message: e.details } }),
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.OUT_OF_RANGE]: () => ({ 406: null }),
       [Status.FAILED_PRECONDITION]: () => ({ 409: null }),

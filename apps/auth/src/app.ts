@@ -26,7 +26,7 @@ type PluginOverrides = Map<Plugin, Plugin>;
 
 function applyPlugins(server: FastifyInstance, pluginOverrides?: PluginOverrides) {
   plugins.forEach((plugin) => {
-    server.register(pluginOverrides && pluginOverrides.has(plugin)
+    void server.register(pluginOverrides?.has(plugin)
       ? pluginOverrides.get(plugin)!
       : plugin);
   });
@@ -58,7 +58,7 @@ export function buildApp(pluginOverrides?: PluginOverrides) {
 
   applyPlugins(server, pluginOverrides);
 
-  routes.forEach((r) => server.register(r));
+  routes.forEach((r) => void server.register(r));
 
   if (authConfig.captcha.enabled) {
     registerCaptchaRoute(server);

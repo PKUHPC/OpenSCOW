@@ -14,6 +14,7 @@ import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
+import { checkUiExtensionConfig, UiExtensionConfigSchema } from "src/uiExtensions";
 
 export const PortalConfigSchema = Type.Object({
   jobManagement: Type.Boolean({ description: "是否启动作业管理功能", default: true }),
@@ -29,30 +30,14 @@ export const PortalConfigSchema = Type.Object({
 
   apps: Type.Boolean({ description: "是否启用交互式任务功能", default: true }),
 
-  homeText: Type.Object({
-    defaultText: createI18nStringSchema({
-      description: "默认主页文本",
-      defaultValue: "Super Computing on Web",
-    }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的文本", default: {} },
-    ),
-  }),
-
-  homeTitle: Type.Object({
-    defaultText: createI18nStringSchema({ description: "默认主页标题", defaultValue: "SCOW" }),
-    hostnameMap: Type.Record(
-      Type.String(), Type.String(),
-      { description: "根据域名(hostname，不包括port)不同，显示在主页上的标题", default: {} },
-    ),
-  }),
-
   submitJobPromptText:
   Type.Optional(createI18nStringSchema({
     description: "提交作业命令框中的提示语",
     defaultValue: "#此处参数设置的优先级高于页面其它地方，两者冲突时以此处为准" })),
+
   misUrl: Type.Optional(Type.String({ description: "管理系统的部署URL或者路径" })),
+
+  aiUrl: Type.Optional(Type.String({ description: "AI系统的部署URL或者路径" })),
 
   shell: Type.Boolean({ description: "是否启用终端功能", default: true }),
 
@@ -93,6 +78,7 @@ export const PortalConfigSchema = Type.Object({
     }),
   )),
 
+  uiExtension: Type.Optional(UiExtensionConfigSchema),
 
 });
 
@@ -100,5 +86,13 @@ const PORTAL_CONFIG_NAME = "portal";
 
 export type PortalConfigSchema = Static<typeof PortalConfigSchema>;
 
-export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+export const getPortalConfig: GetConfigFn<PortalConfigSchema> = (baseConfigPath) => {
+
+  const config = getConfigFromFile(PortalConfigSchema, PORTAL_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+
+  if (config.uiExtension) {
+    checkUiExtensionConfig(config.uiExtension);
+  }
+
+  return config;
+};

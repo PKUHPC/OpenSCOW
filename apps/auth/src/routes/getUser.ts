@@ -44,7 +44,7 @@ export const getUserRoute = fp(async (f) => {
     },
     async (req, rep) => {
       if (!f.auth.getUser) {
-        return await rep.code(501).send(null);
+        return await rep.code(501).send({ code: "NOT_SUPPORTED" });
       }
 
       const { identityId } = req.query;

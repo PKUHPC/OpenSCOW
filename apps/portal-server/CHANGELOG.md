@@ -1,5 +1,144 @@
 # @scow/portal-server
 
+## 1.6.1
+
+## 1.6.0
+
+### Minor Changes
+
+- 806f778: 增加 HPC 文件和桌面功能的 scowd 支持
+- b8d1270: 在管理系统和门户系统中增加依赖于管理系统的集群停用功能
+  **注意：停用后集群将不可用，集群所有数据不再更新。再启用后请手动同步平台数据！**
+
+### Patch Changes
+
+- 0a43348: 修改门户系统下提交作业或交互式应用时可以选择的账号为用户维度未封锁账号，分区为该用户在该集群下对应账号的可用分区；修改从模板提交作业时模板值可以直接提交
+- 383a8bd: 添加 web shell 文件上传功能
+- 3558bd4: 提交作业保存作业模板时最长运行时间的单位也保存入模板中
+- Updated dependencies [806f778]
+- Updated dependencies [b8d1270]
+- Updated dependencies [b8d1270]
+- Updated dependencies [806f778]
+  - @scow/scowd-protos@0.2.0
+  - @scow/lib-scowd@1.1.0
+  - @scow/config@1.5.0
+  - @scow/lib-server@1.3.0
+  - @scow/protos@1.0.12
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.10
+
+## 1.5.2
+
+### Patch Changes
+
+- a50d5ce: 修复请求集群适配器接口的报错信息中出现嵌套型信息，导致页面报错信息显示不正确的问题
+- 6304074: 提交作业时，新增保留作业脚本的选项
+- Updated dependencies [d080a8b]
+  - @scow/config@1.4.5
+  - @scow/lib-server@1.2.2
+  - @scow/protos@1.0.11
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.9
+
+## 1.5.1
+
+### Patch Changes
+
+- Updated dependencies [94aa24c]
+- Updated dependencies [e312efb]
+- Updated dependencies [e312efb]
+- Updated dependencies [640a599]
+  - @scow/config@1.4.4
+  - @scow/scheduler-adapter-protos@1.3.1
+  - @scow/lib-server@1.2.1
+  - @scow/protos@1.0.10
+  - @scow/lib-scheduler-adapter@1.1.8
+  - @scow/rich-error-model@2.0.0
+
+## 1.5.0
+
+### Patch Changes
+
+- 02d6a18: 新增集群区分 AI 功能和 HPC 功能配置
+- Updated dependencies [02d6a18]
+- Updated dependencies [63d1873]
+- Updated dependencies [d822db7]
+  - @scow/config@1.4.3
+  - @scow/lib-server@1.2.0
+  - @scow/protos@1.0.9
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.7
+
+## 1.4.3
+
+### Patch Changes
+
+- 941340a: 修复目录文件过多时导致的 touch 命令报错
+- 410fb0e: 修复只需在文件传输时使用 touch -a 来更新时间戳，修复 touch -a 执行时 ssh 关闭报错，文件名特殊字符报错等问题
+- 48844dc: Web Shell 支持跳转到文件编辑页面
+- Updated dependencies [443187e]
+- Updated dependencies [3242957]
+- Updated dependencies [850bbcd]
+  - @scow/lib-server@1.1.5
+  - @scow/config@1.4.2
+  - @scow/protos@1.0.8
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.6
+
+## 1.4.2
+
+## 1.4.1
+
+### Patch Changes
+
+- Updated dependencies [afc3350]
+- Updated dependencies [8d417ba]
+- Updated dependencies [68447f7]
+  - @scow/lib-config@1.0.1
+  - @scow/config@1.4.1
+  - @scow/lib-server@1.1.4
+  - @scow/protos@1.0.7
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.5
+
+## 1.4.0
+
+### Minor Changes
+
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+- f023d52: 管理系统新增数据统计功能，统计用户，账户，租户，作业，消费及功能使用次数
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+- 26bd8e7: 优化文件系统直接提交脚本任务时如果没有在脚本内指定工作目录，使脚本文件所在的绝对路径作为作业工作目录，并在确认提交对话框中给出提示
+- Updated dependencies [d1c2e74]
+- Updated dependencies [26bd8e7]
+- Updated dependencies [abb7e84]
+  - @scow/config@1.4.0
+  - @scow/scheduler-adapter-protos@1.3.0
+  - @scow/protos@1.0.6
+  - @scow/lib-server@1.1.3
+  - @scow/lib-scheduler-adapter@1.1.4
+  - @scow/rich-error-model@2.0.0
+
+## 1.3.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
+### Patch Changes
+
+- 6a0c73a972: 修复用户删除无权限目录时导致的崩溃问题
+- Updated dependencies [ec06733f9f]
+  - @scow/scheduler-adapter-protos@1.2.0
+  - @scow/config@1.3.0
+  - @scow/lib-scheduler-adapter@1.1.3
+  - @scow/lib-server@1.1.2
+  - @scow/protos@1.0.5
+  - @scow/rich-error-model@2.0.0
+
 ## 1.2.3
 
 ### Patch Changes

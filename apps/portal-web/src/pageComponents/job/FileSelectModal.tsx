@@ -24,7 +24,7 @@ import { FileTable } from "src/pageComponents/filemanager/FileTable";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { FileInfo } from "src/pages/api/file/list";
-import { Cluster } from "src/utils/config";
+import { Cluster } from "src/utils/cluster";
 import { styled } from "styled-components";
 
 
@@ -143,7 +143,11 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
               path={formatPath(path)}
               loading={isLoading}
               onPathChange={(curPath) => {
-                curPath === path ? reload() : setPath(join("/", curPath));
+                if (curPath === path) {
+                  reload();
+                } else {
+                  setPath(join("/", curPath));
+                }
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
                 index === 0

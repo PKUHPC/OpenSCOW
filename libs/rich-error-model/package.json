@@ -7,19 +7,20 @@
   "scripts": {
     "generate": "rimraf generated && buf generate --template buf.gen.yaml https://github.com/googleapis/googleapis.git#subdir=google/rpc",
     "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint -c ../../eslint.config.js ."
   },
   "files": [
     "build",
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.9.11",
+    "@grpc/grpc-js": "1.10.9",
     "long": "5.2.3",
-    "protobufjs": "7.2.5"
+    "protobufjs": "7.3.2"
   },
   "devDependencies": {
-    "ts-proto": "1.164.0",
+    "ts-proto": "1.180.0",
     "@ddadaal/tsgrpc-server": "0.19.5",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",

@@ -20,7 +20,7 @@ import { ssrAuthenticate, SSRProps } from "src/auth/server";
 import { UnifiedErrorPage } from "src/components/errorPages/UnifiedErrorPage";
 import { PageTitle } from "src/components/PageTitle";
 import { useI18nTranslateToString } from "src/i18n";
-import { UserRole } from "src/models/User";
+import { DisplayedAccountState, getDisplayedStateI18nTexts, UserRole } from "src/models/User";
 import {
   checkQueryAccountNameIsAdmin } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { getAccounts } from "src/pages/api/tenant/getAccounts";
@@ -32,7 +32,9 @@ type Props = SSRProps<{
   ownerId: string;
   balance: number;
   blocked: boolean;
-}, 404>
+  displayedState: DisplayedAccountState;
+  blockThresholdAmount: number
+}, 404>;
 
 export const AccountInfoPage: NextPage<Props> = requireAuth(
   (u) => u.accountAffiliations.length > 0,
@@ -41,11 +43,13 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
 
   const t = useI18nTranslateToString();
 
+  const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
+
   if ("error" in props) {
     return <UnifiedErrorPage code={props.error} />;
   }
 
-  const { accountName, balance, ownerId, ownerName, blocked } = props;
+  const { accountName, balance, ownerId, ownerName, displayedState, blockThresholdAmount } = props;
   const title = t("common.accountInfo");
 
   return (
@@ -60,12 +64,18 @@ export const AccountInfoPage: NextPage<Props> = requireAuth(
           {ownerName}（ID：{ownerId}）
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountStatus")}>
-          {blocked ? <Tag color="red">{t("common.block")}</Tag> : <Tag color="green">{t("common.normal")}</Tag>}
+          <Tag color={ displayedState === DisplayedAccountState.DISPLAYED_NORMAL ? "green" : "red"}>
+            {DisplayedStateI18nTexts[displayedState]}
+          </Tag>
         </Descriptions.Item>
         <Descriptions.Item label={t("common.accountBalance")}>
-          {balance.toFixed(3)} {t("common.unit")}
+          {balance.toFixed(2)} {t("common.unit")}
+        </Descriptions.Item>
+        <Descriptions.Item label={t("common.blockThresholdAmount")}>
+          {blockThresholdAmount.toFixed(2)} {t("common.unit")}
         </Descriptions.Item>
       </Descriptions>
+
     </div>
   );
 });
@@ -83,6 +93,8 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       ownerId: "ownerId",
       ownerName: "123",
       blocked: true,
+      displayedState: DisplayedAccountState.DISPLAYED_BLOCKED,
+      blockThresholdAmount: 1.23,
     } };
   }
 
@@ -102,13 +114,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
   }
 
   const account = accounts[0];
-
   return { props: {
     balance: moneyToNumber(account.balance),
     accountName,
     ownerId: account.ownerId,
     ownerName: account.ownerName,
     blocked: account.blocked,
+    displayedState: account.displayedState,
+    blockThresholdAmount: moneyToNumber(account.blockThresholdAmount ?? account.defaultBlockThresholdAmount),
   } };
 
 

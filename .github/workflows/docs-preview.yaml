@@ -14,10 +14,10 @@ concurrency:
 jobs:
   deploy-docs-preview:
     name: Deploy Docs Preview
-    runs-on: ubuntu-latest
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2.4.0
+      - uses: pnpm/action-setup@v4.0.0
       - uses: actions/setup-node@v4
         with:
           node-version: 18.x
@@ -30,7 +30,7 @@ jobs:
         run: pnpm run --filter docs... build
         env:
           GIT_PLATFORM: github
-          CR_URL: ghcr.io/pkuhpc/scow
+          CR_URL: ghcr.io/${{ github.event.repository.name }}
           BASE_PATH: /${{ github.event.repository.name }}/pr-preview/pr-${{ github.event.number }}/
 
       - name: Deploy preview

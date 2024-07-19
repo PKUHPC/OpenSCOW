@@ -20,34 +20,34 @@ export enum AmountStrategy {
   MAX_CPUSALLOC_MEM = "max-cpusAlloc-mem",
   MAX_GPU_CPUSALLOC = "max-gpu-cpusAlloc",
   GPU = "gpu",
-  CPUS_ALLOC = "cpusAlloc"
+  CPUS_ALLOC = "cpusAlloc",
 }
 
 @Entity()
 export class JobPriceItem {
   @PrimaryKey()
-    id!: number;
+  id!: number;
 
   @Property({ unique: true })
-    itemId: string;
+  itemId: string;
 
   @Property({ type: ArrayType, comment: "集群,分区[,qos]" })
-    path: string[];
+  path: string[];
 
   @Property()
-    description: string;
+  description: string;
 
-  @ManyToOne(() => Tenant, { wrappedReference: true, nullable: true })
-    tenant?: Ref<Tenant>;
+  @ManyToOne(() => Tenant, { ref: true, nullable: true })
+  tenant?: Ref<Tenant>;
 
   @Property({ type: DecimalType })
-    price: Decimal;
+  price: Decimal;
 
   @Property({ comment: Object.values(AmountStrategy).join(", ") })
-    amount: string;
+  amount: string;
 
   @Property({ columnType: DATETIME_TYPE })
-    createTime: Date;
+  createTime: Date;
 
   constructor(init: {
     itemId: string;

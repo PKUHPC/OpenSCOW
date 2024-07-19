@@ -1,5 +1,86 @@
 # @scow/grpc-api
 
+## 1.10.0
+
+### Minor Changes
+
+- 5b6af87: 将 mis-server 中 getTopChargeAccount、getTopPayAccount 返回值新增 userName
+- 3558bd4: JobTemplate 与 ListAllJobsResponse 增加 max_time_unit 可选字段
+- b8d1270: 新增集群停用功能 api: getClustersRuntimeInfo, activateCluster, deactivateCluster
+  新增获取集群配置信息 api： getClusterConfigFiles
+- 0a43348: 在 common/config 下新增 getAvailablePartitionsForCluster 作为门户/管理系统共用 proto,管理系统下原 proto 标记为已过时；在 listAccounts 下新增可选 AccountStatusFilter 查询参数
+- 806f778: 获取配置时返回 scowd 的配置
+
+## 1.9.0
+
+### Minor Changes
+
+- 89191ea: GetPaginatedChargeRecords 添加字段 user_id_or_name，将 GetChargeRecordsTotalCount 中的 userIds 改为 user_id_or_name.
+- 875fe29: 管理系统仪表盘账户信息显示卡片中可用余额逻辑和 UI 优化
+- 6304074: JobTemplate 新增 script_output 可选字段，SubmitJobRequest 新增可选字段 script_output。
+- daf3885: getWhitelistedAccounts 新增返回字段 expirationDate，whitelistAccount 新增字段 expirationDate，在 getWhitelistedAccounts 新增每次查询会检测 中是否有账户过期，有的话会自动删除
+- a53bcad: 充值记录和消费记录支持多选账户搜索，充值记录增加类型搜索；导出充值记录和消费记录同步增加这两个搜索条件
+- f534377: 为 getOperationLogs、 getPaginatedChargeRecords、 getJobs 三个 API 新增了 sortBy、sortOreder 参数，表示排序的列、排序方式（升序、降序、默认）
+
+### Patch Changes
+
+- f534377: 增加了 mis portal 中表格排序的功能，以及部分 UI 的修改
+
+## 1.8.1
+
+### Patch Changes
+
+- 583978b: 管理系统下的平台数据统计提交作业前十的用户数横坐标改为以 userName 的方式显示.
+
+## 1.8.0
+
+### Minor Changes
+
+- a097dd1: server 增加 ChangeTenant 接口修改用户的所属租户，增加 CreateTenantWithExistingUserAsAdmin 接口允许创建租户时指定已有用户作为租户管理员
+- 63d1873: 新增 SetBlockThreshold， SetDefaultAccountBlockThreshold 以及 audit 新增以上接口的 operation_event
+
+### Patch Changes
+
+- 850a7ee: 在 getAccountUsers 接口中增加 userStateInAccount , displayedUserState 的返回值
+- 785de17: 修改 GetFileMetadataResponse 中文件大小 size 为 uint64
+- d3d891a: 门户系统部分操作类型增加 clusterId 及 loginNode 参数
+- 24db413: 增加 GetCustomEventTypes 接口获取自定义操作类型，增加 CustomEvent 保存自定义操作类型
+- 8dd8c0e: 在 GetAccounts 接口中增加账户状态，账户显示状态，账户白名单状态的返回值，exportAccounts 接口中增加欠费，冻结的查询参数
+
+## 1.7.0
+
+### Minor Changes
+
+- 443187e: GetDailyCharge,GetDailyPay,GetNewJobCount,GetNewUserCount,GetActiveUserCount 接口新增 time_zone 参数以及返回类型由时间戳改为 date
+
+### Patch Changes
+
+- 410fb0e: 在文件管理的 readDirectory 接口下增加可选参数 updateAccessTime，只在文件传输功能时更新时间戳
+
+## 1.6.0
+
+### Minor Changes
+
+- afc3350: charge 接口增加可选入参 user_id,metadata, 消费记录查询接口增加查询参数 user_ids,增加返回值 user_id 与 metadata
+
+## 1.5.0
+
+### Minor Changes
+
+- f023d52: 新增数据统计接口，audit 新增 GetActiveUserCount，GetPortalUsageCount，GetMisUsageCount, server 新增 GetTopChargeAccount，GetDailyCharge，GetTopPayAccount，GetDailyPay，GetStatisticInfo，GetTopSubmitJobUsers，GetNewJobCount，GetJobTotalCount，GetNewUserCount
+- 081fbcf: server 新增 Export Service, 新增 ExportAccount, ExportUser, ExportChargeRecord, ExportPayRecord 接口，audit-server 新增 ExportOperationLog 接口
+- cb055c4: 门户仪表盘新增快捷入口，可以新增、删除、拖拽排序快捷方式
+
+### Patch Changes
+
+- 201a3e2: 修复部分集群无法获取集群运行信息时导致仪表板无法展示其他正常信息
+
+## 1.4.0
+
+### Minor Changes
+
+- ec06733f9f: 门户仪表盘删除之前的配置标题和文字，增加平台队列状态展示
+
 ## 1.3.1
 
 ### Patch Changes

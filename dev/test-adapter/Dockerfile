@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:d016f19a31ac259d78dc870b4c78132cf9e52e89339ff319bdd9999912818f4a AS base
+FROM node:iron-alpine@sha256:aa22e2c263d7242e7452d1efa40a031ac8ccf2305cc4d925c737486d339bd178 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -17,6 +17,7 @@ RUN corepack enable
 
 WORKDIR /app
 
+COPY package.json .
 COPY pnpm-lock.yaml .
 
 COPY patches ./patches
@@ -38,7 +39,7 @@ COPY --from=pruner /app/out/json/ .
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.js turbo.json ./
+COPY tsconfig.json turbo.json ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 COPY scripts/ ./scripts
