@@ -28,12 +28,13 @@ message Message {
 }
 
 message SendMessageRequest {
-  TargetType target_type = 1;
-  repeated string target_ids = 2;
-  NoticeType notice_type = 3;
-  string message_type = 4;
-  google.protobuf.Struct metadata = 5;
-  repeated string description_data = 6;
+  SenderType sender_type = 1;
+  string sender_id = 2;
+  TargetType target_type = 3;
+  repeated string target_ids = 4;
+  string message_type = 5;
+  google.protobuf.Struct metadata = 6;
+  repeated string description_data = 7;
 }
 
 message SendMessageResponse {
@@ -41,11 +42,12 @@ message SendMessageResponse {
 }
 
 message ListMessagesRequest {
-  optional string message_type = 1;
-  NoticeType notice_type = 2;
-  optional ReadStatus read_status = 3;
-  optional uint32 page = 4;
-  optional uint32 pageSize = 5;
+  string user_id = 1;
+  optional string message_type = 2;
+  NoticeType notice_type = 3;
+  optional ReadStatus read_status = 4;
+  optional uint32 page = 5;
+  optional uint32 pageSize = 6;
 }
 
 message ListMessagesResponse {
@@ -54,7 +56,8 @@ message ListMessagesResponse {
 }
 
 message GetUnreadMessagesRequest {
-  NoticeType notice_type = 1;
+  string user_id = 1;
+  NoticeType notice_type = 2;
 }
 
 message GetUnreadMessagesResponse {
@@ -63,7 +66,8 @@ message GetUnreadMessagesResponse {
 }
 
 message MakeMessageReadRequest {
-  uint64 message_id = 1;
+  string user_id = 1;
+  uint64 message_id = 2;
 }
 
 message MakeMessageReadResponse {

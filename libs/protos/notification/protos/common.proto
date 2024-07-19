@@ -27,6 +27,12 @@ enum ReadStatus {
   ALL = 3;
 }
 
+enum SenderType {
+  SYSTEM = 0;
+  PLATFORM_ADMIN = 1;
+  TENANT_ADMIN = 2;
+}
+
 enum TargetType {
   USER = 0;
   ACCOUNT = 1;
