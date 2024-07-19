@@ -16,11 +16,12 @@ package scow_notification;
 
 import "protos/common.proto";
 import "protos/message_type.proto";
+import "google/protobuf/struct.proto";
 
 message Message {
   uint64 id = 1;
   MessageType message_type = 2;
-  map<string, string> metadata = 3;
+  google.protobuf.Struct metadata = 3;
   repeated string descriptions = 4;
   string created_at = 5;
   string updated_at = 6;
@@ -31,7 +32,7 @@ message SendMessageRequest {
   repeated string target_ids = 2;
   NoticeType notice_type = 3;
   string message_type = 4;
-  map<string, string> metadata = 5;
+  google.protobuf.Struct metadata = 5;
   repeated string description_data = 6;
 }
 
