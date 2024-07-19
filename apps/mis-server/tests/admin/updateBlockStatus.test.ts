@@ -76,16 +76,16 @@ it("gets current sync block status info", async () => {
 
 });
 
-// it("sync unblock and block account", async () => {
-//   const client = new AdminServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
-//   const info = await asyncClientCall(client, "syncBlockStatus", { });
+it("sync unblock and block account", async () => {
+  const client = new AdminServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+  const info = await asyncClientCall(client, "syncBlockStatus", { });
 
-//   expect(info.blockedFailedAccounts).not.toContain(data.blockedAccountB.accountName);
-//   expect(info.blockedFailedUserAccounts).not.toContain([
-//     [data.uaAA.user.getProperty("userId"), data.uaAA.account.getProperty("accountName")],
-//   ]);
-//   expect(info.unblockedFailedAccounts).not.toContain(data.unblockedAccountA.accountName);
-// });
+  expect(info.blockedFailedAccounts).not.toContain(data.blockedAccountB.accountName);
+  expect(info.blockedFailedUserAccounts).not.toContain([
+    [data.uaAA.user.getProperty("userId"), data.uaAA.account.getProperty("accountName")],
+  ]);
+  expect(info.unblockedFailedAccounts).not.toContain(data.unblockedAccountA.accountName);
+});
 
 
 it("starts and stops sync block status ", async () => {
