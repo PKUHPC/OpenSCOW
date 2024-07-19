@@ -265,6 +265,7 @@ export const accountServiceServer = plugin((server) => {
           if (shouldBlockInCluster) {
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
+              blockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw {
@@ -278,6 +279,7 @@ export const accountServiceServer = plugin((server) => {
           } else {
             await asyncClientCall(client.account, "unblockAccount", {
               accountName,
+              unblockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw {

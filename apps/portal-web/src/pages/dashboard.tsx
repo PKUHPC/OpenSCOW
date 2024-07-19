@@ -11,6 +11,7 @@
  */
 
 import { PartitionInfo } from "@scow/protos/build/portal/config";
+import { NodeInfo } from "@scow/protos/build/portal/config";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -36,6 +37,10 @@ interface FulfilledResult {
   clusterInfo: { clusterName: string, partitions: PartitionInfo[] }
 }
 
+interface FulfilledNodesResult {
+  nodeInfo: { clusterName: string, nodes: NodeInfo[] }
+}
+
 
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
@@ -58,9 +63,38 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           .httpError(500, () => {}),
       );
 
-
-
       const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
+
+      // 获取各个集群的详细节点信息
+      const rawClusterNodesInfoPromises = currentClusters.map((x) =>
+        api.getClusterNodesInfo({ query: { cluster: x.id } })
+          .httpError(500, () => {}),
+      );
+
+      // 原始节点数据
+      const rawClusterNodesInfoResults = await Promise.allSettled(rawClusterNodesInfoPromises);
+
+      // 处理成功的节点数据
+      const successfulNodesResults = rawClusterNodesInfoResults
+      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
+        .map((result, idx) => {
+          if (result.status === "fulfilled") {
+            return {
+              ...result,
+              value:{
+                nodeInfo:{ clusterName: currentClusters[idx].id,nodes:result.value.nodeInfo },
+              },
+            } as PromiseSettledResult<FulfilledNodesResult>;
+          }
+
+          return result;
+        })
+        .filter(
+          (result): result is PromiseFulfilledResult<FulfilledNodesResult> =>
+            result.status === "fulfilled")
+        .map((result) => result.value);
+
+      console.log(successfulNodesResults);
 
       // 处理成功的结果
       const successfulResults = rawClusterInfoResults
