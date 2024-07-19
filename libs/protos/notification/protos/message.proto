@@ -35,6 +35,7 @@ message SendMessageRequest {
   string message_type = 5;
   google.protobuf.Struct metadata = 6;
   repeated string description_data = 7;
+  optional MessageType message_type_template = 8;
 }
 
 message SendMessageResponse {
