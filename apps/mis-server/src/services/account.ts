@@ -48,9 +48,9 @@ export const accountServiceServer = plugin((server) => {
           }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
 
           if (!account) {
-            throw <ServiceError>{
+            throw {
               code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-            };
+            } as ServiceError;
           }
 
           // 确认当前需要取消授权分区的集群是否可用
@@ -75,10 +75,10 @@ export const accountServiceServer = plugin((server) => {
           );
 
           if (jobsResp.jobs.length > 0) {
-            throw <ServiceError>{
+            throw {
               code: Status.FAILED_PRECONDITION,
               message: `Account ${accountName}  has jobs running and cannot be unassigned. `,
-            };
+            } as ServiceError;
           }
 
           // 直接对指定分区进行封锁，但是不更改scow中的任何数据
@@ -101,9 +101,9 @@ export const accountServiceServer = plugin((server) => {
         }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
 
         if (!account) {
-          throw <ServiceError>{
+          throw {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-          };
+          } as ServiceError;
         }
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);
@@ -123,10 +123,10 @@ export const accountServiceServer = plugin((server) => {
         );
 
         if (jobs.filter((i) => i.result.jobs.length > 0).length > 0) {
-          throw <ServiceError>{
+          throw {
             code: Status.FAILED_PRECONDITION,
             message: `Account ${accountName}  has jobs running and cannot be blocked. `,
-          };
+          } as ServiceError;
         }
 
         const blockThresholdAmount =
@@ -141,26 +141,26 @@ export const accountServiceServer = plugin((server) => {
           // 如果账户已被手动冻结，提示账户已被冻结
           // 当前scow暂未使用AccountState.FROZEN
           if (account.state === AccountState.FROZEN) {
-            throw <ServiceError>{
+            throw {
               code: Status.FAILED_PRECONDITION,
               message: `Account ${accountName} has been frozen. `,
-            };
+            } as ServiceError;
           }
 
           // 如果是未欠费（余额大于封锁阈值）账户，提示账户已被封锁
           if (account.balance.gt(blockThresholdAmount)) {
-            throw <ServiceError>{
+            throw {
               code: Status.FAILED_PRECONDITION,
               message: `Account ${accountName} has been blocked. `,
-            };
+            } as ServiceError;
           }
         }
 
         if (result === "Whitelisted") {
-          throw <ServiceError>{
+          throw {
             code: Status.FAILED_PRECONDITION,
             message: `The account ${accountName} has been added to the whitelist. `,
-          };
+          } as ServiceError;
         }
 
         // 更改数据库中状态值
@@ -182,9 +182,9 @@ export const accountServiceServer = plugin((server) => {
           }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
 
           if (!account) {
-            throw <ServiceError>{
+            throw {
               code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-            };
+            } as ServiceError;
           }
 
           // 如果当前账户在集群中为封锁状态，不需要做任何处理
@@ -220,15 +220,15 @@ export const accountServiceServer = plugin((server) => {
         }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: [ "tenant"]});
 
         if (!account) {
-          throw <ServiceError>{
+          throw {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-          };
+          } as ServiceError;
         }
 
         if (!account.blockedInCluster) {
-          throw <ServiceError>{
+          throw {
             code: Status.FAILED_PRECONDITION, message: `Account ${accountName} is unblocked`,
-          };
+          } as ServiceError;
         }
         // 将账户从被上级封锁或冻结状态变更为正常
         account.state = AccountState.NORMAL;
@@ -276,9 +276,9 @@ export const accountServiceServer = plugin((server) => {
           const owner = x.users.getItems().find((x) => x.role === EntityUserRole.OWNER);
 
           if (!owner) {
-            throw <ServiceError>{
+            throw {
               code: Status.INTERNAL, message: `Account ${x.accountName} does not have an owner`,
-            };
+            } as ServiceError;
           }
 
           const ownerUser = owner.user.getEntity();
@@ -293,7 +293,7 @@ export const accountServiceServer = plugin((server) => {
             blocked: Boolean(x.blockedInCluster),
             state: account_AccountStateFromJSON(x.state),
             displayedState: displayedAccountState,
-            isInWhitelist: Boolean(!!x.whitelist?.id),
+            isInWhitelist: Boolean(x.whitelist?.id),
             ownerId: ownerUser.userId,
             ownerName: ownerUser.name,
             comment: x.comment,
@@ -312,16 +312,16 @@ export const accountServiceServer = plugin((server) => {
       const user = await em.findOne(User, { userId: ownerId, tenant: { name: tenantName } });
 
       if (!user) {
-        throw <ServiceError> {
+        throw {
           code: Status.NOT_FOUND, message: `User ${user} under tenant ${tenantName} does not exist`,
-        };
+        } as ServiceError;
       }
 
       const tenant = await em.findOne(Tenant, { name: tenantName });
       if (!tenant) {
-        throw <ServiceError> {
+        throw {
           code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found`,
-        };
+        } as ServiceError;
       }
 
       // 新建账户时比较租户默认封锁阈值，如果租户默认封锁阈值小于0则保持账户为在集群中可用状态
@@ -339,9 +339,9 @@ export const accountServiceServer = plugin((server) => {
         await em.persistAndFlush([account, userAccount]);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError>{
+          throw {
             code: Status.ALREADY_EXISTS, message: `Account ${accountName} already exists.`,
-          };
+          } as ServiceError;
         }
       }
 
@@ -377,9 +377,9 @@ export const accountServiceServer = plugin((server) => {
               blockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
-                throw <ServiceError>{
+                throw {
                   code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Block failed`,
-                };
+                } as ServiceError;
               } else {
                 throw e;
               }
@@ -395,9 +395,9 @@ export const accountServiceServer = plugin((server) => {
                 blockedPartitions: [],
               }).catch((e) => {
                 if (e.code === Status.NOT_FOUND) {
-                  throw <ServiceError>{
+                  throw {
                     code: Status.INTERNAL, message: `Account ${accountName} hasn't been created.`,
-                  };
+                  } as ServiceError;
                 } else {
                   throw e;
                 }
@@ -409,9 +409,9 @@ export const accountServiceServer = plugin((server) => {
                 unblockedPartitions: assignedPartitions ?? [],
               }).catch((e) => {
                 if (e.code === Status.NOT_FOUND) {
-                  throw <ServiceError>{
+                  throw {
                     code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
-                  };
+                  } as ServiceError;
                 } else {
                   throw e;
                 }
@@ -495,9 +495,9 @@ export const accountServiceServer = plugin((server) => {
         { populate: [ "tenant"]});
 
       if (!account) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-        };
+        } as ServiceError;
       }
 
       if (account.whitelist) {
@@ -545,9 +545,9 @@ export const accountServiceServer = plugin((server) => {
       const account = await em.findOne(Account, { accountName, tenant: { name: tenantName } }, { populate: ["tenant"]});
 
       if (!account) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-        };
+        } as ServiceError;
       }
       if (!account.whitelist) {
         return [{ executed: false }];
@@ -590,9 +590,9 @@ export const accountServiceServer = plugin((server) => {
       });
 
       if (!account) {
-        throw <ServiceError>{
+        throw {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-        };
+        } as ServiceError;
       }
       account.blockThresholdAmount = blockThresholdAmount
         ? new Decimal(moneyToNumber(blockThresholdAmount))

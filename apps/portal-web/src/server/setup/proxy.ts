@@ -83,7 +83,7 @@ export const proxy = httpProxy.createServer();
 export const setupWssProxy = (req: NextApiRequest) => {
   (req.socket as any).server.on("upgrade", async (req, socket, head) => {
 
-    const url = normalizePathnameWithQuery(req.url!);
+    const url = normalizePathnameWithQuery(req.url);
 
     if (!url.startsWith(join(publicConfig.BASE_PATH, "/api/proxy"))) {
       return;
@@ -106,7 +106,7 @@ export const setupWssProxy = (req: NextApiRequest) => {
     const clusterConfigs = await getClusterConfigFiles();
 
     // req.url of raw node.js request object doesn't remove base path
-    const target = parseProxyTarget(req.url!, true, clusterConfigs);
+    const target = parseProxyTarget(req.url, true, clusterConfigs);
 
     if (target instanceof Error) {
       writeError("400 Bad Request", target.message);

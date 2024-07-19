@@ -32,7 +32,6 @@ export function NavIcon({ src, alt = "" }: Props) {
         <img
           src={src}
           alt={altName}
-
           style={{
             ...style,
             filter: dark ? "invert(100%)" : "none",

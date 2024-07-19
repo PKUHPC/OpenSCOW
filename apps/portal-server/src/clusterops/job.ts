@@ -51,7 +51,7 @@ export const jobOps = (cluster: string): JobOps => {
         const file = join(portalConfig.savedJobsDir, id);
 
         if (!await sftpExists(sftp, file)) {
-          throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` };
+          throw { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` } as ServiceError;
         }
 
         const content = await sftpReadFile(sftp)(file);
@@ -119,7 +119,7 @@ export const jobOps = (cluster: string): JobOps => {
         const file = join(portalConfig.savedJobsDir, id);
 
         if (!await sftpExists(sftp, file)) {
-          throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` };
+          throw { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` } as ServiceError;
         }
 
         await sftpUnlink(sftp)(file);
@@ -138,7 +138,7 @@ export const jobOps = (cluster: string): JobOps => {
         const file = join(portalConfig.savedJobsDir, id);
 
         if (!await sftpExists(sftp, file)) {
-          throw <ServiceError> { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` };
+          throw { code: Status.NOT_FOUND, message: `Job template id ${id} is not found.` } as ServiceError;
         }
 
         const content = await sftpReadFile(sftp)(file);

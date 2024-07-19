@@ -15,6 +15,7 @@ import { ServiceError, status } from "@grpc/grpc-js";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
+import { removePort } from "@scow/utils";
 import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
@@ -28,7 +29,8 @@ export function getLoginNodeScowdUrl(cluster: string, host: string): string | un
   if (!loginNode) return undefined;
 
   const { address, scowdPort } = loginNode;
-  return config.SCOWD_SSL_ENABLED ? `https://${address}:${scowdPort}` : `http://${address}:${scowdPort}`;
+  return config.SCOWD_SSL_ENABLED
+    ? `https://${removePort(address)}:${scowdPort}` : `http://${removePort(address)}:${scowdPort}`;
 }
 
 const scowdClientForClusters = Object.entries(configClusters).reduce((prev, [cluster]) => {
@@ -62,51 +64,51 @@ export function getLoginNodeFromAddress(cluster: string, address: string) {
 // 映射 tRPC 状态码到 gRPC 状态码的函数
 function mapTRPCStatusToGRPC(statusCode: Code): status {
   switch (statusCode) {
-  case Code.Canceled:
-    return status.CANCELLED;
-  case Code.Unknown:
-    return status.UNKNOWN;
-  case Code.InvalidArgument:
-    return status.INVALID_ARGUMENT;
-  case Code.DeadlineExceeded:
-    return status.DEADLINE_EXCEEDED;
-  case Code.NotFound:
-    return status.NOT_FOUND;
-  case Code.AlreadyExists:
-    return status.ALREADY_EXISTS;
-  case Code.PermissionDenied:
-    return status.PERMISSION_DENIED;
-  case Code.ResourceExhausted:
-    return status.RESOURCE_EXHAUSTED;
-  case Code.FailedPrecondition:
-    return status.FAILED_PRECONDITION;
-  case Code.Aborted:
-    return status.ABORTED;
-  case Code.OutOfRange:
-    return status.OUT_OF_RANGE;
-  case Code.Unimplemented:
-    return status.UNIMPLEMENTED;
-  case Code.Internal:
-    return status.INTERNAL;
-  case Code.Unavailable:
-    return status.UNAVAILABLE;
-  case Code.DataLoss:
-    return status.DATA_LOSS;
-  case Code.Unauthenticated:
-    return status.UNAUTHENTICATED;
-  default:
-    return status.OK;
+    case Code.Canceled:
+      return status.CANCELLED;
+    case Code.Unknown:
+      return status.UNKNOWN;
+    case Code.InvalidArgument:
+      return status.INVALID_ARGUMENT;
+    case Code.DeadlineExceeded:
+      return status.DEADLINE_EXCEEDED;
+    case Code.NotFound:
+      return status.NOT_FOUND;
+    case Code.AlreadyExists:
+      return status.ALREADY_EXISTS;
+    case Code.PermissionDenied:
+      return status.PERMISSION_DENIED;
+    case Code.ResourceExhausted:
+      return status.RESOURCE_EXHAUSTED;
+    case Code.FailedPrecondition:
+      return status.FAILED_PRECONDITION;
+    case Code.Aborted:
+      return status.ABORTED;
+    case Code.OutOfRange:
+      return status.OUT_OF_RANGE;
+    case Code.Unimplemented:
+      return status.UNIMPLEMENTED;
+    case Code.Internal:
+      return status.INTERNAL;
+    case Code.Unavailable:
+      return status.UNAVAILABLE;
+    case Code.DataLoss:
+      return status.DATA_LOSS;
+    case Code.Unauthenticated:
+      return status.UNAUTHENTICATED;
+    default:
+      return status.OK;
   }
 }
 
 // 映射 tRPC 异常到 gRPC 异常的函数
 export function mapTRPCExceptionToGRPC(err: any): ServiceError {
   if (err instanceof ConnectError) {
-    return <ServiceError>{ code: mapTRPCStatusToGRPC(err.code), details: err.message };
+    return { code: mapTRPCStatusToGRPC(err.code), details: err.message } as ServiceError;
   }
 
-  return <ServiceError>{
+  return {
     code: status.UNKNOWN,
     details: "An unknown error occurred.",
-  };
+  } as ServiceError;
 }

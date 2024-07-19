@@ -12,9 +12,7 @@
 
 export interface LoggingOption {
   driver: string;
-  options: {
-    [key: string]: string;
-  }
+  options: Record<string, string>
 }
 
 export interface ServiceSpec {

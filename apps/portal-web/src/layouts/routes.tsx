@@ -33,7 +33,7 @@ export const userRoutes: (
   user: User | undefined,
   currentClusters: Cluster[],
   defaultCluster: Cluster | undefined,
-  LoginNodes: Record<string, LoginNode[]>,
+  loginNodes: Record<string, LoginNode[]>,
   enableLoginDesktop: boolean,
   crossClusterFileTransferEnabled: boolean,
   setDefaultCluster: (cluster: Cluster | undefined) => void,

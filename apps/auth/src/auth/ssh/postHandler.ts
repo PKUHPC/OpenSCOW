@@ -22,7 +22,7 @@ import { validateLoginParams } from "src/auth/validateLoginParams";
 
 export function registerPostHandler(f: FastifyInstance, loginNode: string) {
 
-  f.register(formBody);
+  void f.register(formBody);
 
   const bodySchema = Type.Object({
     username: Type.String(),

@@ -12,17 +12,17 @@
 
 export interface Cluster {
   name: (string | {
-      i18n: {
-          default: string;
-          en?: string | undefined;
-          zh_cn?: string | undefined;
-      };
+    i18n: {
+      default: string;
+      en?: string | undefined;
+      zh_cn?: string | undefined;
+    };
   }) & (string | {
-      i18n: {
-          default: string;
-          en?: string | undefined;
-          zh_cn?: string | undefined;
-      };
+    i18n: {
+      default: string;
+      en?: string | undefined;
+      zh_cn?: string | undefined;
+    };
   } | undefined);
   id: string;
 }

@@ -128,10 +128,10 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
               </>
             ), TIMEOUT_SECONDS, () => {
               window.open(
-                  publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
+                publicConfig.CREATE_USER_CONFIG.misConfig.external!.url + "?" + addUserToAccountParams(
                   accountName, identityId, name, token,
                 ),
-                  "_blank",
+                "_blank",
               );
               setModalShow(false);
             });

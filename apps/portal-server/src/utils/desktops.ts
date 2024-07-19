@@ -32,7 +32,7 @@ export function ensureEnabled(cluster: string) {
   const enabled = getDesktopConfig(cluster).enabled;
 
   if (!enabled) {
-    throw <ServiceError>{ code: Status.UNAVAILABLE, message: "Login desktop is not enabled" };
+    throw { code: Status.UNAVAILABLE, message: "Login desktop is not enabled" } as ServiceError;
   }
 }
 

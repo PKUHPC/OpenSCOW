@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:082567d367e7816c7c9ddea38b0258ffbd812e3b6cc2eb84fcab748a13a76f4d AS base
+FROM node:iron-alpine@sha256:aa22e2c263d7242e7452d1efa40a031ac8ccf2305cc4d925c737486d339bd178 AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
@@ -37,7 +37,7 @@ COPY --from=pruner /app/out/json/ .
 RUN pnpm i --offline --frozen-lockfile
 
 COPY --from=pruner /app/out/full/ .
-COPY tsconfig.json .eslintrc.js turbo.json ./
+COPY tsconfig.json turbo.json ./
 COPY libs/tsconfig.json ./libs/
 COPY protos ./protos
 

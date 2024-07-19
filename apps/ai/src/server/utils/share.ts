@@ -123,16 +123,16 @@ export async function shareFileOrDir(
       const cpAndChmodCmd = `nohup cp -r --preserve=links ${sourceFilePath} ${targetFullDir} &&
       chmod -R 555 ${targetTopDir}`;
       await ssh.execCommand(cpAndChmodCmd).catch((e) => {
-        failureCallback && failureCallback();
+        failureCallback?.();
         logger.info("Failed to share %s to %s with error %s", sourceFilePath, targetFullDir, e);
       });
 
-      successCallback && successCallback(targetFullDir);
+      successCallback?.(targetFullDir);
 
     });
   } catch (err) {
     logger.info("share file failed", err);
-    failureCallback && failureCallback();
+    failureCallback?.();
   }
 
 }
@@ -155,10 +155,10 @@ export async function unShareFileOrDir({
     const sftp = await ssh.requestSFTP();
     await sftpExists(sftp, sharedPath);
     await sshRmrf(ssh, sharedPath);
-    successCallback && successCallback();
+    successCallback?.();
   }).catch((err) => {
     logger.info("unShare file failed", err);
-    failureCallback && failureCallback();
+    failureCallback?.();
   });
 
 }

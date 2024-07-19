@@ -38,13 +38,13 @@ async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logge
 
   const { timeEnd = undefined } = (await query.execute("get")) ?? {};
 
-  logger.info(`Latest fetched job's end_time is ${timeEnd}.`);
+  logger.info(`Latest fetched job's end_time is ${timeEnd?.toISOString() ?? "undefined"}.`);
 
   return timeEnd;
 }
 
 const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
-  const jobs: ({cluster: string} & ClusterJobInfo)[] = [];
+  const jobs: ({ cluster: string } & ClusterJobInfo)[] = [];
   result.jobs.forEach((job) => {
     jobs.push({ cluster, ...job });
   });
@@ -75,12 +75,16 @@ export async function fetchJobs(
 
   const accountTenantMap = new Map(accounts.map((x) => [x.accountName, x.tenant.$.name]));
 
-  const priceMap = await createPriceMap(em, clusterPlugin["clusters"], logger);
+  const priceMap = await createPriceMap(em, clusterPlugin.clusters, logger);
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
     const result = await em.transactional(async (em) => {
 
-      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
+        logger.info("!!![important] No available activated clusters.This will skip fetching Jobs in cluster!!!");
+        logger.info(e);
+        return {};
+      });
 
       // Calculate prices for new info and persist
       const pricedJobs: JobInfo[] = [];
@@ -207,7 +211,8 @@ export async function fetchJobs(
         ? (nextDate > configDate ? nextDate : configDate)
         : (nextDate || configDate);
       const endFetchDate = new Date();
-      logger.info(`Fetching new info which end_time is from ${startFetchDate} to ${endFetchDate}`);
+      logger.info(`Fetching new info which end_time is from
+          ${startFetchDate?.toISOString()} to ${endFetchDate.toISOString()}`);
 
       const fields: string[] = [
         "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
@@ -244,7 +249,7 @@ export async function fetchJobs(
           let savedJobsCount = 0;
 
           for (const job of jobsInfo) {
-            if (job.endTime! === previousDate) {
+            if (job.endTime === previousDate) {
               currentJobsGroup.push(job);
             } else {
               savedJobsCount += await persistJobAndCharge(currentJobsGroup);

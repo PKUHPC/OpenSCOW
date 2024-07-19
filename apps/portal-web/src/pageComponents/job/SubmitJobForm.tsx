@@ -140,15 +140,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   };
 
 
-  const jobName = Form.useWatch("jobName", form) as string;
+  const jobName = Form.useWatch("jobName", form);
 
-  const nodeCount = Form.useWatch("nodeCount", form) as number;
+  const nodeCount = Form.useWatch("nodeCount", form);
 
-  const coreCount = Form.useWatch("coreCount", form) as number;
+  const coreCount = Form.useWatch("coreCount", form);
 
-  const gpuCount = Form.useWatch("gpuCount", form) as number;
+  const gpuCount = Form.useWatch("gpuCount", form)!;
 
-  const showScriptOutput = Form.useWatch("showScriptOutput", form) as boolean;
+  const showScriptOutput = Form.useWatch("showScriptOutput", form);
 
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
     join(homePath + "/", parsePlaceholder(template, { name: jobName }));
@@ -294,7 +294,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
               // 第一次请求已经处理过
               setIsFirstParQuery(false);
             } else {
-              if (data && data.partitions && data.partitions.length > 0) {
+              if (data?.partitions && data.partitions.length > 0) {
                 form.setFieldValue("partition", data.partitions[0].name);
                 form.setFieldValue("qos", data.partitions[0].qos?.[0]);
               }
@@ -383,12 +383,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     >
       <Row gutter={4}>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label={t(p("cluster"))} name="cluster" rules={[{ required: true }]}>
+          <Form.Item label={t(p("cluster"))} name="cluster" rules={[{ required: true }]}>
             <SingleClusterSelector onChange={handleClusterChange} />
           </Form.Item>
         </Col>
         <Col span={24} sm={12}>
-          <Form.Item<JobForm> label={t(p("jobName"))} name="jobName" rules={[{ required: true }, { max: 50 }]}>
+          <Form.Item label={t(p("jobName"))} name="jobName" rules={[{ required: true }, { max: 50 }]}>
             <Input />
           </Form.Item>
         </Col>
@@ -567,12 +567,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
-          <Form.Item<JobForm> label={t(p("output"))} name="output" rules={[{ required: true }]}>
+          <Form.Item label={t(p("output"))} name="output" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>
         <Col span={24} sm={6}>
-          <Form.Item<JobForm> label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
+          <Form.Item label={t(p("errorOutput"))} name="errorOutput" rules={[{ required: true }]}>
             <Input />
           </Form.Item>
         </Col>

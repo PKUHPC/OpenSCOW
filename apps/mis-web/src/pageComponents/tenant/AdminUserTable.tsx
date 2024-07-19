@@ -25,7 +25,7 @@ import { Encoding } from "src/models/exportFile";
 import { FullUserInfo, TenantRole } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
-import { GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
+import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 
@@ -85,15 +85,15 @@ export const AdminUserTable: React.FC<Props> = ({
   const getUsersRoleCount = useCallback((role: FilteredRole): number => {
 
     switch (role) {
-    case "TENANT_ADMIN":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
-    case "TENANT_FINANCE":
-      return searchData
-        ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
-    case "ALL_USERS":
-    default:
-      return searchData ? searchData.length : 0;
+      case "TENANT_ADMIN":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_ADMIN)).length : 0;
+      case "TENANT_FINANCE":
+        return searchData
+          ? searchData.filter((user) => user.tenantRoles.includes(TenantRole.TENANT_FINANCE)).length : 0;
+      case "ALL_USERS":
+      default:
+        return searchData ? searchData.length : 0;
     }
   }, [searchData]);
 

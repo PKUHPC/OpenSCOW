@@ -36,15 +36,15 @@ const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const p = prefix("page.admin.statistic.");
 
-const formateData = (data: Array<{
+const formateData = (data: {
   date: { year: number, month: number, day: number },
   count: number
-}>, dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
+}[], dateRange: [dayjs.Dayjs, dayjs.Dayjs]) => {
   const input = data.map((d) => ({
     date: dateMessageToDayjs(d.date),
     count: d.count,
   }));
-  const countData: {date: dayjs.Dayjs, count: number}[] = [];
+  const countData: { date: dayjs.Dayjs, count: number }[] = [];
   const [startDate, endDate] = dateRange;
   const days = endDate.diff(startDate, "day") + 1;
   let curDate = startDate.clone();
@@ -73,9 +73,9 @@ const TitleText = styled.span`
   font-weight: bold;
 `;
 
-export const PlatformStatisticsPage: NextPage =
-requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
-(() => {
+export const PlatformStatisticsPage: NextPage = requireAuth(
+  (u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
+)(() => {
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -83,7 +83,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
   const OperationTypeTexts = getOperationTypeTexts(t);
 
   const today = dayjs().endOf("day");
-  const [query, setQuery] = useState<{filterTime: [dayjs.Dayjs, dayjs.Dayjs],}>({
+  const [query, setQuery] = useState<{ filterTime: [dayjs.Dayjs, dayjs.Dayjs], }>({
     filterTime: [today.clone().subtract(7, "day"), today],
   });
 
@@ -329,7 +329,7 @@ requireAuth((u) => u.platformRoles.includes(PlatformRole.PLATFORM_ADMIN))
             presets={getDefaultPresets(languageId)}
             defaultValue={[query.filterTime?.[0], query.filterTime?.[1]]}
             onChange={(dates) => {
-              if (dates && dates[0] && dates[1]) {
+              if (dates?.[0] && dates?.[1]) {
                 setQuery({ filterTime: [dates[0], dates[1]]});
               }
             }}

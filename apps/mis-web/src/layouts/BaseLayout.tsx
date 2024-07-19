@@ -13,7 +13,8 @@
 import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
-import { JumpToAnotherLink } from "@scow/lib-web/build/layouts/base/header/components";
+import { HeaderNavbarLink } from "@scow/lib-web/build/layouts/base/header";
+import { join } from "path";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
@@ -21,7 +22,6 @@ import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { getAvailableRoutes } from "src/layouts/routes";
 import { UserStore } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
-
 
 interface Props {
   footerText: string;
@@ -43,6 +43,30 @@ export const BaseLayout =
 
   const uiExtensionStore = useStore(UiExtensionStore);
 
+  const toCallbackPage = (url: string) => userStore.user
+    ? join(url,`/api/auth/callback?token=${userStore.user.token}`)
+    : url;
+
+  const navbarLinks: HeaderNavbarLink[] = [];
+
+  if (publicConfig.PORTAL_URL) {
+    navbarLinks.push({
+      icon: <DesktopOutlined style={{ paddingRight: 2 }} />,
+      href: toCallbackPage(publicConfig.PORTAL_URL),
+      text: t("layouts.route.navLinkTextPortal"),
+      crossSystem: true,
+    });
+  }
+
+  if (publicConfig.AI_URL) {
+    navbarLinks.push({
+      icon: <RobotOutlined style={{ paddingRight: 2 }} />,
+      href: publicConfig.AI_URL,
+      text: t("layouts.route.navLinkTextAI"),
+      crossSystem: true,
+    });
+  }
+
   return (
     <LibBaseLayout
       logout={userStore.logout}
@@ -55,27 +79,12 @@ export const BaseLayout =
       from="mis"
       extensionStoreData={uiExtensionStore.data}
       languageId={languageId}
-      headerRightContent={(
-        <>
-          <JumpToAnotherLink
-            user={userStore.user}
-            icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
-            link={publicConfig.PORTAL_URL}
-            linkText={t("layouts.route.navLinkTextPortal")}
-          />
-          <JumpToAnotherLink
-            user={userStore.user}
-            icon={<RobotOutlined style={{ paddingRight: 2 }} />}
-            link={publicConfig.AI_URL}
-            linkText={t("layouts.route.navLinkTextAI")}
-          />
-          {
-            systemLanguageConfig.isUsingI18n ? (
-              <LanguageSwitcher initialLanguage={initialLanguage} />
-            ) : undefined
-          }
-        </>
-      )}
+      headerNavbarLinks={navbarLinks}
+      headerRightContent={
+        systemLanguageConfig.isUsingI18n ? (
+          <LanguageSwitcher initialLanguage={initialLanguage} />
+        ) : undefined
+      }
     >
       {children}
     </LibBaseLayout>

@@ -10,27 +10,36 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, SimpleClusterSchema } from "@scow/config/build/cluster";
 import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { useEffect, useState } from "react";
 import { Cluster, getPublicConfigClusters } from "src/utils/cluster";
 
 // export function ClusterInfoStore(
 export function ClusterInfoStore(
-  clusterConfigs: {[clusterId: string]: ClusterConfigSchema},
-  initialActivatedClusters: {[clusterId: string]: Cluster},
+  clusterConfigs: Record<string, ClusterConfigSchema>,
+  initialActivatedClusters: Record<string, Cluster>,
+  initialSimpleClusters: Record<string, SimpleClusterSchema>,
 ) {
 
-  const publicConfigClusters = getPublicConfigClusters(clusterConfigs);
+  let publicConfigClusters: Record<string, Cluster> = {};
+  let clusterSortedIdList: string[] = [];
 
-  const clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+  if (Object.keys(clusterConfigs).length > 0) {
+    clusterSortedIdList = getSortedClusterIds(clusterConfigs);
+    publicConfigClusters = getPublicConfigClusters(clusterConfigs);
+  } else {
+    clusterSortedIdList = getSortedClusterIds(initialSimpleClusters ?? {});
+    publicConfigClusters = getPublicConfigClusters(initialSimpleClusters ?? {});
+  }
 
   const [activatedClusters, setActivatedClusters]
-   = useState<{[clusterId: string]: Cluster}>(initialActivatedClusters);
+   = useState<Record<string, Cluster>>(initialActivatedClusters);
 
   const initialDefaultClusterId = clusterSortedIdList.find((x) => {
     return Object.keys(initialActivatedClusters).find((c) => c === x);
   });
+
   const initialDefaultCluster
    = initialDefaultClusterId ? activatedClusters[initialDefaultClusterId] : undefined;
 

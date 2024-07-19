@@ -205,7 +205,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
 
 
-type JobInfoTableProps = {
+interface JobInfoTableProps {
   data: RunningJobInfo[] | undefined;
   isLoading: boolean;
   showAccount: boolean;
@@ -216,7 +216,7 @@ type JobInfoTableProps = {
     selected: RunningJobInfo[];
     setSelected: (d: RunningJobInfo[]) => void;
   }
-};
+}
 
 const ChangeJobTimeLimitModalLink = ModalLink(ChangeJobTimeLimitModal);
 

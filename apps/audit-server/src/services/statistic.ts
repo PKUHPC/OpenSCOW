@@ -29,7 +29,7 @@ export const statisticServiceServer = plugin((server) => {
       checkTimeZone(timeZone);
 
       const qb = em.createQueryBuilder(OperationLog, "o");
-      qb
+      void qb
         .select([
           raw("DATE(CONVERT_TZ(o.operation_time, 'UTC', ?)) as date", [timeZone]),
           raw("COUNT(DISTINCT o.operator_user_id) as userCount"),
@@ -39,7 +39,7 @@ export const statisticServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const records: {date: string, userCount: number}[] = await qb.execute();
+      const records: { date: string, userCount: number }[] = await qb.execute();
 
       return [{
         results: records.map((record) => ({
@@ -72,7 +72,7 @@ export const statisticServiceServer = plugin((server) => {
       ];
 
       const qb = em.createQueryBuilder(OperationLog, "o");
-      qb
+      void qb
         .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
@@ -80,7 +80,7 @@ export const statisticServiceServer = plugin((server) => {
         .groupBy(raw("operationType"))
         .orderBy({ [raw("count")]: QueryOrder.DESC });
 
-      const results: {operationType: string, count: number}[] = await qb.execute();
+      const results: { operationType: string, count: number }[] = await qb.execute();
 
       return [{
         results,
@@ -133,7 +133,7 @@ export const statisticServiceServer = plugin((server) => {
       ];
 
       const qb = em.createQueryBuilder(OperationLog, "o");
-      qb
+      void qb
         .select([raw("JSON_EXTRACT(meta_data, '$.$case') as operationType"), raw("COUNT(*) as count")])
         .where({ operationTime: { $gte: startTime } })
         .andWhere({ operationTime: { $lte: endTime } })
@@ -141,7 +141,7 @@ export const statisticServiceServer = plugin((server) => {
         .groupBy(raw("operationType"))
         .orderBy({ [raw("count")]: QueryOrder.DESC });
 
-      const results: {operationType: string, count: number}[] = await qb.execute();
+      const results: { operationType: string, count: number }[] = await qb.execute();
 
       return [{
         results,

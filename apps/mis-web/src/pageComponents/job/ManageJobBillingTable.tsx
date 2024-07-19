@@ -276,7 +276,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
             options={
               [...Object.values(AmountStrategy)
                 .map((x) => ({ label: AmountStrategyDescriptions[x], value: x })),
-              ...(publicConfig.CUSTOM_AMOUNT_STRATEGIES || [])?.map((i) => ({ label: i.name || i.id, value: i.id })),
+              ...(publicConfig.CUSTOM_AMOUNT_STRATEGIES || []).map((i) => ({ label: i.name || i.id, value: i.id })),
               ]}
             dropdownMatchSelectWidth={false}
 

@@ -72,6 +72,7 @@ export async function updateBlockStatusInSlurm(
       );
       blockedAccounts.push(account.accountName);
     } catch (error) {
+      logger.warn("Failed to block account %s in slurm: %o", account.accountName, error);
       blockedFailedAccounts.push(account.accountName);
     }
   }
@@ -91,6 +92,8 @@ export async function updateBlockStatusInSlurm(
       );
       blockedUserAccounts.push([ua.user.getProperty("userId"), ua.account.getProperty("accountName")]);
     } catch (error) {
+      logger.warn("Failed to block user accounts (userid: %s, account_name: %s) in slurm: %o",
+        ua.user.$.userId, ua.account.$.accountName, error);
       blockedFailedUserAccounts.push({
         userId: ua.user.$.userId,
         accountName: ua.account.$.accountName,
@@ -177,6 +180,7 @@ export async function updateUnblockStatusInSlurm(
       );
       unblockedAccounts.push(account.accountName);
     } catch (error) {
+      logger.warn("Failed to unblock account %s in slurm: %o", account.accountName, error);
       unblockedFailedAccounts.push(account.accountName);
     }
   }

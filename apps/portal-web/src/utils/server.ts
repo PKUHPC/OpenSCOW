@@ -22,15 +22,15 @@ export const handlegRPCError = <THandlers extends Partial<Record<Status, (e: Ser
   logHandle?: () => void,
   // @ts-ignore
 ) => (e: ServiceError): ReturnType<ValueOf<THandlers>> => {
-    logHandle?.();
-    const handler = handlers[e.code];
-    if (handler) {
-      // @ts-ignore
-      return handler(e) as ReturnType<ValueOf<THandlers>>;
-    } else {
-      throw e;
-    }
-  };
+  logHandle?.();
+  const handler = handlers[e.code];
+  if (handler) {
+    // @ts-ignore
+    return handler(e) as ReturnType<ValueOf<THandlers>>;
+  } else {
+    throw e;
+  }
+};
 
 export const parseIp = (req: NextApiRequest | IncomingMessage): string | undefined => {
 

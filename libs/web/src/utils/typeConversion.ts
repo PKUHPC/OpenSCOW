@@ -10,9 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, LoginNodeConfigSchema } from "@scow/config/build/cluster";
 import { I18nStringType } from "@scow/config/build/i18n";
-import { LoginNodesType } from "@scow/config/build/type";
 import { ClusterConfigSchemaProto, clusterConfigSchemaProto_K8sRuntimeToJSON,
   ClusterConfigSchemaProto_LoginNodesProtoType } from "@scow/protos/build/common/config";
 import { I18nStringProtoType } from "@scow/protos/build/common/i18n";
@@ -40,17 +39,24 @@ export const getI18nTypeFormat = (i18nProtoType: I18nStringProtoType | undefined
 
 // protobuf中定义的grpc返回值的loginNodes类型映射到前端loginNode
 export const getLoginNodesTypeFormat = (
-  protoType: ClusterConfigSchemaProto_LoginNodesProtoType | undefined): LoginNodesType => {
+  protoType: ClusterConfigSchemaProto_LoginNodesProtoType | undefined): LoginNodeConfigSchema[] => {
 
   if (!protoType?.value) return [];
   if (protoType.value.$case === "loginNodeAddresses") {
-    return protoType.value.loginNodeAddresses.loginNodeAddressesValue;
+    return protoType.value.loginNodeAddresses.loginNodeAddressesValue.map((item) => ({
+      name: item,
+      address: item,
+      scowd: undefined,
+    }));
   } else {
     const loginNodeConfigs = protoType.value.loginNodeConfigs;
+
     return loginNodeConfigs.loginNodeConfigsValue.map((x) => ({
       name: getI18nTypeFormat(x.name),
       address: x.address,
+      scowd: x.scowd,
     }));
+
   }
 
 };
@@ -65,8 +71,7 @@ export const getClusterConfigsTypeFormat = (
     const newCluster = {
       ...rest,
       displayName: getI18nTypeFormat(cluster.displayName),
-      loginNodes: getLoginNodesTypeFormat(
-      cluster.loginNodes as ClusterConfigSchemaProto_LoginNodesProtoType | undefined),
+      loginNodes: getLoginNodesTypeFormat(cluster.loginNodes),
       k8s: cluster.k8s ? {
         k8sRuntime: clusterConfigSchemaProto_K8sRuntimeToJSON(cluster.k8s.runtime).toLowerCase(),
         kubeconfig: cluster.k8s.kubeconfig,

@@ -24,12 +24,12 @@ import { BASE_PATH } from "src/utils/processEnv";
 import { PassThrough } from "stream";
 import { WebSocket, WebSocketServer } from "ws";
 
-export type ShellQuery = {
+export interface ShellQuery {
   cluster: string;
 
   cols?: string;
   rows?: string;
-}
+};
 
 export type ShellInputData =
   | { $case: "resize", resize: { cols: number; rows: number } }
@@ -150,7 +150,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   ws.isAlive = true;
   ws.on("pong", () => {
     // 使用箭头函数确保this上下文为AliveCheckedWebSocket
-    heartbeat.call(ws as AliveCheckedWebSocket);
+    heartbeat.call(ws);
   });
 
   ws.ping();
@@ -207,19 +207,20 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
     // 监听来自客户端WebSocket的消息并写入stdinStream
     ws.on("message", (data) => {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       const message = JSON.parse(data.toString());
 
       switch (message.$case) {
-      case "data":
-        stdinStream.write(message.data.data);
-        break;
-      case "resize":
-        stdinStream.write(
-          `stty cols ${message.resize.cols} rows ${message.resize.rows}\n`);
-        break;
-      case "disconnect":
-        stdinStream.end();
-        break;
+        case "data":
+          stdinStream.write(message.data.data);
+          break;
+        case "resize":
+          stdinStream.write(
+            `stty cols ${message.resize.cols} rows ${message.resize.rows}\n`);
+          break;
+        case "disconnect":
+          stdinStream.end();
+          break;
       }
     });
 

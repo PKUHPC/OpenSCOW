@@ -305,12 +305,12 @@ export const ChargeTable: React.FC<Props> = ({
         >
           {
             showAccountName && (
-              <Table.Column<ChargeInfo> dataIndex="accountName" title={t(pCommon("account"))} />
+              <Table.Column dataIndex="accountName" title={t(pCommon("account"))} />
             )
           }
           {
             showTenantName && (
-              <Table.Column<ChargeInfo> dataIndex="tenantName" title={t("common.tenant")} />
+              <Table.Column dataIndex="tenantName" title={t("common.tenant")} />
             )
           }
 

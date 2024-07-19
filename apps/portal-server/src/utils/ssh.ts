@@ -12,7 +12,7 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { getLoginNode } from "@scow/config/build/cluster";
+import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
@@ -34,7 +34,7 @@ export function getConfigClusterLoginNode(cluster: string): string | undefined {
   return loginNode?.address;
 }
 
-// TODO: 不要？在线集群节点信息
+// 获取集群中各节点信息
 export function getClusterLoginNode(cluster: string): string | undefined {
   const loginNode = getLoginNode(configClusters[cluster]?.loginNodes?.[0]);
   return loginNode?.address;
@@ -119,8 +119,11 @@ export async function sshConnect<T>(
 /**
  * Check whether all clusters can be logged in as root user
  */
-export async function checkClustersRootUserLogin(logger: Logger) {
-  await Promise.all(Object.values(configClusters).map(async ({ displayName, loginNodes }) => {
+export async function checkClustersRootUserLogin(
+  logger: Logger,
+  activatedClusters: Record<string, ClusterConfigSchema>,
+) {
+  await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
     const node = getLoginNode(loginNodes[0]);
     logger.info("Checking if root can login to %s by login node %s", displayName, node.name);
     const error = await testRootUserSshLogin(node.address, rootKeyPair, console);
@@ -136,7 +139,7 @@ export async function checkClustersRootUserLogin(logger: Logger) {
 /**
  * Check whether login node is in current cluster
  */
-export async function checkLoginNodeInCluster(cluster: string, loginNode: string) {
+export function checkLoginNodeInCluster(cluster: string, loginNode: string) {
   const loginNodes = configClusters[cluster]?.loginNodes.map(getLoginNode);
   if (!loginNodes) {
     throw clusterNotFound(cluster);

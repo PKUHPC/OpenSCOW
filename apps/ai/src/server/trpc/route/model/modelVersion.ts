@@ -10,12 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { getUserHomedir, sftpExists } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import path, { basename, dirname, join } from "path";
 import { SharedStatus } from "src/models/common";
 import { Model } from "src/server/entities/Model";
 import { ModelVersion } from "src/server/entities/ModelVersion";
+import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
@@ -28,6 +30,7 @@ import { paginationSchema } from "src/server/utils/pagination";
 import { checkSharePermission, getUpdatedSharedPath, SHARED_TARGET, shareFileOrDir, unShareFileOrDir }
   from "src/server/utils/share";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { booleanQueryParam } from "../utils";
@@ -103,6 +106,28 @@ export const createModelVersion = procedure
     modelId: z.number(),
   }))
   .output(z.object({ id: z.number() }))
+  .use(async ({ input:{ modelId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.createModelVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId:(res.data as any).id } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
     const model = await em.findOne(Model, { id: input.modelId });
@@ -110,7 +135,7 @@ export const createModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.modelId} not accessible` });
     }
 
@@ -153,6 +178,28 @@ export const updateModelVersion = procedure
     modelId: z.number(),
   }))
   .output(z.object({ id: z.number() }))
+  .use(async ({ input:{ modelId,versionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.updateModelVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -163,7 +210,7 @@ export const updateModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
     }
 
@@ -203,7 +250,7 @@ export const updateModelVersion = procedure
 
     modelVersion.versionName = versionName;
     modelVersion.versionDescription = versionDescription;
-    modelVersion.algorithmVersion = algorithmVersion,
+    modelVersion.algorithmVersion = algorithmVersion;
 
     await em.flush();
     return { id: modelVersion.id };
@@ -223,6 +270,28 @@ export const deleteModelVersion = procedure
     modelId: z.number(),
   }))
   .output(z.object({ success: z.boolean() }))
+  .use(async ({ input:{ modelId,versionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.deleteModelVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -237,7 +306,7 @@ export const deleteModelVersion = procedure
       throw new TRPCError({ code: "NOT_FOUND", message: `Model ${input.modelId} not found` });
     }
 
-    if (model.owner !== user!.identityId) {
+    if (model.owner !== user.identityId) {
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${input.modelId} not accessible` });
     }
 
@@ -305,6 +374,28 @@ export const shareModelVersion = procedure
     versionId: z.number(),
   }))
   .output(z.void())
+  .use(async ({ input:{ modelId,versionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.shareModelVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ modelId,versionId } },
+        OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input:{ modelId, versionId }, ctx: { user } }) => {
     const em = await forkEntityManager();
     const modelVersion = await em.findOne(ModelVersion, { id: versionId });
@@ -489,7 +580,35 @@ export const copyPublicModelVersion = procedure
     versionDescription: z.string(),
     path: z.string(),
   }))
-  .output(z.object({ success: z.boolean() }))
+  .output(z.object({ targetModelId:z.number(),targetModelVersionId:z.number() }))
+  .use(async ({ input:{ modelId,versionId }, ctx, next }) => {
+    const res = await next({ ctx });
+
+    const { user, req } = ctx;
+    const logInfo = {
+      operatorUserId: user.identityId,
+      operatorIp: parseIp(req) ?? "",
+      operationTypeName: OperationType.copyModelVersion,
+    };
+
+    if (res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ sourceModelId:modelId,
+        sourceModelVersionId:versionId,
+        targetModelId: (res.data as any).targetModelId,
+        targetModelVersionId: (res.data as any).targetModelVersionId,
+      } },
+      OperationResult.SUCCESS);
+    }
+
+    if (!res.ok) {
+      await callLog({ ...logInfo, operationTypePayload:{ sourceModelId:modelId,
+        sourceModelVersionId:versionId,
+      } },
+      OperationResult.FAIL);
+    }
+
+    return res;
+  })
   .mutation(async ({ input, ctx: { user } }) => {
     const em = await forkEntityManager();
 
@@ -551,9 +670,9 @@ export const copyPublicModelVersion = procedure
       console.log(err);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
-        message: `Copy Error ${err}`,
+        message: `Copy Error ${err as any}`,
       });
     }
 
-    return { success: true };
+    return { targetModelId: newModel.id,targetModelVersionId: newModelVersion.id };
   });

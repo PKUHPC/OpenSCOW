@@ -20,7 +20,7 @@ import { publicConfig } from "src/utils/config";
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
 
 export function ClusterInfoStore(
-  clusterConfigs: {[clusterId: string]: ClusterConfigSchema},
+  clusterConfigs: Record<string, ClusterConfigSchema>,
   initialCurrentClusters: Cluster[],
   // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件
   portalRuntimeDesktopEnabled: boolean,
@@ -40,7 +40,7 @@ export function ClusterInfoStore(
     return currentClusters.find((c) => c.id === x);
   });
 
-  const [clusterId, setClusterId] = useLocalStorage<String>(
+  const [clusterId, setClusterId] = useLocalStorage<string>(
     SCOW_DEFAULT_CLUSTER_ID,
     initialDefaultClusterId || "",
   );

@@ -17,6 +17,7 @@ import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { authUrl } from "src/config";
+import { configClusters } from "src/config/clusters";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -51,15 +52,15 @@ export const initServiceServer = plugin((server) => {
        await createUserInDatabase(userId, name, email, DEFAULT_TENANT_NAME, server.logger, em)
          .catch((e) => {
            if (e.code === Status.ALREADY_EXISTS) {
-             throw <ServiceError> {
+             throw {
                code: Status.ALREADY_EXISTS,
                message:`User with userId ${userId} already exists in scow.`,
                details: "EXISTS_IN_SCOW",
-             };
+             } as ServiceError;
            }
-           throw <ServiceError> {
+           throw {
              code: Status.INTERNAL,
-             message: `Error creating user with userId ${userId} in database.` };
+             message: `Error creating user with userId ${userId} in database.` } as ServiceError;
          });
 
       user.platformRoles.push(PlatformRole.PLATFORM_ADMIN);
@@ -72,7 +73,8 @@ export const initServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // 插入公钥失败也认为是创建用户成功
-          await insertKeyToNewUser(userId, password, server.logger)
+          // 在所有集群下执行
+          await insertKeyToNewUser(userId, password, server.logger, configClusters)
             .catch(() => null);
           return true;
         })
@@ -83,9 +85,9 @@ export const initServiceServer = plugin((server) => {
             return false;
           }
           // 回滚数据库
-          await em.removeAndFlush(user),
+          await em.removeAndFlush(user);
           server.logger.error("Error creating user in auth.", e);
-          throw <ServiceError> { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` };
+          throw { code: Status.INTERNAL, message: `Error creating user ${user.id} in auth.` } as ServiceError;
         });
 
       return [{ createdInAuth: createdInAuth }];
@@ -99,10 +101,10 @@ export const initServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError> {
+        throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,
-        };
+        } as ServiceError;
       }
 
       if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
@@ -125,10 +127,10 @@ export const initServiceServer = plugin((server) => {
       });
 
       if (!user) {
-        throw <ServiceError> {
+        throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,
-        };
+        } as ServiceError;
       }
 
       user.platformRoles = user.platformRoles.filter((x) => x !== PlatformRole.PLATFORM_ADMIN);
@@ -151,9 +153,9 @@ export const initServiceServer = plugin((server) => {
         await em.persistAndFlush(initializationTime);
       } catch (e) {
         if (e instanceof UniqueConstraintViolationException) {
-          throw <ServiceError> {
+          throw {
             code: status.ALREADY_EXISTS, message: "already initialized",
-          };
+          } as ServiceError;
         } else {
           throw e;
         }

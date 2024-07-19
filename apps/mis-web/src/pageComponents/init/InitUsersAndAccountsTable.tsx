@@ -24,7 +24,7 @@ import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { UserRole } from "src/models/User";
-import { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
+import { type InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
 
 interface UserTableFilterForm {
   idOrName: string | undefined;
@@ -91,8 +91,8 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
         bordered
         rowKey="userId"
       >
-        <Table.Column<User> dataIndex="userId" title={t(pCommon("userId"))} />
-        <Table.Column<User> dataIndex="name" title={t(pCommon("name"))} />
+        <Table.Column dataIndex="userId" title={t(pCommon("userId"))} />
+        <Table.Column dataIndex="name" title={t(pCommon("name"))} />
         <Table.Column<User>
           dataIndex="platformRoles"
           title={t(p("platformRole"))}
@@ -124,7 +124,7 @@ const UserTable: React.FC<DataTableProps<User>> = ({ data, loading, reload }) =>
 };
 
 const AccountTable:
-  React.FC<DataTableProps<Static<typeof InitGetAccountsSchema["responses"]["200"][0]>>>
+React.FC<DataTableProps<Static<typeof InitGetAccountsSchema["responses"]["200"][0]>>>
    = ({ data, loading }) => {
 
      const t = useI18nTranslateToString();
@@ -141,7 +141,7 @@ const AccountTable:
          rowKey="accountName"
          bordered
        >
-         <Table.Column<Account> dataIndex="accountName" title={t(pCommon("accountName"))} />
+         <Table.Column dataIndex="accountName" title={t(pCommon("accountName"))} />
          <Table.Column<Account>
            dataIndex="ownerName"
            title={t(pCommon("owner"))}

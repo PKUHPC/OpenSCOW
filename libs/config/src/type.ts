@@ -14,7 +14,7 @@ import { Static, Type } from "@sinclair/typebox";
 
 import { I18nStringType } from "./i18n";
 
-export type Cluster = { id: string; name: I18nStringType; }
+export interface Cluster { id: string; name: I18nStringType; };
 
 export enum ClusterActivationStatus {
   ACTIVATED = 0,
@@ -32,11 +32,3 @@ export const ClusterRuntimeInfoSchema = Type.Object({
 });
 
 export type ClusterRuntimeInfo = Static<typeof ClusterRuntimeInfoSchema>;
-
-
-export type LoginNodesType = string[] |
-  {
-    name: I18nStringType,
-    address: string,
-  }[]
-

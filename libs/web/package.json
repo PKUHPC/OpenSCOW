@@ -7,7 +7,8 @@
   "sideEffects": false,
   "scripts": {
     "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
-    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json"
+    "build": "rimraf build && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "lint": "eslint ."
   },
   "files": [
     "build",
@@ -34,6 +35,7 @@
     "react-dom": ">=18.2.0",
     "react-is": "18.3.1",
     "nookies": "2.5.2",
+    "@ant-design/cssinjs": "1.21.0",
     "react-async": "10.0.1"
   },
   "devDependencies": {

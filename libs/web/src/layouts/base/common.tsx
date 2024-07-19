@@ -45,8 +45,11 @@ export function createMenuItems(
             if (route.openInNewPage) {
               window.open(target);
             } else {
-              EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))
-                ? window.location.href = target : Router.push(target);
+              if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+                window.location.href = target;
+              } else {
+                void Router.push(target);
+              }
             }
           }
           : undefined,
@@ -59,7 +62,8 @@ export function createMenuItems(
       key: route.path,
       label: (
         <Link
-          href={route.clickToPath ?? route.path} {...route.openInNewPage ? { target: "_blank" } : {}}
+          href={route.clickToPath ?? route.path}
+          {...route.openInNewPage ? { target: "_blank" } : {}}
           style={{ textDecoration:"none" }}
         >
           {route.text}
