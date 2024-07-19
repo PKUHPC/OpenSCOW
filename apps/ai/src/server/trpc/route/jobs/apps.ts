@@ -16,7 +16,7 @@ import { JobInfo } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { OperationResult, OperationType } from "@scow/lib-operation-log";
-import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
+import { getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
   sftpExists,
@@ -47,6 +47,7 @@ import {
 } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
+import { getAppConnectionInfoFromAdapterForAi } from "src/server/utils/schedulerAdapterUtils";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { formatTime } from "src/utils/datetime";
 import { isParentOrSameFolder } from "src/utils/file";
@@ -820,7 +821,7 @@ export const listAppSessions =
               // TODO: if vnc apps
               }
               const client = getAdapterClient(clusterId);
-              const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+              const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
               if (connectionInfo?.response?.$case === "appConnectionInfo") {
                 host = connectionInfo.response.appConnectionInfo.host;
                 port = connectionInfo.response.appConnectionInfo.port;
@@ -893,7 +894,7 @@ procedure
       try {
         const client = getAdapterClient(clusterId);
 
-        const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+        const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, jobId, logger);
 
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           const host = connectionInfo.response.appConnectionInfo.host;
@@ -983,7 +984,7 @@ procedure
 
       if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
         const client = getAdapterClient(cluster);
-        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+        const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           const { host, port, password } = connectionInfo.response.appConnectionInfo;
           return {
