@@ -38,6 +38,7 @@ export async function updateBlockStatusInSlurm(
   const blockedUserAccounts: [string, string][] = [];
   const blockedFailedUserAccounts: BlockedFailedUserAccount[] = [];
 
+  em.clear();
   const accounts = await em.find(Account, { blockedInCluster: true });
 
   const currentActivatedClusters = await getActivatedClusters(em, logger).catch((e) => {
@@ -55,8 +56,12 @@ export async function updateBlockStatusInSlurm(
     };
   }
 
-  for (const account of accounts) {
-    if (account.whitelist) {
+  for (const accountItem of accounts) {
+
+    em.clear();
+    const account = await em.findOne(Account, { id: accountItem.id });
+
+    if (!account || account.whitelist) {
       continue;
     }
 
@@ -73,12 +78,18 @@ export async function updateBlockStatusInSlurm(
     }
   }
 
-
+  em.clear();
   const userAccounts = await em.find(UserAccount, {
     blockedInCluster: UserStatus.BLOCKED,
-  }, { populate: ["user", "account"]});
+  });
 
-  for (const ua of userAccounts) {
+  for (const uaItem of userAccounts) {
+
+    em.clear();
+    const ua = await em.findOne(UserAccount, { id: uaItem.id }, { populate: ["user", "account"]});
+
+    if (!ua) { continue; }
+
     try {
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.user, "blockUserInAccount", {
@@ -122,6 +133,7 @@ export async function updateBlockStatusInSlurm(
 export async function updateUnblockStatusInSlurm(
   em: SqlEntityManager<MySqlDriver>, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
 ) {
+  em.clear();
   const accounts = await em.find(Account, {
     $or: [
       { blockedInCluster: false },
@@ -145,7 +157,13 @@ export async function updateUnblockStatusInSlurm(
     };
   }
 
-  for (const account of accounts) {
+  for (const accountItem of accounts) {
+    em.clear();
+    const account = await em.findOne(Account, { id: accountItem.id });
+    if (!account) {
+      continue;
+    }
+
     try {
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "unblockAccount", {
