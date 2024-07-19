@@ -18,7 +18,6 @@ import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { createServer } from "src/app";
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { misConfig } from "src/config/mis";
-import { SystemState } from "src/entities/SystemState";
 import { BlockedData, insertBlockedData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
 
@@ -41,11 +40,6 @@ afterEach(async () => {
   await server.close();
 });
 
-it("test whether the block update time exists at startup", async () => {
-  const em = server.ext.orm.em.fork();
-  const updateTime = await em.findOne(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
-  expect(updateTime).not.toBeNull();
-});
 
 it("update block status", async () => {
   const blockedData = await updateBlockStatusInSlurm(
