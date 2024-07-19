@@ -25,7 +25,6 @@ import { SFTPWrapper } from "ssh2";
 import { Logger } from "ts-log";
 import { z } from "zod";
 
-
 export const getClusterAppConfigs = (cluster: string) => {
 
   const commonApps = getAiAppConfigs();
