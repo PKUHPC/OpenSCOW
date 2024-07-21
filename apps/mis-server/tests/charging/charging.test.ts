@@ -39,6 +39,7 @@ beforeEach(async () => {
   server = await createServer();
 
   em = server.ext.orm.em.fork();
+  await server.ext.syncBlockStatus.sync();
 
   const tenant = new Tenant({ name: "test" });
 
@@ -197,7 +198,6 @@ it("gets account balance", async () => {
 
   account.balance = new Decimal(50);
   await em.flush();
-  await server.ext.syncBlockStatus.sync();
 
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
