@@ -41,6 +41,8 @@ afterEach(async () => {
 
 it("get all tenants", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());
+  await server.ext.syncBlockStatus.sync();
+
   const tenants = await asyncClientCall(client, "getAllTenants", {});
 
   expect(tenants.totalCount).toEqual(2);
