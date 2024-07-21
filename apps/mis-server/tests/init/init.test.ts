@@ -87,6 +87,8 @@ it("creates an init admin user", async () => {
 
   const em = server.ext.orm.em.fork();
 
+  await server.ext.syncBlockStatus.sync();
+
   const user = await em.findOneOrFail(User, { userId: userInfo.userId });
 
   expect(user).toMatchObject({

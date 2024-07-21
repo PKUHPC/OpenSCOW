@@ -197,6 +197,7 @@ it("gets account balance", async () => {
 
   account.balance = new Decimal(50);
   await em.flush();
+  await server.ext.syncBlockStatus.sync();
 
   const client = new ChargingServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
 
