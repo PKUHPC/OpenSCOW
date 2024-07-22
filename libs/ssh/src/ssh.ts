@@ -40,6 +40,8 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
   const [host, port] = address.split(":");
   const ssh = new NodeSSH();
 
+  logger.info("connect, host %s, port %s, username: %s, rootKeyPair.privateKey: %s",
+    host, port, username, rootKeyPair.privateKey);
   async function connect() {
     await ssh.connect({ host, port: port ? +port : undefined,
       username, privateKey: rootKeyPair.privateKey, readyTimeout: 30000 });
