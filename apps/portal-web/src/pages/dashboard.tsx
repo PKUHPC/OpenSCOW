@@ -28,22 +28,17 @@ import { UserStore } from "src/stores/UserStore";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
-
-
-interface Props {
-}
+interface Props {}
 
 interface FulfilledResult {
-  clusterInfo: { clusterName: string, partitions: PartitionInfo[] }
+  clusterInfo: { clusterName: string; partitions: PartitionInfo[] };
 }
 
 interface FulfilledNodesResult {
-  nodeInfo: { clusterName: string, nodes: NodeInfo[] }
+  nodeInfo: { clusterName: string; nodes: NodeInfo[] };
 }
 
-
 export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
-
   const userStore = useStore(UserStore);
   const router = useRouter();
 
@@ -57,32 +52,32 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
-
       const rawClusterInfoPromises = currentClusters.map((x) =>
-        api.getClusterRunningInfo({ query: { clusterId: x.id } })
+        api
+          .getClusterRunningInfo({ query: { clusterId: x.id } })
           .httpError(500, () => {}),
       );
 
       const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
 
-      // 获取各个集群的详细节点信息
       const rawClusterNodesInfoPromises = currentClusters.map((x) =>
-        api.getClusterNodesInfo({ query: { cluster: x.id } })
+        api
+          .getClusterNodesInfo({ query: { cluster: x.id } })
           .httpError(500, () => {}),
       );
 
-      // 原始节点数据
       const rawClusterNodesInfoResults = await Promise.allSettled(rawClusterNodesInfoPromises);
 
-      // 处理成功的节点数据
       const successfulNodesResults = rawClusterNodesInfoResults
-      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
         .map((result, idx) => {
           if (result.status === "fulfilled") {
             return {
               ...result,
-              value:{
-                nodeInfo:{ clusterName: currentClusters[idx].id,nodes:result.value.nodeInfo },
+              value: {
+                nodeInfo: {
+                  clusterName: currentClusters[idx].id,
+                  nodes: result.value.nodeInfo,
+                },
               },
             } as PromiseSettledResult<FulfilledNodesResult>;
           }
@@ -91,21 +86,20 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         })
         .filter(
           (result): result is PromiseFulfilledResult<FulfilledNodesResult> =>
-            result.status === "fulfilled")
+            result.status === "fulfilled",
+        )
         .map((result) => result.value);
 
-      console.log(successfulNodesResults);
-
-      // 处理成功的结果
       const successfulResults = rawClusterInfoResults
-      // 替换clusterId，适配器返回的clusterName和SCOW配置文件中的clusterId没关系
         .map((result, idx) => {
           if (result.status === "fulfilled") {
             return {
               ...result,
-              value:{
-                clusterInfo:{ clusterName: currentClusters[idx].id,
-                  partitions:result.value.clusterInfo.partitions },
+              value: {
+                clusterInfo: {
+                  clusterName: currentClusters[idx].id,
+                  partitions: result.value.clusterInfo.partitions,
+                },
               },
             } as PromiseSettledResult<FulfilledResult>;
           }
@@ -114,19 +108,32 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         })
         .filter(
           (result): result is PromiseFulfilledResult<FulfilledResult> =>
-            result.status === "fulfilled")
+            result.status === "fulfilled",
+        )
         .map((result) => result.value);
 
-
-      // 处理失败的结果
-      const failedClusters = currentClusters.filter((x) =>
-        !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
+      const failedClusters = currentClusters.filter(
+        (x) => !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
 
-      // 成功的集群名称
       const successfulClusters = currentClusters.filter((x) =>
         successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
+
+      const nodeCountsByPartition: Record<string, Record<string, number>> = {};
+      successfulNodesResults.forEach(({ nodeInfo }) => {
+        nodeInfo.nodes.forEach((node) => {
+          node.partitions.forEach((partition) => {
+            if (!nodeCountsByPartition[node.nodeName]) {
+              nodeCountsByPartition[node.nodeName] = {};
+            }
+            if (!nodeCountsByPartition[node.nodeName][partition]) {
+              nodeCountsByPartition[node.nodeName][partition] = 0;
+            }
+            nodeCountsByPartition[node.nodeName][partition]++;
+          });
+        });
+      });
 
       const clustersInfo = successfulResults
         .map((cluster) => ({
@@ -140,32 +147,32 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             clusterName: cluster.clusterInfo.clusterName,
             ...x,
             cpuUsage: ((x.runningCpuCount / x.cpuCoreCount) * 100).toFixed(2),
-            gpuUsage: x.gpuCoreCount ? ((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2) : undefined,
+            gpuUsage: x.gpuCoreCount
+              ? ((x.runningGpuCount / x.gpuCoreCount) * 100).toFixed(2)
+              : undefined,
           })),
         );
 
-      // 平台概览信息
       const platformOverview: PlatformOverview = {
-        nodeCount:0,
-        runningNodeCount:0,
-        idleNodeCount:0,
-        notAvailableNodeCount:0,
-        cpuCoreCount:0,
-        runningCpuCount:0,
-        idleCpuCount:0,
-        notAvailableCpuCount:0,
-        gpuCoreCount:0,
-        runningGpuCount:0,
-        idleGpuCount:0,
-        notAvailableGpuCount:0,
-        jobCount:0,
-        runningJobCount:0,
-        pendingJobCount:0,
-        usageRatePercentage:0,
-        partitionStatus:0,
+        nodeCount: 0,
+        runningNodeCount: 0,
+        idleNodeCount: 0,
+        notAvailableNodeCount: 0,
+        cpuCoreCount: 0,
+        runningCpuCount: 0,
+        idleCpuCount: 0,
+        notAvailableCpuCount: 0,
+        gpuCoreCount: 0,
+        runningGpuCount: 0,
+        idleGpuCount: 0,
+        notAvailableGpuCount: 0,
+        jobCount: 0,
+        runningJobCount: 0,
+        pendingJobCount: 0,
+        usageRatePercentage: 0,
+        partitionStatus: 0,
       };
 
-      // 各个集群概览信息
       const clustersOverview: ClusterOverview[] = [];
       successfulResults.forEach((result) => {
         const { clusterName, partitions } = result.clusterInfo;
@@ -188,6 +195,29 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             acc.runningJobCount += partition.runningJobCount;
             acc.pendingJobCount += partition.pendingJobCount;
             acc.partitionStatus += partition.partitionStatus;
+
+            // 去除重复节点的统计
+            Object.keys(nodeCountsByPartition).forEach((nodeName) => {
+              const nodeCountInPartitions = nodeCountsByPartition[nodeName];
+              if (nodeCountInPartitions[partition.partitionName]) {
+                const duplicateCount = nodeCountInPartitions[partition.partitionName] - 1;
+                acc.nodeCount -= duplicateCount;
+                acc.runningNodeCount -= partition.runningNodeCount ? duplicateCount : 0;
+                acc.idleNodeCount -= partition.idleNodeCount ? duplicateCount : 0;
+                acc.notAvailableNodeCount -= partition.notAvailableNodeCount ? duplicateCount : 0;
+                acc.cpuCoreCount -= duplicateCount * partition.cpuCoreCount;
+                acc.runningCpuCount -= duplicateCount * partition.runningCpuCount;
+                acc.idleCpuCount -= duplicateCount * partition.idleCpuCount;
+                acc.notAvailableCpuCount -= duplicateCount *
+                (partition.cpuCoreCount - partition.runningCpuCount - partition.idleCpuCount);
+                acc.gpuCoreCount -= duplicateCount * partition.gpuCoreCount;
+                acc.runningGpuCount -= duplicateCount * partition.runningGpuCount;
+                acc.idleGpuCount -= duplicateCount * partition.idleGpuCount;
+                acc.notAvailableGpuCount -= duplicateCount *
+                 (partition.gpuCoreCount - partition.runningGpuCount - partition.idleGpuCount);
+              }
+            });
+
             return acc;
           },
           {
@@ -212,7 +242,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           },
         );
 
-        // 累加平台概览信息
         platformOverview.nodeCount += aggregatedData.nodeCount;
         platformOverview.runningNodeCount += aggregatedData.runningNodeCount;
         platformOverview.idleNodeCount += aggregatedData.idleNodeCount;
@@ -230,14 +259,16 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         platformOverview.pendingJobCount += aggregatedData.pendingJobCount;
         platformOverview.partitionStatus += aggregatedData.partitionStatus;
 
-        aggregatedData.usageRatePercentage =
-        Number(((aggregatedData.runningNodeCount / aggregatedData.nodeCount) * 100).toFixed(2));
+        aggregatedData.usageRatePercentage = Number(
+          ((aggregatedData.runningNodeCount / aggregatedData.nodeCount) * 100).toFixed(2),
+        );
 
         clustersOverview.push(aggregatedData);
       });
 
-      platformOverview.usageRatePercentage =
-      Number(((platformOverview.runningNodeCount / platformOverview.nodeCount) * 100).toFixed(2));
+      platformOverview.usageRatePercentage = Number(
+        ((platformOverview.runningNodeCount / platformOverview.nodeCount) * 100).toFixed(2),
+      );
 
       return {
         clustersInfo,
@@ -252,21 +283,23 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
-      <QuickEntry currentClusters={currentClusters} publicConfigClusters={publicConfigClusters} />
+      <QuickEntry
+        currentClusters={currentClusters}
+        publicConfigClusters={publicConfigClusters}
+      />
       <OverviewTable
         isLoading={isLoading}
-        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id:idx })) : []}
+        clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id: idx })) : []}
         failedClusters={data?.failedClusters ?? []}
         currentClusters={currentClusters}
         clustersOverview={data?.clustersOverview ?? []}
-        platformOverview={data?.platformOverview }
+        platformOverview={data?.platformOverview}
         successfulClusters={data?.successfulClusters}
       />
     </DashboardPageContent>
   );
 });
 
-const DashboardPageContent = styled.div`
-`;
+const DashboardPageContent = styled.div``;
 
 export default DashboardPage;
