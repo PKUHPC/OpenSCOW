@@ -818,6 +818,11 @@ export default {
       userIdRequired:"请输入用户ID",
       userNameRequired:"请输入用户姓名",
       incorrectUserIdOrName:"您输入的用户ID或姓名不匹配",
+      userDeleted: "该用户已被删除",
+      deleteFailed:"删除失败",
+      accountsOwnerPrompt:"用户<b>{}</b>是账户<b>{}</b>的拥有者，您需要先删除以上账户后才能删除该用户",
+
+      runningJobsPrompt:"该用户还有未完成的作业，无法删除",
     },
   },
   page: {

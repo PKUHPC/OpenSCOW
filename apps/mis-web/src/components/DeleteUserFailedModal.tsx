@@ -11,32 +11,37 @@
  */
 
 import { Modal } from "antd";
-import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { DeleteFailedReason } from "src/models/User";
+interface Message {
+  type: DeleteFailedReason;
+  userId: string;
+  accounts: string[];
+}
 
 interface Props {
+  message: Message;
   onClose: () => void;
   open: boolean;
 }
 
 const p = prefix("component.others.");
 
-const CannotDeleteModal: React.FC<Props> = ({ onClose, open }) => {
+export const DeleteUserFailedModal: React.FC<Props> = ({ message,onClose,open }) => {
   const t = useI18nTranslateToString();
-
+  const { userId,accounts } = message;
   return (
     <Modal
-      title={t(p("deleteUser2"))}
+      title={`${t(p("deleteFailed"))}`}
       open={open}
       onOk={onClose}
       onCancel={onClose}
-      width={620} // 设置Modal宽度
+      width={"620px"} // 设置Modal宽度
     >
-      <p>
-        <b>{t(p("cannotDeleteSelf"))}</b>
-      </p>
+      {(message.type === DeleteFailedReason.ACCOUNTS_OWNER ?
+        <div dangerouslySetInnerHTML={{ __html: t(p("accountsOwnerPrompt"), [userId, accounts.join(",")]) }} /> :
+        <div>{t(p("runningJobsPrompt"))}</div>
+      )}
     </Modal>
   );
 };
-
-export const CannotDeleteModalLink = ModalLink(CannotDeleteModal);

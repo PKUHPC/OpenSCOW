@@ -84,6 +84,12 @@ export const AccountAffiliationSchema = Type.Object({
 
 export type AccountAffiliation = Static<typeof AccountAffiliationSchema>;
 
+export const UserState = {
+  NORMAL: 0,
+  DELETED: 1,
+} as const;
+export type UserState = ValueOf<typeof UserState>;
+
 export const UserInfoSchema = Type.Object({
   tenant: Type.String(),
   name: Type.Optional(Type.String()),
@@ -106,6 +112,7 @@ export const FullUserInfo = Type.Object({
     Type.Object({ accountName: Type.String(), role: Type.Enum(UserRole) }),
   ),
   tenantRoles: Type.Array(Type.Enum(TenantRole)),
+  state:Type.Enum(UserState),
 });
 export type FullUserInfo = Static<typeof FullUserInfo>;
 
@@ -134,6 +141,7 @@ export const AccountState = {
   NORMAL: 0,
   FROZEN: 1,
   BLOCKED_BY_ADMIN: 2,
+  DELETED: 3,
 } as const;
 
 export type AccountState = ValueOf<typeof AccountState>;
@@ -172,3 +180,8 @@ export const ChargesSortOrder = Type.Union([
 ]);
 
 export type ChargesSortOrder = Static<typeof ChargesSortOrder>;
+
+export enum DeleteFailedReason {
+  ACCOUNTS_OWNER = "ACCOUNTS_OWNER",
+  RUNNING_JOBS = "RUNNING_JOBS",
+}

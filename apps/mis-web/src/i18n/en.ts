@@ -818,6 +818,11 @@ export default {
       userIdRequired: "Please enter the user ID",
       userNameRequired: "Please enter the user name",
       incorrectUserIdOrName: "The user ID or name you entered does not match",
+      userDeleted: "The user has been deleted",
+      deleteFailed: "Delete failed",
+      accountsOwnerPrompt: "The user <b>{}</b> is the owner of account(s) <b>{}</b>." +
+      "You need to delete the above account(s) before deleting this user.",
+      runningJobsPrompt: "The user has unfinished jobs and cannot be deleted.",
     },
   },
   page: {

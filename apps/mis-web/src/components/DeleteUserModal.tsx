@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Form, Input, message,Modal } from "antd";
+import { Form, Input, message, Modal } from "antd";
 import { useState } from "react";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
@@ -39,13 +39,17 @@ const DeleteUserModal: React.FC<Props> = ({ name, userId, onClose, onComplete, o
 
   const onOK = async () => {
     try {
-      const { userId: inputUserId, userName: inputUserName, comments } = await form.validateFields();
-      if (inputUserId !== userId || inputUserName !== name) {
+      const { userId: inputUserId, userName: inputUserName, comments = "" } = await form.validateFields();
+      const trimmedUserId = inputUserId.trim();
+      const trimmedUserName = inputUserName.trim();
+      const trimmedComments = comments.trim();
+
+      if (trimmedUserId !== userId || trimmedUserName !== name) {
         message.error(t(p("incorrectUserIdOrName")));
         return;
       }
       setLoading(true);
-      await onComplete(inputUserId, inputUserName, comments)
+      await onComplete(trimmedUserId, trimmedUserName, trimmedComments)
         .then(() => {
           form.resetFields();
           onClose();

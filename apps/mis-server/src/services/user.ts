@@ -30,6 +30,7 @@ import {
   tenantRoleToJSON,
   UserRole as PFUserRole, UserServiceServer,
   UserServiceService,
+  userStateFromJSON,
   UserStatus as PFUserStatus } from "@scow/protos/build/server/user";
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
@@ -538,10 +539,14 @@ export const userServiceServer = plugin((server) => {
       });
 
       if (needDeleteAccounts.length > 0) {
-        const accountsString = needDeleteAccounts.join(", ");
+        const needDeleteAccountsObj = {
+          userId,
+          accounts:needDeleteAccounts,
+          type:"ACCOUNTS_OWNER",
+        };
         throw {
           code: Status.FAILED_PRECONDITION,
-          message: `User ${userId} owns the following accounts: ${accountsString}. Please delete these accounts first.`,
+          message: JSON.stringify(needDeleteAccountsObj),
         } as ServiceError;
       }
 
@@ -563,10 +568,13 @@ export const userServiceServer = plugin((server) => {
       );
 
       if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        const runningJobsObj = {
+          userId,
+          type:"RUNNING_JOBS",
+        };
         throw {
           code: Status.FAILED_PRECONDITION,
-          message: `User ${userId} has jobs running or pending and cannot remove.
-            Please wait for the job to end or end the job manually before moving out.`,
+          message: JSON.stringify(runningJobsObj),
         } as ServiceError;
       }
 
@@ -646,6 +654,7 @@ export const userServiceServer = plugin((server) => {
           role: PFUserRole[x.role],
         })),
         platformRoles: x.platformRoles.map(platformRoleFromJSON),
+        state:userStateFromJSON(x.state),
       })) } ];
     },
 

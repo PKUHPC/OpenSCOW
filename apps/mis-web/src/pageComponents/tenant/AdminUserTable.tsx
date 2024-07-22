@@ -17,14 +17,15 @@ import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { CannotDeleteModalLink } from "src/components/CannotDeleteModal";
+import { CannotDeleteTooltip } from "src/components/CannotDeleteTooltip";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
+import { DeleteUserFailedModal } from "src/components/DeleteUserFailedModal";
 import { DeleteUserModalLink } from "src/components/DeleteUserModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Encoding } from "src/models/exportFile";
-import { FullUserInfo, TenantRole } from "src/models/User";
+import { DeleteFailedReason, FullUserInfo, TenantRole, UserState } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
@@ -51,8 +52,6 @@ const filteredRoles = {
   "TENANT_FINANCE": "tenantFinance",
 } as const;
 type FilteredRole = keyof typeof filteredRoles;
-
-
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
@@ -148,6 +147,13 @@ export const AdminUserTable: React.FC<Props> = ({
       { label: t(p("affiliatedAccountName")), value: "availableAccounts" },
     ];
   }, [t]);
+
+  const [failedModalVisible, setFailedModalVisible] = useState(false);
+  const [failedDeletedMessage, setFailedDeletedMessage] = useState({
+    type: DeleteFailedReason.ACCOUNTS_OWNER,
+    userId: "",
+    accounts: [],
+  });
 
   return (
     <div>
@@ -247,7 +253,7 @@ export const AdminUserTable: React.FC<Props> = ({
         <Table.Column<FullUserInfo>
           dataIndex="operation"
           title={t(pCommon("operation"))}
-          width="8%"
+          width="13%"
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
@@ -274,33 +280,43 @@ export const AdminUserTable: React.FC<Props> = ({
               >
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
-              { user.identityId !== r.id ? (
+              { user.identityId === r.id ? (
+                <CannotDeleteTooltip tooltipType="cannotDeleteSelf" />
+              ) : r.state === UserState.DELETED ? (
+                <CannotDeleteTooltip tooltipType="userDeleted" />
+              ) : (
                 <DeleteUserModalLink
                   userId={r.id}
                   name={r.name}
                   onComplete={async (inputUserId, inputUserName, comments) => {
+
+                    message.open({
+                      type: "loading",
+                      content: t("common.waitingMessage"),
+                      duration: 0,
+                      key: "deleteUser" });
+
                     await api.deleteUser({ query: {
                       userId:inputUserId,
                       userName:inputUserName,
                       comments: comments,
                     } })// 待完善
                       .httpError(404, (e) => {
-                        message.destroy("removeUser");
+                        message.destroy("deleteUser");
                         message.error({
                           content: e.message,
                           duration: 4,
                         });
                       })
                       .httpError(409, (e) => {
-                        message.destroy("removeUser");
-                        message.error({
-                          content: e.message,
-                          duration: 4,
-                        });
+                        message.destroy("deleteUser");
+                        const { type,userId,accounts } = JSON.parse(e.message);
+                        setFailedModalVisible(true);
+                        setFailedDeletedMessage({ type,userId,accounts });
                         reload();
                       })
                       .then(() => {
-                        message.destroy("removeUser");
+                        message.destroy("deleteUser");
                         reload();
                       })
                       .catch(() => { message.error(t(p("changeFail"))); });
@@ -308,15 +324,19 @@ export const AdminUserTable: React.FC<Props> = ({
                 >
                   {t(p("deleteUser"))}
                 </DeleteUserModalLink>
-              ) : (
-                <CannotDeleteModalLink>
-                  {t(p("deleteUser"))}
-                </CannotDeleteModalLink>
               )}
             </Space>
           )}
         />
       </Table>
+      <DeleteUserFailedModal
+        message={failedDeletedMessage}
+        open={failedModalVisible}
+        onClose={() => {
+          setFailedModalVisible(false);
+        }}
+      >
+      </DeleteUserFailedModal>
     </div>
   );
 };

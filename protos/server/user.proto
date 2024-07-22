@@ -234,6 +234,7 @@ message User {
   repeated AccountAffiliation account_affiliations = 6;
   repeated PlatformRole platform_roles = 7;
   repeated TenantRole tenant_roles = 8;
+  optional UserState state = 9;
 }
 
 message GetUserInfoRequest {
@@ -259,6 +260,11 @@ enum PlatformRole {
 enum TenantRole {
   TENANT_ADMIN = 0;
   TENANT_FINANCE = 1;
+}
+
+enum UserState {
+  NORMAL = 0;
+  DELETED = 1;
 }
 
 message GetUserInfoResponse {
