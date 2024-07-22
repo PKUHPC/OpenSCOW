@@ -41,7 +41,8 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
   const ssh = new NodeSSH();
 
   async function connect() {
-    await ssh.connect({ host, port: port ? +port : undefined, username, privateKey: rootKeyPair.privateKey });
+    await ssh.connect({ host, port: port ? +port : undefined,
+      username, privateKey: rootKeyPair.privateKey, readyTimeout: 30000 });
   }
 
   try {
@@ -210,6 +211,7 @@ export async function executeAsUser(
  */
 export async function testRootUserSshLogin(host: string, keyPair: KeyPair, logger: Logger) {
   return await sshConnect(host, "root", keyPair, logger, async () => undefined).catch((e) => e);
+
 }
 
 /**
