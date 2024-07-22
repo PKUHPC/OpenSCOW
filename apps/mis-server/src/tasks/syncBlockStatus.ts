@@ -11,7 +11,7 @@
  */
 
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { LockMode, MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
+import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { updateBlockStatusInSlurm, updateUnblockStatusInSlurm } from "src/bl/block";
 import { SystemState } from "src/entities/SystemState";
 import { ClusterPlugin } from "src/plugins/clusters";
@@ -24,24 +24,15 @@ export async function synchronizeBlockStatus(
   clusterPlugin: ClusterPlugin,
 ) {
   const { blockedFailedAccounts, blockedFailedUserAccounts } =
-    await updateBlockStatusInSlurm(em, clusterPlugin.clusters, logger);
+   await updateBlockStatusInSlurm(em, clusterPlugin.clusters, logger);
   const { unblockedFailedAccounts } = await updateUnblockStatusInSlurm(em, clusterPlugin.clusters, logger);
 
   lastSyncTime = new Date();
 
-  const currentState = await em.findOne(SystemState, {
-    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS }, { lockMode: LockMode.OPTIMISTIC });
-
-  if (currentState) {
-    currentState.value = new Date().toISOString();
-    await em.persistAndFlush(currentState);
-  } else {
-    const newState = em.create(SystemState, {
-      key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,
-      value: new Date().toISOString(),
-    });
-    await em.persistAndFlush(newState);
-  }
-
+  const updateBlockTime = await em.upsert(SystemState, {
+    key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS,
+    value: new Date().toISOString(),
+  });
+  await em.persistAndFlush(updateBlockTime);
   return { blockedFailedAccounts, blockedFailedUserAccounts, unblockedFailedAccounts };
 }
