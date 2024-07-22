@@ -47,7 +47,7 @@ message AdminSendMessageRequest {
   repeated string target_ids = 3;
   string message_type = 4;
   string content = 5;
-  repeated NoticeType notice_type = 6;
+  repeated NoticeType notice_types = 6;
 }
 
 message AdminSendMessageResponse {
