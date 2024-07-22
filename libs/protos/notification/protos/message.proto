@@ -27,18 +27,30 @@ message Message {
   string updated_at = 6;
 }
 
-message SendMessageRequest {
-  SenderType sender_type = 1;
-  string sender_id = 2;
-  TargetType target_type = 3;
-  repeated string target_ids = 4;
-  string message_type = 5;
-  google.protobuf.Struct metadata = 6;
-  repeated string description_data = 7;
-  optional MessageType message_type_template = 8;
+message SystemSendMessageRequest {
+  string system_id = 1;
+  TargetType target_type = 2;
+  repeated string target_ids = 3;
+  string message_type = 4;
+  google.protobuf.Struct metadata = 5;
+  repeated string description_data = 6;
+  optional MessageType message_type_template = 7;
 }
 
-message SendMessageResponse {
+message SystemSendMessageResponse {
+  Message message =  1;
+}
+
+message AdminSendMessageRequest {
+  string user_id = 1;
+  TargetType target_type = 2;
+  repeated string target_ids = 3;
+  string message_type = 4;
+  string content = 5;
+  repeated NoticeType notice_type = 6;
+}
+
+message AdminSendMessageResponse {
   Message message =  1;
 }
 
@@ -76,7 +88,8 @@ message MakeMessageReadResponse {
 
 
 service MessageService {
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+  rpc AdminSendMessage(AdminSendMessageRequest) returns (AdminSendMessageResponse);
+  rpc SystemSendMessage(SystemSendMessageRequest) returns (SystemSendMessageResponse);
 
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
 
