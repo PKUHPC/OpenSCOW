@@ -14,22 +14,26 @@ syntax = "proto3";
 
 package scow_notification;
 
-import "google/protobuf/struct.proto";
+message Template {
+  string default = 1;
+  string en = 2;
+  string zh = 3;
+}
 
 message MessageType {
   string type = 1;
-  google.protobuf.Struct title_template = 2;
-  google.protobuf.Struct content_template = 3;
+  Template title_template = 2;
+  Template content_template = 3;
   string category = 4;
-  google.protobuf.Struct category_template = 5;
+  Templatet category_template = 5;
 }
 
 message CreateCustomMessageTypeRequest {
   string type = 1;
-  google.protobuf.Struct title_template = 2;
-  google.protobuf.Struct content_template = 3;
+  Template title_template = 2;
+  Template content_template = 3;
   string category = 4;
-  google.protobuf.Struct category_template = 5;
+  Template category_template = 5;
 }
 
 message CreateCustomMessageTypeResponse {
@@ -37,10 +41,10 @@ message CreateCustomMessageTypeResponse {
 
 message EditCustomMessageTypeRequest {
   string type = 1;
-  google.protobuf.Struct title_template = 2;
-  google.protobuf.Struct content_template = 3;
+  Template title_template = 2;
+  Template content_template = 3;
   string category = 4;
-  google.protobuf.Struct category_template = 5;
+  Template category_template = 5;
 }
 
 message EditCustomMessageTypeResponse {
