@@ -48,7 +48,7 @@ import {
 } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
-import { getAppConnectionInfoFromAdapterForAi } from "src/server/utils/schedulerAapterUtils";
+import { getAppConnectionInfoFromAdapterForAi } from "src/server/utils/schedulerAdapterUtils";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { formatTime } from "src/utils/datetime";
 import { isParentOrSameFolder } from "src/utils/file";
