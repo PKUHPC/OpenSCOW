@@ -60,6 +60,7 @@ export const OperationType: OperationTypeEnum = {
   unsetTenantFinance: "unsetTenantFinance",
   tenantChangePassword: "tenantChangePassword",
   createAccount: "createAccount",
+  deleteAccount:"deleteAccount",
   addAccountToWhitelist: "addAccountToWhitelist",
   removeAccountFromWhitelist: "removeAccountFromWhitelist",
   accountPay: "accountPay",

@@ -150,6 +150,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     tenantChangePassword: t(pTypes("tenantChangePassword")),
     deleteUser: t(pTypes("deleteUser")),
     createAccount: t(pTypes("createAccount")),
+    deleteAccount: t(pTypes("deleteAccount")),
     addAccountToWhitelist: t(pTypes("addAccountToWhitelist")),
     removeAccountFromWhitelist: t(pTypes("removeAccountFromWhitelist")),
     accountPay: t(pTypes("accountPay")),
@@ -257,6 +258,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   unblockAccount: "030306",
   setAccountBlockThreshold: "030307",
   setAccountDefaultBlockThreshold: "030308",
+  deleteAccount:"030309",
   importUsers: "040101",
   setPlatformAdmin: "040201",
   unsetPlatformAdmin: "040202",
@@ -508,6 +510,9 @@ export const getOperationDetail = (
       case "createAccount":
         return t(pDetails("createAccount"),
           [operationEvent[logEvent].accountName, operationEvent[logEvent].accountOwner]);
+      case "deleteAccount":
+        return t(pDetails("deleteAccount"),
+          [operationEvent[logEvent].accountName]);
       case "addAccountToWhitelist":
         return t(pDetails("addAccountToWhitelist"),
           [operationEvent[logEvent].accountName, operationEvent[logEvent].tenantName]);

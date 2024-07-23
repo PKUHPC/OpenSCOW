@@ -270,6 +270,10 @@ message CreateAccount {
   string account_owner = 3;
 }
 
+message DeleteAccount {
+  string account_name = 1;
+}
+
 message AddAccountToWhitelist {
   string tenant_name = 1;
   string account_name = 2;
@@ -705,6 +709,7 @@ message CreateOperationLogRequest {
     DeleteModelVersion delete_model_version = 95;
     CopyModelVersion copy_model_version = 96;
     DeleteUser delete_user = 97;
+    DeleteAccount delete_account = 98;
   }
 }
 
@@ -810,6 +815,7 @@ message OperationLog {
     DeleteModelVersion delete_model_version = 97;
     CopyModelVersion copy_model_version = 98;
     DeleteUser delete_user=99;
+    DeleteAccount delete_account = 100;
   }
 }
 

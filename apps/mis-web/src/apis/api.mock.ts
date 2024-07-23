@@ -433,6 +433,7 @@ export const mockApi: MockApi<typeof api> = {
   queryJobTimeLimit: async () => ({ result: 10 }),
   cancelJob: async () => null,
   createAccount: async () => { return {}; },
+  deleteAccount: async () => null,
   dewhitelistAccount: async () => null,
   whitelistAccount: async () => null,
   getWhitelistedAccounts: async () => ({ results: [{

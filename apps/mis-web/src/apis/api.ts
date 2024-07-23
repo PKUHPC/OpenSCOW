@@ -102,6 +102,7 @@ import type { ChangePasswordAsTenantAdminSchema } from "src/pages/api/tenant/cha
 import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { CreateTenantWithExistingUserAsAdminSchema } from "src/pages/api/tenant/createTenantWithExistingUserAsAdmin";
+import type { DeleteAccountSchema } from "src/pages/api/tenant/deleteAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { SetBlockThresholdSchema } from "src/pages/api/tenant/setBlockThreshold";
@@ -229,4 +230,5 @@ export const api = {
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
   getSimpleClustersInfoFromConfigFiles: apiClient.fromTypeboxRoute<typeof GetSimpleClustersInfoFromConfigFilesSchema>("GET", "/api//simpleClustersInfo"),
   deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
+  deleteAccount: apiClient.fromTypeboxRoute<typeof DeleteAccountSchema>("DELETE", "/api/tenant/deleteAccount"),
 };

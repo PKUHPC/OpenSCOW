@@ -17,10 +17,10 @@ import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
 import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
-import { CannotDeleteTooltip } from "src/components/CannotDeleteTooltip";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
-import { DeleteUserFailedModal } from "src/components/DeleteUserFailedModal";
-import { DeleteUserModalLink } from "src/components/DeleteUserModal";
+import { DeleteEntityFailedModal } from "src/components/DeleteEntityFailedModal";
+import { DeleteEntityModalLink } from "src/components/DeleteEntityModal";
+import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -45,6 +45,7 @@ interface FilterForm {
 
 const p = prefix("pageComp.tenant.adminUserTable.");
 const pCommon = prefix("common.");
+const pDelete = prefix("component.deleteModals.");
 
 const filteredRoles = {
   "ALL_USERS": "allUsers",
@@ -281,13 +282,18 @@ export const AdminUserTable: React.FC<Props> = ({
                 {t(p("changePassword"))}
               </ChangePasswordModalLink>
               { user.identityId === r.id ? (
-                <CannotDeleteTooltip tooltipType="cannotDeleteSelf" />
+                <DisabledA message={t(pDelete("cannotDeleteSelf"))} disabled={true}>
+                  {t(p("delete"))}
+                </DisabledA>
               ) : r.state === UserState.DELETED ? (
-                <CannotDeleteTooltip tooltipType="userDeleted" />
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("delete"))}
+                </DisabledA>
               ) : (
-                <DeleteUserModalLink
-                  userId={r.id}
+                <DeleteEntityModalLink
+                  id={r.id}
                   name={r.name}
+                  type="USER"
                   onComplete={async (inputUserId, inputUserName, comments) => {
 
                     message.open({
@@ -322,21 +328,21 @@ export const AdminUserTable: React.FC<Props> = ({
                       .catch(() => { message.error(t(p("changeFail"))); });
                   }}
                 >
-                  {t(p("deleteUser"))}
-                </DeleteUserModalLink>
+                  {t(p("delete"))}
+                </DeleteEntityModalLink>
               )}
             </Space>
           )}
         />
       </Table>
-      <DeleteUserFailedModal
+      <DeleteEntityFailedModal
         message={failedDeletedMessage}
         open={failedModalVisible}
         onClose={() => {
           setFailedModalVisible(false);
         }}
       >
-      </DeleteUserFailedModal>
+      </DeleteEntityFailedModal>
     </div>
   );
 };

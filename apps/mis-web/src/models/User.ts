@@ -151,6 +151,7 @@ export const DisplayedAccountState = {
   DISPLAYED_FROZEN: 1,
   DISPLAYED_BLOCKED: 2,
   DISPLAYED_BELOW_BLOCK_THRESHOLD: 3,
+  DISPLAYED_DELETED: 4,
 } as const;
 
 export type DisplayedAccountState = ValueOf<typeof DisplayedAccountState>;
@@ -162,6 +163,7 @@ export const getDisplayedStateI18nTexts = (t: TransType) => {
     [DisplayedAccountState.DISPLAYED_FROZEN]: t("pageComp.accounts.accountTable.frozen"),
     [DisplayedAccountState.DISPLAYED_BLOCKED]: t("pageComp.accounts.accountTable.blocked"),
     [DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD]: t("pageComp.accounts.accountTable.debt"),
+    [DisplayedAccountState.DISPLAYED_DELETED]: t("pageComp.accounts.accountTable.deleted"),
   };
 };
 
@@ -184,4 +186,9 @@ export type ChargesSortOrder = Static<typeof ChargesSortOrder>;
 export enum DeleteFailedReason {
   ACCOUNTS_OWNER = "ACCOUNTS_OWNER",
   RUNNING_JOBS = "RUNNING_JOBS",
+}
+
+export enum EntityType {
+  USER = "USER",
+  ACCOUNT = "ACCOUNT",
 }
