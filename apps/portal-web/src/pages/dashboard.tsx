@@ -90,6 +90,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         )
         .map((result) => result.value);
 
+      console.log(successfulNodesResults);
+
       const successfulResults = rawClusterInfoResults
         .map((result, idx) => {
           if (result.status === "fulfilled") {
@@ -134,6 +136,8 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           });
         });
       });
+
+      console.log(nodeCountsByPartition);
 
       const clustersInfo = successfulResults
         .map((cluster) => ({
