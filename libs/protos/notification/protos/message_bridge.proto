@@ -30,8 +30,8 @@ message UserInfo {
 
 message TargetInfo {
   TargetType target_type = 1;
-  //  如果 target_type 为 FULL_SITE 时数组为空
-  repeated UserInfo users_info = 2;
+  //  如果 target_type 为 FULL_SITE 时可以不传
+  optional UserInfo user_info = 2;
 }
 
 message MessageTypeInfo {
@@ -42,8 +42,7 @@ message MessageTypeInfo {
 message MessageInfo {
   google.protobuf.Struct metadata = 1;
   string title = 2;
-  string category = 3;
-  string content = 4;
+  string content = 3;
 }
 
 message SendMessageRequest {
