@@ -34,7 +34,7 @@ message TargetInfo {
   repeated UserInfo users_info = 2;
 }
 
-message MessageType {
+message MessageTypeInfo {
   string type = 1;
   string category = 2;
 }
@@ -48,7 +48,7 @@ message MessageInfo {
 
 message SendMessageRequest {
   SenderInfo sender_info = 1;
-  MessageType message_type_info = 2;
+  MessageTypeInfo message_type_info = 2;
   TargetInfo target_info = 3;
   MessageInfo message_info = 4;
   repeated NoticeType notice_types = 5;
