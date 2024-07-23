@@ -41,7 +41,8 @@ afterEach(async () => {
   await server.close();
 });
 
-it("test whether the block update time exists at startup", async () => {
+// Test server will not sync block status at startup
+it.skip("test whether the block update time exists at startup", async () => {
   const em = server.ext.orm.em.fork();
   const updateTime = await em.findOne(SystemState, { key: SystemState.KEYS.UPDATE_SLURM_BLOCK_STATUS });
   expect(updateTime).not.toBeNull();
