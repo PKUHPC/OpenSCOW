@@ -14,7 +14,7 @@ syntax = "proto3";
 
 package scow_notification;
 
-import "proto/common.proto";
+import "protos/common.proto";
 
 message ListNoticeTypesReqeust {
 }
