@@ -15,12 +15,12 @@ syntax = "proto3";
 package resource;
 
 
-message GetUserAssignedClustersRequest {
-    string user_id = 1;
+message GetAccountsAssignedClustersRequest {
+    repeated string account_names = 1;
     string tenant_name = 2;
 }
 
-message GetUserAssignedClustersResponse {
+message GetAccountsAssignedClustersResponse {
     repeated string cluster_ids = 1;
 }
 
@@ -51,18 +51,8 @@ message GetAccountDefaultClusterPartitionsResponse {
     map<string, AssignedClusterParitions> assigned_cluster_partitions = 1;
 }
 
-message AssignAccountWhenCreateRequest {
-    string account_name = 1;
-    string tenant_name = 2;
-}
-
-message AssignAccountWhenCreateResponse {
-    bool executed = 1;
-}
-
 service ClusterPartitionService {
-    rpc GetUserAssignedClusters(GetUserAssignedClustersRequest) returns (GetUserAssignedClustersResponse) {}
+    rpc GetAccountsAssignedClusters(GetAccountsAssignedClustersRequest) returns (GetAccountsAssignedClustersResponse) {}
     rpc GetAccountAssignedClusterPartitions(GetAccountAssignedClusterPartitionsRequest) returns (GetAccountAssignedClusterPartitionsResponse) {}
     rpc GetAccountDefaultClusterPartitions(GetAccountDefaultClusterPartitionsRequest) returns (GetAccountDefaultClusterPartitionsResponse) {}
-    rpc AssignAccountWhenCreate(AssignAccountWhenCreateRequest) returns (AssignAccountWhenCreateResponse) {}
 }
