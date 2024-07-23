@@ -29,7 +29,7 @@ export interface SyncBlockStatusPlugin {
 
 export const syncBlockStatusPlugin = plugin(async (f) => {
   const synchronizeCron = misConfig.periodicSyncUserAccountBlockStatus?.cron ?? "0 4 * * *";
-  const synchronizeStarted = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
+  let synchronizeEnabled = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
   let synchronizeIsRunning = false;
 
   const logger = f.logger.child({ plugin: "syncBlockStatus" });
@@ -59,7 +59,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     () => { void trigger(); },
     {
       timezone: "Asia/Shanghai",
-      scheduled: misConfig.periodicSyncUserAccountBlockStatus?.enabled,
+      scheduled: synchronizeEnabled,
     },
   );
 
@@ -71,17 +71,26 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
   });
 
   f.addExtension("syncBlockStatus", ({
-    started: () => synchronizeStarted,
+    started: () => synchronizeEnabled,
     start: () => {
       logger.info("Sync is started");
+      synchronizeEnabled = true;
       task.start();
     },
     stop: () => {
       logger.info("Sync is started");
+      synchronizeEnabled = false;
       task.stop();
     },
     schedule: synchronizeCron,
     lastSyncTime: () => lastSyncTime,
     run: trigger,
   } satisfies SyncBlockStatusPlugin["syncBlockStatus"]));
+
+  if (synchronizeEnabled) {
+    logger.info("Started a new synchronization");
+    void trigger();
+  } else {
+    logger.info("Account/Account block sychronization is disabled.");
+  }
 });

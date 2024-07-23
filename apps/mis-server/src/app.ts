@@ -55,7 +55,5 @@ export async function createServer() {
   await server.register(misConfigServiceServer);
   await server.register(exportServiceServer);
 
-  void server.ext.syncBlockStatus.run();
-
   return server;
 }
