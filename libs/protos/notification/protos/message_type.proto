@@ -25,7 +25,7 @@ message MessageType {
   Template title_template = 2;
   Template content_template = 3;
   string category = 4;
-  Templatet category_template = 5;
+  Template category_template = 5;
 }
 
 message CreateCustomMessageTypeRequest {
