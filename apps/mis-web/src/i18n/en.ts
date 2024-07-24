@@ -228,6 +228,7 @@ export default {
         blockedAccount: "Blocked ",
         frozenAccount: "Frozen ",
         normalAccount: "Available ",
+        deletedAccount:"Deleted",
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",

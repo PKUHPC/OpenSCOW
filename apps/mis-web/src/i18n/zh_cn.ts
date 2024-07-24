@@ -228,6 +228,7 @@ export default {
         blockedAccount: "封锁账户",
         frozenAccount: "冻结账户",
         normalAccount: "正常账户",
+        deletedAccount:"删除账户",
         account:"账户",
         accountName:"账户名",
         owner:"拥有者",

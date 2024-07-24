@@ -63,6 +63,7 @@ const filteredStatuses = {
   "DISPLAYED_FROZEN": "pageComp.accounts.accountTable.frozenAccount",
   "DISPLAYED_BLOCKED": "pageComp.accounts.accountTable.blockedAccount",
   "DISPLAYED_BELOW_BLOCK_THRESHOLD": "pageComp.accounts.accountTable.debtAccount",
+  "DISPLAYED_DELETED": "pageComp.accounts.accountTable.deletedAccount",
 };
 type FilteredStatus = keyof typeof filteredStatuses;
 
@@ -125,6 +126,7 @@ export const AccountTable: React.FC<Props> = ({
       DISPLAYED_FROZEN: 0,
       DISPLAYED_BELOW_BLOCK_THRESHOLD: 0,
       DISPLAYED_NORMAL: 0,
+      DISPLAYED_DELETED: 0,
       ALL: 0,
     };
     const counts = {
@@ -174,7 +176,9 @@ export const AccountTable: React.FC<Props> = ({
           debt: rangeSearchStatus === "DISPLAYED_BELOW_BLOCK_THRESHOLD",
           frozen: rangeSearchStatus === "DISPLAYED_FROZEN",
           normal: rangeSearchStatus === "DISPLAYED_NORMAL",
+          deleted: rangeSearchStatus === "DISPLAYED_DELETED",
           isFromAdmin: showedTab === "PLATFORM",
+          ownerIdOrName: query.ownerIdOrName,
         },
       });
     }
@@ -358,7 +362,7 @@ export const AccountTable: React.FC<Props> = ({
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
               {/* 只在租户管理下的账户列表中显示管理成员和封锁阈值 */}
-              {showedTab === "TENANT" && (
+              {showedTab === "TENANT" && (r.state !== AccountState.DELETED ? (
                 <>
                   <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
                     {t(p("mangerMember"))}
@@ -373,6 +377,16 @@ export const AccountTable: React.FC<Props> = ({
                     {t(p("blockThresholdAmount"))}
                   </SetBlockThresholdAmountLink>
                 </>
+              ) : (
+                <>
+                  <DisabledA message={t(pDelete("accountDeleted"))} disabled={true}>
+                    {t(p("mangerMember"))}
+                  </DisabledA>
+                  <DisabledA message={t(pDelete("accountDeleted"))} disabled={true}>
+                    {t(p("blockThresholdAmount"))}
+                  </DisabledA>
+                </>
+              )
               )}
               {
                 r.state === AccountState.BLOCKED_BY_ADMIN && (
@@ -434,7 +448,7 @@ export const AccountTable: React.FC<Props> = ({
                   </a>
                 )}
               {showedTab === "TENANT" && (
-                r.state === 3 ? (
+                r.state === AccountState.DELETED ? (
                   <DisabledA message={t(pDelete("accountDeleted"))} disabled={true}>
                     {t(p("delete"))}
                   </DisabledA>

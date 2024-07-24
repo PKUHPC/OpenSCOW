@@ -258,29 +258,36 @@ export const AdminUserTable: React.FC<Props> = ({
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              <ChangePasswordModalLink
-                userId={r.id}
-                name={r.name}
-                onComplete={async (newPassword) => {
-                  await api.changePasswordAsTenantAdmin({
-                    body: {
-                      identityId: r.id,
-                      newPassword: newPassword,
-                    },
-                  })
-                    .httpError(404, () => { message.error(t(p("notExist"))); })
-                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                    .httpError(400, (e) => {
-                      if (e.code === "PASSWORD_NOT_VALID") {
-                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-                      };
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("changePassword"))}
+                </DisabledA>
+              ) : (
+                <ChangePasswordModalLink
+                  userId={r.id}
+                  name={r.name}
+                  onComplete={async (newPassword) => {
+                    await api.changePasswordAsTenantAdmin({
+                      body: {
+                        identityId: r.id,
+                        newPassword: newPassword,
+                      },
                     })
-                    .then(() => { message.success(t(p("changeSuccess"))); })
-                    .catch(() => { message.error(t(p("changeFail"))); });
-                }}
-              >
-                {t(p("changePassword"))}
-              </ChangePasswordModalLink>
+                      .httpError(404, () => { message.error(t(p("notExist"))); })
+                      .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                      .httpError(400, (e) => {
+                        if (e.code === "PASSWORD_NOT_VALID") {
+                          message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                        };
+                      })
+                      .then(() => { message.success(t(p("changeSuccess"))); })
+                      .catch(() => { message.error(t(p("changeFail"))); });
+                  }}
+                >
+                  {t(p("changePassword"))}
+                </ChangePasswordModalLink>
+              )
+              }
               { user.identityId === r.id ? (
                 <DisabledA message={t(pDelete("cannotDeleteSelf"))} disabled={true}>
                   {t(p("delete"))}
