@@ -90,7 +90,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         )
         .map((result) => result.value);
 
-      console.log(successfulNodesResults);
 
       const successfulResults = rawClusterInfoResults
         .map((result, idx) => {
@@ -114,6 +113,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
         )
         .map((result) => result.value);
 
+
       const failedClusters = currentClusters.filter(
         (x) => !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),
       );
@@ -136,8 +136,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           });
         });
       });
-
-      console.log(nodeCountsByPartition);
 
       const clustersInfo = successfulResults
         .map((cluster) => ({
@@ -179,6 +177,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
       const clustersOverview: ClusterOverview[] = [];
       successfulResults.forEach((result) => {
+
         const { clusterName, partitions } = result.clusterInfo;
 
         const aggregatedData = partitions.reduce(
@@ -199,29 +198,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             acc.runningJobCount += partition.runningJobCount;
             acc.pendingJobCount += partition.pendingJobCount;
             acc.partitionStatus += partition.partitionStatus;
-
-            // 去除重复节点的统计
-            Object.keys(nodeCountsByPartition).forEach((nodeName) => {
-              const nodeCountInPartitions = nodeCountsByPartition[nodeName];
-              if (nodeCountInPartitions[partition.partitionName]) {
-                const duplicateCount = nodeCountInPartitions[partition.partitionName] - 1;
-                acc.nodeCount -= duplicateCount;
-                acc.runningNodeCount -= partition.runningNodeCount ? duplicateCount : 0;
-                acc.idleNodeCount -= partition.idleNodeCount ? duplicateCount : 0;
-                acc.notAvailableNodeCount -= partition.notAvailableNodeCount ? duplicateCount : 0;
-                acc.cpuCoreCount -= duplicateCount * partition.cpuCoreCount;
-                acc.runningCpuCount -= duplicateCount * partition.runningCpuCount;
-                acc.idleCpuCount -= duplicateCount * partition.idleCpuCount;
-                acc.notAvailableCpuCount -= duplicateCount *
-                (partition.cpuCoreCount - partition.runningCpuCount - partition.idleCpuCount);
-                acc.gpuCoreCount -= duplicateCount * partition.gpuCoreCount;
-                acc.runningGpuCount -= duplicateCount * partition.runningGpuCount;
-                acc.idleGpuCount -= duplicateCount * partition.idleGpuCount;
-                acc.notAvailableGpuCount -= duplicateCount *
-                 (partition.gpuCoreCount - partition.runningGpuCount - partition.idleGpuCount);
-              }
-            });
-
             return acc;
           },
           {
@@ -245,6 +221,33 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             partitionStatus: 0,
           },
         );
+
+        // 去除重复节点的统计
+        Object.keys(nodeCountsByPartition).forEach((nodeName) => {
+          const nodeCountInPartitions = nodeCountsByPartition[nodeName];
+          if (Object.keys(nodeCountInPartitions).length > 1) {
+            const duplicateNode = successfulNodesResults.
+              find((v) => v.nodeInfo.clusterName === clusterName)?.nodeInfo.nodes
+              .find((v) => v.nodeName === nodeName);
+            const duplicateCount = (duplicateNode?.partitions.length ?? 1) - 1;
+            aggregatedData.nodeCount -= duplicateCount;
+            aggregatedData.runningNodeCount -= (duplicateNode?.state === "ALLOC") ? duplicateCount : 0;
+            aggregatedData.idleNodeCount -= duplicateNode?.state == "IDLE" ? duplicateCount : 0;
+            aggregatedData.notAvailableNodeCount -=
+            (duplicateNode?.state !== "IDLE" && duplicateNode?.state !== "ALLOC")
+              ? duplicateCount : 0;
+            aggregatedData.cpuCoreCount -= duplicateCount * (duplicateNode?.cpuCoreCount ?? 0);
+            aggregatedData.runningCpuCount -= duplicateCount * (duplicateNode?.allocCpuCoreCount ?? 0);
+            aggregatedData.idleCpuCount -= duplicateCount * (duplicateNode?.idleCpuCoreCount ?? 0);
+            aggregatedData.gpuCoreCount -= duplicateCount * (duplicateNode?.gpuCount ?? 0);
+            aggregatedData.runningGpuCount -= duplicateCount * (duplicateNode?.allocGpuCount ?? 0);
+            aggregatedData.idleGpuCount -= duplicateCount * (duplicateNode?.idleGpuCount ?? 0);
+            aggregatedData.notAvailableCpuCount -= aggregatedData.cpuCoreCount -
+            (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount);
+            aggregatedData.notAvailableGpuCount -= aggregatedData.gpuCoreCount -
+            (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount);
+          }
+        });
 
         platformOverview.nodeCount += aggregatedData.nodeCount;
         platformOverview.runningNodeCount += aggregatedData.runningNodeCount;
