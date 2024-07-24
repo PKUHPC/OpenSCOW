@@ -78,7 +78,6 @@ export const jobServiceServer = plugin((server) => {
             logger,
             async (client) => await asyncClientCall(client.account, "queryAccountBlockStatus", {
               accountName: account,
-              queriedPartitions: [],
             }),
           );
           if (resp.blocked) {
