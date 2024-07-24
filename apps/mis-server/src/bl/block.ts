@@ -64,7 +64,6 @@ export async function updateBlockStatusInSlurm(
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "blockAccount", {
           accountName: account.accountName,
-          blockedPartitions: [],
         }),
       );
       blockedAccounts.push(account.accountName);
@@ -151,7 +150,6 @@ export async function updateUnblockStatusInSlurm(
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
         await asyncClientCall(client.account, "unblockAccount", {
           accountName: account.accountName,
-          unblockedPartitions: [],
         }),
       );
       unblockedAccounts.push(account.accountName);
@@ -195,7 +193,6 @@ export async function blockAccount(
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
-      blockedPartitions: [],
     });
   });
 
@@ -225,7 +222,6 @@ export async function unblockAccount(
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
     await asyncClientCall(client.account, "unblockAccount", {
       accountName: account.accountName,
-      unblockedPartitions: [],
     });
   });
 
@@ -294,4 +290,3 @@ export async function unblockUserInAccount(
     accountName, userId,
   }, logger);
 }
-
