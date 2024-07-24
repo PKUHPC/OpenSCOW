@@ -49,11 +49,10 @@
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-operation-log": "workspace:*",
-    "@scow/lib-scheduler-adapter": "workspace:*",
     "@scow/lib-server": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/lib-web": "workspace:*",
-    "@scow/scheduler-adapter-protos": "workspace:*",
+    "@scow/ai-scheduler-adapter-protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
     "@sinclair/typebox": "0.32.34",
@@ -93,7 +92,7 @@
     "@xterm/addon-fit": "0.10.0",
     "zod": "3.23.8",
     "shell-quote": "1.8.1",
-    "replace-in-file": "7.2.0"
+    "replace-in-file": "8.1.0"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "14.2.4",

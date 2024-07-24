@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { OperationEvent, OperationType as LibOperationType, OperationTypeEnum } from "@scow/lib-operation-log";
+import { OperationEvent, OperationType as LibOperationType } from "@scow/lib-operation-log";
 import { ExportChargeRecord, ExportOperationLog, ExportPayRecord } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
@@ -26,70 +26,6 @@ export const OperationResult = {
 } as const;
 
 export type OperationResult = ValueOf<typeof OperationResult>;
-
-export const OperationType: OperationTypeEnum = {
-  login: "login",
-  logout: "logout",
-  submitJob: "submitJob",
-  endJob: "endJob",
-  addJobTemplate: "addJobTemplate",
-  deleteJobTemplate: "deleteJobTemplate",
-  updateJobTemplate: "updateJobTemplate",
-  shellLogin: "shellLogin",
-  createDesktop: "createDesktop",
-  deleteDesktop: "deleteDesktop",
-  createApp: "createApp",
-  createFile: "createFile",
-  deleteFile: "deleteFile",
-  uploadFile: "uploadFile",
-  createDirectory: "createDirectory",
-  deleteDirectory: "deleteDirectory",
-  moveFileItem: "moveFileItem",
-  copyFileItem: "copyFileItem",
-  setJobTimeLimit: "setJobTimeLimit",
-  createUser: "createUser",
-  addUserToAccount: "addUserToAccount",
-  removeUserFromAccount: "removeUserFromAccount",
-  setAccountAdmin: "setAccountAdmin",
-  unsetAccountAdmin: "unsetAccountAdmin",
-  blockUser: "blockUser",
-  unblockUser: "unblockUser",
-  accountSetChargeLimit: "accountSetChargeLimit",
-  accountUnsetChargeLimit: "accountUnsetChargeLimit",
-  setTenantBilling: "setTenantBilling",
-  setTenantAdmin: "setTenantAdmin",
-  unsetTenantAdmin: "unsetTenantAdmin",
-  setTenantFinance: "setTenantFinance",
-  unsetTenantFinance: "unsetTenantFinance",
-  tenantChangePassword: "tenantChangePassword",
-  createAccount: "createAccount",
-  addAccountToWhitelist: "addAccountToWhitelist",
-  removeAccountFromWhitelist: "removeAccountFromWhitelist",
-  accountPay: "accountPay",
-  blockAccount: "blockAccount",
-  unblockAccount: "unblockAccount",
-  importUsers: "importUsers",
-  setPlatformAdmin: "setPlatformAdmin",
-  unsetPlatformAdmin: "unsetPlatformAdmin",
-  setPlatformFinance: "setPlatformFinance",
-  unsetPlatformFinance: "unsetPlatformFinance",
-  platformChangePassword: "platformChangePassword",
-  setPlatformBilling: "setPlatformBilling",
-  createTenant: "createTenant",
-  tenantPay: "tenantPay",
-  submitFileItemAsJob: "submitFileItemAsJob",
-  exportUser: "exportUser",
-  exportAccount: "exportAccount",
-  exportChargeRecord: "exportChargeRecord",
-  exportPayRecord: "exportPayRecord",
-  exportOperationLog: "exportOperationLog",
-  setAccountBlockThreshold: "setAccountBlockThreshold",
-  setAccountDefaultBlockThreshold: "setAccountDefaultBlockThreshold",
-  userChangeTenant: "userChangeTenant",
-  activateCluster: "activateCluster",
-  deactivateCluster: "deactivateCluster",
-  customEvent: "customEvent",
-};
 
 export const OperationLog = Type.Object({
   operationLogId: Type.Number(),
@@ -157,6 +93,9 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     createDesktop: t(pTypes("createDesktop")),
     deleteDesktop: t(pTypes("deleteDesktop")),
     createApp: t(pTypes("createApp")),
+    createAiTrain: t(pTypes("createAiTrain")),
+    cancelAiTrainOrApp: t(pTypes("cancelAiTrainOrApp")),
+    saveImage: t(pTypes("saveImage")),
     createFile: t(pTypes("createFile")),
     deleteFile: t(pTypes("deleteFile")),
     uploadFile: t(pTypes("uploadFile")),
@@ -165,6 +104,35 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     moveFileItem: t(pTypes("moveFileItem")),
     copyFileItem: t(pTypes("copyFileItem")),
     setJobTimeLimit: t(pTypes("setJobTimeLimit")),
+    createImage:t(pTypes("createImage")),
+    updateImage:t(pTypes("updateImage")),
+    shareImage:t(pTypes("shareImage")),
+    deleteImage:t(pTypes("deleteImage")),
+    copyImage:t(pTypes("copyImage")),
+    createDataset:t(pTypes("createDataset")),
+    updateDataset:t(pTypes("updateDataset")),
+    deleteDataset:t(pTypes("deleteDataset")),
+    createDatasetVersion:t(pTypes("createDatasetVersion")),
+    updateDatasetVersion:t(pTypes("updateDatasetVersion")),
+    shareDatasetVersion:t(pTypes("shareDatasetVersion")),
+    copyDatasetVersion:t(pTypes("copyDatasetVersion")),
+    deleteDatasetVersion:t(pTypes("deleteDatasetVersion")),
+    createAlgorithm:t(pTypes("createAlgorithm")),
+    updateAlgorithm:t(pTypes("updateAlgorithm")),
+    deleteAlgorithm:t(pTypes("deleteAlgorithm")),
+    createAlgorithmVersion:t(pTypes("createAlgorithmVersion")),
+    updateAlgorithmVersion:t(pTypes("updateAlgorithmVersion")),
+    shareAlgorithmVersion:t(pTypes("shareAlgorithmVersion")),
+    deleteAlgorithmVersion:t(pTypes("deleteAlgorithmVersion")),
+    copyAlgorithmVersion:t(pTypes("copyAlgorithmVersion")),
+    createModel:t(pTypes("createModel")),
+    updateModel:t(pTypes("updateModel")),
+    deleteModel:t(pTypes("deleteModel")),
+    createModelVersion:t(pTypes("createModelVersion")),
+    updateModelVersion:t(pTypes("updateModelVersion")),
+    shareModelVersion:t(pTypes("shareModelVersion")),
+    deleteModelVersion:t(pTypes("deleteModelVersion")),
+    copyModelVersion:t(pTypes("copyModelVersion")),
     createUser: t(pTypes("createUser")),
     addUserToAccount: t(pTypes("addUserToAccount")),
     removeUserFromAccount: t(pTypes("removeUserFromAccount")),
@@ -223,6 +191,9 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   createDesktop: "010301",
   deleteDesktop: "010302",
   createApp: "010401",
+  createAiTrain: "010402",
+  cancelAiTrainOrApp: "010403",
+  saveImage: "010404",
   createFile: "010501",
   createDirectory: "010502",
   uploadFile: "010503",
@@ -232,6 +203,35 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   copyFileItem: "010507",
   submitFileItemAsJob: "010508",
   setJobTimeLimit: "010601",
+  createImage:"010701",
+  updateImage:"010702",
+  shareImage:"010703",
+  deleteImage:"010704",
+  copyImage:"010705",
+  createDataset:"010801",
+  updateDataset:"010802",
+  deleteDataset:"010803",
+  createDatasetVersion:"010804",
+  updateDatasetVersion:"010805",
+  shareDatasetVersion:"010806",
+  copyDatasetVersion:"010807",
+  deleteDatasetVersion:"010808",
+  createAlgorithm:"010901",
+  updateAlgorithm:"010902",
+  deleteAlgorithm:"010903",
+  createAlgorithmVersion:"010904",
+  updateAlgorithmVersion:"010905",
+  shareAlgorithmVersion:"010906",
+  deleteAlgorithmVersion:"010907",
+  copyAlgorithmVersion:"010908",
+  createModel:"011001",
+  updateModel:"011002",
+  deleteModel:"011003",
+  createModelVersion:"011004",
+  updateModelVersion:"011005",
+  shareModelVersion:"011006",
+  deleteModelVersion:"011007",
+  copyModelVersion:"011008",
   createUser: "020201",
   addUserToAccount: "020202",
   removeUserFromAccount: "020203",
@@ -333,6 +333,14 @@ export const getOperationDetail = (
           ]);
       case "createApp":
         return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+      case "createAiTrain":
+        return t(pDetails("createAiTrain"),
+          [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+      case "cancelAiTrainOrApp":
+        return t(pDetails("cancelAiTrainOrApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);
+      case "saveImage":
+        return t(pDetails("saveImage"), [operationEvent[logEvent].jobId, operationEvent[logEvent].imageId || "-",
+          operationEvent[logEvent].tag || "-" ]);
       case "createFile":
         return t(pDetails("createFile"), [operationEvent[logEvent].path]);
       case "deleteFile":
@@ -351,6 +359,104 @@ export const getOperationDetail = (
         return t(pDetails("setJobTimeLimit"),
           [operationEvent[logEvent].clusterId || "unknown",
             operationEvent[logEvent].jobId, Math.abs(operationEvent[logEvent].limitMinutes)]);
+      case "createImage":
+        return t(pDetails("createImage"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].imageId || "-", operationEvent[logEvent].tag || "-"]);
+      case "updateImage":
+        return t(pDetails("updateImage"),
+          [operationEvent[logEvent].imageId]);
+      case "shareImage":
+        return t(pDetails("shareImage"),
+          [operationEvent[logEvent].imageId]);
+      case "deleteImage":
+        return t(pDetails("deleteImage"),
+          [operationEvent[logEvent].imageId]);
+      case "copyImage":
+        return t(pDetails("copyImage"),
+          [operationEvent[logEvent].sourceImageId,
+            operationEvent[logEvent].targetImageId || "-", operationEvent[logEvent].targetImageTag || "-"]);
+      case "createDataset":
+        return t(pDetails("createDataset"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].datasetId || "-"]);
+      case "updateDataset":
+        return t(pDetails("updateDataset"),
+          [operationEvent[logEvent].datasetId]);
+      case "deleteDataset":
+        return t(pDetails("deleteDataset"),
+          [operationEvent[logEvent].datasetId ]);
+      case "createDatasetVersion":
+        return t(pDetails("createDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId || "-"]);
+      case "updateDatasetVersion":
+        return t(pDetails("updateDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "shareDatasetVersion":
+        return t(pDetails("shareDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "copyDatasetVersion":
+        return t(pDetails("copyDatasetVersion"),
+          [operationEvent[logEvent].sourceDatasetId, operationEvent[logEvent].sourceDatasetVersionId,
+            operationEvent[logEvent].targetDatasetId || "-", operationEvent[logEvent].targetDatasetVersionId || "-",
+          ]);
+      case "deleteDatasetVersion":
+        return t(pDetails("deleteDatasetVersion"),
+          [operationEvent[logEvent].datasetId, operationEvent[logEvent].versionId]);
+      case "createAlgorithm":
+        return t(pDetails("createAlgorithm"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].algorithmId || "-"]);
+      case "updateAlgorithm":
+        return t(pDetails("updateAlgorithm"),
+          [operationEvent[logEvent].algorithmId]);
+      case "deleteAlgorithm":
+        return t(pDetails("deleteAlgorithm"),
+          [operationEvent[logEvent].algorithmId ]);
+      case "createAlgorithmVersion":
+        return t(pDetails("createAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId || "-"]);
+      case "updateAlgorithmVersion":
+        return t(pDetails("updateAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "shareAlgorithmVersion":
+        return t(pDetails("shareAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "copyAlgorithmVersion":
+        return t(pDetails("copyAlgorithmVersion"),
+          [operationEvent[logEvent].sourceAlgorithmId, operationEvent[logEvent].sourceAlgorithmVersionId,
+            operationEvent[logEvent].targetAlgorithmId || "-", operationEvent[logEvent].targetAlgorithmVersionId || "-",
+          ]);
+      case "deleteAlgorithmVersion":
+        return t(pDetails("deleteAlgorithmVersion"),
+          [operationEvent[logEvent].algorithmId, operationEvent[logEvent].versionId]);
+      case "createModel":
+        return t(pDetails("createModel"),
+          [operationEvent[logEvent].clusterId || "-",
+            operationEvent[logEvent].modelId || "-"]);
+      case "updateModel":
+        return t(pDetails("updateModel"),
+          [operationEvent[logEvent].modelId]);
+      case "deleteModel":
+        return t(pDetails("deleteModel"),
+          [operationEvent[logEvent].modelId ]);
+      case "createModelVersion":
+        return t(pDetails("createModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId || "-"]);
+      case "updateModelVersion":
+        return t(pDetails("updateModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
+      case "shareModelVersion":
+        return t(pDetails("shareModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
+      case "copyModelVersion":
+        return t(pDetails("copyModelVersion"),
+          [operationEvent[logEvent].sourceModelId, operationEvent[logEvent].sourceModelVersionId,
+            operationEvent[logEvent].targetModelId || "-", operationEvent[logEvent].targetModelVersionId || "-",
+          ]);
+      case "deleteModelVersion":
+        return t(pDetails("deleteModelVersion"),
+          [operationEvent[logEvent].modelId, operationEvent[logEvent].versionId]);
       case "createUser":
         return t(pDetails("createUser"), [operationEvent[logEvent].userId]);
       case "addUserToAccount":

@@ -17,6 +17,7 @@ import { UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { authUrl } from "src/config";
+import { configClusters } from "src/config/clusters";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -72,7 +73,8 @@ export const initServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // 插入公钥失败也认为是创建用户成功
-          await insertKeyToNewUser(userId, password, server.logger)
+          // 在所有集群下执行
+          await insertKeyToNewUser(userId, password, server.logger, configClusters)
             .catch(() => null);
           return true;
         })
