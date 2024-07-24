@@ -668,9 +668,10 @@ export const saveImage =
           });
         }
 
-        const { node, containerId } = job;
+        const nodeName = job.containerJobInfo?.nodeName;
+        const containerId = job.containerJobInfo?.containerId;
 
-        if (!node || !containerId) {
+        if (!nodeName || !containerId) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Can not find node or containerId of this running job",
@@ -680,14 +681,14 @@ export const saveImage =
         const formateContainerId = formatContainerId(clusterId, containerId);
 
         // 连接到该节点
-        return await sshConnect(node, "root", logger, async (ssh) => {
+        return await sshConnect(nodeName, "root", logger, async (ssh) => {
           try {
             const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // commit镜像
             await commitContainerImage({
-              node,
+              node:nodeName,
               ssh,
               clusterId,
               logger,
