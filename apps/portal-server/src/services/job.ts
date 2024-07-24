@@ -237,12 +237,27 @@ export const jobServiceServer = plugin((server) => {
       const existedJobName = await callOnOne(
         cluster,
         logger,
-        async (client) => await asyncClientCall(client.job, "getJobs", {
-          fields: ["job_id"],
-          filter: {
-            users: [userId], accounts: [], states: [],jobName,
-          },
-        }),
+        async (client) => {
+
+          try {
+            // 当前接口要求的最低调度器接口版本
+            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+            // 检验调度器的API版本是否符合要求，不符合要求报错
+            await checkSchedulerApiVersion(client, minRequiredApiVersion);
+
+            return await asyncClientCall(client.job, "getJobs", {
+              fields: ["job_id"],
+              filter: {
+                users: [userId], accounts: [], states: [], jobName,
+              },
+            });
+
+          } catch (error) {
+            logger.info("Check SchedulerApiVersion failed with %o", error);
+            // 适配器不支持时，返回空数组，跳过检查
+            return { jobs:[]};
+          }
+        },
       ).then((resp) => resp.jobs);
 
       if (existedJobName.length) {
