@@ -86,10 +86,12 @@ export const appOps = (cluster: string): AppOps => {
         async (client) => {
 
           try {
+            console.log(111111);
             // 当前接口要求的最低调度器接口版本
             const minRequiredApiVersion: ApiVersion = { major: 1, minor: 5, patch: 0 };
             // 检验调度器的API版本是否符合要求，不符合要求报错
             await checkSchedulerApiVersion(client, minRequiredApiVersion);
+            console.log(2222222222);
 
             return await asyncClientCall(client.job, "getJobs", {
               fields: ["job_id"],
@@ -99,6 +101,8 @@ export const appOps = (cluster: string): AppOps => {
             });
 
           } catch (error) {
+            console.log(33333);
+
             logger.info("Check SchedulerApiVersion failed with %o", error);
             // 适配器不支持时，返回空数组，跳过检查
             return { jobs:[]};
@@ -106,7 +110,9 @@ export const appOps = (cluster: string): AppOps => {
         },
       ).then((resp) => resp.jobs);
 
+      console.log("existedJobName",existedJobName);
       if (existedJobName.length) {
+        console.log(444444444);
         throw new DetailedError({
           code: Status.ALREADY_EXISTS,
           message: `appJobName ${appJobName} is already existed`,
