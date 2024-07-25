@@ -225,7 +225,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
         // 去除重复节点的统计
         Object.keys(nodeCountsByPartition).forEach((nodeName) => {
-          console.log(success);
+          console.log("success");
           const nodeCountInPartitions = nodeCountsByPartition[nodeName];
           if (Object.keys(nodeCountInPartitions).length > 1) {
             const duplicateNode = successfulNodesResults.
