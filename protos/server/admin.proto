@@ -193,6 +193,11 @@ service AdminService {
   rpc GetFetchInfo(GetFetchInfoRequest) returns (GetFetchInfoResponse);
   rpc SetFetchState(SetFetchStateRequest) returns (SetFetchStateResponse);
   rpc FetchJobs(FetchJobsRequest) returns (FetchJobsResponse);
+
+  /*
+   * Synchronize block status of account and account user to the backing scheduler
+   * If the synchronization is already running when the API is called, it throws ALREADY_EXISTS
+   */
   rpc UpdateBlockStatus(UpdateBlockStatusRequest)
     returns (UpdateBlockStatusResponse);
   rpc GetAdminInfo(GetAdminInfoRequest) returns (GetAdminInfoResponse) {
