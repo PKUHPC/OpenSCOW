@@ -189,9 +189,10 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     return;
   }
 
-  const { namespace, pod } = job;
+  const namespace = job.containerJobInfo?.namespace;
+  const podName = job.containerJobInfo?.podName;
 
-  if (!namespace || !pod) {
+  if (!namespace || !podName) {
     log("[shell] Namespace or pod not obtained, please check the adapter version");
     ws.close(0, "Namespace or pod not obtained, please check the adapter version");
     return;
@@ -201,7 +202,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     const kc = new k8sClient.KubeConfig();
     kc.loadFromFile(join("/etc/scow", clusters[clusterId].k8s?.kubeconfig.path || "/kube/config"));
     const k8sWs = await new k8sClient.Exec(kc)
-      .exec(namespace, pod, "", ["/bin/sh"], stdoutStream, stderrStream, stdinStream, true);
+      .exec(namespace, podName, "", ["/bin/sh"], stdoutStream, stderrStream, stdinStream, true);
 
     log("Connected to shell");
 
