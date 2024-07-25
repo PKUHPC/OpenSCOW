@@ -87,7 +87,7 @@ export const appOps = (cluster: string): AppOps => {
 
           try {
             // 当前接口要求的最低调度器接口版本
-            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 5, patch: 0 };
             // 检验调度器的API版本是否符合要求，不符合要求报错
             await checkSchedulerApiVersion(client, minRequiredApiVersion);
 
