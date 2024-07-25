@@ -23,24 +23,35 @@ export interface SyncBlockStatusPlugin {
     stop: () => void;
     schedule: string;
     lastSyncTime: () => Date | null;
-    sync: () => Promise<SyncBlockStatusResponse>;
+    run: () => Promise<SyncBlockStatusResponse | undefined>;
   }
 }
 
 export const syncBlockStatusPlugin = plugin(async (f) => {
   const synchronizeCron = misConfig.periodicSyncUserAccountBlockStatus?.cron ?? "0 4 * * *";
-  let synchronizeStarted = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
+  let synchronizeEnabled = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
   let synchronizeIsRunning = false;
 
   const logger = f.logger.child({ plugin: "syncBlockStatus" });
   logger.info("misConfig.periodicSyncStatus?.cron: %s", misConfig.periodicSyncUserAccountBlockStatus?.cron);
 
-  const trigger = () => {
-    if (synchronizeIsRunning) return;
+  const trigger = async () => {
+
+    const sublogger = logger.child({ time: new Date() });
+
+    if (synchronizeIsRunning) {
+      sublogger.info("Sync is already running.");
+      return Promise.resolve(undefined);
+    }
 
     synchronizeIsRunning = true;
-    return synchronizeBlockStatus(f.ext.orm.em.fork(), logger, f.ext)
-      .finally(() => { synchronizeIsRunning = false; });
+    sublogger.info("Sync starts to run.");
+
+    try {
+      return await synchronizeBlockStatus(f.ext.orm.em.fork(), sublogger, f.ext);
+    } finally {
+      synchronizeIsRunning = false;
+    }
   };
 
   const task = cron.schedule(
@@ -48,7 +59,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     () => { void trigger(); },
     {
       timezone: "Asia/Shanghai",
-      scheduled: misConfig.periodicSyncUserAccountBlockStatus?.enabled,
+      scheduled: synchronizeEnabled,
     },
   );
 
@@ -60,27 +71,26 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
   });
 
   f.addExtension("syncBlockStatus", ({
-    started: () => synchronizeStarted,
+    started: () => synchronizeEnabled,
     start: () => {
-      if (synchronizeStarted) {
-        logger.info("Sync is requested to start but already started");
-      } else {
-        task.start();
-        synchronizeStarted = true;
-        logger.info("Sync started");
-      }
+      logger.info("Sync is started");
+      synchronizeEnabled = true;
+      task.start();
     },
     stop: () => {
-      if (!synchronizeStarted) {
-        logger.info("Sync is requested to stop but already stopped");
-      } else {
-        task.stop();
-        synchronizeStarted = false;
-        logger.info("Sync stopped");
-      }
+      logger.info("Sync is started");
+      synchronizeEnabled = false;
+      task.stop();
     },
     schedule: synchronizeCron,
     lastSyncTime: () => lastSyncTime,
-    sync: trigger,
-  } as SyncBlockStatusPlugin["syncBlockStatus"]));
+    run: trigger,
+  } satisfies SyncBlockStatusPlugin["syncBlockStatus"]));
+
+  if (synchronizeEnabled) {
+    logger.info("Started a new synchronization");
+    void trigger();
+  } else {
+    logger.info("Account/Account block sychronization is disabled.");
+  }
 });
