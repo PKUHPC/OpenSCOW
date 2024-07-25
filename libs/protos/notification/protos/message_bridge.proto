@@ -18,7 +18,7 @@ import "google/protobuf/struct.proto";
 import "protos/common.proto";
 
 message SenderInfo {
-  SenderType sender_type = 1;
+  optional SenderType sender_type = 1;
   string sender_id = 2;
 }
 
@@ -29,7 +29,7 @@ message UserInfo {
 }
 
 message TargetInfo {
-  TargetType target_type = 1;
+  optional TargetType target_type = 1;
   //  如果 target_type 为 FULL_SITE 时可以不传
   optional UserInfo user_info = 2;
 }

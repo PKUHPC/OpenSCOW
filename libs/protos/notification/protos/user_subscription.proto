@@ -17,18 +17,18 @@ package scow_notification;
 import "protos/common.proto";
 
 message ModifyUserSubscriptionRequest {
-  NoticeType notice_type = 1;
+  optional NoticeType notice_type = 1;
   string message_type = 2;
-  bool enabled = 3;
+  optional bool enabled = 3;
 }
 
 message ModifyUserSubscriptionResponse {
 }
 
 message Subscription {
-  NoticeType notice_type = 1;
+  optional NoticeType notice_type = 1;
   string message_type = 2;
-  bool is_subscribed = 3;
+  optional bool is_subscribed = 3;
 }
 
 message ListUserSubscrptionsRequest {

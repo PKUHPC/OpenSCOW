@@ -29,7 +29,7 @@ message Message {
 
 message SystemSendMessageRequest {
   string system_id = 1;
-  TargetType target_type = 2;
+  optional TargetType target_type = 2;
   repeated string target_ids = 3;
   string message_type = 4;
   google.protobuf.Struct metadata = 5;
@@ -43,7 +43,7 @@ message SystemSendMessageResponse {
 
 message AdminSendMessageRequest {
   string user_id = 1;
-  TargetType target_type = 2;
+  optional TargetType target_type = 2;
   repeated string target_ids = 3;
   string message_type = 4;
   string title = 5;
@@ -58,20 +58,20 @@ message AdminSendMessageResponse {
 message ListMessagesRequest {
   string user_id = 1;
   optional string message_type = 2;
-  NoticeType notice_type = 3;
+  optional NoticeType notice_type = 3;
   optional ReadStatus read_status = 4;
   optional uint32 page = 5;
   optional uint32 pageSize = 6;
 }
 
 message ListMessagesResponse {
-  uint64 total_count = 1;
+  optional uint64 total_count = 1;
   repeated Message messages = 2;
 }
 
 message GetUnreadMessagesRequest {
   string user_id = 1;
-  NoticeType notice_type = 2;
+  optional NoticeType notice_type = 2;
 }
 
 message GetUnreadMessagesResponse {

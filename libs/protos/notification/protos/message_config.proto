@@ -17,20 +17,20 @@ package scow_notification;
 import "protos/common.proto";
 
 message CreateMessageConfigRequest {
-  NoticeType notice_type = 1;
+  optional NoticeType notice_type = 1;
   string message_type = 2;
-  bool enabled = 3;
-  bool can_user_modify = 4;
+  optional bool enabled = 3;
+  optional bool can_user_modify = 4;
 }
 
 message CreateMessageConfigResponse {
 }
 
 message ModifyMessageConfigRequest {
-  NoticeType notice_type = 1;
+  optional NoticeType notice_type = 1;
   string message_type = 2;
-  bool enabled = 3;
-  bool can_user_modify = 4;
+  optional bool enabled = 3;
+  optional bool can_user_modify = 4;
 }
 
 message ModifyMessageConfigResponse {
@@ -40,9 +40,9 @@ message ListMessageConfigsRequest {
 }
 
 message MessageNoticeTypeConfig {
-  NoticeType notice_type = 1;
-  bool enabled = 2;
-  bool can_user_modify = 3;
+  optional NoticeType notice_type = 1;
+  optional bool enabled = 2;
+  optional bool can_user_modify = 3;
 }
 
 message MessageConfig {
