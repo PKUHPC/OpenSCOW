@@ -79,6 +79,7 @@ export const appOps = (cluster: string): AppOps => {
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes, appJobName } = request;
 
+      const jobName = appJobName;
       // 检查是否存在同名的作业
       const existedJobName = await callOnOne(
         cluster,
@@ -137,8 +138,6 @@ export const appOps = (cluster: string): AppOps => {
           details: [errorInfo("NOT FOUND")],
         });
       }
-
-      const jobName = appJobName;
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
