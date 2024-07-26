@@ -26,14 +26,11 @@ message CreateMessageConfigRequest {
 message CreateMessageConfigResponse {
 }
 
-message ModifyMessageConfigRequest {
-  optional NoticeType notice_type = 1;
-  string message_type = 2;
-  optional bool enabled = 3;
-  optional bool can_user_modify = 4;
+message ModifyMessageConfigsRequest {
+  repeated MessageConfig configs = 1;
 }
 
-message ModifyMessageConfigResponse {
+message ModifyMessageConfigsResponse {
 }
 
 message ListMessageConfigsRequest {
@@ -60,7 +57,7 @@ service MessageConfigService {
 
   rpc CreateMessageConfig(CreateMessageConfigRequest) returns (CreateMessageConfigResponse);
 
-  rpc ModifyMessageConfig(ModifyMessageConfigRequest) returns (ModifyMessageConfigResponse);
+  rpc ModifyMessageConfigs(ModifyMessageConfigsRequest) returns (ModifyMessageConfigsResponse);
 
   rpc ListMessageConfigs(ListMessageConfigsRequest) returns (ListMessageConfigsResponse);
 }
