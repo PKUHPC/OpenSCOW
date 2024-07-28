@@ -17,9 +17,16 @@ export const gracefulShutdownPlugin = fp(async (f) => {
 
   await f.register(gracefulShutdown);
 
-  f.addHook("onClose", () => {
-    process.removeAllListeners("SIGTERM");
-    process.removeAllListeners("SIGINT");
+  f.after(() => {
+    f.gracefulShutdown((signal, next) => {
+      f.log.info("Received signal to shutdown: %s", signal);
+      next();
+    });
   });
+
+  // f.addHook("onClose", () => {
+  //   process.removeAllListeners("SIGTERM");
+  //   process.removeAllListeners("SIGINT");
+  // });
 
 });
