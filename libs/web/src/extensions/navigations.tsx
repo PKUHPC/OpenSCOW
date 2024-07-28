@@ -80,6 +80,9 @@ export const toNavItemProps = (
 
   const convertToMap = (navs: NavItemProps) => {
     originalItemsMap.set(navs.path, navs);
+    if (navs.clickToPath) {
+      originalItemsMap.set(navs.clickToPath, navs);
+    }
     navs.children?.forEach(convertToMap);
   };
 
