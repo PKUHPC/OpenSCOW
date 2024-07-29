@@ -15,6 +15,7 @@ syntax = "proto3";
 package scow_notification;
 
 import "protos/common.proto";
+import "protos/message_type.proto";
 
 message CreateMessageConfigRequest {
   optional NoticeType notice_type = 1;
@@ -44,8 +45,10 @@ message MessageNoticeTypeConfig {
 
 message MessageConfig {
   string message_type = 1;
-  string category = 2;
-  repeated MessageNoticeTypeConfig notice_configs = 3;
+  Template title_template = 2;
+  string category = 3;
+  Template category_template = 4;
+  repeated MessageNoticeTypeConfig notice_configs = 5;
 }
 
 message ListMessageConfigsResponse {
