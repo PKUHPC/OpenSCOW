@@ -11,8 +11,8 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import {
@@ -230,7 +230,13 @@ export const adminServiceServer = plugin((server) => {
       // check whether there is activated cluster in SCOW
       // cause syncBlockStatus in plugin will skip the check
       await getActivatedClusters(em, logger);
-      const reply = await server.ext.syncBlockStatus.sync();
+      const reply = await server.ext.syncBlockStatus.run();
+      if (!reply) {
+        throw new ServiceError({
+          code: Status.ALREADY_EXISTS,
+          message: "Sync is already running. Please wait for its completion before starting a new one.",
+        });
+      }
       return [reply];
     },
 
