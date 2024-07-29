@@ -12,3 +12,6 @@
 
 export type { ScowResourcesClient } from "./client";
 export { getScowResourcesClient } from "./client";
+export type { ScowResourcesPlugin } from "./plugin";
+export { scowResourcesPlugin } from "./plugin";
+export { getUserAccountsClusterIds } from "./utils";

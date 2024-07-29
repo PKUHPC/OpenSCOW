@@ -20,7 +20,12 @@
       "@bufbuild/protobuf": "1.8.0",
       "@bufbuild/protoc-gen-es": "1.8.0",
       "@connectrpc/connect": "1.4.0",
-      "@connectrpc/protoc-gen-connect-es": "1.4.0"
+      "@connectrpc/protoc-gen-connect-es": "1.4.0",
+      "@grpc/grpc-js": "1.10.9",
+      "protobufjs": "7.3.2"
+    },
+    "devDependencies": {
+      "ts-proto": "1.180.0"
     }
   }
   

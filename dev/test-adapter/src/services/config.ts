@@ -54,8 +54,5 @@ export const configServiceServer = plugin((server) => {
     getClusterInfo:async () => {
       return [];
     },
-    getClusterNodesInfo: async () => {
-      return [];
-    },
   });
 });

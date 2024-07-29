@@ -17,13 +17,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
-import { getAccountSpecifiedPartitions, libCheckActivatedClusters } from "@scow/lib-server";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
-import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -37,63 +35,7 @@ export const accountServiceServer = plugin((server) => {
 
   server.addService<AccountServiceServer>(AccountServiceService, {
     blockAccount: async ({ request, em, logger }) => {
-      const { accountName, unassignedClusterPartition } = request;
-
-      // 当 unassignedClusterPartition 的值存在时，代表需要在某一分区中取消对账户的授权
-      // 当前只应用在资源分区管理的扩展功能中
-      if (unassignedClusterPartition) {
-        return await em.transactional(async (em) => {
-          const account = await em.findOne(Account, {
-            accountName,
-          }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
-
-          if (!account) {
-            throw {
-              code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-            } as ServiceError;
-          }
-
-          // 确认当前需要取消授权分区的集群是否可用
-          const currentActivatedClusters = await getActivatedClusters(em, logger);
-          libCheckActivatedClusters({ clusterIds: unassignedClusterPartition.clusterId,
-            activatedClusters: currentActivatedClusters, logger });
-
-          // 如果有正在运行的作业暂时不允许取消授权
-          const jobsResp = await server.ext.clusters.callOnOne(
-            unassignedClusterPartition.clusterId,
-            logger,
-            async (client) => {
-              const fields = [
-                "job_id", "user", "state", "account",
-              ];
-
-              return await asyncClientCall(client.job, "getJobs", {
-                fields,
-                filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
-              });
-            },
-          );
-
-          if (jobsResp.jobs.length > 0) {
-            throw {
-              code: Status.FAILED_PRECONDITION,
-              message: `Account ${accountName}  has jobs running and cannot be unassigned. `,
-            } as ServiceError;
-          }
-
-          // 直接对指定分区进行封锁，但是不更改scow中的任何数据
-          await server.ext.clusters.callOnOne(
-            unassignedClusterPartition.clusterId, logger, async (client) => {
-              await asyncClientCall(client.account, "blockAccount", {
-                accountName: account.accountName,
-                blockedPartitions: [ unassignedClusterPartition.partition ],
-              });
-            });
-
-          return [{ result: BlockAccountResponse_Result.OK }];
-        });
-      }
-
+      const { accountName } = request;
 
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
@@ -171,49 +113,8 @@ export const accountServiceServer = plugin((server) => {
     },
 
     unblockAccount: async ({ request, em, logger }) => {
-      const { accountName, assignedClusterPartition } = request;
-
-      // 当 assignedClusterPartition 的值存在时，代表需要在某一分区中增加对账户的授权
-      // 当前只应用在资源分区管理的扩展功能中
-      if (assignedClusterPartition) {
-        return await em.transactional(async (em) => {
-          const account = await em.findOne(Account, {
-            accountName,
-          }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
-
-          if (!account) {
-            throw {
-              code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-            } as ServiceError;
-          }
-
-          // 如果当前账户在集群中为封锁状态，不需要做任何处理
-          if (account.blockedInCluster) {
-            logger.info(`Currently, there are no clusters available for account ${accountName} to use.
-              Any immediate unlocking will not be executed for the time being.`);
-            return [{ executed: true }];
-          }
-
-          // 如果当前账户在集群中为解封状态
-          // 确认当前需要取消授权分区的集群是否可用
-          const currentActivatedClusters = await getActivatedClusters(em, logger);
-          libCheckActivatedClusters({ clusterIds: assignedClusterPartition.clusterId,
-            activatedClusters: currentActivatedClusters, logger });
-
-          // 直接对指定分区进行封锁，但是不更改scow中的任何数据
-          await server.ext.clusters.callOnOne(
-            assignedClusterPartition.clusterId, logger, async (client) => {
-              await asyncClientCall(client.account, "unblockAccount", {
-                accountName: account.accountName,
-                unblockedPartitions: [ assignedClusterPartition.partition ],
-              });
-            });
-
-          return [{ executed: true }];
-        });
-      }
-
-      // assignedClusterPartition 的值不存在时的原始逻辑
+      const { accountName } = request;
+      
       return await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
@@ -361,13 +262,10 @@ export const accountServiceServer = plugin((server) => {
             accountName, ownerUserId: ownerId,
           });
 
-          const assignedPartitions = await getAccountSpecifiedPartitions(
-            cluster,
-            account.accountName,
-            commonConfig.scowResourceManagement,
-            logger,
-            server.ext.partitions?.getAssignedPartitions,
-          );
+          // 获取集群下默认授权分区
+          const assignedPartitions = await server.ext.resources.getAccountDefaultPartitions({
+            accountName, tenantName, clusterId: cluster,
+          });
 
           // 判断为需在集群中封锁时
           if (shouldBlockInCluster) {

@@ -16,7 +16,7 @@ import { createConnectTransport } from "@connectrpc/connect-node";
 import { ClusterPartitionService } from "@scow/scow-resources-protos/build/partition_connect";
 
 export interface ScowResourcesClient {
-  partition: PromiseClient<typeof ClusterPartitionService>
+  resources: PromiseClient<typeof ClusterPartitionService>
 }
 
 export function getClient<TService extends ServiceType>(
@@ -32,6 +32,6 @@ export function getClient<TService extends ServiceType>(
   
 export const getScowResourcesClient = (scowResourcesUrl: string) => {
   return {
-    partition: getClient(scowResourcesUrl, ClusterPartitionService),
+    resources: getClient(scowResourcesUrl, ClusterPartitionService),
   } as ScowResourcesClient;
 };
