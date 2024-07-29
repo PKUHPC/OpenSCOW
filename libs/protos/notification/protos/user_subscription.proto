@@ -15,7 +15,6 @@ syntax = "proto3";
 package scow_notification;
 
 import "protos/common.proto";
-import "protos/message_type.proto";
 
 message ModifyUserSubscriptionRequest {
   repeated MessageConfig configs = 1;

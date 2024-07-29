@@ -39,3 +39,23 @@ enum TargetType {
   TENANT = 2;
   FULL_SITE = 3;
 }
+
+message Template {
+  string default = 1;
+  string en = 2;
+  string zh = 3;
+}
+
+message MessageNoticeTypeConfig {
+  optional NoticeType notice_type = 1;
+  optional bool enabled = 2;
+  optional bool can_user_modify = 3;
+}
+
+message MessageConfig {
+  string message_type = 1;
+  Template title_template = 2;
+  string category = 3;
+  Template category_template = 4;
+  repeated MessageNoticeTypeConfig notice_configs = 5;
+}

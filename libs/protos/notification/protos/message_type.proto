@@ -14,11 +14,7 @@ syntax = "proto3";
 
 package scow_notification;
 
-message Template {
-  string default = 1;
-  string en = 2;
-  string zh = 3;
-}
+import "protos/common.proto";
 
 message MessageType {
   string type = 1;
