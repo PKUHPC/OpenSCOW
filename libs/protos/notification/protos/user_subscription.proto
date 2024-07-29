@@ -15,11 +15,10 @@ syntax = "proto3";
 package scow_notification;
 
 import "protos/common.proto";
+import "protos/message_type.proto";
 
 message ModifyUserSubscriptionRequest {
-  optional NoticeType notice_type = 1;
-  string message_type = 2;
-  optional bool enabled = 3;
+  repeated MessageConfig configs = 1;
 }
 
 message ModifyUserSubscriptionResponse {
@@ -35,8 +34,8 @@ message ListUserSubscrptionsRequest {
 }
 
 message ListUserSubscrptionsResponse {
-  uint64 total_count = 1;
-  repeated Subscription subscriptions = 2;
+  uint32 totalCount = 1;
+  repeated MessageConfig configs = 2;
 }
 
 

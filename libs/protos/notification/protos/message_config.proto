@@ -17,6 +17,20 @@ package scow_notification;
 import "protos/common.proto";
 import "protos/message_type.proto";
 
+message MessageNoticeTypeConfig {
+  optional NoticeType notice_type = 1;
+  optional bool enabled = 2;
+  optional bool can_user_modify = 3;
+}
+
+message MessageConfig {
+  string message_type = 1;
+  Template title_template = 2;
+  string category = 3;
+  Template category_template = 4;
+  repeated MessageNoticeTypeConfig notice_configs = 5;
+}
+
 message CreateMessageConfigRequest {
   optional NoticeType notice_type = 1;
   string message_type = 2;
@@ -35,20 +49,6 @@ message ModifyMessageConfigsResponse {
 }
 
 message ListMessageConfigsRequest {
-}
-
-message MessageNoticeTypeConfig {
-  optional NoticeType notice_type = 1;
-  optional bool enabled = 2;
-  optional bool can_user_modify = 3;
-}
-
-message MessageConfig {
-  string message_type = 1;
-  Template title_template = 2;
-  string category = 3;
-  Template category_template = 4;
-  repeated MessageNoticeTypeConfig notice_configs = 5;
 }
 
 message ListMessageConfigsResponse {
