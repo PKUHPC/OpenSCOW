@@ -13,6 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ConfigServiceClient } from "@scow/protos/build/portal/config";
+import { NodeInfo_NodeState } from "@scow/protos/build/portal/config";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
@@ -21,7 +22,7 @@ import { route } from "src/utils/route";
 export const NodeInfo = Type.Object({
   nodeName: Type.String(),
   partitions: Type.Array(Type.String()),
-  state: Type.String(),
+  state: Type.Enum(NodeInfo_NodeState),
   cpuCoreCount: Type.Number(),
   allocCpuCoreCount: Type.Number(),
   idleCpuCoreCount: Type.Number(),

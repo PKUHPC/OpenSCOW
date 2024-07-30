@@ -84,7 +84,6 @@ export const staticConfigServiceServer = plugin((server) => {
       return [{ clusterConfigs: clusterConfigsProto }];
     },
 
-
   });
 });
 

@@ -241,10 +241,10 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           // 去除被重复计算的节点
           duplicateNodes.forEach((duplicateNode) => {
             const conunt = duplicateNode.partitions.length - 1;
-            aggregatedData.runningNodeCount -= (duplicateNode?.state === "ALLOC") ? conunt : 0;
-            aggregatedData.idleNodeCount -= duplicateNode?.state.includes("IDLE") ? conunt : 0;
+            aggregatedData.runningNodeCount -= (duplicateNode?.state === 2) ? conunt : 0;
+            aggregatedData.idleNodeCount -= duplicateNode?.state === 1 ? conunt : 0;
             aggregatedData.notAvailableNodeCount -=
-            (!duplicateNode?.state.includes("IDLE") && duplicateNode?.state !== "ALLOC")
+            (duplicateNode?.state !== 1 && duplicateNode?.state !== 2)
               ? conunt : 0;
             aggregatedData.cpuCoreCount -= conunt * (duplicateNode?.cpuCoreCount ?? 0);
             aggregatedData.runningCpuCount -= conunt * (duplicateNode?.allocCpuCoreCount ?? 0);
