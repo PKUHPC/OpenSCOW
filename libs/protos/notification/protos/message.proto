@@ -38,21 +38,18 @@ message SystemSendMessageRequest {
 }
 
 message SystemSendMessageResponse {
-  Message message =  1;
 }
 
 message AdminSendMessageRequest {
-  string user_id = 1;
-  optional TargetType target_type = 2;
-  repeated string target_ids = 3;
-  string message_type = 4;
-  string title = 5;
-  string content = 6;
-  repeated NoticeType notice_types = 7;
+  optional TargetType target_type = 1;
+  repeated string target_ids = 2;
+  string message_type = 3;
+  string title = 4;
+  string content = 5;
+  repeated NoticeType notice_types = 6;
 }
 
 message AdminSendMessageResponse {
-  Message message =  1;
 }
 
 message ListMessagesRequest {
