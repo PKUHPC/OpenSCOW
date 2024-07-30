@@ -327,7 +327,7 @@ export const mockApi: MockApi<typeof api> = {
   getClusterNodesInfo: async () => ({
     nodeInfo: [{
       gpuCount: 1,
-      state: "1",
+      state: 1,
       partitions: ["linux","compute"],
       cpuCoreCount: 1,
       idleGpuCount: 1,
