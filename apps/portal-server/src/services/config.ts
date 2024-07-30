@@ -60,7 +60,7 @@ export const staticConfigServiceServer = plugin((server) => {
         }
 
         // 查询集群下的账户已授权分区
-        const assignedPartitions = await server.ext.resources.getAccountAssignedPartitions(
+        const assignedPartitions = await server.ext.resources?.getAccountAssignedPartitions(
           { accountName, tenantName: userInfo.tenantName, clusterId: cluster },
         );
         // 获取分区的详细信息

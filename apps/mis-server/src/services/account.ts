@@ -262,8 +262,7 @@ export const accountServiceServer = plugin((server) => {
             accountName, ownerUserId: ownerId,
           });
 
-          // 获取集群下默认授权分区
-          const assignedPartitions = await server.ext.resources.getAccountDefaultPartitions({
+          const assignedPartitions = await server.ext.resources?.getAccountDefaultPartitions({
             accountName, tenantName, clusterId: cluster,
           });
 

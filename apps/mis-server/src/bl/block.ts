@@ -153,7 +153,7 @@ export async function updateUnblockStatusInSlurm(
     try {
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client, cluster) => {
 
-        const unblockedPartitions = await scowResourcesPlugin?.resources.getAccountAssignedPartitions({
+        const unblockedPartitions = await scowResourcesPlugin?.resources?.getAccountAssignedPartitions({
           accountName: account.accountName,
           tenantName: account.tenant.getProperty("name"),
           clusterId: cluster,
@@ -247,7 +247,7 @@ export async function unblockAccount(
 
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client, cluster) => {
 
-    const unblockedPartitions = await scowResourcesPlugin?.resources.getAccountAssignedPartitions(
+    const unblockedPartitions = await scowResourcesPlugin?.resources?.getAccountAssignedPartitions(
       { accountName: account.accountName, tenantName: account.tenant.getProperty("name"), clusterId: cluster },
     );
 
