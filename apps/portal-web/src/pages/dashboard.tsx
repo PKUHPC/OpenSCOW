@@ -221,9 +221,17 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           },
         );
 
+
         // 真实的节点数
         const realNode = successfulNodesResults.
           find((v) => v.nodeInfo.clusterName === clusterName)?.nodeInfo.nodes;
+
+        if (realNode) {
+          aggregatedData.runningNodeCount = realNode.filter((v) => v.state === 2).length;
+          aggregatedData.notAvailableNodeCount = realNode.filter((v) => v.state === 3).length;
+          aggregatedData.idleNodeCount = realNode.filter((v) => v.state === 1).length;
+        }
+
         if (realNode && ((realNode?.length ?? -1) < aggregatedData.nodeCount)) {
           aggregatedData.nodeCount = realNode.length;
           const duplicateNodes: NodeInfo[] = [];
@@ -240,18 +248,13 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           });
           // 去除被重复计算的节点
           duplicateNodes.forEach((duplicateNode) => {
-            const conunt = duplicateNode.partitions.length - 1;
-            aggregatedData.runningNodeCount -= (duplicateNode?.state === 2) ? conunt : 0;
-            aggregatedData.idleNodeCount -= duplicateNode?.state === 1 ? conunt : 0;
-            aggregatedData.notAvailableNodeCount -=
-            (duplicateNode?.state !== 1 && duplicateNode?.state !== 2)
-              ? conunt : 0;
-            aggregatedData.cpuCoreCount -= conunt * (duplicateNode?.cpuCoreCount ?? 0);
-            aggregatedData.runningCpuCount -= conunt * (duplicateNode?.allocCpuCoreCount ?? 0);
-            aggregatedData.idleCpuCount -= conunt * (duplicateNode?.idleCpuCoreCount ?? 0);
-            aggregatedData.gpuCoreCount -= conunt * (duplicateNode?.gpuCount ?? 0);
-            aggregatedData.runningGpuCount -= conunt * (duplicateNode?.allocGpuCount ?? 0);
-            aggregatedData.idleGpuCount -= conunt * (duplicateNode?.idleGpuCount ?? 0);
+            const count = duplicateNode.partitions.length - 1;
+            aggregatedData.cpuCoreCount -= count * (duplicateNode?.cpuCoreCount ?? 0);
+            aggregatedData.runningCpuCount -= count * (duplicateNode?.allocCpuCoreCount ?? 0);
+            aggregatedData.idleCpuCount -= count * (duplicateNode?.idleCpuCoreCount ?? 0);
+            aggregatedData.gpuCoreCount -= count * (duplicateNode?.gpuCount ?? 0);
+            aggregatedData.runningGpuCount -= count * (duplicateNode?.allocGpuCount ?? 0);
+            aggregatedData.idleGpuCount -= count * (duplicateNode?.idleGpuCount ?? 0);
             aggregatedData.notAvailableCpuCount -= aggregatedData.cpuCoreCount -
             (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount);
             aggregatedData.notAvailableGpuCount -= aggregatedData.gpuCoreCount -
