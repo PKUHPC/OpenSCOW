@@ -80,7 +80,7 @@ export const configServiceServer = plugin((server) => {
 
     getVersion: async () => {
 
-      const version = await JSON.parse(readFileSync(join(__dirname, "../../package.json"), "utf-8")).version;
+      const version = await JSON.parse(readFileSync(join(__dirname, "../../../../package.json"), "utf-8")).version;
 
       const [major, minor, patch] = version.split(".").map(Number);
 
