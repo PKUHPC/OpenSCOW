@@ -20,6 +20,7 @@
     "dependencies": {
       "@ddadaal/tsgrpc-common": "0.2.5",
       "@ddadaal/tsgrpc-client": "0.17.7",
+      "@ddadaal/tsgrpc-server": "0.19.5",
       "@bufbuild/protobuf": "1.8.0",
       "@connectrpc/connect": "1.4.0",
       "@connectrpc/connect-node": "1.4.0",
@@ -27,9 +28,6 @@
       "@scow/scow-resources-protos": "workspace:*",
       "@scow/config": "workspace:*",
       "ts-log": "2.2.5"
-    },
-    "devDependencies": {
-      "@ddadaal/tsgrpc-server": "0.19.5"
     },
     "volta": {
         "extends": "../../package.json"
