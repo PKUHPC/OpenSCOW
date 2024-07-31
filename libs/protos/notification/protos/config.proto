@@ -16,9 +16,14 @@ message PrimaryColor {
   map<string, string> hostname_map = 2;
 }
 
-message GetUiConfigResponse {
+message UiConfig {
   Footer footer = 1;
   PrimaryColor primary_color = 2;
+}
+
+message GetUiConfigResponse {
+  UiConfig config = 1;
+  string default_primary_color = 2;
 }
 
 service ConfigService {
