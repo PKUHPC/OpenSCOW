@@ -21,6 +21,6 @@ message GetUiConfigResponse {
   PrimaryColor primary_color = 2;
 }
 
-service ApiKeyService {
+service ConfigService {
   rpc GetUiConfig(GetUiConfigRequest) returns (GetUiConfigResponse);
 }
