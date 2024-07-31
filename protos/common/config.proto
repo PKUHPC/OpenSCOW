@@ -165,11 +165,11 @@ message GetClusterConfigFilesResponse {
   repeated ClusterConfigSchemaProto cluster_configs = 1;
 }
 
-message GetVersionRequest {
+message GetApiVersionRequest {
 
 }
 
-message GetVersionResponse {
+message GetApiVersionResponse {
   uint32 major = 1;
   uint32 minor = 2;
   uint32 patch = 3;
@@ -184,5 +184,5 @@ service ConfigService {
   rpc GetClusterConfigFiles(GetClusterConfigFilesRequest) returns (GetClusterConfigFilesResponse);
 
   // 获取当前部署 SCOW 的版本，方便接入其它服务
-  rpc GetVersion(GetVersionRequest) returns (GetVersionResponse);
+  rpc GetApiVersion(GetApiVersionRequest) returns (GetApiVersionResponse);
 }

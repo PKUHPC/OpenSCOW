@@ -86,9 +86,10 @@ export const staticConfigServiceServer = plugin((server) => {
       return [{ clusterConfigs: clusterConfigsProto }];
     },
 
-    getVersion: async () => {
+    getApiVersion: async () => {
 
-      const version = await JSON.parse(readFileSync(join(__dirname, "../../../../package.json"), "utf-8")).version;
+      const version = await JSON.parse(readFileSync(join(__dirname,
+        "../../node_modules/@scow/protos/package.json"), "utf-8")).version;
 
       const [major, minor, patch] = version.split(".").map(Number);
 
