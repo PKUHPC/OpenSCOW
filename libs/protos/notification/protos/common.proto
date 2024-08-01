@@ -43,7 +43,7 @@ enum TargetType {
 message Template {
   string default = 1;
   string en = 2;
-  string zh = 3;
+  string zh_cn = 3;
 }
 
 message MessageNoticeTypeConfig {
