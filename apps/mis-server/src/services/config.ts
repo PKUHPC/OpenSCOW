@@ -19,6 +19,8 @@ import { convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-s
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
 
 export const configServiceServer = plugin((server) => {
@@ -76,5 +78,14 @@ export const configServiceServer = plugin((server) => {
       return [{ clusterConfigs: clusterConfigsProto }];
     },
 
+    getApiVersion: async () => {
+
+      const version = await JSON.parse(readFileSync(join(__dirname,
+        "../../node_modules/@scow/protos/package.json"), "utf-8")).version;
+
+      const [major, minor, patch] = version.split(".").map(Number);
+
+      return [{ major, minor, patch }];
+    },
   });
 });
