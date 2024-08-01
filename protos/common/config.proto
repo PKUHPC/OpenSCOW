@@ -183,6 +183,6 @@ service ConfigService {
   // 获取 SCOW 部署的集群配置文件中的集群信息
   rpc GetClusterConfigFiles(GetClusterConfigFilesRequest) returns (GetClusterConfigFilesResponse);
 
-  // 获取当前部署 SCOW 的版本，方便接入其它服务
+  // 获取当前部署 SCOW API 的版本，方便接入其它服务
   rpc GetApiVersion(GetApiVersionRequest) returns (GetApiVersionResponse);
 }
