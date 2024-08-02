@@ -95,11 +95,11 @@ message MarkAllMessagesReadResponse {
 
 message DeleteMessageRequest {
   string user_id = 1;
-  optional message_id = 2;
+  optional uin64 message_id = 2;
 }
 
 message DeleteMessageResponse {
-  
+
 }
 
 service MessageService {
