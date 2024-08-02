@@ -77,14 +77,30 @@ message GetUnreadMessagesResponse {
   repeated Message messages = 2;
 }
 
-message MakeMessageReadRequest {
+message MarkMessageReadRequest {
   string user_id = 1;
   uint64 message_id = 2;
 }
 
-message MakeMessageReadResponse {
+message MarkMessageReadResponse {
 }
 
+message MarkAllMessagesReadRequest {
+  string user_id = 1;
+}
+
+message MarkAllMessagesReadResponse {
+
+}
+
+message DeleteMessageRequest {
+  string user_id = 1;
+  optional message_id = 2;
+}
+
+message DeleteMessageResponse {
+  
+}
 
 service MessageService {
   rpc AdminSendMessage(AdminSendMessageRequest) returns (AdminSendMessageResponse);
@@ -93,5 +109,8 @@ service MessageService {
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
 
   rpc GetUnreadMessages(GetUnreadMessagesRequest) returns (GetUnreadMessagesResponse);
-  rpc MakeMessageRead(MakeMessageReadRequest) returns (MakeMessageReadResponse);
+  rpc MarkMessageRead(MarkMessageReadRequest) returns (MarkMessageReadResponse);
+  rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse);
+
+  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse);
 }
