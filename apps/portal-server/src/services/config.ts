@@ -21,11 +21,12 @@ import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/prot
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 
 export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
-
     getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
       await checkActivatedClusters({ clusterIds: cluster });
@@ -63,7 +64,7 @@ export const staticConfigServiceServer = plugin((server) => {
         availablePartitions = [];
       }
 
-      return [ { partitions: availablePartitions } ];
+      return [{ partitions: availablePartitions }];
     },
 
     getClusterConfigFiles: async ({ logger }) => {
@@ -84,6 +85,15 @@ export const staticConfigServiceServer = plugin((server) => {
       return [{ clusterConfigs: clusterConfigsProto }];
     },
 
+    getApiVersion: async () => {
+
+      const version = await JSON.parse(readFileSync(join(__dirname,
+        "../../node_modules/@scow/protos/package.json"), "utf-8")).version;
+
+      const [major, minor, patch] = version.split(".").map(Number);
+
+      return [{ major, minor, patch }];
+    },
   });
 });
 

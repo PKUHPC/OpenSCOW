@@ -18,8 +18,8 @@ import { SeedManager } from "@mikro-orm/seeder";
 import { entities } from "src/server/entities";
 import { migrations } from "src/server/migrations";
 
-// import { envConfig } from "src/server/trpc/route/config";
 import { aiConfig } from "./ai";
+import { config } from "./env";
 
 const distPath = "src/server";
 
@@ -28,7 +28,7 @@ export const ormConfigs = defineConfig({
   port: aiConfig.db.port,
   user: aiConfig.db.user,
   dbName: aiConfig.db.dbName,
-  password: aiConfig.db.password, // envConfig.DB_PASSWORD ||
+  password: config.DB_PASSWORD || aiConfig.db.password,
   forceUndefined: true,
   extensions: [Migrator, SeedManager],
   migrations: {
