@@ -55,10 +55,11 @@ message AdminSendMessageResponse {
 message ListMessagesRequest {
   string user_id = 1;
   optional string message_type = 2;
-  optional NoticeType notice_type = 3;
-  optional ReadStatus read_status = 4;
-  optional uint32 page = 5;
-  optional uint32 pageSize = 6;
+  optional string category = 3;
+  optional NoticeType notice_type = 4;
+  optional ReadStatus read_status = 5;
+  optional uint32 page = 6;
+  optional uint32 pageSize = 7;
 }
 
 message ListMessagesResponse {
