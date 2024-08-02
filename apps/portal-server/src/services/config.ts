@@ -114,11 +114,16 @@ export const runtimeConfigServiceServer = plugin((server) => {
       const reply = await callOnOne(
         cluster,
         logger,
-        async (client) => await asyncClientCall(client.config, "getClusterNodesInfo", {
-          nodeNames: nodeNames || [],
-        }),
+        async (client) => {
+          // 当前接口要求的最低调度器接口版本
+          const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+          // 检验调度器的API版本是否符合要求，不符合要求报错
+          await checkSchedulerApiVersion(client, minRequiredApiVersion);
+          return await asyncClientCall(client.config, "getClusterNodesInfo", {
+            nodeNames: nodeNames || [],
+          });
+        },
       );
-
       return [{ nodes: reply.nodes }];
     },
   });
