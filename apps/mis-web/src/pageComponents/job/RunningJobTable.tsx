@@ -154,13 +154,13 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                       filterAccountName
                         ? accountNames
                           ? (
-                              <Form.Item label={t(pCommon("account"))} name="accountName">
-                                <Select style={{ minWidth: 96 }} allowClear>
-                                  {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
-                                    <Select.Option key={x} value={x}>{x}</Select.Option>
-                                  ))}
-                                </Select>
-                              </Form.Item>
+                            <Form.Item label={t(pCommon("account"))} name="accountName">
+                              <Select style={{ minWidth: 96 }} allowClear>
+                                {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
+                                  <Select.Option key={x} value={x}>{x}</Select.Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
                           ) : (
                             <>
                               <Form.Item
