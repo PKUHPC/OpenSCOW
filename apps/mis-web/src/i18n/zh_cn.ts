@@ -586,6 +586,7 @@ export default {
         finishJobButton: "结束",
         finishJobConfirm: "确定结束这个任务吗?",
         finishJobSuccess: "任务结束请求已经提交!",
+        userId:"用户ID",
       },
     },
     profile:{

@@ -140,6 +140,7 @@ export default {
         filterForm: {
           cluster: "Cluster",
           jobId: "Job ID",
+          userId:"User ID",
         },
         jobInfoTable: {
           cluster: "Cluster",

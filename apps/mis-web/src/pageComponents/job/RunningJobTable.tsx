@@ -38,6 +38,7 @@ interface FilterForm {
   jobId: number | undefined;
   cluster: Cluster;
   accountName?: string;
+  userId?: string
 }
 
 interface Props {
@@ -73,6 +74,8 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
       cluster: defaultCluster ?? Object.values(activatedClusters)[0],
+      // 默认不传入userId
+      userId: undefined,
     };
   });
 
@@ -94,7 +97,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     };
 
     return await api.getRunningJobs({ query: {
-      userId: userId || undefined,
+      userId: query.userId || undefined,
       cluster: query.cluster.id,
       ...diffAccountNameQuery,
     } });
@@ -123,7 +126,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
           initialValues={query}
           onFinish={async () => {
             setQuery({
-              accountName: query.accountName,
+              ...query,
               ...(await form.validateFields()),
             });
           }}
@@ -151,17 +154,26 @@ export const RunningJobQueryTable: React.FC<Props> = ({
                       filterAccountName
                         ? accountNames
                           ? (
-                            <Form.Item label={t(pCommon("account"))} name="accountName">
-                              <Select style={{ minWidth: 96 }} allowClear>
-                                {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
-                                  <Select.Option key={x} value={x}>{x}</Select.Option>
-                                ))}
-                              </Select>
-                            </Form.Item>
+                              <Form.Item label={t(pCommon("account"))} name="accountName">
+                                <Select style={{ minWidth: 96 }} allowClear>
+                                  {(Array.isArray(accountNames) ? accountNames : [accountNames]).map((x) => (
+                                    <Select.Option key={x} value={x}>{x}</Select.Option>
+                                  ))}
+                                </Select>
+                              </Form.Item>
                           ) : (
-                            <Form.Item label={t(pCommon("account"))} name="accountName">
-                              <Input />
-                            </Form.Item>
+                            <>
+                              <Form.Item
+                                label={t(pCommon("account"))}
+                                name="accountName"
+                                style={{ marginLeft:"0.5em" }}
+                              >
+                                <Input />
+                              </Form.Item>
+                              <Form.Item label={t(p("userId"))} name="userId" style={{ marginLeft:"0.5em" }}>
+                                <Input />
+                              </Form.Item>
+                            </>
                           )
                         : undefined
                     }
@@ -293,7 +305,7 @@ export const RunningJobInfoTable: React.FC<JobInfoTableProps> = ({
               dataIndex="user"
               width="8%"
               ellipsis
-              title={t(pCommon("user"))}
+              title={t(p("userId"))}
               sorter={(a, b) => a.user.localeCompare(b.user)}
             />
           )

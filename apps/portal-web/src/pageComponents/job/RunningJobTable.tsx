@@ -81,8 +81,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
 
   const t = useI18nTranslateToString();
 
-
-
   return (
     <div>
       <FilterFormContainer>

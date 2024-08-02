@@ -140,6 +140,7 @@ export default {
         filterForm: {
           cluster: "集群",
           jobId: "作业ID",
+          userId:"用户ID",
         },
         jobInfoTable: {
           cluster: "集群",
