@@ -162,6 +162,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant1",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+        state:UserState.NORMAL,
       },
       {
         userId: "test01",
@@ -171,6 +172,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+        state:UserState.NORMAL,
       },
       {
         userId: "test02",
@@ -180,6 +182,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE],
+        state:UserState.NORMAL,
       },
       {
         userId: "test03",
@@ -189,6 +192,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [],
+        state:UserState.DELETED,
       },
     ],
 

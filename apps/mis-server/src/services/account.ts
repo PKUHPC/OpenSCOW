@@ -17,6 +17,7 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
+import { removeUserFromAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
@@ -30,6 +31,7 @@ import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
+import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { toRef } from "src/utils/orm";
 
 export const accountServiceServer = plugin((server) => {
@@ -509,7 +511,7 @@ export const accountServiceServer = plugin((server) => {
         }
 
         const account = await em.findOne(Account, { accountName,
-          tenant: { name: tenantName } }, { populate: ["tenant"]});
+          tenant: { name: tenantName } }, { populate: ["tenant","users","users.user"]});
 
         if (!account) {
           throw {
@@ -517,8 +519,7 @@ export const accountServiceServer = plugin((server) => {
           } as ServiceError;
         }
 
-        console.log("这里是deleteAccount的account",account);
-
+        const userAccounts = account.users.getItems();
         const currentActivatedClusters = await getActivatedClusters(em, logger);
         // 查询账户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
         const runningJobs = await server.ext.clusters.callOnAll(
@@ -544,27 +545,35 @@ export const accountServiceServer = plugin((server) => {
         // 处理用户账户关系表，删除账户与所有用户的关系
         const hasCapabilities = server.ext.capabilities.accountUserRelation;
 
-        // for (const userAccount of accountItems) {
-        //   console.log("单个userAccount",PFUserRole[userAccount.role] === PFUserRole.OWNER);
-        //   const accountName = userAccount.account.getEntity().accountName;
-        //   await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-        //     return await asyncClientCall(client.user, "removeUserFromAccount",
-        //       { userId, accountName });
-        //   }).catch(async (e) => {
-        //     // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
-        //     // 除此以外，都抛出异常
-        //     if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-        //            !== Object.keys(currentActivatedClusters).length) {
-        //       throw e;
-        //     }
-        //   });
-        //   await em.removeAndFlush(userAccount);
-        //   if (hasCapabilities) {
-        //     await removeUserFromAccount(authUrl, { accountName, userId }, logger);
-        //   }
-        // }
+        for (const userAccount of userAccounts) {
+          const userId = userAccount.user.getEntity().userId;
+          if (userAccount.role === EntityUserRole.OWNER) {
+            continue;
+          }
+          await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+            return await asyncClientCall(client.user, "removeUserFromAccount",
+              { userId, accountName });
+          }).catch(async (e) => {
+            // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
+            // 除此以外，都抛出异常
+            if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                   !== Object.keys(currentActivatedClusters).length) {
+              throw e;
+            }
+          });
+          await em.removeAndFlush(userAccount);
+          if (hasCapabilities) {
+            await removeUserFromAccount(authUrl, { accountName, userId }, logger);
+          }
+        }
 
-        // await em.flush();
+        if (account.whitelist) {
+          em.remove(account.whitelist);
+          account.whitelist = undefined;
+        }
+
+        account.state = AccountState.DELETED;
+        await em.flush();
 
         return [{}];
       });

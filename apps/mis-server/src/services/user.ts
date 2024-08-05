@@ -35,7 +35,7 @@ import {
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
-import { Account } from "src/entities/Account";
+import { Account,AccountState } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { UserAccount, UserRole, UserStateInAccount, UserStatus } from "src/entities/UserAccount";
@@ -518,20 +518,20 @@ export const userServiceServer = plugin((server) => {
           throw { code: Status.NOT_FOUND, message: `User ${userId} is not found.` } as ServiceError;
         }
 
-        const accountItems = user.accounts.getItems();
+        const userAccounts = user.accounts.getItems();
         // 这里商量是不要管有没有封锁直接删，但要不要先封锁了再删？
 
-        // 如果用户为账户拥有者，提示管理员需要先删除拥有的账户再删除用户
+        // 如果用户为账户拥有者且该用户没有被删除，提示管理员需要先删除拥有的账户再删除用户
         const countAccountOwner = async () => {
-          const ownedAccounts: string[] = [];
-
-          for (const userAccount of accountItems) {
-            if (PFUserRole[userAccount.role] === PFUserRole.OWNER) {
+          const ownedAccounts = userAccounts
+            .filter((userAccount) => PFUserRole[userAccount.role] === PFUserRole.OWNER)
+            .map((userAccount) => {
               const account = userAccount.account.getEntity();
-              const { accountName } = account;
-              ownedAccounts.push(accountName);
-            }
-          }
+              const { accountName, state } = account;
+              return state !== AccountState.DELETED ? accountName : null;
+            })
+            .filter((accountName) => accountName !== null);
+
           return ownedAccounts;
         };
 
@@ -578,11 +578,13 @@ export const userServiceServer = plugin((server) => {
           } as ServiceError;
         }
 
-        // 处理用户账户关系表，删除用户与所有账户的关系
+        // 处理用户账户关系表，删除用户与除其拥有的所有账户的关系
         const hasCapabilities = server.ext.capabilities.accountUserRelation;
 
-        for (const userAccount of accountItems) {
-          console.log("单个userAccount", PFUserRole[userAccount.role] === PFUserRole.OWNER);
+        for (const userAccount of userAccounts) {
+          if (PFUserRole[userAccount.role] === PFUserRole.OWNER) {
+            continue;
+          }
           const accountName = userAccount.account.getEntity().accountName;
           await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
             return await asyncClientCall(client.user, "removeUserFromAccount",
@@ -723,6 +725,7 @@ export const userServiceServer = plugin((server) => {
           tenantName: x.tenant.$.name,
           createTime: x.createTime.toISOString(),
           platformRoles: x.platformRoles.map(platformRoleFromJSON),
+          state:userStateFromJSON(x.state),
         })),
       }];
     },

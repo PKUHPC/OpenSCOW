@@ -13,7 +13,7 @@
 import { Static, Type } from "@sinclair/typebox";
 
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, DisplayedUserState, PlatformRole,
-  TenantRole, UserRole, UserStateInAccount, UserStatus } from "./User";
+  TenantRole, UserRole, UserState,UserStateInAccount, UserStatus } from "./User";
 
 // 这个Model重新用typebox定义了
 // 定义Schema时无法复用的@scow/protos/build/server中的interface
@@ -43,6 +43,7 @@ export const PlatformUserInfo = Type.Object({
   tenantName: Type.String(),
   createTime: Type.Optional(Type.String()),
   platformRoles: Type.Array(Type.Enum(PlatformRole)),
+  state: Type.Optional(Type.Enum(UserState)),
 });
 export type PlatformUserInfo = Static<typeof PlatformUserInfo>;
 

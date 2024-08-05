@@ -19,11 +19,12 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
+import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Encoding } from "src/models/exportFile";
-import { PlatformRole, SortDirectionType, UsersSortFieldType } from "src/models/User";
+import { PlatformRole, SortDirectionType, UsersSortFieldType, UserState } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { type GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
@@ -60,6 +61,7 @@ type FilteredRole = keyof typeof filteredRoles;
 
 const p = prefix("pageComp.admin.allUserTable.");
 const pCommon = prefix("common.");
+const pDelete = prefix("component.deleteModals.");
 
 export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
 
@@ -315,37 +317,53 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
           title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              <ChangePasswordModalLink
-                userId={r.userId}
-                name={r.name}
-                onComplete={async (newPassword) => {
-                  await api.changePasswordAsPlatformAdmin({
-                    body: {
-                      identityId: r.userId,
-                      newPassword: newPassword,
-                    },
-                  })
-                    .httpError(404, () => { message.error(t(p("notExist"))); })
-                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                    .httpError(400, (e) => {
-                      if (e.code === "PASSWORD_NOT_VALID") {
-                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-                      };
-                    })
-                    .then(() => { message.success(t(p("success"))); })
-                    .catch(() => { message.error(t(p("fail"))); });
-                }}
-              >
-                {t(p("changePassword"))}
-              </ChangePasswordModalLink>
-              <ChangeTenantModalLink
-                tenantName={r.tenantName}
-                name={r.name}
-                userId={r.userId}
-                reload={reload}
-              >
-                {t(p("changeTenant"))}
-              </ChangeTenantModalLink>
+              {
+                r.state === UserState.DELETED ? (
+                  <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                    {t(p("changePassword"))}
+                  </DisabledA>
+                ) :
+                  (
+                    <ChangePasswordModalLink
+                      userId={r.userId}
+                      name={r.name}
+                      onComplete={async (newPassword) => {
+                        await api.changePasswordAsPlatformAdmin({
+                          body: {
+                            identityId: r.userId,
+                            newPassword: newPassword,
+                          },
+                        })
+                          .httpError(404, () => { message.error(t(p("notExist"))); })
+                          .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                          .httpError(400, (e) => {
+                            if (e.code === "PASSWORD_NOT_VALID") {
+                              message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                            };
+                          })
+                          .then(() => { message.success(t(p("success"))); })
+                          .catch(() => { message.error(t(p("fail"))); });
+                      }}
+                    >
+                      {t(p("changePassword"))}
+                    </ChangePasswordModalLink>
+                  )}
+              {
+                r.state === UserState.DELETED ? (
+                  <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                    {t(p("changeTenant"))}
+                  </DisabledA>
+                ) : (
+                  <ChangeTenantModalLink
+                    tenantName={r.tenantName}
+                    name={r.name}
+                    userId={r.userId}
+                    reload={reload}
+                  >
+                    {t(p("changeTenant"))}
+                  </ChangeTenantModalLink>
+                )
+              }
             </Space>
           )}
         />
