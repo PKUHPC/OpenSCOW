@@ -81,7 +81,7 @@ export const appOps = (cluster: string): AppOps => {
 
       const jobName = appJobName;
       // 检查是否存在同名的作业
-      const existedJobName = await callOnOne(
+      const existingJobName = await callOnOne(
         cluster,
         logger,
         async (client) => {
@@ -107,7 +107,7 @@ export const appOps = (cluster: string): AppOps => {
         },
       ).then((resp) => resp.jobs);
 
-      if (existedJobName.length) {
+      if (existingJobName.length) {
         throw new DetailedError({
           code: Status.ALREADY_EXISTS,
           message: `appJobName ${appJobName} is already existed`,

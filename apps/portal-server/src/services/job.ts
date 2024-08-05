@@ -234,7 +234,7 @@ export const jobServiceServer = plugin((server) => {
       await checkActivatedClusters({ clusterIds: cluster });
 
       // 检查是否存在同名的作业
-      const existedJobName = await callOnOne(
+      const existingJobName = await callOnOne(
         cluster,
         logger,
         async (client) => {
@@ -260,7 +260,7 @@ export const jobServiceServer = plugin((server) => {
         },
       ).then((resp) => resp.jobs);
 
-      if (existedJobName.length) {
+      if (existingJobName.length) {
         throw {
           code: Status.ALREADY_EXISTS,
           message: "already exists",

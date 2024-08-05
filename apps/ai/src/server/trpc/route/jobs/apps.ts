@@ -313,14 +313,14 @@ export const createAppSession = procedure
     const client = getAdapterClient(clusterId);
 
     // 检查是否存在同名的作业
-    const existedJobName = await asyncClientCall(client.job, "getJobs", {
+    const existingJobName = await asyncClientCall(client.job, "getJobs", {
       fields: ["job_id"],
       filter: {
         users: [userId], accounts: [],states: [],jobName:appJobName,
       },
     }).then((resp) => resp.jobs);
 
-    if (existedJobName.length) {
+    if (existingJobName.length) {
       throw new TRPCError({
         code: "CONFLICT",
         message: `appJobName ${appJobName} is already existed`,
