@@ -1001,7 +1001,7 @@ export default {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
-
+          syncAlreadyStarted: "正在进行一次同步。请等待本次同步执行完成后，再重新同步。",
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",

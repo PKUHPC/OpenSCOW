@@ -16,7 +16,7 @@ import { JobInfo } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { AppType } from "@scow/config/build/appForAi";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { OperationResult, OperationType } from "@scow/lib-operation-log";
-import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
+import { getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
   sftpExists,
@@ -25,6 +25,7 @@ import {
   sftpRealPath,
   sftpWriteFile,
 } from "@scow/lib-ssh";
+import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCError } from "@trpc/server";
 import fs from "fs";
 import { join } from "path";
@@ -34,8 +35,8 @@ import { aiConfig } from "src/server/config/ai";
 import { Image as ImageEntity, Source, Status } from "src/server/entities/Image";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkAppExist, checkCreateAppEntity,
-  fetchJobInputParams, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
+import { allApps, checkAppExist, checkCreateAppEntity,
+  fetchJobInputParams, getAllTags, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
 import { getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -47,6 +48,7 @@ import {
 } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
+import { getAppConnectionInfoFromAdapterForAi } from "src/server/utils/schedulerAdapterUtils";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { formatTime } from "src/utils/datetime";
 import { isParentOrSameFolder } from "src/utils/file";
@@ -55,6 +57,7 @@ import { parseIp } from "src/utils/parse";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
+import { clusters, PartitionSchema } from "../config";
 import { booleanQueryParam } from "../utils";
 
 const ImageSchema = z.object({
@@ -154,6 +157,12 @@ const AttributeTypeSchema = z.enum(["TEXT", "NUMBER", "SELECT"]);
 
 export type AttributeType = z.infer<typeof AttributeTypeSchema>;
 
+const ClusterConfig = z.object({
+  schedulerName: z.string(),
+  clusterId: z.string(),
+  partitions: z.array(PartitionSchema),
+});
+
 
 export const listAvailableApps = procedure
   .meta({
@@ -252,6 +261,7 @@ const CreateAppInputSchema = z.object({
   maxTime: z.number(),
   workingDirectory: z.string().optional(),
   customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
+  gpuType: z.string().optional(),
 });
 
 export type CreateAppInput = z.infer<typeof CreateAppInputSchema>;
@@ -297,7 +307,7 @@ export const createAppSession = procedure
     const { clusterId, appId, appJobName, isAlgorithmPrivate, algorithm,
       image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
       model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
-      maxTime, workingDirectory, customAttributes } = input;
+      maxTime, workingDirectory, customAttributes, gpuType } = input;
 
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
@@ -482,6 +492,7 @@ export const createAppSession = procedure
         // 第五个参数为数据集版本地址
         // 第六个参数为模型版本地址
         // 第七个参数为多挂载点地址，以逗号分隔
+        // 第八个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
         extraOptions: [
           JobType.APP,
           app.type,
@@ -503,6 +514,7 @@ export const createAppSession = procedure
               : modelVersion.path
             : "",
           mountPoints.join(","),
+          gpuType || "",
         ],
       }).catch((e) => {
         const ex = e as ServiceError;
@@ -656,9 +668,10 @@ export const saveImage =
           });
         }
 
-        const { node, containerId } = job;
+        const nodeName = job.containerJobInfo?.nodeName;
+        const containerId = job.containerJobInfo?.containerId;
 
-        if (!node || !containerId) {
+        if (!nodeName || !containerId) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Can not find node or containerId of this running job",
@@ -668,14 +681,14 @@ export const saveImage =
         const formateContainerId = formatContainerId(clusterId, containerId);
 
         // 连接到该节点
-        return await sshConnect(node, "root", logger, async (ssh) => {
+        return await sshConnect(nodeName, "root", logger, async (ssh) => {
           try {
             const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
             const localImageUrl = `${userId}/${imageName}:${imageTag}`;
 
             // commit镜像
             await commitContainerImage({
-              node,
+              node:nodeName,
               ssh,
               clusterId,
               logger,
@@ -820,7 +833,7 @@ export const listAppSessions =
               // TODO: if vnc apps
               }
               const client = getAdapterClient(clusterId);
-              const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+              const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
               if (connectionInfo?.response?.$case === "appConnectionInfo") {
                 host = connectionInfo.response.appConnectionInfo.host;
                 port = connectionInfo.response.appConnectionInfo.port;
@@ -893,7 +906,7 @@ procedure
       try {
         const client = getAdapterClient(clusterId);
 
-        const connectionInfo = await getAppConnectionInfoFromAdapter(client, jobId, logger);
+        const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, jobId, logger);
 
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           const host = connectionInfo.response.appConnectionInfo.host;
@@ -983,7 +996,7 @@ procedure
 
       if (sessionMetadata.jobType === JobType.APP && sessionMetadata.appId) {
         const client = getAdapterClient(cluster);
-        const connectionInfo = await getAppConnectionInfoFromAdapter(client, sessionMetadata.jobId, logger);
+        const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
         if (connectionInfo?.response?.$case === "appConnectionInfo") {
           const { host, port, password } = connectionInfo.response.appConnectionInfo;
           return {
@@ -1045,4 +1058,120 @@ procedure
 
   });
 
+
+export const listApps = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/apps/search",
+      tags: ["app"],
+      summary: "List all Apps By tags",
+    },
+  })
+  .input(z.object({
+    tags: z.string().optional(),
+  }))
+  .output((z.object({ apps: z.array(appSchema) })))
+  .query(async ({ input }) => {
+
+    const { tags } = input;
+
+    const apps = Object.entries(allApps)?.filter(([_, config]) => {
+      if (tags) {
+        return tags.split(",")
+          .some((tag) =>
+            (config.tags?.includes(tag) || config.clusterSpecificConfigs?.some((x) => x.config.tags?.includes(tag))),
+          );
+      }
+      return true;
+    }).map(([id, config]) => {
+
+      const aggregateTags = config.clusterSpecificConfigs?.reduce((prev, curr) => {
+        curr.config.tags?.forEach((tag) => {
+          if (!prev.has(tag)) {
+            prev.add(tag);
+          }
+        });
+        return prev;
+      }, new Set(config.tags)) || config.tags || [];
+
+      return ({
+        id,
+        name: config.name,
+        logoPath: config.logoPath,
+        tags: Array.from(aggregateTags),
+        appComment: getI18nConfigCurrentText(config.appComment, undefined),
+      });
+    });
+
+    return {
+      apps,
+    };
+  });
+
+export const listTags = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/apps/tags/search",
+      tags: ["app"],
+      summary: "List all App tags",
+    },
+  })
+  .input(z.void())
+  .output(z.object({ tags: z.array(z.string()) }))
+  .query(async () => {
+
+    const tags = getAllTags(allApps);
+
+    return {
+      tags,
+    };
+  });
+
+export const listClusters = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/apps/clusters/search",
+      tags: ["app"],
+      summary: "List All Clusters By AppID",
+    },
+  })
+  .input(z.object({
+    appId: z.string(),
+  }))
+  .output(z.object({ clusterConfigs: z.array(ClusterConfig) }))
+  .query(async ({ input }) => {
+    const { appId } = input;
+    const allClusterIds = Object.keys(clusters);
+    const clusterIds: string[] = [];
+    // 获取集群ids
+    // common app
+    if (!allApps[appId].clusterSpecificConfigs) {
+      clusterIds.push(...allClusterIds);
+    } else {
+      allApps[appId].clusterSpecificConfigs?.map((config) => {
+        clusterIds.push(config.cluster);
+      });
+    }
+
+    const configs = await Promise.all(clusterIds
+      .map(async (clusterId) => {
+        const client = getAdapterClient(clusterId);
+        if (!client) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message:`cluster ${clusterId} is not found`,
+          });
+        }
+        return await asyncClientCall(client.config, "getClusterConfig", {});
+      }));
+
+    return {
+      clusterConfigs: configs.map((config,idx) => ({ ...config,clusterId:clusterIds[idx] })),
+    };
+
+  })
+  ;
 

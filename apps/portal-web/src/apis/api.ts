@@ -27,6 +27,7 @@ import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetClusterRunningInfoSchema } from "src/pages/api/dashboard/getClusterInfo";
+import type { GetClusterNodesInfoSchema } from "src/pages/api/dashboard/getClusterNodesInfo";
 import type { GetQuickEntriesSchema } from "src/pages/api/dashboard/getQuickEntries";
 import type { SaveQuickEntriesSchema } from "src/pages/api/dashboard/saveQuickEntries";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
@@ -81,6 +82,7 @@ export const api = {
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
   getClusterRunningInfo: apiClient.fromTypeboxRoute<typeof GetClusterRunningInfoSchema>("GET", "/api/dashboard/getClusterInfo"),
+  getClusterNodesInfo: apiClient.fromTypeboxRoute<typeof GetClusterNodesInfoSchema>("GET", "/api/dashboard/getClusterNodesInfo"),
   getQuickEntries: apiClient.fromTypeboxRoute<typeof GetQuickEntriesSchema>("GET", "/api/dashboard/getQuickEntries"),
   saveQuickEntries: apiClient.fromTypeboxRoute<typeof SaveQuickEntriesSchema>("POST", "/api/dashboard/saveQuickEntries"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),

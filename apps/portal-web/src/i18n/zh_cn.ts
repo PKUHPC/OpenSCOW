@@ -453,7 +453,7 @@ export default {
         resourceInfo:"资源信息",
         core:"核",
         running:"运行中",
-        idle:"可用",
+        idle:"空闲",
         notAvailable:"不可用",
         card:"卡",
         job:"作业",

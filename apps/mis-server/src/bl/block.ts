@@ -290,4 +290,3 @@ export async function unblockUserInAccount(
     accountName, userId,
   }, logger);
 }
-
