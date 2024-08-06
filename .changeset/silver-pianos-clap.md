@@ -1,6 +1,6 @@
 ---
-"@scow/scheduler-adapter-protos": minor
-"@scow/portal-server": minor
+"@scow/scheduler-adapter-protos": patch
+"@scow/portal-server": patch
 "@scow/portal-web": patch
 ---
 
