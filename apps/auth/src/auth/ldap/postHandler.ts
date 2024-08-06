@@ -58,7 +58,7 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       const user = await findUser(logger, ldapConfig, client, username);
 
-      if (!user) {
+      if (!user || user.loginShell === "/sbin/nologin") { // 用户删除即禁止用户登录后视为不存在该用户
         logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
         await serveLoginHtml(true, callbackUrl, req, res);
         return;

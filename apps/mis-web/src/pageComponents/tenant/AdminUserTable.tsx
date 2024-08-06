@@ -327,6 +327,18 @@ export const AdminUserTable: React.FC<Props> = ({
                         setFailedModalVisible(true);
                         setFailedDeletedMessage({ type,userId,accounts });
                         reload();
+                      }).httpError(500, (e) => {
+                        message.destroy("deleteUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      }).httpError(501, (e) => {
+                        message.destroy("deleteUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
                       })
                       .then(() => {
                         message.destroy("deleteUser");

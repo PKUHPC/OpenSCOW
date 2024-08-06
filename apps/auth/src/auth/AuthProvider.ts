@@ -27,6 +27,7 @@ export type CreateUserResult = "AlreadyExists" | "OK";
 export type ChangePasswordResult = "NotFound" | "OK";
 export type CheckPasswordResult = "NotFound" | "Match" | "NotMatch";
 export type ChangeEmailResult = "NotFound" | "OK";
+export type DeleteUserResult = "NotFound" | "OK" | "Faild";
 
 export interface UserInfo {
   identityId: string;
@@ -46,4 +47,5 @@ export interface AuthProvider {
   => Promise<CheckPasswordResult>);
   changeEmail: undefined | ((id: string, newEmail: string,
     req: FastifyRequest) => Promise<ChangeEmailResult>);
+  deleteUser: undefined | ((identityId: string, req: FastifyRequest) => Promise<DeleteUserResult>);
 }

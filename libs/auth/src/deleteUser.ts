@@ -10,20 +10,18 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import "jest-extended";
-module.exports = async () => {
-  jest.mock("@scow/lib-auth", () => ({
-    createUser: jest.fn(async () => ({ status: 204, ok: true, text: () => "" })),
-    getUser: jest.fn(async () => ({ identityId: "test" })),
-    getCapabilities: jest.fn(async () => ({
-      createUser: true,
-      changePassword: true,
-      getUser: true,
-      validateName: true,
-      deleteUser: true,
-      deleteAccount: true,
-    })),
-    // deleteUser:jest.fn(async () => ({ identityId: "test" })),
-    // deleteAccount:jest.fn(async () => ({ accountName: "test" })),
-  }));
-};
+import { applicationJsonHeaders, logHttpErrorAndThrow } from "src/utils";
+import { Logger } from "ts-log";
+
+
+export async function deleteUser(authUrl: string, identityId: string, logger?: Logger) {
+  const resp = await fetch(authUrl + "/user/delete?identityId=" + identityId, {
+    method: "DELETE",
+    headers: applicationJsonHeaders,
+  });
+
+  if (resp.status !== 204) {
+    logHttpErrorAndThrow(resp, logger);
+  }
+}
+

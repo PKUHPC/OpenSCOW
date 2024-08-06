@@ -78,6 +78,7 @@ ldap:
     uid: uid
     name: cn
     mail: mail
+    loginShell: loginShell
 
 ssh:
   baseNode: localhost:22222

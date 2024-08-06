@@ -14,6 +14,7 @@ ldap:
     uid: uid
     name: cn
     mail: mail
+    loginShell: loginShell
 
   addUser:
     userBase: "ou=People,ou=hpc,o=pku"

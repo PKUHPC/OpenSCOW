@@ -15,6 +15,7 @@ import { changeEmailRoute } from "src/routes/changeEmail";
 import { changePasswordRoute } from "src/routes/changePassword";
 import { checkPasswordRoute } from "src/routes/checkPassword";
 import { createUserRoute } from "src/routes/createUser";
+import { deleteUserRoute } from "src/routes/deleteUser";
 import { getUserRoute } from "src/routes/getUser";
 import { logoutRoute } from "src/routes/logout";
 
@@ -33,4 +34,5 @@ export const routes = [
   getUserRoute,
   changeEmailRoute,
   checkPasswordRoute,
+  deleteUserRoute,
 ];

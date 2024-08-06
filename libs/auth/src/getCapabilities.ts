@@ -19,6 +19,7 @@ export interface Capabilities {
   changeEmail?: boolean;
   getUser?: boolean;
   accountUserRelation?: boolean;
+  deleteUser?: boolean;
 }
 
 

@@ -15,7 +15,8 @@ import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { QueryOrder, raw } from "@mikro-orm/core";
-import { addUserToAccount, changeEmail as libChangeEmail, createUser, getCapabilities, getUser, removeUserFromAccount,
+import { addUserToAccount, changeEmail as libChangeEmail, createUser, deleteUser,
+  getCapabilities, getUser, removeUserFromAccount,
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
@@ -602,10 +603,35 @@ export const userServiceServer = plugin((server) => {
             await removeUserFromAccount(authUrl, { accountName, userId }, logger);
           }
         }
+        const ldapCapabilities = await getCapabilities(authUrl);
+        if (ldapCapabilities.deleteUser) {
+
+          await deleteUser(authUrl,
+            userId, server.logger)
+            .then(async (a: any) => {
+              console.log("从lib/auth返回了",a);
+            })
+            .catch(async (e) => {
+              if (e.status === 404) {
+                throw {
+                  code: Status.NOT_FOUND,
+                  message: "User not found in LDAP." } as ServiceError;
+              }
+              throw {
+                code: Status.INTERNAL,
+                message: "Error nologin user in LDAP." } as ServiceError;
+
+            });
+        } else {
+          throw {
+            code: Status.UNAVAILABLE,
+            message: "No permission to delete user in LDAP." } as ServiceError;
+        }
 
         user.state = UserState.DELETED;
 
         await em.flush();
+
         return [{}];
       });
     },
