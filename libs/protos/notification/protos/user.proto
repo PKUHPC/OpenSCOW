@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package scow_notification;
+package scow_notification.user;
 
 enum TenantRole {
   TENANT_ADMIN = 0;
