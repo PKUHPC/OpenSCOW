@@ -41,7 +41,7 @@ message GetUserInfoResponse {
   UserInfo user_info = 1;
 }
 
-service ApiKeyService {
+service UserService {
   rpc GetUserInfo(GetUserInfoRequest) returns (GetUserInfoResponse);
 }
 
