@@ -1,5 +1,27 @@
 # @scow/lib-web
 
+## 1.4.1
+
+### Patch Changes
+
+- 0275a9e: 修复系统初始化时因无法通过鉴权可用集群为空的问题
+- c61348a: 右上角 nav 在生成 portal 及 mis 的 a 标签时不添加 base path
+- 57a91f6: 修复了 header 热区过小的问题.
+- 66f3c0e: 允许 UI 扩展内部页面自定义 iframe 的高度
+- 1a096de: 修复门户系统集群登录节点只配置地址时路由渲染失败的问题，在集群配置接口返回中加入 scowd 配置信息
+- 5159efd: UI 扩展导航栏链接修改 href 为 path，行为和导航项的 path 保持一致
+- 259f247: 如果 UI 扩展自定义导航栏接口返回的某个导航项的`path`与某个已有的路径的`clickToPath`相同（之前只检查`path`），则返回的路径也将不做进一步处理
+- 0eb668d: 修复系统初始化时作业价格表设置页面查询参数报错问题
+- f14bf6c: UI 扩展增加导航栏链接自定义
+- Updated dependencies [0275a9e]
+- Updated dependencies [753a996]
+- Updated dependencies [a9e9011]
+- Updated dependencies [1a096de]
+- Updated dependencies [0eb668d]
+  - @scow/config@1.5.1
+  - @scow/utils@1.1.1
+  - @scow/protos@1.0.13
+
 ## 1.4.0
 
 ### Minor Changes

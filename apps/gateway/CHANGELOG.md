@@ -1,5 +1,12 @@
 # @scow/gateway
 
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [a9e9011]
+  - @scow/utils@1.1.1
+
 ## 1.6.1
 
 ## 1.6.0
