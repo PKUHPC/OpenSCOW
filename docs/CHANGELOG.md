@@ -1,5 +1,12 @@
 # @scow/docs
 
+## 1.4.1
+
+### Patch Changes
+
+- 5159efd: UI 扩展导航栏链接修改 href 为 path，行为和导航项的 path 保持一致
+- f14bf6c: UI 扩展增加导航栏链接自定义
+
 ## 1.4.0
 
 ### Minor Changes

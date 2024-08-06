@@ -1,5 +1,34 @@
 # @scow/ai
 
+## 0.2.5
+
+### Patch Changes
+
+- fcc8c2b: ai 的数据库密码先从 install.yaml 中读取，若没配再从 ai 的 config 中读取
+- 753a996: AI 增加多机多卡分布式训练和对华为 GPU 的特殊处理
+- be429fc: ai 加上国际化的 Provider
+- ca9bf27: 兼容低版本 chrome 浏览器，兼容 360 极速浏览器
+- e9c8bfa: 增加 ai 的操作日志，涉及文件、镜像、数据集、算法、模型和作业应用'
+- Updated dependencies [0275a9e]
+- Updated dependencies [c61348a]
+- Updated dependencies [753a996]
+- Updated dependencies [57a91f6]
+- Updated dependencies [a9e9011]
+- Updated dependencies [66f3c0e]
+- Updated dependencies [1a096de]
+- Updated dependencies [5159efd]
+- Updated dependencies [259f247]
+- Updated dependencies [0eb668d]
+- Updated dependencies [e9c8bfa]
+- Updated dependencies [f14bf6c]
+  - @scow/config@1.5.1
+  - @scow/lib-ssh@1.0.2
+  - @scow/lib-web@1.4.1
+  - @scow/utils@1.1.1
+  - @scow/lib-server@1.3.1
+  - @scow/lib-operation-log@2.1.7
+  - @scow/rich-error-model@2.0.0
+
 ## 0.2.4
 
 ### Patch Changes

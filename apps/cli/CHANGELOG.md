@@ -1,5 +1,15 @@
 # @scow/cli
 
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [0275a9e]
+- Updated dependencies [753a996]
+- Updated dependencies [1a096de]
+- Updated dependencies [0eb668d]
+  - @scow/config@1.5.1
+
 ## 1.6.1
 
 ## 1.6.0
