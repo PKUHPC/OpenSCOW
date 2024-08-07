@@ -5,7 +5,7 @@
 "@scow/portal-web": patch
 "@scow/mis-web": patch
 "@scow/lib-server": patch
-"@scow/grpc-api": patch
+"@scow/grpc-api": minor
 ---
 
 接入 scowd 文件分片上传
