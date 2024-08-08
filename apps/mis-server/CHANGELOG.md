@@ -1,5 +1,28 @@
 # @scow/mis-server
 
+## 1.6.2
+
+### Patch Changes
+
+- 67cc41c: 平台数据统计缓存函数设置缓存时间变量，并默认为 5 分钟
+- 4bef1b3: 增加获取 SCOW API 版本的接口
+- c214bd2: mis-server 启动时，不完整运行一次封锁状态同步
+- 6eebd35: 在门户和管理系统启动时只检查启用中集群登录节点的 ssh 连接，在管理系统启用集群操作中检查登录节点的 ssh 连接
+- Updated dependencies [0275a9e]
+- Updated dependencies [753a996]
+- Updated dependencies [a9e9011]
+- Updated dependencies [1a096de]
+- Updated dependencies [66a96ba]
+- Updated dependencies [0eb668d]
+  - @scow/config@1.5.1
+  - @scow/lib-ssh@1.0.2
+  - @scow/scheduler-adapter-protos@1.3.2
+  - @scow/utils@1.1.1
+  - @scow/lib-server@1.3.1
+  - @scow/lib-hook@1.0.13
+  - @scow/lib-scheduler-adapter@1.1.11
+  - @scow/protos@1.0.13
+
 ## 1.6.1
 
 ## 1.6.0

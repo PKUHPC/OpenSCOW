@@ -1,5 +1,36 @@
 # @scow/portal-web
 
+## 1.6.2
+
+### Patch Changes
+
+- c61348a: 右上角 nav 在生成 portal 及 mis 的 a 标签时不添加 base path
+- f609a5c: 修复 mis 跳转 portal 失败的问题
+- 1a096de: 修复门户系统集群登录节点只配置地址时路由渲染失败的问题，在集群配置接口返回中加入 scowd 配置信息
+- 66a96ba: 修复了门户系统中节点在不同集群中重复计数的问题
+- ca9bf27: 兼容低版本 chrome 浏览器，兼容 360 极速浏览器
+- e9c8bfa: 增加 ai 的操作日志，涉及文件、镜像、数据集、算法、模型和作业应用'
+- f14bf6c: UI 扩展增加导航栏链接自定义
+- Updated dependencies [0275a9e]
+- Updated dependencies [c61348a]
+- Updated dependencies [753a996]
+- Updated dependencies [57a91f6]
+- Updated dependencies [a9e9011]
+- Updated dependencies [66f3c0e]
+- Updated dependencies [1a096de]
+- Updated dependencies [5159efd]
+- Updated dependencies [259f247]
+- Updated dependencies [0eb668d]
+- Updated dependencies [e9c8bfa]
+- Updated dependencies [f14bf6c]
+  - @scow/config@1.5.1
+  - @scow/lib-ssh@1.0.2
+  - @scow/lib-web@1.4.1
+  - @scow/utils@1.1.1
+  - @scow/lib-operation-log@2.1.7
+  - @scow/protos@1.0.13
+  - @scow/rich-error-model@2.0.0
+
 ## 1.6.1
 
 ### Patch Changes

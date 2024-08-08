@@ -1,5 +1,29 @@
 # @scow/portal-server
 
+## 1.6.2
+
+### Patch Changes
+
+- a9e9011: 修复获取 scowdClient 时拼接地址的错误
+- 4bef1b3: 增加获取 SCOW API 版本的接口
+- 1a096de: 修复门户系统集群登录节点只配置地址时路由渲染失败的问题，在集群配置接口返回中加入 scowd 配置信息
+- 66a96ba: 修复了门户系统中节点在不同集群中重复计数的问题
+- 6eebd35: 在门户和管理系统启动时只检查启用中集群登录节点的 ssh 连接，在管理系统启用集群操作中检查登录节点的 ssh 连接
+- Updated dependencies [0275a9e]
+- Updated dependencies [753a996]
+- Updated dependencies [a9e9011]
+- Updated dependencies [1a096de]
+- Updated dependencies [66a96ba]
+- Updated dependencies [0eb668d]
+  - @scow/config@1.5.1
+  - @scow/lib-ssh@1.0.2
+  - @scow/scheduler-adapter-protos@1.3.2
+  - @scow/utils@1.1.1
+  - @scow/lib-server@1.3.1
+  - @scow/lib-scheduler-adapter@1.1.11
+  - @scow/protos@1.0.13
+  - @scow/rich-error-model@2.0.0
+
 ## 1.6.1
 
 ## 1.6.0

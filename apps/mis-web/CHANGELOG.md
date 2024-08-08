@@ -1,5 +1,36 @@
 # @scow/mis-web
 
+## 1.6.2
+
+### Patch Changes
+
+- 0275a9e: 修复系统初始化时因无法通过鉴权可用集群为空的问题
+- c61348a: 右上角 nav 在生成 portal 及 mis 的 a 标签时不添加 base path
+- f609a5c: 修复 mis 跳转 portal 失败的问题
+- c214bd2: mis-server 启动时，不完整运行一次封锁状态同步
+- ca9bf27: 兼容低版本 chrome 浏览器，兼容 360 极速浏览器
+- 0eb668d: 修复系统初始化时作业价格表设置页面查询参数报错问题
+- e9c8bfa: 增加 ai 的操作日志，涉及文件、镜像、数据集、算法、模型和作业应用'
+- f14bf6c: UI 扩展增加导航栏链接自定义
+- Updated dependencies [0275a9e]
+- Updated dependencies [c61348a]
+- Updated dependencies [753a996]
+- Updated dependencies [57a91f6]
+- Updated dependencies [a9e9011]
+- Updated dependencies [66f3c0e]
+- Updated dependencies [1a096de]
+- Updated dependencies [5159efd]
+- Updated dependencies [259f247]
+- Updated dependencies [0eb668d]
+- Updated dependencies [e9c8bfa]
+- Updated dependencies [f14bf6c]
+  - @scow/config@1.5.1
+  - @scow/lib-web@1.4.1
+  - @scow/utils@1.1.1
+  - @scow/lib-operation-log@2.1.7
+  - @scow/protos@1.0.13
+  - @scow/rich-error-model@2.0.0
+
 ## 1.6.1
 
 ### Patch Changes
