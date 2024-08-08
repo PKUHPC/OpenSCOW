@@ -264,6 +264,8 @@ export const jobServiceServer = plugin((server) => {
           } as ServiceError;
         }
 
+      } else {
+        logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
       }
 
       // make sure working directory exists

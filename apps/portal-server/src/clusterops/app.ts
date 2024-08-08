@@ -113,6 +113,8 @@ export const appOps = (cluster: string): AppOps => {
           });
         }
 
+      } else {
+        logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
       }
 
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
