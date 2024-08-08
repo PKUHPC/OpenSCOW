@@ -93,12 +93,20 @@ message MarkAllMessagesReadResponse {
 
 }
 
-message DeleteMessageRequest {
+message DeleteMessagesRequest {
   string user_id = 1;
-  optional uint64 message_id = 2;
+  repeated uint64 message_ids = 2;
 }
 
-message DeleteMessageResponse {
+message DeleteMessagesResponse {
+
+}
+
+message DeleteAllMessagesRequest {
+  string user_id = 1;
+}
+
+message DeleteAllMessagesResponse {
 
 }
 
@@ -112,5 +120,7 @@ service MessageService {
   rpc MarkMessageRead(MarkMessageReadRequest) returns (MarkMessageReadResponse);
   rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse);
 
-  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse);
+  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
+  rpc DeleteAllMessages(DeleteAllMessagesRequest) returns (DeleteAllMessagesResponse);
+
 }

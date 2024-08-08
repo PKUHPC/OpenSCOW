@@ -39,7 +39,7 @@ message ListUserSubscriptionsResponse {
 
 
 
-service UserSubcriptionService {
+service UserSubscriptionService {
   rpc ModifyUserSubscription(ModifyUserSubscriptionRequest) returns (ModifyUserSubscriptionResponse);
 
   rpc ListUserSubscriptions(ListUserSubscriptionsRequest) returns (ListUserSubscriptionsResponse);
