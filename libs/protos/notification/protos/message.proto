@@ -102,11 +102,11 @@ message DeleteMessagesResponse {
 
 }
 
-message DeleteAllMessagesRequest {
+message DeleteAllReadMessagesRequest {
   string user_id = 1;
 }
 
-message DeleteAllMessagesResponse {
+message DeleteAllReadMessagesResponse {
 
 }
 
@@ -121,6 +121,6 @@ service MessageService {
   rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse);
 
   rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
-  rpc DeleteAllMessages(DeleteAllMessagesRequest) returns (DeleteAllMessagesResponse);
+  rpc DeleteAllReadMessages(DeleteAllReadMessagesRequest) returns (DeleteAllReadMessagesResponse);
 
 }
