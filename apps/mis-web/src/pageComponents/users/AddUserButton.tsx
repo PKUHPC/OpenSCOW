@@ -143,6 +143,13 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
       .httpError(409, (e) => {
         message.error(e.message);
       })
+      .httpError(410, ({ code }) => {
+        if (code === "USER_DELETED") {
+          message.error(t(p("userDeleted")));
+        } else {
+          message.error(code);
+        }
+      })
       .then(() => {
         message.success(t(p("addSuccess")));
         refresh();

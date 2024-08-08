@@ -502,7 +502,6 @@ export const accountServiceServer = plugin((server) => {
     deleteAccount: async ({ request, em, logger }) => {
       return await em.transactional(async (em) => {
         const { accountName, tenantName, comment } = ensureNotUndefined(request, ["accountName", "tenantName"]);
-        console.log("deleteAccount后端 accountName, tenantName, comment ", accountName, tenantName, comment);
 
         const tenant = await em.findOne(Tenant, { name: tenantName });
 
@@ -516,6 +515,12 @@ export const accountServiceServer = plugin((server) => {
         if (!account) {
           throw {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+          } as ServiceError;
+        }
+
+        if (account.state === AccountState.DELETED) {
+          throw {
+            code: Status.NOT_FOUND, message: `Account ${accountName} has been deleted`,
           } as ServiceError;
         }
 
@@ -572,7 +577,20 @@ export const accountServiceServer = plugin((server) => {
           account.whitelist = undefined;
         }
 
+        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+          return await asyncClientCall(client.account, "deleteAccount",
+            { accountName });
+        }).catch(async (e) => {
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出账户
+          // 除此以外，都抛出异常
+          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+            throw e;
+          }
+        });
+
         account.state = AccountState.DELETED;
+        account.comment = account.comment + (comment ? "  " + comment.trim() : "");
         await em.flush();
 
         return [{}];

@@ -485,10 +485,11 @@ export const AccountTable: React.FC<Props> = ({
                           reload();
                         })
                         .then(() => {
+                          message.success(t(p("deleteSuccess")));
                           message.destroy("deleteAccount");
                           reload();
                         })
-                        .catch(() => { message.error(t(p("changeFail"))); });
+                        .catch(() => { message.error(t(p("deleteFail"))); });
                     }}
                   >
                     {t(p("delete"))}

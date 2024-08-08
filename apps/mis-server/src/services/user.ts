@@ -187,6 +187,21 @@ export const userServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      if (user.state === UserState.DELETED) {
+        throw {
+          code: Status.NOT_FOUND,
+          details: "USER_DELETED",
+        } as ServiceError;
+      }
+
+
+      if (account.state === AccountState.DELETED) {
+        throw {
+          code: Status.NOT_FOUND,
+          details: "ACCOUNT_DELETED",
+        } as ServiceError;
+      }
+
       if (account.users.getItems().some((x) => x.user.getEntity().userId === userId)) {
         throw {
           code: Status.ALREADY_EXISTS, message: `User ${userId} already in the account ${accountName}.`,
@@ -503,7 +518,6 @@ export const userServiceServer = plugin((server) => {
     deleteUser: async ({ request, em, logger }) => {
       return await em.transactional(async (em) => {
         const { userId, tenantName, deleteRemark } = ensureNotUndefined(request, ["userId", "tenantName"]);
-        console.log("deleteUser后端 userId, tenantName, deleteRemark ", userId, tenantName, deleteRemark);
 
         const tenant = await em.findOne(Tenant, { name: tenantName });
 
@@ -517,6 +531,10 @@ export const userServiceServer = plugin((server) => {
 
         if (!user) {
           throw { code: Status.NOT_FOUND, message: `User ${userId} is not found.` } as ServiceError;
+        }
+
+        if (user.state === UserState.DELETED) {
+          throw { code: Status.NOT_FOUND, message: `User ${userId} has been deleted.` } as ServiceError;
         }
 
         const userAccounts = user.accounts.getItems();
@@ -608,9 +626,6 @@ export const userServiceServer = plugin((server) => {
 
           await deleteUser(authUrl,
             userId, server.logger)
-            .then(async (a: any) => {
-              console.log("从lib/auth返回了",a);
-            })
             .catch(async (e) => {
               if (e.status === 404) {
                 throw {
@@ -628,7 +643,20 @@ export const userServiceServer = plugin((server) => {
             message: "No permission to delete user in LDAP." } as ServiceError;
         }
 
+        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+          return await asyncClientCall(client.user, "deleteUser",
+            { userId });
+        }).catch(async (e) => {
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出此用户
+          // 除此以外，都抛出异常
+          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+            throw e;
+          }
+        });
+
         user.state = UserState.DELETED;
+        user.deleteRemark = deleteRemark?.trim();
 
         await em.flush();
 

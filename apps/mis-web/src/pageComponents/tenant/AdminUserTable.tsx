@@ -342,9 +342,10 @@ export const AdminUserTable: React.FC<Props> = ({
                       })
                       .then(() => {
                         message.destroy("deleteUser");
+                        message.success(t(p("deleteSuccess")));
                         reload();
                       })
-                      .catch(() => { message.error(t(p("changeFail"))); });
+                      .catch(() => { message.error(t(p("deleteFail"))); });
                   }}
                 >
                   {t(p("delete"))}

@@ -270,7 +270,8 @@ export default {
         blockFail: "Account blocking failed!",
 
         delete:"Delete",
-        changeFail: "Modification failed",
+        deleteSuccess: "Account deleting successful!",
+        deleteFail: "Account deleting failed!",
       },
       setBlockThresholdAmountModal: {
         setSuccess: "Set Successfully",
@@ -659,6 +660,8 @@ export default {
         changeFail: "Modification failed",
         changePassword: "Change Password",
         delete:"Delete",
+        deleteFail: "Deletion failed",
+        deleteSuccess: "Deletion successful",
       },
       jobPriceChangeModal: {
         tenantPrice: "Tenant Billing",
@@ -687,6 +690,7 @@ export default {
         createModal: "seconds to open the create user interface",
         createFirst: "User does not exist. Please create a user first",
         addSuccess: "Added Successfully!",
+        userDeleted: "The user has been deleted and cannot be added",
       },
       createUserForm: {
         email: "User Email",

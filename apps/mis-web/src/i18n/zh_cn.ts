@@ -270,7 +270,8 @@ export default {
         blockFail: "封锁帐户失败！",
 
         delete:"删除",
-        changeFail:"修改失败",
+        deleteSuccess:"删除帐户成功",
+        deleteFail:"删除帐户失败",
       },
       setBlockThresholdAmountModal: {
         setSuccess:"设置成功",
@@ -659,6 +660,8 @@ export default {
         changeFail:"修改失败",
         changePassword:"修改密码",
         delete:"删除",
+        deleteFail:"删除失败",
+        deleteSuccess:"删除成功",
       },
       jobPriceChangeModal:{
         tenantPrice:"租户计费",
@@ -687,6 +690,7 @@ export default {
         createModal:"秒后打开创建用户界面",
         createFirst:"用户不存在。请先创建用户",
         addSuccess:"添加成功！",
+        userDeleted:"该用户已删除，无法添加",
       },
       createUserForm:{
         email:"用户邮箱",
