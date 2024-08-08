@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.7
+
+### Patch Changes
+
+- e9c8bfa: 增加 ai 的操作日志，涉及文件、镜像、数据集、算法、模型和作业应用'
+  - @scow/protos@1.0.13
+
 ## 2.1.6
 
 ### Patch Changes

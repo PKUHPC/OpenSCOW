@@ -18,6 +18,9 @@ import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "src/components/ErrorBoundary";
 import { Loading } from "src/components/Loading";
 import { TopProgressBar } from "src/components/TopProgressBar";
+import { Provider } from "src/i18n";
+import en from "src/i18n/en";
+import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { DarkModeCookie, DarkModeProvider } from "src/layouts/darkMode";
 import { RootErrorContent } from "src/layouts/error/RootErrorContent";
@@ -27,6 +30,11 @@ import { UiConfig } from "src/server/trpc/route/config";
 import { trpc } from "src/utils/trpc";
 
 import { UiConfigContext } from "./uiContext";
+
+const languagesMap = {
+  "zh_cn": zh_cn,
+  "en": en,
+};
 
 export function ClientLayout(props: {
   children: React.ReactNode,
@@ -49,36 +57,44 @@ export function ClientLayout(props: {
     ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
 
   return (
-    <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
-      <StyledComponentsRegistry>
-        <AntdStyleRegistry>
-          <body>
-            {
-              useConfig.isLoading ?
-                <Loading />
-                : (
-                  <DarkModeProvider initial={props.initialDark}>
-                    <AntdConfigProvider color={color}>
-                      <GlobalStyle />
-                      <TopProgressBar />
-                      <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
-                        <UiConfigContext.Provider
-                          value={{
-                            hostname,
-                            uiConfig,
-                          }}
-                        >
-                          {props.children}
-                        </UiConfigContext.Provider>
-                      </ErrorBoundary>
-                    </AntdConfigProvider>
-                  </DarkModeProvider>
-                )
-            }
+    <Provider initialLanguage={{
+      // ai还未开发国际化，先直接写zh_cn
+      id: "zh_cn",
+      definitions: languagesMap.zh_cn,
+    }}
+    >
+      <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+        <StyledComponentsRegistry>
+          <AntdStyleRegistry>
+            <body>
+              {
+                useConfig.isLoading ?
+                  <Loading />
+                  : (
+                    <DarkModeProvider initial={props.initialDark}>
+                      <AntdConfigProvider color={color}>
+                        <GlobalStyle />
+                        <TopProgressBar />
+                        <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
+                          <UiConfigContext.Provider
+                            value={{
+                              hostname,
+                              uiConfig,
+                            }}
+                          >
+                            {props.children}
+                          </UiConfigContext.Provider>
+                        </ErrorBoundary>
+                      </AntdConfigProvider>
+                    </DarkModeProvider>
+                  )
+              }
 
-          </body>
-        </AntdStyleRegistry>
-      </StyledComponentsRegistry>
-    </StyleProvider>
+            </body>
+          </AntdStyleRegistry>
+        </StyledComponentsRegistry>
+      </StyleProvider>
+    </Provider>
+
   );
 }

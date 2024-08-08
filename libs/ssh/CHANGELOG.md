@@ -1,5 +1,11 @@
 # @scow/lib-ssh
 
+## 1.0.2
+
+### Patch Changes
+
+- 0275a9e: 修复系统初始化时因无法通过鉴权可用集群为空的问题
+
 ## 1.0.1
 
 ### Patch Changes

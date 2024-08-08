@@ -675,7 +675,7 @@ export const saveImage =
         const client = getAdapterClient(clusterId);
 
         const { job } = await asyncClientCall(client.job, "getJobById", {
-          fields: ["node", "container_id"],
+          fields: ["container_job_info"],
           jobId,
         });
 
