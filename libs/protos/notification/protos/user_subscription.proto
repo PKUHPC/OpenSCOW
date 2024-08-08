@@ -29,10 +29,10 @@ message Subscription {
   optional bool is_subscribed = 3;
 }
 
-message ListUserSubscrptionsRequest {
+message ListUserSubscriptionsRequest {
 }
 
-message ListUserSubscrptionsResponse {
+message ListUserSubscriptionsResponse {
   uint32 totalCount = 1;
   repeated MessageConfig configs = 2;
 }
@@ -42,6 +42,6 @@ message ListUserSubscrptionsResponse {
 service UserSubcriptionService {
   rpc ModifyUserSubscription(ModifyUserSubscriptionRequest) returns (ModifyUserSubscriptionResponse);
 
-  rpc ListUserSubscrptions(ListUserSubscrptionsRequest) returns (ListUserSubscrptionsResponse);
+  rpc ListUserSubscriptions(ListUserSubscriptionsRequest) returns (ListUserSubscriptionsResponse);
 
 }
