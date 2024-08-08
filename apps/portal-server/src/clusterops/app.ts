@@ -16,7 +16,8 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion, getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
+import { compareSchedulerApiVersion, getAppConnectionInfoFromAdapter,
+  getEnvVariables, getSchedulerApiVersion } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
@@ -80,43 +81,41 @@ export const appOps = (cluster: string): AppOps => {
         partition, qos, customAttributes, appJobName } = request;
 
       const jobName = appJobName;
-      // 检查是否存在同名的作业
-      const existingJobName = await callOnOne(
+
+      // 检查作业重名的最低调度器接口版本
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+
+      const scheduleApiVersion = await callOnOne(
         cluster,
         logger,
-        async (client) => {
+        async (client) => await getSchedulerApiVersion(client),
+      );
 
-          try {
-            // 当前接口要求的最低调度器接口版本
-            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
-            // 检验调度器的API版本是否符合要求，不符合要求报错
-            await checkSchedulerApiVersion(client, minRequiredApiVersion);
+      // 适配器支持的话就检查是否存在同名的作业
+      if (compareSchedulerApiVersion(scheduleApiVersion,minRequiredApiVersion)) {
 
-            return await asyncClientCall(client.job, "getJobs", {
-              fields: ["job_id"],
-              filter: {
-                users: [userId], accounts: [], states: [], jobName,
-              },
-            });
+        const existingJobName = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.job, "getJobs", {
+            fields: ["job_id"],
+            filter: {
+              users: [userId], accounts: [], states: [], jobName,
+            },
+          }),
+        ).then((resp) => resp.jobs);
 
-          } catch (error) {
-            logger.info("Check SchedulerApiVersion failed with %o", error);
-            // 适配器不支持时，返回空数组，跳过检查
-            return { jobs:[]};
-          }
-        },
-      ).then((resp) => resp.jobs);
+        if (existingJobName.length) {
+          throw new DetailedError({
+            code: Status.ALREADY_EXISTS,
+            message: `appJobName ${appJobName} is already existed`,
+            details: [errorInfo("ALREADY EXISTS")],
+          });
+        }
 
-      if (existingJobName.length) {
-        throw new DetailedError({
-          code: Status.ALREADY_EXISTS,
-          message: `appJobName ${appJobName} is already existed`,
-          details: [errorInfo("ALREADY EXISTS")],
-        });
       }
 
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
-
 
       const userSbatchOptions = customAttributes.sbatchOptions
         ? splitSbatchArgs(customAttributes.sbatchOptions)

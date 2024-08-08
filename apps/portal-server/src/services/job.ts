@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion } from "@scow/lib-server";
+import { checkSchedulerApiVersion, compareSchedulerApiVersion, getSchedulerApiVersion } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -233,39 +233,37 @@ export const jobServiceServer = plugin((server) => {
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
-      // 检查是否存在同名的作业
-      const existingJobName = await callOnOne(
+      // 检查作业重名的最低调度器接口版本
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+
+      const scheduleApiVersion = await callOnOne(
         cluster,
         logger,
-        async (client) => {
+        async (client) => await getSchedulerApiVersion(client),
+      );
 
-          try {
-            // 当前接口要求的最低调度器接口版本
-            const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
-            // 检验调度器的API版本是否符合要求，不符合要求报错
-            await checkSchedulerApiVersion(client, minRequiredApiVersion);
+      // 适配器支持的话就检查是否存在同名的作业
+      if (compareSchedulerApiVersion(scheduleApiVersion,minRequiredApiVersion)) {
 
-            return await asyncClientCall(client.job, "getJobs", {
-              fields: ["job_id"],
-              filter: {
-                users: [userId], accounts: [], states: [], jobName,
-              },
-            });
+        const existingJobName = await callOnOne(
+          cluster,
+          logger,
+          async (client) => await asyncClientCall(client.job, "getJobs", {
+            fields: ["job_id"],
+            filter: {
+              users: [userId], accounts: [], states: [], jobName,
+            },
+          }),
+        ).then((resp) => resp.jobs);
 
-          } catch (error) {
-            logger.info("Check SchedulerApiVersion failed with %o", error);
-            // 适配器不支持时，返回空数组，跳过检查
-            return { jobs:[]};
-          }
-        },
-      ).then((resp) => resp.jobs);
+        if (existingJobName.length) {
+          throw {
+            code: Status.ALREADY_EXISTS,
+            message: "already exists",
+            details: `jobName ${jobName} is already existed`,
+          } as ServiceError;
+        }
 
-      if (existingJobName.length) {
-        throw {
-          code: Status.ALREADY_EXISTS,
-          message: "already exists",
-          details: `jobName ${jobName} is already existed`,
-        } as ServiceError;
       }
 
       // make sure working directory exists
