@@ -222,14 +222,14 @@ export const fileServiceServer = plugin((server) => {
 
         return [{
           ...initData,
-          chunkSize: Number(initData.chunkSize),
+          chunkSizeByte: Number(initData.chunkSizeByte),
           filesInfo: initData.filesInfo.map((info): FileInfo => {
             return {
               name: info.name,
               type: fileInfo_FileTypeFromJSON(info.fileType),
               mtime: info.modTime,
               mode: info.mode,
-              size: Number(info.size),
+              size: Number(info.sizeByte),
             };
           }),
         }];
@@ -240,7 +240,7 @@ export const fileServiceServer = plugin((server) => {
     },
 
     mergeFileChunks: async ({ request }) => {
-      const { cluster, userId, path, name, size } = request;
+      const { cluster, userId, path, name, sizeByte } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
       const host = getClusterLoginNode(cluster);
@@ -252,7 +252,7 @@ export const fileServiceServer = plugin((server) => {
         const client = getScowdClient(cluster);
 
         try {
-          await client.file.mergeFileChunks({ userId, path, name, size: BigInt(size) });
+          await client.file.mergeFileChunks({ userId, path, name, sizeByte: BigInt(sizeByte) });
 
           return [{}];
 

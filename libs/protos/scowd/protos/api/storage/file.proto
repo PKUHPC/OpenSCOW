@@ -13,7 +13,7 @@ message FileInfo {
   FileType file_type = 1;
   string name = 2;
   string mod_time = 3;
-  uint64 size = 4;
+  uint64 size_byte = 4;
   uint32 mode = 5;
 }
 
@@ -64,7 +64,7 @@ message GetFileMetadataRequest {
 }
 
 message GetFileMetadataResponse {
-  uint64 size = 1;
+  uint64 size_byte = 1;
   FileType type = 2;
 }
 
@@ -111,7 +111,7 @@ message InitMultipartUploadRequest {
 
 message InitMultipartUploadResponse {
   string temp_file_dir = 1;
-  uint64 chunk_size = 2;
+  uint64 chunk_size_byte = 2;
   repeated FileInfo files_info = 3;
 }
 
@@ -136,7 +136,7 @@ message MergeFileChunksRequest {
   string user_id = 1;
   string path = 2;
   string name = 3;
-  uint64 size = 4;
+  uint64 size_byte = 4;
 }
 
 message MergeFileChunksResponse {
@@ -145,7 +145,7 @@ message MergeFileChunksResponse {
 message DownloadRequest {
   string user_id = 1;
   string path = 2;
-  uint32 chunk_size = 3;
+  uint32 chunk_size_byte = 3;
 }
 
 message DownloadResponse {

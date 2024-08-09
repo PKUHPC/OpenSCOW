@@ -30,7 +30,7 @@ export const MergeFileChunksSchema = typeboxRouteSchema({
     cluster: Type.String(),
     path: Type.String(),
     name: Type.String(),
-    size: Type.Number(),
+    sizeByte: Type.Number(),
   }),
 
   responses: {
@@ -49,7 +49,7 @@ export default route(MergeFileChunksSchema, async (req, res) => {
 
   if (!info) { return; }
 
-  const { cluster, path, name, size } = req.body;
+  const { cluster, path, name, sizeByte } = req.body;
 
   const client = getClient(FileServiceClient);
 
@@ -58,12 +58,12 @@ export default route(MergeFileChunksSchema, async (req, res) => {
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.mergeFileChunks,
     operationTypePayload:{
-      clusterId: cluster, path, name, size,
+      clusterId: cluster, path, name, sizeByte,
     },
   };
 
   return asyncUnaryCall(client, "mergeFileChunks", {
-    cluster, path, userId: info.identityId, name, size,
+    cluster, path, userId: info.identityId, name, sizeByte,
   }).then(async () => {
     await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };

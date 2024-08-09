@@ -65,7 +65,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   };
 
   const startMultipartUpload = async (file: File, onProgress: OnProgressCallback) => {
-    const { tempFileDir, chunkSize, filesInfo } = await api.initMultipartUpload({
+    const { tempFileDir, chunkSizeByte, filesInfo } = await api.initMultipartUpload({
       body: { cluster, path, name: file.name },
     });
 
@@ -81,7 +81,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       }
     }).map((item) => item.name);
 
-    const totalCount = Math.ceil(file.size / chunkSize);
+    const totalCount = Math.ceil(file.size / chunkSizeByte);
     const concurrentChunks = 3;
     let uploadedCount = uploadedChunks.length;
 
@@ -105,7 +105,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         return;
       }
 
-      const chunk = file.slice(start * chunkSize, (start + 1) * chunkSize);
+      const chunk = file.slice(start * chunkSizeByte, (start + 1) * chunkSizeByte);
       const hash = await calculateBlobSHA256(chunk);
       const fileName = `${hash}_${start + 1}.scowuploadtemp`;
 
@@ -140,7 +140,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       await Promise.all(uploadPromises);
 
-      await api.mergeFileChunks({ body: { cluster, path, name: file.name, size: file.size } })
+      await api.mergeFileChunks({ body: { cluster, path, name: file.name, sizeByte: file.size } })
         .httpError(520, (err) => {
           message.error(t(p("mergeFileChunksErrorText"), [file.name]));
           throw err;

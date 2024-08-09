@@ -37,7 +37,7 @@ export const InitMultipartUploadSchema = typeboxRouteSchema({
   responses: {
     200: Type.Object({
       tempFileDir: Type.String(),
-      chunkSize: Type.Number(),
+      chunkSizeByte: Type.Number(),
       filesInfo: Type.Array(FileInfo),
     }),
     403: Type.Object({ code: Type.Literal("PERMISSION_DENIED") }),

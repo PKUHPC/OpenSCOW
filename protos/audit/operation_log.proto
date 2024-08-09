@@ -152,7 +152,7 @@ message MergeFileChunks {
   string cluster_id = 1;
   string path = 2;
   string name = 3;
-  uint64 size = 4;
+  uint64 size_byte = 4;
 }
 
 message CreateDirectory {
