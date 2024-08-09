@@ -138,7 +138,7 @@ message InitMultipartUploadRequest {
 
 message InitMultipartUploadResponse {
   string temp_file_dir = 1;
-  uint64 chunk_size = 2;
+  uint64 chunk_size_byte = 2;
   repeated FileInfo files_info = 3;
 }
 
@@ -166,7 +166,7 @@ message MergeFileChunksRequest {
   string cluster = 2;
   string path = 3;
   string name = 4;
-  uint64 size = 5;
+  uint64 size_byte = 5;
 }
 
 message MergeFileChunksResponse {
@@ -258,8 +258,17 @@ service FileService {
 
   rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse);
 
+  /**
+  * InitMultipartUpload 用于初始化文件分片上传。配置开启 scowd 才可使用
+  * 获取文件分片临时存储目录、文件分片的大小和已上传的分片
+  */
   rpc InitMultipartUpload(InitMultipartUploadRequest) returns (InitMultipartUploadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
+  /**
+  * MergeFileChunks 用于在文件全部分片上传完成后，合并文件所有分片，形成最终完整文件。
+  * 配置开启 scowd 才可使用
+  * 合并过程中会校验每个文件分片的完整性
+  */
   rpc MergeFileChunks(MergeFileChunksRequest) returns (MergeFileChunksResponse);
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);

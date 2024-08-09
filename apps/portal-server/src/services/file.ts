@@ -198,6 +198,7 @@ export const fileServiceServer = plugin((server) => {
     },
 
     initMultipartUpload: async ({ request }) => {
+
       const { cluster, userId, path, name } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
@@ -206,34 +207,35 @@ export const fileServiceServer = plugin((server) => {
       if (!host) { throw clusterNotFound(cluster); }
 
       const clusterInfo = configClusters[cluster];
-      if (clusterInfo.scowd?.enabled) {
-        const client = getScowdClient(cluster);
 
-        try {
-          const initData = await client.file.initMultipartUpload({ userId, path, name });
-
-          return [{
-            ...initData,
-            chunkSize: Number(initData.chunkSize),
-            filesInfo: initData.filesInfo.map((info): FileInfo => {
-              return {
-                name: info.name,
-                type: fileInfo_FileTypeFromJSON(info.fileType),
-                mtime: info.modTime,
-                mode: info.mode,
-                size: Number(info.size),
-              };
-            }),
-          }];
-
-        } catch (err) {
-          throw mapTRPCExceptionToGRPC(err);
-        }
-      } else {
+      if (!clusterInfo.scowd?.enabled) {
         throw {
           code: Status.UNIMPLEMENTED,
-          message: "The mergeFileChunks interface is not implemented",
+          message: "To use this interface, you need to enable scowd.",
         } as ServiceError;
+      }
+
+      const client = getScowdClient(cluster);
+
+      try {
+        const initData = await client.file.initMultipartUpload({ userId, path, name });
+
+        return [{
+          ...initData,
+          chunkSize: Number(initData.chunkSize),
+          filesInfo: initData.filesInfo.map((info): FileInfo => {
+            return {
+              name: info.name,
+              type: fileInfo_FileTypeFromJSON(info.fileType),
+              mtime: info.modTime,
+              mode: info.mode,
+              size: Number(info.size),
+            };
+          }),
+        }];
+
+      } catch (err) {
+        throw mapTRPCExceptionToGRPC(err);
       }
     },
 
