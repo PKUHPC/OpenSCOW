@@ -22,7 +22,7 @@ import { addUserToAccount, changeEmail as libChangeEmail, createUser, deleteUser
 import { decimalToMoney } from "@scow/lib-decimal";
 import { checkTimeZone, convertToDateMessage } from "@scow/lib-server/build/date";
 import {
-  AccountStatus,
+  AccountState as PFAccountState, AccountStatus,
   accountUserInfo_UserStateInAccountFromJSON, GetAccountUsersResponse,
   platformRoleFromJSON,
   platformRoleToJSON,
@@ -36,6 +36,7 @@ import {
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { misConfig } from "src/config/mis";
 import { Account,AccountState } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
@@ -123,6 +124,7 @@ export const userServiceServer = plugin((server) => {
           isInWhitelist: Boolean(account.whitelist),
           blockThresholdAmount:account.blockThresholdAmount ?
             decimalToMoney(account.blockThresholdAmount) : decimalToMoney(tenant.defaultAccountBlockThreshold),
+          accountState:PFAccountState["ACCOUNT_" + account.state],
         } as AccountStatus;
         return prev;
       }, {});
@@ -657,7 +659,8 @@ export const userServiceServer = plugin((server) => {
 
         user.state = UserState.DELETED;
         user.deleteRemark = deleteRemark?.trim();
-
+        const deletionMarker = misConfig?.deleteUser?.deletionMarker || "";
+        user.name += deletionMarker;
         await em.flush();
 
         return [{}];

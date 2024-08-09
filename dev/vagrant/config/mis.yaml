@@ -148,4 +148,8 @@ createUser:
 #       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
 #       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
 
+# 新增删除用户相关配置
+deleteUser:
+  # 删除标识,默认为"(已删除)"
+  deletionMarker: "(已删除)"
 

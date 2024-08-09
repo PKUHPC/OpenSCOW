@@ -29,6 +29,17 @@ message GetUserStatusRequest {
   string user_id = 2;
 }
 
+enum AccountState {
+  // 未封锁或未冻结，解封或激活时
+  ACCOUNT_NORMAL = 0;
+  // 账户被手动冻结
+  ACCOUNT_FROZEN = 1;
+  // 账户被上级手动封锁
+  ACCOUNT_BLOCKED_BY_ADMIN = 2;
+  // 账户被删除
+  ACCOUNT_DELETED = 3;
+}
+
 message AccountStatus {
   UserStatus user_status = 1;
   bool account_blocked = 2;
@@ -37,6 +48,7 @@ message AccountStatus {
   common.Money balance = 5;
   optional bool is_in_whitelist = 6;
   common.Money block_threshold_amount = 7;
+  optional AccountState account_state = 8;
 }
 
 message GetUserStatusResponse {

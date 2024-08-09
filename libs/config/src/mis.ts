@@ -170,6 +170,9 @@ export const MisConfigSchema = Type.Object({
     default: true,
   }),
 
+  deleteUser: Type.Optional(Type.Object({
+    deletionMarker: Type.String({ description: "用户名删除标识", default: "(已删除)" },
+    ) })),
 });
 
 const MIS_CONFIG_NAME = "mis";
