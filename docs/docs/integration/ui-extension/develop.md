@@ -162,13 +162,15 @@ SCOW在调用接口时，会将[上下文参数](#上下文参数)作为查询�
 
 - 当右上角导航栏链接数量**大于等于5个**，或者屏幕宽度小于**768px**时，所有导航栏链接将会仅显示图标。
 
-## 注意事项
+## 扩展消息
 
-### 通过发送消息控制扩展页面的高度
+UI扩展可以通过**消息**（`postMessage()`, [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)）与SCOW交互。下列为SCOW支持的所有类型的消息以及使用场景介绍。
+
+### `scow.extensionPageHeightChanged`: 控制扩展页面的高度
 
 您的扩展页面将会通过一个`iframe`组件嵌入到SCOW的页面中。由于浏览器的限制，SCOW无法自动根据您网页的高度调整SCOW页面承载您的页面的高度，在默认情况下，您的页面在SCOW中会出现滚动条，影响用户体验。
 
-为了解决这个问题，SCOW需要您在您的页面中，通过给父页面发送消息(`postMessage()`, [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage))的方式，在您的页面高度变化时，将您的页面的高度报告给SCOW。
+为了解决这个问题，您需要在您的页面高度变化时，将您的页面的高度报告给SCOW。
 
 具体来说，当SCOW接手到由`iframe`发出的如下格式的消息时，SCOW将会修改`iframe`组件的高度为`payload.height`的值，单位为px。
 
@@ -226,7 +228,20 @@ export const RootLayout = () => {
 
 您可以参考此PR[PKUHPC/scow-ui-extension-demo#2](https://github.com/PKUHPC/scow-ui-extension-demo/pull/2)实现。
 
-### 其他注意事项
+### `scow.extensionPageTitleChanged`: 修改扩展页面标题
+
+您可以向SCOW发送以下格式的消息以修改扩展页面的标题。最终标题为`${payload.title} - scow`
+
+```json
+{
+  "type": "scow.extensionPageTitleChanged",
+  "payload": {
+    "title": "新的标题"
+  }
+}
+```
+
+## 其他注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
 - 如果您的扩展站和SCOW部署地址非同源，请注意使得您的扩展站的所有路径均支持CORS访问。
