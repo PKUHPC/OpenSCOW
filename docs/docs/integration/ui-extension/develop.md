@@ -241,6 +241,8 @@ export const RootLayout = () => {
 }
 ```
 
+UI扩展实现参考： https://github.com/PKUHPC/scow-ui-extension-demo/commit/cf20685085889422818055513b238d31b815dc79
+
 ## 其他注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
