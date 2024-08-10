@@ -21,6 +21,7 @@ export const CommonExtensionManifestsSchema = z.object({
     z.object({
       enabled: z.boolean().default(false),
       autoRefresh: z.optional(z.object({
+        enabled: z.boolean().default(false),
         intervalMs: z.number(),
       })),
     }),

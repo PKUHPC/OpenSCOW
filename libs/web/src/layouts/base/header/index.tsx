@@ -246,7 +246,8 @@ const NavbarLinkFetcher = ({ extension, from, routeQuery, onDataFetched }: Fetch
 
       const navbarLinksConfig = extension.manifests[from]?.navbarLinks;
 
-      if (typeof navbarLinksConfig === "object" && navbarLinksConfig?.enabled && navbarLinksConfig.autoRefresh) {
+      if (typeof navbarLinksConfig === "object"
+        && navbarLinksConfig?.enabled && navbarLinksConfig.autoRefresh?.enabled) {
         setTimeout(reload, navbarLinksConfig.autoRefresh.intervalMs);
       }
 
