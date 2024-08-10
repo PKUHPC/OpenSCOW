@@ -32,5 +32,5 @@ export function isUrl(input: string): boolean {
 export const getExtensionRouteQuery = (dark: boolean, languageId: string, userToken?: string) => ({
   scowDark: dark ? "true" : "false",
   scowLangId: languageId,
-  scowUserToken: userToken,
+  ...userToken ? { scowUserToken: userToken } : {},
 }) as ExtensionRouteQuery;

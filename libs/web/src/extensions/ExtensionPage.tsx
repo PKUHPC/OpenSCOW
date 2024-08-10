@@ -14,6 +14,7 @@ import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
+import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
@@ -79,17 +80,12 @@ export const ExtensionPage: React.FC<Props> = ({
 
   const darkMode = useDarkMode();
 
-  const query = new URLSearchParams(
-    Object.fromEntries(Object.entries(rest).filter(([_, val]) => typeof val === "string")) as Record<string, string>,
-  );
+  const extensionQuery = getExtensionRouteQuery(darkMode.dark, currentLanguageId, user?.token);
 
-  if (user) {
-    query.set("scowUserToken", user.token);
-  }
-
-  query.set("scowDark", darkMode.dark ? "true" : "false");
-
-  query.set("scowLangId", currentLanguageId);
+  const query = new URLSearchParams({
+    ...Object.fromEntries(Object.entries(rest).filter(([_, val]) => typeof val === "string")),
+    ...extensionQuery,
+  });
 
   const url = joinWithUrl(config.url, "extensions", ...pathParts)
     + "?" + query.toString();
