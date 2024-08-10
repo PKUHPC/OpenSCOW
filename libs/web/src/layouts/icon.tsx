@@ -18,6 +18,7 @@ import { useDarkMode } from "./darkMode";
 interface Props {
   src: any;
   alt?: string;
+  autoRefreshIntervalMs?: number;
 }
 
 export function NavIcon({ src, alt = "" }: Props) {

@@ -58,6 +58,9 @@ interface JumpToAnotherLinkProps {
   text: string;
   hideText?: boolean;
   crossSystem?: boolean;
+  autoRefresh?: {
+    intervalMs: number;
+  }
 }
 
 export const JumpToAnotherLink: React.FC<JumpToAnotherLinkProps> = ({ href, icon, text, hideText, crossSystem }) => {

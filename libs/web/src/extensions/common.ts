@@ -12,13 +12,13 @@
 
 import { z } from "zod";
 
-export const ScowExtensionRouteContext = z.object({
+export const ExtensionRouteQuery = z.object({
   scowUserToken: z.string().optional(),
   scowDark: z.enum(["true", "false"]),
   scowLangId: z.string(),
 });
 
-export type ScowExtensionRouteContext = z.infer<typeof ScowExtensionRouteContext>;
+export type ExtensionRouteQuery = z.infer<typeof ExtensionRouteQuery>;
 
 export function isUrl(input: string): boolean {
   try {
@@ -29,3 +29,8 @@ export function isUrl(input: string): boolean {
   }
 }
 
+export const getExtensionRouteQuery = (dark: boolean, languageId: string, userToken?: string) => ({
+  scowDark: dark ? "true" : "false",
+  scowLangId: languageId,
+  scowUserToken: userToken,
+}) as ExtensionRouteQuery;
