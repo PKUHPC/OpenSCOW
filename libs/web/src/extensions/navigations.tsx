@@ -60,6 +60,7 @@ export const fromNavItemProps = (props: NavItemProps[]): NavItem[] => {
     text: x.text,
     openInNewPage: x.openInNewPage,
     children: x.children ? fromNavItemProps(x.children) : undefined,
+    hideIfNotActive: x.hideIfNotActive,
   }));
 };
 
