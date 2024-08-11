@@ -132,8 +132,6 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
       : []
   , [finalRoutes, router.asPath]);
 
-  console.log(activeKeys);
-
   const firstLevelRoute = finalRoutes.find((x) => activeKeys.includes(x.path));
 
   const sidebarRoutes = md ? firstLevelRoute?.children : finalRoutes;
