@@ -159,7 +159,7 @@ export const SideNav: React.FC<Props> = ({
               : { openKeys }
           }
           onOpenChange={onOpenChange}
-          items={createMenuItems(routes, false)}
+          items={createMenuItems(routes, pathname, false)}
         >
         </Menu>
       </StyledSider>

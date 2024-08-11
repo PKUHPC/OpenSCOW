@@ -14,7 +14,7 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { Menu } from "antd";
-import Router from "next/router";
+import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { calcSelectedKeys, createMenuItems, EXTERNAL_URL_PREFIX } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
@@ -47,6 +47,8 @@ export const BigScreenMenu: React.FC<Props> = ({
   routes, className, pathname,
 }) => {
 
+  const router = useRouter();
+
   const selectedKeys = useMemo(() =>
     routes
       ? calcSelectedKeys(routes, pathname)
@@ -64,7 +66,7 @@ export const BigScreenMenu: React.FC<Props> = ({
         if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
           window.location.href = target;
         } else {
-          void Router.push(target);
+          void router.push(target);
         }
       }
     }
@@ -81,7 +83,7 @@ export const BigScreenMenu: React.FC<Props> = ({
               mode="horizontal"
               selectedKeys={selectedKeys}
               onClick={handleMenuClick}
-              items={createMenuItems(routes, true)}
+              items={createMenuItems(routes, pathname, true)}
             />
           ) : undefined
       }

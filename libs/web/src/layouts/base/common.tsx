@@ -28,6 +28,7 @@ export const EXTERNAL_URL_PREFIX = ["http://", "https://"];
 
 export function createMenuItems(
   routes: NavItemProps[],
+  pathname: string,
   parentClickable: boolean,
 ) {
 
@@ -53,7 +54,7 @@ export function createMenuItems(
             }
           }
           : undefined,
-        children: createMenuItems(route.children, parentClickable),
+        children: createMenuItems(route.children, pathname, parentClickable),
       } as ItemType;
     }
 
@@ -75,7 +76,9 @@ export function createMenuItems(
     } as ItemType;
   }
 
-  const items = routes.map((r) => createMenuItem(r));
+  const items = routes
+    .filter((x) => !x.hideIfNotActive || match(x, pathname))
+    .map((r) => createMenuItem(r));
 
   return items;
 }
