@@ -80,19 +80,26 @@ export function createMenuItems(
   return items;
 }
 
-export function calcSelectedKeys(links: NavItemProps[], pathname: string) {
+export function calcActiveKeys(links: NavItemProps[], pathname: string): Set<string> {
 
-  return links.reduce((prev, curr) => {
-    if (arrayContainsElement(curr.children)) {
-      prev.push(...calcSelectedKeys(curr.children, pathname));
+  const selectedKeys = new Set<string>();
+
+  for (const link of links) {
+    if (arrayContainsElement(link.children)) {
+      const childrenSelectedKeys = calcActiveKeys(link.children, pathname);
+      for (const childKey of childrenSelectedKeys) {
+        selectedKeys.add(childKey);
+      }
     }
+
     if (
-      (curr.path === "/" && pathname === "/") ||
-        (curr.path !== "/" && curr.path !== "" && match(curr, pathname))
+      link.children?.some((x) => selectedKeys.has(x.path)) ||
+      (link.path === "/" && pathname === "/") ||
+        (link.path !== "/" && link.path !== "" && match(link, pathname))
     ) {
-      prev.push(curr.path);
+      selectedKeys.add(link.path);
     }
+  }
 
-    return prev;
-  }, [] as string[]);
+  return selectedKeys;
 }

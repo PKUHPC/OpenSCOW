@@ -96,6 +96,7 @@ interface Props {
   extensions: ExtensionManifestWithUrl[];
   from: "mis" | "portal";
   routeQuery: ExtensionRouteQuery;
+  activeKeys: string[];
 }
 
 interface SourcedHeaderNavbarLink {
@@ -109,9 +110,10 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
   basePath, userLinks,
-  languageId,
-  staticNavbarLinks, right,
-  extensions, from, routeQuery,
+  languageId, activeKeys,
+  right, staticNavbarLinks,
+  extensions,
+  from, routeQuery,
 }) => {
 
   const [links, setLinks] = useState<SourcedHeaderNavbarLink[]>([]);
@@ -191,6 +193,7 @@ export const Header: React.FC<Props> = ({
       <MenuPart>
         <BigScreenMenu
           pathname={pathname}
+          activeKeys={activeKeys}
           routes={routes}
         />
         <MenuPartPlaceholder />

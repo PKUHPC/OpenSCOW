@@ -21,9 +21,9 @@ import { getExtensionRouteQuery } from "src/extensions/common";
 import { fromNavItemProps, rewriteNavigationsRoute, toNavItemProps } from "src/extensions/navigations";
 import { callExtensionRoute } from "src/extensions/routes";
 import { UiExtensionStoreData } from "src/extensions/UiExtensionStore";
+import { calcActiveKeys } from "src/layouts/base/common";
 import { Footer } from "src/layouts/base/Footer";
 import { Header, HeaderNavbarLink } from "src/layouts/base/header";
-import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
@@ -122,7 +122,13 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const finalRoutes = finalRoutesData ?? routes;
 
-  const firstLevelRoute = finalRoutes.find((x) => match(x, router.asPath));
+  const activeKeys = useMemo(() =>
+    finalRoutes
+      ? [...calcActiveKeys(finalRoutes, router.asPath)]
+      : []
+  , [finalRoutes, router.asPath]);
+
+  const firstLevelRoute = finalRoutes.find((x) => activeKeys.includes(x.path));
 
   const sidebarRoutes = md ? firstLevelRoute?.children : finalRoutes;
 
@@ -146,11 +152,13 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         right={headerRightContent}
         staticNavbarLinks={headerNavbarLinks}
         from={from}
+        activeKeys={activeKeys}
       />
       <StyledLayout>
         {
           hasSidebar ? (
             <SideNav
+              activeKeys={activeKeys}
               pathname={router.asPath}
               collapsed={sidebarCollapsed}
               routes={sidebarRoutes}
