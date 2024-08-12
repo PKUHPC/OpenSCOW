@@ -28,6 +28,7 @@ import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
+import { publicConfig } from "src/utils/config";
 import { dateMessageToDayjs } from "src/utils/date";
 import { Head } from "src/utils/head";
 import { moneyNumberToString } from "src/utils/money";
@@ -384,7 +385,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"
-            precision={2}
+            precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
           />
         </Col>
         <Col span={24}>
