@@ -236,7 +236,7 @@ export const jobServiceServer = plugin((server) => {
       // 检查作业重名的最低调度器接口版本
       const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
 
-      // 可以检查作业重名回调
+      // 支持检查作业重名回调
       const checkNameSuccessCallback: CanSchedulerExecuteCallback = async () => {
         const existingJobName = await callOnOne(
           cluster,
@@ -258,7 +258,7 @@ export const jobServiceServer = plugin((server) => {
         }
       };
 
-      // 无法检查作业重名回调
+      // 无法检查作业重名的回调
       const checkNameFailureCallback: CanSchedulerExecuteCallback = async () => {
         logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
       };
