@@ -16,8 +16,8 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { compareSchedulerApiVersion, getAppConnectionInfoFromAdapter,
-  getEnvVariables, getSchedulerApiVersion } from "@scow/lib-server";
+import { canSchedulerExecute, CanSchedulerExecuteCallback, compareSchedulerApiVersion, getAppConnectionInfoFromAdapter,
+  getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
@@ -85,15 +85,8 @@ export const appOps = (cluster: string): AppOps => {
       // 检查作业重名的最低调度器接口版本
       const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
 
-      const scheduleApiVersion = await callOnOne(
-        cluster,
-        logger,
-        async (client) => await getSchedulerApiVersion(client),
-      );
-
-      // 适配器支持的话就检查是否存在同名的作业
-      if (compareSchedulerApiVersion(scheduleApiVersion,minRequiredApiVersion)) {
-
+      // 可以检查作业重名回调
+      const checkNameSuccessCallback: CanSchedulerExecuteCallback = async () => {
         const existingJobName = await callOnOne(
           cluster,
           logger,
@@ -109,13 +102,41 @@ export const appOps = (cluster: string): AppOps => {
           throw new DetailedError({
             code: Status.ALREADY_EXISTS,
             message: `appJobName ${appJobName} is already existed`,
-            details: [errorInfo("ALREADY EXISTS")],
+            details: [errorInfo("ALREADY_EXISTS")],
           });
         }
+      };
 
-      } else {
+      // 无法检查作业重名回调
+      const checkNameFailureCallback: CanSchedulerExecuteCallback = async () => {
         logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
-      }
+      };
+
+      await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await canSchedulerExecute(client,minRequiredApiVersion,checkNameSuccessCallback,checkNameFailureCallback);
+        },
+      ).catch((e) => {
+        const ex = e as ServiceError;
+        const errors = parseErrorDetails(ex.metadata);
+        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
+              && errors[0].reason === "ALREADY_EXISTS") {
+          throw new DetailedError({
+            code: Status.ALREADY_EXISTS,
+            message: ex.details,
+            details: [errorInfo("ALREADY_EXISTS")],
+          });
+        }
+        else {
+          throw new DetailedError({
+            code: ex.code,
+            message: ex.details,
+            details: [errorInfo("SBATCH_FAILED")],
+          });
+        }
+      });
 
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 

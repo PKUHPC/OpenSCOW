@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion, compareSchedulerApiVersion, getSchedulerApiVersion } from "@scow/lib-server";
+import { canSchedulerExecute, CanSchedulerExecuteCallback, checkSchedulerApiVersion } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -236,15 +236,8 @@ export const jobServiceServer = plugin((server) => {
       // 检查作业重名的最低调度器接口版本
       const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
 
-      const scheduleApiVersion = await callOnOne(
-        cluster,
-        logger,
-        async (client) => await getSchedulerApiVersion(client),
-      );
-
-      // 适配器支持的话就检查是否存在同名的作业
-      if (compareSchedulerApiVersion(scheduleApiVersion,minRequiredApiVersion)) {
-
+      // 可以检查作业重名回调
+      const checkNameSuccessCallback: CanSchedulerExecuteCallback = async () => {
         const existingJobName = await callOnOne(
           cluster,
           logger,
@@ -263,10 +256,20 @@ export const jobServiceServer = plugin((server) => {
             details: `jobName ${jobName} is already existed`,
           } as ServiceError;
         }
+      };
 
-      } else {
+      // 无法检查作业重名回调
+      const checkNameFailureCallback: CanSchedulerExecuteCallback = async () => {
         logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
-      }
+      };
+
+      await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await canSchedulerExecute(client,minRequiredApiVersion,checkNameSuccessCallback,checkNameFailureCallback);
+        },
+      );
 
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);

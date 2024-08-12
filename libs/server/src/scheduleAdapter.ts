@@ -100,3 +100,24 @@ export async function getSchedulerApiVersion(client: SchedulerAdapterClient): Pr
 
   return scheduleApiVersion;
 }
+
+export type CanSchedulerExecuteCallback = () => Promise<void>;
+/**
+ * 判断当前集群下的调度器是否支持当前功能，支持执行successCallback，否则执行failureCallback
+ * @param client
+ * @param minVersion
+ * @param successCallback
+ * @param failureCallback
+ */
+export async function canSchedulerExecute(client: SchedulerAdapterClient, minVersion: ApiVersion,
+  successCallback: CanSchedulerExecuteCallback,failureCallback?: CanSchedulerExecuteCallback) {
+  const scheduleApiVersion = await getSchedulerApiVersion(client);
+
+  if (compareSchedulerApiVersion(scheduleApiVersion,minVersion)) {
+    await successCallback();
+  } else {
+    await failureCallback?.();
+  }
+}
+
+
