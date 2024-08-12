@@ -30,6 +30,7 @@ import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
+import { getScowdClient } from "src/utils/scowd";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
@@ -247,17 +248,36 @@ export const appOps = (cluster: string): AppOps => {
     getAppLastSubmission: async (requset, logger) => {
       const { userId, appId } = requset;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
 
-        const sftp = await ssh.requestSFTP();
-        const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
+      const clusterInfo = configClusters[cluster];
+      if (clusterInfo.scowd?.enabled) {
+        const client = getScowdClient(cluster);
 
-        if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
-        const content = await sftpReadFile(sftp)(file);
-        const data = JSON.parse(content.toString()) as SubmissionInfo;
+        const data = await client.app.getAppLastSubmission({ userId, filePath: file });
 
-        return { lastSubmissionInfo: data };
-      });
+        const submitTime = !data.fileData?.submitTime ? undefined
+          : new Date(Number((data.fileData.submitTime.seconds * BigInt(1000))
+            + BigInt(data.fileData.submitTime.nanos / 1000000)));
+
+        return { lastSubmissionInfo: data.fileData ? {
+          ...data.fileData,
+          submitTime: submitTime?.toISOString(),
+        } : undefined };
+
+      } else {
+        return await sshConnect(host, userId, logger, async (ssh) => {
+
+          const sftp = await ssh.requestSFTP();
+
+          if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
+          const content = await sftpReadFile(sftp)(file);
+          const data = JSON.parse(content.toString()) as SubmissionInfo;
+
+          return { lastSubmissionInfo: data };
+        });
+      }
+
     },
 
     listAppSessions: async (request, logger) => {
