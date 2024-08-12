@@ -208,6 +208,7 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterInfo = configClusters[cluster];
 
+      console.log("test", clusterInfo.scowd?.enabled, !clusterInfo.scowd?.enabled);
       if (!clusterInfo.scowd?.enabled) {
         throw {
           code: Status.UNIMPLEMENTED,
@@ -248,23 +249,23 @@ export const fileServiceServer = plugin((server) => {
       if (!host) { throw clusterNotFound(cluster); }
 
       const clusterInfo = configClusters[cluster];
+
       if (clusterInfo.scowd?.enabled) {
-        const client = getScowdClient(cluster);
-
-        try {
-          await client.file.mergeFileChunks({ userId, path, name, sizeByte: BigInt(sizeByte) });
-
-          return [{}];
-
-        } catch (err) {
-          throw mapTRPCExceptionToGRPC(err);
-        }
-
-      } else {
         throw {
           code: Status.UNIMPLEMENTED,
           message: "The mergeFileChunks interface is not implemented",
         } as ServiceError;
+      }
+
+      const client = getScowdClient(cluster);
+
+      try {
+        await client.file.mergeFileChunks({ userId, path, name, sizeByte: BigInt(sizeByte) });
+
+        return [{}];
+
+      } catch (err) {
+        throw mapTRPCExceptionToGRPC(err);
       }
     },
 
