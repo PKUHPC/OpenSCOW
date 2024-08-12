@@ -210,6 +210,10 @@ export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logge
     throw new Error("The config jobMinCharge needs to match the config jobChargeDecimalPrecision");
   }
 
+  if (![0,1,2,3,4].includes(config.jobChargeDecimalPrecision)) {
+    throw new Error("The config jobChargeDecimalPrecision must be one of the values 0, 1, 2, 3 or 4");
+  }
+
   return config;
 
 };
