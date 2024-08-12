@@ -208,7 +208,6 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterInfo = configClusters[cluster];
 
-      console.log("test", clusterInfo.scowd?.enabled, !clusterInfo.scowd?.enabled);
       if (!clusterInfo.scowd?.enabled) {
         throw {
           code: Status.UNIMPLEMENTED,
