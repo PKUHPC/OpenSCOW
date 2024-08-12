@@ -15,8 +15,8 @@
 import { arrayContainsElement } from "@scow/utils";
 import { Menu } from "antd";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
-import { calcSelectedKeys, createMenuItems, EXTERNAL_URL_PREFIX } from "src/layouts/base/common";
+import React from "react";
+import { createMenuItems, EXTERNAL_URL_PREFIX } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
 import { styled } from "styled-components";
@@ -41,19 +41,14 @@ interface Props {
   routes?: NavItemProps[];
   className?: string;
   pathname: string;
+  activeKeys: string[];
 }
 
 export const BigScreenMenu: React.FC<Props> = ({
-  routes, className, pathname,
+  routes, className, pathname, activeKeys,
 }) => {
 
   const router = useRouter();
-
-  const selectedKeys = useMemo(() =>
-    routes
-      ? calcSelectedKeys(routes, pathname)
-      : []
-  , [routes, pathname]);
 
   const handleMenuClick = (e: any) => {
     const clickedRoute = routes?.find((route) => route.path === e.key);
@@ -81,7 +76,7 @@ export const BigScreenMenu: React.FC<Props> = ({
               style={{ minWidth: 0, flex: "auto", border: 0 }}
               theme="light"
               mode="horizontal"
-              selectedKeys={selectedKeys}
+              selectedKeys={activeKeys}
               onClick={handleMenuClick}
               items={createMenuItems(routes, pathname, true)}
             />
