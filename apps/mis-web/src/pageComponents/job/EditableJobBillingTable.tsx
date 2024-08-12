@@ -81,7 +81,7 @@ const EditPriceModal: React.FC<CommonModalProps & {
           <Select options={Object.values(AmountStrategy).map((x) => ({ label: x, value: x }))} />
         </Form.Item>
         <Form.Item label={t(p("price"))} name="price" rules={[{ required: true }]}>
-          <InputNumber precision={publicConfig.CHARGE_PRECISION} min={0} />
+          <InputNumber precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION} min={0} />
         </Form.Item>
         <Form.Item label={t(pCommon("comment"))} name="description">
           <Input />

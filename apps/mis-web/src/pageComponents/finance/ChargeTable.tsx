@@ -29,6 +29,7 @@ import { ChargeInfo } from "src/pages/api/finance/charges";
 import { publicConfig } from "src/utils/config";
 import { CHARGE_TYPE_OTHERS } from "src/utils/constants";
 import { formatMetadataDisplay } from "src/utils/metadata";
+import { moneyNumberToString } from "src/utils/money";
 
 import { AccountMultiSelector } from "./AccountMultiSelector";
 
@@ -266,7 +267,7 @@ export const ChargeTable: React.FC<Props> = ({
             </Form.Item>
             <Form.Item label={t(pCommon("sum"))}>
               <strong>
-                {totalResultData?.totalAmount?.toFixed(publicConfig.CHARGE_PRECISION) ?? 0}
+                {totalResultData?.totalAmount ? moneyNumberToString(totalResultData.totalAmount) : 0}
               </strong>
             </Form.Item>
             <Form.Item>
@@ -330,7 +331,7 @@ export const ChargeTable: React.FC<Props> = ({
           <Table.Column<ChargeInfo>
             dataIndex="amount"
             title={t(p("amount"))}
-            render={(v) => v.toFixed(publicConfig.CHARGE_PRECISION)}
+            render={(v) => moneyNumberToString(v)}
             sorter={true}
           />
           <Table.Column<ChargeInfo>

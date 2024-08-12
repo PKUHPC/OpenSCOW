@@ -170,11 +170,11 @@ export const MisConfigSchema = Type.Object({
     default: true,
   }),
 
-  chargePrecision: Type.Number({
+  jobChargeDecimalPrecision: Type.Number({
     description: "计费精度小数位，默认2位小数，可以配置为0~4",
     default: 2,
   }),
-  minChargeAmount : Type.Number({
+  jobMinCharge : Type.Number({
     description: "当设置了大于0的单价时，单个作业最小扣费金额，默认为0.01，建议与计费精度一致，如果计费单价为0，此金额不生效",
     default: 0.01,
   }),
@@ -203,6 +203,11 @@ export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logge
 
   if (config.uiExtension) {
     checkUiExtensionConfig(config.uiExtension);
+  }
+
+  if (config.jobChargeDecimalPrecision && config.jobMinCharge &&
+    (1 / Math.pow(10, config.jobChargeDecimalPrecision) > config.jobMinCharge)) {
+    throw new Error("The config jobMinCharge needs to match the config jobChargeDecimalPrecision");
   }
 
   return config;

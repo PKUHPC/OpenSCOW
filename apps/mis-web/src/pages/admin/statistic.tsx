@@ -28,9 +28,9 @@ import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
-import { publicConfig } from "src/utils/config";
 import { dateMessageToDayjs } from "src/utils/date";
 import { Head } from "src/utils/head";
+import { moneyNumberToString } from "src/utils/money";
 import { styled } from "styled-components";
 
 const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -245,7 +245,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
     return topChargeAccount?.results.map((r) => ({
       x: r.userName,
-      y: moneyToNumber(r.chargedAmount).toFixed(publicConfig.CHARGE_PRECISION),
+      y: moneyNumberToString(moneyToNumber(r.chargedAmount)),
     })) || [];
   }, [query, topChargeAccount]);
 
@@ -253,7 +253,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
     return topPayAccount?.results.map((r) => ({
       x: r.userName,
-      y: moneyToNumber(r.payAmount).toFixed(publicConfig.CHARGE_PRECISION),
+      y: moneyNumberToString(moneyToNumber(r.payAmount)),
     })) || [];
   }, [query, topPayAccount]);
 
@@ -448,7 +448,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
                 <DataLineChart
                   data={dailyChargeData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: Number(d.count.toFixed(publicConfig.CHARGE_PRECISION)),
+                    y: Number(moneyNumberToString(d.count)),
                   }))}
                   title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
@@ -470,7 +470,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
                 <DataLineChart
                   data={dailyPayData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: Number(d.count.toFixed(publicConfig.CHARGE_PRECISION)),
+                    y: Number(moneyNumberToString(d.count)),
                   }))}
                   title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}

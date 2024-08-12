@@ -25,7 +25,7 @@ import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { AccountMultiSelector } from "src/pageComponents/finance/AccountMultiSelector";
 import { TenantSelector } from "src/pageComponents/tenant/TenantSelector";
-import { publicConfig } from "src/utils/config";
+import { moneyNumberToString } from "src/utils/money";
 
 export enum SearchType {
   account = "account",
@@ -227,7 +227,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
           </Form.Item>
           <Form.Item label={t(p("sum"))}>
             <strong>
-              {data ? data.total.toFixed(publicConfig.CHARGE_PRECISION) : 0}
+              {data ? moneyNumberToString(data.total) : 0}
             </strong>
           </Form.Item>
           <Form.Item>
@@ -267,7 +267,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
           dataIndex="amount"
           title={t(p("paymentAmount"))}
           width="10%"
-          render={(v) => v.toFixed(publicConfig.CHARGE_PRECISION)}
+          render={(v) => moneyNumberToString(v) }
         />
         <Table.Column
           dataIndex="type"

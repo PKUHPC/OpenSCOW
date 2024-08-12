@@ -113,9 +113,9 @@ export const ChargeForm: React.FC = () => {
       </Form.Item>
       <Form.Item name="amount" label={t(pCommon("amount"))} rules={[{ required: true }]}>
         <InputNumber
-          step={publicConfig.MIN_CHARGE_AMOUNT}
+          step={publicConfig.JOB_MIN_CHARGE}
           addonAfter={t(pCommon("unit"))}
-          precision={publicConfig.CHARGE_PRECISION}
+          precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
         />
       </Form.Item>
       <Form.Item

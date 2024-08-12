@@ -26,8 +26,7 @@ import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Money } from "src/models/UserSchemaModel";
 import type {
   GetWhitelistedAccountsSchema } from "src/pages/api/tenant/accountWhitelist/getWhitelistedAccounts";
-import { publicConfig } from "src/utils/config";
-import { moneyToString } from "src/utils/money";
+import { moneyNumberToString, moneyToString } from "src/utils/money";
 
 interface Props {
   data: Static<typeof GetWhitelistedAccountsSchema["responses"]["200"]> | undefined;
@@ -136,7 +135,7 @@ export const AccountWhitelistTable: React.FC<Props> = ({
                   <Divider type="vertical" />
                   <span>
                     {t(p("debtSum"))}：<strong>{
-                      getTotalDebtAmount(data).toFixed(publicConfig.CHARGE_PRECISION)} {t(pCommon("unit"))}</strong>
+                      moneyNumberToString(getTotalDebtAmount(data))} {t(pCommon("unit"))}</strong>
                   </span>
                 </>
               </div>

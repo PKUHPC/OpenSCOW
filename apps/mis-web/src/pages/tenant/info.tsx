@@ -12,7 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { moneyToNumber, numberToMoney } from "@scow/lib-decimal";
+import { numberToMoney } from "@scow/lib-decimal";
 import type { GetTenantInfoResponse } from "@scow/protos/build/server/tenant";
 import { TenantServiceClient } from "@scow/protos/build/server/tenant";
 import { Descriptions, Space, Tag } from "antd";
@@ -30,8 +30,8 @@ import {
 } from "src/pageComponents/tenant/ChangeDefaultAccountBlockThresholdModal";
 import { ensureNotUndefined } from "src/utils/checkNull";
 import { getClient } from "src/utils/client";
-import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
+import { moneyToString } from "src/utils/money";
 import { handlegRPCError } from "src/utils/server";
 
 type Info = GetTenantInfoResponse & { tenantName: string };
@@ -88,12 +88,12 @@ export const TenantInfoPage: NextPage<Props> = requireAuth((u) => u.tenantRoles.
             {userCount}
           </Descriptions.Item>
           <Descriptions.Item label={t("common.tenantBalance")}>
-            {moneyToNumber(balance).toFixed(publicConfig.CHARGE_PRECISION)} {t("common.unit")}
+            {moneyToString(balance)} {t("common.unit")}
           </Descriptions.Item>
           <Descriptions.Item label={t("common.defaultAccountBlockThreshold")}>
             <Space>
               <span>
-                {moneyToNumber(defaultAccountBlockThreshold).toFixed(publicConfig.CHARGE_PRECISION)} {t("common.unit")}
+                {moneyToString(defaultAccountBlockThreshold)} {t("common.unit")}
               </span>
               <ChangeDefaultAccountBlockThresholdLink
                 tenantName={tenantName}

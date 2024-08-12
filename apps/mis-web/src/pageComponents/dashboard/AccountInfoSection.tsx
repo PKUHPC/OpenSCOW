@@ -19,7 +19,7 @@ import { AccountStatCard } from "src/components/StatCard";
 import { useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
 import type { AccountInfo } from "src/pages/dashboard";
-import { publicConfig } from "src/utils/config";
+import { moneyNumberToString } from "src/utils/money";
 import { styled } from "styled-components";
 
 
@@ -73,10 +73,9 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
                 const isBlocked = accountBlocked || userStatus === UserStatus.BLOCKED;
                 const [ textColor, Icon, opacity] = isBlocked ? statusTexts.blocked : statusTexts.normal;
                 const availableLimit = jobChargeLimit && usedJobCharge
-                  ? (moneyToNumber(jobChargeLimit) -
-                   moneyToNumber(usedJobCharge)).toFixed(publicConfig.CHARGE_PRECISION) : undefined;
+                  ? moneyNumberToString(moneyToNumber(jobChargeLimit) - moneyToNumber(usedJobCharge)) : undefined;
                 const whitelistCharge = isInWhitelist ? "不限" : undefined;
-                const normalCharge = (balance - blockThresholdAmount).toFixed(publicConfig.CHARGE_PRECISION);
+                const normalCharge = moneyNumberToString(balance - blockThresholdAmount);
                 const showAvailableBalance = availableLimit ?? whitelistCharge ?? normalCharge;
                 return (
                   <CardContainer key={accountName}>
