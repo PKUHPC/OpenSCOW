@@ -14,7 +14,7 @@ import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import { App, Button, Modal, Upload, UploadFile } from "antd";
 import pLimit from "p-limit";
 import { join } from "path";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { urlToUpload } from "src/pageComponents/filemanager/api";
@@ -45,8 +45,13 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
   const t = useI18nTranslateToString();
 
+  useEffect(() => {
+    return () => {
+      setUploadFileList([]);
+    };
+  }, [open]);
+
   const onModalClose = () => {
-    setUploadFileList([]);
     for (const controller of Array.from(uploadControllers.current.values())) {
       controller.abort();
     }
@@ -125,6 +130,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         throw new Error(response.statusText);
       }
 
+      updateProgress(1);
+
     };
 
     try {
@@ -138,7 +145,6 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
           batchPromises.push(limit(() => uploadChunk(j)));
         }
         await Promise.all(batchPromises);
-        updateProgress(batchPromises.length); // 根据实际上传的块数更新进度
       }
 
       if (!controller.signal.aborted) {
