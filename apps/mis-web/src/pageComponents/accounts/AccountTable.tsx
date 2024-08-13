@@ -19,6 +19,7 @@ import { App, Button, Divider, Form, Input, Popover, Space, Table, Tag, Tooltip 
 import { SortOrder } from "antd/es/table/interface";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { useStore } from "simstate";
 import { api } from "src/apis";
 import { DeleteEntityFailedModal } from "src/components/DeleteEntityFailedModal";
 import { DeleteEntityModalLink } from "src/components/DeleteEntityModal";
@@ -31,6 +32,7 @@ import { DeleteFailedReason,EntityType } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import type { AdminAccountInfo, GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
+import { UserStore } from "src/stores/UserStore";
 import { moneyToString } from "src/utils/money";
 
 import { SetBlockThresholdAmountLink } from "./SetBlockThresholdAmountModal";
@@ -79,7 +81,7 @@ export const AccountTable: React.FC<Props> = ({
   const [form] = Form.useForm<FilterForm>();
 
   const t = useI18nTranslateToString();
-
+  const userStore = useStore(UserStore);
   const DisplayedStateI18nTexts = getDisplayedStateI18nTexts(t);
 
   const [rangeSearchStatus, setRangeSearchStatus] = useState<FilteredStatus>("ALL");
@@ -487,9 +489,30 @@ export const AccountTable: React.FC<Props> = ({
                         .then(() => {
                           message.success(t(p("deleteSuccess")));
                           message.destroy("deleteAccount");
+
+                          // 修改userStore中user的accountAffiliations，保证菜单栏已删除账户同步不显示
+                          const userInfo = userStore.user;
+                          if (userInfo) {
+                            const newAccountAffiliations = userInfo.accountAffiliations.map((acc) => {
+                              if (acc.accountName === inputAccountName) {
+                                return { ...acc, accountState: AccountState.DELETED };
+                              }
+                              return acc;
+                            });
+
+                            // 使用 setUser 方法更新 userStore 中的用户信息
+                            userStore.setUser({
+                              ...userInfo,
+                              accountAffiliations: newAccountAffiliations,
+                            });
+                          }
+
                           reload();
                         })
-                        .catch(() => { message.error(t(p("deleteFail"))); });
+                        .catch(() => {
+                          message.error(t(p("deleteFail")));
+                          message.destroy("deleteAccount");
+                        });
                     }}
                   >
                     {t(p("delete"))}

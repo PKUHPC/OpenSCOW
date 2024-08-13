@@ -21,7 +21,7 @@ import { ChargeRecord as ChargeRecordProto,
 import { charge, pay } from "src/bl/charging";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { misConfig } from "src/config/mis";
-import { Account } from "src/entities/Account";
+import { Account,AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
@@ -90,6 +90,16 @@ export const chargingServiceServer = plugin((server) => {
             } as ServiceError;
           }
 
+        }
+
+        if (accountName && target) { // 是账户
+          const { state } = target as Account;
+          if (state === AccountState.DELETED) {
+            throw {
+              code: status.FAILED_PRECONDITION,
+              message: `Account  ${accountName} has been deleted`,
+            } as ServiceError;
+          }
         }
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);

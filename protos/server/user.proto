@@ -262,6 +262,7 @@ enum UserRole {
 message AccountAffiliation {
   string account_name = 1;
   UserRole role = 2;
+  optional AccountState account_state = 3;
 }
 
 enum PlatformRole {

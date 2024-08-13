@@ -406,6 +406,7 @@ export default {
         charging:"充值中……",
         notFound:"账户未找到",
         chargeFinished:"充值完成！",
+        deleted:"账户已删除",
       },
       chargeTable:{
         time:"扣费日期",

@@ -735,6 +735,7 @@ export const userServiceServer = plugin((server) => {
         affiliations: user.accounts.getItems().map((x) => ({
           accountName: x.account.getEntity().accountName,
           role: PFUserRole[x.role],
+          accountState: PFAccountState["ACCOUNT_" + x.account.getEntity().state] as PFAccountState,
         })),
         tenantName: user.tenant.$.name,
         name: user.name,

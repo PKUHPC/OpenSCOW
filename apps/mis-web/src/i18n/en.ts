@@ -406,6 +406,7 @@ export default {
         charging: "Charging...",
         notFound: "Account not found.",
         chargeFinished: "Charging finished!",
+        deleted:"Account has been deleted",
       },
       chargeTable: {
         time: "Deduction Date",

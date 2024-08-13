@@ -76,9 +76,17 @@ export enum ClusterAccountInfo_ImportStatus {
   HAS_NEW_USERS = 2,
 }
 
+export const AccountState = {
+  NORMAL: 0,
+  FROZEN: 1,
+  BLOCKED_BY_ADMIN: 2,
+  DELETED: 3,
+} as const;
+
 export const AccountAffiliationSchema = Type.Object({
   accountName: Type.String(),
   role: Type.Enum(UserRole),
+  accountState: Type.Optional(Type.Enum(AccountState)),
 });
 
 
@@ -136,13 +144,6 @@ export enum SearchType {
   ACCOUNT = "ACCOUNT",
   TENANT = "TENANT",
 }
-
-export const AccountState = {
-  NORMAL: 0,
-  FROZEN: 1,
-  BLOCKED_BY_ADMIN: 2,
-  DELETED: 3,
-} as const;
 
 export type AccountState = ValueOf<typeof AccountState>;
 

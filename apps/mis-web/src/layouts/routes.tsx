@@ -360,7 +360,7 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[], t: TransT
     Icon: UserOutlined,
     text: t(pAccount("firstNav")),
     path: "/accounts",
-    children: accounts.map((x) => ({
+    children: accounts.filter((x) => x.accountState !== 3).map((x) => ({
       Icon: AccountBookOutlined,
       text: `${x.accountName}`,
       path: `/accounts/${x.accountName}`,

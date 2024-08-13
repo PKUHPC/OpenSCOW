@@ -41,5 +41,5 @@ export function UserStore(initialUser: User | undefined = undefined) {
       });
   }, []);
 
-  return { loggedIn, user, logout };
+  return { loggedIn, user, logout, setUser };
 }
