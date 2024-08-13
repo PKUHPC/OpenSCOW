@@ -45,7 +45,7 @@ interface Props {
 }
 
 export const BigScreenMenu: React.FC<Props> = ({
-  routes, className, activeKeys,
+  routes, className, activeKeys, pathname,
 }) => {
 
   const router = useRouter();
