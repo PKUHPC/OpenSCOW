@@ -13,7 +13,7 @@
 import { UiExtensionConfigSchema } from "@scow/config/build/uiExtensions";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
-import { fetchExtensionManifests } from "src/extensions/manifests";
+import { ExtensionManifestsSchema, fetchExtensionManifests } from "src/extensions/manifests";
 
 const fetchManifestsWithErrorHandling = (url: string, name?: string): Promise<ExtensionManifestWithUrl | undefined> =>
   fetchExtensionManifests(url)
@@ -21,7 +21,8 @@ const fetchManifestsWithErrorHandling = (url: string, name?: string): Promise<Ex
     .catch((e) => { console.error(`Error fetching extension manifests. ${e}`); return undefined; });
 
 export interface ExtensionManifestWithUrl {
-  url: string; manifests: Awaited<ReturnType<typeof fetchExtensionManifests>>
+  url: string;
+  manifests: ExtensionManifestsSchema;
   name?: string;
 }
 

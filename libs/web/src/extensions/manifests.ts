@@ -15,7 +15,18 @@ import { z } from "zod";
 
 export const CommonExtensionManifestsSchema = z.object({
   rewriteNavigations: z.boolean().default(false),
-  navbarLinks: z.boolean().default(false),
+
+  navbarLinks: z.union([
+    z.boolean(),
+    z.object({
+      enabled: z.boolean().default(false),
+      autoRefresh: z.optional(z.object({
+        enabled: z.boolean().default(false),
+        intervalMs: z.number(),
+      })),
+    }),
+  ]).default(false),
+
 });
 
 export const ExtensionManifestsSchema = z.object({
