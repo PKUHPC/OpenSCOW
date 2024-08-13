@@ -16,13 +16,11 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { canSchedulerExecute, CanSchedulerExecuteCallback, compareSchedulerApiVersion, getAppConnectionInfoFromAdapter,
-  getEnvVariables } from "@scow/lib-server";
+import { checkJobNameExisting, errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
+import { DetailedError, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
-import { ApiVersion } from "@scow/utils/build/version";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
@@ -64,9 +62,6 @@ const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
 const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
-const errorInfo = (reason: string) =>
-  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
-
 export const appOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -82,41 +77,12 @@ export const appOps = (cluster: string): AppOps => {
 
       const jobName = appJobName;
 
-      // 检查作业重名的最低调度器接口版本
-      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
-
-      // 支持检查作业重名的回调
-      const checkNameSuccessCallback: CanSchedulerExecuteCallback = async () => {
-        const existingJobName = await callOnOne(
-          cluster,
-          logger,
-          async (client) => await asyncClientCall(client.job, "getJobs", {
-            fields: ["job_id"],
-            filter: {
-              users: [userId], accounts: [], states: [], jobName,
-            },
-          }),
-        ).then((resp) => resp.jobs);
-
-        if (existingJobName.length) {
-          throw new DetailedError({
-            code: Status.ALREADY_EXISTS,
-            message: `appJobName ${appJobName} is already existed`,
-            details: [errorInfo("ALREADY_EXISTS")],
-          });
-        }
-      };
-
-      // 无法检查作业重名的回调
-      const checkNameFailureCallback: CanSchedulerExecuteCallback = async () => {
-        logger.info("Adapter version lower than 1.6.0, do not perform check for duplicate job names");
-      };
-
+      // 检查作业名是否重复
       await callOnOne(
         cluster,
         logger,
         async (client) => {
-          await canSchedulerExecute(client,minRequiredApiVersion,checkNameSuccessCallback,checkNameFailureCallback);
+          await checkJobNameExisting(client,userId,jobName,logger);
         },
       ).catch((e) => {
         const ex = e as ServiceError;
