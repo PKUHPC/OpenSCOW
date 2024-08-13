@@ -66,7 +66,7 @@ export async function updateBlockStatusInSlurm(
         // 封锁账户时，无论是否部署已授权分区，需要在所有分区下进行封锁
         await asyncClientCall(client.account, "blockAccount", {
           accountName: account.accountName,
-          blockedPartitions: [],
+          // blockedPartitions: [],
         }),
       );
       blockedAccounts.push(account.accountName);
@@ -167,7 +167,7 @@ export async function updateUnblockStatusInSlurm(
         } else {
           await asyncClientCall(client.account, "unblockAccount", {
             accountName: account.accountName,
-            unblockedPartitions: unblockedPartitions ?? [],
+            // unblockedPartitions: unblockedPartitions ?? [],
           });
         }
 
@@ -217,7 +217,7 @@ export async function blockAccount(
     // 封锁账户时，无论是否部署已授权分区，需要在所有分区下进行封锁
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
-      blockedPartitions: [],
+      // blockedPartitions: [],
     });
   });
 
@@ -259,7 +259,7 @@ export async function unblockAccount(
     } else {
       await asyncClientCall(client.account, "unblockAccount", {
         accountName: account.accountName,
-        unblockedPartitions: unblockedPartitions ?? [],
+        // unblockedPartitions: unblockedPartitions ?? [],
       });
     }
 
@@ -330,4 +330,3 @@ export async function unblockUserInAccount(
     accountName, userId,
   }, logger);
 }
-

@@ -1,5 +1,11 @@
 # @scow/utils
 
+## 1.1.1
+
+### Patch Changes
+
+- a9e9011: 修复获取 scowdClient 时拼接地址的错误
+
 ## 1.1.0
 
 ### Minor Changes

@@ -42,6 +42,61 @@ export const accountServiceServer = plugin((server) => {
             ],
             owner: "user1",
             blocked: false,
+          },
+          {
+            accountName: "a_user2",
+            users: [
+              { userId: "user2", userName: "user2", blocked: false },
+              { userId: "user3", userName: "user3", blocked: false },
+            ],
+            owner: "user2",
+            blocked: true,
+          },
+        ],
+      }];
+    },
+
+    queryAccountBlockStatus: async () => {
+      return [{
+        blocked: true,
+        accountBlockedDetails: [
+          { partition: "normal1", blocked: true },
+        ],
+      }];
+    },
+
+    deleteAccount: async () => {
+      return [{}];
+    },
+
+    blockAccountWithPartitions: async () => {
+      return [{}];
+    },
+
+    unblockAccountWithPartitions: async () => {
+      return [{}];
+    },
+
+    queryAccountBlockStatusWithPartitions: async () => {
+      return [{
+        blocked: true,
+        accountBlockedDetails: [
+          { partition: "normal1", blocked: true },
+        ],
+      }];
+    },
+
+    getAllAccountsWithUsersAndBlockedDetails: async () => {
+      return [{
+        accounts: [
+          {
+            accountName: "a_user1",
+            users: [
+              { userId: "user1", userName: "user1", blocked: false },
+              { userId: "user3", userName: "user3", blocked: true },
+            ],
+            owner: "user1",
+            blocked: false,
             accountBlockedDetails: [
               { partition: "normal1", blocked: false },
               { partition: "normal2", blocked: true },
@@ -60,15 +115,6 @@ export const accountServiceServer = plugin((server) => {
               { partition: "normal2", blocked: true },
             ],
           },
-        ],
-      }];
-    },
-
-    queryAccountBlockStatus: async () => {
-      return [{
-        blocked: true,
-        accountBlockedDetails: [
-          { partition: "normal1", blocked: true },
         ],
       }];
     },

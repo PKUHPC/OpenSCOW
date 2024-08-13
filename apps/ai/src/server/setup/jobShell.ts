@@ -179,7 +179,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   });
 
   const { job } = await asyncClientCall(client.job, "getJobById", {
-    fields: ["namespace", "pod"],
+    fields: ["container_job_info"],
     jobId: currentJobInfo.jobId,
   });
 

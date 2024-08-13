@@ -35,5 +35,9 @@ export const userServiceServer = plugin((server) => {
       return [{ blocked: true }];
     },
 
+    deleteUser: async () => {
+      return [{}];
+    },
+
   });
 });

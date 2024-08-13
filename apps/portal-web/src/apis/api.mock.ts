@@ -63,45 +63,46 @@ export const job: JobInfo = {
 };
 
 export const mockApi: MockApi<typeof api> = {
-
-  getQuickEntries:async () => ({ quickEntries: [
-    {
-      id:"submitJob",
-      name:"submitJob",
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/submit",
-          icon:"PlusCircleOutlined",
+  getQuickEntries: async () => ({
+    quickEntries: [
+      {
+        id: "submitJob",
+        name: "submitJob",
+        entry: {
+          $case: "pageLink",
+          pageLink: {
+            path: "/jobs/submit",
+            icon: "PlusCircleOutlined",
+          },
         },
       },
-    },
-    {
-      id:"runningJob",
-      name:"runningJobs",
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/runningJobs",
-          icon:"BookOutlined",
+      {
+        id: "runningJob",
+        name: "runningJobs",
+        entry: {
+          $case: "pageLink",
+          pageLink: {
+            path: "/jobs/runningJobs",
+            icon: "BookOutlined",
+          },
         },
       },
-    },
-    {
-      id:"allJobs",
-      name:"allJobs",
-      entry:{
-        $case:"pageLink",
-        pageLink:{
-          path: "/jobs/allJobs",
-          icon:"BookOutlined",
+      {
+        id: "allJobs",
+        name: "allJobs",
+        entry: {
+          $case: "pageLink",
+          pageLink: {
+            path: "/jobs/allJobs",
+            icon: "BookOutlined",
+          },
         },
       },
-    },
-  ]}),
-  saveQuickEntries:null,
+    ],
+  }),
+  saveQuickEntries: null,
   getClusterInfo: null,
-  getClusterRunningInfo:null,
+  getClusterRunningInfo: null,
   listAvailableTransferClusters: null,
 
   checkAppConnectivity: async () => ({
@@ -112,7 +113,7 @@ export const mockApi: MockApi<typeof api> = {
 
   listAvailableApps: async () => ({
     apps: [
-      { id: "vscode", name: "VSCode", logoPath:"/apps/VSCode.svg" },
+      { id: "vscode", name: "VSCode", logoPath: "/apps/VSCode.svg" },
       { id: "emacs", name: "Emacs" },
       { id: "jupyter", name: "jupyter" },
     ],
@@ -141,33 +142,50 @@ export const mockApi: MockApi<typeof api> = {
     wms: [{ name: "cinnamon", wm: "Cinnamon" }, { name: "gnome", wm: "GNOME" }],
   }),
 
-  getAppSessions: async () => ({ sessions: [
-    { jobId: 100, sessionId: "123", appId: "vscode", appName:"vscode", state: "PENDING", reason: "resource",
-      submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
-      timeLimit: "01:00:00", runningTime: "" },
-    { jobId: 101, sessionId: "124", appId: "vscode", appName:"vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(), dataPath: "/test",
-      timeLimit: "1-01:00:00", runningTime: "01:50" },
-    { jobId: 102, sessionId: "125", appId: "vscode", appName:"vscode", state: "RUNNING",
-      submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
-      timeLimit: "INVALID", runningTime: "01:55" },
-  ]}),
+  getAppSessions: async () => ({
+    sessions: [
+      {
+        jobId: 100, sessionId: "123", appId: "vscode", appName: "vscode", state: "PENDING", reason: "resource",
+        submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
+        timeLimit: "01:00:00", runningTime: "",
+      },
+      {
+        jobId: 101, sessionId: "124", appId: "vscode", appName: "vscode", state: "RUNNING",
+        submitTime: new Date().toISOString(), dataPath: "/test",
+        timeLimit: "1-01:00:00", runningTime: "01:50",
+      },
+      {
+        jobId: 102, sessionId: "125", appId: "vscode", appName: "vscode", state: "RUNNING",
+        submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
+        timeLimit: "INVALID", runningTime: "01:55",
+      },
+    ],
+  }),
 
   getAppMetadata: async () => ({
     appName: "test",
     appCustomFormAttributes: [
-      { type: "NUMBER", label: "版本", name: "version", required: false,
-        placeholder: "选择版本", defaultValue: 123, select: []},
-      { type: "TEXT", label: "文字", name: "text", required: false,
-        placeholder: "提示信息", defaultValue: 555, select: []},
-      { type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
-        required: true, placeholder: "比如：--gpus gres:2 --time 10", select: []},
-      { type: "SELECT", label: "选项", name: "option", required: false,
+      {
+        type: "NUMBER", label: "版本", name: "version", required: false,
+        placeholder: "选择版本", defaultValue: 123, select: [],
+      },
+      {
+        type: "TEXT", label: "文字", name: "text", required: false,
+        placeholder: "提示信息", defaultValue: 555, select: [],
+      },
+      {
+        type: "TEXT", label: "其他sbatch参数", name: "sbatchOptions",
+        required: true, placeholder: "比如：--gpus gres:2 --time 10", select: [],
+      },
+      {
+        type: "SELECT", label: "选项", name: "option", required: false,
         placeholder: "提示信息", defaultValue: "version2", select: [
           { label: "版本1", value: "version1" },
           { label: "版本2", value: "version2" },
-        ]},
-    ]}),
+        ],
+      },
+    ],
+  }),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
     ? {
@@ -183,8 +201,8 @@ export const mockApi: MockApi<typeof api> = {
     }
     : {
       host: "127.0.0.1", port: 3000, password: "123", type: "vnc",
-    }
-  ,
+    },
+
 
   getJobTemplate: async () => ({
     template: {
@@ -199,16 +217,18 @@ export const mockApi: MockApi<typeof api> = {
       output: "job.%j.out",
       errorOutput: "job.%j.err",
       workingDirectory: "/nfs/jobs/123",
-      maxTimeUnit:  TimeUnit.MINUTES,
+      maxTimeUnit: TimeUnit.MINUTES,
     },
   }),
 
-  listJobTemplates: async () => ({ results: [{
-    id: "123-sample-apple",
-    comment: "1234",
-    submitTime: new Date().toString(),
-    jobName: "sample-apple",
-  }]}),
+  listJobTemplates: async () => ({
+    results: [{
+      id: "123-sample-apple",
+      comment: "1234",
+      submitTime: new Date().toString(),
+      jobName: "sample-apple",
+    }],
+  }),
 
   deleteJobTemplate: async () => null,
 
@@ -277,34 +297,53 @@ export const mockApi: MockApi<typeof api> = {
   checkTransferKey: null,
 
   getAvailablePartitionsForCluster: async () => ({ partitions: []}),
-  getClusterConfigFiles: async () => ({ clusterConfigs: {
-    hpc01: {
-      displayName: "hpc01Name",
-      priority: 1,
-      adapterUrl: "0.0.0.0:0000",
-      proxyGateway: undefined,
-      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
-      loginDesktop: undefined,
-      turboVncPath: undefined,
-      crossClusterFileTransfer: undefined,
-      hpc: { enabled: true },
-      ai: { enabled: false },
-      k8s: undefined,
+  getClusterConfigFiles: async () => ({
+    clusterConfigs: {
+      hpc01: {
+        displayName: "hpc01Name",
+        priority: 1,
+        adapterUrl: "0.0.0.0:0000",
+        proxyGateway: undefined,
+        loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+        loginDesktop: undefined,
+        turboVncPath: undefined,
+        crossClusterFileTransfer: undefined,
+        hpc: { enabled: true },
+        ai: { enabled: false },
+        k8s: undefined,
+      },
     },
-  } }),
-
-  getClustersRuntimeInfo: async () => ({ results: [{
-    clusterId: "hpc01",
-    activationStatus: ClusterActivationStatus.ACTIVATED,
-    operatorId: undefined,
-    operatorName: undefined,
-    comment: "",
-  }]}),
+  }),
 
   getUserAssociatedClusterIds: async () => ({
     clusterIds: ["hpc00", "hpc01", "hpc02"],
   }),
 
+  getClustersRuntimeInfo: async () => ({
+    results: [{
+      clusterId: "hpc01",
+      activationStatus: ClusterActivationStatus.ACTIVATED,
+      operatorId: undefined,
+      operatorName: undefined,
+      comment: "",
+    }],
+  }),
+  getClusterNodesInfo: async () => ({
+    nodeInfo: [{
+      gpuCount: 1,
+      state: 1,
+      partitions: ["linux","compute"],
+      cpuCoreCount: 1,
+      idleGpuCount: 1,
+      nodeName: "h1",
+      allocCpuCoreCount: 1,
+      idleCpuCoreCount: 1,
+      totalMemMb: 0.23,
+      allocMemMb: 0.32,
+      idleMemMb: 0.5,
+      allocGpuCount: 0.5,
+    }],
+  }),
 };
 
 

@@ -14,6 +14,7 @@ import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
+import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
@@ -74,6 +75,8 @@ export const ExtensionPage: React.FC<Props> = ({
     return <NotFoundPageComponent />;
   }
 
+  const [title, setTitle] = React.useState(config?.name ?? "Extension");
+
   const darkMode = useDarkMode();
 
   const query = new URLSearchParams(
@@ -93,12 +96,26 @@ export const ExtensionPage: React.FC<Props> = ({
 
   const ref = useRef<HTMLIFrameElement>(null);
 
-  // 监听来自iframe内部网页发送的信息，设置iframe的height
   useEffect(() => {
     const messageHandler = (e: MessageEvent<any>) => {
 
-      if (e.data.type === "scow.extensionPageHeightChanged" && ref.current) {
-        ref.current.style.height = e.data.payload.height + "px";
+      if (!ref.current) {
+        return;
+      }
+
+      const event = extensionEvents.safeParse(e.data);
+
+      if (!event.success) {
+        console.log("SCOW received an invalid event from extension page. event: %s", JSON.stringify(e.data));
+        return;
+      }
+
+      const data = event.data;
+
+      if (data.type === "scow.extensionPageHeightChanged") {
+        ref.current.style.height = data.payload.height + "px";
+      } else if (data.type === "scow.extensionPageTitleChanged") {
+        setTitle(data.payload.title);
       }
     };
     window.addEventListener("message", messageHandler, false);
@@ -110,7 +127,7 @@ export const ExtensionPage: React.FC<Props> = ({
 
   return (
     <>
-      <Head title={config?.name ?? "Extension"} />
+      <Head title={title} />
       <FrameContainer>
         <IFrame
           ref={ref}

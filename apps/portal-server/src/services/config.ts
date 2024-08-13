@@ -22,13 +22,14 @@ import { ConfigServiceServer, ConfigServiceService, Partition } from "@scow/prot
 import { ConfigServiceServer as runTimeConfigServiceServer, ConfigServiceService as runTimeConfigServiceService }
   from "@scow/protos/build/portal/config";
 import { ApiVersion } from "@scow/utils/build/version";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { commonConfig } from "src/config/common";
 import { config } from "src/config/env";
 import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 
 export const staticConfigServiceServer = plugin((server) => {
   return server.addService<ConfigServiceServer>(ConfigServiceService, {
-
     getClusterConfig: async ({ request, logger }) => {
       const { cluster } = request;
       await checkActivatedClusters({ clusterIds: cluster });
@@ -98,9 +99,8 @@ export const staticConfigServiceServer = plugin((server) => {
         availablePartitions = [];
       }
 
-      return [ { partitions: availablePartitions } ];
+      return [{ partitions: availablePartitions }];
     },
-
 
     getClusterConfigFiles: async ({ logger }) => {
 
@@ -120,6 +120,15 @@ export const staticConfigServiceServer = plugin((server) => {
       return [{ clusterConfigs: clusterConfigsProto }];
     },
 
+    getApiVersion: async () => {
+
+      const version = await JSON.parse(readFileSync(join(__dirname,
+        "../../node_modules/@scow/protos/package.json"), "utf-8")).version;
+
+      const [major, minor, patch] = version.split(".").map(Number);
+
+      return [{ major, minor, patch }];
+    },
   });
 });
 
@@ -137,11 +146,30 @@ export const runtimeConfigServiceServer = plugin((server) => {
           const minRequiredApiVersion: ApiVersion = { major: 1, minor: 4, patch: 0 };
           // 检验调度器的API版本是否符合要求，不符合要求报错
           await checkSchedulerApiVersion(client, minRequiredApiVersion);
-          return await asyncClientCall(client.config, "getClusterInfo", {});
+          return await asyncClientCall(client.config, "getClusterInfo", request);
         },
       );
 
       return [reply];
+    },
+
+    getClusterNodesInfo: async ({ request, logger }) => {
+      const { nodeNames,cluster } = request;
+
+      const reply = await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          // 当前接口要求的最低调度器接口版本
+          const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+          // 检验调度器的API版本是否符合要求，不符合要求报错
+          await checkSchedulerApiVersion(client, minRequiredApiVersion);
+          return await asyncClientCall(client.config, "getClusterNodesInfo", {
+            nodeNames: nodeNames || [],
+          });
+        },
+      );
+      return [{ nodes: reply.nodes }];
     },
   });
 });

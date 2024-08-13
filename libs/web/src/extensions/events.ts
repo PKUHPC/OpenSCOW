@@ -10,8 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export type { ScowResourcesClient } from "./client";
-export { getScowResourcesClient } from "./client";
-export type { ScowResourcesPlugin } from "./plugin";
-export { scowResourcesPlugin } from "./plugin";
-export { getUserAccountsClusterIds } from "./utils";
+import { z } from "zod";
+
+export const extensionEvents = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("scow.extensionPageHeightChanged"), payload: z.object({ height: z.number() }) }),
+  z.object({ type: z.literal("scow.extensionPageTitleChanged"), payload: z.object({ title: z.string() }) }),
+  z.object({ type: z.literal("scow.reloadNavbarLink"), payload: z.object({}) }),
+  z.object({ type: z.literal("scow.reloadNavigations"), payload: z.object({}) }),
+]);

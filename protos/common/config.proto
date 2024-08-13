@@ -165,6 +165,16 @@ message GetClusterConfigFilesResponse {
   repeated ClusterConfigSchemaProto cluster_configs = 1;
 }
 
+message GetApiVersionRequest {
+
+}
+
+message GetApiVersionResponse {
+  uint32 major = 1;
+  uint32 minor = 2;
+  uint32 patch = 3;
+}
+
 service ConfigService {
   rpc GetClusterConfig(GetClusterConfigRequest) returns (GetClusterConfigResponse);
 
@@ -172,4 +182,7 @@ service ConfigService {
 
   // 获取 SCOW 部署的集群配置文件中的集群信息
   rpc GetClusterConfigFiles(GetClusterConfigFilesRequest) returns (GetClusterConfigFilesResponse);
+
+  // 获取当前部署 SCOW API 的版本，方便接入其它服务
+  rpc GetApiVersion(GetApiVersionRequest) returns (GetApiVersionResponse);
 }

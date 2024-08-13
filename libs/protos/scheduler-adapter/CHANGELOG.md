@@ -1,5 +1,12 @@
 # @scow/scheduler-adapter-protos
 
+## 1.3.2
+
+### Patch Changes
+
+- 753a996: AI 增加多机多卡分布式训练和对华为 GPU 的特殊处理
+- 66a96ba: 修复了门户系统中节点在不同集群中重复计数的问题
+
 ## 1.3.1
 
 ### Patch Changes

@@ -271,7 +271,7 @@ export const accountServiceServer = plugin((server) => {
 
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
-              blockedPartitions: [],
+              // blockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw {
@@ -289,7 +289,7 @@ export const accountServiceServer = plugin((server) => {
               // 实行一次封锁确保未来不产生冲突，代表账户没有授权分区
               await asyncClientCall(client.account, "blockAccount", {
                 accountName,
-                blockedPartitions: [],
+                // blockedPartitions: [],
               }).catch((e) => {
                 if (e.code === Status.NOT_FOUND) {
                   throw {
@@ -303,7 +303,7 @@ export const accountServiceServer = plugin((server) => {
             } else {
               await asyncClientCall(client.account, "unblockAccount", {
                 accountName,
-                unblockedPartitions: assignedPartitions ?? [],
+                // unblockedPartitions: assignedPartitions ?? [],
               }).catch((e) => {
                 if (e.code === Status.NOT_FOUND) {
                   throw {
