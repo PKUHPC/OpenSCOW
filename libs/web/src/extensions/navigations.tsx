@@ -12,7 +12,7 @@
 
 import { LinkOutlined } from "@ant-design/icons";
 import { join } from "path";
-import { isUrl, ScowExtensionRouteContext } from "src/extensions/common";
+import { ExtensionRouteQuery,isUrl } from "src/extensions/common";
 import { defineExtensionRoute } from "src/extensions/routes";
 import { NavItemProps } from "src/layouts/base/types";
 import { NavIcon } from "src/layouts/icon";
@@ -41,7 +41,7 @@ export const NavItem = BaseNavItem.extend({
 export const rewriteNavigationsRoute = (from: "portal" | "mis") => defineExtensionRoute({
   path: `/${from}/rewriteNavigations`,
   method: "POST" as const,
-  query: ScowExtensionRouteContext,
+  query: ExtensionRouteQuery,
   body: z.object({
     navs: z.array(NavItem) as z.ZodType<NavItem[]>,
   }),
