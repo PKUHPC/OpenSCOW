@@ -27,6 +27,7 @@ export const BaseNavItem = z.object({
     alt: z.string().optional(),
   })),
   openInNewPage: z.boolean().optional(),
+  hideIfNotActive: z.boolean().optional(),
 });
 
 export type NavItem = z.infer<typeof BaseNavItem> & {
@@ -59,6 +60,7 @@ export const fromNavItemProps = (props: NavItemProps[]): NavItem[] => {
     text: x.text,
     openInNewPage: x.openInNewPage,
     children: x.children ? fromNavItemProps(x.children) : undefined,
+    hideIfNotActive: x.hideIfNotActive,
   }));
 };
 
@@ -115,6 +117,7 @@ export const toNavItemProps = (
       ) ?? LinkOutlined,
       handleClick: originalItemsMap.get(item.path)?.handleClick,
       children: item.children ? rec(item.children) : undefined,
+      hideIfNotActive: item.hideIfNotActive,
     }));
   };
 

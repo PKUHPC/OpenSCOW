@@ -78,7 +78,7 @@ export const BigScreenMenu: React.FC<Props> = ({
               mode="horizontal"
               selectedKeys={activeKeys}
               onClick={handleMenuClick}
-              items={createMenuItems(routes, true)}
+              items={createMenuItems(routes, pathname, true)}
             />
           ) : undefined
       }
