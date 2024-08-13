@@ -34,7 +34,7 @@ export const checkJobNameExisting = async (client: SchedulerAdapterClient,userId
   // 检查作业重名的最低调度器接口版本
   const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
 
-  const scheduleApiVersion = await getSchedulerApiVersion(client);
+  const scheduleApiVersion = await getSchedulerApiVersion(client, logger);
 
   if (compareSchedulerApiVersion(scheduleApiVersion,minRequiredApiVersion)) {
     const existingJobName = await asyncClientCall(client.job, "getJobs", {

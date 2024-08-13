@@ -16,6 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
+import { Logger } from "ts-log";
 
 
 /**
@@ -83,7 +84,7 @@ export function compareSchedulerApiVersion(scheduleApiVersion: ApiVersion, minVe
   return geMinVersion;
 }
 
-export async function getSchedulerApiVersion(client: SchedulerAdapterClient): Promise<ApiVersion> {
+export async function getSchedulerApiVersion(client: SchedulerAdapterClient, logger: Logger): Promise<ApiVersion> {
   let scheduleApiVersion: ApiVersion;
   try {
     scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
@@ -95,7 +96,7 @@ export async function getSchedulerApiVersion(client: SchedulerAdapterClient): Pr
 
     // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
     scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
-    console.log("The scheduler API version can not be confirmed");
+    logger.info("The scheduler API version can not be confirmed");
   }
 
   return scheduleApiVersion;
