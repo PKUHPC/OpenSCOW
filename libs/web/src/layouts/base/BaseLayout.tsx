@@ -12,25 +12,21 @@
 
 "use client";
 
-import { LinkOutlined } from "@ant-design/icons";
 import { arrayContainsElement } from "@scow/utils";
 import { Grid, Layout } from "antd";
 import { useRouter } from "next/router";
-import { join } from "path";
 import React, { PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
-import { isUrl, ScowExtensionRouteContext } from "src/extensions/common";
-import { NavbarLink, navbarLinksRoute } from "src/extensions/navbarLinks";
+import { getExtensionRouteQuery } from "src/extensions/common";
 import { fromNavItemProps, rewriteNavigationsRoute, toNavItemProps } from "src/extensions/navigations";
 import { callExtensionRoute } from "src/extensions/routes";
 import { UiExtensionStoreData } from "src/extensions/UiExtensionStore";
+import { calcActiveKeys } from "src/layouts/base/common";
 import { Footer } from "src/layouts/base/Footer";
 import { Header, HeaderNavbarLink } from "src/layouts/base/header";
-import { match } from "src/layouts/base/matchers";
 import { SideNav } from "src/layouts/base/SideNav";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
-import { NavIcon } from "src/layouts/icon";
 import { styled } from "styled-components";
 // import logo from "src/assets/logo-no-text.svg";
 const { useBreakpoint } = Grid;
@@ -93,11 +89,11 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
     ? extensionStoreData
     : extensionStoreData ? [extensionStoreData] : [], [extensionStoreData]);
 
-  const routeQuery = useMemo(() => ({
-    scowDark: dark.dark ? "true" : "false",
-    scowLangId: languageId,
-    scowUserToken: user?.token,
-  }) as ScowExtensionRouteContext, [dark.dark, languageId, user?.token]);
+  const routeQuery = useMemo(() => getExtensionRouteQuery(
+    dark.dark,
+    languageId,
+    user?.token,
+  ), [dark.dark, languageId, user?.token]);
 
   const { data: finalRoutesData } = useAsync({
     promiseFn: useCallback(async () => {
@@ -126,62 +122,23 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const finalRoutes = finalRoutesData ?? routes;
 
-  const firstLevelRoute = finalRoutes.find((x) => match(x, router.asPath));
+  const activeKeys = useMemo(() =>
+    finalRoutes
+      ? [...calcActiveKeys(finalRoutes, router.asPath)]
+      : []
+  , [finalRoutes, router.asPath]);
+
+  const firstLevelRoute = finalRoutes.find((x) => activeKeys.includes(x.path));
 
   const sidebarRoutes = md ? firstLevelRoute?.children : finalRoutes;
 
   const hasSidebar = arrayContainsElement(sidebarRoutes);
 
-  // navbar links
-  const { data: extensionNavbarLinks } = useAsync({
-    promiseFn: useCallback(async () => {
-      if (extensions.length === 0) { return undefined; }
-
-      const result = await Promise.all(extensions.map(async (extension) => {
-        const resp = await callExtensionRoute(navbarLinksRoute(from), routeQuery, {}, extension.url)
-          .catch((e) => {
-            console.warn(`Failed to call navbarLinks of extension ${extension.name ?? extension.url}. Error: `, e);
-            return { 200: { navbarLinks: [] as NavbarLink[] } };
-          });
-
-        if (resp[200]) {
-          return resp[200].navbarLinks?.map((x) => {
-
-            if (!isUrl(x.path)) {
-              const parts = ["/extensions"];
-
-              if (extension.name) {
-                parts.push(extension.name);
-              }
-
-              parts.push(x.path);
-              x.path = join(...parts);
-            }
-
-            return x;
-          });
-        }
-      }));
-
-      const filtered = result.flat().filter((x) => x) as NavbarLink[];
-
-      // order by priority and index. sort is stable, index is preserved
-      filtered.sort((a, b) => {
-        return b.priority - a.priority;
-      });
-
-      return filtered.map((x) => ({
-        href: x.path,
-        text: x.text,
-        icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : <LinkOutlined />,
-      }satisfies HeaderNavbarLink));
-
-    }, [from, routeQuery, extensions]),
-  });
-
   return (
     <Root>
       <Header
+        extensions={extensions}
+        routeQuery={routeQuery}
         setSidebarCollapsed={setSidebarCollapsed}
         pathname={router.asPath}
         sidebarCollapsed={sidebarCollapsed}
@@ -193,12 +150,15 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         userLinks={userLinks}
         languageId={languageId}
         right={headerRightContent}
-        navbarLinks={[...extensionNavbarLinks ?? [], ...headerNavbarLinks ?? []]}
+        staticNavbarLinks={headerNavbarLinks}
+        from={from}
+        activeKeys={activeKeys}
       />
       <StyledLayout>
         {
           hasSidebar ? (
             <SideNav
+              activeKeys={activeKeys}
               pathname={router.asPath}
               collapsed={sidebarCollapsed}
               routes={sidebarRoutes}

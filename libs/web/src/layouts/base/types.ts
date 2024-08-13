@@ -26,6 +26,7 @@ export interface NavItemProps {
   clickable?: boolean
   openInNewPage?: boolean;
   handleClick?: () => void
+  hideIfNotActive?: boolean;
 }
 
 export interface UserLink {

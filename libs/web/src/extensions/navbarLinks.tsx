@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ScowExtensionRouteContext } from "src/extensions/common";
+import { ExtensionRouteQuery } from "src/extensions/common";
 import { defineExtensionRoute } from "src/extensions/routes";
 import { z } from "zod";
 
@@ -23,6 +23,9 @@ export const NavbarLink = z.object({
   })),
   openInNewPage: z.boolean().default(true),
   priority: z.number().default(0),
+  autoRefresh: z.optional(z.object({
+    intervalMs: z.number(),
+  })),
 });
 
 export type NavbarLink = z.infer<typeof NavbarLink>;
@@ -30,7 +33,7 @@ export type NavbarLink = z.infer<typeof NavbarLink>;
 export const navbarLinksRoute = (from: "portal" | "mis") => defineExtensionRoute({
   path: `/${from}/navbarLinks`,
   method: "POST" as const,
-  query: ScowExtensionRouteContext,
+  query: ExtensionRouteQuery,
   responses: {
     200: z.object({
       navbarLinks: z.optional(z.array(NavbarLink)),

@@ -10,15 +10,22 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { LinkOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space } from "antd";
-import React from "react";
+import { join } from "path";
+import React, { useCallback, useState } from "react";
+import { useAsync } from "react-async";
+import { ExtensionRouteQuery, isUrl } from "src/extensions/common";
+import { NavbarLink, navbarLinksRoute } from "src/extensions/navbarLinks";
+import { callExtensionRoute } from "src/extensions/routes";
+import { ExtensionManifestWithUrl } from "src/extensions/UiExtensionStore";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { BigScreenMenu } from "src/layouts/base/header/BigScreenMenu";
 import { HeaderItem, JumpToAnotherLink } from "src/layouts/base/header/components";
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
+import { NavIcon } from "src/layouts/icon";
 import { styled } from "styled-components";
 
 interface ComponentProps {
@@ -85,18 +92,55 @@ interface Props {
   userLinks?: UserLink[];
   languageId: string;
   right?: React.ReactNode;
-  navbarLinks?: HeaderNavbarLink[];
+  staticNavbarLinks?: HeaderNavbarLink[];
+  extensions: ExtensionManifestWithUrl[];
+  from: "mis" | "portal";
+  routeQuery: ExtensionRouteQuery;
+  activeKeys: string[];
 }
 
+interface SourcedHeaderNavbarLink {
+  link: HeaderNavbarLink;
+  extension: ExtensionManifestWithUrl;
+  priority: number;
+};
 
 export const Header: React.FC<Props> = ({
   hasSidebar, routes,
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
   basePath, userLinks,
-  languageId,
-  navbarLinks, right,
+  languageId, activeKeys,
+  right, staticNavbarLinks,
+  extensions,
+  from, routeQuery,
 }) => {
+
+  const [links, setLinks] = useState<SourcedHeaderNavbarLink[]>([]);
+
+  const onFetched = (extension: ExtensionManifestWithUrl) => (data: NavbarLink[]) => {
+    setLinks((links) => {
+
+      // remove all existing links from the same extension
+      links = links.filter((x) => x.extension !== extension);
+
+      // append newly got links
+      links.push(...data.map((x) => ({ link: {
+        href: x.path,
+        text: x.text,
+        icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : <LinkOutlined />,
+      }, extension, priority: x.priority })));
+
+      // order by priority and index. sort is stable, index is preserved
+      links.sort((a, b) => {
+        return b.priority - a.priority;
+      });
+
+      return links;
+    });
+  };
+
+  const navbarLinks = [...links.map((x) => x.link), ...(staticNavbarLinks ?? [])];
 
   const hideLinkText = navbarLinks && navbarLinks.length >= 5;
 
@@ -116,6 +160,23 @@ export const Header: React.FC<Props> = ({
 
   return (
     <Container>
+      {extensions.map((extension) => {
+        const navbarLinksConfig = extension.manifests[from]?.navbarLinks;
+
+        if (navbarLinksConfig === true || (typeof navbarLinksConfig === "object" && navbarLinksConfig?.enabled)) {
+          return (
+            <NavbarLinkFetcher
+              key={extension.name ?? extension.url}
+              extension={extension}
+              from={from}
+              routeQuery={routeQuery}
+              onDataFetched={onFetched(extension)}
+            />
+          );
+        } else {
+          return undefined;
+        }
+      })}
       <HeaderItem>
         <Space size="middle">
           {hasSidebar
@@ -132,6 +193,7 @@ export const Header: React.FC<Props> = ({
       <MenuPart>
         <BigScreenMenu
           pathname={pathname}
+          activeKeys={activeKeys}
           routes={routes}
         />
         <MenuPartPlaceholder />
@@ -147,4 +209,53 @@ export const Header: React.FC<Props> = ({
       </RightContentPart>
     </Container>
   );
+};
+
+
+interface FetcherProps {
+  extension: ExtensionManifestWithUrl;
+  from: "mis" | "portal";
+  routeQuery: ExtensionRouteQuery;
+  onDataFetched: (links: NavbarLink[]) => void;
+}
+
+const NavbarLinkFetcher = ({ extension, from, routeQuery, onDataFetched }: FetcherProps) => {
+
+  const { reload } = useAsync({
+    promiseFn: useCallback(async () => {
+      const resp = await callExtensionRoute(navbarLinksRoute(from), routeQuery, {}, extension.url)
+        .catch((e) => {
+          console.warn(`Failed to call navbarLinks of extension ${extension.name ?? extension.url}. Error: `, e);
+          return { 200: { navbarLinks: [] as NavbarLink[] } };
+        });
+
+      const data = resp[200]?.navbarLinks?.map((x) => {
+
+        if (!isUrl(x.path)) {
+          const parts = ["/extensions"];
+
+          if (extension.name) {
+            parts.push(extension.name);
+          }
+
+          parts.push(x.path);
+          x.path = join(...parts);
+        }
+
+        return x;
+      });
+
+      onDataFetched(data ?? []);
+
+      const navbarLinksConfig = extension.manifests[from]?.navbarLinks;
+
+      if (typeof navbarLinksConfig === "object"
+        && navbarLinksConfig?.enabled && navbarLinksConfig.autoRefresh?.enabled) {
+        setTimeout(reload, navbarLinksConfig.autoRefresh.intervalMs);
+      }
+
+    }, [from, routeQuery, extension]),
+  });
+
+  return <></>;
 };
