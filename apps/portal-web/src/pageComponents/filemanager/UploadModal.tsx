@@ -51,6 +51,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       controller.abort();
     }
 
+    uploadControllers.current.clear();
     onClose();
   };
 
@@ -69,21 +70,17 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       body: { cluster, path, name: file.name },
     });
 
-    const uploadedChunks = filesInfo.sort((a, b) => {
-      const reg = /_(\d+)/;
-      const matchA = reg.exec(a.name);
-      const matchB = reg.exec(b.name);
-
-      if (matchA && matchB) {
-        return parseInt(matchA[1]) - parseInt(matchB[1]);
-      } else {
-        return 0;
-      }
-    }).map((item) => item.name);
+    const uploadedChunkIndices = new Set(
+      filesInfo.map((item) => {
+        const reg = /_(\d+).scowuploadtemp/;
+        const match = reg.exec(item.name);
+        return match ? parseInt(match[1]) : null;
+      }).filter((index) => index !== null),
+    );
 
     const totalCount = Math.ceil(file.size / chunkSizeByte);
     const concurrentChunks = 3;
-    let uploadedCount = uploadedChunks.length;
+    let uploadedCount = uploadedChunkIndices.size;
 
     const uploadFile = uploadFileList.find((uploadFile) => uploadFile.name === file.name);
     if (!uploadFile) {
@@ -91,8 +88,8 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       return;
     }
 
-    const updateProgress = () => {
-      uploadedCount++;
+    const updateProgress = (count: number) => {
+      uploadedCount += count;
       onProgress?.({ percent: Number(((uploadedCount / totalCount) * 100).toFixed(2)) });
     };
 
@@ -100,18 +97,20 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
     uploadControllers.current.set(uploadFile.uid, controller);
 
     const limit = pLimit(concurrentChunks);
+
     const uploadChunk = async (start: number): Promise<void> => {
       if (controller.signal.aborted) {
+        return;
+      }
+
+      if (uploadedChunkIndices.has(start + 1)) {
+        // 如果文件块已经上传，直接跳过
         return;
       }
 
       const chunk = file.slice(start * chunkSizeByte, (start + 1) * chunkSizeByte);
       const hash = await calculateBlobSHA256(chunk);
       const fileName = `${hash}_${start + 1}.scowuploadtemp`;
-
-      if (uploadedChunks.includes(fileName)) {
-        return;
-      }
 
       const formData = new FormData();
       formData.append("file", chunk);
@@ -126,7 +125,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         throw new Error(response.statusText);
       }
 
-      updateProgress();
+      updateProgress(1);
     };
 
     try {
@@ -140,11 +139,14 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
 
       await Promise.all(uploadPromises);
 
-      await api.mergeFileChunks({ body: { cluster, path, name: file.name, sizeByte: file.size } })
-        .httpError(520, (err) => {
-          message.error(t(p("mergeFileChunksErrorText"), [file.name]));
-          throw err;
-        });
+      if (!controller.signal.aborted) {
+        await api.mergeFileChunks({ body: { cluster, path, name: file.name, sizeByte: file.size } })
+          .httpError(520, (err) => {
+            message.error(t(p("mergeFileChunksErrorText"), [file.name]));
+            throw err;
+          });
+      }
+
     } catch (err) {
       message.error(t(p("multipartUploadError"), [err.message]));
       throw err;
