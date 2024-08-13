@@ -351,6 +351,13 @@ export const LaunchAppForm = (props: Props) => {
         name={["customFields", item.name]}
         rules={rules}
         initialValue={initialValue}
+        {...(item.name === "workingDir" ? {
+          tooltip: (
+            <>
+              <span>工作目录的路径会自动添加为挂载点</span>
+            </>
+          ),
+        } : {})}
       >
         {inputItem}
       </Form.Item>
@@ -748,7 +755,7 @@ export const LaunchAppForm = (props: Props) => {
                           if (otherMountPoints.includes(currentValueNormalized)) {
                             return Promise.reject(new Error("挂载点地址不能重复"));
                           }
-                          
+
                           const workingDirectory = form.getFieldValue("customFields").workingDir?.toString();
                           if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
                             return Promise.reject(new Error("该路径已指定为工作目录，无需再设置为挂载点"));
