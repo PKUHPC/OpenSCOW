@@ -125,19 +125,21 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         throw new Error(response.statusText);
       }
 
-      updateProgress(1);
     };
 
     try {
-      const uploadPromises: Promise<void>[] = [];
-      for (let i = 0; i < totalCount; i++) {
-        if (controller.signal.aborted) {
-          break;
+      const batchSize = 10; // 每次上传10个文件块
+      for (let i = 0; i < totalCount; i += batchSize) {
+        const batchPromises: Promise<void>[] = [];
+        for (let j = i; j < Math.min(i + batchSize, totalCount); j++) {
+          if (controller.signal.aborted) {
+            break;
+          }
+          batchPromises.push(limit(() => uploadChunk(j)));
         }
-        uploadPromises.push(limit(() => uploadChunk(i)));
+        await Promise.all(batchPromises);
+        updateProgress(batchPromises.length); // 根据实际上传的块数更新进度
       }
-
-      await Promise.all(uploadPromises);
 
       if (!controller.signal.aborted) {
         await api.mergeFileChunks({ body: { cluster, path, name: file.name, sizeByte: file.size } })

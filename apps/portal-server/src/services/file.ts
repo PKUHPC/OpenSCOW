@@ -249,10 +249,10 @@ export const fileServiceServer = plugin((server) => {
 
       const clusterInfo = configClusters[cluster];
 
-      if (clusterInfo.scowd?.enabled) {
+      if (!clusterInfo.scowd?.enabled) {
         throw {
           code: Status.UNIMPLEMENTED,
-          message: "The mergeFileChunks interface is not implemented",
+          message: "To use this interface, you need to enable scowd.",
         } as ServiceError;
       }
 
