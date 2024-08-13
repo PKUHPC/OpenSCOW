@@ -13,6 +13,7 @@
 import type { ServiceType } from "@bufbuild/protobuf";
 import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
+import { AppService } from "@scow/scowd-protos/build/application/app_connect";
 import { DesktopService } from "@scow/scowd-protos/build/application/desktop_connect";
 import { FileService } from "@scow/scowd-protos/build/storage/file_connect";
 
@@ -20,7 +21,8 @@ import { SslConfig } from "./ssl";
 
 export interface ScowdClient {
   file: PromiseClient<typeof FileService>;
-  desktop: PromiseClient<typeof DesktopService>
+  desktop: PromiseClient<typeof DesktopService>;
+  app: PromiseClient<typeof AppService>;
 }
 
 export function getClient<TService extends ServiceType>(
@@ -40,5 +42,6 @@ export const getScowdClient = (scowdUrl: string, certificates?: SslConfig) => {
   return {
     file: getClient(scowdUrl, FileService, certificates),
     desktop: getClient(scowdUrl, DesktopService, certificates),
+    app: getClient(scowdUrl, AppService, certificates),
   } as ScowdClient;
 };
