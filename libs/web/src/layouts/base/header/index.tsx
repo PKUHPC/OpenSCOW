@@ -86,6 +86,7 @@ interface Props {
   languageId: string;
   right?: React.ReactNode;
   navbarLinks?: HeaderNavbarLink[];
+  activeKeys: string[];
 }
 
 
@@ -94,7 +95,7 @@ export const Header: React.FC<Props> = ({
   setSidebarCollapsed, sidebarCollapsed,
   pathname, user, logout,
   basePath, userLinks,
-  languageId,
+  languageId, activeKeys,
   navbarLinks, right,
 }) => {
 
@@ -132,6 +133,7 @@ export const Header: React.FC<Props> = ({
       <MenuPart>
         <BigScreenMenu
           pathname={pathname}
+          activeKeys={activeKeys}
           routes={routes}
         />
         <MenuPartPlaceholder />

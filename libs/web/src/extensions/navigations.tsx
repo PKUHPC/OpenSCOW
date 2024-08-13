@@ -94,7 +94,9 @@ export const toNavItemProps = (
 
     if (isUrl(returnedPath)) { return returnedPath; }
     const parts = ["/extensions"];
-    if (extensionName) { parts.push(extensionName); }
+    if (extensionName) {
+      parts.push(encodeURIComponent(extensionName));
+    }
     parts.push(returnedPath);
     return join(...parts);
   };
