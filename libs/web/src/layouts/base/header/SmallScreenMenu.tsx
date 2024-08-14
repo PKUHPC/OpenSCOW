@@ -47,7 +47,7 @@ export const SmallScreenMenu: React.FC<Props> = ({
   const items = [] as ItemType[];
 
   if (arrayContainsElement(routes)) {
-    items.push(...createMenuItems(routes, true));
+    items.push(...createMenuItems(routes, pathname, true));
     items.push({ type: "divider" });
   }
 

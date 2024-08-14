@@ -319,6 +319,13 @@ export const mockApi: MockApi<typeof api> = {
     clusterIds: ["hpc00", "hpc01", "hpc02"],
   }),
 
+
+  mergeFileChunks: null,
+  initMultipartUpload: async () => ({
+    tempFileDir: "home/user/scow/tempDir",
+    chunkSizeByte: 5 * 1024 * 1024,
+    filesInfo: [],
+  }),
   getClustersRuntimeInfo: async () => ({
     results: [{
       clusterId: "hpc01",

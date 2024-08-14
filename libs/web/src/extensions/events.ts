@@ -18,3 +18,5 @@ export const extensionEvents = z.discriminatedUnion("type", [
   z.object({ type: z.literal("scow.reloadNavbarLink"), payload: z.object({}) }),
   z.object({ type: z.literal("scow.reloadNavigations"), payload: z.object({}) }),
 ]);
+
+
