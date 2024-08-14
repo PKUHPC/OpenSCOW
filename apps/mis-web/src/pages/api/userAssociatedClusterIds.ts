@@ -11,10 +11,12 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { getUserAccountsClusterIds } from "@scow/lib-scow-resources";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { validateToken } from "src/auth/token";
 import { getUserAssociatedClusterIds } from "src/server/userAssociatedClusterIds";
+import { runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
 
@@ -47,7 +49,13 @@ export default route(GetUserAssociatedClusterIdsSchema,
     const info = token ? await validateToken(token) : await auth(req, res);
     if (!info) { return; }
 
-    const clusterIds = await getUserAssociatedClusterIds(accountNames, tenantName);
+    // const clusterIds = await getUserAssociatedClusterIds(accountNames, tenantName);
+    const clusterIds = await getUserAccountsClusterIds(
+      true,
+      runtimeConfig.SCOW_RESOURCES_CONFIG,
+      accountNames,
+      tenantName,
+    );
 
     return {
       200: {

@@ -20,6 +20,7 @@ import { GetAccountAssignedClusterPartitionsRequest,
   GetAccountsAssignedClustersResponse } from "@scow/scow-resources-protos/build/partition";
 
 import { getScowResourcesClient } from "./client";
+import { extractPartitions } from "./utils";
 
 export interface ScowResourcesPlugin {
   resources: {
@@ -63,21 +64,19 @@ export const scowResourcesPlugin = (
     return await client.resources.getAccountsAssignedClusters(params);
   };
 
-  const getAccountDefaultClusterPartitions = async (params: GetAccountDefaultClusterPartitionsRequest) => { 
+  const getAccountDefaultClusterPartitions = async (params: GetAccountDefaultClusterPartitionsRequest) => {
     return await client.resources.getAccountsAssignedClusters(params);
   };
 
   const getAccountAssignedPartitions = async (params: GetAccountAssignedClusterPartitionsRequest) => { 
     const reply = await client.resources.getAccountAssignedClusterPartitions(params);
-    const assignedInfo = Object.values(reply.assignedClusterPartitions.assignedInfo);
-    const assignedPartitions = assignedInfo.map((x) => x.partition);
+    const assignedPartitions = extractPartitions(reply);
     return assignedPartitions;
   };
 
   const getAccountDefaultPartitions = async (params: GetAccountDefaultClusterPartitionsRequest) => { 
     const reply = await client.resources.getAccountDefaultClusterPartitions(params);
-    const assignedInfo = Object.values(reply.assignedClusterPartitions.assignedInfo);
-    const assignedPartitions = assignedInfo.map((x) => x.partition);
+    const assignedPartitions = extractPartitions(reply);
     return assignedPartitions;
   };
   

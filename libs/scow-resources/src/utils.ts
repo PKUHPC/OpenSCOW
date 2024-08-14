@@ -13,6 +13,8 @@
 import { Code, ConnectError } from "@connectrpc/connect";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { ScowResourcesSchema } from "@scow/config/build/common";
+import { GetAccountAssignedClusterPartitionsResponse, 
+  GetAccountDefaultClusterPartitionsResponse } from "@scow/scow-resources-protos/build/partition";
 
 import { getScowResourcesClient } from "./client";
 
@@ -72,8 +74,8 @@ export function mapTRPCExceptionToGRPC(err: any): ServiceError {
 
 export async function getUserAccountsClusterIds(
   misDeployed: boolean,
-  scowResourcesConfig: ScowResourcesSchema | undefined, 
-  userAccounts: string[] | undefined, 
+  scowResourcesConfig: ScowResourcesSchema | undefined,
+  userAccounts: string[] | undefined,
   tenantName: string | undefined): Promise<string[] | undefined> {
 
   if (!misDeployed || !scowResourcesConfig?.scowResourcesEnabled) {
@@ -83,9 +85,29 @@ export async function getUserAccountsClusterIds(
 
   const resourceClient = getScowResourcesClient(scowResourcesConfig.address);
 
-  const clusters = 
-  await resourceClient.resources.getAccountsAssignedClusters({ accountNames: userAccounts, tenantName });
+  const clusters =
+    await resourceClient.resources.getAccountsAssignedClusters({ accountNames: userAccounts, tenantName });
 
   return clusters.clusterIds;
 
 };
+
+// 提取授权分区
+export function extractPartitions(
+  response: GetAccountAssignedClusterPartitionsResponse | GetAccountDefaultClusterPartitionsResponse) {
+  const result: string[] = [];
+
+  if (response.assignedClusterPartitions) {
+    for (const key in response.assignedClusterPartitions) {
+      const clusterPartitions = response.assignedClusterPartitions[key];
+
+      if (clusterPartitions?.assignedInfo) {
+        clusterPartitions.assignedInfo.forEach((item) => {
+          result.push(item.partition);
+        });
+      }
+    }
+  }
+
+  return result;
+}
