@@ -10,23 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export declare const antdBreakpoints: {
-  xxs: number;
-  xs: number;
-  sm: number;
-  md: number;
-  lg: number;
-  xl: number;
-  xxl: number;
-};
-export type Breakpoint = keyof typeof antdBreakpoints;
-export declare const layoutConstants: {
-  paddingBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-  menuBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-  headerHeight: number;
-  sidebarBreakpoint: "md" | "xxs" | "xs" | "sm" | "lg" | "xl" | "xxl";
-  headerIconColor: string;
-  headerIconBackgroundColor: string;
-  headerBackgrounColor: string;
-  maxWidth: number;
-};
+import { z } from "zod";
+
+export const extensionEvents = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("scow.extensionPageHeightChanged"), payload: z.object({ height: z.number() }) }),
+  z.object({ type: z.literal("scow.extensionPageTitleChanged"), payload: z.object({ title: z.string() }) }),
+  z.object({ type: z.literal("scow.reloadNavbarLink"), payload: z.object({}) }),
+  z.object({ type: z.literal("scow.reloadNavigations"), payload: z.object({}) }),
+]);
+
+
