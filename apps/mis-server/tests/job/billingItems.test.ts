@@ -243,6 +243,7 @@ const calculatePrice = async (testData: typeof import("./testData.json")) => {
   const priceMap = await createPriceMap(orm.em.fork(), server.ext.clusters, server.logger);
 
   const wrongPrices = [] as {
+    jobId: number,
     tenantPrice: { expected: number; actual: number | undefined };
     accountPrice: { expected: number; actual: number | undefined }
   }[];
@@ -264,6 +265,7 @@ const calculatePrice = async (testData: typeof import("./testData.json")) => {
     });
     if (price.tenant?.price.toNumber() !== t.tenantPrice || price.account?.price.toNumber() !== t.accountPrice) {
       wrongPrices.push({
+        jobId: t.jobId,
         tenantPrice: { expected: t.tenantPrice, actual: price.tenant?.price.toNumber() },
         accountPrice: { expected: t.accountPrice, actual: price.account?.price.toNumber() },
       });

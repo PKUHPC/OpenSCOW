@@ -109,10 +109,13 @@ export async function calculateJobPrice(
 
     amount = amount.decimalPlaces(misConfig.jobChargeDecimalPrecision, Decimal.ROUND_DOWN);
 
-    // 如果单价大于0，且运行时间大于0，若结果算下来金额为0，按照最低费用计算价格
+    // 如果单价大于0，且运行时间大于0，若结果算下来金额小于默认最低消费金额，按最低消费金额计算价格
     if (priceItem.price.gt(0) && time.gt(0)) {
-      return priceItem.price.multipliedBy(amount)
-        .decimalPlaces(misConfig.jobChargeDecimalPrecision, Decimal.ROUND_HALF_CEIL);
+      if (priceItem.price.multipliedBy(amount).gt(new Decimal(misConfig.jobMinCharge))) {
+        return priceItem.price.multipliedBy(amount)
+          .decimalPlaces(misConfig.jobChargeDecimalPrecision, Decimal.ROUND_HALF_CEIL);
+      }
+      return new Decimal(misConfig.jobMinCharge);
     }
 
     return new Decimal(0);
