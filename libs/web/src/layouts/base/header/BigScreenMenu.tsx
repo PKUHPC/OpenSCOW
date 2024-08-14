@@ -31,6 +31,10 @@ const Container = styled.div`
     font-size:1.42em;
   }
 
+  .ant-menu-item-icon img{
+    font-size:1.42em;
+  }
+
   .ant-menu-title-content{
     position:relative;
     bottom:0.2em;
