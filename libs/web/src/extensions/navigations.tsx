@@ -12,7 +12,7 @@
 
 import { LinkOutlined } from "@ant-design/icons";
 import { join } from "path";
-import { isUrl, ScowExtensionRouteContext } from "src/extensions/common";
+import { ExtensionRouteQuery,isUrl } from "src/extensions/common";
 import { defineExtensionRoute } from "src/extensions/routes";
 import { NavItemProps } from "src/layouts/base/types";
 import { NavIcon } from "src/layouts/icon";
@@ -27,6 +27,7 @@ export const BaseNavItem = z.object({
     alt: z.string().optional(),
   })),
   openInNewPage: z.boolean().optional(),
+  hideIfNotActive: z.boolean().optional(),
 });
 
 export type NavItem = z.infer<typeof BaseNavItem> & {
@@ -40,7 +41,7 @@ export const NavItem = BaseNavItem.extend({
 export const rewriteNavigationsRoute = (from: "portal" | "mis") => defineExtensionRoute({
   path: `/${from}/rewriteNavigations`,
   method: "POST" as const,
-  query: ScowExtensionRouteContext,
+  query: ExtensionRouteQuery,
   body: z.object({
     navs: z.array(NavItem) as z.ZodType<NavItem[]>,
   }),
@@ -59,6 +60,7 @@ export const fromNavItemProps = (props: NavItemProps[]): NavItem[] => {
     text: x.text,
     openInNewPage: x.openInNewPage,
     children: x.children ? fromNavItemProps(x.children) : undefined,
+    hideIfNotActive: x.hideIfNotActive,
   }));
 };
 
@@ -115,6 +117,7 @@ export const toNavItemProps = (
       ) ?? LinkOutlined,
       handleClick: originalItemsMap.get(item.path)?.handleClick,
       children: item.children ? rec(item.children) : undefined,
+      hideIfNotActive: item.hideIfNotActive,
     }));
   };
 

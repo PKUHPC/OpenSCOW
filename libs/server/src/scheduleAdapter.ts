@@ -16,6 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
 import { parseErrorDetails } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
+import { Logger } from "ts-log";
 
 
 /**
@@ -54,14 +55,7 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
   if (scheduleApiVersion) {
 
     // 检查调度器接口版本是否大于等于最低要求版本
-    let geMinVersion: boolean;
-    if (scheduleApiVersion.major !== minVersion.major) {
-      geMinVersion = (scheduleApiVersion.major > minVersion.major);
-    } else if (scheduleApiVersion.minor !== minVersion.minor) {
-      geMinVersion = (scheduleApiVersion.minor > minVersion.minor);
-    } else {
-      geMinVersion = true;
-    }
+    const geMinVersion = compareSchedulerApiVersion(scheduleApiVersion,minVersion);
 
     if (!geMinVersion) {
       throw {
@@ -74,5 +68,38 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
       } as ServiceError;
     }
   }
-
 };
+
+
+export function compareSchedulerApiVersion(scheduleApiVersion: ApiVersion, minVersion: ApiVersion): boolean {
+  let geMinVersion: boolean;
+  if (scheduleApiVersion.major !== minVersion.major) {
+    geMinVersion = (scheduleApiVersion.major > minVersion.major);
+  } else if (scheduleApiVersion.minor !== minVersion.minor) {
+    geMinVersion = (scheduleApiVersion.minor > minVersion.minor);
+  } else {
+    geMinVersion = true;
+  }
+
+  return geMinVersion;
+}
+
+export async function getSchedulerApiVersion(client: SchedulerAdapterClient, logger: Logger): Promise<ApiVersion> {
+  let scheduleApiVersion: ApiVersion;
+  try {
+    scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
+  } catch (e) {
+    // 适配器请求连接失败的处理
+    if (((e as any).code === status.CANCELLED)) {
+      throw e;
+    }
+
+    // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
+    scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
+    logger.info("The scheduler API version can not be confirmed");
+  }
+
+  return scheduleApiVersion;
+}
+
+

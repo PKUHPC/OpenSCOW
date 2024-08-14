@@ -45,7 +45,7 @@ interface Props {
 }
 
 export const BigScreenMenu: React.FC<Props> = ({
-  routes, className, pathname, activeKeys,
+  routes, className, activeKeys, pathname,
 }) => {
 
   const router = useRouter();
@@ -78,7 +78,7 @@ export const BigScreenMenu: React.FC<Props> = ({
               mode="horizontal"
               selectedKeys={activeKeys}
               onClick={handleMenuClick}
-              items={createMenuItems(routes, true)}
+              items={createMenuItems(routes, pathname, true)}
             />
           ) : undefined
       }
