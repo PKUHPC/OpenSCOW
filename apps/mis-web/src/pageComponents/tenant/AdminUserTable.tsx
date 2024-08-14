@@ -245,7 +245,7 @@ export const AdminUserTable: React.FC<Props> = ({
             <>
               {r.accountAffiliations.map((x, index) => (
                 <>
-                  <Link href={`/accounts/${x.accountName}/users`}>{x.accountName}</Link>
+                  <Link href={`/tenant/accounts/${x.accountName}/users`}>{x.accountName}</Link>
                   {index < r.accountAffiliations.length - 1 && ", "}
                 </>
               ))}
