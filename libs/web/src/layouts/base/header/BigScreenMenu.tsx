@@ -31,7 +31,7 @@ const Container = styled.div`
     font-size:1.42em;
   }
 
-  .ant-menu-item-icon img{
+  .anticon img{
     font-size:1.42em;
   }
 
