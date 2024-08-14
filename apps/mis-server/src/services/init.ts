@@ -18,7 +18,7 @@ import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { authUrl } from "src/config";
 import { SystemState } from "src/entities/SystemState";
-import { PlatformRole, TenantRole, User } from "src/entities/User";
+import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { userExists } from "src/utils/userExists";
@@ -98,7 +98,7 @@ export const initServiceServer = plugin((server) => {
         tenant: { name: DEFAULT_TENANT_NAME },
       });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,
@@ -124,7 +124,7 @@ export const initServiceServer = plugin((server) => {
         tenant: { name: DEFAULT_TENANT_NAME },
       });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
           code: status.NOT_FOUND,
           message: `User ${request.userId} is not found in default tenant.`,

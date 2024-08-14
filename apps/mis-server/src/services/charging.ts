@@ -148,6 +148,15 @@ export const chargingServiceServer = plugin((server) => {
           }
         }
 
+        if (accountName && target) { // 是账户
+          const { state } = target as Account;
+          if (state === AccountState.DELETED) {
+            throw {
+              code: status.NOT_FOUND, message: `Account  ${accountName} has been deleted`,
+            } as ServiceError;
+          }
+        }
+
         const currentActivatedClusters = await getActivatedClusters(em, logger);
 
         return await charge({

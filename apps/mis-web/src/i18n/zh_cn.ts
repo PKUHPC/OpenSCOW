@@ -608,7 +608,7 @@ export default {
       oldPassword:"原密码",
       newPassword:"新密码",
       confirmPassword:"确认密码",
-      userNotExist:"用户不存在",
+      userNotExist:"用户不存在或已删除",
       unavailable:"本功能在当前配置下不可用",
     },
     tenant:{
@@ -842,7 +842,7 @@ export default {
       operationDetail:"操作内容",
       operatorIp:"操作IP",
       alreadyIs:"用户已经是该角色",
-      notExist:"用户不存在",
+      notExist:"用户不存在或已删除",
       notAuth:"用户没有权限",
       setSuccess:"设置成功",
       cannotCancel:"不能取消自己的平台管理员角色",

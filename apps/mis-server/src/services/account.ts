@@ -27,12 +27,21 @@ import { authUrl } from "src/config";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { User, UserState } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { toRef } from "src/utils/orm";
+
+function checkIfAccountDeleted(account: Account) {
+  if (account.state === AccountState.DELETED) {
+    throw {
+      code: Status.NOT_FOUND,
+      message: `Account ${account.accountName} has been deleted.`,
+    } as ServiceError;
+  }
+}
 
 export const accountServiceServer = plugin((server) => {
 
@@ -50,6 +59,9 @@ export const accountServiceServer = plugin((server) => {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
           } as ServiceError;
         }
+
+        // 检查账户是否已删除
+        checkIfAccountDeleted(account);
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);
         const jobs = await server.ext.clusters.callOnAll(
@@ -127,6 +139,8 @@ export const accountServiceServer = plugin((server) => {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
           } as ServiceError;
         }
+
+        checkIfAccountDeleted(account);
 
         if (!account.blockedInCluster) {
           throw {
@@ -214,9 +228,9 @@ export const accountServiceServer = plugin((server) => {
       const { accountName, tenantName, ownerId, comment } = request;
       const user = await em.findOne(User, { userId: ownerId, tenant: { name: tenantName } });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${user} under tenant ${tenantName} does not exist`,
+          code: Status.NOT_FOUND, message: `User ${ownerId} under tenant ${tenantName} does not exist`,
         } as ServiceError;
       }
 
@@ -371,6 +385,8 @@ export const accountServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      checkIfAccountDeleted(account);
+
       if (account.whitelist) {
         return [{ executed: false }];
       }
@@ -420,6 +436,9 @@ export const accountServiceServer = plugin((server) => {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
         } as ServiceError;
       }
+
+      checkIfAccountDeleted(account);
+
       if (!account.whitelist) {
         return [{ executed: false }];
       }
@@ -465,6 +484,9 @@ export const accountServiceServer = plugin((server) => {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
         } as ServiceError;
       }
+
+      checkIfAccountDeleted(account);
+
       account.blockThresholdAmount = blockThresholdAmount
         ? new Decimal(moneyToNumber(blockThresholdAmount))
         : undefined;
@@ -518,11 +540,7 @@ export const accountServiceServer = plugin((server) => {
           } as ServiceError;
         }
 
-        if (account.state === AccountState.DELETED) {
-          throw {
-            code: Status.NOT_FOUND, message: `Account ${accountName} has been deleted`,
-          } as ServiceError;
-        }
+        checkIfAccountDeleted(account);
 
         const userAccounts = account.users.getItems();
         const currentActivatedClusters = await getActivatedClusters(em, logger);

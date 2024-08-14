@@ -788,7 +788,7 @@ export const userServiceServer = plugin((server) => {
       }];
     },
 
-    getUsersByIds: async ({ request, em }) => {
+    getUsersByIds: async ({ request, em }) => { // 操作日志调用，可以展示已删除
       const { userIds } = request;
 
       const users = await em.find(User, { userId: { $in: userIds } });
@@ -832,7 +832,7 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId: userId });
 
-      if (!user) {
+      if (!user || user.state == UserState.DELETED) {
         throw {
           code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
         } as ServiceError;
@@ -856,9 +856,9 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId: userId });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`,
         } as ServiceError;
       }
 
@@ -881,9 +881,9 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId: userId });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`,
         } as ServiceError;
       }
 
@@ -905,9 +905,9 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId: userId });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`,
         } as ServiceError;
       }
 
@@ -928,9 +928,9 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId: userId });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`,
         } as ServiceError;
       }
 
@@ -999,9 +999,10 @@ export const userServiceServer = plugin((server) => {
 
       const user = await em.findOne (User, { userId }, { populate: ["tenant"]});
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${userId} is not found.`, details: "USER_NOT_FOUND",
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`
+          , details: "USER_NOT_FOUND",
         } as ServiceError;
       }
 

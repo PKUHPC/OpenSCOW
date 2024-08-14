@@ -22,7 +22,7 @@ import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
-import { TenantRole, User } from "src/entities/User";
+import { TenantRole, User, UserState } from "src/entities/User";
 import { UserAccount } from "src/entities/UserAccount";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
@@ -239,9 +239,10 @@ export const tenantServiceServer = plugin((server) => {
 
       const user = await em.findOne(User, { userId, name: userName });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName} is not found.`,
+          code: Status.NOT_FOUND, message: `User with userId ${userId} and name ${userName}
+          is either not found or has been deleted.`,
         } as ServiceError;
       }
 

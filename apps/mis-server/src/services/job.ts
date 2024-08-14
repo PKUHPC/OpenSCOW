@@ -29,7 +29,7 @@ import { charge, pay } from "src/bl/charging";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { createPriceMap, getActiveBillingItems } from "src/bl/PriceMap";
 import { misConfig } from "src/config/mis";
-import { Account } from "src/entities/Account";
+import { Account, AccountState } from "src/entities/Account";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
@@ -157,8 +157,15 @@ export const jobServiceServer = plugin((server) => {
 
           if (!account) {
             throw {
-              code: status.INTERNAL,
+              code: status.NOT_FOUND,
               message: `Unknown account ${x.account} of job ${x.biJobIndex}`,
+            } as ServiceError;
+          }
+
+          if (account.state === AccountState.DELETED) {
+            throw {
+              code: status.NOT_FOUND,
+              message: `Account ${x.account} for job ${x.biJobIndex} has been deleted.`,
             } as ServiceError;
           }
 

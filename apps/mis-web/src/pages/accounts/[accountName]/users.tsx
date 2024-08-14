@@ -19,7 +19,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { AccountState,UserRole } from "src/models/User";
+import { UserRole } from "src/models/User";
 import { useAccountPagesAccountName } from "src/pageComponents/accounts/checkQueryAccountNameIsAdmin";
 import { AddUserButton } from "src/pageComponents/users/AddUserButton";
 import { UserTable } from "src/pageComponents/users/UserTable";
@@ -39,10 +39,6 @@ export const UsersPage: NextPage = requireAuth(
 
     const account = userStore.user.accountAffiliations.find((x) => x.accountName === accountName)!;
 
-    // 已删除账户的用户管理返回空白屏蔽操作
-    if (account.accountState === AccountState.DELETED) {
-      return null;
-    }
     const promiseFn = useCallback(async () => {
       return await api.getAccountUsers({ query: {
         accountName,

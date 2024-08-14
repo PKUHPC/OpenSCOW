@@ -43,10 +43,10 @@ export const ChangeJobPriceSchema = typeboxRouteSchema({
 
   responses: {
     200: Type.Object({ count: Type.Number() }),
-    /** 作业未找到 */
-    404: Type.Null(),
     /** 非租户管理员不能修改作业的账户价格；非平台管理员不能修改作业的租户价格 */
     403: Type.Null(),
+    // 账户未找到或已删除，或作业未找到
+    404: Type.Object({ message: Type.String() }),
   },
 });
 
@@ -91,6 +91,6 @@ export default route(ChangeJobPriceSchema,
     })
       .then((x) => ({ 200: x }))
       .catch(handlegRPCError({
-        [Status.NOT_FOUND]: () => ({ 404: null }),
+        [Status.NOT_FOUND]: (e) => ({ 404: { message: e.message } }),
       }));
   });

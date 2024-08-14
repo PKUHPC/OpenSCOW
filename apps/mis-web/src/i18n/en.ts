@@ -608,7 +608,7 @@ export default {
       oldPassword: "Old Password",
       newPassword: "New Password",
       confirmPassword: "Confirm Password",
-      userNotExist:"User Not Exist",
+      userNotExist:"The user does not exist or has been deleted",
       unavailable:"This feature is not available in the current configuration",
     },
     tenant: {
@@ -842,7 +842,7 @@ export default {
       operationDetail: "Operation Details",
       operatorIp: "Operator IP",
       alreadyIs: "User is already in this role",
-      notExist: "User does not exist",
+      notExist: "The user does not exist or has been deleted",
       notAuth: "User does not have permission",
       setSuccess: "Set Successfully",
       cannotCancel: "Cannot cancel your own platform admin role",
