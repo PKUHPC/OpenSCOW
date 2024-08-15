@@ -28,7 +28,7 @@ import { createServer } from "src/app";
 import { authUrl } from "src/config";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
-import { PlatformRole as pRole, TenantRole as tRole, User } from "src/entities/User";
+import { PlatformRole as pRole, TenantRole as tRole, User, UserState } from "src/entities/User";
 import { UserAccount, UserRole, UserStatus } from "src/entities/UserAccount";
 import { range } from "src/utils/array";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -70,7 +70,8 @@ it("creates user", async () => {
   const userId = "2";
   const email = "test@test.com";
 
-  await asyncClientCall(client, "createUser", { name, identityId: userId, email, tenantName: tenant.name, password });
+  await asyncClientCall(client, "createUser",
+    { name, identityId: userId, email, tenantName: tenant.name, password });
 
   const em = server.ext.orm.em.fork();
 
@@ -139,9 +140,9 @@ it("cannot remove a user from account,when user has jobs running or pending", as
   const data = await insertInitialData(server.ext.orm.em.fork());
 
   const reply = await asyncClientCall(client, "removeUserFromAccount", {
-    tenantName: data.tenant.name,
-    accountName: data.accountA.accountName,
-    userId: data.userB.userId,
+    tenantName: data.anotherTenant.name,
+    accountName: data.accountC.accountName,
+    userId: data.userC.userId,
   }).catch((e) => e);
 
   expect(reply.code).toBe(Status.FAILED_PRECONDITION);
@@ -188,37 +189,56 @@ it("when removing a user from an account, the account and user cannot be deleted
 });
 
 it("deletes user", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
   const em = server.ext.orm.em.fork();
-  const data = await insertInitialData(em);
 
+  // 创建用户并关联到 accountC
   const user = new User({
-    name: "test", userId: "test", email: "test@test.com",
-    tenant: data.tenant,
+    name: "test",
+    userId: "testDelete",
+    email: "test@test.com",
+    tenant: data.anotherTenant,
   });
-  data.accountA.users.add(new UserAccount({
-    user,
-    account: data.accountA,
-    role: UserRole.USER,
-    blockedInCluster: UserStatus.BLOCKED,
-  }));
 
-  await em.persistAndFlush([user]);
+  const userAccount = new UserAccount({
+    user,
+    account: data.accountC,
+    role: UserRole.ADMIN,
+    blockedInCluster: UserStatus.UNBLOCKED,
+  });
+
+  await em.persistAndFlush([user, userAccount]);
 
   em.clear();
 
-  expect(await em.count(UserAccount, { account: data.accountA })).toBe(3);
-  expect(await em.count(User, { tenant: data.tenant })).toBe(3);
+  // 确认 accountC 中的用户数量
+  const initialUserAccountCount = await em.count(UserAccount, { account: data.accountC });
+  expect(initialUserAccountCount).toBe(2); // 确认预期的初始状态
 
+  // 确认 anotherTenant 中的用户数量
+  const initialUserCount = await em.count(User, { tenant: data.anotherTenant });
+  expect(initialUserCount).toBe(2);
+
+  // 执行删除用户操作
   await asyncClientCall(client, "deleteUser", {
     tenantName: user.tenant.getProperty("name"),
     userId: user.userId,
   });
 
-  await reloadEntity(em, data.accountA);
+  // 重新加载用户实体，检查状态
+  const deletedUser = await em.findOneOrFail(User, { userId: user.userId });
+  expect(deletedUser.state).toBe(UserState.DELETED);
 
-  expect(await em.count(UserAccount, { account: data.accountA })).toBe(2);
-  expect(await em.count(User, { tenant: data.tenant })).toBe(2);
+  // 重新加载 accountC 以检查删除后的状态
+  await reloadEntity(em, data.accountC);
+  const remainingUserAccountCount = await em.count(UserAccount, { account: data.accountC });
+  expect(remainingUserAccountCount).toBe(1);
+
+  // 确认 anotherTenant 中的用户数量不变
+  const finalUserCount = await em.count(User, { tenant: data.anotherTenant });
+  expect(finalUserCount).toBe(2);
 });
+
 
 it("cannot delete owner", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());
@@ -234,6 +254,21 @@ it("cannot delete owner", async () => {
   expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
 });
 
+it("cannot delete user with jobs running", async () => {
+  const data = await insertInitialData(server.ext.orm.em.fork());
+  const em = server.ext.orm.em.fork();
+
+  // 执行删除用户操作
+  const reply = await asyncClientCall(client, "deleteUser", {
+    tenantName: data.userA.tenant.getProperty("name"),
+    userId: data.userA.userId,
+  }).catch((e) => e);
+  expect(reply.code).toBe(Status.FAILED_PRECONDITION);
+
+  // 确认用户仍然存在
+  const deletedUser = await em.findOneOrFail(User, { userId: data.userA.userId });
+  expect(deletedUser.state).toBe(UserState.NORMAL);
+});
 
 it("get all users", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());

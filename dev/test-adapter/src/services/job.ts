@@ -20,29 +20,41 @@ export const jobServiceServer = plugin((server) => {
     getJobs: async ({ request }) => {
       const endTimeRange = request.filter?.endTime;
       const accountNames = request.filter?.accounts;
+      const users = request.filter?.users;
 
-      // 用于测试removeUserFromAccount接口
-      if (accountNames && accountNames[0] === "account_remove") {
-        return [{ jobs:[], totalCount:0 }];
-      }
+      // 用于筛选deleteUser以及其他有accounts限制的接口
+      let testDataClone = testData.filter((x) => {
+        if (accountNames && accountNames.length !== 0) {
+          return accountNames.includes(x.account);
+        }
+        return true;
+      });
+
+      testDataClone = testDataClone.filter((x) => {
+        if (users && users.length !== 0) {
+          return users.includes(x.user);
+        }
+        return true;
+      });
+
+      const jobs = testDataClone.filter((x) =>
+        x.cluster === clusterId &&
+        (endTimeRange ?
+          new Date(x.endTime) >= new Date(endTimeRange.startTime ?? 0) &&
+          new Date(x.endTime) <= new Date(endTimeRange.endTime ?? 0)
+          : true
+        ))
+        .map(({ tenant, tenantPrice, accountPrice, cluster, ...rest }) => {
+          return {
+            ...rest,
+            state: "COMPLETED",
+            workingDirectory: "",
+          };
+        });
 
       return [{
-        jobs: testData.filter((x) =>
-          x.cluster === clusterId &&
-          (endTimeRange ?
-            new Date(x.endTime) >= new Date(endTimeRange.startTime ?? 0) &&
-            new Date(x.endTime) <= new Date(endTimeRange.endTime ?? 0)
-            : true
-          ))
-          .map(({ tenant, tenantPrice, accountPrice, cluster, ...rest }) => {
-            return {
-              ...rest,
-              state: "COMPLETED",
-              workingDirectory: "",
-            };
-          }),
-        // set this field for test
-        totalCount: 20,
+        jobs,
+        totalCount: jobs.length,
       }];
     },
 

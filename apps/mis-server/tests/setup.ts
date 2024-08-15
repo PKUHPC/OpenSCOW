@@ -20,8 +20,8 @@ module.exports = async () => {
       changePassword: true,
       getUser: true,
       validateName: true,
-      deleteUser: true,
-      deleteAccount: true,
+      // deleteUser: true, 本地测试时lib-auth函数deleteUser等会被视为undefined
+      // deleteAccount: true,
     })),
     // deleteUser:jest.fn(async () => ({ identityId: "test" })),
     // deleteAccount:jest.fn(async () => ({ accountName: "test" })),

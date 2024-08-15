@@ -72,15 +72,19 @@ export async function insertInitialData(em: SqlEntityManager) {
     blockedInCluster: false,
     comment: "123",
   });
+
+
   const uaCC = new UserAccount({
     user: userC,
     account: accountC,
     role: UserRole.ADMIN,
     blockedInCluster: UserStatus.BLOCKED,
   });
+
   await em.persistAndFlush([anotherTenant, userC, accountC, uaCC]);
 
-  return { tenant, userA, userB, userC, accountA, accountB, accountC, uaAA, uaAB, uaBB, uaCC, anotherTenant };
+  return { tenant, userA, userB, userC, accountA, accountB, accountC, uaAA, uaAB, uaBB,
+    uaCC, anotherTenant };
 
 }
 
