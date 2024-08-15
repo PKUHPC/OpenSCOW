@@ -40,6 +40,7 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
+import { UserState } from "src/models/User";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import {
   User, UserStore,
@@ -243,6 +244,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         extra.userInfo = {
           ...result,
           token: token,
+          state: UserState.NORMAL,
         };
 
         // get cluster configs from config file
