@@ -20,6 +20,7 @@ import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { UserStatus } from "src/models/User";
+import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -133,7 +134,11 @@ export const JobChargeLimitModal: React.FC<Props> = ({
                 compareUsedChargeRule(_, value, currentUsed ? moneyToNumber(currentUsed) : undefined, languageId) },
           ]}
         >
-          <InputNumber precision={2} min={0} />
+          <InputNumber
+            step={1 / Math.pow(10, publicConfig.JOB_CHARGE_DECIMAL_PRECISION)}
+            precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
+            min={0}
+          />
         </Form.Item>
       </Form>
 

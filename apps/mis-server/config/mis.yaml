@@ -5,4 +5,5 @@ db:
   password: mysqlrootpassword
   dbName: scow_server_${JEST_WORKER_ID}
 
-
+periodicSyncUserAccountBlockStatus:
+  enabled: false

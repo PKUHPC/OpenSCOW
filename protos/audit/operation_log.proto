@@ -137,9 +137,22 @@ message DeleteFile {
   string path = 2;
 }
 
+message InitMultipartUpload {
+  string cluster_id = 1;
+  string path = 2;
+  string name = 3;
+}
+
 message UploadFile {
   string cluster_id = 1;
   string path = 2;
+}
+
+message MergeFileChunks {
+  string cluster_id = 1;
+  string path = 2;
+  string name = 3;
+  uint64 size_byte = 4;
 }
 
 message CreateDirectory {
@@ -708,8 +721,10 @@ message CreateOperationLogRequest {
     ShareModelVersion share_model_version = 94;
     DeleteModelVersion delete_model_version = 95;
     CopyModelVersion copy_model_version = 96;
-    DeleteUser delete_user = 97;
-    DeleteAccount delete_account = 98;
+    MergeFileChunks merge_file_chunks =  97;
+    InitMultipartUpload init_multipart_upload = 98;
+    DeleteUser delete_user = 99;
+    DeleteAccount delete_account = 100;
   }
 }
 
@@ -814,8 +829,10 @@ message OperationLog {
     ShareModelVersion share_model_version = 96;
     DeleteModelVersion delete_model_version = 97;
     CopyModelVersion copy_model_version = 98;
-    DeleteUser delete_user=99;
-    DeleteAccount delete_account = 100;
+    MergeFileChunks merge_file_chunks = 99;
+    InitMultipartUpload init_multipart_upload = 100;
+    DeleteUser delete_user=101;
+    DeleteAccount delete_account = 102;
   }
 }
 

@@ -1047,7 +1047,7 @@ export default {
         slurmBlockStatus: {
           syncUserAccountBlockingStatus: "用户账户封锁状态同步",
           alertInfo: "SCOW会定期向调度器同步SCOW数据库中账户和用户的封锁状态，您可以点击立刻同步执行一次手动同步",
-
+          syncAlreadyStarted: "正在进行一次同步。请等待本次同步执行完成后，再重新同步。",
           periodicSyncUserAccountBlockStatusInfo:"周期性同步调度器账户和用户的封锁状态",
           turnedOn: "已开启",
           paused: "已暂停",
@@ -1288,6 +1288,8 @@ export default {
       customEvent: "自定义操作行为",
       activateCluster: "启用集群",
       deactivateCluster: "停用集群",
+      mergeFileChunks: "合并临时文件块",
+      initMultipartUpload: "初始化分片上传",
       deleteUser:"删除用户",
       deleteAccount:"删除账户",
     },

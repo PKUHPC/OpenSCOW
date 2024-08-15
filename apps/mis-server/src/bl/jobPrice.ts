@@ -107,9 +107,18 @@ export async function calculateJobPrice(
 
     amount = amount.multipliedBy(time);
 
-    amount = amount.decimalPlaces(3, Decimal.ROUND_DOWN);
+    amount = amount.decimalPlaces(misConfig.jobChargeDecimalPrecision, Decimal.ROUND_DOWN);
 
-    return priceItem.price.multipliedBy(amount).decimalPlaces(3, Decimal.ROUND_HALF_CEIL);
+    // 如果单价大于0，且运行时间大于0，若结果算下来金额小于默认最低消费金额，按最低消费金额计算价格
+    if (priceItem.price.gt(0) && time.gt(0)) {
+      if (priceItem.price.multipliedBy(amount).gt(new Decimal(misConfig.jobMinCharge))) {
+        return priceItem.price.multipliedBy(amount)
+          .decimalPlaces(misConfig.jobChargeDecimalPrecision, Decimal.ROUND_HALF_CEIL);
+      }
+      return new Decimal(misConfig.jobMinCharge);
+    }
+
+    return new Decimal(0);
   }
   const accountBase = getPriceItem(path, info.tenant);
   const tenantBase = getPriceItem(path);

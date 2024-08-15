@@ -18,8 +18,11 @@ import {
   createAppSession,
   getAppMetadata,
   getCreateAppParams,
+  listApps,
   listAppSessions,
   listAvailableApps,
+  listClusters,
+  listTags,
   saveImage,
 } from "./apps";
 import { cancelJob, getSubmitTrainParams, trainJob } from "./jobs";
@@ -32,6 +35,9 @@ export const jobsRouter = router({
   checkAppConnectivity,
   getCreateAppParams,
   connectToApp,
+  listApps,
+  listTags,
+  listClusters,
   cancelJob,
   saveImage,
   trainJob,

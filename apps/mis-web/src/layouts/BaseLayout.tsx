@@ -54,6 +54,7 @@ export const BaseLayout =
       icon: <DesktopOutlined style={{ paddingRight: 2 }} />,
       href: toCallbackPage(publicConfig.PORTAL_URL),
       text: t("layouts.route.navLinkTextPortal"),
+      crossSystem: true,
     });
   }
 
@@ -62,6 +63,7 @@ export const BaseLayout =
       icon: <RobotOutlined style={{ paddingRight: 2 }} />,
       href: publicConfig.AI_URL,
       text: t("layouts.route.navLinkTextAI"),
+      crossSystem: true,
     });
   }
 

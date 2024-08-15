@@ -36,6 +36,7 @@ import {
 import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { configClusters } from "src/config/clusters";
 import { misConfig } from "src/config/mis";
 import { Account,AccountState } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -462,7 +463,9 @@ export const userServiceServer = plugin((server) => {
         server.logger)
         .then(async () => {
           // insert public key
-          await insertKeyToNewUser(identityId, password, server.logger)
+          // 插入公钥失败也认为是创建用户成功
+          // 在所有集群下执行
+          await insertKeyToNewUser(identityId, password, server.logger, configClusters)
             .catch(() => {});
           return true;
         })

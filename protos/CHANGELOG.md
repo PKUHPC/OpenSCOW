@@ -1,5 +1,17 @@
 # @scow/grpc-api
 
+## 1.11.0
+
+### Minor Changes
+
+- 4bef1b3: 增加获取 SCOW API 版本的接口
+- 66a96ba: 新增 getClusterNodesInfo 接口，用于获取集群分区节点信息。
+
+### Patch Changes
+
+- c214bd2: 当 mis-server 正在进行一次封锁状态同步时，调用 server/AdminService.UpdateBlockStatus API 会抛出`AlreadyExists`错误
+- e9c8bfa: 增加 ai 的操作日志，涉及文件、镜像、数据集、算法、模型和作业应用'
+
 ## 1.10.0
 
 ### Minor Changes

@@ -1,5 +1,23 @@
 # @scow/lib-server
 
+## 1.3.1
+
+### Patch Changes
+
+- 1a096de: 修复门户系统集群登录节点只配置地址时路由渲染失败的问题，在集群配置接口返回中加入 scowd 配置信息
+- Updated dependencies [0275a9e]
+- Updated dependencies [753a996]
+- Updated dependencies [a9e9011]
+- Updated dependencies [1a096de]
+- Updated dependencies [66a96ba]
+- Updated dependencies [0eb668d]
+  - @scow/config@1.5.1
+  - @scow/scheduler-adapter-protos@1.3.2
+  - @scow/utils@1.1.1
+  - @scow/lib-scheduler-adapter@1.1.11
+  - @scow/protos@1.0.13
+  - @scow/rich-error-model@2.0.0
+
 ## 1.3.0
 
 ### Minor Changes

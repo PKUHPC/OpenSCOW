@@ -72,6 +72,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       icon: <MisIcon style={{ paddingRight: 2 }} />,
       href: toCallbackPage(publicConfig.MIS_URL),
       text: t("baseLayout.linkTextMis"),
+      crossSystem: true,
     });
   }
 
@@ -80,6 +81,7 @@ export const BaseLayout = ({ footerText, versionTag, initialLanguage, children }
       icon: <RobotOutlined style={{ paddingRight: 2 }} />,
       href: publicConfig.AI_URL,
       text: t("baseLayout.linkTextAI"),
+      crossSystem: true,
     });
   }
 

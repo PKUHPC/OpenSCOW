@@ -16,10 +16,10 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { getAppConnectionInfoFromAdapter, getEnvVariables } from "@scow/lib-server";
+import { checkJobNameExisting, errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { DetailedError, ErrorInfo, parseErrorDetails } from "@scow/rich-error-model";
+import { DetailedError, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
 import fs from "fs";
 import { join } from "path";
@@ -30,6 +30,7 @@ import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
+import { getScowdClient } from "src/utils/scowd";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
@@ -62,9 +63,6 @@ const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
 const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
-const errorInfo = (reason: string) =>
-  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
-
 export const appOps = (cluster: string): AppOps => {
 
   const host = getClusterLoginNode(cluster);
@@ -78,8 +76,36 @@ export const appOps = (cluster: string): AppOps => {
       const { appId, userId, account, coreCount, nodeCount, gpuCount, memory, maxTime, proxyBasePath,
         partition, qos, customAttributes, appJobName } = request;
 
-      const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
+      const jobName = appJobName;
 
+      // 检查作业名是否重复
+      await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await checkJobNameExisting(client,userId,jobName,logger);
+        },
+      ).catch((e) => {
+        const ex = e as ServiceError;
+        const errors = parseErrorDetails(ex.metadata);
+        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
+              && errors[0].reason === "ALREADY_EXISTS") {
+          throw new DetailedError({
+            code: Status.ALREADY_EXISTS,
+            message: ex.details,
+            details: [errorInfo("ALREADY_EXISTS")],
+          });
+        }
+        else {
+          throw new DetailedError({
+            code: ex.code,
+            message: ex.details,
+            details: [errorInfo("SBATCH_FAILED")],
+          });
+        }
+      });
+
+      const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 
       const userSbatchOptions = customAttributes.sbatchOptions
         ? splitSbatchArgs(customAttributes.sbatchOptions)
@@ -95,8 +121,6 @@ export const appOps = (cluster: string): AppOps => {
           details: [errorInfo("NOT FOUND")],
         });
       }
-
-      const jobName = appJobName;
 
       const workingDirectory = join(portalConfig.appJobsDir, jobName);
 
@@ -247,17 +271,36 @@ export const appOps = (cluster: string): AppOps => {
     getAppLastSubmission: async (requset, logger) => {
       const { userId, appId } = requset;
 
-      return await sshConnect(host, userId, logger, async (ssh) => {
+      const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
 
-        const sftp = await ssh.requestSFTP();
-        const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
+      const clusterInfo = configClusters[cluster];
+      if (clusterInfo.scowd?.enabled) {
+        const client = getScowdClient(cluster);
 
-        if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
-        const content = await sftpReadFile(sftp)(file);
-        const data = JSON.parse(content.toString()) as SubmissionInfo;
+        const data = await client.app.getAppLastSubmission({ userId, filePath: file });
 
-        return { lastSubmissionInfo: data };
-      });
+        const submitTime = !data.fileData?.submitTime ? undefined
+          : new Date(Number((data.fileData.submitTime.seconds * BigInt(1000))
+            + BigInt(data.fileData.submitTime.nanos / 1000000)));
+
+        return { lastSubmissionInfo: data.fileData ? {
+          ...data.fileData,
+          submitTime: submitTime?.toISOString(),
+        } : undefined };
+
+      } else {
+        return await sshConnect(host, userId, logger, async (ssh) => {
+
+          const sftp = await ssh.requestSFTP();
+
+          if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
+          const content = await sftpReadFile(sftp)(file);
+          const data = JSON.parse(content.toString()) as SubmissionInfo;
+
+          return { lastSubmissionInfo: data };
+        });
+      }
+
     },
 
     listAppSessions: async (request, logger) => {

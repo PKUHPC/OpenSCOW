@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { after, before } from "node:test";
+
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
@@ -19,6 +21,7 @@ import { Decimal, decimalToMoney, numberToMoney } from "@scow/lib-decimal";
 import { AddBillingItemRequest, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { createServer } from "src/app";
 import { createPriceMap } from "src/bl/PriceMap";
+import { misConfig } from "src/config/mis";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
 import { createPriceItems } from "src/tasks/createBillingItems";
@@ -236,15 +239,11 @@ it("adds billing item to another tenant", async () => {
   expect(reply.historyItems.length).toBe(0);
 });
 
-it("calculates price", async () => {
-
+const calculatePrice = async (testData: typeof import("./testData.json")) => {
   const priceMap = await createPriceMap(orm.em.fork(), server.ext.clusters, server.logger);
 
-
-  // obtain test data by running the following data in db
-  const testData = (await import("./testData.json")).default;
-
   const wrongPrices = [] as {
+    jobId: number,
     tenantPrice: { expected: number; actual: number | undefined };
     accountPrice: { expected: number; actual: number | undefined }
   }[];
@@ -266,14 +265,35 @@ it("calculates price", async () => {
     });
     if (price.tenant?.price.toNumber() !== t.tenantPrice || price.account?.price.toNumber() !== t.accountPrice) {
       wrongPrices.push({
+        jobId: t.jobId,
         tenantPrice: { expected: t.tenantPrice, actual: price.tenant?.price.toNumber() },
         accountPrice: { expected: t.accountPrice, actual: price.account?.price.toNumber() },
       });
     }
   };
 
-  expect(wrongPrices).toBeArrayOfSize(0);
+  console.log(wrongPrices);
 
+  expect(wrongPrices).toBeArrayOfSize(0);
+};
+
+it("calculates job price in precision 3 and min charge 0", async () => {
+
+  const beforeJobChargeDecimalPrecision = misConfig.jobChargeDecimalPrecision;
+  const beforeJobMinCharge = misConfig.jobMinCharge;
+
+  misConfig.jobChargeDecimalPrecision = 3;
+  misConfig.jobMinCharge = 0;
+
+  await calculatePrice((await import("./testData-precision3.json")).default).finally(() => {
+
+    misConfig.jobChargeDecimalPrecision = beforeJobChargeDecimalPrecision;
+    misConfig.jobMinCharge = beforeJobMinCharge;
+  });
+});
+
+it.only("calculates job prices", async () => {
+  await calculatePrice((await import("./testData.json")).default);
 });
 
 it("gets missing price items in platform scope", async () => {

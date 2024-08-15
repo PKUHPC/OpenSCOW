@@ -1049,6 +1049,8 @@ export default {
           alertInfo: "SCOW will regularly synchronize the blocking status of accounts and users to the scheduler. "
           + "You can click Sync Now to perform a manual synchronization.",
           periodicSyncUserAccountBlockStatusInfo: "Periodically Synchronize Scheduler Account And User Blocked Status",
+          syncAlreadyStarted:
+            "Synchronization is already started. Please wait for its completion before starting a new run.",
           turnedOn: "Turned On",
           paused: "Paused",
           stopSync: "Stop Synchronization",
@@ -1288,6 +1290,8 @@ export default {
       customEvent: "Custom Operation Event",
       activateCluster: "Activate Cluster",
       deactivateCluster: "Deactivate Cluster",
+      mergeFileChunks: "Merge and upload temporary file blocks",
+      initMultipartUpload: "Initial multipart upload file",
       deleteUser:"Delete User",
       deleteAccount:"Delete Account",
     },

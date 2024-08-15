@@ -91,6 +91,9 @@ export const SlurmBlockStatusPage: NextPage = requireAuth((u) => u.platformRoles
                       onClick={() => {
                         setFetching(true);
                         api.syncBlockStatus({})
+                          .httpError(409, () => {
+                            message.error(t(p("syncAlreadyStarted")));
+                          })
                           .then(({ blockedFailedAccounts, unblockedFailedAccounts, blockedFailedUserAccounts }) => {
                             if (!(blockedFailedAccounts.length || unblockedFailedAccounts.length
                               || blockedFailedUserAccounts.length)) {

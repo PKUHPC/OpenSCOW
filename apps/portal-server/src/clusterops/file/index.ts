@@ -25,7 +25,7 @@ export const fileOps = (cluster: string): FileOps => {
   const clusterInfo = configClusters[cluster];
   if (clusterInfo.scowd?.enabled) {
     const client = getScowdClient(cluster);
-    
+
     return {
       ...scowdFileServices(client),
     };
@@ -33,7 +33,7 @@ export const fileOps = (cluster: string): FileOps => {
     const host = getClusterLoginNode(cluster);
 
     if (!host) { throw clusterNotFound(cluster); }
-    
+
     return {
       ...sshFileServices(host),
     };

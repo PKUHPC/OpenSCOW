@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["HTTPS_PROXY"],
   "tasks": {
     "dev": {
       "persistent": true,

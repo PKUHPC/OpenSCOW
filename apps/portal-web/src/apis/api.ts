@@ -27,6 +27,7 @@ import type { AuthCallbackSchema } from "src/pages/api/auth/callback";
 import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetClusterRunningInfoSchema } from "src/pages/api/dashboard/getClusterInfo";
+import type { GetClusterNodesInfoSchema } from "src/pages/api/dashboard/getClusterNodesInfo";
 import type { GetQuickEntriesSchema } from "src/pages/api/dashboard/getQuickEntries";
 import type { SaveQuickEntriesSchema } from "src/pages/api/dashboard/saveQuickEntries";
 import type { CreateDesktopSchema } from "src/pages/api/desktop/createDesktop";
@@ -43,8 +44,10 @@ import type { DownloadFileSchema } from "src/pages/api/file/download";
 import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
+import type { InitMultipartUploadSchema } from "src/pages/api/file/initMultipartUpload";
 import type { ListFileSchema } from "src/pages/api/file/list";
 import type { ListAvailableTransferClustersSchema } from "src/pages/api/file/listAvailableTransferClusters";
+import type { MergeFileChunksSchema } from "src/pages/api/file/mergeFileChunks";
 import type { MkdirSchema } from "src/pages/api/file/mkdir";
 import type { MoveFileItemSchema } from "src/pages/api/file/move";
 import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFileTransferProgress";
@@ -79,6 +82,7 @@ export const api = {
   validateToken: apiClient.fromTypeboxRoute<typeof ValidateTokenSchema>("GET", "/api/auth/validateToken"),
   getClusterInfo: apiClient.fromTypeboxRoute<typeof GetClusterInfoSchema>("GET", "/api//cluster"),
   getClusterRunningInfo: apiClient.fromTypeboxRoute<typeof GetClusterRunningInfoSchema>("GET", "/api/dashboard/getClusterInfo"),
+  getClusterNodesInfo: apiClient.fromTypeboxRoute<typeof GetClusterNodesInfoSchema>("GET", "/api/dashboard/getClusterNodesInfo"),
   getQuickEntries: apiClient.fromTypeboxRoute<typeof GetQuickEntriesSchema>("GET", "/api/dashboard/getQuickEntries"),
   saveQuickEntries: apiClient.fromTypeboxRoute<typeof SaveQuickEntriesSchema>("POST", "/api/dashboard/saveQuickEntries"),
   createDesktop: apiClient.fromTypeboxRoute<typeof CreateDesktopSchema>("POST", "/api/desktop/createDesktop"),
@@ -95,8 +99,10 @@ export const api = {
   fileExist: apiClient.fromTypeboxRoute<typeof FileExistSchema>("GET", "/api/file/fileExist"),
   getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
+  initMultipartUpload: apiClient.fromTypeboxRoute<typeof InitMultipartUploadSchema>("POST", "/api/file/initMultipartUpload"),
   listFile: apiClient.fromTypeboxRoute<typeof ListFileSchema>("GET", "/api/file/list"),
   listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
+  mergeFileChunks: apiClient.fromTypeboxRoute<typeof MergeFileChunksSchema>("POST", "/api/file/mergeFileChunks"),
   mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
   queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
