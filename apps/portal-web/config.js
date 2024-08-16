@@ -190,6 +190,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
     SYSTEM_LANGUAGE_CONFIG: systemLanguageConfig,
 
     UI_EXTENSION: portalConfig.uiExtension,
+
+    NOTIF_ENABLED: commonConfig.notification?.enabled,
+    NOTIF_ADDRESS: commonConfig.notification?.address,
   };
 
   if (!building && !testenv) {

@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { TargetType } from "@scow/notification-protos/build/common_pb";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -27,9 +28,12 @@ import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
+import { InternalMessageType } from "src/models/messageType";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
+import { getAccountOwnerAndAdmin } from "src/utils/getAccountOwnerAndAdmin";
 import { toRef } from "src/utils/orm";
+import { sendMessage } from "src/utils/sendMessage";
 
 export const accountServiceServer = plugin((server) => {
 
@@ -37,7 +41,7 @@ export const accountServiceServer = plugin((server) => {
     blockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
-      return await em.transactional(async (em) => {
+      const result = await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
         }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: ["tenant"]});
@@ -107,14 +111,27 @@ export const accountServiceServer = plugin((server) => {
         // 更改数据库中状态值
         account.state = AccountState.BLOCKED_BY_ADMIN;
 
-        return [{ result: BlockAccountResponse_Result.OK }];
+        return { result: BlockAccountResponse_Result.OK };
       });
+
+      // 发送消息
+      const ownerAndAdmin = await getAccountOwnerAndAdmin(accountName, logger, em);
+      await sendMessage({
+        messageType: InternalMessageType.AccountLocked,
+        targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+        metadata: {
+          time: (new Date()).toISOString(),
+          accountName: accountName,
+        },
+      }, logger);
+
+      return [result];
     },
 
     unblockAccount: async ({ request, em, logger }) => {
       const { accountName } = request;
 
-      return await em.transactional(async (em) => {
+      const result = await em.transactional(async (em) => {
         const account = await em.findOne(Account, {
           accountName,
         }, { lockMode: LockMode.PESSIMISTIC_WRITE, populate: [ "tenant"]});
@@ -150,15 +167,27 @@ export const accountServiceServer = plugin((server) => {
             "Can not unblock %s in clusters because the account's balance less than or equal to the blocking threshold",
             accountName,
           );
-          return [{ executed: true }];
+          return { executed: true };
         }
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);
         await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
 
-        return [{ executed: true }];
-
+        return { executed: true };
       });
+
+      // 发送消息
+      const ownerAndAdmin = await getAccountOwnerAndAdmin(accountName, logger, em);
+      await sendMessage({
+        messageType: InternalMessageType.AccountRestored,
+        targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+        metadata: {
+          time: (new Date()).toISOString(),
+          accountName: accountName,
+        },
+      }, logger);
+
+      return [result];
     },
 
     getAccounts: async ({ request, em }) => {
@@ -391,6 +420,18 @@ export const accountServiceServer = plugin((server) => {
         );
       // 如果移入白名单之前账户状态不为冻结，则账户状态变更为正常，账户在集群中为解封状态
       } else {
+        if (account.state !== AccountState.NORMAL) {
+          // 发送账户解封消息
+          const ownerAndAdmin = await getAccountOwnerAndAdmin(accountName, logger, em);
+          await sendMessage({
+            messageType: InternalMessageType.AccountRestored,
+            targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+            metadata: {
+              time: (new Date()).toISOString(),
+              accountName: accountName,
+            },
+          }, logger);
+        }
         account.state = AccountState.NORMAL;
         const currentActivatedClusters = await getActivatedClusters(em, logger);
         await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
@@ -466,6 +507,19 @@ export const accountServiceServer = plugin((server) => {
         ? new Decimal(moneyToNumber(blockThresholdAmount))
         : undefined;
 
+      const ownerAndAdmin = await getAccountOwnerAndAdmin(account.accountName, logger, em);
+      if (account.balance.lt(account.blockThresholdAmount ?? 0)) {
+        await sendMessage({
+          messageType: InternalMessageType.AccountOverdue,
+          targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+          metadata: {
+            time: (new Date()).toISOString(),
+            accountName: account.accountName,
+            amount: account.balance.minus(account.blockThresholdAmount ?? 0).abs().toString(),
+          },
+        }, logger);
+      }
+
       const currentBlockThreshold = blockThresholdAmount ?
         new Decimal(moneyToNumber(blockThresholdAmount)) :
         account.tenant.getProperty("defaultAccountBlockThreshold");
@@ -489,6 +543,19 @@ export const accountServiceServer = plugin((server) => {
         logger.info("The balance of Account %s is greater than the block threshold amount. "
         + "Unblock the account.", account.accountName);
         await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+      }
+
+      // 判断移除白名单后是否时欠费状态，如果是则发送账户欠费通知
+      if (account.balance.lt(account.blockThresholdAmount ?? 0)) {
+        await sendMessage({
+          messageType: InternalMessageType.AccountOverdue,
+          targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+          metadata: {
+            time: (new Date()).toISOString(),
+            accountName: account.accountName,
+            amount: account.balance.minus(account.blockThresholdAmount ?? 0).abs().toString(),
+          },
+        }, logger);
       }
 
       await em.persistAndFlush(account);

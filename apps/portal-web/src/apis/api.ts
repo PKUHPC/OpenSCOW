@@ -63,6 +63,7 @@ import type { ListJobTemplatesSchema } from "src/pages/api/job/listJobTemplates"
 import type { RenameJobTemplateSchema } from "src/pages/api/job/renameJobTemplate";
 import type { SubmitFileAsJobSchema } from "src/pages/api/job/submitFileAsJob";
 import type { SubmitJobSchema } from "src/pages/api/job/submitJob";
+import type { GetUnreadMessageSchema } from "src/pages/api/notif/getUnreadMessages";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 
@@ -118,6 +119,7 @@ export const api = {
   renameJobTemplate: apiClient.fromTypeboxRoute<typeof RenameJobTemplateSchema>("POST", "/api/job/renameJobTemplate"),
   submitFileAsJob: apiClient.fromTypeboxRoute<typeof SubmitFileAsJobSchema>("POST", "/api/job/submitFileAsJob"),
   submitJob: apiClient.fromTypeboxRoute<typeof SubmitJobSchema>("POST", "/api/job/submitJob"),
+  getUnreadMessage: apiClient.fromTypeboxRoute<typeof GetUnreadMessageSchema>("GET", "/api/notif/getUnreadMessages"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
 };
