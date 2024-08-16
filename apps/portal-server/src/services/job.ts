@@ -15,7 +15,7 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { checkSchedulerApiVersion } from "@scow/lib-server";
+import { checkJobNameExisting, checkSchedulerApiVersion } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -232,6 +232,15 @@ export const jobServiceServer = plugin((server) => {
         saveAsTemplate, userId, nodeCount, partition, qos, account, comment, workingDirectory, output
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
+
+      // 检查作业名是否重复
+      await callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          await checkJobNameExisting(client,userId,jobName,logger);
+        },
+      );
 
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);

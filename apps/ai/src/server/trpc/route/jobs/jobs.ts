@@ -88,6 +88,9 @@ const TrainJobInputSchema = z.object({
   maxTime: z.number(),
   command: z.string(),
   gpuType: z.string().optional(),
+  // TensorFlow特有参数
+  psNodes: z.number().optional(),
+  workerNodes: z.number().optional(),
 });
 
 export type TrainJobInput = z.infer<typeof TrainJobInputSchema>;
@@ -134,12 +137,29 @@ procedure
     async ({ input, ctx: { user } }) => {
       const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, image, framework, remoteImageUrl,
         isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
-        coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType } = input;
+        coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
       const userId = user.identityId;
 
       const host = getClusterLoginNode(clusterId);
       if (!host) {
         throw clusterNotFound(clusterId);
+      }
+
+      const client = getAdapterClient(clusterId);
+
+      // 检查是否存在同名的作业
+      const existingJobName = await asyncClientCall(client.job, "getJobs", {
+        fields: ["job_id"],
+        filter: {
+          users: [userId], accounts: [],states: [],jobName:trainJobName,
+        },
+      }).then((resp) => resp.jobs);
+
+      if (existingJobName.length) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: `trainJobName ${trainJobName} is already existed`,
+        });
       }
 
       const em = await forkEntityManager();
@@ -189,7 +209,6 @@ procedure
         const entryScript = command;
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
-        const client = getAdapterClient(clusterId);
         const reply = await asyncClientCall(client.job, "submitJob", {
           userId,
           jobName: trainJobName,
@@ -237,6 +256,8 @@ procedure
             // 如果nodeCount不为1但同时选定镜像又没有框架标签，该接口会报错
             (nodeCount === 1 && !gpuType?.startsWith("huawei.com")) ? "" : framework || "",
           ],
+          psNodeCount:psNodes,
+          workerNodeCount:workerNodes,
         }).catch((e) => {
           const ex = e as ServiceError;
           throw new TRPCError({

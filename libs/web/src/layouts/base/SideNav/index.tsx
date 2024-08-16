@@ -15,7 +15,7 @@
 import { arrayContainsElement } from "@scow/utils";
 import { Layout, Menu } from "antd";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { calcSelectedKeys, createMenuItems } from "src/layouts/base/common";
+import { createMenuItems } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
 import { styled } from "styled-components";
@@ -32,6 +32,7 @@ interface Props {
 
   routes: NavItemProps[];
   pathname: string;
+  activeKeys: string[];
 
 }
 
@@ -78,7 +79,7 @@ function getAllParentKeys(routes: NavItemProps[]): string[] {
 }
 
 export const SideNav: React.FC<Props> = ({
-  collapsed, routes, setCollapsed, pathname,
+  collapsed, routes, setCollapsed, pathname, activeKeys,
 }) => {
 
   const parentKeys = useMemo(() => getAllParentKeys(routes), [routes]);
@@ -118,14 +119,12 @@ export const SideNav: React.FC<Props> = ({
 
   }, [openKeys, parentKeys]);
 
-  const selectedKeys = useMemo(() => calcSelectedKeys(routes, pathname), [routes, pathname]);
-
   // 账户管理页面，联动横向菜单栏展开相应的侧面菜单栏
   useEffect(() => {
     if (menuFocusedRef.current) {
-      setOpenKeys([selectedKeys[1]]);
+      setOpenKeys([activeKeys[1]]);
     }
-  }, [selectedKeys]);
+  }, [activeKeys]);
 
   useEffect(() => {
     if (window.innerWidth <= antdBreakpoints[breakpoint]) {
@@ -152,14 +151,14 @@ export const SideNav: React.FC<Props> = ({
       >
         <Menu
           mode="inline"
-          selectedKeys={selectedKeys}
+          selectedKeys={activeKeys}
           {
             ...collapsed
               ? undefined
               : { openKeys }
           }
           onOpenChange={onOpenChange}
-          items={createMenuItems(routes, false)}
+          items={createMenuItems(routes, pathname, false)}
         >
         </Menu>
       </StyledSider>

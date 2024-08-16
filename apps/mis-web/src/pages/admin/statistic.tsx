@@ -28,8 +28,10 @@ import { PlatformRole, SearchType } from "src/models/User";
 import { DataBarChart } from "src/pageComponents/admin/DataBarChart";
 import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
+import { publicConfig } from "src/utils/config";
 import { dateMessageToDayjs } from "src/utils/date";
 import { Head } from "src/utils/head";
+import { moneyNumberToString } from "src/utils/money";
 import { styled } from "styled-components";
 
 const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -244,7 +246,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
     return topChargeAccount?.results.map((r) => ({
       x: r.userName,
-      y: moneyToNumber(r.chargedAmount).toFixed(2),
+      y: moneyNumberToString(moneyToNumber(r.chargedAmount)),
     })) || [];
   }, [query, topChargeAccount]);
 
@@ -252,7 +254,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
     return topPayAccount?.results.map((r) => ({
       x: r.userName,
-      y: moneyToNumber(r.payAmount).toFixed(2),
+      y: moneyNumberToString(moneyToNumber(r.payAmount)),
     })) || [];
   }, [query, topPayAccount]);
 
@@ -383,7 +385,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             loading={totalChargeAmountLoading || dailyChargeLoading}
             icon={MoneyCollectOutlined}
             iconColor="#feca57"
-            precision={2}
+            precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
           />
         </Col>
         <Col span={24}>
@@ -447,7 +449,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
                 <DataLineChart
                   data={dailyChargeData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: Number(d.count.toFixed(2)),
+                    y: Number(moneyNumberToString(d.count)),
                   }))}
                   title={t(p("chargeAmount"))}
                   isLoading={dailyChargeLoading}
@@ -469,7 +471,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
                 <DataLineChart
                   data={dailyPayData.map((d) => ({
                     x: d.date.format("YYYY-MM-DD"),
-                    y: Number(d.count.toFixed(2)),
+                    y: Number(moneyNumberToString(d.count)),
                   }))}
                   title={t(p("payAmount"))}
                   toolTipFormatter={amountToolTipFormatter}

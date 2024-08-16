@@ -190,6 +190,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     JOB_CHARGE_METADATA: misConfig.jobChargeMetadata,
 
+    JOB_CHARGE_DECIMAL_PRECISION: misConfig.jobChargeDecimalPrecision,
+    JOB_MIN_CHARGE: misConfig.jobMinCharge,
+
   };
 
   if (!building) {
