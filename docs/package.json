@@ -31,7 +31,7 @@
   },
   "devDependencies": {
     "@adobe/jsonschema2md": "8.0.2",
-    "@algolia/client-search": "4.23.3",
+    "@algolia/client-search": "5.0.0",
     "@docusaurus/module-type-aliases": "3.4.0",
     "@scow/config": "workspace:*",
     "@sinclair/typebox": "0.32.34",
