@@ -13,7 +13,7 @@
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
-import { Progress, Table, Tag } from "antd";
+import { Table, Tag } from "antd";
 import React, { useEffect, useMemo, useState } from "react";
 import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ClusterOverview, PlatformOverview } from "src/models/cluster";
