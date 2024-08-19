@@ -22,6 +22,7 @@ import { Cluster } from "src/utils/cluster";
 import { compareWithUndefined } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
+import CustomProgress from "./CustomProgress";
 import { DashboardSection } from "./DashboardSection";
 
 export interface ClusterInfo extends PartitionInfo {
@@ -211,12 +212,12 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             render={(_, r) => (
               r.info?.usageRatePercentage !== undefined ? (
                 <div>
-                  <Progress
+                  <CustomProgress
                     percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
-                    strokeLinecap='square'
-                    size={[120, 15]}
-                    status="normal"
-                    strokeColor={"#566DE5"}
+                    width="120px"
+                    height="15px"
+                    background-color={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -229,12 +230,12 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             render={(_, r) => (
               r.info?.cpuUsage !== undefined ? (
                 <div>
-                  <Progress
+                  <CustomProgress
                     percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
-                    strokeLinecap='square'
-                    size={[120, 15]}
-                    status="normal"
-                    strokeColor={"#566DE5"}
+                    width="120px"
+                    height="15px"
+                    background-color={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -247,12 +248,12 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             render={(_, r) => (
               r.info?.gpuUsage !== undefined ? (
                 <div>
-                  <Progress
+                  <CustomProgress
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}
-                    strokeLinecap='square'
-                    size={[120, 15]}
-                    status="normal"
-                    strokeColor={"#566DE5"}
+                    width="120px"
+                    height="15px"
+                    background-color={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
