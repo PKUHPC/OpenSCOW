@@ -21,8 +21,8 @@
     "cpusReq": 0,
     "tenant": "another",
     "name": "test",
-    "accountPrice": 18.06,
-    "tenantPrice": 9.03,
+    "accountPrice": 18.059,
+    "tenantPrice": 9.029,
     "nodeList": ""
   },
   {
@@ -47,8 +47,8 @@
     "cpusReq": 0,
     "tenant": "default",
     "name": "test",
-    "accountPrice": 10.09,
-    "tenantPrice": 10.09,
+    "accountPrice": 10.086,
+    "tenantPrice": 10.086,
     "nodeList": ""
   },
   {
@@ -73,8 +73,8 @@
     "cpusReq": 0,
     "tenant": "default",
     "name": "test",
-    "accountPrice": 250.05,
-    "tenantPrice": 250.05,
+    "accountPrice": 250.048,
+    "tenantPrice": 250.048,
     "nodeList": ""
   },
   {
@@ -99,8 +99,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 272.3,
-    "tenantPrice": 272.3,
+    "accountPrice": 272.304,
+    "tenantPrice": 272.304,
     "nodeList": ""
   },
   {
@@ -125,8 +125,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 300.19,
-    "tenantPrice": 300.19,
+    "accountPrice": 300.187,
+    "tenantPrice": 300.187,
     "nodeList": ""
   },
   {
@@ -151,8 +151,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 41.32,
-    "tenantPrice": 41.32,
+    "accountPrice": 41.324,
+    "tenantPrice": 41.324,
     "nodeList": ""
   },
   {
@@ -229,8 +229,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 60.58,
-    "tenantPrice": 60.58,
+    "accountPrice": 60.576,
+    "tenantPrice": 60.576,
     "nodeList": ""
   },
   {
@@ -255,8 +255,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -281,8 +281,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "another",
-    "accountPrice": 0.1,
-    "tenantPrice": 0.05,
+    "accountPrice": 0.097,
+    "tenantPrice": 0.049,
     "nodeList": ""
   },
   {
@@ -307,8 +307,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.2,
-    "tenantPrice": 0.2,
+    "accountPrice": 0.199,
+    "tenantPrice": 0.199,
     "nodeList": ""
   },
   {
@@ -333,8 +333,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "another",
-    "accountPrice": 9.63,
-    "tenantPrice": 4.81,
+    "accountPrice": 9.628,
+    "tenantPrice": 4.814,
     "nodeList": ""
   },
   {
@@ -359,8 +359,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -385,8 +385,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "another",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -411,8 +411,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -437,8 +437,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "another",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -463,8 +463,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -489,8 +489,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "another",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -515,8 +515,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -541,8 +541,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -619,8 +619,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -645,8 +645,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -671,8 +671,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.12,
-    "tenantPrice": 0.12,
+    "accountPrice": 0.118,
+    "tenantPrice": 0.118,
     "nodeList": ""
   },
   {
@@ -697,8 +697,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.19,
-    "tenantPrice": 0.19,
+    "accountPrice": 0.192,
+    "tenantPrice": 0.192,
     "nodeList": ""
   },
   {
@@ -723,8 +723,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.02,
-    "tenantPrice": 0.02,
+    "accountPrice": 0.022,
+    "tenantPrice": 0.022,
     "nodeList": ""
   },
   {
@@ -749,8 +749,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0.007,
+    "tenantPrice": 0.007,
     "nodeList": ""
   },
   {
@@ -775,8 +775,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0.007,
+    "tenantPrice": 0.007,
     "nodeList": ""
   },
   {
@@ -801,8 +801,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {
@@ -879,8 +879,8 @@
     "cpusReq": 0,
     "name": "test",
     "tenant": "default",
-    "accountPrice": 0.01,
-    "tenantPrice": 0.01,
+    "accountPrice": 0,
+    "tenantPrice": 0,
     "nodeList": ""
   },
   {

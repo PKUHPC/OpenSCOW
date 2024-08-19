@@ -17,6 +17,7 @@ import { useState } from "react";
 import { api } from "src/apis";
 import { ModalLink } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { publicConfig } from "src/utils/config";
 import { moneyToString } from "src/utils/money";
 
 interface Props {
@@ -119,7 +120,10 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
           </Space>
         </Form.Item>
         <Form.Item name="blockThresholdAmount" label={t(p("setAmount"))} required>
-          <InputNumber precision={2} />
+          <InputNumber
+            step={1 / Math.pow(10, publicConfig.JOB_CHARGE_DECIMAL_PRECISION)}
+            precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
+          />
         </Form.Item>
       </Form>
 

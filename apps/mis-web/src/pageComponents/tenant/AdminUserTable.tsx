@@ -15,6 +15,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Space, Table } from "antd";
 import { SortOrder } from "antd/es/table/interface";
+import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
@@ -240,7 +241,16 @@ export const AdminUserTable: React.FC<Props> = ({
         <Table.Column<FullUserInfo>
           dataIndex="affiliatedAccountNames"
           title={t(p("affiliatedAccountName"))}
-          render={(_, r) => r.accountAffiliations.map((x) => x.accountName).join(", ")}
+          render={(_, r) => (
+            <>
+              {r.accountAffiliations.map((x, index) => (
+                <>
+                  <Link href={`/tenant/accounts/${x.accountName}/users`}>{x.accountName}</Link>
+                  {index < r.accountAffiliations.length - 1 && ", "}
+                </>
+              ))}
+            </>
+          )}
         />
         <Table.Column<FullUserInfo>
           dataIndex="changePassword"

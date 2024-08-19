@@ -73,6 +73,9 @@ interface FixedFormFields {
   account: string;
   maxTime: number;
   command?: string;
+  // TensorFlow特有参数
+  psNodes?: number;
+  workerNodes?: number;
 }
 
 interface CustomFormFields {
@@ -243,6 +246,8 @@ export const LaunchAppForm = (props: Props) => {
 
   const gpuCount = Form.useWatch("gpuCount", form)!;
 
+  const framework = Form.useWatch("framework", form);
+
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
     * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
@@ -351,6 +356,13 @@ export const LaunchAppForm = (props: Props) => {
         name={["customFields", item.name]}
         rules={rules}
         initialValue={initialValue}
+        {...(item.name === "workingDir" ? {
+          tooltip: (
+            <>
+              <span>工作目录的路径会自动添加为挂载点</span>
+            </>
+          ),
+        } : {})}
       >
         {inputItem}
       </Form.Item>
@@ -471,6 +483,8 @@ export const LaunchAppForm = (props: Props) => {
       const customAttributes = "customAttributes" in inputParams ? inputParams.customAttributes : {};
       const command = "command" in inputParams ? inputParams.command : undefined;
       const framework = "framework" in inputParams ? inputParams.framework : undefined;
+      const psNodes = "psNodes" in inputParams ? inputParams.psNodes : undefined;
+      const workerNodes = "workerNodes" in inputParams ? inputParams.workerNodes : undefined;
       form.setFieldsValue({
         mountPoints,
         customFields: {
@@ -486,6 +500,8 @@ export const LaunchAppForm = (props: Props) => {
         maxTime,
         appJobName: genAppJobName(appName ?? "trainJobs"),
         command,
+        psNodes,
+        workerNodes,
       });
     }
 
@@ -511,17 +527,26 @@ export const LaunchAppForm = (props: Props) => {
     },
   });
 
+  const handleFormChange = (changedValues: Partial<FormFields>, allValues: FormFields) => {
+    const { psNodes, workerNodes } = allValues;
+    if ("psNodes" in changedValues || "workerNodes" in changedValues) {
+      const newTotal = (psNodes || 0) + (workerNodes || 0);
+      form.setFieldsValue({ nodeCount: newTotal });
+    }
+  };
+
   return (
     <Form
       form={form}
       initialValues={{
         ... initialValues,
       }}
+      onValuesChange={handleFormChange}
       onFinish={async () => {
 
         const { appJobName, algorithm, dataset, image, remoteImageUrl, framework, startCommand, model,
           mountPoints, account, partition, coreCount,
-          gpuCount, maxTime, command, customFields } = await form.validateFields();
+          gpuCount, maxTime, command, customFields, psNodes, workerNodes } = await form.validateFields();
 
         if (isTraining) {
           await trainJobMutation.mutateAsync({
@@ -548,6 +573,8 @@ export const LaunchAppForm = (props: Props) => {
             memory: memorySize,
             command: command || "",
             gpuType: currentPartitionInfo!.gpuType,
+            psNodes,
+            workerNodes,
           });
         } else {
           let workingDirectory: string | undefined;
@@ -691,20 +718,6 @@ export const LaunchAppForm = (props: Props) => {
               >
                 <Input placeholder="请输入远程镜像地址" />
               </Form.Item>
-              {/* 分布式训练或者华为的卡训练，需要指定训练框架 */}
-              {(isTraining && (nodeCount > 1 || currentPartitionInfo?.gpuType === "huawei.com/Ascend910")) ? (
-                <>
-                  {/* 手动选择算法框架，下拉框只有 tensorflow, pytorch */}
-                  <Form.Item
-                    label="分布式训练框架"
-                    name="framework"
-                    rules={[{ required: true }]}
-                  >
-                    <Select options={frameworkOptions}>
-                    </Select>
-                  </Form.Item>
-                </>
-              ) : null}
               {(customImage && !isTraining) ? (
                 <Form.Item
                   label="启动命令"
@@ -748,6 +761,12 @@ export const LaunchAppForm = (props: Props) => {
                           if (otherMountPoints.includes(currentValueNormalized)) {
                             return Promise.reject(new Error("挂载点地址不能重复"));
                           }
+
+                          const workingDirectory = form.getFieldValue("customFields").workingDir?.toString();
+                          if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
+                            return Promise.reject(new Error("该路径已指定为工作目录，无需再设置为挂载点"));
+                          }
+
                           return Promise.resolve();
                         },
                       }),
@@ -1010,8 +1029,54 @@ export const LaunchAppForm = (props: Props) => {
             min={1}
             max={isTraining ? undefined : 1}
             {...inputNumberFloorConfig}
+            // framework是tensorflow且不是华为卡时 不允许手动改
+            disabled={isTraining && framework === "tensorflow"
+        && (currentPartitionInfo ? currentPartitionInfo.gpuType !== "huawei.com/Ascend910" : true)}
           />
         </Form.Item>
+        {/* tensorflow训练框架时，除了huawei.com/Ascend910的卡之外，都要区分PS node 和worker node */}
+        {(isTraining && framework === "tensorflow"
+        && (currentPartitionInfo ? currentPartitionInfo.gpuType !== "huawei.com/Ascend910" : true)) ? (
+            <>
+              <Form.Item
+                label="PS节点数"
+                name="psNodes"
+                initialValue={1}
+                rules={[
+                  { required: true,
+                    type: "integer",
+                  },
+                ]}
+              >
+                <InputNumber
+                  defaultValue={1}
+                  min={1}
+                  {...inputNumberFloorConfig}
+                />
+              </Form.Item>
+            </>
+          ) : null}
+        {(isTraining && framework === "tensorflow"
+        && (currentPartitionInfo ? currentPartitionInfo.gpuType !== "huawei.com/Ascend910" : true)) ? (
+            <>
+              <Form.Item
+                label="worker节点数"
+                name="workerNodes"
+                initialValue={nodeCount - 1}
+                rules={[
+                  { required: true,
+                    type: "integer",
+                  },
+                ]}
+              >
+                <InputNumber
+                  defaultValue={nodeCount - 1}
+                  min={1}
+                  {...inputNumberFloorConfig}
+                />
+              </Form.Item>
+            </>
+          ) : null}
         {
           currentPartitionInfo?.gpus ? (
             <Form.Item
@@ -1067,6 +1132,20 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           )
         }
+        {/* 分布式训练或者华为的卡训练，需要指定训练框架 */}
+        {(isTraining && (nodeCount > 1 || currentPartitionInfo?.gpuType === "huawei.com/Ascend910")) ? (
+          <>
+            {/* 手动选择算法框架，下拉框只有 tensorflow, pytorch */}
+            <Form.Item
+              label="分布式训练框架"
+              name="framework"
+              rules={[{ required: true }]}
+            >
+              <Select options={frameworkOptions}>
+              </Select>
+            </Form.Item>
+          </>
+        ) : null}
         <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
           <InputNumber min={1} step={1} addonAfter="分钟" />
         </Form.Item>

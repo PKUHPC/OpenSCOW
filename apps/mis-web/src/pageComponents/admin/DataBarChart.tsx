@@ -15,6 +15,7 @@ import React from "react";
 import { Bar, BarChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Formatter } from "recharts/types/component/DefaultTooltipContent";
+import { moneyNumberToString } from "src/utils/money";
 import { styled } from "styled-components";
 
 interface Props {
@@ -58,7 +59,7 @@ export const DataBarChart: React.FC<Props> = ({
   toolTipFormatter = (value) => value,
 }) => {
   const tickFormatter = (value: number) => {
-    const roundedValue = Number.isInteger(value) ? value : parseFloat(value.toFixed(2));
+    const roundedValue = Number.isInteger(value) ? value : parseFloat(moneyNumberToString(value));
     return roundedValue.toString();
   };
 
