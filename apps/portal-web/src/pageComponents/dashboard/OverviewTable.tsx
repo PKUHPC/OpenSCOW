@@ -216,7 +216,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
                     width="120px"
                     height="15px"
-                    background-color={"rgb(240,240,240)"}
+                    bgColor={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -233,7 +234,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
                     width="120px"
                     height="15px"
-                    background-color={"rgb(240,240,240)"}
+                    bgColor={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -250,7 +252,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}
                     width="120px"
                     height="15px"
-                    background-color={"rgb(240,240,240)"}
+                    bgColor={"rgb(240,240,240)"}
+                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
