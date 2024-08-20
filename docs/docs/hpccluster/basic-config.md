@@ -73,10 +73,11 @@ mkdir -p /extend/shell
 #生成脚本，root123 为root用户密码
 cat >>/extend/shell/fenfa_pub.sh<< EOF
 #!/bin/bash
+PASS=root123
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -P ''
 for ip in 101 102 103 
 do
-sshpass -proot123 ssh-copy-id -o StrictHostKeyChecking=no 192.168.29.\$ip
+sshpass -p$PASS ssh-copy-id -o StrictHostKeyChecking=no 192.168.29.\$ip
 done
 EOF
 
