@@ -176,8 +176,9 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
     return { 403: null };
   }
 
-  const mapJobSortBy = sortBy ? mapJobSortByType[sortBy] : undefined;
-  const mapJobSortOrder = sortOrder ? mapJobSortOrderType[sortOrder] : undefined;
+  // 默认按照作业结束时间的降序排列
+  const mapJobSortBy = sortBy ? mapJobSortByType[sortBy] : mapJobSortByType.timeEnd;
+  const mapJobSortOrder = sortOrder ? mapJobSortOrderType[sortOrder] : mapJobSortOrderType.descend;
 
   const result = await getJobInfo({
     filter,

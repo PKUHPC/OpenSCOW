@@ -134,17 +134,17 @@ remunge
 yum -y install mariadb-server
 systemctl start mariadb
 systemctl enable mariadb
-mysql
 
-set password=password('81SLURM@@rabGTjN7');
-create database slurm_acct_db;
-quit
+ROOT_PASS=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16) 
+mysql -e "CREATE USER root IDENTIFIED BY '${ROOT_PASS}'"
+mysql -uroot -p$ROOT_PASS -e 'create database slurm_acct_db'
 ```
 
 创建`slurm`用户，并为其赋予`slurm_acct_db`数据库的所有权限
 
 ```SQL
-mysql -uroot -p'81SLURM@@rabGTjN7'
+mysql -uroot -p$ROOT_PASS
+
 create user slurm;
 
 grant all on slurm_acct_db.* TO 'slurm'@'localhost' identified by '123456' with grant option;

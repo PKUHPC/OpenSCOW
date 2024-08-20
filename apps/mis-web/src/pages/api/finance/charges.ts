@@ -208,8 +208,9 @@ export default typeboxRoute(GetChargesSchema, async (req, res) => {
 
   const client = getClient(ChargingServiceClient);
 
-  const mapChargesSortBy = sortBy ? mapChargesSortByType[sortBy] : undefined;
-  const mapChargesSortOrder = sortOrder ? mapChargesSortOrderType[sortOrder] : undefined;
+  // 默认按照时间的倒序排序
+  const mapChargesSortBy = sortBy ? mapChargesSortByType[sortBy] : mapChargesSortByType.time;
+  const mapChargesSortOrder = sortOrder ? mapChargesSortOrderType[sortOrder] : mapChargesSortOrderType.descend;
 
   const reply = ensureNotUndefined(await asyncClientCall(client, "getPaginatedChargeRecords", {
     startTime,
