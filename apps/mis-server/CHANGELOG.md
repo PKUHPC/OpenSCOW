@@ -1,5 +1,23 @@
 # @scow/mis-server
 
+## 1.6.3
+
+### Patch Changes
+
+- 83df60b: 增加配置消费记录精度，默认精度为 2 位小数；
+  增加最小作业消费金额的功能，默认最小作业消费金额为 0.01；
+  账户、租户的余额展示精度与消费记录精度一致；
+  充值金额展示的小数位与消费记录的精度保持一致；
+  充值时数值输入框精度与消费记录的精度保持一致。
+- 9300087: 修复设置租户默认阈值时会无视账户阈值的问题，并增加封锁和解封账户的日志
+- Updated dependencies [abd69cb]
+- Updated dependencies [83df60b]
+  - @scow/lib-server@1.3.2
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+  - @scow/lib-hook@1.0.14
+  - @scow/lib-scheduler-adapter@1.1.12
+
 ## 1.6.2
 
 ### Patch Changes

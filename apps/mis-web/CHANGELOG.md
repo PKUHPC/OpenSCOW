@@ -1,5 +1,30 @@
 # @scow/mis-web
 
+## 1.6.3
+
+### Patch Changes
+
+- 6ab5659: 增加租户管理下的用户列表的关联账户跳转到账户管理的功能
+- 83df60b: 增加配置消费记录精度，默认精度为 2 位小数；
+  增加最小作业消费金额的功能，默认最小作业消费金额为 0.01；
+  账户、租户的余额展示精度与消费记录精度一致；
+  充值金额展示的小数位与消费记录的精度保持一致；
+  充值时数值输入框精度与消费记录的精度保持一致。
+- 1287509: 将操作日志、消费记录、结束作业的默认排序改为按照时间倒序。
+- abd69cb: 接入 scowd 文件分片上传
+- Updated dependencies [eec12d8]
+- Updated dependencies [b2ee159]
+- Updated dependencies [d3de802]
+- Updated dependencies [acb1992]
+- Updated dependencies [15a7bdd]
+- Updated dependencies [abd69cb]
+- Updated dependencies [83df60b]
+  - @scow/lib-web@1.4.2
+  - @scow/lib-operation-log@2.1.8
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+  - @scow/rich-error-model@2.0.0
+
 ## 1.6.2
 
 ### Patch Changes
