@@ -217,7 +217,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     width="120px"
                     height="15px"
                     background-color={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -235,7 +234,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     width="120px"
                     height="15px"
                     background-color={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"
@@ -253,7 +251,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     width="120px"
                     height="15px"
                     background-color={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
                   />
                 </div>
               ) : "-"

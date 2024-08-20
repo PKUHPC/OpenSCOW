@@ -17,22 +17,20 @@ interface CustomProgressProps {
   percent: number; // 进度百分比
   width?: string; // 进度条的宽度，默认100%
   height?: string; // 进度条的高度，默认20px
-  bgColor: string; // 进度条背景颜色
-  progressColor: string; // 进度条颜色
 }
 
-const ProgressBarContainer = styled.div<{ width: string, height: string, bgColor: string }>`
+const ProgressBarContainer = styled.div<{ width: string, height: string }>`
   display: flex;
   align-items: center;
   width: ${(props) => props.width};
   height: ${(props) => props.height};
-  background-color: ${(props) => props.bgColor};
+  background-color: var(--ant-fill-1); // 使用 Ant Design 的背景颜色变量
   border-radius: 5px;
 `;
 
-const ProgressBar = styled.div<{ percent: number, progressColor: string }>`
+const ProgressBar = styled.div<{ percent: number }>`
   height: 100%;
-  background-color: ${(props) => props.progressColor};
+  background-color: var(--ant-primary-color); // 使用 Ant Design 的主题色变量
   border-radius: 5px;
   transition: width 0.3s ease;
   width: ${(props) => props.percent}%;
@@ -49,15 +47,13 @@ export const CustomProgress: React.FC<CustomProgressProps> = ({
   percent,
   width = "100%",
   height = "20px",
-  bgColor,
-  progressColor,
 }) => {
   const normalizedPercent = Math.min(percent, 100).toFixed(2);
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <ProgressBarContainer width={width} height={height} bgColor={bgColor}>
-        <ProgressBar percent={percent} progressColor={progressColor} />
+      <ProgressBarContainer width={width} height={height}>
+        <ProgressBar percent={percent} />
       </ProgressBarContainer>
       <ProgressLabel>
         {percent === 100 ? "100%" : `${normalizedPercent}%`}
@@ -65,5 +61,3 @@ export const CustomProgress: React.FC<CustomProgressProps> = ({
     </div>
   );
 };
-
-
