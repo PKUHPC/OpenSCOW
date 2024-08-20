@@ -140,7 +140,6 @@ interface ExtraProps {
   clusterConfigs: Record<string, ClusterConfigSchema>;
   initialActivatedClusters: Record<string, Cluster>;
   initialSimpleClustersInfo: Record<string, SimpleClusterSchema>;
-  userAssociatedClusterIds: string[] | undefined;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -160,7 +159,6 @@ function MyApp({ Component, pageProps, extra }: Props) {
       extra.clusterConfigs, 
       extra.initialActivatedClusters, 
       extra.initialSimpleClustersInfo,
-      extra.userAssociatedClusterIds,
     );
   });
 
@@ -225,7 +223,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     clusterConfigs: {},
     initialActivatedClusters: {},
     initialSimpleClustersInfo: {},
-    userAssociatedClusterIds: undefined,
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -258,20 +255,6 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         if (clusterConfigs && Object.keys(clusterConfigs).length > 0) {
           extra.clusterConfigs = clusterConfigs;
         }
-        
-        if (runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled) {
-          const userAccounts = result?.accountAffiliations.map((a) => a.accountName);
-        
-          const userAssociatedClusterIds = await api.getUserAssociatedClusterIds({
-            query: {
-              token,
-              accountNames: userAccounts,
-              tenantName: result.tenant,
-            },
-          });
-          
-          extra.userAssociatedClusterIds = userAssociatedClusterIds.clusterIds;
-        }
       }
     }
 
@@ -291,18 +274,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
       clustersRuntimeInfo: clustersRuntimeInfo?.results ?? [],
       misConfigClusters: publicConfigClusters });
 
-    // 如果用户关联账户的已授权集群存在，则系统初始集群为在线集群与已授权集群的交集
-    const initialUserAssociatedClusters = (extra.userAssociatedClusterIds && activatedClusters.misActivatedClusters) ? 
-      Object.entries(activatedClusters.misActivatedClusters)
-        .reduce<Record<string, Cluster>>((acc, [key, value]) => {
-          if (extra.userAssociatedClusterIds?.includes(key)) {
-            acc[key] = value;
-          }
-          return acc;
-        }, {}) : 
-      activatedClusters.misActivatedClusters;
-    
-    extra.initialActivatedClusters = initialUserAssociatedClusters ?? {};
+    extra.initialActivatedClusters = activatedClusters.misActivatedClusters ?? {};
 
     const hostname = getHostname(appContext.ctx.req);
 

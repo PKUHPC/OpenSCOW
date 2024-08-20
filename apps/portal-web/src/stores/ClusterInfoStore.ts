@@ -37,6 +37,10 @@ export function ClusterInfoStore(
   // 当前可用集群
   const [currentClusters, setCurrentClusters] = useState<Cluster[]>(!publicConfig.MIS_DEPLOYED
     ? publicConfigClusters : initialCurrentClusters);
+  
+  // 当前启用中集群
+  const [activatedClusters, setActivatedClusters] = useState<Cluster[]>(!publicConfig.MIS_DEPLOYED
+    ? publicConfigClusters : initialCurrentClusters);
 
   useEffect(() => {
     if (userAssociatedClusterIds) {
@@ -130,5 +134,7 @@ export function ClusterInfoStore(
     removeDefaultCluster,
     enableLoginDesktop,
     crossClusterFileTransferEnabled,
+    activatedClusters,
+    setActivatedClusters,
   };
 }

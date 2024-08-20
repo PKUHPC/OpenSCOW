@@ -107,7 +107,6 @@ import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { SetBlockThresholdSchema } from "src/pages/api/tenant/setBlockThreshold";
 import type { SetDefaultAccountBlockThresholdSchema } from "src/pages/api/tenant/setDefaultAccountBlockThreshold";
 import type { UnblockAccountSchema } from "src/pages/api/tenant/unblockAccount";
-import type { GetUserAssociatedClusterIdsSchema } from "src/pages/api/userAssociatedClusterIds";
 import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { ChangeTenantSchema } from "src/pages/api/users/changeTenant";
@@ -229,5 +228,4 @@ export const api = {
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
   getSimpleClustersInfoFromConfigFiles: apiClient.fromTypeboxRoute<typeof GetSimpleClustersInfoFromConfigFilesSchema>("GET", "/api//simpleClustersInfo"),
-  getUserAssociatedClusterIds: apiClient.fromTypeboxRoute<typeof GetUserAssociatedClusterIdsSchema>("GET", "/api//userAssociatedClusterIds"),
 };

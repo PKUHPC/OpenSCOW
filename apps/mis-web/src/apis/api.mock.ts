@@ -531,10 +531,6 @@ export const mockApi: MockApi<typeof api> = {
   activateCluster: async () => ({ executed: true }),
   deactivateCluster: async () => ({ executed: true }),
 
-  getUserAssociatedClusterIds: async () => ({
-    clusterIds: ["hpc01", "hpc02"],
-  }),
-
   exportAccount: null,
   exportChargeRecord: null,
   exportPayRecord: null,

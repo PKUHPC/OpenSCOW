@@ -57,7 +57,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const { publicConfigClusters, setCurrentClusters } = useStore(ClusterInfoStore);
+  const { publicConfigClusters, setCurrentClusters, setActivatedClusters } = useStore(ClusterInfoStore);
   const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
@@ -106,6 +106,7 @@ const FailEventHandler: React.FC = () => {
       if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
         message.error(tArgs("pages._app.noActivatedClusters"));
         setCurrentClusters([]);
+        setActivatedClusters([]);
         return;
       }
 
@@ -115,6 +116,7 @@ const FailEventHandler: React.FC = () => {
         const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
         const activatedClusters = publicConfigClusters.filter((x) => currentActivatedClusterIds.includes(x.id));
         setCurrentClusters(activatedClusters);
+        setActivatedClusters(activatedClusters);
         return;
       }
 
