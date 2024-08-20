@@ -75,11 +75,11 @@ yum install nfs-utils -y
 **查看服务端可共享的目录**
 
 ```PowerShell
-# 192.168.29.106为NFS服务端IP
-showmount -e 192.168.29.106
+# manage01 为NFS服务端IP
+showmount -e manage01
 
 # 有如下输出
-Export list for 192.168.29.106:
+Export list for manage01:
 /data *
 ```
 
@@ -88,13 +88,13 @@ Export list for 192.168.29.106:
 ```PowerShell
 # 创建目录
 mkdir /data
-#将共享存储/data 挂载至192.168.29.106服务器的/data目录下
-mount 192.168.29.106:/data /data -o proto=tcp -o nolock
+#将来自manage01的共享存储/data 挂载至当前服务器的/data目录下
+mount manage01:/data /data -o proto=tcp -o nolock
 
 # 设置开机自动挂载
 vim /etc/fstab
 # 在文档末尾添加
-192.168.29.106:/data /data nfs rw,auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
+manage01:/data /data nfs rw,auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
 ```
 
 **查看挂载**
@@ -103,7 +103,7 @@ vim /etc/fstab
 df -h |grep data
 
 # 有如下输出
-192.168.29.106:/data     79G   56M   75G   1% /data
+manage01:/data     79G   56M   75G   1% /data
 ```
 
 ## 3. 使用

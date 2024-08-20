@@ -85,9 +85,11 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const dark = useDarkMode();
 
-  const extensions = useMemo(() => Array.isArray(extensionStoreData)
-    ? extensionStoreData
-    : extensionStoreData ? [extensionStoreData] : [], [extensionStoreData]);
+  const extensions = useMemo(() =>
+    (Array.isArray(extensionStoreData)
+      ? extensionStoreData
+      : extensionStoreData ? [extensionStoreData] : []).filter((x) => x),
+  [extensionStoreData]);
 
   const routeQuery = useMemo(() => getExtensionRouteQuery(
     dark.dark,
