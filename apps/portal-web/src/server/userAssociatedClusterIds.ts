@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { getUserAccountsClusterIds } from "@scow/lib-scow-resources";
+import { getUserAccountsClusterIds } from "@scow/lib-scow-resource";
 import { publicConfig, runtimeConfig } from "src/utils/config";
 
 export async function getUserAssociatedClusterIds(
@@ -20,7 +20,7 @@ export async function getUserAssociatedClusterIds(
 
   const associatedClusterIds = await getUserAccountsClusterIds(
     publicConfig.MIS_DEPLOYED,
-    runtimeConfig.SCOW_RESOURCES_CONFIG,
+    runtimeConfig.SCOW_RESOURCE_CONFIG,
     userAccounts,
     tenantName,
   );

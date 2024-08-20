@@ -351,6 +351,13 @@ export const mockApi: MockApi<typeof api> = {
       allocGpuCount: 0.5,
     }],
   }),
+
+  getUserAssociatedClusterPartitions: async () => ({
+    clusterPartitions: {
+      "hpc01": ["normal", "high", "low"],
+      "hpc02": ["gpu"],
+    },
+  }),
 };
 
 

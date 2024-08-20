@@ -68,9 +68,41 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
       const rawClusterNodesInfoResults = await Promise.allSettled(rawClusterNodesInfoPromises);
 
+      const rawAssignedClusterPartitions = await api.getUserAssociatedClusterPartitions({});
+
       const successfulNodesResults = rawClusterNodesInfoResults
         .map((result, idx) => {
           if (result.status === "fulfilled") {
+
+            // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
+            if (rawAssignedClusterPartitions) {
+              // 判断当前集群是否为已授权集群
+              const isClusterAssigned = 
+                Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
+              if (isClusterAssigned) {
+                // 只返回已经授权的分区
+                const assignedPartitions = rawAssignedClusterPartitions.clusterPartitions[currentClusters[idx].id];
+                return {
+                  ...result,
+                  value: {
+                    nodeInfo: {
+                      clusterName: currentClusters[idx].id,
+                      nodes: result.value.nodeInfo.map((node) => {
+                        const filteredNodePartitions = node.partitions
+                          .filter((partition) => (assignedPartitions.includes(partition)));
+                        // 返回包含已过滤分区的节点信息
+                        return {
+                          ...node,
+                          partitions: filteredNodePartitions,
+                        };
+                      }),
+                    },
+                  },
+                } as PromiseSettledResult<FulfilledNodesResult>;
+                
+              }
+            }
+
             return {
               ...result,
               value: {
@@ -93,6 +125,30 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       const successfulResults = rawClusterInfoResults
         .map((result, idx) => {
           if (result.status === "fulfilled") {
+
+            // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
+            if (rawAssignedClusterPartitions) {
+              // 判断当前集群是否为已授权集群
+              const isClusterAssigned = 
+                Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
+              if (isClusterAssigned) {
+                // 只返回已经授权的分区
+                const assignedPartitions = rawAssignedClusterPartitions.clusterPartitions[currentClusters[idx].id];
+                const filteredPartitions = result.value.clusterInfo.partitions
+                  .filter((partition) => (assignedPartitions.includes(partition.partitionName)));
+                return {
+                  ...result,
+                  value: {
+                    clusterInfo: {
+                      clusterName: currentClusters[idx].id,
+                      partitions: filteredPartitions,
+                    },
+                  },
+                } as PromiseSettledResult<FulfilledResult>;
+                
+              }
+            }
+
             return {
               ...result,
               value: {

@@ -48,7 +48,8 @@ export const staticConfigServiceServer = plugin((server) => {
       const { cluster, accountName, userId } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
-      if (config.MIS_DEPLOYED && commonConfig.scowResources?.scowResourcesEnabled) {
+      // 如果部署了资源管理扩展功能
+      if (config.MIS_DEPLOYED && commonConfig.scowResource?.enabled) {
         // 获取用户在scow中的信息
         const userInfo = await libGetUserInfo(logger, 
           userId, 
@@ -61,7 +62,7 @@ export const staticConfigServiceServer = plugin((server) => {
         }
 
         // 查询集群下的账户已授权分区
-        const assignedPartitions = await server.ext.resources?.getAccountAssignedPartitions(
+        const assignedPartitions = await server.ext.resource?.getAccountAssignedPartitionsForCluster(
           { accountName, tenantName: userInfo.tenantName, clusterId: cluster },
         );
         // 获取分区的详细信息
@@ -154,7 +155,7 @@ export const runtimeConfigServiceServer = plugin((server) => {
     },
 
     getClusterNodesInfo: async ({ request, logger }) => {
-      const { nodeNames,cluster } = request;
+      const { nodeNames, cluster } = request;
 
       const reply = await callOnOne(
         cluster,

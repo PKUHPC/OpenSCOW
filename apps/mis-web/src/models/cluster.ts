@@ -39,3 +39,17 @@ export const ClusterConnectionInfoSchema = Type.Object({
 });
 
 export type ClusterConnectionInfo = Static<typeof ClusterConnectionInfoSchema>;
+
+
+export const PartitionNames = Type.Object({
+  partitionNames: Type.Array(Type.String()),
+});
+export type PartitionNames = Static<typeof PartitionNames>;
+
+export const AssignedClusterPartitionsSchema = Type.Object({
+  assignedClusterPartitions: Type.Record(
+    Type.String(),
+    PartitionNames,
+  ),
+});
+export type AssignedClusterPartitions = Static<typeof AssignedClusterPartitionsSchema>;

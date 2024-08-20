@@ -13,14 +13,17 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
+import { getScowResourceClient } from "@scow/lib-scow-resource";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { USE_MOCK } from "src/apis/useMock";
 import { authenticate } from "src/auth/server";
+import { AssignedClusterPartitions } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { Money } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
+import { runtimeConfig } from "src/utils/config";
 
 // Cannot use BillingItemType from pageComponents/job/ManageJobBillingTable
 export const BillingItemType = Type.Object({
@@ -35,6 +38,8 @@ export const BillingItemType = Type.Object({
       price: Money,
       amountStrategy: Type.String(),
     })),
+  
+  settable: Type.Optional(Type.Boolean()),
 });
 export type BillingItemType = Static<typeof BillingItemType>;
 
@@ -134,8 +139,29 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
 
   const nextId = calculateNextId(reply.activeItems, tenant);
 
+  // 如果查询条件 tenantName 存在 且已部署资源管理服务的情况 
+  // 判断分区是否为已授权分区
+  let tenantAssignedClustersAndPartitions: AssignedClusterPartitions | undefined;
+  if (runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled && tenant) {
+    const resourceClient = getScowResourceClient(runtimeConfig.SCOW_RESOURCE_CONFIG.address);
+    tenantAssignedClustersAndPartitions = await resourceClient.resource.getTenantAssignedClustersAndPartitions({
+      tenantName: tenant,
+    });
+  }
+  const isPartitionAssigned = (
+    clusterId: string, 
+    partitionName: string, 
+  ): boolean => {
+    if (!tenantAssignedClustersAndPartitions) {
+      return true;
+    }
+    return tenantAssignedClustersAndPartitions.assignedClusterPartitions[clusterId]?.partitionNames
+      .includes(partitionName);
+  };
+
   const sourceToBillingItemType = (item: JobBillingItem) => {
     const priceItem = item.path.split(".");
+    const settable = isPartitionAssigned(priceItem[0], priceItem[1]);
     return {
       cluster: priceItem[0],
       partition: priceItem[1],
@@ -146,6 +172,7 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
         price: item.price!,
         amountStrategy: item.amountStrategy,
       },
+      settable,
     } as BillingItemType;
   };
 
@@ -169,9 +196,15 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
       for (const qos of partition.qos ?? [""]) {
         const path = [cluster, partition.name, qos].filter((x) => x).join(".");
         const pathItem = reply.activeItems.find((item) => item.path === path);
-        result.activeItems.push(pathItem ? sourceToBillingItemType(pathItem) : {
-          cluster, partition: partition.name, qos, tenantName: undefined,
-        });
+
+        if (pathItem) {      
+          result.activeItems.push(sourceToBillingItemType(pathItem));
+        } else {
+          const settable = isPartitionAssigned(cluster, partition.name);
+          result.activeItems.push({
+            cluster, partition: partition.name, qos, tenantName: undefined, settable,
+          });
+        }
       }
     }
   }

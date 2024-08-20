@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-export type { ScowResourcesClient } from "./client";
-export { getScowResourcesClient } from "./client";
-export type { ScowResourcesPlugin } from "./plugin";
-export { scowResourcesPlugin } from "./plugin";
+export type { ScowResourceClient } from "./client";
+export { getScowResourceClient } from "./client";
+export type { ScowResourcePlugin } from "./plugin";
+export { scowResourcePlugin } from "./plugin";
 export { getUserAccountsClusterIds } from "./utils";

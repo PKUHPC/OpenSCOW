@@ -11,12 +11,12 @@
  */
 
 import { Plugin } from "@ddadaal/tsgrpc-server";
-import { ScowResourcesPlugin, scowResourcesPlugin } from "@scow/lib-scow-resources";
+import { ScowResourcePlugin,scowResourcePlugin } from "@scow/lib-scow-resource";
 import { apiAuthPlugin } from "@scow/lib-server";
 import { commonConfig } from "src/config/common";
 
 declare module "@ddadaal/tsgrpc-server" {
-  interface Extensions extends ScowResourcesPlugin {}
+  interface Extensions extends ScowResourcePlugin {}
 }
 
 export const plugins = [
@@ -26,6 +26,6 @@ if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));
 }
 
-if (commonConfig.scowResources?.scowResourcesEnabled) {
-  plugins.push(scowResourcesPlugin(commonConfig.scowResources));
+if (commonConfig.scowResource?.enabled) {
+  plugins.push(scowResourcePlugin(commonConfig.scowResource));
 }

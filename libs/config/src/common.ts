@@ -30,9 +30,10 @@ export const ScowHookConfigSchema = Type.Object({
   }), { description: "多个Hook的URL。SCOW将会以数组的顺序逐个调用各个hook。" })),
 }, { description: "SCOW Hook配置" });
 
-export const ScowResourcesSchema = Type.Object({
-  address: Type.String({ description: "资源管理", default: "scow-resources:3000" }),
-  scowResourcesEnabled: Type.Boolean({ description: "是否启用资源管理", default: "true" }),
+export const ScowResourceConfigSchema = Type.Object({
+  enabled: Type.Boolean({ description: "是否启用资源管理", default: "true" }),
+  address: Type.String({ description: "资源管理", default: "scow-resource:3000" }),
+  syncBlockStatusWhenStart: Type.Boolean({ description: "启动时是否执行状态同步" }),
 });
 
 export const CommonConfigSchema = Type.Object({
@@ -68,7 +69,7 @@ export const CommonConfigSchema = Type.Object({
     Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM, { description: "SCOW使用的文本语言，不再允许手动切换" }),
   ], { description: "", default: { autoDetectWhenUserNotSet: true, default: SYSTEM_VALID_LANGUAGE_ENUM.zh_cn } })),
 
-  scowResources: Type.Optional(ScowResourcesSchema),
+  scowResource: Type.Optional(ScowResourceConfigSchema),
 
 });
 
@@ -86,7 +87,7 @@ const COMMON_CONFIG_NAME = "common";
 
 export type ScowHookConfigSchema = Static<typeof ScowHookConfigSchema>;
 export type ScowApiConfigSchema = Static<typeof ScowApiConfigSchema>;
-export type ScowResourcesSchema = Static<typeof ScowResourcesSchema>;
+export type ScowResourceConfigSchema = Static<typeof ScowResourceConfigSchema>;
 
 export type CommonConfigSchema = Static<typeof CommonConfigSchema>;
 

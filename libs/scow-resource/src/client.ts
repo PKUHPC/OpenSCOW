@@ -13,18 +13,18 @@
 import type { ServiceType } from "@bufbuild/protobuf";
 import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
-import { ClusterPartitionService } from "@scow/scow-resources-protos/build/partition_connect";
+import { ClusterPartitionService } from "@scow/scow-resource-protos/build/partition_connect";
 import { join } from "path";
-
-export interface ScowResourcesClient {
-  resources: PromiseClient<typeof ClusterPartitionService>
+ 
+export interface ScowResourceClient {
+  resource: PromiseClient<typeof ClusterPartitionService>
 }
 
 export function getClient<TService extends ServiceType>(
-  scowResourcesUrl: string, service: TService,
+  scowResourceUrl: string, service: TService,
 ): PromiseClient<TService> {
   const transport = createConnectTransport({
-    baseUrl: join(scowResourcesUrl, "/api"),
+    baseUrl: join(scowResourceUrl, "/api"),
     httpVersion: "1.1",
     nodeOptions: {},
   });
@@ -32,8 +32,8 @@ export function getClient<TService extends ServiceType>(
   return createPromiseClient(service, transport);
 }
   
-export const getScowResourcesClient = (scowResourcesUrl: string) => {
+export const getScowResourceClient = (scowResourceUrl: string) => {
   return {
-    resources: getClient(scowResourcesUrl, ClusterPartitionService),
-  } as ScowResourcesClient;
+    resource: getClient(scowResourceUrl, ClusterPartitionService),
+  } as ScowResourceClient;
 };

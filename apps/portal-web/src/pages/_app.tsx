@@ -269,7 +269,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           token: token,
         };
 
-        if (publicConfig.MIS_DEPLOYED && runtimeConfig.SCOW_RESOURCES_CONFIG?.scowResourcesEnabled) {
+        if (publicConfig.MIS_DEPLOYED && runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled) {
           const userAssociatedClusterIds = 
           await api.getUserAssociatedClusterIds({ query: { token, userId: userInfo.identityId } });
           

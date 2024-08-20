@@ -22,6 +22,7 @@ import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceServi
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -30,6 +31,7 @@ import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entitie
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import { toRef } from "src/utils/orm";
+import { unblockAccountAssignedPartitionsInCluster } from "src/utils/resourceManagement";
 
 export const accountServiceServer = plugin((server) => {
 
@@ -251,27 +253,32 @@ export const accountServiceServer = plugin((server) => {
         await em.removeAndFlush([account, userAccount]);
         throw e;
       };
-
+  
       const currentActivatedClusters = await getActivatedClusters(em, logger);
+
+      // 如果已配置资源管理扩展功能，向资源管理数据库写入账户的默认授权集群与分区
+      if (commonConfig.scowResource?.enabled) {
+        // 此接口建立资源管理事务且不回滚，再次创建相同账户时会正常执行
+        await server.ext.resource.assignAccountOnCreate({
+          accountName,
+          tenantName: tenant.name,
+        }).catch(async (e) => {
+          await rollback(e);
+          throw e;
+        });
+      }
+
       logger.info("Creating account in cluster.");
-      await server.ext.clusters.callOnAll(
-        currentActivatedClusters,
-        logger,
-        async (client, cluster) => {
-          await asyncClientCall(client.account, "createAccount", {
-            accountName, ownerUserId: ownerId,
-          });
-
-          const assignedPartitions = await server.ext.resources?.getAccountDefaultPartitions({
-            accountName, tenantName, clusterId: cluster,
-          });
-
-          // 判断为需在集群中封锁时
-          if (shouldBlockInCluster) {
-
+      if (shouldBlockInCluster) {
+        await server.ext.clusters.callOnAll(
+          currentActivatedClusters,
+          logger,
+          async (client) => {
+            await asyncClientCall(client.account, "createAccount", {
+              accountName, ownerUserId: ownerId,
+            });
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
-              // blockedPartitions: [],
             }).catch((e) => {
               if (e.code === Status.NOT_FOUND) {
                 throw {
@@ -281,29 +288,46 @@ export const accountServiceServer = plugin((server) => {
                 throw e;
               }
             });
-          // 判断为需在集群中解封时
-          } else {
+          },  
+        ).catch(async (e) => {
+          await rollback(e);
+          throw e;
+        });
+      // 如果判断为要在集群中解封时
+      } else {
 
-            if (assignedPartitions && assignedPartitions.length === 0) {
-              // 已部署资源分区管理但是实际创建账户时没有授权分区时
-              // 实行一次封锁确保未来不产生冲突，代表账户没有授权分区
-              await asyncClientCall(client.account, "blockAccount", {
-                accountName,
-                // blockedPartitions: [],
-              }).catch((e) => {
-                if (e.code === Status.NOT_FOUND) {
-                  throw {
-                    code: Status.INTERNAL, message: `Account ${accountName} hasn't been created.`,
-                  } as ServiceError;
-                } else {
-                  throw e;
-                }
+        // 条件1：如果配置了资源管理服务，则调用适配器的 unblockAccountWithPartitions 接口
+        if (commonConfig.scowResource?.enabled) {
+          await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
+            await server.ext.clusters.callOnOne(
+              clusterId,
+              logger,
+              async (client) => { 
+                await asyncClientCall(client.account, "createAccount", {
+                  accountName, ownerUserId: ownerId,
+                }); 
+              },      
+            );
+            await unblockAccountAssignedPartitionsInCluster(
+              account.accountName,
+              account.tenant.getProperty("name"),
+              clusterId,
+              server.ext.clusters,
+              logger,
+              server.ext,
+            );
+          }));
+        // 条件2：如果没有配置资源管理服务，则调用适配器的 unblockAccount接口进行解封
+        } else {
+          await server.ext.clusters.callOnAll(
+            currentActivatedClusters,
+            logger,
+            async (client) => {
+              await asyncClientCall(client.account, "createAccount", {
+                accountName, ownerUserId: ownerId,
               });
-
-            } else {
               await asyncClientCall(client.account, "unblockAccount", {
                 accountName,
-                // unblockedPartitions: assignedPartitions ?? [],
               }).catch((e) => {
                 if (e.code === Status.NOT_FOUND) {
                   throw {
@@ -313,16 +337,13 @@ export const accountServiceServer = plugin((server) => {
                   throw e;
                 }
               });
-            }
-
-
-          }
-
-        },
-      ).catch(async (e) => {
-        await rollback(e);
-        throw e;
-      });
+            },  
+          ).catch(async (e) => {
+            await rollback(e);
+            throw e;
+          });
+        }
+      }
 
       logger.info("Account has been created in cluster.");
 

@@ -11,54 +11,55 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { getUserAccountsClusterIds } from "@scow/lib-scow-resource";
+import { getUserAccountsClusterPartitions } from "@scow/lib-scow-resource/build/utils";
+import { libWebGetUserInfo } from "@scow/lib-web/build/server/userAccount";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { validateToken } from "src/auth/token";
-import { runtimeConfig } from "src/utils/config";
+import { publicConfig, runtimeConfig } from "src/utils/config";
 import { route } from "src/utils/route";
 
-
-export const GetUserAssociatedClusterIdsSchema = typeboxRouteSchema({
+export const GetUserAssociatedClusterPartitionsSchema = typeboxRouteSchema({
 
   method: "GET",
 
-  // only set the query value when firstly used in getInitialProps
-  query: Type.Object({
-    token: Type.Optional(Type.String()),
-    accountNames: Type.Array(Type.String()),
-    tenantName: Type.String(),
-  }),
-
   responses: {
     200: Type.Object({
-      clusterIds: Type.Optional(Type.Array(Type.String())),
+      clusterPartitions: Type.Record(
+        Type.String(),
+        Type.Array(Type.String()),
+      ),
     }),
-
     403: Type.Null(),
   },
 });
 
 const auth = authenticate(() => true);
-export default route(GetUserAssociatedClusterIdsSchema,
+export default route(GetUserAssociatedClusterPartitionsSchema,
   async (req, res) => {
-    const { token, accountNames, tenantName } = req.query;
-    // when firstly used in getInitialProps, check the token
-    // when logged in, use auth()
-    const info = token ? await validateToken(token) : await auth(req, res);
+
+    const info = await auth(req, res);
     if (!info) { return; }
 
-    // const clusterIds = await getUserAssociatedClusterIds(accountNames, tenantName);
-    const clusterIds = await getUserAccountsClusterIds(
-      true,
+    const reply = await libWebGetUserInfo(
+      info.identityId, publicConfig.MIS_SERVER_URL, runtimeConfig.SCOW_API_AUTH_TOKEN);
+    const accountNames = reply?.affiliations.map((a) => (a.accountName));
+    const tenantName = reply?.tenantName;
+
+
+    const resp = await getUserAccountsClusterPartitions(
+      publicConfig.MIS_DEPLOYED,
       runtimeConfig.SCOW_RESOURCE_CONFIG,
       accountNames,
       tenantName,
     );
 
-    return {
-      200: {
-        clusterIds,
-      },
-    };
+    if (!resp) {
+      return { 403: null };
+    } else {
+      return {
+        200: {
+          clusterPartitions: resp,
+        },
+      };
+    }
   });

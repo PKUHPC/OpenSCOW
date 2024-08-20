@@ -12,7 +12,7 @@
 
 import { AuditConfigSchema } from "@scow/config/build/audit";
 import type { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
-import { ScowResourcesSchema } from "@scow/config/build/common";
+import { ScowResourceConfigSchema } from "@scow/config/build/common";
 import { I18nStringType, SystemLanguageConfig } from "@scow/config/build/i18n";
 import type { MisConfigSchema } from "@scow/config/build/mis";
 import type { UiConfigSchema } from "@scow/config/build/ui";
@@ -41,7 +41,7 @@ export interface ServerRuntimeConfig {
 
   PROTOCOL: string;
 
-  SCOW_RESOURCES_CONFIG: ScowResourcesSchema | undefined; 
+  SCOW_RESOURCE_CONFIG: ScowResourceConfigSchema | undefined; 
 }
 
 export interface PublicRuntimeConfig {

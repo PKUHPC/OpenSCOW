@@ -1,7 +1,7 @@
 {
-    "name": "@scow/lib-scow-resources",
-    "version": "1.0.0",
-    "description": "scow-resources",
+    "name": "@scow/lib-scow-resource",
+    "version": "0.1.0",
+    "description": "scow-resource",
     "main": "build/index.js",
     "private": true,
     "scripts": {
@@ -25,7 +25,7 @@
       "@connectrpc/connect": "1.4.0",
       "@connectrpc/connect-node": "1.4.0",
       "@grpc/grpc-js": "1.10.9",
-      "@scow/scow-resources-protos": "workspace:*",
+      "@scow/scow-resource-protos": "workspace:*",
       "@scow/config": "workspace:*",
       "ts-log": "2.2.5"
     },

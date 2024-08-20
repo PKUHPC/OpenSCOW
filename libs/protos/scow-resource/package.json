@@ -1,8 +1,8 @@
 {
-    "name": "@scow/scow-resources-protos",
+    "name": "@scow/scow-resource-protos",
     "version": "0.1.0",
     "description": "",
-    "main": "index.js",
+    "main": "build/index.js",
     "private": true,
     "scripts": {
       "generate": "rimraf generated && buf generate --template buf.gen.yaml ./protos",

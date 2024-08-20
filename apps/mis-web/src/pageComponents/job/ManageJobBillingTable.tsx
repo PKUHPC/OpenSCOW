@@ -14,7 +14,7 @@ import { MinusCircleOutlined, PlusCircleOutlined, QuestionCircleOutlined } from 
 import { numberToMoney } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { Money } from "@scow/protos/build/common/money";
-import { App, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
+import { App, Button, Form, Input, InputNumber, Modal, Popover, Select, Space, Table, Tooltip } from "antd";
 import React, { useState } from "react";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -51,6 +51,8 @@ export interface BillingItemType {
     price: Money;
     amountStrategy: string,
   }
+
+  settable?: boolean,
 }
 
 const customAmountStrategiesIdToName = {};
@@ -177,16 +179,24 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
           return {
             children: (
               <Space>
-                <EditPriceModalLink
-                  nextId={data!.nextId}
-                  cluster={r.cluster}
-                  partition={r.partition}
-                  qos={r.qos}
-                  reload={reload}
-                  tenant={tenant}
-                >
-                  {t(pCommon("set"))}
-                </EditPriceModalLink>
+                {
+                  r.settable ? (
+                    <EditPriceModalLink
+                      nextId={data!.nextId}
+                      cluster={r.cluster}
+                      partition={r.partition}
+                      qos={r.qos}
+                      reload={reload}
+                      tenant={tenant}
+                    >
+                      {t(pCommon("set"))}
+                    </EditPriceModalLink>
+                  ) : (
+                    <Tooltip title={t(p("canNotSetUnAssignedPartition"))}>
+                      <Button disabled>{t(pCommon("set"))}</Button>
+                    </Tooltip>
+                  )
+                }               
               </Space>
             ),
           };

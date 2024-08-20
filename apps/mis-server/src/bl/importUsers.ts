@@ -15,7 +15,9 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ScowResourcePlugin } from "@scow/lib-scow-resource";
 import { blockAccount, unblockAccount } from "src/bl/block";
+import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -37,7 +39,10 @@ export interface ImportUsersData {
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   whitelistAll: boolean,
   currentActivatedClusters: Record<string, ClusterConfigSchema>,
-  clusterPlugin: ClusterPlugin["clusters"], logger: Logger)
+  clusterPlugin: ClusterPlugin["clusters"], 
+  logger: Logger,
+  scowResourcePlugin?: ScowResourcePlugin,
+)
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
 
@@ -66,7 +71,10 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   const accountMap: Record<string, Account> = {};
   data.accounts.forEach((account) => {
     // 导入账户时，如果在集群中的账户状态为封锁，则scow同步封锁状态，默认为被上级手动封锁
-    // 导入账户时，如果在集群中的账户状态为正常，则scow同步正常状态
+
+    // 导入账户时，如果在集群中的账户状态为正常，则scow同步正常状态:
+    // 条件1，如果未配置资源管理服务，则默认账户封锁状态正常，默认所有分区为可用分区
+    // 条件2： 如果已配置资源管理服务，则默认账户封锁状态正常，只有已授权的分区为可用分区
     accountMap[account.accountName] = new Account({
       accountName: account.accountName, comment: "", blockedInCluster: Boolean(account.blocked),
       tenant, state: account.blocked ? AccountState.BLOCKED_BY_ADMIN : AccountState.NORMAL,
@@ -117,6 +125,22 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     }
   }
   const finalUserAccounts = userAccounts.filter((_, i) => !indexes.includes(i));
+
+  // 如果已配置资源管理服务，则向数据库写入新创建的账户数据
+  if (commonConfig.scowResource?.enabled) { 
+    await Promise.all(data.accounts.map(async (acc) => {
+      // 失败时已写入的数据不回滚
+      await scowResourcePlugin?.resource.assignAccountOnCreate({
+        accountName: acc.accountName,
+        tenantName: tenant.name,
+      }).catch(async (e) => {
+        logger.info(
+          "Error occured when write in new account assigned info, accountName: %s, tenantName: %s, details: %s",
+          acc.accountName, tenant.name, e);
+        throw e;
+      });
+    }));
+  }
 
   await em.persistAndFlush([...Object.values(usersMap), ...accounts, ...finalUserAccounts]);
 

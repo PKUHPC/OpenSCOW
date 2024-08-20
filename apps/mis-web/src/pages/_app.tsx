@@ -259,7 +259,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           extra.clusterConfigs = clusterConfigs;
         }
         
-        if (runtimeConfig.SCOW_RESOURCES_CONFIG?.scowResourcesEnabled) {
+        if (runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled) {
           const userAccounts = result?.accountAffiliations.map((a) => a.accountName);
         
           const userAssociatedClusterIds = await api.getUserAssociatedClusterIds({

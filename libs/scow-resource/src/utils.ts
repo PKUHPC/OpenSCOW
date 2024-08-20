@@ -12,11 +12,9 @@
 
 import { Code, ConnectError } from "@connectrpc/connect";
 import { ServiceError, status } from "@grpc/grpc-js";
-import { ScowResourcesSchema } from "@scow/config/build/common";
-import { GetAccountAssignedClusterPartitionsResponse, 
-  GetAccountDefaultClusterPartitionsResponse } from "@scow/scow-resources-protos/build/partition";
+import { ScowResourceConfigSchema } from "@scow/config/build/common";
 
-import { getScowResourcesClient } from "./client";
+import { getScowResourceClient } from "./client";
 
 // 映射 tRPC 状态码到 gRPC 状态码的函数
 function mapTRPCStatusToGRPC(statusCode: Code): status {
@@ -70,44 +68,47 @@ export function mapTRPCExceptionToGRPC(err: any): ServiceError {
   } as ServiceError;
 }
 
-
-
+// 获取用户关联账户的已授权集群
 export async function getUserAccountsClusterIds(
   misDeployed: boolean,
-  scowResourcesConfig: ScowResourcesSchema | undefined,
+  scowResourceConfig: ScowResourceConfigSchema | undefined,
   userAccounts: string[] | undefined,
   tenantName: string | undefined): Promise<string[] | undefined> {
 
-  if (!misDeployed || !scowResourcesConfig?.scowResourcesEnabled) {
+  if (!misDeployed || !scowResourceConfig?.enabled) {
     console.info("SCOW RESOURCES is not deployed, the user has not been assigned any authorized clusters.");
     return undefined;
   }
 
-  const resourceClient = getScowResourcesClient(scowResourcesConfig.address);
+  const resourceClient = getScowResourceClient(scowResourceConfig.address);
 
   const clusters =
-    await resourceClient.resources.getAccountsAssignedClusters({ accountNames: userAccounts, tenantName });
+    await resourceClient.resource.getAccountsAssignedClusterIds({ accountNames: userAccounts, tenantName });
 
-  return clusters.clusterIds;
-
+  return clusters.assignedClusterIds;
 };
 
-// 提取授权分区
-export function extractPartitions(
-  response: GetAccountAssignedClusterPartitionsResponse | GetAccountDefaultClusterPartitionsResponse) {
-  const result: string[] = [];
 
-  if (response.assignedClusterPartitions) {
-    for (const key in response.assignedClusterPartitions) {
-      const clusterPartitions = response.assignedClusterPartitions[key];
+// 获取用户关联账户的已授权集群和分区
+export async function getUserAccountsClusterPartitions(
+  misDeployed: boolean,
+  scowResourceConfig: ScowResourceConfigSchema | undefined,
+  userAccounts: string[] | undefined,
+  tenantName: string | undefined): Promise<Record<string, string[]> | undefined> {
 
-      if (clusterPartitions?.assignedInfo) {
-        clusterPartitions.assignedInfo.forEach((item) => {
-          result.push(item.partition);
-        });
-      }
-    }
+  if (!misDeployed || !scowResourceConfig?.enabled) {
+    console.info(
+      "SCOW RESOURCES is not deployed, the user has not been assigned any authorized cluster and partitions.");
+    return undefined;
   }
 
-  return result;
-}
+  const resourceClient = getScowResourceClient(scowResourceConfig.address);
+
+  const clusters =
+    await resourceClient.resource.getAccountsAssignedClustersAndPartitions({ accountNames: userAccounts, tenantName });
+
+  return Object.entries(clusters.assignedClusterPartitions).reduce((acc, [key, value]) => {
+    acc[key] = value.partitionNames;
+    return acc;
+  }, {});
+};
