@@ -17,6 +17,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -264,7 +265,7 @@ export const accountServiceServer = plugin((server) => {
           tenantName: tenant.name,
         }).catch(async (e) => {
           await rollback(e);
-          throw e;
+          throw mapTRPCExceptionToGRPC(e);
         });
       }
 

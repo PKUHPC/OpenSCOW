@@ -14,6 +14,7 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { numberToMoney } from "@scow/lib-decimal";
 import { getScowResourceClient } from "@scow/lib-scow-resource";
+import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { ConfigServiceClient } from "@scow/protos/build/common/config";
 import { GetBillingItemsResponse, JobBillingItem, JobServiceClient } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
@@ -142,12 +143,21 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
   // 如果查询条件 tenantName 存在 且已部署资源管理服务的情况 
   // 判断分区是否为已授权分区
   let tenantAssignedClustersAndPartitions: AssignedClusterPartitions | undefined;
+
   if (runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled && tenant) {
     const resourceClient = getScowResourceClient(runtimeConfig.SCOW_RESOURCE_CONFIG.address);
-    tenantAssignedClustersAndPartitions = await resourceClient.resource.getTenantAssignedClustersAndPartitions({
-      tenantName: tenant,
-    });
+    try {
+      const response = await resourceClient.resource.getTenantAssignedClustersAndPartitions({
+        tenantName: tenant,
+      });
+      tenantAssignedClustersAndPartitions = response;
+    } catch (e) {
+      // 保证在出错时 tenantAssignedClustersAndPartitions 仍为 undefined
+      tenantAssignedClustersAndPartitions = undefined; 
+      mapTRPCExceptionToGRPC(e);
+    }
   }
+
   const isPartitionAssigned = (
     clusterId: string, 
     partitionName: string, 

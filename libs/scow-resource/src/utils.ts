@@ -106,7 +106,7 @@ export async function getUserAccountsClusterPartitions(
 
   const clusters =
     await resourceClient.resource.getAccountsAssignedClustersAndPartitions({ accountNames: userAccounts, tenantName });
-
+    
   return Object.entries(clusters.assignedClusterPartitions).reduce((acc, [key, value]) => {
     acc[key] = value.partitionNames;
     return acc;

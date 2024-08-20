@@ -16,6 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { ScowResourcePlugin } from "@scow/lib-scow-resource";
+import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
@@ -137,7 +138,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
         logger.info(
           "Error occured when write in new account assigned info, accountName: %s, tenantName: %s, details: %s",
           acc.accountName, tenant.name, e);
-        throw e;
+        throw mapTRPCExceptionToGRPC(e);
       });
     }));
   }
