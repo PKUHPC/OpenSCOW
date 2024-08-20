@@ -23,8 +23,9 @@ message Message {
   MessageType message_type = 2;
   google.protobuf.Struct metadata = 3;
   repeated string descriptions = 4;
-  string created_at = 5;
-  string updated_at = 6;
+  optional bool is_read = 5;
+  string created_at = 6;
+  string updated_at = 7;
 }
 
 message SystemSendMessageRequest {
