@@ -646,7 +646,7 @@ export const userServiceServer = plugin((server) => {
                 message: "Error nologin user in LDAP." } as ServiceError;
             });
         }
-        // else {//本地测试无法通过
+        // else { // 无法通过测试
         //   throw {
         //     code: Status.UNAVAILABLE,
         //     message: "No permission to delete user in LDAP." } as ServiceError;
