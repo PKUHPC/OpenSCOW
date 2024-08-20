@@ -11,14 +11,14 @@
  */
 
 import React from "react";
-import styled from "styled-components";
+import styled, { useTheme } from "styled-components";
 
 interface CustomProgressProps {
   percent: number; // 进度百分比
   width?: string; // 进度条的宽度，默认100%
   height?: string; // 进度条的高度，默认20px
-  bgColor: string; // 进度条背景颜色
-  progressColor: string; // 进度条颜色
+  bgColor?: string; // 进度条背景颜色
+  progressColor?: string; // 进度条颜色
 }
 
 const ProgressBarContainer = styled.div<{ width: string, height: string, bgColor: string }>`
@@ -45,6 +45,8 @@ const ProgressLabel = styled.div`
   font-size: 0.9rem;
 `;
 
+
+
 export const CustomProgress: React.FC<CustomProgressProps> = ({
   percent,
   width = "100%",
@@ -54,10 +56,13 @@ export const CustomProgress: React.FC<CustomProgressProps> = ({
 }) => {
   const normalizedPercent = Math.min(percent, 100).toFixed(2);
 
+  // 使用主题色
+  const theme = useTheme();
+
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <ProgressBarContainer width={width} height={height} bgColor={bgColor}>
-        <ProgressBar percent={percent} progressColor={progressColor} />
+      <ProgressBarContainer width={width} height={height} bgColor={bgColor ?? theme.token.colorBorderBg}>
+        <ProgressBar percent={percent} progressColor={progressColor ?? theme.token["blue-4"]} />
       </ProgressBarContainer>
       <ProgressLabel>
         {percent === 100 ? "100%" : `${normalizedPercent}%`}
