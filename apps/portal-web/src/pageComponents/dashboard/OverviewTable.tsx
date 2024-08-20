@@ -22,7 +22,7 @@ import { Cluster } from "src/utils/cluster";
 import { compareWithUndefined } from "src/utils/dashboard";
 import { styled } from "styled-components";
 
-import CustomProgress from "./CustomProgress";
+import { CustomProgress } from "./CustomProgress";
 import { DashboardSection } from "./DashboardSection";
 
 export interface ClusterInfo extends PartitionInfo {

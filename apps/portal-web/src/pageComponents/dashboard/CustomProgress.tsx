@@ -17,8 +17,8 @@ interface CustomProgressProps {
   percent: number; // 进度百分比
   width?: string; // 进度条的宽度，默认100%
   height?: string; // 进度条的高度，默认20px
-  bgColor?: string; // 进度条背景颜色
-  progressColor?: string; // 进度条颜色
+  bgColor: string; // 进度条背景颜色
+  progressColor: string; // 进度条颜色
 }
 
 const ProgressBarContainer = styled.div<{ width: string, height: string, bgColor: string }>`
@@ -45,12 +45,12 @@ const ProgressLabel = styled.div`
   font-size: 0.9rem;
 `;
 
-const CustomProgress: React.FC<CustomProgressProps> = ({
+export const CustomProgress: React.FC<CustomProgressProps> = ({
   percent,
   width = "100%",
   height = "20px",
-  bgColor = "#f5f5f5",
-  progressColor = "#566DE5",
+  bgColor,
+  progressColor,
 }) => {
   const normalizedPercent = Math.min(percent, 100).toFixed(2);
 
@@ -66,4 +66,4 @@ const CustomProgress: React.FC<CustomProgressProps> = ({
   );
 };
 
-export default CustomProgress;
+
