@@ -13,7 +13,7 @@
 import { JsonValue } from "@bufbuild/protobuf";
 import { AdminMessageType, adminMessageTypesMap, CustomMessageType } from "@scow/lib-web/build/models/notif";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Message } from "src/pages/api/notif/getUnreadMessages";
+import { Message } from "src/pages/api/notif/getUnreadMessage";
 
 export interface RenderContent {
   id: number;

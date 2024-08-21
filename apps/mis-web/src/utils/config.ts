@@ -108,6 +108,9 @@ export interface PublicRuntimeConfig {
 
   JOB_CHARGE_DECIMAL_PRECISION: number;
   JOB_MIN_CHARGE: number;
+
+  NOTIF_ENABLED?: boolean;
+  NOTIF_ADDRESS?: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

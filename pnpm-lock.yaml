@@ -715,6 +715,9 @@ importers:
       '@ant-design/icons':
         specifier: 5.3.7
         version: 5.3.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@bufbuild/protobuf':
+        specifier: 1.8.0
+        version: 1.8.0
       '@ddadaal/next-typed-api-routes-runtime':
         specifier: 0.8.2
         version: 0.8.2(@sinclair/typebox@0.32.34)(next@14.2.4(patch_hash=xwomt2iqq5liv3pq43ybpoioua)(@babel/core@7.25.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.23.8)
@@ -739,12 +742,18 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
+      '@scow/lib-notification':
+        specifier: workspace:*
+        version: link:../../libs/notification
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
       '@scow/lib-web':
         specifier: workspace:*
         version: link:../../libs/web
+      '@scow/notification-protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/notification
       '@scow/protos':
         specifier: workspace:*
         version: link:../../libs/protos/scow
