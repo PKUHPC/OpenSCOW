@@ -537,6 +537,61 @@ export const mockApi: MockApi<typeof api> = {
   exportUser: null,
   exportOperationLog: null,
 
+  markMessageRead: null,
+  getUnreadMessage: async () => ({
+    results: {
+      totalCount: 2,
+      messages: [{
+        "id": 20,
+        "messageType": {
+          "type": "SystemNotification",
+          "titleTemplate": {
+            "default": "系统公告",
+            "en": "System Notification",
+            "zhCn": "系统公告",
+          },
+          "category": "Admin",
+          "categoryTemplate": {
+            "default": "Admin Messages",
+            "en": "Admin Messages",
+            "zhCn": "管理员消息",
+          },
+        },
+        "metadata": {
+          "title": "测试2",
+          "content": "测试2测试2测试2测试2测试2测试2测试2测试2测试2",
+        },
+        "isRead": false,
+        "createdAt": "2024-08-22T02:03:38.297Z",
+        "updatedAt": "2024-08-22T02:03:38.297Z",
+      },
+      {
+        "id": 19,
+        "messageType": {
+          "type": "SystemNotification",
+          "titleTemplate": {
+            "default": "系统公告",
+            "en": "System Notification",
+            "zhCn": "系统公告",
+          },
+          "category": "Admin",
+          "categoryTemplate": {
+            "default": "Admin Messages",
+            "en": "Admin Messages",
+            "zhCn": "管理员消息",
+          },
+        },
+        "metadata": {
+          "title": "测试1",
+          "content": "测试1测试1测试1测试1测试1测试1测试1",
+        },
+        "isRead": true,
+        "createdAt": "2024-08-21T09:34:43.200Z",
+        "updatedAt": "2024-08-21T09:34:43.200Z",
+      }],
+    },
+  }),
+
 };
 
 export const MOCK_USER_INFO = {
