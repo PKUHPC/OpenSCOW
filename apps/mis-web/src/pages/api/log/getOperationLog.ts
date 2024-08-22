@@ -146,8 +146,10 @@ export default typeboxRoute(GetOperationLogsSchema, async (req, res) => {
       return { 403: null };
     }
   }
-  const mapOperationSortBy = sortBy ? mapOperationSortByType[sortBy] : undefined;
-  const mapOperationSortOrder = sortOrder ? mapOperationSortOrderType[sortOrder] : undefined;
+
+  // 默认按照时间降序排序
+  const mapOperationSortBy = sortBy ? mapOperationSortByType[sortBy] : mapOperationSortByType.operationTime;
+  const mapOperationSortOrder = sortOrder ? mapOperationSortOrderType[sortOrder] : mapOperationSortOrderType.descend;
 
   const client = getClient(UserServiceClient);
 

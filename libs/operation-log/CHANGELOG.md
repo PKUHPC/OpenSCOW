@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.8
+
+### Patch Changes
+
+- abd69cb: 接入 scowd 文件分片上传
+  - @scow/protos@1.0.14
+
 ## 2.1.7
 
 ### Patch Changes

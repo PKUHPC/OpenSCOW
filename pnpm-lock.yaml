@@ -1261,9 +1261,6 @@ importers:
       '@adobe/jsonschema2md':
         specifier: 8.0.2
         version: 8.0.2
-      '@algolia/client-search':
-        specifier: 4.23.3
-        version: 4.23.3
       '@docusaurus/module-type-aliases':
         specifier: 3.4.0
         version: 3.4.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
