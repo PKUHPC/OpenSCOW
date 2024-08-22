@@ -10,13 +10,15 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { AdminMessageType } from "@scow/lib-web/build/models/notif";
 import { Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";
-import { AdminMessageType } from "src/models/notif";
+import { useI18n } from "src/i18n";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 
 const { Paragraph, Title } = Typography;
+
 interface NotificationLayoutProps {
   children: React.ReactNode;
   interval?: number; // 定时器的时间间隔，默认60秒
@@ -26,21 +28,23 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
 
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
+  const currentLanguage = useI18n().currentLanguage;
 
-  const close = () => {
-    console.log(
-      "Notification was closed. Either the close button was clicked or duration time elapsed.",
-    );
-  };
+  const close = () => {};
 
   const openNotification = (content: RenderContent) => {
     const key = content.id;
     const btn = (
       <Space>
-        <Button type="link" size="small" onClick={() => notifApi.destroy()}>
-          忽略
-        </Button>
-        <Button type="primary" size="small" onClick={() => notifApi.destroy(key)}>
+        <Button
+          style={{ boxShadow: "none" }}
+          type="primary"
+          size="small"
+          onClick={() => {
+            api.markMessageRead({ body:{ messageId: content.id } });
+            notifApi.destroy(key);
+          }}
+        >
           已读
         </Button>
       </Space>
@@ -66,7 +70,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
 
         for (const msg of results.messages) {
           if (msg.messageType?.type === AdminMessageType.SystemNotification) {
-            const content = renderingMessage(msg);
+            const content = renderingMessage(msg, currentLanguage.id);
 
             // 使用 ref 来检查已通知的 ID
             if (content && !notifiedIdsRef.current.has(msg.id)) {
@@ -89,7 +93,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
 
     // 清除定时器
     return () => clearInterval(timer);
-  }, [interval]);
+  }, [interval, currentLanguage.id]);
 
   return (
     <div>

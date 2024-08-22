@@ -68,16 +68,6 @@ message ListMessagesResponse {
   repeated Message messages = 2;
 }
 
-message GetUnreadMessagesRequest {
-  string user_id = 1;
-  optional NoticeType notice_type = 2;
-}
-
-message GetUnreadMessagesResponse {
-  uint64 total_count = 1;
-  repeated Message messages = 2;
-}
-
 message MarkMessageReadRequest {
   string user_id = 1;
   uint64 message_id = 2;
@@ -117,7 +107,6 @@ service MessageService {
 
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
 
-  rpc GetUnreadMessages(GetUnreadMessagesRequest) returns (GetUnreadMessagesResponse);
   rpc MarkMessageRead(MarkMessageReadRequest) returns (MarkMessageReadResponse);
   rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse);
 

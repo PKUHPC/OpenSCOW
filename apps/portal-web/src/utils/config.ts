@@ -95,6 +95,7 @@ export interface PublicRuntimeConfig {
 
   NOTIF_ENABLED?: boolean;
   NOTIF_ADDRESS?: string;
+  NOTIF_NAME?: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

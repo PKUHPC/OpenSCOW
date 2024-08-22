@@ -131,7 +131,7 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
 
   return (
     <DashboardSection
-      style={{ marginBottom: "16px" }}
+      style={{ marginBottom: "16px", minHeight: "320px" }}
       title={ (
         <>
           <Bullet style={{

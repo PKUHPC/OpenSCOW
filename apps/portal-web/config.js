@@ -193,6 +193,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NOTIF_ENABLED: commonConfig.notification?.enabled,
     NOTIF_ADDRESS: commonConfig.notification?.address,
+    NOTIF_NAME: commonConfig.notification?.name,
+
   };
 
   if (!building && !testenv) {

@@ -22,6 +22,12 @@ export interface RenderContent {
   createdAt: string;
 }
 
+enum TemplateLang {
+  Default = "default",
+  EN = "en",
+  zhCn = "zhCn",
+};
+
 export const checkAdminMessageTypeExist = (
   type: string,
 ): CustomMessageType | undefined => {
@@ -66,16 +72,23 @@ function parseAdminMessage(message: Message): RenderContent | undefined {
   };
 }
 
-export const renderingMessage = (message: Message): RenderContent | undefined => {
+export const renderingMessage = (message: Message, languageId: string): RenderContent | undefined => {
   if (!message.messageType || !message.metadata) return undefined;
 
   if (checkAdminMessageTypeExist(message.messageType.type)) {
     return parseAdminMessage(message);
   } else if (checkTemplateNotUndefined(message)) {
+
+    let templateLang: TemplateLang = TemplateLang.Default;
+    if (languageId === "en") {
+      templateLang = TemplateLang.EN;
+    } else if (languageId === "zh_cn") {
+      templateLang = TemplateLang.zhCn;
+    }
     return {
       id: message.id,
-      title: message.messageType.titleTemplate!.default,
-      description: replaceTemplate(message.metadata, message.messageType.contentTemplate!.default),
+      title: message.messageType.titleTemplate![templateLang],
+      description: replaceTemplate(message.metadata, message.messageType.contentTemplate![templateLang]),
       createdAt: formatDateTime(message.createdAt),
     };
   } else {
