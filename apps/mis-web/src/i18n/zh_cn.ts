@@ -1382,4 +1382,8 @@ export default {
     algorithmGpu: "gpu",
     algorithmCpus: "cpusAlloc",
   },
+  notifLayout: {
+    read: "已读",
+    fetchSystemNotifError: "获取系统公告失败",
+  },
 };

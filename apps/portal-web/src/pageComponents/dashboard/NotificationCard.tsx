@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Button, Card, List, Typography } from "antd";
+import { App, Button, Card, List, Typography } from "antd";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
@@ -31,6 +31,7 @@ const p = prefix("pageComp.dashboard.NotificationCard.");
 
 export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
 
+  const { message } = App.useApp();
   const t = useI18nTranslateToString();
   const [msgContents, setMsgContents] = useState<RenderContent[]>();
   const [loading, setLoading] = useState(true);
@@ -53,8 +54,8 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
         }
 
         setMsgContents(msgsToRender);
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
+      } catch {
+        message.error(t(p("fetchNotifError")));
       }
     };
 

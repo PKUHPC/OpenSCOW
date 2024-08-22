@@ -1384,4 +1384,8 @@ export default {
     algorithmGpu: "gpu",
     algorithmCpus: "cpusAlloc",
   },
+  notifLayout: {
+    read: "read",
+    fetchSystemNotifError: "Failed to obtain system announcement",
+  },
 };

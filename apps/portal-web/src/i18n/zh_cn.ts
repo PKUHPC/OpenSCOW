@@ -503,6 +503,7 @@ export default {
         message: "消息",
         check: "查看",
         noMessage: "当前没有未读消息",
+        fetchNotifError: "获取未读消息失败",
       },
     },
   },
@@ -643,5 +644,6 @@ export default {
   },
   notifLayout: {
     read: "已读",
+    fetchSystemNotifError: "获取系统公告失败",
   },
 };

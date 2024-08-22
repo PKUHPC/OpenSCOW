@@ -503,6 +503,7 @@ export default {
         message: "Message",
         check: "Check",
         noMessage: "There are currently no unread messages",
+        fetchNotifError: "Failed to get unread messages",
       },
     },
   },
@@ -643,5 +644,6 @@ export default {
   },
   notifLayout: {
     read: "read",
+    fetchSystemNotifError: "Failed to obtain system announcement",
   },
 };

@@ -11,9 +11,10 @@
  */
 
 import { AdminMessageType } from "@scow/lib-web/build/models/notif";
-import { Button, notification, Space, Typography } from "antd";
+import { App, Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 
 const { Paragraph, Title } = Typography;
@@ -22,26 +23,31 @@ interface NotificationLayoutProps {
   interval?: number; // 定时器的时间间隔，默认60秒
 }
 
+const p = prefix("notifLayout.");
+
 const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, interval = 60000 }) => {
 
+  const { message } = App.useApp();
+  const t = useI18nTranslateToString();
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
 
-  const close = () => {
-    console.log(
-      "Notification was closed. Either the close button was clicked or duration time elapsed.",
-    );
-  };
+  const close = () => {};
 
   const openNotification = (content: RenderContent) => {
     const key = content.id;
     const btn = (
       <Space>
-        <Button type="link" size="small" onClick={() => notifApi.destroy()}>
-          忽略
-        </Button>
-        <Button type="primary" size="small" onClick={() => notifApi.destroy(key)}>
-          已读
+        <Button
+          style={{ boxShadow: "none" }}
+          type="primary"
+          size="small"
+          onClick={() => {
+            api.markMessageRead({ body:{ messageId: content.id } });
+            notifApi.destroy(key);
+          }}
+        >
+          {t(p("read"))}
         </Button>
       </Space>
     );
@@ -75,8 +81,8 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
             }
           }
         }
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
+      } catch {
+        message.error(t(p("fetchSystemNotifError")));
       }
     };
 
