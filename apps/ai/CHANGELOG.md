@@ -1,5 +1,25 @@
 # @scow/ai
 
+## 0.2.6
+
+### Patch Changes
+
+- 5ba5ebb: 修复 AI 应用的工作目录和挂载点重复时报错
+- e776999: ai 和 hpc 在提交作业和应用前检查一下是否重名
+- 3d36aa0: TensorFlow 增加 psNode 和 workerNode 参数
+- Updated dependencies [eec12d8]
+- Updated dependencies [b2ee159]
+- Updated dependencies [d3de802]
+- Updated dependencies [acb1992]
+- Updated dependencies [15a7bdd]
+- Updated dependencies [abd69cb]
+- Updated dependencies [83df60b]
+  - @scow/lib-web@1.4.2
+  - @scow/lib-operation-log@2.1.8
+  - @scow/lib-server@1.3.2
+  - @scow/config@1.5.2
+  - @scow/rich-error-model@2.0.0
+
 ## 0.2.5
 
 ### Patch Changes

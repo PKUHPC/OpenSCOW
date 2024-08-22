@@ -1,5 +1,14 @@
 # @scow/lib-scowd
 
+## 1.1.1
+
+### Patch Changes
+
+- ac6805d: scowd 新增 app service 和 GetAppLastSubmission 接口
+- Updated dependencies [ac6805d]
+- Updated dependencies [abd69cb]
+  - @scow/scowd-protos@0.2.1
+
 ## 1.1.0
 
 ### Minor Changes
