@@ -499,6 +499,11 @@ export default {
       titleContainer:{
         available:"Available",
       },
+      NotificationCard: {
+        message: "Message",
+        check: "Check",
+        noMessage: "There are currently no unread messages",
+      },
     },
   },
   component: {
@@ -635,5 +640,8 @@ export default {
       noAvailableClusters: "There are currently no available clusters."
       + " Please try again later or contact the administrator.",
     },
+  },
+  notifLayout: {
+    read: "read",
   },
 };

@@ -14,7 +14,7 @@ import { Button, Card, List, Typography } from "antd";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { api } from "src/apis";
-import { useI18n } from "src/i18n";
+import { Localized, prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { publicConfig } from "src/utils/config";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 import { useTheme } from "styled-components";
@@ -27,8 +27,11 @@ interface Props {
   interval?: number; // 定时器的时间间隔，默认60秒
 }
 
+const p = prefix("pageComp.dashboard.NotificationCard.");
+
 export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
 
+  const t = useI18nTranslateToString();
   const [msgContents, setMsgContents] = useState<RenderContent[]>();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -81,17 +84,20 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
             marginRight: "1em",
           }}
           />
-          {/* <Localized id={p("quickEntry")} /> */}
-          消息
+          <Localized id={p("message")} />
         </>
       )}
       extra={(
-        <Button onClick={() => router.push(`/extensions/${publicConfig.NOTIF_NAME!}/notification`)}>查看</Button>
+        <Button
+          onClick={() => router.push(`/extensions/${publicConfig.NOTIF_NAME!}/notification`)}
+        >
+          {t(p("check"))}
+        </Button>
       )}
     >
       <List
         itemLayout="horizontal"
-        locale={{ emptyText: "当前没有未读消息" }}
+        locale={{ emptyText: t(p("noMessage")) }}
         dataSource={msgContents}
         renderItem={(item) => (
           <List.Item style={{ borderBottom: "none", padding: "4px 0" }}>

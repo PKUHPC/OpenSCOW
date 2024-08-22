@@ -14,7 +14,7 @@ import { AdminMessageType } from "@scow/lib-web/build/models/notif";
 import { Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 
 const { Paragraph, Title } = Typography;
@@ -24,8 +24,11 @@ interface NotificationLayoutProps {
   interval?: number; // 定时器的时间间隔，默认60秒
 }
 
+const p = prefix("notifLayout.");
+
 const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, interval = 60000 }) => {
 
+  const t = useI18nTranslateToString();
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
   const currentLanguage = useI18n().currentLanguage;
@@ -45,7 +48,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
             notifApi.destroy(key);
           }}
         >
-          已读
+          {t(p("read"))}
         </Button>
       </Space>
     );
