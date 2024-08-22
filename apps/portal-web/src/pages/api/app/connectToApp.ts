@@ -56,6 +56,15 @@ export const ConnectToAppSchema = typeboxRouteSchema({
           customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
         }),
         Type.Object({ type: Type.Literal("vnc") }),
+        Type.Object({
+          type: Type.Literal("shadowDesk"),
+          connect: AppConnectProps,
+          proxyType: Type.Union([
+            Type.Literal("relative"),
+            Type.Literal("absolute"),
+          ]),
+          customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
+        }),
       ]),
     ]),
 
@@ -106,7 +115,32 @@ export default /* #__PURE__*/route(ConnectToAppSchema, async (req, res) => {
           customFormData: x.appProps.web.customFormData,
         },
       };
-    } else {
+    }
+    else if (x.appProps?.$case === "shadowDesk") {
+      const connect: AppConnectProps = {
+        method: x.appProps.shadowDesk.method,
+        path: x.appProps.shadowDesk.path,
+        query: x.appProps.shadowDesk.query ?? {},
+        formData: x.appProps.shadowDesk.formData ?? {},
+      };
+
+      return {
+        200: {
+          host: x.host,
+          port: x.port,
+          password: x.password,
+          type: "shadowDesk" as const,
+
+          connect: connect,
+
+          proxyType: x.appProps.shadowDesk.proxyType === WebAppProps_ProxyType.RELATIVE
+            ? "relative" as const
+            : "absolute" as const,
+          customFormData: x.appProps.shadowDesk.customFormData,
+        },
+      };
+    }
+    else {
       return {
         200: {
           host: x.host,

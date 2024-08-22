@@ -29,6 +29,7 @@ export type AppConnectPropsSchema = Static<typeof AppConnectPropsSchema>;
 export enum AppType {
   web = "web",
   vnc = "vnc",
+  shadowDesk = "shadowDesk",
 }
 
 export const WebAppConfigSchema = Type.Object({
@@ -43,6 +44,7 @@ export const WebAppConfigSchema = Type.Object({
 });
 
 export type WebAppConfigSchema = Static<typeof WebAppConfigSchema>;
+export type ShadowDeskAppConfigSchema = Static<typeof WebAppConfigSchema>;
 
 export const VncAppConfigSchema = Type.Object({
   beforeScript: Type.Optional(Type.String({ description: "启动应用之前的准备命令。具体参考文档" })),
@@ -68,6 +70,7 @@ export const AppConfigSchema = Type.Object({
   slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
+  shadowDesk: Type.Optional(WebAppConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),

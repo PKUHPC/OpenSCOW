@@ -27,12 +27,13 @@ export interface Props {
   cluster: Cluster;
   session: AppSession;
   refreshToken: boolean;
+  appId: string;
 }
 
 const p = prefix("pageComp.app.connectToAppLink.");
 
 export const ConnectTopAppLink: React.FC<Props> = ({
-  session, cluster, refreshToken,
+  session, cluster, refreshToken,appId,
 }) => {
 
   const { message } = App.useApp();
@@ -93,7 +94,48 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         document.body.removeChild(form);
       }
 
-    } else {
+    }
+    else if (reply.type === "shadowDesk") {
+      const { connect, host, password, port, proxyType, customFormData } = reply;
+      const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
+      const path = parsePlaceholder(connect.path, interpolatedValues);
+
+      const interpolateValues = (obj: Record<string, string>) => {
+        return Object.keys(obj).reduce((prev, curr) => {
+          prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
+          return prev;
+        }, {});
+      };
+
+      const query = connect.query ? interpolateValues(connect.query) : {};
+      const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
+
+      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
+
+      const url = pathname + "?" + new URLSearchParams(query).toString();
+      if (connect.method === "GET") {
+        window.open(url, "_blank");
+      } else {
+        const form = document.createElement("form");
+        form.style.display = "none";
+        form.action = url;
+        form.method = "POST";
+        form.target = "_blank";
+        if (formData) {
+          Object.keys(formData).forEach((k) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = k;
+            input.value = formData[k];
+            form.appendChild(input);
+          });
+        }
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+      }
+    }
+    else {
       const { host, port, password } = reply;
       openDesktop(cluster.id, host, port, password);
     }
@@ -101,7 +143,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <DisabledA disabled={!data} onClick={onClick} message={t(p("notReady"))}>{t(p("connect"))}</DisabledA>
+    <DisabledA disabled={appId === "ShadowDesk" ? false : !data} onClick={onClick} message={t(p("notReady"))}>
+      {t(p("connect"))}</DisabledA>
   );
 
 
