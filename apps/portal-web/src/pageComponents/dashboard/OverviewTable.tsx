@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { blue,gray } from "@ant-design/colors";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { PartitionInfo, PartitionInfo_PartitionStatus } from "@scow/protos/build/portal/config";
@@ -117,7 +118,6 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
     );
   }, [selectItem, clustersOverview, languageId]);
 
-
   // 当activekey改变时表格数据显示的逻辑
   const filteredClusterInfo = useMemo(() => {
     if (activeTabKey === "platformOverview") {
@@ -216,8 +216,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
                     width="120px"
                     height="15px"
-                    bgColor={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
+                    bgColor={gray[3]}
+                    progressColor={blue[5]}
                   />
                 </div>
               ) : "-"
@@ -234,8 +234,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
                     width="120px"
                     height="15px"
-                    bgColor={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
+                    bgColor={gray[3]}
+                    progressColor={blue[5]}
                   />
                 </div>
               ) : "-"
@@ -252,8 +252,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}
                     width="120px"
                     height="15px"
-                    bgColor={"rgb(240,240,240)"}
-                    progressColor={"rgb(86,109,229)"}
+                    bgColor={gray[3]}
+                    progressColor={blue[5]}
                   />
                 </div>
               ) : "-"
