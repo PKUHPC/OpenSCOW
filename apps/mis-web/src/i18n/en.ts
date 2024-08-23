@@ -1246,6 +1246,7 @@ export default {
       deactivateCluster: "Deactivate Cluster",
       mergeFileChunks: "Merge and upload temporary file blocks",
       initMultipartUpload: "Initial multipart upload file",
+      markMessageRead: "Mark message as read",
     },
     operationDetails: {
       login: "User Login",

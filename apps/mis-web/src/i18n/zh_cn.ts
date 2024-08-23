@@ -1244,6 +1244,7 @@ export default {
       deactivateCluster: "停用集群",
       mergeFileChunks: "合并临时文件块",
       initMultipartUpload: "初始化分片上传",
+      markMessageRead: "标记消息为已读",
     },
     operationDetails: {
       login: "用户登录",
