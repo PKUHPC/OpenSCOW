@@ -1,5 +1,23 @@
 # @scow/portal-server
 
+## 1.6.3
+
+### Patch Changes
+
+- ac6805d: scowd 新增 app service 和 GetAppLastSubmission 接口
+- e776999: ai 和 hpc 在提交作业和应用前检查一下是否重名
+- abd69cb: 接入 scowd 文件分片上传
+- Updated dependencies [ac6805d]
+- Updated dependencies [abd69cb]
+- Updated dependencies [83df60b]
+  - @scow/scowd-protos@0.2.1
+  - @scow/lib-scowd@1.1.1
+  - @scow/lib-server@1.3.2
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.12
+
 ## 1.6.2
 
 ### Patch Changes

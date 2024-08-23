@@ -183,9 +183,14 @@ export const tenantServiceServer = plugin((server) => {
       tenant.defaultAccountBlockThreshold = new Decimal(moneyToNumber(blockThresholdAmount));
 
       // 判断租户下各账户是否使用该租户封锁阈值，使用后是否需要在集群中进行封锁
-      const accounts = await em.find(Account, { tenant: tenant, blockThresholdAmount : {} }, {
+      const accounts = await em.find(Account, { tenant: tenant, blockThresholdAmount : undefined }, {
         populate: ["tenant"],
       });
+
+      const blockedAccounts: string[] = [];
+      const blockedFailedAccounts: string[] = [];
+      const unBlockedAccounts: string[] = [];
+      const unBlockedFailedAccounts: string[] = [];
 
       const currentActivatedClusters = await getActivatedClusters(em, logger);
       if (accounts.length > 0) {
@@ -202,19 +207,42 @@ export const tenantServiceServer = plugin((server) => {
             if (shouldBlockInCluster) {
               logger.info("Account %s may be out of balance when using default tenant block threshold amount. "
               + "Block the account.", account.accountName);
-              await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+
+              try {
+                await blockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+                blockedAccounts.push(account.accountName);
+              } catch (error) {
+                logger.warn("Failed to block account %s in slurm: %o", account.accountName, error);
+                blockedFailedAccounts.push(account.accountName);
+              }
+
             }
 
             if (!shouldBlockInCluster) {
               logger.info("The balance of Account %s is greater than the default tenant block threshold amount. "
               + "Unblock the account.", account.accountName);
-              await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+
+              try {
+                await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+                unBlockedAccounts.push(account.accountName);
+              } catch (error) {
+                logger.warn("Failed to unBlock account %s in slurm: %o", account.accountName, error);
+                unBlockedFailedAccounts.push(account.accountName);
+              }
+
             }
           }),
         ).catch((e) => {
           logger.error("Block or unblock account failed when set a new default tenant threshold amount.", e);
         });
       }
+
+
+      logger.info("Updated block status in slurm of the following accounts: %o", blockedAccounts);
+      logger.info("Updated block status failed in slurm of the following accounts: %o", blockedFailedAccounts);
+
+      logger.info("Updated unBlock status in slurm of the following accounts: %o", unBlockedAccounts);
+      logger.info("Updated unBlock status failed in slurm of the following accounts: %o", unBlockedFailedAccounts);
 
       if (accounts.length > 0) {
         await em.persistAndFlush([...accounts, tenant]);
