@@ -1,5 +1,24 @@
 # @scow/portal-web
 
+## 1.6.3
+
+### Patch Changes
+
+- e776999: ai 和 hpc 在提交作业和应用前检查一下是否重名
+- abd69cb: 接入 scowd 文件分片上传
+- Updated dependencies [eec12d8]
+- Updated dependencies [b2ee159]
+- Updated dependencies [d3de802]
+- Updated dependencies [acb1992]
+- Updated dependencies [15a7bdd]
+- Updated dependencies [abd69cb]
+- Updated dependencies [83df60b]
+  - @scow/lib-web@1.4.2
+  - @scow/lib-operation-log@2.1.8
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+  - @scow/rich-error-model@2.0.0
+
 ## 1.6.2
 
 ### Patch Changes
