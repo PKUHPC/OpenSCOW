@@ -36,12 +36,14 @@ shadowDesk:
     # export BASEURL="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${SS_PORT}"
     singularity exec --writable-tmpfs --env LOGGER_LEVEL=1 --env SCREEN_RESOLUTION=1920x1080x24 --env SIGNALLING_URL=${SIGNALLING_URL} --env USER_ID=rd --env USER_PASSWORD=${PASSWORD} --env ENCODER=x264enc --env VIDEO_FORMAT=Y444 --env ENABLE_AUDIO=true --env VIDEO_PORT=DFP --env SIZEW=1920 --env SIZEH=1080 --env REFRESH=60 --env CDEPTH=24 --env DPI=96 ${SIF_PATH} bash -c 'start_backend.sh'
 
-  proxyType: absolute
+  proxyType: relative
+  proxyServer: 172.16.20.146:8765
+
   # 改relative
   # 如何连接应用 path直接可以拼在scow后+shadowdesk，也可以完全外部url。如果是http或者https，就直接连外面。如果不是就直接拼在scow的url下面。
   connect:
     method: POST
-    path: /login
+    path: /shadowdesk
     formData:
       id: "rd"
       password: "{{ PASSWORD }}"

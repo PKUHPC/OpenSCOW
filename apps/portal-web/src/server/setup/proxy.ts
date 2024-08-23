@@ -65,7 +65,11 @@ export function parseProxyTarget(
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
     return `http://${node}:${port}${fullUri}`;
-  } else {
+  } else if (type === "shadowDesk-relative") {
+    // node改为scow节点的ip
+    return `http://${node}:${port}/${path.join("/")}`;
+  }
+  else {
     return new Error("type is not absolute or relative");
   }
 }

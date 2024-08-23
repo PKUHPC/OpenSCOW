@@ -356,7 +356,7 @@ export const appOps = (cluster: string): AppOps => {
             // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
             await sftpReaddir(sftp)(jobDir);
 
-            if (app.type === AppType.web || app.type === AppType.shadowDesk) {
+            if (app.type === AppType.web || app.type === AppType.shadowDesk) { // todo,是否shadowDesk单独出来
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
@@ -461,7 +461,7 @@ export const appOps = (cluster: string): AppOps => {
           };
         }
 
-        if (app.type === AppType.web || app.type === AppType.shadowDesk) {
+        if (app.type === AppType.web || app.type === AppType.shadowDesk) { // todo,是否shadowDesk单独出来
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);

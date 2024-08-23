@@ -96,7 +96,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     }
     else if (reply.type === "shadowDesk") {
-      const { connect, host, password, port, proxyType, customFormData } = reply;
+      const { connect, host, password, port, proxyType, customFormData, proxyServer } = reply;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
@@ -112,6 +112,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
       const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
 
+      console.log("connetToAppLink.tsx,pathname",pathname);// /api/proxy/linux/relative/c1/51564/shadowdesk
       const url = pathname + "?" + new URLSearchParams(query).toString();
       if (connect.method === "GET") {
         window.open(url, "_blank");
