@@ -51,7 +51,7 @@
     "pino": "8.16.2",
     "pino-pretty": "10.3.1",
     "uuid": "10.0.0",
-    "wait-on": "7.2.0"
+    "wait-on": "8.0.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.12",
