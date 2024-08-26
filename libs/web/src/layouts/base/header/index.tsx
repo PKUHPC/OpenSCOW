@@ -122,8 +122,7 @@ export const Header: React.FC<Props> = ({
     setLinks((links) => {
 
       // remove all existing links from the same extension
-      links = links.filter((x) => x.extension !== extension);
-
+      links = links.filter((x) => x.extension !== extension);    
       // append newly got links
       links.push(...data.map((x) => ({ link: {
         href: x.path,
