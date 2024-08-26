@@ -57,7 +57,7 @@ export const UnreadMessage = Type.Object({
 });
 export type UnreadMessage = Static<typeof UnreadMessage>;
 
-export const GetUnreadMessageSchema = typeboxRouteSchema({
+export const GetUnreadMessagesSchema = typeboxRouteSchema({
 
   method: "GET",
 
@@ -75,7 +75,7 @@ export const GetUnreadMessageSchema = typeboxRouteSchema({
 
 const auth = authenticate(() => true);
 
-export default route(GetUnreadMessageSchema, async (req, res) => {
+export default route(GetUnreadMessagesSchema, async (req, res) => {
 
   const info = await auth(req, res);
 

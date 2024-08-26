@@ -14,7 +14,7 @@ import { AdminMessageType } from "@scow/lib-web/build/models/notif";
 import { App, Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 
 const { Paragraph, Title } = Typography;
@@ -31,6 +31,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   const t = useI18nTranslateToString();
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
+  const currentLanguage = useI18n().currentLanguage;
 
   const close = () => {};
 
@@ -68,11 +69,11 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const { results } = await api.getUnreadMessage({ query: {} });
+        const { results } = await api.getUnreadMessages({ query: {} });
 
         for (const msg of results.messages) {
           if (msg.messageType?.type === AdminMessageType.SystemNotification) {
-            const content = renderingMessage(msg);
+            const content = renderingMessage(msg, currentLanguage.id);
 
             // 使用 ref 来检查已通知的 ID
             if (content && !notifiedIdsRef.current.has(msg.id)) {
@@ -95,7 +96,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
 
     // 清除定时器
     return () => clearInterval(timer);
-  }, [interval]);
+  }, [interval, currentLanguage.id]);
 
   return (
     <div>

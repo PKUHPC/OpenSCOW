@@ -538,7 +538,7 @@ export const mockApi: MockApi<typeof api> = {
   exportOperationLog: null,
 
   markMessageRead: null,
-  getUnreadMessage: async () => ({
+  getUnreadMessages: async () => ({
     results: {
       totalCount: 2,
       messages: [{
