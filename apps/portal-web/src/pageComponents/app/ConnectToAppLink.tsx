@@ -96,7 +96,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     }
     else if (reply.type === "shadowDesk") {
-      const { connect, host, password, port, proxyType, customFormData, proxyServer } = reply;
+      const { connect, host, password, port, customFormData, proxyServer } = reply;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
