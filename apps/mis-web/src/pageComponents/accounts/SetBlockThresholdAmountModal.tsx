@@ -83,7 +83,6 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
     >
       <Form
         form={form}
-        initialValues={{ blockThresholdAmount: 0 }}
       >
         <Form.Item label={t(pCommon("accountName"))}>
           <strong>{accountName}</strong>
@@ -91,9 +90,18 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
         <Form.Item label={t(pCommon("balance"))}>
           <strong>{moneyToString(balance)} {t(pCommon("unit"))}</strong>
         </Form.Item>
+        <Form.Item label={t(p("defaultBlockThresholdAmount"))}>
+          <strong>{moneyToString(defaultBlockThresholdAmount)} {t(pCommon("unit"))}</strong>
+        </Form.Item>
         <Form.Item label={t(p("curBlockThresholdAmount"))}>
           <Space>
-            <strong>{moneyToString(currentAmount ?? defaultBlockThresholdAmount)} {t(pCommon("unit"))}</strong>
+            { <strong>{currentAmount ? (
+              <>
+                {moneyToString(currentAmount)} {t(pCommon("unit"))}
+              </>
+            ) : (
+              t(p("defaultBlockThresholdAmount"))
+            )} </strong> }
             { currentAmount !== undefined && (
               <a onClick={() => {
                 modal.confirm({
@@ -119,7 +127,13 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
 
           </Space>
         </Form.Item>
-        <Form.Item name="blockThresholdAmount" label={t(p("setAmount"))} required>
+        <Form.Item
+          name="blockThresholdAmount"
+          label={t(p("setAmount"))}
+          rules={[
+            { required: true },
+          ]}
+        >
           <InputNumber
             step={1 / Math.pow(10, publicConfig.JOB_CHARGE_DECIMAL_PRECISION)}
             precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
