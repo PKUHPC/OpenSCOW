@@ -1,5 +1,16 @@
 # @scow/lib-server
 
+## 1.3.2
+
+### Patch Changes
+
+- abd69cb: 接入 scowd 文件分片上传
+- Updated dependencies [83df60b]
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.12
+
 ## 1.3.1
 
 ### Patch Changes

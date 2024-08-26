@@ -1,5 +1,13 @@
 # @scow/docs
 
+## 1.4.2
+
+### Patch Changes
+
+- eec12d8: UI 扩展增加导航栏链接自动刷新功能
+- acb1992: UI 扩展页面支持修改标题
+- 15a7bdd: UI 扩展返回的导航项允许指定 navs[].hideIfNotActive 属性
+
 ## 1.4.1
 
 ### Patch Changes
