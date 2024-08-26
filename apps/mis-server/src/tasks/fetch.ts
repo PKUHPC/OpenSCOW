@@ -135,8 +135,8 @@ export async function fetchJobs(
                     jobId: job.jobId.toString(),
                   },
                 }, logger)
-                  .then(resolve) // 当 sendMessage 成功时调用 resolve
-                  .catch(reject); // 当 sendMessage 失败时调用 reject
+                  .then(resolve)
+                  .catch(reject);
               }),
             );
           }

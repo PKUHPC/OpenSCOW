@@ -167,7 +167,7 @@ export async function charge(
       targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
       metadata: {
         accountName: target.accountName,
-        amount: target.balance.toString(),
+        amount: amount.toString(),
       },
     }, logger);
 

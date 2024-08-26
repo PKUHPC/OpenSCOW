@@ -100,6 +100,7 @@ export const sendMessage = async (message: Message, logger: Logger) => {
   };
 
   try {
+    logger.info(`send ${message.messageType} message to ${message.targetType} ${message.targetIds.toString()}`);
     await notifClient?.message.systemSendMessage(data);
   } catch (err) {
     logger.error(`send message ${JSON.stringify(data)} err: ${err as any}`);
