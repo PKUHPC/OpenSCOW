@@ -110,10 +110,11 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const query = connect.query ? interpolateValues(connect.query) : {};
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
-      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
+      // 直接使用 proxyServer 和 path 生成完整的 URL
+      const url = `http://${proxyServer}${path}` + "?" + new URLSearchParams(query).toString();
 
-      console.log("connetToAppLink.tsx,pathname",pathname);// /api/proxy/linux/relative/c1/51564/shadowdesk
-      const url = pathname + "?" + new URLSearchParams(query).toString();
+      console.log("这里是connetToAppLink.tsx, url", url); // 输出完整的URL
+
       if (connect.method === "GET") {
         window.open(url, "_blank");
       } else {
