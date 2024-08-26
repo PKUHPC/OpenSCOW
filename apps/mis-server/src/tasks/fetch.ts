@@ -123,9 +123,11 @@ export async function fetchJobs(
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
 
+          console.log("jobFetch:", job, job.state);
           if (job.state === "COMPLETED") {
             sendMsgPromises.push(
               new Promise((resolve, reject) => {
+                console.log("jobFetch: start to send msg", job.user, job.jobId);
                 sendMessage({
                   messageType: InternalMessageType.JobCompleted,
                   targetType: TargetType.USER,
