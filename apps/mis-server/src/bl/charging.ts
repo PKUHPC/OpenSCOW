@@ -15,7 +15,7 @@ import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
-import { TargetType } from "@scow/notification-protos/build/common_pb";
+import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";

@@ -15,7 +15,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
-import { TargetType } from "@scow/notification-protos/build/common_pb";
+import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";

@@ -12,7 +12,7 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { getNotificationNodeClient } from "@scow/lib-notification/build/index";
-import { NoticeType, ReadStatus } from "@scow/notification-protos/build/common_pb";
+import { NoticeType, ReadStatus } from "@scow/notification-protos/build/message_common_pb";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { publicConfig } from "src/utils/config";

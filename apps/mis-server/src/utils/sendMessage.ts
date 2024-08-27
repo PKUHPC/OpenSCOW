@@ -12,8 +12,8 @@
 
 import { Struct } from "@bufbuild/protobuf";
 import { Logger } from "@ddadaal/tsgrpc-server";
-import { TargetType } from "@scow/notification-protos/build/common_pb";
-import { SystemSendMessageRequest } from "@scow/notification-protos/build/message_pb";
+import { TargetType } from "@scow/notification-protos/build/message_common_pb";
+import { SystemSendMessageRequest } from "@scow/notification-protos/build/scow_message_pb";
 import { notifClient } from "src/config/notification";
 import { InternalMessageType } from "src/models/messageType";
 
