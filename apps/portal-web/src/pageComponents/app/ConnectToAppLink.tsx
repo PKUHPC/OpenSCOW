@@ -21,6 +21,7 @@ import { DisabledA } from "src/components/DisabledA";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
+// import { openShadowDesk } from "src/utils/shadowDesk";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -96,7 +97,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     }
     else if (reply.type === "shadowDesk") {
-      const { connect, host, password, port, customFormData, proxyServer } = reply;
+      const { connect, password, customFormData, proxyServer,proxyType } = reply;
+      const [host = "",port = ""] = proxyServer.split(":");
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
 
@@ -111,9 +113,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
       // 直接使用 proxyServer 和 path 生成完整的 URL
-      const url = `http://${proxyServer}${path}` + "?" + new URLSearchParams(query).toString();
+      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
 
-      console.log("这里是connetToAppLink.tsx, url", url); // 输出完整的URL
+      const url = pathname + "?" + new URLSearchParams(query).toString();
 
       if (connect.method === "GET") {
         window.open(url, "_blank");
@@ -136,6 +138,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         form.submit();
         document.body.removeChild(form);
       }
+      // openShadowDesk(cluster.id, proxyServer, password);
     }
     else {
       const { host, port, password } = reply;
