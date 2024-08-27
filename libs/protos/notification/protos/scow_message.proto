@@ -14,8 +14,7 @@ syntax = "proto3";
 
 package scow_notification;
 
-import "protos/common.proto";
-import "protos/message_type.proto";
+import "protos/message_common.proto";
 import "google/protobuf/struct.proto";
 
 message Message {
@@ -41,18 +40,6 @@ message SystemSendMessageRequest {
 message SystemSendMessageResponse {
 }
 
-message AdminSendMessageRequest {
-  optional TargetType target_type = 1;
-  repeated string target_ids = 2;
-  string message_type = 3;
-  string title = 4;
-  string content = 5;
-  repeated NoticeType notice_types = 6;
-}
-
-message AdminSendMessageResponse {
-}
-
 message ListMessagesRequest {
   string user_id = 1;
   optional string message_type = 2;
@@ -60,7 +47,7 @@ message ListMessagesRequest {
   optional NoticeType notice_type = 4;
   optional ReadStatus read_status = 5;
   optional uint32 page = 6;
-  optional uint32 pageSize = 7;
+  optional uint32 page_size = 7;
 }
 
 message ListMessagesResponse {
@@ -76,41 +63,10 @@ message MarkMessageReadRequest {
 message MarkMessageReadResponse {
 }
 
-message MarkAllMessagesReadRequest {
-  string user_id = 1;
-}
-
-message MarkAllMessagesReadResponse {
-
-}
-
-message DeleteMessagesRequest {
-  string user_id = 1;
-  repeated uint64 message_ids = 2;
-}
-
-message DeleteMessagesResponse {
-
-}
-
-message DeleteAllReadMessagesRequest {
-  string user_id = 1;
-}
-
-message DeleteAllReadMessagesResponse {
-
-}
-
-service MessageService {
-  rpc AdminSendMessage(AdminSendMessageRequest) returns (AdminSendMessageResponse);
+service ScowMessageService {
   rpc SystemSendMessage(SystemSendMessageRequest) returns (SystemSendMessageResponse);
 
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse);
 
   rpc MarkMessageRead(MarkMessageReadRequest) returns (MarkMessageReadResponse);
-  rpc MarkAllMessagesRead(MarkAllMessagesReadRequest) returns (MarkAllMessagesReadResponse);
-
-  rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
-  rpc DeleteAllReadMessages(DeleteAllReadMessagesRequest) returns (DeleteAllReadMessagesResponse);
-
 }

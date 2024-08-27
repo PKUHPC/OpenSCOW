@@ -14,34 +14,42 @@ syntax = "proto3";
 
 package scow_notification;
 
-import "protos/common.proto";
-
-message ModifyUserSubscriptionRequest {
-  repeated MessageConfig configs = 1;
+enum NoticeType {
+  SITE_MESSAGE = 0;
+  SMS = 1;
+  EMAIL = 2;
+  OFFICIAL_ACCOUNT = 3;
 }
 
-message ModifyUserSubscriptionResponse {
+enum ReadStatus {
+  UNREAD = 0;
+  READ = 1;
+  ALL = 2;
 }
 
-message Subscription {
-  optional NoticeType notice_type = 1;
-  string message_type = 2;
-  optional bool is_subscribed = 3;
+enum SenderType {
+  SYSTEM = 0;
+  PLATFORM_ADMIN = 1;
+  TENANT_ADMIN = 2;
 }
 
-message ListUserSubscriptionsRequest {
+enum TargetType {
+  USER = 0;
+  ACCOUNT = 1;
+  TENANT = 2;
+  FULL_SITE = 3;
 }
 
-message ListUserSubscriptionsResponse {
-  uint32 totalCount = 1;
-  repeated MessageConfig configs = 2;
+message Template {
+  string default = 1;
+  string en = 2;
+  string zh_cn = 3;
 }
 
-
-
-service UserSubscriptionService {
-  rpc ModifyUserSubscription(ModifyUserSubscriptionRequest) returns (ModifyUserSubscriptionResponse);
-
-  rpc ListUserSubscriptions(ListUserSubscriptionsRequest) returns (ListUserSubscriptionsResponse);
-
+message MessageType {
+  string type = 1;
+  Template title_template = 2;
+  Template content_template = 3;
+  string category = 4;
+  Template category_template = 5;
 }
