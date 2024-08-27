@@ -34,7 +34,7 @@ shadowDesk:
        echo $(python -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
     }
     # export BASEURL="${PROXY_BASE_PATH}/${SLURM_COMPUTE_NODE_HOSTNAME}/${SS_PORT}"
-    singularity exec --writable-tmpfs --env LOGGER_LEVEL=1 --env SCREEN_RESOLUTION=1920x1080x24 --env SIGNALLING_URL=${SIGNALLING_URL} --env USER_ID=USER_ID=${USER} --env USER_PASSWORD=${PASSWORD} --env ENCODER=x264enc --env VIDEO_FORMAT=Y444 --env ENABLE_AUDIO=true --env VIDEO_PORT=DFP --env SIZEW=1920 --env SIZEH=1080 --env REFRESH=60 --env CDEPTH=24 --env DPI=96 ${SIF_PATH} bash -c 'start_backend.sh'
+    singularity exec --writable-tmpfs --env LOGGER_LEVEL=1 --env SCREEN_RESOLUTION=1920x1080x24 --env SIGNALLING_URL=${SIGNALLING_URL} --env USER_ID=${USER} --env USER_PASSWORD=${PASSWORD} --env ENCODER=x264enc --env VIDEO_FORMAT=Y444 --env ENABLE_AUDIO=true --env VIDEO_PORT=DFP --env SIZEW=1920 --env SIZEH=1080 --env REFRESH=60 --env CDEPTH=24 --env DPI=96 ${SIF_PATH} bash -c 'start_backend.sh'
 
   proxyType: relative
   proxyServer: 172.16.20.146:8765
@@ -43,7 +43,7 @@ shadowDesk:
   # 如何连接应用 path直接可以拼在scow后+shadowdesk，也可以完全外部url。如果是http或者https，就直接连外面。如果不是就直接拼在scow的url下面。
   connect:
     method: POST
-    path: /shadowdesk/login
+    path: /login
     formData:
       id: "{{ USER }}"
       password: "{{ PASSWORD }}"

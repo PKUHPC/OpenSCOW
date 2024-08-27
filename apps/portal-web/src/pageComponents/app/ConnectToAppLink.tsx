@@ -97,10 +97,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     }
     else if (reply.type === "shadowDesk") {
-      const { connect, password, customFormData, proxyServer,proxyType } = reply;
-      const [host = "",port = ""] = proxyServer.split(":");
-      const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
-      const path = parsePlaceholder(connect.path, interpolatedValues);
+      const { connect, password, customFormData, proxyServer } = reply;
+      // const [host = "",port = ""] = proxyServer.split(":");
+      const interpolatedValues = { PASSWORD: password, ...customFormData };
 
       const interpolateValues = (obj: Record<string, string>) => {
         return Object.keys(obj).reduce((prev, curr) => {
@@ -109,36 +108,27 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         }, {});
       };
 
-      const query = connect.query ? interpolateValues(connect.query) : {};
       const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
-
+      const pathname = join(publicConfig.BASE_PATH,"shadowdesk", connect.path);
       // 直接使用 proxyServer 和 path 生成完整的 URL
-      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
 
-      const url = pathname + "?" + new URLSearchParams(query).toString();
-
-      if (connect.method === "GET") {
-        window.open(url, "_blank");
-      } else {
-        const form = document.createElement("form");
-        form.style.display = "none";
-        form.action = url;
-        form.method = "POST";
-        form.target = "_blank";
-        if (formData) {
-          Object.keys(formData).forEach((k) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = k;
-            input.value = formData[k];
-            form.appendChild(input);
-          });
-        }
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+      const form = document.createElement("form");
+      form.style.display = "none";
+      form.action = pathname;
+      form.method = "POST";
+      form.target = "_blank";
+      if (formData) {
+        Object.keys(formData).forEach((k) => {
+          const input = document.createElement("input");
+          input.type = "hidden";
+          input.name = k;
+          input.value = formData[k];
+          form.appendChild(input);
+        });
       }
-      // openShadowDesk(cluster.id, proxyServer, password);
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
     }
     else {
       const { host, port, password } = reply;
