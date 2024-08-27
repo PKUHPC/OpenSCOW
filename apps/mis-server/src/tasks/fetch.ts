@@ -15,7 +15,6 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
-import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
@@ -26,11 +25,9 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
-import { InternalMessageType } from "src/models/messageType";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { toGrpc } from "src/utils/job";
-import { sendMessage } from "src/utils/sendMessage";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
@@ -81,7 +78,6 @@ export async function fetchJobs(
   const priceMap = await createPriceMap(em, clusterPlugin.clusters, logger);
 
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
-    const sendMsgPromises: Promise<void>[] = [];
 
     const result = await em.transactional(async (em) => {
 
@@ -122,26 +118,6 @@ export async function fetchJobs(
 
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
-
-          console.log("jobFetch:", job, job.state);
-          if (job.state === "COMPLETED") {
-            sendMsgPromises.push(
-              new Promise((resolve, reject) => {
-                console.log("jobFetch: start to send msg", job.user, job.jobId);
-                sendMessage({
-                  messageType: InternalMessageType.JobCompleted,
-                  targetType: TargetType.USER,
-                  targetIds: [job.user],
-                  metadata: {
-                    time: job.endTime!,
-                    jobId: job.jobId.toString(),
-                  },
-                }, logger)
-                  .then(resolve)
-                  .catch(reject);
-              }),
-            );
-          }
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
           continue;
@@ -211,7 +187,6 @@ export async function fetchJobs(
 
     em.clear();
 
-    await Promise.all(sendMsgPromises);
     await callHook("jobsSaved", {
       jobs: result,
     }, logger);
