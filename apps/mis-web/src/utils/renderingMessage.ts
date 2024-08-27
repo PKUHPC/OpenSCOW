@@ -85,10 +85,17 @@ export const renderingMessage = (message: Message, languageId: string): RenderCo
     } else if (languageId === "zh_cn") {
       templateLang = TemplateLang.zhCn;
     }
+    // 对应语言模板没有设置时采用默认模板
+    const messageType = message.messageType;
+    const titleTemplate =
+      messageType.titleTemplate?.[templateLang] ?? messageType.titleTemplate!.default;
+    const contentTemplate =
+      messageType.contentTemplate?.[templateLang] ?? messageType.contentTemplate!.default;
+
     return {
       id: message.id,
-      title: message.messageType.titleTemplate![templateLang],
-      description: replaceTemplate(message.metadata, message.messageType.contentTemplate![templateLang]),
+      title: titleTemplate,
+      description: replaceTemplate(message.metadata, contentTemplate),
       createdAt: formatDateTime(message.createdAt),
     };
   } else {

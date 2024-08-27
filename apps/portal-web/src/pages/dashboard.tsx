@@ -32,13 +32,12 @@ import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
 const StyleCol = styled(Col)`
-min-width: 300px;
 padding-bottom: 16px;
 
 /* 默认隐藏消息部分 */
 display: none;
 
-/* 在屏幕宽度达到中等时显示消息部分 */
+/* 在屏幕宽度达到 1200px 时显示消息部分 */
 @media (min-width: 1200px) {
   display: block;
 }
