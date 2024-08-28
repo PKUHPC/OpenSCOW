@@ -21,7 +21,6 @@ import {
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
-  ShadowDeskAppProps_ProxyType,
   WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
 import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
@@ -88,11 +87,7 @@ export const appServiceServer = plugin((server) => {
               query: app.shadowDesk!.connect.query ?? {},
               method: app.shadowDesk!.connect.method,
               path: app.shadowDesk!.connect.path,
-              proxyType: app.shadowDesk!.proxyType === "absolute"
-                ? ShadowDeskAppProps_ProxyType.ABSOLUTE
-                : ShadowDeskAppProps_ProxyType.RELATIVE,
               customFormData: reply.customFormData ?? {},
-              proxyServer:app.shadowDesk!.proxyServer,
             },
           };
           break;

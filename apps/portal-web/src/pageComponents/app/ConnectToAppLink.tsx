@@ -21,7 +21,6 @@ import { DisabledA } from "src/components/DisabledA";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
-// import { openShadowDesk } from "src/utils/shadowDesk";
 import { openDesktop } from "src/utils/vnc";
 
 export interface Props {
@@ -97,8 +96,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
     }
     else if (reply.type === "shadowDesk") {
-      const { connect, password, customFormData, proxyServer } = reply;
-      // const [host = "",port = ""] = proxyServer.split(":");
+      const { connect, password, customFormData } = reply;
       const interpolatedValues = { PASSWORD: password, ...customFormData };
 
       const interpolateValues = (obj: Record<string, string>) => {

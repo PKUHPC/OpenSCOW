@@ -62,10 +62,8 @@ export function parseProxyTarget(
 
   // connect directly to compute node
   if (type === "relative") {
-    console.log("这里是relative",`http://${node}:${port}/${path.join("/")}`);
     return `http://${node}:${port}/${path.join("/")}`;
   } else if (type === "absolute") {
-    console.log("这里是absolute",`http://${node}:${port}${fullUri}`);
     return `http://${node}:${port}${fullUri}`;
   }
   else {

@@ -13,7 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
-import { AppServiceClient, ShadowDeskAppProps_ProxyType,WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
+import { AppServiceClient, WebAppProps_ProxyType } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { getClient } from "src/utils/client";
@@ -59,11 +59,6 @@ export const ConnectToAppSchema = typeboxRouteSchema({
         Type.Object({
           type: Type.Literal("shadowDesk"),
           connect: AppConnectProps,
-          proxyType: Type.Union([
-            Type.Literal("relative"),
-            Type.Literal("absolute"),
-          ]),
-          proxyServer:Type.String(),
           customFormData: Type.Optional(Type.Record(Type.String(), Type.String())),
         }),
       ]),
@@ -131,13 +126,7 @@ export default /* #__PURE__*/route(ConnectToAppSchema, async (req, res) => {
           port: x.port,
           password: x.password,
           type: "shadowDesk" as const,
-
           connect: connect,
-
-          proxyType: x.appProps.shadowDesk.proxyType === ShadowDeskAppProps_ProxyType.RELATIVE
-            ? "relative" as const
-            : "absolute" as const,
-          proxyServer: x.appProps.shadowDesk.proxyServer,
           customFormData: x.appProps.shadowDesk.customFormData,
         },
       };
