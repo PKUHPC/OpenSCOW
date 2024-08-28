@@ -26,14 +26,18 @@ export async function isPortReachable(
   // 【test】
   if (proxyPort && proxyHost) {
     // 检验到代理网关节点是否可达
-    const proxyPortReachable = directIsPortReachable(proxyPort, proxyHost, timeout);
+    const proxyPortReachable = await directIsPortReachable(proxyPort, proxyHost, timeout);
     console.log("【proxyPortReachable】", proxyPortReachable);
     // 检验代理网关节点到计算节点的主机和端口是否可达
-    const reachableThroughProxy = isReachableThroughProxy(host, port, proxyHost, proxyPort, timeout);
+    const reachableThroughProxy = await isReachableThroughProxy(host, port, proxyHost, proxyPort, timeout);
     console.log("【reachableThroughProxy】", reachableThroughProxy);
-  } 
+
+    return proxyPortReachable && reachableThroughProxy;
+  } else {
+    return await directIsPortReachable(port, host, timeout);
+  }
   
-  return directIsPortReachable(port, host, timeout);
+
 
 }
 
@@ -97,7 +101,7 @@ async function isReachableThroughProxy(
     console.dir(req, { depth: null });
 
     req.on("connect", (res, socket) => {
-      
+
       console.log("【【【res】】】");
       console.dir(res, { depth: null });
 

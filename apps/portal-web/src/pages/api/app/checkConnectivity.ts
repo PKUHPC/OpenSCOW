@@ -61,7 +61,7 @@ export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) 
     const checkProxy = await isPortReachable(port, host, TIMEOUT_MS, proxyPort, proxyHost);
     console.log("【checkProxy】", checkProxy);
 
-    return { 200: { ok: true } };
+    return { 200: { ok: checkProxy } };
   }
 
   const reachable = await isPortReachable(port, host, TIMEOUT_MS);
