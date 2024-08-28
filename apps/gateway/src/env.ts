@@ -32,9 +32,6 @@ export const config = envConfig({
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 
-  // SHADOW_DESK_PATH: str({ desc: "SHADOW_DESK_PATH客户端路径", default: "/shadowdesk/" }),
-  // SHADOW_DESK_URL: str({ desc: "NOVNC内部地址", default: "http://172.16.20.146:8765/shadowdesk/" }),
-
   AUTH_URL: str({ desc: "认证服务地址", default: "http://auth:5000" }),
 
   EXTRA: str({ desc: "更多nginx配置", default: "" }),
