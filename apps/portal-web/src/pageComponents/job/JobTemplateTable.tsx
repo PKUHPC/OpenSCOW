@@ -195,8 +195,8 @@ const InfoTable: React.FC<InfoTableProps> = ({
                 jobTemplateId: r.id,
               },
             }}
-            onClick={r.id === "unknown" ? (e) => e.preventDefault() : undefined}
-            style={r.id === "unknown" ? { color: "grey", cursor: "not-allowed" } : {}}
+            onClick={r.jobName === "unknown" ? (e) => e.preventDefault() : undefined}
+            style={r.jobName === "unknown" ? { color: "grey", cursor: "not-allowed" } : {}}
           >
             {t(p("useTemplate"))}
           </Link>
@@ -220,7 +220,16 @@ const InfoTable: React.FC<InfoTableProps> = ({
           >
             <a>{t("button.deleteButton")}</a>
           </Popconfirm>
-          <a onClick={() => { setTemplateId(r.id); setModalShow(true); }}>{t("button.renameButton")}</a>
+          <a
+            style={r.jobName === "unknown" ? { color: "grey", cursor: "not-allowed" } : {}}
+            onClick={() => {
+              if (r.jobName === "unknown") return;
+
+              setTemplateId(r.id); setModalShow(true);
+            }}
+          >
+            {t("button.renameButton")}
+          </a>
         </Space>
       ),
     },
@@ -244,7 +253,7 @@ const InfoTable: React.FC<InfoTableProps> = ({
           showSizeChanger: true,
           defaultPageSize: DEFAULT_PAGE_SIZE,
         }}
-        rowKey={(x) => x.jobName}
+        rowKey={(x) => x.id}
       />
     </>
   );

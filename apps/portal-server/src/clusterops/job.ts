@@ -82,10 +82,10 @@ export const jobOps = (cluster: string): JobOps => {
           } catch (error) {
             logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
             return {
-              id: "unknown",
+              id: filename,
               submitTime: new Date(), // 提供默认的 submitTime
               comment: "无法解析的内容", // 提供默认的 comment
-              jobName: "未知的 jobName", // 提供默认的 jobName
+              jobName: "unknown", // 提供默认的 jobName
             } as JobTemplateInfo;
           }
 
@@ -99,10 +99,10 @@ export const jobOps = (cluster: string): JobOps => {
           }
 
           return {
-            id: "unknown",
+            id: filename,
             submitTime: new Date(),
             comment: "无法解析的内容",
-            jobName: "未知的 jobName",
+            jobName: "unknown",
           } as JobTemplateInfo;
         }));
 
