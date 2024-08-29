@@ -428,7 +428,6 @@ export const appOps = (cluster: string): AppOps => {
           const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
             || terminatedStates.includes(runningJobInfo?.state);
 
-          console.log("sessionMetadata.jobId",sessionMetadata.jobId);
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,

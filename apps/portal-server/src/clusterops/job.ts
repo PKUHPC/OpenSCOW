@@ -81,7 +81,6 @@ export const jobOps = (cluster: string): JobOps => {
             data = JSON.parse(content.toString()) as JobMetadata;
           } catch (error) {
             logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
-            // 根据需要进行错误处理，可以继续下一个循环或返回一个默认值
             return {
               id: "unknown",
               submitTime: new Date(), // 提供默认的 submitTime
