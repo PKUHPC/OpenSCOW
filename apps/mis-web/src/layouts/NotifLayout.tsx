@@ -54,11 +54,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
     );
     notifApi.open({
       message: <Title level={5}>{content.title}</Title>,
-      description: (
-        <Paragraph ellipsis={{ rows: 3, expandable: true, symbol: "more" }}>
-          {content.description}
-        </Paragraph>
-      ),
+      description: content.description,
       btn,
       key,
       duration: 0,
