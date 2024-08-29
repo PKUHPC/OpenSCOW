@@ -101,7 +101,7 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
         locale={{ emptyText: t(p("noMessage")) }}
         dataSource={msgContents}
         renderItem={(item) => (
-          <List.Item style={{ borderBottom: "none", padding: "4px 0" }}>
+          <List.Item key={item.id} style={{ borderBottom: "none", padding: "4px 0" }}>
             <List.Item.Meta
               style={{ background: "#F7F7F7", borderRadius: "4px", padding: "4px 6px" }}
               title=<div style={{ fontWeight: 700, fontSize: "14px", margin: "0" }}>{item.title}</div>
