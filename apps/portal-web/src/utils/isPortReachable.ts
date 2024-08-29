@@ -95,11 +95,8 @@ async function isReachableThroughProxy(
 
     // 连接到代理服务器
     proxySocket.connect(proxyPort, proxyHost, () => {
-      console.log(`Connected to proxy server ${proxyHost}:${proxyPort}`);
 
-      // 此时代理服务器应该配置为直接转发TCP流量到目标主机和端口
       // 直接通过代理服务器的 socket 连接到目标主机和端口
-      // 无需额外的 HTTP 请求头或协议
       proxySocket.connect(targetPort, targetHost, () => {
         console.log(`Successfully connected to ${targetHost}:${targetPort} through proxy.`);
         proxySocket.end();
