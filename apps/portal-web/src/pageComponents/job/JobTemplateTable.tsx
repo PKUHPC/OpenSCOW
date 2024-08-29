@@ -187,13 +187,16 @@ const InfoTable: React.FC<InfoTableProps> = ({
       title: t("button.actionButton"),
       render:(_, r) => (
         <Space>
-          <Link href={{
-            pathname: "/jobs/submit",
-            query: {
-              cluster: cluster.id,
-              jobTemplateId: r.id,
-            },
-          }}
+          <Link
+            href={{
+              pathname: "/jobs/submit",
+              query: {
+                cluster: cluster.id,
+                jobTemplateId: r.id,
+              },
+            }}
+            onClick={r.id === "unknown" ? (e) => e.preventDefault() : undefined}
+            style={r.id === "unknown" ? { color: "grey", cursor: "not-allowed" } : {}}
           >
             {t(p("useTemplate"))}
           </Link>

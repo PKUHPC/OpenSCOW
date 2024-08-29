@@ -74,13 +74,36 @@ export const jobOps = (cluster: string): JobOps => {
 
         const results = await Promise.all(list.map(async ({ filename }) => {
           const content = await sftpReadFile(sftp)(join(portalConfig.savedJobsDir, filename));
-          const data = JSON.parse(content.toString()) as JobMetadata;
+
+          let data: JobMetadata | undefined;
+
+          try {
+            data = JSON.parse(content.toString()) as JobMetadata;
+          } catch (error) {
+            console.error(`JSON 解析失败，文件名: ${filename}`, error);
+            // 根据需要进行错误处理，可以继续下一个循环或返回一个默认值
+            return {
+              id: "unknown",
+              submitTime: new Date(), // 提供默认的 submitTime
+              comment: "无法解析的内容", // 提供默认的 comment
+              jobName: "未知的 jobName", // 提供默认的 jobName
+            } as JobTemplateInfo;
+          }
+
+          if (data) {
+            return {
+              id: filename,
+              submitTime: new Date(data.submitTime),
+              comment: data.comment,
+              jobName: data.jobName,
+            } as JobTemplateInfo;
+          }
 
           return {
-            id: filename,
-            submitTime: new Date(data.submitTime),
-            comment: data.comment,
-            jobName: data.jobName,
+            id: "unknown",
+            submitTime: new Date(),
+            comment: "无法解析的内容",
+            jobName: "未知的 jobName",
           } as JobTemplateInfo;
         }));
 
