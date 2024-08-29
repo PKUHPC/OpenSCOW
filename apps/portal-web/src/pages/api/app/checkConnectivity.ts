@@ -49,17 +49,10 @@ export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) 
 
   if (proxyGateway) {
 
-    // 【test】
     const proxyUrl = new URL(proxyGateway.url);
-    console.log("【proxyUrl】", proxyUrl);
     const proxyHost = proxyUrl.hostname;
-    console.log("【proxyHost】", proxyHost);
-    console.log("【proxyUrl.port】", proxyUrl.port);
     const proxyPort = parseInt(proxyUrl.port) || (proxyUrl.protocol === "https:" ? 443 : 80);
-    console.log("【proxyPort】", proxyPort);
-
     const checkProxy = await isPortReachable(port, host, TIMEOUT_MS, proxyPort, proxyHost);
-    console.log("【checkProxy】", checkProxy);
 
     return { 200: { ok: checkProxy } };
   }

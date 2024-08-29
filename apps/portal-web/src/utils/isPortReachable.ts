@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import * as http from "http";
 import net from "net";
 
 // https://github.com/sindresorhus/is-port-reachable
@@ -23,22 +22,18 @@ export async function isPortReachable(
   proxyHost?: string,
 ): Promise<boolean> {
 
-  // 【test】
   if (proxyPort && proxyHost) {
     // 检验到代理网关节点是否可达
     const proxyPortReachable = await directIsPortReachable(proxyPort, proxyHost, timeout);
-    console.log("【proxyPortReachable】", proxyPortReachable);
+    if (!proxyPortReachable) return false;
     // 检验代理网关节点到计算节点的主机和端口是否可达
     const reachableThroughProxy = await isReachableThroughProxy(host, port, proxyHost, proxyPort, timeout);
-    console.log("【reachableThroughProxy】", reachableThroughProxy);
 
-    return proxyPortReachable && reachableThroughProxy;
+    return reachableThroughProxy;
   } else {
     return await directIsPortReachable(port, host, timeout);
   }
   
-
-
 }
 
 // check port reachable
@@ -86,50 +81,38 @@ async function isReachableThroughProxy(
   timeout: number,
 ): Promise<boolean> {
   const promise = new Promise<void>((resolve, reject) => {
-    const requestOptions = {
-      host: proxyHost,
-      port: proxyPort,
-      method: "CONNECT",
-      path: `${targetHost}:${targetPort}`,
-      timeout,
+    const proxySocket = new net.Socket();
+
+    const onError = (err: Error) => {
+      console.error("Error in proxy connection:", err.message);
+      proxySocket.destroy();
+      reject(err);
     };
 
-    console.log("【proxy-request-options】", requestOptions);
+    proxySocket.setTimeout(timeout);
+    proxySocket.once("error", onError);
+    proxySocket.once("timeout", () => onError(new Error("Connection timed out")));
 
-    const req = http.request(requestOptions);
-    console.log("【【【req】】】");
-    console.dir(req, { depth: null });
+    // 连接到代理服务器
+    proxySocket.connect(proxyPort, proxyHost, () => {
+      console.log(`Connected to proxy server ${proxyHost}:${proxyPort}`);
 
-    req.on("connect", (res, socket) => {
-
-      console.log("【【【res】】】");
-      console.dir(res, { depth: null });
-
-      if (res.statusCode === 200) {
-        socket.destroy();
+      // 此时代理服务器应该配置为直接转发TCP流量到目标主机和端口
+      // 直接通过代理服务器的 socket 连接到目标主机和端口
+      // 无需额外的 HTTP 请求头或协议
+      proxySocket.connect(targetPort, targetHost, () => {
+        console.log(`Successfully connected to ${targetHost}:${targetPort} through proxy.`);
+        proxySocket.end();
         resolve();
-      } else {
-        socket.destroy();
-        reject(new Error(`Proxy connection failed with status code ${res.statusCode}`));
-      }
+      });
     });
-
-    req.on("error", (err) => {
-      reject(new Error(`Request error: ${err.message}`));
-    });
-    req.on("timeout", () => {
-      req.destroy();
-      reject(new Error("Request timed out"));
-    });
-
-    req.end();
   });
 
   try {
     await promise;
     return true;
   } catch (err) {
-    console.error(err);
+    console.error("Error in proxy connection:", err);
     return false;
   }
 }
