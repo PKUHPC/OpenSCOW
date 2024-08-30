@@ -188,7 +188,7 @@ export const jobServiceServer = plugin((server) => {
             } else if (x.tenantPrice.gt(newTenantPrice)) {
               await pay({
                 target: account.tenant.$,
-                comment,
+                comment: comment + `, job user ${x.user}`,
                 amount: x.tenantPrice.minus(newTenantPrice),
                 operatorId,
                 type,
@@ -211,7 +211,7 @@ export const jobServiceServer = plugin((server) => {
             } else if (x.accountPrice.gt(newAccountPrice)) {
               await pay({
                 target: account,
-                comment,
+                comment: comment + `, job user ${x.user}`,
                 amount: x.accountPrice.minus(newAccountPrice),
                 operatorId,
                 type,

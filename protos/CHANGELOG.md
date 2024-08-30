@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.12.0
+
+### Minor Changes
+
+- abd69cb: 接入 scowd 文件分片上传
+
 ## 1.11.0
 
 ### Minor Changes

@@ -278,6 +278,7 @@ export default {
         setFail: "Set Failed",
         setAmount:"Set block threshold",
         blockThresholdAmount: "Block Threshold",
+        defaultBlockThresholdAmount: "Default Block Threshold Amount",
         curBlockThresholdAmount: "Current Block Threshold: ",
         curDefaultBlockThresholdAmount: "Current Tenant Default Block Threshold",
         useDefaultBlockThresholdAmount: "Use tenant default block threshold",

@@ -1,5 +1,18 @@
 # @scow/lib-web
 
+## 1.4.2
+
+### Patch Changes
+
+- eec12d8: UI 扩展增加导航栏链接自动刷新功能
+- b2ee159: 修复 UI 拓展自定义图标大小与导航栏原有图标大小不一致的问题
+- d3de802: UI 扩展修复当跳往扩展页面的导航项位于已有导航项的下面时，此扩展页面的导航结构不显示的问题
+- acb1992: UI 扩展页面支持修改标题
+- 15a7bdd: UI 扩展返回的导航项允许指定 navs[].hideIfNotActive 属性
+- Updated dependencies [83df60b]
+  - @scow/config@1.5.2
+  - @scow/protos@1.0.14
+
 ## 1.4.1
 
 ### Patch Changes

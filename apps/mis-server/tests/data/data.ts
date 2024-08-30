@@ -72,8 +72,6 @@ export async function insertInitialData(em: SqlEntityManager) {
     blockedInCluster: false,
     comment: "123",
   });
-
-
   const uaCC = new UserAccount({
     user: userC,
     account: accountC,

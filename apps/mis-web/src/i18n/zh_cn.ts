@@ -279,6 +279,7 @@ export default {
         setAmount:"设置封锁阈值",
         blockThresholdAmount: "封锁阈值",
         curBlockThresholdAmount: "当前封锁阈值",
+        defaultBlockThresholdAmount: "租户默认封锁阈值",
         curDefaultBlockThresholdAmount: "当前租户默认封锁阈值: ",
         useDefaultBlockThresholdAmount: "使用租户默认封锁阈值",
         confirmUseDefaultBlockThresholdAmount: "确认使用租户默认封锁阈值？",
