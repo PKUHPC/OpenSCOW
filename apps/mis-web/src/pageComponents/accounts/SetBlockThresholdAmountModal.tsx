@@ -83,7 +83,6 @@ export const SetBlockThresholdAmountModal: React.FC<Props> = ({
     >
       <Form
         form={form}
-        initialValues={{ blockThresholdAmount: 0 }}
       >
         <Form.Item label={t(pCommon("accountName"))}>
           <strong>{accountName}</strong>
