@@ -44,7 +44,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
     console.log("这里是session",session,appId);
     if (!session.host || !session.port) { return false; }
     if (appId === "ShadowDesk") {
-      return api.checkShadowDeskConnectivity({ query: { id: session.user } })
+      return api.checkShadowDeskConnectivity({ query: { id: session.user || "" } })
         .then((x) => x.ok);
     } else {
       return api.checkAppConnectivity({ query: { cluster: cluster.id, host: session.host, port: session.port } })

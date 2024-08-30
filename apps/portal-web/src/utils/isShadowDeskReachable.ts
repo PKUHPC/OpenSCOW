@@ -22,7 +22,7 @@ import { publicConfig } from "src/utils/config";
 const basePath = publicConfig.BASE_PATH;
 
 export async function isShadowDeskReachable(id: string, timeout: number = 1000): Promise<boolean> {
-  if (typeof id !== "string") {
+  if (typeof id !== "string" || id === "") {
     throw new TypeError("Specify a `id`");
   }
 

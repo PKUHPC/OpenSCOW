@@ -108,6 +108,10 @@ export const mockApi: MockApi<typeof api> = {
     ok: Math.random() < 0.5,
   }),
 
+  checkShadowDeskConnectivity: async () => ({
+    ok: Math.random() < 0.5,
+  }),
+
   getAllJobs: async () => ({ results: [job]}),
 
   listAvailableApps: async () => ({
