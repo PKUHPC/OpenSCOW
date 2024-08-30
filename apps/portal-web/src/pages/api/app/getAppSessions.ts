@@ -32,6 +32,7 @@ export const AppSession = Type.Object({
   reason: Type.Optional(Type.String()),
   host: Type.Optional(Type.String()),
   port: Type.Optional(Type.Number()),
+  user: Type.Optional(Type.String()),
 });
 export type AppSession = Static<typeof AppSession>;
 
@@ -65,6 +66,7 @@ export default /* #__PURE__*/route(GetAppSessionsSchema, async (req, res) => {
   return asyncUnaryCall(client, "listAppSessions", {
     cluster, userId: info.identityId,
   }).then((reply) => {
+    console.log("这里是",reply.sessions);
     return { 200: { sessions: reply.sessions } };
   });
 

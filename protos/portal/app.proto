@@ -115,6 +115,7 @@ message AppSession {
 
   optional string host = 11;
   optional uint32 port = 12;
+  optional string user = 13;
 }
 
 message ListAppSessionsResponse {

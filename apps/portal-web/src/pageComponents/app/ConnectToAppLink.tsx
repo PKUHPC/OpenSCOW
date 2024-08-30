@@ -41,9 +41,15 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   const t = useI18nTranslateToString();
 
   const checkConnectivityPromiseFn = useCallback(async () => {
+    console.log("这里是session",session,appId);
     if (!session.host || !session.port) { return false; }
-    return api.checkAppConnectivity({ query: { cluster: cluster.id, host: session.host, port: session.port } })
-      .then((x) => x.ok);
+    if (appId === "ShadowDesk") {
+      return api.checkShadowDeskConnectivity({ query: { id: session.user } })
+        .then((x) => x.ok);
+    } else {
+      return api.checkAppConnectivity({ query: { cluster: cluster.id, host: session.host, port: session.port } })
+        .then((x) => x.ok);
+    }
   }, [session.host, session.port, cluster.id]);
 
   const { data } = useAsync({ promiseFn: checkConnectivityPromiseFn, watch: refreshToken });

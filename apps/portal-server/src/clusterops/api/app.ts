@@ -51,6 +51,7 @@ export interface AppSession {
   reason?: string;
   host: string | undefined;
   port: number | undefined;
+  user?: string | undefined;
 }
 
 export interface GetAppSessionsReply {

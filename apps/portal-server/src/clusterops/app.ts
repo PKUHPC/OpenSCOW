@@ -349,6 +349,7 @@ export const appOps = (cluster: string): AppOps => {
 
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
+          let user: string | undefined = undefined;
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
@@ -366,6 +367,8 @@ export const appOps = (cluster: string): AppOps => {
 
                 host = serverSessionInfo.HOST;
                 port = serverSessionInfo.PORT;
+                user = serverSessionInfo.USER as string;
+                console.log(serverSessionInfo);
               }
             } else {
             // for vnc apps,
@@ -403,6 +406,7 @@ export const appOps = (cluster: string): AppOps => {
           const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
             || terminatedStates.includes(runningJobInfo?.state);
 
+          console.log("这里是user",user);
           sessions.push({
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
@@ -417,6 +421,7 @@ export const appOps = (cluster: string): AppOps => {
             reason: isPendingOrTerminated ? (runningJobInfo?.reason ?? "") : undefined,
             host,
             port,
+            user,
           });
 
         }));

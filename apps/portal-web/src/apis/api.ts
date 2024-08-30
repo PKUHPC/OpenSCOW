@@ -17,6 +17,7 @@ import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { getClusterConfigFilesSchema } from "src/pages/api//getClusterConfigFiles";
 import type { GetClustersRuntimeInfoSchema } from "src/pages/api//getClustersRuntimeInfo";
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
+import type { CheckShadowDeskConnectivitySchema } from "src/pages/api/app/checkShadowDeskConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import type { CreateAppSessionSchema } from "src/pages/api/app/createAppSession";
 import type { GetAppLastSubmissionSchema } from "src/pages/api/app/getAppLastSubmission";
@@ -68,6 +69,7 @@ import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
 
 export const api = {
   checkAppConnectivity: apiClient.fromTypeboxRoute<typeof CheckAppConnectivitySchema>("GET", "/api/app/checkConnectivity"),
+  checkShadowDeskConnectivity: apiClient.fromTypeboxRoute<typeof CheckShadowDeskConnectivitySchema>("GET", "/api/checkConnectivity"),
   connectToApp: apiClient.fromTypeboxRoute<typeof ConnectToAppSchema>("POST", "/api/app/connectToApp"),
   createAppSession: apiClient.fromTypeboxRoute<typeof CreateAppSessionSchema>("POST", "/api/app/createAppSession"),
   getAppLastSubmission: apiClient.fromTypeboxRoute<typeof GetAppLastSubmissionSchema>("GET", "/api/app/getAppLastSubmission"),
