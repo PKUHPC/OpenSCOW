@@ -15,8 +15,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
-  # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
-  # ALIYUN_PROJECT_NAME: scow
 
 jobs:
   test-version-packages:
