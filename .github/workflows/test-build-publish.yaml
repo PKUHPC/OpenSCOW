@@ -74,7 +74,9 @@ jobs:
 
       - name: Start dev env for db testing
         if: vars.RUN_TESTS == 'true'
-        run: pnpm devenv
+        run: |
+          stat $HOME/.ssh/id_rsa.pub
+          pnpm devenv
 
       - name: Check running containers
         if: vars.RUN_TESTS == 'true'
