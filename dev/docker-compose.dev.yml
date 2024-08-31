@@ -34,7 +34,10 @@ services:
     ports:
       - 22222:22
     volumes:
-      - $HOME/.ssh/id_rsa.pub:/id_rsa.pub
+      - type: bind
+        source: $HOME/.ssh/id_rsa.pub
+        target: /id_rsa.pub
+      # - $HOME/.ssh:/root/rootssh
 
   ldap:
     image: ldaptest
