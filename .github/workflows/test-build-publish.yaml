@@ -75,8 +75,7 @@ jobs:
       - name: Start dev env for db testing
         if: vars.RUN_TESTS == 'true'
         run: |
-          stat $HOME/.ssh/id_rsa.pub
-          pnpm devenv
+          SSH_AUTHORIZED_PUBLIC_KEY="$(cat $HOME/.ssh/id_rsa.pub)" pnpm devenv
 
       - name: Check running containers
         if: vars.RUN_TESTS == 'true'
@@ -93,12 +92,6 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          cat $HOME/.ssh/id_rsa.pub
-
-          docker compose -f dev/docker-compose.dev.yml logs ssh-server
-
-          docker inspect $(docker compose -f dev/docker-compose.dev.yml ps ssh-server -q)
-
           cd libs/ssh && pnpm test -- tests/sshKey.test.ts
 
       - name: Upload test converage

@@ -41,8 +41,7 @@ export async function sshRawConnect(address: string, username: string, rootKeyPa
   const ssh = new NodeSSH();
 
   async function connect() {
-    await ssh.connect({ host, port: port ? +port : undefined, username, privateKey: rootKeyPair.privateKey,
-      debug: (m) => logger.info("ssh debug %s", m) });
+    await ssh.connect({ host, port: port ? +port : undefined, username, privateKey: rootKeyPair.privateKey });
   }
 
   try {

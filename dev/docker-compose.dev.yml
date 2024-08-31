@@ -33,11 +33,12 @@ services:
         HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 22222:22
+    environment:
+      SSH_AUTHORIZED_PUBLIC_KEY: ${SSH_AUTHORIZED_PUBLIC_KEY}
     volumes:
       - type: bind
         source: $HOME/.ssh/id_rsa.pub
         target: /id_rsa.pub
-      # - $HOME/.ssh:/root/rootssh
 
   ldap:
     image: ldaptest
