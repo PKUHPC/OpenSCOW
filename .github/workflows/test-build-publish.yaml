@@ -88,7 +88,7 @@ jobs:
           publish: pnpm ci:publish
           createGithubReleases: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   scow-cli:
@@ -107,7 +107,7 @@ jobs:
 
       - name: Install dependencies for scow-cli
         env:
-          HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
+          HTTPS_PROXY: ${{ vars.HTTPS_PROXY }}
         run: |
           pnpm config set registry https://registry.npmmirror.com
           pnpm i --frozen-lockfile --filter @scow/cli...
@@ -161,7 +161,7 @@ jobs:
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
       - name: Docker meta
         id: meta
@@ -176,7 +176,7 @@ jobs:
           context: .
           push: true
           build-args: |
-            HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
+            HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
             NO_PROXY=mirrors.pku.edu.cn
             ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
