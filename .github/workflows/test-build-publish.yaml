@@ -47,6 +47,8 @@ jobs:
           sudo apt update
           sudo apt install -y openssh-client docker-compose-plugin
 
+          export HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
+
       - uses: pnpm/action-setup@v4.0.0
 
       - uses: actions/setup-node@v4

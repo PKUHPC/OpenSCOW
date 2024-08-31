@@ -29,6 +29,8 @@ services:
     image: alpine-ssh
     build:
       context: ssh-server
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 22222:22
     volumes:
@@ -61,6 +63,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6000:6000
     environment:
@@ -72,6 +76,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6001:6001
     environment:
@@ -83,6 +89,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6002:6002
     environment:
