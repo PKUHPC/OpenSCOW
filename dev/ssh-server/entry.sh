@@ -18,6 +18,7 @@ if [ -f /id_rsa.pub ]; then
   chown -R test: /home/test/.ssh/
 else
   echo "No /id_rsa.pub found. Skipping setup public key auth."
+  ls -la /id_rsa.pub
 fi
 
 
