@@ -91,9 +91,7 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          sleep 5
-          docker compose --env-file dev/.env.dev -f dev/docker-compose.dev.yml logs ssh-server
-          docker ps
+          ssh -vvv -p22222 root@localhost echo "HelloWorld"
           pnpm test:ci
 
       - name: Upload test converage
