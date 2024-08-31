@@ -70,7 +70,7 @@ jobs:
 
       - name: Generate SSH key pairs for test
         if: vars.RUN_TESTS == 'true'
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+        run: ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
         if: vars.RUN_TESTS == 'true'
@@ -91,7 +91,7 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          sshpass -p root ssh -vvv -o StrictHostKeyChecking=no -p22222 root@localhost echo "HelloWorld"
+          cat $HOME/.ssh/id_rsa.pub
           pnpm test:ci
 
       - name: Upload test converage

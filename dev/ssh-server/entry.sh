@@ -9,6 +9,8 @@
 # See the Mulan PSL v2 for more details.
 
 if [ -f /id_rsa.pub ]; then
+  echo "Found /id_rsa.pub. Adding it as an authorized key..."
+  echo "id_rsa.pub: $(cat /id_rsa.pub)"
   cp /id_rsa.pub /home/test/.ssh/authorized_keys
   cp /id_rsa.pub /root/.ssh/authorized_keys
 
