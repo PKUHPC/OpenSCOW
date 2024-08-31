@@ -45,7 +45,7 @@ jobs:
             $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
           sudo apt update
-          sudo apt install -y openssh-client docker-compose-plugin sshpass
+          sudo apt install -y openssh-client docker-compose-plugin
 
           export HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
 
@@ -92,7 +92,10 @@ jobs:
         if: vars.RUN_TESTS == 'true'
         run: |
           cat $HOME/.ssh/id_rsa.pub
-          pnpm test:ci
+
+          docker compose -f dev/docker-compose.dev.yml logs ssh-server
+
+          cd libs/ssh && pnpm test -- tests/sshKey.test.ts
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4

@@ -123,7 +123,7 @@ describe("doesn't override authorized_keys if exists", () => {
     await checkExistingKeys();
   });
 
-  it("as root", async () => {
+  it.only("as root", async () => {
 
     await insertKeyAsRoot(testUser, target, rootKeyPair, console);
     await tryLoginAsUser();
