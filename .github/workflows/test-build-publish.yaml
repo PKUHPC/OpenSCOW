@@ -38,9 +38,14 @@ jobs:
           # Use PKU mirrors
           sudo sed -ri.bak -e 's/\/\/.*?(archive.ubuntu.com|mirrors.*?)\/ubuntu/\/\/mirrors.pku.edu.cn\/ubuntu/g' -e '/security.ubuntu.com\/ubuntu/d' /etc/apt/sources.list
 
-          # Install openssh-client for ssh-keygen
+          # Prepare sources for docker compose
+          curl -fsSL https://mirrors.pku.edu.cn/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.pku.edu.cn/docker-ce/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
           sudo apt update
-          sudo apt install -y openssh-client
+          sudo apt install -y openssh-client docker-compose-plugin
 
       - uses: pnpm/action-setup@v4.0.0
 
