@@ -12,7 +12,8 @@
 
 import { join } from "path";
 import { insertKeyAsRoot, insertKeyAsUser, KeyPair } from "src/key";
-import { sftpChmod, sftpChown, sftpExists, sftpMkdir, sftpReadFile, sftpStat, sftpWriteFile } from "src/sftp";
+import { createDirectoriesRecursively, sftpChmod, sftpChown, sftpExists,
+  sftpReadFile, sftpStat, sftpWriteFile } from "src/sftp";
 import { sshConnect, sshRmrf } from "src/ssh";
 
 import { connectToTestServerAsRoot,
@@ -103,7 +104,7 @@ describe("doesn't override authorized_keys if exists", () => {
     const userUID = Number((await serverSsh.ssh.execCommand(`id -g ${testUser}`)).stdout);
     const userGID = Number((await serverSsh.ssh.execCommand(`id -u ${testUser}`)).stdout);
 
-    await sftpMkdir(serverSsh.sftp)(sshDir);
+    await createDirectoriesRecursively(serverSsh.sftp, sshDir);
     await sftpChown(serverSsh.sftp)(sshDir, userUID, userGID);
     await sftpWriteFile(serverSsh.sftp)(keyFile, existingKey.publicKey);
     await sftpChown(serverSsh.sftp)(keyFile, userUID, userGID);
