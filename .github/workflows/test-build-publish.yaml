@@ -45,7 +45,7 @@ jobs:
             $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
           sudo apt update
-          sudo apt install -y openssh-client docker-compose-plugin
+          sudo apt install -y openssh-client docker-compose-plugin sshpass
 
           export HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
 
@@ -91,7 +91,7 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          ssh -vvv -p22222 root@localhost echo "HelloWorld"
+          sshpass -p root ssh -vvv -o StrictHostKeyChecking=no -p22222 root@localhost echo "HelloWorld"
           pnpm test:ci
 
       - name: Upload test converage
