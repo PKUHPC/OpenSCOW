@@ -95,6 +95,8 @@ jobs:
 
           docker compose -f dev/docker-compose.dev.yml logs ssh-server
 
+          docker inspect $(docker compose -f dev/docker-compose.dev.yml ps ssh-server -q)
+
           cd libs/ssh && pnpm test -- tests/sshKey.test.ts
 
       - name: Upload test converage
