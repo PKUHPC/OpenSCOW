@@ -24,6 +24,8 @@ COPY pnpm-lock.yaml .
 
 COPY patches ./patches
 
+ENV COREPACK_NPM_REGISTRY https://registry.npmmirror.com
+
 RUN pnpm config set registry https://registry.npmmirror.com
 RUN pnpm fetch
 

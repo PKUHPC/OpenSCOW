@@ -53,6 +53,7 @@ jobs:
         with:
           node-version: 20.x
           cache: pnpm
+          registry-url: https://registry.npmmirror.com
 
       - name: Install dependencies
         run: |
