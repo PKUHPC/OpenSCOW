@@ -33,6 +33,15 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Install packages
+        run: |
+          # Use PKU mirrors
+          sudo sed -ri.bak -e 's/\/\/.*?(archive.ubuntu.com|mirrors.*?)\/ubuntu/\/\/mirrors.pku.edu.cn\/ubuntu/g' -e '/security.ubuntu.com\/ubuntu/d' /etc/apt/sources.list
+
+          # Install openssh-client for ssh-keygen
+          sudo apt update
+          sudo apt install -y openssh-client
+
       - uses: pnpm/action-setup@v4.0.0
 
       - uses: actions/setup-node@v4
@@ -41,7 +50,9 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: |
+          pnpm config set registry https://registry.npmmirror.com
+          pnpm i --frozen-lockfile
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev

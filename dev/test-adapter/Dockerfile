@@ -11,6 +11,8 @@
 
 FROM node:iron-alpine@sha256:2cc3d19887bfea8bf52574716d5f16d4668e35158de866099711ddfb2b16b6e0 AS base
 
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
+
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
 
 RUN corepack enable
@@ -22,6 +24,7 @@ COPY pnpm-lock.yaml .
 
 COPY patches ./patches
 
+RUN pnpm config set registry https://registry.npmmirror.com
 RUN pnpm fetch
 
 FROM base as pruner
