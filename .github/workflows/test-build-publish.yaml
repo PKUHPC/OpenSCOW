@@ -92,7 +92,12 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          # cd libs/ssh && pnpm test -- tests/sshKey.test.ts
+          # Unset proxy for tests
+          export https_proxy=""
+          export http_proxy=""
+          export HTTPS_PROXY=""
+          export HTTP_PROXY=""
+
           pnpm test:ci
 
       - name: Upload test converage
