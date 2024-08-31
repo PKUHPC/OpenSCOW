@@ -36,9 +36,7 @@ services:
     environment:
       SSH_AUTHORIZED_PUBLIC_KEY: ${SSH_AUTHORIZED_PUBLIC_KEY}
     volumes:
-      - type: bind
-        source: $HOME/.ssh/id_rsa.pub
-        target: /id_rsa.pub
+      - $HOME/.ssh/id_rsa.pub:/id_rsa.pub
 
   ldap:
     image: ldaptest

@@ -92,7 +92,8 @@ jobs:
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
         run: |
-          cd libs/ssh && pnpm test -- tests/sshKey.test.ts
+          # cd libs/ssh && pnpm test -- tests/sshKey.test.ts
+          pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4
