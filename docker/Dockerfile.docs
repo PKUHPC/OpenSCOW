@@ -21,6 +21,8 @@ COPY package.json .
 COPY pnpm-lock.yaml .
 COPY patches ./patches
 
+RUN pnpm config set registry https://registry.npmmirror.com
+
 RUN pnpm fetch
 
 FROM base as pruner

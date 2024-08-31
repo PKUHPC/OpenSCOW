@@ -106,7 +106,11 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies for scow-cli
-        run: pnpm i --frozen-lockfile --filter @scow/cli...
+        env:
+          HTTPS_PROXY: ${{ secrets.HTTPS_PROXY }}
+        run: |
+          pnpm config set registry https://registry.npmmirror.com
+          pnpm i --frozen-lockfile --filter @scow/cli...
 
       - name: Build scow-cli
         run: pnpm build "--filter=@scow/cli"
@@ -171,7 +175,10 @@ jobs:
         with:
           context: .
           push: true
-          build-args: ${{ matrix.build_args }}
+          build-args: |
+            HTTPS_PROXY=${{ secrets.HTTPS_PROXY }}
+            NO_PROXY=mirrors.pku.edu.cn
+            ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
           file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
