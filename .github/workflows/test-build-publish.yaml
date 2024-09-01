@@ -227,6 +227,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4.0.0
+
       - name: Download cli-x64
         uses: actions/download-artifact@v4
         with:
@@ -243,6 +245,16 @@ jobs:
         run: ls -R
         working-directory: release
 
+      - name: Pack SCOW API
+        id: pack-scow-api
+        run: |
+          cd protos
+          output_file=$(pnpm pack)
+          full_path=$(realpath $output_file)
+          echo "Packed SCOW API to $full_path"
+          echo "scow_api_file=$(realpath $full_path)" >> "$GITHUB_OUTPUT"
+
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
@@ -253,6 +265,8 @@ jobs:
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
+            ${{ steps.pack-scow-api.outputs.scow_api_file }}
+
 
       - name: Send Notification Request
         run: |
