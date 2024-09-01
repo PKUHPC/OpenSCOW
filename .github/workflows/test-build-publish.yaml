@@ -15,8 +15,6 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
-  # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
-  # ALIYUN_PROJECT_NAME: scow
 
 jobs:
   test-version-packages:
@@ -35,15 +33,34 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
+      - name: Install packages
+        run: |
+          # Use PKU mirrors
+          sudo sed -ri.bak -e 's/\/\/.*?(archive.ubuntu.com|mirrors.*?)\/ubuntu/\/\/mirrors.pku.edu.cn\/ubuntu/g' -e '/security.ubuntu.com\/ubuntu/d' /etc/apt/sources.list
+
+          # Prepare sources for docker compose
+          curl -fsSL https://mirrors.pku.edu.cn/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://mirrors.pku.edu.cn/docker-ce/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+          sudo apt update
+          sudo apt install -y openssh-client docker-compose-plugin
+
+          export HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
+
       - uses: pnpm/action-setup@v4.0.0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: pnpm
+          registry-url: https://registry.npmmirror.com
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: |
+          pnpm config set registry https://registry.npmmirror.com
+          pnpm i --frozen-lockfile
 
       - name: Prepare dev libs and code
         run: pnpm prepareDev
@@ -53,11 +70,12 @@ jobs:
 
       - name: Generate SSH key pairs for test
         if: vars.RUN_TESTS == 'true'
-        run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
+        run: ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
         if: vars.RUN_TESTS == 'true'
-        run: pnpm devenv
+        run: |
+          SSH_AUTHORIZED_PUBLIC_KEY="$(cat $HOME/.ssh/id_rsa.pub)" pnpm devenv
 
       - name: Check running containers
         if: vars.RUN_TESTS == 'true'
@@ -69,11 +87,18 @@ jobs:
         with:
           log: true
           verbose: true
-          resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
+          resource: "tcp:localhost:22222 tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
       - name: Run tests
         if: vars.RUN_TESTS == 'true'
-        run: pnpm test:ci
+        run: |
+          # Unset proxy for tests
+          export https_proxy=""
+          export http_proxy=""
+          export HTTPS_PROXY=""
+          export HTTP_PROXY=""
+
+          pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4
@@ -90,7 +115,7 @@ jobs:
           publish: pnpm ci:publish
           createGithubReleases: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   scow-cli:
@@ -108,7 +133,11 @@ jobs:
           cache: pnpm
 
       - name: Install dependencies for scow-cli
-        run: pnpm i --frozen-lockfile --filter @scow/cli...
+        env:
+          HTTPS_PROXY: ${{ vars.HTTPS_PROXY }}
+        run: |
+          pnpm config set registry https://registry.npmmirror.com
+          pnpm i --frozen-lockfile --filter @scow/cli...
 
       - name: Build scow-cli
         run: pnpm build "--filter=@scow/cli"
@@ -153,13 +182,17 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: |
+            env.http_proxy=${{ vars.HTTPS_PROXY }}
+            env.https_proxy=${{ vars.HTTPS_PROXY }}
 
       - name: Log in to the GitHub Container registry
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
 
       - name: Docker meta
         id: meta
@@ -173,7 +206,10 @@ jobs:
         with:
           context: .
           push: true
-          build-args: ${{ matrix.build_args }}
+          build-args: |
+            HTTPS_PROXY=${{ vars.HTTPS_PROXY }}
+            NO_PROXY=mirrors.pku.edu.cn
+            ${{ matrix.build_args }}
           tags: ${{ steps.meta.outputs.tags }}
           file: docker/Dockerfile.${{ matrix.file }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -195,6 +231,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4.0.0
+
       - name: Download cli-x64
         uses: actions/download-artifact@v4
         with:
@@ -211,6 +249,16 @@ jobs:
         run: ls -R
         working-directory: release
 
+      - name: Pack SCOW API
+        id: pack-scow-api
+        run: |
+          cd protos
+          output_file=$(pnpm pack)
+          full_path=$(realpath $output_file)
+          echo "Packed SCOW API to $full_path"
+          echo "scow_api_file=$(realpath $full_path)" >> "$GITHUB_OUTPUT"
+
+
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
@@ -221,6 +269,8 @@ jobs:
           files: |
             release/scow-cli/cli-x64
             release/scow-cli/cli-arm64
+            ${{ steps.pack-scow-api.outputs.scow_api_file }}
+
 
       - name: Send Notification Request
         run: |

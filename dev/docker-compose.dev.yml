@@ -29,8 +29,18 @@ services:
     image: alpine-ssh
     build:
       context: ssh-server
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 22222:22
+    environment:
+      # pkuhpc-k8s-runners uses docker-in-docker configuration
+      # It means the container running the workflow job is not the one the docker daemon is running
+      # So, the docker daemon where the dev env is running has no access to the filesystem of the container running the workflow job
+      # Therefore, we need to pass the public key value (not just a path) to the ssh-server container
+      # The same applies to all other containers that need to access the files in the workflow job container.
+      # Luckily there is none for now, but we need to keep this in mind.
+      SSH_AUTHORIZED_PUBLIC_KEY: ${SSH_AUTHORIZED_PUBLIC_KEY}
     volumes:
       - $HOME/.ssh/id_rsa.pub:/id_rsa.pub
 
@@ -61,6 +71,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6000:6000
     environment:
@@ -72,6 +84,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6001:6001
     environment:
@@ -83,6 +97,8 @@ services:
     build:
       context: ..
       dockerfile: dev/test-adapter/Dockerfile
+      args:
+        HTTPS_PROXY: ${HTTPS_PROXY}
     ports:
       - 6002:6002
     environment:
