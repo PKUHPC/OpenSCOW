@@ -209,16 +209,18 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
               compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
             hidden={clusterInfo.every((item) => item.usageRatePercentage === undefined)}
             render={(_, r) => (
-              r.info?.usageRatePercentage !== undefined ? (
-                <div>
-                  <CustomProgress
-                    percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
-                    width="120px"
-                    height="15px"
-                    bgColor={gray[0]}
-                    progressColor={blue[5]}
-                  />
-                </div>
+              (r.info?.usageRatePercentage !== undefined && !isNaN(r.info.usageRatePercentage)) ? (
+                (
+                  <div>
+                    <CustomProgress
+                      percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
+                      width="120px"
+                      height="15px"
+                      bgColor={gray[0]}
+                      progressColor={blue[5]}
+                    />
+                  </div>
+                )
               ) : "-"
             )}
           />
