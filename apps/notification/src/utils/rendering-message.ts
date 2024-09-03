@@ -30,12 +30,12 @@ enum TemplateLang {
   zhCn = "zhCn",
 };
 
-export const checkAdminMessageTypeExist = (type: string): CustomMessageType | undefined => {
+export const checkAdminMessageTypeExist = (type: string): CustomMessageType | null => {
   if (adminMessageTypesMap.has(type as AdminMessageType)) {
     return { type, ...adminMessageTypesMap.get(type as AdminMessageType) } as CustomMessageType;
   }
 
-  return undefined;
+  return null;
 };
 
 export function replaceTemplate(metadata: JsonValue, template: string): string {

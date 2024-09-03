@@ -38,7 +38,7 @@ export const getAllMessageTypesData = async (em: SqlEntityManager): Promise<Cust
 };
 
 export const checkMessageTypeExist =
-  async (em: SqlEntityManager, type: string): Promise<CustomMessageType | undefined> => {
+  async (em: SqlEntityManager, type: string): Promise<CustomMessageType | null> => {
     if (internalMessageTypesMap.has(type as InternalMessageType)) {
       return { type, ...internalMessageTypesMap.get(type as InternalMessageType) } as CustomMessageType;
     }
@@ -48,7 +48,7 @@ export const checkMessageTypeExist =
       return messageType;
     }
 
-    return undefined;
+    return null;
   };
 
 // 查找符合条件的值的函数
