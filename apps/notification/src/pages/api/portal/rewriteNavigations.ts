@@ -11,8 +11,10 @@
  */
 
 import { NextApiRequest, NextApiResponse } from "next";
+import { join } from "path";
 import { PlatformRole } from "src/models/user";
 import { validateToken } from "src/server/auth/token";
+import { BASE_PATH } from "src/utils/processEnv";
 
 import { applyMiddleware } from "../middleware/cors";
 
@@ -68,32 +70,32 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         path: "/notification",
         clickToPath: undefined,
         text: isChinese ? "消息通知" : "Message Notification",
-        icon: { src: "/notif/icons/notif.svg" },
+        icon: { src: join(BASE_PATH, "/icons/notif.svg") },
       },
       {
         path: "/subscription",
         clickToPath: undefined,
         text: isChinese ? "消息订阅" : "Message Subscription",
-        icon: { src: "/notif/icons/subscription.svg" },
+        icon: { src: join(BASE_PATH, "/icons/subscription.svg") },
       },
       ...cookie && userInfo?.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           path: "/message-config",
           clickToPath: undefined,
           text: isChinese ? "消息设置" : "Message Setting",
-          icon: { src: "/notif/icons/msg-config.svg" },
+          icon: { src: join(BASE_PATH, "/icons/msg-config.svg") },
         },
         {
           path: "/send-message",
           clickToPath: undefined,
           text: isChinese ? "发送消息" : "Send Message",
-          icon: { src: "/notif/icons/send-msg.svg" },
+          icon: { src: join(BASE_PATH, "/icons/send-msg.svg") },
         },
         {
           path: "/create-custom-message-type",
           clickToPath: undefined,
           text: isChinese ? "创建自定义消息类型" : "Create Custom Message Type",
-          icon: { src: "/notif/icons/create-custom-type.svg" },
+          icon: { src: join(BASE_PATH, "/icons/create-custom-type.svg") },
         },
       ] : [],
     ],

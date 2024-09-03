@@ -10,32 +10,20 @@
  * See the Mulan PSL v2 for more details.
  */
 
-"use client";
-import { TransportProvider } from "@connectrpc/connect-query";
-import { createConnectTransport } from "@connectrpc/connect-web";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { join } from "path";
 import { BASE_PATH } from "src/utils/processEnv";
 
 import { ClientLayout } from "./client-layout";
-
-const finalTransport = createConnectTransport({
-  baseUrl: join(BASE_PATH + "api"),
-});
-
-const queryClient = new QueryClient();
+import { ServerClientProvider } from "./server-client-provider";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <html lang="en">
-      <TransportProvider transport={finalTransport}>
-        <QueryClientProvider client={queryClient}>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-        </QueryClientProvider>
-      </TransportProvider>
+      <ServerClientProvider basePath={BASE_PATH}>
+        <ClientLayout basePath={BASE_PATH}>
+          {children}
+        </ClientLayout>
+      </ServerClientProvider>
     </html>
   );
 }

@@ -48,6 +48,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const AI_PATH = config.ai?.basePath || "/ai";
   checkPathFormat("ai.basePath", AI_PATH);
 
+  const NOTIF_PATH = config.notif?.basePath || "/notif";
+  checkPathFormat("notif.basePath", NOTIF_PATH);
+
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
@@ -132,6 +135,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
       "AI_PATH": AI_PATH,
+      "NOTIF_PATH": NOTIF_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,

@@ -14,22 +14,28 @@
 
 import { useSearchParams } from "next/navigation";
 import { setCookie } from "nookies";
-import React, { createContext, useEffect } from "react";
+import React, { createContext, PropsWithChildren, useEffect } from "react";
 
 interface ContextProps {
   scowDark: boolean;
   scowUserToken: string | undefined;
   scowLangId: string;
+  basePath: string;
 }
 // 创建一个 Context
 export const ScowParamsContext = createContext<ContextProps>({
   scowDark: false,
   scowUserToken: undefined,
   scowLangId: "zh_cn",
+  basePath: "/",
 });
 
+interface Props {
+  basePath: string
+}
+
 // 定义一个 Provider 组件
-export const ScowParamsProvider = ({ children }) => {
+export const ScowParamsProvider: React.FC<PropsWithChildren<Props>> = ({ children, basePath }) => {
   const searchParams = useSearchParams();
   const scowLangId = searchParams?.get("scowLangId") ?? "zh_cn";
   const scowUserToken = searchParams?.get("scowUserToken") ?? undefined;
@@ -46,7 +52,7 @@ export const ScowParamsProvider = ({ children }) => {
   }, [scowUserToken]);
 
   return (
-    <ScowParamsContext.Provider value={{ scowLangId, scowUserToken, scowDark }}>
+    <ScowParamsContext.Provider value={{ scowLangId, scowUserToken, scowDark, basePath }}>
       {children}
     </ScowParamsContext.Provider>
   );

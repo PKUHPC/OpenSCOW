@@ -904,10 +904,10 @@ importers:
         version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.6)
+        version: 0.17.7(@grpc/grpc-js@1.10.9)
       '@grpc/grpc-js':
-        specifier: 1.10.6
-        version: 1.10.6
+        specifier: 1.10.9
+        version: 1.10.9
       '@mikro-orm/cli':
         specifier: 6.2.5
         version: 6.2.5
@@ -3387,10 +3387,6 @@ packages:
 
   '@fastify/view@9.1.0':
     resolution: {integrity: sha512-jRTGDljs/uB2p8bf6c1x4stGjP7H84VQkhbtDgCx55Mxf9Fplud5UZIHubvL4BTTX8jNYEzP1FpNAOBi7vibxg==}
-
-  '@grpc/grpc-js@1.10.6':
-    resolution: {integrity: sha512-xP58G7wDQ4TCmN/cMUHh00DS7SRDv/+lC+xFLrTkMIN8h55X5NhZMLYbvy7dSELP15qlI6hPhNCRWVMtZMwqLA==}
-    engines: {node: '>=12.10.0'}
 
   '@grpc/grpc-js@1.10.9':
     resolution: {integrity: sha512-5tcgUctCG0qoNyfChZifz2tJqbRbXVO9J7X6duFcOjY3HUNCxg5D0ZCK7EP9vIcZ0zRpLU9bWkyCqVCLZ46IbQ==}
@@ -14212,12 +14208,6 @@ snapshots:
       tslib: 2.6.1
       zod: 3.23.8
 
-  '@ddadaal/tsgrpc-client@0.17.7(@grpc/grpc-js@1.10.6)':
-    dependencies:
-      '@ddadaal/tsgrpc-common': 0.2.5
-      '@grpc/grpc-js': 1.10.6
-      tslib: 2.6.2
-
   '@ddadaal/tsgrpc-client@0.17.7(@grpc/grpc-js@1.10.9)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.5
@@ -15416,11 +15406,6 @@ snapshots:
     dependencies:
       fastify-plugin: 4.5.1
       toad-cache: 3.7.0
-
-  '@grpc/grpc-js@1.10.6':
-    dependencies:
-      '@grpc/proto-loader': 0.7.13
-      '@js-sdsl/ordered-map': 4.4.2
 
   '@grpc/grpc-js@1.10.9':
     dependencies:

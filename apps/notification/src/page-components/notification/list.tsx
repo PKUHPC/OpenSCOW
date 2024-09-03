@@ -16,6 +16,7 @@ import { ListMessagesResponse, Message } from "@scow/notification-protos/build/m
 import { markMessageRead } from "@scow/notification-protos/build/message-MessageService_connectquery";
 import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 import { List, PaginationProps, Typography } from "antd";
+import { join } from "path";
 import React, { useContext, useState } from "react";
 import { PageInfo } from "src/app/extensions/(user)/notification/page";
 import { ScowParamsContext } from "src/components/scow-params-provider";
@@ -116,7 +117,7 @@ export const NotificationList: React.FC<Props> = ({
     onSuccess: () => refetch(),
   });
 
-  const { scowLangId, scowDark: isDark } = useContext(ScowParamsContext);
+  const { scowLangId, scowDark: isDark, basePath } = useContext(ScowParamsContext);
 
   const onPageChange: PaginationProps["onChange"] = (page, pageSize) => {
     setPageInfo({ page, pageSize });
@@ -155,7 +156,7 @@ export const NotificationList: React.FC<Props> = ({
                   <img
                     height={15}
                     width={20}
-                    src={item.isRead ? "/notif/icons/gray-mail.svg" : "/notif/icons/mail.svg"}
+                    src={item.isRead ? join(basePath, "/icons/gray-mail.svg") : join(basePath, "/icons/mail.svg") }
                   />
                   <span>{item.isRead ? compLang.read : compLang.unread}</span>
                 </StatusContainer>
@@ -168,7 +169,7 @@ export const NotificationList: React.FC<Props> = ({
                 <ActionsContainer>
                   <div>{renderingContent.createdAt}</div>
                   <img
-                    src="/notif/icons/delete-msg.svg"
+                    src={join(basePath, "/icons/delete-msg.svg")}
                     onClick={async (e) => {
                       e.stopPropagation();
                       await handleDelete(item.id);

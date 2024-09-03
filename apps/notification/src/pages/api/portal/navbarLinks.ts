@@ -13,6 +13,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import path from "path";
 import { hasUnreadMessage } from "src/utils/message/has-unread-message";
+import { BASE_PATH } from "src/utils/processEnv";
 
 import { applyMiddleware } from "../middleware/cors";
 
@@ -40,8 +41,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const scowUserCookie = cookies?.["SCOW_USER"];
 
     const svgFilePath = (cookie && scowUserCookie && await hasUnreadMessage(scowUserCookie))
-      ? path.join("/notif", "icons", "dot-ding.svg")
-      : path.join("/notif", "icons", "ding.svg");
+      ? path.join(BASE_PATH, "icons", "dot-ding.svg")
+      : path.join(BASE_PATH, "icons", "ding.svg");
 
     const navbarLinks = [
       {

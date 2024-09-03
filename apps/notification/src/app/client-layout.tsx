@@ -15,7 +15,7 @@
 import { legacyLogicalPropertiesTransformer, StyleProvider } from "@ant-design/cssinjs";
 import { useQuery } from "@connectrpc/connect-query";
 import { getUiConfig } from "@scow/notification-protos/build/config-ConfigService_connectquery";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { AntdConfigProvider } from "src/components/layout/antd-config-provider";
 import { DarkModeProvider } from "src/components/layout/dark-mode-provider";
 import { GlobalStyle } from "src/components/layout/global-style";
@@ -62,6 +62,7 @@ const useReportHeightToScow = () => {
 
 export function ClientLayout(props: {
   children: React.ReactNode,
+  basePath: string,
 }) {
   useReportHeightToScow();
 
@@ -73,12 +74,14 @@ export function ClientLayout(props: {
   const host = (typeof window === "undefined") ? "" : location.host;
   const hostname = host?.includes(":") ? host?.split(":")[0] : host;
   const primaryColor = uiConfig?.primaryColor;
-  const color = (hostname && primaryColor?.hostnameMap?.[hostname])
-    ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
+  const color = useMemo(() => {
+    return (hostname && primaryColor?.hostnameMap?.[hostname])
+    ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor ?? "#94070A";
+  }, [data]);
 
   return (
     <Suspense>
-      <ScowParamsProvider>
+      <ScowParamsProvider basePath={props.basePath}>
         <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
           <StyledComponentsRegistry>
             <AntdStyleRegistry>
