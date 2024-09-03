@@ -37,21 +37,19 @@ export const getAllMessageTypesData = async (em: SqlEntityManager): Promise<Cust
   ];
 };
 
-export const checkMessageTypeExist = async (
-  em: SqlEntityManager,
-  type: string,
-): Promise<CustomMessageType | undefined> => {
-  if (internalMessageTypesMap.has(type as InternalMessageType)) {
-    return { type, ...internalMessageTypesMap.get(type as InternalMessageType) } as CustomMessageType;
-  }
+export const checkMessageTypeExist =
+  async (em: SqlEntityManager, type: string): Promise<CustomMessageType | undefined> => {
+    if (internalMessageTypesMap.has(type as InternalMessageType)) {
+      return { type, ...internalMessageTypesMap.get(type as InternalMessageType) } as CustomMessageType;
+    }
 
-  const messageType = await em.findOne(CustomMessageType, { type });
-  if (messageType) {
-    return messageType;
-  }
+    const messageType = await em.findOne(CustomMessageType, { type });
+    if (messageType) {
+      return messageType;
+    }
 
-  return undefined;
-};
+    return undefined;
+  };
 
 // 查找符合条件的值的函数
 export function findInInternalMessageTypesMap(
