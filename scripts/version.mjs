@@ -41,6 +41,7 @@ const changes = {
   "config": [],
   "scheduler-adapter-protos": [],
   "ai": [],
+  "notification": []
 };
 
 for (const file of files) {
