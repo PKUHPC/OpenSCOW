@@ -17,7 +17,7 @@ import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { RenderContent, renderingMessage } from "src/utils/renderingMessage";
 
-const { Paragraph, Title } = Typography;
+const { Title } = Typography;
 interface NotificationLayoutProps {
   children: React.ReactNode;
   interval?: number; // 定时器的时间间隔，默认60秒

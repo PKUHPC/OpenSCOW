@@ -443,5 +443,29 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
+  if (config.notif) {
+    addService("notification", {
+      image: scowImage,
+      ports: {},
+      environment: {
+        "SCOW_LAUNCH_APP": "notification",
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
+        "MIS_SERVER_URL": config.mis ? "mis-server:5000" : "",
+        "DB_PASSWORD": config.mis?.dbPassword ?? "",
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "PROTOCOL": config.gateway.protocol,
+        ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
+      },
+      volumes: {
+        "/etc/hosts": "/etc/hosts",
+        "./config": "/etc/scow",
+        "~/.ssh": "/root/.ssh",
+      },
+    });
+  }
+
   return composeSpec;
 };

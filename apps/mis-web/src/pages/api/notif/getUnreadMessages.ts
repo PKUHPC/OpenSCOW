@@ -88,7 +88,7 @@ export default route(GetUnreadMessagesSchema, async (req, res) => {
     return;
   }
 
-  return notifClient.message.listMessages({
+  return notifClient.scowMessage.listMessages({
     userId: info.identityId, readStatus: ReadStatus.UNREAD, noticeType: NoticeType.SITE_MESSAGE })
     .then((res) => {
       return { 200: { results: {

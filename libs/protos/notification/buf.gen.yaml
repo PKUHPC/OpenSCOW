@@ -6,3 +6,6 @@ plugins:
   - plugin: connect-es
     opt: target=ts
     out: generated
+  - name: connect-query
+    out: generated
+    opt: target=ts

@@ -58,7 +58,7 @@ export default /* #__PURE__*/route(MarkMessageReadSchema, async (req, res) => {
     operationTypePayload:{ messageId: messageId },
   };
 
-  return notifClient.message.markMessageRead({ userId: info.identityId, messageId: BigInt(messageId) })
+  return notifClient.scowMessage.markMessageRead({ userId: info.identityId, messageId: BigInt(messageId) })
     .then(async () => {
       await callLog(logInfo, OperationResult.SUCCESS);
       return { 204: null };
