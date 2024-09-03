@@ -14,7 +14,7 @@ import type { MikroORM } from "@mikro-orm/core";
 import { MikroORM as ORM } from "@mikro-orm/core";
 import type { MySqlDriver } from "@mikro-orm/mysql";
 import { ormConfigs } from "src/server/config/mikro-orm";
-import { DatabaseSeeder } from "src/server/db/seeders/DatabaseSeeder";
+import { DatabaseSeeder } from "src/server/seeders/DatabaseSeeder";
 
 let orm: MikroORM<MySqlDriver>;
 /**

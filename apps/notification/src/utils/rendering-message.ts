@@ -13,7 +13,7 @@
 import { JsonValue } from "@bufbuild/protobuf";
 import { Message } from "@scow/notification-protos/build/message_pb";
 import { AdminMessageType, adminMessageTypesMap } from "src/models/message-type";
-import { CustomMessageType } from "src/server/db/entities/CustomMessageType";
+import { CustomMessageType } from "src/server/entities/CustomMessageType";
 
 import { formatDateTime } from "./datetime";
 

@@ -13,8 +13,8 @@
 import { FilterQuery } from "@mikro-orm/mysql";
 import { NoticeType } from "src/models/notice-type";
 import { validateToken } from "src/server/auth/token";
-import { Message, SenderType } from "src/server/db/entities/Message";
-import { ReadStatus, TargetType, UserMessageRead } from "src/server/db/entities/UserMessageRead";
+import { Message, SenderType } from "src/server/entities/Message";
+import { ReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
 
 import { forkEntityManager } from "../get-orm";
 

@@ -10,13 +10,13 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AdminMessageConfigSchema } from "src/server/db/entities/AdminMessageConfig";
-import { ApiKeySchema } from "src/server/db/entities/ApiKey";
-import { CustomMessageTypeSchema } from "src/server/db/entities/CustomMessageType";
-import { MessageSchema } from "src/server/db/entities/Message";
-import { MessageTargetSchema } from "src/server/db/entities/MessageTarget";
-import { UserMessageReadSchema } from "src/server/db/entities/UserMessageRead";
-import { UserSubscriptionSchema } from "src/server/db/entities/UserSubscription";
+import { AdminMessageConfigSchema } from "src/server/entities/AdminMessageConfig";
+import { ApiKeySchema } from "src/server/entities/ApiKey";
+import { CustomMessageTypeSchema } from "src/server/entities/CustomMessageType";
+import { MessageSchema } from "src/server/entities/Message";
+import { MessageTargetSchema } from "src/server/entities/MessageTarget";
+import { UserMessageReadSchema } from "src/server/entities/UserMessageRead";
+import { UserSubscriptionSchema } from "src/server/entities/UserSubscription";
 
 export const entities = [
   MessageSchema,

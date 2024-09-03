@@ -12,7 +12,7 @@
 
 import { Code, ConnectError, ConnectRouter } from "@connectrpc/connect";
 import { UserSubscriptionService } from "@scow/notification-protos/build/user_subscription_connect";
-import { UserSubscription } from "src/server/db/entities/UserSubscription";
+import { UserSubscription } from "src/server/entities/UserSubscription";
 import { checkAuth } from "src/utils/auth/check-auth";
 import { forkEntityManager } from "src/utils/get-orm";
 import { checkNoticeTypeEnabled } from "src/utils/message/check-message";

@@ -14,7 +14,7 @@ import { Code, ConnectError, ConnectRouter } from "@connectrpc/connect";
 import { MessageTypeService } from "@scow/notification-protos/build/message_type_connect";
 import { MessageTypeInfo } from "src/models/message-type";
 import { PlatformRole } from "src/models/user";
-import { CustomMessageType } from "src/server/db/entities/CustomMessageType";
+import { CustomMessageType } from "src/server/entities/CustomMessageType";
 import { checkAuth } from "src/utils/auth/check-auth";
 import { ensureNotUndefined } from "src/utils/ensure-not-undefined";
 import { forkEntityManager } from "src/utils/get-orm";

@@ -16,7 +16,7 @@ import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/serve
 import { NoticeType } from "src/models/notice-type";
 import { type AccountAffiliation,PlatformRole, TenantRole, UserInfo, UserRole } from "src/models/user";
 import { notificationConfig } from "src/server/config/notification";
-import { TargetType } from "src/server/db/entities/UserMessageRead";
+import { TargetType } from "src/server/entities/UserMessageRead";
 import { getScowClient } from "src/utils/scow-client";
 
 export const isUserAccountsAdmin = (

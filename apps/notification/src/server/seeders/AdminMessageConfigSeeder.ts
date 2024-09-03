@@ -14,7 +14,7 @@ import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Seeder } from "@mikro-orm/seeder";
 import { internalMessageTypesMap } from "src/models/message-type";
 import { NoticeType } from "src/models/notice-type";
-import { AdminMessageConfig } from "src/server/db/entities/AdminMessageConfig";
+import { AdminMessageConfig } from "src/server/entities/AdminMessageConfig";
 
 
 export const AdminMessageConfigSeeder = () => class AdminMessageConfigSeeder extends Seeder {

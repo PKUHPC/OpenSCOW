@@ -16,8 +16,8 @@ import { Migrator } from "@mikro-orm/migrations";
 import { defineConfig } from "@mikro-orm/mysql";
 import { SeedManager } from "@mikro-orm/seeder";
 import { config } from "src/server/config/env";
-import { entities } from "src/server/db/entities";
-import { migrations } from "src/server/db/migrations";
+import { entities } from "src/server/entities";
+import { migrations } from "src/server/migrations";
 
 import { notificationConfig } from "./notification";
 

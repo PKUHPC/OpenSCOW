@@ -13,7 +13,7 @@
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Template } from "src/models/message-type";
 import { NoticeType } from "src/models/notice-type";
-import { AdminMessageConfig } from "src/server/db/entities/AdminMessageConfig";
+import { AdminMessageConfig } from "src/server/entities/AdminMessageConfig";
 import { enabledNoticeTypes } from "src/utils/message/check-message";
 
 import { checkMessageTypeExist, getAllMessageTypesData } from "./message-type";

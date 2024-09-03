@@ -20,7 +20,7 @@
 import { Code, ConnectError, type ConnectRouter } from "@connectrpc/connect";
 import { ApiKeyService } from "@scow/notification-protos/build/api_key_connect";
 import { PlatformRole } from "src/models/user";
-import { ApiKey } from "src/server/db/entities/ApiKey";
+import { ApiKey } from "src/server/entities/ApiKey";
 import { checkAuth } from "src/utils/auth/check-auth";
 import { forkEntityManager } from "src/utils/get-orm";
 import { v4 as UUID } from "uuid";

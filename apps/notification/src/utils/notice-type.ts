@@ -12,7 +12,7 @@
 
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { NoticeType } from "src/models/notice-type";
-import { UserSubscription } from "src/server/db/entities/UserSubscription";
+import { UserSubscription } from "src/server/entities/UserSubscription";
 
 import { getMessageTypeAdminConfigsWithDefault } from "./message-config";
 

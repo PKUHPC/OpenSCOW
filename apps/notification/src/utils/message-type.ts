@@ -16,8 +16,8 @@ import {
   InternalMessageType, internalMessageTypesMap,
   MessageTypeInfo,
 } from "src/models/message-type";
-import { CustomMessageType } from "src/server/db/entities/CustomMessageType";
-import { Message } from "src/server/db/entities/Message";
+import { CustomMessageType } from "src/server/entities/CustomMessageType";
+import { Message } from "src/server/entities/Message";
 
 import { checkAdminMessageTypeExist } from "./rendering-message";
 
