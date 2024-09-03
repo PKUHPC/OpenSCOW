@@ -30,6 +30,7 @@ enum TemplateLang {
   zhCn = "zhCn",
 };
 
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
 export const checkAdminMessageTypeExist = (type: string): CustomMessageType | null => {
   if (adminMessageTypesMap.has(type as AdminMessageType)) {
     return { type, ...adminMessageTypesMap.get(type as AdminMessageType) } as CustomMessageType;
