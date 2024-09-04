@@ -8,7 +8,8 @@
     "next.config.mjs",
     "build",
     "assets",
-    "tsconfig.json"
+    "tsconfig.json",
+    "start.mjs"
   ],
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
@@ -68,7 +69,8 @@
     "superjson": "2.2.1",
     "swagger-ui-react": "5.17.6",
     "uuid": "9.0.1",
-    "zod": "3.23.6"
+    "zod": "3.23.6",
+    "replace-in-file": "8.1.0"
   },
   "devDependencies": {
     "@bufbuild/buf": "1.30.1",
