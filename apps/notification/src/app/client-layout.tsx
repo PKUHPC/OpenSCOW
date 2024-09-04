@@ -76,7 +76,7 @@ export function ClientLayout(props: {
   const primaryColor = uiConfig?.primaryColor;
   const color = useMemo(() => {
     return (hostname && primaryColor?.hostnameMap?.[hostname])
-    ?? primaryColor?.defaultColor ?? data?.defaultPrimaryColor;
+    ?? primaryColor?.defaultColor ?? data?.defaultPrimaryColor ?? "#94070A";
   }, [data]);
 
   return (
