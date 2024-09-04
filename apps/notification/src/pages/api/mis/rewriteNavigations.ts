@@ -70,7 +70,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
         path: "/notification",
         clickToPath: undefined,
         text: isChinese ? "消息通知" : "Message Notification",
-        icon: { src: join(BASE_PATH, "/icons/notif.svg") },
+        icon: { src: join(BASE_PATH, "/icons/notification.svg") },
       },
       {
         path: "/subscription",

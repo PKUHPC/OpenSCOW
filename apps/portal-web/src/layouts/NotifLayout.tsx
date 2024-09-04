@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { AdminMessageType } from "@scow/lib-web/build/models/notif";
+import { AdminMessageType } from "@scow/lib-web/build/models/notification";
 import { App, Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";

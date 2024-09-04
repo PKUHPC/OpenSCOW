@@ -29,8 +29,8 @@ export const config = envConfig({
   AI_PATH: str({ desc: "AI系统路径", default: "/ai" }),
   AI_PATH_INTERNAL_URL: str({ desc: "AI系统内部路径", default: "http://ai:3000" }),
 
-  NOTIF_PATH: str({ desc: "消息系统路径", default: "/notif" }),
-  NOTIF_PATH_INTERNAL_URL: str({ desc: "消息系统内部路径", default: "http://notification:3000" }),
+  NOTIFICATION_PATH: str({ desc: "消息系统路径", default: "/notification" }),
+  NOTIFICATION_PATH_INTERNAL_URL: str({ desc: "消息系统内部路径", default: "http://notification:3000" }),
 
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),

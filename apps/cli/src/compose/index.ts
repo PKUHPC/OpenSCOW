@@ -48,8 +48,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const AI_PATH = config.ai?.basePath || "/ai";
   checkPathFormat("ai.basePath", AI_PATH);
 
-  const NOTIF_PATH = config.notif?.basePath || "/notif";
-  checkPathFormat("notif.basePath", NOTIF_PATH);
+  const NOTIFICATION_PATH = config.notification?.basePath || "/notification";
+  checkPathFormat("notification.basePath", NOTIFICATION_PATH);
 
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
@@ -447,13 +447,13 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
     });
   }
 
-  if (config.notif) {
+  if (config.notification) {
     addService("notification", {
       image: scowImage,
       ports: {},
       environment: {
         "SCOW_LAUNCH_APP": "notification",
-        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, NOTIFICATION_PATH),
         "MIS_SERVER_URL": config.mis ? "mis-server:5000" : "",
         "DB_PASSWORD": config.mis?.dbPassword ?? "",
         "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),

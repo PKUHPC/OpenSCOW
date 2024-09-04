@@ -17,8 +17,8 @@ import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, Sys
 
 export const NotificationConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否开启消息系统", default: false }),
-  name: Type.String({ description: "消息系统名称，和 ui 扩展名称保持一致", default: "notif" }),
-  address: Type.String({ description: "消息系统地址", default: "http://scow-notification:3000" }),
+  name: Type.String({ description: "消息系统名称，和 ui 扩展名称保持一致", default: "notification" }),
+  address: Type.String({ description: "消息系统地址", default: "http://notification:3000" }),
 });
 
 export const ScowApiConfigSchema = Type.Object({

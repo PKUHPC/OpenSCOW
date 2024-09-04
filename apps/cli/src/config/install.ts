@@ -166,8 +166,8 @@ export const InstallConfigSchema = Type.Object({
     })),
   })),
 
-  notif: Type.Optional(Type.Object({
-    basePath: Type.String({ description: "消息系统的部署路径，相对于整个系统的basePath", default: "/notif" }),
+  notification: Type.Optional(Type.Object({
+    basePath: Type.String({ description: "消息系统的部署路径，相对于整个系统的basePath", default: "/notification" }),
   })),
 
   misc: Type.Optional(Type.Object({

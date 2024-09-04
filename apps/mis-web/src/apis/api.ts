@@ -91,8 +91,8 @@ import type { QueryJobTimeLimitSchema } from "src/pages/api/job/queryJobTimeLimi
 import type { GetRunningJobsSchema } from "src/pages/api/job/runningJobs";
 import type { GetCustomEventTypesSchema } from "src/pages/api/log/getCustomEventTypes";
 import type { GetOperationLogsSchema } from "src/pages/api/log/getOperationLog";
-import type { GetUnreadMessagesSchema } from "src/pages/api/notif/getUnreadMessages";
-import type { MarkMessageReadSchema } from "src/pages/api/notif/markMessageRead";
+import type { GetUnreadMessagesSchema } from "src/pages/api/notification/getUnreadMessages";
+import type { MarkMessageReadSchema } from "src/pages/api/notification/markMessageRead";
 import type { ChangeEmailSchema } from "src/pages/api/profile/changeEmail";
 import type { ChangePasswordSchema } from "src/pages/api/profile/changePassword";
 import type { CheckPasswordSchema } from "src/pages/api/profile/checkPassword";
@@ -201,8 +201,8 @@ export const api = {
   getRunningJobs: apiClient.fromTypeboxRoute<typeof GetRunningJobsSchema>("GET", "/api/job/runningJobs"),
   getCustomEventTypes: apiClient.fromTypeboxRoute<typeof GetCustomEventTypesSchema>("GET", "/api/log/getCustomEventTypes"),
   getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
-  getUnreadMessages: apiClient.fromTypeboxRoute<typeof GetUnreadMessagesSchema>("GET", "/api/notif/getUnreadMessages"),
-  markMessageRead: apiClient.fromTypeboxRoute<typeof MarkMessageReadSchema>("POST", "/api/notif/markMessageRead"),
+  getUnreadMessages: apiClient.fromTypeboxRoute<typeof GetUnreadMessagesSchema>("GET", "/api/notification/getUnreadMessages"),
+  markMessageRead: apiClient.fromTypeboxRoute<typeof MarkMessageReadSchema>("POST", "/api/notification/markMessageRead"),
   changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),

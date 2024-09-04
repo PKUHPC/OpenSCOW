@@ -11,9 +11,9 @@
  */
 
 import { JsonValue } from "@bufbuild/protobuf";
-import { AdminMessageType, adminMessageTypesMap, CustomMessageType } from "@scow/lib-web/build/models/notif";
+import { AdminMessageType, adminMessageTypesMap, CustomMessageType } from "@scow/lib-web/build/models/notification";
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
-import { Message } from "src/pages/api/notif/getUnreadMessages";
+import { Message } from "src/pages/api/notification/getUnreadMessages";
 
 export interface RenderContent {
   id: number;
