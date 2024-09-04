@@ -135,7 +135,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
       "AI_PATH": AI_PATH,
-      "NOTIF_PATH": NOTIF_PATH,
+      "NOTIFICATION_PATH": NOTIFICATION_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
