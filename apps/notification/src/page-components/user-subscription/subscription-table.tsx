@@ -177,7 +177,7 @@ export const UserSubscriptionTable: React.FC = () => {
       form.setFieldsValue({ noticeConfigs: initialValues.noticeConfigs });
 
     }
-  }, [data]);
+  }, [data, form]);
 
 
   return (

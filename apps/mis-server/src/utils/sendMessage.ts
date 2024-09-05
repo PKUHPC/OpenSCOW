@@ -57,6 +57,7 @@ interface AccountBalance extends BaseMessage {
   metadata: {
     accountName: string;
     amount: string;
+    balance: string;
   };
 }
 

@@ -168,6 +168,7 @@ export async function charge(
       metadata: {
         accountName: target.accountName,
         amount: amount.toString(),
+        balance: target.balance.toString(),
       },
     }, logger);
 

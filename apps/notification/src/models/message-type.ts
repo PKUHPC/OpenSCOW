@@ -135,9 +135,9 @@ export const internalMessageTypesMap = new Map<InternalMessageType, MessageTypeI
       zhCn: "账户消息",
     },
     contentTemplate: {
-      default: "账户 {__accountName__} 余额发生变动，支出/收入 {__amount__} 元。",
-      en: "Balance change in account {__accountName__}: expenditure/income of {__amount__}.",
-      zhCn: "账户 {__accountName__} 余额发生变动，支出/收入 {__amount__} 元。",
+      default: "账户 {__accountName__} 余额发生变动，支出 {__amount__} 元，当前余额为 {__balance__}。",
+      en: "Balance change in account {__accountName__}: expenditure of {__amount__}, current balance is {__balance__}.",
+      zhCn: "账户 {__accountName__} 余额发生变动，支出 {__amount__} 元，当前余额为 {__balance__}。",
     },
   }],
   [InternalMessageType.AccountLocked, {
