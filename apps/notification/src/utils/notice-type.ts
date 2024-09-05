@@ -33,8 +33,8 @@ export async function getUserNotificationPreferences(em: SqlEntityManager, userI
       // 初始化 enabled 为配置中的默认值
       let enabled = config.enabled;
 
-      // 如果用户可以修改，则查找用户订阅
-      if (config.canUserModify) {
+      // 如果管理员开启了且用户可以修改，则查找用户订阅
+      if (enabled && config.canUserModify) {
         const noticeType = config.noticeType; // 强制转换类型
         const sub = await em.findOne(UserSubscription, { userId, messageType, noticeType });
         if (sub?.isSubscribed !== undefined) {

@@ -89,9 +89,9 @@ export const renderingMessage = (message: Message, languageId: string): RenderCo
     // 对应语言模板没有设置时采用默认模板
     const messageType = message.messageType;
     const titleTemplate =
-      messageType.titleTemplate?.[templateLang] ?? messageType.titleTemplate!.default;
+      messageType.titleTemplate?.[templateLang] || messageType.titleTemplate!.default;
     const contentTemplate =
-      messageType.contentTemplate?.[templateLang] ?? messageType.contentTemplate!.default;
+      messageType.contentTemplate?.[templateLang] || messageType.contentTemplate!.default;
 
     return {
       id: message.id,
