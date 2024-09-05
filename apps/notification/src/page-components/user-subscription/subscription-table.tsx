@@ -86,7 +86,7 @@ export const UserSubscriptionTable: React.FC = () => {
     onError: (err) => message.error(err.message),
     onSuccess: () => {
       setHasChange(false);
-      message.info(compLang.saveSuccess);
+      message.success(compLang.saveSuccess);
     },
   });
 
