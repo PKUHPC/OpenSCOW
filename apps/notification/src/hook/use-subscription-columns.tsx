@@ -178,7 +178,7 @@ export function useSubscriptionColumns({
     ];
 
     setColumns(columns);
-  }, [noticeTypesData, ...Object.values(noticeTypeAllChecked)]);
+  }, [noticeTypesData, checkAllDisabled, ...Object.values(noticeTypeAllChecked)]);
 
   return columns;
 }

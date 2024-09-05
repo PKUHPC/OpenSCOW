@@ -71,11 +71,11 @@ export default (router: ConnectRouter) => {
 
       for (const userId of targetIds) {
         // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理
-        const userSubscription = adminMessageConfig?.canUserModify && adminMessageConfig.enabled
-          ? await em.findOne(UserSubscription, { userId, messageType, noticeType: NoticeType.SITE_MESSAGE })
-          : undefined;
-        // 检查用户是否订阅该类型, 站内消息必须要接收
-        const messageEnabled = userSubscription?.isSubscribed || adminMessageConfig.enabled;
+        const messageEnabled = adminMessageConfig?.canUserModify && adminMessageConfig.enabled
+          ? (
+            await em.findOne(UserSubscription, { userId, messageType, noticeType: NoticeType.SITE_MESSAGE })
+          )?.isSubscribed
+          : adminMessageConfig.enabled;
 
         if (messageEnabled) {
           const messageTarget = new MessageTarget({

@@ -86,7 +86,7 @@ export const UserSubscriptionTable: React.FC = () => {
     onError: (err) => message.error(err.message),
     onSuccess: () => {
       setHasChange(false);
-      message.error(compLang.saveSuccess);
+      message.info(compLang.saveSuccess);
     },
   });
 
@@ -177,7 +177,7 @@ export const UserSubscriptionTable: React.FC = () => {
       form.setFieldsValue({ noticeConfigs: initialValues.noticeConfigs });
 
     }
-  }, [data, form]);
+  }, [data]);
 
 
   return (
