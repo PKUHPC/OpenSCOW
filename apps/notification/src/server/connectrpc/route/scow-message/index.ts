@@ -70,12 +70,14 @@ export default (router: ConnectRouter) => {
       const adminMessageConfig = await getMessageConfigWithDefault(em, messageType, NoticeType.SITE_MESSAGE);
 
       for (const userId of targetIds) {
-        // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理
-        const messageEnabled = adminMessageConfig?.canUserModify && adminMessageConfig.enabled
-          ? (
-            await em.findOne(UserSubscription, { userId, messageType, noticeType: NoticeType.SITE_MESSAGE })
-          )?.isSubscribed
-          : adminMessageConfig.enabled;
+        // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理，用户订阅有可能一开始不存在，则还是已管理员设置的为准
+        let messageEnabled = adminMessageConfig.enabled;
+        if (adminMessageConfig.canUserModify && adminMessageConfig.enabled) {
+          const userSub = await em.findOne(UserSubscription,
+            { userId, messageType, noticeType: NoticeType.SITE_MESSAGE });
+
+          if (userSub) messageEnabled = userSub.isSubscribed;
+        }
 
         if (messageEnabled) {
           const messageTarget = new MessageTarget({
