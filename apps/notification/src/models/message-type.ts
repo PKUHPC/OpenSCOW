@@ -32,7 +32,7 @@ export enum InternalMessageType {
   AccountLocked = "AccountLocked",
   AccountRestored = "AccountRestored",
   JobStarted = "JobStarted",
-  JobCompleted = "JobCompleted",
+  JobFinished = "JobFinished",
   JobAbnormalTermination = "JobAbnormalTermination",
 }
 
@@ -198,11 +198,11 @@ export const internalMessageTypesMap = new Map<InternalMessageType, MessageTypeI
   //     default: "",
   //   },
   // }],
-  [InternalMessageType.JobCompleted, {
-    type: "JobCompleted",
+  [InternalMessageType.JobFinished, {
+    type: "JobFinished",
     titleTemplate: {
       default: "作业完成",
-      en: "Job Completed",
+      en: "Job Finished",
       zhCn: "作业完成",
     },
     category: "Job",
@@ -212,9 +212,9 @@ export const internalMessageTypesMap = new Map<InternalMessageType, MessageTypeI
       zhCn: "作业消息",
     },
     contentTemplate: {
-      default: "作业【__jobId__】已于【__time__】运行完成。",
+      default: "作业【__jobId__】已于【__time__】运行结束。",
       en: "Job [__jobId__] completed at [__time__].",
-      zhCn: "作业【__jobId__】已于【__time__】运行完成。",
+      zhCn: "作业【__jobId__】已于【__time__】运行结束。",
     },
   }],
   // [InternalMessageType.JobAbnormalTermination, {

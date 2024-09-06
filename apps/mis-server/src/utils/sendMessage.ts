@@ -79,8 +79,8 @@ interface AccountRestored extends BaseMessage {
   };
 }
 
-interface JobCompleted extends BaseMessage {
-  messageType: InternalMessageType.JobCompleted;
+interface JobFinished extends BaseMessage {
+  messageType: InternalMessageType.JobFinished;
   targetType: TargetType.USER,
   metadata: {
     time: string;
@@ -90,7 +90,7 @@ interface JobCompleted extends BaseMessage {
 
 type Message = AccountLocked | AccountOverdue | AccountRechargeSuccess
   | AccountLowBalance | AccountBalance | AccountRestored
-  | JobCompleted;
+  | JobFinished;
 
 export const sendMessage = async (message: Message, logger: Logger) => {
   const { metadata } = message;

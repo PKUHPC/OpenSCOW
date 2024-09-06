@@ -15,6 +15,7 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { parsePlaceholder } from "@scow/lib-config";
+import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { ChargeRecord } from "@scow/protos/build/server/charging";
 import { GetJobsResponse, JobInfo as ClusterJobInfo } from "@scow/scheduler-adapter-protos/build/protos/job";
 import { addJobCharge, charge } from "src/bl/charging";
@@ -25,9 +26,11 @@ import { misConfig } from "src/config/mis";
 import { Account } from "src/entities/Account";
 import { JobInfo } from "src/entities/JobInfo";
 import { UserAccount } from "src/entities/UserAccount";
+import { InternalMessageType } from "src/models/messageType";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { toGrpc } from "src/utils/job";
+import { sendMessage } from "src/utils/sendMessage";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
@@ -118,6 +121,15 @@ export async function fetchJobs(
 
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
+          
+          await sendMessage({
+            messageType: InternalMessageType.JobFinished,
+            targetType: TargetType.USER, targetIds: [job.user],
+            metadata: {
+              time: job.endTime!,
+              jobId: job.jobId.toString(),
+            },
+          }, logger);
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
           continue;

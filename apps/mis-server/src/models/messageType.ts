@@ -18,6 +18,6 @@ export enum InternalMessageType {
   AccountLocked = "AccountLocked",
   AccountRestored = "AccountRestored",
   JobStarted = "JobStarted",
-  JobCompleted = "JobCompleted",
+  JobFinished = "JobFinished",
   JobAbnormalTermination = "JobAbnormalTermination",
 }
