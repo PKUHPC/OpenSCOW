@@ -212,9 +212,9 @@ export const internalMessageTypesMap = new Map<InternalMessageType, MessageTypeI
       zhCn: "作业消息",
     },
     contentTemplate: {
-      default: "作业【__jobId__】已于【__time__】运行结束。",
-      en: "Job [__jobId__] completed at [__time__].",
-      zhCn: "作业【__jobId__】已于【__time__】运行结束。",
+      default: "作业【{__jobId__}】已于【{__time__}】运行结束。",
+      en: "Job [{__jobId__}] completed at [{__time__}].",
+      zhCn: "作业【{__jobId__}】已于【{__time__}】运行结束。",
     },
   }],
   // [InternalMessageType.JobAbnormalTermination, {
