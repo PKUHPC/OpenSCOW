@@ -11,6 +11,7 @@
  */
 
 import { joinWithUrl } from "@scow/utils";
+// import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
@@ -19,6 +20,7 @@ import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
 import { UserInfo } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
+// import { getCurrentLangLibWebText } from "src/utils/libWebI18n/libI18n";
 import { queryToArray } from "src/utils/querystring";
 import { styled } from "styled-components";
 
@@ -74,6 +76,15 @@ export const ExtensionPage: React.FC<Props> = ({
 
   if (!config) {
     return <NotFoundPageComponent />;
+  }
+
+  if (!user?.token) {
+    // return (
+    //   <Link href="/api/auth">
+    //     {getCurrentLangLibWebText(currentLanguageId, "userIndicatorLogin")}
+    //   </Link>
+    // );
+    router.push("api/auth");
   }
 
   const [title, setTitle] = React.useState(config?.name ?? "Extension");
