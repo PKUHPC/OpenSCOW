@@ -67,6 +67,7 @@ function heartbeat(this: AliveCheckedWebSocket) {
 const pingInterval = setInterval(function ping() {
   wss.clients.forEach(function each(ws: AliveCheckedWebSocket) {
     if (ws.isAlive === false) {
+      console.log("ws terminate");
       return ws.terminate();
     }
 
@@ -158,9 +159,11 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
   stream.on("data", (chunk: ShellResponse) => {
     switch (chunk.message?.$case) {
       case "data":
+        log(user.identityId, "send data");
         send({ $case: "data", data: { data: chunk.message.data.data.toString() } });
         break;
       case "exit":
+        log(user.identityId, "send exit");
         send({ $case: "exit", exit: { code: chunk.message.exit.code, signal: chunk.message.exit.signal } });
         break;
     }
@@ -172,6 +175,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
     switch (message.$case) {
       case "data":
+        log(user.identityId, "send data");
         stream.write({ message:  { $case :"data", data: { data: Buffer.from(message.data.data) } } });
         break;
       case "resize":
@@ -181,10 +185,16 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
         break;
       case "disconnect":
         stream.write({ message: { $case: "disconnect", disconnect: {} } });
+        console.log(user, "disconnect");
         stream.end();
         break;
     }
 
+  });
+
+  ws.on("close", async () => {
+    stream.write({ message: { $case: "disconnect", disconnect: {} } });
+    stream.end();
   });
 
   ws.on("error", async (err) => {

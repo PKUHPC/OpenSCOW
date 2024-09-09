@@ -61,7 +61,7 @@ export const shellServiceServer = plugin((server) => {
             logger.info("Shell exited with %o", ...args);
 
             const hasCode = args[0] !== null;
-
+            console.log(userId, hasCode, "channel exit");
             call.write({ message: { $case: "exit", exit: {
               code: hasCode ? +args[0] : undefined,
               signal: hasCode ? undefined : args[1],
@@ -115,11 +115,11 @@ export const shellServiceServer = plugin((server) => {
               },
               channel,
             ),
-          ]).finally(() => { call.end(); channel.end(); });
+          ]).finally(() => { call.end(); channel.end(); console.log(userId, "finnaly exit"); });
         }, { cols, rows, term: "xterm-256color" });
       });
 
-
+      console.log(userId, "shell exit");
     },
   });
 
