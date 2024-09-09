@@ -26,6 +26,10 @@ export const InstallConfigSchema = Type.Object({
   image: Type.Optional(Type.String({ description: "镜像", default: "mirrors.pku.edu.cn/pkuhpc-icode/scow" })),
   imageTag: Type.String({ description: "镜像tag", default: "master" }),
   sshDir: Type.String({ description: "ssh目录", default: "~/.ssh" }),
+  extraEnvs: Type.Optional(Type.Union([
+    Type.Array(Type.String({ description: "格式：变量名=变量值" })),
+    Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
+  ], { description: "额外的全局环境变量配置" })),
 
   scowd: Type.Optional(Type.Object({
     ssl: Type.Optional(Type.Object({

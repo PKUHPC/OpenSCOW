@@ -90,9 +90,16 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       return Object.entries(dict).map(([from, to]) => `${from}${splitter}${to}`);
     }
 
+    let extraEnvs = [];
+    if (config.extraEnvs) {
+      extraEnvs = Array.isArray(config.extraEnvs) ? config.extraEnvs : toStringArray(config.extraEnvs, "=");
+    }
+
+    const environment = Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "=");
+
     composeSpec.services[name] = {
       restart: "unless-stopped",
-      environment: Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "="),
+      environment: [...environment, ...extraEnvs],
       ports: Array.isArray(options.ports) ? options.ports : toStringArray(options.ports, ":"),
       image: options.image,
       volumes: Array.isArray(options.volumes) ? options.volumes : toStringArray(options.volumes, ":"),
