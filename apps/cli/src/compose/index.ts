@@ -90,7 +90,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       return Object.entries(dict).map(([from, to]) => `${from}${splitter}${to}`);
     }
 
-    let extraEnvs = [];
+    let extraEnvs: string[] = [];
     if (config.extraEnvs) {
       extraEnvs = Array.isArray(config.extraEnvs) ? config.extraEnvs : toStringArray(config.extraEnvs, "=");
     }
@@ -170,7 +170,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const authVolumes = {
     "/etc/hosts": "/etc/hosts",
     "./config": "/etc/scow",
-    SSH_DIR: "/root/.ssh",
+    [SSH_DIR]: "/root/.ssh",
   };
 
   const authUrl = config.auth.custom?.type === AuthCustomType.external
@@ -282,7 +282,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": configPath,
-        SSH_DIR: "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
         "portal_data":"/var/lib/scow/portal",
       },
     });
@@ -336,7 +336,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
-        SSH_DIR: "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
       },
     });
 
@@ -435,7 +435,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
-        SSH_DIR: "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
       },
     });
 
