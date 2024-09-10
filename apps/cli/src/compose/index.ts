@@ -95,7 +95,8 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       extraEnvs = Array.isArray(config.extraEnvs) ? config.extraEnvs : toStringArray(config.extraEnvs, "=");
     }
 
-    const environment = Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "=");
+    const environment = Array.isArray(options.environment)
+      ? options.environment : toStringArray(options.environment, "=");
 
     composeSpec.services[name] = {
       restart: "unless-stopped",
