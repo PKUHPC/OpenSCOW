@@ -375,8 +375,8 @@ importers:
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        specifier: 0.19.6
+        version: 0.19.6(@grpc/grpc-js@1.10.9)
       '@grpc/grpc-js':
         specifier: 1.10.9
         version: 1.10.9
@@ -420,8 +420,8 @@ importers:
         specifier: 1.11.11
         version: 1.11.11
       pino:
-        specifier: 8.16.2
-        version: 8.16.2
+        specifier: 9.3.2
+        version: 9.3.2
       pino-pretty:
         specifier: 10.3.1
         version: 10.3.1
@@ -607,8 +607,8 @@ importers:
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        specifier: 0.19.6
+        version: 0.19.6(@grpc/grpc-js@1.10.9)
       '@grpc/grpc-js':
         specifier: 1.10.9
         version: 1.10.9
@@ -676,8 +676,8 @@ importers:
         specifier: 3.0.3
         version: 3.0.3
       pino:
-        specifier: 8.16.2
-        version: 8.16.2
+        specifier: 9.3.2
+        version: 9.3.2
       pino-pretty:
         specifier: 10.3.1
         version: 10.3.1
@@ -858,11 +858,11 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.8.0)
       '@ddadaal/tsgrpc-client':
-        specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        specifier: 0.17.8
+        version: 0.17.8(@grpc/grpc-js@1.10.9)
       '@ddadaal/tsgrpc-common':
-        specifier: 0.2.5
-        version: 0.2.5
+        specifier: 0.2.6
+        version: 0.2.6
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
         version: 0.19.6(@grpc/grpc-js@1.10.9)
@@ -918,8 +918,8 @@ importers:
         specifier: 13.2.0
         version: 13.2.0
       pino:
-        specifier: 8.16.2
-        version: 8.16.2
+        specifier: 9.3.2
+        version: 9.3.2
       pino-pretty:
         specifier: 10.3.1
         version: 10.3.1
@@ -1523,8 +1523,8 @@ importers:
         version: 2.2.5
     devDependencies:
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        specifier: 0.19.6
+        version: 0.19.6(@grpc/grpc-js@1.10.9)
       '@types/shell-quote':
         specifier: 1.7.5
         version: 1.7.5
@@ -2633,6 +2633,11 @@ packages:
 
   '@ddadaal/tsgrpc-client@0.17.7':
     resolution: {integrity: sha512-4nWCQa1eAp+hel/kL8QhLgb4lbRlnbcEtGkZDBli21c1F+IMwhA/FMnHDJBgrPqq8i7wt1PSGyJHkRDCImmUUQ==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.7.0'
+
+  '@ddadaal/tsgrpc-client@0.17.8':
+    resolution: {integrity: sha512-SP5o2xy+7cGmeRhQFZVXByAzH5VDmJZRgJyWgJ28u69c2dk5TIIQ7d7GM6L5K5rlQZDb4+0FoQtXn9jBs2dNxg==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
 
@@ -9091,10 +9096,6 @@ packages:
     resolution: {integrity: sha512-2advCDGVEvkKu9TTVSa/kWW7Z3htI/sBKEZpqiHk6ive0i/7f5b1rsU8jn0aimxqfnSz5bj/nOYkwhBUn5xxvg==}
     hasBin: true
 
-  pino@9.2.0:
-    resolution: {integrity: sha512-g3/hpwfujK5a4oVbaefoJxezLzsDgLcNJeITvC6yrfwYeT9la+edCK42j5QpEQSQCZgTKapXvnQIdgZwvRaZug==}
-    hasBin: true
-
   pino@9.3.2:
     resolution: {integrity: sha512-WtARBjgZ7LNEkrGWxMBN/jvlFiE17LTbBoH0konmBU684Kd0uIiDwBXlcTCW7iJnA6HfIKwUssS/2AC6cDEanw==}
     hasBin: true
@@ -13409,6 +13410,12 @@ snapshots:
       '@ddadaal/tsgrpc-common': 0.2.5
       '@grpc/grpc-js': 1.10.9
       tslib: 2.6.2
+
+  '@ddadaal/tsgrpc-client@0.17.8(@grpc/grpc-js@1.10.9)':
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.2.6
+      '@grpc/grpc-js': 1.10.9
+      tslib: 2.6.3
 
   '@ddadaal/tsgrpc-common@0.2.5':
     dependencies:
@@ -19116,7 +19123,7 @@ snapshots:
       fast-json-stringify: 5.14.1
       find-my-way: 8.1.0
       light-my-request: 5.13.0
-      pino: 9.2.0
+      pino: 9.3.2
       process-warning: 3.0.0
       proxy-addr: 2.0.7
       rfdc: 1.3.1
@@ -22358,20 +22365,6 @@ snapshots:
       safe-stable-stringify: 2.4.3
       sonic-boom: 3.8.1
       thread-stream: 2.4.1
-
-  pino@9.2.0:
-    dependencies:
-      atomic-sleep: 1.0.0
-      fast-redact: 3.5.0
-      on-exit-leak-free: 2.1.2
-      pino-abstract-transport: 1.2.0
-      pino-std-serializers: 7.0.0
-      process-warning: 3.0.0
-      quick-format-unescaped: 4.0.4
-      real-require: 0.2.0
-      safe-stable-stringify: 2.4.3
-      sonic-boom: 4.0.1
-      thread-stream: 3.1.0
 
   pino@9.3.2:
     dependencies:
