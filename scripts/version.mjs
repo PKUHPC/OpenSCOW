@@ -179,6 +179,7 @@ ${generateContent("portal-web", "门户系统前端")
  + generateContent("cli", "CLI")
  + generateContent("gateway", "网关")
  + generateContent("ai", "AI系统")
+ + generateContent("notification", "消息系统")
 }
 `;
 
