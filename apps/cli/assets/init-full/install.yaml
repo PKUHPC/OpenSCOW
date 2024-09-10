@@ -7,6 +7,14 @@
 # SCOW的镜像的tag。默认：master
 # imageTag: master
 
+# 指定挂载到容器内 /root/.ssh 的目录。默认为 ~/.ssh (即当前用户家目录下的.ssh目录)
+# sshDir: ./scow-ssh
+
+# 为每个服务指定额外的环境变量。默认为空。
+# extraEnvs:
+#   - SSH_PRIVATE_KEY_PATH=~/.ssh/id_ed25519
+#   - SSH_PUBLIC_KEY_PATH=~/.ssh/id_ed25519.pub
+
 # 门户相关配置。默认不部署
 # 如果不部署，请删除或者注释整个部分
 # portal:

@@ -48,6 +48,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const AI_PATH = config.ai?.basePath || "/ai";
   checkPathFormat("ai.basePath", AI_PATH);
 
+  const SSH_DIR = config.sshDir || "~/.ssh";
+  checkPathFormat("sshDir", SSH_DIR);
+
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
@@ -87,9 +90,16 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       return Object.entries(dict).map(([from, to]) => `${from}${splitter}${to}`);
     }
 
+    let extraEnvs: string[] = [];
+    if (config.extraEnvs) {
+      extraEnvs = Array.isArray(config.extraEnvs) ? config.extraEnvs : toStringArray(config.extraEnvs, "=");
+    }
+
+    const environment = Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "=");
+
     composeSpec.services[name] = {
       restart: "unless-stopped",
-      environment: Array.isArray(options.environment) ? options.environment : toStringArray(options.environment, "="),
+      environment: [...environment, ...extraEnvs],
       ports: Array.isArray(options.ports) ? options.ports : toStringArray(options.ports, ":"),
       image: options.image,
       volumes: Array.isArray(options.volumes) ? options.volumes : toStringArray(options.volumes, ":"),
@@ -160,7 +170,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const authVolumes = {
     "/etc/hosts": "/etc/hosts",
     "./config": "/etc/scow",
-    "~/.ssh": "/root/.ssh",
+    [SSH_DIR]: "/root/.ssh",
   };
 
   const authUrl = config.auth.custom?.type === AuthCustomType.external
@@ -272,7 +282,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": configPath,
-        "~/.ssh": "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
         "portal_data":"/var/lib/scow/portal",
       },
     });
@@ -326,7 +336,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
-        "~/.ssh": "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
       },
     });
 
@@ -425,7 +435,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       volumes: {
         "/etc/hosts": "/etc/hosts",
         "./config": "/etc/scow",
-        "~/.ssh": "/root/.ssh",
+        [SSH_DIR]: "/root/.ssh",
       },
     });
 

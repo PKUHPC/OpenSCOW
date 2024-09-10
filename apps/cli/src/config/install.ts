@@ -25,17 +25,22 @@ export const InstallConfigSchema = Type.Object({
   basePath: Type.String({ description: "整个系统的部署路径", default: "/" }),
   image: Type.Optional(Type.String({ description: "镜像", default: "mirrors.pku.edu.cn/pkuhpc-icode/scow" })),
   imageTag: Type.String({ description: "镜像tag", default: "master" }),
+  sshDir: Type.String({ description: "ssh目录", default: "~/.ssh" }),
+  extraEnvs: Type.Optional(Type.Union([
+    Type.Array(Type.String({ description: "格式：变量名=变量值" })),
+    Type.Record(Type.String(), Type.String(), { description: "格式：字符串: 字符串" }),
+  ], { description: "额外的全局环境变量配置" })),
 
   scowd: Type.Optional(Type.Object({
     ssl: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "到 SCOWD 的连接是否启动SSL", default: false }),
       caCertPath: Type.String({ description: "SCOWD CA根证书路径, 相对 config 的默认目录", default: "./scowd/certs/ca.crt" }),
-      scowCertPath: Type.String({ 
-        description: "SCOWD CA签名的 SCOW 证书路径， 相对 config 的默认目录", 
+      scowCertPath: Type.String({
+        description: "SCOWD CA签名的 SCOW 证书路径， 相对 config 的默认目录",
         default: "./scowd/certs/scow.crt",
       }),
-      scowPrivateKeyPath: Type.String({ 
-        description: "SCOWD CA签名的 SCOW 私钥路径， 相对 config 的默认目录", 
+      scowPrivateKeyPath: Type.String({
+        description: "SCOWD CA签名的 SCOW 私钥路径， 相对 config 的默认目录",
         default: "./scowd/certs/scow.key",
       }),
     }, { description: "scowd  全局 ssl 相关配置" })),
