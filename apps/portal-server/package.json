@@ -23,7 +23,7 @@
   "dependencies": {
     "@connectrpc/connect": "1.4.0",
     "@ddadaal/tsgrpc-common": "0.2.5",
-    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-server": "0.19.6",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@grpc/grpc-js": "1.10.9",
     "@scow/config": "workspace:*",

@@ -67,7 +67,6 @@ function heartbeat(this: AliveCheckedWebSocket) {
 const pingInterval = setInterval(function ping() {
   wss.clients.forEach(function each(ws: AliveCheckedWebSocket) {
     if (ws.isAlive === false) {
-      console.log("ws terminate");
       return ws.terminate();
     }
 
@@ -185,7 +184,6 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
         break;
       case "disconnect":
         stream.write({ message: { $case: "disconnect", disconnect: {} } });
-        console.log(user, "disconnect");
         stream.end();
         break;
     }

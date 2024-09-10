@@ -66,6 +66,7 @@ export const shellServiceServer = plugin((server) => {
               code: hasCode ? +args[0] : undefined,
               signal: hasCode ? undefined : args[1],
             } } });
+
           });
 
           // if either pipeline ends, ends the request
@@ -77,7 +78,9 @@ export const shellServiceServer = plugin((server) => {
                 return { message: { $case: "data" as const, data: { data: chunk } } };
               },
               call,
-            ),
+            ).catch((err) => {
+              logger.error("Error in shell -> client pipeline", err);
+            }),
 
             // client -> shell
             pipeline(
@@ -114,12 +117,12 @@ export const shellServiceServer = plugin((server) => {
                 } as ServiceError;
               },
               channel,
-            ),
-          ]).finally(() => { call.end(); channel.end(); console.log(userId, "finnaly exit"); });
+            ).catch((err) => {
+              logger.error("Error in client -> shell pipeline", err);
+            }),
+          ]).finally(() => { channel.end(); call.end(); });
         }, { cols, rows, term: "xterm-256color" });
       });
-
-      console.log(userId, "shell exit");
     },
   });
 
