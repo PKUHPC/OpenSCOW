@@ -864,8 +864,8 @@ importers:
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
-        specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        specifier: 0.19.6
+        version: 0.19.6(@grpc/grpc-js@1.10.9)
       '@grpc/grpc-js':
         specifier: 1.10.9
         version: 1.10.9
@@ -2639,8 +2639,16 @@ packages:
   '@ddadaal/tsgrpc-common@0.2.5':
     resolution: {integrity: sha512-6b4az5jLFsKSdees2riQ/xHCb2VSkL/RHlC7i95fmNBNIBEaCxkm1YYdrvGOkUIsi1nfMkwHN5amwkicff+agg==}
 
+  '@ddadaal/tsgrpc-common@0.2.6':
+    resolution: {integrity: sha512-uEc5sPnjzMyUVd3HeOt7/lboSyLWjI+YepHuCwPj3F+EH4wrTKJAB5OGnnPWG20l5zcOBIqWN4NHXDHZE0NXaw==}
+
   '@ddadaal/tsgrpc-server@0.19.5':
     resolution: {integrity: sha512-6RB/njYZ5hdMgVBCY58N64gMMqaVTD6Vp3JvMCW2P2bKjIRMHGoSgUTqwDfFR1n+5LlOHdh5ws0w5z9kEWRCIw==}
+    peerDependencies:
+      '@grpc/grpc-js': '>=1.7.0'
+
+  '@ddadaal/tsgrpc-server@0.19.6':
+    resolution: {integrity: sha512-p/IfUEZCnEkRVPY9qMfAyZXH5BIWuU8KV99YXyr79TU1QxK0nC7v3YT2DkvbQr3vV/8l4NFnvQKoqlvm876Xqg==}
     peerDependencies:
       '@grpc/grpc-js': '>=1.7.0'
 
@@ -9087,6 +9095,10 @@ packages:
     resolution: {integrity: sha512-g3/hpwfujK5a4oVbaefoJxezLzsDgLcNJeITvC6yrfwYeT9la+edCK42j5QpEQSQCZgTKapXvnQIdgZwvRaZug==}
     hasBin: true
 
+  pino@9.3.2:
+    resolution: {integrity: sha512-WtARBjgZ7LNEkrGWxMBN/jvlFiE17LTbBoH0konmBU684Kd0uIiDwBXlcTCW7iJnA6HfIKwUssS/2AC6cDEanw==}
+    hasBin: true
+
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
@@ -9652,6 +9664,9 @@ packages:
 
   process-warning@3.0.0:
     resolution: {integrity: sha512-mqn0kFRl0EoqhnL0GQ0veqFHyIN1yig9RHh/InzORTUiZHFRAur+aMtRkELNwGs9aNwKS6tg/An4NYBPGwvtzQ==}
+
+  process-warning@4.0.0:
+    resolution: {integrity: sha512-/MyYDxttz7DfGMMHiysAsFE4qF+pQYAA8ziO/3NcRVrQ5fSk+Mns4QZA/oRPFzvcqNoVJXQNWNAsdwBXLUkQKw==}
 
   process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
@@ -13399,12 +13414,23 @@ snapshots:
     dependencies:
       tslib: 2.6.2
 
+  '@ddadaal/tsgrpc-common@0.2.6':
+    dependencies:
+      tslib: 2.6.3
+
   '@ddadaal/tsgrpc-server@0.19.5(@grpc/grpc-js@1.10.9)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.5
       '@grpc/grpc-js': 1.10.9
       pino: 8.16.2
       tslib: 2.6.2
+
+  '@ddadaal/tsgrpc-server@0.19.6(@grpc/grpc-js@1.10.9)':
+    dependencies:
+      '@ddadaal/tsgrpc-common': 0.2.6
+      '@grpc/grpc-js': 1.10.9
+      pino: 9.3.2
+      tslib: 2.6.3
 
   '@discoveryjs/json-ext@0.5.7': {}
 
@@ -22347,6 +22373,20 @@ snapshots:
       sonic-boom: 4.0.1
       thread-stream: 3.1.0
 
+  pino@9.3.2:
+    dependencies:
+      atomic-sleep: 1.0.0
+      fast-redact: 3.5.0
+      on-exit-leak-free: 2.1.2
+      pino-abstract-transport: 1.2.0
+      pino-std-serializers: 7.0.0
+      process-warning: 4.0.0
+      quick-format-unescaped: 4.0.4
+      real-require: 0.2.0
+      safe-stable-stringify: 2.4.3
+      sonic-boom: 4.0.1
+      thread-stream: 3.1.0
+
   pirates@4.0.6: {}
 
   pkg-dir@4.2.0:
@@ -22958,6 +22998,8 @@ snapshots:
   process-warning@2.3.2: {}
 
   process-warning@3.0.0: {}
+
+  process-warning@4.0.0: {}
 
   process@0.11.10: {}
 
