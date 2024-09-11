@@ -12,7 +12,6 @@
 
 import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NodeInfo } from "@scow/protos/build/portal/config";
-import { Col, Row } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useEffect } from "react";
@@ -22,26 +21,12 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { useI18nTranslateToString } from "src/i18n";
 import { ClusterOverview, PlatformOverview } from "src/models/cluster";
-import { NotificationCard } from "src/pageComponents/dashboard/NotificationCard";
 import { OverviewTable } from "src/pageComponents/dashboard/OverviewTable";
 import { QuickEntry } from "src/pageComponents/dashboard/QuickEntry";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { UserStore } from "src/stores/UserStore";
-import { publicConfig } from "src/utils/config";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
-
-const StyleCol = styled(Col)`
-padding-bottom: 16px;
-
-/* 默认隐藏消息部分 */
-display: none;
-
-/* 在屏幕宽度达到 1200px 时显示消息部分 */
-@media (min-width: 1200px) {
-  display: block;
-}
-`;
 
 interface Props {}
 
@@ -318,19 +303,10 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
   return (
     <DashboardPageContent>
       <Head title={t("pages.dashboard.title")} />
-      <Row gutter={[16, 16]} wrap={true}>
-        <Col sm={24} xl={publicConfig.NOTIF_ENABLED ? 17 : 24}>
-          <QuickEntry
-            currentClusters={currentClusters}
-            publicConfigClusters={publicConfigClusters}
-          />
-        </Col>
-        {publicConfig.NOTIF_ENABLED && (
-          <StyleCol xl={7}>
-            <NotificationCard></NotificationCard>
-          </StyleCol>
-        )}
-      </Row>
+      <QuickEntry
+        currentClusters={currentClusters}
+        publicConfigClusters={publicConfigClusters}
+      />
       <OverviewTable
         isLoading={isLoading}
         clusterInfo={data?.clustersInfo ? data.clustersInfo.map((item, idx) => ({ ...item, id: idx })) : []}

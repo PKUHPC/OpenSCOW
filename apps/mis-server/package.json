@@ -43,8 +43,6 @@
     "@scow/lib-ssh": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/scheduler-adapter-protos": "workspace:*",
-    "@scow/lib-notification": "workspace:*",
-    "@scow/notification-protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "@sinclair/typebox": "0.32.34",
     "dayjs": "1.11.11",
@@ -53,8 +51,7 @@
     "pino": "9.3.2",
     "pino-pretty": "10.3.1",
     "uuid": "10.0.0",
-    "wait-on": "8.0.0",
-    "@bufbuild/protobuf": "1.8.0"
+    "wait-on": "8.0.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.12",

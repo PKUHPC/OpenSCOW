@@ -145,20 +145,6 @@ module.exports = {
       },
     },
     {
-      name: "notification",
-      script: "npm",
-      args: "run dev:server",
-      interpreter: "pnpm",
-      cwd: "./apps/notification",
-      env: {
-        PORT: "6002",
-        AUTH_INTERNAL_URL: "http://localhost:5000",
-        SERVER_URL: "http://localhost:6002",
-        ...PRODUCTION_ENV,
-        ...SCOW_CONFIG_PATH_ENV,
-      },
-    },
-    {
       name: "dev:libs",
       cwd: ".",
       script: "npm",

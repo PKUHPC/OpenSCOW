@@ -119,5 +119,4 @@ export const OperationType: OperationTypeEnum = {
   shareModelVersion:"shareModelVersion",
   deleteModelVersion:"deleteModelVersion",
   copyModelVersion:"copyModelVersion",
-  markMessageRead: "markMessageRead",
 };

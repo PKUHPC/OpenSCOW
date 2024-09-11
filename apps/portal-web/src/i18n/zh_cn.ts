@@ -499,12 +499,6 @@ export default {
       titleContainer:{
         available:"可用",
       },
-      NotificationCard: {
-        message: "消息",
-        check: "查看",
-        noMessage: "当前没有未读消息",
-        fetchNotifError: "获取未读消息失败",
-      },
     },
   },
   component:{
@@ -641,9 +635,5 @@ export default {
       noAvailableClusters: "当前没有可用集群。"
       + "请稍后再试或联系管理员。",
     },
-  },
-  notifLayout: {
-    read: "已读",
-    fetchSystemNotifError: "获取系统公告失败",
   },
 };

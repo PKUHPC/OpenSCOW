@@ -10,6 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { after, before } from "node:test";
+
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";

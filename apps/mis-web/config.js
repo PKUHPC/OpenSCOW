@@ -193,8 +193,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
     JOB_CHARGE_DECIMAL_PRECISION: misConfig.jobChargeDecimalPrecision,
     JOB_MIN_CHARGE: misConfig.jobMinCharge,
 
-    NOTIF_ENABLED: commonConfig.notification?.enabled,
-    NOTIF_ADDRESS: commonConfig.notification?.address,
   };
 
   if (!building) {

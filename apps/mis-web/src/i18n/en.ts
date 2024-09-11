@@ -1247,7 +1247,6 @@ export default {
       deactivateCluster: "Deactivate Cluster",
       mergeFileChunks: "Merge and upload temporary file blocks",
       initMultipartUpload: "Initial multipart upload file",
-      markMessageRead: "Mark message as read",
     },
     operationDetails: {
       login: "User Login",
@@ -1385,9 +1384,5 @@ export default {
     algorithmMaxGpuCpus: "max(gpu, ceil(cpusAlloc / (partitionCores/partitionGPUs)))",
     algorithmGpu: "gpu",
     algorithmCpus: "cpusAlloc",
-  },
-  notifLayout: {
-    read: "read",
-    fetchSystemNotifError: "Failed to obtain system announcement",
   },
 };
