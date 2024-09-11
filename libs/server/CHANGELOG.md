@@ -1,5 +1,11 @@
 # @scow/lib-server
 
+## 1.3.3
+
+### Patch Changes
+
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+
 ## 1.3.2
 
 ### Patch Changes

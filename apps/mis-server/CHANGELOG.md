@@ -1,5 +1,15 @@
 # @scow/mis-server
 
+## 1.6.4
+
+### Patch Changes
+
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+- d26b5c1: 作业费用更改时，如果费用减少需要充值，充值记录的 comment 中记录作业的 user 属性
+- Updated dependencies [d32b7f6]
+  - @scow/lib-server@1.3.3
+  - @scow/lib-ssh@1.0.3
+
 ## 1.6.3
 
 ### Patch Changes

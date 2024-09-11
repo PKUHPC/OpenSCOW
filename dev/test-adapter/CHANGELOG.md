@@ -1,5 +1,11 @@
 # @scow/test-adapter
 
+## 1.1.6
+
+### Patch Changes
+
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+
 ## 1.1.5
 
 ### Patch Changes
