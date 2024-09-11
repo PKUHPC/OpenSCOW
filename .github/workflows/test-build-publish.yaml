@@ -233,6 +233,12 @@ jobs:
 
       - uses: pnpm/action-setup@v4.0.0
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: pnpm
+          registry-url: https://registry.npmmirror.com
+
       - name: Download cli-x64
         uses: actions/download-artifact@v4
         with:
