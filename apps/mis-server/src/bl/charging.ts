@@ -15,15 +15,19 @@ import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
+import { InternalMessageType } from "src/models/messageType";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo, getUserStateInfo } from "src/utils/accountUserState";
+import { getAccountOwnerAndAdmin } from "src/utils/getAccountOwnerAndAdmin";
+import { sendMessage } from "src/utils/sendMessage";
 import { AnyJson } from "src/utils/types";
 
 interface PayRequest {
@@ -85,6 +89,19 @@ export async function pay(
   if (target instanceof Account) {
     await callHook("accountPaid", {
       accountName: target.accountName, amount: decimalToMoney(amount), type, comment }, logger);
+
+    // 给账户充值时发送消息
+    const ownerAndAdmin = await getAccountOwnerAndAdmin(target.accountName, logger, em);
+    await sendMessage({
+      messageType: InternalMessageType.AccountRechargeSuccess,
+      targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+      metadata: {
+        time: (new Date()).toISOString(),
+        accountName: target.accountName,
+        chargeAmount: amount.toString(),
+        amount: target.balance.toString(),
+      },
+    }, logger);
   } else {
     await callHook("tenantPaid", { tenantName: target.name, amount: decimalToMoney(amount), type, comment }, logger);
   }
@@ -141,6 +158,43 @@ export async function charge(
 
   const prevBalance = target.balance;
   target.balance = target.balance.minus(amount);
+
+  if (target instanceof Account) {
+
+    const ownerAndAdmin = await getAccountOwnerAndAdmin(target.accountName, logger, em);
+    await sendMessage({
+      messageType: InternalMessageType.AccountBalance,
+      targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+      metadata: {
+        accountName: target.accountName,
+        amount: amount.toString(),
+        balance: target.balance.toString(),
+      },
+    }, logger);
+
+    if (target.balance.lt(target.blockThresholdAmount ?? 0)) {
+      await sendMessage({
+        messageType: InternalMessageType.AccountOverdue,
+        targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+        metadata: {
+          time: (new Date()).toISOString(),
+          accountName: target.accountName,
+          amount: target.balance.minus(target.blockThresholdAmount ?? 0).abs().toString(),
+        },
+      }, logger);
+    }
+
+    if (target.balance.lt(20)) {
+      await sendMessage({
+        messageType: InternalMessageType.AccountLowBalance,
+        targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
+        metadata: {
+          time: (new Date()).toISOString(),
+          accountName: target.accountName,
+        },
+      }, logger);
+    }
+  }
 
   if (
     target instanceof Account

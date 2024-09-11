@@ -41,6 +41,7 @@ import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
 import { BaseLayout } from "src/layouts/BaseLayout";
 import { FloatButtons } from "src/layouts/FloatButtons";
+import NotificationLayout from "src/layouts/NotifLayout";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import {
@@ -218,7 +219,12 @@ function MyApp({ Component, pageProps, extra }: Props) {
                 versionTag={publicConfig.VERSION_TAG}
                 initialLanguage={extra.initialLanguage}
               >
-                <Component {...pageProps} />
+                {publicConfig.NOTIF_ENABLED ? (
+                  <NotificationLayout interval={60000}>
+                    <Component {...pageProps} />
+                  </NotificationLayout>
+                )
+                  : <Component {...pageProps} />}
               </BaseLayout>
             </AntdConfigProvider>
           </DarkModeProvider>

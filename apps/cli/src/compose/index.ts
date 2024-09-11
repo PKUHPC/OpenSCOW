@@ -48,6 +48,9 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   const AI_PATH = config.ai?.basePath || "/ai";
   checkPathFormat("ai.basePath", AI_PATH);
 
+  const NOTIFICATION_PATH = config.notification?.basePath || "/notification";
+  checkPathFormat("notification.basePath", NOTIFICATION_PATH);
+
   const serviceLogEnv = {
     LOG_LEVEL: config.log.level,
     LOG_PRETTY: String(config.log.pretty),
@@ -132,6 +135,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       "PORTAL_PATH": PORTAL_PATH,
       "MIS_PATH": MIS_PATH,
       "AI_PATH": AI_PATH,
+      "NOTIFICATION_PATH": NOTIFICATION_PATH,
       "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
       "PROXY_READ_TIMEOUT": config.gateway.proxyReadTimeout,
       "PUBLIC_PATH": publicPath,
@@ -440,6 +444,30 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "MYSQL_ROOT_PASSWORD": config.ai.dbPassword,
       },
       ports: config.ai.portMappings?.db ? { [config.ai.portMappings?.db]: 3306 } : {},
+    });
+  }
+
+  if (config.notification) {
+    addService("notification", {
+      image: scowImage,
+      ports: {},
+      environment: {
+        "SCOW_LAUNCH_APP": "notification",
+        "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, NOTIFICATION_PATH),
+        "MIS_SERVER_URL": config.mis ? "mis-server:5000" : "",
+        "DB_PASSWORD": config.mis?.dbPassword ?? "",
+        "AUTH_EXTERNAL_URL": config.auth.custom?.external?.url || join(BASE_PATH, "/auth"),
+        "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
+        "PUBLIC_PATH": join(BASE_PATH, publicPath),
+        "PROTOCOL": config.gateway.protocol,
+        ...serviceLogEnv,
+        ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
+      },
+      volumes: {
+        "/etc/hosts": "/etc/hosts",
+        "./config": "/etc/scow",
+        "~/.ssh": "/root/.ssh",
+      },
     });
   }
 
