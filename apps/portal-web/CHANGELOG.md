@@ -1,5 +1,14 @@
 # @scow/portal-web
 
+## 1.6.4
+
+### Patch Changes
+
+- 92dd666: 修改了门户系统仪表盘表格中进度条的对齐方式、新增组件 CustomProgress。
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+- Updated dependencies [d32b7f6]
+  - @scow/lib-ssh@1.0.3
+
 ## 1.6.3
 
 ### Patch Changes
