@@ -226,4 +226,7 @@ jobs:
         run: |
           curl -X POST ${{ secrets.RELEASE_SERVICE_ADDRESS }}/version/success \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}"
+          -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
+          -d '{
+            "repo": "SCOW"
+          }'
