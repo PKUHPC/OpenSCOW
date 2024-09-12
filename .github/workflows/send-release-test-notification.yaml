@@ -28,5 +28,6 @@ jobs:
         -H "Content-Type: application/json" \
         -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
         -d '{
-          "time": "${{ github.event.inputs.time }}"
+          "time": "${{ github.event.inputs.time }}",
+          "repo": "SCOW"
         }'
