@@ -30,7 +30,7 @@ interface Options {
 }
 
 const owner = "PKUHPC";
-const repo = "SCOW";
+const repo = "private-scow";
 const workflow_id = "test-build-publish.yaml";
 
 const allowedArch = ["x64", "arm64"];

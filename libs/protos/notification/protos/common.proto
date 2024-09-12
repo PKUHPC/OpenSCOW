@@ -1,0 +1,61 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package notification;
+
+enum NoticeType {
+  SITE_MESSAGE = 0;
+  SMS = 1;
+  EMAIL = 2;
+  OFFICIAL_ACCOUNT = 3;
+}
+
+enum ReadStatus {
+  UNREAD = 0;
+  READ = 1;
+  ALL = 2;
+}
+
+enum SenderType {
+  SYSTEM = 0;
+  PLATFORM_ADMIN = 1;
+  TENANT_ADMIN = 2;
+}
+
+enum TargetType {
+  USER = 0;
+  ACCOUNT = 1;
+  TENANT = 2;
+  FULL_SITE = 3;
+}
+
+message Template {
+  string default = 1;
+  string en = 2;
+  string zh_cn = 3;
+}
+
+message MessageNoticeTypeConfig {
+  optional NoticeType notice_type = 1;
+  optional bool enabled = 2;
+  optional bool can_user_modify = 3;
+}
+
+message MessageConfig {
+  string message_type = 1;
+  Template title_template = 2;
+  string category = 3;
+  Template category_template = 4;
+  repeated MessageNoticeTypeConfig notice_configs = 5;
+}
