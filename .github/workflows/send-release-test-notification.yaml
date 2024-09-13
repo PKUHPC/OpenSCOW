@@ -29,5 +29,5 @@ jobs:
         -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
         -d '{
           "time": "${{ github.event.inputs.time }}",
-          "repo": "SCOW"
+          "repo": "OPENSCOW"
         }'

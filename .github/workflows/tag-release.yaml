@@ -11,7 +11,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   tag-if-needed:
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
-    if: github.event.repository.full_name == 'PKUHPC/SCOW'
+    if: github.event.repository.full_name == 'PKUHPC/OPENSCOW'
     steps:
       - uses: actions/checkout@v4
         with:

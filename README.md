@@ -1,4 +1,4 @@
-# <img src="apps/portal-web/assets/icons/192.png" height="30px" /> SCOW - Super Computing On Web
+# <img src="apps/portal-web/assets/icons/192.png" height="30px" /> OPENSCOW - Super Computing On Web
 
 ![Docs](https://github.com/PKUHPC/SCOW/actions/workflows/docs.yaml/badge.svg)
 ![Build](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml/badge.svg)
@@ -8,7 +8,7 @@
 
 ## 介绍
 
-SCOW是一个面向超算使用员和管理员的、基于Web的超算门户(portal)和管理系统(MIS)。
+OPENSCOW是一个面向超算使用员和管理员的、基于Web的超算门户(portal)和管理系统(MIS)。
 
 **超算门户**使超算用户仅通过一个现代浏览器就可以访问并使用各种超算资源，提供基于Web的以下功能：
 
@@ -25,7 +25,7 @@ SCOW是一个面向超算使用员和管理员的、基于Web的超算门户(por
 
 ## 演示集群
 
-我们提供一个完整的使用SCOW管理的slurm超算集群供大家试用，请访问 https://hpc.pku.edu.cn/demo/scow 。
+我们提供一个完整的使用OPENSCOW管理的slurm超算集群供大家试用，请访问 https://hpc.pku.edu.cn/demo/scow 。
 
 用户名和密码信息：
 
@@ -45,15 +45,15 @@ SCOW是一个面向超算使用员和管理员的、基于Web的超算门户(por
 
 ## 文档
 
-关于项目的更多信息，包括如何部署SCOW，请参考[文档](https://pkuhpc.github.io/SCOW)。
+关于项目的更多信息，包括如何部署OPENSCOW，请参考[文档](https://pkuhpc.github.io/SCOW)。
 
 ## 贡献
 
-请参考[贡献指南](https://pkuhpc.github.io/SCOW/docs/contribution)来了解如何参与SCOW的开发。
+请参考[贡献指南](https://pkuhpc.github.io/SCOW/docs/contribution)来了解如何参与OPENSCOW的开发。
 
 ## 授权协议
 
-SCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。
+OPENSCOW 使用 [木兰宽松许可证, 第2版](http://license.coscl.org.cn/MulanPSL2) 开源协议。
 
 ## 欢迎扫码加入SCOW技术交流群
 
