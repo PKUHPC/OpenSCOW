@@ -772,6 +772,9 @@ importers:
       csv-stringify:
         specifier: 6.5.0
         version: 6.5.0
+      d3-scale:
+        specifier: 4.0.2
+        version: 4.0.2
       dayjs:
         specifier: 1.11.11
         version: 1.11.11
