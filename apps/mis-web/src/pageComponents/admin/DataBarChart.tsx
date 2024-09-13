@@ -11,6 +11,7 @@
  */
 
 import { Empty, Spin } from "antd";
+import { scaleLinear } from "d3-scale";
 import React from "react";
 import { Bar, BarChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -63,6 +64,13 @@ export const DataBarChart: React.FC<Props> = ({
     return roundedValue.toString();
   };
 
+  const min = Math.min(...data.map((d) => +d.y));
+  const max = Math.max(...data.map((d) => +d.y));
+  const [niceMin,niceMax] = scaleLinear()
+    .domain([min, max])
+    .nice().domain();
+
+
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -83,7 +91,7 @@ export const DataBarChart: React.FC<Props> = ({
                     height={ 80 }
                     tick={<CustomizedAxisTick /> }
                   />
-                  <YAxis padding={{ top: 20 }} tickFormatter={tickFormatter} />
+                  <YAxis padding={{ top: 20 }} tickFormatter={tickFormatter} domain={[niceMin,niceMax]} />
                   <Tooltip
                     formatter={toolTipFormatter}
                   />

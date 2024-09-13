@@ -11,6 +11,7 @@
  */
 
 import { Spin } from "antd";
+import { scaleLinear } from "d3-scale";
 import { Line, LineChart,
   ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Formatter } from "recharts/types/component/DefaultTooltipContent";
@@ -45,6 +46,13 @@ export const DataLineChart: React.FC<Props> = ({
   lineType = "linear",
   toolTipFormatter = (value) => value,
 }) => {
+
+  const min = Math.min(...data.map((d) => +d.y));
+  const max = Math.max(...data.map((d) => +d.y));
+  const [niceMin,niceMax] = scaleLinear()
+    .domain([min, max])
+    .nice().domain();
+
   return (
     <StatisticContainer>
       {isLoading ? <Spin /> : (
@@ -56,7 +64,7 @@ export const DataLineChart: React.FC<Props> = ({
             >
               <XAxis dataKey="x" padding={{ left: 20, right: 20 }} type="category" />
               <YAxis
-                domain={["dataMin", "dataMax"]}
+                domain={[niceMin,niceMax]}
                 interval={"preserveStartEnd"}
               />
               <Tooltip
