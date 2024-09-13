@@ -64,8 +64,17 @@ export const createSshAuthProvider = (f: FastifyInstance) => {
 
         // https://en.wikipedia.org/wiki/Gecos_field
         // ddadaal:x:1000:1000::/home/ddadaal:/bin/zsh
-        const gecosField = resp.stdout.split(":")[4];
-        const fullName = gecosField.split(",")[0];
+
+        const passwdItems = resp.stdout.split(":");
+        const gecosField = passwdItems[4];
+
+        // use username as default full name
+        let fullName = passwdItems[0];
+        try {
+          fullName = gecosField.split(",")[0] || fullName;
+        } catch (e) {
+          // ignore error and use default value
+        }
 
         return {
           identityId,
