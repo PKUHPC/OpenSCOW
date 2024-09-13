@@ -1,0 +1,24 @@
+{
+  "name": "@scow/lib-notification",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "dev": "tsc -p tsconfig.build.json && (concurrently \"tsc -p tsconfig.build.json -w\" \"tsc-alias -p tsconfig.build.json -w\")",
+    "build": "rimraf build && tsc -p tsconfig.build.json",
+    "lint": "eslint -c ../../eslint.config.js ."
+  },
+  "files": [
+    "build",
+    "!**/*.map"
+  ],
+  "keywords": [],
+  "dependencies": {
+    "@bufbuild/protobuf": "1.8.0",
+    "@connectrpc/connect": "1.4.0",
+    "@connectrpc/connect-node": "1.4.0",
+    "@grpc/grpc-js": "1.10.9",
+    "@scow/notification-protos": "workspace:*"
+  }
+}

@@ -613,6 +613,10 @@ message CopyModelVersion {
   optional uint32 target_model_version_id = 4;
 }
 
+message MarkMessageRead {
+  uint64 message_id = 1;
+}
+
 
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
@@ -715,6 +719,7 @@ message CreateOperationLogRequest {
     CopyModelVersion copy_model_version = 96;
     MergeFileChunks merge_file_chunks =  97;
     InitMultipartUpload init_multipart_upload = 98;
+    MarkMessageRead mark_message_read = 99;
   }
 }
 
@@ -821,6 +826,7 @@ message OperationLog {
     CopyModelVersion copy_model_version = 98;
     MergeFileChunks merge_file_chunks = 99;
     InitMultipartUpload init_multipart_upload = 100;
+    MarkMessageRead mark_message_read = 101;
   }
 }
 

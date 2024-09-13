@@ -92,6 +92,10 @@ export interface PublicRuntimeConfig {
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfig;
 
   UI_EXTENSION?: UiExtensionConfigSchema;
+
+  NOTIF_ENABLED?: boolean;
+  NOTIF_ADDRESS?: string;
+  NOTIF_NAME?: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

@@ -15,6 +15,12 @@ import { Static, Type } from "@sinclair/typebox";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "src/i18n";
 
+export const NotificationConfigSchema = Type.Object({
+  enabled: Type.Boolean({ description: "是否开启消息系统", default: false }),
+  name: Type.String({ description: "消息系统名称，和 ui 扩展名称保持一致", default: "notification" }),
+  address: Type.String({ description: "消息系统地址", default: "http://notification:3000" }),
+});
+
 export const ScowApiConfigSchema = Type.Object({
   auth: Type.Optional(Type.Object({
     token: Type.Optional(Type.String({ description: "允许使用Token认证，token的值" })),
@@ -63,6 +69,7 @@ export const CommonConfigSchema = Type.Object({
     Type.Enum(SYSTEM_VALID_LANGUAGE_ENUM, { description: "SCOW使用的文本语言，不再允许手动切换" }),
   ], { description: "", default: { autoDetectWhenUserNotSet: true, default: SYSTEM_VALID_LANGUAGE_ENUM.zh_cn } })),
 
+  notification: Type.Optional(NotificationConfigSchema),
 });
 
 export const getSystemLanguageConfig = (systemLanguage: SystemLanguage): SystemLanguageConfig => {

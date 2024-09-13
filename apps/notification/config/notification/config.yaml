@@ -1,0 +1,23 @@
+db:
+  host: 10.129.227.58
+  port: 7578
+  user: root
+  password: must!chang3this
+  dbName: scow_notification
+
+redis:
+  enabled: true
+  host: 10.129.227.68
+  port: 6379
+
+scow:
+  misServerUrl: 172.16.20.125:7571
+
+noticeType:
+  siteMessage:
+    enabled: true
+
+log:
+  level: info
+  pretty: false
+

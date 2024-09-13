@@ -1,6 +1,6 @@
 {
   "name": "@scow/mis-web",
-  "version": "1.6.3",
+  "version": "1.6.4",
   "private": true,
   "scripts": {
     "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
@@ -26,6 +26,7 @@
   "dependencies": {
     "@ant-design/cssinjs": "1.21.0",
     "@ant-design/icons": "5.3.7",
+    "@bufbuild/protobuf": "1.8.0",
     "@ddadaal/next-typed-api-routes-runtime": "0.8.2",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@ddadaal/tsgrpc-common": "0.2.5",
@@ -39,6 +40,8 @@
     "@scow/protos": "workspace:*",
     "@scow/rich-error-model": "workspace:*",
     "@scow/utils": "workspace:*",
+    "@scow/lib-notification": "workspace:*",
+    "@scow/notification-protos": "workspace:*",
     "@sinclair/typebox": "0.32.34",
     "antd": "5.18.3",
     "csv-stringify": "6.5.0",

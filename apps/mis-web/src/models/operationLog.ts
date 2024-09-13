@@ -177,6 +177,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     customEvent: t(pTypes("customEvent")),
     mergeFileChunks: t(pTypes("mergeFileChunks")),
     initMultipartUpload: t(pTypes("initMultipartUpload")),
+    markMessageRead: t(pTypes("markMessageRead")),
   };
 
 };
@@ -236,6 +237,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   shareModelVersion:"011006",
   deleteModelVersion:"011007",
   copyModelVersion:"011008",
+  markMessageRead: "011101",
   createUser: "020201",
   addUserToAccount: "020202",
   removeUserFromAccount: "020203",

@@ -1,5 +1,13 @@
 # @scow/auth
 
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [d32b7f6]
+  - @scow/lib-server@1.3.3
+  - @scow/lib-ssh@1.0.3
+
 ## 1.6.3
 
 ### Patch Changes

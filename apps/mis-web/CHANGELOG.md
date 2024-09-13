@@ -1,5 +1,12 @@
 # @scow/mis-web
 
+## 1.6.4
+
+### Patch Changes
+
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+- 0fa5887: 设置封锁阈值界面优化
+
 ## 1.6.3
 
 ### Patch Changes

@@ -499,6 +499,12 @@ export default {
       titleContainer:{
         available:"Available",
       },
+      NotificationCard: {
+        message: "Message",
+        check: "Check",
+        noMessage: "There are currently no unread messages",
+        fetchNotifError: "Failed to get unread messages",
+      },
     },
   },
   component: {
@@ -635,5 +641,9 @@ export default {
       noAvailableClusters: "There are currently no available clusters."
       + " Please try again later or contact the administrator.",
     },
+  },
+  notifLayout: {
+    read: "read",
+    fetchSystemNotifError: "Failed to obtain system announcement",
   },
 };

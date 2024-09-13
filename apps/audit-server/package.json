@@ -1,6 +1,6 @@
 {
   "name": "@scow/audit-server",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "description": "",
   "private": true,
   "main": "build/index.js",
@@ -23,7 +23,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@ddadaal/tsgrpc-server": "0.19.6",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@grpc/grpc-js": "1.10.9",
@@ -40,7 +40,7 @@
     "@scow/utils": "workspace:*",
     "@scow/protos": "workspace:*",
     "dayjs": "1.11.11",
-    "pino": "8.16.2",
+    "pino": "9.3.2",
     "pino-pretty": "10.3.1"
   },
   "devDependencies": {

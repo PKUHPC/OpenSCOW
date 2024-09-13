@@ -66,6 +66,7 @@ export const shellServiceServer = plugin((server) => {
               code: hasCode ? +args[0] : undefined,
               signal: hasCode ? undefined : args[1],
             } } });
+
           });
 
           // if either pipeline ends, ends the request
@@ -115,11 +116,9 @@ export const shellServiceServer = plugin((server) => {
               },
               channel,
             ),
-          ]).finally(() => { call.end(); channel.end(); });
+          ]).finally(() => { channel.end(); call.end(); });
         }, { cols, rows, term: "xterm-256color" });
       });
-
-
     },
   });
 

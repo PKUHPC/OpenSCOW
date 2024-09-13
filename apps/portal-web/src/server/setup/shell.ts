@@ -187,6 +187,11 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
   });
 
+  ws.on("close", async () => {
+    stream.write({ message: { $case: "disconnect", disconnect: {} } });
+    stream.end();
+  });
+
   ws.on("error", async (err) => {
     log("Error occurred from client. Disconnect.", err);
     await callLog({

@@ -1,5 +1,13 @@
 # @scow/audit-server
 
+## 2.3.6
+
+### Patch Changes
+
+- d32b7f6: 修复 shell 退出时 ssh 连接未正常关闭的问题
+- Updated dependencies [d32b7f6]
+  - @scow/lib-server@1.3.3
+
 ## 2.3.5
 
 ### Patch Changes
