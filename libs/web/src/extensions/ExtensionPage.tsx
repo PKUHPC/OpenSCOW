@@ -102,16 +102,17 @@ export const ExtensionPage: React.FC<Props> = ({
     }
   };
 
+  const promiseFn = useCallback(async () => {
+    if (!user?.token) {
+      console.log("Token 不存在，跳过验证");
+      return undefined; // 如果 token 不存在，直接返回 undefined
+    }
+    console.log("执行一次validateTokenAsync");
+    return await validateTokenAsync(user?.token);
+  }, [user?.token]); // 依赖项是 user?.token
+
   const { data, isLoading, error } = useAsync({
-    promiseFn: async () => {
-      if (!user?.token) {
-        console.log("Token 不存在，跳过验证");
-        return undefined; // 如果 token 不存在，直接返回 undefined
-      }
-      console.log("执行一次validateTokenAsync");
-      return await validateTokenAsync(user?.token);
-    },
-    watch: user?.token, // 监控 token 变化
+    promiseFn,
   });
 
 
