@@ -179,7 +179,7 @@ export const accountServiceServer = plugin((server) => {
       // 发送消息
       const ownerAndAdmin = await getAccountOwnerAndAdmin(accountName, logger, em);
       await sendMessage({
-        messageType: InternalMessageType.AccountRestored,
+        messageType: InternalMessageType.AccountUnblocking,
         targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
         metadata: {
           time: (new Date()).toISOString(),
@@ -424,7 +424,7 @@ export const accountServiceServer = plugin((server) => {
           // 发送账户解封消息
           const ownerAndAdmin = await getAccountOwnerAndAdmin(accountName, logger, em);
           await sendMessage({
-            messageType: InternalMessageType.AccountRestored,
+            messageType: InternalMessageType.AccountUnblocking,
             targetType: TargetType.USER, targetIds: ownerAndAdmin.map((x) => x.userId),
             metadata: {
               time: (new Date()).toISOString(),

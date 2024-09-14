@@ -47,7 +47,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const navbarLinks = [
       {
         path: "/notification",
-        text: isChinese ? "消息系统" : "Messaging System",
         icon: { src: svgFilePath },
       },
     ];

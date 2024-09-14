@@ -11,7 +11,7 @@ redis:
   port: 6379
 
 scow:
-  misServerUrl: http://localhost:5004
+  misServerUrl: localhost:5004
 
 noticeType:
   siteMessage:
