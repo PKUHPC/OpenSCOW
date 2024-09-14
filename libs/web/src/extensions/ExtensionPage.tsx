@@ -102,19 +102,24 @@ export const ExtensionPage: React.FC<Props> = ({
     }
   };
 
-  const { data } = useAsync({
-    promiseFn: useCallback(async () => {
+  const { data, isLoading, error } = useAsync({
+    promiseFn: async () => {
       if (!user?.token) {
         console.log("Token 不存在，跳过验证");
         return undefined; // 如果 token 不存在，直接返回 undefined
       }
-      console.log("执行一次validateTokenResult");
+      console.log("执行一次validateTokenAsync");
       return await validateTokenAsync(user?.token);
-    }, [user?.token]) });
+    },
+    watch: user?.token, // 监控 token 变化
+  });
+
 
   console.log("validateTokenResult",data);
 
-  if (!data) {
+  // 如果验证失败或者 data 为空，重定向到登录页
+  if (!isLoading && (error || !data)) {
+    console.log("我回到登录页了");
     return <Redirect url="/api/auth" />;
   }
 
