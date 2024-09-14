@@ -14,6 +14,7 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
+import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { Head } from "src/components/head";
 import { Redirect } from "src/components/Redirect";
@@ -88,28 +89,32 @@ export const ExtensionPage: React.FC<Props> = ({
 
   console.log("user?.token还在",user?.token);
 
-  const validateTokenAsync = async (args: { query: { token: string } }) => {
+  // 异步验证函数
+  const validateTokenAsync = async (token) => {
     try {
-      console.log("validateTokenAsync",args);
-      const result = await validateToken(args);
+      console.log("validateTokenAsync验证 token:", token);
+      const result = await validateToken({ query: { token } });
+      console.log("validateTokenAsync结果",result);
       return result; // 成功时返回结果
     } catch (error) {
       console.error("Token validation failed:", error);
-      return undefined; // 出现错误时返回 undefined
+      throw error; // 抛出错误以便捕获
     }
   };
 
-  const validateTokenResult = useAsync(async () => {
-    console.log("执行一次validateTokenResult");
-    if (user?.token) {
-      return await validateTokenAsync({ query: { token: user?.token } });
-    }
-    return undefined; // 如果 token 不存在，直接返回 undefined
-  }, [user?.token]);
+  const { data } = useAsync({
+    promiseFn: useCallback(async () => {
+      if (!user?.token) {
+        console.log("Token 不存在，跳过验证");
+        return undefined; // 如果 token 不存在，直接返回 undefined
+      }
+      console.log("执行一次validateTokenResult");
+      return await validateTokenAsync(user?.token);
+    }, [user?.token]) });
 
-  console.log("validateTokenResult",validateTokenResult);
+  console.log("validateTokenResult",data);
 
-  if (!validateTokenResult) {
+  if (!data) {
     return <Redirect url="/api/auth" />;
   }
 
