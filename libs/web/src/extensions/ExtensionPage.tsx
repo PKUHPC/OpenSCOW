@@ -10,16 +10,17 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { joinWithUrl } from "@scow/utils";
-// import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
+import { useAsync } from "react-async";
 import { Head } from "src/components/head";
 import { Redirect } from "src/components/Redirect";
 import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
-import { UserInfo } from "src/layouts/base/types";
+import { PortalValidateToken,UserInfo } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
 import { queryToArray } from "src/utils/querystring";
 import { styled } from "styled-components";
@@ -47,10 +48,13 @@ interface Props {
   currentLanguageId: string;
 
   NotFoundPageComponent: React.FC;
+
+  validateToken: (args: { query: { token: string } }) => JsonFetchResultPromiseLike<any>;
+
 }
 
 export const ExtensionPage: React.FC<Props> = ({
-  user, uiExtensionStoreConfig, currentLanguageId, NotFoundPageComponent,
+  user, uiExtensionStoreConfig, currentLanguageId, NotFoundPageComponent, validateToken,
 }) => {
 
   const router = useRouter();
@@ -79,6 +83,33 @@ export const ExtensionPage: React.FC<Props> = ({
   }
 
   if (!user?.token) {
+    return <Redirect url="/api/auth" />;
+  }
+
+  console.log("user?.token还在",user?.token);
+
+  const validateTokenAsync = async (args: { query: { token: string } }) => {
+    try {
+      console.log("validateTokenAsync",args);
+      const result = await validateToken(args);
+      return result; // 成功时返回结果
+    } catch (error) {
+      console.error("Token validation failed:", error);
+      return undefined; // 出现错误时返回 undefined
+    }
+  };
+
+  const validateTokenResult = useAsync(async () => {
+    console.log("执行一次validateTokenResult");
+    if (user?.token) {
+      return await validateTokenAsync({ query: { token: user?.token } });
+    }
+    return undefined; // 如果 token 不存在，直接返回 undefined
+  }, [user?.token]);
+
+  console.log("validateTokenResult",validateTokenResult);
+
+  if (!validateTokenResult) {
     return <Redirect url="/api/auth" />;
   }
 

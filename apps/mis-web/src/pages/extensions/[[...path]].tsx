@@ -15,6 +15,7 @@ import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStor
 import { Spin } from "antd";
 import { NextPage } from "next";
 import { useStore } from "simstate";
+import { api } from "src/apis";
 import { NotFoundPage } from "src/components/errorPages/NotFoundPage";
 import { useI18n } from "src/i18n";
 import { UserStore } from "src/stores/UserStore";
@@ -38,12 +39,16 @@ export const ExtensionPage: NextPage = () => {
     );
   }
 
+  console.log("我在MIS的LibExtensionPage读取了userStore.user",userStore.user);
+  console.log("我在MIS的userStore.user.token",userStore.user?.token);
+
   return (
     <LibExtensionPage
       uiExtensionStoreConfig={uiExtensionStore.data}
       user={userStore.user}
       currentLanguageId={i18n.currentLanguage.id}
       NotFoundPageComponent={NotFoundPage}
+      validateToken={api.validateToken}
     />
   );
 

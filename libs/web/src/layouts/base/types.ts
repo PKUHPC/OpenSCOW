@@ -16,6 +16,11 @@ export interface UserInfo {
   token: string;
 }
 
+export interface PortalValidateToken {
+  identityId: string;
+  name: string;
+}
+
 export interface NavItemProps {
   path: string;
   clickToPath?: string;

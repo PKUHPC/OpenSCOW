@@ -1836,6 +1836,9 @@ importers:
       '@ant-design/cssinjs':
         specifier: 1.21.0
         version: 1.21.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ddadaal/next-typed-api-routes-runtime':
+        specifier: 0.8.2
+        version: 0.8.2(@sinclair/typebox@0.32.34)(next@14.2.4(patch_hash=xwomt2iqq5liv3pq43ybpoioua)(@babel/core@7.24.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.23.8)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
         version: 0.17.7(@grpc/grpc-js@1.10.9)
