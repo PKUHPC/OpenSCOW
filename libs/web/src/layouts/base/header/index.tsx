@@ -60,6 +60,7 @@ const MenuPartPlaceholder = styled.div`
 const LinksPart = styled.div`
   display: flex;
   flex-direction: row;
+  align-items: center;
 `;
 
 const RightContentPart = styled.div`
