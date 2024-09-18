@@ -13,10 +13,8 @@
 import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
-import React, { useEffect, useRef } from "react";
-import { useAsync } from "react-async";
+import React, { useEffect, useRef,useState } from "react";
 import { Head } from "src/components/head";
-import { Redirect } from "src/components/Redirect";
 import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
@@ -65,6 +63,10 @@ export const ExtensionPage: React.FC<Props> = ({
 
   let config: ExtensionManifestWithUrl | undefined = undefined;
 
+  const [validatedData, setValidatedData] = useState<any>(null); // 验证后的数据
+  const [lastValidated, setLastValidated] = useState<number>(0); // 用于存储最后一次验证时间戳
+  const intervalTime = 6000; // 设置为6秒间隔
+
   if (Array.isArray(uiExtensionStoreConfig)) {
     const namePart = pathParts.shift();
 
@@ -82,38 +84,45 @@ export const ExtensionPage: React.FC<Props> = ({
     return <NotFoundPageComponent />;
   }
 
-  if (!user?.token) {
-    return <Redirect url="/api/auth" />;
-  }
-
-  console.log("user?.token还在",user?.token);
-
   // 异步验证函数
   const validateTokenAsync = async (token: string) => {
     try {
-      console.log("validateTokenAsync验证 token:", token);
-      const result = await validateToken({ query: { token } });
-      console.log("validateTokenAsync结果",result);
-      return result; // 成功时返回结果
+      return await validateToken({ query: { token } });
     } catch (error) {
-      console.error("Token validation failed:", error);
-      throw error;
+      return false;
     }
   };
 
-  // 每次渲染时重新执行 validateTokenAsync
-  const { data, isLoading, error } = useAsync({
-    promiseFn: () => validateTokenAsync(user.token), // 每次渲染时验证 token
-  });
+  // 在首次渲染时检查 token，如果不存在则设置为 false
+  useEffect(() => {
+    if (!user?.token) {
+      setValidatedData(false);
+    }
+  }, [user?.token]); // 依赖 user.token
 
+  // 使用 useEffect 设置间隔执行 token 验证
+  useEffect(() => {
+    const validateTokenPeriodically = async () => {
+      const now = Date.now();
+      if (now - lastValidated >= intervalTime) {
+        const result = await validateTokenAsync(user?.token || "");
+        setValidatedData(result);
+        setLastValidated(now); // 更新最后验证时间
+      }
+    };
 
-  console.log("validateTokenResult",data);
+    const intervalId = setInterval(validateTokenPeriodically, intervalTime);
+    validateTokenPeriodically(); // 页面首次渲染时也执行一次验证
 
-  // 如果验证失败或者 data 为空，重定向到登录页
-  if (!isLoading && (error || !data)) {
-    console.log("我回到登录页了");
-    return <Redirect url="/api/auth" />;
-  }
+    return () => clearInterval(intervalId); // 清理定时器
+  }, [lastValidated, user?.token]); // 依赖项是 lastValidated 和 user.token
+
+  // 如果 token 验证失败，重定向到登录页
+  useEffect(() => {
+    if (!validatedData && validatedData !== null) {
+      router.push("/api/auth");
+    }
+  }, [validatedData, router]);
 
   const [title, setTitle] = React.useState(config?.name ?? "Extension");
 
