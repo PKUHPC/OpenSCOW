@@ -21,6 +21,14 @@ export type I18nStringType = string | {
 // languageDic for partitionsManagement
 export const languageDic = {
   zh_cn: {
+    api: {
+      notification: "通知",
+      myMsgs: "我的消息",
+      msgSub: "消息订阅",
+      msgConfig: "消息设置",
+      sendMsg: "发送消息",
+      createType: "创建自定义消息类型",
+    },
     common: {
       default: "默认",
       zhCn: "简体中文",
@@ -140,6 +148,14 @@ export const languageDic = {
     },
   },
   en: {
+    api: {
+      notification: "Notification",
+      myMsgs: "My Messages",
+      msgSub: "Message Subscription",
+      msgConfig: "Message Config",
+      sendMsg: "Send Message",
+      createType: "Create Custom Message Type",
+    },
     common: {
       default: "Default",
       zhCn: "Simplified Chinese",

@@ -14,6 +14,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { join } from "path";
 import { PlatformRole } from "src/models/user";
 import { validateToken } from "src/server/auth/token";
+import { getLanguage } from "src/utils/i18n";
 import { BASE_PATH } from "src/utils/processEnv";
 
 import { applyMiddleware } from "../middleware/cors";
@@ -37,12 +38,12 @@ interface Request {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+
   const body = req.body as Request;
 
   const searchParams = req.query;
-  const scowLangId = searchParams.scowLangId;
-
-  const isChinese = scowLangId === "zh_cn";
+  const scowLangId = searchParams.scowLangId ?? "zh_cn";
+  const language = getLanguage(scowLangId as string).api;
 
   const cookie = req.headers.cookie;
   // 将 cookie 字符串解析为对象
@@ -63,38 +64,38 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   body.navs.push({
     path: "/",
     clickToPath: "/notification",
-    text: isChinese ? "通知" : "Notification",
+    text: language.notification,
     hideIfNotActive: true,
     children: [
       {
         path: "/notification",
         clickToPath: undefined,
-        text: isChinese ? "我的消息" : "My Messages",
+        text: language.myMsgs,
         icon: { src: join(BASE_PATH, "/icons/notification.svg") },
       },
       {
         path: "/subscription",
         clickToPath: undefined,
-        text: isChinese ? "消息订阅" : "Message Subscription",
+        text: language.msgSub,
         icon: { src: join(BASE_PATH, "/icons/subscription.svg") },
       },
       ...cookie && userInfo?.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ? [
         {
           path: "/message-config",
           clickToPath: undefined,
-          text: isChinese ? "消息设置" : "Message Setting",
+          text: language.msgConfig,
           icon: { src: join(BASE_PATH, "/icons/msg-config.svg") },
         },
         {
           path: "/send-message",
           clickToPath: undefined,
-          text: isChinese ? "发送消息" : "Send Message",
+          text: language.sendMsg,
           icon: { src: join(BASE_PATH, "/icons/send-msg.svg") },
         },
         {
           path: "/create-custom-message-type",
           clickToPath: undefined,
-          text: isChinese ? "创建自定义消息类型" : "Create Custom Message Type",
+          text: language.createType,
           icon: { src: join(BASE_PATH, "/icons/create-custom-type.svg") },
         },
       ] : [],
