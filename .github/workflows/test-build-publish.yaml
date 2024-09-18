@@ -214,7 +214,7 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          name: OPENSCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
+          name: OpenSCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
           body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) || null }}
           generate_release_notes: ${{ startsWith(github.ref_name, 'ai-') }}
           prerelease: ${{ startsWith(github.ref_name, 'ai-') }}
@@ -228,5 +228,5 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
           -d '{
-            "repo": "OPENSCOW"
+            "repo": "OpenSCOW"
           }'
