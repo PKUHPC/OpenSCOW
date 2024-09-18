@@ -54,11 +54,11 @@ void yargs(hideBin(process.argv))
   }, (argv) => {
     viewInstall(argv);
   })
-  .command("check-config", "Check SCOW config files", (yargs) => {
+  .command("check-config", "Check OpenSCOW config files", (yargs) => {
     return yargs.options({
       scowConfigPath: {
         type: "string",
-        description: "The directory containing SCOW config files",
+        description: "The directory containing OpenSCOW config files",
         default: "./config",
       },
       continueOnError: {
