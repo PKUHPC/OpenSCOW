@@ -14,14 +14,13 @@ import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runti
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
-import { useCallback } from "react";
 import { useAsync } from "react-async";
 import { Head } from "src/components/head";
 import { Redirect } from "src/components/Redirect";
 import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
-import { PortalValidateToken,UserInfo } from "src/layouts/base/types";
+import { UserInfo } from "src/layouts/base/types";
 import { useDarkMode } from "src/layouts/darkMode";
 import { queryToArray } from "src/utils/querystring";
 import { styled } from "styled-components";
@@ -90,7 +89,7 @@ export const ExtensionPage: React.FC<Props> = ({
   console.log("user?.token还在",user?.token);
 
   // 异步验证函数
-  const validateTokenAsync = async (token) => {
+  const validateTokenAsync = async (token: string) => {
     try {
       console.log("validateTokenAsync验证 token:", token);
       const result = await validateToken({ query: { token } });
@@ -98,21 +97,13 @@ export const ExtensionPage: React.FC<Props> = ({
       return result; // 成功时返回结果
     } catch (error) {
       console.error("Token validation failed:", error);
-      throw error; // 抛出错误以便捕获
+      throw error;
     }
   };
 
-  const promiseFn = useCallback(async () => {
-    if (!user?.token) {
-      console.log("Token 不存在，跳过验证");
-      return undefined; // 如果 token 不存在，直接返回 undefined
-    }
-    console.log("执行一次validateTokenAsync");
-    return await validateTokenAsync(user?.token);
-  }, [user?.token]); // 依赖项是 user?.token
-
+  // 每次渲染时重新执行 validateTokenAsync
   const { data, isLoading, error } = useAsync({
-    promiseFn,
+    promiseFn: () => validateTokenAsync(user.token), // 每次渲染时验证 token
   });
 
 
