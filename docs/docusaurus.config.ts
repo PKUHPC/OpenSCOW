@@ -119,7 +119,7 @@ const config: Config = {
             docId: "integration/index",
             position: "left",
             sidebarId: "deploy",
-            label: "与SCOW集成",
+            label: "与OpenSCOW集成",
           },
           {
             type: "doc",

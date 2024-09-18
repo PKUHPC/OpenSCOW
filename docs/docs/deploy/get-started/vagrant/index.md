@@ -3,9 +3,9 @@ sidebar_position: 1
 title: 使用
 ---
 
-本项目面向**开发**和**测试**人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。
+本项目面向**开发**和**测试**人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+OpenSCOW集群一键部署方案，极大简化了部署流程和部署门槛。
 
-部署slurm+SCOW四节点集群，节点角色及默认配置如下表所示：
+部署slurm+OpenSCOW四节点集群，节点角色及默认配置如下表所示：
 
 | 节点名称/角色 |                           主要服务                            |     私网IP     | 配置  |
 | :-----------: | :-----------------------------------------------------------: | :------------: | :---: |
@@ -46,7 +46,7 @@ vagrant up
 
 ![image-20230126081833205](images/init.png)
 
-### 3. SCOW运维操作
+### 3. OpenSCOW运维操作
 
 ```shell
 #登录到集群scow节点
