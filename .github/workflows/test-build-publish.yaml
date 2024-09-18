@@ -93,7 +93,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-  scow-cli:
+  openscow-cli:
     needs: test-version-packages
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
@@ -107,22 +107,22 @@ jobs:
           node-version: 18.x
           cache: pnpm
 
-      - name: Install dependencies for scow-cli
+      - name: Install dependencies for openscow-cli
         run: pnpm i --frozen-lockfile --filter @scow/cli...
 
-      - name: Build scow-cli
+      - name: Build openscow-cli
         run: pnpm build "--filter=@scow/cli"
 
-      - name: Archive scow-cli-x64
+      - name: Archive openscow-cli-x64
         uses: actions/upload-artifact@v4
         with:
-          name: scow-cli-x64
+          name: openscow-cli-x64
           path: apps/cli/exe/cli-x64
 
-      - name: Archive scow-cli-arm64
+      - name: Archive openscow-cli-arm64
         uses: actions/upload-artifact@v4
         with:
-          name: scow-cli-arm64
+          name: openscow-cli-arm64
           path: apps/cli/exe/cli-arm64
 
 
@@ -184,7 +184,7 @@ jobs:
   release:
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     needs:
-      - scow-cli
+      - openscow-cli
       - build-images
 
     if: github.ref_type == 'tag'
@@ -198,14 +198,14 @@ jobs:
       - name: Download cli-x64
         uses: actions/download-artifact@v4
         with:
-          name: scow-cli-x64
-          path: release/scow-cli
+          name: openscow-cli-x64
+          path: release/openscow-cli
 
       - name: Download cli-arm64
         uses: actions/download-artifact@v4
         with:
-          name: scow-cli-arm64
-          path: release/scow-cli
+          name: openscow-cli-arm64
+          path: release/openscow-cli
 
       - name: Display structure of downloaded files
         run: ls -R
@@ -214,13 +214,13 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          name: SCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
+          name: OpenSCOW ${{ startsWith(github.ref_name, 'ai-') && format('AI Beta {0}', github.ref_name) || github.ref_name }}
           body_path: ${{ !startsWith(github.ref_name, 'ai-') && format('changelogs/{0}.md', github.ref_name) || null }}
           generate_release_notes: ${{ startsWith(github.ref_name, 'ai-') }}
           prerelease: ${{ startsWith(github.ref_name, 'ai-') }}
           files: |
-            release/scow-cli/cli-x64
-            release/scow-cli/cli-arm64
+            release/openscow-cli/cli-x64
+            release/openscow-cli/cli-arm64
 
       - name: Send Notification Request
         run: |
@@ -228,5 +228,5 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ secrets.RELEASE_API_KEY }}" \
           -d '{
-            "repo": "SCOW"
+            "repo": "OpenSCOW"
           }'

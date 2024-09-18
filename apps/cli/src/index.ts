@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
+ * OpenSCOW is licensed under Mulan PSL v2.
  * You can use this software according to the terms and conditions of the Mulan PSL v2.
  * You may obtain a copy of Mulan PSL v2 at:
  *          http://license.coscl.org.cn/MulanPSL2
@@ -54,11 +54,11 @@ void yargs(hideBin(process.argv))
   }, (argv) => {
     viewInstall(argv);
   })
-  .command("check-config", "Check SCOW config files", (yargs) => {
+  .command("check-config", "Check OpenSCOW config files", (yargs) => {
     return yargs.options({
       scowConfigPath: {
         type: "string",
-        description: "The directory containing SCOW config files",
+        description: "The directory containing OpenSCOW config files",
         default: "./config",
       },
       continueOnError: {

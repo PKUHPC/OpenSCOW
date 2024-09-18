@@ -1,4 +1,4 @@
-# <img src="apps/portal-web/assets/icons/192.png" height="30px" /> SCOW - Super Computing On Web
+# <img src="apps/portal-web/assets/icons/192.png" height="30px" /> OpenSCOW - Super Computing On Web
 
 ![Docs](https://github.com/PKUHPC/SCOW/actions/workflows/docs.yaml/badge.svg)
 ![Build](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml/badge.svg)
@@ -8,7 +8,7 @@
 
 ## Overview
 
-SCOW is an HPC portal and management information system (MIS) for HPC users and system administrators. 
+OpenSCOW is an HPC portal and management information system (MIS) for HPC users and system administrators. 
 
 **HPC portal** enables HPC users to access HPC resources with only a modern browser anywhere, anytime and with any device, providing the following features through a web interface:
 
@@ -25,7 +25,7 @@ SCOW is an HPC portal and management information system (MIS) for HPC users and 
 
 ## Demo
 
-A full feature slurm + SCOW cluster is available at https://hpc.pku.edu.cn/demo/scow.
+A full feature slurm + OpenSCOW cluster is available at https://hpc.pku.edu.cn/demo/scow.
 
 Credentials:
 
@@ -45,7 +45,7 @@ Further information about demo cluster can be found [here](https://pkuhpc.github
 
 ## Documentation
 
-For more details about SCOW, including how to deploy SCOW, please checkout https://pkuhpc.github.io/SCOW.
+For more details about OpenSCOW, including how to deploy OpenSCOW, please checkout https://pkuhpc.github.io/SCOW.
 
 ## Contribution
 
@@ -53,7 +53,7 @@ Follow [Contribution Guide](https://pkuhpc.github.io/SCOW/docs/contribution) to 
 
 ## License
 
-SCOW is distributed under [Mulan Permissive Software License, Version 2](http://license.coscl.org.cn/MulanPSL2).
+OpenSCOW is distributed under [Mulan Permissive Software License, Version 2](http://license.coscl.org.cn/MulanPSL2).
 
 ## Join SCOW Tech Group with a QR Scan
 

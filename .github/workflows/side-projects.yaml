@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  scow-vagrant:
-    name: Update scow-vagrant
+  openscow-vagrant:
+    name: Update openscow-vagrant
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     if: vars.PUSH_VAGRANT == 'true'
     steps:
