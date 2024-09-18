@@ -9,9 +9,9 @@ title: 运维
 
 ## 更新
 
-SCOW通过容器镜像分发，版本号即SCOW镜像的tag名。
+OpenSCOW通过容器镜像分发，版本号即OpenSCOW镜像的tag名。
 
-要更新SCOW，请修改`install.yaml`中的`imageTag`为您想更新到的版本（tag名），例如：
+要更新OpenSCOW，请修改`install.yaml`中的`imageTag`为您想更新到的版本（tag名），例如：
 
 ```yaml title="install.yaml"
 # 使用v0.4.0版本

@@ -1,6 +1,6 @@
 ---
 slug: scow-scheduler-adapter
-title: SCOW调度器适配器
+title: OpenSCOW调度器适配器
 authors: [quhan]
 tags: [scow, scow-scheduler-adapter]
 
@@ -8,7 +8,7 @@ tags: [scow, scow-scheduler-adapter]
 
 ## 什么是调度器适配器
 
-SCOW是建立在底层作业调度器基础上的系统，它通过与底层调度器进行功能对接，向用户提供各种超算功能。
+OpenSCOW是建立在底层作业调度器基础上的系统，它通过与底层调度器进行功能对接，向用户提供各种超算功能。
 
 在之前的实现中，scow直接与作业调度器本身交互，因此scow必须知道底层调度器内部的某些细节，
 导致scow内部的某些代码是与调度器种类直接相关的（如最先适配的slurm），这会使适配其它调度器时比较麻烦。
@@ -39,9 +39,9 @@ scow只会调用这套接口来实现调度器功能。
 
 - [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
 
-### 2. 修改SCOW配置文件
+### 2. 修改OpenSCOW配置文件
 
-首先确保您使用了最新的SCOW镜像（可查看`install.yaml`中的`imageTag`字段）
+首先确保您使用了最新的OpenSCOW镜像（可查看`install.yaml`中的`imageTag`字段）
 
 在用于部署scow的`scow-deployment`文件夹中，修改配置文件：
 

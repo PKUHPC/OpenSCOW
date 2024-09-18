@@ -79,7 +79,7 @@ sed -i 's#PasswordAuthentication no#PasswordAuthentication yes#g' /etc/ssh/sshd_
 systemctl restart sshd
 ```
 
-此处slurm的编译请参见文档[slurm集群部署](https://pkuhpc.github.io/SCOW/docs/slurm) 中slurm编译相关内容
+此处slurm的编译请参见文档[slurm集群部署](https://pkuhpc.github.io/OpenSCOW/docs/slurm) 中slurm编译相关内容
 
 ## 2. slurm节点镜像制作
 

@@ -16,7 +16,7 @@ title: 内置认证系统配置
 
 :::
 
-其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
+其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置
 # 可根据不同域名进行不同的展示，当对应域名没有相应配置时采用 default 配置
@@ -32,7 +32,7 @@ ui:
       
     # 登录界面 logo，可选配置
     logo:
-      # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
+      # 未配置自定义 logo（customLogoPath） 时，默认使用 OpenSCOW Logo
       # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
       # 可选配置，默认为黑暗模式 logo
       scowLogoType: "dark"

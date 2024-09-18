@@ -1144,7 +1144,7 @@ systemctl status prometheus-slurm-exporter.service
 systemctl enable prometheus-slurm-exporter.service
 ```
 
-## 五、SCOW 配置开启集群监控功能
+## 五、OpenSCOW 配置开启集群监控功能
 
 在 `mis.yaml` 文件中增加如下配置。
 

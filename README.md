@@ -2,7 +2,7 @@
 
 ![Docs](https://github.com/PKUHPC/OpenSCOW/actions/workflows/docs.yaml/badge.svg)
 ![Build](https://github.com/PKUHPC/OpenSCOW/actions/workflows/test-build-publish.yaml/badge.svg)
-[![codecov](https://codecov.io/gh/PKUHPC/OpenSCOW/branch/master/graph/badge.svg?token=S9JCB2DXML)](https://codecov.io/gh/PKUHPC/OpenSCOW)
+[![codecov](https://codecov.io/gh/PKUHPC/SCOW/branch/master/graph/badge.svg?token=S9JCB2DXML)](https://codecov.io/gh/PKUHPC/SCOW)
 
 [English README](./README.en.md)
 

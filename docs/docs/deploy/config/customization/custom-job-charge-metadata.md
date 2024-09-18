@@ -55,10 +55,10 @@ jobChargeMetadata:
 
 :::note
 
-当前标准部署的**SCOW**数据库实体**JobInfo**中支持的字段为：
+当前标准部署的**OpenSCOW**数据库实体**JobInfo**中支持的字段为：
 
 `idJob`，`account`，`user`，`partition`，`nodelist`，`jobName`，`cluster`，`timeSubmit`，`timeStart`，`timeEnd`，`gpu`，`cpusReq`，`memReq`，`nodesReq`，`cpusAlloc`，`memAlloc`，`nodesAlloc`，`timelimit`，`timeUsed`，`timeWait`，`qos`，`recordTime`，`tenant`，`accountBillingItemId`，`tenantBillingItemId`，`tenantPrice`，`accountPrice`
 
-具体情况请参考实际部署**SCOW**的数据库信息。
+具体情况请参考实际部署**OpenSCOW**的数据库信息。
 
 :::

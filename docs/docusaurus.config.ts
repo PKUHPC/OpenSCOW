@@ -18,7 +18,7 @@ import { themes } from "prism-react-renderer";
 import { plugin, variables } from "./plugins/var";
 
 const config: Config = {
-  title: "SCOW",
+  title: "OpenSCOW",
   tagline: "Super Computing On Web",
   url: variables.DOCS_URL,
   baseUrl: variables.BASE_PATH,
@@ -95,7 +95,7 @@ const config: Config = {
       navbar: {
         title: "",
         logo: {
-          alt: "SCOW Logo",
+          alt: "OpenSCOW Logo",
           src: "img/logo.svg",
           srcDark: "img/logo_dark.svg",
         },

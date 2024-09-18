@@ -7,5 +7,5 @@ sidebar_position: 2
 
 ![架构](./architecture.png)
 
-SCOW由多个容器模块组成，包括gateway、auth、audit等基本模块，作为门户系统的novnc-client、portal-web、portal-server模块，作为管理系统的mis-web、mis-server模块，执行SCOW与计算集群交互的App Proxy、Adapter模块，以及作为部署工具的cli模块。
+OpenSCOW由多个容器模块组成，包括gateway、auth、audit等基本模块，作为门户系统的novnc-client、portal-web、portal-server模块，作为管理系统的mis-web、mis-server模块，执行OpenSCOW与计算集群交互的App Proxy、Adapter模块，以及作为部署工具的cli模块。
 
