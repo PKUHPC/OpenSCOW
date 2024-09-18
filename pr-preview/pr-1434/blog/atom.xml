@@ -83,20 +83,20 @@
         <summary type="html"><![CDATA[什么是调度器适配器]]></summary>
         <content type="html"><![CDATA[<h2 class="anchor anchorWithStickyNavbar_r5bt" id="什么是调度器适配器">什么是调度器适配器<a class="hash-link" aria-label="什么是调度器适配器的直接链接" title="什么是调度器适配器的直接链接" href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/blog/scow-scheduler-adapter#%E4%BB%80%E4%B9%88%E6%98%AF%E8%B0%83%E5%BA%A6%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8">​</a></h2>
 <p>OpenSCOW是建立在底层作业调度器基础上的系统，它通过与底层调度器进行功能对接，向用户提供各种超算功能。</p>
-<p>在之前的实现中，scow直接与作业调度器本身交互，因此scow必须知道底层调度器内部的某些细节，
-导致scow内部的某些代码是与调度器种类直接相关的（如最先适配的slurm），这会使适配其它调度器时比较麻烦。</p>
-<p>调度器适配器（<code>scheduler-adapter</code>）则是为了解决这一问题，通过一层适配器层，scow只与适配器进行交互，
-适配器再对接作业调度器，实现scow需要的调度器功能。</p>
+<p>在之前的实现中，OpenSCOW直接与作业调度器本身交互，因此OpenSCOW必须知道底层调度器内部的某些细节，
+导致OpenSCOW内部的某些代码是与调度器种类直接相关的（如最先适配的slurm），这会使适配其它调度器时比较麻烦。</p>
+<p>调度器适配器（<code>scheduler-adapter</code>）则是为了解决这一问题，通过一层适配器层，OpenSCOW只与适配器进行交互，
+适配器再对接作业调度器，实现OpenSCOW需要的调度器功能。</p>
 <h2 class="anchor anchorWithStickyNavbar_r5bt" id="怎样实现调度器适配器">怎样实现调度器适配器<a class="hash-link" aria-label="怎样实现调度器适配器的直接链接" title="怎样实现调度器适配器的直接链接" href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/blog/scow-scheduler-adapter#%E6%80%8E%E6%A0%B7%E5%AE%9E%E7%8E%B0%E8%B0%83%E5%BA%A6%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8">​</a></h2>
-<p>调度器适配器本质上是一个gRPC服务器，它实现了scow定义的一套<a href="https://github.com/PKUHPC/scow-scheduler-adapter-interface" target="_blank" rel="noopener noreferrer">接口</a>，
-scow只会调用这套接口来实现调度器功能。</p>
-<p>因此，只需要为对应种类的作业调度器实现这样一个gRPC服务器，满足上述接口定义，就能够轻松对接scow系统</p>
+<p>调度器适配器本质上是一个gRPC服务器，它实现了OpenSCOW定义的一套<a href="https://github.com/PKUHPC/scow-scheduler-adapter-interface" target="_blank" rel="noopener noreferrer">接口</a>，
+OpenSCOW只会调用这套接口来实现调度器功能。</p>
+<p>因此，只需要为对应种类的作业调度器实现这样一个gRPC服务器，满足上述接口定义，就能够轻松对接OpenSCOW系统</p>
 <p>我们已经实现的调度器适配器：</p>
 <ul>
 <li><a href="https://github.com/PKUHPC/scow-slurm-adapter" target="_blank" rel="noopener noreferrer">slurm</a></li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_r5bt" id="如何平滑升级">如何平滑升级<a class="hash-link" aria-label="如何平滑升级的直接链接" title="如何平滑升级的直接链接" href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/blog/scow-scheduler-adapter#%E5%A6%82%E4%BD%95%E5%B9%B3%E6%BB%91%E5%8D%87%E7%BA%A7">​</a></h2>
-<p>这一部分介绍如何从旧版本scow升级至新版本，使用调度器适配器</p>
+<p>这一部分介绍如何从旧版本OpenSCOW升级至新版本，使用调度器适配器</p>
 <h3 class="anchor anchorWithStickyNavbar_r5bt" id="1-部署调度器适配器">1. 部署调度器适配器<a class="hash-link" aria-label="1. 部署调度器适配器的直接链接" title="1. 部署调度器适配器的直接链接" href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/blog/scow-scheduler-adapter#1-%E9%83%A8%E7%BD%B2%E8%B0%83%E5%BA%A6%E5%99%A8%E9%80%82%E9%85%8D%E5%99%A8">​</a></h3>
 <p>首先需要确保您的集群上部署了对应的调度器适配器，得到访问它的地址及端口号</p>
 <p>部署适配器可参考文档：</p>
@@ -105,7 +105,7 @@ scow只会调用这套接口来实现调度器功能。</p>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_r5bt" id="2-修改openscow配置文件">2. 修改OpenSCOW配置文件<a class="hash-link" aria-label="2. 修改OpenSCOW配置文件的直接链接" title="2. 修改OpenSCOW配置文件的直接链接" href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/blog/scow-scheduler-adapter#2-%E4%BF%AE%E6%94%B9openscow%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6">​</a></h3>
 <p>首先确保您使用了最新的OpenSCOW镜像（可查看<code>install.yaml</code>中的<code>imageTag</code>字段）</p>
-<p>在用于部署scow的<code>scow-deployment</code>文件夹中，修改配置文件：</p>
+<p>在用于部署OpenSCOW的<code>scow-deployment</code>文件夹中，修改配置文件：</p>
 <ul>
 <li>
 <p>首先修改<a href="https://pkuhpc.github.io/OpenSCOW/pr-preview/pr-1434/docs/deploy/config/cluster-config" target="_blank" rel="noopener noreferrer">集群配置文件</a></p>
