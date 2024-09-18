@@ -30,7 +30,7 @@ interface Options {
 }
 
 const owner = "PKUHPC";
-const repo = "SCOW";
+const repo = "OpenSCOW";
 const workflow_id = "test-build-publish.yaml";
 
 const allowedArch = ["x64", "arm64"];
@@ -128,7 +128,7 @@ Please provide your GitHub personal access token via GITHUB_TOKEN in env or .env
 
     const artifacts = await octokit.rest.actions.listWorkflowRunArtifacts({ owner, repo, run_id: latestRun.id });
 
-    const artifactName = "scow-cli-" + arch;
+    const artifactName = "openscow-cli-" + arch;
 
     const artifact = artifacts.data.artifacts.find((a) => a.name === artifactName);
 
