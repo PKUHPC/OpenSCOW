@@ -16,7 +16,7 @@ export enum InternalMessageType {
   AccountLowBalance = "AccountLowBalance",
   AccountBalance = "AccountBalance",
   AccountLocked = "AccountLocked",
-  AccountRestored = "AccountRestored",
+  AccountUnblocked = "AccountUnblocked",
   JobStarted = "JobStarted",
   JobFinished = "JobFinished",
   JobAbnormalTermination = "JobAbnormalTermination",

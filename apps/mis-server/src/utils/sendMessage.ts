@@ -70,8 +70,8 @@ interface AccountLocked extends BaseMessage {
   };
 }
 
-interface AccountRestored extends BaseMessage {
-  messageType: InternalMessageType.AccountRestored;
+interface AccountUnblocked extends BaseMessage {
+  messageType: InternalMessageType.AccountUnblocked;
   targetType: TargetType.USER,
   metadata: {
     time: string;
@@ -85,11 +85,15 @@ interface JobFinished extends BaseMessage {
   metadata: {
     time: string;
     jobId: string;
+    jobName: string;
+    cluster: string;
+    account: string;
+    price: string;
   };
 }
 
 type Message = AccountLocked | AccountOverdue | AccountRechargeSuccess
-  | AccountLowBalance | AccountBalance | AccountRestored
+  | AccountLowBalance | AccountBalance | AccountUnblocked
   | JobFinished;
 
 export const sendMessage = async (message: Message, logger: Logger) => {

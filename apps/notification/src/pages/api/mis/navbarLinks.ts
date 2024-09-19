@@ -19,11 +19,6 @@ import { applyMiddleware } from "../middleware/cors";
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
 
-  const searchParams = req.query;
-  const scowLangId = searchParams.scowLangId;
-
-  const isChinese = scowLangId === "zh_cn";
-
   if (req.method === "POST") {
 
     const cookie = req.headers.cookie;
@@ -47,7 +42,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const navbarLinks = [
       {
         path: "/notification",
-        text: isChinese ? "消息系统" : "Messaging System",
+        text: "",
         icon: { src: svgFilePath },
       },
     ];

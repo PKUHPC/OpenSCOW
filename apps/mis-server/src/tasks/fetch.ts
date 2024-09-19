@@ -121,13 +121,17 @@ export async function fetchJobs(
 
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
-          
+
           await sendMessage({
             messageType: InternalMessageType.JobFinished,
             targetType: TargetType.USER, targetIds: [job.user],
             metadata: {
               time: job.endTime!,
               jobId: job.jobId.toString(),
+              jobName: job.name,
+              cluster: job.cluster,
+              account: job.account,
+              price: price.account?.price.toString() ?? "0",
             },
           }, logger);
         } catch (error) {

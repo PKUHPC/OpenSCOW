@@ -21,6 +21,14 @@ export type I18nStringType = string | {
 // languageDic for partitionsManagement
 export const languageDic = {
   zh_cn: {
+    api: {
+      notification: "通知",
+      myMsgs: "我的消息",
+      msgSub: "消息订阅",
+      msgConfig: "消息设置",
+      sendMsg: "发送消息",
+      createType: "创建自定义消息类型",
+    },
     common: {
       default: "默认",
       zhCn: "简体中文",
@@ -82,8 +90,8 @@ export const languageDic = {
       },
       messageConfigModal: {
         modifySuccess: "修改成功",
-        authorization: "授权方式",
-        dontAllowCancel: "不允许用户取消以下授权方式",
+        authorization: "订阅设置",
+        dontAllowCancel: "不允许用户取消订阅以下类型的通知",
         inputTitle: "请输入标题",
       },
     },
@@ -105,7 +113,7 @@ export const languageDic = {
       },
     },
     notification: {
-      pageTitle: "消息通知",
+      pageTitle: "我的消息",
       markAllReadErrorInfo: "标记全部已读失败",
       markAllReadSuccessInfo: "标记全部已读成功",
       deleteReadMsgErrorInfo: "删除已读消息失败",
@@ -140,6 +148,14 @@ export const languageDic = {
     },
   },
   en: {
+    api: {
+      notification: "Notification",
+      myMsgs: "My Messages",
+      msgSub: "Message Subscription",
+      msgConfig: "Message Config",
+      sendMsg: "Send Message",
+      createType: "Create Custom Message Type",
+    },
     common: {
       default: "Default",
       zhCn: "Simplified Chinese",
@@ -205,8 +221,8 @@ export const languageDic = {
       messageConfigModal: {
         inputTitle: "Please enter a title",
         modifySuccess: "Modification successful",
-        authorization: "Authorization",
-        dontAllowCancel: "Do not allow users to cancel the following authorization methods",
+        authorization: "Subscription Settings",
+        dontAllowCancel: "Do not allow users to unsubscribe from the following types of notifications.",
       },
     },
     sendMessage: {

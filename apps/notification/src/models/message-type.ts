@@ -30,7 +30,7 @@ export enum InternalMessageType {
   AccountLowBalance = "AccountLowBalance",
   AccountBalance = "AccountBalance",
   AccountLocked = "AccountLocked",
-  AccountRestored = "AccountRestored",
+  AccountUnblocked = "AccountUnblocked",
   JobStarted = "JobStarted",
   JobFinished = "JobFinished",
   JobAbnormalTermination = "JobAbnormalTermination",
@@ -160,12 +160,12 @@ export const internalMessageTypesMap = new Map<InternalMessageType, MessageTypeI
       zhCn: "账户 {__accountName__} 已于【{__time__}】被封锁，您可以联系管理员申请解封。",
     },
   }],
-  [InternalMessageType.AccountRestored, {
-    type: "AccountRestored",
+  [InternalMessageType.AccountUnblocked, {
+    type: "AccountUnblocked",
     titleTemplate: {
-      default: "账户恢复通知",
-      en: "Account Restored",
-      zhCn: "账户恢复通知",
+      default: "账户解封通知",
+      en: "Account Unblocking",
+      zhCn: "账户解封通知",
     },
     category: "Account",
     categoryTemplate: {
