@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import Router from "next/router";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { UrlObject } from "url";
 
@@ -22,11 +22,11 @@ interface Props {
 }
 
 export const Redirect: React.FC<Props> = ({ url, as }) => {
+  const router = useRouter();
 
   useEffect(() => {
-    Router.push(url, as);
-  }, []);
+    router.push(url, as);
+  }, [router]);
 
   return null;
 };
-

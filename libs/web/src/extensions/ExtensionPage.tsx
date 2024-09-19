@@ -10,11 +10,11 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { JsonFetchResultPromiseLike } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
-import React, { useEffect, useRef,useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
+import { Redirect } from "src/components/Redirect";
 import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
@@ -47,12 +47,13 @@ interface Props {
 
   NotFoundPageComponent: React.FC;
 
-  validateToken: (args: { query: { token: string } }) => JsonFetchResultPromiseLike<any>;
-
 }
 
 export const ExtensionPage: React.FC<Props> = ({
-  user, uiExtensionStoreConfig, currentLanguageId, NotFoundPageComponent, validateToken,
+  user,
+  uiExtensionStoreConfig,
+  currentLanguageId,
+  NotFoundPageComponent,
 }) => {
 
   const router = useRouter();
@@ -62,10 +63,6 @@ export const ExtensionPage: React.FC<Props> = ({
   const pathParts = [...queryToArray(path)];
 
   let config: ExtensionManifestWithUrl | undefined = undefined;
-
-  const [validatedData, setValidatedData] = useState<any>(null); // 验证后的数据
-  const [lastValidated, setLastValidated] = useState<number>(0); // 用于存储最后一次验证时间戳
-  const intervalTime = 6000; // 设置为6秒间隔
 
   if (Array.isArray(uiExtensionStoreConfig)) {
     const namePart = pathParts.shift();
@@ -84,45 +81,10 @@ export const ExtensionPage: React.FC<Props> = ({
     return <NotFoundPageComponent />;
   }
 
-  // 异步验证函数
-  const validateTokenAsync = async (token: string) => {
-    try {
-      return await validateToken({ query: { token } });
-    } catch (error) {
-      return false;
-    }
-  };
+  if (!user?.token) {
+    return <Redirect url="/api/auth" />;
+  }
 
-  // 在首次渲染时检查 token，如果不存在则设置为 false
-  useEffect(() => {
-    if (!user?.token) {
-      setValidatedData(false);
-    }
-  }, [user?.token]); // 依赖 user.token
-
-  // 使用 useEffect 设置间隔执行 token 验证
-  useEffect(() => {
-    const validateTokenPeriodically = async () => {
-      const now = Date.now();
-      if (now - lastValidated >= intervalTime) {
-        const result = await validateTokenAsync(user?.token || "");
-        setValidatedData(result);
-        setLastValidated(now); // 更新最后验证时间
-      }
-    };
-
-    const intervalId = setInterval(validateTokenPeriodically, intervalTime);
-    validateTokenPeriodically(); // 页面首次渲染时也执行一次验证
-
-    return () => clearInterval(intervalId); // 清理定时器
-  }, [lastValidated, user?.token]); // 依赖项是 lastValidated 和 user.token
-
-  // 如果 token 验证失败，重定向到登录页
-  useEffect(() => {
-    if (!validatedData && validatedData !== null) {
-      router.push("/api/auth");
-    }
-  }, [validatedData, router]);
 
   const [title, setTitle] = React.useState(config?.name ?? "Extension");
 
@@ -160,6 +122,8 @@ export const ExtensionPage: React.FC<Props> = ({
         ref.current.style.height = data.payload.height + "px";
       } else if (data.type === "scow.extensionPageTitleChanged") {
         setTitle(data.payload.title);
+      } else if (data.type === "scow.logout") {
+        router.push("/api/auth");
       }
     };
     window.addEventListener("message", messageHandler, false);

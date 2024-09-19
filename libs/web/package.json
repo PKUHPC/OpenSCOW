@@ -23,8 +23,7 @@
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@scow/protos": "workspace:*",
     "@scow/config": "workspace:*",
-    "@grpc/grpc-js": "1.10.9",
-    "@ddadaal/next-typed-api-routes-runtime": "0.8.2"
+    "@grpc/grpc-js": "1.10.9"
   },
   "peerDependencies": {
     "antd": "5.18.3",

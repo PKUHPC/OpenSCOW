@@ -256,6 +256,16 @@ export const RootLayout = () => {
 
 UI扩展实现参考： https://github.com/PKUHPC/scow-ui-extension-demo/commit/cf20685085889422818055513b238d31b815dc79
 
+### `scow.logout`: 通知用户登出
+
+当token过期时，您可以向SCOW发送以下格式的消息，使用户登出。
+
+```json
+{
+  "type": "scow.logout",
+  "payload": {}
+}
+```
 ## 其他注意事项
 
 - UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
