@@ -53,14 +53,14 @@ ssh-copy-id root@[TransferNodeIP]
 
 scow-sync传输软件目前只支持从源码构建。
 
-1. 拉取scow-sync代码。首先需要以root身份登录到传输节点，然后拉取scow-sync的仓库https://github.com/PKUHPC/OpenSCOW-sync.git。通常将scow-sync安装在/data/software目录下。
+1. 拉取scow-sync代码。首先需要以root身份登录到传输节点，然后拉取scow-sync的仓库https://github.com/PKUHPC/scow-sync.git。通常将scow-sync安装在/data/software目录下。
 
 ```bash
 # 以root身份登录传输节点
 ssh root@[TransferNodeIP] -p [TransferNodePort]
 # 拉取scow-sync到/data/software目录
 cd /data/software
-git clone https://github.com/PKUHPC/OpenSCOW-sync.git
+git clone https://github.com/PKUHPC/scow-sync.git
 ```
 
 2. 安装python依赖库。在传输节点上按照scow-sync的requirements.txt文件安装好对应版本的依赖库。

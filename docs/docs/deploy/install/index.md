@@ -61,15 +61,15 @@ sudo update-crypto-policies --set LEGACY
 
 ### 2. 编译和部署适配器
 
-针对不同种类的调度器，需要在集群上部署对应的适配器。适配器是在OpenSCOW和底层调度器之间的中间层，向OpenSCOW提供一组[接口](https://github.com/PKUHPC/OpenSCOW-scheduler-adapter-interface)，OpenSCOW通过这组接口调用适配器功能。理论上，只要适配器实现了接口所定义的功能，OpenSCOW就能方便地部署在对应集群上。
+针对不同种类的调度器，需要在集群上部署对应的适配器。适配器是在OpenSCOW和底层调度器之间的中间层，向OpenSCOW提供一组[接口](https://github.com/PKUHPC/scow-scheduler-adapter-interface)，OpenSCOW通过这组接口调用适配器功能。理论上，只要适配器实现了接口所定义的功能，OpenSCOW就能方便地部署在对应集群上。
 
 适配器本质上是一个gRPC服务器，我们已经实现了部分调度器对应的适配器，可以参考下列文档部署适配器
 
-- [slurm](https://github.com/PKUHPC/OpenSCOW-slurm-adapter/blob/master/docs/deploy.md)
+- [slurm](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md)
 
 :::tip
 
-- 适配器运行依赖本机glibc版本，强烈建议在与运行环境(slurm管理节点)一致的环境中下载源码[自行编译](https://github.com/PKUHPC/OpenSCOW-slurm-adapter/blob/master/docs/deploy.md#12-下载代码编译生成二进制文件自己编译生成二进制文件)。
+- 适配器运行依赖本机glibc版本，强烈建议在与运行环境(slurm管理节点)一致的环境中下载源码[自行编译](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-下载代码编译生成二进制文件自己编译生成二进制文件)。
 - 适配器将会暴露一个端口来提供服务，OpenSCOW将通过`ip地址+端口号`访问适配器，调用接口。请记录下适配器的地址信息，用于后续部署。
 
 :::

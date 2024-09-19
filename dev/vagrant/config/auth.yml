@@ -55,10 +55,10 @@ otp:
           password: "y2es3bd3rYwxWs5n8g"
   # 如果mode指定为remote，需要配置以下内容
   remote:
-    # 远程验证url,详见https://pkuhpc.github.io/SCOW/docs/
+    # 远程验证url,详见https://pkuhpc.github.io/OpenSCOW/docs/
     validateUrl: http://localhost:9999/otp/remote/validateCode
     # 登录界面绑定otp按钮跳转的链接, 建议配置，不配置会不显示绑定otp按钮
-    redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+    redirectUrl: https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config
 
 # 在此部分输入LDAP的配置
 ldap:

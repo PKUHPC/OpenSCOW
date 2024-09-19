@@ -70,7 +70,7 @@ export const AmountStrategyDescriptionsItem: React.FC<Props> = ({
                 {Object.entries({ ...AmountStrategyDescriptions, ...customAmountStrategiesIdToName })
                   .map((value) => <p key={value[0]}>{`${value[1]}(${value[0]})`}</p>)}
               </p>
-              <a href="https://pkuhpc.github.io/SCOW/docs/info/mis/business/billing">{t(p("seeDetails"))}</a>
+              <a href="https://pkuhpc.github.io/OpenSCOW/docs/info/mis/business/billing">{t(p("seeDetails"))}</a>
             </div>
           )}
         >

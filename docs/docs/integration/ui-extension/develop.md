@@ -239,7 +239,7 @@ export const RootLayout = () => {
 }
 ```
 
-您可以参考此PR[PKUHPC/scow-ui-extension-demo#2](https://github.com/PKUHPC/OpenSCOW-ui-extension-demo/pull/2)实现。
+您可以参考此PR[PKUHPC/scow-ui-extension-demo#2](https://github.com/PKUHPC/scow-ui-extension-demo/pull/2)实现。
 
 ### `scow.extensionPageTitleChanged`: 修改扩展页面标题
 
@@ -254,10 +254,10 @@ export const RootLayout = () => {
 }
 ```
 
-UI扩展实现参考： https://github.com/PKUHPC/OpenSCOW-ui-extension-demo/commit/cf20685085889422818055513b238d31b815dc79
+UI扩展实现参考： https://github.com/PKUHPC/scow-ui-extension-demo/commit/cf20685085889422818055513b238d31b815dc79
 
 ## 其他注意事项
 
-- UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/OpenSCOW-ui-extension-demo)
+- UI扩展示例项目：[PKUHPC/scow-ui-extension-demo](https://github.com/PKUHPC/scow-ui-extension-demo)
 - 如果您的扩展站和OpenSCOW部署地址非同源，请注意使得您的扩展站的所有路径均支持CORS访问。
-    - Next.js项目可以参考[示例项目中的`src/middleware.ts`](https://github.com/PKUHPC/OpenSCOW-ui-extension-demo/blob/main/src/middleware.ts)
+    - Next.js项目可以参考[示例项目中的`src/middleware.ts`](https://github.com/PKUHPC/scow-ui-extension-demo/blob/main/src/middleware.ts)

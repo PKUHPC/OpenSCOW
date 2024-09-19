@@ -103,7 +103,7 @@ accountNamePattern:
 
 # 4. 部署适配器
 
-适配器编译部署可参考[文档](https://github.com/PKUHPC/OpenSCOW-slurm-adapter/blob/master/docs/deploy.md)。
+适配器编译部署可参考[文档](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md)。
 
 :::tip
 

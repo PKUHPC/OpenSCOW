@@ -45,7 +45,7 @@ Further information about demo cluster can be found [here](https://pkuhpc.github
 
 ## Documentation
 
-For more details about OpenSCOW, including how to deploy OpenSCOW, please checkout https://pkuhpc.github.io/SCOW.
+For more details about OpenSCOW, including how to deploy OpenSCOW, please checkout https://pkuhpc.github.io/OpenSCOW.
 
 ## Contribution
 

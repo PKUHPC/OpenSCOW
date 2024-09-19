@@ -18,14 +18,14 @@ OpenSCOW是建立在底层作业调度器基础上的系统，它通过与底层
 
 ## 怎样实现调度器适配器
 
-调度器适配器本质上是一个gRPC服务器，它实现了OpenSCOW定义的一套[接口](https://github.com/PKUHPC/OpenSCOW-scheduler-adapter-interface)，
+调度器适配器本质上是一个gRPC服务器，它实现了OpenSCOW定义的一套[接口](https://github.com/PKUHPC/scow-scheduler-adapter-interface)，
 OpenSCOW只会调用这套接口来实现调度器功能。
 
 因此，只需要为对应种类的作业调度器实现这样一个gRPC服务器，满足上述接口定义，就能够轻松对接OpenSCOW系统
 
 我们已经实现的调度器适配器：
 
-- [slurm](https://github.com/PKUHPC/OpenSCOW-slurm-adapter)
+- [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
 
 ## 如何平滑升级
 
@@ -37,7 +37,7 @@ OpenSCOW只会调用这套接口来实现调度器功能。
 
 部署适配器可参考文档：
 
-- [slurm](https://github.com/PKUHPC/OpenSCOW-slurm-adapter)
+- [slurm](https://github.com/PKUHPC/scow-slurm-adapter)
 
 ### 2. 修改OpenSCOW配置文件
 

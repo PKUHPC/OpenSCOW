@@ -46,10 +46,10 @@ otp:
           password: "y2es3bd3rYwxWs5n8g"
   # 如果mode指定为remote，需要配置以下内容
   remote:
-    # 远程验证url，详见https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+    # 远程验证url，详见https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config
     validateUrl: http://localhost:9999/otp/remote/validateCode
     # 当用户点击绑定OTP时跳转的链接, 建议是绑定OTP的网站或者说明的地址
-    redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+    redirectUrl: https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config
 
 captcha:
   enabled: true

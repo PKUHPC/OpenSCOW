@@ -30,7 +30,7 @@ export const InitImportUsersTable: React.FC = () => {
   return (
     <div>
       <Typography.Paragraph>{t(p("importUser"))}
-        <a target="_blank" href="https://pkuhpc.github.io/SCOW/docs/mis/business/users" rel="noreferrer">
+        <a target="_blank" href="https://pkuhpc.github.io/OpenSCOW/docs/mis/business/users" rel="noreferrer">
           {t(p("document"))}
         </a>
         {t(p("learn"))}

@@ -5,7 +5,7 @@ title: Go
 
 # Go示例
 
-示例项目：https://github.com/PKUHPC/OpenSCOW-go-demo
+示例项目：https://github.com/PKUHPC/scow-go-demo
 
 ## 准备环境
 
