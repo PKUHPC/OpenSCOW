@@ -42,6 +42,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const navbarLinks = [
       {
         path: "/notification",
+        text: "",
         icon: { src: svgFilePath },
       },
     ];
