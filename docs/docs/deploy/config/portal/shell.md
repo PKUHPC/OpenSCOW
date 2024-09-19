@@ -41,6 +41,6 @@ sedit hello.txt
 
 ## 注意
 
-`sopen`、`sdown [文件名]`和`sedit [文件名]`这三个命令仅在SCOW的Shell终端中使用有效。
+`sopen`、`sdown [文件名]`和`sedit [文件名]`这三个命令仅在OpenSCOW的Shell终端中使用有效。
 
 在系统启动时，系统会自动上传到登录节点的`/etc/profile.d/`目录下一个`scow-shell-file.sh`脚本，用于在Shell终端中进行文件系统的跳转和文件的下载。如果`/etc/profile.d/`目录不存在会创建该目录。

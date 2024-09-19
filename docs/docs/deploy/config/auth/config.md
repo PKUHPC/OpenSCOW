@@ -151,7 +151,7 @@ mockUsers:
 ### 二、由您自己管理OTP密钥(otp.type为remote):
 
   1. 那么您需要提供一个验证otp码的接口, 并配置为`otp.remote.validateUrl`，返回验证的结果。返回结果要求json格式`{"result": true|false}`。
-  2. scow会使用fetch向上述接口（`otp.remote.validateUrl`）发起请求。fetch请求中`otpCode`为用户输入的otp码，`userId`为用户名，类型均为`string`。
+  2. OpenSCOW会使用fetch向上述接口（`otp.remote.validateUrl`）发起请求。fetch请求中`otpCode`为用户输入的otp码，`userId`为用户名，类型均为`string`。
 
   | fetch| |
   |:----:|:---------------------------------: |

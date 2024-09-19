@@ -17,7 +17,7 @@ title: 自定义部署
 - `slurm\ldap_client.sh`文件中`ServHost`改为slurm节点IP；
 - `slurm\nfs_client.sh`文件中的`192.168.88.101`改为slurm节点IP。
 
-**(3) SCOW配置文件修改：**
+**(3) OpenSCOW配置文件修改：**
 
 - `scow\scow-deployment\config\auth.yml`文件中的`ldap.url`的IP改为slurm节点IP；
 - `scow\scow-deployment\config\mis.yaml`文件中`fetchJobs.db.host`改为scow节点IP；

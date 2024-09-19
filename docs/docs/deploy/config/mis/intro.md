@@ -77,7 +77,7 @@ fetchJobs:
     # 周期的cron表达式
     cron: "*/10 * * * *"
 
-# 周期性同步scow与调度器(如slurm)账户用户封锁状态的配置
+# 周期性同步OpenSCOW与调度器(如slurm)账户用户封锁状态的配置
 periodicSyncUserAccountBlockStatus:
   # 是否开启
   enabled: true
@@ -101,7 +101,7 @@ createUser:
   # 允许用户创建用户。默认为true
   enabled: true
 
-  # 使用SCOW内置的创建用户功能。默认为builtin
+  # 使用OpenSCOW内置的创建用户功能。默认为builtin
   type: builtin
 
   # 内置创建用户功能配置

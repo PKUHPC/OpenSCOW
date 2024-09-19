@@ -86,9 +86,9 @@ mkdir -p /root/monitor/prometheus/rules
 
 #### 编辑 grafana 配置文件：`/root/monitor/grafana/grafana.ini`
 
-此处需要修改 [server] 下的 root_url，将 `your_scow_mis_path` 修改为 scow 管理系统的路径
+此处需要修改 [server] 下的 root_url，将 `your_scow_mis_path` 修改为 OpenSCOW 管理系统的路径
 
-此处配置了 root_url 和 allow_embedding，将允许 grafana 通过 iframe 被嵌入。并通过 scow 代理，将请求转发到 grafana。
+此处配置了 root_url 和 allow_embedding，将允许 grafana 通过 iframe 被嵌入。并通过 OpenSCOW 代理，将请求转发到 grafana。
 
 ```bash
 [paths]

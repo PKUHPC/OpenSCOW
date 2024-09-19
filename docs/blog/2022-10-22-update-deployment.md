@@ -80,5 +80,5 @@ cp config-example.py config.py
 
 > `./compose.sh`支持所有基于`Docker Compose`文件的`docker-compose`命令，如：up、down、ps、restart等。
 
-详细说明可参考`PKUHPC/scow-deployment`项目的[README.md](https://github.com/PKUHPC/scow-deployment/blob/master/README.md)。
+详细说明可参考`PKUHPC/scow-deployment`项目的[README.md](https://github.com/PKUHPC/OpenSCOW-deployment/blob/master/README.md)。
 

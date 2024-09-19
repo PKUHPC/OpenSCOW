@@ -8,7 +8,7 @@ title: 配置
 
 ## extra
 
-您可以在cli同级的`install.yml`文件中增加对scow自带网关的配置，可接受的格式为nginx的server可接受的属性配置。
+您可以在cli同级的`install.yml`文件中增加对OpenSCOW自带网关的配置，可接受的格式为nginx的server可接受的属性配置。
 
 例如，增加在当前系统nginx默认端口的http服务`http://extra-web:3000`，则编写
 
@@ -24,12 +24,12 @@ gateway:
         }
 ```
 
-您增加`extra`配置后，可以在使用`./cli compose up -d`启动scow后，使用 ` ./cli compose exec gateway sh` 进入gateway服务，在 `/etc/nginx/http.d` 目录下的 `default.conf` 文件最下方查看到您添加的配置。
+您增加`extra`配置后，可以在使用`./cli compose up -d`启动OpenSCOW后，使用 ` ./cli compose exec gateway sh` 进入gateway服务，在 `/etc/nginx/http.d` 目录下的 `default.conf` 文件最下方查看到您添加的配置。
 如果gateway服务启动失败，说明您的配置不符合规范，请保证其正确性。
 
 ## 域名白名单配置
 
-scow 网关默认不限制 HTTP Host 头
+OpenSCOW 网关默认不限制 HTTP Host 头
 
 为了防止 host 头攻击的发生，可以通过设置域名白名单来限制 Host 的域名或 IP
 
@@ -50,7 +50,7 @@ gateway:
 
 ```
 gateway:
-  # scow 访问协议，将影响 callbackUrl 的 protocol
+  # OpenSCOW 访问协议，将影响 callbackUrl 的 protocol
   # callbackUrl 默认的 protocol 为 http
   protocol: "http"
 ```

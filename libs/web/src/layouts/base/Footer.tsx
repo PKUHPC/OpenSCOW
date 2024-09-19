@@ -30,15 +30,15 @@ interface Props {
 export const Footer: React.FC<Props> = ({ text, versionTag }) => {
 
   const versionTagLink = versionTag
-    ? `https://github.com/PKUHPC/SCOW/releases/tag/${versionTag}`
+    ? `https://github.com/PKUHPC/OpenSCOW/releases/tag/${versionTag}`
     : "";
 
   return (
     <>
       <FooterContainer>
         <span>Powered by&nbsp;
-          <a href="https://github.com/PKUHPC/SCOW" target="_blank">
-            SCOW
+          <a href="https://github.com/PKUHPC/OpenSCOW" target="_blank">
+            OpenSCOW
           </a>
           &nbsp;
           <a href={versionTagLink} target="_blank">

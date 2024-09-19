@@ -49,7 +49,7 @@ imageTag: ai-beta.1
 
   当前版本中，我们提供了调度器适配器的适用版本的二进制文件 [scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
 
-  K8S 调度器适配器的配置请参照[此链接](https://github.com/PKUHPC/scow-ai-adapter-config)。
+  K8S 调度器适配器的配置请参照[此链接](https://github.com/PKUHPC/OpenSCOW-ai-adapter-config)。
 
 - **第三方调度插件 Kueue**
 

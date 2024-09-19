@@ -145,7 +145,7 @@ export default {
     },
   },
 
-  footer: "Powered by SCOW",
+  footer: "Powered by OpenSCOW",
 
   runningJob: {
     title: "本用户未结束的作业",

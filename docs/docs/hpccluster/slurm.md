@@ -300,7 +300,7 @@ squeue -a
 
 :::tip
 
-slurm默认的qos只有一个qos: normal，在对接scow时，需要low、normal、high三个qos，手动创建low、high两个
+slurm默认的qos只有一个qos: normal，在对接OpenSCOW时，需要low、normal、high三个qos，手动创建low、high两个
 
 :::
 
