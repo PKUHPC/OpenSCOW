@@ -14,6 +14,7 @@ import { joinWithUrl } from "@scow/utils";
 import { useRouter } from "next/router";
 import React, { useEffect, useRef } from "react";
 import { Head } from "src/components/head";
+import { Redirect } from "src/components/Redirect";
 import { getExtensionRouteQuery } from "src/extensions/common";
 import { extensionEvents } from "src/extensions/events";
 import { ExtensionManifestWithUrl, UiExtensionStoreData } from "src/extensions/UiExtensionStore";
@@ -45,10 +46,14 @@ interface Props {
   currentLanguageId: string;
 
   NotFoundPageComponent: React.FC;
+
 }
 
 export const ExtensionPage: React.FC<Props> = ({
-  user, uiExtensionStoreConfig, currentLanguageId, NotFoundPageComponent,
+  user,
+  uiExtensionStoreConfig,
+  currentLanguageId,
+  NotFoundPageComponent,
 }) => {
 
   const router = useRouter();
@@ -75,6 +80,11 @@ export const ExtensionPage: React.FC<Props> = ({
   if (!config) {
     return <NotFoundPageComponent />;
   }
+
+  if (!user?.token) {
+    return <Redirect url="/api/auth" />;
+  }
+
 
   const [title, setTitle] = React.useState(config?.name ?? "Extension");
 
@@ -112,6 +122,8 @@ export const ExtensionPage: React.FC<Props> = ({
         ref.current.style.height = data.payload.height + "px";
       } else if (data.type === "scow.extensionPageTitleChanged") {
         setTitle(data.payload.title);
+      } else if (data.type === "scow.logout") {
+        router.push("/api/auth");
       }
     };
     window.addEventListener("message", messageHandler, false);

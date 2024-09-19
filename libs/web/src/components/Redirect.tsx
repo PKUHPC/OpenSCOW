@@ -10,14 +10,23 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { z } from "zod";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
+import { UrlObject } from "url";
 
-export const extensionEvents = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("scow.extensionPageHeightChanged"), payload: z.object({ height: z.number() }) }),
-  z.object({ type: z.literal("scow.extensionPageTitleChanged"), payload: z.object({ title: z.string() }) }),
-  z.object({ type: z.literal("scow.reloadNavbarLink"), payload: z.object({}) }),
-  z.object({ type: z.literal("scow.reloadNavigations"), payload: z.object({}) }),
-  z.object({ type: z.literal("scow.logout"), payload: z.object({}) }),
-]);
+declare type Url = UrlObject | string;
 
+interface Props {
+  url: Url;
+  as?: Url;
+}
 
+export const Redirect: React.FC<Props> = ({ url, as }) => {
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push(url, as);
+  }, [router]);
+
+  return null;
+};
