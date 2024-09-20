@@ -590,7 +590,7 @@ conda deactivate
     tar -zxvf v2023.03.0+386.tar.gz
     cd rstudio-2023.03.0-386
 
-    # 跳过登录时的csrf-token验证，高版本的RStudio Server集成到scow需要跳过验证
+    # 跳过登录时的csrf-token验证，高版本的RStudio Server集成到OpenSCOW需要跳过验证
     sed -i '134s/^/\/\//' src/cpp/server/auth/ServerAuthCommon.cpp
 
     # 在当前路径初始化git仓库

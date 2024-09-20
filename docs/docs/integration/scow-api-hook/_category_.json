@@ -1,8 +1,8 @@
 {
-  "label": "SCOW API和Hook",
+  "label": "OpenSCOW API和Hook",
   "position": 3,
   "link": {
     "type": "generated-index",
-    "description": "介绍如何通过SCOW API和Hook调用SCOW的功能以及监听SCOW的事件"
+    "description": "介绍如何通过OpenSCOW API和Hook调用OpenSCOW的功能以及监听OpenSCOW的事件"
   }
 }

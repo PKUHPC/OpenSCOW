@@ -18,11 +18,11 @@ title: 跨集群文件传输功能（可选）
 
 ### 配置
 
-1. 在跨集群传输功能的配置中，每个集群需要有一个专门用来做文件传输的节点TransferNode，该TransferNode要求具有**集群间可达网**的地址，也就是说接入SCOW系统的所有集群的传输节点之间彼此是可以访问的。传输节点TransferNode和登录节点LoginNode可以是同一个节点。
+1. 在跨集群传输功能的配置中，每个集群需要有一个专门用来做文件传输的节点TransferNode，该TransferNode要求具有**集群间可达网**的地址，也就是说接入OpenSCOW系统的所有集群的传输节点之间彼此是可以访问的。传输节点TransferNode和登录节点LoginNode可以是同一个节点。
 
 2. 传输节点能够访问文件系统，且挂载目录路径和登录节点访问文件系统的路径相同。出于安全性的考虑，传输节点最好不具备访问作业权限（例如，设置与slurm管理节点网络不通）
 
-3. 准备好传输节点后，需要将其接入到scow集群中。接下来需要修改集群配置文件`config/clusters/xxx.yaml`，在yaml文件末尾添加crossClusterFileTransfer模块，添加enabled和transferNode属性。如果enabled为true表示开启该功能需要配置transferNode，为false表示不开启该功能无需配置transferNode。transferNode配置格式为ip:port，如果不配置port默认为22端口。
+3. 准备好传输节点后，需要将其接入到OpenSCOW集群中。接下来需要修改集群配置文件`config/clusters/xxx.yaml`，在yaml文件末尾添加crossClusterFileTransfer模块，添加enabled和transferNode属性。如果enabled为true表示开启该功能需要配置transferNode，为false表示不开启该功能无需配置transferNode。transferNode配置格式为ip:port，如果不配置port默认为22端口。
 
 ```yaml title="config/clusters/hpc01.yaml"
 displayName: hpc01Name
@@ -40,9 +40,9 @@ crossClusterFileTransfer:
 
 :::
 
-## 2. 建立scow节点到每个传输节点的root用户免密
+## 2. 建立OpenSCOW节点到每个传输节点的root用户免密
 
-在scow节点运行以下命令
+在OpenSCOW节点运行以下命令
   
 ```bash
 # 执行以下命令，连续回车，输入密码后设置免密成功

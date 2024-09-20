@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 title: 从源码构建
-description: 从源码构建SCOW
+description: 从源码构建OpenSCOW
 ---
 
 ## 从源码构建

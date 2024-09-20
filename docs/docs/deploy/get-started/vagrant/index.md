@@ -3,9 +3,9 @@ sidebar_position: 1
 title: 使用
 ---
 
-本项目面向**开发**和**测试**人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+SCOW集群一键部署方案，极大简化了部署流程和部署门槛。
+本项目面向**开发**和**测试**人员，基于Vagrant，采用VirtualBox作为Provider，提供slurm+OpenSCOW集群一键部署方案，极大简化了部署流程和部署门槛。
 
-部署slurm+SCOW四节点集群，节点角色及默认配置如下表所示：
+部署slurm+OpenSCOW四节点集群，节点角色及默认配置如下表所示：
 
 | 节点名称/角色 |                           主要服务                            |     私网IP     | 配置  |
 | :-----------: | :-----------------------------------------------------------: | :------------: | :---: |
@@ -23,8 +23,8 @@ git clone https://github.com/PKUHPC/scow-vagrant.git
 
 部署前准备：
 
-- 下载最新Release的scow-cli，拷贝至`scow\scow-deployment`目录，并命名为`cli`;
-- 编译生成最新的适配器可执行程序(CentOS7.9)，替换`adapter`目录下的`scow-slurm-adapter-amd64`(默认为与SCOW`v1.2.3`匹配版本)，[编译参考文档](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-下载代码编译生成二进制文件自己编译生成二进制文件)；
+- 下载最新Release的openscow-cli，拷贝至`scow\scow-deployment`目录，并命名为`cli`;
+- 编译生成最新的适配器可执行程序(CentOS7.9)，替换`adapter`目录下的`scow-slurm-adapter-amd64`(默认为与OpenSCOW`v1.2.3`匹配版本)，[编译参考文档](https://github.com/PKUHPC/scow-slurm-adapter/blob/master/docs/deploy.md#12-下载代码编译生成二进制文件自己编译生成二进制文件)；
 - 修改配置文件`scow\scow-deployment\install.yaml`，`imageTag`修改为与`cli`匹配的版本，例如`v1.2.3`。
 
 一键部署命令：
@@ -46,7 +46,7 @@ vagrant up
 
 ![image-20230126081833205](images/init.png)
 
-### 3. SCOW运维操作
+### 3. OpenSCOW运维操作
 
 ```shell
 #登录到集群scow节点

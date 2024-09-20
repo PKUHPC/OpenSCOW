@@ -1,18 +1,18 @@
 ---
 sidebar_position: 2
 title: scow-cli
-description: 使用scow-cli管理SCOW集群
+description: 使用openscow-cli管理OpenSCOW集群
 ---
 
-scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高效管理您的集群。
+openscow-cli是OpenSCOW集群安装、配置和管理工具，您可以使用openscow-cli高效管理您的集群。
 
 # 下载
 
-请通过以下方法下载scow-cli，并将下载的文件解压，将里面的可执行文件存放到您将会存放SCOW配置文件的目录下。
+请通过以下方法下载openscow-cli，并将下载的文件解压，将里面的可执行文件存放到您将会存放OpenSCOW配置文件的目录下。
 
-- [GitHub Release](https://github.com/PKUHPC/SCOW/releases): SCOW每次发布新的版本时，将会将此版本的`scow-cli`上传到Release中
+- [GitHub Release](https://github.com/PKUHPC/OpenSCOW/releases): OpenSCOW每次发布新的版本时，将会将此版本的`openscow-cli`上传到Release中
 
-想获取最新的scow-cli版本？您可以从GitHub Actions的[`Test, Build and Publish Projects` workflow](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml)中下载到上传到Archive的`scow-cli`。
+想获取最新的openscow-cli版本？您可以从GitHub Actions的[`Test, Build and Publish Projects` workflow](https://github.com/PKUHPC/OpenSCOW/actions/workflows/test-build-publish.yaml)中下载到上传到Archive的`openscow-cli`。
 
 - 参考命令
 
@@ -21,9 +21,9 @@ scow-cli是SCOW集群安装、配置和管理工具，您可以使用scow-cli高
 yum install wget
 
 # 下载对应的release版本。修改latest、cli-x64可下载指定版本cli
-# 修改latest为v0.4.0即可下载0.4.0版本的cli，如 https://github.com/PKUHPC/SCOW/releases/download/v0.4.0/cli-x64
-# 可修改cli-x64为cli-arm64下载arm64版本，如 https://github.com/PKUHPC/SCOW/releases/download/v0.4.0/cli-arm64
-wget https://github.com/PKUHPC/SCOW/releases/download/latest/cli-x64
+# 修改latest为v0.4.0即可下载0.4.0版本的cli，如 https://github.com/PKUHPC/OpenSCOW/releases/download/v0.4.0/cli-x64
+# 可修改cli-x64为cli-arm64下载arm64版本，如 https://github.com/PKUHPC/OpenSCOW/releases/download/v0.4.0/cli-arm64
+wget https://github.com/PKUHPC/OpenSCOW/releases/download/latest/cli-x64
 
 # 重命名
 mv cli-x64 cli
@@ -34,7 +34,7 @@ chmod +x cli
 
 # 配置
 
-scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但您可以通过`-c`命令行选项指定`install.yaml`的路径。
+openscow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但您可以通过`-c`命令行选项指定`install.yaml`的路径。
 
 # 使用
 
@@ -65,15 +65,15 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 # 查看当前使用install.yaml的内容
 ./cli view-install
 
-# 检查./config目录下的SCOW配置文件的格式
+# 检查./config目录下的OpenSCOW配置文件的格式
 ./cli check-config
 ```
 
 # 从scow-deployment迁移
 
-从scow-deployment迁移到scow-cli是非常容易的。
+从scow-deployment迁移到openscow-cli是非常容易的。
 
-首先，请先下载scow-cli到您的scow-deployment文件夹中，确保`config.py`存在于目录中，然后运行
+首先，请先下载openscow-cli到您的scow-deployment文件夹中，确保`config.py`存在于目录中，然后运行
 
 ```bash
 ./cli migrate
@@ -81,11 +81,11 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 
 此命令将会读取当前目录中`config.py`中的配置，并生成对应的`install.yaml`。
 
-之后，您就可以使用scow-cli来管理您的集群了。
+之后，您就可以使用openscow-cli来管理您的集群了。
 
 ## 常见命令的对照
 
-| 使用             | `scow-deployment`      | `scow-cli`              |
+| 使用             | `scow-deployment`      | `openscow-cli`              |
 | ---------------- | ---------------------- | ----------------------- |
 | 启动系统         | `./compose.sh up -d`   | `./cli compose up -d`   |
 | 停止系统         | `./compose.sh down`    | `./cli compose down`    |
@@ -93,9 +93,9 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 | 更新镜像         | `./compose.sh pull`    | `./cli compose pull`    |
 | 进入数据库       | `./db.sh`              | `./cli db`              |
 
-# 更新`scow-cli`
+# 更新`openscow-cli`
 
-`scow-cli`可以自我更新。
+`openscow-cli`可以自我更新。
 
 ```bash
 # 更新到PR 535对应的最新的版本
@@ -107,13 +107,13 @@ scow-cli使用运行目录下的`install.yaml`作为配置来管理集群，但�
 # 更新到test分支的最新cli版本
 ./cli update --branch test
 
-# 更新至最新版本的scow-cli
+# 更新至最新版本的openscow-cli
 ./cli update
 
 # 更新cli至v0.4.0版本
 ./cli update --release v0.4.0
 
-# 下载v0.4.0版本的scow-cli并保存到./cli-test
+# 下载v0.4.0版本的openscow-cli并保存到./cli-test
 ./cli update --release v0.4.0 -o ./cli-test
 ```
 
@@ -126,7 +126,7 @@ GITHUB_TOKEN={token}
 
 # 代理
 
-CLI需要访问网络的功能（例如更新scow-cli）可以设置HTTP代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`, `http_proxy`环境变量来设置代理。如果多个环境变量同时存在，则使用优先级为上面列出来的顺序。
+CLI需要访问网络的功能（例如更新openscow-cli）可以设置HTTP代理。您可以通过设置`HTTPS_PROXY`, `https_proxy`, `HTTP_PROXY`, `http_proxy`环境变量来设置代理。如果多个环境变量同时存在，则使用优先级为上面列出来的顺序。
 
 ```bash
 # 环境变量也可以写入.env中

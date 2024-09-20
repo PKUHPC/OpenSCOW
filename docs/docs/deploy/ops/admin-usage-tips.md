@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: SCOW管理员使用技巧
+title: OpenSCOW管理员使用技巧
 
 ---
 
@@ -42,7 +42,7 @@ mis-web日志：
 
 ### 1.2 设置日志级别
 
-SCOW日志输出支持日志等级设置，可选等级包括`trace`, `debug`, `info`, `warn`, `error`，默认等级为`info`，通过修改`install.yamll`日志配置部分来实现：
+OpenSCOW日志输出支持日志等级设置，可选等级包括`trace`, `debug`, `info`, `warn`, `error`，默认等级为`info`，通过修改`install.yamll`日志配置部分来实现：
 
 ```YAML
 log:
@@ -82,7 +82,7 @@ log:
 
 ## 3. 用户操作审计：查看操作日志
 
-SCOW支持可插拔的审计日志功能，配置审计日志的步骤如下：
+OpenSCOW支持可插拔的审计日志功能，配置审计日志的步骤如下：
 
 - (1) 在install.yaml中添加
   - ```YAML
@@ -100,7 +100,7 @@ SCOW支持可插拔的审计日志功能，配置审计日志的步骤如下：
       dbName: scow_audit 
     ```
 
-SCOW支持用户、账户、租户、平台级别操作日志查看：
+OpenSCOW支持用户、账户、租户、平台级别操作日志查看：
 
 ![img](./user-log.png)![img](./account-log.png)
 
@@ -108,7 +108,7 @@ SCOW支持用户、账户、租户、平台级别操作日志查看：
 
 ## 4. 解决特定环境问题：模仿用户登录
 
-为解决只在某个用户下出现的错误，管理员可以通过模仿该用户，以该用户的身份登录到SCOW重现问题。
+为解决只在某个用户下出现的错误，管理员可以通过模仿该用户，以该用户的身份登录到OpenSCOW重现问题。
 
 - 内置认证系统：
 
@@ -135,10 +135,10 @@ mockUsers:
 
 ### 5.1 用户从账户中移除失败
 
-在SCOW中可能会出现某个用户从账户中移除失败(slurm集群中该用户已与该账户取消关联)。该情况需要在SCOW数据库中处理：
+在OpenSCOW中可能会出现某个用户从账户中移除失败(slurm集群中该用户已与该账户取消关联)。该情况需要在OpenSCOW数据库中处理：
 
 ```PowerShell
-# 进入SCOW数据库
+# 进入OpenSCOW数据库
 ./cli db
 use scow
 
@@ -158,10 +158,10 @@ select * from user_account where user_id={user.id} and account_id={account.id};
 
 ### 5.2 **将用户添加到某个账户失败**
 
-在SCOW中可能会出现将一个用户添加到某个账户中失败的情况(slurm集群中已存在该用户与该账户的关联)。该情况需要在SCOW数据库中处理：
+在OpenSCOW中可能会出现将一个用户添加到某个账户中失败的情况(slurm集群中已存在该用户与该账户的关联)。该情况需要在OpenSCOW数据库中处理：
 
 ```PowerShell
-# 进入SCOW数据库、查找用户ID和账户ID请参考5.1小节
+# 进入OpenSCOW数据库、查找用户ID和账户ID请参考5.1小节
 ./cli db
 use scow
 

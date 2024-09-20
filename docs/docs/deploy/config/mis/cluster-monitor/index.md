@@ -10,12 +10,12 @@ title: 集群监控功能（可选）
 ![集群资源信息](./resourceStatus.png)
 
 资源状态功能通过嵌入配置好的 Grafana 面板查看资源的状态。
-grafana 版本推荐使用较新的版本，否则可能会出现数据无法获取或者样式异常的情况。SCOW 在进行测试时使用的是 Grafana 10.2.2 版本，推荐使用该版本。
+grafana 版本推荐使用较新的版本，否则可能会出现数据无法获取或者样式异常的情况。OpenSCOW 在进行测试时使用的是 Grafana 10.2.2 版本，推荐使用该版本。
 
 目前提供两种嵌入方式
 ### 1. 直接嵌入
 
-直接嵌入指使用 iframe 将 grafana 的实际面板的 url 嵌入到 scow 管理系统中。将在 scow 管理系统的平台管理下添加【集群监控】-【资源状态】页面。
+直接嵌入指使用 iframe 将 grafana 的实际面板的 url 嵌入到 OpenSCOW 管理系统中。将在 OpenSCOW 管理系统的平台管理下添加【集群监控】-【资源状态】页面。
 
 修改 grafana 配置文件 grafana.ini，添加 allow_embedding 配置如下，允许 grafana 能够嵌入页面。
 
@@ -47,14 +47,14 @@ clusterMonitor:
 
 ### 2. 代理
 
-如果你不希望将 grafana 的地址公开，可以使用代理的方式嵌入 grafana 面板。开启代理后，对 grafana 的请求将发送到 scow 的后端然后代理到 grafana。
+如果你不希望将 grafana 的地址公开，可以使用代理的方式嵌入 grafana 面板。开启代理后，对 grafana 的请求将发送到 OpenSCOW 的后端然后代理到 grafana。
 
-修改 grafana 配置文件 grafana.ini，添加 root_url 和 allow_embedding 配置。将如下配置中的 SCOW 地址替换为真实的地址。例如 `http://127.0.0.1/mis`
+修改 grafana 配置文件 grafana.ini，添加 root_url 和 allow_embedding 配置。将如下配置中的 OpenSCOW 地址替换为真实的地址。例如 `http://127.0.0.1/mis`
 
 ```
 ..other config
 [server]
-root_url=[SCOW 管理系统地址]/api/admin/monitor/getResourceStatus
+root_url=[OpenSCOW 管理系统地址]/api/admin/monitor/getResourceStatus
 [security]
 allow_embedding = true
 ```
@@ -90,7 +90,7 @@ clusterMonitor:
 
 ![告警日志](./alarmLog.png)
 
-可以查看资源达到一定使用限额后触发的告警日志，目前仅支持 scow 提供的告警规则查看。详细的配置信息可以查看[部署集群监控](../../../../hpccluster/cluster-monitor/index.md)。完成 grafana 数据源、Prometheus、Alertmanager、alert-db等配置后，修改 `mis.yaml` 文件，在 clusterMonior 下添加如下配置。
+可以查看资源达到一定使用限额后触发的告警日志，目前仅支持 OpenSCOW 提供的告警规则查看。详细的配置信息可以查看[部署集群监控](../../../../hpccluster/cluster-monitor/index.md)。完成 grafana 数据源、Prometheus、Alertmanager、alert-db等配置后，修改 `mis.yaml` 文件，在 clusterMonior 下添加如下配置。
 
 ```yaml
 # 集群监控配置

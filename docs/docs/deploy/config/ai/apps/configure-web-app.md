@@ -103,10 +103,10 @@ web:
 
 | 变量名            | 值                                                                                                     |
 | ----------------- | ------------------------------------------------------------------------------------------------------ |
-| `PROXY_BASE_PATH` | 这个应用在被访问时，其URL中位于**计算节点IP**之前的内容，不以`/`结尾。对SCOW AI来说，为`${SCOW AI的base path}/api/proxy/${集群ID}/${此应用的proxyType}`， 如果[自定义属性](../../portal/apps/configure-attributes.md)中出现了同名的变量，该值将会被覆盖。 |
+| `PROXY_BASE_PATH` | 这个应用在被访问时，其URL中位于**计算节点IP**之前的内容，不以`/`结尾。对OpenSCOW AI来说，为`${OpenSCOW AI的base path}/api/proxy/${集群ID}/${此应用的proxyType}`， 如果[自定义属性](../../portal/apps/configure-attributes.md)中出现了同名的变量，该值将会被覆盖。 |
 | `PORT` | 这个应用启动时容器内的端口|
 | `HOST` | 这个应用启动时容器映射的主机名|
-| `SVCPORT` | 这个应用启动后，SCOW AI 节点可通过`HOST`:`SVCPORT`访问该应用|
+| `SVCPORT` | 这个应用启动后，OpenSCOW AI 节点可通过`HOST`:`SVCPORT`访问该应用|
 
 
 这些脚本会被提交给调度系统，并最终运行后在计算节点上启动应用。

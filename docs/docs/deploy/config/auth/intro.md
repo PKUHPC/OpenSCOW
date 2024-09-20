@@ -26,4 +26,4 @@ title: 简介
 
 # 自定义认证方式
 
-如果您的集群需要使用其他认证方式，您可以参考与SCOW集成文档去[使用](../../../integration/auth/use.md)或者[实现](../../../integration/auth/impl.md)一个自定义认证系统。
+如果您的集群需要使用其他认证方式，您可以参考与OpenSCOW集成文档去[使用](../../../integration/auth/use.md)或者[实现](../../../integration/auth/impl.md)一个自定义认证系统。

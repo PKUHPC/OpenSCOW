@@ -14,7 +14,7 @@ tags: [scow, scow-deployment, v1.0.0]
 ```bash
 # 两种方式升级cli
 # 1. 直接下载替换本地cli
-wget https://github.com/PKUHPC/SCOW/releases/download/v1.0.0/cli-x64
+wget https://github.com/PKUHPC/OpenSCOW/releases/download/v1.0.0/cli-x64
 
 # 2. 使用命令升级
 ./cli update --release v1.0.0
@@ -125,7 +125,7 @@ adapterUrl: "192.168.188.102:8999"
 
 :::tip
 
-注意将登录节点`loginNodes.address`参数和适配器url`adapterUrl`修改为实际集群的值。详细配置可参考[该文档](https://pkuhpc.github.io/SCOW/docs/deploy/config/cluster-config)。
+注意将登录节点`loginNodes.address`参数和适配器url`adapterUrl`修改为实际集群的值。详细配置可参考[该文档](https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/cluster-config)。
 
 :::
 
@@ -141,7 +141,7 @@ logoPath: /apps/jupyter.png
 
 :::tip
 
-多集群下交互式应用配置可参考[该文档](https://pkuhpc.github.io/SCOW/docs/deploy/config/portal/apps/configure-cluster-apps)。
+多集群下交互式应用配置可参考[该文档](https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/portal/apps/configure-cluster-apps)。
 
 :::
 
@@ -167,7 +167,7 @@ ui:
 
 :::tip
 
-详细配置可参考[该文档](https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config)。
+详细配置可参考[该文档](https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config)。
 
 :::
 

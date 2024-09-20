@@ -9,18 +9,18 @@ title: 配置 AI 系统（beta）
 
 # Beta期间配置
 
-SCOW AI当前处于Beta状态，其代码将会和SCOW主线共存，但是SCOW AI的版本发布周期将是独立的，不和SCOW本身同步。
+OpenSCOW AI当前处于Beta状态，其代码将会和OpenSCOW主线共存，但是OpenSCOW AI的版本发布周期将是独立的，不和OpenSCOW本身同步。
 
-您可以在GitHub的Release中找到格式为`ai-beta.{数字}`的Release，这些Release以及对应的Tag均为SCOW AI的Beta发布版本。快速到所有`ai-beta.` Release的链接[点击此处](https://github.com/PKUHPC/SCOW/releases?q=ai-beta.&expanded=true)。
+您可以在GitHub的Release中找到格式为`ai-beta.{数字}`的Release，这些Release以及对应的Tag均为OpenSCOW AI的Beta发布版本。快速到所有`ai-beta.` Release的链接[点击此处](https://github.com/PKUHPC/OpenSCOW/releases?q=ai-beta.&expanded=true)。
 
-要使用SCOW AI的具体的版本，您需要修改`install.yml`的`imageTag`为一个具体的`ai-beta.{数字}`的tag，例如：
+要使用OpenSCOW AI的具体的版本，您需要修改`install.yml`的`imageTag`为一个具体的`ai-beta.{数字}`的tag，例如：
 
 ```yaml title="install.yaml"
 # 指定使用Beta 1版本
 imageTag: ai-beta.1  
 ```
 
-您同样可以使用`master`来跟踪SCOW主线以及其包括的SCOW AI的最新功能。
+您同样可以使用`master`来跟踪OpenSCOW主线以及其包括的OpenSCOW AI的最新功能。
 
 ## 前期准备
 
@@ -39,13 +39,13 @@ imageTag: ai-beta.1
 
 ### K8S 调度服务
 
-**AI 系统（beta）** 同样通过 **SCOW调度器适配器** 来实现对 K8S 集群的调度服务。
+**AI 系统（beta）** 同样通过 **OpenSCOW调度器适配器** 来实现对 K8S 集群的调度服务。
 
 同时为了满足提交 AI 作业、训练 AI 作业的功能，需要使用第三方调度插件 [Kueue](https://kueue.sigs.k8s.io/docs/)、 配置 **Cluster Queue** 的队列信息来协调和处理作业任务。
 
 - **K8S 调度器适配器**
 
-  我们仍然使用 [SCOW调度器适配器](https://pkuhpc.github.io/SCOW/blog/scow-scheduler-adapter) 来实现 K8S 集群的调度服务。
+  我们仍然使用 [OpenSCOW调度器适配器](https://pkuhpc.github.io/OpenSCOW/blog/scow-scheduler-adapter) 来实现 K8S 集群的调度服务。
 
   当前版本中，我们提供了调度器适配器的适用版本的二进制文件 [scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
 
@@ -75,9 +75,9 @@ imageTag: ai-beta.1
 
 ### LDAP
 
-当前 **AI 系统（beta）** 版本中我们仍然延续 **SCOW** 系统的认证系统服务，采用基于 [LDAP](../../config/auth/ldap.md) 认证系统进行用户认证。
+当前 **AI 系统（beta）** 版本中我们仍然延续 **OpenSCOW** 系统的认证系统服务，采用基于 [LDAP](../../config/auth/ldap.md) 认证系统进行用户认证。
 
-在 K8S 集群中仍然需要像 **SCOW** 系统的 `hpc集群` 一样，在管理节点安装 `LDAP服务端` ，在所有节点安装 `LDAP客户端` 。
+在 K8S 集群中仍然需要像 **OpenSCOW** 系统的 `hpc集群` 一样，在管理节点安装 `LDAP服务端` ，在所有节点安装 `LDAP客户端` 。
 
 
 ## 配置文件
@@ -100,7 +100,7 @@ ai:
 
 此外我们支持了不同容器运行时，并提供了进入运行中的 k8s 作业容器的进行 shell 操作的功能。
 
-为了能够在 Kubernetes 集群中通过 kubectl 进入到所有命名空间的容器中执行命令（例如 /bin/sh），需要提供一份 kubeconfig 配置文件。该配置文件的 current context 中的用户需要使用 ClusterRole 创建并具备一定的权限，这些权限包括对 pods/exec 的 create 操作，以及对 pods 的 get 和 list 操作。创建完成后，需要将 kubeconfig 文件放置到 SCOW 部署目录中的 config 目录下，然后在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
+为了能够在 Kubernetes 集群中通过 kubectl 进入到所有命名空间的容器中执行命令（例如 /bin/sh），需要提供一份 kubeconfig 配置文件。该配置文件的 current context 中的用户需要使用 ClusterRole 创建并具备一定的权限，这些权限包括对 pods/exec 的 create 操作，以及对 pods 的 get 和 list 操作。创建完成后，需要将 kubeconfig 文件放置到 OpenSCOW 部署目录中的 config 目录下，然后在`config/clusters/{K8S集群的ID}.yml`中，添加如下内容
 
 ```yaml title="config/clusters/{K8S集群的ID}.yml"
 # 其他配置省略
@@ -111,7 +111,7 @@ k8s:
   runtime: containerd
   # kubeconfig 相关配置
   kubeconfig:
-    # 相对于 SCOW 部署目录下 config 目录的路径
+    # 相对于 OpenSCOW 部署目录下 config 目录的路径
     path: /kube/xxx
 ```
 

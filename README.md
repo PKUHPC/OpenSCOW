@@ -1,7 +1,7 @@
 # <img src="apps/portal-web/assets/icons/192.png" height="30px" /> OpenSCOW - Super Computing On Web
 
-![Docs](https://github.com/PKUHPC/SCOW/actions/workflows/docs.yaml/badge.svg)
-![Build](https://github.com/PKUHPC/SCOW/actions/workflows/test-build-publish.yaml/badge.svg)
+![Docs](https://github.com/PKUHPC/OpenSCOW/actions/workflows/docs.yaml/badge.svg)
+![Build](https://github.com/PKUHPC/OpenSCOW/actions/workflows/test-build-publish.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/PKUHPC/SCOW/branch/master/graph/badge.svg?token=S9JCB2DXML)](https://codecov.io/gh/PKUHPC/SCOW)
 
 [English README](./README.en.md)
@@ -34,7 +34,7 @@ OpenSCOW是一个面向超算使用员和管理员的、基于Web的超算门户
 | 普通用户   | `demo_user`  | `demo_user`  |
 | 管理员用户 | `demo_admin` | `demo_admin` |
 
-访问[文档](https://pkuhpc.github.io/SCOW/docs/info#%E4%BD%93%E9%AA%8C%E7%8E%AF%E5%A2%83)以了解更多关于这个演示集群的信息。
+访问[文档](https://pkuhpc.github.io/OpenSCOW/docs/info#%E4%BD%93%E9%AA%8C%E7%8E%AF%E5%A2%83)以了解更多关于这个演示集群的信息。
 
 ## 特点
 
@@ -45,11 +45,11 @@ OpenSCOW是一个面向超算使用员和管理员的、基于Web的超算门户
 
 ## 文档
 
-关于项目的更多信息，包括如何部署OpenSCOW，请参考[文档](https://pkuhpc.github.io/SCOW)。
+关于项目的更多信息，包括如何部署OpenSCOW，请参考[文档](https://pkuhpc.github.io/OpenSCOW)。
 
 ## 贡献
 
-请参考[贡献指南](https://pkuhpc.github.io/SCOW/docs/contribution)来了解如何参与OpenSCOW的开发。
+请参考[贡献指南](https://pkuhpc.github.io/OpenSCOW/docs/contribution)来了解如何参与OpenSCOW的开发。
 
 ## 授权协议
 

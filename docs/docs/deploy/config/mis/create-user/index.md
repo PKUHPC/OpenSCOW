@@ -5,13 +5,13 @@ title: 创建用户配置
 
 # 创建用户配置
 
-在以下情况下，管理系统允许用户或者管理员在SCOW中创建用户。
+在以下情况下，管理系统允许用户或者管理员在OpenSCOW中创建用户。
 
 - 初始化系统时，创建初始管理员账号
 - 添加用户到账户时，用户不存在
 - 租户管理员添加用户
 
-由于不同机构创建用户的方式完全不同，为了兼容易用性和可扩展性，我们从SCOW中创建用户的方式具有**内置(builtin)**和**外置(external)**两种方式。
+由于不同机构创建用户的方式完全不同，为了兼容易用性和可扩展性，我们从OpenSCOW中创建用户的方式具有**内置(builtin)**和**外置(external)**两种方式。
 
 ## 内置创建用户页面
 
@@ -24,7 +24,7 @@ createUser:
   # 允许用户创建用户。默认为true
   enabled: true
 
-  # 使用SCOW内置的创建用户功能。默认为builtin
+  # 使用OpenSCOW内置的创建用户功能。默认为builtin
   type: builtin
 
   # 内置创建用户功能配置
@@ -40,20 +40,20 @@ createUser:
 创建时对密码的要求，请参考[用户密码正则配置](../../customization/password-pattern.md)
 :::note
 
-如果您的认证系统不支持创建用户，且使用了内置的创建用户功能，那SCOW将会在创建用户时并不会显示创建用户的界面，而会通过报错等方式发出一个通知，告知用户系统无法创建用户。
+如果您的认证系统不支持创建用户，且使用了内置的创建用户功能，那OpenSCOW将会在创建用户时并不会显示创建用户的界面，而会通过报错等方式发出一个通知，告知用户系统无法创建用户。
 
 :::
 
 ## 外置创建用户界面
 
-如果内置创建用户界面不合您的需求，您可以自己开发单独的创建用户界面。SCOW将会在用户从SCOW中创建用户时，跳转到您指定的地址中。
+如果内置创建用户界面不合您的需求，您可以自己开发单独的创建用户界面。OpenSCOW将会在用户从OpenSCOW中创建用户时，跳转到您指定的地址中。
 
 ```yaml title="config/mis.yaml"
 createUser:
   # 允许用户创建用户。默认为true
   enabled: true
 
-  # 使用SCOW内置的创建用户功能 
+  # 使用OpenSCOW内置的创建用户功能 
   type: external
 
   # 外置创建用户界面
@@ -74,13 +74,13 @@ SCOW在跳转时，还会给URL附上如下查询字符串（querystring），�
 
 ![添加用户到账户但用户不存在](./prompt-when-user-does-not-exist.gif)
 
-## 关闭SCOW中创建用户功能
+## 关闭OpenSCOW中创建用户功能
 
-要想关闭SCOW的创建用户的功能，可以在配置文件中配置
+要想关闭OpenSCOW的创建用户的功能，可以在配置文件中配置
 
 ```yaml title="config/mis.yaml"
 createUser:
-  # 在SCOW中关闭创建用户功能
+  # 在OpenSCOW中关闭创建用户功能
   enabled: false
 ```
 

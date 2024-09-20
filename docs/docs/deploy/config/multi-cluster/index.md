@@ -5,19 +5,19 @@ slug: /multi_cluster
 sidebar_position: 1
 ---
 
-SCOW多集群部署架构如下图所示：
+OpenSCOW多集群部署架构如下图所示：
 
 ![img](multi-cluster.png)
 
 :::tip
 
-SCOW主要服务包括portal、mis、auth、gateway、db、audit、cli，支持多HPC集群管理，支持多种调度器(Slurm/CraneSched/K8S)。待接入的HPC集群需满足如下条件：
+OpenSCOW主要服务包括portal、mis、auth、gateway、db、audit、cli，支持多HPC集群管理，支持多种调度器(Slurm/CraneSched/K8S)。待接入的HPC集群需满足如下条件：
 
 1. 所有集群都必须使用同一个LDAP；
 
 1. 每个HPC集群NFS路径需相同，例如用户Home目录都为`/data/home`，软件安装目录都为`/data/software`。
 
-SCOW多集群管理设置：
+OpenSCOW多集群管理设置：
 
 1. 在每个集群管理节点上启动一个适配器服务；
 1. 每个集群有一个集群配置文件，即在`config/clusters`目录下每个集群有一个配置文件；
@@ -25,7 +25,7 @@ SCOW多集群管理设置：
 
 :::
 
-SCOW接入多集群部署，与接入一个集群的区别主要在于：
+OpenSCOW接入多集群部署，与接入一个集群的区别主要在于：
 
 (1) 每个slurm集群有一个集群配置文件，即在`config/clusters`目录下每个集群有一个配置文件，如下所示：
 

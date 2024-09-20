@@ -79,7 +79,7 @@ sed -i 's#PasswordAuthentication no#PasswordAuthentication yes#g' /etc/ssh/sshd_
 systemctl restart sshd
 ```
 
-此处slurm的编译请参见文档[slurm集群部署](https://pkuhpc.github.io/SCOW/docs/slurm) 中slurm编译相关内容
+此处slurm的编译请参见文档[slurm集群部署](https://pkuhpc.github.io/OpenSCOW/docs/slurm) 中slurm编译相关内容
 
 ## 2. slurm节点镜像制作
 
@@ -108,7 +108,7 @@ cp code-server-4.7.1-linux-amd64.tar.gz /root/
 1. 此处code-server的下载地址为：https://github.com/coder/code-server/releases/download/v4.7.1/code-server-4.7.1-linux-amd64.tar.gz
 2. 也可选择其他版本下载：https://github.com/coder/code-server/releases
 
-## 3. SCOW节点镜像制作
+## 3. OpenSCOW节点镜像制作
 
 基于vagrant官方centos/7镜像(7.8.2003)，执行如下命令：
 

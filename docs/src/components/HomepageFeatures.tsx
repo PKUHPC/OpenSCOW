@@ -29,7 +29,7 @@ const FeatureList: FeatureItem[] = [
     image: "/img/undraw_docusaurus_react.svg",
     description: (
       <>
-        SCOW让超算用户和运维人员都可以在浏览器中完成日常科研和运维任务。
+        OpenSCOW让超算用户和运维人员都可以在浏览器中完成日常科研和运维任务。
       </>
     ),
   },
@@ -38,7 +38,7 @@ const FeatureList: FeatureItem[] = [
     image: "/img/undraw_docusaurus_tree.svg",
     description: (
       <>
-        SCOW使用模块化结构，可以根据自己的需求部署全部或者部分功能。
+        OpenSCOW使用模块化结构，可以根据自己的需求部署全部或者部分功能。
       </>
     ),
   },
@@ -49,14 +49,14 @@ const FeatureList: FeatureItem[] = [
       <p>
         使用任何语言，<br/>
         通过
-        <Link href="/docs/integration/scow-api-hook/api">SCOW API</Link>
-        调用SCOW API，<br/>
+        <Link href="/docs/integration/scow-api-hook/api">OpenSCOW API</Link>
+        调用OpenSCOW API，<br/>
         通过
-        <Link href="/docs/integration/scow-api-hook/hook">SCOW Hook</Link>
-        监听SCOW事件，<br/>
+        <Link href="/docs/integration/scow-api-hook/hook">OpenSCOW Hook</Link>
+        监听OpenSCOW事件，<br/>
         使用
         <Link href="/docs/integration/ui-extension">UI扩展</Link>
-        将您的系统集成进SCOW。
+        将您的系统集成进OpenSCOW。
       </p>
     ),
   },

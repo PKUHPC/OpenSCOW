@@ -145,7 +145,7 @@ export default {
     },
   },
 
-  footer: "Powered by SCOW",
+  footer: "Powered by OpenSCOW",
 
   runningJob: {
     title: "My Running Jobs",

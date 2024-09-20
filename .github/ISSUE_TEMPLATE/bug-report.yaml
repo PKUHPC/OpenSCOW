@@ -19,8 +19,8 @@ body:
       description: |
         请先搜索您遇到的错误是否在已有的issues或讨论中提到过。
         Please search to see if an issue / discussion already exists for the bug you encountered.
-        [Issues](https://github.com/PKUHPC/SCOW/issues)
-        [Discussions](https://github.com/PKUHPC/SCOW/discussions)
+        [Issues](https://github.com/PKUHPC/OpenSCOW/issues)
+        [Discussions](https://github.com/PKUHPC/OpenSCOW/discussions)
       options:
         - label: 我已经搜索过已有的issues和讨论 | I have searched the existing issues / discussions
           required: true

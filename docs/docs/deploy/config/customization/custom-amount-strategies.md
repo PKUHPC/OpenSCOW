@@ -8,7 +8,7 @@ title: 通过代码自定义收费规则
 在管理系统中，您可以增加通过代码自定义收费规则，然后在配置文件中进行配置，就可以在创建新的计费项使用这个新的计量方式
 
 ## 增加配置目录及自定义规则js文件
-增加配置目录：`config/scripts`，放置您编写计费规则函数的js文件，这些js文件可以是commonjs或者esm的。SCOW通过require("路径")的方式读取这些脚本文件，并在计费的时候调用这个函数。例如，可以增加一个名为my-strategy.js的文件。文件应当默认导出一个如下的函数，返回一个数值：
+增加配置目录：`config/scripts`，放置您编写计费规则函数的js文件，这些js文件可以是commonjs或者esm的。OpenSCOW通过require("路径")的方式读取这些脚本文件，并在计费的时候调用这个函数。例如，可以增加一个名为my-strategy.js的文件。文件应当默认导出一个如下的函数，返回一个数值：
 
 ```js title="config/scripts/my-strategy.js"
 // 系统自带的计费规则请参考 apps/mis-server/src/bl/jobPrice.ts 文件中的 amountStrategyFuncs

@@ -16,7 +16,7 @@ title: 内置认证系统配置
 
 :::
 
-其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
+其中关于背景图片路径和自定义 logo 图片路径的设置可以参考[公共文件](https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/customization/public-files)进行配置。需要强调的是该路径是相对于公共文件的路径。
 ```yaml
 # auth 界面 ui 配置
 # 可根据不同域名进行不同的展示，当对应域名没有相应配置时采用 default 配置
@@ -32,7 +32,7 @@ ui:
       
     # 登录界面 logo，可选配置
     logo:
-      # 未配置自定义 logo（customLogoPath） 时，默认使用 SCOW Logo
+      # 未配置自定义 logo（customLogoPath） 时，默认使用 OpenSCOW Logo
       # light: 亮色模式下的 logo, dark: 黑暗模式下的 logo
       # 可选配置，默认为黑暗模式 logo
       scowLogoType: "dark"
@@ -151,7 +151,7 @@ mockUsers:
 ### 二、由您自己管理OTP密钥(otp.type为remote):
 
   1. 那么您需要提供一个验证otp码的接口, 并配置为`otp.remote.validateUrl`，返回验证的结果。返回结果要求json格式`{"result": true|false}`。
-  2. scow会使用fetch向上述接口（`otp.remote.validateUrl`）发起请求。fetch请求中`otpCode`为用户输入的otp码，`userId`为用户名，类型均为`string`。
+  2. OpenSCOW会使用fetch向上述接口（`otp.remote.validateUrl`）发起请求。fetch请求中`otpCode`为用户输入的otp码，`userId`为用户名，类型均为`string`。
 
   | fetch| |
   |:----:|:---------------------------------: |
@@ -300,9 +300,9 @@ otp:
           password: "y2es3bd3rYwxWs5n8g"
   # 如果mode指定为remote，需要配置以下内容
   remote:
-    # 远程验证url，例如http://localhost:9999/otp/remote/validateCode,详见https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config
+    # 远程验证url，例如http://localhost:9999/otp/remote/validateCode,详见https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config
     validateUrl: 
     # 当用户点击绑定OTP按钮时跳转的按钮，建议配置，不配置会不显示绑定otp按钮
-    # redirectUrl: https://pkuhpc.github.io/SCOW/docs/deploy/config/auth/config 
+    # redirectUrl: https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config 
 
 ```

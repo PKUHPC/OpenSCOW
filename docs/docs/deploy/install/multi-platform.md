@@ -1,19 +1,19 @@
 ---
 title: 多架构支持
 sidebar_position: 4
-description: SCOW对各类系统和架构的支持
+description: OpenSCOW对各类系统和架构的支持
 ---
 
 # 多架构支持
 
-SCOW系统支持以下运行环境的镜像。您只需在支持的机器上安装对应版本的docker，就可以拉取或者构建符合你当前机器架构的镜像。
+OpenSCOW系统支持以下运行环境的镜像。您只需在支持的机器上安装对应版本的docker，就可以拉取或者构建符合你当前机器架构的镜像。
 
 - `linux/amd64`
 - `linux/arm64`
 
-## `scow-cli`
+## `openscow-cli`
 
-`scow-cli`同样支持上述运行环境。请在下载时选择您部署所在的机器的操作系统和架构下载。
+`openscow-cli`同样支持上述运行环境。请在下载时选择您部署所在的机器的操作系统和架构下载。
 
 ## 编译支持多架构的镜像
 

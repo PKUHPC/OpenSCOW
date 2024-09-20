@@ -29,9 +29,9 @@ plugins:
 
 ### 覆盖`docker-compose.yml` 
 
-您可以通过此功能更改部署的Docker Compose配置，例如在SCOW网络中部署其他的容器，或者给已有的服务增加新的环境变量、端口等。
+您可以通过此功能更改部署的Docker Compose配置，例如在OpenSCOW网络中部署其他的容器，或者给已有的服务增加新的环境变量、端口等。
 
-在插件目录下，您可以编写`docker-compose.yml`文件，此文件将会与CLI生成的Docker Compose配置文件合并。CLI在调用docker compose时，使用`docker compose -f {scow-cli生成的compose文件} ...-f {所有插件的compose文件}`的方法执行。
+在插件目录下，您可以编写`docker-compose.yml`文件，此文件将会与CLI生成的Docker Compose配置文件合并。CLI在调用docker compose时，使用`docker compose -f {openscow-cli生成的compose文件} ...-f {所有插件的compose文件}`的方法执行。
 
 ```yaml title="plugins/plugin1/docker-compose.yml"
 version: "3"
@@ -46,5 +46,5 @@ services:
 
 如果您仅需要增加部分服务端功能，只需要增加一个插件服务即可。
 
-如果您需要增加页面功能，并与scow的http服务绑定在同一个端口上，需要在增加插件服务的同时增加gateway的配置，具体参考[网关配置](../../gateway/config/index.md)
+如果您需要增加页面功能，并与OpenSCOW的http服务绑定在同一个端口上，需要在增加插件服务的同时增加gateway的配置，具体参考[网关配置](../../gateway/config/index.md)
 

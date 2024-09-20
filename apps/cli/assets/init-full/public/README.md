@@ -4,4 +4,4 @@
 
 例如`public/test.png`，SCOW部署在`/scow`下，则您可以在`/scow/__public__/test.png`下访问到这个文件。
 
-请查看文档：https://pkuhpc.github.io/SCOW/docs/deploy/config/customization/public-files
+请查看文档：https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/customization/public-files

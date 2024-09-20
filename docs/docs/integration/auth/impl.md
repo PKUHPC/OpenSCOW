@@ -9,9 +9,9 @@ title: 实现自定义认证系统
 
 ## 基本概念
 
-SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作为用户在集群上的登录名。
+OpenSCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作为用户在集群上的登录名。
 
-用户登录后，认证系统应负责给当前登录用户的当前会话赋予一个Token，SCOW将会在每次需要认证的请求时使用token请求认证系统以获取用户的身份。
+用户登录后，认证系统应负责给当前登录用户的当前会话赋予一个Token，OpenSCOW将会在每次需要认证的请求时使用token请求认证系统以获取用户的身份。
 
 一个认证服务本质是一个实现了以下HTTP API的HTTP服务器。
 
@@ -46,7 +46,7 @@ SCOW中使用`identityId`标识一个用户，并同时使用此`identityId`作�
 
 ### GET /public/validateToken
 
-验证token，返回对应的用户ID。SCOW将会在每次需要验证的请求发生时，使用登录时获取的token请求此API，所以请保证此API的性能。
+验证token，返回对应的用户ID。OpenSCOW将会在每次需要验证的请求发生时，使用登录时获取的token请求此API，所以请保证此API的性能。
 
 #### 请求
 

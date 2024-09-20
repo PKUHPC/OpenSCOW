@@ -24,7 +24,7 @@ title: 开发
 
 ### 准备主机环境
 
-要开发SCOW，你的主机环境需要满足以下要求：
+要开发OpenSCOW，你的主机环境需要满足以下要求：
 
 - Linux/macOS/Windows
 - 安装好[docker](https://docs.docker.com/engine/install/)和[docker compose](https://docs.docker.com/compose/install/)

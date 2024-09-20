@@ -44,20 +44,20 @@ plugins:
 
 ```
 
-指定需要使用的SCOW的版本，生成代码
+指定需要使用的OpenSCOW的版本，生成代码
 
 ```bash
-# 通过#后的参数确认SCOW和SCOW API版本，可输入
-#    SCOW API的版本号（tag=api-v0.3.0）（推荐，从v0.3.0版本开始可用）
-#    SCOW的分支（branch=master）
-#    SCOW Tag号（tag=v0.4.0）
-# 不写默认使用SCOW的master分支版本
-buf generate --template buf.gen.yaml https://github.com/PKUHPC/SCOW.git#subdir=protos,branch=api-v0.3.0
+# 通过#后的参数确认OpenSCOW和OpenSCOW API版本，可输入
+#    OpenSCOW API的版本号（tag=api-v0.3.0）（推荐，从v0.3.0版本开始可用）
+#    OpenSCOW的分支（branch=master）
+#    OpenSCOW Tag号（tag=v0.4.0）
+# 不写默认使用OpenSCOW的master分支版本
+buf generate --template buf.gen.yaml https://github.com/PKUHPC/OpenSCOW.git#subdir=protos,branch=api-v0.3.0
 ```
 
-## 使用SCOW API
+## 使用OpenSCOW API
 
-编写Go代码使用调用SCOW API的代码
+编写Go代码使用调用OpenSCOW API的代码
 
 ```go title="api.go"
 package main
@@ -100,7 +100,7 @@ go mod tidy
 go run api.go
 ```
 
-## 实现并注册SCOW Hook
+## 实现并注册OpenSCOW Hook
 
 创建一个`hook.go`文件，实现HookServiceServer (protos/hook/hook.proto)
 
@@ -161,7 +161,7 @@ scowHook:
   url: localhost:5000
 ```
 
-重启SCOW。当SCOW有相关事件发生时，SCOW会调用Hook Server。
+重启OpenSCOW。当OpenSCOW有相关事件发生时，OpenSCOW会调用Hook Server。
 
 
 
