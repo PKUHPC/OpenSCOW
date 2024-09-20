@@ -65,6 +65,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       .httpError(400, () => { message.error(t(p("userIdAndNameNotMatch"))); })
       .then(() => {
         message.success(t(p("createSuccess")));
+        form.resetFields();
       })
       .finally(() => {
         message.destroy("createAccount");

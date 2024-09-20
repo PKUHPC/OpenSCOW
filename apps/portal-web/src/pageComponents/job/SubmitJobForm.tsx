@@ -265,7 +265,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
         : { accounts: [] as string[] };
     }, [cluster, accountsReloadTrigger]),
     onResolve: (data) => {
-
       if (isFirstAccountsQuery) {
         // 如果第一次查询账户列表时模板值中账户存在，则填入模板值的账户，分区,qos
         if (initial.account) {
@@ -304,14 +303,16 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
               // 第一次请求已经处理过
               setIsFirstParQuery(false);
             } else {
-              if (data?.partitions && data.partitions.length > 0) {
-                form.setFieldValue("partition", data.partitions[0].name);
-                form.setFieldValue("qos", data.partitions[0].qos?.[0]);
-              }
+              form.setFieldValue("partition", data?.partitions[0]?.name);
+              form.setFieldValue("qos", data?.partitions[0]?.qos?.[0]);
+              // 手动触发校验
+              form.validateFields(["partition", "qos"]);
             }
 
             setAccountPartitionsCacheMap(newPartitionsMap);
             handlePartitionCacheMap(newPartitionsMap);
+
+            return data.partitions;
           });
       };
       return { partitions: [] as Partition[] };
@@ -353,11 +354,12 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
     const cacheMap = accountPartitionsCacheMap[account];
     if (cacheMap) {
       handlePartitionCacheMap(accountPartitionsCacheMap);
-      form.setFieldsValue({ partition: cacheMap[0].name, qos: cacheMap[0].qos?.[0] });
+      form.setFieldsValue({ partition: cacheMap[0]?.name, qos: cacheMap[0]?.qos?.[0] });
     } else {
       setIsFirstParQuery(false);
       handlePartitionsReload();
     }
+
   };
 
   // 分区手动变更时

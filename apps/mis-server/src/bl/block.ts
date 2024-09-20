@@ -15,11 +15,14 @@ import { Logger } from "@ddadaal/tsgrpc-server";
 import { Loaded } from "@mikro-orm/core";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { ScowResourcePlugin } from "@scow/lib-scow-resource";
 import { BlockedFailedUserAccount } from "@scow/protos/build/server/admin";
+import { commonConfig } from "src/config/common";
 import { Account } from "src/entities/Account";
 import { UserAccount, UserStatus } from "src/entities/UserAccount";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
+import { unblockAccountAssignedPartitionsInCluster } from "src/utils/resourceManagement";
 
 import { getActivatedClusters } from "./clustersUtils";
 
@@ -59,9 +62,10 @@ export async function updateBlockStatusInSlurm(
     if (account.whitelist) {
       continue;
     }
-
     try {
       await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
+
+        // 封锁账户时，无论是否部署已授权分区的可选功能，需要在所有分区下进行封锁
         await asyncClientCall(client.account, "blockAccount", {
           accountName: account.accountName,
         }),
@@ -121,6 +125,7 @@ export async function updateBlockStatusInSlurm(
  **/
 export async function updateUnblockStatusInSlurm(
   em: SqlEntityManager<MySqlDriver>, clusterPlugin: ClusterPlugin["clusters"], logger: Logger,
+  scowResourcePlugin?: ScowResourcePlugin["resource"],
 ) {
   const accounts = await em.find(Account, {
     $or: [
@@ -146,16 +151,41 @@ export async function updateUnblockStatusInSlurm(
   }
 
   for (const account of accounts) {
-    try {
-      await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) =>
-        await asyncClientCall(client.account, "unblockAccount", {
-          accountName: account.accountName,
-        }),
-      );
-      unblockedAccounts.push(account.accountName);
-    } catch (error) {
-      logger.warn("Failed to unblock account %s in slurm: %o", account.accountName, error);
-      unblockedFailedAccounts.push(account.accountName);
+
+    // 执行解封操作
+
+    // 如果已配置资源管理功能,调用适配器的 unblockAccountWithPartitions
+    if (commonConfig.scowResource?.enabled) {
+      try {
+        await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
+          await unblockAccountAssignedPartitionsInCluster(
+            account.accountName,
+            account.tenant.getProperty("name"),
+            clusterId,
+            clusterPlugin,
+            logger,
+            scowResourcePlugin,
+          );
+        }));
+        unblockedAccounts.push(account.accountName);
+      } catch (error) {
+        logger.warn("Failed to unblock account %s in slurm: %o", account.accountName, error);
+        unblockedFailedAccounts.push(account.accountName);
+      }
+
+    // 如果未配置资源管理扩展功能， 调用适配器的 unblockAccount
+    } else {
+      try {
+        await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
+          await asyncClientCall(client.account, "unblockAccount", {
+            accountName: account.accountName,
+          });
+        });
+        unblockedAccounts.push(account.accountName);
+      } catch (error) {
+        logger.warn("Failed to unblock account %s in slurm: %o", account.accountName, error);
+        unblockedFailedAccounts.push(account.accountName);
+      }
     }
   }
 
@@ -191,6 +221,8 @@ export async function blockAccount(
   }
 
   await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
+
+    // 封锁账户时，无论是否部署已授权分区，需要在所有分区下进行封锁
     await asyncClientCall(client.account, "blockAccount", {
       accountName: account.accountName,
     });
@@ -215,15 +247,32 @@ export async function unblockAccount(
   currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin["clusters"],
   logger: Logger,
+  scowResourcePlugin?: ScowResourcePlugin["resource"],
 ): Promise<"OK" | "ALREADY_UNBLOCKED"> {
 
   if (!account.blockedInCluster) { return "ALREADY_UNBLOCKED"; }
 
-  await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
-    await asyncClientCall(client.account, "unblockAccount", {
-      accountName: account.accountName,
+  // 执行解封操作
+  // 如果已配置资源管理功能,调用适配器的 unblockAccountWithPartitions
+  if (commonConfig.scowResource?.enabled) {
+    await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
+      await unblockAccountAssignedPartitionsInCluster(
+        account.accountName,
+        account.tenant.getProperty("name"),
+        clusterId,
+        clusterPlugin,
+        logger,
+        scowResourcePlugin,
+      );
+    }));
+  // 如果未配置资源管理扩展功能， 调用适配器的 unblockAccount
+  } else {
+    await clusterPlugin.callOnAll(currentActivatedClusters, logger, async (client) => {
+      await asyncClientCall(client.account, "unblockAccount", {
+        accountName: account.accountName,
+      });
     });
-  });
+  }
 
   account.blockedInCluster = false;
   await callHook("accountUnblocked", { accountName: account.accountName, tenantName: account.tenant.$.name }, logger);

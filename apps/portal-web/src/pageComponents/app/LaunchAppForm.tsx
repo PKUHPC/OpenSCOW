@@ -181,7 +181,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         } })
           .httpError(404, (error) => { message.error(error.message); })
           .then(async (accountsResp) => {
-
             // 保存配置表单以外必填项的对象
             let requiredInputObj = {};
 
@@ -207,86 +206,86 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
               await api.getAvailablePartitionsForCluster({ query: {
                 cluster: clusterId,
                 accountName: firstInputAccount,
-              } }).then((partitionsResp) => {
-
-                if (partitionsResp?.partitions.length) {
+              } })
+                .then((partitionsResp) => {
+                  if (partitionsResp?.partitions.length && partitionsResp?.partitions.length > 0) {
                   // 如果上一次提交信息中的分区存在于当前账户可见分区列表,则填入上一次提交记录的分区,否则填入当前列表分区的第一项
-                  const resPartitions = partitionsResp.partitions;
-                  const setLastPartition = !!lastPartition &&
+                    const resPartitions = partitionsResp.partitions;
+                    const setLastPartition = !!lastPartition &&
                     resPartitions.some((item) => item.name === lastPartition);
 
-                  const firstPartitionInfo: Partition = setLastPartition ?
-                    resPartitions.find((item) => item.name === lastPartition)!
-                    : resPartitions[0];
+                    const firstPartitionInfo: Partition = setLastPartition ?
+                      resPartitions.find((item) => item.name === lastPartition)!
+                      : resPartitions[0];
 
-                  setCurrentPartitionInfo(firstPartitionInfo);
-                  setAccountPartitionsCacheMap({ [firstInputAccount]: resPartitions });
+                    setCurrentPartitionInfo(firstPartitionInfo);
+                    setAccountPartitionsCacheMap({ [firstInputAccount]: resPartitions });
 
-                  const setLastQos = setLastPartition &&
+                    const setLastQos = setLastPartition &&
                       firstPartitionInfo.qos?.some((item) => item === lastQos);
-                  const setLastCoreCount = setLastPartition && lastCoreCount &&
+                    const setLastCoreCount = setLastPartition && lastCoreCount &&
                       firstPartitionInfo.cores && firstPartitionInfo.cores >= lastCoreCount;
-                  const setLastNodeCount = setLastPartition && lastNodeCount &&
+                    const setLastNodeCount = setLastPartition && lastNodeCount &&
                       firstPartitionInfo.nodes && firstPartitionInfo.nodes >= lastNodeCount;
-                  const setLastGpuCount = setLastPartition && lastGpuCount &&
+                    const setLastGpuCount = setLastPartition && lastGpuCount &&
                       firstPartitionInfo.gpus && firstPartitionInfo.gpus >= lastGpuCount;
 
-                  requiredInputObj = {
-                    account: firstInputAccount,
-                    partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
-                    qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
-                    nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
-                    coreCount: setLastCoreCount ? lastCoreCount : initialValues.coreCount,
-                    gpuCount: setLastGpuCount ? lastGpuCount : initialValues.gpuCount,
-                    maxTime: lastMaxTime ?? initialValues.maxTime,
-                  };
+                    requiredInputObj = {
+                      account: firstInputAccount,
+                      partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
+                      qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
+                      nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
+                      coreCount: setLastCoreCount ? lastCoreCount : initialValues.coreCount,
+                      gpuCount: setLastGpuCount ? lastGpuCount : initialValues.gpuCount,
+                      maxTime: lastMaxTime ?? initialValues.maxTime,
+                    };
 
-                  // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
-                  const attributesInputObj = {};
-                  if (lastAttributes) {
-                    attributes.forEach((attribute) => {
-                      if (attribute.name in lastAttributes) {
-                        switch (attribute.type) {
-                          case "NUMBER":
-                            attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
-                            break;
-                          case "TEXT":
-                            attributesInputObj[attribute.name] = lastAttributes[attribute.name];
-                            break;
-                          case "SELECT":
-                          // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
-                            if (!firstPartitionInfo.gpus) {
-                            // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
-                              const selectOptions = attribute.select.filter((x) =>
-                                !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
+                    // 如果存在上一次提交信息且上一次提交信息中的配置HTML表单与当前配置HTML表单内容相同，则填入上一次提交信息中的值
+                    const attributesInputObj = {};
+                    if (lastAttributes) {
+                      attributes.forEach((attribute) => {
+                        if (attribute.name in lastAttributes) {
+                          switch (attribute.type) {
+                            case "NUMBER":
+                              attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
+                              break;
+                            case "TEXT":
+                              attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                              break;
+                            case "SELECT":
+                              // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
+                              if (!firstPartitionInfo.gpus) {
+                                // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
+                                const selectOptions = attribute.select.filter((x) =>
+                                  !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
 
-                              if (selectOptions.some((optionItem) =>
-                                optionItem.value === lastAttributes[attribute.name]))
-                              {
-                                attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                                if (selectOptions.some((optionItem) =>
+                                  optionItem.value === lastAttributes[attribute.name]))
+                                {
+                                  attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                                }
                               }
-                            }
-                            else {
-                              if (attribute.select.some((optionItem) =>
-                                optionItem.value === lastAttributes[attribute.name]))
-                              {
-                                attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                              else {
+                                if (attribute.select.some((optionItem) =>
+                                  optionItem.value === lastAttributes[attribute.name]))
+                                {
+                                  attributesInputObj[attribute.name] = lastAttributes[attribute.name];
+                                }
                               }
-                            }
 
-                            break;
-                          default:
-                            break;
+                              break;
+                            default:
+                              break;
+                          }
                         }
-                      }
-                    });
+                      });
+                    }
+
+                    form.setFieldsValue({ ...requiredInputObj, ...attributesInputObj });
                   }
 
-                  form.setFieldsValue({ ...requiredInputObj, ...attributesInputObj });
-                }
 
-
-              });
+                });
 
             }
 
@@ -312,7 +311,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   };
 
   const prevAccountsReloadTriggerRef = useRef<boolean>(false);
-  // 获取未封锁账户
+  // 获取未封锁账户.
   const unblockedAccountsQuery = useAsync({
     promiseFn: useCallback(async () => {
       // 确保进入页面后在查询上一次提交记录后，如果不点击账户刷新按钮不触发额外请求
@@ -323,6 +322,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         } })
           .httpError(404, (error) => { message.error(error.message); })
           .then((data) => {
+
             setSelectableAccounts(data.accounts);
             prevAccountsReloadTriggerRef.current = accountsReloadTrigger;
           });
@@ -343,8 +343,13 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           .then((data) => {
             newPartitionsMap[account] = data.partitions;
             setAccountPartitionsCacheMap(newPartitionsMap);
-            setCurrentPartitionInfo(data.partitions[0]);
-            restPartitionInfo(data.partitions[0]);
+            if (data.partitions.length > 0) {
+              setCurrentPartitionInfo(data.partitions[0]);
+              restPartitionInfo(data.partitions[0]);
+            } else {
+              setCurrentPartitionInfo(undefined);
+              restPartitionInfo(undefined);
+            }
           });
       };
       return { partitions: [] as Partition[] };
@@ -352,10 +357,10 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   });
 
   // 当需要重置分区信息时，分区信息重置
-  const restPartitionInfo = (partitionInfo: Partition) => {
+  const restPartitionInfo = (partitionInfo: Partition | undefined) => {
     form.setFieldsValue({
-      partition: partitionInfo.name,
-      qos: partitionInfo.qos?.[0],
+      partition: partitionInfo?.name,
+      qos: partitionInfo?.qos?.[0],
     });
     if (partitionInfo?.gpus) {
       form.setFieldValue("gpuCount", 1);

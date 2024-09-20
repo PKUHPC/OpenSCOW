@@ -39,3 +39,13 @@ passwordPattern:
 # 若systemLanguage配置为字符串，类型必须指定为当前系统合法语言["zh_cn"，"en"]的字符串枚举值
 # SCOW直接使用此语言，不允许用户再进行语言切换
 # systemLanguage: "zh_cn"
+
+
+# scow资源管理系统
+# scowResource:
+#   # 是否scow资源管理系统
+#   enabled: true
+#   # 资源管理系统url
+#   address: http://localhost:6003
+#   # 启动时是否执行封锁状态同步功能（如果暂未初始化资源管理数据，建议关闭；如已完成初始化资源管理数据则建议开启）
+#   syncBlockStatusWhenStart: false

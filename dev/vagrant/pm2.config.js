@@ -159,6 +159,20 @@ module.exports = {
       },
     },
     {
+      name: "resource",
+      script: "npm",
+      args: "run dev:server",
+      interpreter: "pnpm",
+      cwd: "./apps/resource",
+      env: {
+        PORT: "6003",
+        AUTH_INTERNAL_URL: "http://localhost:5000",
+        SERVER_URL: "http://localhost:6003",
+        ...PRODUCTION_ENV,
+        ...SCOW_CONFIG_PATH_ENV,
+      },
+    },
+    {
       name: "dev:libs",
       cwd: ".",
       script: "npm",

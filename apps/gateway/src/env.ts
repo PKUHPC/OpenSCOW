@@ -32,6 +32,9 @@ export const config = envConfig({
   NOTIFICATION_PATH: str({ desc: "消息系统路径", default: "/notification" }),
   NOTIFICATION_PATH_INTERNAL_URL: str({ desc: "消息系统内部路径", default: "http://notification:3000" }),
 
+  RESOURCE_PATH: str({ desc: "资源管理系统路径", default: "/resource" }),
+  RESOURCE_PATH_INTERNAL_URL: str({ desc: "资源管理系统内部路径", default: "http://resource:3000" }),
+
   VNC_PATH: str({ desc: "VNC客户端路径", default: "/vnc/" }),
   NOVNC_INTERNAL_URL: str({ desc: "NOVNC内部地址", default: "http://novnc:80/" }),
 

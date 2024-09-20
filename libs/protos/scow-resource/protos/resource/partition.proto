@@ -1,0 +1,113 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+syntax = "proto3";
+
+package resource;
+
+message AssignAccountOnCreateRequest {
+    string account_name = 1;
+    string tenant_name = 2;
+}
+
+message AssignAccountOnCreateResponse {
+    bool executed = 1;
+}
+
+message GetAccountsAssignedClusterIdsRequest {
+    repeated string account_names = 1;
+    string tenant_name = 2;
+}
+
+message GetAccountsAssignedClusterIdsResponse {
+    repeated string assigned_cluster_ids = 1;
+}
+
+message GetAccountAssignedPartitionsForClusterRequest {
+    string account_name = 1;
+    string tenant_name = 2;
+    string cluster_id = 3;
+}
+
+message GetAccountAssignedPartitionsForClusterResponse {
+    repeated string assigned_partition_names = 1;
+}
+
+message PartitionNames {
+    repeated string partition_names = 1;
+}
+
+message GetAccountsAssignedClustersAndPartitionsRequest {
+    repeated string account_names = 1;
+    string tenant_name = 2;
+}
+
+message GetAccountsAssignedClustersAndPartitionsResponse {
+    map<string, PartitionNames> assigned_cluster_partitions = 1;
+}
+
+message GetTenantAssignedClustersAndPartitionsRequest {
+    string tenant_name = 1;
+}
+
+message GetTenantAssignedClustersAndPartitionsResponse {
+    map<string, PartitionNames> assigned_cluster_partitions = 1;
+}
+
+message GetClusterAssignedAccountsRequest {
+    string cluster_id = 1;
+    string tenant_name = 2;
+}
+
+message GetClusterAssignedAccountsResponse {
+    repeated string account_names = 1;
+}
+
+
+service ClusterPartitionService {
+   /*
+   * description: assign an account with default assigned clusters and partitions when being created
+   * special-case:
+   * If the tenant does not have any default assigned clusters or partitions, do not write to the database, returns ture.'
+   * If the account already existed, returns true
+   */
+    rpc AssignAccountOnCreate(AssignAccountOnCreateRequest) returns (AssignAccountOnCreateResponse) {}
+
+   /*
+   * description: get accounts assigned cluster ids
+   */
+    rpc GetAccountsAssignedClusterIds(GetAccountsAssignedClusterIdsRequest) returns (GetAccountsAssignedClusterIdsResponse) {}
+
+   /*
+   * description: get account assigned parition names queried by clusterId
+   */
+    rpc GetAccountAssignedPartitionsForCluster(GetAccountAssignedPartitionsForClusterRequest) 
+        returns (GetAccountAssignedPartitionsForClusterResponse) {}
+
+   /*
+   * description: get accounts assigned clusters and partitions
+   */ 
+    rpc GetAccountsAssignedClustersAndPartitions(GetAccountsAssignedClustersAndPartitionsRequest) 
+        returns (GetAccountsAssignedClustersAndPartitionsResponse) {}
+    
+   /*
+   * description: get tenant assigned clusters and partitions
+   */
+    rpc GetTenantAssignedClustersAndPartitions(GetTenantAssignedClustersAndPartitionsRequest) 
+        returns (GetTenantAssignedClustersAndPartitionsResponse) {}
+
+    /*
+   * description: get assigned accounts queried by tenantName and clusterId
+   */
+    rpc GetClusterAssignedAccounts(GetClusterAssignedAccountsRequest) 
+        returns (GetClusterAssignedAccountsResponse) {}
+}

@@ -166,6 +166,9 @@ export const InstallConfigSchema = Type.Object({
     })),
   })),
 
+  resource: Type.Optional(Type.Object({
+    basePath: Type.String({ description: "资源管理系统的部署路径，相对于整个系统的basePath", default: "/resource" }),
+  })),
   notification: Type.Optional(Type.Object({
     basePath: Type.String({ description: "消息系统的部署路径，相对于整个系统的basePath", default: "/notification" }),
   })),

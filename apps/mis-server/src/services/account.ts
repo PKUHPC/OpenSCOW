@@ -17,12 +17,14 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
+import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
+import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
@@ -33,6 +35,7 @@ import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import { getAccountOwnerAndAdmin } from "src/utils/getAccountOwnerAndAdmin";
 import { toRef } from "src/utils/orm";
+import { unblockAccountAssignedPartitionsInCluster } from "src/utils/resourceManagement";
 import { sendMessage } from "src/utils/sendMessage";
 
 export const accountServiceServer = plugin((server) => {
@@ -85,6 +88,7 @@ export const accountServiceServer = plugin((server) => {
         if (result === "AlreadyBlocked") {
 
           // 如果账户已被手动冻结，提示账户已被冻结
+          // 当前scow暂未使用AccountState.FROZEN
           if (account.state === AccountState.FROZEN) {
             throw {
               code: Status.FAILED_PRECONDITION,
@@ -171,7 +175,7 @@ export const accountServiceServer = plugin((server) => {
         }
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger, server.ext.resource);
 
         return { executed: true };
       });
@@ -279,19 +283,30 @@ export const accountServiceServer = plugin((server) => {
         await em.removeAndFlush([account, userAccount]);
         throw e;
       };
-
+  
       const currentActivatedClusters = await getActivatedClusters(em, logger);
-      logger.info("Creating account in cluster.");
-      await server.ext.clusters.callOnAll(
-        currentActivatedClusters,
-        logger,
-        async (client) => {
-          await asyncClientCall(client.account, "createAccount", {
-            accountName, ownerUserId: ownerId,
-          });
 
-          // 判断为需在集群中封锁时
-          if (shouldBlockInCluster) {
+      // 如果已配置资源管理扩展功能，向资源管理数据库写入账户的默认授权集群与分区
+      if (commonConfig.scowResource?.enabled) {
+        // 此接口建立资源管理事务且不回滚，再次创建相同账户时会正常执行
+        await server.ext.resource.assignAccountOnCreate({
+          accountName,
+          tenantName: tenant.name,
+        }).catch(async (e) => {
+          await rollback(e);
+          throw mapTRPCExceptionToGRPC(e);
+        });
+      }
+
+      logger.info("Creating account in cluster.");
+      if (shouldBlockInCluster) {
+        await server.ext.clusters.callOnAll(
+          currentActivatedClusters,
+          logger,
+          async (client) => {
+            await asyncClientCall(client.account, "createAccount", {
+              accountName, ownerUserId: ownerId,
+            });
             await asyncClientCall(client.account, "blockAccount", {
               accountName,
             }).catch((e) => {
@@ -303,26 +318,62 @@ export const accountServiceServer = plugin((server) => {
                 throw e;
               }
             });
-          // 判断为需在集群中解封时
-          } else {
-            await asyncClientCall(client.account, "unblockAccount", {
-              accountName,
-            }).catch((e) => {
-              if (e.code === Status.NOT_FOUND) {
-                throw {
-                  code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
-                } as ServiceError;
-              } else {
-                throw e;
-              }
-            });
-          }
+          },  
+        ).catch(async (e) => {
+          await rollback(e);
+          throw e;
+        });
+      // 如果判断为要在集群中解封时
+      } else {
 
-        },
-      ).catch(async (e) => {
-        await rollback(e);
-        throw e;
-      });
+        // 条件1：如果配置了资源管理服务，则调用适配器的 unblockAccountWithPartitions 接口
+        if (commonConfig.scowResource?.enabled) {
+          await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
+            await server.ext.clusters.callOnOne(
+              clusterId,
+              logger,
+              async (client) => { 
+                await asyncClientCall(client.account, "createAccount", {
+                  accountName, ownerUserId: ownerId,
+                }); 
+              },      
+            );
+            await unblockAccountAssignedPartitionsInCluster(
+              account.accountName,
+              account.tenant.getProperty("name"),
+              clusterId,
+              server.ext.clusters,
+              logger,
+              server.ext.resource,
+            );
+          }));
+        // 条件2：如果没有配置资源管理服务，则调用适配器的 unblockAccount接口进行解封
+        } else {
+          await server.ext.clusters.callOnAll(
+            currentActivatedClusters,
+            logger,
+            async (client) => {
+              await asyncClientCall(client.account, "createAccount", {
+                accountName, ownerUserId: ownerId,
+              });
+              await asyncClientCall(client.account, "unblockAccount", {
+                accountName,
+              }).catch((e) => {
+                if (e.code === Status.NOT_FOUND) {
+                  throw {
+                    code: Status.INTERNAL, message: `Account ${accountName} hasn't been created. Unblock failed`,
+                  } as ServiceError;
+                } else {
+                  throw e;
+                }
+              });
+            },  
+          ).catch(async (e) => {
+            await rollback(e);
+            throw e;
+          });
+        }
+      }
 
       logger.info("Account has been created in cluster.");
 

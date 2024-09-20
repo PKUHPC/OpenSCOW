@@ -44,7 +44,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
   userId,
 }) => {
 
-  const { currentClusters, defaultCluster } = useStore(ClusterInfoStore);
+  const { currentClusters, defaultCluster, activatedClusters } = useStore(ClusterInfoStore);
 
   if (!defaultCluster && currentClusters.length === 0) {
     return <ClusterNotAvailablePage />;
@@ -101,7 +101,7 @@ export const AllJobQueryTable: React.FC<Props> = ({
           }}
         >
           <Form.Item label={t(p("clusterLabel"))} name="cluster">
-            <SingleClusterSelector />
+            <SingleClusterSelector clusterIds={activatedClusters.map((x) => x.id)} />
           </Form.Item>
           <Form.Item
             label={(

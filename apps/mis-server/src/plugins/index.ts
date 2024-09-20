@@ -18,6 +18,7 @@
 import type { MikroORM } from "@mikro-orm/core";
 import type { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import { Capabilities } from "@scow/lib-auth";
+import { ScowResourcePlugin, scowResourcePlugin } from "@scow/lib-scow-resource";
 import { apiAuthPlugin } from "@scow/lib-server";
 import { commonConfig } from "src/config/common";
 import { authServicePlugin } from "src/plugins/authService";
@@ -29,7 +30,8 @@ import { PricePlugin, pricePlugin } from "src/plugins/price";
 import { SyncBlockStatusPlugin, syncBlockStatusPlugin } from "src/plugins/syncBlockStatus";
 
 declare module "@ddadaal/tsgrpc-server" {
-  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin, SyncBlockStatusPlugin, ClearCachePlugin {
+  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin,
+    SyncBlockStatusPlugin, ScowResourcePlugin, ClearCachePlugin {
     orm: MikroORM<MySqlDriver>;
     capabilities: Capabilities;
   }
@@ -48,6 +50,16 @@ export const plugins = [
   syncBlockStatusPlugin,
   clearCachePlugin,
 ];
+
+if (commonConfig.scowResource?.enabled) {
+  // 当资源管理插件部署时，判断启动时是否执行 同步封锁状态
+  if (commonConfig.scowResource.syncBlockStatusWhenStart) {
+    plugins.push(syncBlockStatusPlugin);
+  }
+  plugins.push(scowResourcePlugin(commonConfig.scowResource));
+} else {
+  plugins.push(syncBlockStatusPlugin);
+}
 
 if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));

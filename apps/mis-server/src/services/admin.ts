@@ -14,6 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { ensureResourceManagementFeatureAvailable } from "@scow/lib-server";
 import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import {
   AdminServiceServer, AdminServiceService,
@@ -23,6 +24,7 @@ import {
 import { updateBlockStatusInSlurm } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { importUsers, ImportUsersData } from "src/bl/importUsers";
+import { commonConfig } from "src/config/common";
 import { Account } from "src/entities/Account";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
@@ -126,7 +128,19 @@ export const adminServiceServer = plugin((server) => {
       const result = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (client) => await asyncClientCall(client.account, "getAllAccountsWithUsers", {}),
+        async (client) => { 
+          
+          // 执行获取详细账户信息的操作
+          if (commonConfig.scowResource?.enabled) {
+          // 检查当前适配器是否具有资源管理可选功能接口，同时判断当前适配器版本
+            await ensureResourceManagementFeatureAvailable(client, logger);
+            // 调用适配器的 getAllAccountsWithUsersAndBlockedDetails
+            // TODO: 返回值中的 accountBlockedDetails 暂未使用
+            return await asyncClientCall(client.account, "getAllAccountsWithUsersAndBlockedDetails", {}); 
+          } else {
+            return await asyncClientCall(client.account, "getAllAccountsWithUsers", {});
+          }
+        },
       );
 
       const accounts: ClusterAccountInfo[] = [];

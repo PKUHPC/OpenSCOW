@@ -15,7 +15,8 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
-import { checkJobNameExisting, checkSchedulerApiVersion } from "@scow/lib-server";
+import { getClusterAssignedAccounts } from "@scow/lib-scow-resource";
+import { checkJobNameExisting, checkSchedulerApiVersion, libGetAccounts, libGetUserInfo } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -23,6 +24,8 @@ import { ApiVersion } from "@scow/utils/build/version";
 import path, { join } from "path";
 import { getClusterOps } from "src/clusterops";
 import { JobTemplate } from "src/clusterops/api/job";
+import { commonConfig } from "src/config/common";
+import { config } from "src/config/env";
 import { callOnOne, checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
@@ -52,6 +55,45 @@ export const jobServiceServer = plugin((server) => {
       const { cluster, userId, statusFilter } = request;
       await checkActivatedClusters({ clusterIds: cluster });
 
+      // 如果已部署了管理系统和资源管理系统，获取集群下已授权的账户 与管理系统数据的交集
+      if (config.MIS_DEPLOYED && commonConfig.scowResource?.enabled) {
+
+        // 获取用户在scow中的信息
+        const userInfo = await libGetUserInfo(logger, 
+          userId, 
+          config.MIS_SERVER_URL,
+          commonConfig.scowApi?.auth?.token,
+        );
+        const tenantName = userInfo.tenantName;
+        // 获取资源管理中的这个集群和租户下授权的账户名信息
+        const clusterAssignedAccountNames = await getClusterAssignedAccounts(
+          commonConfig.scowResource,
+          cluster,
+          tenantName,
+        );
+        // 获取scow数据库中账户数据
+        const misAccounts = await libGetAccounts(logger, 
+          userId, 
+          statusFilter, 
+          config.MIS_SERVER_URL, 
+          commonConfig.scowApi?.auth?.token);
+      
+        const filteredAccounts
+               = misAccounts.accounts.filter((account) => clusterAssignedAccountNames.includes(account));
+              
+        return [{ accounts: filteredAccounts }];
+      }
+
+      // 如果已部署了管理系统，从管理系统数据库中获取账户数据
+      if (config.MIS_DEPLOYED) {
+        const result = await libGetAccounts(logger, 
+          userId, 
+          statusFilter, 
+          config.MIS_SERVER_URL, 
+          commonConfig.scowApi?.auth?.token); 
+        return [result];
+      }
+    
       const reply = await callOnOne(
         cluster,
         logger,
@@ -76,6 +118,7 @@ export const jobServiceServer = plugin((server) => {
           const resp = await callOnOne(
             cluster,
             logger,
+            // 当没有特殊指定时，为查询所有分区下的状态
             async (client) => await asyncClientCall(client.account, "queryAccountBlockStatus", {
               accountName: account,
             }),

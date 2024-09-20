@@ -39,5 +39,7 @@ const UI_CONFIG_NAME = "ui";
 
 export type UiConfigSchema = Static<typeof UiConfigSchema>;
 
-export const getUiConfig: GetConfigFn<UiConfigSchema> = (baseConfigPath) =>
-  getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+export const getUiConfig: GetConfigFn<UiConfigSchema> = (baseConfigPath) => {
+  return getConfigFromFile(UiConfigSchema, UI_CONFIG_NAME, baseConfigPath ?? DEFAULT_CONFIG_BASE_PATH);
+};
+  

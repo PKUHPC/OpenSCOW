@@ -58,7 +58,7 @@ const languagesMap = {
 const FailEventHandler: React.FC = () => {
   const { message } = AntdApp.useApp();
   const userStore = useStore(UserStore);
-  const { publicConfigClusters, setCurrentClusters } = useStore(ClusterInfoStore);
+  const { publicConfigClusters, setCurrentClusters, setActivatedClusters } = useStore(ClusterInfoStore);
   const tArgs = useI18nTranslate();
   const languageId = useI18n().currentLanguage.id;
 
@@ -107,6 +107,7 @@ const FailEventHandler: React.FC = () => {
       if (e.data?.code === "NO_ACTIVATED_CLUSTERS") {
         message.error(tArgs("pages._app.noActivatedClusters"));
         setCurrentClusters([]);
+        setActivatedClusters([]);
         return;
       }
 
@@ -116,6 +117,7 @@ const FailEventHandler: React.FC = () => {
         const currentActivatedClusterIds = e.data.currentActivatedClusterIds;
         const activatedClusters = publicConfigClusters.filter((x) => currentActivatedClusterIds.includes(x.id));
         setCurrentClusters(activatedClusters);
+        setActivatedClusters(activatedClusters);
         return;
       }
 
@@ -150,6 +152,8 @@ interface ExtraProps {
   initialCurrentClusters: Cluster[];
   // 用于获取桌面功能是否可用，如集群配置文件中没有配置则判断门户的配置文件，需要通过SSR进行传递
   initialPortalRuntimeDesktopEnabled: boolean;
+  // 用户关联账户的已授权集群
+  userAssociatedClusterIds: string[] | undefined;
 }
 
 type Props = AppProps & { extra: ExtraProps };
@@ -169,6 +173,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
       extra.clusterConfigs,
       extra.initialCurrentClusters,
       extra.initialPortalRuntimeDesktopEnabled,
+      extra.userAssociatedClusterIds,
     );
   });
 
@@ -248,6 +253,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
     // 通过SSR获取门户系统配置文件中是否可用桌面功能
     // enabled: Type.Boolean({ description: "是否启动登录节点上的桌面功能", default: true }),
     initialPortalRuntimeDesktopEnabled: true,
+    userAssociatedClusterIds: undefined,
   };
 
   // This is called on server on first load, and on client on every page transition
@@ -271,6 +277,15 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
           token: token,
         };
 
+        if (publicConfig.MIS_DEPLOYED && runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled) {
+          const userAssociatedClusterIds = 
+          await api.getUserAssociatedClusterIds({ query: { 
+            token, 
+            userId: userInfo.identityId, 
+          } });
+          extra.userAssociatedClusterIds = userAssociatedClusterIds.clusterIds;
+        }
+
         // get cluster configs from config file
         const data = await api.getClusterConfigFiles({ query: { token } })
           .then((x) => x, () => ({ clusterConfigs: {} }));
@@ -292,7 +307,12 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
             clustersRuntimeInfo: currentClusters?.results,
             configClusters: publicConfigClusters,
             misDeployed: publicConfig.MIS_DEPLOYED });
-          extra.initialCurrentClusters = initialActivatedClusters.activatedClusters ?? [];
+          // 如果用户关联账户的已授权集群存在，则系统初始集群为在线集群与已授权集群的交集
+          const initialUserAssociatedClusters = extra.userAssociatedClusterIds ? 
+            initialActivatedClusters.activatedClusters?.filter((c) => (extra.userAssociatedClusterIds?.includes(c.id)))
+            : initialActivatedClusters.activatedClusters;
+
+          extra.initialCurrentClusters = initialUserAssociatedClusters ?? [];
 
           // use all clusters in config files
           const clusterSortedIdList = getSortedClusterIds(clusterConfigs);

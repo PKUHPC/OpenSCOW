@@ -73,19 +73,56 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           .httpError(500, () => {}),
       );
 
-      const rawClusterInfoResults = await Promise.allSettled(rawClusterInfoPromises);
-
       const rawClusterNodesInfoPromises = currentClusters.map((x) =>
         api
           .getClusterNodesInfo({ query: { cluster: x.id } })
           .httpError(500, () => {}),
       );
 
-      const rawClusterNodesInfoResults = await Promise.allSettled(rawClusterNodesInfoPromises);
+      // 并行处理两个Promise，不互相等待
+      const [rawClusterInfoResults, rawClusterNodesInfoResults] = await Promise.all([
+        Promise.allSettled(rawClusterInfoPromises),
+        Promise.allSettled(rawClusterNodesInfoPromises),
+      ]);
+
+      const rawAssignedClusterPartitions = await api.getUserAssociatedClusterPartitions({});
 
       const successfulNodesResults = rawClusterNodesInfoResults
         .map((result, idx) => {
           if (result.status === "fulfilled") {
+
+            // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
+            if (rawAssignedClusterPartitions?.clusterPartitions) {
+              // 判断当前集群是否为已授权集群
+              const isClusterAssigned = 
+                Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
+              if (isClusterAssigned) {
+                // 只返回已经授权的分区
+                const assignedPartitions = rawAssignedClusterPartitions.clusterPartitions[currentClusters[idx].id];
+                return {
+                  ...result,
+                  value: {
+                    nodeInfo: {
+                      clusterName: currentClusters[idx].id,
+                      nodes: result.value.nodeInfo.map((node) => {
+                        const filteredNodePartitions = node.partitions
+                          .filter((partition) => (assignedPartitions.includes(partition)));
+                        // 返回包含已过滤分区的节点信息
+                        // 如果一个分区也没有则不再返回对应节点信息
+                        return filteredNodePartitions.length > 0
+                          ? {
+                            ...node,
+                            partitions: filteredNodePartitions,
+                          }
+                          : null;
+                      }).filter((node) => (node !== null)),
+                    },
+                  },
+                } as PromiseSettledResult<FulfilledNodesResult>;
+                
+              }
+            }
+
             return {
               ...result,
               value: {
@@ -108,6 +145,30 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
       const successfulResults = rawClusterInfoResults
         .map((result, idx) => {
           if (result.status === "fulfilled") {
+
+            // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
+            if (rawAssignedClusterPartitions?.clusterPartitions) {
+              // 判断当前集群是否为已授权集群
+              const isClusterAssigned = 
+                Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
+              if (isClusterAssigned) {
+                // 只返回已经授权的分区
+                const assignedPartitions = rawAssignedClusterPartitions.clusterPartitions[currentClusters[idx].id];
+                const filteredPartitions = result.value.clusterInfo.partitions
+                  .filter((partition) => (assignedPartitions.includes(partition.partitionName)));
+                return {
+                  ...result,
+                  value: {
+                    clusterInfo: {
+                      clusterName: currentClusters[idx].id,
+                      partitions: filteredPartitions,
+                    },
+                  },
+                } as PromiseSettledResult<FulfilledResult>;
+                
+              }
+            }
+
             return {
               ...result,
               value: {
@@ -126,7 +187,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             result.status === "fulfilled",
         )
         .map((result) => result.value);
-
 
       const failedClusters = currentClusters.filter(
         (x) => !successfulResults.find((y) => y.clusterInfo.clusterName === x.id),

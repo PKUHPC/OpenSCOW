@@ -315,6 +315,11 @@ export const mockApi: MockApi<typeof api> = {
     },
   }),
 
+  getUserAssociatedClusterIds: async () => ({
+    clusterIds: ["hpc00", "hpc01", "hpc02"],
+  }),
+
+
   mergeFileChunks: null,
   initMultipartUpload: async () => ({
     tempFileDir: "home/user/scow/tempDir",
@@ -401,6 +406,13 @@ export const mockApi: MockApi<typeof api> = {
       idleMemMb: 0.5,
       allocGpuCount: 0.5,
     }],
+  }),
+
+  getUserAssociatedClusterPartitions: async () => ({
+    clusterPartitions: {
+      "hpc01": ["normal", "high", "low"],
+      "hpc02": ["gpu"],
+    },
   }),
 };
 

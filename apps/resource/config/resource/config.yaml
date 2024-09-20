@@ -1,0 +1,13 @@
+db:
+  host: 172.16.20.123
+  port: 3306
+  user: root
+  password: must!chang3this
+  dbName: scow_resource
+
+scow:
+  misServerUrl: 172.16.20.123:7571
+
+log:
+  level: debug
+  pretty: false

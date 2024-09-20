@@ -563,6 +563,7 @@ export default {
         setPrice: "Set Billing Price",
         object: "Object",
         newItemId: "New Price Item ID",
+        canNotSetUnAssignedPartition: "Unable to set the billing price for unauthorized partition.",
       },
       runningJobDrawer: {
         nodes: "Number of Nodes",

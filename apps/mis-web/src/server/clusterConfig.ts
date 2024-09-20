@@ -20,7 +20,7 @@ export async function getClusterConfigFiles(): Promise<Record<string, ClusterCon
 
   const client = getClient(ConfigServiceClient);
   const result = await asyncClientCall(client, "getClusterConfigFiles", {});
-
+  
   const modifiedClusters: Record<string, ClusterConfigSchema> = getClusterConfigsTypeFormat(result.clusterConfigs);
 
   return modifiedClusters;

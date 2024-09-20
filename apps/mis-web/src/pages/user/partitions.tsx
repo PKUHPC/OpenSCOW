@@ -69,6 +69,9 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
   const clusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
     .filter((x) => Object.keys(activatedClusters).includes(x.id));
   const sortedIds = clusterSortedIdList.filter((id) => activatedClusters[id]);
+
+  
+
   sortedIds.forEach((clusterId) => {
     useAsync({ promiseFn: useCallback(async () => {
       const cluster = activatedClusters[clusterId];

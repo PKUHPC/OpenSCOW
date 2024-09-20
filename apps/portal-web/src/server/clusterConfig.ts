@@ -19,6 +19,7 @@ import { getClient } from "src/utils/client";
 export async function getClusterConfigFiles(): Promise<Record<string, ClusterConfigSchema>> {
 
   const client = getClient(ConfigServiceClient);
+  
   const result = await asyncClientCall(client, "getClusterConfigFiles", {});
 
   const modifiedClusters: Record<string, ClusterConfigSchema> = getClusterConfigsTypeFormat(result.clusterConfigs);

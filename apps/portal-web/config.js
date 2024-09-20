@@ -136,6 +136,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     },
 
     PROTOCOL: config.PROTOCOL,
+
+    SCOW_RESOURCE_CONFIG: commonConfig.scowResource,
   };
 
   // query auth capabilities to set optional auth features

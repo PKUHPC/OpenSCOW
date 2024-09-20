@@ -157,7 +157,9 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const clusterInfoStore = useConstant(() => {
     return createStore(
       ClusterInfoStore,
-      extra.clusterConfigs, extra.initialActivatedClusters, extra.initialSimpleClustersInfo,
+      extra.clusterConfigs, 
+      extra.initialActivatedClusters, 
+      extra.initialSimpleClustersInfo,
     );
   });
 

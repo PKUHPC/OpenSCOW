@@ -563,6 +563,7 @@ export default {
         setPrice:"设置计费价格",
         object:"对象",
         newItemId:"新计费价格编号",
+        canNotSetUnAssignedPartition: "无法设置未授权的分区的计费价格",
       },
       runningJobDrawer:{
         nodes:"节点数（个）",

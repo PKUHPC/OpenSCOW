@@ -104,7 +104,6 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
     pendingJobCount: 0,
   };
 
-
   return (
     <Card
       style={{ width:"100%" }}

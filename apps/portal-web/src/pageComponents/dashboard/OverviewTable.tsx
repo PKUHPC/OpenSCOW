@@ -109,14 +109,15 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
 
   // 找到对应平台概览
   const selectedClusterOverview = useMemo(() => {
-    if (!selectItem?.clusterName) {
+    if (activeTabKey === "platformOverview" || !selectItem?.clusterName) {
       return undefined;
     };
-    return clustersOverview.find(
+    const view = clustersOverview.find(
       (overview) =>
-        overview.clusterName === selectItem.clusterName,
+        overview.clusterName === activeTabKey,
     );
-  }, [selectItem, clustersOverview, languageId]);
+    return view;
+  }, [activeTabKey, clustersOverview, languageId, selectItem]);
 
   // 当activekey改变时表格数据显示的逻辑
   const filteredClusterInfo = useMemo(() => {
@@ -124,7 +125,8 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
       setSelectId(undefined);
       return clustersOverview;
     }
-    return clusterInfo.filter((info) => info.clusterName === activeTabKey);
+    const info = clusterInfo.filter((info) => info.clusterName === activeTabKey);
+    return info;
   }, [activeTabKey, clusterInfo, languageId]);
 
   useEffect(() => {
@@ -147,7 +149,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
     (isLoading || currentClusters.length > 0) ? (
       <Container>
         <InfoPanes
-          selectItem={selectId == undefined ? platformOverview : selectedClusterOverview}
+          selectItem={activeTabKey === "platformOverview" ? platformOverview : selectedClusterOverview}
           loading={isLoading}
           activeTabKey={activeTabKey}
           onTabChange={setActiveTabKey}
@@ -209,7 +211,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
               compareWithUndefined(a.info?.usageRatePercentage, b.info?.usageRatePercentage, sortOrder)}
             hidden={clusterInfo.every((item) => item.usageRatePercentage === undefined)}
             render={(_, r) => (
-              r.info?.usageRatePercentage !== undefined ? (
+              (r.info?.usageRatePercentage !== undefined && !isNaN(r.info.usageRatePercentage)) ? (
                 <div>
                   <CustomProgress
                     percent={Math.min(Number(r.info?.usageRatePercentage.toFixed(2) ?? 0), 100)}
@@ -227,7 +229,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("cpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.cpuUsage, b.info?.cpuUsage, sortOrder)}
             render={(_, r) => (
-              r.info?.cpuUsage !== undefined ? (
+              (r.info?.cpuUsage !== undefined && !isNaN(parseFloat(r.info?.cpuUsage))) ? (
                 <div>
                   <CustomProgress
                     percent={Math.min(Number(Number(r.info?.cpuUsage ?? 0).toFixed(2)), 100)}
@@ -245,7 +247,7 @@ export const OverviewTable: React.FC<Props> = ({ clusterInfo, failedClusters,
             title={t(p("gpuUsage"))}
             sorter={(a, b, sortOrder) => compareWithUndefined(a.info?.gpuUsage, b.info?.gpuUsage, sortOrder) }
             render={(_, r) => (
-              r.info?.gpuUsage !== undefined ? (
+              (r.info?.gpuUsage !== undefined && !isNaN(parseFloat(r.info?.gpuUsage))) ? (
                 <div>
                   <CustomProgress
                     percent={Math.min(Number(Number(r.info.gpuUsage).toFixed(2)), 100)}

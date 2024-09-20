@@ -88,3 +88,49 @@ export function getCurrentLanguageId(req: IncomingMessage | undefined,
   // 如果判断不出，或者autoDetectWhenUserNotSet为false则直接使用默认语言
   return systemLanguageConfig.defaultLanguage;
 };
+
+
+
+const splitter = /(\{\})/;
+
+/**
+ * 根据当前语言获取带有插值变量的国际化文本
+ * @param languageItem 国际化文本
+ * @param placeholderValues 插值变量
+ * @returns
+ */
+export const getCurrentLangTextArgs = (
+  languageItem: string,
+  placeholderValues?: React.ReactNode[],
+): string | React.ReactNode | undefined => {
+
+  const value = languageItem;
+
+  if (value && typeof value === "string") {
+    if (placeholderValues && placeholderValues.length > 0) {
+      // 使用正则表达式进行占位符替换
+      const array = value.split(splitter) as React.ReactNode[];
+      let ri = 0;
+
+      let containsNonPrimitive = false;
+
+      for (let i = 1; i < array.length; i += 2) {
+        if (typeof placeholderValues[ri] === "object") {
+          containsNonPrimitive = true;
+        }
+        array[i] = placeholderValues[ri++];
+      }
+
+      if (!containsNonPrimitive) {
+        return array.join("");
+      }
+
+      return array.filter((item) => item !== "{}");
+    } else {
+      return value;
+    }
+  } else {
+    return undefined;
+  }
+
+};
