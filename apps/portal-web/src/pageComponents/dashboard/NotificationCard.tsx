@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { useDarkMode } from "@scow/lib-web/build/layouts/darkMode";
 import { App, Button, Card, List, Typography } from "antd";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -36,6 +37,7 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
   const [msgContents, setMsgContents] = useState<RenderContent[]>();
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { dark } = useDarkMode();
 
   const currentLanguage = useI18n().currentLanguage;
 
@@ -103,7 +105,10 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
         renderItem={(item) => (
           <List.Item key={item.id} style={{ borderBottom: "none", padding: "4px 0" }}>
             <List.Item.Meta
-              style={{ background: "#F7F7F7", borderRadius: "4px", padding: "4px 6px" }}
+              style={{
+                ...dark ? { background: "#282828" } : { background: "#F7F7F7" },
+                borderRadius: "4px", padding: "4px 6px",
+              }}
               title=<div style={{ fontWeight: 700, fontSize: "14px", margin: "0" }}>{item.title}</div>
               description=<Text style={{ fontWeight: 350, fontSize: "14px" }} ellipsis={true}>{item.description}</Text>
             />
