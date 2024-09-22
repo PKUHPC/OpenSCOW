@@ -19,7 +19,7 @@ import { fetchAllUsers } from "./auth/get-user";
 import { logger } from "./logger";
 import { getMessageTypeData } from "./message-type";
 import { getUserNotificationPreferences } from "./notice-type";
-import { replaceTemplate } from "./template";
+import { replaceTemplate } from "./rendering-message";
 
 interface AdminSendMsgToBridge {
   senderType: SenderType;
@@ -54,28 +54,32 @@ export async function adminSendMsgToBridge(info: AdminSendMsgToBridge) {
   if (targetType === TargetType.USER) {
     const usersInfo = await fetchAllUsers(targetIds, logger);
 
+    usersInfo.forEach(async (info) => {
+      if (info === undefined) {
+        return;
+      }
+
+      await client.messageBridge.sendMessage({
+        messageInfo: { title, content },
+        messageTypeInfo: { type: messageType, category },
+        senderInfo: { senderType, senderId },
+        targetInfo: { targetType, userInfo: {
+          userId: info?.identityId, name: info?.name, email: info?.email,
+        } },
+        noticeTypes,
+      });
+
+    });
+  } else {
     await client.messageBridge.sendMessage({
       messageInfo: { title, content },
       messageTypeInfo: { type: messageType, category },
       senderInfo: { senderType, senderId },
-      targetInfo: { targetType, ...usersInfo ? {
-        usersInfo: usersInfo.map((info) => ({
-          userId: info?.identityId,
-          name: info?.name,
-          email: info?.email,
-        })),
-      } : {} },
+      targetInfo: { targetType },
       noticeTypes,
     });
   }
 
-  await client.messageBridge.sendMessage({
-    messageInfo: { title, content },
-    messageTypeInfo: { type: messageType, category },
-    senderInfo: { senderType, senderId },
-    targetInfo: { targetType },
-    noticeTypes,
-  });
 }
 
 export async function systemSendMsgToBridge(em: SqlEntityManager, info: SystemSendMsgToBridge) {
@@ -100,18 +104,16 @@ export async function systemSendMsgToBridge(em: SqlEntityManager, info: SystemSe
 
     await client.messageBridge.sendMessage({
       messageInfo: {
-        title: messageTypeData.titleTemplate?.default ?? "",
+        title: messageTypeData.titleTemplate.default ?? "",
         content: messageTypeData.contentTemplate
-          ? replaceTemplate(metadata, messageTypeData.contentTemplate?.default) : "" },
+          ? replaceTemplate(metadata.toJson(), messageTypeData.contentTemplate.default) : "",
+        metadata,
+      },
       messageTypeInfo: { type: messageType, category },
       senderInfo: { senderType, senderId },
-      targetInfo: { targetType, ...usersInfo ? {
-        usersInfo: usersInfo.map((info) => ({
-          userId: info?.identityId,
-          name: info?.name,
-          email: info?.email,
-        })),
-      } : {} },
+      targetInfo: { targetType, userInfo: {
+        userId: info?.identityId, name: info?.name, email: info?.email,
+      } },
       noticeTypes,
     });
   });

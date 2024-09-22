@@ -110,6 +110,7 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
               <Checkbox
                 key={noticeType}
                 value={noticeType}
+                disabled={NoticeType.SITE_MESSAGE === noticeType}
               >
                 {noticeTypeNameMap.get(noticeType)}
               </Checkbox>
