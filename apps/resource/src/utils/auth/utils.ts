@@ -1,4 +1,6 @@
 import { TRPCError } from "@trpc/server";
+import { PlatformRole, TenantRole } from "src/models/user";
+import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { Logger } from "ts-log";
 
 export const applicationJsonHeaders = { "content-type": "application/json" };
@@ -36,5 +38,10 @@ export class NoAvailableClustersError extends TRPCError {
       message: "There is no available clusters",
     });
   }
+}
+
+export function isResourceAdmin(user: ClientUserInfo): boolean {
+  return user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN) 
+      || user.tenantRoles.includes(TenantRole.TENANT_ADMIN);
 }
 

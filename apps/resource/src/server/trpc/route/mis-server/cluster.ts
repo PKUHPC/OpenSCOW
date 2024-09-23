@@ -5,9 +5,8 @@ import { getClusterConfigsTypeFormat } from "@scow/lib-web/build/utils/typeConve
 import { ConfigServiceClient as CommonConfigClient } from "@scow/protos/build/common/config";
 import { ClusterActivationStatus, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { TRPCError } from "@trpc/server";
-import { PlatformRole } from "src/models/user";
 import { getScowActivatedClusters } from "src/server/mis-server/cluster";
-import { NoAvailableClustersError, UserForbiddenError } from "src/utils/auth/utils";
+import { isResourceAdmin, NoAvailableClustersError, UserForbiddenError } from "src/utils/auth/utils";
 import { getClusterUtils } from "src/utils/clusterAdapter";
 import { logger } from "src/utils/logger";
 import { getScowClient } from "src/utils/scowClient";
@@ -164,7 +163,7 @@ export const currentClustersPartitionsInfo = authProcedure
     return mock(
       async () => {
 
-        if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        if (!isResourceAdmin(user)) {
           throw new UserForbiddenError(user.identityId);
         }
 

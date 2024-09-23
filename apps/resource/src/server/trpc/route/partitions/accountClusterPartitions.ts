@@ -1,13 +1,12 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureResourceManagementFeatureAvailable } from "@scow/lib-server";
 import { TRPCError } from "@trpc/server";
-import { PlatformRole } from "src/models/user";
 import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
 import { AccountPartitionRule } from "src/server/entities/AccountPartitionRule";
 import { getScowActivatedClusters, getScowClusterConfigs } from "src/server/mis-server/cluster";
 import { getScowAccounts } from "src/server/mis-server/tenantAccount";
 import { authProcedure } from "src/server/trpc/procedure/base";
-import { NoAvailableClustersError, UserForbiddenError } from "src/utils/auth/utils";
+import { isResourceAdmin, NoAvailableClustersError, UserForbiddenError } from "src/utils/auth/utils";
 import { getClusterUtils } from "src/utils/clusterAdapter";
 import { forkEntityManager } from "src/utils/getOrm";
 import { logger } from "src/utils/logger";
@@ -45,7 +44,7 @@ export const allAccountsAssignedClustersPartitions = authProcedure
 
         const { tenantName } = input;
 
-        if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        if (!isResourceAdmin(user)) {
           throw new UserForbiddenError(user.identityId);
         }
 
@@ -149,7 +148,7 @@ export const assignAccountCluster = authProcedure
 
     const { tenantName, accountName, clusterId } = input;
 
-    if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+    if (!isResourceAdmin(user)) {
       throw new UserForbiddenError(user.identityId);
     }
 
@@ -198,7 +197,7 @@ export const unAssignAccountCluster = authProcedure
 
     const { accountName, tenantName, clusterId } = input;
 
-    if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+    if (!isResourceAdmin(user)) {
       throw new UserForbiddenError(user.identityId);
     }
 
@@ -286,7 +285,7 @@ export const assignAccountPartition = authProcedure
 
     const { accountName, tenantName, clusterId, partition } = input;
 
-    if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+    if (!isResourceAdmin(user)) {
       throw new UserForbiddenError(user.identityId);
     }
 
@@ -383,7 +382,7 @@ export const unAssignAccountPartition = authProcedure
 
     const { accountName, tenantName, clusterId, partition } = input;
 
-    if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+    if (!isResourceAdmin(user)) {
       throw new UserForbiddenError(user.identityId);
     }
     // 检查现在是否有可用集群
@@ -473,7 +472,7 @@ export const accountAssignedPartitions = authProcedure
       async () => {
         const { accountName, tenantName } = input;
 
-        if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        if (!isResourceAdmin(user)) {
           throw new UserForbiddenError(user.identityId);
         }
 
@@ -525,7 +524,7 @@ export const accountAssignedClusters = authProcedure
       async () => {
         const { accountName, tenantName } = input;
 
-        if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        if (!isResourceAdmin(user)) {
           throw new UserForbiddenError(user.identityId);
         }
 
