@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.13.0
+
+### Minor Changes
+
+- 721b227: 新增消息系统
+
 ## 1.12.0
 
 ### Minor Changes

@@ -1,5 +1,20 @@
 # @scow/ai
 
+## 0.2.8
+
+### Patch Changes
+
+- Updated dependencies [a16b1e1]
+- Updated dependencies [721b227]
+- Updated dependencies [9895952]
+- Updated dependencies [0f02d9d]
+- Updated dependencies [5746037]
+  - @scow/lib-server@1.3.4
+  - @scow/lib-operation-log@2.1.9
+  - @scow/config@1.5.3
+  - @scow/lib-web@1.4.3
+  - @scow/rich-error-model@2.0.0
+
 ## 0.2.7
 
 ### Patch Changes
