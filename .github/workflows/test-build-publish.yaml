@@ -106,17 +106,14 @@ jobs:
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
-      - name: Create Release Pull Request or Publish
+      - name: Create Release Pull Request
         id: changesets
         uses: changesets/action@v1
         if: vars.RUN_RELEASE == 'true' && github.ref == 'refs/heads/master'
         with:
           version: pnpm ci:version
-          publish: pnpm ci:publish
-          createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
   scow-cli:
     needs: test-version-packages
