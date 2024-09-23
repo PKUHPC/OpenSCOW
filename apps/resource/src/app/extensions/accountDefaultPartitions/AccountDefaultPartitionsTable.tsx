@@ -48,7 +48,7 @@ export const AccountDefaultPartitionsTable: React.FC<AccountDefaultPartitionsPro
     isFetching: currentClustersFetching } = trpc.misServer.currentClusters.useQuery();
 
   const filteredData = useMemo(() => {
-    if (!data) return undefined;
+    if (!data || !currentClustersData) return undefined;
   
     const { cluster, partition } = query;
     const lowerPartition = partition?.toLowerCase();
@@ -56,10 +56,11 @@ export const AccountDefaultPartitionsTable: React.FC<AccountDefaultPartitionsPro
     return data.filter((x) => {
       const partitionMatch = lowerPartition ? x.partition.toLowerCase().includes(lowerPartition) : true;
       const clusterMatch = cluster?.id ? x.clusterId === cluster.id : true;
-  
-      return clusterMatch && partitionMatch;
+      const onlineMatch = currentClustersData.results?.some((currentCluster) => currentCluster.id === x.clusterId);
+
+      return clusterMatch && partitionMatch && onlineMatch;
     });
-  }, [data, query]);
+  }, [data, query, currentClustersData]);
 
   const removeFromDefaultPartitionsMutation = trpc.partitions.removeFromAccountDefaultPartitions.useMutation({
     onSuccess() {

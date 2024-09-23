@@ -68,7 +68,7 @@ export const languageDic = {
       details: {
         tenantName: "租户名",
         accountName: "账户名",
-        assignedClustersCount: "已授权极群数",
+        assignedClustersCount: "已授权集群数",
         assignedClusters: "已授权集群",
         assignedPartitionsCount:"已授权分区数",
         assignedPartitions: "已授权分区",

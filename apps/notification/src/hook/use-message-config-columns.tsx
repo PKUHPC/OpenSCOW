@@ -61,7 +61,7 @@ export function useMessageConfigColumns({
     };
     setNoticeTypeAllChecked({
       ...noticeTypeAllChecked,
-      [checkedNoticeType]: true,
+      [checkedNoticeType]: defaultCheckValue,
     });
   };
 

@@ -340,6 +340,7 @@ export default {
         notImport: "Not imported",
         userList: "User List",
         addWhitelist: "Add all accounts to the whitelist.",
+        errorMessage: "Failed to retrieve cluster users information.",
       },
       statisticCard: {
         total: "Total ",

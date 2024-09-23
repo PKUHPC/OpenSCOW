@@ -1,8 +1,10 @@
 "use client";
+import { Cluster } from "@scow/config/build/type";
 import { Descriptions, Drawer } from "antd";
 import { I18nDicType } from "src/models/i18n";
 import { PartitionOperationType } from "src/models/partition";
 import { AllAssignedInfoSchema } from "src/server/trpc/route/partitions/tenantClusterPartitions";
+import { getCurrentClusterI18nName } from "src/utils/i18n";
 
 interface Props {
   open: boolean;
@@ -10,6 +12,8 @@ interface Props {
   detail?: AllAssignedInfoSchema;
   onClose: () => void;
   language: I18nDicType;
+  languageId: string;
+  currentClustersData?: Cluster[];
 }
 
 type NestedKeys<T> = {
@@ -33,25 +37,32 @@ export const AssignedDetailsDrawer: React.FC<Props> = (props) => {
     const clusterMap: Record<string, string[]> = {};
 
     partitions.forEach(({ clusterId, partition }) => {
-      if (!clusterMap[clusterId]) {
-        clusterMap[clusterId] = [];
+      const clusterName = getCurrentClusterI18nName(clusterId, languageId, currentClustersData);
+      if (!clusterMap[clusterName]) {
+        clusterMap[clusterName] = [];
       }
-      clusterMap[clusterId].push(partition);
+      clusterMap[clusterName].push(partition);
     });
 
     return Object.entries(clusterMap)
-      .map(([clusterId, partitions]) => `${clusterId} : ${partitions.join(", ")}`)
+      .map(([clusterName, partitions]) => `${clusterName} :  ${partitions.join(", ")}`)
       .join("\n");
   };
 
-  const { detail, onClose, open, language } = props;
+  const { detail, onClose, open, language, languageId, currentClustersData } = props;
   const drawerItems: DrawerItem[] = [
     [language.clusterPartitionManagement.details.tenantName, "tenantName", String],
     [language.clusterPartitionManagement.details.accountName, "accountName", (v) => v || null],
     [language.clusterPartitionManagement.details.assignedClustersCount,
       "assignedInfo.assignedClustersCount", (v) => v.toString()],
     [language.clusterPartitionManagement.details.assignedClusters,
-      "assignedInfo.assignedClusters", (v) => v.join(", ")],
+      "assignedInfo.assignedClusters", (v) => {
+        const clusterNames = v.map((clusterId) => {
+          return getCurrentClusterI18nName(clusterId, languageId, currentClustersData);
+        });
+        return clusterNames.join(", ");
+      },
+    ],
     [language.clusterPartitionManagement.details.assignedPartitionsCount,
       "assignedInfo.assignedPartitionsCount", (v) => v.toString()],
     [language.clusterPartitionManagement.details.assignedPartitions, "assignedInfo.assignedPartitions", (v) => {

@@ -277,6 +277,15 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       } else {
         if (data.accounts && data.accounts.length > 0) {
           setSelectableAccounts(data.accounts);
+        } else {
+          setSelectableAccounts([]);
+          setSelectablePartitions([]);
+          form.setFieldValue("account", undefined);
+          form.setFieldValue("partition", undefined);
+          form.setFieldValue("qos", undefined);
+          // 手动触发校验
+          form.validateFields(["account", "partition", "qos"]);
+        
         }
       }
     },

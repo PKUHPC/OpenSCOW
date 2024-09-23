@@ -1,6 +1,6 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
-import { Cluster } from "@scow/config/build/type";
+import { Cluster, ClusterActivationStatus } from "@scow/config/build/type";
 import { getClusterConfigsTypeFormat } from "@scow/lib-web/build/utils/typeConversion";
 import { ConfigServiceClient as CommonConfigClient } from "@scow/protos/build/common/config";
 import { ConfigServiceClient } from "@scow/protos/build/server/config";
@@ -53,8 +53,9 @@ export async function getScowActivatedClusters(): Promise<Cluster[]> {
 
   const serverConfigClient = getScowClient(ConfigServiceClient);
   const clustersRuntimeInfo = await asyncClientCall(serverConfigClient, "getClustersRuntimeInfo", {});
-
-  const activatedClusters: Cluster[] = clustersRuntimeInfo.results.map((item) => {
+  const activatedRuntimeInfo = clustersRuntimeInfo.results.
+    filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED);
+  const activatedClusters: Cluster[] = activatedRuntimeInfo.map((item) => {
 
     return { id: item.clusterId, name: modifiedClustersInfo[item.clusterId].displayName };
   });

@@ -293,6 +293,8 @@ const ClusterPartitionInfoTable: React.FC<ClusterPartitionManagementInfoTablePro
         onClose={() => setPreviewItem(undefined)}
         operationType={operationType}
         language={language}
+        languageId={languageId}
+        currentClustersData={currentClustersData}
       />
     </div>
   );

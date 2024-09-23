@@ -48,7 +48,7 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     sublogger.info("Sync starts to run.");
 
     try {
-      return await synchronizeBlockStatus(f.ext.orm.em.fork(), sublogger, f.ext);
+      return await synchronizeBlockStatus(f.ext.orm.em.fork(), sublogger, f.ext, f.ext);
     } finally {
       synchronizeIsRunning = false;
     }

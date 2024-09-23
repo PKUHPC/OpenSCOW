@@ -1,4 +1,5 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ensureResourceManagementFeatureAvailable } from "@scow/lib-server";
 import { TRPCError } from "@trpc/server";
 import { PlatformRole } from "src/models/user";
 import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
@@ -245,7 +246,7 @@ export const unAssignAccountCluster = authProcedure
             accountName, clusterId, e);
           throw new TRPCError({
             message: `Can not block the unblocked account ${accountName} in cluster (ClusterId: ${clusterId}).
-                 Please refresh the page and try again later`,
+                 Please confirm the adapter version and try again later`,
             code: "CONFLICT",
           });
         });
@@ -323,8 +324,11 @@ export const assignAccountPartition = authProcedure
       if (!accountInfo.results[0].blocked) {
         await clustersUtil.callOnOne(
           clusterId,
+        
           logger,
           async (adapterClient) => {
+            // 检查当前适配器是否具有资源管理可选功能接口，同时判断当前适配器版本
+            await ensureResourceManagementFeatureAvailable(adapterClient, logger);
             await asyncClientCall(adapterClient.account, "unblockAccountWithPartitions", {
               accountName,
               unblockedPartitions: [ partition ],
@@ -336,9 +340,9 @@ export const assignAccountPartition = authProcedure
             accountName, clusterId, partition, e);
           throw new TRPCError({
             message:
-            `Can not unblock the unblocked account ${accountName} in partition
+            `Can not unblock the account ${accountName} in partition
              (ClusterId: ${clusterId}, Name: ${partition}).
-              Please refresh the page and try again later`,
+              Please confirm the adapter version and try again later`,
             code: "CONFLICT",
           });
         });
@@ -391,7 +395,7 @@ export const unAssignAccountPartition = authProcedure
     if (!currentClusterIds.includes(clusterId)) {
       throw new TRPCError({
         message: `Can not find cluster ${clusterId} in current activated clusters.
-          Please refresh the page and try again later`,
+          Please confirm the adapter version and try again later`,
         code: "NOT_FOUND",
       });
     }
@@ -417,6 +421,8 @@ export const unAssignAccountPartition = authProcedure
           clusterId,
           logger,
           async (adapterClient) => {
+
+            await ensureResourceManagementFeatureAvailable(adapterClient, logger);
             await asyncClientCall(adapterClient.account, "blockAccountWithPartitions", {
               accountName,
               blockedPartitions: [ partition ],
@@ -427,9 +433,9 @@ export const unAssignAccountPartition = authProcedure
             accountName, clusterId, partition, e);
           throw new TRPCError({
             message:
-             `Can not block the unblocked account ${accountName} in partition
+             `Can not block the account ${accountName} in partition
               (ClusterId: ${clusterId}, Name: ${partition}).
-              Please refresh the page and try again later`,
+              Please confirm the adapter version and try again later`,
             code: "CONFLICT",
           });
         });

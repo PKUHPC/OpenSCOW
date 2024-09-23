@@ -137,12 +137,18 @@ export async function ensureResourceManagementFeatureAvailable(
 
   // 需要满足1.8.0版本适配器及以上
   const minRequiredApiVersion: ApiVersion = { major: 1, minor: 8, patch: 0 };
+
   await checkSchedulerApiVersion(client, minRequiredApiVersion);
 
   const optionalFeatures = await listSchedulerAdapterOptionalFeatures(client, logger);
 
   if (!optionalFeatures.includes(OptionalFeatures.RESOURCE_MANAGEMENT)) {
-    throw new Error("Resource management feature is not available in the current adapter.");
+    throw {
+      code: Status.FAILED_PRECONDITION,
+      message: "precondition failed",
+      details: "Resource management feature is not available in the current adapter v"
+      + `${minRequiredApiVersion.major}.${minRequiredApiVersion.minor}.${minRequiredApiVersion.patch} .`,
+    } as ServiceError;
   }
 }
 

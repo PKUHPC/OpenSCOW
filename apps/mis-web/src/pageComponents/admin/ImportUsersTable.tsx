@@ -33,7 +33,7 @@ export const ImportUsersTable: React.FC = () => {
 
   const t = useI18nTranslateToString();
 
-  const { message } = App.useApp();
+  const { message, modal } = App.useApp();
 
   const qs = useQuerystring();
 
@@ -60,12 +60,23 @@ export const ImportUsersTable: React.FC = () => {
     return await api.getClusterUsers({ query: {
       cluster: cluster.id,
     },
-    }).then((data) => ({
-      accounts: data?.accounts?.map((account) => ({
-        owner: account.users[0]?.userId,
-        ...account,
-      })),
-    }));
+    })
+      .httpError(409, (e) => {
+        if (e.code === "FAILED_PRECONDITION" || e.code === "UNIMPLEMENTED") {
+          modal.error({
+            title: t(p("errorMessage")),
+            content: e.message,
+          });
+        } else {
+          throw e;
+        }
+      })
+      .then((data) => ({
+        accounts: data?.accounts?.map((account) => ({
+          owner: account.users[0]?.userId,
+          ...account,
+        })),
+      }));
   }, [cluster]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });

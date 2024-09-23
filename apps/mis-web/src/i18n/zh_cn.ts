@@ -340,6 +340,7 @@ export default {
         notImport:"未导入",
         userList:"用户列表",
         addWhitelist:"将所有账户加入白名单",
+        errorMessage: "获取集群用户信息失败",
       },
       statisticCard: {
         total: "总",

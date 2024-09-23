@@ -11,7 +11,8 @@
  */
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { AdminServiceClient } from "@scow/protos/build/server/admin";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -20,6 +21,7 @@ import { ClusterAccountInfo } from "src/models/UserSchemaModel";
 import { getClient } from "src/utils/client";
 import { queryIfInitialized } from "src/utils/init";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 // Cannot use GetClusterUsersResponse from protos
 export const GetClusterUsersResponse = Type.Object({
@@ -36,6 +38,14 @@ export const GetClusterUsersSchema = typeboxRouteSchema({
 
   responses: {
     200: GetClusterUsersResponse,
+
+    409: Type.Object({
+      code: Type.Union([
+        Type.Literal("FAILED_PRECONDITION"),
+        Type.Literal("UNIMPLEMENTED"),
+      ]),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -53,11 +63,18 @@ export default /* #__PURE__*/route(GetClusterUsersSchema,
 
     const client = getClient(AdminServiceClient);
 
-    const result = await asyncClientCall(client, "getClusterUsers", {
+    return await asyncUnaryCall(client, "getClusterUsers", {
       cluster,
-    });
-
-    return {
-      200: result,
-    };
+    })
+      .then((result) => ({ 200:  result }))
+      .catch(handlegRPCError({
+        [status.FAILED_PRECONDITION]: () => ({ 409: {
+          code: "FAILED_PRECONDITION" as const,
+          message: "The method is not supported with your current scheduler adapter version, " 
+        + "please confirm the adapter version detail" } }),
+        [status.UNIMPLEMENTED]: () => ({ 409: {
+          code: "UNIMPLEMENTED" as const,
+          message: "The scheduler API version can not be confirmed." } }),
+      }));
+    
   });

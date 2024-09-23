@@ -1,4 +1,5 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ensureResourceManagementFeatureAvailable } from "@scow/lib-server";
 import { TRPCError } from "@trpc/server";
 import { PlatformRole } from "src/models/user";
 import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
@@ -295,11 +296,15 @@ export const unAssignTenantCluster = authProcedure
     // 若上述等待移除的数据存在，则同步到数据库
       await em.flush();
 
-      throw new TRPCError({
-        message:
+      logger.info(
         `Unassign tenant ${tenantName} from cluster (ClusterId: ${clusterId}) failed.`
         + ` Accounts ${failedBlockedAccounts.toString()} were failed to be unassigned,`
         + ` while ${successfullyBlockedAccounts.toString()} were successfully unassigned.`,
+      );
+      throw new TRPCError({
+        message:
+        `Unassign tenant ${tenantName} from cluster (ClusterId: ${clusterId}) failed.`
+        + ` Accounts ${failedBlockedAccounts.toString()} were failed to be unassigned,`,
         code: "CONFLICT",
       });
     }
@@ -428,6 +433,8 @@ export const unAssignTenantPartition = authProcedure
         await Promise.allSettled(accountNameList.map(async (accountName) => {
           try {
             // 指定分区下封锁
+            // 检查当前适配器是否具有资源管理可选功能接口，同时判断当前适配器版本
+            await ensureResourceManagementFeatureAvailable(adapterClient, logger);
             const result = await asyncClientCall(adapterClient.account, "blockAccountWithPartitions", {
               accountName,
               blockedPartitions: [partition],
@@ -460,11 +467,15 @@ export const unAssignTenantPartition = authProcedure
       // 若上述等待移除的数据存在，则同步到数据库
       await em.flush();
 
+      logger.info(
+        `Unassign tenant ${tenantName} from partition ${partition} of cluster (ClusterId: ${clusterId}) failed.`
+          + ` Accounts ${failedBlockedAccounts.toString()} were failed to be unassigned,`
+          + ` while ${successfullyBlockedAccounts.toString()} were successfully unassigned.`);
+
       throw new TRPCError({
         message:
           `Unassign tenant ${tenantName} from partition ${partition} of cluster (ClusterId: ${clusterId}) failed.`
-          + ` Accounts ${failedBlockedAccounts.toString()} were failed to be unassigned,`
-          + ` while ${successfullyBlockedAccounts.toString()} were successfully unassigned.`,
+          + ` Accounts ${failedBlockedAccounts.toString()} were failed to be unassigned.`,
         code: "CONFLICT",
       });
     }

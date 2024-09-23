@@ -27,10 +27,15 @@ export const AccountDefaultClustersTable: React.FC<AccountDefaultClustersProps> 
 
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
 
-  const displayedData = useMemo(() => assignedClusterIds ? assignedClusterIds.map((id) => {
-    const name = currentClusters.find((cluster) => cluster.id === id)?.name;
-    return { id, name };
-  }) : undefined, [assignedClusterIds]);
+  const displayedData = useMemo(() => assignedClusterIds 
+    ? assignedClusterIds
+      .map((id) => {
+        const name = currentClusters.find((cluster) => cluster.id === id)?.name;
+        return name ? { id, name } : null;
+      })
+      .filter((item) => item !== null)
+    : undefined, 
+  [assignedClusterIds, currentClusters]);
 
   const removeFromDefaultClustersMutation = trpc.partitions.removeFromAccountDefaultClusters.useMutation({
     onSuccess() {

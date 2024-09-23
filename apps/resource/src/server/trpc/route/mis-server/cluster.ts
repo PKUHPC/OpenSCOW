@@ -3,7 +3,7 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Cluster } from "@scow/config/build/type";
 import { getClusterConfigsTypeFormat } from "@scow/lib-web/build/utils/typeConversion";
 import { ConfigServiceClient as CommonConfigClient } from "@scow/protos/build/common/config";
-import { ConfigServiceClient } from "@scow/protos/build/server/config";
+import { ClusterActivationStatus, ConfigServiceClient } from "@scow/protos/build/server/config";
 import { TRPCError } from "@trpc/server";
 import { PlatformRole } from "src/models/user";
 import { getScowActivatedClusters } from "src/server/mis-server/cluster";
@@ -59,7 +59,9 @@ export const currentClusters = authProcedure
 
         const clustersRuntimeInfo = await asyncClientCall(serverConfigClient, "getClustersRuntimeInfo", {});
 
-        const activatedClusters: Cluster[] = clustersRuntimeInfo.results.map((item) => {
+        const activatedRuntimeInfo = clustersRuntimeInfo.results.
+          filter((x) => x.activationStatus === ClusterActivationStatus.ACTIVATED);
+        const activatedClusters: Cluster[] = activatedRuntimeInfo.map((item) => {
           return { id: item.clusterId, name: modifiedClustersInfo[item.clusterId].displayName };
         });
 

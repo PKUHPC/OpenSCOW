@@ -42,7 +42,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   currentActivatedClusters: Record<string, ClusterConfigSchema>,
   clusterPlugin: ClusterPlugin["clusters"], 
   logger: Logger,
-  scowResourcePlugin?: ScowResourcePlugin,
+  scowResourcePlugin?: ScowResourcePlugin["resource"],
 )
 {
   const tenant = await em.findOneOrFail(Tenant, { name: DEFAULT_TENANT_NAME });
@@ -126,12 +126,11 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
     }
   }
   const finalUserAccounts = userAccounts.filter((_, i) => !indexes.includes(i));
-
   // 如果已配置资源管理服务，则向数据库写入新创建的账户数据
   if (commonConfig.scowResource?.enabled) { 
     await Promise.all(data.accounts.map(async (acc) => {
       // 失败时已写入的数据不回滚
-      await scowResourcePlugin?.resource.assignAccountOnCreate({
+      await scowResourcePlugin?.assignAccountOnCreate({
         accountName: acc.accountName,
         tenantName: tenant.name,
       }).catch(async (e) => {

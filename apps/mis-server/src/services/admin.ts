@@ -113,7 +113,7 @@ export const adminServiceServer = plugin((server) => {
         em,
         whitelist,
         currentActivatedClusters,
-        server.ext.clusters, logger);
+        server.ext.clusters, logger, server.ext.resource);
 
       return [reply];
 

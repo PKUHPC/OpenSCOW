@@ -56,6 +56,7 @@ export async function unblockAccountAssignedPartitionsInCluster(
       async (client) => { 
         // 检查当前适配器是否具有资源管理可选功能接口，同时判断当前适配器版本
         await ensureResourceManagementFeatureAvailable(client, logger);
+  
         // 调用适配器的 unblockAccountWithPartitions
         await asyncClientCall(client.account, "unblockAccountWithPartitions", {
           accountName,
@@ -63,5 +64,6 @@ export async function unblockAccountAssignedPartitionsInCluster(
         }); 
       },      
     );
+    
   }; 
 };
