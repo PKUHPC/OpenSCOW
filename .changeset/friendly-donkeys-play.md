@@ -11,7 +11,7 @@
 "@scow/config": patch
 "@scow/cli": minor
 "@scow/lib-web": patch
-"@scow/grpc-api": patch
+"@scow/grpc-api": minor
 ---
 
 新增消息系统
