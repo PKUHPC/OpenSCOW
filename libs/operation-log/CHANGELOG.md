@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.9
+
+### Patch Changes
+
+- 721b227: 新增消息系统
+  - @scow/protos@1.0.15
+
 ## 2.1.8
 
 ### Patch Changes

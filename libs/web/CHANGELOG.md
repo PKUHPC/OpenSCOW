@@ -1,5 +1,18 @@
 # @scow/lib-web
 
+## 1.4.3
+
+### Patch Changes
+
+- 721b227: 新增消息系统
+- 9895952: 新增资源管理系统，增加对租户/账户的集群，分区授权和取消授权的功能
+- 0f02d9d: 修复 navlink 只有图标没有文字是不水平居中的问题
+- 5746037: 修复 ui 扩展用户登出 bug，ui 扩展可通知 SCOW 登出用户
+- Updated dependencies [721b227]
+- Updated dependencies [9895952]
+  - @scow/config@1.5.3
+  - @scow/protos@1.0.15
+
 ## 1.4.2
 
 ### Patch Changes

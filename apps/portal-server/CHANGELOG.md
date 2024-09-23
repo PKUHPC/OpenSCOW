@@ -1,5 +1,25 @@
 # @scow/portal-server
 
+## 1.7.0
+
+### Minor Changes
+
+- 9895952: 新增资源管理系统，增加对租户/账户的集群，分区授权和取消授权的功能
+
+### Patch Changes
+
+- Updated dependencies [a16b1e1]
+- Updated dependencies [721b227]
+- Updated dependencies [9895952]
+  - @scow/lib-server@1.3.4
+  - @scow/scowd-protos@0.2.2
+  - @scow/config@1.5.3
+  - @scow/lib-scow-resource@0.2.0
+  - @scow/lib-scowd@1.1.2
+  - @scow/protos@1.0.15
+  - @scow/rich-error-model@2.0.0
+  - @scow/lib-scheduler-adapter@1.1.13
+
 ## 1.6.4
 
 ### Patch Changes

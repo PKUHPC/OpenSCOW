@@ -1,5 +1,11 @@
 # @scow/docs
 
+## 1.4.3
+
+### Patch Changes
+
+- 5746037: 修复 ui 扩展用户登出 bug，ui 扩展可通知 SCOW 登出用户
+
 ## 1.4.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @scow/scowd-protos
 
+## 0.2.2
+
+### Patch Changes
+
+- 721b227: 新增消息系统
+
 ## 0.2.1
 
 ### Patch Changes
