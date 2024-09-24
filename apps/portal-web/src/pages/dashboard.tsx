@@ -94,7 +94,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
             if (rawAssignedClusterPartitions?.clusterPartitions) {
               // 判断当前集群是否为已授权集群
-              const isClusterAssigned = 
+              const isClusterAssigned =
                 Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
               if (isClusterAssigned) {
                 // 只返回已经授权的分区
@@ -119,7 +119,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
                     },
                   },
                 } as PromiseSettledResult<FulfilledNodesResult>;
-                
+
               }
             }
 
@@ -149,7 +149,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
             if (rawAssignedClusterPartitions?.clusterPartitions) {
               // 判断当前集群是否为已授权集群
-              const isClusterAssigned = 
+              const isClusterAssigned =
                 Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
               if (isClusterAssigned) {
                 // 只返回已经授权的分区
@@ -165,7 +165,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
                     },
                   },
                 } as PromiseSettledResult<FulfilledResult>;
-                
+
               }
             }
 
@@ -330,11 +330,20 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             aggregatedData.gpuCoreCount -= count * (duplicateNode?.gpuCount ?? 0);
             aggregatedData.runningGpuCount -= count * (duplicateNode?.allocGpuCount ?? 0);
             aggregatedData.idleGpuCount -= count * (duplicateNode?.idleGpuCount ?? 0);
-            aggregatedData.notAvailableCpuCount -= aggregatedData.cpuCoreCount -
-            (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount);
-            aggregatedData.notAvailableGpuCount -= aggregatedData.gpuCoreCount -
-            (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount);
           });
+
+          console.dir(aggregatedData);
+
+          // 校验节点计算是否正确
+          if (aggregatedData.idleCpuCount > aggregatedData.cpuCoreCount) {
+            aggregatedData.idleCpuCount = aggregatedData.cpuCoreCount;
+          }
+
+          aggregatedData.notAvailableCpuCount -= aggregatedData.cpuCoreCount -
+          (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount);
+          aggregatedData.notAvailableGpuCount -= aggregatedData.gpuCoreCount -
+          (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount);
+
         }
 
         platformOverview.nodeCount += aggregatedData.nodeCount;
