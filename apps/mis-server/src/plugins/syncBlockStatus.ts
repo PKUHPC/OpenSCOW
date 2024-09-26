@@ -13,6 +13,7 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { SyncBlockStatusResponse } from "@scow/protos/build/server/admin";
 import cron from "node-cron";
+import { commonConfig } from "src/config/common";
 import { misConfig } from "src/config/mis";
 import { lastSyncTime, synchronizeBlockStatus } from "src/tasks/syncBlockStatus";
 
@@ -29,7 +30,9 @@ export interface SyncBlockStatusPlugin {
 
 export const syncBlockStatusPlugin = plugin(async (f) => {
   const synchronizeCron = misConfig.periodicSyncUserAccountBlockStatus?.cron ?? "0 4 * * *";
-  let synchronizeEnabled = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled;
+  // 如果配置了资源管理系统服务，则资源管理系统配置项 syncBlockStatusWhenStart 也为 true 时才在启动时满足 synchronizeEnabled
+  let synchronizeEnabled = !!misConfig.periodicSyncUserAccountBlockStatus?.enabled
+   && !(commonConfig.scowResource?.syncBlockStatusWhenStart === false);
   let synchronizeIsRunning = false;
 
   const logger = f.logger.child({ plugin: "syncBlockStatus" });
@@ -91,6 +94,6 @@ export const syncBlockStatusPlugin = plugin(async (f) => {
     logger.info("Started a new synchronization");
     void trigger();
   } else {
-    logger.info("Account/Account block sychronization is disabled.");
+    logger.info("Account/Account block synchronization is disabled.");
   }
 });
