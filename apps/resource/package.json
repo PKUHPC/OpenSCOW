@@ -12,7 +12,7 @@
     "start.mjs"
   ],
   "scripts": {
-    "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 NEXT_PUBLIC_RUNTIME_BASE_PATH=/rrr NEXT_PUBLIC_BASE_PATH=/rrr next dev",
+    "dev": "cross-env NEXT_PUBLIC_USE_MOCK=1 next dev",
     "dev:server": "cross-env NEXT_PUBLIC_USE_MOCK=0 next dev",
     "serve": "node start.mjs",
     "serve:next": "next start",
@@ -99,7 +99,7 @@
   "mikro-orm": {
     "useTsNode": true,
     "configPaths": [
-      "./src/server/db/mikro-orm.config.ts"
+      "./src/server/mikro-orm.config.ts"
     ]
   }
 }

@@ -52,14 +52,8 @@ export const plugins = [
 ];
 
 if (commonConfig.scowResource?.enabled) {
-  // 当资源管理插件部署时，判断启动时是否执行 同步封锁状态
-  if (commonConfig.scowResource.syncBlockStatusWhenStart) {
-    plugins.push(syncBlockStatusPlugin);
-  }
   plugins.push(scowResourcePlugin(commonConfig.scowResource));
-} else {
-  plugins.push(syncBlockStatusPlugin);
-}
+} 
 
 if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));

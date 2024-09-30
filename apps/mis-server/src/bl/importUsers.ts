@@ -156,7 +156,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
           failedUnblockAccounts.push(acc.accountName);
         } else {
           try {
-            await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger);
+            await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger, scowResourcePlugin);
           } catch (e) {
             // 集群解锁账户失败，记录失败账户
             failedUnblockAccounts.push(account.accountName);
