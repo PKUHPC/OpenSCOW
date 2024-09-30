@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { DeleteAllReadMessagesRequest } from "@scow/notification-protos/build/message_pb";
 import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NodeInfo } from "@scow/protos/build/portal/config";
 import { Col, Row } from "antd";
@@ -94,7 +95,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
             if (rawAssignedClusterPartitions?.clusterPartitions) {
               // 判断当前集群是否为已授权集群
-              const isClusterAssigned = 
+              const isClusterAssigned =
                 Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
               if (isClusterAssigned) {
                 // 只返回已经授权的分区
@@ -119,7 +120,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
                     },
                   },
                 } as PromiseSettledResult<FulfilledNodesResult>;
-                
+
               }
             }
 
@@ -149,7 +150,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             // 如果已配置资源管理扩展功能，则只显示关联账户已被授权的集群和分区
             if (rawAssignedClusterPartitions?.clusterPartitions) {
               // 判断当前集群是否为已授权集群
-              const isClusterAssigned = 
+              const isClusterAssigned =
                 Object.keys(rawAssignedClusterPartitions.clusterPartitions).includes(currentClusters[idx].id);
               if (isClusterAssigned) {
                 // 只返回已经授权的分区
@@ -165,7 +166,7 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
                     },
                   },
                 } as PromiseSettledResult<FulfilledResult>;
-                
+
               }
             }
 
@@ -271,7 +272,6 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
             acc.jobCount += partition.jobCount;
             acc.runningJobCount += partition.runningJobCount;
             acc.pendingJobCount += partition.pendingJobCount;
-            acc.partitionStatus += partition.partitionStatus;
             return acc;
           },
           {
@@ -305,6 +305,20 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           aggregatedData.runningNodeCount = realNode.filter((v) => v.state === 2).length;
           aggregatedData.notAvailableNodeCount = realNode.filter((v) => v.state === 3).length;
           aggregatedData.idleNodeCount = realNode.filter((v) => v.state === 1).length;
+          // 重置CPU GPU的计数
+          aggregatedData.runningCpuCount = 0;
+          aggregatedData.idleCpuCount = 0;
+          aggregatedData.runningGpuCount = 0;
+          aggregatedData.idleGpuCount = 0;
+          // 重新计算CPU GPU的计数
+          for (const node of realNode) {
+            aggregatedData.cpuCoreCount += node.cpuCoreCount;
+            aggregatedData.idleCpuCount += node.idleCpuCoreCount;
+            aggregatedData.runningCpuCount += node.allocCpuCoreCount;
+            aggregatedData.gpuCoreCount += node.gpuCount;
+            aggregatedData.idleGpuCount += node.idleGpuCount;
+            aggregatedData.runningGpuCount += node.allocGpuCount;
+          }
         }
 
         if (realNode && ((realNode?.length ?? -1) < aggregatedData.nodeCount)) {
@@ -325,16 +339,15 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           duplicateNodes.forEach((duplicateNode) => {
             const count = duplicateNode.partitions.length - 1;
             aggregatedData.cpuCoreCount -= count * (duplicateNode?.cpuCoreCount ?? 0);
-            aggregatedData.runningCpuCount -= count * (duplicateNode?.allocCpuCoreCount ?? 0);
-            aggregatedData.idleCpuCount -= count * (duplicateNode?.idleCpuCoreCount ?? 0);
             aggregatedData.gpuCoreCount -= count * (duplicateNode?.gpuCount ?? 0);
-            aggregatedData.runningGpuCount -= count * (duplicateNode?.allocGpuCount ?? 0);
-            aggregatedData.idleGpuCount -= count * (duplicateNode?.idleGpuCount ?? 0);
-            aggregatedData.notAvailableCpuCount -= aggregatedData.cpuCoreCount -
-            (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount);
-            aggregatedData.notAvailableGpuCount -= aggregatedData.gpuCoreCount -
-            (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount);
           });
+
+          //  计算不可用节点，因为你getclusterNode没有返回
+          aggregatedData.notAvailableCpuCount = Math.min(aggregatedData.cpuCoreCount -
+            (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount),0);
+          aggregatedData.notAvailableGpuCount = Math.min(aggregatedData.gpuCoreCount -
+            (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount),0);
+
         }
 
         platformOverview.nodeCount += aggregatedData.nodeCount;
