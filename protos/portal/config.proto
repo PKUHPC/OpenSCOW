@@ -51,6 +51,7 @@ message GetClusterInfoResponse {
   string cluster_name = 1;
   repeated PartitionInfo partitions = 2;
   // 3-17 Newly added parameters may not be returned(adapter)
+  // adapter>v1.6.0 只会在getClusterNodesInfo有值的时候返回
   uint32 node_count = 3;
   uint32 running_node_count = 4;
   uint32 idle_node_count = 5;
