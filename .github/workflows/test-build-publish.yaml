@@ -15,6 +15,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
+  INTERNAL_CR: ccimage.pku.edu.cn
 
 jobs:
   test-version-packages:
@@ -191,12 +192,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
+      - name: Log in to the ${{ env.INTERNAL_CR }}
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
+        with:
+          registry: ${{ env.INTERNAL_CR }}
+          username: ${{ secrets.CCIMAGE_USERNAME }}
+          password: ${{ secrets.CCIMAGE_PASSWORD }}
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: |
             ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
+            ${{ env.INTERNAL_CR }}/scow/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
