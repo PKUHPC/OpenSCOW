@@ -19,7 +19,7 @@ OpenSCOW在[木兰宽松许可证，第2版 (MulanPSL-2.0)](https://www.google.c
 
 OpenSCOW对于较大的修改采用**RFC流程**进行管理。若您想发起的修改较大（由您以及团队进行判断），您的修改须经过RFC流程。RFC流程如下：
 
-1. 创建一个RFC issue，并尽量详细地填写
+1. 创建一个[RFC issue](https://github.com/PKUHPC/OpenSCOW/issues/new?assignees=&labels=rfc&projects=&template=rfc.yaml&title=%5BRFC%5D+mis%3A+Add+a+feature+for+management+of+cluster+resource+partition)，并尽量详细地填写
    1. 如果您已经创建了一个功能请求issue，请将此RFC issue与功能请求issue关联起来
 2. 团队成员以及社区将会参与讨论，并确定主要的实现者
    1. 在讨论中，如果您需要修改RFC，请直接修改issue描述
