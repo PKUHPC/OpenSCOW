@@ -1,7 +1,7 @@
-name: Feature Request
+name: 功能请求 | Feature Request
 description: 为OpenSCOW项目提出一个增强或新功能建议 | Suggest an enhancement or new feature for the OpenSCOW project
 title: "[Feature/Enhancement] mis: Add a feature for management of cluster resource partition"
-labels: []
+labels: ["feature-request"]
 body:
   - type: markdown
     attributes:

@@ -1,0 +1,83 @@
+name: RFC
+description: 为OpenSCOW提出一个新的RFC | Raise a RFC
+title: "[RFC] mis: Add a feature for management of cluster resource partition"
+labels: ["rfc"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写此RFC表单！
+        Thanks for taking the time to fill out this RFC!
+
+        若您不熟悉RFC流程，请阅读文档[贡献指南](https://pkuhpc.github.io/OpenSCOW/docs/contribution)。
+        If you are not familiar with RFC, please read [Contribution guide](https://pkuhpc.github.io/OpenSCOW/docs/contribution).
+
+        请为您的issue命名一个好的标题，尽量在标题中注明您的issue相关的模块名称并对功能做简要描述。像这样：
+          - `[RFC] portal: 交互式应用列表增加排序功能`
+        Please try to give your issue a good title. Try using the app module name related to your issue in the title and a brief description of the feature. Like this:
+          - `[RFC] portal: Adds sorting to interactive app list`
+
+        在填写表单的时候请牢记：
+        Please keep in mind when filling out the form:
+
+        一个好的RFC应可以直接对应到实现代码。任何对项目有足够了解的开发者应可以仅根据RFC做出实现。请尽量避免模糊或者有歧义的语言。
+        A good RFC should directly correspond to the implementation code.
+        Any developer who is sufficiently familiar with the project should be able to implement it based on the RFC alone.
+        Please avoid vague or ambiguous language as much as possible.
+
+  - type: textarea
+    attributes:
+      label: 简介 | Abstract
+      description: |
+        尽可能简短地介绍此功能。
+        Provide a brief description of this feature.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: 详细介绍 | Detailed Description
+      description: |
+        尽可能详细地介绍此功能。
+        Provide a detailed description of this feature.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: UI设计 | UI Design
+      description: |
+        如果此新功能需要涉及到UI，请简单设计新的UI，将效果图复制到此处并进行简单介绍。
+        If this new feature involves UI, please briefly design the new UI, paste the mockup here and provide a brief introduction.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: 对数据库的修改 | Changes to database schemas.
+      description: |
+        如果此RFC需要修改数据库结构，请详细描述对数据库结构的修改（具体到列层面），以及如何确保和之前版本的数据库的兼容性。
+        If this RFC requires changes to the database schema, describe the changes in detail (down to the column level) and how to ensure compatibility with previous versions of the database.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: 对API的修改 | Changes to API
+      description: |
+        如果此RFC需要描述此功能对API的修改（包括SCOW API以及调度器API），请详细描述将会进行的修改，以及如何确保和之前版本的兼容性。
+        If this RFC requires describing changes to the API (including SCOW API and scheduler API), describe the changes in detail and how to ensure compatibility with previous versions.
+    validations:
+      required: false
+
+  - type: checkboxes
+    attributes:
+      label: 您是否有兴趣实现此功能？ | Are you interested to implement it?
+      description: |
+        您是否有兴趣实现此功能？
+        Are you interested to implement it?
+      options:
+        - label: "是 | Yes"
+        - label: "否 | No"
+    validations:
+      required: false

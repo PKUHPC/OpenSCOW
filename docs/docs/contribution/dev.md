@@ -167,10 +167,10 @@ pnpm devenv:stop
 
 ## 容器构建说明
 
-- 每个子系统的Dockerfile都应该放在dockerfiles目录下
-- 每个Dockerfile的context都应该是项目根目录，记得复制proto目录和依赖的本地库
-- 所有根据proto生成的文件都应该被gitignore和dockerignore，在容器中构建时需要现场生成
-- 根目录的`docker-compose.yml`应该只用于容器构建
+- SCOW的所有组件均打包于同一个镜像中，以方便离线部署
+- 项目的`Dockerfile`存放于`docker`目录下，`Dockerfile.scow`用于SCOW本身，`Dockerfile.docs`为文档镜像
+- 所有构建过程中可以自动生成的文件均应该被`.gitignore`，并在容器构建过程中生成
+
 
 ## 代码风格检查
 
