@@ -9,7 +9,7 @@ on:
 jobs:
   check-api-breaking-changes:
     name: Check OpenSCOW API Breaking Changes
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
