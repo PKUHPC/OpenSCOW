@@ -14,7 +14,7 @@ concurrency:
 jobs:
   deploy-docs:
     name: Deploy to GitHub Pages
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4.0.0

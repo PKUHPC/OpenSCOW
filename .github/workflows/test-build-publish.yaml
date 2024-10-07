@@ -15,13 +15,11 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
   GITHUB_CR: ghcr.io
-  # ALIYUN_CR: registry.cn-hangzhou.aliyuncs.com
-  # ALIYUN_PROJECT_NAME: scow
 
 jobs:
   test-version-packages:
     name: Test and version packages
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
 
     permissions:
       contents: write
@@ -52,19 +50,15 @@ jobs:
         run: pnpm lint
 
       - name: Generate SSH key pairs for test
-        if: vars.RUN_TESTS == 'true'
         run: ssh-keygen -t rsa -q -f "$HOME/.ssh/id_rsa" -N ""
 
       - name: Start dev env for db testing
-        if: vars.RUN_TESTS == 'true'
         run: pnpm devenv
 
       - name: Check running containers
-        if: vars.RUN_TESTS == 'true'
         run: docker ps
 
       - name: Wait for ports
-        if: vars.RUN_TESTS == 'true'
         uses: ifaxity/wait-on-action@v1.2.1
         with:
           log: true
@@ -72,19 +66,17 @@ jobs:
           resource: "tcp:localhost:3306 tcp:localhost:6379 tcp:localhost:389 tcp:localhost:6000 tcp:localhost:6001 tcp:localhost:6002"
 
       - name: Run tests
-        if: vars.RUN_TESTS == 'true'
         run: pnpm test:ci
 
       - name: Upload test converage
         uses: codecov/codecov-action@v4
-        if: vars.RUN_TESTS == 'true'
         with:
           files: ./libs/auth/coverage/lcov.info,./libs/ssh/coverage/lcov.info,./libs/libconfig/coverage/lcov.info,./libs/decimal/coverage/lcov.info,./libs/server/coverage/lcov.info,./apps/cli/coverage/lcov.info,./apps/auth/coverage/lcov.info,./apps/mis-server/coverage/lcov.info,./apps/portal-server/coverage/lcov.info,./apps/gateway/coverage/lcov.info,./apps/audit-server/coverage/lcov.info
 
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
-        if: vars.RUN_RELEASE == 'true' && github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/master'
         with:
           version: pnpm ci:version
           publish: pnpm ci:publish
@@ -95,7 +87,7 @@ jobs:
 
   openscow-cli:
     needs: test-version-packages
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -128,7 +120,7 @@ jobs:
 
   build-images:
     needs: test-version-packages
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
 
     permissions:
       contents: read
@@ -182,7 +174,7 @@ jobs:
 
 
   release:
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
     needs:
       - openscow-cli
       - build-images

@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
   tag-if-needed:
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    runs-on: ubuntu-latest
     if: github.event.repository.full_name == 'PKUHPC/OpenSCOW'
     steps:
       - uses: actions/checkout@v4

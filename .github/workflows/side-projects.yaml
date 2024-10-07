@@ -14,8 +14,7 @@ concurrency:
 jobs:
   openscow-vagrant:
     name: Update openscow-vagrant
-    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
-    if: vars.PUSH_VAGRANT == 'true'
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -26,10 +25,10 @@ jobs:
           FILE_NAME: "./deploy/vagrant/VERSION"
           FILE_DATA: "${{ github.ref_name }}"
 
-      - name: Pushes to ${{ vars.VAGRANT_REPO_OWNER }}/${{ vars.VAGRANT_REPO_NAME }} repo
+      - name: Pushes to PKUHPC/scow-vagrant repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/vagrant
-          repository-name: ${{ vars.VAGRANT_REPO_OWNER }}/${{ vars.VAGRANT_REPO_NAME }}
+          repository-name: PKUHPC/scow-vagrant
           branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
