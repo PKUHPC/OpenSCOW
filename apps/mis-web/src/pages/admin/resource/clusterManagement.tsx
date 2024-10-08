@@ -20,7 +20,7 @@ import { api } from "src/apis";
 import { requireAuth } from "src/auth/requireAuth";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { ClusterConnectionStatus, Partition } from "src/models/cluster";
+import { ClusterConnectionStatus } from "src/models/cluster";
 import { PlatformRole } from "src/models/User";
 import { ClusterManagementTable } from "src/pageComponents/admin/ClusterManagementTable";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
@@ -30,9 +30,11 @@ import { Head } from "src/utils/head";
 
 export interface CombinedClusterInfo {
   clusterId: string,
-  schedulerName: string,
   connectionStatus: ClusterConnectionStatus,
-  partitions: Partition[],
+  totalMemMb: number,
+  totalNodeCount: number,
+  totalCpuCoreCount: number,
+  totalGpuCount: number,
   activationStatus: ClusterActivationStatus,
   deactivationComment?: string,
   operatorId?: string,
@@ -51,6 +53,7 @@ export const ClusterManagementPage: NextPage =
     const { publicConfigClusters, clusterSortedIdList, setActivatedClusters } = useStore(ClusterInfoStore);
 
     const promiseFn = useCallback(async () => {
+
       const [connectionClustersData, dbClustersData] = await Promise.all([
         api.getClustersConnectionInfo({}),
         api.getClustersRuntimeInfo({ query: {} }),

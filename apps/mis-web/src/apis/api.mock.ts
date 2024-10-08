@@ -515,9 +515,11 @@ export const mockApi: MockApi<typeof api> = {
 
   getClustersConnectionInfo: async () => ({ results: [{
     clusterId: "hpc01",
-    schedulerName: "hpc",
     connectionStatus: ClusterConnectionStatus.AVAILABLE,
-    partitions: [],
+    totalMemMb: 4028,
+    totalNodeCount: 3,
+    totalCpuCoreCount: 2,
+    totalGpuCount: 1,
   }]}),
 
   getClustersRuntimeInfo: async () => ({ results: [{

@@ -70,7 +70,9 @@ message GetClusterInfoResponse {
 }
 
 message NodeInfo {
-
+  // deprecated message
+  // use message NodeInfo from porots/common/config instead
+  option deprecated = true;
   enum NodeState {
     UNKNOWN = 0;
     IDLE = 1;
@@ -94,12 +96,18 @@ message NodeInfo {
 
 
 message GetClusterNodesInfoRequest {
+  // deprecated message
+  // use message GetClusterNodesInfoRequest from porots/common/config instead
+  option deprecated = true;
   // if the value of node_names = [], request all nodes info
   string cluster = 1;
   repeated string node_names = 2;
 }
 
 message GetClusterNodesInfoResponse {
+  // deprecated message
+  // use message GetClusterNodesInfoResponse from porots/common/config instead
+  option deprecated = true;
   repeated NodeInfo nodes = 1;
 }
 
@@ -107,5 +115,12 @@ service ConfigService {
 
   rpc GetClusterInfo(GetClusterInfoRequest) returns (GetClusterInfoResponse);
 
-  rpc GetClusterNodesInfo(GetClusterNodesInfoRequest) returns (GetClusterNodesInfoResponse);
+  /**
+   * Depracated Notice
+   * This API funcition GetClusterNodesInfo has been deprecated.
+   * Use the new COMMON API function getClusterNodesInfo from ConfigServiceService from protos/common/config instead.
+   */
+  rpc GetClusterNodesInfo(GetClusterNodesInfoRequest) returns (GetClusterNodesInfoResponse) {
+    option deprecated = true;
+  };
 }

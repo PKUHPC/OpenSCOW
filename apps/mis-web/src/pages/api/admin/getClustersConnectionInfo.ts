@@ -49,22 +49,31 @@ export default route(GetClustersConnectionInfoSchema,
     const client = getClient(ConfigServiceClient);
 
     await Promise.allSettled(Object.keys(configClusters).map(async (cluster) => {
-      const reply = await asyncClientCall(client, "getClusterConfig", { cluster })
+      const reply = await asyncClientCall(client, "getClusterNodesInfo", { cluster, nodeNames: []})
         .catch((e) => {
           console.info("Cluster Connection Error ( Cluster ID : %s , Details: %s ) .", cluster, e);
           clustersConnectionResp.push({
             clusterId: cluster,
             connectionStatus: ClusterConnectionStatus.ERROR,
-            partitions: [],
+            totalNodeCount: 0,
+            totalCpuCoreCount: 0,
+            totalGpuCount: 0,
+            totalMemMb: 0,
           });
         });
 
       if (reply) {
+
+        const totalCpuCoreCount = reply.nodes.reduce((total, node) => total + node.cpuCoreCount, 0);
+        const totalGpuCount = reply.nodes.reduce((total, node) => total + node.gpuCount, 0);
+        const totalMemMb = reply.nodes.reduce((total, node) => total + node.totalMemMb, 0);
         clustersConnectionResp.push({
           clusterId: cluster,
           connectionStatus: ClusterConnectionStatus.AVAILABLE,
-          schedulerName: reply.schedulerName,
-          partitions: reply.partitions,
+          totalNodeCount: reply.nodes.length,
+          totalCpuCoreCount,
+          totalGpuCount,
+          totalMemMb,
         });
       }
 

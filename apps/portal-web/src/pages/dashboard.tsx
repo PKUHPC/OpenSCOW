@@ -10,7 +10,6 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DeleteAllReadMessagesRequest } from "@scow/notification-protos/build/message_pb";
 import { PartitionInfo } from "@scow/protos/build/portal/config";
 import { NodeInfo } from "@scow/protos/build/portal/config";
 import { Col, Row } from "antd";

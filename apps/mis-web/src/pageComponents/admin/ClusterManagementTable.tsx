@@ -114,27 +114,23 @@ export const ClusterManagementTable: React.FC<Props> = ({
           }}
         />
         <Table.Column<CombinedClusterInfo>
-          dataIndex="partitions"
+          dataIndex="totalNodeCount"
           title={tArgs(p("table.nodesCount"))}
-          render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.nodes, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
-          dataIndex="partitions"
+          dataIndex="totalCpuCoreCount"
           title={tArgs(p("table.cpusCount"))}
-          render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.cores, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
-          dataIndex="partitions"
+          dataIndex="totalGpuCount"
           title={tArgs(p("table.gpusCount"))}
-          render={(_, r) => r.partitions?.reduce((sum, p) => sum + p.gpus, 0) || 0}
         />
         <Table.Column<CombinedClusterInfo>
-          dataIndex="partitions"
+          dataIndex="totalMemMb"
           title={tArgs(p("table.totalMemMb"))}
           width="10%"
           render={(_, r) => {
-            const totalMemMb = r.partitions?.reduce((sum, p) => sum + p.memMb, 0) || 0;
-            return `${totalMemMb} MB`;
+            return `${r.totalMemMb} MB`;
           }}
         />
         <Table.Column<CombinedClusterInfo>

@@ -15,10 +15,11 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { getClusterConfigs } from "@scow/config/build/cluster";
-import { convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-server";
+import { checkSchedulerApiVersion, convertClusterConfigsToServerProtoType, NO_CLUSTERS } from "@scow/lib-server";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { libCheckActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
 import { ConfigServiceServer, ConfigServiceService } from "@scow/protos/build/common/config";
+import { ApiVersion } from "@scow/utils/build/version";
 import { readFileSync } from "fs";
 import { join } from "path";
 import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
@@ -87,5 +88,25 @@ export const configServiceServer = plugin((server) => {
 
       return [{ major, minor, patch }];
     },
+
+    getClusterNodesInfo: async ({ request, logger }) => {
+      const { nodeNames, cluster } = request;
+
+      const reply = await server.ext.clusters.callOnOne(
+        cluster,
+        logger,
+        async (client) => {
+          // 当前接口要求的最低调度器接口版本
+          const minRequiredApiVersion: ApiVersion = { major: 1, minor: 6, patch: 0 };
+          // 检验调度器的API版本是否符合要求，不符合要求报错
+          await checkSchedulerApiVersion(client, minRequiredApiVersion);
+          return await asyncClientCall(client.config, "getClusterNodesInfo", {
+            nodeNames: nodeNames || [],
+          });
+        },
+      );
+      return [{ nodes: reply.nodes }];
+    },
+
   });
 });

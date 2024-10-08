@@ -34,8 +34,10 @@ export type ClusterConnectionStatus = ValueOf<typeof ClusterConnectionStatus>;
 export const ClusterConnectionInfoSchema = Type.Object({
   clusterId: Type.String(),
   connectionStatus: Type.Enum(ClusterConnectionStatus),
-  schedulerName: Type.Optional(Type.String()),
-  partitions: Type.Array(Partition),
+  totalMemMb: Type.Number(),
+  totalNodeCount: Type.Number(),
+  totalCpuCoreCount: Type.Number(),
+  totalGpuCount: Type.Number(),
 });
 
 export type ClusterConnectionInfo = Static<typeof ClusterConnectionInfoSchema>;
