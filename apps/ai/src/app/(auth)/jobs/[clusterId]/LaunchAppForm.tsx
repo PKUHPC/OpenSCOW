@@ -738,61 +738,65 @@ export const LaunchAppForm = (props: Props) => {
         <Form.List name="mountPoints">
           {(fields, { add, remove }) => (
             <>
-              {fields.map((field, index) => (
-                <Space key={field.key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
-                  <Form.Item
-                    {...field}
-                    label={`挂载点-${index + 1}`}
-                    rules={[
-                      { required: true, message: "请提供挂载点地址" },
-                      // 添加的自定义校验器以确保挂载点不重复
-                      ({ getFieldValue }) => ({
-                        validator(_, value: string) {
+              {fields.map((field, index) => {
+                const { key, ...restField } = field;
 
-                          const currentValueNormalized = value.replace(/\/+$/, "");
+                return (
+                  <Space key={field.key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
+                    <Form.Item
+                      {...restField}
+                      label={`挂载点-${index + 1}`}
+                      rules={[
+                        { required: true, message: "请提供挂载点地址" },
+                        // 添加的自定义校验器以确保挂载点不重复
+                        ({ getFieldValue }) => ({
+                          validator(_, value: string) {
 
-                          const mountPoints: string[] = getFieldValue("mountPoints").map((mountPoint: string) =>
-                            mountPoint.replace(/\/+$/, ""),
-                          );
+                            const currentValueNormalized = value.replace(/\/+$/, "");
 
-                          const currentIndex = mountPoints.findIndex((point) => point === currentValueNormalized);
+                            const mountPoints: string[] = getFieldValue("mountPoints").map((mountPoint: string) =>
+                              mountPoint.replace(/\/+$/, ""),
+                            );
 
-                          const otherMountPoints = mountPoints.filter((_, idx) => idx !== currentIndex);
-                          if (otherMountPoints.includes(currentValueNormalized)) {
-                            return Promise.reject(new Error("挂载点地址不能重复"));
-                          }
+                            const currentIndex = mountPoints.findIndex((point) => point === currentValueNormalized);
 
-                          const workingDirectory = form.getFieldValue("customFields").workingDir?.toString();
-                          if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
-                            return Promise.reject(new Error("该路径已指定为工作目录，无需再设置为挂载点"));
-                          }
+                            const otherMountPoints = mountPoints.filter((_, idx) => idx !== currentIndex);
+                            if (otherMountPoints.includes(currentValueNormalized)) {
+                              return Promise.reject(new Error("挂载点地址不能重复"));
+                            }
 
-                          return Promise.resolve();
-                        },
-                      }),
-                    ]}
-                  >
-                    <Input
-                      placeholder="选择挂载点"
-                      prefix={(
-                        <FileSelectModal
-                          allowedFileType={["DIR"]}
-                          onSubmit={(path: string) => {
+                            const workingDirectory = form.getFieldValue("customFields")?.workingDir?.toString();
+                            if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
+                              return Promise.reject(new Error("该路径已指定为工作目录，无需再设置为挂载点"));
+                            }
+
+                            return Promise.resolve();
+                          },
+                        }),
+                      ]}
+                    >
+                      <Input
+                        placeholder="选择挂载点"
+                        prefix={(
+                          <FileSelectModal
+                            allowedFileType={["DIR"]}
+                            onSubmit={(path: string) => {
                             // 当用户选择路径后触发表单的值更新并进行校验
-                            form.setFieldValue(["mountPoints", field.name], path);
-                            // 校验特定的挂载点字段
-                            form.validateFields([["mountPoints", field.name]]);
-                          }}
-                          clusterId={clusterId ?? ""}
-                        />
-                      )}
+                              form.setFieldValue(["mountPoints", field.name], path);
+                              // 校验特定的挂载点字段
+                              form.validateFields([["mountPoints", field.name]]);
+                            }}
+                            clusterId={clusterId ?? ""}
+                          />
+                        )}
+                      />
+                    </Form.Item>
+                    <MinusCircleOutlined
+                      onClick={() => remove(field.name)}
                     />
-                  </Form.Item>
-                  <MinusCircleOutlined
-                    onClick={() => remove(field.name)}
-                  />
-                </Space>
-              ))}
+                  </Space>
+                );
+              })}
               <Form.Item>
                 <Button
                   type="dashed"
