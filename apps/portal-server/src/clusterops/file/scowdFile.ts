@@ -128,13 +128,18 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
       });
 
       for await (const response of readStream) {
-        call.write(response);
+        // 如果写入返回 false，表示缓冲区已满，需要等待 `drain` 事件
+        if (!call.write(response)) {
+          await new Promise((resolve) => call.once("drain", resolve));
+        }
       }
-
-      return {};
     } catch (err) {
       throw mapTRPCExceptionToGRPC(err);
+    } finally {
+      call.end();
     }
+
+    return {};
   },
 
   upload: async (request, logger) => {
