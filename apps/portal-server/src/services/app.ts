@@ -80,6 +80,18 @@ export const appServiceServer = plugin((server) => {
             },
           };
           break;
+        case AppType.shadowDesk:
+          appProps = {
+            $case: "shadowDesk",
+            shadowDesk: {
+              formData: app.shadowDesk!.connect.formData ?? {},
+              query: app.shadowDesk!.connect.query ?? {},
+              method: app.shadowDesk!.connect.method,
+              path: app.shadowDesk!.connect.path,
+              customFormData: reply.customFormData ?? {},
+            },
+          };
+          break;
         default:
           throw new Error(`Unknown app type ${app.type as string} of app id ${reply.appId}`);
       }

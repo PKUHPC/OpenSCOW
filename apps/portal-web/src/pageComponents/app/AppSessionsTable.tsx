@@ -144,7 +144,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
       key: "action",
       fixed:"right",
       width: "10%",
-      render: (_, record) => (
+      render: (appId: string, record) => (
         <Space>
           {
             (record.state === "RUNNING") ? (
@@ -153,6 +153,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
                   session={record}
                   cluster={cluster}
                   refreshToken={connectivityRefreshToken}
+                  appId={record.appName ?? appId}
                 />
                 <Popconfirm
                   title={t(p("table.popFinishConfirmTitle"))}

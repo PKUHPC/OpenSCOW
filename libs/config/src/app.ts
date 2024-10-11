@@ -29,6 +29,7 @@ export type AppConnectPropsSchema = Static<typeof AppConnectPropsSchema>;
 export enum AppType {
   web = "web",
   vnc = "vnc",
+  shadowDesk = "shadowDesk",
 }
 
 export const WebAppConfigSchema = Type.Object({
@@ -42,7 +43,15 @@ export const WebAppConfigSchema = Type.Object({
   connect: AppConnectPropsSchema,
 });
 
+export const ShadowDeskConfigSchema = Type.Object({
+  proxyServer: Type.String({ description: "代理服务器的地址和端口，例如 '10.129.227.58:8765'" }),
+  beforeScript: Type.String({ description: "启动应用之前的准备命令。具体参考文档" }),
+  script: Type.String({ description: "启动应用的命令。可以使用beforeScript中定义的变量" }),
+  connect: AppConnectPropsSchema,
+});
+
 export type WebAppConfigSchema = Static<typeof WebAppConfigSchema>;
+export type ShadowDeskAppConfigSchema = Static<typeof ShadowDeskConfigSchema>;
 
 export const VncAppConfigSchema = Type.Object({
   beforeScript: Type.Optional(Type.String({ description: "启动应用之前的准备命令。具体参考文档" })),
@@ -68,6 +77,7 @@ export const AppConfigSchema = Type.Object({
   slurm: Type.Optional(SlurmConfigSchema),
   web: Type.Optional(WebAppConfigSchema),
   vnc: Type.Optional(VncAppConfigSchema),
+  shadowDesk: Type.Optional(ShadowDeskConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
       type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),

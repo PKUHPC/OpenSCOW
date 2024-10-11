@@ -32,6 +32,8 @@ export const AppSession = Type.Object({
   reason: Type.Optional(Type.String()),
   host: Type.Optional(Type.String()),
   port: Type.Optional(Type.Number()),
+  user: Type.Optional(Type.String()),
+  proxyServer:Type.Optional(Type.String()),
 });
 export type AppSession = Static<typeof AppSession>;
 

@@ -50,6 +50,11 @@ interface ServerSessionInfoData {
   PASSWORD: string;
 }
 
+interface ShadowDeskSession {
+  [key: string]: string | number;
+  SHADOWDESK_USER: string;
+}
+
 const SERVER_ENTRY_COMMAND = fs.readFileSync("assets/slurm/server_entry.sh", { encoding: "utf-8" });
 const VNC_ENTRY_COMMAND = fs.readFileSync("assets/slurm/vnc_entry.sh", { encoding: "utf-8" });
 
@@ -58,6 +63,7 @@ const VNC_OUTPUT_FILE = "output";
 const SESSION_METADATA_NAME = "session.json";
 
 const SERVER_SESSION_INFO = "server_session_info.json";
+const SHADOWDESK_SESSION = "shadowdesk_session.json";
 const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
@@ -239,7 +245,41 @@ export const appOps = (cluster: string): AppOps => {
             coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
             workingDirectory, extraOptions,
           });
-        } else {
+        } else if (appConfig.type === AppType.shadowDesk) {
+          let customForm = String.raw`\"HOST\":\"$HOST\",\"PORT\":$PORT`;
+          for (const key in appConfig.shadowDesk!.connect.formData) {
+            const texts = getPlaceholderKeys(appConfig.shadowDesk!.connect.formData[key]);
+            for (const i of texts) {
+              customForm += `,\\"${i}\\":\\"$${i}\\"`;
+            }
+          }
+          customForm += `,\\"PROXYSERVER\\":\\"${appConfig.shadowDesk!.proxyServer}\\"`;
+          const sessionInfo = `echo -e "{${customForm}}" >$SERVER_SESSION_INFO`;
+
+          const runtimeVariables = `export PROXY_BASE_PATH=${quote([join(proxyBasePath)])}\n`;
+
+          const beforeScript = runtimeVariables + customAttributesExport +
+          appConfig.shadowDesk!.beforeScript + sessionInfo;
+          await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
+
+          const webScript = BIN_BASH_SCRIPT_HEADER + appConfig.shadowDesk!.script;
+          const scriptPath = join(workingDirectory, "script.sh");
+          await sftpWriteFile(sftp)(scriptPath, webScript);
+          await sftpChmod(sftp)(scriptPath, "755");
+
+          const configSlurmOptions: string[] = appConfig.slurm?.options ?? [];
+
+          const extraOptions = configSlurmOptions.concat(userSbatchOptions);
+
+          const envVariables = getEnvVariables({ SERVER_SESSION_INFO });
+
+          return await submitAndWriteMetadata({
+            userId, jobName, account, partition: partition!, qos, nodeCount, gpuCount: gpuCount ?? 0, memoryMb,
+            coreCount, timeLimitMinutes: maxTime, script: envVariables + SERVER_ENTRY_COMMAND,
+            workingDirectory, extraOptions,
+          });
+        }
+        else {
           // vnc app
           const beforeScript = customAttributesExport + (appConfig.vnc!.beforeScript ?? "");
           await sftpWriteFile(sftp)(join(workingDirectory, "before.sh"), beforeScript);
@@ -358,6 +398,8 @@ export const appOps = (cluster: string): AppOps => {
 
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
+          let user: string | undefined = undefined;
+          let proxyServer: string | undefined = undefined;
 
           // judge whether the app is ready
           if (runningJobInfo && runningJobInfo.state === "RUNNING") {
@@ -365,7 +407,7 @@ export const appOps = (cluster: string): AppOps => {
             // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
             await sftpReaddir(sftp)(jobDir);
 
-            if (app.type === AppType.web) {
+            if (app.type === AppType.web || app.type === AppType.shadowDesk) {
             // for server apps,
             // try to read the SESSION_INFO file to get port and password
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
@@ -375,6 +417,17 @@ export const appOps = (cluster: string): AppOps => {
 
                 host = serverSessionInfo.HOST;
                 port = serverSessionInfo.PORT;
+                if (app.type === AppType.shadowDesk) {
+                  proxyServer = serverSessionInfo.PROXYSERVER as string;
+                }
+              }
+              if (app.type === AppType.shadowDesk) {
+                const shadowdeskFilePath = join(jobDir, SHADOWDESK_SESSION);
+                if (await sftpExists(sftp, shadowdeskFilePath)) {
+                  const content = await sftpReadFile(sftp)(shadowdeskFilePath);
+                  const sessionInfo = JSON.parse(content.toString()) as ShadowDeskSession;
+                  user = sessionInfo.SHADOWDESK_USER;
+                }
               }
             } else {
             // for vnc apps,
@@ -426,6 +479,8 @@ export const appOps = (cluster: string): AppOps => {
             reason: isPendingOrTerminated ? (runningJobInfo?.reason ?? "") : undefined,
             host,
             port,
+            user,
+            proxyServer,
           });
 
         }));
@@ -470,7 +525,7 @@ export const appOps = (cluster: string): AppOps => {
           };
         }
 
-        if (app.type === AppType.web) {
+        if (app.type === AppType.web || app.type === AppType.shadowDesk) {
           const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
           if (await sftpExists(sftp, infoFilePath)) {
             const content = await sftpReadFile(sftp)(infoFilePath);
