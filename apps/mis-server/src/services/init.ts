@@ -19,7 +19,7 @@ import { InitServiceServer, InitServiceService } from "@scow/protos/build/server
 import { authUrl } from "src/config";
 import { configClusters } from "src/config/clusters";
 import { SystemState } from "src/entities/SystemState";
-import { PlatformRole, TenantRole, User } from "src/entities/User";
+import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 import { createUserInDatabase, insertKeyToNewUser } from "src/utils/createUser";
 import { userExists } from "src/utils/userExists";
@@ -100,10 +100,10 @@ export const initServiceServer = plugin((server) => {
         tenant: { name: DEFAULT_TENANT_NAME },
       });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
           code: status.NOT_FOUND,
-          message: `User ${request.userId} is not found in default tenant.`,
+          message: `User ${request.userId} is not found or has been deleted in default tenant.`,
         } as ServiceError;
       }
 
@@ -126,10 +126,10 @@ export const initServiceServer = plugin((server) => {
         tenant: { name: DEFAULT_TENANT_NAME },
       });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
           code: status.NOT_FOUND,
-          message: `User ${request.userId} is not found in default tenant.`,
+          message: `User ${request.userId} is not found or has been deleted in default tenant.`,
         } as ServiceError;
       }
 

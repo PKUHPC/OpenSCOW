@@ -61,6 +61,21 @@ createUser:
     # 外置页面URL
     # url: http://your-create-user-page.com
 
+# 删除用户相关配置
+deleteUser:
+
+  # 是否允许用户从SCOW中删除用户，默认为true
+  enabled: true
+
+  # 删除标识
+  nameMarker: "(已删除)"
+
+# 删除账户相关配置
+deleteAccount:
+
+  # 是否允许用户从SCOW中删除账户，默认为true
+  enabled: true
+
 # 添加用户至账户相关配置
 # addUserToAccount:
 #   accountAdmin:

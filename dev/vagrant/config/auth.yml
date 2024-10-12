@@ -95,6 +95,9 @@ ldap:
     # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
     mail: mail
 
+    # LDAP中指定用户在Unix/Linux系统上的shell的属性名。当前仅用于判断用户是否被禁止登录。
+    loginShell: loginShell
+
   # 添加用户的相关配置。必填
   addUser:
     # 增加用户节点时，把用户增加到哪个节点下
@@ -144,6 +147,10 @@ ldap:
     # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps:
     #   key: value
+
+# 删除用户的相关配置，选填，默认开启。
+  deleteUser:
+    enabled: true
 
 # auth 界面 ui 配置
 ui:

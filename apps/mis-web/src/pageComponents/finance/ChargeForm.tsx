@@ -85,6 +85,9 @@ export const ChargeForm: React.FC = () => {
       .httpError(404, () => {
         message.error(t(p("notFound")));
       })
+      .httpError(410, () => {
+        message.error(t(p("deleted")));
+      })
       .then(() => {
         message.success(t(p("chargeFinished")));
         form.resetFields();

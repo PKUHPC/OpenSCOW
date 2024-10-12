@@ -118,6 +118,21 @@ createUser:
       #     en: "It is required to enter a string of 3-20 characters in length, consisting of lowercase letters, numbers,   and underscores, and starting with a lowercase letter."
       #     zh_cn: "要求输入长度为3-20位，由小写字母、数字、下划线组成，且以小写字母开头的字符串"
 
+# 删除用户相关配置
+deleteUser:
+
+  # 是否允许用户从SCOW中删除用户，默认为true
+  enabled: true
+
+  # 删除标识
+  nameMarker: "(已删除)"
+
+# 删除账户相关配置
+deleteAccount:
+
+  # 是否允许用户从SCOW中删除账户，默认为true
+  enabled: true
+
 # # 新增导航链接相关配置
 # navLinks:
 #   # 链接名

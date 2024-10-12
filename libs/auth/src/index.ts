@@ -16,6 +16,7 @@ export { changePassword } from "./changePassword";
 export { checkPassword } from "./checkPassword";
 export { createUser } from "./createUser";
 export { deleteToken } from "./deleteToken";
+export { deleteUser } from "./deleteUser";
 export type { Capabilities } from "./getCapabilities";
 export { getCapabilities } from "./getCapabilities";
 export { getUser } from "./getUser";

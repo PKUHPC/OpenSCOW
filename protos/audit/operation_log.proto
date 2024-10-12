@@ -198,6 +198,10 @@ message CreateUser {
   string user_id = 1;
 }
 
+message DeleteUser {
+  string user_id = 1;
+}
+
 message AddUserToAccount {
   string account_name = 1;
   string user_id = 2;
@@ -277,6 +281,10 @@ message CreateAccount {
   string tenant_name = 1;
   string account_name = 2;
   string account_owner = 3;
+}
+
+message DeleteAccount {
+  string account_name = 1;
 }
 
 message AddAccountToWhitelist {
@@ -720,6 +728,8 @@ message CreateOperationLogRequest {
     MergeFileChunks merge_file_chunks =  97;
     InitMultipartUpload init_multipart_upload = 98;
     MarkMessageRead mark_message_read = 99;
+    DeleteUser delete_user = 100;
+    DeleteAccount delete_account = 101;
   }
 }
 
@@ -827,6 +837,8 @@ message OperationLog {
     MergeFileChunks merge_file_chunks = 99;
     InitMultipartUpload init_multipart_upload = 100;
     MarkMessageRead mark_message_read = 101;
+    DeleteUser delete_user=102;
+    DeleteAccount delete_account = 103;
   }
 }
 

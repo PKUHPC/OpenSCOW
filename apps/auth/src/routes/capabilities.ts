@@ -20,6 +20,7 @@ const CapabilitiesSchema = Type.Object({
   getUser: Type.Optional(Type.Boolean({ description: "是否可以查询用户" })),
   accountUserRelation: Type.Optional(Type.Boolean({ description: "是否可以管理账户用户关系" })),
   checkPassword: Type.Optional(Type.Boolean({ description: "是否可以验证密码" })),
+  deleteUser: Type.Optional(Type.Boolean({ description: "是否可以删除用户" })),
 });
 
 export type Capabilities = Static<typeof CapabilitiesSchema>;
@@ -43,7 +44,16 @@ export const getCapabilitiesRoute = fp(async (f) => {
     async () => {
 
       const provider = f.auth;
-
+      console.log("/capabilities是在auth读的,",{
+        createUser: provider.createUser !== undefined,
+        checkPassword: provider.checkPassword !== undefined,
+        changePassword: provider.changePassword !== undefined,
+        changeEmail: provider.changeEmail !== undefined,
+        getUser: provider.getUser !== undefined,
+        accountUserRelation: false,
+        deleteUser: provider.deleteUser !== undefined,
+      });
+      // 打点
       return {
         createUser: provider.createUser !== undefined,
         checkPassword: provider.checkPassword !== undefined,
@@ -51,6 +61,7 @@ export const getCapabilitiesRoute = fp(async (f) => {
         changeEmail: provider.changeEmail !== undefined,
         getUser: provider.getUser !== undefined,
         accountUserRelation: false,
+        deleteUser: provider.deleteUser !== undefined,
       };
     },
   );

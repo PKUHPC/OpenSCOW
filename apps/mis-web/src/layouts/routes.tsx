@@ -26,7 +26,7 @@ import { join } from "path";
 import { Lang } from "react-typed-i18n";
 import { prefix } from "src/i18n";
 import en from "src/i18n/en";
-import { PlatformRole, TenantRole, UserRole } from "src/models/User";
+import { AccountState, PlatformRole, TenantRole, UserRole } from "src/models/User";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { createUserParams, useBuiltinCreateUser } from "src/utils/createUser";
@@ -360,7 +360,7 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[], t: TransT
     Icon: UserOutlined,
     text: t(pAccount("firstNav")),
     path: "/accounts",
-    children: accounts.map((x) => ({
+    children: accounts.filter((x) => x.accountState !== AccountState.DELETED).map((x) => ({
       Icon: AccountBookOutlined,
       text: `${x.accountName}`,
       path: `/accounts/${x.accountName}`,
@@ -422,7 +422,9 @@ export const getAvailableRoutes = (user: User | undefined, t: TransType): NavIte
 
   routes.push(...userRoutes(user.accountAffiliations, t));
 
-  const adminAccounts = user.accountAffiliations.filter((x) => x.role !== UserRole.USER);
+  const adminAccounts = user.accountAffiliations.filter((x) => x.role !== UserRole.USER
+  && x.accountState !== AccountState.DELETED);
+
   if (adminAccounts.length > 0) {
     routes.push(...accountAdminRoutes(adminAccounts, t));
   }
@@ -488,9 +490,12 @@ const getCurrentUserRoles = (user: User) => {
   return {
     user: user.accountAffiliations.length === 0,
     accountUser: user.accountAffiliations.length > 0
-      && user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER),
-    accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN),
-    accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER),
+      && user.accountAffiliations.every((affiliation) => affiliation.role === UserRole.USER &&
+      affiliation.accountState !== AccountState.DELETED),
+    accountAdmin: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.ADMIN &&
+    affiliation.accountState !== AccountState.DELETED),
+    accountOwner: user.accountAffiliations.some((affiliation) => affiliation.role === UserRole.OWNER &&
+    affiliation.accountState !== AccountState.DELETED),
     platformAdmin: user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN),
     platformFinance: user.platformRoles.includes(PlatformRole.PLATFORM_FINANCE),
     tenantAdmin: user.tenantRoles.includes(TenantRole.TENANT_ADMIN),

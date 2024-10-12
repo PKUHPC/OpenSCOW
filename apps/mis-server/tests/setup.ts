@@ -20,6 +20,10 @@ module.exports = async () => {
       changePassword: true,
       getUser: true,
       validateName: true,
+      deleteUser: true,
+      deleteAccount: true,
     })),
+    deleteUser:jest.fn(async () => ({ status: 204, ok: true })),
+    deleteAccount:jest.fn(async () => ({ status: 204, ok: true })),
   }));
 };

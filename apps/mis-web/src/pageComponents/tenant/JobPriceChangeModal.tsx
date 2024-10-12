@@ -62,6 +62,14 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
 
         setLoading(true);
         await api.changeJobPrice({ body: { ...filter, price, reason, target } })
+          .httpError(404, (e) => {
+            message.error({
+              content: e.message.split(": ")[1],
+              duration: 4,
+            });
+            reload();
+            onClose();
+          })
           .then(() => {
             message.success(t(pCommon("changeSuccess")));
             reload();

@@ -21,7 +21,7 @@ import { type api } from "src/apis/api";
 import { ClusterConnectionStatus } from "src/models/cluster";
 import { OperationResult } from "src/models/operationLog";
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
-  TenantRole, UserInfo, UserRole, UserStatus } from "src/models/User";
+  TenantRole, UserInfo, UserRole, UserState,UserStatus } from "src/models/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
@@ -106,9 +106,10 @@ const mockUsers = [
     tenantRoles: [TenantRole.TENANT_ADMIN, TenantRole.TENANT_FINANCE],
     platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
     accountAffiliations: [
-      { accountName: "hpc2001213077", role: UserRole.ADMIN },
-      { accountName: "hpc2001213075", role: UserRole.USER },
+      { accountName: "hpc2001213077", role: UserRole.ADMIN, accountState:AccountState.NORMAL },
+      { accountName: "hpc2001213075", role: UserRole.USER, accountState:AccountState.NORMAL },
     ],
+    state:UserState.NORMAL,
   },
 ];
 
@@ -161,6 +162,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant1",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+        state:UserState.NORMAL,
       },
       {
         userId: "test01",
@@ -170,6 +172,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
+        state:UserState.NORMAL,
       },
       {
         userId: "test02",
@@ -179,6 +182,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE],
+        state:UserState.NORMAL,
       },
       {
         userId: "test03",
@@ -188,6 +192,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "tenant2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [],
+        state:UserState.DELETED,
       },
     ],
 
@@ -432,6 +437,7 @@ export const mockApi: MockApi<typeof api> = {
   queryJobTimeLimit: async () => ({ result: 10 }),
   cancelJob: async () => null,
   createAccount: async () => { return {}; },
+  deleteAccount: async () => null,
   dewhitelistAccount: async () => null,
   whitelistAccount: async () => null,
   getWhitelistedAccounts: async () => ({ results: [{
@@ -456,7 +462,7 @@ export const mockApi: MockApi<typeof api> = {
   createTenant: async () => ({ createdInAuth: true }),
   createTenantWithExistingUserAsAdmin: async () => null,
   validateToken: async () => MOCK_USER_INFO,
-
+  deleteUser: async () => null,
   getOperationLogs: async () => ({ results: [{
     operationLogId: 99,
     operatorUserId: "testUser",
@@ -606,8 +612,8 @@ export const MOCK_USER_INFO = {
   tenantRoles: [TenantRole.TENANT_ADMIN, TenantRole.TENANT_FINANCE],
   platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
   accountAffiliations: [
-    { accountName: "hpc2001213077", role: UserRole.ADMIN },
-    { accountName: "hpc2001213075", role: UserRole.USER },
+    { accountName: "hpc2001213077", role: UserRole.ADMIN, accountState:AccountState.NORMAL },
+    { accountName: "hpc2001213075", role: UserRole.USER , accountState:AccountState.NORMAL },
   ],
   createTime:"2023-08-03T03:47:23.485Z",
 } as UserInfo;
@@ -618,8 +624,8 @@ export const MOCK_USER_STATUS: GetUserStatusResponse = {
     "WM1": 200,
   },
   accountStatuses: {
-    "hpc1": { userStatus: UserStatus.BLOCKED, accountBlocked: false },
-    "hpc2": { userStatus: UserStatus.BLOCKED, accountBlocked: true,
+    "hpc1": { userStatus: UserStatus.BLOCKED, accountBlocked: false, accountState:AccountState.NORMAL },
+    "hpc2": { userStatus: UserStatus.BLOCKED, accountBlocked: true, accountState:AccountState.NORMAL,
       jobChargeLimit: numberToMoney(10),
       usedJobCharge: numberToMoney(2),
     },

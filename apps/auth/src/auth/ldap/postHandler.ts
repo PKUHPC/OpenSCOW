@@ -58,8 +58,12 @@ export function registerPostHandler(f: FastifyInstance, ldapConfig: LdapConfigSc
 
       const user = await findUser(logger, ldapConfig, client, username);
 
-      if (!user) {
-        logger.info("Didn't find user with %s=%s", ldapConfig.attrs.uid, username);
+      if (!user || user.loginShell === "/sbin/nologin") {
+        const logMessage = !user
+          ? `Didn't find user with ${ldapConfig.attrs.uid}=${username}`
+          : `User with ${ldapConfig.attrs.uid}=${username} has been marked as deleted`;
+
+        logger.info(logMessage);
         await serveLoginHtml(true, callbackUrl, req, res);
         return;
       }

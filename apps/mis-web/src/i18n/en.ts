@@ -228,6 +228,7 @@ export default {
         blockedAccount: "Blocked ",
         frozenAccount: "Frozen ",
         normalAccount: "Available ",
+        deletedAccount:"Deleted",
         account: "Account",
         accountName: "Account Name",
         owner: "Owner",
@@ -253,6 +254,7 @@ export default {
         frozen:"Frozen",
         debt: "Debt",
         normal: "Available",
+        deleted:"Deleted",
         unit: "CNY",
         unblockConfirmTitle: "Confirm Unblock of User?",
         unblockConfirmContent: "Do you wish to unblock account {} within tenant {}?",
@@ -266,6 +268,10 @@ export default {
         blockConfirmContent: "Do you wish to block account {} within tenant {}?",
         blockSuccess: "Account blocking successful!",
         blockFail: "Account blocking failed!",
+
+        delete:"Delete",
+        deleteSuccess: "Account deleting successful!",
+        deleteFail: "Account deleting failed!",
       },
       setBlockThresholdAmountModal: {
         setSuccess: "Set Successfully",
@@ -402,6 +408,7 @@ export default {
         charging: "Charging...",
         notFound: "Account not found.",
         chargeFinished: "Charging finished!",
+        deleted:"Account has been deleted",
       },
       chargeTable: {
         time: "Deduction Date",
@@ -604,7 +611,7 @@ export default {
       oldPassword: "Old Password",
       newPassword: "New Password",
       confirmPassword: "Confirm Password",
-      userNotExist:"User Not Exist",
+      userNotExist:"The user does not exist or has been deleted",
       unavailable:"This feature is not available in the current configuration",
     },
     tenant: {
@@ -656,6 +663,9 @@ export default {
         changeSuccess: "Modification successful",
         changeFail: "Modification failed",
         changePassword: "Change Password",
+        delete:"Delete",
+        deleteFail: "Deletion failed",
+        deleteSuccess: "Deletion successful",
       },
       jobPriceChangeModal: {
         tenantPrice: "Tenant Billing",
@@ -684,6 +694,7 @@ export default {
         createModal: "seconds to open the create user interface",
         createFirst: "User does not exist. Please create a user first",
         addSuccess: "Added Successfully!",
+        userDeleted: "The user has been deleted and cannot be added",
       },
       createUserForm: {
         email: "User Email",
@@ -775,6 +786,43 @@ export default {
       clusterNotAvailable: "The cluster you are currently accessing is unavailable or there are no available clusters. "
       + " Please try again later or contact the administrator.",
     },
+    deleteModals:{
+      deleteUser:"Delete User",
+      userId:"User ID",
+      userName:"User Name",
+      comments:"Comments",
+      confirmPermanentDeleteUser: "Please confirm if you want to delete the user with ID <b>{}</b> and name <b>{}</b>?",
+      confirmDeleteUserPrompt1: "If deleting a user, please confirm that the user is no longer in use" +
+      "and enter the user ID and name below.",
+      confirmDeleteUserPrompt2: "<span style='color:red'>Warning: This action is irreversible, and the user " +
+      "will be unavailable!</span>",
+      cannotDeleteSelf: "Deleting the current user is not allowed",
+      platformAdmin:"Platform administrators cannot be deleted",
+      userIdRequired: "Please enter the user ID",
+      userNameRequired: "Please enter the user name",
+      incorrectUserIdOrName: "The user ID or name you entered does not match",
+      userDeleted: "The user has been deleted and cannot be operated",
+      deleteFailed: "Delete failed",
+      accountsOwnerPrompt: "The user <b>{}</b> is the owner of account(s) <b>{}</b>." +
+      "You need to delete the above account(s) before deleting this user.",
+      userRunningJobsPrompt: "The user has unfinished jobs and cannot be deleted.",
+      delete:"Delete",
+
+      deleteAccount:"Delete Account",
+      accountName:"Account Name",
+      accountOwnerId:"Account Owner ID",
+      accountNameRequired:"Please enter the account name",
+      ownerIdRequired:"Please enter the account owner ID",
+      invalidAccountNameOrOwnerId: "The account name or owner ID you entered does not match.",
+      confirmPermanentDeleteAccount:"Please confirm whether to delete the account with " +
+      "account name <b>{}</b> and account owner ID <b>{}</b>.",
+      confirmDeleteAccountPrompt1:"If you delete the account, please confirm that it is no longer in use" +
+      ", and enter the account name and owner ID below.",
+      confirmDeleteAccountPrompt2:"<span style='color:red'>Note: This action is irreversible." +
+      "The account will be unusable after deletion!</span>",
+      accountRunningJobsPrompt: "The account has unfinished jobs and cannot be deleted.",
+      accountDeleted:"The account has been deleted and cannot be operated",
+    },
     others: {
       seeDetails: "For details, please refer to the documentation",
       modifyUser: "Modify User",
@@ -799,7 +847,7 @@ export default {
       operationDetail: "Operation Details",
       operatorIp: "Operator IP",
       alreadyIs: "User is already in this role",
-      notExist: "User does not exist",
+      notExist: "The user does not exist or has been deleted",
       notAuth: "User does not have permission",
       setSuccess: "Set Successfully",
       cannotCancel: "Cannot cancel your own platform admin role",
@@ -1250,6 +1298,8 @@ export default {
       mergeFileChunks: "Merge and upload temporary file blocks",
       initMultipartUpload: "Initial multipart upload file",
       markMessageRead: "Mark message as read",
+      deleteUser:"Delete User",
+      deleteAccount:"Delete Account",
     },
     operationDetails: {
       login: "User Login",
@@ -1307,6 +1357,7 @@ export default {
       copyModelVersion: "Copy Model Version"
       + " (Source ModelId: {}, Source VersionId: {}; Target ModelId: {}, VersionId: {})",
       createUser: "Create User {}",
+      deleteUser:"Delete User {}",
       addUserToAccount: "Add user {} to account {}",
       removeUserFromAccount: "Remove user {} from account {}",
       setAccountAdmin: "Set user {} as administrator of account {}",
@@ -1322,6 +1373,7 @@ export default {
       unsetTenantFinance: "Unset user {} as finance personnel of tenant {}",
       tenantChangePassword: "Reset login password for user {}",
       createAccount: "Create account {}, owner {}",
+      deleteAccount:"Delete account {}",
       addAccountToWhitelist: "Add account {} to tenant {} whitelist",
       removeAccountFromWhitelist: "Remove account {} from tenant {} whitelist",
       accountPay: "Recharge account {} by {} yuan",

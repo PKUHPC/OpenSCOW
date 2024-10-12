@@ -15,7 +15,7 @@ import { validateToken as authValidateToken } from "@scow/lib-auth";
 import { GetUserInfoResponse, UserServiceClient } from "@scow/protos/build/server/user";
 import { MOCK_USER_INFO } from "src/apis/api.mock";
 import { USE_MOCK } from "src/apis/useMock";
-import { UserInfo } from "src/models/User";
+import { AccountState,UserInfo } from "src/models/User";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
 
@@ -41,7 +41,7 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
   });
 
   return {
-    accountAffiliations: userInfo.affiliations,
+    accountAffiliations: userInfo.affiliations.filter((x) => x.accountState !== AccountState.DELETED),
     identityId: resp.identityId,
     name: userInfo.name,
     platformRoles: userInfo.platformRoles,

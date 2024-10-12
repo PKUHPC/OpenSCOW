@@ -60,6 +60,13 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
       message: Type.Optional(Type.String()),
     }),
 
+    /** 用户或账户已删除 */
+    410: Type.Object({
+      code: Type.Union([
+        Type.Literal("USER_DELETED"),
+        Type.Literal("ACCOUNT_DELETED"),
+      ]),
+    }),
   },
 });
 
@@ -124,9 +131,12 @@ export default /* #__PURE__*/route(AddUserToAccountSchema, async (req, res) => {
            * */
 
           return { 404: { code: "USER_ALREADY_EXIST_IN_OTHER_TENANT" as const } };
-        } else {
-
+        } else if (e.details === "ACCOUNT_OR_TENANT_NOT_FOUND") {
           return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } };
+        } else if (e.details === "USER_DELETED") {
+          return { 410: { code: "USER_DELETED" as const } };
+        } else {
+          return { 410: { code: "ACCOUNT_DELETED" as const } };
         }
       },
     },

@@ -120,6 +120,7 @@ it("creates user and group if groupStrategy is newGroupPerUser", async () => {
   expect(responseUser).toEqual({
     dn: userDn,
     identityId: user.identityId,
+    loginShell: "/bin/bash",
     mail: savedUserMail,
     name: user.name,
   });
@@ -376,4 +377,56 @@ it("change password", async () => {
   });
   expect(notExistedResp.statusCode).toBe(404);
   expect(notExistedResp.json()).toBe(null);
+});
+
+it("delete user", async () => {
+  await createUser();
+
+  const { payload, headers } = createFormData({
+    username: user.identityId,
+    password: user.password,
+    callbackUrl,
+    token: user.captchaToken,
+    code: user.captchaCode,
+  });
+  await saveCaptchaText(server, user.captchaCode, user.captchaToken);
+
+  const resp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+
+  expect(resp.statusCode).toBe(302);
+
+  const deleteUserResp = await server.inject({
+    method: "DELETE",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(deleteUserResp.statusCode).toBe(204);
+
+  const newResp = await server.inject({
+    method: "POST",
+    url: "/public/auth",
+    payload,
+    headers,
+  });
+
+  expect(newResp.statusCode).toBe(400);
+  // 只是设置了loginshell，并没有在ldap中真正清除用户
+  const userInfo = await server.inject({
+    method: "GET",
+    url: "/user",
+    query: { identityId: user.identityId },
+  });
+
+  expect(userInfo.statusCode).toBe(200);
+  expect(userInfo.json()).toEqual({ user: {
+    identityId: user.identityId,
+    name: user.name,
+    mail: savedUserMail,
+  } });
 });

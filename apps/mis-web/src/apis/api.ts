@@ -104,6 +104,7 @@ import type { ChangePasswordAsTenantAdminSchema } from "src/pages/api/tenant/cha
 import type { CreateTenantSchema } from "src/pages/api/tenant/create";
 import type { CreateAccountSchema } from "src/pages/api/tenant/createAccount";
 import type { CreateTenantWithExistingUserAsAdminSchema } from "src/pages/api/tenant/createTenantWithExistingUserAsAdmin";
+import type { DeleteAccountSchema } from "src/pages/api/tenant/deleteAccount";
 import type { GetAccountsSchema } from "src/pages/api/tenant/getAccounts";
 import type { GetTenantsSchema } from "src/pages/api/tenant/getTenants";
 import type { SetBlockThresholdSchema } from "src/pages/api/tenant/setBlockThreshold";
@@ -113,6 +114,7 @@ import type { AddUserToAccountSchema } from "src/pages/api/users/addToAccount";
 import type { BlockUserInAccountSchema } from "src/pages/api/users/blockInAccount";
 import type { ChangeTenantSchema } from "src/pages/api/users/changeTenant";
 import type { CreateUserSchema } from "src/pages/api/users/create";
+import type { DeleteUserSchema } from "src/pages/api/users/delete";
 import type { GetAccountUsersSchema } from "src/pages/api/users/index";
 import type { CancelJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/cancel";
 import type { SetJobChargeLimitSchema } from "src/pages/api/users/jobChargeLimit/set";
@@ -121,7 +123,6 @@ import type { SetAdminSchema } from "src/pages/api/users/setAsAdmin";
 import type { QueryStorageUsageSchema } from "src/pages/api/users/storageUsage";
 import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAccount";
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
-
 
 export const api = {
   activateCluster: apiClient.fromTypeboxRoute<typeof ActivateClusterSchema>("PUT", "/api/admin/activateCluster"),
@@ -232,4 +233,6 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
+  deleteAccount: apiClient.fromTypeboxRoute<typeof DeleteAccountSchema>("DELETE", "/api/tenant/deleteAccount"),
 };

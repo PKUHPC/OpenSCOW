@@ -12,7 +12,7 @@
 
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
 import { ForbiddenPage } from "src/components/errorPages/ForbiddenPage";
-import { UserRole } from "src/models/User";
+import { AccountState, UserRole } from "src/models/User";
 import type { User } from "src/stores/UserStore";
 
 export const checkQueryAccountNameIsAdmin = (u: User) => {
@@ -20,7 +20,7 @@ export const checkQueryAccountNameIsAdmin = (u: User) => {
   const accountName = queryToString(query.accountName);
 
   const account = u.accountAffiliations.find((x) => x.accountName === accountName);
-  if (!account || account.role === UserRole.USER) {
+  if (!account || account.role === UserRole.USER || account.accountState === AccountState.DELETED) {
     return <ForbiddenPage />;
   }
 };

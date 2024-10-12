@@ -17,6 +17,7 @@ LDAP认证系统支持的功能如下表：
 | 用户名和姓名验证 | 是                       |
 | 修改密码         | 是                       |
 | 管理用户账户关系 | 否                       |
+| 用户删除         | 如果配置了相关配置即支持 |
 
 ## LDAP认证要求和流程
 
@@ -86,6 +87,9 @@ LDAP认证系统支持的功能如下表：
 
 4. 设置新用户的密码为用户输入的密码
 
+### 删除用户
+
+本系统仅支持ldap删除用户，实现方法为禁止shell登录，即修改用户的loginShell属性为/sbin/nologin。
 
 ## 配置LDAP认证服务
 
@@ -129,6 +133,9 @@ ldap:
 
     # LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。
     # mail: mail
+
+    # LDAP中指定用户在Unix/Linux系统上的shell的属性名。可不填。用于判断用户是否被禁止登录。
+    # loginShell: loginShell
 
   # 添加用户的相关配置。可不填，不填的话SCOW不支持创建用户。
   addUser:
@@ -179,6 +186,9 @@ ldap:
     # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps: 
     #   key: value
+  # 删除用户的相关配置，选填，默认开启。
+  deleteUser:
+    enabled: true
 ```
 
 增加好配置后，运行`./cli compose restart`重启系统即可。
@@ -219,6 +229,7 @@ ldap:
     uid: uid
     name: cn
     mail: mail
+    loginShell: loginShell
 ```
 
 ## LDAP镜像

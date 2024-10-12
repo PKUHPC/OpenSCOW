@@ -51,7 +51,14 @@ export interface PublicRuntimeConfig {
   CREATE_USER_CONFIG: {
     misConfig: MisConfigSchema["createUser"],
     authSupportsCreateUser: boolean | undefined,
-  },
+  }
+
+  DELETE_USER_CONFIG: {
+    misConfig: MisConfigSchema["deleteUser"],
+    authSupportsDeleteUser: boolean | undefined,
+  }
+
+  DELETE_ACCOUNT_CONFIG: MisConfigSchema["deleteAccount"],
 
   ADD_USER_TO_ACCOUNT: {
     accountAdmin: {

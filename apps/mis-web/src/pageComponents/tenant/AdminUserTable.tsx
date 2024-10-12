@@ -19,15 +19,19 @@ import Link from "next/link";
 import React, { useCallback, useMemo, useState } from "react";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
+import { DeleteEntityFailedModal } from "src/components/DeleteEntityFailedModal";
+import { DeleteEntityModalLink } from "src/components/DeleteEntityModal";
+import { DisabledA } from "src/components/DisabledA";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Encoding } from "src/models/exportFile";
-import { FullUserInfo, TenantRole } from "src/models/User";
+import { AccountState,DeleteFailedReason, FullUserInfo, TenantRole, UserState } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
+import { publicConfig } from "src/utils/config";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 
 interface Props {
@@ -43,6 +47,7 @@ interface FilterForm {
 
 const p = prefix("pageComp.tenant.adminUserTable.");
 const pCommon = prefix("common.");
+const pDelete = prefix("component.deleteModals.");
 
 const filteredRoles = {
   "ALL_USERS": "allUsers",
@@ -52,6 +57,7 @@ const filteredRoles = {
 type FilteredRole = keyof typeof filteredRoles;
 
 
+const deleteEnabled = publicConfig.DELETE_USER_CONFIG?.misConfig?.enabled ?? true;
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,
@@ -76,7 +82,13 @@ export const AdminUserTable: React.FC<Props> = ({
     (!query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName))
     && (rangeSearchRole === "ALL_USERS" || x.tenantRoles.includes(
       rangeSearchRole === "TENANT_ADMIN" ? TenantRole.TENANT_ADMIN : TenantRole.TENANT_FINANCE))
-  )) : undefined, [data, query, rangeSearchRole]);
+  ))
+    .map((x) => ({
+      ...x,
+      accountAffiliations: x.accountAffiliations.filter((acc) => acc.accountState !== AccountState.DELETED),
+    }))
+    : undefined, [data, query, rangeSearchRole],
+  );
 
   const searchData = useMemo(() => data ? data.results.filter((x) => (
     !query.idOrName || x.id.includes(query.idOrName) || x.name.includes(query.idOrName)
@@ -147,6 +159,13 @@ export const AdminUserTable: React.FC<Props> = ({
       { label: t(p("affiliatedAccountName")), value: "availableAccounts" },
     ];
   }, [t]);
+
+  const [failedModalVisible, setFailedModalVisible] = useState(false);
+  const [failedDeletedMessage, setFailedDeletedMessage] = useState({
+    type: DeleteFailedReason.ACCOUNTS_OWNER,
+    userId: "",
+    accounts: [],
+  });
 
   return (
     <div>
@@ -227,7 +246,13 @@ export const AdminUserTable: React.FC<Props> = ({
           dataIndex="tenantRoles"
           title={t(p("tenantRole"))}
           render={(_, r) => (
-            <TenantRoleSelector reload={reload} roles={r.tenantRoles} userId={r.id} currentUser={user} />
+            <TenantRoleSelector
+              reload={reload}
+              roles={r.tenantRoles}
+              userId={r.id}
+              currentUser={user}
+              isDisabled={r.state === UserState.DELETED}
+            />
           )}
         />
         <Table.Column<FullUserInfo>
@@ -253,39 +278,121 @@ export const AdminUserTable: React.FC<Props> = ({
           )}
         />
         <Table.Column<FullUserInfo>
-          dataIndex="changePassword"
+          dataIndex="operation"
           title={t(pCommon("operation"))}
-          width="8%"
+          width="13%"
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              <ChangePasswordModalLink
-                userId={r.id}
-                name={r.name}
-                onComplete={async (newPassword) => {
-                  await api.changePasswordAsTenantAdmin({
-                    body: {
-                      identityId: r.id,
-                      newPassword: newPassword,
-                    },
-                  })
-                    .httpError(404, () => { message.error(t(p("notExist"))); })
-                    .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                    .httpError(400, (e) => {
-                      if (e.code === "PASSWORD_NOT_VALID") {
-                        message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-                      };
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("changePassword"))}
+                </DisabledA>
+              ) : (
+                <ChangePasswordModalLink
+                  userId={r.id}
+                  name={r.name}
+                  onComplete={async (newPassword) => {
+                    await api.changePasswordAsTenantAdmin({
+                      body: {
+                        identityId: r.id,
+                        newPassword: newPassword,
+                      },
                     })
-                    .then(() => { message.success(t(p("changeSuccess"))); })
-                    .catch(() => { message.error(t(p("changeFail"))); });
-                }}
-              >
-                {t(p("changePassword"))}
-              </ChangePasswordModalLink>
+                      .httpError(404, () => { message.error(t(p("notExist"))); })
+                      .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                      .httpError(400, (e) => {
+                        if (e.code === "PASSWORD_NOT_VALID") {
+                          message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                        };
+                      })
+                      .then(() => { message.success(t(p("changeSuccess"))); })
+                      .catch(() => { message.error(t(p("changeFail"))); });
+                  }}
+                >
+                  {t(p("changePassword"))}
+                </ChangePasswordModalLink>
+              )
+              }
+              { deleteEnabled === true ? r.platformRoles.includes(0) ? (
+                <DisabledA message={t(pDelete("platformAdmin"))} disabled={true}>
+                  {t(p("delete"))}
+                </DisabledA>
+              ) : user.identityId === r.id ? (
+                <DisabledA message={t(pDelete("cannotDeleteSelf"))} disabled={true}>
+                  {t(p("delete"))}
+                </DisabledA>
+              ) : r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("delete"))}
+                </DisabledA>
+              ) : (
+                <DeleteEntityModalLink
+                  id={r.id}
+                  name={r.name}
+                  type="USER"
+                  onComplete={async (inputUserId, inputUserName, comments) => {
+
+                    message.open({
+                      type: "loading",
+                      content: t("common.waitingMessage"),
+                      duration: 0,
+                      key: "deleteUser" });
+
+                    await api.deleteUser({ query: {
+                      userId:inputUserId,
+                      userName:inputUserName,
+                      comments: comments,
+                    } })
+                      .httpError(404, (e) => {
+                        message.destroy("deleteUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      })
+                      .httpError(409, (e) => {
+                        message.destroy("deleteUser");
+                        const { type,userId,accounts } = JSON.parse(e.message);
+                        setFailedModalVisible(true);
+                        setFailedDeletedMessage({ type,userId,accounts });
+                        reload();
+                      }).httpError(500, (e) => {
+                        message.destroy("deleteUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      }).httpError(501, (e) => {
+                        message.destroy("deleteUser");
+                        message.error({
+                          content: e.message,
+                          duration: 4,
+                        });
+                      })
+                      .then(() => {
+                        message.destroy("deleteUser");
+                        message.success(t(p("deleteSuccess")));
+                        reload();
+                      })
+                      .catch(() => { message.error(t(p("deleteFail"))); });
+                  }}
+                >
+                  {t(p("delete"))}
+                </DeleteEntityModalLink>
+              ) : null}
             </Space>
           )}
         />
       </Table>
+      <DeleteEntityFailedModal
+        message={failedDeletedMessage}
+        open={failedModalVisible}
+        onClose={() => {
+          setFailedModalVisible(false);
+        }}
+      >
+      </DeleteEntityFailedModal>
     </div>
   );
 };

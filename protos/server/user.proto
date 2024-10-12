@@ -29,6 +29,17 @@ message GetUserStatusRequest {
   string user_id = 2;
 }
 
+enum AccountState {
+  // 未封锁或未冻结，解封或激活时
+  ACCOUNT_NORMAL = 0;
+  // 账户被手动冻结
+  ACCOUNT_FROZEN = 1;
+  // 账户被上级手动封锁
+  ACCOUNT_BLOCKED_BY_ADMIN = 2;
+  // 账户被删除
+  ACCOUNT_DELETED = 3;
+}
+
 message AccountStatus {
   UserStatus user_status = 1;
   bool account_blocked = 2;
@@ -37,6 +48,7 @@ message AccountStatus {
   common.Money balance = 5;
   optional bool is_in_whitelist = 6;
   common.Money block_threshold_amount = 7;
+  AccountState account_state = 8;
 }
 
 message GetUserStatusResponse {
@@ -203,6 +215,7 @@ message AddUserResponse {
 message DeleteUserRequest {
   string tenant_name = 1;
   string user_id = 2;
+  optional string deletion_comment = 3;
 }
 
 // FAILED_PRECONDITION: the user is an owner of an account.
@@ -233,6 +246,7 @@ message User {
   repeated AccountAffiliation account_affiliations = 6;
   repeated PlatformRole platform_roles = 7;
   repeated TenantRole tenant_roles = 8;
+  UserState state = 9;
 }
 
 message GetUserInfoRequest {
@@ -248,6 +262,7 @@ enum UserRole {
 message AccountAffiliation {
   string account_name = 1;
   UserRole role = 2;
+  AccountState account_state = 3;
 }
 
 enum PlatformRole {
@@ -260,6 +275,11 @@ enum TenantRole {
   TENANT_FINANCE = 1;
 }
 
+enum UserState {
+  NORMAL = 0;
+  DELETED = 1;
+}
+
 message GetUserInfoResponse {
   repeated AccountAffiliation affiliations = 1;
   repeated PlatformRole platform_roles = 2;
@@ -268,7 +288,6 @@ message GetUserInfoResponse {
   string tenant_name = 5;
   string email = 6;
   google.protobuf.Timestamp create_time = 7;
-
 }
 
 message GetUsersResponse {
@@ -283,6 +302,7 @@ message PlatformUserInfo {
   google.protobuf.Timestamp create_time = 5;
   repeated PlatformRole platform_roles = 6;
   string email = 7;
+  UserState state = 8;
 }
 
 enum SortDirection {

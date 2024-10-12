@@ -123,6 +123,9 @@ export const LdapConfigSchema = Type.Object({
         `,
         })),
   }, { description: "添加用户的配置" })),
+  deleteUser: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否允许从SCOW中删除用户", default: true }),
+  }, { description: "删除用户的配置" })),// 补文档
   attrs: Type.Object({
     uid: Type.String({ description: "LDAP中对应用户的id的属性名。" }),
     name: Type.Optional(Type.String({ description: `
@@ -137,6 +140,7 @@ export const LdapConfigSchema = Type.Object({
         3. 管理系统添加用户时，不验证ID与姓名是否匹配
     ` })),
     mail: Type.Optional(Type.String({ description: "LDAP中对应用户的邮箱的属性名。可不填。此字段只用于在创建用户的时候把邮件信息填入LDAP。" })),
+    loginShell: Type.Optional(Type.String({ description: "LDAP中对应用户在 Unix/Linux 系统上的默认shel。当前仅用于判断用户是否被禁止登录" })),
   }, { description: "属性映射" }),
 }, { description: "LDAP配置" });
 

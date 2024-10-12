@@ -12,10 +12,12 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { plugin } from "@ddadaal/tsgrpc-server";
+import { ensureNotUndefined } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
+import { removeUserFromAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
@@ -28,15 +30,25 @@ import { commonConfig } from "src/config/common";
 import { Account, AccountState } from "src/entities/Account";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { Tenant } from "src/entities/Tenant";
-import { User } from "src/entities/User";
+import { User, UserState } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { InternalMessageType } from "src/models/messageType";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
+import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
 import { getAccountOwnerAndAdmin } from "src/utils/getAccountOwnerAndAdmin";
 import { toRef } from "src/utils/orm";
 import { unblockAccountAssignedPartitionsInCluster } from "src/utils/resourceManagement";
 import { sendMessage } from "src/utils/sendMessage";
+
+function ensureAccountNotDeleted(account: Account) {
+  if (account.state === AccountState.DELETED) {
+    throw {
+      code: Status.NOT_FOUND,
+      message: `Account ${account.accountName} has been deleted.`,
+    } as ServiceError;
+  }
+}
 
 export const accountServiceServer = plugin((server) => {
 
@@ -54,6 +66,9 @@ export const accountServiceServer = plugin((server) => {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
           } as ServiceError;
         }
+
+        // 检查账户是否已删除
+        ensureAccountNotDeleted(account);
 
         const currentActivatedClusters = await getActivatedClusters(em, logger);
         const jobs = await server.ext.clusters.callOnAll(
@@ -145,6 +160,8 @@ export const accountServiceServer = plugin((server) => {
             code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
           } as ServiceError;
         }
+
+        ensureAccountNotDeleted(account);
 
         if (!account.blockedInCluster) {
           throw {
@@ -244,9 +261,10 @@ export const accountServiceServer = plugin((server) => {
       const { accountName, tenantName, ownerId, comment } = request;
       const user = await em.findOne(User, { userId: ownerId, tenant: { name: tenantName } });
 
-      if (!user) {
+      if (!user || user.state === UserState.DELETED) {
         throw {
-          code: Status.NOT_FOUND, message: `User ${user} under tenant ${tenantName} does not exist`,
+          code: Status.NOT_FOUND,
+          message: `User ${ownerId} under tenant ${tenantName} does not exist or has been deleted`,
         } as ServiceError;
       }
 
@@ -283,7 +301,7 @@ export const accountServiceServer = plugin((server) => {
         await em.removeAndFlush([account, userAccount]);
         throw e;
       };
-  
+
       const currentActivatedClusters = await getActivatedClusters(em, logger);
 
       // 如果已配置资源管理扩展功能，向资源管理数据库写入账户的默认授权集群与分区
@@ -318,7 +336,7 @@ export const accountServiceServer = plugin((server) => {
                 throw e;
               }
             });
-          },  
+          },
         ).catch(async (e) => {
           await rollback(e);
           throw e;
@@ -332,11 +350,11 @@ export const accountServiceServer = plugin((server) => {
             await server.ext.clusters.callOnOne(
               clusterId,
               logger,
-              async (client) => { 
+              async (client) => {
                 await asyncClientCall(client.account, "createAccount", {
                   accountName, ownerUserId: ownerId,
-                }); 
-              },      
+                });
+              },
             );
             await unblockAccountAssignedPartitionsInCluster(
               account.accountName,
@@ -367,7 +385,7 @@ export const accountServiceServer = plugin((server) => {
                   throw e;
                 }
               });
-            },  
+            },
           ).catch(async (e) => {
             await rollback(e);
             throw e;
@@ -448,6 +466,8 @@ export const accountServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      ensureAccountNotDeleted(account);
+
       if (account.whitelist) {
         return [{ executed: false }];
       }
@@ -509,6 +529,9 @@ export const accountServiceServer = plugin((server) => {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
         } as ServiceError;
       }
+
+      ensureAccountNotDeleted(account);
+
       if (!account.whitelist) {
         return [{ executed: false }];
       }
@@ -554,6 +577,9 @@ export const accountServiceServer = plugin((server) => {
           code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
         } as ServiceError;
       }
+
+      ensureAccountNotDeleted(account);
+
       account.blockThresholdAmount = blockThresholdAmount
         ? new Decimal(moneyToNumber(blockThresholdAmount))
         : undefined;
@@ -612,6 +638,106 @@ export const accountServiceServer = plugin((server) => {
       await em.persistAndFlush(account);
 
       return [{}];
+    },
+
+    deleteAccount: async ({ request, em, logger }) => {
+      return await em.transactional(async (em) => {
+        const { accountName, tenantName, comment } = ensureNotUndefined(request, ["accountName", "tenantName"]);
+
+        const tenant = await em.findOne(Tenant, { name: tenantName });
+
+        if (!tenant) {
+          throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
+        }
+
+        const account = await em.findOne(Account, { accountName,
+          tenant: { name: tenantName } }, { populate: ["tenant","users","users.user"]});
+
+        if (!account) {
+          throw {
+            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+          } as ServiceError;
+        }
+
+        ensureAccountNotDeleted(account);
+
+        const userAccounts = account.users.getItems();
+        const currentActivatedClusters = await getActivatedClusters(em, logger);
+        // 查询账户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
+        const runningJobs = await server.ext.clusters.callOnAll(
+          currentActivatedClusters,
+          logger,
+          async (client) => {
+            const fields = ["job_id", "user", "state", "account"];
+
+            return await asyncClientCall(client.job, "getJobs", {
+              fields,
+              filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
+            });
+          },
+        );
+
+        const runningJobsObj = {
+          accountName,
+          type: "RUNNING_JOBS",
+        };
+
+        if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+          throw {
+            code: Status.FAILED_PRECONDITION,
+            message: JSON.stringify(runningJobsObj),
+          } as ServiceError;
+        }
+
+        // 处理用户账户关系表，删除账户与所有用户的关系
+        const hasCapabilities = server.ext.capabilities.accountUserRelation;
+
+        for (const userAccount of userAccounts) {
+          const userId = userAccount.user.getEntity().userId;
+          if (userAccount.role === EntityUserRole.OWNER) {
+            continue;
+          }
+          await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+            return await asyncClientCall(client.user, "removeUserFromAccount",
+              { userId, accountName });
+          }).catch(async (e) => {
+            // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
+            // 除此以外，都抛出异常
+            if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                   !== Object.keys(currentActivatedClusters).length) {
+              throw e;
+            }
+          });
+          await em.removeAndFlush(userAccount);
+          if (hasCapabilities) {
+            await removeUserFromAccount(authUrl, { accountName, userId }, logger);
+          }
+        }
+
+        if (account.whitelist) {
+          em.remove(account.whitelist);
+          account.whitelist = undefined;
+        }
+
+        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+          return await asyncClientCall(client.account, "deleteAccount",
+            { accountName });
+        }).catch(async (e) => {
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出账户
+          // 除此以外，都抛出异常
+          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+            throw e;
+          }
+        });
+
+        account.state = AccountState.DELETED;
+        account.comment = account.comment + (comment ? "  " + comment.trim() : "");
+        account.blockedInCluster = true;
+        await em.flush();
+
+        return [{}];
+      });
     },
   });
 

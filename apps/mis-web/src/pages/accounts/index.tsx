@@ -17,6 +17,8 @@ import { Redirect } from "src/components/Redirect";
 import { useI18nTranslateToString } from "src/i18n";
 import { accountAdminRoutes } from "src/layouts/routes";
 import { AccountAffiliation, UserRole } from "src/models/User";
+import { AccountState } from "src/models/User";
+
 
 interface Props {
   error: AuthResultError;
@@ -38,7 +40,8 @@ export const FinanceIndexPage: NextPage<Props> = ({ error, adminAccounts }) => {
 
 };
 
-const auth = ssrAuthenticate((u) => u.accountAffiliations.some((x) => x.role !== UserRole.USER));
+const auth = ssrAuthenticate((u) => u.accountAffiliations.some((x) => x.role !== UserRole.USER
+ && x.accountState !== AccountState.DELETED));
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
