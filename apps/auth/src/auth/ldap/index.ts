@@ -71,7 +71,7 @@ export const createLdapAuthProvider = (f: FastifyInstance) => {
         return result ? "OK" : "Wrong";
       });
     },
-    deleteUser: (ldap.deleteUser?.enabled || !ldap.deleteUser) ? async (identityId, req) => {
+    deleteUser: (ldap.deleteUser?.enabled) ? async (identityId, req) => {
       return useLdap(req.log, ldap)(async (client) => {
         const user = await findUser(req.log, ldap, client, identityId);
         if (!user) {

@@ -124,8 +124,8 @@ export const LdapConfigSchema = Type.Object({
         })),
   }, { description: "添加用户的配置" })),
   deleteUser: Type.Optional(Type.Object({
-    enabled: Type.Boolean({ description: "是否允许从SCOW中删除用户", default: true }),
-  }, { description: "删除用户的配置" })),// 补文档
+    enabled: Type.Boolean({ description: "是否允许从SCOW中删除用户", default: false }),
+  }, { description: "删除用户的配置" })),
   attrs: Type.Object({
     uid: Type.String({ description: "LDAP中对应用户的id的属性名。" }),
     name: Type.Optional(Type.String({ description: `

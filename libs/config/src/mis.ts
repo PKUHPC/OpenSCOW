@@ -179,14 +179,14 @@ export const MisConfigSchema = Type.Object({
     default: 0.01,
   }),
 
-  deleteUser: Type.Object({
-    enabled: Type.Boolean({ description: "是否启用从SCOW中删除用户", default: true }),
-    nameMarker: Type.String({ description: "用户名删除标识", default: "(-)" }),
-  }),
+  deleteUser: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否启用从SCOW中删除用户", default: false }),
+    nameMarker: Type.String({ description: "用户名删除标识", default: "(已删除)" }),
+  })),
 
-  deleteAccount: Type.Object({
-    enabled: Type.Boolean({ description: "是否启用从SCOW中删除账户", default: true }),
-  }),
+  deleteAccount: Type.Optional(Type.Object({
+    enabled: Type.Boolean({ description: "是否启用从SCOW中删除账户", default: false }),
+  })),
 });
 
 const MIS_CONFIG_NAME = "mis";

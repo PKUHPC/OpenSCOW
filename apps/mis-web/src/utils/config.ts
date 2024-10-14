@@ -41,7 +41,7 @@ export interface ServerRuntimeConfig {
 
   PROTOCOL: string;
 
-  SCOW_RESOURCE_CONFIG: ScowResourceConfigSchema | undefined; 
+  SCOW_RESOURCE_CONFIG: ScowResourceConfigSchema | undefined;
 }
 
 export interface PublicRuntimeConfig {
@@ -53,12 +53,12 @@ export interface PublicRuntimeConfig {
     authSupportsCreateUser: boolean | undefined,
   }
 
-  DELETE_USER_CONFIG: {
+  DELETE_USER_CONFIG?: {
     misConfig: MisConfigSchema["deleteUser"],
     authSupportsDeleteUser: boolean | undefined,
   }
 
-  DELETE_ACCOUNT_CONFIG: MisConfigSchema["deleteAccount"],
+  DELETE_ACCOUNT_CONFIG?: MisConfigSchema["deleteAccount"],
 
   ADD_USER_TO_ACCOUNT: {
     accountAdmin: {

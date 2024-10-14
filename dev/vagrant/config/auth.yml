@@ -148,9 +148,9 @@ ldap:
     # extraProps:
     #   key: value
 
-# 删除用户的相关配置，选填，默认开启。
-  deleteUser:
-    enabled: true
+# 删除用户的相关配置，选填，默认关闭。
+  # deleteUser:
+  #   enabled: false
 
 # auth 界面 ui 配置
 ui:

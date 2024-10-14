@@ -29,11 +29,9 @@ const { readVersionFile } = require("@scow/utils/build/version");
 async function queryCapabilities(authUrl, phase) {
 
   if (phase === PHASE_PRODUCTION_SERVER) {
-    console.log("PHASE_PRODUCTION_SERVER",authUrl, phase)
     // @ts-ignore
     return await getCapabilities(authUrl);
   } else {
-    console.log("默认的")
     return { changePassword: true, createUser: true, validateName: true, changeEmail:true, deleteUser: true, };
   }
 }
@@ -90,7 +88,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
   // query auth capabilities to set optional auth features
   const capabilities = await queryCapabilities(config.AUTH_INTERNAL_URL, phase);
-  console.log("你读的啥",capabilities)
   const configBasePath = mockEnv ? join(__dirname, "config") : undefined;
 
   const clusterTexts = getClusterTextsConfig(configBasePath, console);
@@ -131,11 +128,11 @@ const buildRuntimeConfig = async (phase, basePath) => {
     },
 
     DELETE_USER_CONFIG: {
-      misConfig: misConfig.deleteUser,
+      misConfig: misConfig.deleteUser ? misConfig.deleteUser : undefined,
       authSupportsDeleteUser: capabilities.deleteUser,
     },
 
-    DELETE_ACCOUNT_CONFIG: misConfig.deleteAccount,
+    DELETE_ACCOUNT_CONFIG: misConfig.deleteAccount ? misConfig.deleteAccount : undefined,
 
     ADD_USER_TO_ACCOUNT: {
       accountAdmin: misConfig.addUserToAccount.accountAdmin,

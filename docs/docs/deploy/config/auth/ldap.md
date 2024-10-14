@@ -186,9 +186,9 @@ ldap:
     # 例如：sn: "{{ cn }}"，那么添加时将会增加一个sn属性，其值为cn的属性，即为用户输入的姓名
     # extraProps: 
     #   key: value
-  # 删除用户的相关配置，选填，默认开启。
+  # 删除用户的相关配置，选填，默认不开启。
   deleteUser:
-    enabled: true
+    enabled: false
 ```
 
 增加好配置后，运行`./cli compose restart`重启系统即可。

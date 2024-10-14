@@ -74,7 +74,7 @@ const p = prefix("pageComp.accounts.accountTable.");
 const pCommon = prefix("common.");
 const pDelete = prefix("component.deleteModals.");
 
-const deleteEnabled = publicConfig.DELETE_ACCOUNT_CONFIG?.enabled ?? true;
+const deleteEnabled = publicConfig.DELETE_ACCOUNT_CONFIG?.enabled ?? false;
 
 export const AccountTable: React.FC<Props> = ({
   data, isLoading, showedTab, reload,

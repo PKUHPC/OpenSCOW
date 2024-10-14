@@ -8,9 +8,3 @@ db:
 periodicSyncUserAccountBlockStatus:
   enabled: false
 
-deleteUser:
-  enabled: true
-  nameMarker: "(已删除)"
-
-deleteAccount:
-  enabled: true

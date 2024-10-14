@@ -44,16 +44,7 @@ export const getCapabilitiesRoute = fp(async (f) => {
     async () => {
 
       const provider = f.auth;
-      console.log("/capabilities是在auth读的,",{
-        createUser: provider.createUser !== undefined,
-        checkPassword: provider.checkPassword !== undefined,
-        changePassword: provider.changePassword !== undefined,
-        changeEmail: provider.changeEmail !== undefined,
-        getUser: provider.getUser !== undefined,
-        accountUserRelation: false,
-        deleteUser: provider.deleteUser !== undefined,
-      });
-      // 打点
+
       return {
         createUser: provider.createUser !== undefined,
         checkPassword: provider.checkPassword !== undefined,

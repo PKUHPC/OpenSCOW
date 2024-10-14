@@ -74,6 +74,9 @@ ldap:
     extraProps:
       # test overriding existing property
       mail: mail is {{ mail }}
+  deleteUser:
+    enabled: true
+
   attrs:
     uid: uid
     name: cn

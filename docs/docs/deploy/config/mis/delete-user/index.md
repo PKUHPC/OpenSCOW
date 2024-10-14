@@ -14,14 +14,14 @@ title: 删除用户与账户
 
 ## 开启关闭SCOW中删除用户功能
 
-要想开启关闭SCOW的删除用户的功能，可以在配置文件中配置，默认为开启。
+要想开启关闭SCOW的删除用户的功能，可以在配置文件中配置，默认不开启。
 
 ```yaml title="config/mis.yaml"
 # 删除用户相关配置
 deleteUser:
 
   # 是否允许用户从SCOW中删除用户
-  enabled: true
+  enabled: false
 
   # 删除标识
   nameMarker: "(已删除)"
@@ -38,14 +38,14 @@ deleteUser:
 
 ## 开启关闭SCOW中删除账户功能
 
-要想开启关闭SCOW的删除账户的功能，可以在配置文件中配置，默认为开启。
+要想开启关闭SCOW的删除账户的功能，可以在配置文件中配置，默认不开启。
 
 ```yaml title="config/mis.yaml"
 # 删除账户相关配置
 deleteAccount:
 
-  # 是否允许用户从SCOW中删除账户，默认允许
-  enabled: true
+  # 是否允许用户从SCOW中删除账户，默认不允许
+  enabled: false
 ```
 
 当您关闭此功能时，UI上所有关于删除账户的功能的链接都会被隐藏。

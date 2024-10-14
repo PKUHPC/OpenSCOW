@@ -57,7 +57,7 @@ const filteredRoles = {
 type FilteredRole = keyof typeof filteredRoles;
 
 
-const deleteEnabled = publicConfig.DELETE_USER_CONFIG?.misConfig?.enabled ?? true;
+const deleteEnabled = publicConfig.DELETE_USER_CONFIG?.misConfig?.enabled ?? false;
 
 export const AdminUserTable: React.FC<Props> = ({
   data, isLoading, reload, user,

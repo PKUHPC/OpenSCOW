@@ -121,8 +121,8 @@ createUser:
 # 删除用户相关配置
 deleteUser:
 
-  # 是否允许用户从SCOW中删除用户，默认为true
-  enabled: true
+  # 是否允许用户从SCOW中删除用户，默认为false
+  enabled: false
 
   # 删除标识
   nameMarker: "(已删除)"
@@ -130,8 +130,8 @@ deleteUser:
 # 删除账户相关配置
 deleteAccount:
 
-  # 是否允许用户从SCOW中删除账户，默认为true
-  enabled: true
+  # 是否允许用户从SCOW中删除账户，默认为false
+  enabled: false
 
 # # 新增导航链接相关配置
 # navLinks:
