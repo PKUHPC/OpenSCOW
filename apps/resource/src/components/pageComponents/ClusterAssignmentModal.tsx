@@ -9,8 +9,6 @@ import { I18nDicType } from "src/models/i18n";
 import { AssignmentState, PartitionOperationType } from "src/models/partition";
 import { trpc } from "src/server/trpc/api";
 
-import { ModalLink } from "../ModalLink";
-
 interface Props {
   operationType: PartitionOperationType
   assignedTenantName: string;
@@ -345,5 +343,3 @@ export const ClusterAssignmentModal: React.FC<Props> = ({
 
   );
 };
-
-export const ClusterAssignmentLink = ModalLink(ClusterAssignmentModal);

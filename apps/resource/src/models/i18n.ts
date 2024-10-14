@@ -43,6 +43,7 @@ export const languageDic = {
         noAccountDisplayedClusters: "当前暂无可以授权的集群，请确认当前在线集群信息以及是否已经在租户下授权了集群信息",
         noTenantDisplayedPartitions: "当前暂无可以授权的分区，请确认当前在线集群信息",
         noAccountDisplayedPartitions: "当前暂无可以授权的分区，请确认当前在线集群信息以及是否已经在租户下授权了分区信息",
+        someClusterPartitionsFailed: "当前可能存在获取失败的集群分区数据，请检查各集群连接是否正常",
       },
       setPartitionAssignmentModal: {
         title: "配置授权分区",
@@ -159,6 +160,8 @@ export const languageDic = {
         noAccountDisplayedPartitions: "There are currently no partitions available for authorization. "
         + "Please verify the current online cluster information and whether any partition information "
         + "has already been authorized under the associated tenant.",
+        someClusterPartitionsFailed: "There may be some cluster partition data retrieval failures. "
+        + "Please check the connectivity of each cluster.",
       },
       setPartitionAssignmentModal: {
         title: "Set Partition Assignment",

@@ -22,7 +22,6 @@ export default function Page() {
     }, "*");
   }, [language]);
 
-
   return (
     <div>
       <Head title={language.clusterPartitionManagement.common.head} />

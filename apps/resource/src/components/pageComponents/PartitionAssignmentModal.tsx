@@ -12,7 +12,6 @@ import { AssignedClustersPartitionsSchema } from "src/server/trpc/route/partitio
 
 import { SingleClusterSelector } from "../ClusterSelector";
 import { FilterFormContainer } from "../FilterFormContainer";
-import { ModalLink } from "../ModalLink";
 
 interface Props {
   operationType: PartitionOperationType
@@ -69,6 +68,8 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
 }) => {
 
   const [form] = Form.useForm<FormFields>();
+  const [partitionsInconsistency, setPartitionDataInconsistency]
+   = useState<boolean>(false);
 
   const { message, modal } = App.useApp();
 
@@ -110,12 +111,44 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
         selectable: assignedClusterIdsSet.has(item.clusterId) ? true : false,
       };
     });
+
     return filteredData;
   }, [assignedInfo, currentClustersPartitionsData, tenantAssignedPartitions]);
 
+
+  // 判断是否存在集群连接获取分区信息失败的情况
+  useEffect(() => {
+
+    const currentClusterIds = currentClustersData?.map((x) => x.id);
+    let hasInconsistency: boolean = false;
+    // 如果是平台管理下的租户授权分区，当前已获取的在线集群下如果分区为空则推测获取数据出现问题
+    if (operationType === PartitionOperationType.TENANT_OPERATION && 
+      currentClustersPartitionsData &&
+      currentClusterIds) {
+      hasInconsistency = currentClusterIds.some((id) => {
+        return !currentClustersPartitionsData.find((x) => x.clusterId === id);
+      });   
+    }
+
+    // 如果是租户管理下的账户授权分区，当前已获取的在线集群下如果租户已授权的分区数据存在分区为空则推测获取数据出现问题
+    if (operationType === PartitionOperationType.ACCOUNT_OPERATION && 
+      currentClustersPartitionsData &&
+      currentClusterIds &&
+      tenantAssignedPartitions) {
+      hasInconsistency = tenantAssignedPartitions.some((x) => {
+        return currentClusterIds.includes(x.clusterId) && 
+        !currentClustersPartitionsData.find((c) => c.clusterId === x.clusterId);
+      });     
+    }
+
+    if (hasInconsistency) {
+      setPartitionDataInconsistency(true);
+    }
+  }, [currentClustersData, currentClustersPartitionsData, tenantAssignedPartitions]);
+
   const [filteredPartitionList, setFilteredPartitionList] = 
     useState<DisplayedPartition[] | undefined>(displayedTotalPartitionList);
-
+  
   useEffect(() => {
     const { cluster, partition } = query;
     if (displayedTotalPartitionList) {
@@ -297,6 +330,15 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
             </div>
           )
       }
+      {/* 如果有没有获取到的可以展示的集群分区数据，提示集群分区获取可能失败 */}
+      {
+        partitionsInconsistency && filteredPartitionList && filteredPartitionList.length > 0
+          && (
+            <div style={{ marginBottom: "20px" }}>
+              {language.clusterPartitionManagement.common.someClusterPartitionsFailed}
+            </div>
+          )
+      }
       <FilterFormContainer style={{ display: "flex", justifyContent: "space-between" }}>
         <Form<FilterForm>
           layout="inline"
@@ -341,9 +383,6 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
             const clusterName = currentClustersData?.find((cluster) => (cluster.id === r.clusterId))?.name;
             return clusterName ? getI18nConfigCurrentText(clusterName, languageId) : r.clusterId;
           }}
-        // sorter={(a, b) => a.id.localeCompare(b.id)}
-        // sortDirections={["ascend", "descend"]}
-        // sortOrder={currentSortInfo.field === "id" ? currentSortInfo.order : null}
         />
         <Table.Column<DisplayedPartition>
           dataIndex="partition"
@@ -368,9 +407,6 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
 
             );
           }}
-        // sorter={(a, b) => a.name.localeCompare(b.name)}
-        // sortDirections={["ascend", "descend"]}
-        // sortOrder={currentSortInfo.field === "name" ? currentSortInfo.order : null}
         />
         <Table.Column<DisplayedPartition>
           dataIndex="assignmentState"
@@ -460,5 +496,3 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
 
   );
 };
-
-export const PartitionAssignmentLink = ModalLink(PartitionAssignmentModal);

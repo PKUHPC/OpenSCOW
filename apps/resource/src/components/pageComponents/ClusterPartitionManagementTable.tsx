@@ -9,10 +9,12 @@ import { trpc } from "src/server/trpc/api";
 import { AllAssignedInfoSchema } from "src/server/trpc/route/partitions/tenantClusterPartitions";
 import { DEFAULT_PAGE_SIZE } from "src/utils/constants";
 
+import { AssignedClustersPartitionsSchema } from "../../server/trpc/route/partitions/tenantClusterPartitions";
 import { FilterFormContainer } from "../FilterFormContainer";
-import { AssignedDetailsDrawer } from "./AssinedDetailsDrawer";
-import { ClusterAssignmentLink } from "./ClusterAssignmentModal";
-import { PartitionAssignmentLink } from "./PartitionAssignmentModal";
+import { ModalButton } from "../ModalLink";
+import { AssignedDetailsDrawer } from "./AssignedDetailsDrawer";
+import { ClusterAssignmentModal } from "./ClusterAssignmentModal";
+import { PartitionAssignmentModal } from "./PartitionAssignmentModal";
 
 
 interface Props {
@@ -156,7 +158,8 @@ const ClusterPartitionInfoTable: React.FC<ClusterPartitionManagementInfoTablePro
 
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
   const [previewItem, setPreviewItem] = useState<AllAssignedInfoSchema | undefined>(undefined);
-
+  const [clusterPreviewItem, setClusterPreviewItem] = useState<AllAssignedInfoSchema | undefined>(undefined);
+  const [partitionPreviewItem, setPartitionPreviewItem] = useState<AllAssignedInfoSchema | undefined>(undefined);
 
   const [query, setQuery] = useState<FilterForm>({
     name: undefined,
@@ -171,6 +174,23 @@ const ClusterPartitionInfoTable: React.FC<ClusterPartitionManagementInfoTablePro
     }
 
   }) : undefined, [data, query, operationType]);
+
+  const getPreviewAssignedInfo = (
+    sourceData?: AllAssignedInfoSchema[],
+    tenantName?: string,
+    accountName?: string,
+  ): AssignedClustersPartitionsSchema | undefined => {
+    
+    if (!sourceData) return undefined;
+
+    const found = sourceData.find((x) => 
+      accountName 
+        ? x.tenantName === tenantName && x.accountName === accountName
+        : x.tenantName === tenantName,
+    );
+  
+    return found?.assignedInfo;
+  };
 
   return (
     <div>
@@ -244,49 +264,75 @@ const ClusterPartitionInfoTable: React.FC<ClusterPartitionManagementInfoTablePro
           title={language.common.operation}
           width="30%"
           fixed="right"
-          render={(_, r) => (
-            <Space>
-              <>
-                <ClusterAssignmentLink
-                  assignedAccountName={r.accountName}
-                  assignedTenantName={r.tenantName}
-                  assignedClusters={r.assignedInfo.assignedClusters}
-                  operationType={operationType}
-                  reload={reload}
-                  isCurrentClustersLoading={currentClustersFetching}
-                  languageId={languageId}
-                  language={language}
-                  tenantAssignedClusters={tenantAssignedClusters}
-                  currentClustersData={currentClustersData}
-                >
-                  {language.clusterPartitionManagement.common.assignCluster}
-                </ClusterAssignmentLink>
-                <Divider type="vertical" />
-                <PartitionAssignmentLink
-                  assignedAccountName={r.accountName}
-                  assignedTenantName={r.tenantName}
-                  assignedInfo={r.assignedInfo}
-                  operationType={operationType}
-                  reload={reload}
-                  languageId={languageId}
-                  language={language}
-                  tenantAssignedPartitions={tenantAssignedPartitions}
-                  currentClustersData={currentClustersData}
-                  currentClustersDataFetching={currentClustersFetching}
-                  currentClustersPartitionsData={currentClustersPartitionsData}
-                  currentClustersPartitionsFetching={currentClustersPartitionsFetching}
-                >
-                  {language.clusterPartitionManagement.common.assignPartition}
-                </PartitionAssignmentLink>
-                <Divider type="vertical" />
-                <a onClick={() => setPreviewItem(r)}>
-                  {language.common.detail}
-                </a>
-              </>
-            </Space>
-          )}
+          render={(_, r) => {
+
+            // 维持上一次模态框选中的账户/租户数据
+            return (
+              <Space>
+                <>
+                  <a onClick={() => setClusterPreviewItem(r)}>
+                    {language.clusterPartitionManagement.common.assignCluster}
+                  </a>
+                  <Divider type="vertical" />
+                  <a onClick={() => setPartitionPreviewItem(r)}>
+                    {language.clusterPartitionManagement.common.assignPartition}
+                  </a>
+                  <Divider type="vertical" />
+                  <a onClick={() => setPreviewItem(r)}>
+                    {language.common.detail}
+                  </a>
+                </>
+              </Space>
+            );
+          }}
         />
       </Table>
+      <ClusterAssignmentLink
+        externalOpen={clusterPreviewItem !== undefined}
+        onToggle={(open) => {
+          if (!open) {
+            setClusterPreviewItem(undefined);
+          }
+        }}
+        assignedAccountName={clusterPreviewItem?.accountName}
+        assignedTenantName={clusterPreviewItem?.tenantName ?? ""}
+        assignedClusters={
+          getPreviewAssignedInfo(filteredData, 
+            clusterPreviewItem?.tenantName, 
+            clusterPreviewItem?.accountName)?.assignedClusters
+           ?? []}
+        operationType={operationType}
+        reload={reload}
+        isCurrentClustersLoading={currentClustersFetching}
+        languageId={languageId}
+        language={language}
+        tenantAssignedClusters={tenantAssignedClusters}
+        currentClustersData={currentClustersData}
+      />
+      <PartitionAssignmentLink
+        externalOpen={partitionPreviewItem !== undefined}
+        onToggle={(open) => {
+          if (!open) {
+            setPartitionPreviewItem(undefined);
+          }
+        }}
+        assignedAccountName={partitionPreviewItem?.accountName}
+        assignedTenantName={partitionPreviewItem?.tenantName ?? ""}
+        assignedInfo={
+          getPreviewAssignedInfo(filteredData, 
+            partitionPreviewItem?.tenantName, 
+            partitionPreviewItem?.accountName)
+        }
+        operationType={operationType}
+        reload={reload}
+        languageId={languageId}
+        language={language}
+        tenantAssignedPartitions={tenantAssignedPartitions}
+        currentClustersData={currentClustersData}
+        currentClustersDataFetching={currentClustersFetching}
+        currentClustersPartitionsData={currentClustersPartitionsData}
+        currentClustersPartitionsFetching={currentClustersPartitionsFetching}
+      />
       <AssignedDetailsDrawer
         open={previewItem !== undefined}
         detail={previewItem}
@@ -299,3 +345,7 @@ const ClusterPartitionInfoTable: React.FC<ClusterPartitionManagementInfoTablePro
     </div>
   );
 };
+
+
+const ClusterAssignmentLink = ModalButton(ClusterAssignmentModal, { type: "link" });
+const PartitionAssignmentLink = ModalButton(PartitionAssignmentModal, { type: "link" });

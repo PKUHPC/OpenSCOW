@@ -3,7 +3,7 @@
 import { legacyLogicalPropertiesTransformer, StyleProvider } from "@ant-design/cssinjs";
 import { DEFAULT_PRIMARY_COLOR } from "@scow/config/build/ui";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { AntdConfigProvider } from "src/components/layout/AntdConfigProvider";
 import { DarkModeProvider } from "src/components/layout/DarkModeProvider";
 import { ErrorBoundary } from "src/components/layout/ErrorBoundary";
@@ -11,6 +11,7 @@ import { GlobalStyle } from "src/components/layout/globalStyle";
 import { Loading } from "src/components/layout/Loading";
 import { AntdStyleRegistry } from "src/components/layout/styleRegistry/AntdRegistry";
 import StyledComponentsRegistry from "src/components/layout/styleRegistry/StyledComponentsRegistry";
+import { ScowParamsProvider } from "src/components/ScowParamsProvider";
 import { ServerErrorPage } from "src/components/ServerErrorPage";
 import { trpc } from "src/server/trpc/api";
 import { UiConfig } from "src/server/trpc/route/config";
@@ -73,37 +74,41 @@ export function ClientLayout(props: {
     ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
 
   return (
-    <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
-      <StyledComponentsRegistry>
-        <AntdStyleRegistry>
-          <body>
-            {
-              useConfig.isLoading ? (
-                <AntdConfigProvider color={DEFAULT_PRIMARY_COLOR}>
-                  <Loading />
-                </AntdConfigProvider>
-              ) : (
-                <DarkModeProvider>
-                  <AntdConfigProvider color={color}>
-                    <GlobalStyle />
-                    <ErrorBoundary Component={ServerErrorPage} pathname={pathname ?? ""}>
-                      <UiConfigContext.Provider
-                        value={{
-                          hostname,
-                          uiConfig,
-                        }}
-                      >
-                        {props.children}
-                      </UiConfigContext.Provider>
-                    </ErrorBoundary>
-                  </AntdConfigProvider>
-                </DarkModeProvider>
-              )
-            }
+    <Suspense>
+      <ScowParamsProvider>
+        <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+          <StyledComponentsRegistry>
+            <AntdStyleRegistry>
+              <body>
+                {
+                  useConfig.isLoading ? (
+                    <AntdConfigProvider color={DEFAULT_PRIMARY_COLOR}>
+                      <Loading />
+                    </AntdConfigProvider>
+                  ) : (
+                    <DarkModeProvider>
+                      <AntdConfigProvider color={color}>
+                        <GlobalStyle />
+                        <ErrorBoundary Component={ServerErrorPage} pathname={pathname ?? ""}>
+                          <UiConfigContext.Provider
+                            value={{
+                              hostname,
+                              uiConfig,
+                            }}
+                          >
+                            {props.children}
+                          </UiConfigContext.Provider>
+                        </ErrorBoundary>
+                      </AntdConfigProvider>
+                    </DarkModeProvider>
+                  )
+                }
 
-          </body>
-        </AntdStyleRegistry>
-      </StyledComponentsRegistry>
-    </StyleProvider>
+              </body>
+            </AntdStyleRegistry>
+          </StyledComponentsRegistry>
+        </StyleProvider>
+      </ScowParamsProvider>
+    </Suspense>
   );
 }
