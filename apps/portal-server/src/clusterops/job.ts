@@ -74,13 +74,19 @@ export const jobOps = (cluster: string): JobOps => {
 
         const results = await Promise.all(list.map(async ({ filename }) => {
           const content = await sftpReadFile(sftp)(join(portalConfig.savedJobsDir, filename));
-          const data = JSON.parse(content.toString()) as JobMetadata;
+          let data: JobMetadata | object = {};
+
+          try {
+            data = JSON.parse(content.toString()) as JobMetadata;
+          } catch (error) {
+            logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
+          }
 
           return {
             id: filename,
-            submitTime: new Date(data.submitTime),
-            comment: data.comment,
-            jobName: data.jobName,
+            submitTime: ("submitTime" in data && data.submitTime) ? new Date(data.submitTime) : new Date(),
+            comment: ("comment" in data && data.comment) ? data.comment : "",
+            jobName: ("jobName" in data && data.jobName) ? data.jobName : "unknown",
           } as JobTemplateInfo;
         }));
 

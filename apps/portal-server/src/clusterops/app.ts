@@ -390,7 +390,16 @@ export const appOps = (cluster: string): AppOps => {
           }
 
           const content = await sftpReadFile(sftp)(metadataPath);
-          const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
+
+          let sessionMetadata: SessionMetadata | undefined;
+
+          try {
+            sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
+          } catch (error) {
+            logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
+          }
+
+          if (!sessionMetadata) return;
 
           const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
@@ -413,12 +422,23 @@ export const appOps = (cluster: string): AppOps => {
               const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
               if (await sftpExists(sftp, infoFilePath)) {
                 const content = await sftpReadFile(sftp)(infoFilePath);
-                const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+                let serverSessionInfo: ServerSessionInfoData | undefined;
 
-                host = serverSessionInfo.HOST;
-                port = serverSessionInfo.PORT;
+                try {
+                  serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
+                  host = serverSessionInfo.HOST;
+                  port = serverSessionInfo.PORT;
+                } catch (error) {
+                  logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
+                }
+
                 if (app.type === AppType.shadowDesk) {
-                  proxyServer = serverSessionInfo.PROXYSERVER as string;
+                  if (serverSessionInfo) {
+                    proxyServer = serverSessionInfo.PROXYSERVER as string;
+                  }
+                  else {
+                    logger.error("Getting serverSessionInfo.PROXYSERVER failed");
+                  }
                 }
               }
               if (app.type === AppType.shadowDesk) {
