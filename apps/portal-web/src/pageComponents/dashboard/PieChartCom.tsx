@@ -30,15 +30,18 @@ interface PieData {
 }
 
 const Container = styled.div`
-  position:relative;
+  position: relative;
+  width: 230px;  /* 容器宽度应与饼图宽度一致 */
+  height: 230px;  /* 容器高度应与饼图高度一致 */
 `;
 
 const JobRange = styled.div`
-  font-weight:700;
-  position:relative;
-  width:max-content;
-  left:50%;
-  top:50%;
+  font-weight: 700;
+  position: absolute;  /* 需要使用 absolute 定位 */
+  width: max-content;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);  /* 确保其完全居中 */
 `;
 
 // 鼠标交互时cell 的渲染组件
