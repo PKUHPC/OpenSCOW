@@ -50,6 +50,9 @@ export const AiConfigSchema = Type.Object({
     protocol: Type.String({ description: "Harbor API 的访问协议", default: "http" }),
   }),
 
+  publicMountPoints:Type.Optional(Type.Array(
+    Type.String({ description: "公共挂载点" }), { description:"公共挂载点数组，全部会被挂载进AI应用和训练" },
+  )),
 });
 
 const AT_CONFIG_NAME = "ai/config";

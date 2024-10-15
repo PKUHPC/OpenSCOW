@@ -509,8 +509,9 @@ export const createAppSession = procedure
         // 第四个参数为算法版本地址
         // 第五个参数为数据集版本地址
         // 第六个参数为模型版本地址
-        // 第七个参数为多挂载点地址，以逗号分隔
+        // 第七个参数为多挂载点地址，以逗号分隔 (此挂载点是可读可写的)
         // 第八个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
+        // 第九个参数为多挂载点地址，以逗号分隔 (此挂载点是只读的)
         extraOptions: [
           JobType.APP,
           app.type,
@@ -533,6 +534,7 @@ export const createAppSession = procedure
             : "",
           mountPoints.join(","),
           gpuType || "",
+          aiConfig.publicMountPoints ? aiConfig.publicMountPoints.join(",") : "",
         ],
       }).catch((e) => {
         const ex = e as ServiceError;

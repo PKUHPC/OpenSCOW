@@ -231,6 +231,7 @@ procedure
           // 第七个参数为多挂载点地址，以逗号分隔
           // 第八个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
           // 第九个参数告知适配器 该镜像对应的AI训练框架 如 tensorflow, pytorch 等
+          // 第十个参数为多挂载点地址，以逗号分隔 (此挂载点是只读的)
           extraOptions: [
             JobType.TRAIN,
             "",
@@ -255,6 +256,7 @@ procedure
             // 如果是单机训练,则训练框架为空，表明为普通训练，华为的卡单机训练也要传框架
             // 如果nodeCount不为1但同时选定镜像又没有框架标签，该接口会报错
             (nodeCount === 1 && !gpuType?.startsWith("huawei.com")) ? "" : framework || "",
+            aiConfig.publicMountPoints ? aiConfig.publicMountPoints.join(",") : "",
           ],
           psNodeCount:psNodes,
           workerNodeCount:workerNodes,
