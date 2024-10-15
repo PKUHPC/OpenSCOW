@@ -34,6 +34,7 @@ export const ormConfigs = defineConfig({
   migrations: {
     path: join(distPath, "migrations"),
     glob: "*.{js,ts}",
+    transactional: false,
   },
   entities,
   debug: auditConfig.db.debug,

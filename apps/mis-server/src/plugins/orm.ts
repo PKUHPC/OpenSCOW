@@ -35,12 +35,14 @@ export const ormConfigs = defineConfig({
   migrations: {
     path: join(distPath, "migrations"),
     glob: "*.{js,ts}",
+    transactional: false,
   },
   entities,
   debug: misConfig.db.debug,
   seeder: {
     path: join(distPath, "seenders"),
   },
+
 });
 
 export const ormPlugin = plugin(async (server) => {

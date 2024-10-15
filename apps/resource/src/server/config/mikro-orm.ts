@@ -25,6 +25,7 @@ export const ormConfigs = defineConfig({
   migrations: {
     pathTs: join(distPath, "migrations"),
     migrationsList: migrations,
+    transactional: false,
   },
   entities: entities,
   debug,
