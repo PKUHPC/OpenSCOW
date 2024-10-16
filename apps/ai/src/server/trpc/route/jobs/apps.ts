@@ -700,57 +700,78 @@ export const saveImage =
 
         const formateContainerId = formatContainerId(clusterId, containerId);
 
-        // 连接到该节点
-        return await sshConnect(nodeName, "root", logger, async (ssh) => {
+        const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
+        const localImageUrl = `${userId}/${imageName}:${imageTag}`;
+
+        // 数据库添加image
+        const newImage = new ImageEntity({
+          name: imageName,
+          tag: imageTag,
+          description: imageDesc,
+          path: harborImageUrl,
+          owner: userId,
+          source: Source.EXTERNAL,
+          status: Status.CREATING,
+          sourcePath: harborImageUrl,
+        });
+        await em.persistAndFlush(newImage);
+
+        const createProcess = async () => {
+          const em = await forkEntityManager();
+          const image = await em.findOne(ImageEntity, { name: imageName, tag: imageTag, owner:userId });
+
+          if (!image) {
+            throw new Error(`copyImage error: image ${imageName}:${imageTag} not found`);
+          }
+
           try {
-            const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
-            const localImageUrl = `${userId}/${imageName}:${imageTag}`;
+            await sshConnect(nodeName, "root", logger, async (ssh) => {
 
-            // commit镜像
-            await commitContainerImage({
-              node:nodeName,
-              ssh,
-              clusterId,
-              logger,
-              formateContainerId,
-              localImageUrl,
+              // commit镜像
+              await commitContainerImage({
+                node:nodeName,
+                ssh,
+                clusterId,
+                logger,
+                formateContainerId,
+                localImageUrl,
+              });
+
+              // 保存镜像至harbor
+              await pushImageToHarbor({
+                ssh,
+                clusterId,
+                logger,
+                localImageUrl,
+                harborImageUrl,
+              });
+
+
+              // 更新数据库
+              image.status = Status.CREATED;
+              await em.persistAndFlush(image);
+
+              return;
+
             });
+          } catch (error: any) {
+            image.status = Status.FAILURE;
+            await em.persistAndFlush(image);
 
-            // 保存镜像至harbor
-            await pushImageToHarbor({
-              ssh,
-              clusterId,
-              logger,
-              localImageUrl,
-              harborImageUrl,
-            });
-
-            // 数据库添加image
-            const newImage = new ImageEntity({
-              name: imageName,
-              tag: imageTag,
-              description: imageDesc,
-              path: harborImageUrl,
-              owner: userId,
-              source: Source.EXTERNAL,
-              status: Status.CREATED,
-              sourcePath: harborImageUrl,
-            });
-            await em.persistAndFlush(newImage);
-
-            return { imageId:newImage.id };
-          } catch (e) {
-            const ex = e as ServiceError;
+            const ex = error as ServiceError;
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
               message: `Save image failed, ${ex.message}`,
             });
           }
-        });
+        };
+
+        // 不 await 直接返回
+        createProcess();
+
+        return { imageId:newImage.id };
       },
     );
-
-
 
 export const listAppSessions =
   procedure
