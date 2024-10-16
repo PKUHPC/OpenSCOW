@@ -243,6 +243,8 @@ it("deletes user", async () => {
 it("cannot delete owner", async () => {
   const data = await insertInitialData(server.ext.orm.em.fork());
 
+  const em = server.ext.orm.em.fork();
+
   const reply = await asyncClientCall(client, "deleteUser", {
     tenantName: data.tenant.name,
     userId: data.userA.userId,
@@ -250,8 +252,8 @@ it("cannot delete owner", async () => {
 
   expect(reply.code).toBe(Status.FAILED_PRECONDITION);
 
-  expect(await server.ext.orm.em.count(UserAccount, { account: data.accountA })).toBe(2);
-  expect(await server.ext.orm.em.count(User, { tenant: data.tenant })).toBe(2);
+  expect(await em.count(UserAccount, { account: data.accountA })).toBe(2);
+  expect(await em.count(User, { tenant: data.tenant })).toBe(2);
 });
 
 it("cannot delete user with jobs running", async () => {
