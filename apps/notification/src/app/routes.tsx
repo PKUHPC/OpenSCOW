@@ -46,12 +46,12 @@ export const userRoutes:
         path: "/send-message",
         clickToPath: `/send-message?${scowParams}`,
       },
-      {
-        Icon: FileImageOutlined,
-        text: "创建自定义消息类型",
-        path: "/create-custom-message-type",
-        clickToPath: `/create-custom-message-type?${scowParams}`,
-      },
+      // {
+      //   Icon: FileImageOutlined,
+      //   text: "创建自定义消息类型",
+      //   path: "/create-custom-message-type",
+      //   clickToPath: `/create-custom-message-type?${scowParams}`,
+      // },
     ] : []),
   ];
 

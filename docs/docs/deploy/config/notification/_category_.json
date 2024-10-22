@@ -1,0 +1,8 @@
+{
+  "label": "通知系统",
+  "position": 12,
+  "link": {
+    "type": "generated-index",
+    "description": "关于通知系统的部署和配置"
+  }
+}

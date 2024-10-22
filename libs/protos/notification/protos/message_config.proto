@@ -41,6 +41,7 @@ message ListMessageConfigsResponse {
   repeated MessageConfig configs = 2;
 }
 
+
 service MessageConfigService {
 
   rpc CreateMessageConfig(CreateMessageConfigRequest) returns (CreateMessageConfigResponse);

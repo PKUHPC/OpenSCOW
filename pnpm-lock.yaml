@@ -995,6 +995,9 @@ importers:
       nextjs-cors:
         specifier: 2.2.0
         version: 2.2.0(next@14.2.4(patch_hash=xwomt2iqq5liv3pq43ybpoioua)(@babel/core@7.24.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+      node-cron:
+        specifier: 3.0.3
+        version: 3.0.3
       nookies:
         specifier: 2.5.2
         version: 2.5.2
@@ -1866,7 +1869,7 @@ importers:
         specifier: 1.8.0
         version: 1.8.0
       '@connectrpc/connect':
-        specifier: ^1.4.0
+        specifier: 1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.8.0)
       '@connectrpc/protoc-gen-connect-es':
         specifier: 1.4.0

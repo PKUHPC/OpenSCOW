@@ -40,6 +40,16 @@ export const languageDic = {
       serialNumber: "序号",
       title: "标题",
     },
+    expirationTimeSelect: {
+      oneWeek: "一周",
+      halfAMonth: "半个月",
+      oneMonth: "一个月",
+      threeMonth: "三个月",
+      halfAYear: "半年",
+      oneYear: "一年",
+      neverExpires: "永不过期",
+      selectExpirationTime: "请选择过期时间",
+    },
     createCustomMessageType : {
       pageTitle: "新建自定义消息类型",
       create: {
@@ -80,6 +90,10 @@ export const languageDic = {
         saveSuccess: "保存成功",
         formError: "表单数据错误，请联系管理员",
         saveError: "保存数据出错",
+        changeExpirationTimeSuccess: "修改过期时间成功",
+        changeExpirationTimeFailed: "修改过期时间失败",
+        msgExpirationTime: "消息过期时间",
+        msgExpirationTimeTip: "系统将定时删除过期消息",
       },
       useMessageConfigColumns: {
         messageType: "消息类型",
@@ -110,6 +124,9 @@ export const languageDic = {
         sendType: "发送方式",
         selectSentType: "请选择发送方式",
         sendMsg: "发送消息",
+        msgExpirationTime: "消息过期时间",
+        msgExpirationTimeTip: "达到消息过期时间后，消息将被自动删除",
+        expirationTimeSelectRule: "请选择消息过期时间",
       },
     },
     notification: {
@@ -167,6 +184,16 @@ export const languageDic = {
       serialNumber: "Serial Num",
       title: "Title",
     },
+    expirationTimeSelect: {
+      oneWeek: "one week",
+      halfAMonth: "half a month",
+      oneMonth: "one month",
+      threeMonth: "three months",
+      halfAYear: "half a year",
+      oneYear: "one year",
+      neverExpires: "never expires",
+      selectExpirationTime: "Please select expiration time",
+    },
     createCustomMessageType: {
       pageTitle: "Create a custom message type",
       create: {
@@ -210,6 +237,10 @@ export const languageDic = {
         saveSuccess: "Saved successfully",
         formError: "The form data is incorrect, please contact the administrator",
         saveError: "Error saving data",
+        changeExpirationTimeSuccess: "Modify expiration time successfully",
+        changeExpirationTimeFailed: "Failed to modify the expiration time",
+        msgExpirationTime: "Messages Expiration Time",
+        msgExpirationTimeTip: "The system will delete expired messages regularly",
       },
       useMessageConfigColumns: {
         messageType: "Message Type",
@@ -240,6 +271,10 @@ export const languageDic = {
         sendType: "Sending method",
         selectSentType: "Please select the delivery method",
         sendMsg: "Send Message",
+        msgExpirationTime: "Messages Expiration Time",
+        msgExpirationTimeTip: "After the message expiration time is reached, "
+          + "the message will be automatically deleted.",
+        expirationTimeSelectRule: "Please select the message expiration time",
       },
     },
     notification: {

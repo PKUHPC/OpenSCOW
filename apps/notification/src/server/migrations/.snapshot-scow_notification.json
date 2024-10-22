@@ -49,6 +49,15 @@
           "nullable": false,
           "mappedType": "boolean"
         },
+        "expired_after_seconds": {
+          "name": "expired_after_seconds",
+          "type": "bigint",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "bigint"
+        },
         "created_at": {
           "name": "created_at",
           "type": "DATETIME(6)",
@@ -321,12 +330,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "int",
+          "type": "bigint",
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "bigint"
         },
         "sender_type": {
           "name": "sender_type",
@@ -394,6 +403,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "expired_at": {
+          "name": "expired_at",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
         "created_at": {
           "name": "created_at",
           "type": "DATETIME(6)",
@@ -456,12 +475,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "int",
+          "type": "bigint",
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "bigint"
         },
         "notice_types": {
           "name": "notice_types",
@@ -493,12 +512,12 @@
         },
         "message_id": {
           "name": "message_id",
-          "type": "int",
+          "type": "bigint",
           "unsigned": true,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "bigint"
         },
         "created_at": {
           "name": "created_at",
@@ -576,6 +595,7 @@
             "id"
           ],
           "referencedTableName": "messages",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -585,12 +605,12 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "int",
+          "type": "bigint",
           "unsigned": true,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "bigint"
         },
         "user_id": {
           "name": "user_id",
@@ -604,12 +624,12 @@
         },
         "message_id": {
           "name": "message_id",
-          "type": "int",
+          "type": "bigint",
           "unsigned": true,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "integer"
+          "mappedType": "bigint"
         },
         "status": {
           "name": "status",
@@ -705,6 +725,7 @@
             "id"
           ],
           "referencedTableName": "messages",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

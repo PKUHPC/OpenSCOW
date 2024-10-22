@@ -56,10 +56,10 @@ message ListMessageTypesResponse {
   repeated MessageType message_types = 2;
 }
 
-
 service MessageTypeService {
   rpc CreateCustomMessageType(CreateCustomMessageTypeRequest) returns (CreateCustomMessageTypeResponse);
   rpc EditCustomMessageType(EditCustomMessageTypeRequest) returns (EditCustomMessageTypeResponse);
 
   rpc ListMessageTypes(ListMessageTypesRequest) returns (ListMessageTypesResponse);
+
 }

@@ -23,3 +23,10 @@ log:
   level: info
   pretty: false
 
+# messageBridge:
+#   address: http://localhost:3000
+
+deleteExpiredMessages:
+  cron: "0 3 * * *"
+
+

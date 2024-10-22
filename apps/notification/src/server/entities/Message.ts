@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Collection, EntitySchema } from "@mikro-orm/core";
+import { Cascade, Collection, EntitySchema } from "@mikro-orm/core";
 import { DATETIME_TYPE } from "src/utils/orm";
 
 import { MessageTarget } from "./MessageTarget";
@@ -23,7 +23,7 @@ export enum SenderType {
 }
 
 export class Message {
-  id!: number;
+  id!: bigint;
   senderType: SenderType;
   senderId!: string;
   targetType: TargetType;
@@ -31,6 +31,7 @@ export class Message {
   category: string;
   descriptionData: string[];
   metadata: Record<string, any>;
+  expiredAt?: Date;
   createdAt = new Date();
   updatedAt = new Date();
   userMessageRead = new Collection<UserMessageRead>(this);
@@ -45,6 +46,7 @@ export class Message {
     category: string;
     metadata?: Record<string, any>;
     descriptionData?: string[];
+    expiredAt?: Date;
   }) {
     this.senderId = init.senderId;
     this.senderType = init.senderType;
@@ -53,6 +55,7 @@ export class Message {
     this.category = init.category;
     this.metadata = init.metadata ?? {};
     this.descriptionData = init.descriptionData ?? [];
+    this.expiredAt = init.expiredAt;
   }
 }
 
@@ -61,7 +64,7 @@ export const MessageSchema = new EntitySchema<Message>({
   class: Message,
   tableName: "messages",
   properties: {
-    id: { type: "number", primary: true },
+    id: { type: "bigint", primary: true },
     senderType: { enum: true, items: () => SenderType, index: true, nullable: false },
     senderId: { type: String, length: 255, index: true, nullable: false },
     targetType: { enum: true, items: () => TargetType },
@@ -73,8 +76,15 @@ export const MessageSchema = new EntitySchema<Message>({
       kind: "1:m",
       entity: () => UserMessageRead,
       mappedBy: (userMessageRead) => userMessageRead.message,
+      cascade: [Cascade.REMOVE],
     },
-    messageTarget: { kind: "1:m", entity: () => MessageTarget, mappedBy: (messageTarget) => messageTarget.message },
+    messageTarget: {
+      kind: "1:m",
+      entity: () => MessageTarget,
+      mappedBy: (messageTarget) => messageTarget.message,
+      cascade: [Cascade.REMOVE],
+    },
+    expiredAt: { type: "data", columnType: DATETIME_TYPE, nullable: true },
     createdAt: { type: "date", columnType: DATETIME_TYPE },
     updatedAt: { type: "date", columnType: DATETIME_TYPE, onUpdate: () => new Date() },
   },

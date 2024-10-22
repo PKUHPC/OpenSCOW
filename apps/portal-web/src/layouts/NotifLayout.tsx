@@ -34,7 +34,10 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
   const currentLanguage = useI18n().currentLanguage;
 
-  const close = () => {};
+  const close = (messageId: number) => {
+    api.markMessageRead({ body:{ messageId: messageId } });
+    notifApi.destroy(messageId);
+  };
 
   const openNotification = (content: RenderContent) => {
     const key = content.id;
@@ -59,7 +62,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
       btn,
       key,
       duration: 0,
-      onClose: close,
+      onClose: () => close(content.id),
     });
   };
 

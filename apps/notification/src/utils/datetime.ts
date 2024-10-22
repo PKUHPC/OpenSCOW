@@ -86,5 +86,3 @@ export const parseMinutes = (time: number, unit: TimeUnits): number => {
   }
 
 };
-
-

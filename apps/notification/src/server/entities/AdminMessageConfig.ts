@@ -21,6 +21,8 @@ export class AdminMessageConfig {
   noticeType: NoticeType;
   enabled: boolean;
   canUserModify: boolean;
+  // 每个通知类型的过期时间（秒）
+  expiredAfterSeconds?: bigint;
   createdAt = new Date();
   updatedAt = new Date();
 
@@ -46,6 +48,7 @@ export const AdminMessageConfigSchema = new EntitySchema<AdminMessageConfig>({
     messageType: { type: "string", length: 255 },
     enabled: { type: "boolean" },
     canUserModify: { type: "boolean" },
+    expiredAfterSeconds: { type: "bigint", nullable: true },
     createdAt: { type: "date", columnType: DATETIME_TYPE },
     updatedAt: { type: "date", columnType: DATETIME_TYPE, onUpdate: () => new Date() },
   },

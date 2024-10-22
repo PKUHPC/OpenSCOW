@@ -17,6 +17,7 @@ package notification;
 import "protos/common.proto";
 import "protos/message_type.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
 
 message Message {
   uint64 id = 1;
@@ -48,6 +49,7 @@ message AdminSendMessageRequest {
   string title = 4;
   string content = 5;
   repeated NoticeType notice_types = 6;
+  optional google.protobuf.Timestamp expired_at = 7;
 }
 
 message AdminSendMessageResponse {
@@ -101,6 +103,21 @@ message DeleteAllReadMessagesResponse {
 
 }
 
+message GetMessageExpirationTimeRequest {
+  optional string message_type = 1;
+}
+message GetMessageExpirationTimeResponse {
+  optional uint64 expired_after_seconds = 1;
+}
+
+message ChangeMessageExpirationTimeRequest {
+  optional string message_type = 1;
+  optional uint64 expired_after_seconds = 2;
+}
+
+message ChangeMessageExpirationTimeResponse {
+}
+
 service MessageService {
   rpc AdminSendMessage(AdminSendMessageRequest) returns (AdminSendMessageResponse);
 
@@ -112,4 +129,6 @@ service MessageService {
   rpc DeleteMessages(DeleteMessagesRequest) returns (DeleteMessagesResponse);
   rpc DeleteAllReadMessages(DeleteAllReadMessagesRequest) returns (DeleteAllReadMessagesResponse);
 
+  rpc GetMessageExpirationTime(GetMessageExpirationTimeRequest) returns (GetMessageExpirationTimeResponse);
+  rpc ChangeMessageExpirationTime(ChangeMessageExpirationTimeRequest) returns (ChangeMessageExpirationTimeResponse);
 }

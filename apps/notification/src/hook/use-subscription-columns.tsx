@@ -15,8 +15,9 @@ import { MessageConfig } from "@scow/notification-protos/build/common_pb";
 import { listNoticeTypes } from "@scow/notification-protos/build/notice_type-NoticeTypeService_connectquery";
 import { Checkbox, Form, FormInstance, TableColumnsType } from "antd";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
 import { CheckAllSpecifiedNoticeType } from "src/components/check-all-specified-notice-type";
+import { ScowParamsContext } from "src/components/scow-params-provider";
 import { I18nDicType } from "src/models/i18n";
 import { NoticeType } from "src/models/notice-type";
 import { FormValues } from "src/page-components/message-config/message-config-table";
@@ -43,6 +44,8 @@ export function useSubscriptionColumns({
   const { data: noticeTypesData } = useQuery(listNoticeTypes);
   const [columns, setColumns] = useState<TableColumnsType<MessageConfig>>([]);
   const compLang = lang.subscription.useSubscriptionColumns;
+
+  const { scowLangId } = useContext(ScowParamsContext);
 
   const handleCheckChange = ({ e, checkedNoticeType }: SelectAllProps) => {
     if (!messageConfigs) return;
@@ -132,7 +135,7 @@ export function useSubscriptionColumns({
         fixed: "left",
         render: (_, record) => {
           const template = record.titleTemplate;
-          return template ? template.default : record.messageType;
+          return template?.[scowLangId] || template?.default;
         },
       },
       {
@@ -141,7 +144,7 @@ export function useSubscriptionColumns({
         key: "category",
         render: (_, record) => {
           const template = record.categoryTemplate;
-          return template ? template.default : record.category;
+          return template?.[scowLangId] || template?.default;
         },
       },
       {

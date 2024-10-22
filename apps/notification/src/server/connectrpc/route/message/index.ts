@@ -17,6 +17,7 @@ import { ReadStatus } from "@scow/notification-protos/build/common_pb";
 import { MessageService } from "@scow/notification-protos/build/message_connect";
 import { PlatformRole } from "src/models/user";
 import { notificationConfig } from "src/server/config/notification";
+import { AdminMessageConfig } from "src/server/entities/AdminMessageConfig";
 import { Message, SenderType } from "src/server/entities/Message";
 import { MessageTarget } from "src/server/entities/MessageTarget";
 import { ReadStatus as EntityReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
@@ -33,7 +34,7 @@ import { checkAdminMessageTypeExist } from "src/utils/rendering-message";
 export default (router: ConnectRouter) => {
   router.service(MessageService, {
     async adminSendMessage(req, context) {
-      const { targetIds, noticeTypes, messageType, title, content } = req;
+      const { targetIds, noticeTypes, messageType, title, content, expiredAt } = req;
       const { targetType } = ensureNotUndefined(req, ["targetType"]);
 
       const user = await checkAuth(context);
@@ -70,6 +71,7 @@ export default (router: ConnectRouter) => {
         messageType,
         category: messageTypeData.category,
         metadata: { title, content },
+        expiredAt: expiredAt ? expiredAt.toDate() : undefined,
       });
 
       await em.persistAndFlush(message);
@@ -323,7 +325,7 @@ export default (router: ConnectRouter) => {
       });
 
       for (const id of messageIds) {
-        const record = userReadRecords.find((record) => record.message.id === Number(id));
+        const record = userReadRecords.find((record) => record.message.id === id);
         if (record) {
           record.isDeleted = true;
           em.persist(record);
@@ -393,6 +395,72 @@ export default (router: ConnectRouter) => {
 
       return;
 
+    },
+
+    async changeMessageExpirationTime(req, context) {
+
+      const user = await checkAuth(context);
+
+      if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        throw new ConnectError(
+          `User ${user.identityId} unable to modify message config`,
+          Code.PermissionDenied,
+        );
+      }
+
+      const { messageType, expiredAfterSeconds } = req;
+
+      const em = await forkEntityManager();
+
+      if (!messageType) {
+        const allConfigs = await em.findAll(AdminMessageConfig);
+
+        for (const config of allConfigs) {
+          config.expiredAfterSeconds = expiredAfterSeconds;
+        }
+
+        await em.persistAndFlush(allConfigs);
+      } else {
+        const messageConfig = await em.findOne(AdminMessageConfig, { messageType });
+
+        if (messageConfig) {
+          messageConfig.expiredAfterSeconds = expiredAfterSeconds;
+
+          await em.persistAndFlush(messageConfig);
+        }
+      }
+
+      return;
+    },
+    async getMessageExpirationTime(req, context) {
+
+      const user = await checkAuth(context);
+
+      if (!user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        throw new ConnectError(
+          `User ${user.identityId} unable to modify message config`,
+          Code.PermissionDenied,
+        );
+      }
+
+      const { messageType } = req;
+
+      const em = await forkEntityManager();
+
+      const messageConfigs = await em.find(AdminMessageConfig, {
+        ...messageType ? { messageType } : {},
+      }, { limit: 1 });
+
+      if (messageConfigs.length === 0) {
+        throw new ConnectError(
+          `Message type ${messageType} does not exist`,
+          Code.InvalidArgument,
+        );
+      }
+
+      return {
+        expiredAfterSeconds: messageConfigs[0].expiredAfterSeconds,
+      };
     },
   });
 };

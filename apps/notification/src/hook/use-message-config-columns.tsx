@@ -14,12 +14,13 @@ import { useQuery } from "@connectrpc/connect-query";
 import { MessageConfig } from "@scow/notification-protos/build/common_pb";
 import { listNoticeTypes } from "@scow/notification-protos/build/notice_type-NoticeTypeService_connectquery";
 import { Checkbox, Form, FormInstance, TableColumnsType } from "antd";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import {
   CheckAllSpecifiedNoticeType,
   SelectAllProps,
 } from "src/components/check-all-specified-notice-type";
 import { ModalButton } from "src/components/modal-button";
+import { ScowParamsContext } from "src/components/scow-params-provider";
 import { I18nDicType } from "src/models/i18n";
 import { NoticeType } from "src/models/notice-type";
 import { MessageConfigModal } from "src/page-components/message-config/message-config-modal";
@@ -39,6 +40,8 @@ export function useMessageConfigColumns({
   const { data } = useQuery(listNoticeTypes);
   const [columns, setColumns] = useState<TableColumnsType<MessageConfig>>([]);
   const compLang = lang.messageConfig.useMessageConfigColumns;
+
+  const { scowLangId } = useContext(ScowParamsContext);
 
   const handleCheckChange = ({ e, checkedNoticeType }: SelectAllProps) => {
     const values = form.getFieldsValue();
@@ -116,7 +119,7 @@ export function useMessageConfigColumns({
         fixed: "left",
         render: (_, record) => {
           const template = record.titleTemplate;
-          return template ? template.default : record.messageType;
+          return template?.[scowLangId] || template?.default;
         },
       },
       {
@@ -125,7 +128,7 @@ export function useMessageConfigColumns({
         key: "category",
         render: (_, record) => {
           const template = record.categoryTemplate;
-          return template ? template.default : record.category;
+          return template?.[scowLangId] || template?.default;
         },
       },
       {

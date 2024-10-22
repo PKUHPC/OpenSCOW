@@ -21,3 +21,6 @@ log:
   level: info
   pretty: false
 
+deleteExpiredMessages:
+  cron: "0 3 * * *"
+

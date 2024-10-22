@@ -21,7 +21,7 @@ import { migrations } from "src/server/migrations";
 
 import { notificationConfig } from "./notification";
 
-const distPath = "src/server/db";
+const distPath = "src/server";
 
 const { host, port, user, dbName, password, debug } = notificationConfig.db;
 

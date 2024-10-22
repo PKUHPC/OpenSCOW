@@ -18,7 +18,7 @@ import { Message } from "./Message";
 import { TargetType } from "./UserMessageRead";
 
 export class MessageTarget {
-  id!: number;
+  id!: bigint;
   targetType: TargetType;
   targetId?: string;
   noticeTypes: NoticeType[];
@@ -44,11 +44,11 @@ export const MessageTargetSchema = new EntitySchema<MessageTarget>({
   class: MessageTarget,
   tableName: "message_targets",
   properties: {
-    id: { type: Number, primary: true },
+    id: { type: "bigint", primary: true },
     noticeTypes: { type: "array" },
     targetType: { enum: true, items: () => TargetType, index: true },
     targetId: { type: String, length: 255, index: true, nullable: true },
-    message: { kind: "m:1", entity: () => Message },
+    message: { kind: "m:1", entity: () => Message, deleteRule: "cascade" },
     createdAt: { type: "date", columnType: DATETIME_TYPE },
     updatedAt: { type: "date", columnType: DATETIME_TYPE, onUpdate: () => new Date() },
   },

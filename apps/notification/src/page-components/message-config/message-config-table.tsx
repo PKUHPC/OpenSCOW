@@ -10,13 +10,21 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { QuestionCircleOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@connectrpc/connect-query";
 import {
   listMessageConfigs,
   modifyMessageConfigs,
 } from "@scow/notification-protos/build/message_config-MessageConfigService_connectquery";
-import { Form, message, Table } from "antd";
+import {
+  changeMessageExpirationTime,
+  getMessageExpirationTime,
+} from "@scow/notification-protos/build/message-MessageService_connectquery";
+import { Form, message, Popover, Table } from "antd";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import { ExpirationTimeSelect, NEVER_EXPIRES_VALUE } from "src/components/expiration-time-select";
 import { NoShadowButton } from "src/components/no-shadow-button";
 import { PageTitle } from "src/components/page-title";
 import { ScowParamsContext } from "src/components/scow-params-provider";
@@ -25,6 +33,7 @@ import { NoticeType } from "src/models/notice-type";
 import { getLanguage } from "src/utils/i18n";
 import { styled } from "styled-components";
 
+dayjs.extend(duration);
 interface StyledTrProps {
   isDark: boolean;
 }
@@ -49,9 +58,15 @@ export interface FormValues {
   noticeConfigs: Record<string, Partial<Record<NoticeType, boolean>>>;
 }
 
+interface ExpirationTimeFormValues {
+  expirationDays: number;
+}
+
 export const MessageConfigTable: React.FC = () => {
 
   const [form] = Form.useForm<FormValues>();
+  const [expirationTimeForm] = Form.useForm<ExpirationTimeFormValues>();
+
   const { scowLangId, scowDark } = useContext(ScowParamsContext);
   const lang = getLanguage(scowLangId);
   const compLang = lang.messageConfig.messageConfigTable;
@@ -70,12 +85,21 @@ export const MessageConfigTable: React.FC = () => {
   const [hasChange, setHasChange] = useState(false);
 
   const { data, isLoading, refetch } = useQuery(listMessageConfigs);
+  const { data: expirationTime, isLoading: expirationTimeLoading } = useQuery(getMessageExpirationTime);
+
   const { mutateAsync } = useMutation(modifyMessageConfigs, {
     onError: (err) => message.error(err.message),
     onSuccess: () => {
       message.success(compLang.saveSuccess);
       setHasChange(false);
       refetch();
+    },
+  });
+
+  const { mutateAsync: changeExpireTime } = useMutation(changeMessageExpirationTime, {
+    onError: () => message.error(compLang.changeExpirationTimeFailed),
+    onSuccess: () => {
+      message.success(compLang.changeExpirationTimeSuccess);
     },
   });
 
@@ -129,6 +153,14 @@ export const MessageConfigTable: React.FC = () => {
   };
 
   useEffect(() => {
+    const value = expirationTime?.expiredAfterSeconds === undefined
+      ? NEVER_EXPIRES_VALUE
+      : dayjs.duration(Number(expirationTime.expiredAfterSeconds), "seconds").asDays();
+
+    expirationTimeForm.setFieldValue("expirationDays", value);
+  }, [expirationTime]);
+
+  useEffect(() => {
     if (data) {
       const initialValues: FormValues = data.configs.reduce((acc, item) => {
         if (!acc.noticeConfigs) acc.noticeConfigs = {};
@@ -153,7 +185,6 @@ export const MessageConfigTable: React.FC = () => {
     }
   }, [form, data]);
 
-
   return (
     <div>
       <PageTitle titleText={lang.messageConfig.pageTitle}>
@@ -167,6 +198,30 @@ export const MessageConfigTable: React.FC = () => {
           {lang.common.save}
         </NoShadowButton>
       </PageTitle>
+      <Form form={expirationTimeForm}>
+        <Form.Item
+          label={(
+            <div>
+              <span style={{ marginRight: "5px" }}>{compLang.msgExpirationTime}</span>
+              <Popover content={compLang.msgExpirationTimeTip}>
+                <QuestionCircleOutlined />
+              </Popover>
+            </div>
+          )}
+          name="expirationDays"
+        >
+          <ExpirationTimeSelect
+            style={{ width: 200 }}
+            loading={expirationTimeLoading}
+            onChange={async (value) => {
+              await changeExpireTime({
+                expiredAfterSeconds: value === NEVER_EXPIRES_VALUE
+                  ? undefined : BigInt(dayjs.duration(value, "days").asSeconds()),
+              });
+            }}
+          />
+        </Form.Item>
+      </Form>
       <Form form={form} name="message-config">
         <Table
           bordered

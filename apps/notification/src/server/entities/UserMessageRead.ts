@@ -29,7 +29,7 @@ export enum TargetType {
 }
 
 export class UserMessageRead {
-  id!: number;
+  id!: bigint;
   userId: string;
   status: ReadStatus;
   readTime?: Date;
@@ -60,9 +60,9 @@ export const UserMessageReadSchema = new EntitySchema<UserMessageRead>({
     { name: "idx_user_id", properties: ["userId"]},
   ],
   properties: {
-    id: { type: Number, primary: true },
+    id: { type: "bigint", primary: true },
     userId: { type: String, length: 255 },
-    message: { kind: "m:1", entity: () => Message },
+    message: { kind: "m:1", entity: () => Message, deleteRule: "cascade" },
     status: { enum: true, items: () => ReadStatus },
     readTime: { type: Date, nullable: true },
     isDeleted: { type: "boolean" },

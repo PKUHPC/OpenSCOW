@@ -53,6 +53,11 @@ export const NotificationConfigSchema = Type.Object({
   messageBridge: Type.Optional(Type.Object({
     address: Type.String({ description: "地址", default: "http://message-bridge:3000" }),
   }, { description: "第三方消息发送组件" })),
+
+  deleteExpiredMessages: Type.Object({
+    // 默认每天凌晨 3 点执行一次
+    cron: Type.String({ description: "删除消息的周期的cron表达式", default: "0 3 * * *" }),
+  }),
 });
 
 const NOTIFICATION_CONFIG_NAME = "notification/config";

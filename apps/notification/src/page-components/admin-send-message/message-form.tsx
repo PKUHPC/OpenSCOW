@@ -10,12 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { QuestionCircleOutlined } from "@ant-design/icons";
+import { Timestamp } from "@bufbuild/protobuf";
 import { useMutation, useQuery } from "@connectrpc/connect-query";
 import { TargetType } from "@scow/notification-protos/build/common_pb";
 import { adminSendMessage } from "@scow/notification-protos/build/message-MessageService_connectquery";
 import { listNoticeTypes } from "@scow/notification-protos/build/notice_type-NoticeTypeService_connectquery";
-import { Button, Checkbox, Form, Input, message } from "antd";
+import { Button, Checkbox, Form, Input, message, Popover } from "antd";
+import dayjs from "dayjs";
 import React from "react";
+import { ExpirationTimeSelect, NEVER_EXPIRES_VALUE } from "src/components/expiration-time-select";
 import { I18nDicType } from "src/models/i18n";
 import { AdminMessageType } from "src/models/message-type";
 import { NoticeType, noticeTypeNameMap } from "src/models/notice-type";
@@ -24,6 +28,7 @@ interface FormValues {
   title: string;
   content: string;
   noticeTypes: NoticeType[];
+  expirationDays: number;
 }
 
 interface Props {
@@ -45,11 +50,15 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
   });
 
   const onFinish = async (values: FormValues) => {
-    const { title, content, noticeTypes } = values;
+    const { title, content, noticeTypes, expirationDays } = values;
+
     mutateAsync({
       title, content, noticeTypes,
       messageType: AdminMessageType.SystemNotification,
       targetType: TargetType.FULL_SITE,
+      expiredAt: expirationDays === NEVER_EXPIRES_VALUE
+        ? undefined
+        : Timestamp.fromDate(dayjs().add(Number(expirationDays), "days").toDate()),
     });
   };
 
@@ -117,6 +126,21 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
             ))
           }
         </Checkbox.Group>
+      </Form.Item>
+      <Form.Item
+        label={(
+          <div>
+            <span style={{ marginRight: "5px" }}>{compLang.msgExpirationTime}</span>
+            <Popover content={compLang.msgExpirationTimeTip}>
+              <QuestionCircleOutlined />
+            </Popover>
+          </div>
+        )}
+        name="expirationDays"
+        rules={[{ required: true, message: compLang.expirationTimeSelectRule }]}
+        initialValue={NEVER_EXPIRES_VALUE}
+      >
+        <ExpirationTimeSelect style={{ width: 200 }} />
       </Form.Item>
       <Form.Item style={{ marginTop: "48px" }} wrapperCol={{ span: 14 }}>
         <Button loading={isPending} type="primary" htmlType="submit">

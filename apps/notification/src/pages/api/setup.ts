@@ -10,11 +10,19 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Migration20240826031724 } from "./Migration20240826031724";
-import { Migration20241016020849 } from "./Migration20241016020849";
+import { NextApiRequest } from "next";
+import { startDeleteExpiredMessages } from "src/task/delete-expired-messages";
 
-export const migrations =
-[
-  Migration20240826031724,
-  Migration20241016020849,
-].map((x) => ({ name: x.name, class: x }));
+let setup = false;
+
+export default async (req: NextApiRequest, res: any) => {
+  if (setup) {
+    res.send("Already setup");
+    return;
+  }
+
+  startDeleteExpiredMessages();
+
+  setup = true;
+  res.send("Setup complete");
+};
