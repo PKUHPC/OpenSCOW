@@ -132,16 +132,6 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           throw e;
         }
       })
-      .httpError(409, (e) => {
-        if (e.code === "ALREADY_EXISTS") {
-          modal.error({
-            title: t(p("errorMessage")),
-            content: e.message,
-          });
-        } else {
-          throw e;
-        }
-      })
       .then(({ jobId }) => {
         message.success(t(p("successMessage")) + jobId);
         Router.push("/jobs/runningJobs");
@@ -285,7 +275,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
           form.setFieldValue("qos", undefined);
           // 手动触发校验
           form.validateFields(["account", "partition", "qos"]);
-        
+
         }
       }
     },

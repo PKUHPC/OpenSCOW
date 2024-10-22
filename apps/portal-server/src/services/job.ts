@@ -16,7 +16,7 @@ import { plugin } from "@ddadaal/tsgrpc-server";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { jobInfoToPortalJobInfo, jobInfoToRunningjob } from "@scow/lib-scheduler-adapter";
 import { getClusterAssignedAccounts } from "@scow/lib-scow-resource";
-import { checkJobNameExisting, checkSchedulerApiVersion, libGetAccounts, libGetUserInfo } from "@scow/lib-server";
+import { checkSchedulerApiVersion, libGetAccounts, libGetUserInfo } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
 import { parseErrorDetails } from "@scow/rich-error-model";
@@ -59,8 +59,8 @@ export const jobServiceServer = plugin((server) => {
       if (config.MIS_DEPLOYED && commonConfig.scowResource?.enabled) {
 
         // 获取用户在scow中的信息
-        const userInfo = await libGetUserInfo(logger, 
-          userId, 
+        const userInfo = await libGetUserInfo(logger,
+          userId,
           config.MIS_SERVER_URL,
           commonConfig.scowApi?.auth?.token,
         );
@@ -72,28 +72,28 @@ export const jobServiceServer = plugin((server) => {
           tenantName,
         );
         // 获取scow数据库中账户数据
-        const misAccounts = await libGetAccounts(logger, 
-          userId, 
-          statusFilter, 
-          config.MIS_SERVER_URL, 
+        const misAccounts = await libGetAccounts(logger,
+          userId,
+          statusFilter,
+          config.MIS_SERVER_URL,
           commonConfig.scowApi?.auth?.token);
-      
+
         const filteredAccounts
                = misAccounts.accounts.filter((account) => clusterAssignedAccountNames.includes(account));
-              
+
         return [{ accounts: filteredAccounts }];
       }
 
       // 如果已部署了管理系统，从管理系统数据库中获取账户数据
       if (config.MIS_DEPLOYED) {
-        const result = await libGetAccounts(logger, 
-          userId, 
-          statusFilter, 
-          config.MIS_SERVER_URL, 
-          commonConfig.scowApi?.auth?.token); 
+        const result = await libGetAccounts(logger,
+          userId,
+          statusFilter,
+          config.MIS_SERVER_URL,
+          commonConfig.scowApi?.auth?.token);
         return [result];
       }
-    
+
       const reply = await callOnOne(
         cluster,
         logger,
@@ -275,15 +275,6 @@ export const jobServiceServer = plugin((server) => {
         saveAsTemplate, userId, nodeCount, partition, qos, account, comment, workingDirectory, output
         , errorOutput, memory, scriptOutput } = request;
       await checkActivatedClusters({ clusterIds: cluster });
-
-      // 检查作业名是否重复
-      await callOnOne(
-        cluster,
-        logger,
-        async (client) => {
-          await checkJobNameExisting(client,userId,jobName,logger);
-        },
-      );
 
       // make sure working directory exists
       const host = getClusterLoginNode(cluster);

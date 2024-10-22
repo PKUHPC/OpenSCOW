@@ -55,11 +55,6 @@ export const CreateAppSessionSchema = typeboxRouteSchema({
       message: Type.String(),
     }),
 
-    409: Type.Object({
-      code: Type.Literal("ALREADY_EXISTS"),
-      message: Type.String(),
-    }),
-
     404: Type.Object({
       code: Type.Literal("APP_NOT_FOUND"),
       message: Type.String(),
@@ -136,8 +131,6 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
           return { 404: { code: "APP_NOT_FOUND" as const, message: ex.details } };
         case "INVALID ARGUMENT":
           return { 400: { code: "INVALID_INPUT" as const, message: ex.details } };
-        case "ALREADY EXISTS":
-          return { 409: { code: "ALREADY_EXISTS" as const, message: ex.details } };
         default:
           return e;
       }

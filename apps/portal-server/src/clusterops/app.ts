@@ -16,7 +16,7 @@ import { Status } from "@grpc/grpc-js/build/src/constants";
 import { AppType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
-import { checkJobNameExisting, errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
+import { errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, parseErrorDetails } from "@scow/rich-error-model";
@@ -83,33 +83,6 @@ export const appOps = (cluster: string): AppOps => {
         partition, qos, customAttributes, appJobName } = request;
 
       const jobName = appJobName;
-
-      // 检查作业名是否重复
-      await callOnOne(
-        cluster,
-        logger,
-        async (client) => {
-          await checkJobNameExisting(client,userId,jobName,logger);
-        },
-      ).catch((e) => {
-        const ex = e as ServiceError;
-        const errors = parseErrorDetails(ex.metadata);
-        if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
-              && errors[0].reason === "ALREADY_EXISTS") {
-          throw new DetailedError({
-            code: Status.ALREADY_EXISTS,
-            message: ex.details,
-            details: [errorInfo("ALREADY_EXISTS")],
-          });
-        }
-        else {
-          throw new DetailedError({
-            code: ex.code,
-            message: ex.details,
-            details: [errorInfo("SBATCH_FAILED")],
-          });
-        }
-      });
 
       const memoryMb = memory ? Number(memory.slice(0, -2)) : undefined;
 

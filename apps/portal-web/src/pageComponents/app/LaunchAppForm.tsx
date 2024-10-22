@@ -137,13 +137,6 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
           throw e;
         }
       })
-      .httpError(409, (e) => {
-        if (e.code === "ALREADY_EXISTS") {
-          createErrorModal(e.message);
-        } else {
-          throw e;
-        }
-      })
       .then(() => {
         message.success(t(p("successMessage")));
         Router.push(`/apps/${clusterId}/sessions`);

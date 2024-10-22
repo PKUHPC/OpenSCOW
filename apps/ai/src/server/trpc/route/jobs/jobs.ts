@@ -147,21 +147,6 @@ procedure
 
       const client = getAdapterClient(clusterId);
 
-      // 检查是否存在同名的作业
-      const existingJobName = await asyncClientCall(client.job, "getJobs", {
-        fields: ["job_id"],
-        filter: {
-          users: [userId], accounts: [],states: [],jobName:trainJobName,
-        },
-      }).then((resp) => resp.jobs);
-
-      if (existingJobName.length) {
-        throw new TRPCError({
-          code: "CONFLICT",
-          message: `trainJobName ${trainJobName} is already existed`,
-        });
-      }
-
       const em = await forkEntityManager();
       const {
         datasetVersion,
