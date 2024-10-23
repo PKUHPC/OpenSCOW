@@ -404,9 +404,10 @@ export default {
         },
       },
       connectToAppLink: {
-        notFoundMessage: "此应用会话不存在",
-        notConnectableMessage: "此应用目前无法连接",
+        notFoundMessage: "此应用会话不存在, jobId: {}",
+        notConnectableMessage: "此应用目前无法连接, jobId: {}",
         notReady: "应用还未准备好",
+        portNotOpen: "应用端口还未开放",
         connect: "连接",
       },
       createApps: {

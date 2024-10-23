@@ -12,13 +12,14 @@
 
 import { parsePlaceholder } from "@scow/lib-config/build/parse";
 import type { AppSession } from "@scow/protos/build/portal/app";
+import { Static } from "@sinclair/typebox";
 import { App } from "antd";
 import { join } from "path";
-import { useCallback } from "react";
-import { useAsync } from "react-async";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
-import { prefix, useI18nTranslateToString } from "src/i18n";
+import { prefix, useI18nTranslate } from "src/i18n";
+import { type ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 import { openDesktop } from "src/utils/vnc";
@@ -27,122 +28,180 @@ export interface Props {
   cluster: Cluster;
   session: AppSession;
   refreshToken: boolean;
-  appId: string;
 }
 
 const p = prefix("pageComp.app.connectToAppLink.");
 
 export const ConnectTopAppLink: React.FC<Props> = ({
-  session, cluster, refreshToken,appId,
+  session, cluster, refreshToken,
 }) => {
 
   const { message } = App.useApp();
 
-  const t = useI18nTranslateToString();
+  const tArgs = useI18nTranslate();
 
-  const checkConnectivityPromiseFn = useCallback(async () => {
+  const replyRef = useRef<Static<typeof ConnectToAppSchema["responses"]["200"]> | undefined>(undefined);
+  
+  // 保存是否已经检查到可以连接的状态
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  const checkConnectivityPromiseFn = useCallback(async (signal: AbortSignal) => {
 
     if (!session.host || !session.port) { return false; }
-    if (appId === "ShadowDesk") {
+
+    // 判断是否已经检查为可以连接的状态，如果是，直接返回true不再进行下方检查
+    if (isConnected) { return true; }
+
+    if (session.appType?.toLowerCase() === "shadowdesk") {
       return api.checkShadowDeskConnectivity({ query: { id: session.user || "",
-        proxyServer: session.proxyServer || "" } })
+        proxyServer: session.proxyServer || "" } }, signal)
         .then((x) => x.ok);
     } else {
-      return api.checkAppConnectivity({ query: { cluster: cluster.id, host: session.host, port: session.port } })
-        .then((x) => x.ok);
-    }
-  }, [session.host, session.port, cluster.id]);
 
-  const { data } = useAsync({ promiseFn: checkConnectivityPromiseFn, watch: refreshToken });
+      // 先通过ConnectToApp获取后端返回的host，port，proxyType
+      const response = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } }, signal)
+        .httpError(404, () => { 
+          message.error(tArgs(p("notFoundMessage"), [session.jobId])); 
+          return false;
+        })
+        .httpError(409, () => { 
+          message.error(tArgs(p("notConnectableMessage"), [session.jobId])); 
+          return false;
+        });
+      
+      // 保存获取的 response 信息连接时使用
+      replyRef.current = response;
+
+      if (response.type === "web" || response.type === "vnc") {
+      
+        // 对于 web或vnc 应用，模拟到端口的http请求
+        return await api.checkAppConnectivity({
+          query: { 
+            cluster: cluster.id,
+            host: response.host,
+            port: response.port,
+            appType: response.type,
+            proxyType: response.type === "web" ? response.proxyType : undefined,
+          } }, signal)
+          .then((x) => x.ok);
+
+      // 此检验方法不支持 web 和 vnc 以外类型的应用
+      } else {
+        message.error(tArgs(p("notConnectableMessage"), [session.jobId])); 
+        return false;
+      }
+
+    } 
+
+  }, [session.host, session.port, cluster.id, isConnected]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    const checkConnectivity = async () => {
+      try {
+        const checkResult = await checkConnectivityPromiseFn(signal);
+        setIsConnected(checkResult);
+      } catch {
+        message.error(tArgs(p("notConnectableMessage"), [session.jobId]));
+        setIsConnected(false); 
+      } 
+    };
+  
+    checkConnectivity();
+
+    return () => {
+      controller.abort();
+    };
+  }, [checkConnectivityPromiseFn, refreshToken, session]); 
+
+  const submitForm = (url: string, formData: Record<string, string> | undefined) => {
+    const form = document.createElement("form");
+    form.style.display = "none";
+    form.action = url;
+    form.method = "POST";
+    form.target = "_blank";
+    if (formData) {
+      Object.keys(formData).forEach((k) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = k;
+        input.value = formData[k];
+        form.appendChild(input);
+      });
+    }
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  };
 
   const onClick = async () => {
-    const reply = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
-      .httpError(404, () => { message.error(t(p("notFoundMessage"))); })
-      .httpError(409, () => { message.error(t(p("notConnectableMessage"))); });
+    
+    // 如果是web应用直接使用已保存的信息提交表单, 不再发送connectToApp请求
+    if (replyRef?.current?.type === "web") {
 
-    if (reply.type === "web") {
-      const { connect, host, password, port, proxyType, customFormData } = reply;
+      const { connect, host, password, port, proxyType, customFormData } = replyRef.current;
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
-
+      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
+  
       const interpolateValues = (obj: Record<string, string>) => {
         return Object.keys(obj).reduce((prev, curr) => {
           prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
           return prev;
         }, {});
       };
-
       const query = connect.query ? interpolateValues(connect.query) : {};
-      const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
-
-      const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
-
       const url = pathname + "?" + new URLSearchParams(query).toString();
+      const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
 
       if (connect.method === "GET") {
         window.open(url, "_blank");
       } else {
-        const form = document.createElement("form");
-        form.style.display = "none";
-        form.action = url;
-        form.method = "POST";
-        form.target = "_blank";
-        if (formData) {
-          Object.keys(formData).forEach((k) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = k;
-            input.value = formData[k];
-            form.appendChild(input);
-          });
-        }
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        submitForm(url, formData);
       }
 
-    }
-    else if (reply.type === "shadowDesk") {
-      const { connect, password, customFormData } = reply;
-      const interpolatedValues = { PASSWORD: password, ...customFormData };
+    } else {
 
-      const interpolateValues = (obj: Record<string, string>) => {
-        return Object.keys(obj).reduce((prev, curr) => {
-          prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
-          return prev;
-        }, {});
-      };
+      // 如果不是web应用需要重新发起 connectToApp的请求
+      const res = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
+        .httpError(404, () => { message.error(tArgs(p("notFoundMessage"), [session.jobId])); })
+        .httpError(409, () => { message.error(tArgs(p("notConnectableMessage"), [session.jobId])); });
 
-      const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
-      const pathname = join(publicConfig.BASE_PATH,"shadowdesk", connect.path);
+      if (res.type === "shadowDesk") {
+        // shadowDesk
+        const { connect, password, customFormData } = res;
+        const interpolatedValues = { PASSWORD: password, ...customFormData };
+    
+        const interpolateValues = (obj: Record<string, string>) => {
+          return Object.keys(obj).reduce((prev, curr) => {
+            prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
+            return prev;
+          }, {});
+        };
+    
+        const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
+        const pathname = join(publicConfig.BASE_PATH, "shadowdesk", connect.path);
+  
+        submitForm(pathname, formData);
 
-      const form = document.createElement("form");
-      form.style.display = "none";
-      form.action = pathname;
-      form.method = "POST";
-      form.target = "_blank";
-      if (formData) {
-        Object.keys(formData).forEach((k) => {
-          const input = document.createElement("input");
-          input.type = "hidden";
-          input.name = k;
-          input.value = formData[k];
-          form.appendChild(input);
-        });
+      } else {
+
+        // vnc 应用需要点击连接时 发送connectToApp请求实时刷新密码
+        const { host, port, password } = res;
+        openDesktop(cluster.id, host, port, password);
       }
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
     }
-    else {
-      const { host, port, password } = reply;
-      openDesktop(cluster.id, host, port, password);
-    }
-
   };
 
   return (
-    <DisabledA disabled={!data} onClick={onClick} message={t(p("notReady"))}>
-      {t(p("connect"))}</DisabledA>
+    <DisabledA 
+      disabled={!isConnected} 
+      onClick={onClick} 
+      message={session.appType?.toLowerCase() === "shadowdesk" ? tArgs(p("notReady")) : tArgs(p("portNotOpen"))}
+    >
+      {tArgs(p("connect"))}
+    </DisabledA>
   );
 };

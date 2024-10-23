@@ -351,7 +351,6 @@ export const appOps = (cluster: string): AppOps => {
 
         // get all job directories
         const list = await sftpReaddir(sftp)(userAppJobDir);
-
         const sessions = [] as AppSession[];
 
         await Promise.all(list.map(async ({ filename }) => {
@@ -474,6 +473,7 @@ export const appOps = (cluster: string): AppOps => {
             port,
             user,
             proxyServer,
+            appType: apps[sessionMetadata.appId]?.type,
           });
 
         }));
@@ -526,6 +526,7 @@ export const appOps = (cluster: string): AppOps => {
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as Record<string, string>;
             const ip = await getIpFromProxyGateway(cluster, HOST, logger);
+
             return {
               appId: sessionMetadata.appId,
               host: ip || HOST,

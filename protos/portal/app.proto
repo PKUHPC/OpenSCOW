@@ -115,8 +115,12 @@ message AppSession {
 
   optional string host = 11;
   optional uint32 port = 12;
+
   optional string user = 13;
   optional string proxy_server = 14;
+
+  // app type: the value may be "web", "vnc" and "shadowDesk"
+  optional string app_type = 15;
 }
 
 message ListAppSessionsResponse {

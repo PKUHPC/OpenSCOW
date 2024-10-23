@@ -41,8 +41,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     target,
     ignorePath: true, xfwd: true,
   }, (err) => {
-    if (err) {
-      console.error(err, "Error when proxing requests");
+
+    if (!err) { return; }
+    console.error(err, "Error when proxying requests");
+
+    // 如果节点解析失败 或者 节点:端口不可连接
+    if ((err.message.includes("getaddrinfo") && err.message.includes("ENOTFOUND")) || 
+    (err.message.includes("ECONNREFUSED"))) {
+      return res.status(502).send(err);
+    } else {
       res.status(500).send(err);
     }
   });

@@ -13,8 +13,7 @@
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
-import { getClusterConfigFiles } from "src/server/clusterConfig";
-import { isPortReachable } from "src/utils/isPortReachable";
+import { isPortReachableThroughUrl } from "src/utils/isPortReachable";
 import { route } from "src/utils/route";
 
 export const CheckAppConnectivitySchema = typeboxRouteSchema({
@@ -24,6 +23,14 @@ export const CheckAppConnectivitySchema = typeboxRouteSchema({
     cluster: Type.String(),
     host: Type.String(),
     port: Type.Number(),
+    appType: Type.Union([
+      Type.Literal("web"),
+      Type.Literal("vnc"),
+    ]),
+    proxyType: Type.Optional(Type.Union([
+      Type.Literal("relative"),
+      Type.Literal("absolute"),
+    ])),
   }),
 
   responses: {
@@ -41,17 +48,12 @@ export default /* #__PURE__*/route(CheckAppConnectivitySchema, async (req, res) 
 
   if (!info) { return; }
 
-  const { host, port, cluster } = req.query;
+  const { cluster, host, port, proxyType, appType } = req.query;
 
-  const clusterConfigs = await getClusterConfigFiles();
-  // TODO ignore proxy gateway
-  const proxyGateway = clusterConfigs[cluster].proxyGateway;
+  // ignore proxy gateway, check the url directly
+  const checkUrl = await isPortReachableThroughUrl(
+    req, TIMEOUT_MS, cluster, host, port, appType, proxyType);
 
-  if (proxyGateway) {
-    return { 200: { ok: true } };
-  }
+  return { 200: { ok: checkUrl } };
 
-  const reachable = await isPortReachable(port, host, TIMEOUT_MS);
-
-  return { 200: { ok: reachable } };
 });

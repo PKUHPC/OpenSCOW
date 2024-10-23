@@ -153,7 +153,6 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
                   session={record}
                   cluster={cluster}
                   refreshToken={connectivityRefreshToken}
-                  appId={record.appName ?? appId}
                 />
                 <Popconfirm
                   title={t(p("table.popFinishConfirmTitle"))}
@@ -247,7 +246,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button loading={isLoading} onClick={reload}>{t("button.refreshButton")}</Button>
+              <Button loading={isLoading} onClick={() => reloadTable()}>{t("button.refreshButton")}</Button>
             </Space>
           </Form.Item>
           <Form.Item>
