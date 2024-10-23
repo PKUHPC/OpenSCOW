@@ -122,7 +122,8 @@ export const AdminUserTable: React.FC<Props> = ({
   };
 
   const handleExport = async (columns: string[], encoding: Encoding) => {
-
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const total = filteredData?.length ?? 0;
 
@@ -144,6 +145,7 @@ export const AdminUserTable: React.FC<Props> = ({
             : rangeSearchRole === "TENANT_FINANCE"
               ? TenantRole.TENANT_FINANCE : undefined,
         },
+        timeZone:timeZone,
       });
     }
 

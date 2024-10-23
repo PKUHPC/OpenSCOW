@@ -55,6 +55,8 @@ export const ExportUserSchema = typeboxRouteSchema({
 
     tenantRole: Type.Optional(Type.Enum(TenantRole)),
 
+    timeZone:Type.Optional(Type.String()),
+
     // true表示只导出自己租户的用户
     selfTenant: Type.Optional(Type.Boolean()),
     encoding: Type.Enum(Encoding),
@@ -72,7 +74,8 @@ const auth = authenticate((info) => info.platformRoles.includes(PlatformRole.PLA
 export default route(ExportUserSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, sortField, sortOrder, idOrName, platformRole, tenantRole, selfTenant, count, encoding } = query;
+  const { columns, sortField, sortOrder, idOrName, platformRole,
+    tenantRole, selfTenant, count, encoding,timeZone } = query;
 
   const info = await auth(req, res);
   if (!info) {
@@ -98,7 +101,7 @@ export default route(ExportUserSchema, async (req, res) => {
   } else {
     const client = getClient(ExportServiceClient);
 
-    const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
+    const filename = `account-${new Date().toLocaleString("zh-CN",{ timeZone: timeZone ?? "UTC" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
     const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
@@ -152,7 +155,8 @@ export default route(ExportUserSchema, async (req, res) => {
         email: x.email,
         tenantName: x.tenantName,
         availableAccounts: x.availableAccounts.join(","),
-        createTime: x.createTime ? new Date(x.createTime).toISOString() : "",
+        createTime: x.createTime ? new Date(x.createTime).toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })
+          : "",
         tenantRoles: x.tenantRoles.map((x) => TenantRoleI18nTexts[x]).join(","),
         platformRoles: x.platformRoles.map((x) => PlatformRoleI18nTexts[x]).join(","),
       };

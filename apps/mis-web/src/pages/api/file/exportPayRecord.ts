@@ -50,6 +50,8 @@ export const ExportPayRecordSchema = typeboxRouteSchema({
     searchType: Type.Enum(SearchType),
     types:Type.Optional(Type.Array(Type.String())),
     encoding: Type.Enum(Encoding),
+    // 导出的时间时区，按照浏览器时区，不传默认UTC
+    timeZone: Type.Optional(Type.String()),
   }),
 
   responses:{
@@ -63,7 +65,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
   const { query } = req;
 
-  const { columns, startTime, endTime, searchType, count, encoding } = query;
+  const { columns, startTime, endTime, searchType, count, encoding,timeZone } = query;
   let { targetNames, types } = query;
   // targetName为空字符串数组时视为初始态，即undefined
   targetNames = emptyStringArrayToUndefined(targetNames);
@@ -114,7 +116,7 @@ export default route(ExportPayRecordSchema, async (req, res) => {
 
     const client = getClient(ExportServiceClient);
 
-    const filename = `pay_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
+    const filename = `pay_record-${new Date().toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
     const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
@@ -137,12 +139,14 @@ export default route(ExportPayRecordSchema, async (req, res) => {
     const p = prefix("pageComp.commonComponent.paymentTable.");
     const pCommon = prefix("common.");
 
+    // 使用 timezone 参数格式化 operationTime
     const formatPayRecord = (x: PaymentRecord) => {
       return {
         id: x.index,
         accountName: x.accountName,
         tenantName: x.tenantName,
-        time: x.time ? new Date(x.time).toISOString() : "",
+        time: x.time ? new Date(x.time).toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })
+          : "",
         amount: nullableMoneyToString(x.amount),
         type: x.type,
         ipAddress: x.ipAddress,

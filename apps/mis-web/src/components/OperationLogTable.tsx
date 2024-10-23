@@ -182,6 +182,10 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
 
   const handleExport = async (columns: string[], encoding: Encoding) => {
     const total = data?.totalCount ?? 0;
+
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     if (total > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
     } else if (total <= 0) {
@@ -192,6 +196,7 @@ export const OperationLogTable: React.FC<Props> = ({ user, queryType, accountNam
         exportApi: "exportOperationLog",
         columns,
         count: total,
+        timeZone, // 将浏览器时区作为参数传递到后端
         query: {
           type: queryType,
           operatorUserIds: getOperatorUserIds().join(","),

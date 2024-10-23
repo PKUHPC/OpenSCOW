@@ -163,6 +163,8 @@ export const AccountTable: React.FC<Props> = ({
   const handleExport = async (columns: string[], encoding: Encoding) => {
 
     const total = filteredData?.length || 0;
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     if (total > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -175,6 +177,7 @@ export const AccountTable: React.FC<Props> = ({
         columns,
         count: total,
         encoding,
+        timeZone, // 将浏览器时区作为参数传递到后端
         query: {
           accountName: query.accountName,
           blocked: rangeSearchStatus === "DISPLAYED_BLOCKED",

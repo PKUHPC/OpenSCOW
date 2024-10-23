@@ -49,6 +49,7 @@ export const ExportAccountSchema = typeboxRouteSchema({
     isFromAdmin: Type.Boolean(),
     encoding: Type.Enum(Encoding),
     ownerIdOrName: Type.Optional(Type.String()),
+    timeZone:Type.Optional(Type.String()),
   }),
 
   responses:{
@@ -70,7 +71,7 @@ export default route(ExportAccountSchema, async (req, res) => {
   const { query } = req;
 
   const { columns, accountName, tenantName, blocked, debt, frozen, normal, count, isFromAdmin,
-    encoding, deleted, ownerIdOrName } = query;
+    encoding, deleted, ownerIdOrName,timeZone } = query;
 
   const info = isFromAdmin ? await adminAuth(req, res) : await tenantAuth(req, res);
 
@@ -94,7 +95,7 @@ export default route(ExportAccountSchema, async (req, res) => {
   } else {
     const client = getClient(ExportServiceClient);
 
-    const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
+    const filename = `account-${new Date().toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
     const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);

@@ -168,6 +168,10 @@ export const ChargeTable: React.FC<Props> = ({
   // 处理消费记录导出的函数
   const handleExport = async (columns: string[], encoding: Encoding) => {
     const totalCount = totalResultData?.totalCount ?? 0;
+
+    // 时区信息
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     if (totalCount > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
     } else if (totalCount <= 0) {
@@ -178,6 +182,7 @@ export const ChargeTable: React.FC<Props> = ({
         exportApi: "exportChargeRecord",
         columns,
         count: totalCount,
+        timeZone:timeZone,
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),

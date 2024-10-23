@@ -114,6 +114,8 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
 
   const handleExport = async (columns: string[], encoding: Encoding) => {
 
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     const total = data?.results?.length ?? 0;
 
     if (total > MAX_EXPORT_COUNT) {
@@ -127,6 +129,7 @@ export const PaymentTable: React.FC<Props> = ({ accountNames, searchType }) => {
         exportApi: "exportPayRecord",
         columns,
         count: total,
+        timeZone:timeZone,
         query: {
           startTime: query.time[0].clone().startOf("day").toISOString(),
           endTime: query.time[1].clone().endOf("day").toISOString(),

@@ -129,6 +129,8 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
   const handleExport = async (columns: string[], encoding: Encoding) => {
 
     let total = 0;
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     if (currentPlatformRole === undefined) {
       total = platformUsersCounts?.totalCount ?? 0;
@@ -148,6 +150,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
         exportApi: "exportUser",
         columns,
         count: total,
+        timeZone, // 将浏览器时区作为参数传递到后端
         query: {
           sortField: sortInfo.sortField,
           sortOrder: sortInfo.sortOrder,

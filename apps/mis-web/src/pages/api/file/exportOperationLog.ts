@@ -66,6 +66,8 @@ export const ExportOperationLogSchema = typeboxRouteSchema({
     count: Type.Number(),
 
     encoding: Type.Enum(Encoding),
+
+    timeZone: Type.Optional(Type.String()),
   }),
 
   responses: {
@@ -117,16 +119,16 @@ const getExportSource = (
 export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
   const auth = authenticate(() => true);
 
-
-
   const info = await auth(req, res);
 
   if (!info) { return; }
 
+  // 从请求中解析出 timeZone 参数
   const {
-    count, columns, type, operatorUserIds, startTime, endTime, operationType,
-    operationResult, operationDetail, operationTargetAccountName, customEventType, encoding } = req.query;
-
+    count, columns, type, operatorUserIds, startTime, endTime,
+    operationType, operationResult, operationDetail, operationTargetAccountName,
+    customEventType, encoding, timeZone,
+  } = req.query;
 
   const logSource = getExportSource(type, info, operationTargetAccountName);
 
@@ -134,7 +136,7 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
     operatorUserId: info.identityId,
     operatorIp: parseIp(req) ?? "",
     operationTypeName: OperationType.exportOperationLog,
-    operationTypePayload:{
+    operationTypePayload: {
       source: logSource,
     },
   };
@@ -150,7 +152,7 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
       operationDetail,
       customEventType,
     };
-    // 用户请求
+
     if (type === OperationLogQueryType.USER) {
       filter.operatorUserIds = [info.identityId];
     }
@@ -161,33 +163,30 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
         return { 400: null };
       }
 
-      // 确认用户是账户管理员或者拥有者
       if (
-        !info.accountAffiliations
-          .find((au) => au.accountName === filter.operationTargetAccountName
-      && (au.role === UserRole.ADMIN || au.role === UserRole.OWNER))
+        !info.accountAffiliations.find((au) => au.accountName === filter.operationTargetAccountName
+          && (au.role === UserRole.ADMIN || au.role === UserRole.OWNER))
       ) {
         await callLog(logInfo, OperationResult.FAIL);
         return { 403: null };
       }
-    };
+    }
 
     if (type === OperationLogQueryType.TENANT) {
       if (!info.tenantRoles.includes(TenantRole.TENANT_ADMIN)) {
         await callLog(logInfo, OperationResult.FAIL);
         return { 403: null };
       }
-      // 查看该租户下所有用户的操作日志
+
       const client = getClient(UserServiceClient);
       const { users } = await asyncClientCall(client, "getUsers", {
         tenantName: info.tenant,
       });
 
-      // 搜索条件中的userId必须是属于该tenant的
       filter.operatorUserIds = filter.operatorUserIds.length === 0
         ? users.map((u) => u.userId)
         : filter.operatorUserIds.filter((id) => users.find((u) => u.userId === id));
-    };
+    }
 
     if (type === OperationLogQueryType.PLATFORM) {
       if (!info.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
@@ -195,18 +194,18 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
         return { 403: null };
       }
     }
+
     const { exportLog } = createOperationLogClient(runtimeConfig.AUDIT_CONFIG, console);
 
-    const filename = `operation_log-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
+    const filename = `operation_log-${new Date().toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
     const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
 
     res.writeHead(200, {
-      "Content-Type":contentTypeWithCharset,
+      "Content-Type": contentTypeWithCharset,
       "Content-Disposition": `attachment; ${dispositionParm}`,
     });
-
 
     const stream = await exportLog({ filter, count });
 
@@ -217,7 +216,7 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
     const OperationTypeTexts = getOperationTypeTexts(t);
     const OperationResultTexts = getOperationResultTexts(t);
 
-
+    // 使用 timezone 参数格式化 operationTime
     const formatOperationLog = (x: OperationLog) => {
       return {
         id: x.operationLogId,
@@ -225,17 +224,21 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
         operationType: x.operationEvent?.$case === "customEvent"
           ? getI18nCurrentText(x.operationEvent.customEvent.name, languageId)
           : OperationTypeTexts[x.operationEvent?.$case || "unknown"],
-        operationDetail: x.operationEvent ?
-          x.operationEvent?.$case === "customEvent"
+        operationDetail: x.operationEvent
+          ? x.operationEvent?.$case === "customEvent"
             ? getI18nCurrentText(x.operationEvent.customEvent.content, languageId)
             : getOperationDetail(x.operationEvent, t, tArgs, languageId)
           : "",
         operationResult: OperationResultTexts[x.operationResult],
         operatorUserId: x.operatorUserId,
-        operationTime: x.operationTime ? new Date(x.operationTime).toISOString() : "",
+        // 使用用户指定的时区格式化时间
+        operationTime: x.operationTime ? new Date(x.operationTime).
+          toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })
+          : "",
         operatorIp: x.operatorIp,
       };
     };
+
 
     const headerColumns = {
       id: "Operation Log ID",
@@ -270,3 +273,4 @@ export default typeboxRoute(ExportOperationLogSchema, async (req, res) => {
     );
   }
 });
+
