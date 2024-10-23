@@ -140,6 +140,7 @@ export default {
         filterForm: {
           cluster: "Cluster",
           jobId: "Job ID",
+          userId:"User ID",
         },
         jobInfoTable: {
           cluster: "Cluster",
@@ -159,6 +160,7 @@ export default {
           linkToPath: "Go to Directory",
           popConfirm: "Are you sure you want to terminate this task?",
           successMessage: "Task termination request has been submitted!",
+          userId:"User ID",
         },
       },
       // submitJobForm

@@ -140,6 +140,7 @@ export default {
         filterForm: {
           cluster: "集群",
           jobId: "作业ID",
+          userId:"用户ID",
         },
         jobInfoTable: {
           cluster: "集群",
@@ -159,6 +160,7 @@ export default {
           linkToPath: "进入目录",
           popConfirm: "确定结束这个任务吗?",
           successMessage: "任务结束请求已经提交!",
+          userId:"用户ID",
         },
       },
       // submitJobForm
