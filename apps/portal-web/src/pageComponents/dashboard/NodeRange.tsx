@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { Card, Typography } from "antd";
+import { Card, Statistic,Typography } from "antd";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { styled } from "styled-components";
 
@@ -32,11 +32,17 @@ const JobInfoContainer = styled.div`
   padding-right:15px;
 `;
 
-const JobNumber = styled(Text)`
+const JobNumber = styled(Statistic)<{ color: string }>`
   margin: 0;
-  font-weight:700;
-  font-size:64px;
+  font-weight: 700;
+
+  & .ant-statistic-content-value-int {
+    font-size: clamp(24px, 5vw, 64px);
+    color: ${(props) => props.color};  // 动态设置颜色
+    white-space: nowrap;  // 防止内容换行
+  }
 `;
+
 
 const JobLabel = styled(Text)`
   margin: 0;
@@ -75,11 +81,11 @@ const JobInfo: React.FC<Props> = ({ runningJobs, pendingJobs, loading, display }
       >
         <JobInfoContainer>
           <JobInfoRow>
-            <JobNumber style={{ color: "#D1CB5B", fontSize:"64px" }}>{runningJobs}</JobNumber>
+            <JobNumber color="#D1CB5B" value={runningJobs}></JobNumber>
             <JobLabel style={{ fontSize:"18px" }}>{t(p("running"))}</JobLabel>
           </JobInfoRow>
           <JobInfoRow style={{ marginTop:"5px", marginBottom:"25px" }}>
-            <JobNumber style={{ color: "#A58E74", fontSize:"64px" }}>{pendingJobs}</JobNumber>
+            <JobNumber color="#A58E74" value={pendingJobs}></JobNumber>
             <JobLabel style={{ fontSize:"18px" }}>{t(p("pending"))}</JobLabel>
           </JobInfoRow>
         </JobInfoContainer>
