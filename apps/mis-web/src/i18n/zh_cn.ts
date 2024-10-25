@@ -271,7 +271,7 @@ export default {
 
         delete:"删除",
         deleteSuccess:"删除帐户成功",
-        deleteFail:"删除帐户失败",
+        deleteFail:"删除帐户失败，请联系管理员",
       },
       setBlockThresholdAmountModal: {
         setSuccess:"设置成功",
@@ -664,7 +664,7 @@ export default {
         changeFail:"修改失败",
         changePassword:"修改密码",
         delete:"删除",
-        deleteFail:"删除失败",
+        deleteFail:"删除失败，请联系管理员",
         deleteSuccess:"删除成功",
       },
       jobPriceChangeModal:{

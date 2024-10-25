@@ -697,6 +697,7 @@ export const accountServiceServer = plugin((server) => {
           if (userAccount.role === EntityUserRole.OWNER) {
             continue;
           }
+          await em.removeAndFlush(userAccount);
           await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
             return await asyncClientCall(client.user, "removeUserFromAccount",
               { userId, accountName });
@@ -708,7 +709,6 @@ export const accountServiceServer = plugin((server) => {
               throw e;
             }
           });
-          await em.removeAndFlush(userAccount);
           if (hasCapabilities) {
             await removeUserFromAccount(authUrl, { accountName, userId }, logger);
           }
@@ -719,6 +719,13 @@ export const accountServiceServer = plugin((server) => {
           account.whitelist = undefined;
         }
 
+        // 先在数据库中删除，避免适配器不能在全部集群中删除账户（如默认账户）带来的一系列问题
+
+        account.state = AccountState.DELETED;
+        account.comment = account.comment + (comment ? "  " + comment.trim() : "");
+        account.blockedInCluster = true;
+        await em.flush();
+
         await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
           return await asyncClientCall(client.account, "deleteAccount",
             { accountName });
@@ -727,14 +734,10 @@ export const accountServiceServer = plugin((server) => {
           // 除此以外，都抛出异常
           if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
                  !== Object.keys(currentActivatedClusters).length) {
+            logger.error(e, "deleteAccount Error occurred.");
             throw e;
           }
         });
-
-        account.state = AccountState.DELETED;
-        account.comment = account.comment + (comment ? "  " + comment.trim() : "");
-        account.blockedInCluster = true;
-        await em.flush();
 
         return [{}];
       });

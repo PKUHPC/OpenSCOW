@@ -407,7 +407,7 @@ export default {
         notFoundMessage: "Application session does not exist. JobId: {}.",
         notConnectableMessage: "Application cannot be connected now, please wait. JobId: {}.",
         notReady: "Application is not ready yet.",
-        portNotOpen: "Application posrt is not open yet.",
+        portNotOpen: "Application port is not open yet.",
         connect: "Connect",
       },
       createApps: {

@@ -622,6 +622,7 @@ export const userServiceServer = plugin((server) => {
             continue;
           }
           const accountName = userAccount.account.getEntity().accountName;
+          await em.removeAndFlush(userAccount);
           await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
             return await asyncClientCall(client.user, "removeUserFromAccount",
               { userId, accountName });
@@ -633,11 +634,31 @@ export const userServiceServer = plugin((server) => {
               throw e;
             }
           });
-          await em.removeAndFlush(userAccount);
           if (hasCapabilities) {
             await removeUserFromAccount(authUrl, { accountName, userId }, logger);
           }
         }
+
+        user.state = UserState.DELETED;
+        user.deletionComment = deletionComment?.trim();
+
+        const nameMarker = misConfig?.deleteUser?.nameMarker || "";
+        user.name += nameMarker;
+        await em.flush();
+
+        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+          return await asyncClientCall(client.user, "deleteUser",
+            { userId });
+        }).catch(async (e) => {
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出此用户
+          // 除此以外，都抛出异常
+          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+            logger.error(e, "deleteUser Error occurred.");
+            throw e;
+          }
+        });
+
         const ldapCapabilities = await getCapabilities(authUrl);
         if (ldapCapabilities.deleteUser) {
 
@@ -654,25 +675,6 @@ export const userServiceServer = plugin((server) => {
                 message: "Error nologin user in LDAP." } as ServiceError;
             });
         }
-
-        await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-          return await asyncClientCall(client.user, "deleteUser",
-            { userId });
-        }).catch(async (e) => {
-          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出此用户
-          // 除此以外，都抛出异常
-          if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-                 !== Object.keys(currentActivatedClusters).length) {
-            throw e;
-          }
-        });
-
-        user.state = UserState.DELETED;
-        user.deletionComment = deletionComment?.trim();
-
-        const nameMarker = misConfig?.deleteUser?.nameMarker || "";
-        user.name += nameMarker;
-        await em.flush();
 
         return [{}];
       });

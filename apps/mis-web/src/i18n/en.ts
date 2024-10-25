@@ -271,7 +271,7 @@ export default {
 
         delete:"Delete",
         deleteSuccess: "Account deleting successful!",
-        deleteFail: "Account deleting failed!",
+        deleteFail: "Failed to delete the account. Please contact the administrator.",
       },
       setBlockThresholdAmountModal: {
         setSuccess: "Set Successfully",
@@ -664,7 +664,7 @@ export default {
         changeFail: "Modification failed",
         changePassword: "Change Password",
         delete:"Delete",
-        deleteFail: "Deletion failed",
+        deleteFail: "Deletion failed. Please contact the administrator.",
         deleteSuccess: "Deletion successful",
       },
       jobPriceChangeModal: {
