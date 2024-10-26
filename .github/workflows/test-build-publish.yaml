@@ -14,7 +14,6 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 env:
-  GITHUB_CR: ghcr.io
   INTERNAL_CR: ccimage.pku.edu.cn
 
 jobs:
@@ -183,13 +182,6 @@ jobs:
             env.http_proxy=${{ vars.HTTPS_PROXY }}
             env.https_proxy=${{ vars.HTTPS_PROXY }}
 
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
-        with:
-          registry: ${{ env.GITHUB_CR }}
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
       - name: Log in to the ${{ env.INTERNAL_CR }}
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567
         with:
@@ -202,7 +194,6 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
             ${{ env.INTERNAL_CR }}/scow/${{ matrix.name }}
 
       - name: Build and push Docker image
