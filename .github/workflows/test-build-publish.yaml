@@ -117,7 +117,6 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
 
   scow-cli:
-    needs: test-version-packages
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     steps:
@@ -154,7 +153,6 @@ jobs:
 
 
   build-images:
-    needs: test-version-packages
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
 
     permissions:
