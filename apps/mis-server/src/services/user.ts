@@ -521,163 +521,161 @@ export const userServiceServer = plugin((server) => {
     },
 
     deleteUser: async ({ request, em, logger }) => {
-      return await em.transactional(async (em) => {
-        const { userId, tenantName, deletionComment }
+      const { userId, tenantName, deletionComment }
          = ensureNotUndefined(request, ["userId", "tenantName"]);
 
-        const tenant = await em.findOne(Tenant, { name: tenantName });
+      const tenant = await em.findOne(Tenant, { name: tenantName });
 
-        if (!tenant) {
-          throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
-        }
+      if (!tenant) {
+        throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
+      }
 
-        const user = await em.findOne(User, { userId, tenant: { name: tenantName } }, {
-          populate: ["accounts", "accounts.account"],
-        });
+      const user = await em.findOne(User, { userId, tenant: { name: tenantName } }, {
+        populate: ["accounts", "accounts.account"],
+      });
 
-        if (!user) {
-          throw { code: Status.NOT_FOUND, message: `User ${userId} is not found.` } as ServiceError;
-        }
+      if (!user) {
+        throw { code: Status.NOT_FOUND, message: `User ${userId} is not found.` } as ServiceError;
+      }
 
-        if (user.state === UserState.DELETED) {
-          throw { code: Status.NOT_FOUND, message: `User ${userId} has been deleted.` } as ServiceError;
-        }
+      if (user.state === UserState.DELETED) {
+        throw { code: Status.NOT_FOUND, message: `User ${userId} has been deleted.` } as ServiceError;
+      }
 
-        if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
-          throw {
-            code: Status.INTERNAL,
-            message: "Platform administrators cannot be deleted.",
-          } as ServiceError;
-        }
+      if (user.platformRoles.includes(PlatformRole.PLATFORM_ADMIN)) {
+        throw {
+          code: Status.INTERNAL,
+          message: "Platform administrators cannot be deleted.",
+        } as ServiceError;
+      }
 
-        const userAccounts = user.accounts.getItems();
-        // 这里商量是不要管有没有封锁直接删，但要不要先封锁了再删？
+      const userAccounts = user.accounts.getItems();
+      // 这里商量是不要管有没有封锁直接删，但要不要先封锁了再删？
 
-        // 如果用户为账户拥有者且该用户没有被删除，提示管理员需要先删除拥有的账户再删除用户
-        const countAccountOwner = async () => {
-          const ownedAccounts = userAccounts
-            .filter((userAccount) => PFUserRole[userAccount.role] === PFUserRole.OWNER)
-            .map((userAccount) => {
-              const account = userAccount.account.getEntity();
-              const { accountName, state } = account;
-              return state !== AccountState.DELETED ? accountName : null;
-            })
-            .filter((accountName) => accountName !== null);
+      // 如果用户为账户拥有者且该用户没有被删除，提示管理员需要先删除拥有的账户再删除用户
+      const countAccountOwner = async () => {
+        const ownedAccounts = userAccounts
+          .filter((userAccount) => PFUserRole[userAccount.role] === PFUserRole.OWNER)
+          .map((userAccount) => {
+            const account = userAccount.account.getEntity();
+            const { accountName, state } = account;
+            return state !== AccountState.DELETED ? accountName : null;
+          })
+          .filter((accountName) => accountName !== null);
 
-          return ownedAccounts;
+        return ownedAccounts;
+      };
+
+      const needDeleteAccounts = await countAccountOwner().catch((error) => {
+        console.error("Error processing countAccountOwner:", error);
+        return [];
+      });
+
+      if (needDeleteAccounts.length > 0) {
+        const needDeleteAccountsObj = {
+          userId,
+          accounts: needDeleteAccounts,
+          type: "ACCOUNTS_OWNER",
         };
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: JSON.stringify(needDeleteAccountsObj),
+        } as ServiceError;
+      }
 
-        const needDeleteAccounts = await countAccountOwner().catch((error) => {
-          console.error("Error processing countAccountOwner:", error);
-          return [];
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      // 查询用户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
+      const runningJobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
+        logger,
+        async (client) => {
+          const fields = ["job_id", "user", "state", "account"];
+
+          return await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: [userId], accounts: [], states: ["RUNNING", "PENDING"]},
+          });
+        },
+      );
+
+      if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        const a = runningJobs.filter((i) => i.result.jobs.length > 0);
+        a.forEach((i) => {
+          i.result.jobs.forEach((c) => console.log(c));
         });
+        const runningJobsObj = {
+          userId,
+          type: "RUNNING_JOBS",
+        };
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: JSON.stringify(runningJobsObj),
+        } as ServiceError;
+      }
 
-        if (needDeleteAccounts.length > 0) {
-          const needDeleteAccountsObj = {
-            userId,
-            accounts: needDeleteAccounts,
-            type: "ACCOUNTS_OWNER",
-          };
-          throw {
-            code: Status.FAILED_PRECONDITION,
-            message: JSON.stringify(needDeleteAccountsObj),
-          } as ServiceError;
+      // 处理用户账户关系表，删除用户与除其拥有的所有账户的关系
+      const hasCapabilities = server.ext.capabilities.accountUserRelation;
+
+      for (const userAccount of userAccounts) {
+        if (PFUserRole[userAccount.role] === PFUserRole.OWNER) {
+          continue;
         }
-
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
-        // 查询用户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
-        const runningJobs = await server.ext.clusters.callOnAll(
-          currentActivatedClusters,
-          logger,
-          async (client) => {
-            const fields = ["job_id", "user", "state", "account"];
-
-            return await asyncClientCall(client.job, "getJobs", {
-              fields,
-              filter: { users: [userId], accounts: [], states: ["RUNNING", "PENDING"]},
-            });
-          },
-        );
-
-        if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
-          const a = runningJobs.filter((i) => i.result.jobs.length > 0);
-          a.forEach((i) => {
-            i.result.jobs.forEach((c) => console.log(c));
-          });
-          const runningJobsObj = {
-            userId,
-            type: "RUNNING_JOBS",
-          };
-          throw {
-            code: Status.FAILED_PRECONDITION,
-            message: JSON.stringify(runningJobsObj),
-          } as ServiceError;
-        }
-
-        // 处理用户账户关系表，删除用户与除其拥有的所有账户的关系
-        const hasCapabilities = server.ext.capabilities.accountUserRelation;
-
-        for (const userAccount of userAccounts) {
-          if (PFUserRole[userAccount.role] === PFUserRole.OWNER) {
-            continue;
-          }
-          const accountName = userAccount.account.getEntity().accountName;
-          await em.removeAndFlush(userAccount);
-          await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-            return await asyncClientCall(client.user, "removeUserFromAccount",
-              { userId, accountName });
-          }).catch(async (e) => {
-            // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
-            // 除此以外，都抛出异常
-            if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-              !== Object.keys(currentActivatedClusters).length) {
-              throw e;
-            }
-          });
-          if (hasCapabilities) {
-            await removeUserFromAccount(authUrl, { accountName, userId }, logger);
-          }
-        }
-
-        user.state = UserState.DELETED;
-        user.deletionComment = deletionComment?.trim();
-
-        const nameMarker = misConfig?.deleteUser?.nameMarker || "";
-        user.name += nameMarker;
-        await em.flush();
-
+        const accountName = userAccount.account.getEntity().accountName;
+        await em.removeAndFlush(userAccount);
         await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-          return await asyncClientCall(client.user, "deleteUser",
-            { userId });
+          return await asyncClientCall(client.user, "removeUserFromAccount",
+            { userId, accountName });
         }).catch(async (e) => {
-          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出此用户
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
           // 除此以外，都抛出异常
           if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-                 !== Object.keys(currentActivatedClusters).length) {
-            logger.error(e, "deleteUser Error occurred.");
+              !== Object.keys(currentActivatedClusters).length) {
             throw e;
           }
         });
-
-        const ldapCapabilities = await getCapabilities(authUrl);
-        if (ldapCapabilities.deleteUser) {
-
-          await deleteUser(authUrl,
-            userId, server.logger)
-            .catch(async (e) => {
-              if (e.status === 404) {
-                throw {
-                  code: Status.NOT_FOUND,
-                  message: "User not found in LDAP." } as ServiceError;
-              }
-              throw {
-                code: Status.INTERNAL,
-                message: "Error nologin user in LDAP." } as ServiceError;
-            });
+        if (hasCapabilities) {
+          await removeUserFromAccount(authUrl, { accountName, userId }, logger);
         }
+      }
 
-        return [{}];
+      user.state = UserState.DELETED;
+      user.deletionComment = deletionComment?.trim();
+
+      const nameMarker = misConfig?.deleteUser?.nameMarker || "";
+      user.name += nameMarker;
+      await em.flush();
+
+      const ldapCapabilities = await getCapabilities(authUrl);
+      if (ldapCapabilities.deleteUser) {
+
+        await deleteUser(authUrl,
+          userId, server.logger)
+          .catch(async (e) => {
+            if (e.status === 404) {
+              throw {
+                code: Status.NOT_FOUND,
+                message: "User not found in LDAP." } as ServiceError;
+            }
+            throw {
+              code: Status.INTERNAL,
+              message: "Error nologin user in LDAP." } as ServiceError;
+          });
+      }
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+        return await asyncClientCall(client.user, "deleteUser",
+          { userId });
+      }).catch(async (e) => {
+        // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出此用户
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+          logger.error(e, "deleteUser Error occurred.");
+          throw e;
+        }
       });
+
+      return [{}];
     },
 
 

@@ -518,6 +518,8 @@ export const AccountTable: React.FC<Props> = ({
                         .catch(() => {
                           message.error(t(p("deleteFail")));
                           message.destroy("deleteAccount");
+
+                          reload();
                         });
                     }}
                   >

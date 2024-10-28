@@ -641,106 +641,104 @@ export const accountServiceServer = plugin((server) => {
     },
 
     deleteAccount: async ({ request, em, logger }) => {
-      return await em.transactional(async (em) => {
-        const { accountName, tenantName, comment } = ensureNotUndefined(request, ["accountName", "tenantName"]);
+      const { accountName, tenantName, comment } = ensureNotUndefined(request, ["accountName", "tenantName"]);
 
-        const tenant = await em.findOne(Tenant, { name: tenantName });
+      const tenant = await em.findOne(Tenant, { name: tenantName });
 
-        if (!tenant) {
-          throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
-        }
+      if (!tenant) {
+        throw { code: Status.NOT_FOUND, message: `Tenant ${tenantName} is not found.` } as ServiceError;
+      }
 
-        const account = await em.findOne(Account, { accountName,
-          tenant: { name: tenantName } }, { populate: ["tenant","users","users.user"]});
+      const account = await em.findOne(Account, { accountName,
+        tenant: { name: tenantName } }, { populate: ["tenant","users","users.user"]});
 
-        if (!account) {
-          throw {
-            code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
-          } as ServiceError;
-        }
+      if (!account) {
+        throw {
+          code: Status.NOT_FOUND, message: `Account ${accountName} is not found`,
+        } as ServiceError;
+      }
 
-        ensureAccountNotDeleted(account);
+      ensureAccountNotDeleted(account);
 
-        const userAccounts = account.users.getItems();
-        const currentActivatedClusters = await getActivatedClusters(em, logger);
-        // 查询账户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
-        const runningJobs = await server.ext.clusters.callOnAll(
-          currentActivatedClusters,
-          logger,
-          async (client) => {
-            const fields = ["job_id", "user", "state", "account"];
+      const userAccounts = account.users.getItems();
+      const currentActivatedClusters = await getActivatedClusters(em, logger);
+      // 查询账户是否有RUNNING、PENDING的作业与交互式应用，有则抛出异常
+      const runningJobs = await server.ext.clusters.callOnAll(
+        currentActivatedClusters,
+        logger,
+        async (client) => {
+          const fields = ["job_id", "user", "state", "account"];
 
-            return await asyncClientCall(client.job, "getJobs", {
-              fields,
-              filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
-            });
-          },
-        );
-
-        const runningJobsObj = {
-          accountName,
-          type: "RUNNING_JOBS",
-        };
-
-        if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
-          throw {
-            code: Status.FAILED_PRECONDITION,
-            message: JSON.stringify(runningJobsObj),
-          } as ServiceError;
-        }
-
-        // 处理用户账户关系表，删除账户与所有用户的关系
-        const hasCapabilities = server.ext.capabilities.accountUserRelation;
-
-        for (const userAccount of userAccounts) {
-          const userId = userAccount.user.getEntity().userId;
-          if (userAccount.role === EntityUserRole.OWNER) {
-            continue;
-          }
-          await em.removeAndFlush(userAccount);
-          await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-            return await asyncClientCall(client.user, "removeUserFromAccount",
-              { userId, accountName });
-          }).catch(async (e) => {
-            // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
-            // 除此以外，都抛出异常
-            if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-                   !== Object.keys(currentActivatedClusters).length) {
-              throw e;
-            }
+          return await asyncClientCall(client.job, "getJobs", {
+            fields,
+            filter: { users: [], accounts: [accountName], states: ["RUNNING", "PENDING"]},
           });
-          if (hasCapabilities) {
-            await removeUserFromAccount(authUrl, { accountName, userId }, logger);
-          }
+        },
+      );
+
+      const runningJobsObj = {
+        accountName,
+        type: "RUNNING_JOBS",
+      };
+
+      if (runningJobs.filter((i) => i.result.jobs.length > 0).length > 0) {
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: JSON.stringify(runningJobsObj),
+        } as ServiceError;
+      }
+
+      // 处理用户账户关系表，删除账户与所有用户的关系
+      const hasCapabilities = server.ext.capabilities.accountUserRelation;
+
+      for (const userAccount of userAccounts) {
+        const userId = userAccount.user.getEntity().userId;
+        if (userAccount.role === EntityUserRole.OWNER) {
+          continue;
         }
-
-        if (account.whitelist) {
-          em.remove(account.whitelist);
-          account.whitelist = undefined;
-        }
-
-        // 先在数据库中删除，避免适配器不能在全部集群中删除账户（如默认账户）带来的一系列问题
-
-        account.state = AccountState.DELETED;
-        account.comment = account.comment + (comment ? "  " + comment.trim() : "");
-        account.blockedInCluster = true;
-        await em.flush();
-
+        await em.removeAndFlush(userAccount);
         await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
-          return await asyncClientCall(client.account, "deleteAccount",
-            { accountName });
+          return await asyncClientCall(client.user, "removeUserFromAccount",
+            { userId, accountName });
         }).catch(async (e) => {
-          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出账户
+          // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已将此用户移出账户，可以在scow数据库及认证系统中删除该条关系，
           // 除此以外，都抛出异常
           if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
-                 !== Object.keys(currentActivatedClusters).length) {
-            logger.error(e, "deleteAccount Error occurred.");
+                   !== Object.keys(currentActivatedClusters).length) {
             throw e;
           }
         });
+        if (hasCapabilities) {
+          await removeUserFromAccount(authUrl, { accountName, userId }, logger);
+        }
+      }
 
-        return [{}];
+      if (account.whitelist) {
+        em.remove(account.whitelist);
+        account.whitelist = undefined;
+      }
+
+      // 先在数据库中删除，避免适配器不能在全部集群中删除账户（如默认账户）带来的一系列问题
+
+      account.state = AccountState.DELETED;
+      account.comment = account.comment + (comment ? "  " + comment.trim() : "");
+      account.blockedInCluster = true;
+      await em.flush();
+
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+        return await asyncClientCall(client.account, "deleteAccount",
+          { accountName });
+      }).catch(async (e) => {
+        // 如果每个适配器返回的Error都是NOT_FOUND，说明所有集群均已移出账户
+        // 除此以外，都抛出异常
+        if (countSubstringOccurrences(e.details, "Error: 5 NOT_FOUND")
+                 !== Object.keys(currentActivatedClusters).length) {
+          logger.error(e, "deleteAccount Error occurred.");
+          throw e;
+        }
       });
+
+      return [{}];
     },
   });
 
