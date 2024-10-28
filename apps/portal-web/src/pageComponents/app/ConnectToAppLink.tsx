@@ -18,7 +18,7 @@ import { join } from "path";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
-import { prefix, useI18nTranslate } from "src/i18n";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { type ConnectToAppSchema } from "src/pages/api/app/connectToApp";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
@@ -38,7 +38,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
   const { message } = App.useApp();
 
-  const tArgs = useI18nTranslate();
+  const t = useI18nTranslateToString();
 
   const replyRef = useRef<Static<typeof ConnectToAppSchema["responses"]["200"]> | undefined>(undefined);
   
@@ -61,11 +61,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       // 先通过ConnectToApp获取后端返回的host，port，proxyType
       const response = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } }, signal)
         .httpError(404, () => { 
-          message.error(tArgs(p("notFoundMessage"), [session.jobId])); 
           return false;
         })
         .httpError(409, () => { 
-          message.error(tArgs(p("notConnectableMessage"), [session.jobId])); 
           return false;
         });
       
@@ -87,7 +85,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
       // 此检验方法不支持 web 和 vnc 以外类型的应用
       } else {
-        message.error(tArgs(p("notConnectableMessage"), [session.jobId])); 
+        message.error(t(p("notConnectableMessage"))); 
         return false;
       }
 
@@ -104,7 +102,6 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         const checkResult = await checkConnectivityPromiseFn(signal);
         setIsConnected(checkResult);
       } catch {
-        message.error(tArgs(p("notConnectableMessage"), [session.jobId]));
         setIsConnected(false); 
       } 
     };
@@ -166,8 +163,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
       // 如果不是web应用需要重新发起 connectToApp的请求
       const res = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
-        .httpError(404, () => { message.error(tArgs(p("notFoundMessage"), [session.jobId])); })
-        .httpError(409, () => { message.error(tArgs(p("notConnectableMessage"), [session.jobId])); });
+        .httpError(404, () => { message.error(t(p("notFoundMessage"))); })
+        .httpError(409, () => { message.error(t(p("notConnectableMessage"))); });
 
       if (res.type === "shadowDesk") {
         // shadowDesk
@@ -199,9 +196,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
     <DisabledA 
       disabled={!isConnected} 
       onClick={onClick} 
-      message={session.appType?.toLowerCase() === "shadowdesk" ? tArgs(p("notReady")) : tArgs(p("portNotOpen"))}
+      message={session.appType?.toLowerCase() === "shadowdesk" ? t(p("notReady")) : t(p("portNotOpen"))}
     >
-      {tArgs(p("connect"))}
+      {t(p("connect"))}
     </DisabledA>
   );
 };

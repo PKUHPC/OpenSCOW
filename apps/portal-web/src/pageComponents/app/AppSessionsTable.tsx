@@ -144,7 +144,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
       key: "action",
       fixed:"right",
       width: "10%",
-      render: (appId: string, record) => (
+      render: (record) => (
         <Space>
           {
             (record.state === "RUNNING") ? (

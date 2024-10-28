@@ -404,8 +404,8 @@ export default {
         },
       },
       connectToAppLink: {
-        notFoundMessage: "Application session does not exist. JobId: {}.",
-        notConnectableMessage: "Application cannot be connected now, please wait. JobId: {}.",
+        notFoundMessage: "Application session does not exist.",
+        notConnectableMessage: "Application cannot be connected now, please wait.",
         notReady: "Application is not ready yet.",
         portNotOpen: "Application port is not open yet.",
         connect: "Connect",
