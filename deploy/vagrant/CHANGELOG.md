@@ -1,5 +1,11 @@
 # @scow/demo-vagrant
 
+## 2.0.5
+
+### Patch Changes
+
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+
 ## 2.0.4
 
 ### Patch Changes

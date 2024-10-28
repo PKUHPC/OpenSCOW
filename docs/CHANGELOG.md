@@ -1,5 +1,11 @@
 # @scow/docs
 
+## 1.4.4
+
+### Patch Changes
+
+- a7e7585: 删除用户账户可选开启，以及默认改为关闭
+
 ## 1.4.3
 
 ### Patch Changes

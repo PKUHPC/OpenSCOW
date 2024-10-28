@@ -1,5 +1,23 @@
 # @scow/audit-server
 
+## 2.3.8
+
+### Patch Changes
+
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+- 6c6f8c6: 账户列表导出时增加拥有者 ID 和姓名筛选，操作日志修正为导出账户
+- Updated dependencies [bec8a37]
+- Updated dependencies [9880cd0]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-server@1.3.5
+  - @scow/lib-operation-log@2.1.10
+  - @scow/protos@1.0.16
+
 ## 2.3.7
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @scow/lib-web
 
+## 1.4.4
+
+### Patch Changes
+
+- Updated dependencies [bec8a37]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/protos@1.0.16
+
 ## 1.4.3
 
 ### Patch Changes

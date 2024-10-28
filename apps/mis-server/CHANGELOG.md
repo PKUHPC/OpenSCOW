@@ -1,5 +1,34 @@
 # @scow/mis-server
 
+## 1.7.1
+
+### Patch Changes
+
+- 17a5531: 修改删除用户账户的步骤顺序
+- a38ef7f: 修改 getClusterNodesInfo 为门户和管理系统共用 grpc api，修改集群管理页面的节点信息计数方式
+- 74789b4: 修复资源系统配置项中关闭启动时的状态同步没有生效的问题
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+- a7e7585: 删除用户账户可选开启，以及默认改为关闭
+- 6c6f8c6: 账户列表导出时增加拥有者 ID 和姓名筛选，操作日志修正为导出账户
+- Updated dependencies [bec8a37]
+- Updated dependencies [9880cd0]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-server@1.3.5
+  - @scow/lib-auth@1.0.1
+  - @scow/scheduler-adapter-protos@1.4.0
+  - @scow/notification-protos@0.1.2
+  - @scow/lib-hook@1.0.16
+  - @scow/lib-scow-resource@0.2.1
+  - @scow/protos@1.0.16
+  - @scow/lib-scheduler-adapter@1.1.14
+  - @scow/lib-notification@1.0.2
+
 ## 1.7.0
 
 ### Minor Changes

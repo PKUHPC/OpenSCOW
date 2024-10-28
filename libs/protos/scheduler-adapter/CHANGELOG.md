@@ -1,5 +1,11 @@
 # @scow/scheduler-adapter-protos
 
+## 1.4.0
+
+### Minor Changes
+
+- 6c6f8c6: **删除账户用户功能**需要**1.7.0 及以上版本**的接口
+
 ## 1.3.2
 
 ### Patch Changes

@@ -1,5 +1,22 @@
 # @scow/lib-server
 
+## 1.3.5
+
+### Patch Changes
+
+- 9880cd0: 去掉 HPC 和 AI 的提交应用和训练的检查重名
+- Updated dependencies [bec8a37]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/scheduler-adapter-protos@1.4.0
+  - @scow/protos@1.0.16
+  - @scow/lib-scheduler-adapter@1.1.14
+  - @scow/rich-error-model@2.0.0
+
 ## 1.3.4
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # @scow/grpc-api
 
+## 1.14.0
+
+### Minor Changes
+
+- a38ef7f: 将 portal 中的 getClusterNodesInfo 移动到 common 下作为共用 grpc api，标记原有接口为 deprecated
+- 6c6f8c6: 新增删除用户账户相关接口
+- 701ebc7: 增加塔影交互式应用接口和相关字段
+
+### Patch Changes
+
+- bef6181: 改进了门户仪表盘中计算分区、平台的节点逻辑
+- b66dcfe: 适配器 getClusterInfo 新增返回接口参数.
+- 873fa96: 在 protos/portal/app 的 AppSession 中增加 appType 的返回值
+
 ## 1.13.0
 
 ### Minor Changes

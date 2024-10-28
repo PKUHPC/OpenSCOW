@@ -1,5 +1,33 @@
 # @scow/mis-web
 
+## 1.7.1
+
+### Patch Changes
+
+- ab971fb: 为租户未结束作业添加用户 ID 搜索
+- 17a5531: 修改删除用户账户的步骤顺序
+- a38ef7f: 修改 getClusterNodesInfo 为门户和管理系统共用 grpc api，修改集群管理页面的节点信息计数方式
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+- a7e7585: 删除用户账户可选开启，以及默认改为关闭
+- aa94edc: 消息系统新增消息过期时间和定期删除过期消息功能
+- 956be7c: 为 OperationLogTable、AccountTable、AllUsersTable、PaymentTable、AdminUserTable 增加导出表格按时区导出的功能。
+- 6c6f8c6: 账户列表导出时增加拥有者 ID 和姓名筛选，操作日志修正为导出账户
+- Updated dependencies [bec8a37]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-operation-log@2.1.10
+  - @scow/lib-auth@1.0.1
+  - @scow/notification-protos@0.1.2
+  - @scow/lib-scow-resource@0.2.1
+  - @scow/lib-web@1.4.4
+  - @scow/protos@1.0.16
+  - @scow/lib-notification@1.0.2
+  - @scow/rich-error-model@2.0.0
+
 ## 1.7.0
 
 ### Minor Changes

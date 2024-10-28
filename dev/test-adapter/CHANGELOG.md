@@ -1,5 +1,13 @@
 # @scow/test-adapter
 
+## 1.1.8
+
+### Patch Changes
+
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+- Updated dependencies [6c6f8c6]
+  - @scow/scheduler-adapter-protos@1.4.0
+
 ## 1.1.7
 
 ### Patch Changes

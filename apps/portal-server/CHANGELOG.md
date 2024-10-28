@@ -1,5 +1,30 @@
 # @scow/portal-server
 
+## 1.7.1
+
+### Patch Changes
+
+- 667a123: 增加获取交互式应用和作业模版 JSON.parse 错误的处理
+- 9880cd0: 去掉 HPC 和 AI 的提交应用和训练的检查重名
+- a38ef7f: 修改 getClusterNodesInfo 为门户和管理系统共用 grpc api，修改集群管理页面的节点信息计数方式
+- 6e4241b: 新增 scowd 下载文件时的背压处理
+- 873fa96: 在检查 web 应用和 vnc 应用检查连接时，忽略代理网关的配置，通过模拟到端口的 http 请求检查端口是否开放
+- 701ebc7: 增加塔影交互式应用配置和链接流程
+- Updated dependencies [bec8a37]
+- Updated dependencies [9880cd0]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-server@1.3.5
+  - @scow/scheduler-adapter-protos@1.4.0
+  - @scow/lib-scow-resource@0.2.1
+  - @scow/protos@1.0.16
+  - @scow/lib-scheduler-adapter@1.1.14
+  - @scow/rich-error-model@2.0.0
+
 ## 1.7.0
 
 ### Minor Changes

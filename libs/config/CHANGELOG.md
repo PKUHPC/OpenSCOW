@@ -1,5 +1,18 @@
 # @scow/config
 
+## 1.6.0
+
+### Minor Changes
+
+- 701ebc7: 增加塔影交互式应用相关配置
+
+### Patch Changes
+
+- bec8a37: ai 增加公共只读挂载点
+- a7e7585: 删除用户账户配置可选
+- 6c6f8c6: 新增 ldap 的用户 loginShell 属性与删除用户时删除标识配置
+- aa94edc: 消息系统新增消息过期时间和定期删除过期消息功能
+
 ## 1.5.3
 
 ### Patch Changes

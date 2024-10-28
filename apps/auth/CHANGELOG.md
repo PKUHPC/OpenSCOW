@@ -1,5 +1,20 @@
 # @scow/auth
 
+## 1.7.1
+
+### Patch Changes
+
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+- a7e7585: 删除用户账户可选开启，以及默认改为关闭
+- Updated dependencies [bec8a37]
+- Updated dependencies [9880cd0]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-server@1.3.5
+
 ## 1.7.0
 
 ### Patch Changes

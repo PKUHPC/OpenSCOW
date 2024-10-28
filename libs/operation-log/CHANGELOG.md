@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.10
+
+### Patch Changes
+
+- 6c6f8c6: 新增删除用户账户功能以及用户账户的删除状态带来的其他相关接口与测试文件完善
+  - @scow/protos@1.0.16
+
 ## 2.1.9
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # @scow/ai
 
+## 0.2.9
+
+### Patch Changes
+
+- bec8a37: ai 增加公共只读挂载点
+- 9880cd0: 去掉 HPC 和 AI 的提交应用和训练的检查重名
+- a021f77: 训练选择挂载点提示字段验证错误
+- c587554: ai 运行中的作业保存镜像改成异步
+- Updated dependencies [bec8a37]
+- Updated dependencies [9880cd0]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [a7e7585]
+- Updated dependencies [6c6f8c6]
+- Updated dependencies [701ebc7]
+- Updated dependencies [aa94edc]
+  - @scow/config@1.6.0
+  - @scow/lib-server@1.3.5
+  - @scow/lib-operation-log@2.1.10
+  - @scow/lib-auth@1.0.1
+  - @scow/lib-web@1.4.4
+  - @scow/rich-error-model@2.0.0
+
 ## 0.2.8
 
 ### Patch Changes
