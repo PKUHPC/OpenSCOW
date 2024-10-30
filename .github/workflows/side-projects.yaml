@@ -24,8 +24,6 @@ jobs:
       has_write_permission: ${{ steps.check-permission.outputs.result }}
     steps:
 
-      - uses: actions/checkout@v4
-
       - name: Check if the user has write permission to ${{ env.VAGRANT_ORG }}/${{ env.VAGRANT_REPO }}
         id: check-permission
         uses: actions/github-script@v6
@@ -34,7 +32,7 @@ jobs:
             const { data: { permission } } = await github.repos.getCollaboratorPermissionLevel({
               owner: '${{ env.VAGRANT_ORG }}',
               repo: '${{ env.VAGRANT_REPO }}',
-              username: github.context.actor
+              username: github.context.actor,
             });
 
             console.log(`The user has ${permission} permission to ${env.VAGRANT_ORG}/${env.VAGRANT_REPO}`);
@@ -51,6 +49,8 @@ jobs:
 
     steps:
 
+      - uses: actions/checkout@v4
+
       - name: Create version file for tag commit
         if: github.ref_type == 'tag'
         uses: finnp/create-file-action@master
@@ -58,10 +58,10 @@ jobs:
           FILE_NAME: "./deploy/vagrant/VERSION"
           FILE_DATA: "${{ github.ref_name }}"
 
-      - name: Pushes to PKUHPC/scow-vagrant repo
+      - name: Pushes to ${{ env.VAGRANT_ORG }}/${{ env.VAGRANT_REPO }} repo
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
           folder: ./deploy/vagrant
-          repository-name: PKUHPC/scow-vagrant
+          repository-name: ${{ env.VAGRANT_ORG }}/${{ env.VAGRANT_REPO }}
           branch: ${{ github.ref_type == 'branch' && github.ref_name || 'master' }}
