@@ -32,7 +32,7 @@ jobs:
             const { data: { permission } } = await github.rest.repos.getCollaboratorPermissionLevel({
               owner: '${{ env.VAGRANT_ORG }}',
               repo: '${{ env.VAGRANT_REPO }}',
-              username: github.context.actor,
+              username: context.actor,
             });
 
             console.log(`The user has ${permission} permission to ${env.VAGRANT_ORG}/${env.VAGRANT_REPO}`);
