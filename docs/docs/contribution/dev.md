@@ -193,4 +193,7 @@ pnpm devenv:stop
 
 ![CI流程](./ci.png)
 
+注意：
+
+1. 针对来自非fork项目的PR，CI不会构建镜像以及更新scow-vagrant
 
