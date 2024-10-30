@@ -120,6 +120,7 @@ jobs:
 
   build-images:
     needs: test-version-packages
+    if: github.event.pull_request.head.repo.fork == false
     runs-on: ubuntu-latest
 
     permissions:
@@ -158,7 +159,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.GITHUB_CR }}/${{ github.event.pull_request.head.repo.full_name }}/${{ matrix.name }}
+            ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6

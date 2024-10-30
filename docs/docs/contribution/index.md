@@ -11,6 +11,10 @@ title: 贡献指南
 
 ![贡献流程](process.png)
 
+注意事项：
+
+1. 对于来自fork的仓库的PR，仓库的CI将会对您的代码运行测试，但是不会构建镜像。为了方便您自己以及团队的测试工作，我们推荐您首先在您的仓库中，发起一个您的分支到您仓库的master分支的PR。这个过程的CI将会运行在您的仓库中，将会构建镜像并上传到您的仓库的GitHub Container Registry中，您以及我们团队可以使用这些镜像进行测试。
+
 ## 开源协议
 
 OpenSCOW在[木兰宽松许可证，第2版 (MulanPSL-2.0)](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwir0N_4hPuIAxUinK8BHT7XBfIQFnoECBQQAQ&url=https%3A%2F%2Fspdx.org%2Flicenses%2FMulanPSL-2.0.html&usg=AOvVaw2pyvwh8sqZpV0XmHiRXQje&opi=89978449)下开源。您贡献的代码同样会在此协议下开源。
