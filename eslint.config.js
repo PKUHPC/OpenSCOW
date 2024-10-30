@@ -10,10 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-const path = require("path");
-
 const base = require("@ddadaal/eslint-config");
-const licenseHeader = require("eslint-plugin-license-header");
 
 module.exports = [
   {
@@ -29,17 +26,6 @@ module.exports = [
     ]
   },
   ...base,
-  {
-    plugins: {
-      "license-header": licenseHeader,
-    },
-    rules: {
-      "license-header/header": [
-        "error",
-        path.join(__dirname, "license-header"),
-      ],
-    }
-  },
   {
     rules: {
       "@typescript-eslint/no-require-imports": "off",
