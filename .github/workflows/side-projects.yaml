@@ -20,6 +20,7 @@ jobs:
   openscow-vagrant-check:
     name: Check if the user has write permission to vagrant repo
     runs-on: ubuntu-latest
+    permissions: read-all
     outputs:
       has_write_permission: ${{ steps.check-permission.outputs.result }}
     steps:
