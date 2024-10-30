@@ -158,7 +158,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.GITHUB_CR }}/${{ github.repository }}/${{ matrix.name }}
+            ${{ env.GITHUB_CR }}/${{ github.event.pull_request.head.repo.full_name }}/${{ matrix.name }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
