@@ -86,7 +86,7 @@ export default /* #__PURE__*/route(ConnectToAppSchema, async (req, res) => {
   const client = getClient(AppServiceClient);
 
   return await asyncUnaryCall(client, "connectToApp", {
-    sessionId, userId: info.identityId, cluster,
+    userId: info.identityId, cluster,sessionId,
   }).then(async (x) => {
     if (x.appProps?.$case === "web") {
       const connect: AppConnectProps = {

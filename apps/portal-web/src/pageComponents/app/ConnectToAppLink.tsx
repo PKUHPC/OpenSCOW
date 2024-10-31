@@ -41,7 +41,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   const t = useI18nTranslateToString();
 
   const replyRef = useRef<Static<typeof ConnectToAppSchema["responses"]["200"]> | undefined>(undefined);
-  
+
   // 保存是否已经检查到可以连接的状态
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -59,22 +59,23 @@ export const ConnectTopAppLink: React.FC<Props> = ({
     } else {
 
       // 先通过ConnectToApp获取后端返回的host，port，proxyType
-      const response = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } }, signal)
-        .httpError(404, () => { 
+      const response = await api.connectToApp({ body:
+        { cluster: cluster.id, sessionId:session.sessionId } }, signal)
+        .httpError(404, () => {
           return false;
         })
-        .httpError(409, () => { 
+        .httpError(409, () => {
           return false;
         });
-      
+
       // 保存获取的 response 信息连接时使用
       replyRef.current = response;
 
       if (response.type === "web" || response.type === "vnc") {
-      
+
         // 对于 web或vnc 应用，模拟到端口的http请求
         return await api.checkAppConnectivity({
-          query: { 
+          query: {
             cluster: cluster.id,
             host: response.host,
             port: response.port,
@@ -85,11 +86,11 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
       // 此检验方法不支持 web 和 vnc 以外类型的应用
       } else {
-        message.error(t(p("notConnectableMessage"))); 
+        message.error(t(p("notConnectableMessage")));
         return false;
       }
 
-    } 
+    }
 
   }, [session.host, session.port, cluster.id, isConnected]);
 
@@ -102,16 +103,16 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         const checkResult = await checkConnectivityPromiseFn(signal);
         setIsConnected(checkResult);
       } catch {
-        setIsConnected(false); 
-      } 
+        setIsConnected(false);
+      }
     };
-  
+
     checkConnectivity();
 
     return () => {
       controller.abort();
     };
-  }, [checkConnectivityPromiseFn, refreshToken, session]); 
+  }, [checkConnectivityPromiseFn, refreshToken, session]);
 
   const submitForm = (url: string, formData: Record<string, string> | undefined) => {
     const form = document.createElement("form");
@@ -134,7 +135,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   const onClick = async () => {
-    
+
     // 如果是web应用直接使用已保存的信息提交表单, 不再发送connectToApp请求
     if (replyRef?.current?.type === "web") {
 
@@ -142,7 +143,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
       const interpolatedValues = { HOST: host, PASSWORD: password, PORT: port, ...customFormData };
       const path = parsePlaceholder(connect.path, interpolatedValues);
       const pathname = join(publicConfig.BASE_PATH, "/api/proxy", cluster.id, proxyType, host, String(port), path);
-  
+
       const interpolateValues = (obj: Record<string, string>) => {
         return Object.keys(obj).reduce((prev, curr) => {
           prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
@@ -162,7 +163,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
     } else {
 
       // 如果不是web应用需要重新发起 connectToApp的请求
-      const res = await api.connectToApp({ body: { cluster: cluster.id, sessionId: session.sessionId } })
+      const res = await api.connectToApp({ body:
+        { cluster: cluster.id, sessionId:session.sessionId } })
         .httpError(404, () => { message.error(t(p("notFoundMessage"))); })
         .httpError(409, () => { message.error(t(p("notConnectableMessage"))); });
 
@@ -170,17 +172,17 @@ export const ConnectTopAppLink: React.FC<Props> = ({
         // shadowDesk
         const { connect, password, customFormData } = res;
         const interpolatedValues = { PASSWORD: password, ...customFormData };
-    
+
         const interpolateValues = (obj: Record<string, string>) => {
           return Object.keys(obj).reduce((prev, curr) => {
             prev[curr] = parsePlaceholder(obj[curr], interpolatedValues);
             return prev;
           }, {});
         };
-    
+
         const formData = connect.formData ? interpolateValues(connect.formData) : undefined;
         const pathname = join(publicConfig.BASE_PATH, "shadowdesk", connect.path);
-  
+
         submitForm(pathname, formData);
 
       } else {
@@ -193,9 +195,9 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <DisabledA 
-      disabled={!isConnected} 
-      onClick={onClick} 
+    <DisabledA
+      disabled={!isConnected}
+      onClick={onClick}
       message={session.appType?.toLowerCase() === "shadowdesk" ? t(p("notReady")) : t(p("portNotOpen"))}
     >
       {t(p("connect"))}

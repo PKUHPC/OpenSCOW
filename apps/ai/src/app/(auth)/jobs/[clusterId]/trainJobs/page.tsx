@@ -27,7 +27,7 @@ export default function Page({ params }: { params: { clusterId: string } }) {
   const searchParams = useSearchParams();
 
   const jobId = searchParams?.get("jobId");
-  const jobName = searchParams?.get("jobName");
+  const sessionId = searchParams?.get("sessionId");
 
 
   const { data: clusterInfo, isLoading: isClusterLoading, isError } =
@@ -37,8 +37,8 @@ export default function Page({ params }: { params: { clusterId: string } }) {
   const parsedJobId = jobId ? parseInt(jobId, 10) : null;
 
   const { data: submitTrainParams, isLoading: isSubmitTrainParamsLoading } = trpc.jobs.getSubmitTrainParams.useQuery(
-    { clusterId, jobId: parsedJobId!, jobName: jobName! }, {
-      enabled: (!!jobId && !!jobName),
+    { clusterId, jobId: parsedJobId!, sessionId: sessionId! }, {
+      enabled: (!!jobId && !!sessionId),
       retry: false,
     });
 
@@ -46,7 +46,7 @@ export default function Page({ params }: { params: { clusterId: string } }) {
   if (
     isClusterLoading
     || !clusterInfo
-    || (!!jobId && !!jobName && (isSubmitTrainParamsLoading))) {
+    || (!!jobId && !!sessionId && (isSubmitTrainParamsLoading))) {
 
     return <LoadingOutlined />;
   }

@@ -20,6 +20,7 @@ import {
   sftpWriteFile,
 } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
+import dayjs from "dayjs";
 import { join } from "path";
 import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
@@ -135,8 +136,8 @@ procedure
   })
   .mutation(
     async ({ input, ctx: { user } }) => {
-      const { clusterId, trainJobName, isAlgorithmPrivate, algorithm, image, framework, remoteImageUrl,
-        isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
+      const { clusterId, trainJobName , isAlgorithmPrivate, algorithm, image, framework,
+        remoteImageUrl,isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
       const userId = user.identityId;
 
@@ -175,7 +176,8 @@ procedure
           }
         });
 
-        const trainJobsDirectory = join(aiConfig.appJobsDir, trainJobName);
+        const scowWorkDirectoryName = `${clusterId}-job-${dayjs().format("YYYYMMDD-HHmmss")}`;
+        const trainJobsDirectory = join(aiConfig.appJobsDir, scowWorkDirectoryName);
 
         // 确保所有映射到容器的路径都不重复
         validateUniquePaths([
@@ -256,7 +258,7 @@ procedure
         // Save session metadata
         const metadata: SessionMetadata = {
           jobId: reply.jobId,
-          sessionId: trainJobName,
+          sessionId: scowWorkDirectoryName,
           submitTime: new Date().toISOString(),
           image: {
             name: remoteImageUrl || existImage!.name,
@@ -287,13 +289,11 @@ procedure
   .input(z.object({
     clusterId: z.string(),
     jobId: z.number(),
-    jobName: z.string(),
+    sessionId: z.string(),
   }))
   .output(TrainJobInputSchema)
   .query(async ({ input, ctx: { user } }) => {
-
-
-    const { clusterId, jobId, jobName } = input;
+    const { clusterId, jobId, sessionId } = input;
     const userId = user.identityId;
     const host = getClusterLoginNode(clusterId);
     if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
@@ -301,7 +301,7 @@ procedure
     return await sshConnect(host, userId, logger, async (ssh) => {
 
       const homeDir = await getUserHomedir(ssh, userId, logger);
-      const jobsDirectory = join(aiConfig.appJobsDir, jobName);
+      const jobsDirectory = join(aiConfig.appJobsDir, sessionId);
 
       const sftp = await ssh.requestSFTP();
 

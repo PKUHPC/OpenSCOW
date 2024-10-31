@@ -27,6 +27,7 @@ import {
 } from "@scow/lib-ssh";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { TRPCError } from "@trpc/server";
+import dayjs from "dayjs";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
@@ -259,6 +260,7 @@ const CreateAppInputSchema = z.object({
   gpuCount: z.number().optional(),
   memory: z.number().optional(),
   maxTime: z.number(),
+  // APP工作目录
   workingDirectory: z.string().optional(),
   customAttributes: z.record(z.string(), z.union([z.number(), z.string(), z.undefined()])),
   gpuType: z.string().optional(),
@@ -405,7 +407,10 @@ export const createAppSession = procedure
           });
         }
       });
-      const appJobsDirectory = join(aiConfig.appJobsDir, appJobName);
+
+      const scowWorkDirectoryName = `${clusterId}-${appId}-${dayjs().format("YYYYMMDD-HHmmss")}`;
+
+      const appJobsDirectory = join(aiConfig.appJobsDir, scowWorkDirectoryName);
 
       // 确保所有映射到容器的路径都不重复
       validateUniquePaths([
@@ -531,7 +536,7 @@ export const createAppSession = procedure
 
       const metadata: SessionMetadata = {
         jobId: reply.jobId,
-        sessionId: appJobName,
+        sessionId: scowWorkDirectoryName,
         submitTime: new Date().toISOString(),
         appId,
         image: existImage ? { name: existImage.name, tag: existImage.tag } : app.image,
@@ -560,12 +565,12 @@ export const getCreateAppParams =
     .input(z.object({
       clusterId: z.string(),
       jobId: z.number(),
-      jobName: z.string(),
+      sessionId: z.string(),
     }))
     .output(CreateAppInputSchema)
     .query(async ({ input, ctx: { user } }) => {
 
-      const { clusterId, jobId, jobName } = input;
+      const { clusterId, jobId, sessionId } = input;
       const userId = user.identityId;
       const host = getClusterLoginNode(clusterId);
       if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
@@ -573,7 +578,7 @@ export const getCreateAppParams =
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
-        const jobsDirectory = join(aiConfig.appJobsDir, jobName);
+        const jobsDirectory = join(aiConfig.appJobsDir, sessionId);
 
         const sftp = await ssh.requestSFTP();
 

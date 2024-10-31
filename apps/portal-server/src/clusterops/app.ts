@@ -21,6 +21,7 @@ import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
 import { DetailedError, parseErrorDetails } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
+import dayjs from "dayjs";
 import fs from "fs";
 import { join } from "path";
 import { quote } from "shell-quote";
@@ -101,7 +102,8 @@ export const appOps = (cluster: string): AppOps => {
         });
       }
 
-      const workingDirectory = join(portalConfig.appJobsDir, jobName);
+      const workDirectoryName = `${cluster}-${appId}-${dayjs().format("YYYYMMDD-HHmmss")}`;
+      const workingDirectory = join(portalConfig.appJobsDir, workDirectoryName);
 
       const lastSubmissionDirectory = join(portalConfig.appLastSubmissionDir, appId);
 
@@ -147,7 +149,7 @@ export const appOps = (cluster: string): AppOps => {
           // write session metadata
           const metadata: SessionMetadata = {
             jobId,
-            sessionId: jobName,
+            sessionId: workDirectoryName,
             submitTime: new Date().toISOString(),
             appId,
           };
@@ -495,6 +497,7 @@ export const appOps = (cluster: string): AppOps => {
 
         if (!await sftpExists(sftp, jobDir)) {
           throw { code: Status.NOT_FOUND, message: `session id ${sessionId} is not found` } as ServiceError;
+
         }
 
         const metadataPath = join(jobDir, SESSION_METADATA_NAME);

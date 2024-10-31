@@ -218,7 +218,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
               let basePath = `/jobs/${cluster.id}`;
               const searchParams = new URLSearchParams({
                 jobId:  record.jobId.toString(),
-                jobName: record.sessionId,
+                sessionId: record.sessionId,
               });
 
               if (record.jobType === JobType.APP) {

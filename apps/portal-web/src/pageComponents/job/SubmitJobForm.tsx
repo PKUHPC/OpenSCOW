@@ -55,8 +55,8 @@ interface JobForm {
 }
 
 // 生成默认工作名称，命名规则为年月日-时分秒，如job-20230510-103010
-const genJobName = (): string => {
-  return `job-${dayjs().format("YYYYMMDD-HHmmss")}`;
+const genJobName = (clusterId: string): string => {
+  return `${clusterId}-job-${dayjs().format("YYYYMMDD-HHmmss")}`;
 };
 
 // 设置节点数，单节点核心数，单节点GPU卡数填入变化config
@@ -151,7 +151,8 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
   const showScriptOutput = Form.useWatch("showScriptOutput", form);
 
   const calculateWorkingDirectory = (template: string, homePath: string = "") =>
-    join(homePath + "/", parsePlaceholder(template, { name: jobName }));
+    join(homePath + "/",
+      parsePlaceholder(template, { name: jobName }));
 
   const calculateScriptOutput = () => {
     const parseName = parsePlaceholder("{{ name }}", { name: jobName }).trim();
@@ -163,7 +164,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
       ? api.getClusterInfo({ query: { cluster: cluster?.id } })
       : undefined, [cluster]),
     onResolve: () => {
-      const jobInitialName = genJobName();
+      const jobInitialName = genJobName(cluster?.id ?? "");
       form.setFieldValue("jobName", jobInitialName);
 
       // TODO 调度器类别,K8S镜像
@@ -205,7 +206,7 @@ export const SubmitJobForm: React.FC<Props> = ({ initial = initialValues, submit
 
   useEffect(() => {
     setWorkingDirectoryValue();
-  }, [jobName, clusterInfoQuery.data, homePath?.path]);
+  }, [clusterInfoQuery.data, homePath?.path]);
 
   // 集群，账户，分区，qos的模板值存在时, 手动控制模板值填入时机
   const excludedFields = ["cluster", "account", "partition", "qos"];

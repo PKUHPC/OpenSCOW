@@ -52,9 +52,9 @@ interface FormFields {
   maxTime: number;
 }
 
-// 生成默认应用名称，命名规则为"当前应用名-年月日-时分秒"
-const genAppJobName = (appName: string): string => {
-  return `${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
+// 生成默认应用名称，命名规则为"集群Id-当前应用名-年月日-时分秒"
+const genAppJobName = (clusterId: string,appName: string): string => {
+  return `${clusterId}-${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
 };
 
 const initialValues = {
@@ -165,7 +165,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     await api.getAppLastSubmission({ query: { cluster: clusterId, appId } })
       .then(async (lastData) => {
 
-        form.setFieldValue("appJobName", genAppJobName(appName));
+        form.setFieldValue("appJobName", genAppJobName(clusterId,appName));
 
         // 进入页面时第一次请求集群下未封锁账户
         await api.getAccounts({ query: {

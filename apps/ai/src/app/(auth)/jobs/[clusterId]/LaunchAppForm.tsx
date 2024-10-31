@@ -104,9 +104,9 @@ export enum AccessibilityType {
   PRIVATE = "PRIVATE",
 }
 
-// 生成默认应用名称，命名规则为"当前应用名-年月日-时分秒"
-const genAppJobName = (appName: string): string => {
-  return `${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
+// 生成默认应用名称，命名规则为"集群名-当前应用名-年月日-时分秒"
+const genAppJobName = (clusterId: string, appName: string): string => {
+  return `${clusterId}-${appName}-${dayjs().format("YYYYMMDD-HHmmss")}`;
 };
 
 const initialValues = {
@@ -475,7 +475,7 @@ export const LaunchAppForm = (props: Props) => {
     if (!inputParams) {
       form.setFieldsValue({
         partition: clusterInfo?.partitions[0]?.name,
-        appJobName: genAppJobName(appName ?? "trainJobs"),
+        appJobName: genAppJobName(clusterId, appName ?? "trainJobs"),
       });
     } else {
       const { account, partition, gpuCount, coreCount, maxTime, mountPoints, nodeCount } = inputParams;
@@ -498,7 +498,7 @@ export const LaunchAppForm = (props: Props) => {
         gpuCount,
         coreCount,
         maxTime,
-        appJobName: genAppJobName(appName ?? "trainJobs"),
+        appJobName: genAppJobName(clusterId, appName ?? "trainJobs"),
         command,
         psNodes,
         workerNodes,
