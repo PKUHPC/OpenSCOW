@@ -112,9 +112,13 @@ export const MessageConfigModal: React.FC<Props> = ({
             <Checkbox.Group style={{ width: "100%" }}>
               {
                 enabledNoticeTypes.map((noticeType) => {
+                  const disabled = !data.noticeConfigs.find(
+                    (config) => config.noticeType === noticeType,
+                  )?.enabled;
+
                   return (
                     <Checkbox
-                      disabled={!data.noticeConfigs[noticeType]?.enabled}
+                      disabled={disabled}
                       value={noticeType}
                     >
                       {noticeTypeNameMap.get(noticeType)}

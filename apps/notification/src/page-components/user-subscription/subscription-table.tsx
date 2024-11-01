@@ -109,23 +109,25 @@ export const UserSubscriptionTable: React.FC = () => {
           throw Error("Unable to find the corresponding MessageConfig");
         };
 
-        const noticeConfigs = Object.keys(values.noticeConfigs[messageType]).map((noticeType) => {
-          const enumNoticeType = Number(noticeType) as unknown as NoticeType;
+        const noticeConfigs = Object.keys(values.noticeConfigs[messageType])
+          .filter((noticeType) => values.noticeConfigs[messageType][noticeType] !== undefined)
+          .map((noticeType) => {
+            const enumNoticeType = Number(noticeType) as unknown as NoticeType;
 
-          const originalNoticeConfig = messageConfig?.noticeConfigs.find(
-            (config) => config.noticeType === enumNoticeType);
+            const originalNoticeConfig = messageConfig?.noticeConfigs.find(
+              (config) => config.noticeType === enumNoticeType);
 
-          if (!originalNoticeConfig) {
-            message.error(compLang.formError);
-            throw Error("Unable to find the corresponding NoticeType");
-          };
+            if (!originalNoticeConfig) {
+              message.error(compLang.formError);
+              throw Error("Unable to find the corresponding NoticeType");
+            };
 
-          return {
-            noticeType: enumNoticeType,
-            canUseModify: originalNoticeConfig.canUserModify,
-            enabled: values.noticeConfigs[messageType][noticeType]!,
-          };
-        });
+            return {
+              noticeType: enumNoticeType,
+              canUseModify: originalNoticeConfig.canUserModify,
+              enabled: values.noticeConfigs[messageType][noticeType]!,
+            };
+          });
 
         return {
           ...messageConfig,
@@ -178,7 +180,6 @@ export const UserSubscriptionTable: React.FC = () => {
 
     }
   }, [data]);
-
 
   return (
     <div>

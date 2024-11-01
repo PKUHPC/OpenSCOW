@@ -39,6 +39,9 @@ export const getMessageConfigsWithDefault = async (em: SqlEntityManager) => {
 
   // 处理已存入数据库消息设置
   for (const config of adminConfigs) {
+    if (!enabledNoticeTypes.includes(config.noticeType)) {
+      continue;
+    }
     const key = config.messageType;
     const noticeConfig: MessageNoticeTypeConfig = {
       noticeType: config.noticeType,

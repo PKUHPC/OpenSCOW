@@ -19,6 +19,9 @@ enum NoticeType {
   SMS = 1;
   EMAIL = 2;
   OFFICIAL_ACCOUNT = 3;
+  WE_COM = 4;
+  DING_TALK = 5;
+  LARK = 6;
 }
 
 enum ReadStatus {

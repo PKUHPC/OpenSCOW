@@ -15,6 +15,9 @@ export enum NoticeType {
   SMS,
   EMAIL,
   OFFICIAL_ACCOUNT,
+  WE_COM,
+  DING_TALK,
+  LARK,
 }
 
 export const noticeTypeNameMap = new Map<NoticeType, string>([
@@ -22,4 +25,7 @@ export const noticeTypeNameMap = new Map<NoticeType, string>([
   [NoticeType.SMS, "短信"],
   [NoticeType.EMAIL, "邮箱"],
   [NoticeType.OFFICIAL_ACCOUNT, "公众号"],
+  [NoticeType.WE_COM, "企业微信"],
+  [NoticeType.DING_TALK, "钉钉"],
+  [NoticeType.LARK, "飞书"],
 ]);

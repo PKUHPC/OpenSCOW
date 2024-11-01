@@ -107,6 +107,12 @@ export const checkNoticeTypeEnabled = (noticeType: NoticeType) => {
       return noticeTypeConfig.email?.enabled ?? false;
     case NoticeType.OFFICIAL_ACCOUNT:
       return noticeTypeConfig.officialAccount?.enabled ?? false;
+    case NoticeType.WE_COM:
+      return noticeTypeConfig.weCom?.enabled ?? false;
+    case NoticeType.DING_TALK:
+      return noticeTypeConfig.dingTalk?.enabled ?? false;
+    case NoticeType.LARK:
+      return noticeTypeConfig.lark?.enabled ?? false;
     default:
       return false;
   }

@@ -13,9 +13,9 @@
 import { useQuery } from "@connectrpc/connect-query";
 import { MessageConfig } from "@scow/notification-protos/build/common_pb";
 import { listNoticeTypes } from "@scow/notification-protos/build/notice_type-NoticeTypeService_connectquery";
-import { Checkbox, Form, FormInstance, TableColumnsType } from "antd";
-import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { Dispatch, useContext, useEffect, useState } from "react";
+import { Checkbox, Form, FormInstance, TableColumnsType, Tooltip } from "antd";
+import { CheckboxChangeEvent, CheckboxProps } from "antd/es/checkbox";
+import { Dispatch, ReactNode, useContext, useEffect, useState } from "react";
 import { CheckAllSpecifiedNoticeType } from "src/components/check-all-specified-notice-type";
 import { ScowParamsContext } from "src/components/scow-params-provider";
 import { I18nDicType } from "src/models/i18n";
@@ -36,6 +36,17 @@ interface Props {
   setHasChange: Dispatch<React.SetStateAction<boolean>>;
   lang: I18nDicType;
 }
+
+interface TooltipCheckboxProps extends CheckboxProps {
+  tooltipTitle: ReactNode;
+}
+
+const TooltipCheckbox: React.FC<TooltipCheckboxProps> = ({ tooltipTitle, ...restProps }) => (
+  <Tooltip title={tooltipTitle}>
+    <Checkbox {...restProps} />
+  </Tooltip>
+);
+
 
 export function useSubscriptionColumns({
   form, messageConfigs, checkAllDisabled, noticeTypeAllChecked, setNoticeTypeAllChecked, setHasChange, lang,
@@ -163,14 +174,21 @@ export function useSubscriptionColumns({
           key: type,
           render: (_, record) => {
             const noticeTypeConfig = record.noticeConfigs.find((config) => config.noticeType === type);
+            const checkboxDisabled = !noticeTypeConfig?.canUserModify;
+            const checked = noticeTypeConfig?.enabled;
+
+            const title = checkboxDisabled ?
+              (checked ? compLang.unableToCancelPrompt : compLang.unableToOpenPrompt) : "";
+
             return (
               <Form.Item
                 name={["noticeConfigs", record.messageType, type]}
                 valuePropName="checked"
                 noStyle
               >
-                <Checkbox
-                  disabled={!noticeTypeConfig?.canUserModify}
+                <TooltipCheckbox
+                  tooltipTitle={title}
+                  disabled={checkboxDisabled}
                   onChange={(e) => handleCheckChange({ e, checkedNoticeType: type })}
                 />
               </Form.Item>

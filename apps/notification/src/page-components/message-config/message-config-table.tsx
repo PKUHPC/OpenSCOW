@@ -114,30 +114,34 @@ export const MessageConfigTable: React.FC = () => {
 
       const parsedValues = Object.keys(values.noticeConfigs).map((messageType) => {
 
-        const messageConfig = data?.configs.find((config) => config.messageType === messageType);
+        const messageConfig = data?.configs.find((config) => {
+          return config.messageType === messageType;
+        });
 
         if (!messageConfig) {
           message.error(compLang.formError);
           throw Error("Unable to find the corresponding MessageConfig");
         };
 
-        const noticeConfigs = Object.keys(values.noticeConfigs[messageType]).map((noticeType) => {
-          const enumNoticeType = Number(noticeType) as unknown as NoticeType;
+        const noticeConfigs = Object.keys(values.noticeConfigs[messageType])
+          .filter((noticeType) => values.noticeConfigs[messageType][noticeType] !== undefined)
+          .map((noticeType) => {
+            const enumNoticeType = Number(noticeType) as unknown as NoticeType;
 
-          const originalNoticeConfig = messageConfig?.noticeConfigs.find(
-            (config) => config.noticeType === enumNoticeType);
+            const originalNoticeConfig = messageConfig?.noticeConfigs.find(
+              (config) => config.noticeType === enumNoticeType);
 
-          if (!originalNoticeConfig) {
-            message.error(compLang.formError);
-            throw Error("Unable to find the corresponding NoticeType");
-          };
+            if (!originalNoticeConfig) {
+              message.error(compLang.formError);
+              throw Error("Unable to find the corresponding NoticeType");
+            };
 
-          return {
-            noticeType: enumNoticeType,
-            canUseModify: originalNoticeConfig.canUserModify,
-            enabled: values.noticeConfigs[messageType][noticeType]!,
-          };
-        });
+            return {
+              noticeType: enumNoticeType,
+              canUseModify: originalNoticeConfig.canUserModify,
+              enabled: values.noticeConfigs[messageType][noticeType]!,
+            };
+          });
 
         return {
           ...messageConfig,
@@ -181,7 +185,6 @@ export const MessageConfigTable: React.FC = () => {
       }, { noticeConfigs:  {} as Record<string, Partial<Record<NoticeType, boolean>>> }); // 添加显式类型断言
 
       form.setFieldsValue({ noticeConfigs: initialValues.noticeConfigs });
-
     }
   }, [form, data]);
 

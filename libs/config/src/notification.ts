@@ -48,6 +48,15 @@ export const NotificationConfigSchema = Type.Object({
     officialAccount: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "是否启用公众号", default: false }),
     })),
+    weCom: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否启用企业微信", default: false }),
+    })),
+    dingTalk: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否启用钉钉", default: false }),
+    })),
+    lark: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "是否启用飞书", default: false }),
+    })),
   }),
 
   messageBridge: Type.Optional(Type.Object({
