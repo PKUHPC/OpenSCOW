@@ -13,7 +13,7 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.10.9",
+    "@grpc/grpc-js": "1.12.2",
     "long": "5.2.3",
     "protobufjs": "7.3.2"
   },

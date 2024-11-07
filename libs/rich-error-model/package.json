@@ -15,16 +15,16 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.10.9",
+    "@grpc/grpc-js": "1.12.2",
     "long": "5.2.3",
     "protobufjs": "7.3.2"
   },
   "devDependencies": {
-    "ts-proto": "1.180.0",
-    "@ddadaal/tsgrpc-server": "0.19.5",
-    "@ddadaal/tsgrpc-common": "0.2.5",
     "@ddadaal/tsgrpc-client": "0.17.7",
-    "@scow/protos": "workspace:*"
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-server": "0.19.5",
+    "@scow/protos": "workspace:*",
+    "ts-proto": "1.180.0"
   },
   "keywords": [],
   "author": "",

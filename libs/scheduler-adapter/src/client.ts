@@ -18,6 +18,8 @@ import { JobServiceClient } from "@scow/scheduler-adapter-protos/build/protos/jo
 import { UserServiceClient } from "@scow/scheduler-adapter-protos/build/protos/user";
 import { VersionServiceClient } from "@scow/scheduler-adapter-protos/build/protos/version";
 
+import { SslConfig } from "./ssl";
+
 type ClientConstructor<TClient> =
   new (address: string, credentials: ChannelCredentials) => TClient;
 
@@ -31,21 +33,28 @@ export interface SchedulerAdapterClient {
 }
 
 export function getClient<TClient>(
-  address: string, ctor: ClientConstructor<TClient>,
+  address: string, sslConfig: SslConfig, ctor: ClientConstructor<TClient>,
 ): TClient {
+  if (sslConfig.enabled) {
+    return new ctor(
+      address,
+      ChannelCredentials.createSsl(sslConfig.ca, sslConfig.key, sslConfig.cert),
+    );
+  }
+
   return new ctor(
     address,
     ChannelCredentials.createInsecure(),
   );
 }
 
-export const getSchedulerAdapterClient = (address: string) => {
+export const getSchedulerAdapterClient = (address: string, sslConfig: SslConfig) => {
   return {
-    account: getClient(address, AccountServiceClient),
-    user: getClient(address, UserServiceClient),
-    job: getClient(address, JobServiceClient),
-    config: getClient(address, ConfigServiceClient),
-    version: getClient(address, VersionServiceClient),
-    app: getClient(address, AppServiceClient),
+    account: getClient(address, sslConfig, AccountServiceClient),
+    user: getClient(address, sslConfig, UserServiceClient),
+    job: getClient(address, sslConfig, JobServiceClient),
+    config: getClient(address, sslConfig, ConfigServiceClient),
+    version: getClient(address, sslConfig, VersionServiceClient),
+    app: getClient(address, sslConfig, AppServiceClient),
   } as SchedulerAdapterClient;
 };

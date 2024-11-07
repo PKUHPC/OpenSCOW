@@ -39,6 +39,11 @@ export const config = envConfig({
   SCOWD_SSL_SCOW_CERT_PATH: str({ desc: "SCOWD CA签名的 SCOW 证书路径", default: "./scowd/certs/scow.crt" }),
   SCOWD_SSL_SCOW_PRIVATE_KEY_PATH: str({ desc: "SCOWD CA签名的 SCOW 私钥路径", default: "./scowd/certs/scow.key" }),
 
+  ADAPTER_SSL_ENABLED: bool({ desc: "到适配器的连接是否启动SSL", default: false }),
+  ADAPTER_SSL_CA_CERT_PATH: str({ desc: "适配器 CA根证书路径", default: "./adapter/certs/ca.crt" }),
+  ADAPTER_SSL_SCOW_CERT_PATH: str({ desc: "适配器 CA签名的 SCOW 证书路径", default: "./adapter/certs/scow.crt" }),
+  ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: str({ desc: "适配器 CA签名的 SCOW 私钥路径", default: "./adapter/certs/scow.key" }),
+
 });
 
 export const rootKeyPair = getKeyPair(config.SSH_PRIVATE_KEY_PATH, config.SSH_PUBLIC_KEY_PATH);

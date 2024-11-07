@@ -14,12 +14,14 @@ import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
 import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
-import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import {
+  createAdapterCertificates, getSchedulerAdapterClient, SchedulerAdapterClient,
+} from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
-import { rootKeyPair } from "src/config/env";
+import { config, rootKeyPair } from "src/config/env";
 
 type CallOnAllResult<T> = {
   cluster: string;
@@ -49,6 +51,8 @@ export interface ClusterPlugin {
 
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
+
+export const certificates = createAdapterCertificates(config);
 
 export const clustersPlugin = plugin(async (f) => {
 
@@ -83,7 +87,7 @@ export const clustersPlugin = plugin(async (f) => {
 
   // adapterClient of all config clusters
   const adapterClientForClusters = Object.entries(configClusters).reduce((prev, [cluster, c]) => {
-    const client = getSchedulerAdapterClient(c.adapterUrl);
+    const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
 
     prev[cluster] = client;
 
@@ -93,7 +97,7 @@ export const clustersPlugin = plugin(async (f) => {
   // adapterClients of activated clusters
   const getAdapterClientForActivatedClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
     return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
-      const client = getSchedulerAdapterClient(c.adapterUrl);
+      const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
       prev[cluster] = client;
       return prev;
     }, {} as Record<string, SchedulerAdapterClient>);

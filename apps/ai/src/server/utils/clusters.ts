@@ -29,7 +29,10 @@ import { ConfigServiceClient } from "@scow/ai-scheduler-adapter-protos/build/pro
 import { JobServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { UserServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/user";
 import { VersionServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/version";
+import { createAdapterCertificates } from "@scow/lib-scheduler-adapter";
+import { SslConfig } from "@scow/lib-scheduler-adapter/build/ssl";
 import { clusters } from "src/server/config/clusters";
+import { config } from "src/server/config/env";
 
 type ClientConstructor<TClient> =
   new (address: string, credentials: ChannelCredentials) => TClient;
@@ -44,27 +47,36 @@ export interface SchedulerAdapterClient {
 }
 
 export function getClient<TClient>(
-  address: string, ctor: ClientConstructor<TClient>,
+  address: string, sslConfig: SslConfig, ctor: ClientConstructor<TClient>,
 ): TClient {
+  if (sslConfig.enabled) {
+    return new ctor(
+      address,
+      ChannelCredentials.createSsl(sslConfig.ca, sslConfig.key, sslConfig.cert),
+    );
+  }
+
   return new ctor(
     address,
     ChannelCredentials.createInsecure(),
   );
 }
 
-export const getSchedulerAdapterClient = (address: string) => {
+export const certificates = createAdapterCertificates(config);
+
+export const getSchedulerAdapterClient = (address: string, sslConfig: SslConfig) => {
   return {
-    account: getClient(address, AccountServiceClient),
-    user: getClient(address, UserServiceClient),
-    job: getClient(address, JobServiceClient),
-    config: getClient(address, ConfigServiceClient),
-    version: getClient(address, VersionServiceClient),
-    app: getClient(address, AppServiceClient),
+    account: getClient(address, sslConfig, AccountServiceClient),
+    user: getClient(address, sslConfig, UserServiceClient),
+    job: getClient(address, sslConfig, JobServiceClient),
+    config: getClient(address, sslConfig, ConfigServiceClient),
+    version: getClient(address, sslConfig, VersionServiceClient),
+    app: getClient(address, sslConfig, AppServiceClient),
   } as SchedulerAdapterClient;
 };
 
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
-  const client = getSchedulerAdapterClient(c.adapterUrl);
+  const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
   prev[cluster] = client;
   return prev;
 }, {} as Record<string, SchedulerAdapterClient>);

@@ -18,15 +18,15 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "keywords": [],
   "dependencies": {
-    "@ddadaal/tsgrpc-common": "0.2.5",
-    "@ddadaal/tsgrpc-client": "0.17.7",
-    "@ddadaal/tsgrpc-server": "0.19.6",
     "@bufbuild/protobuf": "1.8.0",
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-node": "1.4.0",
-    "@grpc/grpc-js": "1.10.9",
-    "@scow/scow-resource-protos": "workspace:*",
+    "@ddadaal/tsgrpc-client": "0.17.7",
+    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-server": "0.19.6",
+    "@grpc/grpc-js": "1.12.2",
     "@scow/config": "workspace:*",
+    "@scow/scow-resource-protos": "workspace:*",
     "ts-log": "2.2.5"
   },
   "volta": {

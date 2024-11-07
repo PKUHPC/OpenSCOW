@@ -117,13 +117,13 @@ importers:
         version: 5.3.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@kubernetes/client-node':
         specifier: ^0.21.0
         version: 0.21.0
@@ -160,6 +160,9 @@ importers:
       '@scow/lib-operation-log':
         specifier: workspace:*
         version: link:../../libs/operation-log
+      '@scow/lib-scheduler-adapter':
+        specifier: workspace:*
+        version: link:../../libs/scheduler-adapter
       '@scow/lib-server':
         specifier: workspace:*
         version: link:../../libs/server
@@ -367,16 +370,16 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@mikro-orm/cli':
         specifier: 6.3.13
         version: 6.3.13(mariadb@3.3.2)
@@ -602,16 +605,16 @@ importers:
         version: 1.8.0
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@mikro-orm/cli':
         specifier: 6.3.13
         version: 6.3.13(mariadb@3.3.2)
@@ -726,13 +729,13 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.32.34)(next@14.2.4(patch_hash=xwomt2iqq5liv3pq43ybpoioua)(@babel/core@7.24.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.23.8)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -913,10 +916,10 @@ importers:
         version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@mikro-orm/cli':
         specifier: 6.3.13
         version: 6.3.13(mariadb@3.3.2)
@@ -1100,16 +1103,16 @@ importers:
         version: 1.4.0(@bufbuild/protobuf@1.10.0)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.8
-        version: 0.17.8(@grpc/grpc-js@1.10.9)
+        version: 0.17.8(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.6
         version: 0.2.6
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/config':
         specifier: workspace:*
         version: link:../../libs/config
@@ -1224,7 +1227,7 @@ importers:
         version: 0.8.2(@sinclair/typebox@0.32.34)(next@14.2.4(patch_hash=xwomt2iqq5liv3pq43ybpoioua)(@babel/core@7.24.4)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(zod@3.23.8)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
@@ -1238,8 +1241,8 @@ importers:
         specifier: 3.2.2
         version: 3.2.2(react@18.3.1)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@monaco-editor/react':
         specifier: ^4.6.0
         version: 4.6.0(monaco-editor@0.50.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1290,7 +1293,7 @@ importers:
         version: 4.22.2(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)
       '@uiw/react-codemirror':
         specifier: 4.21.20
-        version: 4.21.20(@babel/runtime@7.25.6)(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1))(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.28.2)(codemirror@6.0.1(@lezer/common@1.2.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 4.21.20(@babel/runtime@7.25.6)(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3))(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.28.2)(codemirror@6.0.1(@lezer/common@1.2.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@xterm/addon-fit':
         specifier: 0.10.0
         version: 0.10.0(@xterm/xterm@5.5.0)
@@ -1462,16 +1465,16 @@ importers:
         version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@mikro-orm/core':
         specifier: 6.3.13
         version: 6.3.13
@@ -1660,10 +1663,10 @@ importers:
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        version: 0.19.5(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/lib-config':
         specifier: workspace:*
         version: link:../../libs/libconfig
@@ -1761,10 +1764,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1816,8 +1819,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/notification-protos':
         specifier: workspace:*
         version: link:../protos/notification
@@ -1826,10 +1829,10 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1844,8 +1847,8 @@ importers:
   libs/protos/ai-scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1882,8 +1885,8 @@ importers:
   libs/protos/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1898,8 +1901,8 @@ importers:
   libs/protos/scow:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/grpc-api':
         specifier: workspace:*
         version: link:../../../protos
@@ -1932,8 +1935,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       protobufjs:
         specifier: 7.3.2
         version: 7.3.2
@@ -1963,8 +1966,8 @@ importers:
   libs/rich-error-model:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       long:
         specifier: 5.2.3
         version: 5.2.3
@@ -1974,13 +1977,13 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.5
-        version: 0.19.5(@grpc/grpc-js@1.10.9)
+        version: 0.19.5(@grpc/grpc-js@1.12.2)
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -1991,8 +1994,8 @@ importers:
   libs/scheduler-adapter:
     dependencies:
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/protos':
         specifier: workspace:*
         version: link:../protos/scow
@@ -2013,16 +2016,16 @@ importers:
         version: 1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -2045,8 +2048,8 @@ importers:
         specifier: 1.4.0
         version: 1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/scowd-protos':
         specifier: workspace:*
         version: link:../protos/scowd
@@ -2055,13 +2058,13 @@ importers:
     dependencies:
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@ddadaal/tsgrpc-common':
         specifier: 0.2.5
         version: 0.2.5
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -2095,7 +2098,7 @@ importers:
     devDependencies:
       '@ddadaal/tsgrpc-server':
         specifier: 0.19.6
-        version: 0.19.6(@grpc/grpc-js@1.10.9)
+        version: 0.19.6(@grpc/grpc-js@1.12.2)
       '@types/shell-quote':
         specifier: 1.7.5
         version: 1.7.5
@@ -2128,10 +2131,10 @@ importers:
         version: 1.21.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
-        version: 0.17.7(@grpc/grpc-js@1.10.9)
+        version: 0.17.7(@grpc/grpc-js@1.12.2)
       '@grpc/grpc-js':
-        specifier: 1.10.9
-        version: 1.10.9
+        specifier: 1.12.2
+        version: 1.12.2
       '@scow/config':
         specifier: workspace:*
         version: link:../config
@@ -2323,6 +2326,10 @@ packages:
     resolution: {integrity: sha512-y5+tLQyV8pg3fsiln67BVLD1P13Eg4lh5RW9mF0zUuvLrv9uIQ4MCL+CRT+FTsBlBjcIan6PGsLcBN0m3ClUyQ==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/code-frame@7.26.2':
+    resolution: {integrity: sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/compat-data@7.24.4':
     resolution: {integrity: sha512-vg8Gih2MLK+kOkHJp4gBEIkyaIi00jgWot2D9QOmmfLC8jINSOzmCLta6Bvz/JSBCqnegV0L80jhxkol5GWNfQ==}
     engines: {node: '>=6.9.0'}
@@ -2432,6 +2439,10 @@ packages:
 
   '@babel/helper-validator-identifier@7.22.20':
     resolution: {integrity: sha512-Y4OZ+ytlatR8AI+8KZfKuL5urKp7qey08ha31L8b3BwewJAoJamTzyvxPR/5D+KkdJCGPq/+8TukHBlY10FX9A==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.25.9':
+    resolution: {integrity: sha512-Ed61U6XJc3CVRfkERJWDz4dJwKe7iLmmJsbOGu9wSloNSFttHV0I8g6UAgb7qnK5ly5bGLPd4oXZlxCdANBOWQ==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-validator-option@7.23.5':
@@ -2979,6 +2990,10 @@ packages:
     resolution: {integrity: sha512-VBj9MYyDb9tuLq7yzqjgzt6Q+IBQLrGZfdjOekyEirZPHxXWoTSGUTMrpsfi58Up73d13NfYLv8HT9vmznjzhQ==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/runtime@7.26.0':
+    resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/template@7.24.0':
     resolution: {integrity: sha512-Bkf2q8lMB0AFpX0NFEqSbx1OkTHf0f+0j82mkw+ZpzBnkk7e9Ql0891vlfgi+kHwOk8tQjiQHpqh4LaSa0fKEA==}
     engines: {node: '>=6.9.0'}
@@ -3173,6 +3188,9 @@ packages:
 
   '@codemirror/commands@6.4.0':
     resolution: {integrity: sha512-HB3utD5GxCvEhSyj5EuG9KpuQQhFpxalh3lwrspyL/GeSNDe4c6JDxVzL12SJ+7gUknHjZzmq7OPCb9QPgiRmQ==}
+
+  '@codemirror/commands@6.7.1':
+    resolution: {integrity: sha512-llTrboQYw5H4THfhN4U3qCnSZ1SOJ60ohhz+SzU0ADGtwlc533DtklQP0vSFaQuCPDn3BPpOd1GbbnUtwNjsrw==}
 
   '@codemirror/language@6.10.2':
     resolution: {integrity: sha512-kgbTYTo0Au6dCSc/TFy7fK3fpJmgHDv1sG1KNQKJXVi+xBTEeBPY/M30YXiU6mMXeH+YIDLsbrT4ZwNRdtF+SA==}
@@ -3639,8 +3657,18 @@ packages:
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
 
+  '@eslint-community/eslint-utils@4.4.1':
+    resolution: {integrity: sha512-s3O3waFUrMV8P/XaF/+ZTp1X9XBZW1a4B97ZnjQF2KYWaFD2A8KyFBsrsfSjEmjn3RGWAIuvlneuZm3CUK3jbA==}
+    engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
+    peerDependencies:
+      eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
+
   '@eslint-community/regexpp@4.10.0':
     resolution: {integrity: sha512-Cu96Sd2By9mCNTx2iyKOmq10v22jUVQv0lQnlGNy16oE9589yE+QADPbrMGCkA51cKZSg3Pu/aTJVTGfL/qjUA==}
+    engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
+
+  '@eslint-community/regexpp@4.12.1':
+    resolution: {integrity: sha512-CCZCDJuduB9OUkFkY2IgppNZMi2lBQgD2qzwXkEia16cge2pijY/aXi96CJMquDMn3nJdlPV1A5KrJEXwfLNzQ==}
     engines: {node: ^12.0.0 || ^14.0.0 || >=16.0.0}
 
   '@eslint/config-array@0.17.0':
@@ -3697,8 +3725,8 @@ packages:
   '@fastify/view@9.1.0':
     resolution: {integrity: sha512-jRTGDljs/uB2p8bf6c1x4stGjP7H84VQkhbtDgCx55Mxf9Fplud5UZIHubvL4BTTX8jNYEzP1FpNAOBi7vibxg==}
 
-  '@grpc/grpc-js@1.10.9':
-    resolution: {integrity: sha512-5tcgUctCG0qoNyfChZifz2tJqbRbXVO9J7X6duFcOjY3HUNCxg5D0ZCK7EP9vIcZ0zRpLU9bWkyCqVCLZ46IbQ==}
+  '@grpc/grpc-js@1.12.2':
+    resolution: {integrity: sha512-bgxdZmgTrJZX50OjyVwz3+mNEnCTNkh3cIqGPWVNeW9jX6bn1ZkU80uPd+67/ZpIJIjRQ9qaHCjhavyoWYxumg==}
     engines: {node: '>=12.10.0'}
 
   '@grpc/proto-loader@0.7.13':
@@ -3844,8 +3872,14 @@ packages:
   '@lezer/common@1.2.1':
     resolution: {integrity: sha512-yemX0ZD2xS/73llMZIK6KplkjIjf2EvAHcinDi/TfJ9hS25G0388+ClHt6/3but0oOxinTcQHJLDXh6w1crzFQ==}
 
+  '@lezer/common@1.2.3':
+    resolution: {integrity: sha512-w7ojc8ejBqr2REPsWxJjrMFsA/ysDCFICn8zEOR9mrqzOu2amhITYuLD8ag6XZf0CFXDrhKqw7+tW8cX66NaDA==}
+
   '@lezer/highlight@1.2.0':
     resolution: {integrity: sha512-WrS5Mw51sGrpqjlh3d4/fOwpEV2Hd3YOkp9DBt4k8XZQcoTHZFB7sx030A6OcahF4J1nDQAa3jXlTVVYH50IFA==}
+
+  '@lezer/highlight@1.2.1':
+    resolution: {integrity: sha512-Z5duk4RN/3zuVO7Jq0pGLJ3qynpxUVsh7IbUbGj88+uV2ApSAn6kWg2au3iJb+0Zi7kKtqffIESgNcRXWZWmSA==}
 
   '@lezer/lr@1.4.0':
     resolution: {integrity: sha512-Wst46p51km8gH0ZUmeNrtpRYmdlRHUpN1DQd3GFAyKANi8WVz8c2jHYTf1CVScFaCjQw1iO3ZZdqGDxQPRErTg==}
@@ -5155,8 +5189,8 @@ packages:
       typescript:
         optional: true
 
-  '@typescript-eslint/scope-manager@7.13.1':
-    resolution: {integrity: sha512-adbXNVEs6GmbzaCpymHQ0MB6E4TqoiVbC0iqG3uijR8ZYfpAXMGttouQzF4Oat3P2GxDVIrg7bMI/P65LiQZdg==}
+  '@typescript-eslint/scope-manager@7.18.0':
+    resolution: {integrity: sha512-jjhdIE/FPF2B7Z1uzc6i3oWKbGcHb87Qw7AWj6jmEqNOfDFbJWtjt/XfwCpvNkpGWlcJaog5vTR+VV8+w9JflA==}
     engines: {node: ^18.18.0 || >=20.0.0}
 
   '@typescript-eslint/scope-manager@8.0.0-alpha.30':
@@ -5176,8 +5210,8 @@ packages:
       typescript:
         optional: true
 
-  '@typescript-eslint/types@7.13.1':
-    resolution: {integrity: sha512-7K7HMcSQIAND6RBL4kDl24sG/xKM13cA85dc7JnmQXw2cBDngg7c19B++JzvJHRG3zG36n9j1i451GBzRuHchw==}
+  '@typescript-eslint/types@7.18.0':
+    resolution: {integrity: sha512-iZqi+Ds1y4EDYUtlOOC+aUmxnE9xS/yCigkjA7XpTKV6nCBd3Hp/PRGGmdwnfkV2ThMyYldP1wRpm/id99spTQ==}
     engines: {node: ^18.18.0 || >=20.0.0}
 
   '@typescript-eslint/types@8.0.0-alpha.30':
@@ -5188,8 +5222,8 @@ packages:
     resolution: {integrity: sha512-COx2JJSRdgemh/0vGKip3z2wYcfyZ1ZgZ9durBM6+NDK1OSaVYesWNl2hfwRm0XNd6SxghKjfESwbGghcTK2UQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typescript-eslint/typescript-estree@7.13.1':
-    resolution: {integrity: sha512-uxNr51CMV7npU1BxZzYjoVz9iyjckBduFBP0S5sLlh1tXYzHzgZ3BR9SVsNed+LmwKrmnqN3Kdl5t7eZ5TS1Yw==}
+  '@typescript-eslint/typescript-estree@7.18.0':
+    resolution: {integrity: sha512-aP1v/BSPnnyhMHts8cf1qQ6Q1IFwwRvAQGRvBFkWlo3/lH29OXA3Pts+c10nxRxIBrDnoMqzhgdwVe5f2D6OzA==}
     engines: {node: ^18.18.0 || >=20.0.0}
     peerDependencies:
       typescript: '*'
@@ -5215,8 +5249,8 @@ packages:
       typescript:
         optional: true
 
-  '@typescript-eslint/utils@7.13.1':
-    resolution: {integrity: sha512-h5MzFBD5a/Gh/fvNdp9pTfqJAbuQC4sCN2WzuXme71lqFJsZtLbjxfSk4r3p02WIArOF9N94pdsLiGutpDbrXQ==}
+  '@typescript-eslint/utils@7.18.0':
+    resolution: {integrity: sha512-kK0/rNa2j74XuHVcoCZxdFBMF+aq/vH83CXAOHieC+2Gis4mF8jJXT5eAfyD3K0sAxtPuwxaIOIOvhwzVDt/kw==}
     engines: {node: ^18.18.0 || >=20.0.0}
     peerDependencies:
       eslint: ^8.56.0
@@ -5233,8 +5267,8 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
 
-  '@typescript-eslint/visitor-keys@7.13.1':
-    resolution: {integrity: sha512-k/Bfne7lrP7hcb7m9zSsgcBmo+8eicqqfNAJ7uUY+jkTFpKeH2FSkWpFRtimBxgkyvqfu9jTPRbYOvud6isdXA==}
+  '@typescript-eslint/visitor-keys@7.18.0':
+    resolution: {integrity: sha512-cDF0/Gf81QpY3xYyJKDV14Zwdmid5+uuENhjH2EqFaF0ni+yAyq/LzMaIJdhNJXZI7uLzwIlA+V7oWoyn6Curg==}
     engines: {node: ^18.18.0 || >=20.0.0}
 
   '@typescript-eslint/visitor-keys@8.0.0-alpha.30':
@@ -6678,6 +6712,15 @@ packages:
       supports-color:
         optional: true
 
+  debug@4.3.7:
+    resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
+    engines: {node: '>=6.0'}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
   decamelize@1.2.0:
     resolution: {integrity: sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA==}
     engines: {node: '>=0.10.0'}
@@ -7982,6 +8025,10 @@ packages:
 
   ignore@5.3.1:
     resolution: {integrity: sha512-5Fytz/IraMjqpwfd34ke28PTVMjZjJG2MPn5t7OE4eUCUNf8BAa7b5WUS9/Qvr6mwOQS7Mk6vdsMno5he+T8Xw==}
+    engines: {node: '>= 4'}
+
+  ignore@5.3.2:
+    resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
   image-size@0.5.5:
@@ -9309,6 +9356,10 @@ packages:
     resolution: {integrity: sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  minimatch@9.0.5:
+    resolution: {integrity: sha512-G6T0ZX48xgozx7587koeX9Ys2NYy6Gmv//P89sEte9V9whIapMNF4idKxnW2QtCcLiTWlb/wfCabAtAFWhhBow==}
+    engines: {node: '>=16 || 14 >=14.17'}
+
   minimist@1.2.7:
     resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
 
@@ -9909,6 +9960,9 @@ packages:
 
   picocolors@1.0.0:
     resolution: {integrity: sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ==}
+
+  picocolors@1.1.1:
+    resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
 
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
@@ -11559,6 +11613,11 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
+  semver@7.6.3:
+    resolution: {integrity: sha512-oVekP1cKtI+CTDvHWYFUcMtsK/00wmAEfyqKfNdARm8u1wNVhSgaX7A8d4UuIlUI5e84iEwOhs7ZPYRmzU9U6A==}
+    engines: {node: '>=10'}
+    hasBin: true
+
   send@0.18.0:
     resolution: {integrity: sha512-qqWzuOjSFOuqPjFe4NOsMLafToQQwBSOEpS+FwEt3A2V3vKubTquT3vmLTQpFgMXp8AlFWFuP1qKaJZOtPpVXg==}
     engines: {node: '>= 0.8.0'}
@@ -12251,6 +12310,12 @@ packages:
 
   ts-api-utils@1.3.0:
     resolution: {integrity: sha512-UQMIo7pb8WRomKR1/+MFVLTroIvDVtMX3K6OUir8ynLyzB8Jeriont2bTAtmNPa1ekAgN7YPDyf6V+ygrdU+eQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      typescript: '>=4.2.0'
+
+  ts-api-utils@1.4.0:
+    resolution: {integrity: sha512-032cPxaEKwM+GT3vA5JXNzIaizx388rhsSW79vGRNGXfRRAdEAn2mvk36PvK5HnOchyWZ7afLEXqYCvPCrzuzQ==}
     engines: {node: '>=16'}
     peerDependencies:
       typescript: '>=4.2.0'
@@ -13228,6 +13293,12 @@ snapshots:
       '@babel/highlight': 7.24.2
       picocolors: 1.0.0
 
+  '@babel/code-frame@7.26.2':
+    dependencies:
+      '@babel/helper-validator-identifier': 7.25.9
+      js-tokens: 4.0.0
+      picocolors: 1.1.1
+
   '@babel/compat-data@7.24.4': {}
 
   '@babel/core@7.24.4':
@@ -13304,7 +13375,7 @@ snapshots:
       '@babel/core': 7.24.4
       '@babel/helper-compilation-targets': 7.23.6
       '@babel/helper-plugin-utils': 7.24.0
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       lodash.debounce: 4.0.8
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -13373,6 +13444,8 @@ snapshots:
   '@babel/helper-string-parser@7.24.1': {}
 
   '@babel/helper-validator-identifier@7.22.20': {}
+
+  '@babel/helper-validator-identifier@7.25.9': {}
 
   '@babel/helper-validator-option@7.23.5': {}
 
@@ -14017,6 +14090,10 @@ snapshots:
     dependencies:
       regenerator-runtime: 0.14.1
 
+  '@babel/runtime@7.26.0':
+    dependencies:
+      regenerator-runtime: 0.14.1
+
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.24.2
@@ -14294,12 +14371,12 @@ snapshots:
       human-id: 1.0.2
       prettier: 2.8.8
 
-  '@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1)':
+  '@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3)':
     dependencies:
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
       '@codemirror/view': 6.28.2
-      '@lezer/common': 1.2.1
+      '@lezer/common': 1.2.3
 
   '@codemirror/commands@6.4.0':
     dependencies:
@@ -14307,6 +14384,13 @@ snapshots:
       '@codemirror/state': 6.4.1
       '@codemirror/view': 6.28.2
       '@lezer/common': 1.2.1
+
+  '@codemirror/commands@6.7.1':
+    dependencies:
+      '@codemirror/language': 6.10.2
+      '@codemirror/state': 6.4.1
+      '@codemirror/view': 6.28.2
+      '@lezer/common': 1.2.3
 
   '@codemirror/language@6.10.2':
     dependencies:
@@ -14340,7 +14424,7 @@ snapshots:
       '@codemirror/language': 6.10.2
       '@codemirror/state': 6.4.1
       '@codemirror/view': 6.28.2
-      '@lezer/highlight': 1.2.0
+      '@lezer/highlight': 1.2.1
 
   '@codemirror/view@6.28.2':
     dependencies:
@@ -14489,16 +14573,16 @@ snapshots:
       tslib: 2.6.1
       zod: 3.23.8
 
-  '@ddadaal/tsgrpc-client@0.17.7(@grpc/grpc-js@1.10.9)':
+  '@ddadaal/tsgrpc-client@0.17.7(@grpc/grpc-js@1.12.2)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.5
-      '@grpc/grpc-js': 1.10.9
+      '@grpc/grpc-js': 1.12.2
       tslib: 2.6.2
 
-  '@ddadaal/tsgrpc-client@0.17.8(@grpc/grpc-js@1.10.9)':
+  '@ddadaal/tsgrpc-client@0.17.8(@grpc/grpc-js@1.12.2)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.6
-      '@grpc/grpc-js': 1.10.9
+      '@grpc/grpc-js': 1.12.2
       tslib: 2.6.3
 
   '@ddadaal/tsgrpc-common@0.2.5':
@@ -14509,17 +14593,17 @@ snapshots:
     dependencies:
       tslib: 2.6.3
 
-  '@ddadaal/tsgrpc-server@0.19.5(@grpc/grpc-js@1.10.9)':
+  '@ddadaal/tsgrpc-server@0.19.5(@grpc/grpc-js@1.12.2)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.5
-      '@grpc/grpc-js': 1.10.9
+      '@grpc/grpc-js': 1.12.2
       pino: 8.16.2
       tslib: 2.6.2
 
-  '@ddadaal/tsgrpc-server@0.19.6(@grpc/grpc-js@1.10.9)':
+  '@ddadaal/tsgrpc-server@0.19.6(@grpc/grpc-js@1.12.2)':
     dependencies:
       '@ddadaal/tsgrpc-common': 0.2.6
-      '@grpc/grpc-js': 1.10.9
+      '@grpc/grpc-js': 1.12.2
       pino: 9.3.2
       tslib: 2.6.3
 
@@ -15207,7 +15291,7 @@ snapshots:
 
   '@docusaurus/react-loadable@5.5.2(react@18.2.0)':
     dependencies:
-      '@types/react': 18.3.3
+      '@types/react': 18.2.37
       prop-types: 15.8.1
       react: 18.2.0
 
@@ -15626,7 +15710,14 @@ snapshots:
       eslint: 9.6.0
       eslint-visitor-keys: 3.4.3
 
+  '@eslint-community/eslint-utils@4.4.1(eslint@9.6.0)':
+    dependencies:
+      eslint: 9.6.0
+      eslint-visitor-keys: 3.4.3
+
   '@eslint-community/regexpp@4.10.0': {}
+
+  '@eslint-community/regexpp@4.12.1': {}
 
   '@eslint/config-array@0.17.0':
     dependencies:
@@ -15705,7 +15796,7 @@ snapshots:
       fastify-plugin: 4.5.1
       toad-cache: 3.7.0
 
-  '@grpc/grpc-js@1.10.9':
+  '@grpc/grpc-js@1.12.2':
     dependencies:
       '@grpc/proto-loader': 0.7.13
       '@js-sdsl/ordered-map': 4.4.2
@@ -15975,9 +16066,15 @@ snapshots:
 
   '@lezer/common@1.2.1': {}
 
+  '@lezer/common@1.2.3': {}
+
   '@lezer/highlight@1.2.0':
     dependencies:
       '@lezer/common': 1.2.1
+
+  '@lezer/highlight@1.2.1':
+    dependencies:
+      '@lezer/common': 1.2.3
 
   '@lezer/lr@1.4.0':
     dependencies:
@@ -16772,7 +16869,7 @@ snapshots:
   '@stylistic/eslint-plugin-plus@2.3.0(eslint@9.6.0)(typescript@5.5.2)':
     dependencies:
       '@types/eslint': 8.56.10
-      '@typescript-eslint/utils': 7.13.1(eslint@9.6.0)(typescript@5.5.2)
+      '@typescript-eslint/utils': 7.18.0(eslint@9.6.0)(typescript@5.5.2)
       eslint: 9.6.0
     transitivePeerDependencies:
       - supports-color
@@ -16782,7 +16879,7 @@ snapshots:
     dependencies:
       '@stylistic/eslint-plugin-js': 2.3.0(eslint@9.6.0)
       '@types/eslint': 8.56.10
-      '@typescript-eslint/utils': 7.13.1(eslint@9.6.0)(typescript@5.5.2)
+      '@typescript-eslint/utils': 7.18.0(eslint@9.6.0)(typescript@5.5.2)
       eslint: 9.6.0
     transitivePeerDependencies:
       - supports-color
@@ -17344,8 +17441,8 @@ snapshots:
 
   '@testing-library/dom@10.0.0':
     dependencies:
-      '@babel/code-frame': 7.24.2
-      '@babel/runtime': 7.25.6
+      '@babel/code-frame': 7.26.2
+      '@babel/runtime': 7.26.0
       '@types/aria-query': 5.0.4
       aria-query: 5.3.0
       chalk: 4.1.2
@@ -17798,7 +17895,7 @@ snapshots:
 
   '@typescript-eslint/eslint-plugin@8.0.0-alpha.62(@typescript-eslint/parser@8.0.0-alpha.62(eslint@9.6.0)(typescript@5.5.2))(eslint@9.6.0)(typescript@5.5.2)':
     dependencies:
-      '@eslint-community/regexpp': 4.10.0
+      '@eslint-community/regexpp': 4.12.1
       '@typescript-eslint/parser': 8.0.0-alpha.62(eslint@9.6.0)(typescript@5.5.2)
       '@typescript-eslint/scope-manager': 8.0.0-alpha.62
       '@typescript-eslint/type-utils': 8.0.0-alpha.62(eslint@9.6.0)(typescript@5.5.2)
@@ -17806,9 +17903,9 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.0.0-alpha.62
       eslint: 9.6.0
       graphemer: 1.4.0
-      ignore: 5.3.1
+      ignore: 5.3.2
       natural-compare: 1.4.0
-      ts-api-utils: 1.3.0(typescript@5.5.2)
+      ts-api-utils: 1.4.0(typescript@5.5.2)
     optionalDependencies:
       typescript: 5.5.2
     transitivePeerDependencies:
@@ -17820,17 +17917,17 @@ snapshots:
       '@typescript-eslint/types': 8.0.0-alpha.62
       '@typescript-eslint/typescript-estree': 8.0.0-alpha.62(typescript@5.5.2)
       '@typescript-eslint/visitor-keys': 8.0.0-alpha.62
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       eslint: 9.6.0
     optionalDependencies:
       typescript: 5.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@7.13.1':
+  '@typescript-eslint/scope-manager@7.18.0':
     dependencies:
-      '@typescript-eslint/types': 7.13.1
-      '@typescript-eslint/visitor-keys': 7.13.1
+      '@typescript-eslint/types': 7.18.0
+      '@typescript-eslint/visitor-keys': 7.18.0
 
   '@typescript-eslint/scope-manager@8.0.0-alpha.30':
     dependencies:
@@ -17846,30 +17943,30 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.0.0-alpha.62(typescript@5.5.2)
       '@typescript-eslint/utils': 8.0.0-alpha.62(eslint@9.6.0)(typescript@5.5.2)
-      debug: 4.3.4(supports-color@5.5.0)
-      ts-api-utils: 1.3.0(typescript@5.5.2)
+      debug: 4.3.7
+      ts-api-utils: 1.4.0(typescript@5.5.2)
     optionalDependencies:
       typescript: 5.5.2
     transitivePeerDependencies:
       - eslint
       - supports-color
 
-  '@typescript-eslint/types@7.13.1': {}
+  '@typescript-eslint/types@7.18.0': {}
 
   '@typescript-eslint/types@8.0.0-alpha.30': {}
 
   '@typescript-eslint/types@8.0.0-alpha.62': {}
 
-  '@typescript-eslint/typescript-estree@7.13.1(typescript@5.5.2)':
+  '@typescript-eslint/typescript-estree@7.18.0(typescript@5.5.2)':
     dependencies:
-      '@typescript-eslint/types': 7.13.1
-      '@typescript-eslint/visitor-keys': 7.13.1
-      debug: 4.3.4(supports-color@5.5.0)
+      '@typescript-eslint/types': 7.18.0
+      '@typescript-eslint/visitor-keys': 7.18.0
+      debug: 4.3.7
       globby: 11.1.0
       is-glob: 4.0.3
-      minimatch: 9.0.4
-      semver: 7.6.2
-      ts-api-utils: 1.3.0(typescript@5.5.2)
+      minimatch: 9.0.5
+      semver: 7.6.3
+      ts-api-utils: 1.4.0(typescript@5.5.2)
     optionalDependencies:
       typescript: 5.5.2
     transitivePeerDependencies:
@@ -17879,7 +17976,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.0.0-alpha.30
       '@typescript-eslint/visitor-keys': 8.0.0-alpha.30
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.4
@@ -17894,23 +17991,23 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 8.0.0-alpha.62
       '@typescript-eslint/visitor-keys': 8.0.0-alpha.62
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       globby: 11.1.0
       is-glob: 4.0.3
-      minimatch: 9.0.4
-      semver: 7.6.2
-      ts-api-utils: 1.3.0(typescript@5.5.2)
+      minimatch: 9.0.5
+      semver: 7.6.3
+      ts-api-utils: 1.4.0(typescript@5.5.2)
     optionalDependencies:
       typescript: 5.5.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@7.13.1(eslint@9.6.0)(typescript@5.5.2)':
+  '@typescript-eslint/utils@7.18.0(eslint@9.6.0)(typescript@5.5.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@9.6.0)
-      '@typescript-eslint/scope-manager': 7.13.1
-      '@typescript-eslint/types': 7.13.1
-      '@typescript-eslint/typescript-estree': 7.13.1(typescript@5.5.2)
+      '@eslint-community/eslint-utils': 4.4.1(eslint@9.6.0)
+      '@typescript-eslint/scope-manager': 7.18.0
+      '@typescript-eslint/types': 7.18.0
+      '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.5.2)
       eslint: 9.6.0
     transitivePeerDependencies:
       - supports-color
@@ -17929,7 +18026,7 @@ snapshots:
 
   '@typescript-eslint/utils@8.0.0-alpha.62(eslint@9.6.0)(typescript@5.5.2)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.4.0(eslint@9.6.0)
+      '@eslint-community/eslint-utils': 4.4.1(eslint@9.6.0)
       '@typescript-eslint/scope-manager': 8.0.0-alpha.62
       '@typescript-eslint/types': 8.0.0-alpha.62
       '@typescript-eslint/typescript-estree': 8.0.0-alpha.62(typescript@5.5.2)
@@ -17938,9 +18035,9 @@ snapshots:
       - supports-color
       - typescript
 
-  '@typescript-eslint/visitor-keys@7.13.1':
+  '@typescript-eslint/visitor-keys@7.18.0':
     dependencies:
-      '@typescript-eslint/types': 7.13.1
+      '@typescript-eslint/types': 7.18.0
       eslint-visitor-keys: 3.4.3
 
   '@typescript-eslint/visitor-keys@8.0.0-alpha.30':
@@ -17955,13 +18052,13 @@ snapshots:
 
   '@typescript/vfs@1.5.0':
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
-  '@uiw/codemirror-extensions-basic-setup@4.21.20(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1))(@codemirror/commands@6.4.0)(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)':
+  '@uiw/codemirror-extensions-basic-setup@4.21.20(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3))(@codemirror/commands@6.4.0)(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)':
     dependencies:
-      '@codemirror/autocomplete': 6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1)
+      '@codemirror/autocomplete': 6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3)
       '@codemirror/commands': 6.4.0
       '@codemirror/language': 6.10.2
       '@codemirror/lint': 6.5.0
@@ -17983,15 +18080,15 @@ snapshots:
       '@codemirror/state': 6.4.1
       '@codemirror/view': 6.28.2
 
-  '@uiw/react-codemirror@4.21.20(@babel/runtime@7.25.6)(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1))(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.28.2)(codemirror@6.0.1(@lezer/common@1.2.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@uiw/react-codemirror@4.21.20(@babel/runtime@7.25.6)(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3))(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/theme-one-dark@6.1.2)(@codemirror/view@6.28.2)(codemirror@6.0.1(@lezer/common@1.2.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@babel/runtime': 7.25.6
       '@codemirror/commands': 6.4.0
       '@codemirror/state': 6.4.1
       '@codemirror/theme-one-dark': 6.1.2
       '@codemirror/view': 6.28.2
-      '@uiw/codemirror-extensions-basic-setup': 4.21.20(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1))(@codemirror/commands@6.4.0)(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)
-      codemirror: 6.0.1(@lezer/common@1.2.1)
+      '@uiw/codemirror-extensions-basic-setup': 4.21.20(@codemirror/autocomplete@6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3))(@codemirror/commands@6.4.0)(@codemirror/language@6.10.2)(@codemirror/lint@6.5.0)(@codemirror/search@6.5.6)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)
+      codemirror: 6.0.1(@lezer/common@1.2.3)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
@@ -18156,7 +18253,7 @@ snapshots:
 
   agentkeepalive@4.2.1:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       depd: 1.1.2
       humanize-ms: 1.2.1
     transitivePeerDependencies:
@@ -19021,10 +19118,10 @@ snapshots:
 
   co@4.6.0: {}
 
-  codemirror@6.0.1(@lezer/common@1.2.1):
+  codemirror@6.0.1(@lezer/common@1.2.3):
     dependencies:
-      '@codemirror/autocomplete': 6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.1)
-      '@codemirror/commands': 6.4.0
+      '@codemirror/autocomplete': 6.16.0(@codemirror/language@6.10.2)(@codemirror/state@6.4.1)(@codemirror/view@6.28.2)(@lezer/common@1.2.3)
+      '@codemirror/commands': 6.7.1
       '@codemirror/language': 6.10.2
       '@codemirror/lint': 6.5.0
       '@codemirror/search': 6.5.6
@@ -19674,6 +19771,10 @@ snapshots:
       ms: 2.1.2
     optionalDependencies:
       supports-color: 5.5.0
+
+  debug@4.3.7:
+    dependencies:
+      ms: 2.1.3
 
   decamelize@1.2.0: {}
 
@@ -21275,6 +21376,8 @@ snapshots:
 
   ignore@5.3.1: {}
 
+  ignore@5.3.2: {}
+
   image-size@0.5.5:
     optional: true
 
@@ -21675,7 +21778,7 @@ snapshots:
 
   istanbul-lib-source-maps@4.0.1:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       istanbul-lib-coverage: 3.2.2
       source-map: 0.6.1
     transitivePeerDependencies:
@@ -22975,7 +23078,7 @@ snapshots:
   micromark@4.0.0:
     dependencies:
       '@types/debug': 4.1.12
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       decode-named-character-reference: 1.0.2
       devlop: 1.1.0
       micromark-core-commonmark: 2.0.0
@@ -23058,6 +23161,10 @@ snapshots:
       brace-expansion: 2.0.1
 
   minimatch@9.0.4:
+    dependencies:
+      brace-expansion: 2.0.1
+
+  minimatch@9.0.5:
     dependencies:
       brace-expansion: 2.0.1
 
@@ -23677,6 +23784,8 @@ snapshots:
   pg-connection-string@2.6.2: {}
 
   picocolors@1.0.0: {}
+
+  picocolors@1.1.1: {}
 
   picomatch@2.3.1: {}
 
@@ -25673,6 +25782,8 @@ snapshots:
 
   semver@7.6.2: {}
 
+  semver@7.6.3: {}
+
   send@0.18.0:
     dependencies:
       debug: 2.6.9
@@ -25880,7 +25991,7 @@ snapshots:
   socks-proxy-agent@6.1.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       socks: 2.8.3
     transitivePeerDependencies:
       - supports-color
@@ -25943,7 +26054,7 @@ snapshots:
 
   spdy-transport@3.0.0:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       detect-node: 2.1.0
       hpack.js: 2.1.6
       obuf: 1.1.2
@@ -25954,7 +26065,7 @@ snapshots:
 
   spdy@4.0.2:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       handle-thing: 2.0.1
       http-deceiver: 1.2.7
       select-hose: 2.0.0
@@ -26534,6 +26645,10 @@ snapshots:
       - uWebSockets.js
 
   ts-api-utils@1.3.0(typescript@5.5.2):
+    dependencies:
+      typescript: 5.5.2
+
+  ts-api-utils@1.4.0(typescript@5.5.2):
     dependencies:
       typescript: 5.5.2
 

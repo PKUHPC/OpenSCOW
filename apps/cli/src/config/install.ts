@@ -41,6 +41,21 @@ export const InstallConfigSchema = Type.Object({
     }, { description: "scowd  全局 ssl 相关配置" })),
   }, { description: "全局 scowd 相关配置" })),
 
+  adapter: Type.Optional(Type.Object({
+    ssl: Type.Optional(Type.Object({
+      enabled: Type.Boolean({ description: "到适配器的连接是否启动SSL", default: false }),
+      caCertPath: Type.String({ description: "适配器 CA根证书路径, 相对 config 的默认目录", default: "./adapter/certs/ca.crt" }),
+      scowCertPath: Type.String({
+        description: "适配器 CA签名的 SCOW 证书路径， 相对 config 的默认目录",
+        default: "./adapter/certs/scow.crt",
+      }),
+      scowPrivateKeyPath: Type.String({
+        description: "适配器 CA签名的 SCOW 私钥路径， 相对 config 的默认目录",
+        default: "./adapter/certs/scow.key",
+      }),
+    }, { description: "适配器 ssl 相关配置" })),
+  }, { description: "适配器相关配置" })),
+
   log: Type.Object({
     level: Type.String({ description: "日志级别", default: "info" }),
     pretty: Type.Boolean({ description: "日志格式", default: false }),

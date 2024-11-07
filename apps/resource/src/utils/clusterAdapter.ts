@@ -1,8 +1,11 @@
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import {
+  createAdapterCertificates, getSchedulerAdapterClient, SchedulerAdapterClient,
+} from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { Logger } from "pino";
+import { config } from "src/server/config/env";
 import { getScowClusterConfigs } from "src/server/mis-server/cluster";
 
 interface ClusterConfigSchema {
@@ -31,12 +34,14 @@ type CallOnOne = <T>(
 export const CLUSTEROPS_ERROR_CODE = "CLUSTEROPS_ERROR";
 export const ADAPTER_CALL_ON_ONE_ERROR = "ADAPTER_CALL_ON_ONE_ERROR";
 
+export const certificates = createAdapterCertificates(config);
+
 export async function getClusterUtils() {
 
   const configClusters = await getScowClusterConfigs();
   // adapterClient of all config clusters
   const adapterClientForClusters = Object.entries(configClusters.clusterConfigs).reduce((prev, [_, c]) => {
-    const client = getSchedulerAdapterClient(c.adapterUrl);
+    const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
 
     prev[c.clusterId] = client;
 
@@ -46,7 +51,7 @@ export async function getClusterUtils() {
   // adapterClients of activated clusters
   const getAdapterClientForActivatedClusters = (clustersParam: Record<string, ClusterConfigSchema>) => {
     return Object.entries(clustersParam).reduce((prev, [cluster, c]) => {
-      const client = getSchedulerAdapterClient(c.adapterUrl);
+      const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
       prev[cluster] = client;
       return prev;
     }, {} as Record<string, SchedulerAdapterClient>);

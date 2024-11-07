@@ -12,7 +12,11 @@
 
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { getSchedulerAdapterClient, SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
+import {
+  createAdapterCertificates,
+  getSchedulerAdapterClient,
+  SchedulerAdapterClient,
+} from "@scow/lib-scheduler-adapter";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { libCheckActivatedClusters,
   libGetCurrentActivatedClusters } from "@scow/lib-server/build/misCommon/clustersActivation";
@@ -22,10 +26,11 @@ import { config } from "src/config/env";
 import { logger as pinoLogger } from "src/utils/logger";
 import { Logger } from "ts-log";
 
+export const certificates = createAdapterCertificates(config);
 
 const clusters = configClusters;
 const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster, c]) => {
-  const client = getSchedulerAdapterClient(c.adapterUrl);
+  const client = getSchedulerAdapterClient(c.adapterUrl, certificates);
   prev[cluster] = client;
   return prev;
 }, {} as Record<string, SchedulerAdapterClient>);

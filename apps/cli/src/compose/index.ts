@@ -50,7 +50,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
   const RESOURCE_PATH = config.resource?.basePath || "/resource";
   checkPathFormat("resource.basePath", RESOURCE_PATH);
-  
+
   const NOTIFICATION_PATH = config.notification?.basePath || "/notification";
   checkPathFormat("notification.basePath", NOTIFICATION_PATH);
 
@@ -66,6 +66,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   };
 
   const nodeOptions = config.misc?.nodeOptions;
+
+  // 适配器证书相关配置
+  const adapterSslCaCertPath = config.adapter?.ssl?.caCertPath ?
+    join("/etc/scow", config.adapter.ssl.caCertPath) : "";
+  const adapterSslScowCertPath = config.adapter?.ssl?.scowCertPath ?
+    join("/etc/scow", config.adapter.ssl.scowCertPath) : "";
+  const adapterSslScowPrivateKeyPath = config.adapter?.ssl?.scowPrivateKeyPath ?
+    join("/etc/scow", config.adapter.ssl.scowPrivateKeyPath) : "";
 
   // service creation function
   const addService = (
@@ -267,10 +275,17 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       environment: {
         SCOW_LAUNCH_APP: "portal-server",
         PORTAL_BASE_PATH: portalBasePath,
+
         SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enabled ?? false),
         SCOWD_SSL_CA_CERT_PATH: scowdSslCaCertPath,
         SCOWD_SSL_SCOW_CERT_PATH: scowdSslScowCertPath,
         SCOWD_SSL_SCOW_PRIVATE_KEY_PATH: scowdSslScowPrivateKeyPath,
+
+        ADAPTER_SSL_ENABLED: String(config.adapter?.ssl?.enabled ?? false),
+        ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
+        ADAPTER_SSL_SCOW_CERT_PATH: adapterSslScowCertPath,
+        ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: adapterSslScowPrivateKeyPath,
+
         MIS_DEPLOYED: config.mis ? "true" : "false",
         MIS_SERVER_URL: config.mis ? "mis-server:5000" : "",
         ...serviceLogEnv,
@@ -328,6 +343,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
         AUTH_URL: config.auth.custom?.external?.url ?? "",
+
+        ADAPTER_SSL_ENABLED: String(config.adapter?.ssl?.enabled ?? false),
+        ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
+        ADAPTER_SSL_SCOW_CERT_PATH: adapterSslScowCertPath,
+        ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: adapterSslScowPrivateKeyPath,
+
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
@@ -427,6 +448,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "CLIENT_MAX_BODY_SIZE": config.gateway.uploadFileSizeLimit,
         "PROTOCOL": config.gateway.protocol,
         "NOVNC_CLIENT_URL": join(BASE_PATH, "/vnc"),
+
+        ADAPTER_SSL_ENABLED: String(config.adapter?.ssl?.enabled ?? false),
+        ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
+        ADAPTER_SSL_SCOW_CERT_PATH: adapterSslScowCertPath,
+        ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: adapterSslScowPrivateKeyPath,
+
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
@@ -474,7 +501,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
       },
     });
   }
-  
+
   if (config.resource) {
     addService("resource", {
       image: scowImage,
@@ -488,6 +515,12 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "AUTH_INTERNAL_URL": authUrl || "http://auth:5000",
         "PUBLIC_PATH": join(BASE_PATH, publicPath),
         "PROTOCOL": config.gateway.protocol,
+
+        ADAPTER_SSL_ENABLED: String(config.adapter?.ssl?.enabled ?? false),
+        ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
+        ADAPTER_SSL_SCOW_CERT_PATH: adapterSslScowCertPath,
+        ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: adapterSslScowPrivateKeyPath,
+        
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },
