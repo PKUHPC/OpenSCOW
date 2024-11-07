@@ -385,7 +385,7 @@ export default {
     app: {
       appSessionTable: {
         table: {
-          sessionId: "Job Name",
+          jobName: "Job Name",
           jobId: "Job ID",
           appId: "Application",
           submitTime: "Submission Time",

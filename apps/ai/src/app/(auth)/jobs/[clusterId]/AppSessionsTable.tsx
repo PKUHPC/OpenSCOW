@@ -92,7 +92,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
     },
     {
       title: "作业名",
-      dataIndex: "sessionId",
+      dataIndex: "jobName",
       width: "25%",
       ellipsis: true,
     },
@@ -262,14 +262,20 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
     return data.sessions.filter((x) => {
       if (query.appJobName) {
-        return x.sessionId.toLowerCase().includes(query.appJobName.toLowerCase());
+        // 之前的作业只有sessionId，没有存jobName
+        const jobName = x.jobName ? x.jobName : x.sessionId;
+        return jobName.toLowerCase().includes(query.appJobName.toLowerCase());
       }
       return true;
-    }).map((x) => ({
-      ...x,
-      remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
-        x.state === "PENDING" ? "" : x.timeLimit,
-    }));
+    }).map((x) =>
+      ({
+        ...x,
+        jobName:x.jobName ? x.jobName : x.sessionId,
+        remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
+          x.state === "PENDING" ? "" : x.timeLimit,
+      }),
+    );
+
   }, [data, query]);
 
   return (

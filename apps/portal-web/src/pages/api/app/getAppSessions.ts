@@ -21,6 +21,7 @@ import { route } from "src/utils/route";
 // Cannot use AppSession from protos
 export const AppSession = Type.Object({
   sessionId: Type.String(),
+  jobName: Type.String(),
   jobId: Type.Number(),
   submitTime: Type.Optional(Type.String()),
   appId: Type.String(),

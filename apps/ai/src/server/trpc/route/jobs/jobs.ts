@@ -60,6 +60,7 @@ export type Image = z.infer<typeof ImageSchema>;
 
 interface SessionMetadata {
   sessionId: string;
+  jobName: string;
   jobId: number;
   appId?: string;
   submitTime: string;
@@ -258,6 +259,7 @@ procedure
         // Save session metadata
         const metadata: SessionMetadata = {
           jobId: reply.jobId,
+          jobName:trainJobName,
           sessionId: scowWorkDirectoryName,
           submitTime: new Date().toISOString(),
           image: {

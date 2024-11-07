@@ -62,6 +62,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
       return sessions.map((x) => ({
         ...x,
+        jobName:x.jobName ? x.jobName : x.sessionId,
         remainingTime: x.state === "RUNNING" ? calculateAppRemainingTime(x.runningTime, x.timeLimit) :
           x.state === "PENDING" ? "" : x.timeLimit,
       }));
@@ -74,7 +75,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
     let filtered = data;
     if (query.appJobName) {
-      filtered = filtered.filter((x) => x.sessionId.toLowerCase().includes(query.appJobName!.toLowerCase()));
+      filtered = filtered.filter((x) => (x.jobName.toLowerCase().includes(query.appJobName!.toLowerCase())));
     }
 
     return filtered;
@@ -83,11 +84,11 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
 
   const columns: TableColumnsType<AppSession> = [
     {
-      title: t(p("table.sessionId")),
-      dataIndex: "sessionId",
+      title: t(p("table.jobName")),
+      dataIndex: "jobName",
       width: "25%",
       ellipsis: true,
-      sorter: (a, b) => a.sessionId.localeCompare(b.sessionId),
+      sorter: (a, b) => a.jobName.localeCompare(b.jobName),
     },
     {
       title: t(p("table.jobId")),

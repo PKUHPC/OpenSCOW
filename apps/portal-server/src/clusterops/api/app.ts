@@ -40,6 +40,7 @@ export interface GetAppSessionsRequest {
 
 export interface AppSession {
   sessionId: string;
+  jobName: string;
   jobId: number;
   submitTime: Date;
   appId: string;

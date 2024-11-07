@@ -72,6 +72,7 @@ const JobTypeSchema = z.nativeEnum(JobType);
 
 const AppSessionSchema = z.object({
   sessionId: z.string(),
+  jobName: z.string(),
   jobId: z.number(),
   submitTime: z.string(),
   jobType: JobTypeSchema,
@@ -98,6 +99,7 @@ interface ServerSessionInfoData {
 
 interface SessionMetadata {
   sessionId: string;
+  jobName: string;
   jobId: number;
   appId?: string;
   submitTime: string;
@@ -536,6 +538,7 @@ export const createAppSession = procedure
 
       const metadata: SessionMetadata = {
         jobId: reply.jobId,
+        jobName: appJobName,
         sessionId: scowWorkDirectoryName,
         submitTime: new Date().toISOString(),
         appId,
@@ -882,6 +885,7 @@ export const listAppSessions =
             appId: sessionMetadata.appId,
             appName: sessionMetadata?.appId ? apps[sessionMetadata?.appId]?.name : undefined,
             sessionId: sessionMetadata.sessionId,
+            jobName: sessionMetadata.jobName ?? "",
             submitTime: sessionMetadata.submitTime,
             jobType: sessionMetadata.jobType,
             image: sessionMetadata.image,

@@ -38,6 +38,7 @@ import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
 
 interface SessionMetadata {
   sessionId: string;
+  jobName: string;
   jobId: number;
   appId: string;
   submitTime: string;
@@ -149,6 +150,7 @@ export const appOps = (cluster: string): AppOps => {
           // write session metadata
           const metadata: SessionMetadata = {
             jobId,
+            jobName: appJobName,
             sessionId: workDirectoryName,
             submitTime: new Date().toISOString(),
             appId,
@@ -463,6 +465,7 @@ export const appOps = (cluster: string): AppOps => {
             jobId: sessionMetadata.jobId,
             appId: sessionMetadata.appId,
             appName: apps[sessionMetadata.appId]?.name,
+            jobName: sessionMetadata.jobName ?? "",
             sessionId: sessionMetadata.sessionId,
             submitTime: new Date(sessionMetadata.submitTime),
             state: runningJobInfo?.state ?? "ENDED",
