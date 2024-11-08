@@ -15,6 +15,7 @@ import { trpc } from "src/server/trpc/def";
 import { accountRouter } from "./route/account";
 import { algorithm } from "./route/algorithm";
 import { auth } from "./route/auth";
+import { resource } from "./route/cluster";
 import { config } from "./route/config";
 import { dataset } from "./route/dataset";
 import { file } from "./route/file";
@@ -32,6 +33,7 @@ export const appRouter = trpc.router({
   algorithm,
   model,
   file,
+  resource,
   account: accountRouter,
   jobs: jobsRouter,
 });

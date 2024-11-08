@@ -12,8 +12,9 @@
 
 import { GetConfigFn, getConfigFromFile } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
-import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
-import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "src/i18n";
+
+import { DEFAULT_CONFIG_BASE_PATH } from "./constants";
+import { createI18nStringSchema, SYSTEM_VALID_LANGUAGE_ENUM, SystemLanguage, SystemLanguageConfig } from "./i18n";
 
 export const NotificationConfigSchema = Type.Object({
   enabled: Type.Boolean({ description: "是否开启消息系统", default: false }),

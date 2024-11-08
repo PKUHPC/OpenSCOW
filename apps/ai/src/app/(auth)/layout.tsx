@@ -31,6 +31,10 @@ const useConfigQuery = () => {
   return trpc.config.publicConfig.useQuery();
 };
 
+const useCurrentClusterIdsQuery = () => {
+  return trpc.resource.getCurrentUserAssignedClusters.useQuery();
+};
+
 export default function Layout(
   { children }:
   { children: React.ReactNode },
@@ -38,6 +42,7 @@ export default function Layout(
 
   const userQuery = useUserQuery();
   const configQuery = useConfigQuery();
+  const currentClusterIdsQuery = useCurrentClusterIdsQuery();
 
   if (userQuery.isLoading) {
     return (
@@ -51,7 +56,7 @@ export default function Layout(
     return;
   }
 
-  if (configQuery.isLoading) {
+  if (configQuery.isLoading || currentClusterIdsQuery.isLoading) {
     return (
       <BaseLayout user={userQuery.data.user}>
         {children}
@@ -68,14 +73,15 @@ export default function Layout(
   }
 
   const publicConfig = configQuery.data;
-  const { setDefaultCluster, defaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
+  const { setDefaultCluster, defaultCluster, currentClusters }
+   = defaultClusterContext(publicConfig.CLUSTERS, currentClusterIdsQuery?.data?.clusterIds ?? []);
 
   const { hostname, uiConfig } = useUiConfig();
   const footerConfig = uiConfig.config.footer;
   const footerText = (hostname && footerConfig?.hostnameMap?.[hostname])
     ?? footerConfig?.defaultText ?? "";
 
-  const routes = userRoutes(userQuery.data.user, publicConfig, setDefaultCluster, defaultCluster);
+  const routes = userRoutes(userQuery.data.user, publicConfig, currentClusters, setDefaultCluster, defaultCluster);
 
   return (
     <BaseLayout
@@ -111,7 +117,9 @@ export default function Layout(
         user: userQuery.data.user,
         publicConfig,
         clusters: publicConfig.CLUSTERS,
-        defaultClusterContext: defaultClusterContext(publicConfig.CLUSTERS ?? []),
+        currentAssociateClusterIds: currentClusterIdsQuery?.data?.clusterIds ?? [],
+        defaultClusterContext: 
+          defaultClusterContext(publicConfig.CLUSTERS ?? [], currentClusterIdsQuery?.data?.clusterIds ?? []),
       }}
       >
         {children}

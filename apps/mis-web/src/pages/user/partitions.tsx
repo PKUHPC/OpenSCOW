@@ -11,10 +11,11 @@
  */
 
 import { ClusterTextsConfigSchema } from "@scow/config/build/clusterTexts";
+import { getUserAccountsClusterIds } from "@scow/lib-scow-resource/build/utils";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { Collapse, Divider, Space, Spin, Typography } from "antd";
 import { GetServerSideProps, NextPage } from "next";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -46,6 +47,9 @@ type ValueOf<T> = T[keyof T];
 
 interface Props {
   text: ValueOf<ClusterTextsConfigSchema> | undefined;
+  isResourceDeployed: boolean,
+  // 用户关联账户的已授权集群Id
+  assignedClusterIds: string[];
 }
 
 const p = prefix("page.user.partitions.");
@@ -59,22 +63,27 @@ export const PartitionsPage: NextPage<Props> = requireAuth(() => true)((props: P
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
-  const { text } = props;
+  const { text, isResourceDeployed, assignedClusterIds } = props;
 
   const [completedRequestCount, setCompletedRequestCount] = useState<number>(0);
   const [renderData, setRenderData] = useState<Record<string, JobBillingTableItem[]>>({});
 
   const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
 
-  const clusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
-    .filter((x) => Object.keys(activatedClusters).includes(x.id));
-  const sortedIds = clusterSortedIdList.filter((id) => activatedClusters[id]);
+  const currentUserAssignedClusters = useMemo(() => {
+    if (!isResourceDeployed) return activatedClusters;
+    return Object.fromEntries(
+      Object.entries(activatedClusters).filter(([clusterId, _]) => assignedClusterIds.includes(clusterId)),
+    );  
+  }, [activatedClusters, isResourceDeployed, assignedClusterIds]);
 
-  
+  const clusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
+    .filter((x) => Object.keys(currentUserAssignedClusters).includes(x.id));
+  const sortedIds = clusterSortedIdList.filter((id) => currentUserAssignedClusters[id]);
 
   sortedIds.forEach((clusterId) => {
     useAsync({ promiseFn: useCallback(async () => {
-      const cluster = activatedClusters[clusterId];
+      const cluster = currentUserAssignedClusters[clusterId];
       return api.getAvailableBillingTable({
         query: { cluster: cluster.id, tenant: user?.tenant, userId: user?.identityId } })
         .then((data) => {
@@ -167,6 +176,17 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
 
   const clusterTexts = runtimeConfig.CLUSTER_TEXTS_CONFIG;
 
+  // 如果部署了资源管理系统，获取用户关联账户的已授权集群信息
+  let assignedClusterIds: string[] = []; 
+  if (runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled && typeof user !== "number") {
+    const userAccounts = user.accountAffiliations.map((aff) => (aff.accountName));
+    assignedClusterIds = await getUserAccountsClusterIds(
+      runtimeConfig.SCOW_RESOURCE_CONFIG, 
+      userAccounts,
+      user.tenant,
+    );
+  }
+
   // find the applicable text
   const applicableTexts = clusterTexts ? (
     typeof user === "number"
@@ -174,7 +194,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       : (clusterTexts[user.tenant] ?? clusterTexts.default)
   ) : undefined;
 
-  return { props: { text: applicableTexts } };
+  return { props: { 
+    text: applicableTexts,
+    isResourceDeployed: !!runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled,
+    assignedClusterIds, 
+  } };
 };
 
 

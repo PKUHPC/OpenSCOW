@@ -141,6 +141,7 @@ module.exports = {
         PORTAL_URL: "localhost:5001",
         MIS_DEPLOYED: 1,
         MIS_URL: "localhost:5003",
+        MIS_SERVER_URL: "localhost:5004",
         ...SCOW_CONFIG_PATH_ENV,
       },
     },

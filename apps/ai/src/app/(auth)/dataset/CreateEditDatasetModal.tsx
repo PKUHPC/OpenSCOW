@@ -29,6 +29,7 @@ export interface Props {
   isEdit: boolean;
   editData?: DatasetInterface;
   clusters: Cluster[];
+  currentClusterIds: string[];
 }
 
 interface FormFields {
@@ -41,12 +42,12 @@ interface FormFields {
 }
 
 export const CreateEditDatasetModal: React.FC<Props> = (
-  { open, onClose, refetch, isEdit, editData, clusters },
+  { open, onClose, refetch, isEdit, editData, clusters, currentClusterIds },
 ) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const { defaultCluster } = defaultClusterContext(clusters);
+  const { defaultCluster } = defaultClusterContext(clusters, currentClusterIds);
 
   useEffect(() => {
     resetForm();

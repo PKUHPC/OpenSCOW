@@ -25,9 +25,10 @@ import { Cluster, NavLink, PublicConfig } from "src/server/trpc/route/config";
 export const userRoutes: (
   user: ClientUserInfo | undefined,
   publicConfig: PublicConfig,
-  setDefaultCluster: (cluster: Cluster) => void,
-  defaultCluster: Cluster,
-) => NavItemProps[] = (user, publicConfig, setDefaultCluster, defaultCluster) => {
+  currentClusters: Cluster[],
+  setDefaultCluster: (cluster: Cluster | undefined) => void,
+  defaultCluster: Cluster | undefined,
+) => NavItemProps[] = (user, publicConfig, currentClusters, setDefaultCluster, defaultCluster) => {
 
   if (!user) { return []; }
 
@@ -74,13 +75,14 @@ export const userRoutes: (
         },
       ],
     },
-    {
+    // 无可用集群时不显示该层级路由
+    ...(currentClusters.length > 0 ? [ {
       Icon: BookOutlined,
       text: "作业",
       path: "/jobs",
-      clickToPath: `/jobs/${defaultCluster.id}/createApps`,
+      clickToPath: `/jobs/${defaultCluster?.id ?? currentClusters[0].id}/createApps`,
       children: [
-        ...publicConfig.CLUSTERS.map((cluster) => ({
+        ...currentClusters.map((cluster) => ({
           Icon: FolderOutlined,
           text: getI18nConfigCurrentText(cluster.name, undefined),
           path: `/jobs/${cluster.id}`,
@@ -110,6 +112,7 @@ export const userRoutes: (
         })),
       ],
     },
+    ] : []),
     {
       Icon: UngroupOutlined,
       text: "算法",
@@ -146,13 +149,13 @@ export const userRoutes: (
         },
       ],
     },
-    ...(publicConfig.CLUSTERS.length > 0 ? [
+    ...(currentClusters.length > 0 ? [
       {
         Icon: FolderOutlined,
         text: "文件管理",
         path: "/files",
-        clickToPath: `/files/${defaultCluster.id}/~`,
-        children: publicConfig.CLUSTERS.map((cluster) => ({
+        clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
+        children: currentClusters.map((cluster) => ({
           Icon: FolderOutlined,
           text: cluster.name,
           path: `/files/${cluster.id}`,

@@ -1,27 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { AccountServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/account";
 import { AppServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/app";
@@ -29,10 +5,15 @@ import { ConfigServiceClient } from "@scow/ai-scheduler-adapter-protos/build/pro
 import { JobServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { UserServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/user";
 import { VersionServiceClient } from "@scow/ai-scheduler-adapter-protos/build/protos/version";
+import { getCommonConfig } from "@scow/config/src/common";
 import { createAdapterCertificates } from "@scow/lib-scheduler-adapter";
 import { SslConfig } from "@scow/lib-scheduler-adapter/build/ssl";
+import { getUserAccountsClusterIds } from "@scow/lib-scow-resource";
+import { libWebGetUserInfo } from "@scow/lib-web/build/server/userAccount";
+import { TRPCError } from "@trpc/server";
 import { clusters } from "src/server/config/clusters";
 import { config } from "src/server/config/env";
+import { logger } from "src/server/utils/logger";
 
 type ClientConstructor<TClient> =
   new (address: string, credentials: ChannelCredentials) => TClient;
@@ -83,4 +64,45 @@ const adapterClientForClusters = Object.entries(clusters).reduce((prev, [cluster
 
 export const getAdapterClient = (cluster: string) => {
   return adapterClientForClusters[cluster];
+};
+
+export async function getCurrentClusters(userId: string): Promise<string[]> {
+
+  const commonConfig = getCommonConfig();
+
+  // 如果没有部署管理系统或者资源管理系统为不可用，返回当前系统已配置集群ID
+  if (!config.MIS_SERVER_URL || !commonConfig.scowResource?.enabled) {
+    return clusters ? Object.keys(clusters) : [];
+  }
+
+  const userAffliction
+       = await libWebGetUserInfo(userId, config.MIS_SERVER_URL);
+
+  const accountNames = userAffliction?.affiliations.map((a) => (a.accountName));
+  const tenantName = userAffliction?.tenantName;
+
+  if (!tenantName) {
+    logger.info(`Afflicted tenant of user id: ${userId} is not found.`);
+    return [];
+  }
+  const results
+       = await getUserAccountsClusterIds(commonConfig.scowResource, accountNames, tenantName);
+
+  if (results.length === 0) {
+    logger.info(`Can not find authorized clusters for the user id: ${userId}.`);
+  }
+
+  return results;
+}
+
+
+export const checkClusterAvailable = (clusterIds: string[], clusterId: string) => {
+
+  if (!clusterIds.includes(clusterId)) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `Cluster id ${clusterId} is not found. ` +
+        "Please confirm whether the cluster has been authorized for the login user.",
+    });
+  }
 };

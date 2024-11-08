@@ -20,6 +20,7 @@ import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -32,6 +33,7 @@ import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { booleanQueryParam } from "../utils";
 
 export const getAlgorithmVersions = procedure
@@ -135,6 +137,9 @@ export const createAlgorithmVersion = procedure
       { versionName: input.versionName, algorithm });
     if (algorithmVersionExist)
       throw new TRPCError({ code: "CONFLICT", message: `AlgorithmVersion name:${input.versionName} already exist` });
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, algorithm.clusterId);
 
     // 检查目录是否存在
     const host = getClusterLoginNode(algorithm.clusterId);
@@ -301,7 +306,9 @@ export const deleteAlgorithmVersion = procedure
 
     // 如果是已分享的数据集版本，则删除分享
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED) {
-
+   
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, algorithm.clusterId);
       try {
         const host = getClusterLoginNode(algorithm.clusterId);
         if (!host) { throw clusterNotFound(algorithm.clusterId); }
@@ -393,6 +400,9 @@ export const shareAlgorithmVersion = procedure
 
     if (algorithm.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Algorithm id:${algorithmId}  not accessible` });
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, algorithm.clusterId);
 
     const host = getClusterLoginNode(algorithm.clusterId);
     if (!host) { throw clusterNotFound(algorithm.clusterId); }
@@ -615,6 +625,8 @@ export const copyPublicAlgorithmVersion = procedure
         message: `An algorithm with the same name as ${input.algorithmName} already exists`,
       });
     }
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, algorithmVersion.algorithm.$.clusterId);
 
     // 3. 检查用户是否可以将源算法拷贝至目标目录
     const host = getClusterLoginNode(algorithmVersion.algorithm.$.clusterId);

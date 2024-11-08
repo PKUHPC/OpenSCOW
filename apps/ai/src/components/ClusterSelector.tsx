@@ -29,7 +29,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
   // const languageId = useI18n().currentLanguage.id;
   // const t = useI18nTranslateToString();
   const languageId = "zh_cn";
-  const { publicConfig } = usePublicConfig();
+  const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
+  const currentClusters = publicConfig.CLUSTERS.filter((cluster) => (currentAssociateClusterIds.includes(cluster.id)));
 
   return (
     <Select
@@ -38,8 +39,8 @@ export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
       value={value?.map((v) => v.id)}
       onChange={(values) => onChange?.(values.map((x) => ({
         id: x,
-        name: publicConfig.CLUSTERS.find((cluster) => cluster.id === x)?.name ?? x })))}
-      options={publicConfig.CLUSTERS.map((x) => ({ value: x.id, label:
+        name: currentClusters.find((cluster) => cluster.id === x)?.name ?? x })))}
+      options={currentClusters.map((x) => ({ value: x.id, label:
         getI18nConfigCurrentText(x.name, languageId) }))}
       key={languageId}
     />
@@ -65,8 +66,9 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   // const t = useI18nTranslateToString();
   // const languageId = useI18n().currentLanguage.id;
   const languageId = "zh_cn";
-  const { publicConfig } = usePublicConfig();
-  const { setDefaultCluster } = defaultClusterContext(publicConfig.CLUSTERS);
+  const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
+  const { setDefaultCluster, currentClusters }
+   = defaultClusterContext(publicConfig.CLUSTERS, currentAssociateClusterIds);
 
   return (
     <Select
@@ -76,15 +78,15 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
       onChange={(value) => {
         onChange?.({
           id: value,
-          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
+          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value });
         setDefaultCluster({
           id: value,
-          name: publicConfig.CLUSTERS.find((cluster) => cluster.id === value)?.name ?? value });
+          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value });
       }
       }
       options={
         (label ? [{ value: label, label, disabled: true }] : [])
-          .concat((publicConfig.CLUSTERS.filter((x) => clusterIds?.includes(x.id) ?? true) || [])
+          .concat((currentClusters.filter((x) => clusterIds?.includes(x.id) ?? true) || [])
             .map((x) => ({
               value: x.id,
               label:  getI18nConfigCurrentText(x.name, languageId),

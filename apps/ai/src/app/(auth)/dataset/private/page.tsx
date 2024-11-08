@@ -19,12 +19,16 @@ import { DatasetListTable } from "../DatasetListTable";
 
 export default function Page() {
 
-  const { publicConfig } = usePublicConfig();
+  const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
 
   return (
     <div>
       <PageTitle titleText="我的数据集" />
-      <DatasetListTable isPublic={false} clusters={publicConfig.CLUSTERS} />
+      <DatasetListTable 
+        isPublic={false} 
+        clusters={publicConfig.CLUSTERS} 
+        currentClusterIds={currentAssociateClusterIds}
+      />
     </div>
   );
 }

@@ -346,7 +346,8 @@ export const accountServiceServer = plugin((server) => {
 
         // 条件1：如果配置了资源管理服务，则调用适配器的 unblockAccountWithPartitions 接口
         if (commonConfig.scowResource?.enabled) {
-          await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
+          await Promise.allSettled(Object.entries(currentActivatedClusters).map(async ([clusterId, cluster]) => {
+
             await server.ext.clusters.callOnOne(
               clusterId,
               logger,
@@ -356,14 +357,31 @@ export const accountServiceServer = plugin((server) => {
                 });
               },
             );
-            await unblockAccountAssignedPartitionsInCluster(
-              account.accountName,
-              account.tenant.getProperty("name"),
-              clusterId,
-              server.ext.clusters,
-              logger,
-              server.ext.resource,
-            );
+
+            // 当前AI集群只能使用AI适配器且不支持分区概念，一旦判断为AI集群只调用原有 unblockAccount 接口
+            // 上述情况以外，如果是HPC集群，调用unblockAccountAssignedPartitionsInCluster
+            if (cluster.ai.enabled) {
+              await server.ext.clusters.callOnOne(
+                clusterId,
+                logger,
+                async (client) => { 
+                  await asyncClientCall(client.account, "unblockAccount", {
+                    accountName: account.accountName,
+                  }); 
+                },      
+              );
+              
+            } else if (cluster.hpc.enabled) {
+              await unblockAccountAssignedPartitionsInCluster(
+                account.accountName,
+                account.tenant.getProperty("name"),
+                clusterId,
+                server.ext.clusters,
+                logger,
+                server.ext.resource,
+              );
+            }
+           
           }));
         // 条件2：如果没有配置资源管理服务，则调用适配器的 unblockAccount接口进行解封
         } else {

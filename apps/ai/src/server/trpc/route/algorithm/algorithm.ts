@@ -17,6 +17,7 @@ import { Algorithm, Framework } from "src/server/entities/Algorithm";
 import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
@@ -26,6 +27,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { booleanQueryParam, clusterExist } from "../utils";
 
 
@@ -140,7 +142,9 @@ export const createAlgorithm = procedure
   })
   .mutation(async ({ input, ctx: { user } }) => {
 
-    if (!clusterExist(input.clusterId)) {
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+
+    if (!clusterExist(input.clusterId, currentClusterIds)) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: `Cluster id ${input.clusterId} does not exist.`,
@@ -332,6 +336,9 @@ export const deleteAlgorithm = procedure
     // 获取此算法的共享的算法绝对路径
     if (sharedVersions.length > 0) {
       const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, algorithm.clusterId);
 
       const host = getClusterLoginNode(algorithm.clusterId);
       if (!host) { throw clusterNotFound(algorithm.clusterId); }

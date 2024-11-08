@@ -35,6 +35,7 @@ import { CreateEditImageModal } from "./CreateEditImageModal";
 interface Props {
   isPublic: boolean;
   clusters: Cluster[];
+  currentClusterIds: string[];
 }
 
 interface FilterForm {
@@ -52,7 +53,7 @@ const CreateImageModalButton = ModalButton(CreateEditImageModal, { type: "primar
 const EditImageModalButton = ModalButton(CreateEditImageModal, { type: "link" });
 const CopyImageModalButton = ModalButton(CopyImageModal, { type: "link" });
 
-export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
+export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClusterIds }) => {
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
@@ -141,6 +142,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               refetch={refetch}
               isEdit={false}
               clusters={clusters}
+              currentClusterIds={currentClusterIds}
             > 添加
             </CreateImageModalButton>
           </Space>
@@ -221,7 +223,13 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                   )} */}
 
                     { r.status === Status.CREATED && (
-                      <EditImageModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
+                      <EditImageModalButton 
+                        refetch={refetch} 
+                        isEdit={true} 
+                        editData={r} 
+                        clusters={clusters}
+                        currentClusterIds={currentClusterIds}
+                      >
                         编辑
                       </EditImageModalButton>
                     )}

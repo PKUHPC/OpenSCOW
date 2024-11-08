@@ -33,7 +33,7 @@ import { z } from "zod";
 const configPath = USE_MOCK ? join(__dirname, "config") : undefined;
 const clustersInit = getClusterConfigs(configPath, console, ["ai"]);
 Object.keys(clustersInit).map((id) => clustersInit[id].loginNodes = clustersInit[id].loginNodes.map(getLoginNode));
-
+// 配置文件中的已配置集群
 export const clusters = clustersInit;
 
 const I18nStringTypeSchema = z.union([
@@ -79,6 +79,12 @@ const UserLinkSchema = z.object({
   openInNewPage: z.boolean().optional(),
 });
 
+const ScowResourceConfigSchema = z.object({
+  enabled: z.boolean(),
+  address: z.string(),
+  syncBlockStatusWhenStart: z.boolean(),
+});
+
 const PublicConfigSchema = z.object({
   ENABLE_CHANGE_PASSWORD: z.boolean().optional(),
   MIS_URL: z.string().optional(),
@@ -100,6 +106,7 @@ const PublicConfigSchema = z.object({
   SYSTEM_LANGUAGE_CONFIG: SystemLanguageConfigSchema,
   LOGIN_NODES: z.record(z.string()),
   NOVNC_CLIENT_URL: z.string(),
+  SCOW_RESOURCE: ScowResourceConfigSchema.optional(),
 });
 
 const UiConfigSchema = z.object({
@@ -161,12 +168,15 @@ export const config = router({
 
       const capabilities = await getCapabilities(envConfig.AUTH_INTERNAL_URL);
       const versionTag = readVersionFile()?.tag;
+
       const systemLanguageConfig = getSystemLanguageConfig(getCommonConfig().systemLanguage);
 
       return {
         ENABLE_CHANGE_PASSWORD: capabilities.changePassword,
 
         MIS_URL: envConfig.MIS_URL,
+
+        MIS_SERVER_URL: envConfig.MIS_SERVER_URL,
 
         PORTAL_URL: envConfig.PORTAL_URL,
 
@@ -198,6 +208,7 @@ export const config = router({
 
         NOVNC_CLIENT_URL: envConfig.NOVNC_CLIENT_URL,
 
+        SCOW_RESOURCE: commonConfig.scowResource,
       };
     }),
 

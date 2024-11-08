@@ -41,6 +41,7 @@ const specs = {
 
   MIS_DEPLOYED: bool({ desc: "是否部署了管理系统", default: false }),
   MIS_URL: str({ desc: "如果部署了管理系统，管理系统的URL。如果和本系统域名相同，可以只写完整的路径。将会覆盖配置文件。空字符串等价于未部署管理系统", default: "" }),
+  MIS_SERVER_URL: str({ desc: "如果部署了管理系统，管理系统后端服务的路径", default: "" }),
 
   CLIENT_MAX_BODY_SIZE: str({ desc: "限制整个系统上传（请求）文件的大小，可接受的格式为nginx的client_max_body_size可接受的值", default: "1G" }),
 

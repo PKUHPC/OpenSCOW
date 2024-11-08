@@ -21,6 +21,7 @@ import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -33,6 +34,7 @@ import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { booleanQueryParam } from "../utils";
 
 export const DatasetVersionListSchema = z.object({
@@ -149,6 +151,9 @@ export const createDatasetVersion = procedure
 
     if (dataset && dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, dataset.clusterId);
 
     // 检查目录是否存在
     const host = getClusterLoginNode(dataset.clusterId);
@@ -336,6 +341,9 @@ export const deleteDatasetVersion = procedure
     // 如果是已分享的数据集版本，则删除分享
     if (datasetVersion.sharedStatus === SharedStatus.SHARED) {
 
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, dataset.clusterId);
+  
       try {
         const host = getClusterLoginNode(dataset.clusterId);
         if (!host) { throw clusterNotFound(dataset.clusterId); }
@@ -430,6 +438,8 @@ export const shareDatasetVersion = procedure
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
 
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, dataset.clusterId);
 
     const host = getClusterLoginNode(dataset.clusterId);
     if (!host) { throw clusterNotFound(dataset.clusterId); }
@@ -522,6 +532,9 @@ export const unShareDatasetVersion = procedure
 
     if (dataset.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Dataset ${datasetId} not accessible` });
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, dataset.clusterId);
 
     const host = getClusterLoginNode(dataset.clusterId);
     if (!host) { throw clusterNotFound(dataset.clusterId); }
@@ -650,6 +663,9 @@ export const copyPublicDatasetVersion = procedure
         message: `A dataset with the same name as ${input.datasetName} already exists`,
       });
     }
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, datasetVersion.dataset.$.clusterId);
 
     // 3. 检查用户是否可以将源文件复制到目标文件
     const host = getClusterLoginNode(datasetVersion.dataset.$.clusterId);

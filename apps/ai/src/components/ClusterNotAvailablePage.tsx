@@ -12,23 +12,19 @@
 
 "use client";
 
-import { PageTitle } from "src/components/PageTitle";
+import { Result } from "antd";
+import { Head } from "src/utils/head";
 
-import { usePublicConfig } from "../../context";
-import { ImageListTable } from "../ImageListTable";
 
-export default function Page() {
-
-  const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
-
+export const ClusterNotAvailablePage = () => {
   return (
-    <div>
-      <PageTitle titleText="公共镜像" />
-      <ImageListTable 
-        isPublic={true} 
-        clusters={publicConfig.CLUSTERS}
-        currentClusterIds={currentAssociateClusterIds}
+    <>
+      <Head title="Cluster Not Available" />
+      <Result
+        status="404"
+        title={"404"}
+        subTitle={"Cluster Not Available"}
       />
-    </div>
+    </>
   );
-}
+};

@@ -157,16 +157,33 @@ export async function updateUnblockStatusInSlurm(
     // 执行解封操作
     // 如果已配置资源管理功能,调用适配器的 unblockAccountWithPartitions
     if (commonConfig.scowResource?.enabled) {
-      const results = await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
-        return await unblockAccountAssignedPartitionsInCluster(
-          account.accountName,
-          account.tenant.getProperty("name"),
-          clusterId,
-          clusterPlugin,
-          logger,
-          scowResourcePlugin,
-        );
-      }));
+      const results = await Promise.allSettled(
+        Object.entries(currentActivatedClusters).map(async ([clusterId, cluster]) => {
+
+          // 当前AI集群只能使用AI适配器且不支持分区概念，一旦判断为AI集群只调用原有 unblockAccount 接口
+          // 上述情况以外，如果是HPC集群，调用unblockAccountAssignedPartitionsInCluster
+          if (cluster.ai.enabled) {
+            return await clusterPlugin.callOnOne(
+              clusterId,
+              logger,
+              async (client) => { 
+                await asyncClientCall(client.account, "unblockAccount", {
+                  accountName: account.accountName,
+                }); 
+              },      
+            );
+          } else if (cluster.hpc.enabled) {
+            return await unblockAccountAssignedPartitionsInCluster(
+              account.accountName,
+              account.tenant.getProperty("name"),
+              clusterId,
+              clusterPlugin,
+              logger,
+              scowResourcePlugin,
+            );
+          }
+
+        }));
       const errors = results
         .map((result, index) => result.status === "rejected" ? 
           { clusterId: Object.keys(currentActivatedClusters)[index], reason: result.reason } : null)
@@ -266,17 +283,34 @@ export async function unblockAccount(
   // 如果已配置资源管理功能,调用适配器的 unblockAccountWithPartitions
   if (commonConfig.scowResource?.enabled) {
 
-    const results = await Promise.allSettled(Object.keys(currentActivatedClusters).map(async (clusterId) => {
-      return await unblockAccountAssignedPartitionsInCluster(
-        account.accountName,
-        account.tenant.getProperty("name"),
-        clusterId,
-        clusterPlugin,
-        logger,
-        scowResourcePlugin,
-      );
-
-    }));
+    const results = await Promise.allSettled(
+      Object.entries(currentActivatedClusters).map(async ([clusterId, cluster]) => {
+      
+        // 当前AI集群只能使用AI适配器且不支持分区概念，一旦判断为AI集群只调用原有 unblockAccount 接口
+        // 上述情况以外，如果是HPC集群，调用unblockAccountAssignedPartitionsInCluster
+        if (cluster.ai.enabled) {
+          return await clusterPlugin.callOnOne(
+            clusterId,
+            logger,
+            async (client) => { 
+              await asyncClientCall(client.account, "unblockAccount", {
+                accountName: account.accountName,
+              }); 
+            },      
+          );
+          
+        } else if (cluster.hpc.enabled) {
+          return await unblockAccountAssignedPartitionsInCluster(
+            account.accountName,
+            account.tenant.getProperty("name"),
+            clusterId,
+            clusterPlugin,
+            logger,
+            scowResourcePlugin,
+          );
+        }
+        
+      }));
 
     const errors = results
       .map((result, index) => result.status === "rejected" ? 

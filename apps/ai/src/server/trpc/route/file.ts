@@ -23,12 +23,15 @@ import { config } from "src/server/config/env";
 import { callLog } from "src/server/setup/operationLog";
 import { router } from "src/server/trpc/def";
 import { authProcedure } from "src/server/trpc/procedure/base";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
+
+import { getCurrentClusters } from "../../utils/clusters";
 
 export const FileType = z.union([z.literal("FILE"), z.literal("DIR")]);
 export type FileType = z.infer<typeof FileType>;
@@ -59,6 +62,9 @@ export const file = router({
     .output(z.object({ path: z.string() }))
     .query(async ({ input: { clusterId }, ctx: { user } }) => {
 
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -85,6 +91,9 @@ export const file = router({
     .input(z.object({ clusterId: z.string(), target: z.enum(["FILE", "DIR"]), path: z.string() }))
     .output(z.void())
     .mutation(async ({ input: { target, clusterId, path }, ctx: { user, req } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       const host = getClusterLoginNode(clusterId);
 
@@ -157,6 +166,9 @@ export const file = router({
     .output(z.void())
     .mutation(async ({ input: { op, clusterId, fromPath, toPath }, ctx: { user, req } }) => {
 
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -223,8 +235,8 @@ export const file = router({
     .output(z.void())
     .use(async ({ input:{ clusterId,path }, ctx, next }) => {
       const res = await next({ ctx });
-
       const { user, req } = ctx;
+
       const logInfo = {
         operatorUserId: user.identityId,
         operatorIp: parseIp(req) ?? "",
@@ -245,6 +257,10 @@ export const file = router({
       return res;
     })
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
+      
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -298,6 +314,10 @@ export const file = router({
       return res;
     })
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -328,6 +348,10 @@ export const file = router({
     .input(z.object({ clusterId: z.string(), path: z.string() }))
     .output(z.array(ListDirectorySchema))
     .query(async ({ input: { clusterId, path }, ctx: { user } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -381,6 +405,9 @@ export const file = router({
     }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
 
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }
@@ -407,6 +434,9 @@ export const file = router({
       type: z.string(),
     }))
     .mutation(async ({ input: { clusterId, path }, ctx: { user } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       const host = getClusterLoginNode(clusterId);
 
@@ -436,6 +466,9 @@ export const file = router({
     .input(z.object({ clusterId: z.string(), path: z.string(), download: z.string() }))
     .output(z.void())
     .query(async ({ input: { clusterId, path, download }, ctx: { user, res } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       const host = getClusterLoginNode(clusterId);
 
@@ -492,6 +525,10 @@ export const file = router({
     .input(z.object({ clusterId: z.string(), filePath: z.string(), decompressionPath: z.string() }))
     .output(z.void())
     .mutation(async ({ input: { clusterId, filePath, decompressionPath }, ctx: { user } }) => {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
 
       if (!host) { throw clusterNotFound(clusterId); }

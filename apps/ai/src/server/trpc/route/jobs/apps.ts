@@ -38,7 +38,7 @@ import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { allApps, checkAppExist, checkCreateAppEntity,
   fetchJobInputParams, getAllTags, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
-import { getAdapterClient } from "src/server/utils/clusters";
+import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import {
@@ -58,7 +58,8 @@ import { parseIp } from "src/utils/parse";
 import { BASE_PATH } from "src/utils/processEnv";
 import { z } from "zod";
 
-import { clusters, PartitionSchema } from "../config";
+import { getCurrentClusters } from "../../../utils/clusters";
+import { PartitionSchema } from "../config";
 import { booleanQueryParam } from "../utils";
 
 const ImageSchema = z.object({
@@ -178,8 +179,12 @@ export const listAvailableApps = procedure
   })
   .input(z.object({ clusterId: z.string() }))
   .output(z.object({ apps: z.array(appSchema) }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx: { user } }) => {
     const { clusterId } = input;
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, clusterId);
+
     const apps = getClusterAppConfigs(clusterId);
 
     return {
@@ -207,8 +212,11 @@ export const getAppMetadata = procedure
     attributes: z.array(AppCustomAttributeSchema),
     appComment: I18nStringSchema.optional(),
   }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx: { user } }) => {
     const { clusterId, appId } = input;
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, clusterId);
 
     const apps = getClusterAppConfigs(clusterId);
     const app = checkAppExist(apps, appId);
@@ -314,6 +322,10 @@ export const createAppSession = procedure
       maxTime, workingDirectory, customAttributes, gpuType } = input;
 
     const userId = user.identityId;
+
+    const currentClusterIds = await getCurrentClusters(userId);
+    checkClusterAvailable(currentClusterIds, clusterId);
+
     const client = getAdapterClient(clusterId);
 
     const apps = getClusterAppConfigs(clusterId);
@@ -381,7 +393,6 @@ export const createAppSession = procedure
       algorithm,
       model,
     });
-
 
     const host = getClusterLoginNode(clusterId);
     if (!host) {
@@ -575,6 +586,10 @@ export const getCreateAppParams =
 
       const { clusterId, jobId, sessionId } = input;
       const userId = user.identityId;
+
+      const currentClusterIds = await getCurrentClusters(userId);
+      checkClusterAvailable(currentClusterIds, clusterId);
+
       const host = getClusterLoginNode(clusterId);
       if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
 
@@ -666,6 +681,9 @@ export const saveImage =
             message: `Image with name: ${imageName} and tag: ${imageTag} of user: ${userId} already exists.`,
           });
         }
+
+        const currentClusterIds = await getCurrentClusters(userId);
+        checkClusterAvailable(currentClusterIds, clusterId);
         // 根据jobId获取该应用运行在集群的节点和对应的containerId
         const client = getAdapterClient(clusterId);
 
@@ -787,6 +805,9 @@ export const listAppSessions =
       const { clusterId, isRunning, page, pageSize } = input;
 
       const userId = user.identityId;
+
+      const currentClusterIds = await getCurrentClusters(userId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       const host = getClusterLoginNode(clusterId);
 
@@ -934,9 +955,12 @@ procedure
   })).output(z.object({
     ok: z.boolean(),
   })).query(
-    async ({ input }) => {
+    async ({ input, ctx: { user } }) => {
 
       const { jobId, clusterId } = input;
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       try {
         const client = getAdapterClient(clusterId);
@@ -1177,9 +1201,9 @@ export const listClusters = procedure
     appId: z.string(),
   }))
   .output(z.object({ clusterConfigs: z.array(ClusterConfig) }))
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx: { user } }) => {
     const { appId } = input;
-    const allClusterIds = Object.keys(clusters);
+    const allClusterIds = await getCurrentClusters(user.identityId);
     const clusterIds: string[] = [];
     // 获取集群ids
     // common app

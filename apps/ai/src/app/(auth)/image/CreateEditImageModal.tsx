@@ -31,6 +31,7 @@ export interface Props {
   isEdit: boolean;
   editData?: ImageInterface;
   clusters: Cluster[];
+  currentClusterIds: string[];
 }
 
 interface FormFields {
@@ -44,12 +45,12 @@ interface FormFields {
 }
 
 export const CreateEditImageModal: React.FC<Props> = ({
-  open, onClose, refetch, isEdit, editData, clusters,
+  open, onClose, refetch, isEdit, editData, clusters, currentClusterIds,
 }: Props) => {
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
-  const { defaultCluster } = defaultClusterContext(clusters);
+  const { defaultCluster } = defaultClusterContext(clusters, currentClusterIds);
 
   useEffect(() => {
     resetForm();

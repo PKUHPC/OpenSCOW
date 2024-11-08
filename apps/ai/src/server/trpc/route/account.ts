@@ -18,6 +18,8 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { paginate, paginationSchema } from "src/server/utils/pagination";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../utils/clusters";
+
 export const accountRouter = router({
 
   listAccounts: procedure
@@ -36,7 +38,10 @@ export const accountRouter = router({
     .output(z.object({ accounts: z.array(z.string()), count: z.number() }))
     .query(async ({ input, ctx: { user } }) => {
       const { clusterId, page, pageSize } = input;
-      if (!clusterId) {
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      
+      if (!clusterId || !currentClusterIds.includes(clusterId)) {
         return { accounts: [], count: 0 };
       }
       const client = getAdapterClient(clusterId);

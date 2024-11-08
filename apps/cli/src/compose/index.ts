@@ -438,6 +438,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "NEXT_PUBLIC_BASE_PATH": join(BASE_PATH, AI_PATH),
         "MIS_URL": join(BASE_PATH, MIS_PATH),
         "MIS_DEPLOYED": config.mis ? "true" : "false",
+        "MIS_SERVER_URL": config.mis ? "mis-server:5000" : "",
         "DB_PASSWORD": config.ai.dbPassword,
         "PORTAL_URL": join(BASE_PATH, PORTAL_PATH),
         "PORTAL_DEPLOYED": config.portal ? "true" : "false",

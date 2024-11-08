@@ -20,6 +20,7 @@ import { rootKeyPair } from "src/server/config/env";
 import { Image, Source, Status } from "src/server/entities/Image";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { createHarborImageUrl, getLoadedImage, getPulledImage, pushImageToHarbor } from "src/server/utils/image";
@@ -31,6 +32,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { clusters } from "../config";
 import { booleanQueryParam, clusterExist } from "../utils";
 
@@ -172,7 +174,8 @@ export const createImage = procedure
   })
   .mutation(async ({ input, ctx: { user } }) => {
 
-    if (input.clusterId && !clusterExist(input.clusterId)) {
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    if (input.clusterId && !clusterExist(input.clusterId, currentClusterIds)) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: `Cluster id ${input.clusterId} does not exist.`,
@@ -195,6 +198,7 @@ export const createImage = procedure
     const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
 
     if (!processClusterId) { throw new NoClusterError(name, tag); }
+    checkClusterAvailable(currentClusterIds, processClusterId);
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
@@ -663,6 +667,9 @@ export const copyImage = procedure
 
     const processClusterId = getSortedClusterIds(clusters)[0];
     if (!processClusterId) { throw new NoClusterError(newName, newTag); }
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, processClusterId);
 
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };

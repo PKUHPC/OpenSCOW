@@ -36,6 +36,7 @@ import { DatasetVersionList } from "./DatasetVersionList";
 interface Props {
   isPublic: boolean;
   clusters: Cluster[];
+  currentClusterIds: string[];
 }
 
 const FilterType = {
@@ -60,13 +61,13 @@ const CreateDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "pr
 const EditDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "link" });
 const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
-export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
+export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentClusterIds }) => {
 
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
 
   const { message } = App.useApp();
 
-  const { defaultCluster } = defaultClusterContext(clusters);
+  const { defaultCluster } = defaultClusterContext(clusters, currentClusterIds);
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
@@ -165,6 +166,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
               refetch={refetch}
               isEdit={false}
               clusters={clusters}
+              currentClusterIds={currentClusterIds}
             >
               添加
             </CreateDatasetModalButton>
@@ -205,7 +207,13 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters }) => {
                   >
                     创建新版本
                   </CreateEditVersionModalButton>
-                  <EditDatasetModalButton refetch={refetch} isEdit={true} editData={r} clusters={clusters}>
+                  <EditDatasetModalButton 
+                    refetch={refetch} 
+                    isEdit={true} 
+                    editData={r} 
+                    clusters={clusters} 
+                    currentClusterIds={currentClusterIds}
+                  >
                     编辑
                   </EditDatasetModalButton>
                   <Button

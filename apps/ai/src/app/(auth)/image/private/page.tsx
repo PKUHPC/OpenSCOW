@@ -19,12 +19,16 @@ import { ImageListTable } from "../ImageListTable";
 
 export default function Page() {
 
-  const { publicConfig } = usePublicConfig();
+  const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
 
   return (
     <div>
       <PageTitle titleText="我的镜像" />
-      <ImageListTable isPublic={false} clusters={publicConfig.CLUSTERS} />
+      <ImageListTable 
+        isPublic={false} 
+        clusters={publicConfig.CLUSTERS} 
+        currentClusterIds={currentAssociateClusterIds}
+      />
     </div>
   );
 }

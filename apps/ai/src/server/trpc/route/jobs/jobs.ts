@@ -27,7 +27,7 @@ import { aiConfig } from "src/server/config/ai";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCreateAppEntity, fetchJobInputParams, validateUniquePaths } from "src/server/utils/app";
-import { getAdapterClient } from "src/server/utils/clusters";
+import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
@@ -35,6 +35,8 @@ import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { isParentOrSameFolder } from "src/utils/file";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
+
+import { getCurrentClusters } from "../../../utils/clusters";
 
 const SESSION_METADATA_NAME = "session.json";
 
@@ -141,6 +143,9 @@ procedure
         remoteImageUrl,isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
       const userId = user.identityId;
+
+      const currentClusterIds = await getCurrentClusters(userId);
+      checkClusterAvailable(currentClusterIds, clusterId);
 
       const host = getClusterLoginNode(clusterId);
       if (!host) {
@@ -297,6 +302,10 @@ procedure
   .query(async ({ input, ctx: { user } }) => {
     const { clusterId, jobId, sessionId } = input;
     const userId = user.identityId;
+
+    const currentClusterIds = await getCurrentClusters(userId);
+    checkClusterAvailable(currentClusterIds, clusterId);
+
     const host = getClusterLoginNode(clusterId);
     if (!host) throw new TRPCError({ code: "NOT_FOUND", message: `Cluster ${clusterId} not found.` });
 
@@ -375,8 +384,11 @@ procedure
   .mutation(async ({ input, ctx: { user } }) => {
 
     const { cluster, jobId } = input;
-
     const userId = user.identityId;
+    
+    const currentClusterIds = await getCurrentClusters(userId);
+    checkClusterAvailable(currentClusterIds, cluster);
+
     const client = getAdapterClient(cluster);
     await asyncClientCall(client.job, "cancelJob", {
       userId,

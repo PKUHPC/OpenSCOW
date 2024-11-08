@@ -18,6 +18,7 @@ import { Dataset } from "src/server/entities/Dataset";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { paginationProps } from "src/server/utils/orm";
@@ -27,6 +28,7 @@ import { getClusterLoginNode } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { booleanQueryParam, clusterExist } from "../utils";
 
 export const DatasetListSchema = z.object({
@@ -154,7 +156,8 @@ export const createDataset = procedure
   })
   .mutation(async ({ input, ctx: { user } }) => {
 
-    if (!clusterExist(input.clusterId)) {
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    if (!clusterExist(input.clusterId, currentClusterIds)) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: `Cluster id ${input.clusterId} does not exist.`,
@@ -350,6 +353,9 @@ export const deleteDataset = procedure
     // 获取此数据集的共享的数据集绝对路径
     if (sharedVersions.length > 0) {
       const sharedDatasetPath = dirname(dirname(sharedVersions[0].path));
+
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, dataset.clusterId);
 
       const host = getClusterLoginNode(dataset.clusterId);
       if (!host) { throw clusterNotFound(dataset.clusterId); }

@@ -22,9 +22,10 @@ export const PublicConfigContext = React.createContext<{
   publicConfig: PublicConfig,
   clusters: Cluster[],
   user: ClientUserInfo;
+  currentAssociateClusterIds: string[],
   defaultClusterContext: {
-    defaultCluster: Cluster;
-    setDefaultCluster: (cluster: Cluster) => void;
+    defaultCluster: Cluster | undefined;
+    setDefaultCluster: (cluster: Cluster | undefined) => void;
     removeDefaultCluster: () => void;
   }
 }>(undefined!);

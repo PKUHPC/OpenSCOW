@@ -21,6 +21,7 @@ import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { checkCopyFilePath, checkCreateResourcePath } from "src/server/utils/checkPathPermission";
 import { chmod } from "src/server/utils/chmod";
+import { checkClusterAvailable } from "src/server/utils/clusters";
 import { copyFile } from "src/server/utils/copyFile";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -33,6 +34,7 @@ import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
+import { getCurrentClusters } from "../../../utils/clusters";
 import { booleanQueryParam } from "../utils";
 
 export const VersionListSchema = z.object({
@@ -143,6 +145,8 @@ export const createModelVersion = procedure
       { versionName: input.versionName, model });
     if (modelVersionExist) throw new TRPCError({ code: "CONFLICT", message: "ModelVersionExist already exist" });
 
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, model.clusterId);
     // 检查目录是否存在
     const host = getClusterLoginNode(model.clusterId);
 
@@ -321,6 +325,9 @@ export const deleteModelVersion = procedure
     // 如果是已分享的模型版本，则删除分享
     if (modelVersion.sharedStatus === SharedStatus.SHARED) {
 
+      const currentClusterIds = await getCurrentClusters(user.identityId);
+      checkClusterAvailable(currentClusterIds, model.clusterId);
+
       try {
         const host = getClusterLoginNode(model.clusterId);
         if (!host) { throw clusterNotFound(model.clusterId); }
@@ -412,6 +419,8 @@ export const shareModelVersion = procedure
     if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId}  not accessible` });
 
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, model.clusterId);
 
     const host = getClusterLoginNode(model.clusterId);
     if (!host) { throw clusterNotFound(model.clusterId); }
@@ -502,6 +511,9 @@ export const unShareModelVersion = procedure
 
     if (model.owner !== user.identityId)
       throw new TRPCError({ code: "FORBIDDEN", message: `Model ${modelId} not accessible` });
+
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, model.clusterId);
 
     const host = getClusterLoginNode(model.clusterId);
     if (!host) { throw clusterNotFound(model.clusterId); }
@@ -632,6 +644,8 @@ export const copyPublicModelVersion = procedure
       });
     }
 
+    const currentClusterIds = await getCurrentClusters(user.identityId);
+    checkClusterAvailable(currentClusterIds, modelVersion.model.$.clusterId);
     // 3. 检查用户是否能将源模型拷贝至目标目录
     const host = getClusterLoginNode(modelVersion.model.$.clusterId);
 

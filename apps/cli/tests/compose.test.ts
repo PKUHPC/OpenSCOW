@@ -45,6 +45,7 @@ it("generate correct paths", async () => {
   expect(composeConfig.services["portal-web"].environment).toContain("MIS_SERVER_URL=mis-server:5000");
   expect(composeConfig.services["mis-web"].environment).toContain("PORTAL_URL=/");
   expect(composeConfig.services.ai.environment).toContain("MIS_URL=/mis");
+  expect(composeConfig.services.ai.environment).toContain("MIS_SERVER_URL=mis-server:5000");
 });
 
 it("sets proxy_read_timeout", async () => {

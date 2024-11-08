@@ -64,7 +64,7 @@ export const AccountDefaultPartitionsTable: React.FC<AccountDefaultPartitionsPro
 
   const removeFromDefaultPartitionsMutation = trpc.partitions.removeFromAccountDefaultPartitions.useMutation({
     onSuccess() {
-      message.success(language.accountDefaultPartitions.addModal.successMessage);
+      message.success(language.accountDefaultPartitions.removeModal.successMessage);
       form.resetFields();
       reload();
       currentClustersRefetch();
