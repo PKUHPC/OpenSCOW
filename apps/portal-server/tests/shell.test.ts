@@ -46,7 +46,7 @@ it.skip("tests shell interaction", async () => {
 
   // types commands
   const type = "echo 123\nexit\n";
-  await stream.writeAsync({ message: { $case: "data", data: { data: Buffer.from(type) } } });
+  await stream.writeAsync({ message: { $case: "data", data: { data: Uint8Array.from(Buffer.from(type)) } } });
 
   // collect output
   const data = await collectInfo<ShellResponse>(stream);

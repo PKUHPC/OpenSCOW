@@ -172,7 +172,7 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
 
     switch (message.$case) {
       case "data":
-        stream.write({ message:  { $case :"data", data: { data: Buffer.from(message.data.data) } } });
+        stream.write({ message:  { $case :"data", data: { data: Uint8Array.from(Buffer.from(message.data.data)) } } });
         break;
       case "resize":
         stream.write({ message: { $case: "resize", resize: {

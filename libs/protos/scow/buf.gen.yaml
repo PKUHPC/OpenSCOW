@@ -12,3 +12,5 @@ plugins:
       - esModuleInterop=true
       - useOptionals=messages
       - outputServices=grpc-js
+      - outputTypeAnnotations=static-only
+

@@ -14,7 +14,6 @@ import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { compareNumber, compareTimeAsSeconds } from "@scow/lib-web/build/utils/math";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
-import type { AppSession } from "@scow/protos/build/portal/app";
 import { App, Button, Checkbox, Form, Input, Popconfirm, Space, Table, TableColumnsType, Tooltip } from "antd";
 import type { CheckboxChangeEvent } from "antd/es/checkbox";
 import { useRouter } from "next/router";
@@ -82,7 +81,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
   }, [data, query.appJobName]);
 
 
-  const columns: TableColumnsType<AppSession> = [
+  const columns: TableColumnsType<NonNullable<typeof data>[number]> = [
     {
       title: t(p("table.jobName")),
       dataIndex: "jobName",

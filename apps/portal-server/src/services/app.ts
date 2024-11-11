@@ -23,14 +23,14 @@ import {
   ConnectToAppResponse,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
-import { DetailedError, ErrorInfo } from "@scow/rich-error-model";
+import { DetailedError, encodeMessage, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
 import { getClusterAppConfigs } from "src/utils/app";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
 const errorInfo = (reason: string) =>
-  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
+  encodeMessage(ErrorInfo, { domain: "", reason: reason, metadata: {} });
 
 export const appServiceServer = plugin((server) => {
 

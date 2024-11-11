@@ -128,7 +128,7 @@ export const Shell: React.FC<Props> = ({ user, cluster, loginNode, path }) => {
                 window.open(join(publicConfig.BASE_PATH, "/files", cluster, path + "?uploadModalOpen=true"));
               }
             }
-            term.write(data);
+            term.write(Uint8Array.from(data));
 
             break;
           }

@@ -56,7 +56,7 @@ export async function calculateBlobSHA256(blob: Blob): Promise<string> {
   try {
 
     const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = Uint8Array.from(Buffer.from(arrayBuffer));
     const hash = crypto.createHash("sha256");
     hash.update(buffer);
     const hashHex = hash.digest("hex");

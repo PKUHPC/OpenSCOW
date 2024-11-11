@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { GetAppConnectionInfoResponse } from "@scow/ai-scheduler-adapter-protos/build/protos/app";
-import { parseErrorDetails } from "@scow/rich-error-model/build";
+import { ErrorInfo, parseErrorStatus } from "@scow/rich-error-model/build";
 import { ApiVersion } from "@scow/utils/build/version";
 import { Logger } from "ts-log";
 
@@ -55,13 +55,16 @@ export async function checkSchedulerApiVersionForAi(client: SchedulerAdapterClie
     scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
   } catch (e: any) {
     const ex = e as ServiceError;
-    const errors = parseErrorDetails(ex.metadata);
+
+    const { findDetails } = parseErrorStatus(ex.metadata);
+
+    const errorInfos = findDetails(ErrorInfo);
+
     // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
-    if (((e).code === status.UNIMPLEMENTED) ||
-      (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
+    if ((ex.code === status.UNIMPLEMENTED) || errorInfos.find((x) => x.reason === "UNIMPLEMENTED")) {
       scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
       // 适配器请求连接失败的处理
-    } else if (((e).code === status.CANCELLED)) {
+    } else if ((ex.code === status.CANCELLED)) {
       throw e;
     } else {
       throw {

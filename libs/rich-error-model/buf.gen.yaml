@@ -12,4 +12,4 @@ plugins:
       - esModuleInterop=true
       - useOptionals=messages
       - outputServices=grpc-js
-      - outputTypeRegistry=true
+      - outputTypeAnnotations=static-only

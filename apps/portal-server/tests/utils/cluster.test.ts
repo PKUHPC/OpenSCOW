@@ -51,7 +51,7 @@ it("get cluster configs info", async () => {
 
   const clusterConfigsByReadingFiles = getClusterConfigs(undefined, logger, ["hpc"]);
 
-  const reply = await asyncUnaryCall(client, "getClusterConfigFiles", { query: {} });
+  const reply = await asyncUnaryCall(client, "getClusterConfigFiles", {});
 
   const clusterConfigsResp = reply.clusterConfigs;
 

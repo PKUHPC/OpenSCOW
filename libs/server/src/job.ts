@@ -10,8 +10,8 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { ErrorInfo } from "@scow/rich-error-model";
+import { encodeMessage, ErrorInfo } from "@scow/rich-error-model";
 
 export const errorInfo = (reason: string) =>
-  ErrorInfo.create({ domain: "", reason: reason, metadata: {} });
+  encodeMessage(ErrorInfo, { domain: "", reason: reason, metadata: {} });
 

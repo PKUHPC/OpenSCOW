@@ -14,7 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { SchedulerAdapterClient } from "@scow/lib-scheduler-adapter";
-import { parseErrorDetails } from "@scow/rich-error-model";
+import { ErrorInfo, parseErrorStatus } from "@scow/rich-error-model";
 import { OptionalFeatures } from "@scow/scheduler-adapter-protos/build/protos/config";
 import { ApiVersion } from "@scow/utils/build/version";
 import { Logger } from "ts-log";
@@ -33,13 +33,16 @@ export async function checkSchedulerApiVersion(client: SchedulerAdapterClient,
     scheduleApiVersion = await asyncClientCall(client.version, "getVersion", {});
   } catch (e) {
     const ex = e as ServiceError;
-    const errors = parseErrorDetails(ex.metadata);
-    // 如果找不到获取版本号的接口，指定版本为接口存在前的最新版1.0.0
-    if (((e as any).code === status.UNIMPLEMENTED) ||
-    (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
+
+    const { findDetails } = parseErrorStatus(ex.metadata);
+    const errors = findDetails(ErrorInfo);
+
+
+    if (ex.code === Status.UNIMPLEMENTED) {
       scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
-    // 适配器请求连接失败的处理
-    } else if (((e as any).code === status.CANCELLED)) {
+    } else if (errors.find((x) => x.reason === "UNIMPLEMENTED")) {
+      scheduleApiVersion = { major: 1, minor: 0, patch: 0 };
+    } else if (ex.code === status.CANCELLED) {
       throw e;
     } else {
       throw {
@@ -107,7 +110,7 @@ export async function getSchedulerApiVersion(client: SchedulerAdapterClient, log
 /**
  * 判断当前集群下调度器适配器是否包含可选功能
  */
-export async function listSchedulerAdapterOptionalFeatures(client: SchedulerAdapterClient, logger: Logger): 
+export async function listSchedulerAdapterOptionalFeatures(client: SchedulerAdapterClient, logger: Logger):
 Promise<OptionalFeatures[]> {
 
   const optionalFeatures: OptionalFeatures[] = [];
@@ -116,23 +119,19 @@ Promise<OptionalFeatures[]> {
     optionalFeatures.push(...reply.features);
   } catch (e) {
     const ex = e as ServiceError;
-    const errors = parseErrorDetails(ex.metadata);
-    // 如果找不到获取可选功能的接口，默认可选功能返回列表为空
-    if (((e as any).code === status.UNIMPLEMENTED) ||
-    (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "UNIMPLEMENTED")) {
+    if (ex.code === status.UNIMPLEMENTED) {
       logger.info("The current adapter has not implemented any optional features.");
-    // 其他适配器请求连接失败的处理
     } else {
       throw e;
     };
   }
-  return optionalFeatures; 
+  return optionalFeatures;
 };
 
 
 // 检查当前适配器是否可以使用 资源管理 的可选功能接口
 export async function ensureResourceManagementFeatureAvailable(
-  client: SchedulerAdapterClient, 
+  client: SchedulerAdapterClient,
   logger: Logger): Promise<void> {
 
   // 需要满足1.8.0版本适配器及以上

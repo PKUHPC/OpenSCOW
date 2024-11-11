@@ -19,7 +19,7 @@ import { formatTime } from "@scow/lib-scheduler-adapter";
 import { errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
 import { getUserHomedir,
   sftpChmod, sftpExists, sftpReaddir, sftpReadFile, sftpRealPath, sftpWriteFile } from "@scow/lib-ssh";
-import { DetailedError, parseErrorDetails } from "@scow/rich-error-model";
+import { DetailedError, ErrorInfo, parseErrorStatus } from "@scow/rich-error-model";
 import { JobInfo, SubmitJobRequest } from "@scow/scheduler-adapter-protos/build/protos/job";
 import dayjs from "dayjs";
 import fs from "fs";
@@ -127,9 +127,12 @@ export const appOps = (cluster: string): AppOps => {
             async (client) => await asyncClientCall(client.job, "submitJob", request),
           ).catch((e) => {
             const ex = e as ServiceError;
-            const errors = parseErrorDetails(ex.metadata);
-            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo"
-              && errors[0].reason === "SBATCH_FAILED") {
+
+            const { findDetails } = parseErrorStatus(ex.metadata);
+
+            const errorInfos = findDetails(ErrorInfo);
+
+            if (errorInfos.find((x) => x.reason === "SBATCH_FAILED")) {
               throw new DetailedError({
                 code: Status.INTERNAL,
                 message: ex.details,

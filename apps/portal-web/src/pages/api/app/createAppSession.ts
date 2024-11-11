@@ -15,7 +15,7 @@ import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@grpc/grpc-js";
 import { OperationType } from "@scow/lib-operation-log";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
-import { parseErrorDetails } from "@scow/rich-error-model";
+import { ErrorInfo, parseErrorStatus } from "@scow/rich-error-model";
 import { Type } from "@sinclair/typebox";
 import { join } from "path";
 import { authenticate } from "src/auth/server";
@@ -122,8 +122,12 @@ export default /* #__PURE__*/route(CreateAppSessionSchema, async (req, res) => {
       operationTypePayload: { ... logInfo.operationTypePayload },
     }, OperationResult.FAIL);
     const ex = e as ServiceError;
-    const errors = parseErrorDetails(ex.metadata);
-    if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo") {
+
+    const { findDetails } = parseErrorStatus(ex.metadata);
+
+    const errors = findDetails(ErrorInfo);
+
+    if (errors[0]) {
       switch (errors[0].reason) {
         case "SBATCH_FAILED":
           return { 500: { code: "SBATCH_FAILED" as const, message: ex.details } };

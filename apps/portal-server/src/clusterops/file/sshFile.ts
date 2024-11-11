@@ -204,8 +204,7 @@ export const sshFileServices = (host: string): FileOps => ({
         await pipeline(
           readStream,
           async (chunk) => {
-
-            return { chunk: Buffer.from(chunk) };
+            return { chunk: Uint8Array.from(Buffer.from(chunk)) };
           },
           call,
         );

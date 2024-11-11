@@ -15,14 +15,14 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials, ServiceError, status } from "@grpc/grpc-js";
 import { HookServiceClient, HookServiceServer, HookServiceService } from "@scow/protos/build/hook/hook";
 
-import { DetailedError, ErrorInfo, LocalizedMessage, parseErrorDetails } from "../src";
+import { DetailedError, encodeMessage,ErrorInfo, LocalizedMessage, parseErrorStatus } from "../src";
 
 let server: Server;
 
 const errorMessage = "The expected error message";
 
-const errorInfo = () => ErrorInfo.create({ domain: "test.com", reason: "123", metadata: { test1: "test" } });
-const localizedMessage = () => LocalizedMessage.create({ locale: "zh-CN", message: "123" });
+const errorInfo = ({ domain: "test.com", reason: "123", metadata: { test1: "test" } });
+const localizedMessage = ({ locale: "zh-CN", message: "123" });
 
 function createServer() {
   const server = new Server({
@@ -36,7 +36,10 @@ function createServer() {
         throw new DetailedError({
           code: status.ALREADY_EXISTS,
           message: errorMessage,
-          details: [errorInfo(), localizedMessage()],
+          details: [
+            encodeMessage(ErrorInfo, errorInfo),
+            encodeMessage(LocalizedMessage, localizedMessage),
+          ],
         });
       }
       if (request.event?.$case === "accountBlocked") {
@@ -76,12 +79,15 @@ it("throws and catches ErrorDetails", async () => {
 
     const ex = e as ServiceError;
 
-    const errors = parseErrorDetails(ex.metadata);
+    const { findDetails } = parseErrorStatus(ex.metadata);
     expect(ex.details).toBe(errorMessage);
 
-    expect(errors).toIncludeAllMembers([
-      errorInfo(), localizedMessage(),
-    ]);
+    const errors: ErrorInfo[] = findDetails(ErrorInfo);
+
+    expect(errors).toIncludeAllMembers([ErrorInfo.fromPartial(errorInfo)]);
+
+    expect(findDetails(LocalizedMessage) satisfies LocalizedMessage[])
+      .toIncludeAllMembers([LocalizedMessage.fromPartial(localizedMessage)]);
   }
 });
 
@@ -98,7 +104,7 @@ it("does not interfere with normal error", async () => {
   catch (e) {
     const ex = e as ServiceError;
     expect(ex.details).toBe("Normal error");
-    const errors = parseErrorDetails(ex.metadata);
+    const errors = parseErrorStatus(ex.metadata).findDetails(ErrorInfo);
     expect(errors).toHaveLength(0);
   }
 });

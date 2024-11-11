@@ -50,7 +50,7 @@ it("uploads file", async () => {
 
   const rep = await asyncRequestStreamCall(client, "upload", async ({ writeAsync }) => {
     await writeAsync({ message: { $case: "info", info: { cluster, path: filePath, userId } } });
-    await writeAsync({ message: { $case: "chunk", chunk: content } });
+    await writeAsync({ message: { $case: "chunk", chunk: Uint8Array.from(content) } });
   });
 
   expect(rep.writtenBytes).toBe(size);
@@ -70,7 +70,7 @@ it("returns error if written to path without permission", async () => {
   const filePath = "/test";
 
   const size = 10000;
-  const content = randomBytes(size);
+  const content = Uint8Array.from(randomBytes(size));
 
   await expectGrpcThrow(asyncRequestStreamCall(client, "upload", async function *() {
     yield { message: { $case: "info" as const, info: { cluster, path: filePath, userId } } };

@@ -19,7 +19,7 @@ import { getClusterAssignedAccounts } from "@scow/lib-scow-resource";
 import { checkSchedulerApiVersion, libGetAccounts, libGetUserInfo } from "@scow/lib-server";
 import { createDirectoriesRecursively, sftpReadFile, sftpStat, sftpWriteFile } from "@scow/lib-ssh";
 import { AccountStatusFilter, JobServiceServer, JobServiceService, TimeUnit } from "@scow/protos/build/portal/job";
-import { parseErrorDetails } from "@scow/rich-error-model";
+import { ErrorInfo, parseErrorStatus } from "@scow/rich-error-model";
 import { ApiVersion } from "@scow/utils/build/version";
 import path, { join } from "path";
 import { getClusterOps } from "src/clusterops";
@@ -298,8 +298,12 @@ export const jobServiceServer = plugin((server) => {
           script: command, workingDirectory, stdout: output, stderr: errorOutput, extraOptions: [],
         }).catch((e) => {
           const ex = e as ServiceError;
-          const errors = parseErrorDetails(ex.metadata);
-          if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+
+          const { findDetails } = parseErrorStatus(ex.metadata);
+
+          const errors = findDetails(ErrorInfo);
+
+          if (errors.find((x) => x.reason === "SBATCH_FAILED")) {
             throw {
               code: Status.INTERNAL,
               message: "sbatch failed",
@@ -411,8 +415,11 @@ export const jobServiceServer = plugin((server) => {
             userId, script, scriptFileFullPath,
           }).catch((e) => {
             const ex = e as ServiceError;
-            const errors = parseErrorDetails(ex.metadata);
-            if (errors[0] && errors[0].$type === "google.rpc.ErrorInfo" && errors[0].reason === "SBATCH_FAILED") {
+            const { findDetails } = parseErrorStatus(ex.metadata);
+
+            const errors = findDetails(ErrorInfo);
+
+            if (errors.find((x) => x.reason === "SBATCH_FAILED")) {
               throw {
                 code: Status.INTERNAL,
                 message: "sbatch failed",

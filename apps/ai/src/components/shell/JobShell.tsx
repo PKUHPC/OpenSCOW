@@ -70,7 +70,7 @@ export const JobShell: React.FC<Props> = ({ user, cluster, jobId }) => {
         switch (message.$case) {
           case "data": {
             const data = Buffer.from(message.data.data);
-            term.write(data);
+            term.write(Uint8Array.from(data));
             break;
           }
           case "exit":

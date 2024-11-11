@@ -48,7 +48,7 @@ afterEach(async () => {
 
 it("get scow version configs info", async () => {
 
-  const reply = await asyncUnaryCall(client, "getApiVersion", { query: {} });
+  const reply = await asyncUnaryCall(client, "getApiVersion", {});
 
   const version = await JSON.parse(readFileSync(join(__dirname,
     "../../node_modules/@scow/protos/package.json"), "utf-8")).version;

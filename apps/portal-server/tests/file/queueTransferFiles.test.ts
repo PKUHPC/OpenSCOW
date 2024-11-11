@@ -77,7 +77,7 @@ beforeEach(async () => {
 
   await asyncRequestStreamCall(client, "upload", async ({ writeAsync }) => {
     await writeAsync({ message: { $case: "info", info: { cluster, path: testTransferFile, userId } } });
-    await writeAsync({ message: { $case: "chunk", chunk: Buffer.from(content) } });
+    await writeAsync({ message: { $case: "chunk", chunk: Uint8Array.from(Buffer.from(content)) } });
   });
 });
 
