@@ -151,6 +151,11 @@ export const ImportUsersTable: React.FC = () => {
                 Router.push({ query: { cluster: value.id } });
               }}
             />
+
+            <Form.Item name="whitelist" valuePropName="checked">
+              <Checkbox>{t(p("addWhitelist"))}</Checkbox>
+            </Form.Item>
+
             <Button type="primary" htmlType="submit" loading={loading}>
               {t(pCommon("import"))}
             </Button>
@@ -233,9 +238,7 @@ export const ImportUsersTable: React.FC = () => {
             )}
           />
         </Table>
-        <Form.Item name="whitelist" valuePropName="checked">
-          <Checkbox>{t(p("addWhitelist"))}</Checkbox>
-        </Form.Item>
+
         <Drawer
           placement="right"
           onClose={() => setusersList(undefined)}
