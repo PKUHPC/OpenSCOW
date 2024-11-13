@@ -74,8 +74,6 @@ export const RunningJobQueryTable: React.FC<Props> = ({
       accountName: typeof accountNames === "string" ? accountNames : undefined,
       jobId: undefined,
       cluster: defaultCluster ?? Object.values(activatedClusters)[0],
-      // 默认不传入userId
-      userId: undefined,
     };
   });
 
@@ -97,7 +95,7 @@ export const RunningJobQueryTable: React.FC<Props> = ({
     };
 
     return await api.getRunningJobs({ query: {
-      userId: query.userId || undefined,
+      userId: userId || query.userId || undefined,
       cluster: query.cluster.id,
       ...diffAccountNameQuery,
     } });
