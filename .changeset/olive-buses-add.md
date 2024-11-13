@@ -2,7 +2,7 @@
 "@scow/mis-server": patch
 "@scow/resource": patch
 "@scow/config": patch
-"@scow/cli": minor
+"@scow/cli": patch
 "@scow/ai": patch
 ---
 
