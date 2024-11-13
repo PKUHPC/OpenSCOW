@@ -1,5 +1,26 @@
 # @scow/portal-server
 
+## 1.7.2
+
+### Patch Changes
+
+- 87ff0e7: 修改 HPC 和 AI 的作业和应用的默认工作目录命名规则
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- f75af4b: hpc 应用作业列表和 AI 的作业列表修改作业名获取方式
+- 56e0152: scow 和 适配器交互添加双向 tls 校验
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+- Updated dependencies [56e0152]
+  - @scow/config@1.6.1
+  - @scow/scheduler-adapter-protos@1.4.1
+  - @scow/lib-scheduler-adapter@1.1.15
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scow-resource@0.2.2
+  - @scow/protos@1.0.17
+  - @scow/lib-server@1.3.6
+  - @scow/lib-scowd@1.1.3
+
 ## 1.7.1
 
 ### Patch Changes

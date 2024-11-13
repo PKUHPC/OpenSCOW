@@ -1,5 +1,24 @@
 # @scow/mis-web
 
+## 1.7.2
+
+### Patch Changes
+
+- 8bd51e4: 修复了管理系统中，按用户查询会搜索到不属于本用户的未结束作业
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- 71466e6: 导入用户页面的将用户添加入白名单放置在导入按键附近
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+  - @scow/notification-protos@0.1.3
+  - @scow/config@1.6.1
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-operation-log@2.1.11
+  - @scow/lib-scow-resource@0.2.2
+  - @scow/lib-notification@1.0.3
+  - @scow/protos@1.0.17
+  - @scow/lib-web@1.4.5
+
 ## 1.7.1
 
 ### Patch Changes

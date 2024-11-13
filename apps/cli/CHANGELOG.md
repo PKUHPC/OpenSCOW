@@ -1,5 +1,16 @@
 # @scow/cli
 
+## 1.7.2
+
+### Patch Changes
+
+- 1a531ed: 已部署管理系统与资源管理系统的情况下，可以对 AI 集群的集群信息进行授权
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- 56e0152: scow 和 适配器交互添加双向 tls 校验
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+  - @scow/config@1.6.1
+
 ## 1.7.1
 
 ### Patch Changes

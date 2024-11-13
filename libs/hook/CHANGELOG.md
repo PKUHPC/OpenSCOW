@@ -1,5 +1,13 @@
 # @scow/lib-hook
 
+## 1.0.17
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [56e0152]
+  - @scow/protos@1.0.17
+
 ## 1.0.16
 
 ### Patch Changes

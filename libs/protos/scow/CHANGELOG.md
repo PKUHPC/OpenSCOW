@@ -1,5 +1,13 @@
 # @scow/protos
 
+## 1.0.17
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [f75af4b]
+  - @scow/grpc-api@1.14.1
+
 ## 1.0.16
 
 ### Patch Changes

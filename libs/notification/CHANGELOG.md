@@ -1,5 +1,13 @@
 # @scow/lib-notification
 
+## 1.0.3
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [aeac587]
+  - @scow/notification-protos@0.1.3
+
 ## 1.0.2
 
 ### Patch Changes

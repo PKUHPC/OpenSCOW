@@ -1,5 +1,15 @@
 # @scow/lib-scheduler-adapter
 
+## 1.1.15
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- 56e0152: scow 和 适配器交互添加双向 tls 校验
+- Updated dependencies [56e0152]
+  - @scow/scheduler-adapter-protos@1.4.1
+  - @scow/protos@1.0.17
+
 ## 1.1.14
 
 ### Patch Changes

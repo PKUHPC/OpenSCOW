@@ -1,5 +1,16 @@
 # @scow/lib-scow-resource
 
+## 0.2.2
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+  - @scow/config@1.6.1
+  - @scow/scow-resource-protos@0.2.1
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # @scow/portal-web
 
+## 1.7.2
+
+### Patch Changes
+
+- 87ff0e7: 修改 HPC 和 AI 的作业和应用的默认工作目录命名规则
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- f75af4b: hpc 应用作业列表和 AI 的作业列表修改作业名获取方式
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+  - @scow/notification-protos@0.1.3
+  - @scow/config@1.6.1
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-operation-log@2.1.11
+  - @scow/lib-scow-resource@0.2.2
+  - @scow/lib-notification@1.0.3
+  - @scow/protos@1.0.17
+  - @scow/lib-web@1.4.5
+
 ## 1.7.1
 
 ### Patch Changes

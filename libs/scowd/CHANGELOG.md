@@ -1,5 +1,11 @@
 # @scow/lib-scowd
 
+## 1.1.3
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+
 ## 1.1.2
 
 ### Patch Changes

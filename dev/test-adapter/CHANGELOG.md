@@ -1,5 +1,13 @@
 # @scow/test-adapter
 
+## 1.1.9
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [56e0152]
+  - @scow/scheduler-adapter-protos@1.4.1
+
 ## 1.1.8
 
 ### Patch Changes

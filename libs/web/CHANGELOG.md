@@ -1,5 +1,16 @@
 # @scow/lib-web
 
+## 1.4.5
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+  - @scow/config@1.6.1
+  - @scow/protos@1.0.17
+
 ## 1.4.4
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @scow/lib-operation-log
 
+## 2.1.11
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [56e0152]
+  - @scow/protos@1.0.17
+
 ## 2.1.10
 
 ### Patch Changes

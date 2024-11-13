@@ -1,5 +1,11 @@
 # @scow/grpc-api
 
+## 1.14.1
+
+### Patch Changes
+
+- f75af4b: ListAppSessions 返回增加 jobName
+
 ## 1.14.0
 
 ### Minor Changes

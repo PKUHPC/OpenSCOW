@@ -1,5 +1,20 @@
 # @scow/lib-server
 
+## 1.3.6
+
+### Patch Changes
+
+- 56e0152: 更新 @grpc/grpc-js 到 1.12.2
+- Updated dependencies [aeac587]
+- Updated dependencies [1a531ed]
+- Updated dependencies [56e0152]
+- Updated dependencies [56e0152]
+  - @scow/config@1.6.1
+  - @scow/scheduler-adapter-protos@1.4.1
+  - @scow/lib-scheduler-adapter@1.1.15
+  - @scow/rich-error-model@2.0.1
+  - @scow/protos@1.0.17
+
 ## 1.3.5
 
 ### Patch Changes
