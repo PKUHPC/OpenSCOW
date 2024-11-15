@@ -58,6 +58,33 @@ message DeleteFileRequest {
 message DeleteFileResponse {
 }
 
+message WriteFileRequest {
+  string user_id = 1;
+  string file_path = 2;
+  string content = 3;
+}
+
+message WriteFileResponse {
+}
+
+message ReadFileRequest {
+  string user_id = 1;
+  string file_path = 2;
+}
+
+message ReadFileResponse {
+  bytes content = 1;
+}
+
+message ChangeModeRequest {
+  string user_id = 1;
+  string path = 2;
+  uint32 mode = 3;
+}
+
+message ChangeModeResponse {
+}
+
 message GetFileMetadataRequest {
   string user_id = 1;
   string file_path = 2;
@@ -212,6 +239,12 @@ service FileService {
 
   rpc CreateFile(CreateFileRequest) returns (CreateFileResponse) {}
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse) {}
+  // 写入文件大小限制为 10 MB，上传更大文件考虑使用分片上传相关接口
+  rpc WriteFile(WriteFileRequest) returns (WriteFileResponse) {};
+  // 读取文件大小限制为 10 MB，读取更大文件考虑使用 Download 接口
+  rpc ReadFile(ReadFileRequest) returns (ReadFileResponse) {};
+
+  rpc ChangeMode(ChangeModeRequest) returns (ChangeModeResponse) {};
 
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
   rpc InitMultipartUpload(InitMultipartUploadRequest) returns (InitMultipartUploadResponse);

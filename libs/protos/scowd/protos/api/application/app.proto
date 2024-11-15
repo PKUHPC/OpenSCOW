@@ -31,7 +31,20 @@ message GetAppLastSubmissionResponse {
   SubmissionInfo file_data = 1;
 }
 
+message RefreshVncPasswordRequest {
+  string user_id = 1;
+  int32 display_id = 2;
+  string host = 3;
+  string vnc_passwd_path = 4;
+}
+
+message RefreshVncPasswordResponse {
+  string password = 1;
+}
+
 
 service AppService {
   rpc GetAppLastSubmission(GetAppLastSubmissionRequest) returns (GetAppLastSubmissionResponse) {}
+
+  rpc RefreshVncPassword(RefreshVncPasswordRequest) returns (RefreshVncPasswordResponse) {};
 }

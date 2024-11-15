@@ -11,9 +11,9 @@
  */
 
 import { ClusterOps } from "src/clusterops/api";
-import { appOps } from "src/clusterops/app";
-import { desktopOps } from "src/clusterops/desktop";
-import { fileOps } from "src/clusterops/file";
+import { appOps } from "src/clusterops/app/index";
+import { desktopOps } from "src/clusterops/desktop/index";
+import { fileOps } from "src/clusterops/file/index";
 import { jobOps } from "src/clusterops/job";
 import { configClusters } from "src/config/clusters";
 

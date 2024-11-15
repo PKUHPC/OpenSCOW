@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -31,8 +19,7 @@ import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
 import { getIpFromProxyGateway } from "src/utils/proxy";
-import { getScowdClient } from "src/utils/scowd";
-import { getClusterLoginNode, sshConnect } from "src/utils/ssh";
+import { sshConnect } from "src/utils/ssh";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId,
   refreshPassword, refreshPasswordByProxyGateway } from "src/utils/turbovnc";
 
@@ -71,11 +58,7 @@ const VNC_SESSION_INFO = "VNC_SESSION_INFO";
 const APP_LAST_SUBMISSION_INFO = "last_submission.json";
 const BIN_BASH_SCRIPT_HEADER = "#!/bin/bash -l\n";
 
-export const appOps = (cluster: string): AppOps => {
-
-  const host = getClusterLoginNode(cluster);
-
-  if (!host) { throw new Error(`Cluster ${cluster} has no login node`); }
+export const sshAppServices = (cluster: string, host: string): AppOps => {
 
   return {
     createApp: async (request, logger) => {
@@ -288,39 +271,26 @@ export const appOps = (cluster: string): AppOps => {
       });
     },
 
-    getAppLastSubmission: async (requset, logger) => {
-      const { userId, appId } = requset;
+    getAppLastSubmission: async (request, logger) => {
+      const { userId, appId } = request;
 
       const file = join(portalConfig.appLastSubmissionDir, appId, APP_LAST_SUBMISSION_INFO);
 
-      const clusterInfo = configClusters[cluster];
-      if (clusterInfo.scowd?.enabled) {
-        const client = getScowdClient(cluster);
+      return await sshConnect(host, userId, logger, async (ssh) => {
 
-        const data = await client.app.getAppLastSubmission({ userId, filePath: file });
+        const sftp = await ssh.requestSFTP();
 
-        const submitTime = !data.fileData?.submitTime ? undefined
-          : new Date(Number((data.fileData.submitTime.seconds * BigInt(1000))
-            + BigInt(data.fileData.submitTime.nanos / 1000000)));
+        if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
+        const content = await sftpReadFile(sftp)(file);
 
-        return { lastSubmissionInfo: data.fileData ? {
-          ...data.fileData,
-          submitTime: submitTime?.toISOString(),
-        } : undefined };
-
-      } else {
-        return await sshConnect(host, userId, logger, async (ssh) => {
-
-          const sftp = await ssh.requestSFTP();
-
-          if (!await sftpExists(sftp, file)) { return { lastSubmissionInfo: undefined }; }
-          const content = await sftpReadFile(sftp)(file);
+        try {
           const data = JSON.parse(content.toString()) as SubmissionInfo;
-
           return { lastSubmissionInfo: data };
-        });
-      }
-
+        } catch (error) {
+          logger.error("Parsing JSON failed, the content is %s,the error is %o",content.toString(),error);
+          throw { code: Status.UNAVAILABLE, message: `${appId} last submission record not available` } as ServiceError;
+        }
+      });
     },
 
     listAppSessions: async (request, logger) => {
