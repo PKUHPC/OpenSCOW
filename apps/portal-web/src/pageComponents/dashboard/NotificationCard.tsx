@@ -44,7 +44,9 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const { results } = await api.getUnreadMessage({ query: {} });
+        const { results } = await api.getUnreadMessage({ query: {
+          page: 1, pageSize: 10,
+        } }).httpError(500, () => {});
         setLoading(false);
 
         const msgsToRender: RenderContent[] = [];

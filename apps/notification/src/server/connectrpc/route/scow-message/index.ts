@@ -152,20 +152,17 @@ export default (router: ConnectRouter) => {
           break;
       }
 
-      const messageTypeCondition: Record<string, any> = {};
-      if (messageType) messageTypeCondition.type = messageType;
-
       // 发送消息时已经过滤了用户未订阅的消息，所以无需在查询时再过滤
       const [messages, totalCount] = await em.findAndCount(Message, {
         ...category ? { category } : {},
+        ...messageType ? { messageType } : {},
         $and: [
-          { messageType: messageTypeCondition },
           { $or: targetConditions },
           { $or: readConditions },
         ],
       }, {
         ...paginationProps(page, pageSize),
-        populate: ["messageType", "userMessageRead"],
+        populate: ["userMessageRead"],
         orderBy: { "createdAt": "DESC" },
       });
 

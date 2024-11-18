@@ -49,3 +49,10 @@ passwordPattern:
 #   address: http://localhost:6003
 #   # 启动时是否执行封锁状态同步功能（如果暂未初始化资源管理数据，建议关闭；如已完成初始化资源管理数据则建议开启）
 #   syncBlockStatusWhenStart: false
+
+# scow资源管理系统
+# notification:
+#   # 是否启用消息系统
+#   enabled: true
+#   # 消息系统url
+#   address: http://localhost:6004

@@ -61,7 +61,11 @@ export const GetUnreadMessagesSchema = typeboxRouteSchema({
 
   method: "GET",
 
-  query: Type.Object({}),
+  query: Type.Object({
+    messageType: Type.Optional(Type.String()),
+    page: Type.Optional(Type.Number()),
+    pageSize: Type.Optional(Type.Number()),
+  }),
 
   responses: {
     200: Type.Object({
@@ -88,8 +92,12 @@ export default route(GetUnreadMessagesSchema, async (req, res) => {
     return;
   }
 
+  const { messageType, page, pageSize } = req.query;
+
   return notifClient.scowMessage.listMessages({
-    userId: info.identityId, readStatus: ReadStatus.UNREAD, noticeType: NoticeType.SITE_MESSAGE })
+    messageType, page, pageSize,
+    userId: info.identityId, readStatus: ReadStatus.UNREAD, noticeType: NoticeType.SITE_MESSAGE,
+  })
     .then((res) => {
       return { 200: { results: {
         totalCount: Number(res.totalCount),

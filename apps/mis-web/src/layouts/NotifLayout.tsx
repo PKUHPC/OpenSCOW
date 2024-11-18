@@ -68,17 +68,17 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const { results } = await api.getUnreadMessages({ query: {} });
+        const { results } = await api.getUnreadMessages({
+          query: { messageType: AdminMessageType.SystemNotification },
+        }).httpError(500, () => {});
 
         for (const msg of results.messages) {
-          if (msg.messageType?.type === AdminMessageType.SystemNotification) {
-            const content = renderingMessage(msg, currentLanguage.id);
+          const content = renderingMessage(msg, currentLanguage.id);
 
-            // 使用 ref 来检查已通知的 ID
-            if (content && !notifiedIdsRef.current.has(msg.id)) {
-              openNotification(content);
-              notifiedIdsRef.current.add(msg.id); // 更新 ref 中的 ID 集合
-            }
+          // 使用 ref 来检查已通知的 ID
+          if (content && !notifiedIdsRef.current.has(msg.id)) {
+            openNotification(content);
+            notifiedIdsRef.current.add(msg.id); // 更新 ref 中的 ID 集合
           }
         }
       } catch {

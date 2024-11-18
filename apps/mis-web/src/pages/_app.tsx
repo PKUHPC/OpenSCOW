@@ -158,8 +158,8 @@ function MyApp({ Component, pageProps, extra }: Props) {
   const clusterInfoStore = useConstant(() => {
     return createStore(
       ClusterInfoStore,
-      extra.clusterConfigs, 
-      extra.initialActivatedClusters, 
+      extra.clusterConfigs,
+      extra.initialActivatedClusters,
       extra.initialSimpleClustersInfo,
     );
   });
@@ -206,7 +206,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
                 initialLanguage={extra.initialLanguage}
               >
                 {publicConfig.NOTIF_ENABLED ? (
-                  <NotificationLayout interval={60000}>
+                  <NotificationLayout interval={300000}>
                     <Component {...pageProps} />
                   </NotificationLayout>
                 )

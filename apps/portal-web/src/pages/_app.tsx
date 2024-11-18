@@ -225,7 +225,7 @@ function MyApp({ Component, pageProps, extra }: Props) {
                 initialLanguage={extra.initialLanguage}
               >
                 {publicConfig.NOTIF_ENABLED ? (
-                  <NotificationLayout interval={60000}>
+                  <NotificationLayout interval={300000}>
                     <Component {...pageProps} />
                   </NotificationLayout>
                 )
@@ -278,10 +278,10 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
         };
 
         if (publicConfig.MIS_DEPLOYED && runtimeConfig.SCOW_RESOURCE_CONFIG?.enabled) {
-          const userAssociatedClusterIds = 
-          await api.getUserAssociatedClusterIds({ query: { 
-            token, 
-            userId: userInfo.identityId, 
+          const userAssociatedClusterIds =
+          await api.getUserAssociatedClusterIds({ query: {
+            token,
+            userId: userInfo.identityId,
           } });
           extra.userAssociatedClusterIds = userAssociatedClusterIds.clusterIds;
         }
@@ -308,7 +308,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
             configClusters: publicConfigClusters,
             misDeployed: publicConfig.MIS_DEPLOYED });
           // 如果用户关联账户的已授权集群存在，则系统初始集群为在线集群与已授权集群的交集
-          const initialUserAssociatedClusters = extra.userAssociatedClusterIds ? 
+          const initialUserAssociatedClusters = extra.userAssociatedClusterIds ?
             initialActivatedClusters.activatedClusters?.filter((c) => (extra.userAssociatedClusterIds?.includes(c.id)))
             : initialActivatedClusters.activatedClusters;
 

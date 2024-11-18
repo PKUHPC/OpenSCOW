@@ -22,7 +22,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           "enabled": true,
           "autoRefresh": {
             "enabled": true,
-            "intervalMs": 5000,
+            "intervalMs": 60000,
           },
         },
         rewriteNavigations: true,
@@ -32,7 +32,7 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
           "enabled": true,
           "autoRefresh": {
             "enabled": true,
-            "intervalMs": 5000,
+            "intervalMs": 60000,
           },
         },
         rewriteNavigations: true,
