@@ -5,8 +5,10 @@ import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
 import { AccountPartitionRule } from "src/server/entities/AccountPartitionRule";
 import { TenantClusterRule } from "src/server/entities/TenantClusterRule";
 import { TenantPartitionRule } from "src/server/entities/TenantPartitionRule";
+import { callHook } from "src/server/hookClient";
 
 import { forkEntityManager } from "./getOrm";
+import { logger } from "./logger";
 import { USE_MOCK } from "./processEnv";
 
 /**
@@ -142,11 +144,12 @@ Promise<boolean> {
   const foundDefaultClusters = await em.find(TenantClusterRule, { tenantName, isAccountDefaultCluster: true });
   const foundDefaultPartitions = await em.find(TenantPartitionRule, { tenantName, isAccountDefaultPartition: true });
 
-  foundDefaultClusters.forEach((item) => {
+  const foundDefaultClusterIds = foundDefaultClusters.map((item) => (item.clusterId));
+  foundDefaultClusterIds.forEach((clusterId) => {
     const accountCluster = new AccountClusterRule({
       accountName,
       tenantName,
-      clusterId: item.clusterId,
+      clusterId,
     });
     em.persist(accountCluster);
   });
@@ -162,6 +165,10 @@ Promise<boolean> {
   });
 
   await em.flush();
+
+  // 通知账户授权集群数据
+  await callHook("accountAssignedToClusters", 
+    { accountName, tenantName, clusterIds: foundDefaultClusterIds }, logger);
 
   return true;
 }

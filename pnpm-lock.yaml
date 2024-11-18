@@ -1499,6 +1499,9 @@ importers:
       '@scow/lib-decimal':
         specifier: workspace:*
         version: link:../../libs/decimal
+      '@scow/lib-hook':
+        specifier: workspace:*
+        version: link:../../libs/hook
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../../libs/scheduler-adapter

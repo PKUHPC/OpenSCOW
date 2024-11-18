@@ -3,6 +3,7 @@ import { ensureResourceManagementFeatureAvailable } from "@scow/lib-server";
 import { TRPCError } from "@trpc/server";
 import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
 import { AccountPartitionRule } from "src/server/entities/AccountPartitionRule";
+import { callHook } from "src/server/hookClient";
 import { getScowActivatedClusters, getScowClusterConfigs } from "src/server/mis-server/cluster";
 import { getScowAccounts } from "src/server/mis-server/tenantAccount";
 import { authProcedure } from "src/server/trpc/procedure/base";
@@ -203,6 +204,8 @@ export const assignAccountCluster = authProcedure
     });
     await em.persistAndFlush(newAccountCluster);
 
+    await callHook("accountAssignedToClusters", { accountName, tenantName, clusterIds: [clusterId]}, logger);
+
   });
 
 export const unAssignAccountCluster = authProcedure
@@ -287,6 +290,8 @@ export const unAssignAccountCluster = authProcedure
       em.remove([accountCluster, ...removedAccountPartitions]);
 
       await em.flush();
+
+      await callHook("accountUnassignedFromCluster", { accountName, tenantName, clusterId }, logger);
     });
 
 
