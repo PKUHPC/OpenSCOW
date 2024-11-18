@@ -167,6 +167,35 @@ export const assignAccountCluster = authProcedure
       return;
     }
 
+    // 确保正常账户在**AI集群**下解封
+    const isAiCluster = configClusters.clusterConfigs.find((x) => (x.clusterId === clusterId))?.ai?.enabled;
+    if (isAiCluster) {
+      const accountInfo = await getScowAccounts(tenantName, accountName);
+      const clustersUtil = await getClusterUtils();
+      if (!accountInfo.results[0].blocked) {
+        await clustersUtil.callOnOne(
+          clusterId,
+          logger,
+          async (adapterClient) => {
+            // 对于AI集群，直接在集群下解封
+            await asyncClientCall(adapterClient.account, "unblockAccount", {
+              accountName,
+            });
+          },
+        ).catch((e) => {
+          logger.info(
+            "Unblock account %s in AI cluster (clusterId: %s) failed with error details: %s",
+            accountName, clusterId, e);
+          throw new TRPCError({
+            message:
+            `Can not unblock the account ${accountName} in AI cluster (ClusterId: ${clusterId}).`
+            + " Please confirm the adapter version and try again later",
+            code: "CONFLICT",
+          });
+        });
+      }
+    }
+
     const newAccountCluster = new AccountClusterRule({
       tenantName,
       accountName,
