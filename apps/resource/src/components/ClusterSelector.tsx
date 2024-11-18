@@ -6,7 +6,7 @@ import { getLanguage } from "src/utils/i18n";
 
 interface SingleSelectionProps {
   value?: Cluster;
-  onChange?: (cluster: Cluster) => void;
+  onChange?: (cluster: Cluster | undefined) => void;
   label?: string;
   clusterIds?: string[];
   currentClusters: Cluster[];
@@ -31,9 +31,10 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
       placeholder={language.common.clusterSelectorPlaceholder}
       value={value?.id}
       onChange={(value) => {
-        onChange?.({
+        onChange?.(value ? {
           id: value,
-          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value });
+          name: currentClusters.find((cluster) => cluster.id === value)?.name ?? value }
+          : undefined);
       }
       }
       options={

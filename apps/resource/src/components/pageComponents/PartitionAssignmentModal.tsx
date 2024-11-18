@@ -74,10 +74,11 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
   const { message, modal } = App.useApp();
 
   const [filterForm] = Form.useForm<FilterForm>();
-  const [query, setQuery] = useState<FilterForm>({
+  const initialFilterQuery = {
     cluster: undefined,
     partition: undefined,
-  });
+  };
+  const [query, setQuery] = useState<FilterForm>(initialFilterQuery);
 
   // 租户授权分区展示列表为当前在线集群分区，如果是集群没有授权的分区，对应分区授权按键不可按，增加提示信息
   // 账户授权分区展示列表为租户已授权的分区与在线集群的交集，如果是账户没有被授权的集群的分区，对应分区授权按键不可按，增加提示信息
@@ -115,7 +116,6 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
     return filteredData;
   }, [assignedInfo, currentClustersPartitionsData, tenantAssignedPartitions]);
 
-
   // 判断是否存在集群连接获取分区信息失败的情况
   useEffect(() => {
 
@@ -152,16 +152,12 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
   useEffect(() => {
     const { cluster, partition } = query;
     if (displayedTotalPartitionList) {
-      
       const lowerPartition = partition?.toLowerCase();
-    
       const filteredData = displayedTotalPartitionList.filter((x) => {
-        const partitionMatch = lowerPartition ? x.partition.toLowerCase().includes(lowerPartition) : true;
-        const clusterMatch = cluster?.id ? x.clusterId === cluster.id : true;
-    
-        return clusterMatch && partitionMatch;
+        const matchCluster = !cluster || x.clusterId === cluster.id;
+        const matchPartition = !lowerPartition || x.partition.toLowerCase().includes(lowerPartition);
+        return matchCluster && matchPartition;
       });
-
       setFilteredPartitionList(filteredData);
     }
 
@@ -294,11 +290,17 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
     }
   };
 
+  const closeModal = () => {
+    onClose();
+    filterForm.resetFields();
+    setQuery(initialFilterQuery);
+  };
+
   return (
     <Modal
       title={language.clusterPartitionManagement.common.assignPartition}
       open={open}
-      onCancel={onClose}
+      onCancel={closeModal}
       confirmLoading={currentClustersDataFetching || currentClustersPartitionsFetching}
       footer={null}
       width={800}
@@ -343,7 +345,7 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
         <Form<FilterForm>
           layout="inline"
           form={filterForm}
-          initialValues={query}
+          initialValues={initialFilterQuery}
           onFinish={async () => {
             const { cluster, partition } = await filterForm.validateFields();
             setQuery({ cluster, partition });
@@ -372,7 +374,7 @@ export const PartitionAssignmentModal: React.FC<Props> = ({
         dataSource={filteredPartitionList}
         loading={currentClustersPartitionsFetching}
         pagination={false}
-        rowKey="partition"
+        rowKey={(record) => [record.clusterId, record.partition].join(".")}
         scroll={{ y: 500 }}
       >
         <Table.Column<DisplayedPartition>
