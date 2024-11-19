@@ -23,7 +23,7 @@ import { notificationConfig } from "./notification";
 
 const distPath = "src/server";
 
-const { host, port, user, dbName, password, debug } = notificationConfig.db;
+const { host, port, user, dbName, password, debug, pool } = notificationConfig.db;
 
 export const ormConfigs = defineConfig({
   host,
@@ -40,5 +40,6 @@ export const ormConfigs = defineConfig({
   },
   entities: entities,
   debug,
+  pool,
 });
 

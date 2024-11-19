@@ -26,43 +26,67 @@ export const hasUnreadMessage = async (token: string) => {
   }
 
   const em = await forkEntityManager();
+  const knex = em.getConnection().getKnex();
 
-  // 获取用户已读的消息ID列表
-  const readMessages = await em.find(UserMessageRead, { userId: info.identityId });
-  const readMessageIds = readMessages.map((read) => read.message.id);
-  // 基础查询条件
-  const targetConditions: FilterQuery<Message>[] = [
-    { senderType: SenderType.PLATFORM_ADMIN }, // 管理员发送的消息必须要接收
-    { messageTarget: { targetType: TargetType.FULL_SITE, noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` } } },
-    { messageTarget: {
-      targetType: TargetType.TENANT, targetId: info.tenant, noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` } } },
-    { messageTarget: {
-      targetType: TargetType.ACCOUNT,
-      targetId: { $in: info.accountAffiliations.map((a) => a.accountName) },
-      noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` },
-    } },
-    { messageTarget: {
-      targetType: TargetType.USER,
-      targetId: info.identityId,
-      noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` },
-    } },
-  ];
+  // 构建子查询：从 message_targets 表获取符合条件的 message_id
+  const mtSubquery = knex("message_targets as mt")
+    .select("mt.message_id")
+    .where(function() {
+      this.where("mt.notice_types", "like", `%${NoticeType.SITE_MESSAGE}%`)
+        .andWhere(function() {
+          this.where("mt.target_type", TargetType.FULL_SITE)
+            // 暂时没有通过租户和账户查询的需求
+            // .orWhere(function() {
+            //   this.where('mt.target_type', TargetType.TENANT)
+            //     .andWhere('mt.target_id', info.tenant);
+            // })
+            // .orWhere(function() {
+            //   this.where('mt.target_type', TargetType.ACCOUNT)
+            //     .andWhere('mt.target_id', 'in', info.accountAffiliations.map(a => a.accountName));
+            // })
+            .orWhere(function() {
+              this.where("mt.target_type", TargetType.USER)
+                .andWhere("mt.target_id", info.identityId);
+            });
+        });
+    });
 
-  const unreadConditions: FilterQuery<Message>[] = [
-    { id: { $nin: readMessageIds } },
-    { userMessageRead: { status: ReadStatus.UNREAD, isDeleted: false } },
-  ];
+  // 构建子查询：从 messages 表获取 sender_type = PLATFORM_ADMIN 的 message_id
+  const mSubquery = knex("messages as m")
+    .select("m.id as message_id")
+    .where("m.sender_type", SenderType.PLATFORM_ADMIN);
 
+  // 使用 UNION 合并两个子查询
+  const unionSubquery = knex.union([
+    mtSubquery,
+    mSubquery,
+  ], true).as("message_ids");
 
-  const message = await em.findOne(Message, {
-    $and: [
-      { $or: targetConditions },
-      { $or: unreadConditions },
-    ],
-  });
+  // 构建子查询，获取当前用户已读的 message_id 列表
+  const userMessageIdsSubquery = knex("user_message_read")
+    .select("message_id")
+    .where("user_id", info.identityId);
 
-  if (message) return true;
+  // 构建最终查询
+  const result = await knex("messages as m")
+    // 左连接 user_message_read 表，仅限于当前用户的记录
+    .leftJoin("user_message_read as umr", function() {
+      this.on("m.id", "=", "umr.message_id")
+        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]));
+    })
+    // 筛选符合条件的 message_id
+    .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+    // 修改查询条件，使用动态的 message_id 列表
+    .andWhere(function() {
+      this.whereNotIn("m.id", userMessageIdsSubquery)
+        .orWhere(function() {
+          this.where("umr.status", ReadStatus.UNREAD)
+            .andWhere("umr.is_deleted", false);
+        });
+    })
+    .limit(1)
+    .select("m.*");
 
-  return false;
+  return result.length > 0;
 };
 
