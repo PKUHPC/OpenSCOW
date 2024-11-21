@@ -40,7 +40,7 @@ export const ormConfigs = defineConfig({
   entities,
   debug: misConfig.db.debug,
   seeder: {
-    path: join(distPath, "seenders"),
+    path: join(distPath, "seeders"),
   },
 
 });

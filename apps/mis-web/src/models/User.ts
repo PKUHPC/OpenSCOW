@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 
@@ -106,6 +94,8 @@ export const UserInfoSchema = Type.Object({
   tenantRoles: Type.Array(Type.Enum(TenantRole)),
   platformRoles: Type.Array(Type.Enum(PlatformRole)),
   email: Type.Optional(Type.String()),
+  phone: Type.Optional(Type.String()),
+  organization: Type.Optional(Type.String()),
   createTime:Type.Optional(Type.String()),
 });
 
@@ -115,6 +105,10 @@ export const FullUserInfo = Type.Object({
   id: Type.String(),
   name: Type.String(),
   email: Type.String(),
+  phone: Type.Optional(Type.String()),
+  organization: Type.Optional(Type.String()),
+  tenant: Type.String(),
+  adminComment: Type.Optional(Type.String()),
   createTime: Type.String(),
   accountAffiliations: Type.Array(AccountAffiliationSchema),
   tenantRoles: Type.Array(Type.Enum(TenantRole)),

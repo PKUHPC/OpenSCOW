@@ -1,19 +1,9 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
+import { QueryOrderMap } from "@mikro-orm/core";
 import { SortOrder } from "@scow/protos/build/common/sort_order";
 import { GetPaginatedChargeRecordsRequest_SortBy as ChargesSortBy } from "@scow/protos/build/server/charging";
 import { GetJobsRequest_SortBy } from "@scow/protos/build/server/job";
 import { GetAllUsersRequest_UsersSortField, SortDirection } from "@scow/protos/build/server/user";
+import { User } from "src/entities/User";
 
 import { DEFAULT_PAGE_SIZE, paginationProps } from "./orm";
 
@@ -32,7 +22,12 @@ export const generateAllUsersQueryOptions = (
   page: number,
   pageSize?: number,
   sortField?: GetAllUsersRequest_UsersSortField,
-  sortOrder?: SortDirection) => {
+  sortOrder?: SortDirection,
+): {
+  offset: number;
+  limit: number;
+  orderBy?: QueryOrderMap<User>; // 明确 orderBy 的类型
+} => {
   return {
     ...paginationProps(page, pageSize || DEFAULT_PAGE_SIZE),
     orderBy: (sortField !== undefined && sortOrder !== undefined) ?

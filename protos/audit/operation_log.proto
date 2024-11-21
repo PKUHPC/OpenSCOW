@@ -344,6 +344,10 @@ message PlatformChangePassword {
   string user_id = 2;
 }
 
+message EditUserProfile {
+  string user_id = 1;
+}
+
 message SetPlatformBilling {
   // 集群_分区_QOS
   string path = 1;
@@ -730,6 +734,7 @@ message CreateOperationLogRequest {
     MarkMessageRead mark_message_read = 99;
     DeleteUser delete_user = 100;
     DeleteAccount delete_account = 101;
+    EditUserProfile edit_user_profile = 102;
   }
 }
 
@@ -839,6 +844,7 @@ message OperationLog {
     MarkMessageRead mark_message_read = 101;
     DeleteUser delete_user=102;
     DeleteAccount delete_account = 103;
+    EditUserProfile edit_user_profile = 104;
   }
 }
 

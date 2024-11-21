@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { PlatformUserInfo } from "@scow/protos/build/server/user";
@@ -20,17 +8,19 @@ import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DisabledA } from "src/components/DisabledA";
+import { EditUserProfileModalLink } from "src/components/EditUserProfileModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { PlatformRoleSelector } from "src/components/PlatformRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Encoding } from "src/models/exportFile";
-import { PlatformRole, SortDirectionType, UsersSortFieldType, UserState } from "src/models/User";
+import { FullUserInfo, PlatformRole, SortDirectionType, UsersSortFieldType, UserState } from "src/models/User";
 import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { type GetAllUsersSchema } from "src/pages/api/admin/getAllUsers";
 import { User } from "src/stores/UserStore";
 import { getRuntimeI18nConfigText } from "src/utils/config";
 
+import { UserInfoDrawer } from "../users/UserInfoDrawer";
 import { ChangeTenantModalLink } from "./ChangeTenantModal";
 
 interface FilterForm {
@@ -248,6 +238,8 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
 
   const { message } = App.useApp();
 
+  const [previewItem, setPreviewItem] = useState<Partial<FullUserInfo> | undefined>(undefined);
+
   const handleTableChange = (_, __, sorter) => {
     if (setSortInfo) {
       setSortInfo({
@@ -291,9 +283,9 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
         <Table.Column dataIndex="tenantName" ellipsis title={t(p("tenant"))} />
         <Table.Column<PlatformUserInfo>
           dataIndex="availableAccounts"
-          width="25%"
+          width="400px"
           title={t(p("availableAccounts"))}
-          render={(accounts) => accounts.join(",")}
+          render={(accounts) => accounts.join(", ")}
         />
         <Table.Column<PlatformUserInfo>
           dataIndex="createTime"
@@ -318,65 +310,105 @@ const UserInfoTable: React.FC<UserInfoTableProps> = ({
             />
           )}
         />
-
         <Table.Column<PlatformUserInfo>
           dataIndex="operation"
-          width="10%"
           fixed="right"
           title={t(pCommon("operation"))}
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
-              {
-                r.state === UserState.DELETED ? (
-                  <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
-                    {t(p("changePassword"))}
-                  </DisabledA>
-                ) :
-                  (
-                    <ChangePasswordModalLink
-                      userId={r.userId}
-                      name={r.name}
-                      onComplete={async (newPassword) => {
-                        await api.changePasswordAsPlatformAdmin({
-                          body: {
-                            identityId: r.userId,
-                            newPassword: newPassword,
-                          },
-                        })
-                          .httpError(404, () => { message.error(t(p("notExist"))); })
-                          .httpError(501, () => { message.error(t(p("notAvailable"))); })
-                          .httpError(400, (e) => {
-                            if (e.code === "PASSWORD_NOT_VALID") {
-                              message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
-                            };
-                          })
-                          .then(() => { message.success(t(p("success"))); })
-                          .catch(() => { message.error(t(p("fail"))); });
-                      }}
-                    >
-                      {t(p("changePassword"))}
-                    </ChangePasswordModalLink>
-                  )}
-              {
-                r.state === UserState.DELETED ? (
-                  <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
-                    {t(p("changeTenant"))}
-                  </DisabledA>
-                ) : (
-                  <ChangeTenantModalLink
-                    tenantName={r.tenantName}
-                    name={r.name}
-                    userId={r.userId}
-                    reload={reload}
-                  >
-                    {t(p("changeTenant"))}
-                  </ChangeTenantModalLink>
-                )
-              }
+              <a onClick={() => setPreviewItem({
+                ...r,
+                id: r.userId,
+                tenant: r.tenantName,
+              })}
+              >
+                {t(p("detail"))}
+              </a>
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("editUserProfile"))}
+                </DisabledA>
+              ) : (
+                <EditUserProfileModalLink
+                  userId={r.userId}
+                  name={r.name}
+                  email={r.email}
+                  phone={r.phone}
+                  organization={r.organization}
+                  adminComment={r.adminComment}
+                  onComplete={async (newUserInfo) => {
+                    await api.editUserProfile({
+                      body: {
+                        identityId: r.userId,
+                        email: newUserInfo.email,
+                        phone: newUserInfo.phone,
+                        organization: newUserInfo.organization,
+                        adminComment: newUserInfo.adminComment,
+                      },
+                    })
+                      .httpError(404, () => { message.error(t(p("notExist"))); })
+                      .httpError(500, (e) => { message.error(e.message); })
+                      .httpError(501, () => { message.error("featureUnavailable"); })
+                      .then(() => { message.success(t(p("success"))); })
+                      .catch(() => { message.error(t(p("fail"))); })
+                      .finally(() => reload());
+                  }}
+                >
+                  {t(p("editUserProfile"))}
+                </EditUserProfileModalLink>
+              )}
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("changePassword"))}
+                </DisabledA>
+              ) : (
+                <ChangePasswordModalLink
+                  userId={r.userId}
+                  name={r.name}
+                  onComplete={async (newPassword) => {
+                    await api.changePasswordAsPlatformAdmin({
+                      body: {
+                        identityId: r.userId,
+                        newPassword: newPassword,
+                      },
+                    })
+                      .httpError(404, () => { message.error(t(p("notExist"))); })
+                      .httpError(501, () => { message.error(t(p("notAvailable"))); })
+                      .httpError(400, (e) => {
+                        if (e.code === "PASSWORD_NOT_VALID") {
+                          message.error(getRuntimeI18nConfigText(languageId, "passwordPatternMessage"));
+                        };
+                      })
+                      .then(() => { message.success(t(p("success"))); })
+                      .catch(() => { message.error(t(p("fail"))); });
+                  }}
+                >
+                  {t(p("changePassword"))}
+                </ChangePasswordModalLink>
+              )}
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("changeTenant"))}
+                </DisabledA>
+              ) : (
+                <ChangeTenantModalLink
+                  tenantName={r.tenantName}
+                  name={r.name}
+                  userId={r.userId}
+                  reload={reload}
+                >
+                  {t(p("changeTenant"))}
+                </ChangeTenantModalLink>
+              )}
             </Space>
           )}
         />
       </Table>
+      <UserInfoDrawer
+        open={previewItem !== undefined}
+        item={previewItem}
+        onClose={() => setPreviewItem(undefined)}
+      />
     </>
   );
 

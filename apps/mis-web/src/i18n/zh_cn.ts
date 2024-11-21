@@ -114,6 +114,8 @@ export default {
     other: "其他",
     noAvailableClusters: "当前没有可用集群。"
     + "请稍后再试或联系管理员。",
+    phone: "手机号",
+    organization: "组织",
   },
   dashboard: {
     title: "仪表盘",
@@ -318,6 +320,10 @@ export default {
         fail:"修改失败",
         changePassword:"修改密码",
         changeTenant: "修改租户",
+        more: "更多",
+        featureUnavailable: "该功能暂时不可用",
+        detail: "详情",
+        editUserProfile: "修改用户信息",
       },
       createTenantForm:{
         prompt:"请输入租户名并为其创建一个新用户作为该租户的管理员",
@@ -666,6 +672,11 @@ export default {
         delete:"删除",
         deleteFail:"删除失败，请联系管理员",
         deleteSuccess:"删除成功",
+        featureUnavailable: "该功能暂时不可用",
+        detail: "详情",
+        editUserProfile: "修改用户信息",
+        editUserProfileError: "修改用户信息失败",
+        editUserProfileSuccess: "修改用户信息成功",
       },
       jobPriceChangeModal:{
         tenantPrice:"租户计费",
@@ -769,6 +780,17 @@ export default {
         cannotRemoverUserWhoHaveRunningJobFromAccount:"用户还有作业在运行，已封锁该用户，请等待作业结束或手动结束作业后再移出",
 
       },
+      userInfoDrawer: {
+        id: "用户 ID",
+        name: "用户姓名",
+        email: "邮箱",
+        phone: "手机号",
+        tenant: "所属租户",
+        organization: "组织",
+        comment: "备注",
+        createTime: "创建时间",
+        detail: "用户详细信息",
+      },
     },
   },
   component:{
@@ -822,6 +844,20 @@ export default {
 
       accountRunningJobsPrompt:"该账户还有未完成的作业，无法删除",
       accountDeleted:"该账户已删除，无法操作",
+    },
+    editUserProfileModal: {
+      title: "修改用户 {}（ID：{}）的信息",
+      email: "邮箱",
+      errorEmail: "邮箱格式错误",
+      enterEmail: "请输入邮箱",
+      phone: "手机号",
+      errorPhone: "手机号格式错误",
+      enterPhone: "请输入手机号",
+      organization: "组织",
+      enterOrganization: "请输入组织",
+      comment: "备注",
+      enterComment: "请输入备注",
+      organizationLength: "组织名称超出长度限制",
     },
     others:{
       seeDetails:"细节请查阅文档",
@@ -1298,6 +1334,7 @@ export default {
       markMessageRead: "标记消息为已读",
       deleteUser:"删除用户",
       deleteAccount:"删除账户",
+      editUserProfile: "修改用户信息",
     },
     operationDetails: {
       login: "用户登录",

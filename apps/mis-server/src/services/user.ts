@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ensureNotUndefined, plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
@@ -718,6 +706,10 @@ export const userServiceServer = plugin((server) => {
         tenantName: x.tenant.$.name,
         email: x.email,
         name: x.name,
+        phone: x.phone,
+        organization: x.organization,
+        adminComment: x.adminComment,
+        metadata: x.metadata,
         userId: x.userId,
         createTime: x.createTime.toISOString(),
         tenantRoles: x.tenantRoles.map(tenantRoleFromJSON),
@@ -752,6 +744,10 @@ export const userServiceServer = plugin((server) => {
         tenantName: user.tenant.$.name,
         name: user.name,
         email: user.email,
+        phone: user.phone,
+        organization: user.organization,
+        adminComment: user.adminComment,
+        metadata: user.metadata,
         tenantRoles: user.tenantRoles.map(tenantRoleFromJSON),
         platformRoles: user.platformRoles.map(platformRoleFromJSON),
         createTime:user.createTime.toISOString(),
@@ -787,6 +783,10 @@ export const userServiceServer = plugin((server) => {
           userId: x.userId,
           name: x.name,
           email: x.email,
+          phone: x.phone,
+          organization: x.organization,
+          adminComment: x.adminComment,
+          metadata: x.metadata,
           availableAccounts: x.accounts.getItems()
             .filter((ua) => ua.blockedInCluster === UserStatus.UNBLOCKED &&
             ua.account.getProperty("state") !== AccountState.DELETED)
@@ -948,7 +948,7 @@ export const userServiceServer = plugin((server) => {
       }
 
       user.email = newEmail;
-      await em.flush();
+      em.persist(user);
 
       const ldapCapabilities = await getCapabilities(authUrl);
 
@@ -978,6 +978,59 @@ export const userServiceServer = plugin((server) => {
             }
           });
       }
+
+      await em.flush();
+
+      return [{}];
+    },
+
+    changeUserProfile: async ({ request, em, logger }) => {
+      const { userId, email, phone, organization, adminComment, metadata } = request;
+
+      const user = await em.findOne(User, { userId: userId });
+
+      if (!user || user.state === UserState.DELETED) {
+        throw {
+          code: Status.NOT_FOUND, message: `User ${userId} is either not found or has been deleted.`,
+        } as ServiceError;
+      }
+
+      const ldapCapabilities = await getCapabilities(authUrl);
+
+      // 看LDAP是否有修改邮箱的权限
+      if (ldapCapabilities.changeEmail && (email !== undefined && user.email !== email)) {
+        await libChangeEmail(authUrl, {
+          identityId: userId,
+          newEmail: email,
+        }, logger)
+          .catch(async (e) => {
+            switch (e.status) {
+
+              case "NOT_FOUND":
+                throw {
+                  code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+                } as ServiceError;
+
+              case "NOT_SUPPORTED":
+                throw {
+                  code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+                } as ServiceError;
+
+              default:
+                throw {
+                  code: Status.UNKNOWN, message: "LDAP failed to change email",
+                } as ServiceError;
+            }
+          });
+      }
+
+      user.email = email !== undefined ? email : user.email;
+      user.phone = phone !== undefined ? phone : user.phone;
+      user.organization = organization !== undefined ? organization : user.organization;
+      user.adminComment = adminComment !== undefined ? adminComment : user.adminComment;
+      user.metadata = metadata !== undefined ? metadata : user.metadata;
+
+      await em.persistAndFlush(user);
 
       return [{}];
     },

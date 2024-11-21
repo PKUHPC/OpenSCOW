@@ -114,6 +114,8 @@ export default {
     other: "Other",
     noAvailableClusters: "There are currently no available clusters."
     + " Please try again later or contact the administrator.",
+    phone: "Phone",
+    organization: "Organization",
   },
   dashboard: {
     title: "Dashboard",
@@ -318,6 +320,10 @@ export default {
         fail: "Modification failed",
         changePassword: "Change Password",
         changeTenant: "Change Tenant",
+        more: "more",
+        featureUnavailable: "This feature is temporarily unavailable",
+        detail: "detail",
+        editUserProfile: "edit user profile",
       },
       createTenantForm: {
         prompt: "Please enter the tenant name and create a new user as the administrator for this tenant.",
@@ -666,6 +672,12 @@ export default {
         delete:"Delete",
         deleteFail: "Deletion failed. Please contact the administrator.",
         deleteSuccess: "Deletion successful",
+        featureUnavailable: "This feature is temporarily unavailable",
+        detail: "Details",
+        editUserProfile: "Edit User Information",
+        editUserProfileError: "Failed to Edit User Information",
+        editUserProfileSuccess: "Successfully Edited User Information",
+
       },
       jobPriceChangeModal: {
         tenantPrice: "Tenant Billing",
@@ -769,6 +781,17 @@ export default {
         cannotRemoverUserWhoHaveRunningJobFromAccount: "The user still has a job running, "
           + " and the user has been blocked. Please wait for the job to end or end the job manually before moving out.",
       },
+      userInfoDrawer: {
+        id: "User ID",
+        name: "User Name",
+        email: "Email",
+        phone: "Phone Number",
+        tenant: "Tenant",
+        organization: "Organization",
+        comment: "Comment",
+        createTime: "Creation Time",
+        detail: "User Details",
+      },
     },
   },
   component: {
@@ -822,6 +845,20 @@ export default {
       "The account will be unusable after deletion!</span>",
       accountRunningJobsPrompt: "The account has unfinished jobs and cannot be deleted.",
       accountDeleted:"The account has been deleted and cannot be operated",
+    },
+    editUserProfileModal: {
+      title: "Modify user {} (ID: {}) information",
+      email: "Email",
+      errorEmail: "Invalid email format",
+      enterEmail: "Please enter email",
+      phone: "Phone number",
+      errorPhone: "Invalid phone number format",
+      enterPhone: "Please enter phone number",
+      organization: "Organization",
+      enterOrganization: "Please enter organization",
+      comment: "Comment",
+      enterComment: "Please enter comment",
+      organizationLength: "Organization name exceeds length limit",
     },
     others: {
       seeDetails: "For details, please refer to the documentation",
@@ -1300,6 +1337,7 @@ export default {
       markMessageRead: "Mark message as read",
       deleteUser:"Delete User",
       deleteAccount:"Delete Account",
+      editUserProfile: "Edit User Information",
     },
     operationDetails: {
       login: "User Login",

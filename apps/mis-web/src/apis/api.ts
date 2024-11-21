@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 /* eslint-disable @stylistic/max-len */
 
 import { apiClient } from "src/apis/client";
@@ -20,6 +8,7 @@ import type { ChangeJobPriceSchema } from "src/pages/api/admin/changeJobPrice";
 import type { ChangePasswordAsPlatformAdminSchema } from "src/pages/api/admin/changePassword";
 import type { ChangeStorageQuotaSchema } from "src/pages/api/admin/changeStorage";
 import type { DeactivateClusterSchema } from "src/pages/api/admin/deactivateCluster";
+import type { EditUserProfileSchema } from "src/pages/api/admin/editUserProfile";
 import type { FetchJobsSchema } from "src/pages/api/admin/fetchJobs/fetchJobs";
 import type { GetFetchJobInfoSchema } from "src/pages/api/admin/fetchJobs/getFetchInfo";
 import type { SetFetchStateSchema } from "src/pages/api/admin/fetchJobs/setFetchState";
@@ -124,12 +113,14 @@ import type { QueryStorageUsageSchema } from "src/pages/api/users/storageUsage";
 import type { UnblockUserInAccountSchema } from "src/pages/api/users/unblockInAccount";
 import type { UnsetAdminSchema } from "src/pages/api/users/unsetAdmin";
 
+
 export const api = {
   activateCluster: apiClient.fromTypeboxRoute<typeof ActivateClusterSchema>("PUT", "/api/admin/activateCluster"),
   changeJobPrice: apiClient.fromTypeboxRoute<typeof ChangeJobPriceSchema>("PATCH", "/api/admin/changeJobPrice"),
   changePasswordAsPlatformAdmin: apiClient.fromTypeboxRoute<typeof ChangePasswordAsPlatformAdminSchema>("PATCH", "/api/admin/changePassword"),
   changeStorageQuota: apiClient.fromTypeboxRoute<typeof ChangeStorageQuotaSchema>("PUT", "/api/admin/changeStorage"),
   deactivateCluster: apiClient.fromTypeboxRoute<typeof DeactivateClusterSchema>("PUT", "/api/admin/deactivateCluster"),
+  editUserProfile: apiClient.fromTypeboxRoute<typeof EditUserProfileSchema>("PUT", "/api/admin/editUserProfile"),
   fetchJobs: apiClient.fromTypeboxRoute<typeof FetchJobsSchema>("POST", "/api/admin/fetchJobs/fetchJobs"),
   getFetchJobInfo: apiClient.fromTypeboxRoute<typeof GetFetchJobInfoSchema>("GET", "/api/admin/fetchJobs/getFetchInfo"),
   setFetchState: apiClient.fromTypeboxRoute<typeof SetFetchStateSchema>("POST", "/api/admin/fetchJobs/setFetchState"),
@@ -216,6 +207,7 @@ export const api = {
   createTenant: apiClient.fromTypeboxRoute<typeof CreateTenantSchema>("POST", "/api/tenant/create"),
   createAccount: apiClient.fromTypeboxRoute<typeof CreateAccountSchema>("POST", "/api/tenant/createAccount"),
   createTenantWithExistingUserAsAdmin: apiClient.fromTypeboxRoute<typeof CreateTenantWithExistingUserAsAdminSchema>("POST", "/api/tenant/createTenantWithExistingUserAsAdmin"),
+  deleteAccount: apiClient.fromTypeboxRoute<typeof DeleteAccountSchema>("DELETE", "/api/tenant/deleteAccount"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/tenant/getAccounts"),
   getTenants: apiClient.fromTypeboxRoute<typeof GetTenantsSchema>("GET", "/api/tenant/getTenants"),
   setBlockThreshold: apiClient.fromTypeboxRoute<typeof SetBlockThresholdSchema>("PUT", "/api/tenant/setBlockThreshold"),
@@ -225,6 +217,7 @@ export const api = {
   blockUserInAccount: apiClient.fromTypeboxRoute<typeof BlockUserInAccountSchema>("PUT", "/api/users/blockInAccount"),
   changeTenant: apiClient.fromTypeboxRoute<typeof ChangeTenantSchema>("PUT", "/api/users/changeTenant"),
   createUser: apiClient.fromTypeboxRoute<typeof CreateUserSchema>("POST", "/api/users/create"),
+  deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
   getAccountUsers: apiClient.fromTypeboxRoute<typeof GetAccountUsersSchema>("GET", "/api/users"),
   cancelJobChargeLimit: apiClient.fromTypeboxRoute<typeof CancelJobChargeLimitSchema>("DELETE", "/api/users/jobChargeLimit/cancel"),
   setJobChargeLimit: apiClient.fromTypeboxRoute<typeof SetJobChargeLimitSchema>("PUT", "/api/users/jobChargeLimit/set"),
@@ -233,6 +226,4 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
-  deleteUser: apiClient.fromTypeboxRoute<typeof DeleteUserSchema>("DELETE", "/api/users/delete"),
-  deleteAccount: apiClient.fromTypeboxRoute<typeof DeleteAccountSchema>("DELETE", "/api/tenant/deleteAccount"),
 };
