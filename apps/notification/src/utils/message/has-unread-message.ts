@@ -1,20 +1,7 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
-import { FilterQuery } from "@mikro-orm/mysql";
 import { NoticeType } from "src/models/notice-type";
 import { validateToken } from "src/server/auth/token";
-import { Message, SenderType } from "src/server/entities/Message";
-import { ReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
+import { SenderType } from "src/server/entities/Message";
+import { ReadStatus, TargetType } from "src/server/entities/UserMessageRead";
 
 import { forkEntityManager } from "../get-orm";
 
@@ -65,7 +52,7 @@ export const hasUnreadMessage = async (token: string) => {
   // 构建子查询，获取当前用户已读的 message_id 列表
   const userMessageIdsSubquery = knex("user_message_read")
     .select("message_id")
-    .where("user_id", info.identityId);
+    .where("user_message_read.status", ReadStatus.READ);
 
   // 构建最终查询
   const result = await knex("messages as m")
