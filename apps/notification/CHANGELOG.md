@@ -1,5 +1,14 @@
 # @scow/notification
 
+## 0.2.3
+
+### Patch Changes
+
+- 2ca3fe6: 优化门户和管理系统定时消息查询,隐藏报错
+  - @scow/protos@1.0.18
+  - @scow/lib-scheduler-adapter@1.1.16
+  - @scow/lib-web@1.4.6
+
 ## 0.2.2
 
 ### Patch Changes
