@@ -11,7 +11,8 @@
  */
 
 import { OperationEvent, OperationType as LibOperationType } from "@scow/lib-operation-log";
-import { ExportChargeRecord, ExportOperationLog, ExportPayRecord } from "@scow/protos/build/audit/operation_log";
+import { ExportChargeRecord, ExportJobRecord, ExportOperationLog,
+  ExportPayRecord } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
@@ -171,6 +172,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     exportChargeRecord: t(pTypes("exportChargeRecord")),
     exportPayRecord: t(pTypes("exportPayRecord")),
     exportOperationLog: t(pTypes("exportOperationLog")),
+    exportJobRecord: t(pTypes("exportJobRecord")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
     userChangeTenant: t(pTypes("userChangeTenant")),
@@ -284,6 +286,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   userChangeTenant: "040308",
   activateCluster: "040309",
   deactivateCluster: "040310",
+  exportJobRecord: "040311",
   customEvent: "050001",
 };
 
@@ -575,6 +578,8 @@ export const getOperationDetail = (
         return getExportChargeRecordDetail(operationEvent[logEvent], t);
       case "exportPayRecord":
         return getExportPayRecordDetail(operationEvent[logEvent], t);
+      case "exportJobRecord":
+        return getExportJobRecordDetail(operationEvent[logEvent], t);
       case "exportOperationLog":
         return getExportOperationLogDetail(operationEvent[logEvent], t);
       case "setAccountBlockThreshold":
@@ -695,6 +700,53 @@ const getExportPayRecordDetail = (exportPayRecord: ExportPayRecord, t: Operation
     }
     case "allTenants":
       return t(pDetails("exportTenantsPayRecordOfAdmin"));
+    default:
+      return "-";
+  }
+};
+
+const getExportJobRecordDetail = (exportJobRecord: ExportJobRecord, t: OperationTextsTransType) => {
+  const exportJobTarget = exportJobRecord.target;
+  if (!exportJobTarget) {
+    return "-";
+  }
+  const exportJobCase = exportJobTarget.$case;
+  switch (exportJobCase) {
+    case "jobsOfTenant": {
+      const jobsOfTenant = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfTenant"),
+        [jobsOfTenant.tenantName]);
+    }
+    case "jobsOfJobId": {
+      const jobsOfJobId = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfJobId"),
+        [jobsOfJobId.tenantName, jobsOfJobId.jobId]);
+    }
+    case "jobsOfJobIdAndUser": {
+      const jobsOfJobIdAndUser = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfJobIdAndUser"),
+        [jobsOfJobIdAndUser.tenantName, jobsOfJobIdAndUser.userId, jobsOfJobIdAndUser.jobId]);
+    }
+    case "jobsOfJobIdAndAccount": {
+      const jobsOfJobIdAndAccount = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfJobIdAndAccount"),
+        [jobsOfJobIdAndAccount.tenantName, jobsOfJobIdAndAccount.accountName, jobsOfJobIdAndAccount.jobId]);
+    }
+    case "jobsOfAccountAndUser": {
+      const jobsOfAccountAndUser = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfAccountAndUser"),
+        [jobsOfAccountAndUser.tenantName, jobsOfAccountAndUser.userId, jobsOfAccountAndUser.accountName]);
+    }
+    case "jobsOfAccount": {
+      const jobsOfAccount = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfAccount"),
+        [jobsOfAccount.tenantName, jobsOfAccount.accountName]);
+    }
+    case "jobsOfUser": {
+      const jobsOfUser = exportJobTarget[exportJobCase];
+      return t(pDetails("exportJobsOfUser"),
+        [jobsOfUser.tenantName, jobsOfUser.userId]);
+    }
     default:
       return "-";
   }

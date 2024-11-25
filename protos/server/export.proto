@@ -15,9 +15,11 @@ syntax = "proto3";
 package scow.server;
 
 import "server/charging.proto";
+import "server/job.proto";
 import "server/user.proto";
 import "server/account.proto";
 import "google/protobuf/timestamp.proto";
+import "common/ended_job.proto";
 
 message ExportAccountRequest {
   uint32 count = 1;
@@ -112,9 +114,36 @@ message ExportPayRecordResponse {
   repeated PaymentRecord pay_records = 1;
 }
 
+message ExportJobRecordRequest {
+  uint32 count = 1;
+  optional google.protobuf.Timestamp job_end_time_start = 2;
+  optional google.protobuf.Timestamp job_end_time_end = 3;
+  repeated string clusters = 4;
+  oneof target {
+    // 导出租户内某账户执行过的作业列表
+    JobsOfAccountTarget jobs_of_account = 5;
+    // 返回这个租户下某用户在某账户执行过的作业列表
+    JobsOfAccountAndUserTarget jobs_of_account_and_user = 6;
+    // 导出租户内某用户执行过的作业列表
+    JobsOfUserTarget jobs_of_user = 7;
+    // 导出租户内执行过的作业列表
+    JobsOfTenantTarget jobs_of_tenant = 8;
+    // 导出租户内执行过的特定ID的作业列表
+    JobsOfJobIdTarget jobs_of_job_id = 9;
+    JobsOfJobIdAndUserTarget jobs_of_job_id_and_user = 10;
+    JobsOfJobIdAndAccountTarget jobs_of_job_id_and_account = 11;
+  }
+}
+
+// 还要调整
+message ExportJobRecordResponse {
+  repeated common.JobInfo job_records = 1;
+}
+
 service ExportService {
   rpc ExportAccount(ExportAccountRequest) returns (stream ExportAccountResponse);
   rpc ExportUser(ExportUserRequest) returns (stream ExportUserResponse);
   rpc ExportChargeRecord(ExportChargeRecordRequest) returns (stream ExportChargeRecordResponse);
   rpc ExportPayRecord(ExportPayRecordRequest) returns (stream ExportPayRecordResponse);
+  rpc ExportJobRecord(ExportJobRecordRequest) returns (stream ExportJobRecordResponse);
 }

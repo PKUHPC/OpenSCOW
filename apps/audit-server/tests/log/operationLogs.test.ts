@@ -420,3 +420,42 @@ it("export operation logs", async () => {
     },
   ]);
 });
+
+it("create operation log for jobRecord", async () => {
+
+  const em = server.ext.orm.em.fork();
+
+  const exportJobRecordLog = {
+    operatorUserId: "testUserId",
+    operatorIp: "127.0.0.1",
+    operationResult: operationResultFromJSON(OperationResult.SUCCESS),
+    operationEvent: {
+      $case: "exportJobRecord" as const,
+      exportJobRecord: { target:{
+        $case: "jobsOfAccount" as const,
+        jobsOfAccount: {
+          tenantName: "testTenant",
+          accountName: "testAccount",
+        },
+      },
+      },
+    },
+  };
+
+  await asyncClientCall(client, "createOperationLog", {
+    ...exportJobRecordLog,
+  });
+
+  const operationLogs = await em.find(OperationLog, { operatorUserId: operationLog.operatorUserId }, {
+    orderBy: { operationTime: "DESC" },
+    limit: 1,
+  });
+
+  expect(operationLogs[0].metaData?.$case).toEqual("exportJobRecord");
+  expect(operationLogs[0].metaData?.[operationLogs[0].metaData?.$case])
+    .toEqual(exportJobRecordLog.operationEvent.exportJobRecord);
+  expect(operationLogs[0].metaData?.[operationLogs[0].metaData?.$case].
+    target?.[exportJobRecordLog.operationEvent.exportJobRecord.target.$case].accountName)
+    .toEqual(exportJobRecordLog.operationEvent.exportJobRecord.target.jobsOfAccount.accountName);
+
+});

@@ -129,6 +129,7 @@ export const statisticServiceServer = plugin((server) => {
         "exportAccount",
         "exportChargeRecord",
         "exportPayRecord",
+        "exportJobRecord",
         "exportOperationLog",
         "setAccountBlockThreshold",
         "setAccountDefaultBlockThreshold",

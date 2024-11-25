@@ -12,6 +12,8 @@
 
 import { decimalToMoney } from "@scow/lib-decimal";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
+import { JobsOfAccountAndUserTarget, JobsOfAccountTarget, JobsOfJobIdAndAccountTarget, JobsOfJobIdAndUserTarget,
+  JobsOfJobIdTarget, JobsOfTenantTarget, JobsOfUserTarget } from "@scow/protos/build/server/job";
 import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 
 export function toGrpc(x: JobInfoEntity) {
@@ -43,3 +45,57 @@ export function toGrpc(x: JobInfoEntity) {
     accountPrice: decimalToMoney(x.accountPrice),
   } as JobInfo;
 }
+
+export const getJobsTargetSearchParam = (target:
+| { $case: "jobsOfJobId";jobsOfJobId: JobsOfJobIdTarget; }
+| { $case: "jobsOfJobIdAndUser";jobsOfJobIdAndUser: JobsOfJobIdAndUserTarget; }
+| { $case: "jobsOfJobIdAndAccount";jobsOfJobIdAndAccount: JobsOfJobIdAndAccountTarget; }
+| { $case: "jobsOfAccountAndUser"; jobsOfAccountAndUser: JobsOfAccountAndUserTarget }
+| { $case: "jobsOfAccount"; jobsOfAccount: JobsOfAccountTarget }
+| { $case: "jobsOfUser"; jobsOfUser: JobsOfUserTarget }
+| { $case: "jobsOfTenant"; jobsOfTenant: JobsOfTenantTarget },
+): { tenant: string, account?: string | { $ne: null },
+  user?: string | { $ne: null }, idJob?: number | { $ne: null } } => {
+
+
+
+  const { accountName, tenantName, userId, jobId } = target[target.$case];
+
+  let searchParam: {
+    tenant: string,
+    account?: string | { $ne: null },
+    user?: string | { $ne: null },
+    idJob?: number | { $ne: null },
+  } = { tenant: tenantName };
+
+  switch (target?.$case)
+  {
+    case "jobsOfJobId":
+      searchParam = { tenant: tenantName, idJob: jobId };
+      break;
+    case "jobsOfJobIdAndUser":
+      searchParam = { tenant: tenantName, idJob: jobId, user: userId };
+      break;
+    case "jobsOfJobIdAndAccount":
+      searchParam = { tenant: tenantName, idJob: jobId, account: accountName };
+      break;
+    case "jobsOfAccountAndUser":
+      searchParam = { tenant: tenantName, account: accountName, user: userId };
+      break;
+    case "jobsOfAccount": {
+      searchParam = { tenant: tenantName, account: accountName };
+      break;
+    }
+    case "jobsOfUser": {
+      searchParam = { tenant: tenantName, user: userId };
+      break;
+    }
+    case "jobsOfTenant": {
+      break;
+    }
+    default:
+      break;
+  }
+  return searchParam;
+};
+

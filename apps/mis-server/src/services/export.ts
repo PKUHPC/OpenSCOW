@@ -24,6 +24,7 @@ import {
   platformRoleToJSON, SortDirection, tenantRoleFromJSON, tenantRoleToJSON } from "@scow/protos/build/server/user";
 import { Account, AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
+import { JobInfo } from "src/entities/JobInfo";
 import { PayRecord } from "src/entities/PayRecord";
 import { User } from "src/entities/User";
 import { UserRole, UserStatus } from "src/entities/UserAccount";
@@ -35,7 +36,11 @@ import {
   getPaymentsSearchType,
   getPaymentsTargetSearchParam,
 } from "src/utils/chargesQuery";
+import {
+  getJobsTargetSearchParam,
+} from "src/utils/job";
 import { mapUsersSortField } from "src/utils/queryOptions";
+
 
 export const exportServiceServer = plugin((server) => {
 
@@ -410,6 +415,98 @@ export const exportServiceServer = plugin((server) => {
           if (data.length === 200 || writeTotal === records.length) {
             await new Promise((resolve) => {
               void writeAsync({ payRecords: data });
+              // 清空暂存
+              data = [];
+              resolve("done");
+            }).catch((e) => {
+              throw {
+                code: status.INTERNAL,
+                message: "Error when exporting file",
+                details: e?.message,
+              } as ServiceError;
+            });
+          }
+        }
+        offset += limit;
+      }
+    },
+
+    exportJobRecord: async (call) => {
+      const { request, em } = call;
+      const {
+        jobEndTimeStart,
+        jobEndTimeEnd,
+        target,
+        count,
+        clusters,
+      } = ensureNotUndefined(request, ["target"]);
+      // 定义查询条件
+      const searchParam = getJobsTargetSearchParam(target);
+      const query = {
+        ...(jobEndTimeEnd || jobEndTimeStart) ? {
+          timeEnd: {
+            ...jobEndTimeStart ? { $gte: jobEndTimeStart } : {},
+            ...jobEndTimeEnd ? { $lte: jobEndTimeEnd } : {},
+          },
+        } : {},
+        ...searchParam,
+        ...clusters.length > 0 ? { cluster: clusters } : {},
+      };
+
+      const recordFormat = (x: Loaded<JobInfo, never>) => ({
+        idJob: x.idJob,
+        jobName: x.jobName,
+        account: x.account,
+        user: x.user,
+        accountPrice: decimalToMoney(x.accountPrice),
+        cluster: x.cluster,
+        partition: x.partition,
+        qos: x.qos,
+        timeSubmit: x.timeSubmit.toISOString(),
+        timeEnd: x.timeEnd.toISOString(),
+        biJobIndex:x.biJobIndex,
+        nodelist:x.nodelist,
+        timeStart:x.timeStart.toISOString(),
+        gpu:x.gpu,
+        cpusReq:x.cpusReq,
+        memReq:x.memReq,
+        nodesReq:x.nodesReq,
+        cpusAlloc:x.cpusAlloc,
+        memAlloc:x.memAlloc,
+        nodesAlloc:x.nodesAlloc,
+        timelimit:x.timelimit,
+        timeUsed:x.timeUsed,
+        timeWait:x.timeWait,
+        recordTime:x.recordTime.toISOString(),
+        tenantPrice:decimalToMoney(x.tenantPrice),
+      });
+
+      type RecordFormatReturnType = ReturnType<typeof recordFormat>;
+
+      const batchSize = 5000;
+      let offset = 0;
+
+      const { writeAsync } = createWriterExtensions(call);
+
+      while (offset < count) {
+        const limit = Math.min(batchSize, count - offset);
+        const records = (await em.find(JobInfo, query, { limit, offset }))
+          .map(recordFormat ?? ((x) => x));
+
+        if (records.length === 0) {
+          break;
+        }
+
+        let data: RecordFormatReturnType[] = [];
+        // 记录传输的总数量
+        let writeTotal = 0;
+
+        for (const row of records) {
+          data.push(row);
+          writeTotal += 1;
+          if (data.length === 200 || writeTotal === records.length) {
+            await new Promise((resolve) => {
+              void writeAsync({ jobRecords: data });
               // 清空暂存
               data = [];
               resolve("done");

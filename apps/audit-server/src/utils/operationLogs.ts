@@ -93,6 +93,17 @@ export const getTargetAccountName = (operationEvent: OperationEvent): string | u
     if (source && source.$case === "account") {
       return source.account.accountName;
     }
+  } else if (operationType === "exportJobRecord") {
+    switch (operationEvent[operationType].target?.$case) {
+      case "jobsOfAccountAndUser" :
+        return operationEvent[operationType].target.jobsOfAccountAndUser.accountName;
+      case "jobsOfAccount" :
+        return operationEvent[operationType].target.jobsOfAccount.accountName;
+      case "jobsOfJobIdAndAccount" :
+        return operationEvent[operationType].target.jobsOfJobIdAndAccount.accountName;
+      default:
+        return undefined;
+    }
   } else {
     return (operationEvent && operationType)
       ? operationEvent[operationType].accountName

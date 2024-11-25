@@ -19,7 +19,7 @@ import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
 import { App, AutoComplete, Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
 import { api } from "src/apis";
@@ -27,7 +27,10 @@ import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { JobSortBy, JobSortOrder } from "src/models/job";
+import { Encoding } from "src/models/exportFile";
+import { JobSortBy, JobSortOrder, SearchType } from "src/models/job";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import type { GetJobInfoSchema } from "src/pages/api/job/jobInfo";
 import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
@@ -59,14 +62,30 @@ interface Sorter {
   order: JobSortOrder | undefined,
 }
 
+interface PrecisionDiffQuery {
+  userId: string | undefined;
+  accountName: string | undefined;
+  jobId: number | undefined;
+}
+
+interface RangeDiffQuery {
+  userId: string | undefined;
+  accountName: string | undefined;
+  jobEndTimeStart: string;
+  jobEndTimeEnd: string;
+}
+
 const p = prefix("pageComp.job.historyJobTable.");
 const pCommon = prefix("common.");
+const priceText = {
+  tenant: "platformPrice",
+  account: "tenantPrice",
+} as const;
 
 export const JobTable: React.FC<Props> = ({
   userId, accountNames, filterAccountName = true, filterUser = true,
   showAccount, showUser, showedPrices, priceTexts,
 }) => {
-
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
@@ -76,6 +95,9 @@ export const JobTable: React.FC<Props> = ({
 
   const [pageInfo, setPageInfo] = useState({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
   const [selectedAccountName, setSelectedAccountName] = useState<string | undefined>(undefined);
+
+  // 防止用户切换批量/精确搜索、修改账户条件，但还没点击搜索时，导出结果已经跟随条件变化的情况。
+  const [currentDiffQuery, setCurrentDiffQuery] = useState<PrecisionDiffQuery | RangeDiffQuery | undefined>(undefined);
 
   const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
   const sortedClusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
@@ -119,6 +141,9 @@ export const JobTable: React.FC<Props> = ({
       jobId: query.jobId,
       accountName: Array.isArray(accountNames) ? undefined : accountNames,
     };
+
+    setCurrentDiffQuery(diffQuery);
+
     return await api.getJobInfo({ query: {
       ...diffQuery,
       sortBy: sorter.field,
@@ -136,7 +161,72 @@ export const JobTable: React.FC<Props> = ({
     });
   }, [pageInfo, query, sorter]);
 
-  const { data, isLoading, reload } = useAsync({ promiseFn });
+  const { data, isLoading } = useAsync({ promiseFn });
+
+  const finalPriceText = {
+    tenant: priceTexts?.tenant ?? t(p(priceText.tenant)),
+    account: priceTexts?.account ?? t(p(priceText.account)),
+  };
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+    const totalCount = data?.totalCount ?? 0;
+
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    if (totalCount > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (totalCount <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportJobRecord",
+        columns,
+        count: totalCount,
+        timeZone, // 将浏览器时区作为参数传递到后端
+        query: {
+          ...currentDiffQuery,
+          searchType: SearchType.NORMAL,
+          clusters: query.clusters?.map((x) => x.id),
+          finalPriceText: JSON.stringify(finalPriceText),
+          publicConfigClusters: JSON.stringify(publicConfigClusters),
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    // 生成每列的选项对象
+    const baseOptions = [
+      { label: t(pCommon("clusterWorkId")), value: "idJob" },
+      { label: t(pCommon("workName")), value: "jobName" },
+    ];
+
+    if (showAccount) {
+      baseOptions.push({ label: t(pCommon("account")), value: "account" });
+    }
+
+    if (showUser) {
+      baseOptions.push({ label: t(pCommon("user")), value: "user" });
+    }
+
+    baseOptions.push(
+      { label: t(pCommon("clusterName")), value: "cluster" },
+      { label: t(pCommon("partition")), value: "partition" },
+      { label: "QOS", value: "qos" },
+      { label: t(pCommon("timeSubmit")), value: "timeSubmit" },
+      { label: t(pCommon("timeEnd")), value: "timeEnd" },
+    );
+
+    // 添加价格列选项
+    const priceOptions = showedPrices.map((v) => ({
+      label: finalPriceText[v],
+      value: `${v}Price`,
+    }));
+
+    return [...baseOptions, ...priceOptions];
+  }, [showAccount, showUser, showedPrices, t, finalPriceText]);
 
   return (
     <div>
@@ -154,7 +244,12 @@ export const JobTable: React.FC<Props> = ({
             button={(
               <Space>
                 <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
-                <Button onClick={reload} loading={isLoading}>{t(pCommon("fresh"))}</Button>
+                <ExportFileModaLButton
+                  options={exportOptions} // 定义导出列选项
+                  onExport={handleExport}
+                >
+                  {t(pCommon("export"))}
+                </ExportFileModaLButton>
               </Space>
             )}
             onChange={(a) => rangeSearch.current = a === "range"}
@@ -231,7 +326,6 @@ export const JobTable: React.FC<Props> = ({
   );
 };
 
-
 interface JobInfoTableProps {
   data: Static<typeof GetJobInfoSchema["responses"]["200"]> | undefined;
   pageInfo: { page: number, pageSize: number };
@@ -243,12 +337,6 @@ interface JobInfoTableProps {
   showedPrices: ("tenant" | "account")[];
   priceTexts?: { tenant?: string; account?: string };
 }
-
-const priceText = {
-  tenant: "platformPrice",
-  account: "tenantPrice",
-} as const;
-
 
 export const JobInfoTable: React.FC<JobInfoTableProps> = ({
   data, pageInfo, setPageInfo, setSorter, isLoading,

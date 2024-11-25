@@ -129,3 +129,9 @@ export const JobSortBy = Type.Union(
   ],
 );
 export type JobSortBy = Static<typeof JobSortBy>;
+
+// 查询类型，租户管理或常规用户、账户管理
+export enum SearchType {
+  NORMAL = "NORMAL",
+  TENANT = "TENANT",
+}

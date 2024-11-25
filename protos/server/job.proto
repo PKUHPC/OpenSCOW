@@ -230,6 +230,38 @@ message GetJobTotalCountResponse {
   uint64 count = 1;
 }
 
+// 充值记录及消费记录请求target
+message JobsOfAccountTarget {
+  string account_name = 1;
+  string tenant_name = 2;
+}
+message JobsOfAccountAndUserTarget {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name = 3;
+}
+message JobsOfUserTarget {
+  string user_id = 1;
+  string tenant_name = 2;
+}
+message JobsOfTenantTarget {
+  string tenant_name = 1;
+}
+message JobsOfJobIdTarget {
+  uint64 job_id = 1;
+  string tenant_name = 2;
+}
+message JobsOfJobIdAndUserTarget {
+  uint64 job_id = 1;
+  string tenant_name = 2;
+  string user_id = 3;
+}
+message JobsOfJobIdAndAccountTarget {
+  uint64 job_id = 1;
+  string tenant_name = 2;
+  string account_name = 3;
+}
+
 service JobService {
   rpc GetJobs(GetJobsRequest) returns (GetJobsResponse);
   rpc GetJobByBiJobIndex(GetJobByBiJobIndexRequest) returns (GetJobByBiJobIndexResponse);

@@ -559,6 +559,7 @@ export const mockApi: MockApi<typeof api> = {
   exportAccount: null,
   exportChargeRecord: null,
   exportPayRecord: null,
+  exportJobRecord: null,
   exportUser: null,
   exportOperationLog: null,
 

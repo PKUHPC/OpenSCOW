@@ -15,7 +15,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobInfo } from "@scow/protos/build/common/ended_job";
 import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
-import { Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
+import { App, Button, DatePicker, Divider, Form, Input, InputNumber, Space, Table } from "antd";
 import dayjs from "dayjs";
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
@@ -25,6 +25,10 @@ import { ClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { Encoding } from "src/models/exportFile";
+import { SearchType } from "src/models/job";
+import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal";
+import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { HistoryJobDrawer } from "src/pageComponents/job/HistoryJobDrawer";
 import { JobPriceChangeModal } from "src/pageComponents/tenant/JobPriceChangeModal";
 import type { GetJobFilter, GetJobInfoSchema } from "src/pages/api/job/jobInfo";
@@ -50,6 +54,15 @@ interface Props {
 
 }
 
+interface DiffQuery {
+  userId?: string | undefined;
+  accountName?: string | undefined;
+  jobId?: number | undefined;
+  jobEndTimeStart?: string | undefined;
+  jobEndTimeEnd?: string | undefined;
+  clusters?: string[] | undefined;
+}
+
 const p = prefix("pageComp.tenant.adminJobTable.");
 const pCommon = prefix("common.");
 
@@ -69,7 +82,10 @@ export const AdminJobTable: React.FC<Props> = () => {
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
 
+  const { message } = App.useApp();
+
   const rangeSearch = useRef(true);
+  const [currentDiffQuery, setCurrentDiffQuery] = useState<DiffQuery | undefined>(undefined);
 
   const { publicConfigClusters, clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
   const sortedClusters = getSortedClusterValues(publicConfigClusters, clusterSortedIdList)
@@ -91,14 +107,64 @@ export const AdminJobTable: React.FC<Props> = () => {
   const [pageInfo, setPageInfo] = useState<PageInfo>({ page: 1, pageSize: DEFAULT_PAGE_SIZE });
 
   const promiseFn = useCallback(async () => {
+    const diffQuery = filterFormToQuery(query, rangeSearch.current);
+    setCurrentDiffQuery(diffQuery);
     return await api.getJobInfo({ query: {
-      ...filterFormToQuery(query, rangeSearch.current),
+      ...diffQuery,
       page: pageInfo.page,
       pageSize: pageInfo.pageSize,
     } });
   }, [pageInfo, query]);
 
   const { data, isLoading, reload } = useAsync({ promiseFn });
+
+  const finalPriceText = {
+    tenant: t(p("platformPrice")),
+    account: t(p("tenantPrice")),
+  };
+
+  const handleExport = async (columns: string[], encoding: Encoding) => {
+    const totalCount = data?.totalCount ?? 0;
+
+    // 获取浏览器时区
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+    if (totalCount > MAX_EXPORT_COUNT) {
+      message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
+    } else if (totalCount <= 0) {
+      message.error(t(pCommon("exportNoDataErrorMsg")));
+    } else {
+      window.location.href = urlToExport({
+        encoding,
+        exportApi: "exportJobRecord",
+        columns,
+        count: totalCount,
+        timeZone, // 将浏览器时区作为参数传递到后端
+        query: {
+          ...currentDiffQuery,
+          searchType: SearchType.TENANT,
+          finalPriceText: JSON.stringify(finalPriceText),
+          publicConfigClusters: JSON.stringify(publicConfigClusters),
+        },
+      });
+    }
+  };
+
+  const exportOptions = useMemo(() => {
+    return [
+      { label: t(pCommon("clusterWorkId")), value: "idJob" },
+      { label: t(pCommon("workName")), value: "jobName" },
+      { label: t(pCommon("account")), value: "account" },
+      { label: t(pCommon("user")), value: "user" },
+      { label: t(pCommon("cluster")), value: "cluster" },
+      { label: t(pCommon("partition")), value: "partition" },
+      { label: "QOS", value: "qos" },
+      { label: t(pCommon("timeSubmit")), value: "timeSubmit" },
+      { label: t(pCommon("timeEnd")), value: "timeEnd" },
+      { label: t(p("tenantPrice")), value: "accountPrice" },
+      { label: t(p("platformPrice")), value: "tenantPrice" },
+    ];
+  }, [t]);
 
   return (
     <div>
@@ -114,9 +180,15 @@ export const AdminJobTable: React.FC<Props> = () => {
         >
           <FilterFormTabs
             button={(
-              <Form.Item>
+              <Space>
                 <Button type="primary" htmlType="submit">{t(pCommon("search"))}</Button>
-              </Form.Item>
+                <ExportFileModaLButton
+                  options={exportOptions} // 定义导出列选项
+                  onExport={handleExport}
+                >
+                  {t(pCommon("export"))}
+                </ExportFileModaLButton>
+              </Space>
             )}
             onChange={(a) => rangeSearch.current = a === "range"}
             tabs={[

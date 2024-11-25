@@ -423,6 +423,57 @@ message ExportChargeRecord {
   }
 }
 
+// 充值记录及消费记录请求target
+message JobsOfAccountTarget {
+  string account_name = 1;
+  string tenant_name = 2;
+}
+message JobsOfAccountAndUserTarget {
+  string account_name = 1;
+  string user_id = 2;
+  string tenant_name = 3;
+}
+message JobsOfUserTarget {
+  string user_id = 1;
+  string tenant_name = 2;
+}
+message JobsOfTenantTarget {
+  string tenant_name = 1;
+}
+message JobsOfJobIdTarget {
+  uint32 job_id = 1;
+  string tenant_name = 2;
+}
+message JobsOfJobIdAndUserTarget {
+  uint64 job_id = 1;
+  string tenant_name = 2;
+  string user_id = 3;
+}
+message JobsOfJobIdAndAccountTarget {
+  uint64 job_id = 1;
+  string tenant_name = 2;
+  string account_name = 3;
+}
+
+message ExportJobRecord {
+  oneof target {
+    // 导出租户内某账户执行过的作业列表
+    JobsOfAccountTarget jobs_of_account = 1;
+    // 返回这个租户下某用户在某账户执行过的作业列表
+    JobsOfAccountAndUserTarget jobs_of_account_and_user = 2;
+    // 导出租户内某用户执行过的作业列表
+    JobsOfUserTarget jobs_of_user = 3;
+    // 导出租户内执行过的作业列表
+    JobsOfTenantTarget jobs_of_tenant = 4;
+    // 导出租户内执行过的特定ID的作业列表
+    JobsOfJobIdTarget jobs_of_job_id = 5;
+    // 导出租户内某用户执行过的特定ID的作业列表
+    JobsOfJobIdAndUserTarget jobs_of_job_id_and_user = 6;
+     // 导出租户内某账户执行过的特定ID的作业列表
+    JobsOfJobIdAndAccountTarget jobs_of_job_id_and_account = 7;
+  }
+}
+
 message ExportOperationLog {
   message User {
     string user_id = 1;
@@ -735,6 +786,7 @@ message CreateOperationLogRequest {
     DeleteUser delete_user = 100;
     DeleteAccount delete_account = 101;
     EditUserProfile edit_user_profile = 102;
+    ExportJobRecord export_job_record = 103;
   }
 }
 
@@ -845,6 +897,7 @@ message OperationLog {
     DeleteUser delete_user=102;
     DeleteAccount delete_account = 103;
     EditUserProfile edit_user_profile = 104;
+    ExportJobRecord export_job_record = 105;
   }
 }
 

@@ -13,8 +13,9 @@
 import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { SortOrder } from "@scow/protos/build/common/sort_order";
-import { GetJobsRequest, GetJobsRequest_SortBy as SortBy, JobFilter
-  , JobServiceClient,
+import { GetJobsRequest, GetJobsRequest_SortBy as SortBy, JobFilter, JobServiceClient, JobsOfAccountAndUserTarget,
+  JobsOfAccountTarget, JobsOfJobIdAndAccountTarget,
+  JobsOfJobIdAndUserTarget, JobsOfJobIdTarget, JobsOfTenantTarget, JobsOfUserTarget,
 } from "@scow/protos/build/server/job";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -192,3 +193,33 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
     200: result,
   };
 });
+
+export const buildJobsRequestTarget = (
+  tenantName: string,
+  jobId?: number,
+  accountName?: string,
+  userId?: string,
+):
+  | { $case: "jobsOfAccount"; jobsOfAccount: JobsOfAccountTarget }
+  | { $case: "jobsOfUser"; jobsOfUser: JobsOfUserTarget }
+  | { $case: "jobsOfAccountAndUser"; jobsOfAccountAndUser: JobsOfAccountAndUserTarget }
+  | { $case: "jobsOfTenant"; jobsOfTenant: JobsOfTenantTarget }
+  | { $case: "jobsOfJobId"; jobsOfJobId: JobsOfJobIdTarget }
+  | { $case: "jobsOfJobIdAndUser"; jobsOfJobIdAndUser: JobsOfJobIdAndUserTarget }
+  | { $case: "jobsOfJobIdAndAccount"; jobsOfJobIdAndAccount: JobsOfJobIdAndAccountTarget } => {
+
+  return jobId && userId
+    ? { $case: "jobsOfJobIdAndUser", jobsOfJobIdAndUser: { jobId, userId, tenantName } }
+    : jobId && accountName
+      ? { $case: "jobsOfJobIdAndAccount", jobsOfJobIdAndAccount: { jobId, accountName, tenantName } }
+      : jobId
+        ? { $case: "jobsOfJobId", jobsOfJobId: { jobId, tenantName } }
+        : accountName && userId
+          ? { $case: "jobsOfAccountAndUser", jobsOfAccountAndUser: { accountName, userId, tenantName } }
+          : accountName
+            ? { $case: "jobsOfAccount", jobsOfAccount: { accountName, tenantName } }
+            : userId
+              ? { $case: "jobsOfUser", jobsOfUser: { userId, tenantName } }
+              : { $case: "jobsOfTenant", jobsOfTenant: { tenantName } };
+};
+

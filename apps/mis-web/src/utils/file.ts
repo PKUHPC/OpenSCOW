@@ -41,7 +41,7 @@ export const getCsvStringify = (headerColumns: {[key in string]: string }, colum
   return csvStringify;
 };
 
-type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "operationLogs";;
+type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "jobRecords" | "operationLogs";
 
 /**
  *

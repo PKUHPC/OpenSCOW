@@ -53,6 +53,7 @@ import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import type { ExportAccountSchema } from "src/pages/api/file/exportAccount";
 import type { ExportChargeRecordSchema } from "src/pages/api/file/exportChargeRecord";
+import type { ExportJobRecordSchema } from "src/pages/api/file/exportJobRecord";
 import type { ExportOperationLogSchema } from "src/pages/api/file/exportOperationLog";
 import type { ExportPayRecordSchema } from "src/pages/api/file/exportPayRecord";
 import type { ExportUserSchema } from "src/pages/api/file/exportUser";
@@ -169,6 +170,7 @@ export const api = {
   exportOperationLog: apiClient.fromTypeboxRoute<typeof ExportOperationLogSchema>("GET", "/api/file/exportOperationLog"),
   exportPayRecord: apiClient.fromTypeboxRoute<typeof ExportPayRecordSchema>("GET", "/api/file/exportPayRecord"),
   exportUser: apiClient.fromTypeboxRoute<typeof ExportUserSchema>("GET", "/api/file/exportUser"),
+  exportJobRecord: apiClient.fromTypeboxRoute<typeof ExportJobRecordSchema>("GET", "/api/file/exportJobRecord"),
   getCharges: apiClient.fromTypeboxRoute<typeof GetChargesSchema>("GET", "/api/finance/charges"),
   getChargeRecordsTotalCount: apiClient.fromTypeboxRoute<typeof GetChargeRecordsTotalCountSchema>("GET", "/api/finance/getChargeRecordsTotalCount"),
   getUsedPayTypes: apiClient.fromTypeboxRoute<typeof GetUsedPayTypesSchema>("GET", "/api/finance/getUsedPayTypes"),

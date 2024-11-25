@@ -15,12 +15,14 @@ import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { JobInfo as JobInfoProto } from "@scow/protos/build/common/ended_job";
 import { Account, Account_DisplayedAccountState as DisplayedAccountState } from "@scow/protos/build/server/account";
 import { ChargeRecord as ChargeRecordProto, PaymentRecord } from "@scow/protos/build/server/charging";
 import {
   ExportAccountResponse,
   ExportChargeRecordResponse,
   ExportedUser,
+  ExportJobRecordResponse,
   ExportPayRecordResponse,
   ExportServiceClient,
   ExportUserResponse,
@@ -32,6 +34,7 @@ import {
 } from "@scow/protos/build/server/user";
 import { createServer } from "src/app";
 import { ChargeRecord } from "src/entities/ChargeRecord";
+import { JobInfo } from "src/entities/JobInfo";
 import { PayRecord } from "src/entities/PayRecord";
 import { InitialData, insertInitialData } from "tests/data/data";
 import { dropDatabase } from "tests/data/helpers";
@@ -71,6 +74,40 @@ afterEach(async () => {
   await server.close();
 });
 
+const mockOriginalJobData = (
+  account: string,
+  user: string,
+  jobId?: number,
+  cluster?: string,
+  endTime?: Date,
+) => new JobInfo({ cluster: cluster ?? "pkuhpc", ...{
+  "jobId": jobId ?? 5119061,
+  "account": account,
+  "user": user,
+  "partition": "C032M0128G",
+  "nodeList": "a5u15n01",
+  "name": "CoW",
+  "state": "COMPLETED",
+  "workingDirectory": "",
+  "submitTime": "2020-04-23T22:23:00.000Z",
+  "startTime": "2020-04-23T22:25:12.000Z",
+  "endTime": endTime ? endTime.toISOString() : "2020-04-23T23:18:02.000Z",
+  "gpusAlloc": 0,
+  "cpusReq": 32,
+  "memReqMb": 124000,
+  "nodesReq": 1,
+  "cpusAlloc": 32,
+  "memAllocMb": 124000,
+  "nodesAlloc": 1,
+  "timeLimitMinutes": 7200,
+  "elapsedSeconds": 3170,
+  "timeWait": endTime ? 0 : 132,
+  "qos": "normal",
+  "recordTime": new Date("2020-04-23T23:49:50.000Z"),
+} }, data.tenant.name, {
+  tenant: { billingItemId: "", price: new Decimal(20) },
+  account: { billingItemId: "", price: new Decimal(10) },
+});
 
 it("export users", async () => {
 
@@ -390,5 +427,126 @@ it("export pay Records", async () => {
     },
   ]);
 
+});
+
+it("export job Records", async () => {
+
+  const accountA = data.accountA.accountName,
+    accountB = data.accountB.accountName;
+
+  const userA = data.userA.userId,
+    userB = data.userB.userId;
+
+
+  const jobs = [
+    mockOriginalJobData(accountA, userA),
+    mockOriginalJobData(accountB, userA),
+    mockOriginalJobData(accountB, userB),
+    mockOriginalJobData(accountA, userB),
+    mockOriginalJobData(accountA, userA, 89757),
+    mockOriginalJobData(accountA, userA, 5119061, "cuchpc"),
+    mockOriginalJobData(accountA, userA, 5119061, "pkuhpc", new Date("2020-04-24T00:00:00.000Z")),
+  ];
+
+  await em.persistAndFlush(jobs);
+
+  const client = new ExportServiceClient(server.serverAddress, ChannelCredentials.createInsecure());
+
+  const baseQueryTime = new Date("2020-04-23T23:21:02.000Z");
+  const jobEndTimeStart = new Date(baseQueryTime);
+  jobEndTimeStart.setDate(baseQueryTime.getDate() - 1);
+  const jobEndTimeEnd = new Date(baseQueryTime);
+  jobEndTimeEnd.setDate(baseQueryTime.getDate());
+
+  const stream = asyncReplyStreamCall(client, "exportJobRecord", {
+    count: 3,
+    jobEndTimeStart: jobEndTimeStart.toISOString(),
+    jobEndTimeEnd: jobEndTimeEnd.toISOString(),
+    target:{ $case: "jobsOfAccountAndUser",
+      jobsOfAccountAndUser: { accountName: accountA, userId: userA,
+        tenantName: data.accountA.tenant.getProperty("name") },
+    }, clusters:["pkuhpc"],
+  });
+
+  const handlePaymentResponse = (response: ExportJobRecordResponse): JobInfoProto[] => {
+    return response.jobRecords;
+  };
+  const records = await collectData(stream, handlePaymentResponse);
+
+  expect(records).toHaveLength(2);
+
+  const expectObject = [
+    {
+      idJob: 5119061,
+      account: accountA,
+      user: userA,
+      cluster: "pkuhpc",
+      timeEnd: "2020-04-23T23:18:02.000Z",
+    },
+    {
+      idJob: 89757,
+      account: accountA,
+      user: userA,
+      timeEnd: "2020-04-23T23:18:02.000Z",
+      cluster: "pkuhpc",
+    },
+  ];
+
+  expect(records).toMatchObject(expectObject);
+
+  const stream2 = asyncReplyStreamCall(client, "exportJobRecord", {
+    count: 4,
+    jobEndTimeStart: jobEndTimeStart.toISOString(),
+    jobEndTimeEnd: jobEndTimeEnd.toISOString(),
+    target:{ $case: "jobsOfUser",
+      jobsOfUser: { userId: userA,
+        tenantName: data.accountA.tenant.getProperty("name") },
+    }, clusters:["pkuhpc","cuchpc"],
+  });
+
+  const records2 = await collectData(stream2, handlePaymentResponse);
+
+  expect(records2).toHaveLength(4);
+
+  expect(records2).toMatchObject([
+    expectObject[0],
+    {
+      idJob: 5119061,
+      account: accountB,
+      user: userA,
+      cluster: "pkuhpc",
+      timeEnd: "2020-04-23T23:18:02.000Z",
+    },
+    expectObject[1],
+    {
+      idJob: 5119061,
+      account: accountA,
+      user: userA,
+      cluster: "cuchpc",
+      timeEnd: "2020-04-23T23:18:02.000Z",
+    },
+  ]);
+
+  const stream3 = asyncReplyStreamCall(client, "exportJobRecord", {
+    count: 1,
+    jobEndTimeStart: jobEndTimeStart.toISOString(),
+    jobEndTimeEnd: jobEndTimeEnd.toISOString(),
+    target:{ $case: "jobsOfJobId",
+      jobsOfJobId: { jobId: 5119061,
+        tenantName: data.accountA.tenant.getProperty("name") },
+    }, clusters:["cuchpc"],
+  });
+
+  const records3 = await collectData(stream3, handlePaymentResponse);
+
+  expect(records3).toHaveLength(1);
+
+  expect(records3).toMatchObject([{
+    idJob: 5119061,
+    account: accountA,
+    user: userA,
+    cluster: "cuchpc",
+    timeEnd: "2020-04-23T23:18:02.000Z",
+  }]);
 });
 
