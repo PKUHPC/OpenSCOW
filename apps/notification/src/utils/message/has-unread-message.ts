@@ -49,28 +49,17 @@ export const hasUnreadMessage = async (token: string) => {
     mSubquery,
   ], true).as("message_ids");
 
-  // 构建子查询，获取当前用户已读的 message_id 列表
-  const userMessageIdsSubquery = knex("user_message_read")
-    .select("message_id")
-    .where("user_message_read.status", ReadStatus.READ);
-
   // 构建最终查询
   const result = await knex("messages as m")
     // 左连接 user_message_read 表，仅限于当前用户的记录
     .leftJoin("user_message_read as umr", function() {
       this.on("m.id", "=", "umr.message_id")
-        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]));
+        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]))
+        .andOn("umr.status", "=", knex.raw("?", [ReadStatus.UNREAD]))
+        .andOn("umr.is_deleted", "=", knex.raw("?", [false]));
     })
     // 筛选符合条件的 message_id
     .whereIn("m.id", knex.select("message_id").from(unionSubquery))
-    // 修改查询条件，使用动态的 message_id 列表
-    .andWhere(function() {
-      this.whereNotIn("m.id", userMessageIdsSubquery)
-        .orWhere(function() {
-          this.where("umr.status", ReadStatus.UNREAD)
-            .andWhere("umr.is_deleted", false);
-        });
-    })
     .limit(1)
     .select("m.*");
 
