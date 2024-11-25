@@ -691,6 +691,7 @@
           "primary": false,
           "nullable": false,
           "length": 1,
+          "default": "false",
           "mappedType": "boolean"
         },
         "created_at": {
