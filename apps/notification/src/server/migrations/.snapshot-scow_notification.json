@@ -702,6 +702,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "CURRENT_TIMESTAMP",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -712,6 +713,7 @@
           "primary": false,
           "nullable": false,
           "length": 6,
+          "default": "CURRENT_TIMESTAMP",
           "mappedType": "datetime"
         }
       },
