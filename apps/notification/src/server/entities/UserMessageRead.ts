@@ -59,6 +59,9 @@ export const UserMessageReadSchema = new EntitySchema<UserMessageRead>({
   indexes: [
     { name: "idx_user_id", properties: ["userId"]},
   ],
+  uniques: [
+    { name: "idx_user_message_unique", properties: ["userId", "message"]},
+  ],
   properties: {
     id: { type: "bigint", primary: true },
     userId: { type: String, length: 255 },

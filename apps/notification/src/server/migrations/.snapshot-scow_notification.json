@@ -737,6 +737,17 @@
           "unique": false
         },
         {
+          "keyName": "idx_user_message_unique",
+          "columnNames": [
+            "user_id",
+            "message_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"

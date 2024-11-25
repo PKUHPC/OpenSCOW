@@ -33,9 +33,13 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
   const currentLanguage = useI18n().currentLanguage;
+  const readIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已标记为已读的 ID
 
   const close = (messageId: number) => {
-    api.markMessageRead({ body:{ messageId: messageId } });
+    if (!readIdsRef.current.has(messageId)) {
+      api.markMessageRead({ body: { messageId } });
+      readIdsRef.current.add(messageId); // 标记为已读
+    }
     notifApi.destroy(messageId);
   };
 
@@ -47,10 +51,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
           style={{ boxShadow: "none" }}
           type="primary"
           size="small"
-          onClick={() => {
-            api.markMessageRead({ body:{ messageId: content.id } });
-            notifApi.destroy(key);
-          }}
+          onClick={() => close(content.id)}
         >
           {t(p("read"))}
         </Button>
@@ -62,7 +63,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
       btn,
       key,
       duration: 0,
-      onClose: () => close(content.id),
+      onClose: () => close(key),
     });
   };
 

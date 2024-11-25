@@ -246,9 +246,9 @@ export default (router: ConnectRouter) => {
         id: Number(messageId),
         $or: [
           { messageTarget: { targetType: TargetType.FULL_SITE } },
-          { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          { $in: user.accountAffiliations.map((a) => a.accountName) } } },
+          // { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
+          // { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
+          // { $in: user.accountAffiliations.map((a) => a.accountName) } } },
           { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
         ],
       });
@@ -260,39 +260,17 @@ export default (router: ConnectRouter) => {
         );
       }
 
-      const userReadRecord = await em.findOne(UserMessageRead, {
-        userId: user.identityId, message: { id: Number(messageId) } });
+      const readRecord = await em.upsert(UserMessageRead, {
+        userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ,
+      }, { onConflictFields: ["userId", "message"]});
 
-      if (!userReadRecord) {
-        const newReadRecord = new UserMessageRead({
-          userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ });
-
-        await em.persistAndFlush(newReadRecord);
-        // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-
-        return {
-          ...newReadRecord,
-          messageId: message.id,
-          readTime: newReadRecord.readTime?.toISOString() ?? new Date().toISOString(),
-          createdAt: newReadRecord.createdAt.toISOString(),
-          updatedAt: newReadRecord.updatedAt.toISOString(),
-        };
-      } else {
-        if (userReadRecord.status === EntityReadStatus.UNREAD) {
-          userReadRecord.status = EntityReadStatus.READ;
-          userReadRecord.readTime = new Date();
-          await em.persistAndFlush(userReadRecord);
-        }
-
-        // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-        return {
-          ...userReadRecord,
-          messageId: message.id,
-          readTime: userReadRecord.readTime?.toISOString() ?? new Date().toISOString(),
-          createdAt: userReadRecord.createdAt.toISOString(),
-          updatedAt: userReadRecord.updatedAt.toISOString(),
-        };
-      }
+      return {
+        ...readRecord,
+        messageId: message.id,
+        readTime: readRecord.readTime?.toISOString() ?? new Date().toISOString(),
+        createdAt: readRecord.createdAt.toISOString(),
+        updatedAt: readRecord.updatedAt.toISOString(),
+      };
     },
   });
 };
