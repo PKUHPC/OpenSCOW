@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
 
 import { compareDateTime, formatDateTime } from "@scow/lib-web/build/utils/datetime";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
@@ -22,6 +11,7 @@ import { ChangePasswordModalLink } from "src/components/ChangePasswordModal";
 import { DeleteEntityFailedModal } from "src/components/DeleteEntityFailedModal";
 import { DeleteEntityModalLink } from "src/components/DeleteEntityModal";
 import { DisabledA } from "src/components/DisabledA";
+import { EditUserProfileModalLink } from "src/components/EditUserProfileModal";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
 import { TenantRoleSelector } from "src/components/TenantRoleSelector";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -33,6 +23,8 @@ import { type GetTenantUsersSchema } from "src/pages/api/admin/getTenantUsers";
 import { User } from "src/stores/UserStore";
 import { publicConfig } from "src/utils/config";
 import { getRuntimeI18nConfigText } from "src/utils/config";
+
+import { UserInfoDrawer } from "../users/UserInfoDrawer";
 
 interface Props {
   data: Static<typeof GetTenantUsersSchema["responses"]["200"]> | undefined;
@@ -73,6 +65,7 @@ export const AdminUserTable: React.FC<Props> = ({
     idOrName: undefined,
   });
 
+  const [previewItem, setPreviewItem] = useState<FullUserInfo | undefined>(undefined);
   const [rangeSearchRole, setRangeSearchRole] = useState<FilteredRole>("ALL_USERS");
   const [currentPageNum, setCurrentPageNum] = useState<number>(1);
   const [currentSortInfo, setCurrentSortInfo] =
@@ -282,10 +275,47 @@ export const AdminUserTable: React.FC<Props> = ({
         <Table.Column<FullUserInfo>
           dataIndex="operation"
           title={t(pCommon("operation"))}
-          width="13%"
+          width="300px"
           fixed="right"
           render={(_, r) => (
             <Space split={<Divider type="vertical" />}>
+              <a onClick={() => setPreviewItem(r)}>
+                {t(p("detail"))}
+              </a>
+              {r.state === UserState.DELETED ? (
+                <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
+                  {t(p("editUserProfile"))}
+                </DisabledA>
+              ) : (
+                <EditUserProfileModalLink
+                  userId={r.id}
+                  name={r.name}
+                  email={r.email}
+                  phone={r.phone ?? ""}
+                  organization={r.organization ?? ""}
+                  adminComment={r.adminComment ?? ""}
+                  onComplete={async (newUserInfo) => {
+                    await api.editUserProfile({
+                      body: {
+                        identityId: r.id,
+                        tenantName: r.tenant,
+                        email: newUserInfo.email,
+                        phone: newUserInfo.phone,
+                        organization: newUserInfo.organization,
+                        adminComment: newUserInfo.adminComment,
+                      },
+                    })
+                      .httpError(404, () => { message.error(t(p("notExist"))); })
+                      .httpError(500, (e) => { message.error(e.message); })
+                      .httpError(501, () => { message.error("featureUnavailable"); })
+                      .then(() => { message.success(t(p("editUserProfileSuccess"))); })
+                      .catch(() => { message.error(t(p("editUserProfileError"))); })
+                      .finally(() => reload());
+                  }}
+                >
+                  {t(p("editUserProfile"))}
+                </EditUserProfileModalLink>
+              )}
               {r.state === UserState.DELETED ? (
                 <DisabledA message={t(pDelete("userDeleted"))} disabled={true}>
                   {t(p("changePassword"))}
@@ -400,6 +430,11 @@ export const AdminUserTable: React.FC<Props> = ({
         }}
       >
       </DeleteEntityFailedModal>
+      <UserInfoDrawer
+        open={previewItem !== undefined}
+        item={previewItem}
+        onClose={() => setPreviewItem(undefined)}
+      />
     </div>
   );
 };

@@ -1,5 +1,11 @@
 # @scow/auth
 
+## 1.7.3
+
+### Patch Changes
+
+- @scow/lib-server@1.3.7
+
 ## 1.7.2
 
 ### Patch Changes

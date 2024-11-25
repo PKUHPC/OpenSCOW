@@ -180,6 +180,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     mergeFileChunks: t(pTypes("mergeFileChunks")),
     initMultipartUpload: t(pTypes("initMultipartUpload")),
     markMessageRead: t(pTypes("markMessageRead")),
+    editUserProfile: t(pTypes("editUserProfile")),
   };
 
 };
@@ -272,6 +273,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   unsetPlatformFinance: "040204",
   platformChangePassword: "040205",
   setPlatformBilling: "040206",
+  editUserProfile: "040207",
   createTenant: "040301",
   tenantPay: "040302",
   exportUser: "040303",

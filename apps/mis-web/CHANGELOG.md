@@ -1,5 +1,17 @@
 # @scow/mis-web
 
+## 1.7.3
+
+### Patch Changes
+
+- 2ca3fe6: 优化门户和管理系统定时消息查询,隐藏报错
+- b0a38e0: 用户表增加手机、组织和备注字段并允许平台和租户管理员修改用户信息
+- Updated dependencies [b0a38e0]
+  - @scow/lib-operation-log@2.1.12
+  - @scow/protos@1.0.18
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-web@1.4.6
+
 ## 1.7.2
 
 ### Patch Changes

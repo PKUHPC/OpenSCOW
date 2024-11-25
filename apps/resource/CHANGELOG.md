@@ -1,5 +1,18 @@
 # @scow/resource
 
+## 0.2.3
+
+### Patch Changes
+
+- 035ff28: 修复授权分区模态框中出现不同集群相同分区名时搜索集群分区展示错误问题
+- 597955e: 增加授权账户集群与取消授权账户集群的 Hook
+- 4b7b331: 修复正常账户在授权 AI 集群后没有在 AI 集群下解封的问题
+  - @scow/protos@1.0.18
+  - @scow/lib-hook@1.0.18
+  - @scow/lib-scheduler-adapter@1.1.16
+  - @scow/lib-server@1.3.7
+  - @scow/lib-web@1.4.6
+
 ## 0.2.2
 
 ### Patch Changes

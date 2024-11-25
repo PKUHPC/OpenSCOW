@@ -1,5 +1,16 @@
 # @scow/mis-server
 
+## 1.7.3
+
+### Patch Changes
+
+- b0a38e0: 用户表增加手机、组织和备注字段并允许平台和租户管理员修改用户信息
+- 09d5e82: 计算作业价格时，只在最后进行一次四舍五入
+  - @scow/protos@1.0.18
+  - @scow/lib-hook@1.0.18
+  - @scow/lib-scheduler-adapter@1.1.16
+  - @scow/lib-server@1.3.7
+
 ## 1.7.2
 
 ### Patch Changes

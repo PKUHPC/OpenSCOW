@@ -122,4 +122,5 @@ export const OperationType: OperationTypeEnum = {
   deleteModelVersion:"deleteModelVersion",
   copyModelVersion:"copyModelVersion",
   markMessageRead: "markMessageRead",
+  editUserProfile: "editUserProfile",
 };

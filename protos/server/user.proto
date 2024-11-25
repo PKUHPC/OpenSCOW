@@ -16,6 +16,7 @@ package scow.server;
 
 import "common/money.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 import "google/type/date.proto";
 
@@ -247,6 +248,10 @@ message User {
   repeated PlatformRole platform_roles = 7;
   repeated TenantRole tenant_roles = 8;
   UserState state = 9;
+  optional string phone = 10;
+  optional string organization = 11;
+  optional string admin_comment = 12;
+  optional google.protobuf.Struct metadata = 13;
 }
 
 message GetUserInfoRequest {
@@ -288,6 +293,10 @@ message GetUserInfoResponse {
   string tenant_name = 5;
   string email = 6;
   google.protobuf.Timestamp create_time = 7;
+  optional string phone = 8;
+  optional string organization = 9;
+  optional string admin_comment = 10;
+  optional google.protobuf.Struct metadata = 11;
 }
 
 message GetUsersResponse {
@@ -303,6 +312,10 @@ message PlatformUserInfo {
   repeated PlatformRole platform_roles = 6;
   string email = 7;
   UserState state = 8;
+  optional string phone = 9;
+  optional string organization = 10;
+  optional string admin_comment = 11;
+  optional google.protobuf.Struct metadata = 12;
 }
 
 enum SortDirection {
@@ -413,6 +426,18 @@ message ChangeEmailRequest {
 message ChangeEmailResponse {
 }
 
+message ChangeUserProfileRequest {
+  string user_id = 1;
+  optional string email = 2;
+  optional string phone = 3;
+  optional string organization = 4;
+  optional string admin_comment = 5;
+  optional google.protobuf.Struct metadata = 6;
+}
+
+message ChangeUserProfileResponse {
+}
+
 
 message GetNewUserCountRequest {
   google.protobuf.Timestamp start_time = 1;
@@ -487,6 +512,7 @@ service UserService {
 
   rpc CheckUserNameMatch (CheckUserNameMatchRequest) returns (CheckUserNameMatchResponse);
   rpc ChangeEmail (ChangeEmailRequest) returns (ChangeEmailResponse);
+  rpc ChangeUserProfile (ChangeUserProfileRequest) returns (ChangeUserProfileResponse);
 
   rpc GetNewUserCount(GetNewUserCountRequest) returns (GetNewUserCountResponse);
 

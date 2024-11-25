@@ -1,20 +1,9 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Collection, Entity, Enum, ManyToOne, OneToMany, PrimaryKey, Property, Ref } from "@mikro-orm/core";
 import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { UserAccount } from "src/entities/UserAccount";
 import { CURRENT_TIMESTAMP, DATETIME_TYPE, EntityOrRef, toRef } from "src/utils/orm";
+import { type AnyJson } from "src/utils/types";
 
 export enum PlatformRole {
   PLATFORM_FINANCE = "PLATFORM_FINANCE",
@@ -51,6 +40,18 @@ export class User {
   @Property()
   email: string;
 
+  @Property({ type: "varchar", length: 20, nullable: true })
+  phone?: string;
+
+  @Property({ type: "text", nullable: true })
+  adminComment?: string;
+
+  @Property({ type: "text", nullable: true })
+  organization?: string;
+
+  @Property({ type: "json", nullable: true })
+  metadata?: AnyJson;
+
   @Property({ columnType: DATETIME_TYPE, defaultRaw: CURRENT_TIMESTAMP })
   createTime: Date;
 
@@ -74,16 +75,24 @@ export class User {
     tenant: EntityOrRef<Tenant>;
     name: string;
     email: string;
+    phone?: string
+    organization?: string;
+    adminComment?: string;
     createTime?: Date;
     tenantRoles?: TenantRole[];
     platformRoles?: PlatformRole[];
     state?: UserState;
     deletionComment?: string;
+    metadata?: AnyJson;
   }) {
     this.userId = init.userId;
     this.tenant = toRef(init.tenant);
     this.name = init.name;
     this.email = init.email;
+    this.phone = init.phone;
+    this.organization = init.organization;
+    this.adminComment = init.adminComment;
+    this.metadata = init.metadata;
     this.createTime = init.createTime ?? new Date();
     this.tenantRoles = init.tenantRoles ?? [];
     this.platformRoles = init.platformRoles ?? [];

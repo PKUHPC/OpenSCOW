@@ -48,6 +48,8 @@ export async function validateToken(token: string): Promise<UserInfo | undefined
     tenant: userInfo.tenantName,
     tenantRoles: userInfo.tenantRoles,
     email:userInfo.email,
+    phone: userInfo.phone,
+    organization: userInfo.organization,
     createTime:userInfo.createTime,
   };
 

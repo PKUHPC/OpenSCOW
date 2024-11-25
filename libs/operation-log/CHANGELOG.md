@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.12
+
+### Patch Changes
+
+- b0a38e0: 用户表增加手机、组织和备注字段并允许平台和租户管理员修改用户信息
+  - @scow/protos@1.0.18
+
 ## 2.1.11
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @scow/ai
 
+## 0.2.11
+
+### Patch Changes
+
+- Updated dependencies [b0a38e0]
+  - @scow/lib-operation-log@2.1.12
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.16
+  - @scow/lib-server@1.3.7
+  - @scow/lib-web@1.4.6
+
 ## 0.2.10
 
 ### Patch Changes

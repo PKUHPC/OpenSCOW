@@ -1,5 +1,11 @@
 # @scow/scowd-protos
 
+## 0.2.3
+
+### Patch Changes
+
+- bb0b697: 交互式应用全面接入 scowd
+
 ## 0.2.2
 
 ### Patch Changes

@@ -10,6 +10,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "time": {
@@ -19,7 +20,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "comment": {
@@ -29,6 +30,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "operator_id": {
@@ -38,6 +40,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "expiration_time": {
@@ -47,7 +50,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         }
       },
@@ -77,6 +80,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "time": {
@@ -86,7 +90,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "tenant_name": {
@@ -96,6 +100,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "account_name": {
@@ -105,6 +110,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "user_id": {
@@ -114,6 +120,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "type": {
@@ -123,6 +130,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "amount": {
@@ -143,6 +151,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "metadata": {
@@ -152,6 +161,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "json"
         }
       },
@@ -256,6 +266,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "cluster_id": {
@@ -265,6 +276,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "activation_status": {
@@ -289,6 +301,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "json"
         },
         "create_time": {
@@ -348,6 +361,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "id_job": {
@@ -357,6 +371,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "account": {
@@ -399,6 +414,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "comment": "使用节点列表",
           "mappedType": "text"
         },
@@ -431,7 +447,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "comment": "提交时间",
           "mappedType": "datetime"
         },
@@ -442,7 +458,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "comment": "开始时间",
           "mappedType": "datetime"
         },
@@ -453,7 +469,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "comment": "结束时间",
           "mappedType": "datetime"
         },
@@ -464,6 +480,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 10,
           "comment": "使用GPU数。来自gres_req字段",
           "mappedType": "integer"
         },
@@ -575,7 +592,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "default": "CURRENT_TIMESTAMP",
           "comment": "记录时间",
           "mappedType": "datetime"
@@ -587,6 +604,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "account_billing_item_id": {
@@ -596,6 +614,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "default": "'UNKNOWN'",
           "mappedType": "string"
         },
@@ -606,6 +625,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "default": "'UNKNOWN'",
           "mappedType": "string"
         },
@@ -750,6 +770,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "jobs": {
@@ -759,6 +780,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "comment": "{ biJobIndex: number; tenantPrice: tenantPrice.toFixed(4), accountPrice: accountPrice.toFixed(4) }[]",
           "mappedType": "json"
         },
@@ -769,6 +791,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "new_tenant_price": {
@@ -800,6 +823,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "ip_address": {
@@ -809,6 +833,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "time": {
@@ -848,6 +873,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "time": {
@@ -867,6 +893,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "account_name": {
@@ -876,6 +903,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "type": {
@@ -885,6 +913,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "amount": {
@@ -905,6 +934,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "ip_address": {
@@ -914,6 +944,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "comment": {
@@ -923,6 +954,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         }
       },
@@ -964,6 +996,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "query_key": {
@@ -973,6 +1006,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "query_result": {
@@ -982,6 +1016,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "json"
         },
         "timestamp": {
@@ -1021,6 +1056,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "value": {
@@ -1030,6 +1066,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         }
       },
@@ -1059,6 +1096,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "name": {
@@ -1068,6 +1106,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "balance": {
@@ -1142,6 +1181,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "item_id": {
@@ -1151,6 +1191,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "path": {
@@ -1160,6 +1201,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "comment": "集群,分区[,qos]",
           "mappedType": "text"
         },
@@ -1170,6 +1212,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "tenant_id": {
@@ -1179,6 +1222,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "integer"
         },
         "price": {
@@ -1199,6 +1243,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "comment": "max-cpusAlloc-mem, max-gpu-cpusAlloc, gpu, cpusAlloc",
           "mappedType": "string"
         },
@@ -1273,6 +1318,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "account_name": {
@@ -1282,6 +1328,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "tenant_id": {
@@ -1291,6 +1338,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "blocked_in_cluster": {
@@ -1300,6 +1348,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "whitelist_id": {
@@ -1309,6 +1358,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "integer"
         },
         "comment": {
@@ -1318,6 +1368,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "default": "''",
           "mappedType": "string"
         },
@@ -1454,6 +1505,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "tenant_id": {
@@ -1463,6 +1515,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "user_id": {
@@ -1472,6 +1525,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "name": {
@@ -1481,6 +1535,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "email": {
@@ -1490,7 +1545,48 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 20,
+          "mappedType": "string"
+        },
+        "admin_comment": {
+          "name": "admin_comment",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "organization": {
+          "name": "organization",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
         },
         "create_time": {
           "name": "create_time",
@@ -1510,6 +1606,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "enumItems": [
             "TENANT_FINANCE",
             "TENANT_ADMIN"
@@ -1524,6 +1621,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "enumItems": [
             "PLATFORM_FINANCE",
             "PLATFORM_ADMIN"
@@ -1553,6 +1651,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         }
       },
@@ -1615,6 +1714,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "user_id": {
@@ -1624,6 +1724,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "cluster": {
@@ -1633,6 +1734,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "storage_quota": {
@@ -1642,6 +1744,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },
@@ -1695,6 +1798,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "user_id": {
@@ -1704,6 +1808,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "account_id": {
@@ -1713,6 +1818,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "blocked_in_cluster": {
@@ -1722,6 +1828,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 10,
           "comment": "UNBLOCKED, BLOCKED",
           "mappedType": "string"
         },
@@ -1732,6 +1839,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 10,
           "comment": "USER, ADMIN, OWNER",
           "mappedType": "string"
         },

@@ -1,16 +1,5 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Static, Type } from "@sinclair/typebox";
+import { MetadataMap } from "src/pages/api/finance/charges";
 
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, DisplayedUserState, PlatformRole,
   TenantRole, UserRole, UserState,UserStateInAccount, UserStatus } from "./User";
@@ -39,6 +28,10 @@ export const PlatformUserInfo = Type.Object({
   userId: Type.String(),
   name: Type.String(),
   email: Type.String(),
+  phone: Type.Optional(Type.String()),
+  organization: Type.Optional(Type.String()),
+  adminComment: Type.Optional(Type.String()),
+  metadata: Type.Optional(MetadataMap),
   availableAccounts: Type.Array(Type.String()),
   tenantName: Type.String(),
   createTime: Type.Optional(Type.String()),
@@ -119,6 +112,10 @@ export const User = Type.Object({
   userId: Type.String(),
   name: Type.String(),
   email: Type.String(),
+  phone: Type.Optional(Type.String()),
+  organization: Type.Optional(Type.String()),
+  adminComment: Type.Optional(Type.String()),
+  metadata: Type.Optional(MetadataMap),
   createTime: Type.Optional(Type.String()),
   accountAffiliations: Type.Array(AccountAffiliation),
   platformRoles: Type.Array(Type.Enum(PlatformRole)),
