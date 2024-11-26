@@ -344,6 +344,7 @@ export const mockApi: MockApi<typeof api> = {
   getChargeRecordsTotalCount: async () => ({
     totalAmount: 10,
     totalCount: 10,
+    refreshTime: "2024-11-18T09:10:54.855Z",
   }),
 
   getPayments: async () => ({ results: [{
@@ -429,8 +430,9 @@ export const mockApi: MockApi<typeof api> = {
   getPortalUsageCount: async () => ({ results: [{ operationType: "submitJob", count: 10 }]}),
   getMisUsageCount: async () => ({ results: [{ operationType: "createAccount", count: 10 }]}),
   getStatisticInfo: async () =>
-    ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10, newTenant: 10 }),
-  getJobTotalCount: async () => ({ count: 10 }),
+    ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10,
+      newTenant: 10, refreshTime: "2024-11-18T09:10:54.855Z" }),
+  getJobTotalCount: async () => ({ count: 10, refreshTime: "2024-11-18T09:10:54.855Z" }),
   syncBlockStatus: async () => ({
     blockedFailedAccounts: [],
     unblockedFailedAccounts:[],

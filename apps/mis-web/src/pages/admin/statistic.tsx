@@ -13,7 +13,7 @@
 import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
   TeamOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
-import { getDefaultPresets } from "@scow/lib-web/build/utils/datetime";
+import { getAdminStatPresets } from "@scow/lib-web/build/utils/datetime";
 import { Card, Col, DatePicker, Row, Space } from "antd";
 import dayjs from "dayjs";
 import { NextPage } from "next";
@@ -30,6 +30,7 @@ import { DataLineChart } from "src/pageComponents/admin/DataLineChart";
 import { StatisticCard } from "src/pageComponents/admin/StatisticCard";
 import { publicConfig } from "src/utils/config";
 import { dateMessageToDayjs } from "src/utils/date";
+import { formatLastTime } from "src/utils/dateTimeZone";
 import { Head } from "src/utils/head";
 import { moneyNumberToString } from "src/utils/money";
 import { styled } from "styled-components";
@@ -86,7 +87,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
   const today = dayjs().endOf("day");
   const [query, setQuery] = useState<{ filterTime: [dayjs.Dayjs, dayjs.Dayjs], }>({
-    filterTime: [today.clone().subtract(7, "day"), today],
+    filterTime: [today.clone().subtract(8, "day"), today.clone().subtract(1, "day")],
   });
 
   const getStatisticInfoFn = useCallback(async () => {
@@ -112,6 +113,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
         endTime: new Date().toISOString(),
         isPlatformRecords: true,
         searchType: SearchType.ACCOUNT,
+        preferCache: true,
       },
     });
   }, []);
@@ -319,22 +321,40 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
 
   const amountToolTipFormatter = (value: number) => [`${value.toLocaleString()}(${t(p("yuan"))})`, t(p("amount"))];
 
+  // 禁止选择今天及以后的日期
+  const disabledDate = (current: dayjs.Dayjs) => {
+    return current.isAfter(today, "day") || current.isSame(today, "day");
+  };
+
+  const isoStrings = [totalCharge?.refreshTime, jobTotalCount?.refreshTime, statisticInfo?.refreshTime];
+
+  const formatLastTimeString = formatLastTime(isoStrings);
+
   return (
     <>
       <Head title={t("layouts.route.common.statistic")} />
       <PageTitle titleText={t(p("dataOverview"))} />
       <Row gutter={[16, 16]}>
-        <Col span={24} style={{ textAlign: "right" }}>
+        <Col span={13} style={{ textAlign: "left", display: "flex", alignItems: "center" }}>
+          <span>{ t(p("statisticsDelay1")) }
+            { formatLastTimeString ?
+              t(p("statisticsDelay2"), [formatLastTimeString])
+              : ""
+            }
+          </span>
+        </Col>
+        <Col span={11} style={{ textAlign: "right" }}>
           <span>{t(p("dateRange"))}：</span>
           <DatePicker.RangePicker
             allowClear={false}
-            presets={getDefaultPresets(languageId)}
+            presets={getAdminStatPresets(languageId)}
             defaultValue={[query.filterTime?.[0], query.filterTime?.[1]]}
             onChange={(dates) => {
               if (dates?.[0] && dates?.[1]) {
                 setQuery({ filterTime: [dates[0], dates[1]]});
               }
             }}
+            disabledDate={disabledDate}
           />
         </Col>
         <Col flex={4}>

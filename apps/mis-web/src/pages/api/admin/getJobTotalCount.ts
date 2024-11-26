@@ -20,6 +20,7 @@ import { getClient } from "src/utils/client";
 
 export const GetJobTotalCountResponse = Type.Object({
   count: Type.Number(),
+  refreshTime: Type.String({ format: "date-time" }),
 });
 
 export type GetJobTotalCountResponse = Static<typeof GetJobTotalCountResponse>;
@@ -47,6 +48,9 @@ export default typeboxRoute(GetJobTotalCountSchema,
     const result = await asyncClientCall(client, "getJobTotalCount", {});
 
     return {
-      200: result,
+      200: {
+        ...result,
+        refreshTime: result.refreshTime!,
+      },
     };
   });

@@ -1204,6 +1204,8 @@ export default {
         accountName: "Account Name",
         amount: "Amount",
         yuan: "CNY",
+        statisticsDelay1: "The statistics are updated once per day",
+        statisticsDelay2: ". Last updated at: {}",
       },
     },
     accounts: {

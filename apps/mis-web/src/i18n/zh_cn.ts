@@ -1201,6 +1201,8 @@ export default {
         accountName: "账户名",
         amount: "金额",
         yuan: "元",
+        statisticsDelay1: "统计数据每日更新一次",
+        statisticsDelay2: "，最后更新于: {}",
       },
     },
     accounts: {

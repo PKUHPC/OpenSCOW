@@ -34,7 +34,7 @@ import { JobInfo as JobInfoEntity } from "src/entities/JobInfo";
 import { JobPriceChange } from "src/entities/JobPriceChange";
 import { AmountStrategy, JobPriceItem } from "src/entities/JobPriceItem";
 import { Tenant } from "src/entities/Tenant";
-import { queryWithCache } from "src/utils/cache";
+import { getJobTotalCountCached, queryWithCache } from "src/utils/cache";
 import { toGrpc } from "src/utils/job";
 import { logger } from "src/utils/logger";
 import { DEFAULT_PAGE_SIZE, paginationProps } from "src/utils/orm";
@@ -430,11 +430,14 @@ export const jobServiceServer = plugin((server) => {
         .orderBy({ [raw("COUNT(*)")]: QueryOrder.DESC })
         .limit(topRank);
 
-      const results: { userId: string, count: number }[] = await queryWithCache({
+      const queryResult = await queryWithCache({
         em,
         queryKeys: ["top_submit_job_users", `${startTime}`, `${endTime}`, `${topRank}`],
-        queryQb: qb,
+        queryExecutor: qb,
       });
+
+      const results: { userId: string, count: number }[] = queryResult.result;
+
       return [
         {
           results,
@@ -491,11 +494,14 @@ export const jobServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const results: { date: string, count: number }[] = await queryWithCache({
+      const queryResult = await queryWithCache({
         em,
         queryKeys: ["new_job_count", `${startTime}`, `${endTime}`],
-        queryQb: qb,
+        queryExecutor: qb,
       });
+
+      const results: { date: string, count: number }[] = queryResult.result;
+
       return [
         {
           results: results.map((record) => ({
@@ -507,8 +513,11 @@ export const jobServiceServer = plugin((server) => {
     },
 
     getJobTotalCount: async ({ em }) => {
-      const count = await em.count(JobInfoEntity, {});
-      return [{ count }];
+
+      const { result , refreshTime }
+      = await getJobTotalCountCached(em);
+
+      return [{ ...result , refreshTime: refreshTime.toISOString() }];
     },
 
     cancelJob: async ({ request, em, logger }) => {

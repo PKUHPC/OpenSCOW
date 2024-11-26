@@ -14,6 +14,7 @@ import { createServer } from "src/app";
 import { createPriceItems } from "src/tasks/createBillingItems";
 import { fetchJobs } from "src/tasks/fetch";
 import { migrationUp } from "src/tasks/migrationUp";
+import { fetchStatistics } from "src/tasks/statistic";
 
 async function main() {
 
@@ -42,6 +43,11 @@ async function main() {
       case "migrationUp":
         await migrationUp(server.ext.orm);
         break;
+
+      case "fetchStatistics":
+        await fetchStatistics(em, logger);
+        break;
+
       default:
         logger.error("Unexpected task name %s", command);
         process.exit(1);

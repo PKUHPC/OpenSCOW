@@ -228,6 +228,7 @@ message GetJobTotalCountRequest {
 
 message GetJobTotalCountResponse {
   uint64 count = 1;
+  google.protobuf.Timestamp refresh_time = 2;
 }
 
 // 充值记录及消费记录请求target

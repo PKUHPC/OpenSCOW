@@ -27,10 +27,11 @@ import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
 import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
 import { ormPlugin } from "src/plugins/orm";
 import { PricePlugin, pricePlugin } from "src/plugins/price";
+import { StatisticPlugin, statisticPlugin } from "src/plugins/statistic";
 import { SyncBlockStatusPlugin, syncBlockStatusPlugin } from "src/plugins/syncBlockStatus";
 
 declare module "@ddadaal/tsgrpc-server" {
-  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin,
+  interface Extensions extends ClusterPlugin, PricePlugin, FetchPlugin, StatisticPlugin,
     SyncBlockStatusPlugin, ScowResourcePlugin, ClearCachePlugin {
     orm: MikroORM<MySqlDriver>;
     capabilities: Capabilities;
@@ -46,6 +47,7 @@ export const plugins = [
   clustersPlugin,
   pricePlugin,
   fetchPlugin,
+  statisticPlugin,
   authServicePlugin,
   syncBlockStatusPlugin,
   clearCachePlugin,
@@ -53,7 +55,7 @@ export const plugins = [
 
 if (commonConfig.scowResource?.enabled) {
   plugins.push(scowResourcePlugin(commonConfig.scowResource));
-} 
+}
 
 if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));

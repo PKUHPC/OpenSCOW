@@ -182,11 +182,13 @@ message GetChargeRecordsTotalCountRequest {
   }
 
   repeated string user_ids_or_names = 9;
+  optional bool prefer_cache = 12;
 }
 
 message GetChargeRecordsTotalCountResponse {
   optional common.Money total_amount = 1;
   uint64 total_count = 2;
+  google.protobuf.Timestamp refresh_time = 3;
 }
 
 message PaymentRecord {

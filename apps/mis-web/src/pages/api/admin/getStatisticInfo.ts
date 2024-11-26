@@ -25,6 +25,7 @@ export const GetStatisticInfoResponse = Type.Object({
   newUser: Type.Number(),
   newAccount: Type.Number(),
   newTenant: Type.Number(),
+  refreshTime: Type.String({ format: "date-time" }),
 });
 
 export type GetStatisticInfoResponse = Static<typeof GetStatisticInfoResponse>;
@@ -74,6 +75,7 @@ export default typeboxRoute(GetStatisticInfoSchema,
     return {
       200: {
         ...results,
+        refreshTime: results.refreshTime!,
       },
     };
   });

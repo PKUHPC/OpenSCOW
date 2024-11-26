@@ -30,6 +30,7 @@ import { StorageQuota } from "src/entities/StorageQuota";
 import { Tenant } from "src/entities/Tenant";
 import { PlatformRole, User } from "src/entities/User";
 import { UserAccount, UserRole } from "src/entities/UserAccount";
+import { getTotalStatisticsInfoCached } from "src/utils/cache";
 
 export const adminServiceServer = plugin((server) => {
 
@@ -130,21 +131,21 @@ export const adminServiceServer = plugin((server) => {
       const result = await server.ext.clusters.callOnOne(
         cluster,
         logger,
-        async (client) => { 
-          
+        async (client) => {
+
           // 执行获取详细账户信息的操作
           // 如果一个集群在当前系统下为AI集群，那么只能使用 AI适配器 的原有 getAllAccountsWithUsers 接口
           // 如果是未配置资源管理系统 或者 为AI集群的情况调用原有 getAllAccountsWithUsers 接口
           if (!commonConfig.scowResource?.enabled || isAiCluster) {
             return await asyncClientCall(client.account, "getAllAccountsWithUsers", {});
-          
+
           // 如果配置了资源管理系统且不是AI集群，那么使用 getAllAccountsWithUsersAndBlockedDetails 同时获取账户的详细分区封锁信息
           } else {
             // 检查当前适配器是否具有资源管理可选功能接口，同时判断当前适配器版本
             await ensureResourceManagementFeatureAvailable(client, logger);
             // 调用适配器的 getAllAccountsWithUsersAndBlockedDetails
             // TODO: 返回值中的 accountBlockedDetails 暂未使用
-            return await asyncClientCall(client.account, "getAllAccountsWithUsersAndBlockedDetails", {}); 
+            return await asyncClientCall(client.account, "getAllAccountsWithUsersAndBlockedDetails", {});
           }
         },
       );
@@ -285,16 +286,15 @@ export const adminServiceServer = plugin((server) => {
     getStatisticInfo: async ({ request, em }) => {
       const { startTime, endTime } = request;
 
-      const totalUser = await em.count(User, {});
-      const totalAccount = await em.count(Account, {});
-      const totalTenant = await em.count(Tenant, {});
+      const { result: totalRecords, refreshTime }
+      = await getTotalStatisticsInfoCached(em);
 
       const newUser = await em.count(User, { createTime: { $gte: startTime, $lte: endTime } });
       const newAccount = await em.count(Account, { createTime: { $gte: startTime, $lte: endTime, $ne: null } });
       const newTenant = await em.count(Tenant, { createTime: { $gte: startTime, $lte: endTime } });
 
       return [{
-        totalUser, totalAccount, totalTenant, newUser, newAccount, newTenant,
+        ... totalRecords, newUser, newAccount, newTenant, refreshTime: refreshTime.toISOString(),
       }];
     },
   });

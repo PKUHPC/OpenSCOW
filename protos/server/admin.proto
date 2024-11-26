@@ -181,6 +181,7 @@ message GetStatisticInfoResponse {
   uint64 new_user = 4;
   uint64 new_account = 5;
   uint64 new_tenant = 6;
+  google.protobuf.Timestamp refresh_time = 7;
 }
 
 service AdminService {

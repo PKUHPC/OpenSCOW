@@ -44,6 +44,28 @@ export const getDefaultPresets = (languageId: string): TimeRangePickerProps["pre
   ];
 };
 
+export const getAdminStatPresets = (languageId: string): TimeRangePickerProps["presets"] => {
+  const yesterday = dayjs().subtract(1, "day");
+  const yesterdayEnd = yesterday.endOf("day");
+
+  const oneday = getCurrentLangLibWebText(languageId, "dateTimeOneDay");
+  const oneWeek = getCurrentLangLibWebText(languageId, "dateTimeOneWeek");
+  const oneMonth = getCurrentLangLibWebText(languageId, "dateTimeOneMonth");
+  const threeMonths = getCurrentLangLibWebText(languageId, "dateTimeThreeMonths");
+  const sixMonths = getCurrentLangLibWebText(languageId, "dateTimeSixMonths");
+  const oneYear = getCurrentLangLibWebText(languageId, "dateTimeOneYear");
+
+
+  return [
+    { label: oneday, value: [yesterday.startOf("day"), yesterdayEnd]},
+    { label: oneWeek, value: [yesterday.subtract(1, "week"), yesterdayEnd]},
+    { label: oneMonth, value: [yesterday.subtract(1, "month"), yesterdayEnd]},
+    { label: threeMonths, value: [yesterday.subtract(3, "month").startOf("day"), yesterdayEnd]},
+    { label: sixMonths, value: [yesterday.subtract(6, "month").startOf("day"), yesterdayEnd]},
+    { label: oneYear, value: [yesterday.subtract(1, "year").startOf("day"), yesterdayEnd]},
+  ];
+};
+
 export function compareDateTime(a: string, b: string): number {
   const aMoment = dayjs(a);
   const bMoment = dayjs(b);

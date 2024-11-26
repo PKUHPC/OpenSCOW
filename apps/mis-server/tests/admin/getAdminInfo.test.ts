@@ -139,6 +139,7 @@ it("get statistic info", async () => {
     totalUser: 23,
     totalAccount: 13,
     totalTenant: 42,
+    refreshTime: expect.any(String), // 允许任意时间字符串
   });
 
 });

@@ -25,7 +25,7 @@ import { Account,AccountState } from "src/entities/Account";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { PayRecord } from "src/entities/PayRecord";
 import { Tenant } from "src/entities/Tenant";
-import { queryWithCache } from "src/utils/cache";
+import { getChargeRecordsTotalCountCached, queryWithCache } from "src/utils/cache";
 import {
   getChargesSearchType,
   getChargesSearchTypes,
@@ -358,11 +358,13 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const records: { date: string, totalAmount: number }[] = await queryWithCache({
+      const queryResult = await queryWithCache({
         em,
         queryKeys: ["get_daily_charge", `${startTime}`, `${endTime}`, `${timeZone}`],
-        queryQb: qb,
+        queryExecutor: qb,
       });
+
+      const records: { date: string, totalAmount: number }[] = queryResult.result;
 
       return [{
         results: records.map((record) => ({
@@ -435,11 +437,13 @@ export const chargingServiceServer = plugin((server) => {
         .groupBy(raw("date"))
         .orderBy({ [raw("date")]: QueryOrder.DESC });
 
-      const records: { date: string, totalAmount: number }[] = await queryWithCache({
+      const queryResult = await queryWithCache({
         em,
         queryKeys: ["get_daily_pay", `${startTime}`, `${endTime}`, `${timeZone}`],
-        queryQb: qb,
+        queryExecutor: qb,
       });
+
+      const records: { date: string, totalAmount: number }[] = queryResult.result;
 
       return [{
         results: records.map((record) => ({
@@ -530,12 +534,12 @@ export const chargingServiceServer = plugin((server) => {
    * @returns
    */
     getChargeRecordsTotalCount: async ({ request, em }) => {
-      const { startTime, endTime, type, types, target, userIdsOrNames }
+      const { startTime, endTime, type, types, target, userIdsOrNames, preferCache }
       = ensureNotUndefined(request, ["startTime", "endTime"]);
 
       const searchParam = getChargesTargetSearchParam(target);
       const searchType = types.length === 0 ? getChargesSearchType(type) : getChargesSearchTypes(types);
-
+      let refreshTime = new Date();
 
       const qb = em.createQueryBuilder(ChargeRecord, "c")
         .select([raw("count(c.id) as total_count"), raw("sum(c.amount) as total_amount")])
@@ -561,6 +565,12 @@ export const chargingServiceServer = plugin((server) => {
         });
 
         result = await em.getConnection().execute(sql);
+      } else if (target?.$case === "accountsOfAllTenants" && preferCache) {
+
+        const { result: queryResult, refreshTime: cacheTime } = await getChargeRecordsTotalCountCached(em);
+
+        result = queryResult;
+        refreshTime = cacheTime;
       } else {
         result = await qb.execute("get");
       }
@@ -568,6 +578,7 @@ export const chargingServiceServer = plugin((server) => {
       return [{
         totalAmount: decimalToMoney(new Decimal(result.total_amount ?? result[0]?.total_amount ?? 0)),
         totalCount: result.total_count ?? result[0].total_count,
+        refreshTime: refreshTime.toISOString(),
       }];
     },
 

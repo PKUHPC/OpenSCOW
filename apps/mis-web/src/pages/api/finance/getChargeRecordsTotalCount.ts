@@ -50,18 +50,22 @@ export const GetChargeRecordsTotalCountSchema = typeboxRouteSchema({
     // 消费的用户id或姓名
     userIdsOrNames: Type.Optional(Type.Array(Type.String())),
 
+    // 是否要使用缓存，平台数据统计使用
+    preferCache: Type.Optional(Type.Boolean()),
   }),
 
   responses: {
     200: Type.Object({
       totalAmount: Type.Number(),
       totalCount: Type.Number(),
+      refreshTime: Type.String({ format: "date-time" }),
     }),
   },
 });
 
 export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) => {
-  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIdsOrNames } = req.query;
+  const { endTime, startTime, accountNames, isPlatformRecords, searchType, types, userIdsOrNames,
+    preferCache } = req.query;
   const info = await getUserInfoForCharges(accountNames, req, res);
   if (!info) return;
 
@@ -75,13 +79,15 @@ export default typeboxRoute(GetChargeRecordsTotalCountSchema, async (req, res) =
     types:types ?? [],
     target: buildChargesRequestTarget(accountNames, tenantOfAccount, searchType, isPlatformRecords),
     userIdsOrNames:userIdsOrNames ?? [],
-  }), ["totalAmount", "totalCount"]);
+    preferCache: preferCache ?? false,
+  }), ["totalAmount", "totalCount", "refreshTime"]);
 
   return {
     200: {
 
       totalAmount: reply.totalAmount ? moneyToNumber(reply.totalAmount) : 0,
       totalCount: reply.totalCount,
+      refreshTime: reply.refreshTime,
     },
   };
 });
