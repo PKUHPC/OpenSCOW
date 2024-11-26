@@ -702,7 +702,6 @@
           "primary": false,
           "nullable": false,
           "length": 6,
-          "default": "CURRENT_TIMESTAMP",
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -713,7 +712,6 @@
           "primary": false,
           "nullable": false,
           "length": 6,
-          "default": "CURRENT_TIMESTAMP",
           "mappedType": "datetime"
         }
       },
@@ -738,17 +736,6 @@
           "constraint": false,
           "primary": false,
           "unique": false
-        },
-        {
-          "keyName": "idx_user_message_unique",
-          "columnNames": [
-            "user_id",
-            "message_id"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": false,
-          "unique": true
         },
         {
           "keyName": "PRIMARY",

@@ -1,4 +1,4 @@
-import { EntitySchema, type Ref } from "@mikro-orm/core";
+import { EntitySchema, EventArgs, type Ref } from "@mikro-orm/core";
 import { DATETIME_TYPE, toRef } from "src/utils/orm";
 
 import { Message } from "./Message";
@@ -47,9 +47,17 @@ export const UserMessageReadSchema = new EntitySchema<UserMessageRead>({
   indexes: [
     { name: "idx_user_id", properties: ["userId"]},
   ],
-  uniques: [
-    { name: "idx_user_message_unique", properties: ["userId", "message"]},
-  ],
+  hooks: {
+    beforeUpsert: [
+      (args: EventArgs<UserMessageRead>) => {
+        const now = new Date();
+        if (!args.entity.createdAt) {
+          args.entity.createdAt = now;
+        }
+        args.entity.updatedAt = now;
+      },
+    ],
+  },
   properties: {
     id: { type: "bigint", primary: true },
     userId: { type: String, length: 255 },
@@ -57,7 +65,7 @@ export const UserMessageReadSchema = new EntitySchema<UserMessageRead>({
     status: { enum: true, items: () => ReadStatus },
     readTime: { type: Date, nullable: true },
     isDeleted: { type: "boolean", default: false },
-    createdAt: { type: "date", columnType: DATETIME_TYPE, defaultRaw: "CURRENT_TIMESTAMP" },
-    updatedAt: { type: "date", columnType: DATETIME_TYPE, onUpdate: () => new Date(), defaultRaw: "CURRENT_TIMESTAMP" },
+    createdAt: { type: "date", columnType: DATETIME_TYPE, onCreate: () => new Date() },
+    updatedAt: { type: "date", columnType: DATETIME_TYPE, onCreate: () => new Date(), onUpdate: () => new Date() },
   },
 });
