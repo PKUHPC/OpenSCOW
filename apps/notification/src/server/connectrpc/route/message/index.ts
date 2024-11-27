@@ -302,31 +302,16 @@ export default (router: ConnectRouter) => {
           // { $in: user.accountAffiliations.map((a) => a.accountName) } } },
           { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
         ],
-      });
-
-      const messageIds = messages.map((message) => message.id);
-
-      const userReadRecords = await em.find(UserMessageRead, {
-        userId: user.identityId, message: { id: { $in: messageIds } } });
+      }, { fields: ["id"]});
 
       for (const message of messages) {
-        const userReadRecord = userReadRecords.find((record) => record.message.id === message.id);
-
-        if (!userReadRecord) {
-          const newReadRecord = new UserMessageRead({
-            userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ });
-
-          em.persist(newReadRecord);
-        } else {
-          if (userReadRecord.status === EntityReadStatus.UNREAD) {
-            userReadRecord.status = EntityReadStatus.READ;
-            userReadRecord.readTime = new Date();
-            em.persist(userReadRecord);
-          }
-        }
+        const messageRef = em.getReference(Message, message.id);
+        await em.upsert(UserMessageRead, {
+          userId: user.identityId, message: messageRef,
+          readTime: new Date(), status: EntityReadStatus.READ,
+        }, { onConflictFields: ["userId", "message"]});
       }
 
-      await em.flush();
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
 
       return;
@@ -389,10 +374,11 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
-      // 删除所有用户已读消息
 
-      // step 1. 找到所有用户已读的消息
+      // 删除所有用户已读消息
+      // step 1. 找到所有用户已读且未被删除的消息
       const messages = await em.find(Message, {
+        userMessageRead: { userId: user.identityId, status: ReadStatus.READ, isDeleted: false },
         $or: [
           { messageTarget: { targetType: TargetType.FULL_SITE } },
           // { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
@@ -400,25 +386,15 @@ export default (router: ConnectRouter) => {
           //   { $in: user.accountAffiliations.map((a) => a.accountName) } } },
           { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
         ],
-      });
+      }, { fields: ["id"]});
 
       const messageIds = messages.map((message) => message.id);
 
-      const userReadRecords = await em.find(UserMessageRead, {
-        userId: user.identityId, status: ReadStatus.READ, message: { id: { $in: messageIds } } });
-
-      for (const record of userReadRecords) {
-        record.isDeleted = true;
-
-        em.persist(record);
-      }
-
-      await em.flush();
+      await em.nativeUpdate(UserMessageRead, {
+        userId: user.identityId, message: { id: { $in: messageIds } } }, { isDeleted: true });
 
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-
       return;
-
     },
 
     async changeMessageExpirationTime(req, context) {

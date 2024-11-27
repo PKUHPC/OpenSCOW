@@ -37,7 +37,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
   const close = (messageId: number) => {
     if (!readIdsRef.current.has(messageId)) {
       api.markMessageRead({ body: { messageId } });
-      readIdsRef.current.add(messageId); // 标记为已读
+      readIdsRef.current.add(messageId);
     }
     notifApi.destroy(messageId);
   };
