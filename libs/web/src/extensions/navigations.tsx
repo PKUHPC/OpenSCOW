@@ -106,8 +106,10 @@ export const toNavItemProps = (
   originalItems.forEach(convertToMap);
 
   const rec = (items: NavItem[]): NavItemProps[] => {
+
     return items.map((item) => ({
       path: convertPath(item.path),
+      clickable: originalItemsMap.get(item.path)?.clickable,
       clickToPath: item.clickToPath ? convertPath(item.clickToPath) : undefined,
       text: item.text,
       openInNewPage: item.openInNewPage,
