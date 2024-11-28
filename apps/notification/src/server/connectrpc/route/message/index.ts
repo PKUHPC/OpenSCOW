@@ -1,18 +1,6 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Struct } from "@bufbuild/protobuf";
 import { Code, ConnectError, ConnectRouter } from "@connectrpc/connect";
-import { FilterQuery } from "@mikro-orm/core";
+import { Knex } from "@mikro-orm/mysql";
 import { ReadStatus } from "@scow/notification-protos/build/common_pb";
 import { MessageService } from "@scow/notification-protos/build/message_connect";
 import { PlatformRole } from "src/models/user";
@@ -23,12 +11,12 @@ import { MessageTarget } from "src/server/entities/MessageTarget";
 import { ReadStatus as EntityReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
 import { getUser } from "src/utils/auth";
 import { checkAuth } from "src/utils/auth/check-auth";
+import { toCamelCaseArray } from "src/utils/camelCase";
 import { ensureNotUndefined } from "src/utils/ensure-not-undefined";
 import { forkEntityManager } from "src/utils/get-orm";
 import { logger } from "src/utils/logger";
 import { adminSendMsgToBridge } from "src/utils/message-bridge";
 import { getMessagesTypeData } from "src/utils/message-type";
-import { paginationProps } from "src/utils/pagination";
 import { checkAdminMessageTypeExist } from "src/utils/rendering-message";
 
 export default (router: ConnectRouter) => {
@@ -121,72 +109,133 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
+      const knex = em.getConnection().getKnex();
 
-      // 获取用户已读的消息ID列表
-      const readMessages = await em.find(UserMessageRead, { userId: user.identityId });
-      const readMessageIds = readMessages.map((read) => read.message.id);
-      // 基础查询条件
-      const targetConditions: FilterQuery<Message>[] = [
-        { senderType: SenderType.PLATFORM_ADMIN }, // 管理员发送的消息必须要接收
-        { messageTarget: { targetType: TargetType.FULL_SITE, noticeTypes: { $like: `%${noticeType}%` } } },
-        { messageTarget: {
-          targetType: TargetType.TENANT, targetId: user.tenant, noticeTypes: { $like: `%${noticeType}%` } } },
-        { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          { $in: user.accountAffiliations.map((a) => a.accountName) }, noticeTypes: { $like: `%${noticeType}%` } } },
-        { messageTarget: {
-          targetType: TargetType.USER, targetId: user.identityId, noticeTypes: { $like: `%${noticeType}%` } } },
-      ];
+      // 构建子查询：从 message_targets 表获取符合条件的 message_id
+      const mtSubquery = knex("message_targets as mt")
+        .select("mt.message_id")
+        .where(function() {
+          this.where("mt.notice_types", "like", `%${noticeType}%`)
+            .andWhere(function() {
+              this.where("mt.target_type", TargetType.FULL_SITE)
+                // .orWhere(function() {
+                //   this.where("mt.target_type", TargetType.TENANT)
+                //     .andWhere("mt.target_id", user.tenant);
+                // })
+                // .orWhere(function() {
+                //   this.where("mt.target_type", TargetType.ACCOUNT)
+                //     .andWhere("mt.target_id", "in", user.accountAffiliations.map((a) => a.accountName));
+                // })
+                .orWhere(function() {
+                  this.where("mt.target_type", TargetType.USER)
+                    .andWhere("mt.target_id", user.identityId);
+                });
+            });
+        });
 
-      // 根据 readStatus 枚举值添加不同的查询条件
-      let readConditions: FilterQuery<Message>[] = [];
+      // 构建子查询：从 messages 表获取 sender_type = PLATFORM_ADMIN 的 message_id
+      const mSubquery = knex("messages as m")
+        .select("m.id as message_id")
+        .where("m.sender_type", SenderType.PLATFORM_ADMIN);
+
+      // 使用 UNION 合并两个子查询
+      const unionSubquery = knex.union([
+        mtSubquery,
+        mSubquery,
+      ], true).as("message_ids");
+
+      // 构建读取状态的查询条件
+      let readConditions;
       switch (readStatus) {
         case ReadStatus.UNREAD:
-          readConditions = [
-            { id: { $nin: readMessageIds } },
-            { userMessageRead: { userId: user.identityId, status: EntityReadStatus.UNREAD, isDeleted: false } },
-          ];
+          readConditions = function(this: Knex.QueryBuilder) {
+            this.whereNotIn("m.id", function(this: Knex.QueryBuilder) {
+              this.select("umr.message_id as message_id")
+                .where("umr.status", ReadStatus.READ);
+            })
+              .orWhere(function(this: Knex.QueryBuilder) {
+                this.where("umr.status", EntityReadStatus.UNREAD)
+                  .andWhere("umr.is_deleted", false);
+              });
+          };
           break;
         case ReadStatus.READ:
-          readConditions = [
-            { userMessageRead: { userId: user.identityId, status: EntityReadStatus.READ, isDeleted: false } },
-          ];
+          readConditions = function(this: Knex.QueryBuilder) {
+            this.where("umr.status", EntityReadStatus.READ)
+              .andWhere("umr.is_deleted", false);
+          };
           break;
         default:
           // 如果是 ALL 或未指定 readStatus，则不添加额外条件
-          readConditions = [
-            { id: { $nin: readMessageIds } },
-            { userMessageRead: { userId: user.identityId, isDeleted: false } },
-          ];
+          readConditions = function(this: Knex.QueryBuilder) {
+            this.whereNotIn("m.id", function(this: Knex.QueryBuilder) {
+              this.select("umr.message_id as message_id")
+                .where("umr.is_deleted", true);
+            });
+          };
           break;
       }
 
-      // 发送消息时已经过滤了用户未订阅的消息，所以无需在查询时再过滤
-      const [messages, totalCount] = await em.findAndCount(Message, {
-        ...category ? { category } : {},
-        ...messageType ? { messageType } : {},
-        $and: [
-          { $or: targetConditions },
-          { $or: readConditions },
-        ],
-      }, {
-        ...paginationProps(page, pageSize),
-        populate: ["userMessageRead"],
-        orderBy: { "createdAt": "DESC" },
-      });
+      // 确保 pageSize 是 number 类型
+      const DEFAULT_PAGE_SIZE = 10; // 设置默认的每页数量
+      const effectivePageSize = pageSize ?? DEFAULT_PAGE_SIZE;
+      const effectivePage = page ?? 1;
 
-      const messagesTypeDataMap = await getMessagesTypeData(em, messages);
+      // 构建最终查询
+      const query = knex("messages as m")
+        .leftJoin("user_message_read as umr", function() {
+          this.on("m.id", "=", "umr.message_id")
+            .andOn("umr.user_id", "=", knex.raw("?", [user.identityId]));
+        })
+        .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+        .andWhere(readConditions)
+        .modify(function(queryBuilder) {
+          if (category) {
+            queryBuilder.andWhere("m.category", category);
+          }
+          if (messageType) {
+            queryBuilder.andWhere("m.message_type", messageType);
+          }
+        })
+        .orderBy("m.created_at", "DESC")
+        .limit(effectivePageSize)
+        .offset((effectivePage - 1) * effectivePageSize)
+        .select("m.*", "umr.status as umr_status");
+
+      // 获取消息列表和总数
+      const [messages, [{ total }]] = await Promise.all([
+        query,
+        knex("messages as m")
+          .countDistinct("m.id as total")
+          .leftJoin("user_message_read as umr", function() {
+            this.on("m.id", "=", "umr.message_id")
+              .andOn("umr.user_id", "=", knex.raw("?", [user.identityId]));
+          })
+          .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+          .andWhere(readConditions)
+          .modify(function(queryBuilder) {
+            if (category) {
+              queryBuilder.andWhere("m.category", category);
+            }
+            if (messageType) {
+              queryBuilder.andWhere("m.message_type", messageType);
+            }
+          }),
+      ]);
+
+      const camelCaseMessage = toCamelCaseArray<(Message & { umrStatus: ReadStatus })[]>(messages);
+      const messagesTypeDataMap = await getMessagesTypeData(em, camelCaseMessage);
 
       return {
-        totalCount: BigInt(totalCount),
-        messages: messages.filter((m) => messagesTypeDataMap.has(m.messageType)).map((m) => ({
+        totalCount: BigInt(total),
+        messages: camelCaseMessage.filter((m) => messagesTypeDataMap.has(m.messageType)).map((m) => ({
           ...m,
           id: BigInt(m.id),
           metadata: Struct.fromJson(m.metadata),
           messageType: messagesTypeDataMap.get(m.messageType)!,
-          isRead: m.userMessageRead.$.find(
-            (item) => item.userId === user.identityId)?.status === ReadStatus.READ ? true : false,
-          createdAt: m.createdAt.toISOString(),
-          updatedAt: m.updatedAt.toISOString(),
+          isRead: m.umrStatus === ReadStatus.READ ? true : false,
+          createdAt: new Date(m.createdAt).toISOString(),
+          updatedAt: new Date(m.updatedAt).toISOString(),
         })),
       };
     },
@@ -206,9 +255,9 @@ export default (router: ConnectRouter) => {
         id: Number(messageId),
         $or: [
           { messageTarget: { targetType: TargetType.FULL_SITE } },
-          { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          { $in: user.accountAffiliations.map((a) => a.accountName) } } },
+          // { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
+          // { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
+          // { $in: user.accountAffiliations.map((a) => a.accountName) } } },
           { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
         ],
       });
@@ -220,39 +269,17 @@ export default (router: ConnectRouter) => {
         );
       }
 
-      const userReadRecord = await em.findOne(UserMessageRead, {
-        userId: user.identityId, message: { id: Number(messageId) } });
+      const readRecord = await em.upsert(UserMessageRead, {
+        userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ,
+      }, { onConflictFields: ["userId", "message"]});
 
-      if (!userReadRecord) {
-        const newReadRecord = new UserMessageRead({
-          userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ });
-
-        await em.persistAndFlush(newReadRecord);
-        // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-
-        return {
-          ...newReadRecord,
-          messageId: message.id,
-          readTime: newReadRecord.readTime?.toISOString() ?? new Date().toISOString(),
-          createdAt: newReadRecord.createdAt.toISOString(),
-          updatedAt: newReadRecord.updatedAt.toISOString(),
-        };
-      } else {
-        if (userReadRecord.status === EntityReadStatus.UNREAD) {
-          userReadRecord.status = EntityReadStatus.READ;
-          userReadRecord.readTime = new Date();
-          await em.persistAndFlush(userReadRecord);
-        }
-
-        // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-        return {
-          ...userReadRecord,
-          messageId: message.id,
-          readTime: userReadRecord.readTime?.toISOString() ?? new Date().toISOString(),
-          createdAt: userReadRecord.createdAt.toISOString(),
-          updatedAt: userReadRecord.updatedAt.toISOString(),
-        };
-      }
+      return {
+        ...readRecord,
+        messageId: message.id,
+        readTime: readRecord.readTime?.toISOString() ?? new Date().toISOString(),
+        createdAt: readRecord.createdAt.toISOString(),
+        updatedAt: readRecord.updatedAt.toISOString(),
+      };
     },
 
     async markAllMessagesRead(req, context) {
@@ -265,41 +292,85 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
+      const knex = em.getConnection().getKnex();
 
-      // 查询用户所有的消息
-      const messages = await em.find(Message, {
-        $or: [
-          { messageTarget: { targetType: TargetType.FULL_SITE } },
-          { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          { $in: user.accountAffiliations.map((a) => a.accountName) } } },
-          { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
-        ],
-      });
+      const batchSize = 100; // 每批处理的消息数量
+      let lastProcessedId: bigint | null = null; // 用于分页查询
+      let hasMoreMessages = true;
 
-      const messageIds = messages.map((message) => message.id);
+      // 构建子查询：从 message_targets 表获取符合条件的 message_id
+      const mtSubquery = knex("message_targets as mt")
+        .select("mt.message_id")
+        .where(function() {
+          this.where(function() {
+            this.where("mt.target_type", TargetType.FULL_SITE)
+              // .orWhere(function() {
+              //   this.where("mt.target_type", TargetType.TENANT)
+              //     .andWhere("mt.target_id", user.tenant);
+              // })
+              // .orWhere(function() {
+              //   this.where("mt.target_type", TargetType.ACCOUNT)
+              //     .andWhere("mt.target_id", "in", user.accountAffiliations.map((a) => a.accountName));
+              // })
+              .orWhere(function() {
+                this.where("mt.target_type", TargetType.USER)
+                  .andWhere("mt.target_id", user.identityId);
+              });
+          });
+        });
 
-      const userReadRecords = await em.find(UserMessageRead, {
-        userId: user.identityId, message: { id: { $in: messageIds } } });
+      // 构建子查询：从 messages 表获取 sender_type = PLATFORM_ADMIN 的 message_id
+      const mSubquery = knex("messages as m")
+        .select("m.id as message_id")
+        .where("m.sender_type", SenderType.PLATFORM_ADMIN);
 
-      for (const message of messages) {
-        const userReadRecord = userReadRecords.find((record) => record.message.id === message.id);
+      // 使用 UNION 合并两个子查询
+      const unionSubquery = knex.union([
+        mtSubquery,
+        mSubquery,
+      ], true).as("message_ids");
 
-        if (!userReadRecord) {
-          const newReadRecord = new UserMessageRead({
-            userId: user.identityId, message, readTime: new Date(), status: EntityReadStatus.READ });
+      while (hasMoreMessages) {
+        // 查询一个批次的消息
+        // 构建最终查询
+        const query = knex("messages as m")
+          .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+          .modify(function(queryBuilder) {
+            if (lastProcessedId) {
+              queryBuilder.andWhereRaw(`m.id > ${lastProcessedId}`);
+            }
+          })
+          .orderBy("m.id", "asc")
+          .limit(batchSize)
+          .select("m.id");
 
-          em.persist(newReadRecord);
-        } else {
-          if (userReadRecord.status === EntityReadStatus.UNREAD) {
-            userReadRecord.status = EntityReadStatus.READ;
-            userReadRecord.readTime = new Date();
-            em.persist(userReadRecord);
-          }
+        const messages: Message[] = await query;
+
+        if (messages.length === 0) {
+          hasMoreMessages = false; // 没有更多消息，停止分页
+          break;
+        }
+
+        try {
+          const upsertPromises = messages.map((message) => {
+            const messageRef = em.getReference(Message, message.id);
+            return em.upsert(UserMessageRead, {
+              userId: user.identityId,
+              message: messageRef,
+              readTime: new Date(),
+              status: EntityReadStatus.READ,
+            }, { onConflictFields: ["userId", "message"]});
+          });
+
+          // 等待所有更新操作完成
+          await Promise.all(upsertPromises);
+
+          // 更新分页标记，指向当前批次的最后一条消息 ID
+          lastProcessedId = messages[messages.length - 1].id;
+        } catch {
+          throw new ConnectError("Error processing messages", Code.Internal);
         }
       }
-
-      await em.flush();
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
 
       return;
@@ -362,36 +433,46 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
-      // 删除所有用户已读消息
+      const batchSize = 100; // 每批次处理的消息数量
+      let lastProcessedId: bigint | null = null; // 用于分页查询
+      let hasMoreMessages = true;
 
-      // step 1. 找到所有用户已读的消息
-      const messages = await em.find(Message, {
-        $or: [
-          { messageTarget: { targetType: TargetType.FULL_SITE } },
-          { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-            { $in: user.accountAffiliations.map((a) => a.accountName) } } },
-          { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
-        ],
-      });
+      // 执行分页查询并批量删除
+      while (hasMoreMessages) {
+        // 查询批次的消息，按照 ID 排序以便分页
+        const messages = await em.find(Message, {
+          userMessageRead: { userId: user.identityId, status: ReadStatus.READ, isDeleted: false },
+          $or: [
+            { messageTarget: { targetType: TargetType.FULL_SITE } },
+            { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
+          ],
+          ...(lastProcessedId ? { id: { $gt: lastProcessedId } } : {}), // 分页：只查询大于上次处理的 ID
+        }, {
+          fields: ["id"],
+          limit: batchSize,
+          orderBy: { id: 1 }, // 按照 ID 排序
+        });
 
-      const messageIds = messages.map((message) => message.id);
+        if (messages.length === 0) {
+          hasMoreMessages = false; // 没有更多消息，退出循环
+          break;
+        }
 
-      const userReadRecords = await em.find(UserMessageRead, {
-        userId: user.identityId, status: ReadStatus.READ, message: { id: { $in: messageIds } } });
+        // 提取消息的 ID
+        const messageIds = messages.map((message) => message.id);
 
-      for (const record of userReadRecords) {
-        record.isDeleted = true;
+        // 执行批量更新，标记这些消息为已删除
+        await em.nativeUpdate(UserMessageRead, {
+          userId: user.identityId,
+          message: { id: { $in: messageIds } },
+        }, { isDeleted: true });
 
-        em.persist(record);
+        // 更新分页的起始 ID，为下一批次查询做准备
+        lastProcessedId = messages[messages.length - 1].id;
       }
 
-      await em.flush();
-
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
-
       return;
-
     },
 
     async changeMessageExpirationTime(req, context) {

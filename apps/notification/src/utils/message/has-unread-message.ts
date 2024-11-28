@@ -1,20 +1,7 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
-import { FilterQuery } from "@mikro-orm/mysql";
 import { NoticeType } from "src/models/notice-type";
 import { validateToken } from "src/server/auth/token";
-import { Message, SenderType } from "src/server/entities/Message";
-import { ReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
+import { SenderType } from "src/server/entities/Message";
+import { ReadStatus, TargetType } from "src/server/entities/UserMessageRead";
 
 import { forkEntityManager } from "../get-orm";
 
@@ -26,43 +13,56 @@ export const hasUnreadMessage = async (token: string) => {
   }
 
   const em = await forkEntityManager();
+  const knex = em.getConnection().getKnex();
 
-  // 获取用户已读的消息ID列表
-  const readMessages = await em.find(UserMessageRead, { userId: info.identityId });
-  const readMessageIds = readMessages.map((read) => read.message.id);
-  // 基础查询条件
-  const targetConditions: FilterQuery<Message>[] = [
-    { senderType: SenderType.PLATFORM_ADMIN }, // 管理员发送的消息必须要接收
-    { messageTarget: { targetType: TargetType.FULL_SITE, noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` } } },
-    { messageTarget: {
-      targetType: TargetType.TENANT, targetId: info.tenant, noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` } } },
-    { messageTarget: {
-      targetType: TargetType.ACCOUNT,
-      targetId: { $in: info.accountAffiliations.map((a) => a.accountName) },
-      noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` },
-    } },
-    { messageTarget: {
-      targetType: TargetType.USER,
-      targetId: info.identityId,
-      noticeTypes: { $like: `%${NoticeType.SITE_MESSAGE}%` },
-    } },
-  ];
+  // 构建子查询：从 message_targets 表获取符合条件的 message_id
+  const mtSubquery = knex("message_targets as mt")
+    .select("mt.message_id")
+    .where(function() {
+      this.where("mt.notice_types", "like", `%${NoticeType.SITE_MESSAGE}%`)
+        .andWhere(function() {
+          this.where("mt.target_type", TargetType.FULL_SITE)
+            // 暂时没有通过租户和账户查询的需求
+            // .orWhere(function() {
+            //   this.where('mt.target_type', TargetType.TENANT)
+            //     .andWhere('mt.target_id', info.tenant);
+            // })
+            // .orWhere(function() {
+            //   this.where('mt.target_type', TargetType.ACCOUNT)
+            //     .andWhere('mt.target_id', 'in', info.accountAffiliations.map(a => a.accountName));
+            // })
+            .orWhere(function() {
+              this.where("mt.target_type", TargetType.USER)
+                .andWhere("mt.target_id", info.identityId);
+            });
+        });
+    });
 
-  const unreadConditions: FilterQuery<Message>[] = [
-    { id: { $nin: readMessageIds } },
-    { userMessageRead: { status: ReadStatus.UNREAD, isDeleted: false } },
-  ];
+  // 构建子查询：从 messages 表获取 sender_type = PLATFORM_ADMIN 的 message_id
+  const mSubquery = knex("messages as m")
+    .select("m.id as message_id")
+    .where("m.sender_type", SenderType.PLATFORM_ADMIN);
 
+  // 使用 UNION 合并两个子查询
+  const unionSubquery = knex.union([
+    mtSubquery,
+    mSubquery,
+  ], true).as("message_ids");
 
-  const message = await em.findOne(Message, {
-    $and: [
-      { $or: targetConditions },
-      { $or: unreadConditions },
-    ],
-  });
+  // 构建最终查询
+  const result = await knex("messages as m")
+    // 左连接 user_message_read 表，仅限于当前用户的记录
+    .leftJoin("user_message_read as umr", function() {
+      this.on("m.id", "=", "umr.message_id")
+        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]))
+        .andOn("umr.status", "=", knex.raw("?", [ReadStatus.UNREAD]))
+        .andOn("umr.is_deleted", "=", knex.raw("?", [false]));
+    })
+    // 筛选符合条件的 message_id
+    .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+    .limit(1)
+    .select("m.*");
 
-  if (message) return true;
-
-  return false;
+  return result.length > 0;
 };
 

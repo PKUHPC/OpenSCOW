@@ -49,7 +49,7 @@ const NotificationPage = () => {
     ...pageInfo,
   });
 
-  const { mutateAsync: markAllRead } = useMutation(markAllMessagesRead, {
+  const { mutateAsync: markAllRead, isPending: isMarkAllReadPending } = useMutation(markAllMessagesRead, {
     onError: () => message.error(language.notification.markAllReadErrorInfo),
     onSuccess: () => {
       refetch();
@@ -57,7 +57,7 @@ const NotificationPage = () => {
     },
   });
 
-  const { mutateAsync: deleteAllRead } = useMutation(deleteAllReadMessages, {
+  const { mutateAsync: deleteAllRead, isPending: isDeleteAllReadPending } = useMutation(deleteAllReadMessages, {
     onError: () => message.error(language.notification.deleteReadMsgErrorInfo),
     onSuccess: () => {
       refetch();
@@ -83,11 +83,12 @@ const NotificationPage = () => {
             shape="round"
             size="large"
             onClick={handleMarkAllRead}
+            loading={isMarkAllReadPending}
             style={{ marginRight: "10px" }}
           >
             {language.notification.markAllRead}
           </NoShadowButton>
-          <Button size="large" shape="round" onClick={handleDeleteAll}>
+          <Button size="large" shape="round" onClick={handleDeleteAll} loading={isDeleteAllReadPending}>
             {language.notification.deleteReadMsg}
           </Button>
         </div>
