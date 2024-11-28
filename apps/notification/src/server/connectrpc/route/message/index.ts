@@ -292,26 +292,85 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
+      const knex = em.getConnection().getKnex();
 
-      // 查询用户所有的消息
-      const messages = await em.find(Message, {
-        $or: [
-          { messageTarget: { targetType: TargetType.FULL_SITE } },
-          // { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          // { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          // { $in: user.accountAffiliations.map((a) => a.accountName) } } },
-          { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
-        ],
-      }, { fields: ["id"]});
+      const batchSize = 100; // 每批处理的消息数量
+      let lastProcessedId: bigint | null = null; // 用于分页查询
+      let hasMoreMessages = true;
 
-      for (const message of messages) {
-        const messageRef = em.getReference(Message, message.id);
-        await em.upsert(UserMessageRead, {
-          userId: user.identityId, message: messageRef,
-          readTime: new Date(), status: EntityReadStatus.READ,
-        }, { onConflictFields: ["userId", "message"]});
+      // 构建子查询：从 message_targets 表获取符合条件的 message_id
+      const mtSubquery = knex("message_targets as mt")
+        .select("mt.message_id")
+        .where(function() {
+          this.where(function() {
+            this.where("mt.target_type", TargetType.FULL_SITE)
+              // .orWhere(function() {
+              //   this.where("mt.target_type", TargetType.TENANT)
+              //     .andWhere("mt.target_id", user.tenant);
+              // })
+              // .orWhere(function() {
+              //   this.where("mt.target_type", TargetType.ACCOUNT)
+              //     .andWhere("mt.target_id", "in", user.accountAffiliations.map((a) => a.accountName));
+              // })
+              .orWhere(function() {
+                this.where("mt.target_type", TargetType.USER)
+                  .andWhere("mt.target_id", user.identityId);
+              });
+          });
+        });
+
+      // 构建子查询：从 messages 表获取 sender_type = PLATFORM_ADMIN 的 message_id
+      const mSubquery = knex("messages as m")
+        .select("m.id as message_id")
+        .where("m.sender_type", SenderType.PLATFORM_ADMIN);
+
+      // 使用 UNION 合并两个子查询
+      const unionSubquery = knex.union([
+        mtSubquery,
+        mSubquery,
+      ], true).as("message_ids");
+
+      while (hasMoreMessages) {
+        // 查询一个批次的消息
+        // 构建最终查询
+        const query = knex("messages as m")
+          .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+          .modify(function(queryBuilder) {
+            if (lastProcessedId) {
+              queryBuilder.andWhereRaw(`m.id > ${lastProcessedId}`);
+            }
+          })
+          .orderBy("m.id", "asc")
+          .limit(batchSize)
+          .select("m.id");
+
+        const messages: Message[] = await query;
+
+        if (messages.length === 0) {
+          hasMoreMessages = false; // 没有更多消息，停止分页
+          break;
+        }
+
+        try {
+          const upsertPromises = messages.map((message) => {
+            const messageRef = em.getReference(Message, message.id);
+            return em.upsert(UserMessageRead, {
+              userId: user.identityId,
+              message: messageRef,
+              readTime: new Date(),
+              status: EntityReadStatus.READ,
+            }, { onConflictFields: ["userId", "message"]});
+          });
+
+          // 等待所有更新操作完成
+          await Promise.all(upsertPromises);
+
+          // 更新分页标记，指向当前批次的最后一条消息 ID
+          lastProcessedId = messages[messages.length - 1].id;
+        } catch {
+          throw new ConnectError("Error processing messages", Code.Internal);
+        }
       }
-
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
 
       return;
@@ -374,24 +433,43 @@ export default (router: ConnectRouter) => {
       }
 
       const em = await forkEntityManager();
+      const batchSize = 100; // 每批次处理的消息数量
+      let lastProcessedId: bigint | null = null; // 用于分页查询
+      let hasMoreMessages = true;
 
-      // 删除所有用户已读消息
-      // step 1. 找到所有用户已读且未被删除的消息
-      const messages = await em.find(Message, {
-        userMessageRead: { userId: user.identityId, status: ReadStatus.READ, isDeleted: false },
-        $or: [
-          { messageTarget: { targetType: TargetType.FULL_SITE } },
-          // { messageTarget: { targetType: TargetType.TENANT, targetId: user.tenant } },
-          // { messageTarget: { targetType: TargetType.ACCOUNT, targetId:
-          //   { $in: user.accountAffiliations.map((a) => a.accountName) } } },
-          { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
-        ],
-      }, { fields: ["id"]});
+      // 执行分页查询并批量删除
+      while (hasMoreMessages) {
+        // 查询批次的消息，按照 ID 排序以便分页
+        const messages = await em.find(Message, {
+          userMessageRead: { userId: user.identityId, status: ReadStatus.READ, isDeleted: false },
+          $or: [
+            { messageTarget: { targetType: TargetType.FULL_SITE } },
+            { messageTarget: { targetType: TargetType.USER, targetId: user.identityId } },
+          ],
+          ...(lastProcessedId ? { id: { $gt: lastProcessedId } } : {}), // 分页：只查询大于上次处理的 ID
+        }, {
+          fields: ["id"],
+          limit: batchSize,
+          orderBy: { id: 1 }, // 按照 ID 排序
+        });
 
-      const messageIds = messages.map((message) => message.id);
+        if (messages.length === 0) {
+          hasMoreMessages = false; // 没有更多消息，退出循环
+          break;
+        }
 
-      await em.nativeUpdate(UserMessageRead, {
-        userId: user.identityId, message: { id: { $in: messageIds } } }, { isDeleted: true });
+        // 提取消息的 ID
+        const messageIds = messages.map((message) => message.id);
+
+        // 执行批量更新，标记这些消息为已删除
+        await em.nativeUpdate(UserMessageRead, {
+          userId: user.identityId,
+          message: { id: { $in: messageIds } },
+        }, { isDeleted: true });
+
+        // 更新分页的起始 ID，为下一批次查询做准备
+        lastProcessedId = messages[messages.length - 1].id;
+      }
 
       // await deleteKeys([`${unreadMessageCountPrefixKey}${user.identityId}`]);
       return;

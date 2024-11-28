@@ -22,44 +22,68 @@ import { checkAdminMessageTypeExist } from "src/utils/rendering-message";
 let deleteIsRunning = false;
 
 export async function deleteExpiredMessages() {
-  logger.info("starting delete messages");
+  logger.info("Starting delete expired messages");
 
   const deletedMessageIds: bigint[] = [];
   const em = await forkEntityManager();
-  // 1. 获取所有的消息
-  const messages = await em.findAll(Message, {});
 
   // 使用 Map 缓存查询过的 messageConfig
   const messageConfigCache = new Map<string, AdminMessageConfig | null>();
 
-  // 2. 遍历所有的消息判断是否需要删除
-  for (const msg of messages) {
-    // 缓存中找不到，才查询数据库
-    let messageConfig = messageConfigCache.get(msg.messageType);
+  // 每次处理的消息数量（可以根据实际情况调整）
+  const batchSize = 100;
+  let page = 0;
 
-    if (!messageConfig && !messageConfigCache.has(msg.messageType)) {
-      messageConfig = await em.findOne(AdminMessageConfig, { messageType: msg.messageType });
-      messageConfigCache.set(msg.messageType, messageConfig);
+  // 逐页处理消息，避免一次性加载太多数据
+  while (true) {
+    // 分页查询消息
+    const messages = await em.find(Message, {}, {
+      fields: ["id", "expiredAt", "createdAt", "messageType"],
+      limit: batchSize,
+      offset: page * batchSize,
+    });
+
+    // 如果没有更多消息，结束循环
+    if (messages.length === 0) {
+      break;
     }
 
-    if (!msg.expiredAt && !checkAdminMessageTypeExist(msg.messageType)) { // 无过期时间的按照消息设置的过期时间删除
-      if (messageConfig?.expiredAfterSeconds) {
-        const expiredDate = dayjs(msg.createdAt).add(Number(messageConfig.expiredAfterSeconds), "seconds").toDate();
+    // 遍历当前批次的消息
+    for (const msg of messages) {
+      let messageConfig = messageConfigCache.get(msg.messageType);
 
-        if (expiredDate <= new Date()) {
-          em.remove(msg);
-          deletedMessageIds.push(msg.id);
-        }
+      // 缓存中找不到，才查询数据库
+      if (!messageConfig && !messageConfigCache.has(msg.messageType)) {
+        messageConfig = await em.findOne(AdminMessageConfig, { messageType: msg.messageType });
+        messageConfigCache.set(msg.messageType, messageConfig);
       }
-    } else if (msg.expiredAt && msg.expiredAt <= new Date()) { // 有过期时间的按过期时间处理
-      em.remove(msg);
-      deletedMessageIds.push(msg.id);
+
+      // 逻辑判断删除过期消息
+      if (!msg.expiredAt && !checkAdminMessageTypeExist(msg.messageType)) {
+        // 无过期时间的，按照消息配置的过期时间删除
+        if (messageConfig?.expiredAfterSeconds) {
+          const expiredDate = dayjs(msg.createdAt)
+            .add(Number(messageConfig.expiredAfterSeconds), "seconds")
+            .toDate();
+
+          if (expiredDate <= new Date()) {
+            em.remove(msg);
+            deletedMessageIds.push(msg.id);
+          }
+        }
+      } else if (msg.expiredAt && msg.expiredAt <= new Date()) {
+        // 有过期时间的，按过期时间删除
+        em.remove(msg);
+        deletedMessageIds.push(msg.id);
+      }
     }
+
+    // 每处理完一批数据就执行一次 flush，减少内存占用
+    await em.flush();
+    page++;
   }
 
-  await em.flush();
-  logger.info(`This round of deleting expired messages is completed, delete: ${deletedMessageIds.toString()}`);
-
+  logger.info(`This round of deleting expired messages is completed, deleted: ${deletedMessageIds.toString()}`);
   return;
 }
 
