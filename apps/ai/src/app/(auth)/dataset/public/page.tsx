@@ -13,18 +13,20 @@
 "use client";
 
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 
 import { usePublicConfig } from "../../context";
 import { DatasetListTable } from "../DatasetListTable";
 
 export default function Page() {
+  const t = useI18nTranslateToString();
 
   const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
 
   return (
     <div>
-      <PageTitle titleText="公共数据集" />
-      <DatasetListTable 
+      <PageTitle titleText={t("app.dataset.public")} />
+      <DatasetListTable
         isPublic={true} 
         clusters={publicConfig.CLUSTERS}
         currentClusterIds={currentAssociateClusterIds}

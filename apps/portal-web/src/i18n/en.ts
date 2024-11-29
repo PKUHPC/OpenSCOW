@@ -14,7 +14,7 @@ export default {
   // baseLayout
   baseLayout: {
     linkTextMis: "Admin",
-    linkTextAI: "SCOW AI",
+    linkTextAI: "AI",
   },
   // routes
   routes: {

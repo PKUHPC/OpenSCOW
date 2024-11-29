@@ -14,11 +14,15 @@
 
 import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 
 import { AppSessionsTable, AppTableStatus } from "../AppSessionsTable";
 
 export default function Page({ params }: { params: { clusterId: string } }) {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.historyJobs.");
+
   const { clusterId } = params;
 
   const { publicConfig } = usePublicConfig();
@@ -32,7 +36,7 @@ export default function Page({ params }: { params: { clusterId: string } }) {
   return (
     <>
       <PageTitle
-        titleText="已完成的作业"
+        titleText={t(p("title"))}
       />
       <AppSessionsTable cluster={cluster} status={AppTableStatus.FINISHED} />
     </>

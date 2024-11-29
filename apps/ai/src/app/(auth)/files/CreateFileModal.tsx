@@ -14,6 +14,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import { join } from "path";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { trpc } from "src/utils/trpc";
 
@@ -30,6 +31,8 @@ interface FormProps {
 }
 
 export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.files.createFileModal.");
 
   const { message } = App.useApp();
 
@@ -37,14 +40,14 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
 
   const mutation = trpc.file.createFile.useMutation({
     onSuccess: () => {
-      message.success("创建成功");
+      message.success(t(p("success")));
       reload();
       onClose();
       form.resetFields();
     },
     onError: (e) => {
       if (e.data?.code === "CONFLICT") {
-        message.error("同名文件已经存在");
+        message.error(t(p("alreadyExist")));
       } else {
         throw e;
       }
@@ -60,19 +63,19 @@ export const CreateFileModal: React.FC<Props> = ({ open, onClose, path, reload, 
   return (
     <Modal
       open={open}
-      title="创建文件"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("createFile"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={mutation.isLoading}
       destroyOnClose
       onOk={form.submit}
     >
       <Form form={form} onFinish={onSubmit}>
-        <Form.Item label="要创建的文件的目录">
+        <Form.Item label={t(p("dir"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item label="文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label={t(p("name"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

@@ -20,7 +20,8 @@ import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { DatasetTypeText, SceneTypeText } from "src/models/Dateset";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { DatasetTypeText, getDatasetTexts } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { AppRouter } from "src/server/trpc/router";
@@ -39,12 +40,13 @@ interface Props {
   currentClusterIds: string[];
 }
 
-const FilterType = {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const FilterTypeForKeys = {
   ALL: "全部",
   ...DatasetTypeText,
 } as Record<string, string>;
 
-type FilterTypeKeys = Extract<keyof typeof FilterType, string>;
+type FilterTypeKeys = Extract<keyof typeof FilterTypeForKeys, string>;
 
 interface FilterForm {
   cluster?: Cluster | undefined,
@@ -62,7 +64,35 @@ const EditDatasetModalButton = ModalButton(CreateEditDatasetModal, { type: "link
 const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
 export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentClusterIds }) => {
+  const t = useI18nTranslateToString();
+  const pModel = prefix("app.dataset.model.");
+  const p = prefix("app.dataset.datasetListTable.");
+  const languageId = useI18n().currentLanguage.id;
 
+  // 本来应该是放在组件外，但是为了国际化将其放入组件中
+  const FilterType = {
+    ALL: t(pModel("all")),
+    IMAGE: t(pModel("image")),
+    TEXT: t(pModel("text")),
+    VIDEO: t(pModel("video")),
+    AUDIO: t(pModel("audio")),
+    OTHER: t(pModel("other")),
+  } as Record<string, string>;
+
+  const SceneTypeText: Record<string, string> = {
+    CWS:t(pModel("ces")),
+    DA:t(pModel("da")),
+    IC:t(pModel("ic")),
+    OD:t(pModel("od")),
+    OTHER:t(pModel("other")),
+  };
+  const DatasetTypeTextTrans: Record<string, string> = {
+    IMAGE: getDatasetTexts(t).image,
+    TEXT: getDatasetTexts(t).text,
+    VIDEO: getDatasetTexts(t).video,
+    AUDIO: getDatasetTexts(t).audio,
+    OTHER: getDatasetTexts(t).other,
+  };
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
 
   const { message } = App.useApp();
@@ -84,20 +114,20 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
     ...pageInfo, ...query, clusterId: query.cluster?.id, isPublic: parseBooleanParam(isPublic),
   });
   if (error) {
-    message.error("找不到数据集");
+    message.error(t(p("notFound")));
   }
 
   const deleteDatasetMutation = trpc.dataset.deleteDataset.useMutation({
     onSuccess() {
       refetch();
-      message.success("删除成功");
+      message.success(t(p("deleteSuccessfully")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("找不到数据集");
+        message.error(t(p("notFound")));
       } else {
-        message.error("删除数据集失败");
+        message.error(t(p("deleteFailed")));
       }
     },
   });
@@ -105,7 +135,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
   const deleteDataset = useCallback(
     (id: number) => {
       confirm({
-        title: "删除数据集",
+        title: t(p("delete")),
         onOk: async () => {
           await deleteDatasetMutation.mutateAsync({ id });
         },
@@ -134,30 +164,30 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
             refetch();
           }}
         >
-          <Form.Item label="集群" name="cluster">
+          <Form.Item label={t(p("cluster"))} name="cluster">
             <SingleClusterSelector
               allowClear={true}
               onChange={(value) => { setQuery({ ...query, cluster: value }); }}
             />
           </Form.Item>
-          <Form.Item label="数据类型" name="type">
+          <Form.Item label={t(p("type"))} name="type">
             <Select
               style={{ minWidth: "100px" }}
               allowClear
               onChange={(value: FilterTypeKeys) => {
                 setQuery({ ...query, type: value === "ALL" ? undefined : value });
               }}
-              placeholder="请选择数据类型"
+              placeholder={t(p("selectType"))}
               defaultValue={FilterType.ALL}
               options={
                 Object.entries(FilterType).map(([key, value]) => ({ label:value, value:key }))}
             />
           </Form.Item>
           <Form.Item name="nameOrDesc">
-            <Input allowClear placeholder="名称或描述" />
+            <Input allowClear placeholder={t(p("nameOrDesc"))} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
           </Form.Item>
         </Form>
         {!isPublic && (
@@ -168,7 +198,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
               clusters={clusters}
               currentClusterIds={currentClusterIds}
             >
-              添加
+              {t("button.addButton")}
             </CreateDatasetModalButton>
           </Space>
         )}
@@ -178,22 +208,22 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
         dataSource={data?.items}
         loading={isFetching}
         columns={[
-          { dataIndex: "name", title: "名称" },
-          { dataIndex: "clusterId", title: "集群",
+          { dataIndex: "name", title: t(p("name")) },
+          { dataIndex: "clusterId", title: t(p("cluster")),
             render: (_, r) =>
-              getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
-          { dataIndex: "type", title: "数据集类型",
-            render: (_, r) => DatasetTypeText[r.type] },
-          { dataIndex: "description", title: "数据集描述" },
-          { dataIndex: "scene", title: "应用场景",
+              getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, languageId) ?? r.clusterId },
+          { dataIndex: "type", title: t(p("datasetType")),
+            render: (_, r) => DatasetTypeTextTrans[r.type] },
+          { dataIndex: "description", title: t(p("description")) },
+          { dataIndex: "scene", title: t(p("scene")),
             render: (_, r) => SceneTypeText[r.scene] },
-          { dataIndex: "versions", title: "版本数量",
+          { dataIndex: "versions", title: t(p("versions")),
             render: (_, r) => r.versions.length },
-          isPublic ? { dataIndex: "shareUser", title: "分享者",
+          isPublic ? { dataIndex: "shareUser", title: t(p("shareUser")),
             render: (_, r) => r.owner } : {},
-          { dataIndex: "createTime", title: "创建时间",
+          { dataIndex: "createTime", title: t(p("createTime")),
             render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
-          ...!isPublic ? [{ dataIndex: "action", title: "操作",
+          ...!isPublic ? [{ dataIndex: "action", title: t(p("action")),
             render: (_: any, r: DatasetInterface) => {
               return (
                 <>
@@ -205,16 +235,16 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
                       refetch();
                     }}
                   >
-                    创建新版本
+                    {t(p("createNewVersion"))}
                   </CreateEditVersionModalButton>
-                  <EditDatasetModalButton 
-                    refetch={refetch} 
-                    isEdit={true} 
-                    editData={r} 
-                    clusters={clusters} 
+                  <EditDatasetModalButton
+                    refetch={refetch}
+                    isEdit={true}
+                    editData={r}
+                    clusters={clusters}
                     currentClusterIds={currentClusterIds}
                   >
-                    编辑
+                    {t("button.editButton")}
                   </EditDatasetModalButton>
                   <Button
                     type="link"
@@ -222,7 +252,7 @@ export const DatasetListTable: React.FC<Props> = ({ isPublic, clusters, currentC
                       deleteDataset(r.id);
                     }}
                   >
-                    删除
+                    {t("button.deleteButton")}
                   </Button>
                 </>
               );

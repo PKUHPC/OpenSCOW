@@ -20,6 +20,7 @@ import { join } from "path";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { JobType } from "src/models/Job";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
@@ -55,6 +56,8 @@ export function compareState(a: string, b: string): -1 | 0 | 1 {
 const SaveImageModalButton = ModalButton(SaveImageModal, { type: "link" });
 
 export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.appSessionsTable.");
 
   const router = useRouter();
   const { message } = App.useApp();
@@ -75,7 +78,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const cancelJobMutation = trpc.jobs.cancelJob.useMutation({
     onError:(e) => {
-      message.error(`操作失败: ${e.message}`);
+      message.error(`${t(p("operateFailed"))}: ${e.message}`);
     },
     onSuccess: () => {
       refetch();
@@ -84,44 +87,44 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
   const columns: TableColumnsType<AppSession> = [
     {
-      title: "作业ID",
+      title: t(p("jobId")),
       dataIndex: "jobId",
       width: "8%",
       defaultSortOrder: "descend",
       sorter: (a, b) => compareNumber(a.jobId, b.jobId),
     },
     {
-      title: "作业名",
+      title: t(p("jobName")),
       dataIndex: "jobName",
       width: "25%",
       ellipsis: true,
     },
     {
-      title: "类型",
+      title: t(p("jobType")),
       dataIndex: "jobType",
       width: "8%",
       render: (_, record) => {
         if (record.jobType === JobType.APP) {
-          return "应用";
+          return t(p("app"));
         }
-        return "训练";
+        return t(p("train"));
       },
     },
     {
-      title: "应用",
+      title: t(p("app")),
       dataIndex: "appId",
       width: "8%",
       render: (appId: string, record) => record.appName ?? appId,
       sorter: (a, b) => (!a.submitTime || !b.submitTime) ? -1 : compareDateTime(a.submitTime, b.submitTime),
     },
     {
-      title: "提交时间",
+      title: t(p("submitTime")),
       dataIndex: "submitTime",
       width: "200px",
       render: (_, record) => record.submitTime ? formatDateTime(record.submitTime) : "",
     },
     {
-      title: "状态",
+      title: t(p("state")),
       dataIndex: "state",
       width: "120px",
       render: (_, record) => (
@@ -143,16 +146,16 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
 
     },
     ...(unfinished ? [{
-      title: "剩余时间",
-      width: "100px",
+      title: t(p("remainingTime")),
+      width: "120px",
       dataIndex: "remainingTime",
     },
     ] : []),
     {
-      title: "操作",
+      title: t(p("action")),
       key: "action",
       fixed:"right",
-      width: "350px",
+      width: "550px",
       render: (_, record) => (
         <Space>
           {
@@ -166,21 +169,21 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                   />
                 )}
                 <Link href={`/jobShell/${cluster.id}/${record.jobId}`} target="_blank">
-                  {"进入容器"}
+                  {t(p("enterContainer"))}
                 </Link>
                 <Popconfirm
-                  title="确定结束这个任务吗"
+                  title={t(p("confirmFinish"))}
                   onConfirm={
                     async () => {
                       await cancelJobMutation.mutateAsync({
                         cluster: cluster.id,
                         jobId: record.jobId,
                       });
-                      message.success("任务结束请求已经提交");
+                      message.success(t(p("jobFinishReq")));
                     }
                   }
                 >
-                  <a>结束</a>
+                  <a>{t("button.finishButton")}</a>
                 </Popconfirm>
               </>
             ) : undefined
@@ -188,18 +191,18 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
           {
             (record.state === "PENDING" || record.state === "SUSPENDED") ? (
               <Popconfirm
-                title="确定取消这个任务吗"
+                title={t(p("confirmCancel"))}
                 onConfirm={
                   async () => {
                     await cancelJobMutation.mutateAsync({
                       cluster: cluster.id,
                       jobId: record.jobId,
                     });
-                    message.success("任务取消请求已经提交");
+                    message.success(t(p("jobCancelReq")));
                   }
                 }
               >
-                <a>取消</a>
+                <a>{t("button.cancelButton")}</a>
               </Popconfirm>
             ) : undefined
           }
@@ -209,7 +212,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                 reload={refetch}
                 appSession={record}
                 clusterId={cluster.id}
-              >保存镜像</SaveImageModalButton>
+              >{t(p("saveImage"))}</SaveImageModalButton>
             ) : undefined
           }
           <Button
@@ -230,12 +233,12 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
               }
               router.push(`${basePath}?${searchParams.toString()}`);
             }}
-          >再次提交</Button>
+          >{t(p("submitAgain"))}</Button>
           <a onClick={() => {
             router.push(join("/files", cluster.id, record.dataPath));
           }}
           >
-            进入目录
+            {t(p("enterDir"))}
           </a>
         </Space>
       ),
@@ -291,17 +294,17 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
             });
           }}
         >
-          <Form.Item label="作业名" name="appJobName">
+          <Form.Item label={t(p("jobName"))} name="appJobName">
             <Input style={{ minWidth: "160px" }} />
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button type="primary" htmlType="submit">搜索</Button>
+              <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
             </Space>
           </Form.Item>
           <Form.Item>
             <Space>
-              <Button loading={isLoading} onClick={() => refetch()}>刷新</Button>
+              <Button loading={isLoading} onClick={() => refetch()}>{t("button.refreshButton")}</Button>
             </Space>
           </Form.Item>
           {unfinished && (
@@ -310,7 +313,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                 checked={checked}
                 onChange={(e) => { setChecked(e.target.checked); }}
               >
-                10s自动刷新
+                10s{t(p("autoRefresh"))}
               </Checkbox>
             </Form.Item>
           ) }
@@ -322,7 +325,7 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
         columns={columns}
         rowKey={(record) => record.sessionId}
         loading={isLoading || isFetching}
-        scroll={{ x: filteredData?.length ? 1200 : true }}
+        scroll={{ x:true }}
         pagination={{
           showSizeChanger: true,
           defaultPageSize: 50,

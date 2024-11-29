@@ -15,11 +15,12 @@ import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SharedStatus } from "src/models/common";
 import { ModelInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { getSharedStatusText } from "src/utils/common";
+import { getSharedStatusText, getSharedStatusUpperText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
@@ -41,6 +42,10 @@ const CopyPublicModelModalButton = ModalButton(CopyPublicModelModal, { type: "li
 export const ModelVersionList: React.FC<Props> = (
   { isPublic, modelId, modelName, cluster },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.model.modelVersionList.");
+  const pCommon = prefix("app.common.");
+
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
@@ -51,7 +56,7 @@ export const ModelVersionList: React.FC<Props> = (
       isPublic: isPublic !== undefined ? parseBooleanParam(isPublic) : undefined,
     });
   if (versionError) {
-    message.error("找不到模型版本");
+    message.error(t(p("notFound")));
   }
 
   const checkFileExist = trpc.file.checkFileExist.useMutation();
@@ -59,12 +64,12 @@ export const ModelVersionList: React.FC<Props> = (
   const shareMutation = trpc.model.shareModelVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交分享请求");
+      message.success(t(p("submitShare")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限分享此版本");
+        message.error(t(p("noAuthShare")));
         return;
       }
 
@@ -75,32 +80,32 @@ export const ModelVersionList: React.FC<Props> = (
   const unShareMutation = trpc.model.unShareModelVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交取消分享请求");
+      message.success(t(p("cancelShare")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限取消分享此版本");
+        message.error(t(p("noAuthCancel")));
         return;
       }
 
-      message.error("取消分享失败");
+      message.error(t(p("shareFailed")));
     },
   });
 
   const deleteModelVersionMutation = trpc.model.deleteModelVersion.useMutation({
     onSuccess() {
-      message.success("删除算法版本成功");
+      message.success(t(p("deleteSuccessfully")));
       refetch();
     },
     onError() {
-      message.error("删除模型版本失败");
+      message.error(t(p("deleteFailed")));
     } });
 
   const deleteModelVersion = useCallback(
     (versionId: number, isConfirmed?: boolean) => {
       confirm({
-        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除模型版本",
+        title: isConfirmed ? t(p("confirmedText")) : t(p("delete")),
         onOk:async () => {
           await deleteModelVersionMutation.mutateAsync({ versionId, modelId });
         },
@@ -118,11 +123,11 @@ export const ModelVersionList: React.FC<Props> = (
         pagination={false}
         scroll={{ y:275 }}
         columns={[
-          { dataIndex: "versionName", title: "版本名称" },
-          { dataIndex: "versionDescription", title: "版本描述" },
-          { dataIndex: "algorithmVersion", title: "算法版本" },
-          { dataIndex: "createTime", title: "创建时间", render:(createTime) => formatDateTime(createTime) },
-          { dataIndex: "action", title: "操作",
+          { dataIndex: "versionName", title: t(p("versionName")) },
+          { dataIndex: "versionDescription", title: t(p("versionDescription")) },
+          { dataIndex: "algorithmVersion", title: t(p("algorithmVersion")) },
+          { dataIndex: "createTime", title: t(p("createTime")), render:(createTime) => formatDateTime(createTime) },
+          { dataIndex: "action", title: t(p("action")),
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
@@ -133,7 +138,7 @@ export const ModelVersionList: React.FC<Props> = (
                   data={r}
                   cluster={cluster}
                 >
-                  复制
+                  {t("button.copyButton")}
                 </CopyPublicModelModalButton>
               ) :
                 (
@@ -151,7 +156,7 @@ export const ModelVersionList: React.FC<Props> = (
                       }}
 
                     >
-                      编辑
+                      {t("button.editButton")}
                     </EditVersionModalButton>
 
                     <Button
@@ -167,15 +172,16 @@ export const ModelVersionList: React.FC<Props> = (
                         }
                       }}
                     >
-                      查看文件
+                      {t(p("check"))}
                     </Button>
                     <Button
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
                         confirm({
-                          title: "分享算法版本",
-                          content: `确认${getSharedStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
+                          title: t(p("share")),
+                          content:
+                          `${t(p("confirmed"),[t(pCommon(getSharedStatusText(r.sharedStatus))),r.versionName])}`,
                           onOk: async () => {
                             if (r.sharedStatus === SharedStatus.SHARED) {
 
@@ -193,7 +199,7 @@ export const ModelVersionList: React.FC<Props> = (
                         });
                       }}
                     >
-                      {getSharedStatusText(r.sharedStatus)}
+                      {t(pCommon(getSharedStatusUpperText(r.sharedStatus)))}
                     </Button>
                     <Button
                       type="link"
@@ -202,7 +208,7 @@ export const ModelVersionList: React.FC<Props> = (
                         deleteModelVersion(r.id);
                       }}
                     >
-                      删除
+                      {t("button.deleteButton")}
                     </Button>
                   </>
                 );

@@ -14,6 +14,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import { dirname, join } from "path";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { trpc } from "src/utils/trpc";
 
@@ -30,18 +31,21 @@ interface FormProps {
 }
 
 export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, cluster }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.files.renameModal.");
+
   const { message } = App.useApp();
   const [form] = Form.useForm<FormProps>();
 
   const mutation = trpc.file.copyOrMove.useMutation({
     onSuccess: () => {
-      message.success("修改成功");
+      message.success(t(p("success")));
       reload();
       onClose();
       form.resetFields();
     },
     onError: (e) => {
-      message.error(e.message || "重命名失败，请检查是否有权限或是否存在相同的目录或文件");
+      message.error(e.message || t(p("failed")));
     },
   });
 
@@ -57,19 +61,19 @@ export const RenameModal: React.FC<Props> = ({ open, onClose, path, reload, clus
   return (
     <Modal
       open={open}
-      title="重命名文件"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("rename"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={mutation.isLoading}
       destroyOnClose
       onOk={form.submit}
     >
       <Form form={form} onFinish={onSubmit}>
-        <Form.Item label="要重命名的文件">
+        <Form.Item label={t(p("wannaRename"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item label="新文件名" name="newFileName" rules={[{ required: true }]}>
+        <Form.Item label={t(p("newFileName"))} name="newFileName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

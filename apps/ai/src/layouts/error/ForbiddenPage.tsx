@@ -14,6 +14,7 @@
 
 import { Result } from "antd";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 interface Props {
@@ -22,16 +23,18 @@ interface Props {
 }
 
 export const ForbiddenPage: React.FC<Props> = ({
-  title = "不允许访问此页面",
-  subTitle = "系统不允许您访问此页面。",
+  title ,subTitle,
 }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("layout.error.forbiddenPage.");
+
   return (
     <>
-      <Head title="不允许访问" />
+      <Head title={t(p("forbidden"))} />
       <Result
         status="403"
-        title={title}
-        subTitle={subTitle}
+        title={title ?? t(p("title"))}
+        subTitle={subTitle ?? t(p("subTitle"))}
       />
     </>
   );

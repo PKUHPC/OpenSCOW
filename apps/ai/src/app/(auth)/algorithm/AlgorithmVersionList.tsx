@@ -15,11 +15,12 @@ import { App, Button, Modal, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AlgorithmInterface } from "src/models/Algorithm";
 import { SharedStatus } from "src/models/common";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { getSharedStatusText } from "src/utils/common";
+import { getSharedStatusText, getSharedStatusUpperText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
@@ -42,6 +43,10 @@ const CopyPublicAlgorithmModalButton = ModalButton(CopyPublicAlgorithmModal, { t
 export const AlgorithmVersionList: React.FC<Props> = (
   { isPublic, algorithms, algorithmId, algorithmName, cluster },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.algorithm.algorithmVersionList.");
+  const pCommon = prefix("app.common.");
+
   const { message } = App.useApp();
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const router = useRouter();
@@ -52,7 +57,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
       isPublic: isPublic !== undefined ? parseBooleanParam(isPublic) : undefined,
     });
   if (versionError) {
-    message.error("找不到算法版本");
+    message.error(t(p("notFound")));
   }
 
   useEffect(() => {
@@ -64,48 +69,48 @@ export const AlgorithmVersionList: React.FC<Props> = (
   const shareMutation = trpc.algorithm.shareAlgorithmVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交分享请求");
+      message.success(t(p("submitShare")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限分享此版本");
+        message.error(t(p("noAuthShare")));
         return;
       }
 
-      message.error("分享失败");
+      message.error(t(p("shareFailed")));
     },
   });
 
   const unShareMutation = trpc.algorithm.unShareAlgorithmVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交取消分享");
+      message.success(t(p("cancelShare")));
     },
     onError(err) {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限取消分享此版本");
+        message.error(t(p("noAuthCancel")));
         return;
       }
 
-      message.error("取消分享失败");
+      message.error(t(p("cancelShareFailed")));
     },
   });
 
   const deleteAlgorithmVersionMutation = trpc.algorithm.deleteAlgorithmVersion.useMutation({
     onSuccess() {
-      message.success("删除算法版本成功");
+      message.success(t(p("deleteSuccessfully")));
       refetch();
     },
     onError() {
-      message.error("删除算法版本失败");
+      message.error(t(p("deleteFailed")));
     } });
 
   const deleteAlgorithmVersion = useCallback(
     (id: number, isConfirmed?: boolean) => {
       confirm({
-        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除算法版本",
+        title: isConfirmed ? t(p("confirmedText")) : t(p("delete")),
         onOk:async () => {
           await deleteAlgorithmVersionMutation.mutateAsync({ algorithmVersionId: id, algorithmId });
         },
@@ -123,10 +128,10 @@ export const AlgorithmVersionList: React.FC<Props> = (
         pagination={false}
         scroll={{ y:275 }}
         columns={[
-          { dataIndex: "versionName", title: "版本名称" },
-          { dataIndex: "versionDescription", title: "版本描述" },
-          { dataIndex: "createTime", title: "创建时间", render:(createTime) => formatDateTime(createTime) },
-          { dataIndex: "action", title: "操作",
+          { dataIndex: "versionName", title: t(p("versionName")) },
+          { dataIndex: "versionDescription", title: t(p("versionDescription")) },
+          { dataIndex: "createTime", title: t(p("createTime")), render:(createTime) => formatDateTime(createTime) },
+          { dataIndex: "action", title: t(p("action")),
             ...isPublic ? {} : { width: 350 },
             render: (_, r) => {
               return isPublic ? (
@@ -137,7 +142,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                   algorithmVersionId={r.id}
                   cluster={cluster}
                 >
-                  复制
+                  {t("button.copyButton")}
                 </CopyPublicAlgorithmModalButton>
               ) :
                 (
@@ -153,7 +158,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         versionDescription:r.versionDescription,
                       }}
                     >
-                      编辑
+                      {t("button.editButton")}
                     </EditVersionModalButton>
                     <Button
                       type="link"
@@ -168,15 +173,16 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         }
                       }}
                     >
-                      查看文件
+                      {t(p("check"))}
                     </Button>
                     <Button
                       type="link"
                       disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                       onClick={() => {
                         confirm({
-                          title: "分享算法版本",
-                          content: `确认${getSharedStatusText(r.sharedStatus)}算法版本 ${r.versionName}?`,
+                          title: t(p("share")),
+                          content:
+                          `${t(p("confirmed"),[t(pCommon(getSharedStatusText(r.sharedStatus))),r.versionName])}`,
                           onOk: async () => {
                             if (r.sharedStatus === SharedStatus.SHARED) {
                               await unShareMutation.mutateAsync({
@@ -193,7 +199,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         });
                       }}
                     >
-                      {getSharedStatusText(r.sharedStatus)}
+                      {t(pCommon(getSharedStatusUpperText(r.sharedStatus)))}
                     </Button>
                     <Button
                       type="link"
@@ -202,7 +208,7 @@ export const AlgorithmVersionList: React.FC<Props> = (
                         deleteAlgorithmVersion(r.id);
                       }}
                     >
-                      删除
+                      {t("button.deleteButton")}
                     </Button>
                   </>
                 );

@@ -11,14 +11,12 @@
  */
 
 import { inferRouterOutputs } from "@trpc/server";
+import { prefix } from "src/i18n";
 import { AppRouter } from "src/server/trpc/router";
 
-export type ImageInterface = inferRouterOutputs<AppRouter>["image"]["list"]["items"][0];
+import { TextsTransType } from "./Algorithm";
 
-export const SourceText: Record<string, string> = {
-  INTERNAL: "本地文件",
-  EXTERNAL: "远程镜像",
-};
+export type ImageInterface = inferRouterOutputs<AppRouter>["image"]["list"]["items"][0];
 
 export enum Source {
   INTERNAL = "INTERNAL",
@@ -30,3 +28,13 @@ export enum Status {
   CREATED = "CREATED",
   FAILURE = "FAILURE",
 }
+const p = prefix("app.image.model.");
+
+export const getImageTexts = (t: TextsTransType) => {
+
+  return {
+    INTERNAL:t(p("internal")),
+    EXTERNAL:t(p("external")),
+  };
+
+};

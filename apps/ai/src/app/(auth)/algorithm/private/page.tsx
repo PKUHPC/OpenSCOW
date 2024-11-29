@@ -14,14 +14,16 @@
 import { AlgorithmTable } from "src/app/(auth)/algorithm/AlgorithmTable";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 
 export default function Page() {
 
   const { publicConfig } = usePublicConfig();
+  const t = useI18nTranslateToString();
 
   return (
     <div>
-      <PageTitle titleText="我的算法" />
+      <PageTitle titleText={t("app.algorithm.private")} />
       <AlgorithmTable isPublic={false} clusters={publicConfig.CLUSTERS} />
     </div>
   );

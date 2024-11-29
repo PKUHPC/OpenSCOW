@@ -15,7 +15,9 @@
 import { DatabaseOutlined, DesktopOutlined } from "@ant-design/icons";
 import React from "react";
 import { useUserQuery } from "src/app/auth";
+import { LanguageSwitcher } from "src/components/LanguageSwitcher";
 import { Loading } from "src/components/Loading";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { BaseLayout } from "src/layouts/base/BaseLayout";
 import { JumpToAnotherLink } from "src/layouts/base/header/Components";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
@@ -43,6 +45,8 @@ export default function Layout(
   const userQuery = useUserQuery();
   const configQuery = useConfigQuery();
   const currentClusterIdsQuery = useCurrentClusterIdsQuery();
+
+  const languageId = useI18n().currentLanguage.id;
 
   if (userQuery.isLoading) {
     return (
@@ -83,6 +87,8 @@ export default function Layout(
 
   const routes = userRoutes(userQuery.data.user, publicConfig, currentClusters, setDefaultCluster, defaultCluster);
 
+  const t = useI18nTranslateToString();
+
   return (
     <BaseLayout
       routes={routes}
@@ -93,21 +99,19 @@ export default function Layout(
             user={userQuery.data.user}
             icon={<DatabaseOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.MIS_URL}
-            // linkText={t("baseLayout.linkTextMis")}
-            linkText="管理系统"
+            linkText={t("baseLayout.linkTextMis")}
           />
           <JumpToAnotherLink
             user={userQuery.data.user}
             icon={<DesktopOutlined style={{ paddingRight: 2 }} />}
             link={publicConfig.PORTAL_URL}
-            // linkText={t("baseLayout.linkTextAI")}
             linkText="HPC"
           />
-          {/* {
-            systemLanguageConfig.isUsingI18n ? (
-              <LanguageSwitcher initialLanguage={initialLanguage} />
+          {
+            publicConfig.SYSTEM_LANGUAGE_CONFIG.isUsingI18n ? (
+              <LanguageSwitcher initialLanguage={languageId} />
             ) : undefined
-          } */}
+          }
         </>
       )}
       versionTag={publicConfig.VERSION_TAG}

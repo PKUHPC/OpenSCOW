@@ -159,7 +159,7 @@ export default {
         statistic: "平台数据统计",
       },
       navLinkTextPortal: "超算平台",
-      navLinkTextAI: "SCOW AI",
+      navLinkTextAI: "AI",
       dashboard: "仪表盘",
       user: {
         firstNav: "用户空间",

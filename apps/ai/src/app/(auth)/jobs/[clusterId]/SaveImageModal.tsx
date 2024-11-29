@@ -12,6 +12,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { imageNameValidation, imageTagValidation } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
@@ -33,18 +34,21 @@ interface FormFields {
 export const SaveImageModal: React.FC<Props> = (
   { open, onClose, reload, appSession, clusterId },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.saveImageModal.");
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const saveImageMutation = trpc.jobs.saveImage.useMutation({
     onSuccess() {
-      message.success("保存镜像成功");
+      message.success(t(p("saveSuccessfully")));
       onClose();
       form.resetFields();
       reload();
     },
     onError() {
-      message.error("保存镜像失败");
+      message.error(t(p("saveFailed")));
     },
   });
 
@@ -64,7 +68,7 @@ export const SaveImageModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={"保存镜像"}
+      title={t(p("saveImage"))}
       open={open}
       onOk={form.submit}
       confirmLoading={saveImageMutation.isLoading}
@@ -77,14 +81,14 @@ export const SaveImageModal: React.FC<Props> = (
         wrapperCol={{ span: 20 }}
         labelCol={{ span: 4 }}
       >
-        <Form.Item label="原镜像名称">
+        <Form.Item label={t(p("originalName"))}>
           {appSession.image.name}
         </Form.Item>
-        <Form.Item label="原镜像标签">
+        <Form.Item label={t(p("originalTag"))}>
           {appSession.image.tag || ""}
         </Form.Item>
         <Form.Item
-          label="镜像名称"
+          label={t(p("imageName"))}
           name="name"
           rules={[
             { required: true },
@@ -94,7 +98,7 @@ export const SaveImageModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="镜像标签"
+          label={t(p("imageTag"))}
           name="tag"
           rules={[
             { required: true },
@@ -103,7 +107,7 @@ export const SaveImageModal: React.FC<Props> = (
         >
           <Input />
         </Form.Item>
-        <Form.Item label="镜像描述" name="description">
+        <Form.Item label={t(p("description"))} name="description">
           <Input.TextArea />
         </Form.Item>
       </Form>

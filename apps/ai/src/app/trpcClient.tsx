@@ -56,7 +56,7 @@ export function ClientProvider(props: { baseUrl: string; basePath: string; child
           const msg = query?.meta?.[data?.code] as string;
           message.error(msg);
         } else {
-          message.error("出了一些问题，请稍后再试！");
+          message.error("There have been some issues, please try again later!");
         }
       },
     }),
@@ -68,12 +68,13 @@ export function ClientProvider(props: { baseUrl: string; basePath: string; child
           window.location.href = join(props.basePath, "/api/auth");
         } else if (data?.path?.startsWith("file") && data?.code === "PRECONDITION_FAILED"
          && errMessage.startsWith("SSH_ERROR:")) {
-          message.error("无法以用户身份连接到登录节点。请确认您的家目录的权限为700、750或者755，或您是否有权限在此执行操作");
+          message.error("Unable to connect to the login node as a user. Please confirm if your home "
+            + "directory permissions are 700, 750, or 755, or if you have permission to perform operations here");
         } else if (data?.path?.startsWith("file") && data?.code === "BAD_REQUEST"
         && errMessage.startsWith("SFTP_ERROR:")) {
-          message.error(errMessage || "SFTP操作失败，请确认您是否有操作的权限");
+          message.error(errMessage || "SFTP operation failed, please confirm if you have the permission to operate");
         } else if (!onError) {
-          message.error("出了一些问题，请稍后再试！");
+          message.error("There have been some issues, please try again later!");
         }
       },
     }),

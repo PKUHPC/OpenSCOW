@@ -18,7 +18,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Button, Space } from "antd";
 import dynamic from "next/dynamic";
 import { usePublicConfig } from "src/app/(auth)/context";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
 
@@ -65,6 +65,8 @@ const JobShellComponent = dynamic(
   });
 
 export default function Page({ params }: { params: { clusterId: string, jobId: string } }) {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobShell.");
 
   const { clusterId, jobId } = params;
   const { publicConfig, user } = usePublicConfig();
@@ -77,14 +79,14 @@ export default function Page({ params }: { params: { clusterId: string, jobId: s
 
   return (
     <Container>
-      <Head title={`${clusterId}的终端`} />
+      <Head title={`${clusterId}${t(p("terminal"))}`} />
       <Header>
         <h2>
-          {`用户 ${user.identityId} 连接到集群 ${i18nClusterName} 的作业 ${jobId}`}
+          {`${t(p("user"))} ${user.identityId} ${t(p("connect"))} ${i18nClusterName} ${t(p("job"))} ${jobId}`}
         </h2>
         <Space wrap>
           <Button onClick={() => window.location.reload()}>
-            {"刷新并重新连接"}
+            {t(p("refresh"))}
           </Button>
         </Space>
       </Header>

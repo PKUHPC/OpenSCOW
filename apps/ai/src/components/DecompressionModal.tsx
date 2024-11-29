@@ -13,6 +13,7 @@
 "use client";
 
 import { App, Form, Modal } from "antd";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { trpc } from "src/utils/trpc";
 
 interface Props {
@@ -28,19 +29,22 @@ interface FormProps {
 }
 
 export const CompressionModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("component.decompressionModal.");
+
   const { message } = App.useApp();
   const [form] = Form.useForm<FormProps>();
 
   const mutation = trpc.file.decompression.useMutation({
     onSuccess: () => {
-      message.success("解压成功");
+      message.success(t(p("success")));
       reload(form.getFieldValue("newDirName"));
       onClose();
       form.resetFields();
     },
     onError: (e) => {
       if (e.data?.code === "CONFLICT") {
-        message.error("已存在同名目录");
+        message.error(t(p("alreadyExisted")));
       }
     },
   });
@@ -61,15 +65,15 @@ export const CompressionModal: React.FC<Props> = ({ open, onClose, path, reload,
   return (
     <Modal
       open={open}
-      title="解压文件"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("decompress"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={mutation.isLoading}
       destroyOnClose
       onOk={onSubmit}
     >
-      {`是否确认在同级文件夹解压缩文件 ${path}`}
+      {`${t(p("confirmText"))} ${path}`}
     </Modal>
   );
 };

@@ -13,7 +13,7 @@
 import "antd/dist/reset.css";
 
 import { DarkModeCookie } from "@scow/lib-web/build/layouts/darkMode";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { join } from "path";
 import React from "react";
 import { ClientLayout } from "src/app/clientLayout";
@@ -23,8 +23,11 @@ import { BASE_PATH } from "src/utils/processEnv";
 export default function MyApp({ children }: { children: React.ReactNode }) {
 
   const cookie = cookies();
+  const header = headers();
 
   const darkModeCookie = cookie.get("scow-dark");
+  const languageCookie = cookie.get("language")?.value;
+  const acceptLanguageHeader = header.get("accept-language");
 
   const dark = darkModeCookie ? JSON.parse(darkModeCookie.value) as DarkModeCookie : undefined;
 
@@ -36,7 +39,11 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
         <link href={join(BASE_PATH, "/api/icon?type=favicon")} rel="icon" type="image/x-icon" />
       </head>
       <ServerClientProvider>
-        <ClientLayout initialDark={dark}>
+        <ClientLayout
+          initialDark={dark}
+          languageCookie={languageCookie}
+          acceptLanguageHeader={acceptLanguageHeader}
+        >
           {children}
         </ClientLayout>
       </ServerClientProvider>
@@ -44,3 +51,5 @@ export default function MyApp({ children }: { children: React.ReactNode }) {
   );
 
 }
+
+

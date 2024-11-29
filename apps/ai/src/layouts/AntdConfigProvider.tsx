@@ -14,16 +14,20 @@
 
 import "dayjs/locale/zh-cn";
 
+import { SYSTEM_VALID_LANGUAGES } from "@scow/config/build/i18n";
 import { App, ConfigProvider, theme } from "antd";
+import { Locale } from "antd/lib/locale";
+import enUSlocale from "antd/locale/en_US";
 import zhCNlocale from "antd/locale/zh_CN";
 import React, { } from "react";
+import { useI18n } from "src/i18n";
 import { AppFloatButtons } from "src/layouts/AppFloatButtons";
 import { useDarkMode } from "src/layouts/darkMode";
 import { ThemeProvider } from "styled-components";
 
-
 type Props = React.PropsWithChildren<{
   color: string | undefined;
+  locale: string | undefined;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
@@ -40,13 +44,15 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
 
   const { dark } = useDarkMode();
 
+  const currentLangId = useI18n().currentLanguage.id;
+
   return (
     <ConfigProvider
-      locale={zhCNlocale}
+      locale={getAntdLocale(currentLangId)}
       theme={{ token: { colorPrimary: color, colorInfo: color },
         algorithm: dark ? theme.darkAlgorithm : undefined }}
     >
-      <StyledComponentsThemeProvider color={color}>
+      <StyledComponentsThemeProvider color={color} locale={currentLangId}>
         <App>
           <AppFloatButtons />
           {children}
@@ -55,3 +61,13 @@ export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
     </ConfigProvider>
   );
 };
+
+function getAntdLocale(langId: string): Locale {
+  switch (langId) {
+    case SYSTEM_VALID_LANGUAGES.ZH_CN:
+      return zhCNlocale;
+    case SYSTEM_VALID_LANGUAGES.EN:
+    default:
+      return enUSlocale;
+  }
+}

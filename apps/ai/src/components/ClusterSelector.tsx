@@ -16,6 +16,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { Select } from "antd";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { defaultClusterContext } from "src/app/(auth)/defaultClusterContext";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 
 
@@ -26,16 +27,15 @@ interface Props {
 
 export const ClusterSelector: React.FC<Props> = ({ value, onChange }) => {
 
-  // const languageId = useI18n().currentLanguage.id;
-  // const t = useI18nTranslateToString();
-  const languageId = "zh_cn";
+  const languageId = useI18n().currentLanguage.id;
+  const t = useI18nTranslateToString();
   const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
   const currentClusters = publicConfig.CLUSTERS.filter((cluster) => (currentAssociateClusterIds.includes(cluster.id)));
 
   return (
     <Select
       mode="multiple"
-      // placeholder={t("component.others.clusterSelector")}
+      placeholder={t("component.clusterSelector.select")}
       value={value?.map((v) => v.id)}
       onChange={(values) => onChange?.(values.map((x) => ({
         id: x,
@@ -63,17 +63,15 @@ export const SingleClusterSelector: React.FC<SingleSelectionProps> = ({
   allowClear,
 }) => {
 
-  // const t = useI18nTranslateToString();
-  // const languageId = useI18n().currentLanguage.id;
-  const languageId = "zh_cn";
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
   const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
   const { setDefaultCluster, currentClusters }
    = defaultClusterContext(publicConfig.CLUSTERS, currentAssociateClusterIds);
 
   return (
     <Select
-      // placeholder={t("component.others.clusterSelector")}
-      placeholder={"请选择集群"}
+      placeholder={t("component.clusterSelector.select")}
       value={value?.id}
       onChange={(value) => {
         onChange?.({

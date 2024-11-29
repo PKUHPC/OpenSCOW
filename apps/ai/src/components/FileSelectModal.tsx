@@ -18,6 +18,7 @@ import { join } from "path";
 import React, { Key, useEffect, useState } from "react";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FileInfo } from "src/models/File";
 import { FileType } from "src/server/trpc/route/file";
 import { getExtension, isDecompressibleFile, isParentOrSameFolder } from "src/utils/file";
@@ -117,6 +118,8 @@ const formatPath = (path: string) => {
 
 
 export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("component.fileSelectModal.");
 
   const [visible, setVisible] = useState(false);
   const [prevPath, setPrevPath] = useState<string>("~");
@@ -146,7 +149,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
     if (!homeDir?.path || path === "~") return;
 
     if (!isParentOrSameFolder(homeDir.path, path)) {
-      message.info("仅可在家目录下操作");
+      message.info(t(p("onlyHomeDir")));
       setPath(prevPath);
     }
   }, [homeDir, path]);
@@ -196,11 +199,11 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
 
   const onOkClick = () => {
     if (!selectedFileInfo) {
-      message.info("请选择文件或文件夹");
+      message.info(t(p("emptyInfo")));
       return;
     }
     if (!checkFileSelectability(selectedFileInfo)) {
-      message.info("当前文件或文件夹不可选取");
+      message.info(t(p("notAllowed")));
       return;
     }
     if (selectedKeys.length > 0) {
@@ -231,7 +234,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
         width={1000}
         open={visible}
         onCancel={() => { closeModal(); }}
-        title="选择文件"
+        title={t(p("select"))}
         centered
         footer={[
           <div key="footer" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
@@ -244,7 +247,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                   setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
                 }}
               >
-                上传文件
+                {t(p("upload"))}
               </UploadFileButton>
               <MkdirButton
                 key="new"
@@ -255,7 +258,7 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                   setDirTree(updateTreeData(dirTree, homeDir?.path || "~", join(path, dirName), curDirContent ?? []));
                 }}
               >
-                新建文件夹
+                {t(p("mkdir"))}
               </MkdirButton>
               <CompressionModalButton
                 clusterId={clusterId}
@@ -265,12 +268,12 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                   setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
                 }}
               >
-                解压文件
+                {t(p("depression"))}
               </CompressionModalButton>
             </div>
             <div key="right">
-              <Button key="cancel" onClick={() => { closeModal(); }}>取消</Button>
-              <Button key="ok" type="primary" onClick={onOkClick}>确认</Button>
+              <Button key="cancel" onClick={() => { closeModal(); }}>{t("button.cancelButton")}</Button>
+              <Button key="ok" type="primary" onClick={onOkClick}>{t("button.confirmButton")}</Button>
             </div>
           </div>,
         ]}

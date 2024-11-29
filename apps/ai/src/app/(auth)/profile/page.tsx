@@ -15,6 +15,7 @@ import { Descriptions, Typography } from "antd";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { ModalButton } from "src/components/ModalLink";
 import { Section } from "src/components/Section";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { antdBreakpoints } from "src/styles/constants";
 import { Head } from "src/utils/head";
 import { styled } from "styled-components";
@@ -54,14 +55,16 @@ const TitleText = styled(Typography.Title)`
 const ChangePasswordModalButton = ModalButton(ChangePasswordModal, { type: "link" });
 
 export default function Page() {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.profile.");
 
   const { publicConfig, user } = usePublicConfig();
 
   return (
     <Container>
-      <Head title="账号信息" />
+      <Head title={t(p("accountInfo"))} />
       <TitleText>
-        用户信息
+        {t(p("userInfo"))}
       </TitleText>
       <Part title>
         <Descriptions
@@ -69,10 +72,10 @@ export default function Page() {
           labelStyle={{ paddingLeft:"10px", marginBottom:"10px" }}
           contentStyle={{ paddingLeft:"10px" }}
         >
-          <Descriptions.Item label="用户ID">
+          <Descriptions.Item label={t(p("userId"))}>
             {user.identityId}
           </Descriptions.Item>
-          <Descriptions.Item label="用户姓名">
+          <Descriptions.Item label={t(p("userName"))}>
             {user.name}
           </Descriptions.Item>
         </Descriptions>
@@ -81,7 +84,7 @@ export default function Page() {
         publicConfig.ENABLE_CHANGE_PASSWORD ? (
           <>
             <TitleText>
-              修改密码
+              {t(p("changePw"))}
             </TitleText>
             <Part title>
               <Descriptions
@@ -89,10 +92,10 @@ export default function Page() {
                 labelStyle={{ paddingLeft:"10px", paddingTop:"5px" }}
                 contentStyle={{ paddingLeft:"10px" }}
               >
-                <Descriptions.Item label="登录密码">
+                <Descriptions.Item label={t(p("loginPw"))}>
                   <span style={{ width:"200px" }}>********</span>
                   <ChangePasswordModalButton identityId={user.identityId}>
-                    修改密码
+                    {t(p("changePw"))}
                   </ChangePasswordModalButton>
                 </Descriptions.Item>
               </Descriptions>

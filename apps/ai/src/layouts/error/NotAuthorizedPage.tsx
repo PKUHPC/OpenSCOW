@@ -12,22 +12,25 @@
 
 import { Button, Result } from "antd";
 import Link from "next/link";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
- 
+
 export const NotAuthorizedPage = () => {
+  const t = useI18nTranslateToString();
+  const p = prefix("layout.error.notAuthorizedPage.");
 
   return (
     <>
-      <Head title="需要登录" />
+      <Head title={t(p("needLogin"))} />
       <Result
         status="403"
-        title="需要登录"
-        subTitle="您未登录或者登录状态已经过期。您需要登录才能访问此页面。"
+        title={t(p("needLogin"))}
+        subTitle={t(p("subTitle"))}
         extra={(
           <Link href={"/api/auth"}>
             <Button type="primary">
-              登录
+              {t(p("login"))}
             </Button>
           </Link>
         )}

@@ -14,7 +14,8 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal, Select } from "antd";
 import React from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { AlgorithmTypeText, Framework } from "src/models/Algorithm";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { AlgorithmTypeText, Framework, getAlgorithmTexts } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
@@ -45,54 +46,63 @@ interface FormFields {
 export const CreateAndEditModalModal: React.FC<Props> = (
   { open, onClose, refetch, editData },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.model.createAndEditModelModal.");
+  const languageId = useI18n().currentLanguage.id;
+
+  const AlgorithmTypeTextTrans = {
+    ...AlgorithmTypeText,
+    [Framework.OTHER]:getAlgorithmTexts(t).other,
+  };
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const createModelMutation = trpc.model.createModel.useMutation({
     onSuccess() {
-      message.success("添加模型成功");
+      message.success(t(p("addSuccessfully")));
       form.resetFields();
       refetch();
       onClose();
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("模型名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "modelName",
-            errors: ["模型名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
         return;
       }
-      message.error("添加模型失败");
+      message.error(t(p("addFailed")));
     } });
 
   const updateModelMutation = trpc.model.updateModel.useMutation({
     onSuccess() {
-      message.success("修改模型成功");
+      message.success(t(p("editSuccessfully")));
       refetch();
       onClose();
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("模型名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "modelName",
-            errors: ["模型名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
       }
       else if (e.data?.code === "NOT_FOUND") {
-        message.error("模型未找到");
+        message.error(t(p("notFound")));
       }
       else if (e.data?.code === "PRECONDITION_FAILED") {
-        message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
+        message.error(t(p("tryLater")));
       }
       else {
-        message.error("修改模型失败");
+        message.error(t(p("editFailed")));
 
       }
     } });
@@ -123,20 +133,21 @@ export const CreateAndEditModalModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={editData?.modelName ? "修改模型" : "添加模型"}
+      title={editData?.modelName ? t(p("edit")) : t(p("add"))}
       open={open}
       onOk={form.submit}
       confirmLoading={createModelMutation.isLoading}
       onCancel={onClose}
+      width={800}
     >
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 19 }}
+        labelCol={{ span: 5 }}
       >
         <Form.Item
-          label="名称"
+          label={t(p("name"))}
           name="modelName"
           rules={[
             { required: true },
@@ -148,13 +159,13 @@ export const CreateAndEditModalModal: React.FC<Props> = (
         </Form.Item>
         {editData?.cluster ? (
           <Form.Item
-            label="集群"
+            label={t(p("cluster"))}
           >
-            {getI18nConfigCurrentText(editData?.cluster?.name, undefined)}
+            {getI18nConfigCurrentText(editData?.cluster?.name, languageId)}
           </Form.Item>
         ) : (
           <Form.Item
-            label="集群"
+            label={t(p("cluster"))}
             name="cluster"
             rules={[
               { required: true },
@@ -164,26 +175,26 @@ export const CreateAndEditModalModal: React.FC<Props> = (
           </Form.Item>
         )}
         <Form.Item
-          label="算法名称"
+          label={t(p("algorithmName"))}
           name="algorithmName"
           initialValue={editData?.algorithmName}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="算法框架"
+          label={t(p("algorithmFramework"))}
           name="algorithmFramework"
           initialValue={editData?.algorithmFramework}
         >
           <Select
             style={{ minWidth: "120px" }}
             options={
-              Object.entries(AlgorithmTypeText).map(([key, value]) => ({ label:value, value:key }))}
+              Object.entries(AlgorithmTypeTextTrans).map(([key, value]) => ({ label:value, value:key }))}
           >
           </Select>
         </Form.Item>
         <Form.Item
-          label="模型描述"
+          label={t(p("description"))}
           name="modalDescription"
           initialValue={editData?.modalDescription}
         >

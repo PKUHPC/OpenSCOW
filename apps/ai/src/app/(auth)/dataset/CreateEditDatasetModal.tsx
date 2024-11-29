@@ -14,7 +14,8 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
-import { DatasetType, DatasetTypeText, SceneType, SceneTypeText } from "src/models/Dateset";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { DatasetType, getDatasetTexts, SceneType } from "src/models/Dateset";
 import { Cluster } from "src/server/trpc/route/config";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { validateNoChinese } from "src/utils/form";
@@ -44,6 +45,26 @@ interface FormFields {
 export const CreateEditDatasetModal: React.FC<Props> = (
   { open, onClose, refetch, isEdit, editData, clusters, currentClusterIds },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.dataset.createEditDatasetModal.");
+  const languageId = useI18n().currentLanguage.id;
+
+  const DatasetTypeTextTrans: Record<string, string> = {
+    IMAGE: getDatasetTexts(t).image,
+    TEXT: getDatasetTexts(t).text,
+    VIDEO: getDatasetTexts(t).video,
+    AUDIO: getDatasetTexts(t).audio,
+    OTHER: getDatasetTexts(t).other,
+  };
+
+  const SceneTypeTextTrans = {
+    CWS: getDatasetTexts(t).ces,
+    DA: getDatasetTexts(t).da,
+    IC: getDatasetTexts(t).ic,
+    OD: getDatasetTexts(t).od,
+    OTHER: getDatasetTexts(t).other,
+  };
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
@@ -69,7 +90,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
 
   const createMutation = trpc.dataset.createDataset.useMutation({
     onSuccess() {
-      message.success("添加数据集成功");
+      message.success(t(p("addSuccessfully")));
       onClose();
       form.resetFields();
       resetForm();
@@ -77,44 +98,44 @@ export const CreateEditDatasetModal: React.FC<Props> = (
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("数据集名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "name",
-            errors: ["数据集名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
         return;
       }
 
-      message.error("添加数据集失败");
+      message.error(t(p("addFailed")));
     },
   });
 
   const editMutation = trpc.dataset.updateDataset.useMutation({
     onSuccess() {
-      message.success("编辑数据集成功");
+      message.success(t(p("editSuccessfully")));
       onClose();
       refetch();
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("数据集名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "name",
-            errors: ["数据集名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
       }
       else if (e.data?.code === "NOT_FOUND") {
-        message.error("无法找到数据集");
+        message.error(t(p("notFound")));
       }
       else if (e.data?.code === "PRECONDITION_FAILED") {
-        message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
+        message.error(t(p("tryLater")));
       }
       else {
-        message.error("编辑数据集失败");
+        message.error(t(p("editFailed")));
       }
     },
   });
@@ -143,7 +164,7 @@ export const CreateEditDatasetModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={isEdit ? "编辑数据集" : "添加数据集"}
+      title={isEdit ? t(p("edit")) : t(p("add"))}
       open={open}
       onOk={form.submit}
       confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
@@ -153,12 +174,12 @@ export const CreateEditDatasetModal: React.FC<Props> = (
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 19 }}
+        labelCol={{ span: 5 }}
         initialValues={isEdit && editData ? editData : { cluster: defaultCluster }}
       >
         <Form.Item
-          label="数据集名称"
+          label={t(p("name"))}
           name="name"
           rules={[
             { required: true },
@@ -169,15 +190,15 @@ export const CreateEditDatasetModal: React.FC<Props> = (
         </Form.Item>
         {isEdit && editData ? (
           <Form.Item
-            label="集群"
+            label={t(p("cluster"))}
           >
             {getI18nConfigCurrentText(
-              clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+              clusters.find((x) => (x.id === editData.clusterId))?.name, languageId)
                       ?? editData.clusterId }
           </Form.Item>
         ) : (
           <Form.Item
-            label="集群"
+            label={t(p("cluster"))}
             name="cluster"
             rules={[
               { required: true },
@@ -187,21 +208,21 @@ export const CreateEditDatasetModal: React.FC<Props> = (
           </Form.Item>
         )
         }
-        <Form.Item label="数据类型" name="type" required={true}>
+        <Form.Item label={t(p("type"))} name="type" required={true}>
           <Select
             style={{ minWidth: "100px" }}
             options={
-              Object.entries(DatasetTypeText).map(([key, value]) => ({ label:value, value:key }))}
+              Object.entries(DatasetTypeTextTrans).map(([key, value]) => ({ label:value, value:key }))}
           />
         </Form.Item>
-        <Form.Item label="应用场景" name="scene" required={true}>
+        <Form.Item label={t(p("scene"))} name="scene" required={true}>
           <Select
             style={{ minWidth: "100px" }}
             options={
-              Object.entries(SceneTypeText).map(([key, value]) => ({ label:value, value:key }))}
+              Object.entries(SceneTypeTextTrans).map(([key, value]) => ({ label:value, value:key }))}
           />
         </Form.Item>
-        <Form.Item label="数据集描述" name="description">
+        <Form.Item label={t(p("description"))} name="description">
           <Input.TextArea />
         </Form.Item>
       </Form>

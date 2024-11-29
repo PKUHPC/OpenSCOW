@@ -13,6 +13,7 @@
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { confirmPasswordFormItemProps } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
@@ -32,6 +33,8 @@ export const ChangePasswordModal: React.FC<Props> = ({
   onClose,
   identityId,
 }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.profile.");
 
   const { publicConfig } = usePublicConfig();
   const [form] = Form.useForm<FormInfo>();
@@ -39,19 +42,19 @@ export const ChangePasswordModal: React.FC<Props> = ({
 
   const changePasswordMutation = trpc.auth.changePassword.useMutation({
     onSuccess() {
-      message.success("修改密码成功");
+      message.success(t(p("cPSuccessfully")));
       form.resetFields();
       onClose();
     },
     onError(e) {
       if (e.data?.code === "BAD_REQUEST") {
-        message.error(`修改密码失败: ${e.message}`);
+        message.error(`${t(p("cPFailed"))}: ${e.message}`);
       }
       else if (e.data?.code === "CONFLICT") {
-        message.error("原密码错误");
+        message.error(t(p("originalPwError")));
       }
       else {
-        message.error("修改密码失败");
+        message.error(t(p("cPFailed")));
       }
     },
   });
@@ -63,7 +66,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title="修改密码"
+      title={t(p("changePw"))}
       open={open}
       onOk={form.submit}
       confirmLoading={changePasswordMutation.isLoading}
@@ -79,7 +82,7 @@ export const ChangePasswordModal: React.FC<Props> = ({
       >
         <Form.Item
           rules={[{ required: true }]}
-          label="旧密码"
+          label={t(p("originalPw"))}
           name="oldPassword"
         >
           <Input.Password />
@@ -89,14 +92,14 @@ export const ChangePasswordModal: React.FC<Props> = ({
             { required: true },
             { pattern: publicConfig.PASSWORD_PATTERN ? new RegExp(publicConfig.PASSWORD_PATTERN) : undefined },
           ]}
-          label="新密码"
+          label={t(p("newPw"))}
           name="newPassword"
         >
-          <Input.Password placeholder="请输入新密码" />
+          <Input.Password placeholder={t(p("newPwPlaceholder"))} />
         </Form.Item>
         <Form.Item
           name="confirm"
-          label="确认"
+          label={t("button.confirmButton")}
           hasFeedback
           {...confirmPasswordFormItemProps(form, "newPassword", "zh_cn")}
         >

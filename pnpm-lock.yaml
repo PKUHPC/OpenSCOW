@@ -266,8 +266,8 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       react-typed-i18n:
-        specifier: 2.3.0
-        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.3.1)
+        specifier: 2.4.0
+        version: 2.4.0(react@18.3.1)
       replace-in-file:
         specifier: 8.1.0
         version: 8.1.0
@@ -11185,6 +11185,11 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
+  react-typed-i18n@2.4.0:
+    resolution: {integrity: sha512-CeeeOcsnGJTk16sjgA87uuo+SWfHHlK6Biq3vioTPFvFs/9Uaevry9tRJ/YNPFD2hHOgxgigLbP+XMIb10is6g==}
+    peerDependencies:
+      react: '>=16.8.0'
+
   react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
     engines: {node: '>=0.10.0'}
@@ -18247,7 +18252,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
     transitivePeerDependencies:
       - supports-color
 
@@ -25263,6 +25268,10 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   react-typed-i18n@2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+
+  react-typed-i18n@2.4.0(react@18.3.1):
     dependencies:
       react: 18.3.1
 

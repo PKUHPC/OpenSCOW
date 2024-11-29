@@ -15,6 +15,7 @@
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Select, Space, Tooltip } from "antd";
 import { useEffect } from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { trpc } from "src/utils/trpc";
 
 interface Props {
@@ -24,6 +25,8 @@ interface Props {
 }
 
 export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("component.accountSelector.");
 
   const { data, isLoading, refetch } = trpc.account.listAccounts.useQuery({ clusterId: cluster });
 
@@ -41,12 +44,12 @@ export const AccountSelector: React.FC<Props> = ({ cluster, onChange, value }) =
       <Select
         loading={isLoading}
         options={data ? data.accounts.map((x) => ({ label: x, value: x })) : []}
-        placeholder="请选择账户"
+        placeholder={t(p("select"))}
         value={value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />
-      <Tooltip title="刷新账户列表">
+      <Tooltip title={t(p("refresh"))}>
         <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => { refetch(); }} loading={isLoading} />
       </Tooltip>
     </Space.Compact>

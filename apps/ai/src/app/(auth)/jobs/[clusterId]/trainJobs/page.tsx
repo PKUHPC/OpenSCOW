@@ -15,12 +15,15 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { useSearchParams } from "next/navigation";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
 
 import { LaunchAppForm } from "../LaunchAppForm";
 
 export default function Page({ params }: { params: { clusterId: string } }) {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.trainJobs.");
 
   const { clusterId } = params;
 
@@ -59,7 +62,7 @@ export default function Page({ params }: { params: { clusterId: string } }) {
 
   return (
     <div>
-      <PageTitle titleText="训练" />
+      <PageTitle titleText={t(p("title"))} />
       <LaunchAppForm
         clusterId={clusterId}
         clusterInfo={clusterInfo}

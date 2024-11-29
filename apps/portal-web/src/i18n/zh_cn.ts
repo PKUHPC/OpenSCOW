@@ -14,7 +14,7 @@ export default {
   // baseLayout
   baseLayout: {
     linkTextMis: "管理系统",
-    linkTextAI: "SCOW AI",
+    linkTextAI: "AI",
   },
   // routes
   routes: {

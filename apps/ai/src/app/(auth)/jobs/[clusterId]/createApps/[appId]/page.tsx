@@ -15,12 +15,16 @@
 import { LoadingOutlined } from "@ant-design/icons";
 import { useSearchParams } from "next/navigation";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { trpc } from "src/utils/trpc";
 
 import { LaunchAppForm } from "../../LaunchAppForm";
 
 
 export default function Page({ params }: { params: { clusterId: string, appId: string } }) {
+
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.createApps.");
 
   const { appId, clusterId } = params;
   const searchParams = useSearchParams();
@@ -49,7 +53,7 @@ export default function Page({ params }: { params: { clusterId: string, appId: s
 
   return (
     <div>
-      <PageTitle titleText={`创建${appInfo.appName}`} />
+      <PageTitle titleText={`${t(p("create"))} ${appInfo.appName}`} />
       <LaunchAppForm
         appName={appInfo.appName}
         appId={appId}

@@ -16,6 +16,7 @@ import { Footer } from "@scow/lib-web/build/layouts/base/Footer";
 import { Grid, Layout } from "antd";
 import { usePathname } from "next/navigation";
 import React, { PropsWithChildren, useMemo, useState } from "react";
+import { useI18n } from "src/i18n";
 import { Header } from "src/layouts/base/header";
 import { match } from "src/layouts/base/matchers";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
@@ -80,6 +81,8 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
 
   const useLogoutMutation = trpc.auth.logout.useMutation();
 
+  const languageId = useI18n().currentLanguage.id;
+
   return (
     <Root>
       <Header
@@ -91,7 +94,7 @@ export const BaseLayout: React.FC<PropsWithChildren<Props>> = ({
         user={user}
         logout={() => { useLogoutMutation.mutateAsync().then(() => { location.reload(); }); }}
         userLinks={[]}
-        languageId="zh_cn"
+        languageId={languageId}
         right={headerRightContent}
       />
       <StyledLayout>

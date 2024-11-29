@@ -18,6 +18,7 @@ import { BookOutlined, DashboardOutlined,
 import { NavIcon } from "@scow/lib-web/build/layouts/icon";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { join } from "path";
+import { useI18n, useI18nTranslateToString } from "src/i18n";
 import { NavItemProps } from "src/layouts/base/NavItemProps";
 import { ClientUserInfo } from "src/server/trpc/route/auth";
 import { Cluster, NavLink, PublicConfig } from "src/server/trpc/route/config";
@@ -32,45 +33,48 @@ export const userRoutes: (
 
   if (!user) { return []; }
 
+  const t = useI18nTranslateToString();
+  const languageId = useI18n().currentLanguage.id;
+
   return [
     {
       Icon: DashboardOutlined,
-      text: "仪表盘",
+      text: t("routes.dashboard"),
       path: "/dashboard",
       clickToPath: "/dashboard",
     },
     {
       Icon: DatabaseOutlined,
-      text: "数据",
+      text: t("routes.data.title"),
       path: "/dataset",
       clickToPath: "/dataset/private",
       children: [
         {
           Icon: LockOutlined,
-          text: "我的数据集",
+          text: t("routes.data.private"),
           path: "/dataset/private",
         },
         {
           Icon: ShareAltOutlined,
-          text: "公共数据集",
+          text: t("routes.data.public"),
           path: "/dataset/public",
         },
       ],
     },
     {
       Icon: FileImageOutlined,
-      text: "镜像",
+      text: t("routes.image.title"),
       path: "/image",
       clickToPath: "/image/private",
       children: [
         {
           Icon: LockOutlined,
-          text: "我的镜像",
+          text: t("routes.image.private"),
           path: "/image/private",
         },
         {
           Icon: ShareAltOutlined,
-          text: "公共镜像",
+          text: t("routes.image.public"),
           path: "/image/public",
         },
       ],
@@ -78,34 +82,34 @@ export const userRoutes: (
     // 无可用集群时不显示该层级路由
     ...(currentClusters.length > 0 ? [ {
       Icon: BookOutlined,
-      text: "作业",
+      text: t("routes.job.title"),
       path: "/jobs",
       clickToPath: `/jobs/${defaultCluster?.id ?? currentClusters[0].id}/createApps`,
       children: [
         ...currentClusters.map((cluster) => ({
           Icon: FolderOutlined,
-          text: getI18nConfigCurrentText(cluster.name, undefined),
+          text: getI18nConfigCurrentText(cluster.name, languageId),
           path: `/jobs/${cluster.id}`,
           clickable: false,
           children:[
             {
               Icon: PlusOutlined,
-              text: "创建应用",
+              text: t("routes.job.createApp"),
               path: `/jobs/${cluster.id}/createApps`,
             },
             {
               Icon: PlusOutlined,
-              text: "训练",
+              text: t("routes.job.trainJob"),
               path: `/jobs/${cluster.id}/trainJobs`,
             },
             {
               Icon: BookOutlined,
-              text: "正在运行的作业",
+              text: t("routes.job.runningJobs"),
               path: `/jobs/${cluster.id}/runningJobs`,
             },
             {
               Icon: BookOutlined,
-              text: "已完成的作业",
+              text: t("routes.job.historyJobs"),
               path: `/jobs/${cluster.id}/historyJobs`,
             },
           ],
@@ -115,36 +119,36 @@ export const userRoutes: (
     ] : []),
     {
       Icon: UngroupOutlined,
-      text: "算法",
+      text: t("routes.algorithm.title"),
       path: "/algorithm",
       clickToPath: "/algorithm/private",
       children: [
         {
           Icon: LockOutlined,
-          text: "我的算法",
+          text: t("routes.algorithm.private"),
           path: "/algorithm/private",
         },
         {
           Icon: ShareAltOutlined,
-          text: "公共算法",
+          text: t("routes.algorithm.public"),
           path: "/algorithm/public",
         },
       ],
     },
     {
       Icon: OneToOneOutlined,
-      text: "模型",
+      text: t("routes.model.title"),
       path: "/model",
       clickToPath: "/model/private",
       children: [
         {
           Icon: LockOutlined,
-          text: "我的模型",
+          text: t("routes.model.private"),
           path: "/model/private",
         },
         {
           Icon: ShareAltOutlined,
-          text: "公共模型",
+          text: t("routes.model.public"),
           path: "/model/public",
         },
       ],
@@ -152,12 +156,12 @@ export const userRoutes: (
     ...(currentClusters.length > 0 ? [
       {
         Icon: FolderOutlined,
-        text: "文件管理",
+        text: t("routes.file"),
         path: "/files",
         clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
         children: currentClusters.map((cluster) => ({
           Icon: FolderOutlined,
-          text: cluster.name,
+          text: getI18nConfigCurrentText(cluster.name, languageId),
           path: `/files/${cluster.id}`,
           clickToPath: `/files/${cluster.id}/~`,
           handleClick: () => { setDefaultCluster(cluster); },

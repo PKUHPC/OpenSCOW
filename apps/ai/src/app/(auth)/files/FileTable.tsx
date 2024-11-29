@@ -17,6 +17,7 @@ import { Table, TableProps, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import React from "react";
 import { TableFileInfo } from "src/app/(auth)/files/[cluster]/context";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FileType } from "src/server/trpc/route/file";
 import { compareDateTime, formatDateTime } from "src/utils/datetime";
 import { formatSize } from "src/utils/format";
@@ -58,6 +59,8 @@ export const FileTable: React.FC<Props> = (
     ...otherProps
   },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.files.fileTable.");
 
   const columns: ColumnsType<TableFileInfo> = [
     {
@@ -70,7 +73,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "name",
       dataIndex: "name",
-      title: "文件名",
+      title: t(p("name")),
       defaultSortOrder: "ascend",
       sorter: (a, b) => a.type.localeCompare(b.type) === 0
         ? a.name.localeCompare(b.name)
@@ -81,7 +84,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "mtime",
       dataIndex: "mtime",
-      title: "修改日期",
+      title: t(p("mtime")),
       render: (mtime: string | undefined) => mtime ? formatDateTime(mtime) : "",
       sorter: (a, b) => a.type.localeCompare(b.type) === 0
         ? compareDateTime(a.mtime, b.mtime) === 0
@@ -92,7 +95,7 @@ export const FileTable: React.FC<Props> = (
     {
       key: "size",
       dataIndex: "size",
-      title: "大小",
+      title: t(p("size")),
       render: (size: number | undefined, file: TableFileInfo) => (size === undefined || file.type === "DIR")
         ? ""
         : (
@@ -111,13 +114,13 @@ export const FileTable: React.FC<Props> = (
     {
       key: "mode",
       dataIndex: "mode",
-      title: "权限",
+      title: t(p("mode")),
       render: (mode: number | undefined) => mode === undefined ? "" : nodeModeToString(mode),
     },
     ...(actionRender ? [{
       key: "action",
       dataIndex: "action",
-      title: "操作",
+      title: t(p("action")),
       render: actionRender,
     }] : []),
   ];

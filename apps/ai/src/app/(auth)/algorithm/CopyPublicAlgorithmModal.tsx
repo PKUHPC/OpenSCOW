@@ -14,6 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AlgorithmVersionInterface } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
@@ -39,22 +40,26 @@ interface FormFields {
 export const CopyPublicAlgorithmModal: React.FC<Props> = (
   { open, onClose, algorithmId, algorithmVersionId, algorithmName, cluster, data },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.algorithm.copyPublicAlgorithmModal.");
+  const languageId = useI18n().currentLanguage.id;
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const copyMutation = trpc.algorithm.copyPublicAlgorithmVersion.useMutation({
     onSuccess() {
-      message.success("复制算法成功");
+      message.success(t(p("copySuccessfully")));
       onClose();
     },
     onError(err) {
       const errCode = err.data?.code;
       if (errCode === "CONFLICT") {
-        message.error("目标算法名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "targetDatasetName",
-            errors: ["目标算法名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
         return;
@@ -79,7 +84,7 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={"复制算法"}
+      title={t(p("copy"))}
       open={open}
       onOk={form.submit}
       confirmLoading={copyMutation.isLoading}
@@ -90,16 +95,16 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 6 }}
       >
         <Form.Item
-          label="源算法名称"
+          label={t(p("sourceName"))}
         >
           {algorithmName}
         </Form.Item>
         <Form.Item
-          label="目标算法名称"
+          label={t(p("targetName"))}
           name="targetAlgorithmName"
           rules={[
             { required: true },
@@ -109,12 +114,12 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="集群"
+          label={t(p("cluster"))}
         >
-          {getI18nConfigCurrentText(cluster?.name, undefined)}
+          {getI18nConfigCurrentText(cluster?.name, languageId)}
         </Form.Item>
         <Form.Item
-          label="版本名称"
+          label={t(p("versionName"))}
           name="versionName"
           rules={[
             { required: true },
@@ -124,11 +129,11 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
         >
           <Input allowClear />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription" initialValue={data?.versionDescription}>
+        <Form.Item label={t(p("versionDescription"))} name="versionDescription" initialValue={data?.versionDescription}>
           <Input.TextArea />
         </Form.Item>
         <Form.Item
-          label="复制目标地址"
+          label={t(p("address"))}
           name="path"
           rules={[{ required: true }]}
         >

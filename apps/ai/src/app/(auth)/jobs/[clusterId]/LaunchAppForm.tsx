@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
 import { Status } from "src/models/Image";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
@@ -123,6 +124,10 @@ const inputNumberFloorConfig = {
 
 
 export const LaunchAppForm = (props: Props) => {
+
+  const languageId = useI18n().currentLanguage.id;
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.launchAppForm.");
 
   const { clusterId, appName, clusterInfo, isTraining = false,
     appId, attributes = [], appImage, createAppParams, trainJobInput } = props;
@@ -306,7 +311,7 @@ export const LaunchAppForm = (props: Props) => {
     if (item.name === "workingDir") {
       inputItem = (
         <Input
-          placeholder={getI18nConfigCurrentText(placeholder, undefined)}
+          placeholder={getI18nConfigCurrentText(placeholder, languageId)}
           prefix={
             (
               <FileSelectModal
@@ -327,13 +332,13 @@ export const LaunchAppForm = (props: Props) => {
       );
     } else {
       inputItem = item.type === "NUMBER" ?
-        (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
-        : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, undefined)} />)
+        (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
+        : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
           : (
             <Select
               options={selectOptions.map((x) => ({
-                label: getI18nConfigCurrentText(x.label, undefined), value: x.value }))}
-              placeholder={getI18nConfigCurrentText(placeholder, undefined)}
+                label: getI18nConfigCurrentText(x.label, languageId), value: x.value }))}
+              placeholder={getI18nConfigCurrentText(placeholder, languageId)}
             />
           );
     }
@@ -352,14 +357,14 @@ export const LaunchAppForm = (props: Props) => {
     return (
       <Form.Item
         key={`${item.name}+${index}`}
-        label={getI18nConfigCurrentText(item.label, undefined) ?? undefined}
+        label={getI18nConfigCurrentText(item.label, languageId) ?? undefined}
         name={["customFields", item.name]}
         rules={rules}
         initialValue={initialValue}
         {...(item.name === "workingDir" ? {
           tooltip: (
             <>
-              <span>工作目录的路径会自动添加为挂载点</span>
+              <span>{t(p("autoAdd"))}</span>
             </>
           ),
         } : {})}
@@ -367,7 +372,7 @@ export const LaunchAppForm = (props: Props) => {
         {inputItem}
       </Form.Item>
     );
-  }), [attributes, currentPartitionInfo]);
+  }), [attributes, currentPartitionInfo,languageId]);
 
 
   useEffect(() => {
@@ -509,21 +514,21 @@ export const LaunchAppForm = (props: Props) => {
 
   const createAppSessionMutation = trpc.jobs.createAppSession.useMutation({
     onSuccess() {
-      message.success("创建成功");
+      message.success(t(p("createSuccessfully")));
       router.push(`/jobs/${clusterId}/runningJobs`);
     },
     onError(e) {
-      message.error(`创建失败: ${e.message}`);
+      message.error(`${t(p("createFailed"))}: ${e.message}`);
     },
   });
 
   const trainJobMutation = trpc.jobs.trainJob.useMutation({
     onSuccess() {
-      message.success("提交训练成功");
+      message.success(t(p("submitTrainSuccessfully")));
       router.push(`/jobs/${clusterId}/runningJobs`);
     },
     onError(e) {
-      message.error(`提交训练失败: ${e.message}`);
+      message.error(`${t(p("submitTrainFailed"))}: ${e.message}`);
     },
   });
 
@@ -620,15 +625,17 @@ export const LaunchAppForm = (props: Props) => {
 
     >
       <Spin spinning={createAppSessionMutation.isLoading || trainJobMutation.isLoading} tip="loading">
-        <Form.Item name="appJobName" label="名称" rules={[{ required: true }, { max: 50 }]}>
+        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 50 }]}>
           <Input />
         </Form.Item>
-        <Divider orientation="left" orientationMargin="0">{isTraining ? "训练配置" : "应用配置"}</Divider>
+        <Divider orientation="left" orientationMargin="0">
+          {isTraining ? t(p("trainConfig")) : t(p("appConfig"))}
+        </Divider>
         {!isTraining && (
           <Form.Item
-            label="启动镜像"
+            label={t(p("startImage"))}
             help={ useCustomImage &&
-            <Typography.Text type="danger">{`请选择镜像或填写远程镜像地址，确保镜像安装了${appName}应用，并指定启动命令`}</Typography.Text>
+            <Typography.Text type="danger">{`${t(p("imageText1"),[appName])}${t(p("imageText2"))}`}</Typography.Text>
             }
           >
             <Space>
@@ -647,7 +654,7 @@ export const LaunchAppForm = (props: Props) => {
                     image: { type: undefined, name: undefined }, remoteImageUrl: undefined, startCommand: undefined,
                   });
                 }}
-                >使用自定义镜像</Checkbox>
+                >{t(p("useCustomImage"))}</Checkbox>
               </Form.Item>
             </Space>
           </Form.Item>
@@ -655,7 +662,7 @@ export const LaunchAppForm = (props: Props) => {
         {
           (isTraining || useCustomImage) && (
             <>
-              <Form.Item label="镜像">
+              <Form.Item label={t(p("image"))}>
                 <Space>
                   <Form.Item name={["image", "type"]} noStyle>
                     <Select
@@ -668,11 +675,11 @@ export const LaunchAppForm = (props: Props) => {
                         [
                           {
                             value: AccessibilityType.PRIVATE,
-                            label: "我的镜像",
+                            label: t(p("privateImage")),
                           },
                           {
                             value:  AccessibilityType.PUBLIC,
-                            label: "公共镜像",
+                            label: t(p("publicImage")),
                           },
                         ]
                       }
@@ -685,7 +692,7 @@ export const LaunchAppForm = (props: Props) => {
                         if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
                           return Promise.resolve();
                         }
-                        return Promise.reject(new Error("请选择镜像或填写远程镜像地址"));
+                        return Promise.reject(new Error(t(p("selectImage"))));
                       },
                     })]}
                     dependencies={["remoteImageUrl"]}
@@ -704,28 +711,28 @@ export const LaunchAppForm = (props: Props) => {
                 </Space>
               </Form.Item>
               <Form.Item
-                label="远程镜像地址"
+                label={t(p("remoteImageUrl"))}
                 name="remoteImageUrl"
                 rules={[({ getFieldValue }) => ({
                   validator() {
                     if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error("请选择镜像或填写远程镜像地址"));
+                    return Promise.reject(new Error(t(p("selectImage"))));
                   },
                 })]}
                 dependencies={[["image", "name"]]}
               >
-                <Input placeholder="请输入远程镜像地址" />
+                <Input placeholder={t(p("RemoteImageUrlPlaceholder"))} />
               </Form.Item>
               {(customImage && !isTraining) ? (
                 <Form.Item
-                  label="启动命令"
+                  label={t(p("startCommand"))}
                   name="startCommand"
                   rules={[{ required: customImage !== undefined }]}
                   dependencies={["image", "name"]}
                 >
-                  <Input placeholder="运行镜像里程序的启动命令" />
+                  <Input placeholder={t(p("startCommandPlaceholder"))} />
                 </Form.Item>
               ) : null }
             </>
@@ -745,9 +752,9 @@ export const LaunchAppForm = (props: Props) => {
                   <Space key={field.key} style={{ display: "flex", marginBottom: 8 }} align="baseline">
                     <Form.Item
                       {...restField}
-                      label={`挂载点-${index + 1}`}
+                      label={`${t(p("mounts"))}-${index + 1}`}
                       rules={[
-                        { required: true, message: "请提供挂载点地址" },
+                        { required: true, message: t(p("mountsPlaceholder")) },
                         // 添加的自定义校验器以确保挂载点不重复
                         ({ getFieldValue }) => ({
                           validator(_, value: string) {
@@ -762,12 +769,12 @@ export const LaunchAppForm = (props: Props) => {
 
                             const otherMountPoints = mountPoints.filter((_, idx) => idx !== currentIndex);
                             if (otherMountPoints.includes(currentValueNormalized)) {
-                              return Promise.reject(new Error("挂载点地址不能重复"));
+                              return Promise.reject(new Error(t(p("mountsDuplicate"))));
                             }
 
                             const workingDirectory = form.getFieldValue("customFields")?.workingDir?.toString();
                             if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
-                              return Promise.reject(new Error("该路径已指定为工作目录，无需再设置为挂载点"));
+                              return Promise.reject(new Error(t(p("mountsText"))));
                             }
 
                             return Promise.resolve();
@@ -776,7 +783,7 @@ export const LaunchAppForm = (props: Props) => {
                       ]}
                     >
                       <Input
-                        placeholder="选择挂载点"
+                        placeholder={t(p("selectMounts"))}
                         prefix={(
                           <FileSelectModal
                             allowedFileType={["DIR"]}
@@ -803,14 +810,14 @@ export const LaunchAppForm = (props: Props) => {
                   onClick={() => add()}
                   icon={<PlusOutlined />}
                 >
-                  添加挂载点
+                  {t(p("addMounts"))}
                 </Button>
               </Form.Item>
             </>
           )}
         </Form.List>
-        <Divider orientation="left" orientationMargin="0">添加算法/数据集/模型</Divider>
-        <Form.Item label="添加类型" style={{ marginBottom: 0 }}>
+        <Divider orientation="left" orientationMargin="0">{t(p("addOther"))}</Divider>
+        <Form.Item label={t(p("addType"))} style={{ marginBottom: 0 }}>
           <div style={{ display: "flex", alignItems: "center" }}>
             <Form.Item
               name="showAlgorithm"
@@ -820,7 +827,7 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ algorithm: { type: undefined, name: undefined, version: undefined } })}
               >
-                算法
+                {t(p("algorithm"))}
               </Checkbox>
             </Form.Item>
             <Form.Item
@@ -831,7 +838,7 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ dataset: { type: undefined, name: undefined, version: undefined } })}
               >
-                数据集
+                {t(p("dataset"))}
               </Checkbox>
             </Form.Item>
             <Form.Item
@@ -842,14 +849,14 @@ export const LaunchAppForm = (props: Props) => {
               <Checkbox onChange={() =>
                 form.setFieldsValue({ model: { type: undefined, name: undefined, version: undefined } })}
               >
-                模型
+                {t(p("model"))}
               </Checkbox>
             </Form.Item>
           </div>
         </Form.Item>
         {
           showAlgorithm ? (
-            <Form.Item label="算法">
+            <Form.Item label={t(p("algorithm"))}>
               <Space>
                 <Form.Item name={["algorithm", "type"]} noStyle>
                   <Select
@@ -862,11 +869,11 @@ export const LaunchAppForm = (props: Props) => {
                       [
                         {
                           value: AccessibilityType.PRIVATE,
-                          label: "我的算法",
+                          label: t(p("privateAlgorithm")),
                         },
                         {
                           value:  AccessibilityType.PUBLIC,
-                          label: "公共算法",
+                          label: t(p("publicAlgorithm")),
                         },
                       ]
                     }
@@ -898,7 +905,7 @@ export const LaunchAppForm = (props: Props) => {
 
         {
           showDataset ? (
-            <Form.Item label="数据集">
+            <Form.Item label={t(p("dataset"))}>
               <Space>
                 <Form.Item name={["dataset", "type"]} noStyle>
                   <Select
@@ -911,11 +918,11 @@ export const LaunchAppForm = (props: Props) => {
                       [
                         {
                           value: AccessibilityType.PRIVATE,
-                          label: "我的数据集",
+                          label: t(p("privateDataset")),
                         },
                         {
                           value: AccessibilityType.PUBLIC,
-                          label: "公共数据集",
+                          label: t(p("publicDataset")),
                         },
 
                       ]
@@ -948,7 +955,7 @@ export const LaunchAppForm = (props: Props) => {
 
         {
           showModel ? (
-            <Form.Item label="模型">
+            <Form.Item label={t(p("model"))}>
               <Space>
                 <Form.Item name={["model", "type"]} noStyle>
                   <Select
@@ -961,11 +968,11 @@ export const LaunchAppForm = (props: Props) => {
                       [
                         {
                           value: AccessibilityType.PRIVATE,
-                          label: "我的模型",
+                          label: t(p("privateModel")),
                         },
                         {
                           value:  AccessibilityType.PUBLIC,
-                          label: "公共模型",
+                          label: t(p("publicModel")),
                         },
                       ]
                     }
@@ -995,9 +1002,9 @@ export const LaunchAppForm = (props: Props) => {
           ) : null
         }
 
-        <Divider orientation="left" orientationMargin="0">资源</Divider>
+        <Divider orientation="left" orientationMargin="0">{t(p("resource"))}</Divider>
         <Form.Item
-          label="账户"
+          label={t(p("account"))}
           name="account"
           rules={[{ required: true }]}
         >
@@ -1005,7 +1012,7 @@ export const LaunchAppForm = (props: Props) => {
         </Form.Item>
 
         <Form.Item
-          label="队列"
+          label={t(p("partition"))}
           name="partition"
           rules={[{ required: true }]}
         >
@@ -1019,7 +1026,7 @@ export const LaunchAppForm = (props: Props) => {
           />
         </Form.Item>
         <Form.Item
-          label="节点数"
+          label={t(p("nodeCount"))}
           name="nodeCount"
           dependencies={["partition"]}
           rules={[
@@ -1043,7 +1050,7 @@ export const LaunchAppForm = (props: Props) => {
         && (currentPartitionInfo ? currentPartitionInfo.gpuType !== "huawei.com/Ascend910" : true)) ? (
             <>
               <Form.Item
-                label="PS节点数"
+                label={t(p("psNodes"))}
                 name="psNodes"
                 initialValue={1}
                 rules={[
@@ -1064,7 +1071,7 @@ export const LaunchAppForm = (props: Props) => {
         && (currentPartitionInfo ? currentPartitionInfo.gpuType !== "huawei.com/Ascend910" : true)) ? (
             <>
               <Form.Item
-                label="worker节点数"
+                label={t(p("workerNodes"))}
                 name="workerNodes"
                 initialValue={nodeCount - 1}
                 rules={[
@@ -1084,7 +1091,7 @@ export const LaunchAppForm = (props: Props) => {
         {
           currentPartitionInfo?.gpus ? (
             <Form.Item
-              label="单节点GPU卡数"
+              label={t(p("gpuCount"))}
               name="gpuCount"
               dependencies={["partition"]}
               rules={[
@@ -1113,7 +1120,7 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           ) : (
             <Form.Item
-              label="单节点CPU核心数"
+              label={t(p("coreCount"))}
               name="coreCount"
               dependencies={["partition"]}
               rules={[
@@ -1141,7 +1148,7 @@ export const LaunchAppForm = (props: Props) => {
           <>
             {/* 手动选择算法框架，下拉框只有 tensorflow, pytorch */}
             <Form.Item
-              label="分布式训练框架"
+              label={t(p("framework"))}
               name="framework"
               rules={[{ required: true }]}
             >
@@ -1150,8 +1157,8 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           </>
         ) : null}
-        <Form.Item label="最长运行时间" name="maxTime" rules={[{ required: true }]}>
-          <InputNumber min={1} step={1} addonAfter="分钟" />
+        <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
+          <InputNumber min={1} step={1} addonAfter={t(p("min"))} />
         </Form.Item>
         {
           customFormItems.filter((item) => !item?.key?.includes("workingDir"))
@@ -1162,19 +1169,19 @@ export const LaunchAppForm = (props: Props) => {
               ?
               (
                 <Col span={12} sm={6}>
-                  <Form.Item label="总GPU数">
+                  <Form.Item label={t(p("totalGpus"))}>
                     {nodeCount * gpuCount}
                   </Form.Item>
                 </Col>
               ) : null
           }
           <Col span={12} sm={6}>
-            <Form.Item label="总CPU数">
+            <Form.Item label={t(p("totalCpus"))}>
               {coreCountSum}
             </Form.Item>
           </Col>
           <Col span={12} sm={6}>
-            <Form.Item label="总内存">
+            <Form.Item label={t(p("totalMem"))}>
               {memoryDisplay}
             </Form.Item>
           </Col>
@@ -1182,8 +1189,8 @@ export const LaunchAppForm = (props: Props) => {
         {
           isTraining ? (
             <>
-              <Divider orientation="left" orientationMargin="0" plain>运行设置</Divider>
-              <Form.Item label="运行命令" name="command" rules={[{ required: true }]}>
+              <Divider orientation="left" orientationMargin="0" plain>{t(p("runningSetting"))}</Divider>
+              <Form.Item label={t(p("command"))} name="command" rules={[{ required: true }]}>
                 <Input.TextArea minLength={3} />
               </Form.Item>
             </>
@@ -1195,14 +1202,14 @@ export const LaunchAppForm = (props: Props) => {
           onClick={() => router.push(`/jobs/${clusterId}/createApps`)}
           style={{ marginRight: "10px" }}
         >
-          取消
+          {t("button.cancelButton")}
         </Button>
         <Button
           type="primary"
           htmlType="submit"
           loading={createAppSessionMutation.isLoading}
         >
-          提交
+          {t("button.submitButton")}
         </Button>
       </Form.Item>
     </Form>

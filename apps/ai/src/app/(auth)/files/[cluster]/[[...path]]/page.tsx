@@ -18,12 +18,14 @@ import { join } from "path";
 import { useEffect, useMemo } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { FileManager } from "src/app/(auth)/files/FileManager";
-import { useI18n } from "src/i18n";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 import { Head } from "src/utils/head";
 import { trpc } from "src/utils/trpc";
 
 export default function Page({ params }: { params: { cluster: string; resourceId: string; path: string[] } }) {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.files.pages.");
 
   const router = useRouter();
 
@@ -63,7 +65,7 @@ export default function Page({ params }: { params: { cluster: string; resourceId
 
   return (
     <>
-      <Head title={`${i18nClusterName}文件管理`} />
+      <Head title={`${i18nClusterName} ${t(p("fileManage"))}`} />
       {
         clusterObj ? (
           <FileManager

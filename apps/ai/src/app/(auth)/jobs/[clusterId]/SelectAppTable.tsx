@@ -17,6 +17,7 @@ import { Avatar, Card, Col, Result, Row, Tooltip } from "antd";
 import Link from "next/link";
 import { join } from "path";
 import { useState } from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AppSchema } from "src/server/trpc/route/jobs/apps";
 import { styled } from "styled-components";
 
@@ -53,6 +54,9 @@ type ImageErrorMap = Record<string, boolean>;
 
 export const SelectAppTable: React.FC<Props> = ({ publicPath, clusterId, apps, isTraining = false }) => {
 
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.selectAppTable.");
+
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});
 
   const handleImageError = (appId: string) => {
@@ -75,7 +79,7 @@ export const SelectAppTable: React.FC<Props> = ({ publicPath, clusterId, apps, i
         {apps.map((app) => (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} xxl={4} key={app.id} style={{ marginBottom: "16px" }}>
             <Card bodyStyle={{ display: "flex", flexDirection: "column", flex: 1 }}>
-              <Tooltip title={`创建${app.name}`} placement="bottom">
+              <Tooltip title={`${t(p("create"))}${app.name}`} placement="bottom">
                 <Link href={`/jobs/${clusterId}/${isTraining ? "trainJobs" : "createApps"}/${app.id}`}>
                   <AvatarContainer>
                     {

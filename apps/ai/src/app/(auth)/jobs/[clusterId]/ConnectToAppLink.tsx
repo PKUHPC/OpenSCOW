@@ -17,6 +17,7 @@ import { App } from "antd";
 import { join } from "path";
 import { useEffect } from "react";
 import { DisabledA } from "src/components/DisabledA";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { AppSession } from "src/server/trpc/route/jobs/apps";
 import { trpc } from "src/utils/trpc";
 import { openDesktop } from "src/utils/vnc";
@@ -32,6 +33,9 @@ export interface Props {
 export const ConnectTopAppLink: React.FC<Props> = ({
   session, cluster, refreshToken,
 }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.connectToAppLink.");
+
   const { publicConfig: { BASE_PATH, NOVNC_CLIENT_URL } } = usePublicConfig();
   const { message } = App.useApp();
 
@@ -42,7 +46,7 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   const connectMutation = trpc.jobs.connectToApp.useMutation(
     {
       onError(e) {
-        message.error(`连接应用失败: ${e.message}`);
+        message.error(`${t(p("connectFailed"))}: ${e.message}`);
       },
     },
   );
@@ -109,6 +113,6 @@ export const ConnectTopAppLink: React.FC<Props> = ({
   };
 
   return (
-    <DisabledA disabled={!data} onClick={onClick} message="应用还未准备好">连接</DisabledA>
+    <DisabledA disabled={!data} onClick={onClick} message={t(p("notReady"))}>{t(p("connect"))}</DisabledA>
   );
 };

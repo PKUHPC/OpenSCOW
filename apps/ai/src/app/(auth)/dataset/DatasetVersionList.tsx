@@ -15,11 +15,12 @@ import { App, Button, Table } from "antd";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect } from "react";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { SharedStatus } from "src/models/common";
 import { Cluster } from "src/server/trpc/route/config";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { AppRouter } from "src/server/trpc/router";
-import { getSharedStatusText } from "src/utils/common";
+import { getSharedStatusText, getSharedStatusUpperText } from "src/utils/common";
 import { formatDateTime } from "src/utils/datetime";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
@@ -40,6 +41,10 @@ const CopyPublicDatasetModalButton = ModalButton(CopyPublicDatasetModal, { type:
 export const DatasetVersionList: React.FC<Props> = (
   { datasets, datasetId, datasetName, isPublic, cluster },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.dataset.datasetVersionList.");
+  const pCommon = prefix("app.common.");
+
   const { modal, message } = App.useApp();
   const CreateEditVersionModalButton = ModalButton(CreateEditDSVersionModal, { type: "link" });
 
@@ -51,7 +56,7 @@ export const DatasetVersionList: React.FC<Props> = (
       isPublic:  isPublic !== undefined ? parseBooleanParam(isPublic) : undefined,
     });
   if (versionError) {
-    message.error("找不到数据集版本");
+    message.error(t(p("notFound")));
   }
 
   useEffect(() => {
@@ -63,14 +68,14 @@ export const DatasetVersionList: React.FC<Props> = (
   const shareMutation = trpc.dataset.shareDatasetVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交分享请求");
+      message.success(t(p("submitShare")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限分享此数据集版本");
+        message.error(t(p("noAuthShare")));
       } else {
-        message.error("分享数据集版本失败");
+        message.error(t(p("shareFailed")));
       }
     },
   });
@@ -78,29 +83,29 @@ export const DatasetVersionList: React.FC<Props> = (
   const unShareMutation = trpc.dataset.unShareDatasetVersion.useMutation({
     onSuccess() {
       refetch();
-      message.success("提交取消分享请求");
+      message.success(t(p("cancelShare")));
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "FORBIDDEN") {
-        message.error("没有权限取消分享此数据集版本");
+        message.error(t(p("noAuthCancel")));
       } else {
-        message.error("取消分享数据集版本失败");
+        message.error(t(p("cancelShareFailed")));
       }
     },
   });
 
   const deleteMutation = trpc.dataset.deleteDatasetVersion.useMutation({
     onSuccess() {
-      message.success("删除成功");
+      message.success(t(p("deleteSuccessfully")));
       refetch();
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("找不到该数据集版本");
+        message.error(t(p("notFound")));
       } else {
-        message.error("删除数据集版本失败");
+        message.error(t(p("deleteFailed")));
       }
     },
   });
@@ -108,7 +113,7 @@ export const DatasetVersionList: React.FC<Props> = (
   const deleteDatasetVersion = useCallback(
     (id: number, datasetId: number, isConfirmed?: boolean) => {
       modal.confirm({
-        title: isConfirmed ? "源文件已被删除，是否删除本条数据" : "删除数据集版本",
+        title: isConfirmed ? t(p("confirmedText")) : t(p("delete")),
         onOk: async () => {
           await deleteMutation.mutateAsync({
             datasetVersionId: id,
@@ -128,12 +133,12 @@ export const DatasetVersionList: React.FC<Props> = (
       pagination={false}
       scroll={{ y:275 }}
       columns={[
-        { dataIndex: "versionName", title: "版本名称" },
-        { dataIndex: "versionDescription", title: "版本描述" },
-        isPublic ? {} : { dataIndex: "privatePath", title: "路径" },
-        { dataIndex: "createTime", title: "创建时间",
+        { dataIndex: "versionName", title: t(p("versionName")) },
+        { dataIndex: "versionDescription", title: t(p("versionDescription")) },
+        isPublic ? {} : { dataIndex: "privatePath", title: t(p("path")) },
+        { dataIndex: "createTime", title: t(p("createTime")),
           render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
-        { dataIndex: "action", title: "操作",
+        { dataIndex: "action", title: t(p("action")),
           render: (_, r) => {
             return !isPublic ? (
               <>
@@ -146,7 +151,7 @@ export const DatasetVersionList: React.FC<Props> = (
                   editData={r}
                   refetch={refetch}
                 >
-                  编辑
+                  {t("button.editButton")}
                 </CreateEditVersionModalButton>
                 <Button
                   type="link"
@@ -161,15 +166,16 @@ export const DatasetVersionList: React.FC<Props> = (
                     }
                   }}
                 >
-                  查看文件
+                  {t(p("check"))}
                 </Button>
                 <Button
                   type="link"
                   disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
                   onClick={() => {
                     modal.confirm({
-                      title: "分享数据集版本",
-                      content: `确认${getSharedStatusText(r.sharedStatus)}数据集版本 ${r.versionName}?`,
+                      title: t(p("share")),
+                      content:
+                      `${t(p("confirmed"),[t(pCommon(getSharedStatusText(r.sharedStatus))),r.versionName])}`,
                       onOk: async () => {
                         if (r.sharedStatus === SharedStatus.SHARED) {
                           await unShareMutation.mutateAsync({
@@ -185,7 +191,7 @@ export const DatasetVersionList: React.FC<Props> = (
                       },
                     });
                   }}
-                >{getSharedStatusText(r.sharedStatus)}</Button>
+                >{t(pCommon(getSharedStatusUpperText(r.sharedStatus)))}</Button>
                 <Button
                   type="link"
                   disabled={r.sharedStatus === SharedStatus.SHARING || r.sharedStatus === SharedStatus.UNSHARING}
@@ -193,7 +199,7 @@ export const DatasetVersionList: React.FC<Props> = (
                     deleteDatasetVersion(r.id, r.datasetId);
                   }}
                 >
-                  删除
+                  {t("button.deleteButton")}
                 </Button>
               </>
             ) : (
@@ -204,7 +210,7 @@ export const DatasetVersionList: React.FC<Props> = (
                 cluster={cluster}
                 data={r}
               >
-                复制
+                {t("button.copyButton")}
               </CopyPublicDatasetModalButton>
             );
           },

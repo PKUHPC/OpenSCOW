@@ -14,6 +14,7 @@
 
 import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { NotFoundPage } from "src/layouts/error/NotFoundPage";
 import { ServerErrorPage } from "src/layouts/error/ServerErrorPage";
 import { trpc } from "src/utils/trpc";
@@ -26,6 +27,9 @@ const useClusterAppConfigQuery = (clusterId: string) => {
 };
 
 export default function Page({ params }: { params: { clusterId: string } }) {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.jobs.createApps.");
+
   const { clusterId } = params;
 
   const { publicConfig } = usePublicConfig();
@@ -51,7 +55,7 @@ export default function Page({ params }: { params: { clusterId: string } }) {
   return (
     <>
       <PageTitle
-        titleText="创建应用"
+        titleText={t(p("title"))}
       />
       <SelectAppTable publicPath={publicConfig.PUBLIC_PATH} clusterId={clusterId} apps={data?.apps || []} />
     </>

@@ -14,6 +14,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import { join } from "path";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { trpc } from "src/utils/trpc";
 
 interface Props {
@@ -29,19 +30,22 @@ interface FormProps {
 }
 
 export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, clusterId }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("component.mkdirModal.");
+
   const { message } = App.useApp();
   const [form] = Form.useForm<FormProps>();
 
   const mutation = trpc.file.mkdir.useMutation({
     onSuccess: () => {
-      message.success("创建成功");
+      message.success(t(p("success")));
       reload(form.getFieldValue("newDirName"));
       onClose();
       form.resetFields();
     },
     onError: (e) => {
       if (e.data?.code === "CONFLICT") {
-        message.error("已存在同名目录");
+        message.error(t(p("alreadyExisted")));
       }
     },
   });
@@ -57,19 +61,19 @@ export const MkdirModal: React.FC<Props> = ({ open, onClose, path, reload, clust
   return (
     <Modal
       open={open}
-      title="创建目录"
-      okText={"确认"}
-      cancelText="取消"
+      title={t(p("mkDir"))}
+      okText={t("button.confirmButton")}
+      cancelText={t("button.cancelButton")}
       onCancel={onClose}
       confirmLoading={mutation.isLoading}
       destroyOnClose
       onOk={form.submit}
     >
       <Form form={form} onFinish={onSubmit}>
-        <Form.Item label="要创建的目录的目录">
+        <Form.Item label={t(p("dirPath"))}>
           <strong>{path}</strong>
         </Form.Item>
-        <Form.Item label="目录名" name="newDirName" rules={[{ required: true }]}>
+        <Form.Item label={t(p("newDirName"))} name="newDirName" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
       </Form>

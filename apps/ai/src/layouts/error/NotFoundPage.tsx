@@ -13,16 +13,20 @@
 "use client";
 
 import { Result } from "antd";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Head } from "src/utils/head";
 
 export const NotFoundPage = () => {
+  const t = useI18nTranslateToString();
+  const p = prefix("layout.error.notFoundPage.");
+
   return (
     <>
-      <Head title="不存在" />
+      <Head title={t(p("notFound"))} />
       <Result
         status="404"
         title={"404"}
-        subTitle={"您所请求的页面不存在。"}
+        subTitle={t(p("notFoundPage"))}
       />
     </>
   );

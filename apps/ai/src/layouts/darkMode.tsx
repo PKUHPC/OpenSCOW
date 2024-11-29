@@ -19,15 +19,12 @@ import React, { PropsWithChildren, useEffect, useState } from "react";
 import moon from "src/components/icons/moon.svg";
 import sun from "src/components/icons/sun.svg";
 import sunMoon from "src/components/icons/sun-moon.svg";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const modes = ["system", "dark", "light"] as const;
 
-const icons = {
-  system: [sunMoon, "system", "跟随系统"],
-  light: [sun, "light", "亮色"],
-  dark: [moon, "dark", "暗色"],
-};
+
 
 export type DarkMode = typeof modes[number];
 
@@ -40,6 +37,14 @@ const DarkModeContext = React.createContext<{
 export const useDarkMode = () => React.useContext(DarkModeContext);
 
 export const DarkModeButton = () => {
+  const t = useI18nTranslateToString();
+  const p = prefix("layout.darkMode.");
+
+  const icons = {
+    system: [sunMoon, "system", t(p("system"))],
+    light: [sun, "light", t(p("light"))],
+    dark: [moon, "dark", t(p("dark"))],
+  };
   const { mode, setMode } = useDarkMode();
 
   const [icon, alt, label] = icons[mode];

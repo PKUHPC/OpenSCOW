@@ -11,7 +11,7 @@
  */
 
 import { Select } from "antd";
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 import { setCookie } from "nookies";
 import { useEffect, useState } from "react";
 import { languageInfo, useI18n } from "src/i18n";
@@ -35,6 +35,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ initialLangu
   const i18n = useI18n();
 
   const router = useRouter();
+  const pathname = usePathname() ?? "";
 
   useEffect(() => {
     const init = i18n.currentLanguage.id;
@@ -59,7 +60,8 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ initialLangu
       maxAge: 30 * 24 * 60 * 60,
       path: "/",
     });
-    router.replace(router.asPath);
+
+    router.replace(pathname);
   };
 
   return (

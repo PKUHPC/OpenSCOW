@@ -12,19 +12,38 @@
 
 import { SharedStatus } from "src/models/common";
 
-export const getSharedStatusText = (status: SharedStatus) => {
+export const getSharedStatusText = (status: SharedStatus):
+"share" | "cancelShare" | "cancelSharing" | "sharing" => {
   switch (status) {
 
     case SharedStatus.SHARED:
-      return "取消分享";
+      return "cancelShare";
 
     case SharedStatus.UNSHARING:
-      return "取消分享中";
+      return "cancelSharing";
 
     case SharedStatus.SHARING:
-      return "分享中";
+      return "sharing";
 
     default:
-      return "分享";
+      return "share";
+  }
+};
+
+export const getSharedStatusUpperText = (status: SharedStatus):
+"upperShare" | "upperCancelShare" | "upperCancelSharing" | "upperSharing" => {
+  switch (status) {
+
+    case SharedStatus.SHARED:
+      return "upperCancelShare";
+
+    case SharedStatus.UNSHARING:
+      return "upperCancelSharing";
+
+    case SharedStatus.SHARING:
+      return "upperSharing";
+
+    default:
+      return "upperShare";
   }
 };

@@ -14,19 +14,21 @@
 
 import { usePublicConfig } from "src/app/(auth)/context";
 import { PageTitle } from "src/components/PageTitle";
+import { useI18nTranslateToString } from "src/i18n";
 
 import { DatasetListTable } from "../DatasetListTable";
 
 export default function Page() {
+  const t = useI18nTranslateToString();
 
   const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
 
   return (
     <div>
-      <PageTitle titleText="我的数据集" />
-      <DatasetListTable 
+      <PageTitle titleText={t("app.dataset.private")} />
+      <DatasetListTable
         isPublic={false} 
-        clusters={publicConfig.CLUSTERS} 
+        clusters={publicConfig.CLUSTERS}
         currentClusterIds={currentAssociateClusterIds}
       />
     </div>

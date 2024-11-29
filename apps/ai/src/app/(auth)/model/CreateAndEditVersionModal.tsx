@@ -14,6 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
@@ -44,12 +45,16 @@ interface FormFields {
 export const CreateAndEditVersionModal: React.FC<Props> = (
   { open, onClose, modelId, cluster, modelName, refetch, editData },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.model.createAndEditVersionModal.");
+  const languageId = useI18n().currentLanguage.id;
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const createModelVersionMutation = trpc.model.createModelVersion.useMutation({
     onSuccess() {
-      message.success("创建新版本成功");
+      message.success(t(p("addSuccessfully")));
       form.resetFields();
       onClose();
       refetch();
@@ -57,23 +62,23 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("版本名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "versionName",
-            errors: ["版本名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
       } else if (e.data?.code === "BAD_REQUEST") {
-        message.error("所选文件夹路径不存在");
+        message.error(t(p("addressNotFound")));
         form.setFields([
           {
             name: "path",
-            errors: ["所选文件夹路径不存在"],
+            errors: [t(p("addressNotFound"))],
           },
         ]);
       } else {
-        message.error("创建新版本失败");
+        message.error(t(p("addFailed")));
       }
     },
   });
@@ -81,25 +86,25 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
 
   const updateModelVersionMutation = trpc.model.updateModelVersion.useMutation({
     onSuccess() {
-      message.success("修改版本成功");
+      message.success(t(p("editSuccessfully")));
       onClose();
       refetch();
     },
     onError(e) {
       if (e.data?.code === "CONFLICT") {
-        message.error("版本名称已存在");
+        message.error(t(p("alreadyExisted")));
         form.setFields([
           {
             name: "versionName",
-            errors: ["版本名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
       }
       else if (e.data?.code === "NOT_FOUND") {
-        message.error("模型或模型版本未找到");
+        message.error(t(p("notFound")));
       }
       else if (e.data?.code === "PRECONDITION_FAILED") {
-        message.error("有正在分享或正在取消分享的数据存在，请稍后再试");
+        message.error(t(p("tryLater")));
       }
       else {
         message.error(e.message);
@@ -132,12 +137,13 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={editData?.versionName ? "编辑版本" : "创建新版本"}
+      title={editData?.versionName ? t(p("edit")) : t(p("add"))}
       open={open}
       onOk={form.submit}
       confirmLoading={createModelVersionMutation.isLoading || updateModelVersionMutation.isLoading}
       onCancel={onClose}
       destroyOnClose
+      width={800}
     >
       <Form
         form={form}
@@ -146,17 +152,17 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         labelCol={{ span: 4 }}
       >
         <Form.Item
-          label="模型名称"
+          label={t(p("name"))}
         >
           {modelName}
         </Form.Item>
         <Form.Item
-          label="集群"
+          label={t(p("cluster"))}
         >
-          {getI18nConfigCurrentText(cluster?.name, undefined)}
+          {getI18nConfigCurrentText(cluster?.name, languageId)}
         </Form.Item>
         <Form.Item
-          label="版本名称"
+          label={t(p("versionName"))}
           name="versionName"
           rules={[
             { required: true },
@@ -166,16 +172,16 @@ export const CreateAndEditVersionModal: React.FC<Props> = (
         >
           <Input />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription" initialValue={editData?.versionDescription}>
+        <Form.Item label={t(p("description"))} name="versionDescription" initialValue={editData?.versionDescription}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item label="算法版本" name="algorithmVersion" initialValue={editData?.algorithmVersion}>
+        <Form.Item label={t(p("algorithmVersion"))} name="algorithmVersion" initialValue={editData?.algorithmVersion}>
           <Input.TextArea />
         </Form.Item>
         {
           !editData?.versionId ? (
             <Form.Item
-              label="选择模型"
+              label={t(p("select"))}
               name="path"
               rules={[{ required: true }]}
             >

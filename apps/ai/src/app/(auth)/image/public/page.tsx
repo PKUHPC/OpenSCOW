@@ -13,19 +13,22 @@
 "use client";
 
 import { PageTitle } from "src/components/PageTitle";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 
 import { usePublicConfig } from "../../context";
 import { ImageListTable } from "../ImageListTable";
 
 export default function Page() {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.image.");
 
   const { publicConfig, currentAssociateClusterIds } = usePublicConfig();
 
   return (
     <div>
-      <PageTitle titleText="公共镜像" />
-      <ImageListTable 
-        isPublic={true} 
+      <PageTitle titleText={t(p("public"))} />
+      <ImageListTable
+        isPublic={true}
         clusters={publicConfig.CLUSTERS}
         currentClusterIds={currentAssociateClusterIds}
       />

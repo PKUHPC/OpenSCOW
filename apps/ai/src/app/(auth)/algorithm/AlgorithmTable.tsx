@@ -19,7 +19,8 @@ import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { AlgorithmInterface, AlgorithmTypeText, Framework } from "src/models/Algorithm";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { AlgorithmInterface, AlgorithmTypeText, Framework, getAlgorithmTexts } from "src/models/Algorithm";
 import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
 import { parseBooleanParam } from "src/utils/parse";
@@ -34,12 +35,15 @@ interface Props {
   clusters: Cluster[];
 }
 
-const FilterType = {
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const FilterTypeForKeys = {
   ALL: "全部",
   ...AlgorithmTypeText,
 } as const;
 
-type FilterTypeKeys = keyof typeof FilterType;
+
+type FilterTypeKeys = keyof typeof FilterTypeForKeys;
 
 interface FilterForm {
   framework?: FilterTypeKeys,
@@ -59,8 +63,25 @@ ModalButton(CreateAndEditAlgorithmModal, { type: "link" });
 const CreateVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.algorithm.algorithmTable.");
+  const languageId = useI18n().currentLanguage.id;
+
+  // 本来应该是放在组件外，但是为了国际化将其放入组件中
+  const FilterType = {
+    ALL: getAlgorithmTexts(t).all,
+    ...AlgorithmTypeText,
+    [Framework.OTHER]:getAlgorithmTexts(t).other,
+  } as const;
+
+  const AlgorithmTypeTextTrans = {
+    ...AlgorithmTypeText,
+    [Framework.OTHER]:getAlgorithmTexts(t).other,
+  };
+
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const { message } = App.useApp();
+
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
@@ -81,22 +102,22 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
       isPublic: parseBooleanParam(isPublic),
     });
   if (error) {
-    message.error("找不到算法");
+    message.error(t(p("notFound")));
   }
 
   const deleteAlgorithmMutation = trpc.algorithm.deleteAlgorithm.useMutation({
     onSuccess() {
-      message.success("删除算法成功");
+      message.success(t(p("deleteSuccessfully")));
       refetch();
     },
     onError() {
-      message.error("删除算法失败");
+      message.error(t(p("deleteFailed")));
     } });
 
   const deleteAlgorithm = useCallback(
     (id: number) => {
       confirm({
-        title: "删除算法",
+        title: t(p("delete")),
         onOk:async () => {
           await deleteAlgorithmMutation.mutateAsync({ id });
         },
@@ -110,24 +131,25 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }, [clusters]);
 
   const columns: TableColumnsType<AlgorithmInterface> = [
-    { dataIndex: "name", title: "名称" },
-    { dataIndex: "clusterId", title: "集群",
+    { dataIndex: "name", title: t(p("name")) },
+    { dataIndex: "clusterId", title: t(p("cluster")),
       render: (_, r) =>
-        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
-    { dataIndex: "framework", title: "算法框架", render:(framework: Framework) => AlgorithmTypeText[framework] },
-    { dataIndex: "description", title: "算法描述" },
-    { dataIndex: "versions", title: "版本数量",
+        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, languageId) ?? r.clusterId },
+    { dataIndex: "framework", title: t(p("framework")), render:(framework: Framework) =>
+      AlgorithmTypeTextTrans[framework] },
+    { dataIndex: "description", title: t(p("description")) },
+    { dataIndex: "versions", title: t(p("versions")),
       render: (_, r) => {
         return r.versions.length;
       } },
-    isPublic ? { dataIndex: "shareUser", title: "分享者",
+    isPublic ? { dataIndex: "shareUser", title: t(p("shareUser")),
       render: (_, r) => {
         return r.owner;
       } } : {},
-    { dataIndex: "createTime", title: "创建时间",
+    { dataIndex: "createTime", title: t(p("createTime")),
       render:(createTime) => formatDateTime(createTime),
     },
-    ...!isPublic ? [{ dataIndex: "action", title: "操作",
+    ...!isPublic ? [{ dataIndex: "action", title:  t(p("action")),
       render: (_: any, r: AlgorithmInterface) => {
         return (
           <>
@@ -137,7 +159,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
               algorithmName={r.name}
               cluster={getCurrentCluster(r.clusterId)}
             >
-              创建新版本
+              {t(p("createNewVersion"))}
             </CreateVersionModalButton>
             <EditAlgorithmModalButton
               refetch={refetch}
@@ -149,7 +171,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 algorithmDescription:r.description,
               }}
             >
-              编辑
+              {t("button.editButton")}
             </EditAlgorithmModalButton>
             <Button
               type="link"
@@ -157,7 +179,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 deleteAlgorithm(r.id);
               }}
             >
-              删除
+              {t("button.deleteButton")}
             </Button>
           </>
         );
@@ -178,7 +200,7 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
-          <Form.Item label="集群" name="clusterId">
+          <Form.Item label={t(p("cluster"))} name="clusterId">
             <SingleClusterSelector
               allowClear={true}
               onChange={(val) => {
@@ -186,14 +208,14 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
               }}
             />
           </Form.Item>
-          <Form.Item label="算法框架" name="framework">
+          <Form.Item label={t(p("framework"))} name="framework">
             <Select
               style={{ minWidth: "120px" }}
               allowClear
               onChange={(val: FilterTypeKeys) => {
                 setQuery({ ...query, framework:val });
               }}
-              placeholder="请选择算法框架"
+              placeholder={t(p("selectFramework"))}
               defaultValue={"ALL"}
               options={
                 Object.entries(FilterType).map(([key, value]) => ({ label:value, value:key }))
@@ -202,15 +224,15 @@ export const AlgorithmTable: React.FC<Props> = ({ isPublic, clusters }) => {
             </Select>
           </Form.Item>
           <Form.Item name="nameOrDesc">
-            <Input allowClear placeholder="名称或描述" />
+            <Input allowClear placeholder={t(p("nameOrDesc"))} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit"> {t("button.searchButton")} </Button>
           </Form.Item>
         </Form>
         {!isPublic && (
           <Space>
-            <CreateAlgorithmModalButton refetch={refetch}> 添加 </CreateAlgorithmModalButton>
+            <CreateAlgorithmModalButton refetch={refetch}> {t("button.addButton")} </CreateAlgorithmModalButton>
           </Space>
         )}
       </FilterFormContainer>

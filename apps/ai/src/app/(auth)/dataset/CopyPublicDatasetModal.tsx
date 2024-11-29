@@ -15,6 +15,7 @@ import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { useUser } from "src/app/auth";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
 import { validateNoChinese } from "src/utils/form";
@@ -40,6 +41,9 @@ interface FormFields {
 export const CopyPublicDatasetModal: React.FC<Props> = (
   { open, onClose, data, datasetId, datasetName, cluster },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.dataset.copyPublicDatasetModal.");
+  const languageId = useI18n().currentLanguage.id;
 
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
@@ -47,7 +51,7 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
 
   const copyMutation = trpc.dataset.copyPublicDatasetVersion.useMutation({
     onSuccess() {
-      message.success("复制数据集成功");
+      message.success(t(p("copySuccessfully")));
       onClose();
       form.resetFields();
     },
@@ -56,7 +60,7 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
         form.setFields([
           {
             name: "targetDatasetName",
-            errors: ["目标数据集名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
         return;
@@ -80,7 +84,7 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={"复制数据集"}
+      title={t(p("copy"))}
       open={open}
       onOk={form.submit}
       confirmLoading={copyMutation.isLoading}
@@ -90,17 +94,17 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 6 }}
         initialValues={data}
       >
         <Form.Item
-          label="源数据集名称"
+          label={t(p("sourceName"))}
         >
           {datasetName}
         </Form.Item>
         <Form.Item
-          label="目标数据集名称"
+          label={t(p("targetName"))}
           name="targetDatasetName"
           rules={[
             { required: true },
@@ -111,12 +115,12 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="集群"
+          label={t(p("cluster"))}
         >
-          {getI18nConfigCurrentText(cluster?.name, undefined)}
+          {getI18nConfigCurrentText(cluster?.name, languageId)}
         </Form.Item>
         <Form.Item
-          label="版本名称"
+          label={t(p("versionName"))}
           name="versionName"
           rules={[
             { required: true },
@@ -125,11 +129,11 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
         >
           <Input allowClear />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription">
+        <Form.Item label={t(p("versionDescription"))} name="versionDescription">
           <Input.TextArea />
         </Form.Item>
         <Form.Item
-          label="复制目标地址"
+          label={t(p("address"))}
           name="targetPath"
           rules={[{ required: true }]}
         >

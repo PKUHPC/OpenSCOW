@@ -16,7 +16,8 @@ import { App, Form, Input, Modal, Select } from "antd";
 import React, { useEffect } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
-import { ImageInterface, Source, SourceText } from "src/models/Image";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { getImageTexts, ImageInterface, Source } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { imageNameValidation, imageTagValidation } from "src/utils/form";
@@ -47,6 +48,15 @@ interface FormFields {
 export const CreateEditImageModal: React.FC<Props> = ({
   open, onClose, refetch, isEdit, editData, clusters, currentClusterIds,
 }: Props) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.image.createEditImageModal.");
+  const languageId = useI18n().currentLanguage.id;
+
+  const sourceText = {
+    INTERNAL: getImageTexts(t).INTERNAL,
+    EXTERNAL: getImageTexts(t).EXTERNAL,
+  };
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
@@ -73,7 +83,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
 
   const createMutation = trpc.image.createImage.useMutation({
     onSuccess() {
-      message.success("添加镜像任务已提交");
+      message.success(t(p("alreadySubmit")));
       onClose();
       form.resetFields();
       resetForm();
@@ -81,31 +91,31 @@ export const CreateEditImageModal: React.FC<Props> = ({
     },
     onError(err) {
       if (err.data?.code === "UNPROCESSABLE_CONTENT") {
-        message.error("镜像文件不是 tar 文件");
+        message.error(t(p("notTar")));
         form.setFields([
           {
             name: "sourcePath",
-            errors: ["请选择 tar 文件作为镜像"],
+            errors: [t(p("selectTar"))],
           },
         ]);
         return;
       }
-      message.error(`添加镜像失败, ${err.message}`);
+      message.error(`${t(p("addFailed"))}, ${err.message}`);
     },
   });
 
   const editMutation = trpc.image.updateImage.useMutation({
     onSuccess() {
-      message.success("编辑镜像成功");
+      message.success(t(p("editSuccess")));
       onClose();
       refetch();
     },
     onError(e) {
       const { data } = e as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("镜像不存在");
+        message.error(t(p("notExisted")));
       } else {
-        message.error(`编辑镜像失败,${e.message}`);
+        message.error(`${t(p("editFailed"))},${e.message}`);
       }
     },
   });
@@ -132,7 +142,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
 
   return (
     <Modal
-      title={isEdit ? "编辑镜像" : "添加镜像"}
+      title={isEdit ? t(p("editImage")) : t(p("addImage"))}
       open={open}
       onOk={form.submit}
       confirmLoading={isEdit ? editMutation.isLoading : createMutation.isLoading}
@@ -149,29 +159,29 @@ export const CreateEditImageModal: React.FC<Props> = ({
         { (isEdit && editData) ? (
           <>
             <Form.Item
-              label="镜像名称"
+              label={t(p("imageName"))}
               name="name"
             >
               {editData.name}
             </Form.Item>
             <Form.Item
-              label="镜像标签"
+              label={t(p("imageTag"))}
               name="tag"
             >
               {editData.tag}
             </Form.Item>
             <Form.Item
-              label="镜像来源"
+              label={t(p("source"))}
             >
-              {SourceText[editData.source]}
+              {sourceText[editData.source]}
             </Form.Item>
             { editData.source === Source.INTERNAL && (
               <>
                 <Form.Item
-                  label="集群"
+                  label={t(p("cluster"))}
                 >
                   {getI18nConfigCurrentText(
-                    clusters.find((x) => (x.id === editData.clusterId))?.name, undefined)
+                    clusters.find((x) => (x.id === editData.clusterId))?.name, languageId)
                       ?? editData.clusterId }
                 </Form.Item>
               </>
@@ -183,7 +193,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
         ) : (
           <>
             <Form.Item
-              label="镜像名称"
+              label={t(p("imageName"))}
               name="name"
               rules={[
                 { required: true },
@@ -193,7 +203,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
               <Input allowClear />
             </Form.Item>
             <Form.Item
-              label="镜像标签"
+              label={t(p("imageTag"))}
               name="tag"
               rules={[
                 { required: true },
@@ -206,7 +216,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
               source === Source.INTERNAL && (
                 <>
                   <Form.Item
-                    label="集群"
+                    label={t(p("cluster"))}
                     name="cluster"
                     rules={[
                       { required: true },
@@ -222,14 +232,14 @@ export const CreateEditImageModal: React.FC<Props> = ({
           </>
         )
         }
-        <Form.Item label="镜像描述" name="description">
+        <Form.Item label={t(p("description"))} name="description">
           <Input.TextArea />
         </Form.Item>
 
         { !isEdit && (
           <>
             <Form.Item
-              label="镜像来源"
+              label={t(p("source"))}
               name="source"
               rules={[
                 { required: true },
@@ -238,11 +248,11 @@ export const CreateEditImageModal: React.FC<Props> = ({
               <Select
                 style={{ minWidth: "100px" }}
                 options={
-                  Object.entries(SourceText).map(([key, value]) => ({ label:value, value:key }))}
+                  Object.entries(sourceText).map(([key, value]) => ({ label:value, value:key }))}
               />
             </Form.Item>
             <Form.Item
-              label={source === Source.INTERNAL ? "选择镜像" : "镜像地址" }
+              label={source === Source.INTERNAL ? t(p("selectImage")) : t(p("imageAddress")) }
               name="sourcePath"
               rules={[{ required: true }]}
             >
@@ -260,7 +270,8 @@ export const CreateEditImageModal: React.FC<Props> = ({
                     />
                   ) : undefined
                 }
-                placeholder={source === Source.INTERNAL ? "请选择镜像文件" : "请输入远程镜像地址"}
+                placeholder={source === Source.INTERNAL ?
+                  t(p("selectImagePlaceHolder")) : t(p("inputImagePlaceHolder"))}
               />
             </Form.Item>
           </>

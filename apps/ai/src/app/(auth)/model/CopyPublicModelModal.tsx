@@ -14,6 +14,7 @@ import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLangua
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
 import { FileSelectModal } from "src/components/FileSelectModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ModelVersionInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { validateNoChinese } from "src/utils/form";
@@ -39,12 +40,16 @@ interface FormFields {
 export const CopyPublicModelModal: React.FC<Props> = (
   { open, onClose, modelId, modelVersionId, cluster, modelName, data },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.model.copyPublicModelModal.");
+  const languageId = useI18n().currentLanguage.id;
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
   const copyMutation = trpc.model.copyPublicModelVersion.useMutation({
     onSuccess() {
-      message.success("复制模型成功");
+      message.success(t(p("copySuccessfully")));
       onClose();
       form.resetFields();
     },
@@ -53,7 +58,7 @@ export const CopyPublicModelModal: React.FC<Props> = (
         form.setFields([
           {
             name: "targetDatasetName",
-            errors: ["目标模型名称已存在"],
+            errors: [t(p("alreadyExisted"))],
           },
         ]);
         return;
@@ -80,7 +85,7 @@ export const CopyPublicModelModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={"复制模型"}
+      title={t(p("copy"))}
       open={open}
       onOk={form.submit}
       confirmLoading={copyMutation.isLoading}
@@ -91,16 +96,16 @@ export const CopyPublicModelModal: React.FC<Props> = (
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 18 }}
+        labelCol={{ span: 6 }}
       >
         <Form.Item
-          label="源模型名称"
+          label={t(p("sourceName"))}
         >
           {modelName}
         </Form.Item>
         <Form.Item
-          label="目标模型名称"
+          label={t(p("targetName"))}
           name="targetModalName"
           rules={[
             { required: true },
@@ -110,12 +115,12 @@ export const CopyPublicModelModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="集群"
+          label={t(p("cluster"))}
         >
-          {getI18nConfigCurrentText(cluster?.name, undefined)}
+          {getI18nConfigCurrentText(cluster?.name, languageId)}
         </Form.Item>
         <Form.Item
-          label="版本名称"
+          label={t(p("versionName"))}
           name="versionName"
           rules={[
             { required: true },
@@ -125,14 +130,14 @@ export const CopyPublicModelModal: React.FC<Props> = (
         >
           <Input />
         </Form.Item>
-        <Form.Item label="版本描述" name="versionDescription" initialValue={data.versionDescription}>
+        <Form.Item label={t(p("versionDescription"))} name="versionDescription" initialValue={data.versionDescription}>
           <Input.TextArea />
         </Form.Item>
-        <Form.Item label="算法版本" name="algorithmVersion">
+        <Form.Item label={t(p("algorithmVersion"))} name="algorithmVersion">
           {data.algorithmVersion}
         </Form.Item>
         <Form.Item
-          label="目标复制地址"
+          label={t(p("address"))}
           name="path"
           rules={[{ required: true }]}
         >

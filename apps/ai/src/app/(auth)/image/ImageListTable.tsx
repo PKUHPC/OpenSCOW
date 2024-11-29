@@ -21,7 +21,8 @@ import { useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
-import { SourceText, Status } from "src/models/Image";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
+import { getImageTexts, Status } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { formatDateTime } from "src/utils/datetime";
@@ -54,6 +55,14 @@ const EditImageModalButton = ModalButton(CreateEditImageModal, { type: "link" })
 const CopyImageModalButton = ModalButton(CopyImageModal, { type: "link" });
 
 export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClusterIds }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.image.imageListTable.");
+  const languageId = useI18n().currentLanguage.id;
+
+  const sourceText = {
+    INTERNAL: getImageTexts(t).INTERNAL,
+    EXTERNAL: getImageTexts(t).EXTERNAL,
+  };
 
   const [query, setQuery] = useState<FilterForm>(() => {
     return {
@@ -85,13 +94,13 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
 
   const deleteImageMutation = trpc.image.deleteImage.useMutation({
     onSuccess: () => {
-      message.success("删除镜像成功");
+      message.success(t(p("delSuccess")));
       refetch();
     },
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("找不到镜像");
+        message.error(t(p("notFound")));
       } else {
         message.error(err.message);
       }
@@ -102,9 +111,9 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
     onError: (err) => {
       const { data } = err as TRPCClientError<AppRouter>;
       if (data?.code === "NOT_FOUND") {
-        message.error("找不到镜像");
+        message.error(t(p("notFound")));
       } else {
-        message.error("分享镜像失败");
+        message.error(t(p("shareFailed")));
       }
     },
   });
@@ -123,17 +132,17 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
             refetch();
           }}
         >
-          <Form.Item label="集群" name="cluster">
+          <Form.Item label={t(p("cluster"))} name="cluster">
             <SingleClusterSelector
               allowClear={true}
               value={undefined}
             />
           </Form.Item>
           <Form.Item name="nameOrTagOrDesc">
-            <Input allowClear placeholder="名称、标签或描述" />
+            <Input allowClear placeholder={t(p("nameOrTagOrDesc"))} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
           </Form.Item>
         </Form>
         {!isPublic && (
@@ -143,7 +152,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
               isEdit={false}
               clusters={clusters}
               currentClusterIds={currentClusterIds}
-            > 添加
+            > {t("button.addButton")}
             </CreateImageModalButton>
           </Space>
         )}
@@ -153,33 +162,33 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
         dataSource={data?.items}
         loading={isFetching}
         columns={[
-          { dataIndex: "name", title: "名称" },
-          { dataIndex: "clusterId", title: "集群",
+          { dataIndex: "name", title: t(p("name")) },
+          { dataIndex: "clusterId", title: t(p("cluster")),
             render: (_, r) =>
-              getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, undefined) ?? r.clusterId },
-          { dataIndex: "tag", title: "标签" },
-          { dataIndex: "source", title: "镜像来源",
-            render: (_, r) => SourceText[r.source] },
-          { dataIndex: "description", title: "镜像描述" },
-          isPublic ? { dataIndex: "shareUser", title: "分享者",
+              getI18nConfigCurrentText(clusters.find((x) => (x.id === r.clusterId))?.name, languageId) ?? r.clusterId },
+          { dataIndex: "tag", title: t(p("tag")) },
+          { dataIndex: "source", title: t(p("source")),
+            render: (_, r) => sourceText[r.source] },
+          { dataIndex: "description", title: t(p("description")) },
+          isPublic ? { dataIndex: "shareUser", title: t(p("shareUser")),
             render: (_, r) => r.owner } : {},
-          { dataIndex: "status", title: "状态",
+          { dataIndex: "status", title: t(p("status")),
             render: (_, r) => {
               switch (r.status) {
                 case Status.CREATING:
-                  return <Tag color="processing">创建中</Tag>;
+                  return <Tag color="processing">{t(p("processing"))}</Tag>;
                 case Status.CREATED:
-                  return <Tag color="success">已创建</Tag>;
+                  return <Tag color="success">{t(p("success"))}</Tag>;
                 default:
-                  return <Tag color="error">创建失败</Tag>;
+                  return <Tag color="error">{t(p("error"))}</Tag>;
               }
             },
           },
-          { dataIndex: "createTime", title: "创建时间",
+          { dataIndex: "createTime", title: t(p("createTime")),
             render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
-          { dataIndex: "action", title: "操作",
+          { dataIndex: "action", title: t(p("action")),
             render: (_, r) => {
-              const shareOrUnshareStr = r.isShared ? "取消分享" : "分享";
+              const shareOrUnshareStr = r.isShared ? t(p("cancelShare")) : t(p("share"));
               return !isPublic ?
                 (
                   <>
@@ -189,8 +198,8 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                         onClick={() => {
 
                           modal.confirm({
-                            title: `${shareOrUnshareStr}镜像`,
-                            content: `确认${shareOrUnshareStr}镜像${r.name}:${r.tag}？`,
+                            title: `${shareOrUnshareStr}${t(p("image"))}`,
+                            content: `${t(p("confirmText"),[shareOrUnshareStr,r.name,r.tag])}`,
                             onOk: async () => {
                               await shareOrUnshareMutation.mutateAsync({
                                 id: r.id,
@@ -198,7 +207,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                               }, {
                                 onSuccess() {
                                   refetch();
-                                  message.success(`${shareOrUnshareStr}镜像成功`);
+                                  message.success(`${shareOrUnshareStr}${t(p("imageSuccessfully"))}`);
                                 },
                               });
                             },
@@ -223,26 +232,26 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                   )} */}
 
                     { r.status === Status.CREATED && (
-                      <EditImageModalButton 
-                        refetch={refetch} 
-                        isEdit={true} 
-                        editData={r} 
+                      <EditImageModalButton
+                        refetch={refetch}
+                        isEdit={true}
+                        editData={r}
                         clusters={clusters}
                         currentClusterIds={currentClusterIds}
                       >
-                        编辑
+                        {t("button.editButton")}
                       </EditImageModalButton>
                     )}
                     <Button
                       type="link"
                       onClick={() => {
                         modal.confirm({
-                          title: "删除镜像",
+                          title: t(p("delImage")),
                           content: r.status === Status.CREATING ? (
-                            <p>镜像正在创建中，是否强制删除？</p>
+                            <p>{t(p("delText1"))}</p>
                           ) : (
                             <>
-                              <p>{`是否确认删除镜像${r.name}标签${r.tag}？如该镜像已分享，则分享的镜像也会被删除。`}</p>
+                              <p>{`${t(p("confirmDel"))}${r.name}${t(p("tag"))}${r.tag}？${t(p("delText2"))}`}</p>
                             </>
                           ),
                           onOk: async () => {
@@ -254,7 +263,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                         });
                       }}
                     >
-                      删除
+                      {t("button.deleteButton")}
                     </Button>
                   </>
                 ) :
@@ -265,7 +274,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                     copiedName={r.name}
                     copiedTag={r.tag}
                   >
-                    复制
+                    {t("button.copyButton")}
                   </CopyImageModalButton>
                 );
             },

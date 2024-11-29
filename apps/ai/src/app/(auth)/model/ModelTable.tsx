@@ -19,6 +19,7 @@ import { useCallback, useState } from "react";
 import { SingleClusterSelector } from "src/components/ClusterSelector";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { ModelInterface } from "src/models/Model";
 import { Cluster } from "src/server/trpc/route/config";
 import { formatDateTime } from "src/utils/datetime";
@@ -51,6 +52,10 @@ ModalButton(CreateAndEditModalModal, { type: "link" });
 const CreateVersionModalButton = ModalButton(CreateAndEditVersionModal, { type: "link" });
 
 export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.model.modelTable.");
+  const languageId = useI18n().currentLanguage.id;
+
   const [{ confirm }, confirmModalHolder] = Modal.useModal();
   const { message } = App.useApp();
 
@@ -72,23 +77,23 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
       isPublic: parseBooleanParam(isPublic),
     });
   if (error) {
-    message.error("找不到模型");
+    message.error(t(p("notFound")));
   }
 
   const deleteModelMutation = trpc.model.deleteModel.useMutation({
     onSuccess() {
-      message.success("删除算法成功");
+      message.success(t(p("deleteSuccessfully")));
       refetch();
     },
     onError() {
-      message.error("删除模型失败");
+      message.error(t(p("deleteFailed")));
     },
   });
 
   const deleteModel = useCallback(
     async (id: number) => {
       confirm({
-        title: "删除模型",
+        title: t(p("delete")),
         onOk:async () => {
           await deleteModelMutation.mutateAsync({ id });
         },
@@ -102,19 +107,19 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
   }, [clusters]);
 
   const columns: TableColumnsType<ModelInterface> = [
-    { dataIndex: "name", title: "名称" },
-    { dataIndex: "clusterId", title: "集群",
+    { dataIndex: "name", title: t(p("name")) },
+    { dataIndex: "clusterId", title: t(p("cluster")),
       render: (_, r) =>
-        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, undefined) ?? r.clusterId },
-    { dataIndex: "description", title: "模型描述" },
-    { dataIndex: "algorithmName", title: "算法名称" },
-    { dataIndex: "algorithmFramework", title: "算法框架" },
-    { dataIndex: "versions", title: "版本数量", render:(versions) => versions.length },
-    isPublic ? { dataIndex: "owner", title: "分享者" } : {},
-    { dataIndex: "createTime", title: "创建时间",
+        getI18nConfigCurrentText(getCurrentCluster(r.clusterId)?.name, languageId) ?? r.clusterId },
+    { dataIndex: "description", title: t(p("description")) },
+    { dataIndex: "algorithmName", title: t(p("algorithmName")) },
+    { dataIndex: "algorithmFramework", title: t(p("algorithmFramework")) },
+    { dataIndex: "versions", title: t(p("versions")), render:(versions) => versions.length },
+    isPublic ? { dataIndex: "owner", title: t(p("owner")) } : {},
+    { dataIndex: "createTime", title: t(p("createTime")),
       render:(createTime) => formatDateTime(createTime),
     },
-    ...!isPublic ? [{ dataIndex: "action", title: "操作",
+    ...!isPublic ? [{ dataIndex: "action", title: t(p("action")),
       render: (_: any, r: ModelInterface) => {
         return (
           <>
@@ -124,7 +129,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
               modelName={r.name}
               cluster={getCurrentCluster(r.clusterId)}
             >
-              创建新版本
+              {t(p("createNewVersion"))}
             </CreateVersionModalButton>
             <EditModalModalButton
               refetch={refetch}
@@ -137,7 +142,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 modalDescription:r.description,
               }}
             >
-              编辑
+              {t("button.editButton")}
             </EditModalModalButton>
             <Button
               type="link"
@@ -145,7 +150,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
                 deleteModel(r.id);
               }}
             >
-              删除
+              {t("button.deleteButton")}
             </Button>
           </>
         );
@@ -166,7 +171,7 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >
-          <Form.Item label="集群" name="clusterId">
+          <Form.Item label={t(p("cluster"))} name="clusterId">
             <SingleClusterSelector
               allowClear={true}
               onChange={(val) => {
@@ -175,15 +180,15 @@ export const ModalTable: React.FC<Props> = ({ isPublic, clusters }) => {
             />
           </Form.Item>
           <Form.Item name="nameOrDesc">
-            <Input allowClear placeholder="名称或描述" />
+            <Input allowClear placeholder={t(p("nameOrDes"))} />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">搜索</Button>
+            <Button type="primary" htmlType="submit">{t("button.searchButton")}</Button>
           </Form.Item>
         </Form>
         {!isPublic && (
           <Space>
-            <CreateModalModalButton refetch={refetch}>添加</CreateModalModalButton>
+            <CreateModalModalButton refetch={refetch}>{t("button.addButton")}</CreateModalModalButton>
           </Space>
         )}
       </FilterFormContainer>

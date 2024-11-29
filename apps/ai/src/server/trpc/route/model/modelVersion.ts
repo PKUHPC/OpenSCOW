@@ -671,6 +671,7 @@ export const copyPublicModelVersion = procedure
       versionDescription: input.versionDescription,
       path: input.path,
       privatePath: input.path,
+      algorithmVersion:modelVersion.algorithmVersion,
       model: newModel,
     });
 

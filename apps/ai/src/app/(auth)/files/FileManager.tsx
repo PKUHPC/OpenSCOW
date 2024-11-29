@@ -29,6 +29,7 @@ import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { UploadModal } from "src/components/UploadModal";
+import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
 import { trpc } from "src/utils/trpc";
@@ -74,13 +75,17 @@ interface PromiseSettledResult {
   value?: FileInfo | undefined;
 }
 
-const operationTexts = {
-  copy: "复制",
-  move: "移动",
-};
+
 
 export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPrefix }) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.files.fileManager.");
+  const languageId = useI18n().currentLanguage.id;
 
+  const operationTexts = {
+    copy: t(p("copy")),
+    move: t(p("move")),
+  };
   const { message, modal } = App.useApp();
   const router = useRouter();
   const { publicConfig } = usePublicConfig();
@@ -149,14 +154,14 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
 
       if (error.data?.code === "CONFLICT") {
         Modal.error({
-          title: `${operationText}失败`,
-          content: "存在相同的目录或文件",
+          title: `${operationText}${t(p("fail"))}`,
+          content: t(p("alreadyExist")),
         });
         return;
       }
 
       Modal.error({
-        title: `${operationText}失败`,
+        title: `${operationText}${t(p("fail"))}`,
         content: error.message,
       });
     },
@@ -202,14 +207,15 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
         const successfulCount = successfulInfo.filter((x) => x).length;
         const allCount = operation.selected.length;
         if (successfulCount === allCount) {
-          message.success(`${operationText}${allCount}项成功！`);
+          message.success(`${operationText}${allCount}${t(p("success"))}！`);
           resetSelectedAndOperation();
         } else {
-          message.error(`${operationText}成功${successfulCount}项，失败${allCount - successfulCount}项`);
+          message.error(`${operationText}${t(p("success"))}${successfulCount}，`
+          + `${t(p("fail"))}${allCount - successfulCount}`);
         }
       }).catch((e) => {
         console.log(e);
-        message.error(`执行${operationText}操作时遇到错误`);
+        message.error(`${t(p("exec"))}${operationText}${t(p("encounterError"))}`);
       }).finally(() => {
         resetSelectedAndOperation();
         reload();
@@ -222,8 +228,9 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
   const onDeleteClick = () => {
     const files = keysToFiles(selectedKeys);
     modal.confirm({
-      title: "确认删除",
-      content: `确认要删除选中的${files.length}项？`,
+      title: t(p("confirmDelTitle")),
+      content:
+      `${t(p("confirmDelText"),[files.length])}`,
       onOk: async () => {
         await Promise.allSettled(files.map(async (x: FileInfo) => {
           return deleteMutation.mutateAsync({
@@ -237,15 +244,15 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
               (!x || x.status === "rejected" || !x.value)).length;
             const allCount = files.length;
             if (failedCount === 0) {
-              message.success(`删除${allCount}项成功！`);
+              message.success(`${t(p("delText"),[allCount])}`);
               resetSelectedAndOperation();
             } else {
-              message.error(`删除成功${allCount - failedCount}项，失败${failedCount}项`);
+              message.error(`${t(p("delText2"),[allCount - failedCount,failedCount])}`);
               setOperation((o) => o && ({ ...o, started: false }));
             }
           }).catch((e) => {
             console.log(e);
-            message.error("执行删除操作时遇到错误");
+            message.error(t(p("errorText1")));
             setOperation((o) => o && ({ ...o, started: false }));
             setSelectedKeys([]);
           }).finally(() => {
@@ -269,7 +276,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
     <div>
       <TitleText>
         <span>
-          集群{getI18nConfigCurrentText(cluster.name, undefined)}文件管理
+          {t(p("cluster"))} {getI18nConfigCurrentText(cluster.name, languageId)} {t(p("fileManage"))}
         </span>
       </TitleText>
       <TopBar>
@@ -311,7 +318,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             path={path}
             reload={reload}
           >
-            上传文件
+            {t(p("upload"))}
           </UploadButton>
           <Divider type="vertical" />
           <Button
@@ -320,7 +327,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             onClick={onDeleteClick}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
-            删除选中
+            {t(p("delSelected"))}
           </Button>
           <Button
             icon={<CopyOutlined />}
@@ -330,7 +337,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
               })}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
-            复制选中
+            {t(p("copySelected"))}
           </Button>
           <Button
             icon={<ScissorOutlined />}
@@ -340,27 +347,27 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
                 selected: keysToFiles(selectedKeys), originalPath: path, started: false, completed: []})}
             disabled={selectedKeys.length === 0 || operation?.started}
           >
-            移动选中
+            {t(p("moveSelected"))}
           </Button>
           <Button
             icon={<SnippetsOutlined />}
             onClick={paste}
             disabled={!operation || operation.started || operation.originalPath === path}
           >
-            粘贴到此处
+            {t(p("pasteSelected"))}
           </Button>
           {
             operation ? (
               operation.started ? (
                 <span>
-                  {`正在${operationTexts[operation.op]}，` +
-                    `已完成：${operation.completed.length} / ${operation.selected.length}`}
+                  {`${t(p("ing"))}${operationTexts[operation.op]}，` +
+                    `${t(p("completed"))}：${operation.completed.length} / ${operation.selected.length}`}
                 </span>
               ) : (
                 <span>
-                  {`已选择${operationTexts[operation.op]}${operation.selected.length}个项`}
+                  {`${t(p("select"))}${operationTexts[operation.op]}${operation.selected.length}${t(p("item"))}`}
                   <a onClick={() => setOperation(undefined)} style={{ marginLeft: "4px" }}>
-                    取消
+                    {t("button.cancelButton")}
                   </a>
                 </span>
               )) : ""
@@ -371,14 +378,14 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             onClick={onHiddenClick}
             icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
           >
-            {showHiddenFile ? "不显示" : "显示"}隐藏的项目
+            {showHiddenFile ? t(p("noDisplay")) : t(p("display"))}{t(p("hidden"))}
           </Button>
           <Link
             href={`/shell/${cluster.id}/${loginNodeAddress}${path}`}
             target="_blank"
           >
             <Button icon={<MacCommandOutlined />}>
-              在终端中打开
+              {t(p("terminal"))}
             </Button>
           </Link>
           <CreateFileButton
@@ -386,14 +393,14 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             path={path}
             reload={reload}
           >
-            新文件
+            {t(p("newFile"))}
           </CreateFileButton>
           <MkdirButton
             clusterId={cluster.id}
             path={path}
             reload={() => reload()}
           >
-            新目录
+            {t(p("newDir"))}
           </MkdirButton>
         </Space>
       </OperationBar>
@@ -439,7 +446,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             {
               i.type === "FILE" ? (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true, publicConfig.BASE_PATH)}>
-                  下载
+                  {t(p("download"))}
                 </a>
               ) : undefined
             }
@@ -448,21 +455,21 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
               path={join(path, i.name)}
               reload={reload}
             >
-              重命名
+              {t(p("rename"))}
             </RenameLink>
             <a onClick={() => {
               const fullPath = join(path, i.name);
               modal.confirm({
-                title: "确认删除",
+                title: t(p("confirmDelTitle")),
                 // icon: < />,
-                content: `确认删除${fullPath}？`,
-                okText: "确认",
+                content: `${t(p("confirmDelTitle"))}${fullPath}？`,
+                okText: t("button.confirmButton"),
                 onOk: () => {
                   deleteMutation.mutate({
                     target: i.type, clusterId: cluster.id, path: fullPath,
                   }, {
                     onSuccess: () => {
-                      message.success("删除成功！");
+                      message.success(t(p("delSuccessful")));
                       resetSelectedAndOperation();
                       reload();
                     },
@@ -471,7 +478,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
               });
             }}
             >
-              删除
+              {t("button.deleteButton")}
             </a>
           </Space>
         )}

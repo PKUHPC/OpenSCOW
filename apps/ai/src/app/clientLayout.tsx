@@ -18,7 +18,7 @@ import { usePathname } from "next/navigation";
 import { ErrorBoundary } from "src/components/ErrorBoundary";
 import { Loading } from "src/components/Loading";
 import { TopProgressBar } from "src/components/TopProgressBar";
-import { Provider } from "src/i18n";
+import { Provider as I18nProvider } from "src/i18n";
 import en from "src/i18n/en";
 import zh_cn from "src/i18n/zh_cn";
 import { AntdConfigProvider } from "src/layouts/AntdConfigProvider";
@@ -27,6 +27,7 @@ import { RootErrorContent } from "src/layouts/error/RootErrorContent";
 import { AntdStyleRegistry } from "src/layouts/styleRegistry/AntdRegistry.jsx";
 import StyledComponentsRegistry from "src/layouts/styleRegistry/StyledComponentsRegistry.jsx";
 import { UiConfig } from "src/server/trpc/route/config";
+import { getAiCurrentLanguageId } from "src/utils/systemLanguage";
 import { trpc } from "src/utils/trpc";
 
 import { UiConfigContext } from "./uiContext";
@@ -39,7 +40,10 @@ const languagesMap = {
 export function ClientLayout(props: {
   children: React.ReactNode,
   initialDark?: DarkModeCookie,
+  languageCookie: string | undefined,
+  acceptLanguageHeader: string | null,
 }) {
+  const { children,initialDark,languageCookie,acceptLanguageHeader } = props;
   const pathname = usePathname();
 
   const useConfigQuery = () => {
@@ -56,23 +60,46 @@ export function ClientLayout(props: {
   const color = (hostname && primaryColor?.hostnameMap?.[hostname])
     ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
 
+  const usePublicConfigQuery = () => {
+    return trpc.config.publicConfig.useQuery();
+  };
+
+  const publicConfig = usePublicConfigQuery();
+
+  if (publicConfig.isLoading) {
+    return (
+      <body>
+        <Loading />
+      </body>
+    );
+  }
+
+  if (publicConfig.isError) {
+    return (
+      <body>
+      </body>
+    );
+  }
+
+  const initialLanguage =
+  getAiCurrentLanguageId(languageCookie,acceptLanguageHeader,publicConfig.data.SYSTEM_LANGUAGE_CONFIG);
+
   return (
-    <Provider initialLanguage={{
-      // ai还未开发国际化，先直接写zh_cn
-      id: "zh_cn",
-      definitions: languagesMap.zh_cn,
-    }}
-    >
-      <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
-        <StyledComponentsRegistry>
-          <AntdStyleRegistry>
-            <body>
-              {
-                useConfig.isLoading ?
-                  <Loading />
-                  : (
-                    <DarkModeProvider initial={props.initialDark}>
-                      <AntdConfigProvider color={color}>
+    <StyleProvider hashPriority="high" transformers={[legacyLogicalPropertiesTransformer]}>
+      <StyledComponentsRegistry>
+        <AntdStyleRegistry>
+          <body>
+            {
+              useConfig.isLoading || publicConfig.isLoading ?
+                <Loading />
+                : (
+                  <DarkModeProvider initial={initialDark}>
+                    <I18nProvider initialLanguage={{
+                      id: initialLanguage,
+                      definitions: languagesMap[initialLanguage as keyof typeof languagesMap],
+                    }}
+                    >
+                      <AntdConfigProvider color={color} locale={initialLanguage}>
                         <GlobalStyle />
                         <TopProgressBar />
                         <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>
@@ -82,19 +109,18 @@ export function ClientLayout(props: {
                               uiConfig,
                             }}
                           >
-                            {props.children}
+                            {children}
                           </UiConfigContext.Provider>
                         </ErrorBoundary>
                       </AntdConfigProvider>
-                    </DarkModeProvider>
-                  )
-              }
+                    </I18nProvider>
 
-            </body>
-          </AntdStyleRegistry>
-        </StyledComponentsRegistry>
-      </StyleProvider>
-    </Provider>
-
+                  </DarkModeProvider>
+                )
+            }
+          </body>
+        </AntdStyleRegistry>
+      </StyledComponentsRegistry>
+    </StyleProvider>
   );
 }

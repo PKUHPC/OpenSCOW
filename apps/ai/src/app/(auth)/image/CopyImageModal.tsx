@@ -12,6 +12,7 @@
 
 import { App, Form, Input, Modal } from "antd";
 import React from "react";
+import { prefix, useI18nTranslateToString } from "src/i18n";
 import { imageNameValidation, imageTagValidation } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
@@ -33,6 +34,9 @@ interface FormFields {
 export const CopyImageModal: React.FC<Props> = (
   { open, onClose, refetch, copiedId, copiedName, copiedTag },
 ) => {
+  const t = useI18nTranslateToString();
+  const p = prefix("app.image.copyImageModal.");
+
   const [form] = Form.useForm<FormFields>();
   const { message } = App.useApp();
 
@@ -43,13 +47,13 @@ export const CopyImageModal: React.FC<Props> = (
 
   const copyMutation = trpc.image.copyImage.useMutation({
     onSuccess() {
-      message.success("复制镜像成功");
+      message.success(t(p("success")));
       onClose();
       form.resetFields();
       refetch();
     },
     onError() {
-      message.error("复制镜像失败");
+      message.error(t(p("failed")));
     },
   });
 
@@ -65,7 +69,7 @@ export const CopyImageModal: React.FC<Props> = (
 
   return (
     <Modal
-      title={"复制镜像"}
+      title={t(p("copy"))}
       open={open}
       onOk={form.submit}
       confirmLoading={copyMutation.isLoading}
@@ -80,7 +84,7 @@ export const CopyImageModal: React.FC<Props> = (
         initialValues={{ ...initialValues }}
       >
         <Form.Item
-          label="镜像名称"
+          label={t(p("name"))}
           name="newName"
           rules={[
             { required: true },
@@ -90,7 +94,7 @@ export const CopyImageModal: React.FC<Props> = (
           <Input allowClear />
         </Form.Item>
         <Form.Item
-          label="镜像标签"
+          label={t(p("tag"))}
           name="newTag"
           rules={[
             { required: true },
