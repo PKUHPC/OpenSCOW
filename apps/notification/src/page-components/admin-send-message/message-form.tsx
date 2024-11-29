@@ -1,25 +1,12 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { Timestamp } from "@bufbuild/protobuf";
 import { useMutation, useQuery } from "@connectrpc/connect-query";
 import { TargetType } from "@scow/notification-protos/build/common_pb";
 import { adminSendMessage } from "@scow/notification-protos/build/message-MessageService_connectquery";
 import { listNoticeTypes } from "@scow/notification-protos/build/notice_type-NoticeTypeService_connectquery";
-import { Button, Checkbox, Form, Input, message, Popover } from "antd";
-import dayjs from "dayjs";
+import { Button, Checkbox, DatePicker, Form, Input, message, Popover } from "antd";
+import dayjs, { Dayjs } from "dayjs";
 import React from "react";
-import { ExpirationTimeSelect, NEVER_EXPIRES_VALUE } from "src/components/expiration-time-select";
 import { I18nDicType } from "src/models/i18n";
 import { AdminMessageType } from "src/models/message-type";
 import { NoticeType, noticeTypeNameMap } from "src/models/notice-type";
@@ -28,7 +15,7 @@ interface FormValues {
   title: string;
   content: string;
   noticeTypes: NoticeType[];
-  expirationDays: number;
+  expirationTime: Dayjs;
 }
 
 interface Props {
@@ -50,15 +37,13 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
   });
 
   const onFinish = async (values: FormValues) => {
-    const { title, content, noticeTypes, expirationDays } = values;
+    const { title, content, noticeTypes, expirationTime } = values;
 
     mutateAsync({
       title, content, noticeTypes,
       messageType: AdminMessageType.SystemNotification,
       targetType: TargetType.FULL_SITE,
-      expiredAt: expirationDays === NEVER_EXPIRES_VALUE
-        ? undefined
-        : Timestamp.fromDate(dayjs().add(Number(expirationDays), "days").toDate()),
+      expiredAt: Timestamp.fromDate(expirationTime.toDate()),
     });
   };
 
@@ -67,6 +52,48 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
       return Promise.resolve();
     }
     return Promise.reject(new Error(compLang.checkboxSelectInfo));
+  };
+
+  // 获取当前时间
+  const currentDateTime = dayjs();
+
+  // 禁用当前时间之前的日期
+  const disabledDate = (current: Dayjs) => {
+    return current && current < dayjs().startOf("day"); // 禁选当前日期之前的日期
+  };
+
+  // 禁用当前时间之前的时、分、秒
+  const disabledTime = (current: Dayjs) => {
+    if (current.isBefore(currentDateTime, "minute")) {
+      return {
+        disabledHours: () => {
+          const disabledHours: number[] = [];
+          for (let i = 0; i < currentDateTime.hour(); i++) {
+            disabledHours.push(i);
+          }
+          return disabledHours;
+        },
+        disabledMinutes: () => {
+          const disabledMinutes: number[] = [];
+          if (current.hour() === currentDateTime.hour()) {
+            for (let i = 0; i < currentDateTime.minute(); i++) {
+              disabledMinutes.push(i);
+            }
+          }
+          return disabledMinutes;
+        },
+        disabledSeconds: () => {
+          const disabledSeconds: number[] = [];
+          if (current.hour() === currentDateTime.hour() && current.minute() === currentDateTime.minute()) {
+            for (let i = 0; i < currentDateTime.second(); i++) {
+              disabledSeconds.push(i);
+            }
+          }
+          return disabledSeconds;
+        },
+      };
+    }
+    return {};
   };
 
   return (
@@ -136,11 +163,20 @@ export const MessageForm: React.FC<Props> = ({ lang }) => {
             </Popover>
           </div>
         )}
-        name="expirationDays"
+        name="expirationTime"
         rules={[{ required: true, message: compLang.expirationTimeSelectRule }]}
-        initialValue={NEVER_EXPIRES_VALUE}
+        initialValue={currentDateTime}
       >
-        <ExpirationTimeSelect style={{ width: 200 }} />
+        <DatePicker
+          showTime={{
+            defaultValue: currentDateTime, // 默认时分秒为00:00:00
+            format: "HH:mm:ss",
+          }}
+          format="YYYY-MM-DD HH:mm:ss"
+          disabledDate={disabledDate} // 禁选当前时间之前的日期
+          disabledTime={disabledTime} // 禁选当前时间之前的时分秒
+          showNow={false}
+        />
       </Form.Item>
       <Form.Item style={{ marginTop: "48px" }} wrapperCol={{ span: 14 }}>
         <Button loading={isPending} type="primary" htmlType="submit">

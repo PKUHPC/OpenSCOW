@@ -180,6 +180,10 @@ export default (router: ConnectRouter) => {
         })
         .whereIn("m.id", knex.select("message_id").from(unionSubquery))
         .andWhere(readConditions)
+        .andWhere(function() {
+          this.where("m.expired_at", ">", new Date()) // expired_at 大于当前时间
+            .orWhereNull("m.expired_at"); // 或者 expired_at 为 null
+        })
         .modify(function(queryBuilder) {
           if (category) {
             queryBuilder.andWhere("m.category", category);
@@ -204,6 +208,10 @@ export default (router: ConnectRouter) => {
           })
           .whereIn("m.id", knex.select("message_id").from(unionSubquery))
           .andWhere(readConditions)
+          .andWhere(function() {
+            this.where("m.expired_at", ">", new Date()) // expired_at 大于当前时间
+              .orWhereNull("m.expired_at"); // 或者 expired_at 为 null
+          })
           .modify(function(queryBuilder) {
             if (category) {
               queryBuilder.andWhere("m.category", category);
