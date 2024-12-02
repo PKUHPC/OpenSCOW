@@ -180,9 +180,11 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
       <p>
         {t(p("uploadRemark1"))}<strong>{path}</strong>{t(p("uploadRemark2"))}
       </p>
-      <p>
-        {t(p("uploadRemark3"))}<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>{t(p("uploadRemark4"))}
-      </p>
+      { !scowdEnabled && (
+        <p>
+          {t(p("uploadRemark3"))}<strong>{publicConfig.CLIENT_MAX_BODY_SIZE}</strong>{t(p("uploadRemark4"))}
+        </p>
+      )}
       <Upload.Dragger
         name="file"
         multiple
@@ -223,7 +225,7 @@ export const UploadModal: React.FC<Props> = ({ open, onClose, path, reload, clus
         beforeUpload={(file) => {
           const fileMaxSize = convertToBytes(publicConfig.CLIENT_MAX_BODY_SIZE);
 
-          if (file.size > fileMaxSize) {
+          if (!scowdEnabled && file.size > fileMaxSize) {
             message.error(t(p("maxSizeErrorMessage"), [file.name, publicConfig.CLIENT_MAX_BODY_SIZE]));
             return Upload.LIST_IGNORE;
           }
