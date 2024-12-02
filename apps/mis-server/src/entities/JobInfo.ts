@@ -146,7 +146,7 @@ export class JobInfo {
     this.tenantPrice = jobPriceInfo.tenant?.price ?? new Decimal(0);
     this.tenantBillingItemId = jobPriceInfo.tenant?.billingItemId ?? UNKNOWN_PRICE_ITEM;
     this.accountPrice = jobPriceInfo.account?.price ?? new Decimal(0);
-    this.accountBillingItemId = jobPriceInfo.tenant?.billingItemId ?? UNKNOWN_PRICE_ITEM;
+    this.accountBillingItemId = jobPriceInfo.account?.billingItemId ?? UNKNOWN_PRICE_ITEM;
 
     this.timeSubmit = new Date(job.submitTime!);
     this.timeStart = new Date(job.startTime!);
