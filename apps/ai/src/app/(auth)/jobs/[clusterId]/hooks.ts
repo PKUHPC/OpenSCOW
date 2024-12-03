@@ -54,7 +54,8 @@ export function useDataVersionOptions<T>(
   dataType: DataType,
   queryHook: QueryHookFunction,
   mapItemToOption: (item: T) => Option,
-): { dataVersions: T[], dataVersionOptions: Option[], isDataVersionsLoading: boolean } {
+): { dataVersions: T[], dataVersionOptions: Option[], isDataVersionsLoading: boolean,
+    dataVersionDescription: Record<number,string | undefined> } {
   const typePath = [dataType, "type"];
   const namePath = [dataType, "name"];
   const selectedItem = Form.useWatch(namePath, form);
@@ -70,10 +71,21 @@ export function useDataVersionOptions<T>(
     return versions?.items.map(mapItemToOption);
   }, [versions]);
 
+  const dataVersionDescription = useMemo(() => {
+    const descObj: Record<number,string | undefined> = {};
+
+    versions?.items.forEach((x: any) => {
+      descObj[x.id] = x.versionDescription;
+    });
+
+    return descObj;
+  }, [versions]);
+
   return {
     dataVersions: versions?.items || [],
     dataVersionOptions,
     isDataVersionsLoading: isDataVersionsLoading && selectedItem !== undefined,
+    dataVersionDescription,
   };
 }
 

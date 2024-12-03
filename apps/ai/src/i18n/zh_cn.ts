@@ -359,6 +359,10 @@ export default {
         totalMem:"总内存",
         runningSetting:"运行设置",
         command:"运行命令",
+        imageDesc:"镜像描述",
+        algorithmDesc:"算法描述",
+        datasetDesc:"数据集描述",
+        modelDesc:"模型描述",
       },
       saveImageModal:{
         saveSuccessfully:"保存镜像成功",

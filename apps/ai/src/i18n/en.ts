@@ -359,6 +359,10 @@ export default {
         totalMem:"Total memory",
         runningSetting:"Running setting",
         command:"Running command",
+        imageDesc:"Image Description",
+        algorithmDesc:"Algorithm Description",
+        datasetDesc:"Dataset Description",
+        modelDesc:"Model Description",
       },
       saveImageModal:{
         saveSuccessfully:"Save image successfully",

@@ -174,6 +174,7 @@ export const LaunchAppForm = (props: Props) => {
     dataVersions: datasetVersions,
     dataVersionOptions: datasetVersionOptions,
     isDataVersionsLoading: isDatasetVersionsLoading,
+    dataVersionDescription:datasetVersionDescription,
   } =
   useDataVersionOptions<DatasetVersionInterface>(
     form,
@@ -196,6 +197,7 @@ export const LaunchAppForm = (props: Props) => {
     dataVersions: algorithmVersions,
     dataVersionOptions: algorithmVersionOptions,
     isDataVersionsLoading: isAlgorithmVersionsLoading,
+    dataVersionDescription:algorithmVersionDescription,
   } =
   useDataVersionOptions<AlgorithmVersionInterface>(
     form,
@@ -216,6 +218,7 @@ export const LaunchAppForm = (props: Props) => {
     dataVersions: modelVersions,
     dataVersionOptions: modelVersionOptions,
     isDataVersionsLoading: isModelVersionsLoading,
+    dataVersionDescription: modelVersionDescription,
   } =
   useDataVersionOptions<ModelVersionInterface>(
     form,
@@ -245,6 +248,16 @@ export const LaunchAppForm = (props: Props) => {
       .map((x) => ({ label: `${x.name}:${x.tag}`, value: x.id }));
   }, [images]);
 
+  const imageDescription = useMemo(() => {
+    const imageDescObj: Record<number,string | undefined> = {};
+
+    images?.items.forEach((x) => {
+      imageDescObj[x.id] = x.description;
+    });
+
+    return imageDescObj;
+  }, [images]);
+
   const nodeCount = Form.useWatch("nodeCount", form);
 
   const coreCount = Form.useWatch("coreCount", form);
@@ -252,6 +265,11 @@ export const LaunchAppForm = (props: Props) => {
   const gpuCount = Form.useWatch("gpuCount", form)!;
 
   const framework = Form.useWatch("framework", form);
+
+  const imageId = Form.useWatch(["image", "name"], form);
+  const algorithmVersionId = Form.useWatch(["algorithm", "version"], form);
+  const datasetVersionId = Form.useWatch(["dataset", "version"], form);
+  const modelVersionId = Form.useWatch(["model", "version"], form);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -710,6 +728,13 @@ export const LaunchAppForm = (props: Props) => {
                   </Form.Item>
                 </Space>
               </Form.Item>
+              {
+                imageId && (
+                  <Form.Item label={t(p("imageDesc"))}>
+                    {imageDescription[imageId]}
+                  </Form.Item>
+                )
+              }
               <Form.Item
                 label={t(p("remoteImageUrl"))}
                 name="remoteImageUrl"
@@ -738,7 +763,6 @@ export const LaunchAppForm = (props: Props) => {
             </>
           )
         }
-
         {
           customFormItems.filter((item) => item?.key?.includes("workingDir"))
         }
@@ -902,7 +926,13 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           ) : null
         }
-
+        {
+          algorithmVersionId && (
+            <Form.Item label={t(p("algorithmDesc"))}>
+              {algorithmVersionDescription[algorithmVersionId]}
+            </Form.Item>
+          )
+        }
         {
           showDataset ? (
             <Form.Item label={t(p("dataset"))}>
@@ -952,7 +982,13 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           ) : null
         }
-
+        {
+          datasetVersionId && (
+            <Form.Item label={t(p("datasetDesc"))}>
+              {datasetVersionDescription[datasetVersionId]}
+            </Form.Item>
+          )
+        }
         {
           showModel ? (
             <Form.Item label={t(p("model"))}>
@@ -1001,7 +1037,13 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           ) : null
         }
-
+        {
+          modelVersionId && (
+            <Form.Item label={t(p("modelDesc"))}>
+              {modelVersionDescription[modelVersionId]}
+            </Form.Item>
+          )
+        }
         <Divider orientation="left" orientationMargin="0">{t(p("resource"))}</Divider>
         <Form.Item
           label={t(p("account"))}
