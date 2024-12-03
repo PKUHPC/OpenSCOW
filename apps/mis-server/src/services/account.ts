@@ -364,13 +364,13 @@ export const accountServiceServer = plugin((server) => {
               await server.ext.clusters.callOnOne(
                 clusterId,
                 logger,
-                async (client) => { 
+                async (client) => {
                   await asyncClientCall(client.account, "unblockAccount", {
                     accountName: account.accountName,
-                  }); 
-                },      
+                  });
+                },
               );
-              
+
             } else if (cluster.hpc.enabled) {
               await unblockAccountAssignedPartitionsInCluster(
                 account.accountName,
@@ -381,7 +381,7 @@ export const accountServiceServer = plugin((server) => {
                 server.ext.resource,
               );
             }
-           
+
           }));
         // 条件2：如果没有配置资源管理服务，则调用适配器的 unblockAccount接口进行解封
         } else {
@@ -709,9 +709,12 @@ export const accountServiceServer = plugin((server) => {
       // 处理用户账户关系表，删除账户与所有用户的关系
       const hasCapabilities = server.ext.capabilities.accountUserRelation;
 
+      let ownerId;
+
       for (const userAccount of userAccounts) {
         const userId = userAccount.user.getEntity().userId;
         if (userAccount.role === EntityUserRole.OWNER) {
+          ownerId = userId;
           continue;
         }
         await em.removeAndFlush(userAccount);
@@ -742,6 +745,8 @@ export const accountServiceServer = plugin((server) => {
       account.comment = account.comment + (comment ? "  " + comment.trim() : "");
       account.blockedInCluster = true;
       await em.flush();
+
+      await callHook("accountDeleted", { accountName, comment, ownerId, tenantName }, logger);
 
       await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
         return await asyncClientCall(client.account, "deleteAccount",

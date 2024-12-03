@@ -633,6 +633,8 @@ export const userServiceServer = plugin((server) => {
       user.name += nameMarker;
       await em.flush();
 
+      await callHook("userDeleted", { tenantName, userId: user.userId }, logger);
+
       const ldapCapabilities = await getCapabilities(authUrl);
       if (ldapCapabilities.deleteUser) {
 
