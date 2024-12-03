@@ -198,19 +198,23 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   };
 
   const onOkClick = () => {
+    // 不选中文件夹的，直接把所在目录作为值
     if (!selectedFileInfo) {
-      message.info(t(p("emptyInfo")));
+      onSubmit(path);
+      closeModal();
       return;
     }
+
     if (!checkFileSelectability(selectedFileInfo)) {
       message.info(t(p("notAllowed")));
       return;
     }
+
     if (selectedKeys.length > 0) {
       const selectedFilePath = selectedKeys[0].toString();
       onSubmit(selectedFilePath);
+      closeModal();
     }
-    closeModal();
   };
 
   const onClickLink = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, clickPath: string) => {

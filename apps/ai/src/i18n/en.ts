@@ -609,7 +609,6 @@ export default {
   component: {
     fileSelectModal: {
       onlyHomeDir: "Operations are only allowed in the home directory",
-      emptyInfo: "Please select a file or folder",
       notAllowed: "The current file or folder cannot be selected",
       select: "Select File",
       upload: "Upload File",

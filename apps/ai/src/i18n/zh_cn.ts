@@ -307,7 +307,7 @@ export default {
       launchAppForm:{
         autoAdd:"工作目录的路径会自动添加为挂载点",
         createSuccessfully:"创建成功",
-        createFailed:"创建成功",
+        createFailed:"创建失败",
         submitTrainSuccessfully:"提交训练成功",
         submitTrainFailed:"提交训练失败",
         appJobName:"名称",
@@ -609,7 +609,6 @@ export default {
   component:{
     fileSelectModal:{
       onlyHomeDir:"仅可在家目录下操作",
-      emptyInfo:"请选择文件或文件夹",
       notAllowed:"当前文件或文件夹不可选取",
       select:"选择文件",
       upload:"上传文件",

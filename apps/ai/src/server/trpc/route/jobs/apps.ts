@@ -20,6 +20,7 @@ import { getEnvVariables } from "@scow/lib-server";
 import {
   getUserHomedir,
   sftpExists,
+  sftpLstat,
   sftpReaddir,
   sftpReadFile,
   sftpRealPath,
@@ -402,9 +403,9 @@ export const createAppSession = procedure
 
     return await sshConnect(host, userId, logger, async (ssh) => {
       const homeDir = await getUserHomedir(ssh, userId, logger);
+      const sftp = await ssh.requestSFTP();
 
       // 工作目录和挂载点必须在用户的homeDir下
-
       if ((workingDirectory && !isParentOrSameFolder(homeDir, workingDirectory))) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -420,6 +421,17 @@ export const createAppSession = procedure
           });
         }
       });
+      // 检查挂载点是否为目录，不能是软链接
+      for (const path of mountPoints) {
+        const lstat = await sftpLstat(sftp)(path).catch((e) => {
+          logger.error(e, "lstat %s as %s failed", path, userId);
+          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+        });
+
+        if (lstat.isSymbolicLink()) {
+          throw new TRPCError({ code: "FORBIDDEN", message: `${path} is a symbolic link, not a directory` });
+        }
+      }
 
       const scowWorkDirectoryName = `${clusterId}-${appId}-${dayjs().format("YYYYMMDD-HHmmss")}`;
 
@@ -437,7 +449,6 @@ export const createAppSession = procedure
 
       // make sure appJobsDirectory exists.
       await ssh.mkdir(appJobsDirectory);
-      const sftp = await ssh.requestSFTP();
       const remoteEntryPath = join(homeDir, appJobsDirectory, "entry.sh");
 
       let customAttributesExport: string = "";

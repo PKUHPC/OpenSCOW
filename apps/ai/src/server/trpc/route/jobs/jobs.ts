@@ -16,6 +16,7 @@ import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import {
   getUserHomedir,
   sftpExists,
+  sftpLstat,
   sftpReadFile,
   sftpWriteFile,
 } from "@scow/lib-ssh";
@@ -171,7 +172,7 @@ procedure
       return await sshConnect(host, userId, logger, async (ssh) => {
 
         const homeDir = await getUserHomedir(ssh, userId, logger);
-
+        const sftp = await ssh.requestSFTP();
 
         mountPoints.forEach((mountPoint) => {
           if (mountPoint && !isParentOrSameFolder(homeDir, mountPoint)) {
@@ -194,9 +195,20 @@ procedure
           ...mountPoints,
         ]);
 
+        // 检查挂载点是否为目录，不能是软链接
+        for (const path of mountPoints) {
+          const lstat = await sftpLstat(sftp)(path).catch((e) => {
+            logger.error(e, "lstat %s as %s failed", path, userId);
+            throw new TRPCError({ code: "FORBIDDEN", message: `${path} is not accessible` });
+          });
+
+          if (lstat.isSymbolicLink()) {
+            throw new TRPCError({ code: "FORBIDDEN", message: `${path} is a symbolic link, not a directory` });
+          }
+        }
+
         // make sure trainJobsDirectory exists.
         await ssh.mkdir(trainJobsDirectory);
-        const sftp = await ssh.requestSFTP();
         const remoteEntryPath = join(homeDir, trainJobsDirectory, "entry.sh");
 
         const entryScript = command;
@@ -385,7 +397,7 @@ procedure
 
     const { cluster, jobId } = input;
     const userId = user.identityId;
-    
+
     const currentClusterIds = await getCurrentClusters(userId);
     checkClusterAvailable(currentClusterIds, cluster);
 
