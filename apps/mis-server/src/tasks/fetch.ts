@@ -231,7 +231,7 @@ export async function fetchJobs(
           ${startFetchDate?.toISOString()} to ${endFetchDate.toISOString()}`);
 
       const fields: string[] = [
-        "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "mem_req_mb",
+        "job_id", "name", "user", "account", "cpus_alloc", "gpus_alloc", "mem_alloc_mb", "cpus_req", "mem_req_mb",
         "partition", "qos", "elapsed_seconds", "node_list", "nodes_req", "nodes_alloc", "time_limit_minutes",
         "submit_time", "start_time", "end_time",
       ];
