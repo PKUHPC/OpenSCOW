@@ -109,6 +109,9 @@ importers:
 
   apps/ai:
     dependencies:
+      '@ant-design/colors':
+        specifier: 7.0.2
+        version: 7.0.2
       '@ant-design/cssinjs':
         specifier: 1.21.0
         version: 1.21.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -175,6 +178,9 @@ importers:
       '@scow/lib-web':
         specifier: workspace:*
         version: link:../../libs/web
+      '@scow/protos':
+        specifier: workspace:*
+        version: link:../../libs/protos/scow
       '@scow/rich-error-model':
         specifier: workspace:*
         version: link:../../libs/rich-error-model
@@ -268,6 +274,9 @@ importers:
       react-typed-i18n:
         specifier: 2.4.0
         version: 2.4.0(react@18.3.1)
+      recharts:
+        specifier: 2.12.7
+        version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       replace-in-file:
         specifier: 8.1.0
         version: 8.1.0
