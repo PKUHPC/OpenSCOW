@@ -26,7 +26,7 @@ services:
       - ..:/workspace/SCOW:cached
 
   db:
-    image: mysql:8
+    image: ccimage.pku.edu.cn/mirror/library/mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: mysqlrootpassword
     volumes:
@@ -34,7 +34,7 @@ services:
     network_mode: service:scow-dev
 
   redis:
-    image: redis:alpine
+    image: ccimage.pku.edu.cn/mirror/library/redis:alpine
     network_mode: service:scow-dev
 
   ssh-server:
@@ -59,7 +59,7 @@ services:
     network_mode: service:scow-dev
 
   ldapadmin:
-    image: osixia/phpldapadmin
+    image: ccimage.pku.edu.cn/mirror/osixia/phpldapadmin
     ports:
       - 3890:80
     environment:

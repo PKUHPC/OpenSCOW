@@ -8,7 +8,7 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-FROM centos:7
+FROM ccimage.pku.edu.cn/mirror/library/centos:7
 
 WORKDIR /ldap
 COPY dev/ldap/provider.sh .

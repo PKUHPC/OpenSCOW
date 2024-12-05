@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM ccimage.pku.edu.cn/dockerhub/library/node:iron-alpine@sha256:2cc3d19887bfea8bf52574716d5f16d4668e35158de866099711ddfb2b16b6e0 AS base
+FROM ccimage.pku.edu.cn/mirror/library/node:iron-alpine@sha256:c42db635f7d5742f5565fa85bf56c7b99bc6126dc458a2906699cd3d62512125 AS base
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
@@ -49,7 +49,7 @@ COPY protos ./protos
 
 RUN pnpm build
 
-FROM ccimage.pku.edu.cn/dockerhub/library/nginx:alpine@sha256:c04c18adc2a407740a397c8407c011fc6c90026a9b65cceddef7ae5484360158 as runner
+FROM ccimage.pku.edu.cn/mirror/library/nginx:alpine@sha256:2c8018e59b9ce43bd27955c844c85667409a96ecaa5180fa663cd6008ccdc663 as runner
 
 COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/
