@@ -15,6 +15,7 @@
 import "dayjs/locale/zh-cn";
 
 import { SYSTEM_VALID_LANGUAGES } from "@scow/config/build/i18n";
+import { PrimaryColor } from "@scow/config/build/ui";
 import { App, ConfigProvider, theme } from "antd";
 import { Locale } from "antd/lib/locale";
 import enUSlocale from "antd/locale/en_US";
@@ -25,9 +26,11 @@ import { AppFloatButtons } from "src/layouts/AppFloatButtons";
 import { useDarkMode } from "src/layouts/darkMode";
 import { ThemeProvider } from "styled-components";
 
+
 type Props = React.PropsWithChildren<{
   color: string | undefined;
   locale: string | undefined;
+  primaryColor: PrimaryColor;
 }>;
 
 const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
@@ -40,19 +43,21 @@ const StyledComponentsThemeProvider: React.FC<Props> = ({ children }) => {
   );
 };
 
-export const AntdConfigProvider: React.FC<Props> = ({ children, color }) => {
+export const AntdConfigProvider: React.FC<Props> = ({ children, primaryColor }) => {
 
   const { dark } = useDarkMode();
+  const { defaultColor, darkModeColor = defaultColor } = primaryColor; // 解构时设置默认值
+  const currentPrimaryColor = dark ? darkModeColor : defaultColor;
 
   const currentLangId = useI18n().currentLanguage.id;
 
   return (
     <ConfigProvider
       locale={getAntdLocale(currentLangId)}
-      theme={{ token: { colorPrimary: color, colorInfo: color },
+      theme={{ token: { colorPrimary: currentPrimaryColor, colorInfo: currentPrimaryColor },
         algorithm: dark ? theme.darkAlgorithm : undefined }}
     >
-      <StyledComponentsThemeProvider color={color} locale={currentLangId}>
+      <StyledComponentsThemeProvider color={currentPrimaryColor} locale={currentLangId} primaryColor={primaryColor}>
         <App>
           <AppFloatButtons />
           {children}

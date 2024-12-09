@@ -44,10 +44,12 @@ footer:
         a.com: a.com的文本
 
 # 主题色配置。可以不填
-# 对portal-web和mis-web有效
+# 对portal-web、mis-web以及可读取SCOW主题色的第三方系统有效
 primaryColor:
     # 对所有域名生效的主题色。默认为#9B0000
     defaultColor: string
+    # 对所有域名在暗色模式下生效的主题色。默认等于defaultColor，可以不填
+    darkModeColor: string
     # 对某特定来访域名生效的主题色，可以不填
     hostnameMap: 
         # 从a.com的访问的主题色为#000000

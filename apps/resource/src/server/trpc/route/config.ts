@@ -14,6 +14,7 @@ const UiConfigSchema = z.object({
     primaryColor: z.object({
       defaultColor: z.string().default(DEFAULT_PRIMARY_COLOR),
       hostnameMap: z.record(z.string(), z.string()).optional(),
+      darkModeColor: z.string().optional(),
     }).optional(),
   }),
   defaultPrimaryColor: z.string().default(DEFAULT_PRIMARY_COLOR),

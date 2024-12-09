@@ -79,6 +79,11 @@ export function ClientLayout(props: {
     ?? primaryColor?.defaultColor ?? data?.defaultPrimaryColor ?? "#94070A";
   }, [data]);
 
+  const darkModeColor = useMemo(() => {
+    return (hostname && primaryColor?.hostnameMap?.[hostname])
+    ?? primaryColor?.darkModeColor ?? color;
+  }, [data]);
+
   return (
     <Suspense>
       <ScowParamsProvider basePath={props.basePath}>
@@ -88,12 +93,12 @@ export function ClientLayout(props: {
               <body>
                 {
                   isLoading ? (
-                    <AntdConfigProvider color={color}>
+                    <AntdConfigProvider color={color} primaryColor={{ defaultColor: color,darkModeColor }}>
                       <Loading />
                     </AntdConfigProvider>
                   ) : (
                     <DarkModeProvider>
-                      <AntdConfigProvider color={color}>
+                      <AntdConfigProvider color={color} primaryColor={{ defaultColor: color,darkModeColor }}>
                         <GlobalStyle />
                         <UiConfigContext.Provider
                           value={{

@@ -60,6 +60,9 @@ export function ClientLayout(props: {
   const color = (hostname && primaryColor?.hostnameMap?.[hostname])
     ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
 
+  const darkModeColor = (hostname && primaryColor?.hostnameMap?.[hostname])
+  ?? primaryColor?.darkModeColor ?? color;
+
   const usePublicConfigQuery = () => {
     return trpc.config.publicConfig.useQuery();
   };
@@ -99,7 +102,11 @@ export function ClientLayout(props: {
                       definitions: languagesMap[initialLanguage as keyof typeof languagesMap],
                     }}
                     >
-                      <AntdConfigProvider color={color} locale={initialLanguage}>
+                      <AntdConfigProvider
+                        color={color}
+                        locale={initialLanguage}
+                        primaryColor={{ defaultColor: color,darkModeColor }}
+                      >
                         <GlobalStyle />
                         <TopProgressBar />
                         <ErrorBoundary Component={RootErrorContent} pathname={pathname ?? ""}>

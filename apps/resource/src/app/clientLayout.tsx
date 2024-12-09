@@ -73,6 +73,9 @@ export function ClientLayout(props: {
   const color = (hostname && primaryColor?.hostnameMap?.[hostname])
     ?? primaryColor?.defaultColor ?? uiConfig.defaultPrimaryColor;
 
+  const darkModeColor = (hostname && primaryColor?.hostnameMap?.[hostname])
+    ?? primaryColor?.darkModeColor ?? color;
+
   return (
     <Suspense>
       <ScowParamsProvider>
@@ -82,12 +85,15 @@ export function ClientLayout(props: {
               <body>
                 {
                   useConfig.isLoading ? (
-                    <AntdConfigProvider color={DEFAULT_PRIMARY_COLOR}>
+                    <AntdConfigProvider
+                      color={DEFAULT_PRIMARY_COLOR}
+                      primaryColor={{ defaultColor: color,darkModeColor }}
+                    >
                       <Loading />
                     </AntdConfigProvider>
                   ) : (
                     <DarkModeProvider>
-                      <AntdConfigProvider color={color}>
+                      <AntdConfigProvider color={color} primaryColor={{ defaultColor: color,darkModeColor }}>
                         <GlobalStyle />
                         <ErrorBoundary Component={ServerErrorPage} pathname={pathname ?? ""}>
                           <UiConfigContext.Provider

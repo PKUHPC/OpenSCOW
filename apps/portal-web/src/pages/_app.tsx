@@ -15,6 +15,7 @@ import "antd/dist/reset.css";
 
 import { failEvent } from "@ddadaal/next-typed-api-routes-runtime/lib/client";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
+import { PrimaryColor } from "@scow/config/build/ui";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { DarkModeCookie, DarkModeProvider, getDarkModeCookieValue } from "@scow/lib-web/build/layouts/darkMode";
 import { GlobalStyle } from "@scow/lib-web/build/layouts/globalStyle";
@@ -143,7 +144,7 @@ const TopProgressBar = dynamic(
 
 interface ExtraProps {
   userInfo: User | undefined;
-  primaryColor: string;
+  primaryColor: PrimaryColor;
   footerText: string;
   loginNodes: Record<string, LoginNode[]>;
   darkModeCookieValue: DarkModeCookie | undefined;
@@ -214,7 +215,11 @@ function MyApp({ Component, pageProps, extra }: Props) {
           stores={[userStore, clusterInfoStore, loginNodeStore, uiExtensionStore]}
         >
           <DarkModeProvider initial={extra.darkModeCookieValue}>
-            <AntdConfigProvider color={primaryColor} locale={ extra.initialLanguage}>
+            <AntdConfigProvider
+              primaryColor={primaryColor}
+              locale={ extra.initialLanguage}
+              color={primaryColor.defaultColor}
+            >
               <FloatButtons languageId={ extra.initialLanguage } />
               <GlobalStyle />
               <FailEventHandler />
@@ -244,7 +249,7 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
   const extra: ExtraProps = {
     userInfo: undefined,
     footerText: "",
-    primaryColor: "",
+    primaryColor: { defaultColor:"#94070A" },
     darkModeCookieValue: getDarkModeCookieValue(appContext.ctx.req),
     loginNodes: {},
     initialLanguage: "",
@@ -329,8 +334,14 @@ MyApp.getInitialProps = async (appContext: AppContext) => {
 
     const hostname = getHostname(appContext.ctx.req);
 
-    extra.primaryColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
+    const defaultColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.primaryColor?.defaultColor ?? runtimeConfig.DEFAULT_PRIMARY_COLOR;
+
+    const darkModeColor = (hostname && runtimeConfig.UI_CONFIG?.primaryColor?.hostnameMap?.[hostname])
+    ?? runtimeConfig.UI_CONFIG?.primaryColor?.darkModeColor ?? defaultColor;
+
+    extra.primaryColor = { defaultColor,darkModeColor };
+
     extra.footerText = (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameMap?.[hostname])
       ?? (hostname && runtimeConfig.UI_CONFIG?.footer?.hostnameTextMap?.[hostname])
       ?? runtimeConfig.UI_CONFIG?.footer?.defaultText ?? "";
