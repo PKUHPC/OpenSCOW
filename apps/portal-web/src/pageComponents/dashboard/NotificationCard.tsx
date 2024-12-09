@@ -66,12 +66,12 @@ export const NotificationCard: React.FC<Props> = ({ interval = 60000 }) => {
     fetchNotifications();
 
     // 定时器，按指定的时间间隔调用
-    const timer = setInterval(() => {
-      fetchNotifications();
-    }, interval);
+    // const timer = setInterval(() => {
+    //   fetchNotifications();
+    // }, interval);
 
-    // 清除定时器
-    return () => clearInterval(timer);
+    // // 清除定时器
+    // return () => clearInterval(timer);
   }, [interval, currentLanguage.id]);
 
   const theme = useTheme();

@@ -20,20 +20,20 @@ function handler(req: NextApiRequest, res: NextApiResponse) {
       portal: {
         navbarLinks: {
           "enabled": true,
-          "autoRefresh": {
-            "enabled": true,
-            "intervalMs": 60000,
-          },
+          // "autoRefresh": {
+          //   "enabled": true,
+          //   "intervalMs": 60000,
+          // },
         },
         rewriteNavigations: true,
       },
       mis: {
         navbarLinks: {
           "enabled": true,
-          "autoRefresh": {
-            "enabled": true,
-            "intervalMs": 60000,
-          },
+          // "autoRefresh": {
+          //   "enabled": true,
+          //   "intervalMs": 60000,
+          // },
         },
         rewriteNavigations: true,
       },

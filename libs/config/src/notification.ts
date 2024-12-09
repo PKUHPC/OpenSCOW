@@ -22,6 +22,11 @@ export const NotificationConfigSchema = Type.Object({
     password: Type.Optional(Type.String({ description: "数据库密码" })),
     dbName: Type.String({ description: "数据库数据库名" }),
     debug: Type.Boolean({ description: "打开ORM的debug模式", default: false }),
+    pool: Type.Optional(Type.Object({
+      min: Type.Number({ description: "连接池连接数最小值" }),
+      max: Type.Number({ description: "连接池连接数最大值" }),
+      acquireTimeoutMillis: Type.Number({ description: "连接获取超时毫秒数" }),
+    }, { description: "mikro orm 使用的连接池大小" })),
   }),
 
   redis: Type.Optional(Type.Object({

@@ -1,17 +1,5 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { AdminMessageType } from "@scow/lib-web/build/models/notification";
-import { App, Button, notification, Space, Typography } from "antd";
+import { Button, notification, Space, Typography } from "antd";
 import { useEffect, useRef } from "react";
 import { api } from "src/apis";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
@@ -27,14 +15,17 @@ const p = prefix("notifLayout.");
 
 const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, interval = 60000 }) => {
 
-  const { message } = App.useApp();
   const t = useI18nTranslateToString();
   const [notifApi, contextHolder] = notification.useNotification();
   const notifiedIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已通知的ID
   const currentLanguage = useI18n().currentLanguage;
+  const readIdsRef = useRef<Set<number>>(new Set()); // 用于追踪已标记为已读的 ID
 
-  const close = (messageId: number) => {
-    api.markMessageRead({ body:{ messageId: messageId } });
+  const close = async (messageId: number) => {
+    if (!readIdsRef.current.has(messageId)) {
+      await api.markMessageRead({ body: { messageId } });
+      readIdsRef.current.add(messageId);
+    }
     notifApi.destroy(messageId);
   };
 
@@ -46,10 +37,7 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
           style={{ boxShadow: "none" }}
           type="primary"
           size="small"
-          onClick={() => {
-            api.markMessageRead({ body:{ messageId: content.id } });
-            notifApi.destroy(key);
-          }}
+          onClick={() => close(key)}
         >
           {t(p("read"))}
         </Button>
@@ -61,28 +49,24 @@ const NotificationLayout: React.FC<NotificationLayoutProps> = ({ children, inter
       btn,
       key,
       duration: 0,
-      onClose: () => close(content.id),
+      onClose: () => close(key),
     });
   };
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      try {
-        const { results } = await api.getUnreadMessages({
-          query: { messageType: AdminMessageType.SystemNotification },
-        }).httpError(500, () => {});
+      const { results } = await api.getUnreadMessages({
+        query: { messageType: AdminMessageType.SystemNotification },
+      }).httpError(500, () => {});
 
-        for (const msg of results.messages) {
-          const content = renderingMessage(msg, currentLanguage.id);
+      for (const msg of results.messages) {
+        const content = renderingMessage(msg, currentLanguage.id);
 
-          // 使用 ref 来检查已通知的 ID
-          if (content && !notifiedIdsRef.current.has(msg.id)) {
-            openNotification(content);
-            notifiedIdsRef.current.add(msg.id); // 更新 ref 中的 ID 集合
-          }
+        // 使用 ref 来检查已通知的 ID
+        if (content && !notifiedIdsRef.current.has(msg.id)) {
+          openNotification(content);
+          notifiedIdsRef.current.add(msg.id); // 更新 ref 中的 ID 集合
         }
-      } catch {
-        message.error(t(p("fetchSystemNotifError")));
       }
     };
 

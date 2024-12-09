@@ -10,6 +10,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "notice_type": {
@@ -19,6 +20,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "message_type": {
@@ -38,6 +40,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "can_user_modify": {
@@ -47,6 +50,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "expired_after_seconds": {
@@ -56,6 +60,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "bigint"
         },
         "created_at": {
@@ -119,6 +124,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "app_id": {
@@ -208,6 +214,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "type": {
@@ -227,6 +234,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "json"
         },
         "content_template": {
@@ -236,6 +244,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "json"
         },
         "category": {
@@ -256,6 +265,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "json"
         },
         "created_at": {
@@ -335,6 +345,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "bigint"
         },
         "sender_type": {
@@ -344,6 +355,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "sender_id": {
@@ -363,6 +375,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "metadata": {
@@ -372,6 +385,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "json"
         },
         "description_data": {
@@ -381,6 +395,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "message_type": {
@@ -480,6 +495,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "bigint"
         },
         "notice_types": {
@@ -489,6 +505,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "target_type": {
@@ -498,6 +515,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "target_id": {
@@ -517,6 +535,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "bigint"
         },
         "created_at": {
@@ -573,6 +592,17 @@
           "unique": false
         },
         {
+          "keyName": "target_type_target_id_idx",
+          "columnNames": [
+            "target_type",
+            "target_id"
+          ],
+          "composite": true,
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"
@@ -610,6 +640,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "bigint"
         },
         "user_id": {
@@ -629,6 +660,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "bigint"
         },
         "status": {
@@ -638,6 +670,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "read_time": {
@@ -647,7 +680,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "is_deleted": {
@@ -657,6 +690,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
+          "default": "false",
           "mappedType": "boolean"
         },
         "created_at": {
@@ -740,6 +775,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "user_id": {
@@ -759,6 +795,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "enum"
         },
         "message_type": {
@@ -778,6 +815,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "created_at": {
