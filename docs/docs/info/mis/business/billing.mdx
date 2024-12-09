@@ -159,9 +159,9 @@ tenant_1: # 对租户tenant_1的账户用户发起的任务，在默认规则的
 1. 每个计费项应该只出现一次。即使多个QOS费用相同，也应该定义两个计费项
 2. 数据库中不存在具有相同计费项名的行
 
-在数据库正在运行、`docker-compose.yml`配置编写完成的条件下，运行以下命令快速在数据库中创建费用项信息：
+在数据库正在运行时、运行以下命令快速在数据库中创建费用项信息：
 
 ```bash
-docker compose run mis-server createPriceItems
+./cli compose run mis-server createPriceItems
 ```
 
