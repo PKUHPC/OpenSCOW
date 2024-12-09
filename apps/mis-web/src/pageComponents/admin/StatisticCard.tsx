@@ -13,7 +13,7 @@
 import { Card, Space, Statistic } from "antd";
 import React from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { styled } from "styled-components"; ;
+import { styled } from "styled-components";
 
 interface Props {
   title: string
@@ -23,6 +23,7 @@ interface Props {
   icon: React.ReactNode | React.ForwardRefExoticComponent<{}>;
   iconColor?: string
   precision?: number | undefined
+  prefixText?: string
 }
 
 const Container = styled.div`
@@ -42,7 +43,7 @@ const iconToNode = (Icon: any, color?: string) => {
 const p = prefix("pageComp.admin.statisticCard.");
 
 export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0,
-  totalValue = 0, loading, icon, iconColor, precision = 0 }) =>
+  totalValue = 0, loading, icon, iconColor, precision = 0, prefixText }) =>
 {
   const t = useI18nTranslateToString();
 
@@ -54,6 +55,7 @@ export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0,
           <Statistic
             title={title}
             value={newAddValue}
+            prefix={<span style={{ color: "rgba(0, 0, 0, 0.45)", fontSize: "14px" }}>{prefixText}</span>}
             precision={precision}
             loading={loading}
             valueStyle={{ color: "#94070A" }}

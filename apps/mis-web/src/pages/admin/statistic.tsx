@@ -365,6 +365,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             loading={statisticInfoLoading}
             icon={UserOutlined}
             iconColor="#94070A"
+            prefixText={`${t(p("newlyAdd"))}: `}
           />
         </Col>
         <Col flex={4}>
@@ -377,7 +378,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             iconColor="#2e86de"
           />
         </Col>
-        <Col flex={4}>
+        {/* <Col flex={4}>
           <StatisticCard
             title={t(p("tenant"))}
             newAddValue={statisticInfo?.newTenant}
@@ -386,7 +387,7 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             icon={TeamOutlined}
             iconColor="#1dd1a1"
           />
-        </Col>
+        </Col> */}
         <Col flex={4}>
           <StatisticCard
             title={t(p("job"))}

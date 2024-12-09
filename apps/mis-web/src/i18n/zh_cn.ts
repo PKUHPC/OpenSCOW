@@ -1203,6 +1203,7 @@ export default {
         yuan: "元",
         statisticsDelay1: "统计数据每日更新一次",
         statisticsDelay2: "，最后更新于: {}",
+        newlyAdd: "新增",
       },
     },
     accounts: {
