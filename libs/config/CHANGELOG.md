@@ -1,5 +1,12 @@
 # @scow/config
 
+## 1.6.2
+
+### Patch Changes
+
+- c641401: 优化消息查询等 sql，解决重复已读 bug
+- ca98dac: primaryColor 下增加可选字段 darkModeColor
+
 ## 1.6.1
 
 ### Patch Changes

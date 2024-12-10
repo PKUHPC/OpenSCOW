@@ -1,5 +1,23 @@
 # @scow/notification
 
+## 0.2.4
+
+### Patch Changes
+
+- c641401: 优化消息查询等 sql，解决重复已读 bug
+- ca98dac: 在 SCOW 的 light mode 和 dark mode 下，可以选择两种不同的主题色
+- Updated dependencies [1adb22b]
+- Updated dependencies [249d35d]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+- Updated dependencies [ca98dac]
+  - @scow/lib-web@1.4.7
+  - @scow/config@1.6.2
+  - @scow/notification-protos@0.1.4
+  - @scow/protos@1.0.19
+  - @scow/lib-notification@1.0.4
+  - @scow/lib-scheduler-adapter@1.1.17
+
 ## 0.2.3
 
 ### Patch Changes

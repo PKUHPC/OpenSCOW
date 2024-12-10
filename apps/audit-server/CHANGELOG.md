@@ -1,5 +1,18 @@
 # @scow/audit-server
 
+## 2.3.11
+
+### Patch Changes
+
+- 46dfcf9: 增加导出已结束作业功能
+- Updated dependencies [46dfcf9]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+  - @scow/lib-operation-log@2.1.13
+  - @scow/config@1.6.2
+  - @scow/protos@1.0.19
+  - @scow/lib-server@1.3.8
+
 ## 2.3.10
 
 ### Patch Changes

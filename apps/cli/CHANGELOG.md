@@ -1,5 +1,14 @@
 # @scow/cli
 
+## 1.7.4
+
+### Patch Changes
+
+- e552885: 修复 cli compose run 命令时命令行参数没有传给容器的问题
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+  - @scow/config@1.6.2
+
 ## 1.7.3
 
 ## 1.7.2

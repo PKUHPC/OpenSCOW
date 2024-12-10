@@ -1,5 +1,32 @@
 # @scow/ai
 
+## 0.2.12
+
+### Patch Changes
+
+- 7363662: 增加 ai 仪表盘
+- b3f2c15: AI 增加国际化
+- ca98dac: 在 SCOW 的 light mode 和 dark mode 下，可以选择两种不同的主题色
+- 0a670dc: 不能讲软链接作为挂载点，前端可以直接选择用户家目录作为挂载点
+- 35f48a8: AI 训练界面优化：如果选择了镜像|算法|模型|数据，展示相关描述信息
+- Updated dependencies [1adb22b]
+- Updated dependencies [0a670dc]
+- Updated dependencies [46dfcf9]
+- Updated dependencies [249d35d]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+- Updated dependencies [7363662]
+  - @scow/lib-web@1.4.7
+  - @scow/lib-ssh@1.0.4
+  - @scow/lib-operation-log@2.1.13
+  - @scow/config@1.6.2
+  - @scow/ai-scheduler-adapter-protos@1.1.0
+  - @scow/protos@1.0.19
+  - @scow/lib-scow-resource@0.2.3
+  - @scow/lib-server@1.3.8
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.17
+
 ## 0.2.11
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # @scow/lib-web
 
+## 1.4.7
+
+### Patch Changes
+
+- 1adb22b: 修复增加 UI 扩展后原本不可点击跳转的导航按钮点击后跳转 404 页面的问题
+- 249d35d: 平台统计页面最晚截止上一天，总额数据每日计算一次后存在数据库中并返回数据更新时间，UI 显示加上提示数据更新到昨天。
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+  - @scow/config@1.6.2
+  - @scow/protos@1.0.19
+
 ## 1.4.6
 
 ### Patch Changes

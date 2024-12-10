@@ -1,5 +1,12 @@
 # @scow/lib-notification
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies [ca98dac]
+  - @scow/notification-protos@0.1.4
+
 ## 1.0.3
 
 ### Patch Changes

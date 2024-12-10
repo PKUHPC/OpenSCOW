@@ -1,5 +1,13 @@
 # @scow/grpc-api
 
+## 1.16.0
+
+### Minor Changes
+
+- a2f8a67: 增加删除用户和账户 hook
+- 249d35d: GetStatisticInfo,GetChargeRecordsTotalCount,GetJobTotalCount 的返回增加数据产生更新时间的字段
+- 46dfcf9: 增加导出已结束作业接口
+
 ## 1.15.0
 
 ### Minor Changes

@@ -1,5 +1,30 @@
 # @scow/portal-web
 
+## 1.7.4
+
+### Patch Changes
+
+- c641401: 优化消息查询等 sql，解决重复已读 bug
+- b3f2c15: AI 增加国际化
+- 056e7f7: 上传文件在启用 SCOWD 时,取消 1GB 限制
+- ca98dac: 在 SCOW 的 light mode 和 dark mode 下，可以选择两种不同的主题色
+- Updated dependencies [1adb22b]
+- Updated dependencies [0a670dc]
+- Updated dependencies [46dfcf9]
+- Updated dependencies [249d35d]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+- Updated dependencies [ca98dac]
+  - @scow/lib-web@1.4.7
+  - @scow/lib-ssh@1.0.4
+  - @scow/lib-operation-log@2.1.13
+  - @scow/config@1.6.2
+  - @scow/notification-protos@0.1.4
+  - @scow/protos@1.0.19
+  - @scow/lib-scow-resource@0.2.3
+  - @scow/lib-notification@1.0.4
+  - @scow/rich-error-model@2.0.1
+
 ## 1.7.3
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @scow/lib-ssh
 
+## 1.0.4
+
+### Patch Changes
+
+- 0a670dc: 增加 sftpLstat
+
 ## 1.0.3
 
 ### Patch Changes

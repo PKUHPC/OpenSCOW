@@ -1,5 +1,28 @@
 # @scow/mis-server
 
+## 1.7.4
+
+### Patch Changes
+
+- 46dfcf9: 增加导出已结束作业功能
+- 52077cb: 修复记录账户计费计费项 id 错误的问题
+- 76777c9: 修复 getJobs 数据获取不全
+- a2f8a67: 增加删除用户账户 hook
+- 249d35d: 平台统计页面最晚截止上一天，总额数据每日计算一次后存在数据库中并返回数据更新时间，UI 显示加上提示数据更新到昨天。
+- Updated dependencies [0a670dc]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+- Updated dependencies [ca98dac]
+  - @scow/lib-ssh@1.0.4
+  - @scow/config@1.6.2
+  - @scow/notification-protos@0.1.4
+  - @scow/protos@1.0.19
+  - @scow/lib-hook@1.0.19
+  - @scow/lib-scow-resource@0.2.3
+  - @scow/lib-server@1.3.8
+  - @scow/lib-notification@1.0.4
+  - @scow/lib-scheduler-adapter@1.1.17
+
 ## 1.7.3
 
 ### Patch Changes

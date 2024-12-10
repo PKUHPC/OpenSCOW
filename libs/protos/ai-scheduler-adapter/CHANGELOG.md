@@ -1,5 +1,11 @@
 # @scow/ai-scheduler-adapter-protos
 
+## 1.1.0
+
+### Minor Changes
+
+- 7363662: 增加与完善 AI 平台概览相关接口，GetClusterInfo 和 GetClusterNodesInfo
+
 ## 1.0.1
 
 ### Patch Changes

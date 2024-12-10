@@ -1,5 +1,29 @@
 # @scow/mis-web
 
+## 1.7.4
+
+### Patch Changes
+
+- 46dfcf9: 增加导出已结束作业功能
+- 249d35d: 平台统计页面最晚截止上一天，总额数据每日计算一次后存在数据库中并返回数据更新时间，UI 显示加上提示数据更新到昨天。
+- c641401: 优化消息查询等 sql，解决重复已读 bug
+- b3f2c15: AI 增加国际化
+- ca98dac: 在 SCOW 的 light mode 和 dark mode 下，可以选择两种不同的主题色
+- Updated dependencies [1adb22b]
+- Updated dependencies [46dfcf9]
+- Updated dependencies [249d35d]
+- Updated dependencies [c641401]
+- Updated dependencies [ca98dac]
+- Updated dependencies [ca98dac]
+  - @scow/lib-web@1.4.7
+  - @scow/lib-operation-log@2.1.13
+  - @scow/config@1.6.2
+  - @scow/notification-protos@0.1.4
+  - @scow/protos@1.0.19
+  - @scow/lib-scow-resource@0.2.3
+  - @scow/lib-notification@1.0.4
+  - @scow/rich-error-model@2.0.1
+
 ## 1.7.3
 
 ### Patch Changes

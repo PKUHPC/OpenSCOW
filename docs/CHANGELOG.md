@@ -1,5 +1,11 @@
 # @scow/docs
 
+## 1.4.5
+
+### Patch Changes
+
+- 428e083: 修改交互式应用 HTML 表单配置默认值的变量名为 defaultValue
+
 ## 1.4.4
 
 ### Patch Changes

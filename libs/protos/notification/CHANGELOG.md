@@ -1,5 +1,11 @@
 # @scow/notification-protos
 
+## 0.1.4
+
+### Patch Changes
+
+- ca98dac: PrimaryColor 增加可选 dark_mode_color
+
 ## 0.1.3
 
 ### Patch Changes

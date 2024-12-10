@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.13
+
+### Patch Changes
+
+- 46dfcf9: 增加导出已结束作业功能
+  - @scow/protos@1.0.19
+
 ## 2.1.12
 
 ### Patch Changes
