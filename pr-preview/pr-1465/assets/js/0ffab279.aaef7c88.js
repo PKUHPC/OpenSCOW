@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_scow_docs=self.webpackChunk_scow_docs||[]).push([[8426],{58253:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/OpenSCOW/pr-preview/pr-1465/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":6,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
