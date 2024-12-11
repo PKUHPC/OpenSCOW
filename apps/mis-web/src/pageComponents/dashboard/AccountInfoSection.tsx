@@ -75,7 +75,7 @@ export const AccountInfoSection: React.FC<Props> = ({ info }) => {
                   const [ textColor, Icon, opacity] = isBlocked ? statusTexts.blocked : statusTexts.normal;
                   const availableLimit = jobChargeLimit && usedJobCharge
                     ? moneyNumberToString(moneyToNumber(jobChargeLimit) - moneyToNumber(usedJobCharge)) : undefined;
-                  const whitelistCharge = isInWhitelist ? "不限" : undefined;
+                  const whitelistCharge = isInWhitelist ? t("dashboard.account.unlimited") : undefined;
                   const normalCharge = moneyNumberToString(balance - blockThresholdAmount);
                   const showAvailableBalance = availableLimit ?? whitelistCharge ?? normalCharge;
                   return (

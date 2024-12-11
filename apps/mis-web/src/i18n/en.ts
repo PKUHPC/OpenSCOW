@@ -124,6 +124,7 @@ export default {
       state: "Status",
       balance: "Available Balance",
       alert: "You do not belong to any account.",
+      unlimited:"Unlimited",
     },
     job: {
       title: "Running Job List",

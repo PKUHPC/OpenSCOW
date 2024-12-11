@@ -42,3 +42,12 @@ export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): 
   const fixedNumber = size < 9.996 ? 2 : (size < 99.95 ? 1 : 0);
   return `${size.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
+
+export function truncateString(str: string, maxLength = 52) {
+
+  if (str.length > maxLength) {
+    return str.slice(0, maxLength);
+  }
+
+  return str;
+}

@@ -124,6 +124,7 @@ export default {
       state: "状态",
       balance: "可用额度",
       alert: "您不属于任何一个账户。",
+      unlimited:"不限",
     },
     job: {
       title: "未结束作业列表",
