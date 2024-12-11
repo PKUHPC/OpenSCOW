@@ -245,3 +245,6 @@ export const validateUniquePaths = (paths: (string | undefined)[]) => {
     }
   }
 };
+
+export const genPublicOrPrivateDataJsonString = (path: string | undefined,isPublic: boolean) =>
+  JSON.stringify({ path,isPublic });

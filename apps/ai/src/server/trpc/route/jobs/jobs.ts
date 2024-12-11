@@ -27,7 +27,8 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity, fetchJobInputParams, validateUniquePaths } from "src/server/utils/app";
+import { checkCreateAppEntity, fetchJobInputParams, genPublicOrPrivateDataJsonString,
+  validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -243,18 +244,18 @@ procedure
             remoteImageUrl || existImage?.path || "",
             algorithmVersion
               ? isAlgorithmPrivate
-                ? algorithmVersion.privatePath
-                : algorithmVersion.path
+                ? genPublicOrPrivateDataJsonString(algorithmVersion.privatePath,false)
+                : genPublicOrPrivateDataJsonString(algorithmVersion.path,true)
               : "",
             datasetVersion
               ? isDatasetPrivate
-                ? datasetVersion.privatePath
-                : datasetVersion.path
+                ? genPublicOrPrivateDataJsonString(datasetVersion.privatePath,false)
+                : genPublicOrPrivateDataJsonString(datasetVersion.path,true)
               : "",
             modelVersion
               ? isModelPrivate
-                ? modelVersion.privatePath
-                : modelVersion.path
+                ? genPublicOrPrivateDataJsonString(modelVersion.privatePath,false)
+                : genPublicOrPrivateDataJsonString(modelVersion.path,true)
               : "",
             mountPoints.join(","),
             gpuType || "",

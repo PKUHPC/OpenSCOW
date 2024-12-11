@@ -38,7 +38,8 @@ import { Image as ImageEntity, Source, Status } from "src/server/entities/Image"
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { allApps, checkAppExist, checkCreateAppEntity,
-  fetchJobInputParams, getAllTags, getClusterAppConfigs, validateUniquePaths } from "src/server/utils/app";
+  fetchJobInputParams, genPublicOrPrivateDataJsonString, getAllTags, getClusterAppConfigs,
+  validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -533,18 +534,18 @@ export const createAppSession = procedure
           (remoteImageUrl || (existImage ? existImage.path : `${app.image.name}:${app.image.tag || "latest"}`)) || "",
           algorithmVersion
             ? isAlgorithmPrivate
-              ? algorithmVersion.privatePath
-              : algorithmVersion.path
+              ? genPublicOrPrivateDataJsonString(algorithmVersion.privatePath,false)
+              : genPublicOrPrivateDataJsonString(algorithmVersion.path,true)
             : "",
           datasetVersion
             ? isDatasetPrivate
-              ? datasetVersion.privatePath
-              : datasetVersion.path
+              ? genPublicOrPrivateDataJsonString(datasetVersion.privatePath,false)
+              : genPublicOrPrivateDataJsonString(datasetVersion.path,true)
             : "",
           modelVersion
             ? isModelPrivate
-              ? modelVersion.privatePath
-              : modelVersion.path
+              ? genPublicOrPrivateDataJsonString(modelVersion.privatePath,false)
+              : genPublicOrPrivateDataJsonString(modelVersion.path,true)
             : "",
           mountPoints.join(","),
           gpuType || "",
