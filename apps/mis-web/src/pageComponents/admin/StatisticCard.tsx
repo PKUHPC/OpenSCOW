@@ -13,7 +13,7 @@
 import { Card, Space, Statistic } from "antd";
 import React from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { styled } from "styled-components"; ;
+import { styled } from "styled-components";
 
 interface Props {
   title: string
@@ -31,7 +31,10 @@ const Container = styled.div`
   flex: 1;
 `;
 
-
+export const StatisticTitle = styled.div<{ justify?: string }>`
+  color: grey;
+  margin-bottom: 4px
+`;
 
 const iconToNode = (Icon: any, color?: string) => {
   return React.isValidElement(Icon)
@@ -51,13 +54,17 @@ export const StatisticCard: React.FC<Props> = ({ title, newAddValue = 0,
       <Container>
         <Space>
           {iconToNode(icon, iconColor)}
-          <Statistic
-            title={title}
-            value={newAddValue}
-            precision={precision}
-            loading={loading}
-            valueStyle={{ color: "#94070A" }}
-          />
+          <div>
+            <StatisticTitle>{title}</StatisticTitle>
+            <Statistic
+              style={{ display: "flex", alignItems: "flex-end" }}
+              title={<span style={{ color: "grey", fontSize: "14px" }}>{`${t(p("newlyAdd"))}: `}</span>}
+              value={newAddValue}
+              precision={precision}
+              loading={loading}
+              valueStyle={{ color: "#94070A", marginLeft: "6px" }}
+            />
+          </div>
         </Space>
       </Container>
       <Statistic

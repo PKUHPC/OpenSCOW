@@ -11,7 +11,7 @@
  */
 
 import { MoneyCollectOutlined, PlayCircleOutlined, ProjectOutlined,
-  TeamOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons";
+  UserOutlined, WalletOutlined } from "@ant-design/icons";
 import { moneyToNumber } from "@scow/lib-decimal";
 import { getAdminStatPresets } from "@scow/lib-web/build/utils/datetime";
 import { Card, Col, DatePicker, Row, Space } from "antd";
@@ -375,16 +375,6 @@ export const PlatformStatisticsPage: NextPage = requireAuth(
             loading={statisticInfoLoading}
             icon={WalletOutlined}
             iconColor="#2e86de"
-          />
-        </Col>
-        <Col flex={4}>
-          <StatisticCard
-            title={t(p("tenant"))}
-            newAddValue={statisticInfo?.newTenant}
-            totalValue={statisticInfo?.totalTenant}
-            loading={statisticInfoLoading}
-            icon={TeamOutlined}
-            iconColor="#1dd1a1"
           />
         </Col>
         <Col flex={4}>

@@ -357,6 +357,7 @@ export default {
       },
       statisticCard: {
         total: "总",
+        newlyAdd: "新增",
       },
       tenantChargeForm:{
         loadType:"正在加载使用过的类型……",

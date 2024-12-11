@@ -357,6 +357,7 @@ export default {
       },
       statisticCard: {
         total: "Total ",
+        newlyAdd: "Newly Added",
       },
       tenantChargeForm: {
         loadType: "Loading used types...",
