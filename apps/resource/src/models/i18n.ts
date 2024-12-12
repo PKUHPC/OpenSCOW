@@ -51,8 +51,8 @@ export const languageDic = {
         tenantUnAssignedMessage: "取消授权租户分区成功",
         accountAssignedSuccessMessage: "授权账户分区成功",
         accountUnassignedSuccessMessage: "取消授权账户分区成功",
-        assignContent: "确定在集群 {} 的分区 {} 下对 {} 进行授权吗？",
-        unAssignContent: "确定要在集群 {} 的分区 {} 下取消对租户 {} 的授权吗？",
+        assignContent: "确定在集群 {0} 的分区 {1} 下对 {2} 进行授权吗？",
+        unAssignContent: "确定要在集群 {0} 的分区 {1} 下取消对租户 {2} 的授权吗？",
         unAssignTenantPartitionExplanation: "取消授权后，该租户下所有账户均无法使用该分区  ",
       },
       setClusterAssignmentModal: {
@@ -61,8 +61,8 @@ export const languageDic = {
         tenantUnAssignedMessage: "取消授权租户集群成功",
         accountAssignedSuccessMessage: "授权账户集群成功",
         accountUnassignedSuccessMessage: "取消授权账户集群成功",
-        assignContent: "确定在集群 {} 下对 {} 进行授权吗？",
-        unAssignContent: "确定要在集群 {} 下取消对租户 {} 的授权吗？",
+        assignContent: "确定在集群 {0} 下对 {1} 进行授权吗？",
+        unAssignContent: "确定要在集群 {0} 下取消对租户 {1} 的授权吗？",
         unAssignTenantClusterExplanation: "取消授权后，该集群所有分区均对该租户取消授权 ",
         unAssignAccountClusterExplanation: "取消授权后，该集群所有分区均对该账户取消授权",
       },
@@ -81,7 +81,7 @@ export const languageDic = {
       explanation: "新建账户时，会自动添加默认授权集群信息到该账户的授权集群中",
       removeModal: {
         title: "移出默认集群",
-        content: "确认从租户 {} 的默认授权集群下移出集群 {} 吗？",
+        content: "确认从租户 {0} 的默认授权集群下移出集群 {1} 吗？",
         removedSuccessMessage: "已从默认授权集群下移出",
       },
       addModal: {
@@ -100,7 +100,7 @@ export const languageDic = {
       },
       removeModal: {
         title: "移出默认授权分区",
-        content: "确认从租户 {} 的默认授权分区下移出分区 {} 吗？",
+        content: "确认从租户 {0} 的默认授权分区下移出分区 {1} 吗？",
         successMessage: "已从租户下设置的默认授权分区移出",
       },
       noDataText: "当前暂无可以添加的分区，请确认租户下是否已有已授权分区。",
@@ -169,9 +169,9 @@ export const languageDic = {
         tenantUnAssignedMessage: "Successfully unassigned tenant partition",
         accountAssignedSuccessMessage: "Successfully assigned account partition",
         accountUnassignedSuccessMessage: "Successfully unassigned account partition",
-        assignContent: "Are you sure you want to assign the partition {} of the cluster {} to {}?",
+        assignContent: "Are you sure you want to assign the partition {1} of the cluster {0} to {2}?",
         unAssignContent: "Are you sure you want to unassign"
-        + " the partition {} of the cluster {} from the tenant {}?",
+        + " the partition {1} of the cluster {0} from the tenant {2}?",
         unAssignTenantPartitionExplanation: "After revoking authorization, "
         + "all accounts under this tenant will be unable to use this partition.",
       },
@@ -181,8 +181,8 @@ export const languageDic = {
         tenantUnAssignedMessage: "Successfully unassigned tenant cluster",
         accountAssignedSuccessMessage: "Successfully assigned account cluster",
         accountUnassignedSuccessMessage: "Successfully unassigned account cluster",
-        assignContent: "Are you sure you want to assign {} in the cluster {}?",
-        unAssignContent: "Are you sure you want to unassign the target {} in the cluster {}?",
+        assignContent: "Are you sure you want to assign {1} in the cluster {0}?",
+        unAssignContent: "Are you sure you want to unassign the tenant {1} in the cluster {0}?",
         unAssignTenantClusterExplanation: "After revoking authorization, "
         + "all partitions of this cluster will be unauthorized for the tenant.",
         unAssignAccountClusterExplanation: "After revoking authorization, "
@@ -204,7 +204,7 @@ export const languageDic = {
       + "added to the account's authorized clusters.",
       removeModal: {
         title: "Remove Default Cluster",
-        content: "Are you sure you want to remove cluster {} from the default assigned clusters of tenant {}?",
+        content: "Are you sure you want to remove cluster {1} from the default assigned clusters of tenant {0}?",
         removedSuccessMessage: "Successfully removed from the default assigned clusters",
       },
       addModal: {
@@ -225,7 +225,7 @@ export const languageDic = {
       },
       removeModal: {
         title: "Remove Default Partition",
-        content: "Are you sure you want to remove partition {} from the default assigned partitions of tenant {}?",
+        content: "Are you sure you want to remove partition {1} from the default assigned partitions of tenant {0}?",
         successMessage: "Successfully removed from the tenant's default assigned partitions",
       },
       noDataText: "No partitions are available to add at the moment. "

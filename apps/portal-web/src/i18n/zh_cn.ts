@@ -225,7 +225,7 @@ export default {
         currentProgress: "当前进度",
         operation: "操作",
         confirmCancelTitle: "确认取消",
-        confirmCancelContent: "确认取消 {} -> {} 的文件 {} 的传输吗?",
+        confirmCancelContent: "确认取消 {0} -> {1} 的文件 {2} 的传输吗?",
         confirmOk: "确认",
         cancelSuccess: "取消成功",
         cancel: "取消",
@@ -595,7 +595,7 @@ export default {
     shell: {
       loginNode: {
         title: "的终端",
-        content: "以ID: {} 连接到集群 {} 的 {} 节点",
+        content: "以ID: {0} 连接到集群 {1} 的 {2} 节点",
         reloadButton: "刷新并重新连接",
         popoverTitle: "命令",
         popoverContent1: "跳转到文件系统",

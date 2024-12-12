@@ -225,7 +225,7 @@ export default {
         currentProgress: "Current Progress",
         operation: "Operation",
         confirmCancelTitle: "Confirm Cancellation",
-        confirmCancelContent: "Are you sure you want to cancel the transfer of the file {} from {} to {}?",
+        confirmCancelContent: "Are you sure you want to cancel the transfer of the file {2} from {0} to {1}?",
         confirmOk: "Confirm",
         cancelSuccess: "Cancellation Successful",
         cancel: "Cancel",
@@ -595,7 +595,7 @@ export default {
     shell: {
       loginNode: {
         title: "Terminal",
-        content: "Connected to {}  {} node with ID: {}",
+        content: "Connected to {1}  {2} node with ID: {0}",
         reloadButton: "Refresh and Reconnect",
         popoverTitle: "Commands",
         popoverContent1: "Navigate to the file system ",

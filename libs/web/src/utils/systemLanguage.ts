@@ -90,9 +90,6 @@ export function getCurrentLanguageId(req: IncomingMessage | undefined,
 };
 
 
-
-const splitter = /(\{\})/;
-
 /**
  * 根据当前语言获取带有插值变量的国际化文本
  * @param languageItem 国际化文本
@@ -101,36 +98,78 @@ const splitter = /(\{\})/;
  */
 export const getCurrentLangTextArgs = (
   languageItem: string,
-  placeholderValues?: React.ReactNode[],
+  placeholderValues: React.ReactNode[] | Record<string, React.ReactNode>,
 ): string | React.ReactNode | undefined => {
 
-  const value = languageItem;
-
-  if (value && typeof value === "string") {
-    if (placeholderValues && placeholderValues.length > 0) {
-      // 使用正则表达式进行占位符替换
-      const array = value.split(splitter) as React.ReactNode[];
-      let ri = 0;
-
-      let containsNonPrimitive = false;
-
-      for (let i = 1; i < array.length; i += 2) {
-        if (typeof placeholderValues[ri] === "object") {
-          containsNonPrimitive = true;
-        }
-        array[i] = placeholderValues[ri++];
-      }
-
-      if (!containsNonPrimitive) {
-        return array.join("");
-      }
-
-      return array.filter((item) => item !== "{}");
-    } else {
-      return value;
+  // https://github.com/ddadaal/react-typed-i18n/
+  let head = 0, index = 0;
+  let valueArgs: React.ReactNode[] | undefined = undefined;
+  const results = [] as React.ReactNode[];
+  let escaped = false;
+  let allString = true;
+  const append = (text: string | React.ReactNode | undefined) => {
+  
+    if (typeof text !== "string") {
+      results.push(text ?? "");
+      allString = false;
+      return;
     }
-  } else {
-    return undefined;
+  
+    if (results.length === 0) {
+      results.push(text);
+    } else {
+      if (typeof results[results.length - 1] === "string") {
+        (results[results.length - 1] as string) += text;
+      } else {
+        results.push(text);
+      }
+    }
+  };
+  while (head < languageItem.length) {
+    if (languageItem[head] === "\\") {
+      if (escaped) {
+        append("\\");
+        escaped = false;
+      } else {
+        escaped = true;
+      }
+      head++;
+    } else if (languageItem[head] === "{") {
+      if (escaped) {
+        append("\\{");
+        escaped = false;
+        head++;
+      } else {
+        head++;
+        if (head < languageItem.length) {
+          let key = "";
+          while (head < languageItem.length && languageItem[head] !== "}") {
+            key += languageItem[head++];
+          }
+          if (head === languageItem.length) {
+            append("{" + key);
+            break;
+          } else {
+            head++;
+            if (key === "") {
+              if (!valueArgs) {
+                valueArgs = Array.isArray(placeholderValues) ? placeholderValues : Object.values(placeholderValues);
+              }
+              append(valueArgs[index++]);
+            } else {
+              append(placeholderValues[key]);
+            }
+          }
+        } else {
+          append("{");
+          break;
+        }
+      }
+    } else {
+      append(languageItem[head]);
+      head++;
+    }
   }
-
+  
+  return allString ? results.join("") : results;
 };

@@ -839,8 +839,8 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       react-typed-i18n:
-        specifier: 2.3.0
-        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.3.1)
+        specifier: 2.4.0
+        version: 2.4.0(react@18.3.1)
       recharts:
         specifier: ^2.7.3
         version: 2.12.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1367,8 +1367,8 @@ importers:
         specifier: 18.3.1
         version: 18.3.1
       react-typed-i18n:
-        specifier: 2.3.0
-        version: 2.3.0(patch_hash=eybujl4up7xenffji6zpg43f3u)(react@18.3.1)
+        specifier: 2.4.0
+        version: 2.4.0(react@18.3.1)
       recharts:
         specifier: 2.12.7
         version: 2.12.7(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -24576,7 +24576,7 @@ snapshots:
   proxy-agent@6.3.1:
     dependencies:
       agent-base: 7.1.1
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.4
       lru-cache: 7.18.3
@@ -25581,7 +25581,7 @@ snapshots:
 
   require-in-the-middle@5.2.0:
     dependencies:
-      debug: 4.3.4(supports-color@5.5.0)
+      debug: 4.3.7
       module-details-from-path: 1.0.3
       resolve: 1.22.8
     transitivePeerDependencies:
