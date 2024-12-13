@@ -11,7 +11,7 @@
  */
 
 import { CopyOutlined, DatabaseOutlined, DeleteOutlined, EyeInvisibleOutlined, EyeOutlined,
-  FileAddOutlined, FolderAddOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined,
+  FileAddOutlined, FolderAddOutlined, HomeOutlined, LeftOutlined,
   RightOutlined, ScissorOutlined, SnippetsOutlined, UploadOutlined,
   UpOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
@@ -100,7 +100,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
     clusterId: cluster.id, path,
   }, { enabled: path !== "~" });
 
-  const loginNodeAddress = loginNodes[cluster.id];
 
   const reload = filesQuery.refetch;
 
@@ -380,14 +379,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
           >
             {showHiddenFile ? t(p("noDisplay")) : t(p("display"))}{t(p("hidden"))}
           </Button>
-          <Link
-            href={`/shell/${cluster.id}/${loginNodeAddress}${path}`}
-            target="_blank"
-          >
-            <Button icon={<MacCommandOutlined />}>
-              {t(p("terminal"))}
-            </Button>
-          </Link>
           <CreateFileButton
             cluster={cluster}
             path={path}
