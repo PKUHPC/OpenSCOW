@@ -30,10 +30,10 @@ importers:
         version: 2.1.0(eslint@9.6.0)(typescript@5.5.2)
       '@pnpm/lockfile-file':
         specifier: 9.1.1
-        version: 9.1.1(@pnpm/logger@5.0.0)
+        version: 9.1.1(@pnpm/logger@1000.0.0)
       '@pnpm/logger':
-        specifier: 5.0.0
-        version: 5.0.0
+        specifier: 1000.0.0
+        version: 1000.0.0
       '@types/jest':
         specifier: 29.5.12
         version: 29.5.12
@@ -3536,9 +3536,9 @@ packages:
     resolution: {integrity: sha512-hbsLB52+/zK9ae4JPR8EnT5K6bB2eBaEx1Mei4IVxtvIRnj6XU7C95PXBX/4QmsRIkpr3PGaKg2GiQALE22WNg==}
     engines: {node: '>=18.12'}
 
-  '@pnpm/logger@5.0.0':
-    resolution: {integrity: sha512-YfcB2QrX+Wx1o6LD1G2Y2fhDhOix/bAY/oAnMpHoNLsKkWIRbt1oKLkIFvxBMzLwAEPqnYWguJrYC+J6i4ywbw==}
-    engines: {node: '>=12.17'}
+  '@pnpm/logger@1000.0.0':
+    resolution: {integrity: sha512-v5WO9L4pT7ZjZpf7a/a3H3Xj59JPHNMFJwRS7m/01VMWrKjs89CdVIE5e/N6DwuzP750j0iKozTw6UrCVEfQjA==}
+    engines: {node: '>=18.12'}
 
   '@pnpm/merge-lockfile-changes@6.0.3':
     resolution: {integrity: sha512-XFd+c1PzNK5TkLAqaG90RyA0RFIpwhvFxprEDxMVnu9d5Gq8ws4TWz0vy5oTZuKTPODmN7i01xZzEV2/+0KrOw==}
@@ -5027,8 +5027,8 @@ packages:
     resolution: {integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
 
-  bole@5.0.11:
-    resolution: {integrity: sha512-KB0Ye0iMAW5BnNbnLfMSQcnI186hKUzE2fpkZWqcxsoTR7eqzlTidSOMYPHJOn/yR7VGH7uSZp37qH9q2Et0zQ==}
+  bole@5.0.17:
+    resolution: {integrity: sha512-q6F82qEcUQTP178ZEY4WI1zdVzxy+fOnSF1dOMyC16u1fc0c24YrDPbgxA6N5wGHayCUdSBWsF8Oy7r2AKtQdA==}
 
   bonjour-service@1.2.1:
     resolution: {integrity: sha512-oSzCS2zV14bh2kji6vNe7vrpJYCHGvcZnlffFQ1MEoX/WOeQ/teD8SYWKR942OI3INjq8OMNJlbPK5LLLUxFDw==}
@@ -15271,9 +15271,9 @@ snapshots:
 
   '@pnpm/constants@8.0.0': {}
 
-  '@pnpm/core-loggers@10.0.2(@pnpm/logger@5.0.0)':
+  '@pnpm/core-loggers@10.0.2(@pnpm/logger@1000.0.0)':
     dependencies:
-      '@pnpm/logger': 5.0.0
+      '@pnpm/logger': 1000.0.0
       '@pnpm/types': 10.1.1
 
   '@pnpm/crypto.base32-hash@3.0.0':
@@ -15290,11 +15290,11 @@ snapshots:
     dependencies:
       '@pnpm/constants': 8.0.0
 
-  '@pnpm/fetch@8.0.2(@pnpm/logger@5.0.0)':
+  '@pnpm/fetch@8.0.2(@pnpm/logger@1000.0.0)':
     dependencies:
-      '@pnpm/core-loggers': 10.0.2(@pnpm/logger@5.0.0)
+      '@pnpm/core-loggers': 10.0.2(@pnpm/logger@1000.0.0)
       '@pnpm/fetching-types': 6.0.0
-      '@pnpm/logger': 5.0.0
+      '@pnpm/logger': 1000.0.0
       '@pnpm/network.agent': 2.0.0
       '@pnpm/types': 10.1.1
       '@zkochan/retry': 0.2.0
@@ -15310,9 +15310,9 @@ snapshots:
     transitivePeerDependencies:
       - domexception
 
-  '@pnpm/git-resolver@9.0.3(@pnpm/logger@5.0.0)':
+  '@pnpm/git-resolver@9.0.3(@pnpm/logger@1000.0.0)':
     dependencies:
-      '@pnpm/fetch': 8.0.2(@pnpm/logger@5.0.0)
+      '@pnpm/fetch': 8.0.2(@pnpm/logger@1000.0.0)
       '@pnpm/resolver-base': 12.0.2
       graceful-git: 3.1.2
       hosted-git-info: '@pnpm/hosted-git-info@1.0.0'
@@ -15330,16 +15330,16 @@ snapshots:
     dependencies:
       lru-cache: 6.0.0
 
-  '@pnpm/lockfile-file@9.1.1(@pnpm/logger@5.0.0)':
+  '@pnpm/lockfile-file@9.1.1(@pnpm/logger@1000.0.0)':
     dependencies:
       '@pnpm/constants': 8.0.0
       '@pnpm/dependency-path': 5.1.1
       '@pnpm/error': 6.0.1
-      '@pnpm/git-resolver': 9.0.3(@pnpm/logger@5.0.0)
+      '@pnpm/git-resolver': 9.0.3(@pnpm/logger@1000.0.0)
       '@pnpm/git-utils': 2.0.0
       '@pnpm/lockfile-types': 7.1.1
       '@pnpm/lockfile-utils': 11.0.2
-      '@pnpm/logger': 5.0.0
+      '@pnpm/logger': 1000.0.0
       '@pnpm/merge-lockfile-changes': 6.0.3
       '@pnpm/types': 10.1.1
       '@pnpm/util.lex-comparator': 3.0.0
@@ -15370,9 +15370,9 @@ snapshots:
       get-npm-tarball-url: 2.1.0
       ramda: '@pnpm/ramda@0.28.1'
 
-  '@pnpm/logger@5.0.0':
+  '@pnpm/logger@1000.0.0':
     dependencies:
-      bole: 5.0.11
+      bole: 5.0.17
       ndjson: 2.0.0
 
   '@pnpm/merge-lockfile-changes@6.0.3':
@@ -17427,7 +17427,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  bole@5.0.11:
+  bole@5.0.17:
     dependencies:
       fast-safe-stringify: 2.1.1
       individual: 3.0.0

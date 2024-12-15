@@ -26,7 +26,7 @@
     "@commitlint/config-conventional": "19.2.2",
     "@ddadaal/eslint-config": "2.1.0",
     "@pnpm/lockfile-file": "9.1.1",
-    "@pnpm/logger": "5.0.0",
+    "@pnpm/logger": "1000.0.0",
     "@types/jest": "29.5.12",
     "@types/node": "20.14.8",
     "concurrently": "8.2.2",
