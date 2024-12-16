@@ -146,12 +146,15 @@ jobs:
         run: pnpm build "--filter=@scow/cli"
 
       - name: Archive scow-cli-x64
+        continue-on-error: true
         uses: actions/upload-artifact@v4
+
         with:
           name: scow-cli-x64
           path: apps/cli/exe/cli-x64
 
       - name: Archive scow-cli-arm64
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: scow-cli-arm64
