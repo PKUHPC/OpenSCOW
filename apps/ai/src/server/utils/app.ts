@@ -18,7 +18,7 @@ import { sftpExists, sftpReadFile } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
 import { join } from "path";
 import { getAiAppConfigs } from "src/server/config/apps";
-import { AlgorithmVersion, SharedStatus } from "src/server/entities/AlgorithmVersion";
+import { AlgorithmVersion } from "src/server/entities/AlgorithmVersion";
 import { DatasetVersion } from "src/server/entities/DatasetVersion";
 import { Image as ImageEntity } from "src/server/entities/Image";
 import { ModelVersion } from "src/server/entities/ModelVersion";
@@ -119,7 +119,7 @@ export const getAllTags = (allApps: Record<string, AppConfigWithClusterSpecific>
  * @throws TRPCError if dataset, algorithm, image, model is not found
  */
 export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, model }: {
-  em: EntityManager,
+  em: EntityManager
   dataset: number | undefined,
   algorithm: number | undefined,
   image: number | undefined,
@@ -127,7 +127,7 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
 }) => {
   let algorithmVersion: AlgorithmVersion | undefined;
   if (algorithm !== undefined) {
-    const selectAlgorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithm }, { populate:["algorithm"]});
+    const selectAlgorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithm });
 
     if (!selectAlgorithmVersion) {
       throw new TRPCError({
@@ -140,7 +140,7 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
 
   let datasetVersion: DatasetVersion | undefined;
   if (dataset !== undefined) {
-    const selectDatasetVersion = await em.findOne(DatasetVersion, { id: dataset }, { populate:["dataset"]});
+    const selectDatasetVersion = await em.findOne(DatasetVersion, { id: dataset });
 
     if (!selectDatasetVersion) {
       throw new TRPCError({
@@ -153,8 +153,7 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
 
   let modelVersion: ModelVersion | undefined;
   if (model !== undefined) {
-    const selectedModelVersion = await em.findOne(ModelVersion, { id: model }, { populate:["model"]});
-
+    const selectedModelVersion = await em.findOne(ModelVersion, { id: model });
     if (!selectedModelVersion) {
       throw new TRPCError({
         code: "NOT_FOUND",
@@ -249,69 +248,3 @@ export const validateUniquePaths = (paths: (string | undefined)[]) => {
 
 export const genPublicOrPrivateDataJsonString = (path: string | undefined,isPublic: boolean) =>
   JSON.stringify({ path,isPublic });
-
-export const checkEntityAuth = ({ datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
-  modelVersion, isModelPrivate, image, userId }: {
-  datasetVersion: DatasetVersion | undefined,
-  isDatasetPrivate: boolean | undefined,
-  algorithmVersion: AlgorithmVersion | undefined,
-  isAlgorithmPrivate: boolean | undefined,
-  modelVersion: ModelVersion | undefined,
-  isModelPrivate: boolean | undefined,
-  image: ImageEntity | undefined,
-  userId: string,
-}) => {
-  if (datasetVersion) {
-    if (isDatasetPrivate && datasetVersion.dataset.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `dataset version id ${datasetVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isDatasetPrivate && datasetVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `dataset version id ${datasetVersion.id} is not accessible`,
-      });
-    }
-  }
-
-  if (algorithmVersion) {
-    if (isAlgorithmPrivate && algorithmVersion.algorithm.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `algorithm version id ${algorithmVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isAlgorithmPrivate && algorithmVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `algorithm version id ${algorithmVersion.id} is not accessible`,
-      });
-    }
-  }
-
-  if (modelVersion) {
-    if (isModelPrivate && modelVersion.model.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `model version id ${modelVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isModelPrivate && modelVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `model version id ${modelVersion.id} is not accessible`,
-      });
-    }
-  }
-
-  if (image) {
-    if (image.owner !== userId && !image.isShared) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `image id ${image.id} is not accessible`,
-      });
-    }
-  }
-};
