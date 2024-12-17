@@ -20,9 +20,11 @@ import { createAccount } from "@scow/lib-auth";
 import { removeUserFromAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
+import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
+import { ApiVersion } from "@scow/utils/build/version";
 import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
@@ -705,6 +707,26 @@ export const accountServiceServer = plugin((server) => {
           message: JSON.stringify(runningJobsObj),
         } as ServiceError;
       }
+
+      // 当前接口要求的最低调度器接口版本
+      const minRequiredApiVersion: ApiVersion = { major: 1, minor: 7, patch: 0 };
+      await server.ext.clusters.callOnAll(currentActivatedClusters, logger, async (client) => {
+        // 当前接口要求的最低调度器接口版本
+        // 检查调度器的 API 版本
+        await checkSchedulerApiVersion(client, minRequiredApiVersion);
+      }).catch(() => {
+
+        const details = "The method is not supported with the current scheduler adapter version. " +
+          "To use this method, the scheduler adapter must be upgraded to version " +
+          `${minRequiredApiVersion.major}.${minRequiredApiVersion.minor}.${minRequiredApiVersion.patch} or higher.`;
+
+        logger.error(details, "Scheduler API version mismatch.");
+
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: details,
+        } as ServiceError;
+      });
 
       // 处理用户账户关系表，删除账户与所有用户的关系
       const hasCapabilities = server.ext.capabilities.accountUserRelation;

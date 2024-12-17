@@ -39,6 +39,8 @@ export const DeleteAccountSchema = typeboxRouteSchema({
     404: Type.Object({ message: Type.String() }),
     // 不能移出有正在运行作业的用户，只能先封锁
     409: Type.Object({ message: Type.String() }),
+    /** 本功能在当前配置下不可用 */
+    501: Type.Object({ message: Type.String() }),
   },
 });
 
@@ -72,6 +74,7 @@ export default /* #__PURE__*/route(DeleteAccountSchema, async (req,res) => {
     .catch(handlegRPCError({
       [status.NOT_FOUND]: (e) => ({ 404: { message: e.details } }),
       [status.FAILED_PRECONDITION]: (e) => ({ 409: { message: e.details } }),
+      [status.UNIMPLEMENTED]: (e) => ({ 501:{ message: e.details } }),
     },
     async () => await callLog(logInfo, OperationResult.FAIL),
     ));

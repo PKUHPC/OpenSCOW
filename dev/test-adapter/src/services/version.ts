@@ -17,7 +17,7 @@ export const versionServiceServer = plugin((server) => {
   server.addService<VersionServiceServer>(VersionServiceService, {
 
     getVersion: async () => {
-      return [{ major: 0, minor: 0, patch: 0 }];
+      return [{ major: 1, minor: 7, patch: 0 }];
     },
 
   });

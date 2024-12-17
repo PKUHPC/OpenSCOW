@@ -492,6 +492,13 @@ export const AccountTable: React.FC<Props> = ({
                           setFailedDeletedMessage({ type });
                           reload();
                         })
+                        .httpError(501, (e) => {
+                          message.destroy("deleteAccount");
+                          message.error({
+                            content: e.message,
+                            duration: 4,
+                          });
+                        })
                         .then(() => {
                           message.success(t(p("deleteSuccess")));
                           message.destroy("deleteAccount");
