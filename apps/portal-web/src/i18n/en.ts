@@ -305,6 +305,7 @@ export default {
           submitConfirmOk: "Confirm",
           submitSuccessMessage: "Submitted successfully! Your new job ID is: {}",
           submitFailedMessage: "Submitted Failed",
+          downloadSelected: "Download Selected",
         },
       },
       fileTable: {

@@ -13,7 +13,7 @@
 import {
   CopyOutlined,
   DatabaseOutlined,
-  DeleteOutlined, EyeInvisibleOutlined,
+  DeleteOutlined, DownloadOutlined, EyeInvisibleOutlined,
   EyeOutlined, FileAddOutlined, FolderAddOutlined,
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
@@ -33,7 +33,7 @@ import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { urlToDownload } from "src/pageComponents/filemanager/api";
+import { urlToDownload, urlToDownloadAndCompress } from "src/pageComponents/filemanager/api";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -265,6 +265,12 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     reload();
   };
 
+  const onDownloadClick = () => {
+    const files = keysToFiles(selectedKeys);
+
+    fetch(urlToDownloadAndCompress(cluster.id, files.map((x) => join(path, x.name)), true));
+  };
+
   const onDeleteClick = () => {
     const files = keysToFiles(selectedKeys);
     modal.confirm({
@@ -417,6 +423,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
             {t(p("tableInfo.uploadButton"))}
           </UploadButton>
           <Divider type="vertical" />
+          {
+            !scowdEnabled && (
+              <Button
+                icon={<DownloadOutlined />}
+                danger
+                onClick={onDownloadClick}
+                disabled={selectedKeys.length === 0}
+              >
+                {t(p("tableInfo.downloadSelected"))}
+              </Button>
+            )
+          }
           <Button
             icon={<DeleteOutlined />}
             danger
@@ -555,6 +573,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
             {
               i.type === "FILE" && (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
+                  {t(p("tableInfo.download"))}
+                </a>
+              )
+            }
+            {
+              (i.type === "DIR" && !scowdEnabled) && (
+                <a href={urlToDownloadAndCompress(cluster.id, [join(path, i.name)], true)}>
                   {t(p("tableInfo.download"))}
                 </a>
               )

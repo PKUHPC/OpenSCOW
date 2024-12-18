@@ -67,6 +67,16 @@ message DownloadResponse {
   bytes chunk = 1;
 }
 
+message DownloadAndCompressRequest {
+  string user_id = 1;
+  string cluster = 2;
+  repeated string paths = 3; // 需要压缩的文件或目录路径
+}
+
+message DownloadAndCompressResponse {
+  bytes chunk = 1;
+}
+
 message GetHomeDirectoryRequest {
   string user_id = 1;
   string cluster = 2;
@@ -250,6 +260,7 @@ service FileService {
   rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc DownloadAndCompress (DownloadAndCompressRequest) returns (stream DownloadAndCompressResponse);
   rpc GetHomeDirectory(GetHomeDirectoryRequest)
       returns (GetHomeDirectoryResponse);
   rpc ReadDirectory(ReadDirectoryRequest) returns (ReadDirectoryResponse);

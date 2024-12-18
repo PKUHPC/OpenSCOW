@@ -81,6 +81,7 @@
     "styled-components": "6.1.11",
     "tslib": "2.6.3",
     "typescript": "5.5.2",
+    "uuid": "10.0.0",
     "ws": "8.17.1"
   },
   "devDependencies": {

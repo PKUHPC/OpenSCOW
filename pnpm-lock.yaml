@@ -1384,6 +1384,9 @@ importers:
       typescript:
         specifier: 5.5.2
         version: 5.5.2
+      uuid:
+        specifier: 10.0.0
+        version: 10.0.0
       ws:
         specifier: 8.17.1
         version: 8.17.1

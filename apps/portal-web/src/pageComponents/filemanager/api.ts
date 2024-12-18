@@ -13,6 +13,13 @@
 import { join } from "path";
 import { publicConfig } from "src/utils/config";
 
+export const urlToDownloadAndCompress = (cluster: string, path: string[], download: boolean): string => {
+  const pathParams = path.map((p) => `path=${encodeURIComponent(p)}`).join("&");
+
+  return `${join(publicConfig.BASE_PATH, "/api/file/download")}?${pathParams}&cluster=${cluster}&download=${download}`;
+};
+
+
 export const urlToDownload = (cluster: string, path: string, download: boolean): string => {
 
   return join(publicConfig.BASE_PATH, "/api/file/download")

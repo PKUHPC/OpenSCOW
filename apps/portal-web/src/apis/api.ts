@@ -1,21 +1,11 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 /* eslint-disable @stylistic/max-len */
 
 import { apiClient } from "src/apis/client";
 import type { GetClusterInfoSchema } from "src/pages/api//cluster";
 import type { getClusterConfigFilesSchema } from "src/pages/api//getClusterConfigFiles";
 import type { GetClustersRuntimeInfoSchema } from "src/pages/api//getClustersRuntimeInfo";
+import type { GetUserAssociatedClusterIdsSchema } from "src/pages/api//getUserAssociatedClusterIds";
+import type { GetUserAssociatedClusterPartitionsSchema } from "src/pages/api//getUserAssociatedClusterPartitions";
 import type { CheckAppConnectivitySchema } from "src/pages/api/app/checkConnectivity";
 import type { CheckShadowDeskConnectivitySchema } from "src/pages/api/app/checkShadowDeskConnectivity";
 import type { ConnectToAppSchema } from "src/pages/api/app/connectToApp";
@@ -42,6 +32,7 @@ import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
 import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
 import type { DownloadFileSchema } from "src/pages/api/file/download";
+import type { DownloadAndCompressFileSchema } from "src/pages/api/file/downloadAndCompress";
 import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
@@ -55,8 +46,6 @@ import type { QueryFileTransferProgressSchema } from "src/pages/api/file/queryFi
 import type { StartFileTransferSchema } from "src/pages/api/file/startFileTransfer";
 import type { TerminateFileTransferSchema } from "src/pages/api/file/terminateFileTransfer";
 import type { UploadFileSchema } from "src/pages/api/file/upload";
-import type { GetUserAssociatedClusterIdsSchema } from "src/pages/api/getUserAssociatedClusterIds";
-import type { GetUserAssociatedClusterPartitionsSchema } from "src/pages/api/getUserAssociatedClusterPartitions";
 import type { CancelJobSchema } from "src/pages/api/job/cancelJob";
 import type { DeleteJobTemplateSchema } from "src/pages/api/job/deleteJobTemplate";
 import type { GetAccountsSchema } from "src/pages/api/job/getAccounts";
@@ -102,6 +91,7 @@ export const api = {
   deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
   deleteFile: apiClient.fromTypeboxRoute<typeof DeleteFileSchema>("DELETE", "/api/file/deleteFile"),
   downloadFile: apiClient.fromTypeboxRoute<typeof DownloadFileSchema>("GET", "/api/file/download"),
+  downloadAndCompressFile: apiClient.fromTypeboxRoute<typeof DownloadAndCompressFileSchema>("GET", "/api/file/downloadAndCompress"),
   fileExist: apiClient.fromTypeboxRoute<typeof FileExistSchema>("GET", "/api/file/fileExist"),
   getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
@@ -117,6 +107,8 @@ export const api = {
   uploadFile: apiClient.fromTypeboxRoute<typeof UploadFileSchema>("POST", "/api/file/upload"),
   getClusterConfigFiles: apiClient.fromTypeboxRoute<typeof getClusterConfigFilesSchema>("GET", "/api//getClusterConfigFiles"),
   getClustersRuntimeInfo: apiClient.fromTypeboxRoute<typeof GetClustersRuntimeInfoSchema>("GET", "/api//getClustersRuntimeInfo"),
+  getUserAssociatedClusterIds: apiClient.fromTypeboxRoute<typeof GetUserAssociatedClusterIdsSchema>("GET", "/api//getUserAssociatedClusterIds"),
+  getUserAssociatedClusterPartitions: apiClient.fromTypeboxRoute<typeof GetUserAssociatedClusterPartitionsSchema>("GET", "/api//getUserAssociatedClusterPartitions"),
   cancelJob: apiClient.fromTypeboxRoute<typeof CancelJobSchema>("DELETE", "/api/job/cancelJob"),
   deleteJobTemplate: apiClient.fromTypeboxRoute<typeof DeleteJobTemplateSchema>("DELETE", "/api/job/deleteJobTemplate"),
   getAccounts: apiClient.fromTypeboxRoute<typeof GetAccountsSchema>("GET", "/api/job/getAccounts"),
@@ -132,6 +124,4 @@ export const api = {
   markMessageRead: apiClient.fromTypeboxRoute<typeof MarkMessageReadSchema>("POST", "/api/notification/markMessageRead"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),
   checkPassword: apiClient.fromTypeboxRoute<typeof CheckPasswordSchema>("GET", "/api/profile/checkPassword"),
-  getUserAssociatedClusterIds: apiClient.fromTypeboxRoute<typeof GetUserAssociatedClusterIdsSchema>("GET", "/api//getUserAssociatedClusterIds"),
-  getUserAssociatedClusterPartitions: apiClient.fromTypeboxRoute<typeof GetUserAssociatedClusterPartitionsSchema>("GET", "/api//getUserAssociatedClusterPartitions"),
 };

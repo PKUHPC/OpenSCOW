@@ -305,6 +305,7 @@ export default {
           submitConfirmOk: "确认",
           submitSuccessMessage: "提交成功！您的新作业ID为：{}",
           submitFailedMessage: "提交失败",
+          downloadSelected: "下载选中",
         },
       },
       fileTable: {
