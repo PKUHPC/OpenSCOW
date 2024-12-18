@@ -38,6 +38,7 @@ import { Image as ImageEntity, Source, Status } from "src/server/entities/Image"
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
 import { allApps, checkAppExist, checkCreateAppEntity,
+  checkEntityAuth,
   fetchJobInputParams, genPublicOrPrivateDataJsonString, getAllTags, getClusterAppConfigs,
   validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
@@ -401,6 +402,11 @@ export const createAppSession = procedure
       throw clusterNotFound(clusterId);
     }
 
+    // 检查数据集、算法、模型和镜像是否有权限使用
+    checkEntityAuth({
+      datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
+      modelVersion, isModelPrivate, image:existImage, userId,
+    });
 
     return await sshConnect(host, userId, logger, async (ssh) => {
       const homeDir = await getUserHomedir(ssh, userId, logger);
@@ -938,7 +944,7 @@ export const listAppSessions =
         const filteredSessions = sessions.filter((session) => isRunning
           ? runningStates.includes(session.state)
           : !runningStates.includes(session.state))
-          .sort((a, b) => b.submitTime.localeCompare(a.submitTime)); ;
+          .sort((a, b) => b.submitTime.localeCompare(a.submitTime));
 
         const { paginatedItems: paginatedSessions, totalCount } = paginate(
           filteredSessions, page, pageSize,

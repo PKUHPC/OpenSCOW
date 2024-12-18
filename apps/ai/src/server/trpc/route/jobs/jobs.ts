@@ -27,7 +27,7 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity, fetchJobInputParams, genPublicOrPrivateDataJsonString,
+import { checkCreateAppEntity, checkEntityAuth, fetchJobInputParams, genPublicOrPrivateDataJsonString,
   validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
@@ -168,6 +168,12 @@ procedure
         algorithm,
         image,
         model,
+      });
+
+      // 检查数据集、算法、模型和镜像是否有权限使用
+      checkEntityAuth({
+        datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
+        modelVersion, isModelPrivate, image:existImage, userId,
       });
 
       return await sshConnect(host, userId, logger, async (ssh) => {
