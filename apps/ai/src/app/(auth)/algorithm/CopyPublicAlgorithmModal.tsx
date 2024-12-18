@@ -54,11 +54,12 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
     },
     onError(err) {
       const errCode = err.data?.code;
-      if (errCode === "CONFLICT") {
+      const errMessage = err.message;
+      if (errCode === "CONFLICT" && errMessage.startsWith("An algorithm with the same name")) {
         message.error(t(p("alreadyExisted")));
         form.setFields([
           {
-            name: "targetDatasetName",
+            name: "targetAlgorithmName",
             errors: [t(p("alreadyExisted"))],
           },
         ]);
@@ -66,7 +67,6 @@ export const CopyPublicAlgorithmModal: React.FC<Props> = (
       }
 
       message.error(err.message);
-
     },
   });
 

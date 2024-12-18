@@ -596,7 +596,7 @@ export const copyImage = procedure
       summary: "copy a image",
     },
   })
-  .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string() }))
+  .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string(),clusterId:z.optional(z.string()) }))
   .output(z.number())
   .use(async ({ input:{ id, newTag }, ctx, next }) => {
     const res = await next({ ctx });
@@ -626,7 +626,7 @@ export const copyImage = procedure
 
     const em = await forkEntityManager();
 
-    const { id, newName, newTag } = input;
+    const { id, newName, newTag,clusterId } = input;
 
     const sharedImage = await em.findOne(Image, { id, isShared: true, status: Status.CREATED });
 
@@ -662,6 +662,7 @@ export const copyImage = procedure
       sourcePath: sharedImage.path,
       status: Status.CREATING,
       description: sharedImage.description,
+      clusterId,
     });
     await em.persistAndFlush(image);
 

@@ -135,7 +135,7 @@ export const DatasetVersionList: React.FC<Props> = (
       columns={[
         { dataIndex: "versionName", title: t(p("versionName")) },
         { dataIndex: "versionDescription", title: t(p("versionDescription")) },
-        isPublic ? {} : { dataIndex: "privatePath", title: t(p("path")) },
+        ...(isPublic ? [] : [{ dataIndex: "privatePath", title: t(p("path")) }]),
         { dataIndex: "createTime", title: t(p("createTime")),
           render: (_, r) => r.createTime ? formatDateTime(r.createTime) : "-" },
         { dataIndex: "action", title: t(p("action")),

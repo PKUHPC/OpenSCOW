@@ -24,6 +24,7 @@ export interface Props {
   copiedId: number;
   copiedName: string;
   copiedTag: string;
+  copiedClusterId?: string;
 }
 
 interface FormFields {
@@ -32,7 +33,7 @@ interface FormFields {
 }
 
 export const CopyImageModal: React.FC<Props> = (
-  { open, onClose, refetch, copiedId, copiedName, copiedTag },
+  { open, onClose, refetch, copiedId, copiedName, copiedTag,copiedClusterId },
 ) => {
   const t = useI18nTranslateToString();
   const p = prefix("app.image.copyImageModal.");
@@ -64,6 +65,7 @@ export const CopyImageModal: React.FC<Props> = (
       id: copiedId,
       newName,
       newTag,
+      clusterId:copiedClusterId,
     });
   };
 

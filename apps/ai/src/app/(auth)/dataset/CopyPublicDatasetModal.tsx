@@ -56,7 +56,9 @@ export const CopyPublicDatasetModal: React.FC<Props> = (
       form.resetFields();
     },
     onError(err) {
-      if (err.data?.code === "CONFLICT") {
+      const errCode = err.data?.code;
+      const errMessage = err.message;
+      if (errCode === "CONFLICT" && errMessage.startsWith("A dataset with the same name")) {
         form.setFields([
           {
             name: "targetDatasetName",
