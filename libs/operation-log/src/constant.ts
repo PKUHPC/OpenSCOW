@@ -124,4 +124,6 @@ export const OperationType: OperationTypeEnum = {
   copyModelVersion:"copyModelVersion",
   markMessageRead: "markMessageRead",
   editUserProfile: "editUserProfile",
+  changePassword: "changePassword",
+  changeEmail: "changeEmail",
 };

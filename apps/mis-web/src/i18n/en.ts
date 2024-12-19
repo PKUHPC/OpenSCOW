@@ -1343,6 +1343,8 @@ export default {
       deleteUser:"Delete User",
       deleteAccount:"Delete Account",
       editUserProfile: "Edit User Information",
+      changePassword: "Modify user password",
+      changeEmail: "Modify user email",
     },
     operationDetails: {
       login: "User Login",
@@ -1467,6 +1469,8 @@ export default {
       userChangeTenant: "User {} changes from tenant {} to tenant {}",
       activateCluster: "User {} activates the Cluster: {}",
       deactivateCluster: "User {} deactivates the Cluster: {}",
+      changePassword: "User changes their personal password",
+      changeEmail: "User changes their personal email",
     },
   },
   userRoles: {

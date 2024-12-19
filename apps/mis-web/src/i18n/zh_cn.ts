@@ -1340,6 +1340,8 @@ export default {
       deleteUser:"删除用户",
       deleteAccount:"删除账户",
       editUserProfile: "修改用户信息",
+      changePassword: "修改用户密码",
+      changeEmail: "修改用户邮箱",
     },
     operationDetails: {
       login: "用户登录",
@@ -1464,6 +1466,8 @@ export default {
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
       activateCluster: "用户{}启用集群：{}",
       deactivateCluster: "用户{}停用集群：{}",
+      changePassword: "用户修改自身密码",
+      changeEmail: "用户修改自身邮箱",
     },
   },
   userRoles: {

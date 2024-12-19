@@ -12,8 +12,12 @@
 
 import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { changePassword as libChangePassword, getCapabilities } from "@scow/lib-auth";
+import { OperationType } from "@scow/lib-operation-log";
 import { authenticate } from "src/auth/server";
+import { OperationResult } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { publicConfig, runtimeConfig } from "src/utils/config";
+import { parseIp } from "src/utils/server";
 
 export const ChangePasswordSchema = typeboxRouteSchema({
 
@@ -68,12 +72,22 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
     } };
   }
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.changePassword,
+  };
+
   return await libChangePassword(runtimeConfig.AUTH_INTERNAL_URL, {
     identityId: info.identityId,
     newPassword,
   }, console)
-    .then(() => ({ 204: null }))
-    .catch((e) => {
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 204: null };
+    })
+    .catch(async (e) => {
+      await callLog(logInfo, OperationResult.FAIL);
       switch (e.status) {
         case "NOT_FOUND":
           return { 404: null };
