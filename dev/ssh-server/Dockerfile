@@ -8,7 +8,7 @@
 # MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
 # See the Mulan PSL v2 for more details.
 
-FROM alpine:3.20
+FROM alpine:3.21
 
 ENV TZ Asia/Shanghai
 
