@@ -837,13 +837,17 @@ export const listAppSessions =
 
       return await sshConnect(host, userId, logger, async (ssh) => {
 
+
+        const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
+          "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
+
         // If a job is not running, it cannot be ready
         const client = getAdapterClient(clusterId);
         const runningJobsInfo = await asyncClientCall(client.job, "getJobs", {
           fields: ["job_id", "state", "elapsed_seconds", "time_limit_minutes", "reason"],
           filter: {
             users: [userId], accounts: [],
-            states: ["RUNNING", "PENDING", "FAILED", "TIMEOUT", "COMPLETED"],
+            states: isRunning ? ["RUNNING", "PENDING"] : terminatedStates,
           },
         }).then((resp) => resp.jobs);
 
@@ -871,7 +875,6 @@ export const listAppSessions =
           const content = await sftpReadFile(sftp)(metadataPath);
           const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-
           const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
           let host: string | undefined = undefined;
@@ -887,35 +890,22 @@ export const listAppSessions =
             }
             // judge whether the app is ready
             if (runningJobInfo && runningJobInfo.state === "RUNNING") {
-            // 对于k8s这种通过容器运行作业的集群，当把容器中的作业工作目录挂载到宿主机中时，目录中新生成的文件不会马上反映到宿主机中，
-            // 具体体现为sftpExists无法找到新生成的SERVER_SESSION_INFO和VNC_SESSION_INFO文件，必须实际读取一次目录，才能识别到它们
-              await sftpReaddir(sftp)(jobDir);
-
-              if (app.type === "web") {
-                // for server apps,
-                // try to read the SESSION_INFO file to get port and password
-                const infoFilePath = join(jobDir, SERVER_SESSION_INFO);
-                if (await sftpExists(sftp, infoFilePath)) {
-                  const content = await sftpReadFile(sftp)(infoFilePath);
-                  const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
-
-                  host = serverSessionInfo.HOST;
-                  port = serverSessionInfo.PORT;
+              try {
+                const client = getAdapterClient(clusterId);
+                const connectionInfo =
+                await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
+                if (connectionInfo?.response?.$case === "appConnectionInfo") {
+                  host = connectionInfo.response.appConnectionInfo.host;
+                  port = connectionInfo.response.appConnectionInfo.port;
                 }
-              } else {
-              // TODO: if vnc apps
+              } catch (error: any) {
+                logger.info("Job(jobId:%s) gets app connection info failed , reason: %o",
+                  sessionMetadata.jobId, error.message);
               }
-              const client = getAdapterClient(clusterId);
-              const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
-              if (connectionInfo?.response?.$case === "appConnectionInfo") {
-                host = connectionInfo.response.appConnectionInfo.host;
-                port = connectionInfo.response.appConnectionInfo.port;
-              }
+
             }
           }
 
-          const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
-            "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
           const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
             || terminatedStates.includes(runningJobInfo?.state);
 
