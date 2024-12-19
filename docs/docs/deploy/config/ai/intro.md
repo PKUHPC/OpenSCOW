@@ -43,14 +43,6 @@ imageTag: ai-beta.1
 
 同时为了满足提交 AI 作业、训练 AI 作业的功能，需要使用第三方调度插件 [Kueue](https://kueue.sigs.k8s.io/docs/)、 配置 **Cluster Queue** 的队列信息来协调和处理作业任务。
 
-- **K8S 调度器适配器**
-
-  我们仍然使用 [OpenSCOW调度器适配器](https://pkuhpc.github.io/OpenSCOW/blog/scow-scheduler-adapter) 来实现 K8S 集群的调度服务。
-
-  当前版本中，我们提供了调度器适配器的适用版本的二进制文件 [scow-ai-adapter-amd64](https://mirrors.pku.edu.cn/scow/releases/)，欢迎下载进行试用。
-
-  K8S 调度器适配器的配置请参照[此链接](https://github.com/PKUHPC/scow-ai-adapter-config)。
-
 - **第三方调度插件 Kueue**
 
   **Kueue** 是一个用于 **Kubernetes** 的作业排队系统。它旨在管理和优化批处理作业和其他非实时工作负载的执行。 Kueue 的安装下载参照[此链接](https://kueue.sigs.k8s.io/docs/installation/)。
