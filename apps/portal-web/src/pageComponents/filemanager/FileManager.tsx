@@ -424,7 +424,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
           </UploadButton>
           <Divider type="vertical" />
           {
-            !scowdEnabled && (
+            scowdEnabled && (
               <Button
                 icon={<DownloadOutlined />}
                 danger
@@ -578,7 +578,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               )
             }
             {
-              (i.type === "DIR" && !scowdEnabled) && (
+              (i.type === "DIR" && scowdEnabled) && (
                 <a href={urlToDownloadAndCompress(cluster.id, [join(path, i.name)], true)}>
                   {t(p("tableInfo.download"))}
                 </a>
