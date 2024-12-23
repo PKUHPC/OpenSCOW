@@ -267,8 +267,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 
   const onDownloadClick = () => {
     const files = keysToFiles(selectedKeys);
-
-    fetch(urlToDownloadAndCompress(cluster.id, files.map((x) => join(path, x.name)), true));
+    
+    window.open(urlToDownloadAndCompress(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
   };
 
   const onDeleteClick = () => {
