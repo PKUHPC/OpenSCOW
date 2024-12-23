@@ -16,7 +16,8 @@ import { publicConfig } from "src/utils/config";
 export const urlToDownloadAndCompress = (cluster: string, path: string[], download: boolean): string => {
   const pathParams = path.map((p) => `path=${encodeURIComponent(p)}`).join("&");
 
-  return `${join(publicConfig.BASE_PATH, "/api/file/download")}?${pathParams}&cluster=${cluster}&download=${download}`;
+  // eslint-disable-next-line @stylistic/max-len
+  return `${join(publicConfig.BASE_PATH, "/api/file/downloadAndCompress")}?${pathParams}&cluster=${cluster}&download=${download}`;
 };
 
 
