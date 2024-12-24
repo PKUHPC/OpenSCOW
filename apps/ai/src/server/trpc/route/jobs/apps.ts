@@ -94,13 +94,6 @@ const AppSessionSchema = z.object({
 
 export type AppSession = z.infer<typeof AppSessionSchema>;
 
-interface ServerSessionInfoData {
-  [key: string]: string | number;
-  HOST: string;
-  PORT: number;
-  PASSWORD: string;
-}
-
 interface SessionMetadata {
   sessionId: string;
   jobName: string;

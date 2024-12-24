@@ -1471,6 +1471,7 @@ export default {
       deactivateCluster: "User {} deactivates the Cluster: {}",
       changePassword: "User changes their personal password",
       changeEmail: "User changes their personal email",
+      editUserProfile: "Modify the information of user (id: {})",
     },
   },
   userRoles: {

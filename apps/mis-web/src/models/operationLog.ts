@@ -616,6 +616,10 @@ export const getOperationDetail = (
         return t(pDetails("changePassword"));
       case "changeEmail":
         return t(pDetails("changeEmail"));
+      case "editUserProfile": {
+        return t(pDetails("editUserProfile"),
+          [operationEvent[logEvent].userId]);
+      }
       default:
         return "-";
     }

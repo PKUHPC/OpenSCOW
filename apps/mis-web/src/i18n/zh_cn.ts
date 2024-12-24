@@ -1468,6 +1468,7 @@ export default {
       deactivateCluster: "用户{}停用集群：{}",
       changePassword: "用户修改自身密码",
       changeEmail: "用户修改自身邮箱",
+      editUserProfile: "修改用户(id: {})的信息",
     },
   },
   userRoles: {
