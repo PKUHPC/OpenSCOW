@@ -65,6 +65,7 @@ export const AddUserToAccountSchema = typeboxRouteSchema({
       code: Type.Union([
         Type.Literal("USER_DELETED"),
         Type.Literal("ACCOUNT_DELETED"),
+        Type.Literal("ACCOUNT_BLOCKED_BY_ADMIN"),
       ]),
     }),
   },
@@ -114,6 +115,7 @@ export default /* #__PURE__*/route(AddUserToAccountSchema, async (req, res) => {
     tenantName: info.tenant,
     accountName,
     userId: identityId,
+    isTenantAdmin: info.tenantRoles.includes(TenantRole.TENANT_ADMIN) ,
   }).then(async () => {
     await callLog(logInfo, OperationResult.SUCCESS);
     return { 204: null };
@@ -135,6 +137,8 @@ export default /* #__PURE__*/route(AddUserToAccountSchema, async (req, res) => {
           return { 404: { code: "ACCOUNT_OR_TENANT_NOT_FOUND" as const } };
         } else if (e.details === "USER_DELETED") {
           return { 410: { code: "USER_DELETED" as const } };
+        } else if (e.details === "ACCOUNT_BLOCKED_BY_ADMIN") {
+          return { 410: { code: "ACCOUNT_BLOCKED_BY_ADMIN" as const } };
         } else {
           return { 410: { code: "ACCOUNT_DELETED" as const } };
         }

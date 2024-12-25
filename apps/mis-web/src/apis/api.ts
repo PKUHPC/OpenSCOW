@@ -36,6 +36,7 @@ import type { GetTopPayAccountSchema } from "src/pages/api/admin/getTopPayAccoun
 import type { GetTopSubmitJobUserSchema } from "src/pages/api/admin/getTopSubmitJobUser";
 import type { GetUsersWithMostJobSubmissionsSchema } from "src/pages/api/admin/getUsersWithMostJobSubmissions";
 import type { ImportUsersSchema } from "src/pages/api/admin/importUsers";
+import type { AccountThresholdSchema } from "src/pages/api/admin/isAccountBelowBlockThreshold";
 import type { GetAlarmDbIdSchema } from "src/pages/api/admin/monitor/getAlarmDbId";
 import type { GetAlarmLogsSchema } from "src/pages/api/admin/monitor/getAlarmLogs";
 import type { GetAlarmLogsCountSchema } from "src/pages/api/admin/monitor/getAlarmLogsCount";
@@ -228,4 +229,5 @@ export const api = {
   queryStorageUsage: apiClient.fromTypeboxRoute<typeof QueryStorageUsageSchema>("GET", "/api/users/storageUsage"),
   unblockUserInAccount: apiClient.fromTypeboxRoute<typeof UnblockUserInAccountSchema>("PUT", "/api/users/unblockInAccount"),
   unsetAdmin: apiClient.fromTypeboxRoute<typeof UnsetAdminSchema>("PUT", "/api/users/unsetAdmin"),
+  isAccountBelowBlockThreshold:apiClient.fromTypeboxRoute<typeof AccountThresholdSchema>("GET","/api/admin/isAccountBelowBlockThreshold"),
 };

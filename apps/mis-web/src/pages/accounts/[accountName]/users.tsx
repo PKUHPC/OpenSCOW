@@ -59,7 +59,7 @@ export const UsersPage: NextPage = requireAuth(
         >
           <Space split={<Divider type="vertical" />}>
             {
-              publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.allowed && (
+              publicConfig.ADD_USER_TO_ACCOUNT.accountAdmin.allowed && ( 
                 <AddUserButton
                   refresh={reload}
                   accountName={account.accountName}

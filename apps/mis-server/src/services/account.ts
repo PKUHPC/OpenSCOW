@@ -22,7 +22,7 @@ import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { checkSchedulerApiVersion } from "@scow/lib-server";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
-import { account_AccountStateFromJSON, AccountServiceServer, AccountServiceService,
+import { account_AccountStateFromJSON, Account_DisplayedAccountState, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
 import { ApiVersion } from "@scow/utils/build/version";
 import { blockAccount, unblockAccount } from "src/bl/block";
@@ -788,6 +788,31 @@ export const accountServiceServer = plugin((server) => {
       });
 
       return [{}];
+    },
+
+    // 检查账户是否欠费
+    isAccountBelowBlockThreshold:async ({ request, em }) => {
+      const { accountName } = request;
+      const account = await em.findOne(Account, {
+        accountName,
+      });
+
+      if (!account) {
+        throw {
+          code: Status.NOT_FOUND,
+          message: `Account ${accountName} is not found`,
+        } as ServiceError;
+      }
+
+      const thresholdAmount = account.blockThresholdAmount ?? new Decimal(0);
+      const state = getAccountStateInfo(account.whitelist?.id, account.state, account.balance, thresholdAmount)
+        .displayedState;
+
+      if (state === Account_DisplayedAccountState.DISPLAYED_BELOW_BLOCK_THRESHOLD) {
+        return [{ isBelowBlockThreshold:true }];
+      } else {
+        return [{ isBelowBlockThreshold:false }];
+      }
     },
   });
 

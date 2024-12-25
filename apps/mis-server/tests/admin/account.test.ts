@@ -14,6 +14,7 @@ import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Server } from "@ddadaal/tsgrpc-server";
 import { ChannelCredentials } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
+import { Decimal } from "@scow/lib-decimal";
 import { AccountServiceClient } from "@scow/protos/build/server/account";
 import { createServer } from "src/app";
 import { Account, AccountState } from "src/entities/Account";
@@ -181,3 +182,67 @@ it("cannot delete account with jobs running", async () => {
   const remainingUserAccountCount = await em.count(UserAccount, { account:accountA });
   expect(remainingUserAccountCount).toBe(1);
 });
+
+it("should check if account is below block threshold", async () => {
+  const em = server.ext.orm.em.fork();
+
+  // 创建一个模拟账户
+  const accountA = new Account({
+    accountName: "testAccountBelowThreshold",
+    tenant,
+    blockedInCluster: false,
+    comment: "test account",
+  });
+
+  // 设置账户的余额和阈值
+  accountA.balance = new Decimal(50);
+  accountA.blockThresholdAmount = new Decimal(100); // 阻止阈值为 100
+  await em.persistAndFlush(accountA);
+
+  // 调用 isAccountBelowBlockThreshold 检查账户是否低于阻止阈值
+  const result = await asyncClientCall(client, "isAccountBelowBlockThreshold", {
+    accountName: "testAccountBelowThreshold",
+  });
+
+  // 确认返回值
+  expect(result.isBelowBlockThreshold).toBe(true);
+});
+
+it("should return false if account is not below block threshold", async () => {
+  const em = server.ext.orm.em.fork();
+
+  // 创建一个模拟账户
+  const accountA = new Account({
+    accountName: "testAccountAboveThreshold",
+    tenant,
+    blockedInCluster: false,
+    comment: "test account",
+  });
+
+  // 设置账户的余额和阈值
+  accountA.balance = new Decimal(150); // 余额高于阈值
+  accountA.blockThresholdAmount = new Decimal(100); // 阻止阈值为 100
+  await em.persistAndFlush(accountA);
+
+
+  // 调用 isAccountBelowBlockThreshold 检查账户是否低于阻止阈值
+  const result = await asyncClientCall(client, "isAccountBelowBlockThreshold", {
+    accountName: "testAccountAboveThreshold",
+  });
+
+  // 确认返回值
+  expect(result.isBelowBlockThreshold).toBe(false);
+});
+
+it("should throw NOT_FOUND if account does not exist", async () => {
+
+  // 调用 isAccountBelowBlockThreshold 时模拟账户不存在
+  const reply = await asyncClientCall(client, "isAccountBelowBlockThreshold", {
+    accountName: "nonExistentAccount",
+  }).catch((e) => e);
+
+  // 账户不存在时应抛出 NOT_FOUND 错误
+  expect(reply.code).toBe(Status.NOT_FOUND);
+  expect(reply.message).toBe("5 NOT_FOUND: Account nonExistentAccount is not found");
+});
+

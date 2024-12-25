@@ -707,6 +707,8 @@ export default {
         will: "Will be in",
         createModal: "seconds to open the create user interface",
         createFirst: "User does not exist. Please create a user first",
+        blockAccount:"User has been blocked. Please unblock first",
+        arrearsAccount:"Failed to obtain user arrears status",
         addSuccess: "Added Successfully!",
         userDeleted: "The user has been deleted and cannot be added",
       },

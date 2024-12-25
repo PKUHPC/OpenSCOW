@@ -706,6 +706,8 @@ export default {
         will:"将在",
         createModal:"秒后打开创建用户界面",
         createFirst:"用户不存在。请先创建用户",
+        blockAccount:"账户处于封锁状态，请联系管理员解封",
+        arrearsAccount:"获取账户欠费状态失败",
         addSuccess:"添加成功！",
         userDeleted:"该用户已删除，无法添加",
       },

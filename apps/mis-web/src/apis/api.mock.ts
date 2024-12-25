@@ -119,7 +119,6 @@ const mockUsers = [
 
 
 export const mockApi: MockApi<typeof api> = {
-
   getMissingDefaultPriceItems: async () => {
     return { items: ["test.test", "test1.test2"]};
   },
@@ -133,7 +132,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "test1",
         balance: numberToMoney(0.0000),
         userCount: 1,
-        accountCount:1,
+        accountCount: 1,
         createTime: "2022-10-05T23:49:50.000Z",
       },
       {
@@ -141,7 +140,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "test2",
         balance: numberToMoney(10.0000),
         userCount: 4,
-        accountCount:2,
+        accountCount: 2,
         createTime: "2022-10-05T23:49:50.000Z",
       },
       {
@@ -149,7 +148,7 @@ export const mockApi: MockApi<typeof api> = {
         tenantName: "test3",
         balance: numberToMoney(10.5),
         userCount: 5,
-        accountCount:3,
+        accountCount: 3,
         createTime: "2022-10-05T23:49:50.000Z",
       },
       ],
@@ -169,7 +168,7 @@ export const mockApi: MockApi<typeof api> = {
         organization: "org1",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-        state:UserState.NORMAL,
+        state: UserState.NORMAL,
       },
       {
         userId: "test01",
@@ -182,7 +181,7 @@ export const mockApi: MockApi<typeof api> = {
         organization: "org2",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE, PlatformRole.PLATFORM_ADMIN],
-        state:UserState.NORMAL,
+        state: UserState.NORMAL,
       },
       {
         userId: "test02",
@@ -195,7 +194,7 @@ export const mockApi: MockApi<typeof api> = {
         organization: "org3",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [PlatformRole.PLATFORM_FINANCE],
-        state:UserState.NORMAL,
+        state: UserState.NORMAL,
       },
       {
         userId: "test03",
@@ -208,10 +207,9 @@ export const mockApi: MockApi<typeof api> = {
         organization: "org4",
         createTime: "2022-10-05T23:49:50.000Z",
         platformRoles: [],
-        state:UserState.DELETED,
+        state: UserState.DELETED,
       },
     ],
-
   }),
 
   getPlatformUsersCounts: async () => ({
@@ -239,24 +237,40 @@ export const mockApi: MockApi<typeof api> = {
 
   getBillingItems: async () => ({
     activeItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low",
-        priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "normal",
-        priceItem: { itemId: "HPC02", price: numberToMoney(0.06), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "compute", qos: "high",
-        priceItem: { itemId: "HPC03", price: numberToMoney(0.08), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "low",
-        priceItem: { itemId: "HPC04", price: numberToMoney(10.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "normal",
-        priceItem: { itemId: "HPC05", price: numberToMoney(12.00), amountStrategy: "gpu" } },
-      { cluster: "hpc01", partition: "GPU", qos: "high",
-        priceItem: { itemId: "HPC06", price: numberToMoney(14.00), amountStrategy: "gpu" } },
+      {
+        cluster: "hpc01", partition: "compute", qos: "low",
+        priceItem: { itemId: "HPC08", price: numberToMoney(0.01), amountStrategy: "max-cpusAlloc-mem" },
+      },
+      {
+        cluster: "hpc01", partition: "compute", qos: "normal",
+        priceItem: { itemId: "HPC02", price: numberToMoney(0.06), amountStrategy: "gpu" },
+      },
+      {
+        cluster: "hpc01", partition: "compute", qos: "high",
+        priceItem: { itemId: "HPC03", price: numberToMoney(0.08), amountStrategy: "gpu" },
+      },
+      {
+        cluster: "hpc01", partition: "GPU", qos: "low",
+        priceItem: { itemId: "HPC04", price: numberToMoney(10.00), amountStrategy: "gpu" },
+      },
+      {
+        cluster: "hpc01", partition: "GPU", qos: "normal",
+        priceItem: { itemId: "HPC05", price: numberToMoney(12.00), amountStrategy: "gpu" },
+      },
+      {
+        cluster: "hpc01", partition: "GPU", qos: "high",
+        priceItem: { itemId: "HPC06", price: numberToMoney(14.00), amountStrategy: "gpu" },
+      },
     ],
     historyItems: [
-      { cluster: "hpc01", partition: "compute", qos: "low",
-        priceItem: { itemId: "HPC01", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" } },
-      { cluster: "hpc01", partition: "compute", qos: "low",
-        priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" } },
+      {
+        cluster: "hpc01", partition: "compute", qos: "low",
+        priceItem: { itemId: "HPC01", price: numberToMoney(0.04), amountStrategy: "max-cpusAlloc-mem" },
+      },
+      {
+        cluster: "hpc01", partition: "compute", qos: "low",
+        priceItem: { itemId: "HPC07", price: numberToMoney(0.02), amountStrategy: "gpu" },
+      },
     ],
     nextId: "1",
   }),
@@ -318,9 +332,9 @@ export const mockApi: MockApi<typeof api> = {
 
   getRunningJobs: async () => ({ results: [runningJob]}),
 
-  getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count:10 }]}),
+  getTopSubmitJobUser: async () => ({ results: [{ userId: "test", count: 10 }]}),
 
-  getUsersWithMostJobSubmissions: async () => ({ results: [{ userName: "name1", userId: "test1", count:10 }]}),
+  getUsersWithMostJobSubmissions: async () => ({ results: [{ userName: "name1", userId: "test1", count: 10 }]}),
 
   getNewJobCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
 
@@ -328,17 +342,18 @@ export const mockApi: MockApi<typeof api> = {
 
   logout: async () => null,
 
-  getCharges: async () => ({ results: [{
-    tenantName: "tenant",
-    amount: 10,
-    comment: "123",
-    index: 1,
-    time: "123",
-    accountName: "123",
-    ipAddress: "127.0.0.1",
-    operatorId: "123",
-    type: "Task",
-  }],
+  getCharges: async () => ({
+    results: [{
+      tenantName: "tenant",
+      amount: 10,
+      comment: "123",
+      index: 1,
+      time: "123",
+      accountName: "123",
+      ipAddress: "127.0.0.1",
+      operatorId: "123",
+      type: "Task",
+    }],
   }),
 
   getChargeRecordsTotalCount: async () => ({
@@ -347,27 +362,31 @@ export const mockApi: MockApi<typeof api> = {
     refreshTime: "2024-11-18T09:10:54.855Z",
   }),
 
-  getPayments: async () => ({ results: [{
-    amount: 10,
-    comment: "123",
-    index: 1,
-    time: "123",
-    accountName: "123",
-    ipAddress: "127.0.0.1",
-    operatorId: "123",
-    type: "Task",
-  }], totalCount: 1, total: 10 }),
+  getPayments: async () => ({
+    results: [{
+      amount: 10,
+      comment: "123",
+      index: 1,
+      time: "123",
+      accountName: "123",
+      ipAddress: "127.0.0.1",
+      operatorId: "123",
+      type: "Task",
+    }], totalCount: 1, total: 10,
+  }),
 
-  getTenantPayments: async () => ({ results: [{
-    amount: 10,
-    comment: "123",
-    index: 1,
-    time: "123",
-    tenantName: "default",
-    ipAddress: "127.0.0.1",
-    operatorId: "123",
-    type: "Task",
-  }], totalCount: 1, total: 10 }),
+  getTenantPayments: async () => ({
+    results: [{
+      amount: 10,
+      comment: "123",
+      index: 1,
+      time: "123",
+      tenantName: "default",
+      ipAddress: "127.0.0.1",
+      operatorId: "123",
+      type: "Task",
+    }], totalCount: 1, total: 10,
+  }),
 
   getUsedPayTypes: async () => ({ types: ["Pay", "JobPriceChange"]}),
 
@@ -422,27 +441,33 @@ export const mockApi: MockApi<typeof api> = {
   setDefaultAccountBlockThreshold: async () => ({ executed: true }),
   getNewUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
   getActiveUserCount: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, count: 10 }]}),
-  getTopChargeAccount: async () => ({ results: [{ accountName: "test",
-    userName:"user1", chargedAmount: numberToMoney(10) }]}),
+  getTopChargeAccount: async () => ({
+    results: [{
+      accountName: "test",
+      userName: "user1", chargedAmount: numberToMoney(10),
+    }],
+  }),
   getDailyCharge: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
-  getTopPayAccount: async () => ({ results: [{ accountName: "test", userName:"user1", payAmount: numberToMoney(10) }]}),
+  getTopPayAccount: async () =>
+    ({ results: [{ accountName: "test", userName: "user1", payAmount: numberToMoney(10) }]}),
   getDailyPay: async () => ({ results: [{ date: { year: 2023, month: 12, day: 21 }, amount: numberToMoney(10) }]}),
   getPortalUsageCount: async () => ({ results: [{ operationType: "submitJob", count: 10 }]}),
   getMisUsageCount: async () => ({ results: [{ operationType: "createAccount", count: 10 }]}),
-  getStatisticInfo: async () =>
-    ({ totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10,
-      newTenant: 10, refreshTime: "2024-11-18T09:10:54.855Z" }),
+  getStatisticInfo: async () => ({
+    totalUser: 10, totalAccount: 10, totalTenant: 10, newUser: 10, newAccount: 10,
+    newTenant: 10, refreshTime: "2024-11-18T09:10:54.855Z",
+  }),
   getJobTotalCount: async () => ({ count: 10, refreshTime: "2024-11-18T09:10:54.855Z" }),
   syncBlockStatus: async () => ({
     blockedFailedAccounts: [],
-    unblockedFailedAccounts:[],
+    unblockedFailedAccounts: [],
     blockedFailedUserAccounts: [],
   }),
   getSyncBlockStatusJobInfo: async () => ({
     syncStarted: false,
     schedule: "0 4 * * *",
   }),
-  setSyncBlockStatusState:  async () => null,
+  setSyncBlockStatusState: async () => null,
   removeUserFromAccount: async () => null,
   setAdmin: async () => ({ executed: true }),
   unsetAdmin: async () => ({ executed: false }),
@@ -459,15 +484,17 @@ export const mockApi: MockApi<typeof api> = {
   editUserProfile: async () => null,
   dewhitelistAccount: async () => null,
   whitelistAccount: async () => null,
-  getWhitelistedAccounts: async () => ({ results: [{
-    accountName: "123",
-    addTime: "2020-04-23T23:49:50.000Z",
-    comment: "comment",
-    operatorId: "123",
-    ownerId: "123",
-    ownerName: "123",
-    balance: numberToMoney(10.5),
-  }], totalCount: 1 }),
+  getWhitelistedAccounts: async () => ({
+    results: [{
+      accountName: "123",
+      addTime: "2020-04-23T23:49:50.000Z",
+      comment: "comment",
+      operatorId: "123",
+      ownerId: "123",
+      ownerName: "123",
+      balance: numberToMoney(10.5),
+    }], totalCount: 1,
+  }),
 
   changePassword: async () => null,
   changeEmail: async () => null,
@@ -475,22 +502,25 @@ export const mockApi: MockApi<typeof api> = {
   changePasswordAsTenantAdmin: async () => null,
   checkPassword: null,
   createUser: async () => (
-    { id: 1,
+    {
+      id: 1,
       createdInAuth: false,
     }),
   createTenant: async () => ({ createdInAuth: true }),
   createTenantWithExistingUserAsAdmin: async () => null,
   validateToken: async () => MOCK_USER_INFO,
   deleteUser: async () => null,
-  getOperationLogs: async () => ({ results: [{
-    operationLogId: 99,
-    operatorUserId: "testUser",
-    operatorUserName: "testUser",
-    operatorIp: "localhost",
-    operationResult: OperationResult.SUCCESS,
-    operationTime: "2020-04-23T23:49:50.000Z",
-    operationEvent: { $case: "login", login: {} },
-  }], totalCount: 1 }),
+  getOperationLogs: async () => ({
+    results: [{
+      operationLogId: 99,
+      operatorUserId: "testUser",
+      operatorUserName: "testUser",
+      operatorIp: "localhost",
+      operationResult: OperationResult.SUCCESS,
+      operationTime: "2020-04-23T23:49:50.000Z",
+      operationEvent: { $case: "login", login: {} },
+    }], totalCount: 1,
+  }),
 
   getCustomEventTypes: async () => ({ results: []}),
 
@@ -500,33 +530,37 @@ export const mockApi: MockApi<typeof api> = {
     name: "alertdb",
     type: "mysql",
   }),
-  getAlarmLogs: async () => ({ results: [{
-    id: 13,
-    status: "resolved",
-    severity: "Warning",
-    fingerprint: "38cc18aad8e553f6",
-    description: "hpc01 partition: normal - CPU usage above 80% (current value: 1)",
-    startsAt: 1702886670000,
-    endsAt: 1702889670000,
-  }]}),
+  getAlarmLogs: async () => ({
+    results: [{
+      id: 13,
+      status: "resolved",
+      severity: "Warning",
+      fingerprint: "38cc18aad8e553f6",
+      description: "hpc01 partition: normal - CPU usage above 80% (current value: 1)",
+      startsAt: 1702886670000,
+      endsAt: 1702889670000,
+    }],
+  }),
   getAlarmLogsCount: async () => ({ totalCount: 1 }),
   changeTenant: async () => null,
 
-  getClusterConfigFiles: async () => ({ clusterConfigs: {
-    hpc01: {
-      displayName: "hpc01Name",
-      priority: 1,
-      adapterUrl: "0.0.0.0:0000",
-      proxyGateway: undefined,
-      loginNodes: [{ "address": "localhost:22222", "name": "login" }],
-      loginDesktop: undefined,
-      turboVncPath: undefined,
-      crossClusterFileTransfer: undefined,
-      hpc: { enabled: true },
-      ai: { enabled: false },
-      k8s: undefined,
+  getClusterConfigFiles: async () => ({
+    clusterConfigs: {
+      hpc01: {
+        displayName: "hpc01Name",
+        priority: 1,
+        adapterUrl: "0.0.0.0:0000",
+        proxyGateway: undefined,
+        loginNodes: [{ "address": "localhost:22222", "name": "login" }],
+        loginDesktop: undefined,
+        turboVncPath: undefined,
+        crossClusterFileTransfer: undefined,
+        hpc: { enabled: true },
+        ai: { enabled: false },
+        k8s: undefined,
+      },
     },
-  } }),
+  }),
 
   getSimpleClustersInfoFromConfigFiles: async () => ({
     clustersInfo: {
@@ -538,22 +572,26 @@ export const mockApi: MockApi<typeof api> = {
     },
   }),
 
-  getClustersConnectionInfo: async () => ({ results: [{
-    clusterId: "hpc01",
-    connectionStatus: ClusterConnectionStatus.AVAILABLE,
-    totalMemMb: 4028,
-    totalNodeCount: 3,
-    totalCpuCoreCount: 2,
-    totalGpuCount: 1,
-  }]}),
+  getClustersConnectionInfo: async () => ({
+    results: [{
+      clusterId: "hpc01",
+      connectionStatus: ClusterConnectionStatus.AVAILABLE,
+      totalMemMb: 4028,
+      totalNodeCount: 3,
+      totalCpuCoreCount: 2,
+      totalGpuCount: 1,
+    }],
+  }),
 
-  getClustersRuntimeInfo: async () => ({ results: [{
-    clusterId: "hpc01",
-    activationStatus: ClusterActivationStatus.ACTIVATED,
-    operatorId: undefined,
-    operatorName: undefined,
-    comment: "",
-  }]}),
+  getClustersRuntimeInfo: async () => ({
+    results: [{
+      clusterId: "hpc01",
+      activationStatus: ClusterActivationStatus.ACTIVATED,
+      operatorId: undefined,
+      operatorName: undefined,
+      comment: "",
+    }],
+  }),
 
   activateCluster: async () => ({ executed: true }),
   deactivateCluster: async () => ({ executed: true }),
@@ -619,7 +657,7 @@ export const mockApi: MockApi<typeof api> = {
       }],
     },
   }),
-
+  isAccountBelowBlockThreshold: null,
 };
 
 export const MOCK_USER_INFO = {
