@@ -525,7 +525,11 @@ export const accountServiceServer = plugin((server) => {
         }
         account.state = AccountState.NORMAL;
         const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, 
+          currentActivatedClusters, 
+          server.ext.clusters, logger, 
+          server.ext.resource,
+        );
       }
 
       await em.persistAndFlush(whitelist);
@@ -639,7 +643,7 @@ export const accountServiceServer = plugin((server) => {
       if (!shouldBlockInCluster) {
         logger.info("The balance of Account %s is greater than the block threshold amount. "
         + "Unblock the account.", account.accountName);
-        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+        await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger, server.ext.resource);
       }
 
       // 判断移除白名单后是否时欠费状态，如果是则发送账户欠费通知

@@ -193,7 +193,12 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, currentActivatedClusters, logger, server.ext);
+              }, em, 
+              currentActivatedClusters, 
+              logger, 
+              server.ext,
+              server.ext,
+              );
             }
             x.tenantPrice = newTenantPrice;
           }
@@ -216,7 +221,13 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, currentActivatedClusters, logger, server.ext);
+              }, 
+              em, 
+              currentActivatedClusters, 
+              logger, 
+              server.ext,
+              server.ext,
+              );
             }
             x.accountPrice = newAccountPrice;
           }

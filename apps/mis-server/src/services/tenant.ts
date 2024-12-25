@@ -223,7 +223,11 @@ export const tenantServiceServer = plugin((server) => {
               + "Unblock the account.", account.accountName);
 
               try {
-                await unblockAccount(account, currentActivatedClusters, server.ext.clusters, logger);
+                await unblockAccount(account,
+                  currentActivatedClusters, 
+                  server.ext.clusters, 
+                  logger, 
+                  server.ext.resource);
                 unBlockedAccounts.push(account.accountName);
               } catch (error) {
                 logger.warn("Failed to unBlock account %s in slurm: %o", account.accountName, error);

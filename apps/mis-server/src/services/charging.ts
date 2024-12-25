@@ -111,7 +111,7 @@ export const chargingServiceServer = plugin((server) => {
           type,
           ipAddress,
           operatorId,
-        }, em, currentActivatedClusters, logger, server.ext);
+        }, em, currentActivatedClusters, logger, server.ext, server.ext);
       });
 
       return [{
