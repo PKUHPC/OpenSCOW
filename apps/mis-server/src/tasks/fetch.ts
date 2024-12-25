@@ -49,7 +49,10 @@ async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logge
 const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
   const jobs: ({ cluster: string } & ClusterJobInfo)[] = [];
   result.jobs.forEach((job) => {
-    jobs.push({ cluster, ...job });
+    jobs.push({
+      cluster,
+      ...job,
+    });
   });
 
   // sort by end time
@@ -59,8 +62,7 @@ const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
     return endTimeA - endTimeB;
   });
 
-  // filter jobs without start time
-  return jobs.filter((x) => x.startTime);
+  return jobs;
 };
 
 export let lastFetched: Date | null = null;
