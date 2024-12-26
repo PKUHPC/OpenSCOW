@@ -1,3 +1,4 @@
+import { Knex } from "@mikro-orm/mysql";
 import { NoticeType } from "src/models/notice-type";
 import { validateToken } from "src/server/auth/token";
 import { SenderType } from "src/server/entities/Message";
@@ -49,17 +50,27 @@ export const hasUnreadMessage = async (token: string) => {
     mSubquery,
   ], true).as("message_ids");
 
+  // 未读消息的查询
+  const readConditions = function(this: Knex.QueryBuilder) {
+    this.whereNotIn("m.id", function(this: Knex.QueryBuilder) {
+      this.select("umr.message_id as message_id")
+        .where("umr.status", ReadStatus.READ);
+    })
+      .orWhere(function(this: Knex.QueryBuilder) {
+        this.where("umr.status", ReadStatus.UNREAD)
+          .andWhere("umr.is_deleted", false);
+      });
+  };
   // 构建最终查询
   const result = await knex("messages as m")
     // 左连接 user_message_read 表，仅限于当前用户的记录
     .leftJoin("user_message_read as umr", function() {
       this.on("m.id", "=", "umr.message_id")
-        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]))
-        .andOn("umr.status", "=", knex.raw("?", [ReadStatus.UNREAD]))
-        .andOn("umr.is_deleted", "=", knex.raw("?", [false]));
+        .andOn("umr.user_id", "=", knex.raw("?", [info.identityId]));
     })
     // 筛选符合条件的 message_id
     .whereIn("m.id", knex.select("message_id").from(unionSubquery))
+    .andWhere(readConditions)
     .limit(1)
     .select("m.*");
 
