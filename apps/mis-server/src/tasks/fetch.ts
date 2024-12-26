@@ -49,8 +49,6 @@ const processGetJobsResult = (cluster: string, result: GetJobsResponse) => {
     jobs.push({
       cluster,
       ...job,
-      // 如果开始时间为空，这种作业属于被取消或者有故障的作业，未开始过，将其设置等于结束时间
-      startTime: job.startTime ?? job.endTime,
     });
   });
 

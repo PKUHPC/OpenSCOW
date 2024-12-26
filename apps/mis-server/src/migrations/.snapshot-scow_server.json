@@ -441,7 +441,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 0,
           "comment": "开始时间",
           "mappedType": "datetime"
