@@ -147,29 +147,30 @@ export const Sortable: FC<Props> = ({
     (item: Entry) => {
       if (!isEditable) {
         switch (item.entry?.$case) {
-          case "pageLink":
-            router.push(item.entry.pageLink.path);
+
+          case "pageLink": {
+            window.open(item.entry.pageLink.path, "_blank");
             break;
+          }
 
           case "shell": {
             const savedShellClusterId = item.entry.shell.clusterId;
-            router.push(join("/shell", savedShellClusterId, item.entry.shell.loginNode));
+            window.open(join("/shell", savedShellClusterId, item.entry.shell.loginNode), "_blank");
             if (!currentClusters.some((x) => x.id === savedShellClusterId)) {
               return <ClusterNotAvailablePage />;
             }
             break;
           }
-          case "app": {
 
+          case "app": {
             const savedAppClusterId = item.entry.app.clusterId;
-            router.push(
-              join("/apps", savedAppClusterId, "/create", item.entry.app.appId),
-            );
+            window.open(join("/apps", savedAppClusterId, "/create", item.entry.app.appId), "_blank");
             if (!currentClusters.some((x) => x.id === savedAppClusterId)) {
               return <ClusterNotAvailablePage />;
             }
             break;
           }
+
           default:
             break;
         }
