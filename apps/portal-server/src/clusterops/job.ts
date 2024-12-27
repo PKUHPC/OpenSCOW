@@ -86,7 +86,7 @@ export const jobOps = (cluster: string): JobOps => {
           return {
             id: filename,
             submitTime: ("submitTime" in data && data.submitTime) ? new Date(data.submitTime) : new Date(),
-            comment: ("comment" in data && data.comment) ? data.comment : "无法解析的内容",
+            comment: ("comment" in data && data.comment) ? data.comment : "",
             jobName: ("jobName" in data && data.jobName) ? data.jobName : "unknown",
           } as JobTemplateInfo;
         }));
