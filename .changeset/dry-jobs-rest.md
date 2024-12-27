@@ -1,5 +1,4 @@
 ---
-"@scow/mis-server": minor
 "@scow/grpc-api": minor
 ---
 
