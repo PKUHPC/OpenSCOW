@@ -33,7 +33,7 @@ export function toGrpc(x: JobInfoEntity) {
     qos: x.qos,
     recordTime: x.recordTime.toISOString(),
     timeEnd: x.timeEnd.toISOString(),
-    timeStart: x.timeStart.toISOString(),
+    timeStart: x.timeStart ? x.timeStart.toISOString() : undefined,
     timeSubmit: x.timeSubmit.toISOString(),
     timeUsed: x.timeUsed,
     timeWait: x.timeWait,

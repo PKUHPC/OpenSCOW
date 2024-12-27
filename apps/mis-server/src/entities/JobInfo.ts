@@ -55,8 +55,8 @@ export class JobInfo {
   timeSubmit!: Date;
 
   @Index({ name: "time_start" })
-  @Property({ comment: "开始时间" })
-  timeStart!: Date;
+  @Property({ comment: "开始时间", nullable: true })
+  timeStart?: Date;
 
   @Property({ comment: "结束时间", index: "time_end" })
   timeEnd!: Date;
@@ -140,7 +140,8 @@ export class JobInfo {
     this.nodesAlloc = job.nodesAlloc!;
     this.timelimit = job.timeLimitMinutes;
     this.timeUsed = job.elapsedSeconds!;
-    this.timeWait = ((new Date(job.startTime!)).getTime() - (new Date(job.submitTime!)).getTime()) / 1000;
+    this.timeWait = job.startTime ? ((new Date(job.startTime)).getTime() - (new Date(job.submitTime!)).getTime()) / 1000
+      : ((new Date(job.endTime!)).getTime() - (new Date(job.submitTime!)).getTime()) / 1000;
     this.qos = job.qos;
 
     this.tenantPrice = jobPriceInfo.tenant?.price ?? new Decimal(0);
@@ -149,7 +150,7 @@ export class JobInfo {
     this.accountBillingItemId = jobPriceInfo.account?.billingItemId ?? UNKNOWN_PRICE_ITEM;
 
     this.timeSubmit = new Date(job.submitTime!);
-    this.timeStart = new Date(job.startTime!);
+    this.timeStart = job.startTime ? new Date(job.startTime) : undefined;
     this.timeEnd = new Date(job.endTime!);
   }
 }
