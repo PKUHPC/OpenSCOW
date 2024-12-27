@@ -212,14 +212,14 @@ export const JobInfoTable: React.FC<JobInfoTableProps> = ({
         dataIndex="submitTime"
         width="8.6%"
         title={t(p("submitTime"))}
-        render={(t) => t ? formatDateTime(t) : "-"}
+        render={(t) => formatDateTime(t)}
         sorter={(a, b) => Number(dayjs(a.submitTime).isAfter(dayjs(b.submitTime))) }
       />
       <Table.Column<JobInfo>
         dataIndex="startTime"
         width="8.6%"
         title={t(p("startTime"))}
-        render={(t) => formatDateTime(t)}
+        render={(t) => t ? formatDateTime(t) : "-"}
         sorter={(a, b) => Number(dayjs(a.startTime).isAfter(dayjs(b.startTime))) }
       />
       <Table.Column<JobInfo>
