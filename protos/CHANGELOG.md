@@ -1,5 +1,16 @@
 # @scow/grpc-api
 
+## 1.17.0
+
+### Minor Changes
+
+- 6262855: AddUserToAccount 增加了 is_tenant_admin 参数，新增 isAccountBelowBlockThreshold 接口，判断账户是否低于封锁阈值
+
+### Patch Changes
+
+- d598517: mis-server 作业信息查询接口及导出接口中的 time_start 变为 optional
+- 6262855: 封锁或欠费账户无法添加用户
+
 ## 1.16.0
 
 ### Minor Changes

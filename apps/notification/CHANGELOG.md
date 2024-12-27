@@ -1,5 +1,15 @@
 # @scow/notification
 
+## 0.2.5
+
+### Patch Changes
+
+- 8ea184e: 修复消息系统铃铛状态获取不对的问题
+- aea62f5: user_message_read 表添加联合唯一索引
+  - @scow/protos@1.0.20
+  - @scow/lib-scheduler-adapter@1.1.18
+  - @scow/lib-web@1.4.8
+
 ## 0.2.4
 
 ### Patch Changes

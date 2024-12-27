@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.14
+
+### Patch Changes
+
+- cd75359: 用户修改自身密码和邮箱增加操作日志
+  - @scow/protos@1.0.20
+
 ## 2.1.13
 
 ### Patch Changes

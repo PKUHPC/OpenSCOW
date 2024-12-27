@@ -1,5 +1,17 @@
 # @scow/resource
 
+## 0.2.5
+
+### Patch Changes
+
+- 770a527: 修正 portal、mis、resource 的国际化顺序
+- 355a523: 修复将账户添加到白名单时没有获取到已授权分区以及解封账户时没有对未授权分区再次封锁的问题
+  - @scow/protos@1.0.20
+  - @scow/lib-hook@1.0.20
+  - @scow/lib-scheduler-adapter@1.1.18
+  - @scow/lib-server@1.3.9
+  - @scow/lib-web@1.4.8
+
 ## 0.2.4
 
 ### Patch Changes
