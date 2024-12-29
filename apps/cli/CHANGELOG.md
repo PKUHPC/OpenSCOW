@@ -1,5 +1,17 @@
 # @scow/cli
 
+## 1.6.4
+
+### Patch Changes
+
+- 35f3b60: 增加新的 install.yaml 配置`sshDir`and`extraEnvs`
+- 9ddad3b: cli update 命令切换 repo 名称和 cli 名称
+- 0ec6591: 修复 cli compose run 命令时命令行参数没有传给容器的问题
+- 7c96613: 修改更名后的链接地址和文档描述
+- Updated dependencies [7c96613]
+  - @scow/lib-config@1.0.2
+  - @scow/config@1.5.3
+
 ## 1.6.3
 
 ### Patch Changes

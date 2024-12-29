@@ -1,5 +1,24 @@
 # @scow/mis-web
 
+## 1.6.4
+
+### Patch Changes
+
+- 7f53da3: slurm 数据库中开始时间为空的作业也同步到 scow 数据库
+- 5726a47: 导入用户页面的将用户添加入白名单应该放置在导入按键附近
+- 0fa5887: 设置封锁阈值界面优化
+- 7c96613: 修改更名后的链接地址和文档描述
+- Updated dependencies [7c96613]
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-operation-log@2.1.9
+  - @scow/lib-config@1.0.2
+  - @scow/lib-decimal@1.0.1
+  - @scow/config@1.5.3
+  - @scow/utils@1.1.2
+  - @scow/lib-auth@1.0.1
+  - @scow/lib-web@1.4.3
+  - @scow/protos@1.0.15
+
 ## 1.6.3
 
 ### Patch Changes
