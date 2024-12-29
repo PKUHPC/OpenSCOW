@@ -1,5 +1,12 @@
 # @scow/grpc-api
 
+## 1.12.1
+
+### Patch Changes
+
+- 7f53da3: mis-server 作业信息查询接口及导出接口中的 time_start 变为 optional
+- 7c96613: 修改更名后的链接地址和文档描述
+
 ## 1.12.0
 
 ### Minor Changes
