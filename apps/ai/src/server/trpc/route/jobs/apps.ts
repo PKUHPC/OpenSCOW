@@ -683,6 +683,9 @@ export const saveImage =
         const userId = user.identityId;
         const { clusterId, jobId, imageName, imageTag, imageDesc } = input;
 
+        // tag的唯一标识符
+        const tagPostfix = dayjs().unix().toString();
+
         // 检查镜像在数据库中是否重复
         const em = await forkEntityManager();
         const existImage = await em.findOne(ImageEntity, { owner: userId, name: imageName, tag: imageTag });
@@ -722,13 +725,14 @@ export const saveImage =
 
         const formateContainerId = formatContainerId(clusterId, containerId);
 
-        const harborImageUrl = createHarborImageUrl(imageName, imageTag, user.identityId);
-        const localImageUrl = `${userId}/${imageName}:${imageTag}`;
+        const harborImageUrl = createHarborImageUrl(imageName, imageTag + tagPostfix, user.identityId);
+        const localImageUrl = `${userId}/${imageName}:${imageTag + tagPostfix}`;
 
         // 数据库添加image
         const newImage = new ImageEntity({
           name: imageName,
           tag: imageTag,
+          tagPostfix,
           description: imageDesc,
           path: harborImageUrl,
           owner: userId,

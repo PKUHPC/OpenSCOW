@@ -30,6 +30,9 @@ export class Image {
   owner: string;
   source: Source;
   tag: string;
+  // 用户删除镜像(name,tag)后再次新建相同的镜像(name,tag)，会导致计算节点不会拉取新镜像(使用之前同名同tag的镜像)
+  // 故增加这个tagPostfix使得tag唯一，解决缓存问题
+  tagPostfix?: string;
   description?: string;
   clusterId?: string;
 
@@ -49,6 +52,7 @@ export class Image {
     owner: string;
     source: Source;
     tag: string;
+    tagPostfix: string;
     description?: string;
     path?: string;
     sourcePath?: string;
@@ -62,6 +66,7 @@ export class Image {
     this.owner = init.owner;
     this.source = init.source;
     this.tag = init.tag;
+    this.tagPostfix = init.tagPostfix;
     this.description = init.description;
     this.path = init.path;
     this.sourcePath = init.sourcePath;
@@ -89,6 +94,7 @@ imageEntitySchema.addProperty("name", String);
 imageEntitySchema.addProperty("owner", String);
 imageEntitySchema.addEnum("source", String, { items: () => Source });
 imageEntitySchema.addProperty("tag", String);
+imageEntitySchema.addProperty("tagPostfix", String, { nullable: true });
 imageEntitySchema.addUnique({
   properties: ["name", "tag", "owner"],
   name: "unique_name_tag_owner",
