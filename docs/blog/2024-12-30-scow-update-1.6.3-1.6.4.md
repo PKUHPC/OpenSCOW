@@ -1,8 +1,8 @@
 ---
-slug: scow-update-to-v1.6.4
-title: OpenSCOW: 1.6.3升级到1.6.4
+slug: scow-update-to-v1.0
+title: SCOW升级：从v0.4.0(及以上)到v1.0.0
 authors: [huangjun]
-tags: [scow, scow-deployment, v1.6.4]
+tags: [scow, scow-deployment, v1.0.0]
 
 ---
 
