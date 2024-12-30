@@ -39,5 +39,6 @@ next-env.d.ts
 .vscode
 
 public/novnc
+public/monaco-assets
 
 .next.backup

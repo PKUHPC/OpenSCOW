@@ -53,6 +53,15 @@ export const AiConfigSchema = Type.Object({
   publicMountPoints:Type.Optional(Type.Array(
     Type.String({ description: "公共挂载点" }), { description:"公共挂载点数组，全部会被挂载进AI应用和训练" },
   )),
+
+  file: Type.Optional(Type.Object({
+    preview: Type.Object({
+      limitSize: Type.String({ description: "文件预览大小限制", default: "50m" }),
+    }, { description: "文件预览功能", default: {} }),
+    edit: Type.Object({
+      limitSize: Type.String({ description: "文件编辑大小限制", default: "1m" }),
+    }, { description: "文件编辑功能", default: {} }),
+  }, { description: "文件管理" })),
 });
 
 const AT_CONFIG_NAME = "ai/config";

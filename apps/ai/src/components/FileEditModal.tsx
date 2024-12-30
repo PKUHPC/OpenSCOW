@@ -5,12 +5,12 @@ import { App, Badge, Button, Modal, Space, Spin, Tabs, Tooltip } from "antd";
 import { editor } from "monaco-editor";
 import { join } from "path";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { usePublicConfig } from "src/app/(auth)/context";
+import { urlToDownload, urlToUpload } from "src/app/(auth)/files/api";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
 import { styled } from "styled-components";
 
-import { urlToDownload, urlToUpload } from "./api";
 
 const StyledTabs = styled(Tabs)`
   .ant-tabs-nav {
@@ -80,13 +80,7 @@ interface FilenameProps {
 
 const DEFAULT_FILE_EDIT_LIMIT_SIZE = "1m";
 
-const p = prefix("pageComp.fileManagerComp.fileEditModal.");
-
-loader.config({
-  paths: {
-    vs: join(publicConfig.BASE_PATH ?? "", "/monaco-assets/vs"),
-  },
-});
+const p = prefix("component.fileEditModal.");
 
 function ConfirmModal({ open, saving, onSave, onClose }: ConfirmModalProps) {
 
@@ -148,6 +142,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const [abortController, setAbortController] = useState(new AbortController());
+  const { publicConfig } = usePublicConfig();
 
   const [options, setOptions] = useState({
     readOnly: true,
@@ -171,7 +166,13 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
 
   const { message } = App.useApp();
 
-  const handleEdit = (content) => {
+  loader.config({
+    paths: {
+      vs: join(publicConfig.BASE_PATH ?? "", "/monaco-assets/vs"),
+    },
+  });
+
+  const handleEdit = (content: string | undefined) => {
     if (mode === Mode.EDIT) {
       setIsEdit(true);
     }
@@ -239,12 +240,11 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
     const formData = new FormData();
     formData.append("file", blob);
 
-    await fetch(urlToUpload(clusterId, filePath), {
+    await fetch(urlToUpload(clusterId, filePath, publicConfig.BASE_PATH), {
       method: "POST",
       body: formData,
     }).then((response) => {
       if (!response.ok) {
-        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         return Promise.reject(response.statusText);
       }
       message.success(t(p("saveFileSuccess")));
@@ -267,7 +267,7 @@ export const FileEditModal: React.FC<Props> = ({ previewFile, setPreviewFile }) 
 
     const newAbortController = new AbortController();
     setAbortController(newAbortController);
-    fetch(urlToDownload(clusterId, filePath, false), { signal: newAbortController.signal })
+    fetch(urlToDownload(clusterId, filePath, false, publicConfig.BASE_PATH), { signal: newAbortController.signal })
       .then((res) => {
         if (!res.ok) {
           message.error(t(p("failedGetFile"), [filename]));
