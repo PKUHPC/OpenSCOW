@@ -82,10 +82,20 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
    * @param folderPath 文件夹名称
    * @returns 文件夹是否存在
    */
-  const checkFolderExists = async (folderPath: string): Promise<boolean> => {
+  const checkFolderExists = async (folderPath: string, root?: boolean): Promise<boolean> => {
     // If a check is already in progress, return the existing promise
     if (folderCheckPromisesRef.current.has(folderPath)) {
       return folderCheckPromisesRef.current.get(folderPath)!;
+    }
+
+    if (root) {
+      message.info({
+        content: "正在检查上传目录是否存在...",
+        key: "checkDir",
+        onClose: () => {
+          message.info("检查完成...", 2);
+        },
+      });
     }
 
     // Create a new check promise and cache it
@@ -99,6 +109,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
       }
     })().finally(() => {
       folderCheckPromisesRef.current.delete(folderPath);
+      message.destroy("checkDir");
     });
 
     folderCheckPromisesRef.current.set(folderPath, checkPromise);
@@ -159,9 +170,8 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
 
     // 检查该文件夹的覆盖状态
     if (!folderOverwriteMapRef.current.has(folderPath)) {
-      message.info("正在检查上传目录是否存在...");
       // 未检查过该文件夹，进行存在性检查
-      const exists = await checkFolderExists(folderPath);
+      const exists = await checkFolderExists(folderPath, true);
 
       if (exists) {
         // 检查是否已经有一个确认正在进行
@@ -187,8 +197,6 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
         folderOverwriteMapRef.current.set(folderPath, true);
       }
     }
-
-    message.info("检查完成，即将上传...");
 
     // 如果允许上传该文件夹，确保父目录存在
     if (folderOverwriteMapRef.current.get(folderPath)) {
@@ -244,7 +252,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const startMultipartUpload = async (file: RcFile, onProgress: OnProgressCallback) => {
     // 获取文件的相对路径或名称
     const relativePath = file.webkitRelativePath || file.name;
-    const folderName = relativePath.split("/")[0];
+    const folderName = relativePath.split("/").slice(0, -2).join("/");
     const folderPath = join(path, folderName);
 
     const { tempFileDir, chunkSizeByte, filesInfo } = await api.initMultipartUpload({
