@@ -45,7 +45,7 @@ export default {
       private:"我的模型",
       public:"公共模型",
     },
-    file:"文件管理",
+    file:"文件",
   },
   // button
   button: {
@@ -427,7 +427,7 @@ export default {
         dir:"要创建的文件的目录",
         name:"文件名",
       },
-      fileManager:{
+      fileManager: {
         copy:"复制",
         move:"移动",
         fail:"失败",
@@ -461,6 +461,9 @@ export default {
         newDir:"新目录",
         download:"下载",
         rename:"重命名",
+        preview: {
+          cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
+        },
       },
       fileTable:{
         name:"文件名",
@@ -642,6 +645,24 @@ export default {
     },
   },
   component:{
+    fileEditModal: {
+      edit: "编辑",
+      prompt: "提示",
+      save: "保存",
+      doNotSave: "不保存",
+      notSaved: "未保存",
+      notSavePrompt: "文件未保存，是否保存该文件？",
+      fileEdit: "文件编辑",
+      filePreview: "文件预览",
+      fileLoading: "文件正在加载...",
+      exitEdit: "退出编辑",
+      failedGetFile: "获取文件: {} 失败",
+      cantReadFile: "无法读取文件: {}",
+      saveFileFail: "文件保存失败: {}",
+      saveFileSuccess: "文件保存成功",
+      fileSizeExceeded: "文件过大（最大{}），请下载后编辑",
+      fileFetchAbortPrompt: "获取文件 {} 操作被终止",
+    },
     fileSelectModal:{
       onlyHomeDir:"仅可在家目录下操作",
       notAllowed:"当前文件或文件夹不可选取",

@@ -348,6 +348,12 @@ message EditUserProfile {
   string user_id = 1;
 }
 
+message ChangePassword {
+}
+
+message ChangeEmail {
+}
+
 message SetPlatformBilling {
   // 集群_分区_QOS
   string path = 1;
@@ -787,6 +793,8 @@ message CreateOperationLogRequest {
     DeleteAccount delete_account = 101;
     EditUserProfile edit_user_profile = 102;
     ExportJobRecord export_job_record = 103;
+    ChangePassword change_password = 104;
+    ChangeEmail change_email = 105;
   }
 }
 
@@ -898,6 +906,8 @@ message OperationLog {
     DeleteAccount delete_account = 103;
     EditUserProfile edit_user_profile = 104;
     ExportJobRecord export_job_record = 105;
+    ChangePassword change_password = 106;
+    ChangeEmail change_email = 107;
   }
 }
 

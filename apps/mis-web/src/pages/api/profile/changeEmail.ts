@@ -14,13 +14,15 @@ import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getCapabilities } from "@scow/lib-auth";
+import { OperationType } from "@scow/lib-operation-log";
 import { UserServiceClient } from "@scow/protos/build/server/user";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { OperationResult } from "src/models/operationLog";
+import { callLog } from "src/server/operationLog";
 import { getClient } from "src/utils/client";
 import { runtimeConfig } from "src/utils/config";
-import { handlegRPCError } from "src/utils/server";
-
+import { handlegRPCError, parseIp } from "src/utils/server";
 
 
 // 此API用于用户修改自己的邮箱。
@@ -29,7 +31,7 @@ export const ChangeEmailSchema = typeboxRouteSchema({
   method: "PATCH",
 
   body: Type.Object({
-    userId:Type.String(),
+    userId: Type.String(),
     newEmail: Type.String(),
   }),
 
@@ -64,14 +66,25 @@ export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) =>
 
   const client = getClient(UserServiceClient);
 
+  const logInfo = {
+    operatorUserId: info.identityId,
+    operatorIp: parseIp(req) ?? "",
+    operationTypeName: OperationType.changeEmail,
+  };
+
   return await asyncClientCall(client, "changeEmail", {
     userId,
     newEmail,
   })
-    .then(() => ({ 204: null }))
+    .then(async () => {
+      await callLog(logInfo, OperationResult.SUCCESS);
+      return { 204: null };
+    })
     .catch(handlegRPCError({
       [Status.NOT_FOUND]: () => ({ 404: null }),
       [Status.UNKNOWN]: () => ({ 500: null }),
       [Status.UNIMPLEMENTED]: () => ({ 501: null }),
-    }));
+    },
+    async () => await callLog(logInfo, OperationResult.FAIL),
+    ));
 });

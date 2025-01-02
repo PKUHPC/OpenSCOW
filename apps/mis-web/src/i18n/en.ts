@@ -707,6 +707,8 @@ export default {
         will: "Will be in",
         createModal: "seconds to open the create user interface",
         createFirst: "User does not exist. Please create a user first",
+        blockAccount:"User has been blocked. Please unblock first",
+        arrearsAccount:"Failed to obtain user arrears status",
         addSuccess: "Added Successfully!",
         userDeleted: "The user has been deleted and cannot be added",
       },
@@ -1343,6 +1345,8 @@ export default {
       deleteUser:"Delete User",
       deleteAccount:"Delete Account",
       editUserProfile: "Edit User Information",
+      changePassword: "Modify user password",
+      changeEmail: "Modify user email",
     },
     operationDetails: {
       login: "User Login",
@@ -1467,6 +1471,9 @@ export default {
       userChangeTenant: "User {} changes from tenant {} to tenant {}",
       activateCluster: "User {} activates the Cluster: {}",
       deactivateCluster: "User {} deactivates the Cluster: {}",
+      changePassword: "User changes their personal password",
+      changeEmail: "User changes their personal email",
+      editUserProfile: "Modify the information of user (id: {})",
     },
   },
   userRoles: {

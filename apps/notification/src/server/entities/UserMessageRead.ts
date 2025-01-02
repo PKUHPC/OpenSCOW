@@ -47,6 +47,9 @@ export const UserMessageReadSchema = new EntitySchema<UserMessageRead>({
   indexes: [
     { name: "idx_user_id", properties: ["userId"]},
   ],
+  uniques: [
+    { name: "uniq_user_message", properties: ["userId", "message"]},
+  ],
   hooks: {
     beforeUpsert: [
       (args: EventArgs<UserMessageRead>) => {

@@ -15,6 +15,7 @@ import { Loaded } from "@mikro-orm/core";
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { Decimal, decimalToMoney } from "@scow/lib-decimal";
+import { ScowResourcePlugin } from "@scow/lib-scow-resource";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { blockAccount, blockUserInAccount, unblockAccount, unblockUserInAccount } from "src/bl/block";
 import { Account } from "src/entities/Account";
@@ -64,7 +65,9 @@ export function checkShouldUnblockAccount(account: Loaded<Account, "tenant">) {
 export async function pay(
   request: PayRequest, em: SqlEntityManager,
   currentActivatedClusters: Record<string, ClusterConfigSchema>,
-  logger: Logger, clusterPlugin: ClusterPlugin,
+  logger: Logger, 
+  clusterPlugin: ClusterPlugin,
+  scowResourcePlugin?: ScowResourcePlugin,
 ) {
   const {
     target, amount, comment, operatorId, ipAddress, type,
@@ -111,7 +114,12 @@ export async function pay(
     && checkShouldUnblockAccount(target)
   ) {
     logger.info("Unblock account %s", target.accountName);
-    await unblockAccount(target, currentActivatedClusters, clusterPlugin.clusters, logger);
+    await unblockAccount(target, 
+      currentActivatedClusters, 
+      clusterPlugin.clusters, 
+      logger, 
+      scowResourcePlugin?.resource,
+    );
   }
 
   if (

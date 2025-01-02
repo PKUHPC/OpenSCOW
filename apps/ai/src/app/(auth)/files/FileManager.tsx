@@ -1,19 +1,8 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { CopyOutlined, DatabaseOutlined, DeleteOutlined, EyeInvisibleOutlined, EyeOutlined,
   FileAddOutlined, FolderAddOutlined, HomeOutlined, LeftOutlined,
   RightOutlined, ScissorOutlined, SnippetsOutlined, UploadOutlined,
   UpOutlined } from "@ant-design/icons";
+import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import type { inferRouterOutputs } from "@trpc/server";
 import { App, Button, Divider, Modal, Space } from "antd";
@@ -23,7 +12,9 @@ import { join } from "path";
 import React, { useEffect, useRef, useState } from "react";
 import { usePublicConfig } from "src/app/(auth)/context";
 import { useOperation } from "src/app/(auth)/files/[cluster]/context";
+import { FileEditModal } from "src/components/FileEditModal";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
+import { ImagePreviewer } from "src/components/ImagePreviewer";
 import { MkdirModal } from "src/components/MkdirModal";
 import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
@@ -32,6 +23,7 @@ import { UploadModal } from "src/components/UploadModal";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
+import { convertToBytes } from "src/utils/format";
 import { trpc } from "src/utils/trpc";
 import { styled } from "styled-components";
 
@@ -64,6 +56,8 @@ const OperationBar = styled(TableTitle)`
   gap: 4px;
 `;
 
+const DEFAULT_FILE_PREVIEW_LIMIT_SIZE = "50m";
+
 type FileInfoKey = React.Key;
 
 type FileInfo = inferRouterOutputs<AppRouter>["file"]["listDirectory"][0];
@@ -74,8 +68,6 @@ interface PromiseSettledResult {
   status: string;
   value?: FileInfo | undefined;
 }
-
-
 
 export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPrefix }) => {
   const t = useI18nTranslateToString();
@@ -95,6 +87,19 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
   const { operation, setOperation } = useOperation();
   const [showHiddenFile, setShowHiddenFile] = useState(false);
+
+  const [previewFile, setPreviewFile] = useState({
+    open: false,
+    filename: "",
+    fileSize: 0,
+    filePath: "",
+    clusterId: "",
+  });
+  const [previewImage, setPreviewImage] = useState({
+    visible: false,
+    src: "",
+    scaleStep: 0.5,
+  });
 
   const filesQuery = trpc.file.listDirectory.useQuery({
     clusterId: cluster.id, path,
@@ -271,6 +276,36 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
     setShowHiddenFile(!showHiddenFile);
   };
 
+  const handlePreview = (filename: string, fileSize: number) => {
+
+    const filePreviewLimitSize = publicConfig.FILE_PREVIEW_SIZE || DEFAULT_FILE_PREVIEW_LIMIT_SIZE;
+    if (fileSize > convertToBytes(filePreviewLimitSize)) {
+      message.info(t(p("preview.cantPreview"), [filePreviewLimitSize]));
+      return;
+    }
+
+    if (isImage(filename)) {
+      setPreviewImage({
+        ...previewImage,
+        visible: true,
+        src: urlToDownload(cluster.id, join(path, filename), false, publicConfig.BASE_PATH),
+      });
+      return;
+    } else if (canPreviewWithEditor(filename)) {
+      setPreviewFile({
+        open: true,
+        filename,
+        fileSize: fileSize,
+        filePath: join(path, filename),
+        clusterId: cluster.id,
+      });
+      return;
+    } else {
+      message.info(t(p("preview.cantPreview"), [filePreviewLimitSize]));
+      return;
+    }
+  };
+
   return (
     <div>
       <TitleText>
@@ -412,8 +447,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             if (r.type === "DIR") {
               router.push(fullUrl(join(path, r.name)));
             } else if (r.type === "FILE") {
-              const href = urlToDownload(cluster.id, join(path, r.name), false, publicConfig.BASE_PATH);
-              openPreviewLink(href);
+              handlePreview(r.name, r.size);
             }
           },
         })}
@@ -424,8 +458,7 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
             </Link>
           ) : (
             <a onClick={() => {
-              const href = urlToDownload(cluster.id, join(path, r.name), false, publicConfig.BASE_PATH);
-              openPreviewLink(href);
+              handlePreview(r.name, r.size);
             }}
             >
               {r.name}
@@ -435,11 +468,11 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
         actionRender={(_, i: FileInfo) => (
           <Space>
             {
-              i.type === "FILE" ? (
+              i.type === "FILE" && (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true, publicConfig.BASE_PATH)}>
                   {t(p("download"))}
                 </a>
-              ) : undefined
+              )
             }
             <RenameLink
               cluster={cluster}
@@ -474,6 +507,8 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
           </Space>
         )}
       />
+      <ImagePreviewer previewImage={previewImage} setPreviewImage={setPreviewImage} />
+      <FileEditModal previewFile={previewFile} setPreviewFile={setPreviewFile} />
     </div>
   );
 };
@@ -482,8 +517,3 @@ const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
-
-
-function openPreviewLink(href: string) {
-  window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
-}

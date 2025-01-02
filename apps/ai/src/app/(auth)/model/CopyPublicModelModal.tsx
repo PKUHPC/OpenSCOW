@@ -54,10 +54,12 @@ export const CopyPublicModelModal: React.FC<Props> = (
       form.resetFields();
     },
     onError(err) {
-      if (err.data?.code === "CONFLICT") {
+      const errCode = err.data?.code;
+      const errMessage = err.message;
+      if (errCode === "CONFLICT" && errMessage.startsWith("A model with the same name")) {
         form.setFields([
           {
-            name: "targetDatasetName",
+            name: "targetModalName",
             errors: [t(p("alreadyExisted"))],
           },
         ]);

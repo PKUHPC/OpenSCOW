@@ -466,7 +466,7 @@ export const exportServiceServer = plugin((server) => {
         timeEnd: x.timeEnd.toISOString(),
         biJobIndex:x.biJobIndex,
         nodelist:x.nodelist,
-        timeStart:x.timeStart.toISOString(),
+        timeStart:x.timeStart ? x.timeStart.toISOString() : undefined,
         gpu:x.gpu,
         cpusReq:x.cpusReq,
         memReq:x.memReq,

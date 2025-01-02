@@ -54,6 +54,9 @@ export default /* #__PURE__*/route(BlockUserInAccountSchema, async (req, res) =>
 
   const info = await auth(req, res);
 
+  // 检查操作者是否已经被Block，若果是直接返回
+  
+
   if (!info) { return; }
 
 

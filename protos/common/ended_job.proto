@@ -27,7 +27,7 @@ message JobInfo {
   string job_name = 7;
   string cluster = 8;
   google.protobuf.Timestamp time_submit = 9;
-  google.protobuf.Timestamp time_start = 10;
+  optional google.protobuf.Timestamp time_start = 10;
   google.protobuf.Timestamp time_end = 11;
   int32 gpu = 12;
   uint32 cpus_req = 13;

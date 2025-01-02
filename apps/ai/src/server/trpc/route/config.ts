@@ -210,6 +210,10 @@ export const config = router({
         NOVNC_CLIENT_URL: envConfig.NOVNC_CLIENT_URL,
 
         SCOW_RESOURCE: commonConfig.scowResource,
+
+        FILE_EDIT_SIZE: aiConfig.file?.edit.limitSize,
+
+        FILE_PREVIEW_SIZE: aiConfig.file?.preview.limitSize,
       };
     }),
 

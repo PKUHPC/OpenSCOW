@@ -706,6 +706,8 @@ export default {
         will:"将在",
         createModal:"秒后打开创建用户界面",
         createFirst:"用户不存在。请先创建用户",
+        blockAccount:"账户处于封锁状态，请联系管理员解封",
+        arrearsAccount:"获取账户欠费状态失败",
         addSuccess:"添加成功！",
         userDeleted:"该用户已删除，无法添加",
       },
@@ -1340,6 +1342,8 @@ export default {
       deleteUser:"删除用户",
       deleteAccount:"删除账户",
       editUserProfile: "修改用户信息",
+      changePassword: "修改用户密码",
+      changeEmail: "修改用户邮箱",
     },
     operationDetails: {
       login: "用户登录",
@@ -1464,6 +1468,9 @@ export default {
       userChangeTenant: "用户{}切换租户，从租户{}切换到租户{}",
       activateCluster: "用户{}启用集群：{}",
       deactivateCluster: "用户{}停用集群：{}",
+      changePassword: "用户修改自身密码",
+      changeEmail: "用户修改自身邮箱",
+      editUserProfile: "修改用户(id: {})的信息",
     },
   },
   userRoles: {

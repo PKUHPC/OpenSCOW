@@ -1,5 +1,24 @@
 # @scow/ai
 
+## 0.2.13
+
+### Patch Changes
+
+- 1ae20a2: 删除 ai 文件管理在终端中打开按钮
+- e124465: 优化 listAppsessions，防止某个作业有问题导致整个作业列表显示不出来
+- df930f7: 限制 ai 作业名长度和若长度超了截断
+- 1c7fc04: 1.复制公共算法/数据集时，若重复复制到同一个文件夹，报错信息有误 2.公共数据集存在空白栏 3.公共镜像复制到本地后，集群为空
+- 78cb011: 区分我的和公共的算法数据集模型
+- 3d729a5: 修复镜像、数据集模型算法 id 可以是别人没分享出来的
+- cd75359: 用户修改自身密码和邮箱增加操作日志
+- Updated dependencies [cd75359]
+  - @scow/lib-operation-log@2.1.14
+  - @scow/protos@1.0.20
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.18
+  - @scow/lib-server@1.3.9
+  - @scow/lib-web@1.4.8
+
 ## 0.2.12
 
 ### Patch Changes

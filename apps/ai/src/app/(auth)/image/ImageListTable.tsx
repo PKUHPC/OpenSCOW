@@ -273,6 +273,7 @@ export const ImageListTable: React.FC<Props> = ({ isPublic, clusters, currentClu
                     copiedId={r.id}
                     copiedName={r.name}
                     copiedTag={r.tag}
+                    copiedClusterId={r.clusterId}
                   >
                     {t("button.copyButton")}
                   </CopyImageModalButton>

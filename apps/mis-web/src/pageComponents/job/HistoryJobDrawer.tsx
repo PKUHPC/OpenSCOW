@@ -46,7 +46,7 @@ export const HistoryJobDrawer: React.FC<Props> = (props) => {
     [t(pCommon("workName")), "jobName"],
     [t(pCommon("clusterName")), "cluster", getClusterName],
     [t(p("timeSubmit")), "timeSubmit", formatDateTime],
-    [t(p("timeStart")), "timeStart", formatDateTime],
+    [t(p("timeStart")), "timeStart", (t) => (t ? formatDateTime(t) : "-")],
     [t(p("timeEnd")), "timeEnd", formatDateTime],
     [t(p("gpus")), "gpu"],
     [t(p("cpusReq")), "cpusReq"],

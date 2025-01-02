@@ -51,3 +51,15 @@ export function truncateString(str: string, maxLength = 52) {
 
   return str;
 }
+
+export function convertToBytes(sizeStr: string): number {
+  const units: Record<string, number> = {
+    K: 1024,
+    M: 1024 * 1024,
+    G: 1024 * 1024 * 1024,
+  };
+  const unit = sizeStr.slice(-1).toUpperCase();
+  const size = parseFloat(sizeStr);
+
+  return size * units[unit];
+}

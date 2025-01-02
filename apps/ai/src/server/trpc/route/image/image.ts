@@ -15,6 +15,7 @@ import { getSortedClusterIds } from "@scow/config/build/cluster";
 import { OperationResult, OperationType } from "@scow/lib-operation-log";
 import { sshConnect as libConnect } from "@scow/lib-ssh";
 import { TRPCError } from "@trpc/server";
+import dayjs from "dayjs";
 import { aiConfig } from "src/server/config/ai";
 import { rootKeyPair } from "src/server/config/env";
 import { Image, Source, Status } from "src/server/entities/Image";
@@ -184,6 +185,9 @@ export const createImage = procedure
     const em = await forkEntityManager();
     const { name, tag, source, sourcePath } = input;
 
+    // tag的唯一标识符
+    const tagPostfix = dayjs().unix().toString();
+
     const imageNameTagExist = await em.findOne(Image, {
       name, tag, owner: user.identityId });
 
@@ -203,11 +207,15 @@ export const createImage = procedure
     const host = getClusterLoginNode(processClusterId);
     if (!host) { throw clusterNotFound(processClusterId); };
 
-    const harborImageUrl = createHarborImageUrl(name, tag, user.identityId);
+    const harborImageUrl = createHarborImageUrl(name, tag + tagPostfix, user.identityId);
 
     // 创建一个状态为 creating 的数据
     const image = new Image({
-      ...input, path: harborImageUrl, status: Status.CREATING, owner: user.identityId,
+      ...input,
+      path: harborImageUrl,
+      status: Status.CREATING,
+      owner: user.identityId,
+      tagPostfix,
     });
     await em.persistAndFlush([image]);
 
@@ -449,7 +457,8 @@ export const deleteImage = procedure
     let needDeleteArtifact: boolean = false;
 
     for (const item of referenceRes) {
-      if (item.tags?.length > 0 && item.tags.find((i: { name: string }) => i.name === image.tag)) {
+      if (item.tags?.length > 0 && item.tags.find((i: { name: string }) =>
+        i.name === image.tag + (image.tagPostfix ?? ""))) {
         reference = item.digest;
         needDeleteArtifact = (item.tags.length === 1);
       }
@@ -495,7 +504,7 @@ export const deleteImage = procedure
     } else {
       const deleteUrl = `${aiConfig.harborConfig.protocol}://${aiConfig.harborConfig.url}/api/v2.0/projects`
       + `/${aiConfig.harborConfig.project}/repositories/${user.identityId}%252F${image.name}`
-      + `/artifacts/${reference}/tags/${image.tag}`;
+      + `/artifacts/${reference}/tags/${image.tag + (image.tagPostfix ?? "")}`;
 
       const deleteRes = await fetch(deleteUrl, {
         method: "DELETE",
@@ -596,7 +605,7 @@ export const copyImage = procedure
       summary: "copy a image",
     },
   })
-  .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string() }))
+  .input(z.object({ id: z.number(), newName: z.string(), newTag: z.string(),clusterId:z.optional(z.string()) }))
   .output(z.number())
   .use(async ({ input:{ id, newTag }, ctx, next }) => {
     const res = await next({ ctx });
@@ -626,7 +635,10 @@ export const copyImage = procedure
 
     const em = await forkEntityManager();
 
-    const { id, newName, newTag } = input;
+    const { id, newName, newTag,clusterId } = input;
+
+    // tag的唯一标识符
+    const tagPostfix = dayjs().unix().toString();
 
     const sharedImage = await em.findOne(Image, { id, isShared: true, status: Status.CREATED });
 
@@ -657,11 +669,13 @@ export const copyImage = procedure
     const image = new Image({
       name: newName,
       tag: newTag,
+      tagPostfix,
       owner: user.identityId,
       source: Source.EXTERNAL,
       sourcePath: sharedImage.path,
       status: Status.CREATING,
       description: sharedImage.description,
+      clusterId,
     });
     await em.persistAndFlush(image);
 
@@ -703,7 +717,7 @@ export const copyImage = procedure
             throw new Error(`copyImage Error: Image ${newName}:${newTag} create failed: localImage not found`);
           }
 
-          const harborImageUrl = createHarborImageUrl(newName, newTag, user.identityId);
+          const harborImageUrl = createHarborImageUrl(newName, newTag + tagPostfix, user.identityId);
 
           // 制作镜像上传
           await pushImageToHarbor({

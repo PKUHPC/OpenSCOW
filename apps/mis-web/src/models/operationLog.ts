@@ -183,6 +183,8 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     initMultipartUpload: t(pTypes("initMultipartUpload")),
     markMessageRead: t(pTypes("markMessageRead")),
     editUserProfile: t(pTypes("editUserProfile")),
+    changePassword: t(pTypes("changePassword")),
+    changeEmail: t(pTypes("changeEmail")),
   };
 
 };
@@ -243,6 +245,8 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   deleteModelVersion:"011007",
   copyModelVersion:"011008",
   markMessageRead: "011101",
+  changePassword: "011201",
+  changeEmail: "011202",
   createUser: "020201",
   addUserToAccount: "020202",
   removeUserFromAccount: "020203",
@@ -607,6 +611,14 @@ export const getOperationDetail = (
       case "customEvent": {
         const c = operationEvent[logEvent]?.content;
         return getI18nCurrentText(c, languageId);
+      }
+      case "changePassword":
+        return t(pDetails("changePassword"));
+      case "changeEmail":
+        return t(pDetails("changeEmail"));
+      case "editUserProfile": {
+        return t(pDetails("editUserProfile"),
+          [operationEvent[logEvent].userId]);
       }
       default:
         return "-";

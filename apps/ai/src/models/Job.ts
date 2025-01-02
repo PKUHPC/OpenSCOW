@@ -13,5 +13,6 @@
 export enum JobType {
   APP = "app",
   TRAIN = "train",
+  INFER = "infer",
 }
 

@@ -10,6 +10,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "name": {
@@ -19,6 +20,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "owner": {
@@ -28,6 +30,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "framework": {
@@ -53,6 +56,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "description": {
@@ -62,6 +66,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "cluster_id": {
@@ -71,6 +76,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -122,6 +128,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "version_name": {
@@ -131,6 +138,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "version_description": {
@@ -140,6 +148,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "private_path": {
@@ -149,6 +158,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "path": {
@@ -158,6 +168,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -189,6 +200,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "algorithm_id": {
@@ -198,6 +210,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },
@@ -251,6 +264,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "name": {
@@ -260,6 +274,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "owner": {
@@ -269,6 +284,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "type": {
@@ -278,6 +294,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "is_shared": {
@@ -287,6 +304,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "scene": {
@@ -296,6 +314,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "description": {
@@ -305,6 +324,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "cluster_id": {
@@ -314,6 +334,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -365,6 +386,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "version_name": {
@@ -374,6 +396,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "version_description": {
@@ -383,6 +406,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "private_path": {
@@ -392,6 +416,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "path": {
@@ -401,6 +426,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -432,6 +458,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "dataset_id": {
@@ -441,6 +468,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },
@@ -494,6 +522,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "name": {
@@ -503,6 +532,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "owner": {
@@ -512,6 +542,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "source": {
@@ -534,6 +565,17 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "tag_postfix": {
+          "name": "tag_postfix",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "description": {
@@ -543,6 +585,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "cluster_id": {
@@ -552,6 +595,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "source_path": {
@@ -561,6 +605,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "path": {
@@ -570,6 +615,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "is_shared": {
@@ -579,6 +625,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "status": {
@@ -656,6 +703,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "name": {
@@ -665,6 +713,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "owner": {
@@ -674,6 +723,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "algorithm_framework": {
@@ -683,6 +733,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "comment": "algorithm algorithmFramework",
           "mappedType": "string"
         },
@@ -693,6 +744,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "comment": "algorithm name",
           "mappedType": "string"
         },
@@ -703,6 +755,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 1,
           "mappedType": "boolean"
         },
         "description": {
@@ -712,6 +765,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "cluster_id": {
@@ -721,6 +775,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -772,6 +827,7 @@
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "version_name": {
@@ -781,6 +837,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "version_description": {
@@ -790,6 +847,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "algorithm_version": {
@@ -799,6 +857,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": 255,
           "mappedType": "string"
         },
         "private_path": {
@@ -808,6 +867,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "path": {
@@ -817,6 +877,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "create_time": {
@@ -848,6 +909,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": 255,
           "mappedType": "string"
         },
         "model_id": {
@@ -857,6 +919,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },

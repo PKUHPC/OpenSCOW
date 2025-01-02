@@ -1,5 +1,18 @@
 # @scow/mis-server
 
+## 1.7.5
+
+### Patch Changes
+
+- d598517: slurm 数据库中开始时间为空的作业也同步到 scow 数据库
+- 325d309: 删除用户账户判断适配器接口版本
+- 6262855: 封锁或欠费账户无法添加用户
+- 355a523: 修复将账户添加到白名单时没有获取到已授权分区以及解封账户时没有对未授权分区再次封锁的问题
+  - @scow/protos@1.0.20
+  - @scow/lib-hook@1.0.20
+  - @scow/lib-scheduler-adapter@1.1.18
+  - @scow/lib-server@1.3.9
+
 ## 1.7.4
 
 ### Patch Changes

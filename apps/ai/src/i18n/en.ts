@@ -45,7 +45,7 @@ export default {
       private: "My Models",
       public: "Public Models",
     },
-    file: "File Management",
+    file: "File",
   },
   // button
   button: {
@@ -461,6 +461,9 @@ export default {
         newDir: "New Directory",
         download: "Download",
         rename: "Rename",
+        preview: {
+          cantPreview: "File too large (maximum {}) or format not supported, please download to view",
+        },
       },
       fileTable: {
         name: "File Name",
@@ -642,6 +645,24 @@ export default {
     },
   },
   component: {
+    fileEditModal: {
+      edit: "Edit",
+      prompt: "Prompt",
+      save: "Save",
+      doNotSave: "Do Not Save",
+      notSaved: "Not Saved",
+      notSavePrompt: "The file has not been saved, do you want to save this file?",
+      fileEdit: "File Edit",
+      filePreview: "File Preview",
+      fileLoading: "File is loading...",
+      exitEdit: "Exit Edit Mode",
+      failedGetFile: "Failed to get file: {}",
+      cantReadFile: "Cannot read file: {}",
+      saveFileFail: "File save failed: {}",
+      saveFileSuccess: "File saved successfully",
+      fileSizeExceeded: "File too large (maximum {}), please download and edit",
+      fileFetchAbortPrompt: "Fetch {} operation was aborted",
+    },
     fileSelectModal: {
       onlyHomeDir: "Operations are only allowed in the home directory",
       notAllowed: "The current file or folder cannot be selected",

@@ -74,6 +74,14 @@ message WhitelistAccountResponse {
   bool executed = 1;
 }
 
+message IsAccountBelowBlockThresholdRequest{
+  string account_name = 1;
+}
+
+message IsAccountBelowBlockThresholdResponse {
+  bool is_below_block_threshold = 1;
+}
+
 message DewhitelistAccountRequest {
   string tenant_name = 1;
   string account_name = 2;
@@ -186,4 +194,6 @@ service AccountService {
   rpc SetBlockThreshold(SetBlockThresholdRequest) returns (SetBlockThresholdResponse);
 
   rpc DeleteAccount(DeleteAccountRequest) returns (DeleteAccountResponse);
+
+  rpc IsAccountBelowBlockThreshold(IsAccountBelowBlockThresholdRequest) returns (IsAccountBelowBlockThresholdResponse);
 }

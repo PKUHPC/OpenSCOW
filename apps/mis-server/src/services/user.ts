@@ -154,7 +154,7 @@ export const userServiceServer = plugin((server) => {
     },
 
     addUserToAccount: async ({ request, em, logger }) => {
-      const { accountName, userId, tenantName } = request;
+      const { accountName, userId, tenantName,isTenantAdmin } = request;
 
       const account = await em.findOne(Account, {
         accountName, tenant: { name: tenantName },
@@ -180,13 +180,20 @@ export const userServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      // 如果账户是被封锁的状态且用户不是租户管理员，报错
+      if (account.state === AccountState.BLOCKED_BY_ADMIN && !isTenantAdmin) {
+        throw {
+          code: Status.NOT_FOUND,
+          details: "ACCOUNT_BLOCKED_BY_ADMIN",
+        } as ServiceError;
+      }
+
       if (user.state === UserState.DELETED) {
         throw {
           code: Status.NOT_FOUND,
           details: "USER_DELETED",
         } as ServiceError;
       }
-
 
       if (account.state === AccountState.DELETED) {
         throw {

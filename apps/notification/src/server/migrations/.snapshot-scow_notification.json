@@ -738,6 +738,17 @@
           "unique": false
         },
         {
+          "keyName": "uniq_user_message",
+          "columnNames": [
+            "user_id",
+            "message_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"

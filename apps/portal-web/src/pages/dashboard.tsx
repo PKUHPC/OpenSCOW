@@ -254,23 +254,17 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
 
         const { clusterName, partitions } = result.clusterInfo;
 
+        // 先累加分区的资源信息
         const aggregatedData = partitions.reduce(
           (acc, partition) => {
             acc.nodeCount += partition.nodeCount;
             acc.runningNodeCount += partition.runningNodeCount;
             acc.idleNodeCount += partition.idleNodeCount;
             acc.notAvailableNodeCount += partition.notAvailableNodeCount;
-            acc.cpuCoreCount += partition.cpuCoreCount;
-            acc.runningCpuCount += partition.runningCpuCount;
-            acc.idleCpuCount += partition.idleCpuCount;
-            acc.notAvailableCpuCount += partition.notAvailableCpuCount;
-            acc.gpuCoreCount += partition.gpuCoreCount;
-            acc.runningGpuCount += partition.runningGpuCount;
-            acc.idleGpuCount += partition.idleGpuCount;
-            acc.notAvailableGpuCount += partition.notAvailableGpuCount;
             acc.jobCount += partition.jobCount;
             acc.runningJobCount += partition.runningJobCount;
             acc.pendingJobCount += partition.pendingJobCount;
+
             return acc;
           },
           {
@@ -295,8 +289,27 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           },
         );
 
+        // 通过 successfulNodesResults 来更新 CPU 和 GPU 相关的数据
+        successfulNodesResults.forEach((nodeResult) => {
+          if (nodeResult.nodeInfo.clusterName === aggregatedData.clusterName) {
+            nodeResult.nodeInfo.nodes.forEach((node) => {
+              aggregatedData.cpuCoreCount += node.cpuCoreCount;
+              aggregatedData.runningCpuCount += node.allocCpuCoreCount;
+              aggregatedData.idleCpuCount += node.idleCpuCoreCount;
+              aggregatedData.gpuCoreCount += node.gpuCount;
+              aggregatedData.runningGpuCount += node.allocGpuCount;
+              aggregatedData.idleGpuCount += node.idleGpuCount;
+            });
+          }
+        });
 
-        // 真实的节点数
+        // 计算 `notAvailableCpuCount` 和 `notAvailableGpuCount`
+        aggregatedData.notAvailableCpuCount = aggregatedData.cpuCoreCount -
+        aggregatedData.idleCpuCount - aggregatedData.runningCpuCount;
+        aggregatedData.notAvailableGpuCount = aggregatedData.gpuCoreCount -
+         aggregatedData.idleGpuCount - aggregatedData.runningGpuCount;
+
+        // 计算真实节点数
         const realNode = successfulNodesResults.
           find((v) => v.nodeInfo.clusterName === clusterName)?.nodeInfo.nodes;
 
@@ -304,67 +317,32 @@ export const DashboardPage: NextPage<Props> = requireAuth(() => true)(() => {
           aggregatedData.runningNodeCount = realNode.filter((v) => v.state === 2).length;
           aggregatedData.notAvailableNodeCount = realNode.filter((v) => v.state === 3).length;
           aggregatedData.idleNodeCount = realNode.filter((v) => v.state === 1).length;
-          // 重置CPU GPU的计数
-          aggregatedData.runningCpuCount = 0;
-          aggregatedData.idleCpuCount = 0;
-          aggregatedData.runningGpuCount = 0;
-          aggregatedData.idleGpuCount = 0;
-          // 重新计算CPU GPU的计数
-          for (const node of realNode) {
-            aggregatedData.cpuCoreCount += node.cpuCoreCount;
-            aggregatedData.idleCpuCount += node.idleCpuCoreCount;
-            aggregatedData.runningCpuCount += node.allocCpuCoreCount;
-            aggregatedData.gpuCoreCount += node.gpuCount;
-            aggregatedData.idleGpuCount += node.idleGpuCount;
-            aggregatedData.runningGpuCount += node.allocGpuCount;
-          }
+          aggregatedData.nodeCount = aggregatedData.runningNodeCount +
+           aggregatedData.notAvailableNodeCount +
+            aggregatedData.idleNodeCount;
         }
 
-        if (realNode && ((realNode?.length ?? -1) < aggregatedData.nodeCount)) {
-          aggregatedData.nodeCount = realNode.length;
-          const duplicateNodes: NodeInfo[] = [];
-          // 找到被重复计算的节点
-          Object.keys(nodeCountsByPartition).forEach((nodeName) => {
-            const nodeCountInPartitions = nodeCountsByPartition[nodeName];
-            if (Object.keys(nodeCountInPartitions).length > 1) {
-              const duplicateNode = successfulNodesResults.find((v) => v.nodeInfo.clusterName === clusterName)
-                ?.nodeInfo.nodes.find((v) => v.nodeName === nodeName);
-              if (duplicateNode) {
-                duplicateNodes.push(duplicateNode);
-              }
-            }
-          });
-          // 去除被重复计算的节点
-          duplicateNodes.forEach((duplicateNode) => {
-            const count = duplicateNode.partitions.length - 1;
-            aggregatedData.cpuCoreCount -= count * (duplicateNode?.cpuCoreCount ?? 0);
-            aggregatedData.gpuCoreCount -= count * (duplicateNode?.gpuCount ?? 0);
-          });
-
-          //  计算不可用节点，因为你getclusterNode没有返回
-          aggregatedData.notAvailableCpuCount = Math.min(aggregatedData.cpuCoreCount -
-            (aggregatedData.runningCpuCount + aggregatedData.idleCpuCount),0);
-          aggregatedData.notAvailableGpuCount = Math.min(aggregatedData.gpuCoreCount -
-            (aggregatedData.runningGpuCount + aggregatedData.idleGpuCount),0);
-
-        }
-
+        // 累加平台节点数
         platformOverview.nodeCount += aggregatedData.nodeCount;
         platformOverview.runningNodeCount += aggregatedData.runningNodeCount;
         platformOverview.idleNodeCount += aggregatedData.idleNodeCount;
         platformOverview.notAvailableNodeCount += aggregatedData.notAvailableNodeCount;
-        platformOverview.cpuCoreCount += aggregatedData.cpuCoreCount;
-        platformOverview.runningCpuCount += aggregatedData.runningCpuCount;
-        platformOverview.idleCpuCount += aggregatedData.idleCpuCount;
-        platformOverview.notAvailableCpuCount += aggregatedData.notAvailableCpuCount;
-        platformOverview.gpuCoreCount += aggregatedData.gpuCoreCount;
-        platformOverview.runningGpuCount += aggregatedData.runningGpuCount;
-        platformOverview.idleGpuCount += aggregatedData.idleGpuCount;
-        platformOverview.notAvailableGpuCount += aggregatedData.notAvailableGpuCount;
         platformOverview.jobCount += aggregatedData.jobCount;
         platformOverview.runningJobCount += aggregatedData.runningJobCount;
         platformOverview.pendingJobCount += aggregatedData.pendingJobCount;
         platformOverview.partitionStatus += aggregatedData.partitionStatus;
+        // 累加 CPU 核心数据
+        platformOverview.cpuCoreCount += aggregatedData.cpuCoreCount;
+        platformOverview.runningCpuCount += aggregatedData.runningCpuCount;
+        platformOverview.idleCpuCount += aggregatedData.idleCpuCount;
+        platformOverview.notAvailableCpuCount +=
+                    (aggregatedData.cpuCoreCount - aggregatedData.runningCpuCount - aggregatedData.idleCpuCount);
+        // 累加 GPU 核心数据
+        platformOverview.gpuCoreCount += aggregatedData.gpuCoreCount;
+        platformOverview.runningGpuCount += aggregatedData.runningGpuCount;
+        platformOverview.idleGpuCount += aggregatedData.idleGpuCount;
+        platformOverview.notAvailableGpuCount += (aggregatedData.gpuCoreCount -
+          aggregatedData.runningGpuCount - aggregatedData.idleGpuCount);
 
         aggregatedData.usageRatePercentage = Number(
           ((aggregatedData.runningNodeCount / aggregatedData.nodeCount) * 100).toFixed(2),

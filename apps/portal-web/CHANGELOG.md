@@ -1,5 +1,20 @@
 # @scow/portal-web
 
+## 1.7.5
+
+### Patch Changes
+
+- d598517: slurm 数据库中开始时间为空的作业也同步到 scow 数据库
+- 49d531a: 对平台概览的计算节点函数解耦优化
+- 770a527: 修正 portal、mis、resource 的国际化顺序
+- 0370959: HPC 仪表盘快捷入口对应功能在新标签页打开
+- cd75359: 用户修改自身密码和邮箱增加操作日志
+- Updated dependencies [cd75359]
+  - @scow/lib-operation-log@2.1.14
+  - @scow/protos@1.0.20
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-web@1.4.8
+
 ## 1.7.4
 
 ### Patch Changes

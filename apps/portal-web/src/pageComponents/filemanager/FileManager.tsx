@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
+import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Divider, Dropdown, MenuProps, Space } from "antd";
 import Link from "next/link";
@@ -36,7 +37,6 @@ import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 import { convertToBytes } from "src/utils/format";
-import { canPreviewWithEditor, isImage } from "src/utils/staticFiles";
 import { styled } from "styled-components";
 
 interface Props {

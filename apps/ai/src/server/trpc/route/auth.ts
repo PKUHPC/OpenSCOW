@@ -170,11 +170,17 @@ export const auth = router({
       newPassword:z.string(),
     }))
     .output(z.void())
-    .mutation(async ({ input:{ identityId, oldPassword, newPassword } }) => {
+    .mutation(async ({ ctx: { req },input:{ identityId, oldPassword, newPassword } }) => {
       const checkRes = await checkPassword(config.AUTH_INTERNAL_URL, {
         identityId,
         password: oldPassword,
       }, console);
+
+      const logInfo = {
+        operatorUserId: identityId,
+        operatorIp: parseIp(req) ?? "",
+        operationTypeName: OperationType.changePassword,
+      };
 
       if (!checkRes?.success) {
         throw new TRPCError({
@@ -198,10 +204,13 @@ export const auth = router({
         .catch((e) => e.status);
 
       if (changeRes) {
+        await callLog(logInfo, OperationResult.FAIL);
         throw new TRPCError({
           message: changeRes,
           code: "BAD_REQUEST",
         });
+      } else {
+        await callLog(logInfo, OperationResult.SUCCESS);
       }
 
       return;

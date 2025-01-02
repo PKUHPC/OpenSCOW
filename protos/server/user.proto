@@ -157,6 +157,7 @@ message AddUserToAccountRequest {
   string tenant_name = 1;
   string user_id = 2;
   string account_name = 3;
+  bool is_tenant_admin = 4;
 }
 
 // ALREADY_EXISTS: user already in the account

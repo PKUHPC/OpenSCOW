@@ -1,5 +1,22 @@
 # @scow/mis-web
 
+## 1.7.5
+
+### Patch Changes
+
+- d2aa9ab: 修改用户信息操作日志补全被修改用户的 id
+- d598517: slurm 数据库中开始时间为空的作业也同步到 scow 数据库
+- 325d309: 删除用户账户判断适配器接口版本
+- 6262855: 封锁或欠费账户无法添加用户
+- 770a527: 修正 portal、mis、resource 的国际化顺序
+- cd75359: 用户修改自身密码和邮箱增加操作日志
+- eea0a48: 平台统计页面优化
+- Updated dependencies [cd75359]
+  - @scow/lib-operation-log@2.1.14
+  - @scow/protos@1.0.20
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-web@1.4.8
+
 ## 1.7.4
 
 ### Patch Changes
