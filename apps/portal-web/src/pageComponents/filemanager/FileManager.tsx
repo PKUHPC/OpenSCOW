@@ -1,19 +1,7 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import {
   CopyOutlined,
   DatabaseOutlined,
-  DeleteOutlined, DownloadOutlined, EyeInvisibleOutlined,
+  DeleteOutlined, DownloadOutlined, DownOutlined, EyeInvisibleOutlined,
   EyeOutlined, FileAddOutlined, FolderAddOutlined,
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
@@ -21,7 +9,7 @@ import {
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Divider, Space } from "antd";
+import { App, Button, Divider, Dropdown, MenuProps, Space } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -41,6 +29,7 @@ import { ImagePreviewer } from "src/pageComponents/filemanager/ImagePreviewer";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
+import { UploadDirModal } from "src/pageComponents/filemanager/UploadDirModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -93,6 +82,11 @@ interface Operation {
 }
 
 const p = prefix("pageComp.fileManagerComp.fileManager.");
+
+enum UploadType {
+  File = "file",
+  Dir = "dir",
+}
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEnabled }) => {
 
@@ -267,7 +261,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 
   const onDownloadClick = () => {
     const files = keysToFiles(selectedKeys);
-    
     window.open(urlToDownloadAndCompress(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
   };
 
@@ -361,6 +354,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   }, [editFile, files]);
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploadDirModalOpen, setIsUploadDirModalOpen] = useState(false);
 
   useEffect(() => {
     const uploadQuery = queryToString(router.query.uploadModalOpen);
@@ -371,6 +365,37 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     }
   }, []);
 
+  const handleUploadModalClose = () => {
+    setIsUploadModalOpen(false);
+  };
+
+  const handleUploadDirModalClose = () => {
+    setIsUploadDirModalOpen(false);
+  };
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    if (e.key as UploadType === UploadType.File) {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadDirModalOpen(true);
+    }
+  };
+
+  const items: MenuProps["items"] = [
+    {
+      label: "上传文件",
+      key: UploadType.File,
+    },
+    {
+      label: "上传文件夹",
+      key: UploadType.Dir,
+    },
+  ];
+
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
 
   return (
     <div>
@@ -413,15 +438,14 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
       </TopBar>
       <OperationBar>
         <Space wrap>
-          <UploadButton
-            externalOpen={isUploadModalOpen}
-            cluster={cluster.id}
-            path={path}
-            reload={reload}
-            scowdEnabled={scowdEnabled}
-          >
-            {t(p("tableInfo.uploadButton"))}
-          </UploadButton>
+          {<Dropdown menu={menuProps}>
+            <Button icon={<UploadOutlined />}>
+              <Space>
+                上传
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>}
           <Divider type="vertical" />
           {
             scowdEnabled && (
@@ -680,6 +704,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
       />
       <ImagePreviewer previewImage={previewImage} setPreviewImage={setPreviewImage} />
       <FileEditModal previewFile={previewFile} setPreviewFile={setPreviewFile} />
+      <UploadModal
+        open={isUploadModalOpen}
+        onClose={handleUploadModalClose}
+        cluster={cluster.id}
+        path={path}
+        reload={reload}
+        scowdEnabled={scowdEnabled}
+      />
+      <UploadDirModal
+        open={isUploadDirModalOpen}
+        onClose={handleUploadDirModalClose}
+        cluster={cluster.id}
+        path={path}
+        reload={reload}
+        scowdEnabled={scowdEnabled}
+      />
     </div>
   );
 };
@@ -688,7 +728,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
-const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
 
 // function openPreviewLink(href: string) {
 //   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
