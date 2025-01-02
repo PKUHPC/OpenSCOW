@@ -11,6 +11,7 @@
  */
 
 import { Account } from "src/entities/Account";
+import { AccountBill } from "src/entities/AccountBill";
 import { AccountWhitelist } from "src/entities/AccountWhitelist";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { JobInfo } from "src/entities/JobInfo";
@@ -23,6 +24,7 @@ import { SystemState } from "src/entities/SystemState";
 import { Tenant } from "src/entities/Tenant";
 import { User } from "src/entities/User";
 import { UserAccount } from "src/entities/UserAccount";
+import { UserBill } from "src/entities/UserBill";
 
 import { Cluster } from "./Cluster";
 
@@ -41,4 +43,6 @@ export const entities = [
   SystemState,
   QueryCache,
   Cluster,
+  UserBill,
+  AccountBill,
 ];

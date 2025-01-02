@@ -168,3 +168,10 @@ deleteAccount:
 #       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
 #       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
 
+bill:
+# 生成月账单的定时任务，默认于每月的1、2号执行定时任务，2号再执行一次是为了防止1号环境有问题未完全生成
+  monthlyCron: "0 1 1~2 * *"
+# 生成年账单的定时任务
+  yearlyCron: "0 1 1~2 1 *"
+# 自定义生成之前某个账期的账单，例如 customTerms: ["2023","202407","202408"]，将会在系统启动时，生成"2023","202407","202408"三个周期的账单
+  customTerms: []

@@ -686,6 +686,14 @@ message MarkMessageRead {
   uint64 message_id = 1;
 }
 
+message ExportBill {
+  optional string tenant_name = 1;
+  repeated string account_names = 2;
+}
+
+message ExportUserBill {
+  string account_name = 1;
+}
 
 // INVALID_ARGUMENT: Custom event type name not match with exist type name.
 message CreateOperationLogRequest {
@@ -795,6 +803,8 @@ message CreateOperationLogRequest {
     ExportJobRecord export_job_record = 103;
     ChangePassword change_password = 104;
     ChangeEmail change_email = 105;
+    ExportBill export_bill = 106;
+    ExportUserBill export_user_bill = 107;
   }
 }
 
@@ -908,6 +918,8 @@ message OperationLog {
     ExportJobRecord export_job_record = 105;
     ChangePassword change_password = 106;
     ChangeEmail change_email = 107;
+    ExportBill export_bill = 108;
+    ExportUserBill export_user_bill = 109;
   }
 }
 

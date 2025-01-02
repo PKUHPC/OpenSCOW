@@ -13,7 +13,9 @@
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { MySqlDriver, SqlEntityManager } from "@mikro-orm/mysql";
 import cron from "node-cron";
+import { misConfig } from "src/config/mis";
 import { QueryCache } from "src/entities/QueryCache";
+import { queryBillTypesCache } from "src/utils/bill";
 
 
 export interface ClearCachePlugin {
@@ -55,6 +57,8 @@ export const clearCachePlugin = plugin(async (f) => {
     cacheClearIsRunning = true;
     return await clearQueryCache(f.ext.orm.em.fork(), logger).finally(() => {
       cacheClearIsRunning = false;
+      // 对于账单类型的查询缓存，清除后需重新生成
+      void (misConfig.bill?.enabled && queryBillTypesCache(f.ext.orm.em.fork()));
     });
   };
 

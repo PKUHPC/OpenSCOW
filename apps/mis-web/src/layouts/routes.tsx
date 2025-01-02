@@ -107,6 +107,12 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
             text: t(pPlatform("accountChargeRecords")),
             path: "/admin/finance/accountChargeRecords",
           },
+          ...(publicConfig.BILL_ENABLED
+            ? [{
+              Icon: AccountBookOutlined,
+              text: t(pPlatform("accountBills")),
+              path: "/admin/finance/bills",
+            }] : []),
         ],
       },
       {
@@ -299,6 +305,13 @@ export const tenantRoutes: (tenantRoles: TenantRole[], token: string, t: TransTy
                 text: t(pTenant("accountChargeRecords")),
                 path: "/tenant/finance/accountChargeRecords",
               },
+              ...(publicConfig.BILL_ENABLED ? [
+                {
+                  Icon: AccountBookOutlined,
+                  text: t(pTenant("accountBills")),
+                  path: "/tenant/finance/bills",
+                },
+              ] : []),
             ],
           },
         ] : []),
@@ -396,6 +409,12 @@ export const accountAdminRoutes: (adminAccounts: AccountAffiliation[], t: TransT
           text: t(pAccount("cost")),
           path: `/accounts/${x.accountName}/charges`,
         },
+        ...(publicConfig.BILL_ENABLED
+          ? [{
+            Icon: AccountBookOutlined,
+            text: t(pAccount("bill")),
+            path: `/accounts/${x.accountName}/bills`,
+          }] : []),
         ...(publicConfig.AUDIT_DEPLOYED
           ? [{
             Icon: BookOutlined,

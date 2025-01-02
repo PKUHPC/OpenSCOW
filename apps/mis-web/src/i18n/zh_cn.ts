@@ -114,6 +114,7 @@ export default {
     other: "其他",
     noAvailableClusters: "当前没有可用集群。"
     + "请稍后再试或联系管理员。",
+    serialNumber: "序号",
     phone: "手机号",
     organization: "组织",
   },
@@ -181,6 +182,7 @@ export default {
         tenantPay: "租户充值",
         payments: "充值记录",
         accountChargeRecords: "账户消费记录",
+        accountBills: "账户账单明细",
         systemDebug: "平台调试",
         statusSynchronization: "封锁状态同步",
         jobSynchronization: "作业信息同步",
@@ -211,6 +213,7 @@ export default {
         financePayments: "租户充值记录",
         accountPayments: "账户充值记录",
         accountChargeRecords: "账户消费记录",
+        accountBills: "账户账单明细",
       },
       accountManagement: {
         firstNav:"账户管理",
@@ -220,6 +223,7 @@ export default {
         userManagement: "用户管理",
         pay: "充值记录",
         cost: "消费记录",
+        bill: "账单明细",
       },
     },
   },
@@ -394,6 +398,19 @@ export default {
         ipAddress:"IP地址",
         operatorId:"操作者ID",
         searchTypePlaceholder:"多个请用逗号隔开",
+      },
+      billTable: {
+        statisticalCycle: "统计周期",
+        term: "账期",
+        totalAmount: "总金额",
+        summary: "汇总",
+        year: "年",
+        month: "月",
+        subtotal: "小计",
+        explanation:`{}支持向上或向下调整。如果向上调整，则需要再扣除账户余额，因此会在消费记录中增加一条数据，这部分数据将会被统计到{}1；
+        如果向下调整，则需要退回账户余额，因此会在充值记录中增加一条数据，这部分金额将会被统计到{}2。`,
+
+
       },
     },
     dashboard:{
@@ -990,6 +1007,9 @@ export default {
         accountChargeRecords: {
           title: "账户消费记录",
         },
+        bills: {
+          title: "账单明细",
+        },
       },
       accounts: {
         whitelist: {
@@ -1330,6 +1350,8 @@ export default {
       exportPayRecord: "导出充值记录",
       exportJobRecord: "导出作业记录",
       exportOperationLog: "导出操作日志",
+      exportBill: "导出账户账单",
+      exportUserBill: "导出账单详情",
       setAccountBlockThreshold: "设置账户封锁阈值",
       setAccountDefaultBlockThreshold: "设置账户默认封锁阈值",
       userChangeTenant: "用户切换租户",
@@ -1462,6 +1484,11 @@ export default {
       exportOperationLogFromAccount: "导出账户{}的操作日志",
       exportOperationLogFromTenant: "导出租户{}的操作日志",
       exportOperationLogFromAdmin: "导出平台的操作日志",
+      exportBillFromAccount: "导出租户{}下账户{}的账单",
+      exportBillFromTenant: "导出租户{}下所有账户的账单",
+      exportBillFromAdminAccount: "导出平台下账户{}的账单",
+      exportBillFromAdmin: "导出平台下所有账户的账单",
+      exportUserBillFromAccount: "导出账户{}的账单详情",
       setAccountBlockThreshold: "设置账户{}的封锁阈值为{}",
       setAccountDefaultBlockThreshold: "设置租户{}的默认账户封锁阈值为{}",
       unsetAccountBlockThreshold: "账户{}恢复使用默认封锁阈值",

@@ -17,6 +17,7 @@ import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { accountServiceServer } from "src/services/account";
 import { adminServiceServer } from "src/services/admin";
+import { billServiceServer } from "src/services/bill";
 import { chargingServiceServer } from "src/services/charging";
 import { configServiceServer } from "src/services/config";
 import { exportServiceServer } from "src/services/export";
@@ -54,6 +55,7 @@ export async function createServer() {
   await server.register(configServiceServer);
   await server.register(misConfigServiceServer);
   await server.register(exportServiceServer);
+  await server.register(billServiceServer);
 
   return server;
 }

@@ -21,7 +21,9 @@ import { Capabilities } from "@scow/lib-auth";
 import { ScowResourcePlugin, scowResourcePlugin } from "@scow/lib-scow-resource";
 import { apiAuthPlugin } from "@scow/lib-server";
 import { commonConfig } from "src/config/common";
+import { misConfig } from "src/config/mis";
 import { authServicePlugin } from "src/plugins/authService";
+import { billPlugin } from "src/plugins/bill";
 import { ClearCachePlugin, clearCachePlugin } from "src/plugins/cachePlugin";
 import { ClusterPlugin, clustersPlugin } from "src/plugins/clusters";
 import { FetchPlugin, fetchPlugin } from "src/plugins/fetch";
@@ -60,3 +62,8 @@ if (commonConfig.scowResource?.enabled) {
 if (commonConfig.scowApi) {
   plugins.push(apiAuthPlugin(commonConfig.scowApi));
 }
+
+if (misConfig.bill?.enabled) {
+  plugins.push(billPlugin);
+}
+

@@ -1,14 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
 
 import { stringify } from "csv-stringify";
 import iconv from "iconv-lite";
@@ -41,7 +30,8 @@ export const getCsvStringify = (headerColumns: {[key in string]: string }, colum
   return csvStringify;
 };
 
-type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "jobRecords" | "operationLogs";
+type exportKey = "users" | "accounts" | "payRecords" | "chargeRecords" | "jobRecords" | "operationLogs"
+| "bills" | "userBills";
 
 /**
  *
@@ -96,4 +86,37 @@ export const getContentTypeWithCharset = (filename: string, encoding: Encoding) 
     contentTypeWithCharset = `${contentType}; charset=${encoding}`;
   }
   return contentTypeWithCharset;
+};
+
+
+/**
+ * 账单相关表格导出时，表头是未知的变量，所以无法全部提前指定，根据选择的column动态增加
+ * @param headerColumns csv文件的表头
+ * @param columns 需要导出的列
+ * @returns
+ */
+export const getBillCsvStringify = (headerColumns: {[key in string]: string }, columns: string[]) => {
+
+  if (columns.length) {
+    const headerColumnsKeyArr = Object.keys(headerColumns);
+    headerColumnsKeyArr.forEach((key) => {
+      if (!columns.includes(key) && key !== "id") {
+        delete headerColumns[key];
+      }
+    });
+
+    columns.forEach((i) => {
+      if (!headerColumnsKeyArr.includes(i)) {
+        headerColumns[i] = i;
+      }
+    });
+  }
+  const transformOptions = {
+    header: true,
+    columns: headerColumns,
+  };
+
+  const csvStringify = stringify(transformOptions);
+
+  return csvStringify;
 };

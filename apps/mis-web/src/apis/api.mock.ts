@@ -22,6 +22,7 @@ import { ClusterConnectionStatus } from "src/models/cluster";
 import { OperationResult } from "src/models/operationLog";
 import { AccountState, ClusterAccountInfo_ImportStatus, DisplayedAccountState, PlatformRole,
   TenantRole, UserInfo, UserRole, UserState,UserStatus } from "src/models/User";
+import bill from "src/pages/api/finance/bill";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
 
 export type MockApi<TApi extends Record<
@@ -602,6 +603,10 @@ export const mockApi: MockApi<typeof api> = {
   exportJobRecord: null,
   exportUser: null,
   exportOperationLog: null,
+  exportBill: null,
+  getBills: async () => { return { bills:[], total:0 }; },
+  getUserBills: async () => { return { userBills:[]}; },
+  getBillTypes: async () => { return { types:[]}; },
 
   markMessageRead: null,
   getUnreadMessages: async () => ({
