@@ -252,7 +252,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const startMultipartUpload = async (file: RcFile, onProgress: OnProgressCallback) => {
     // 获取文件的相对路径或名称
     const relativePath = file.webkitRelativePath || file.name;
-    const folderName = relativePath.split("/").slice(0, -2).join("/");
+    const folderName = relativePath.split("/").slice(0, -1).join("/");
     const folderPath = join(path, folderName);
 
     const { tempFileDir, chunkSizeByte, filesInfo } = await api.initMultipartUpload({
@@ -351,7 +351,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   return (
     <Modal
       open={open}
-      title={t(p("title"))}
+      title={"上传文件夹"}
       onCancel={onModalClose}
       destroyOnClose={true}
       maskClosable={false}

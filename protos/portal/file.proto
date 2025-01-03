@@ -139,6 +139,17 @@ message MakeDirectoryRequest {
 message MakeDirectoryResponse {
 }
 
+message CompressFilesRequest {
+  string user_id = 1;
+  string cluster = 2;
+  // 需压缩的文件路径
+  repeated string paths = 3;
+  // 目标文件名
+  string archive_name = 4;
+}
+
+message CompressFilesResponse {}
+
 message InitMultipartUploadRequest {
   string cluster = 1;
   string user_id = 2;
@@ -269,6 +280,7 @@ service FileService {
 
   rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse);
 
+  rpc CompressFiles(CompressFilesRequest) returns (CompressFilesResponse);
   /**
   * InitMultipartUpload 用于初始化文件分片上传。配置开启 scowd 才可使用
   * 获取文件分片临时存储目录、文件分片的大小和已上传的分片

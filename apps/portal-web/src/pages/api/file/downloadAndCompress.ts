@@ -49,7 +49,6 @@ const auth = authenticate(() => true);
 
 export default route(DownloadAndCompressFileSchema, async (req, res) => {
   const info = await auth(req, res);
-
   if (!info) { return; }
 
   const { cluster, paths } = req.query;
