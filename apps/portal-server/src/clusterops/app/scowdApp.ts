@@ -18,7 +18,6 @@ import { AppOps, AppSession, SubmissionInfo } from "src/clusterops/api/app";
 import { portalConfig } from "src/config/portal";
 import { getClusterAppConfigs, splitSbatchArgs } from "src/utils/app";
 import { callOnOne } from "src/utils/clusters";
-import { getIpFromProxyGateway } from "src/utils/proxy";
 import { mapTRPCExceptionToGRPC } from "src/utils/scowd";
 import { displayIdToPort, getTurboVNCBinPath, parseDisplayId } from "src/utils/turbovnc";
 
@@ -537,11 +536,10 @@ export const scowdAppServices = (cluster: string, client: ScowdClient): AppOps =
             const serverSessionInfo = JSON.parse(content.toString()) as ServerSessionInfoData;
             const { HOST, PORT, PASSWORD, ...rest } = serverSessionInfo;
             const customFormData = rest as Record<string, string>;
-            const ip = await getIpFromProxyGateway(cluster, HOST, logger);
 
             return {
               appId: sessionMetadata.appId,
-              host: ip || HOST,
+              host: HOST,
               port: +PORT,
               password: PASSWORD,
               customFormData:  customFormData ?? {},
