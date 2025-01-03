@@ -564,6 +564,7 @@ export const LaunchAppForm = (props: Props) => {
       initialValues={{
         ... initialValues,
       }}
+      labelAlign="left"
       onValuesChange={handleFormChange}
       onFinish={async () => {
 
@@ -717,12 +718,14 @@ export const LaunchAppForm = (props: Props) => {
                     noStyle
                   >
                     <Select
-                      style={{ minWidth: 100 }}
+                      style={{ minWidth: 200 }}
                       allowClear
                       onChange={() => {
                         form.setFieldValue("startCommand", undefined);
                       }}
                       loading={isImagesLoading && isImagePublic !== undefined}
+                      showSearch
+                      optionFilterProp="label"
                       options={imageOptions}
                     />
                   </Form.Item>
@@ -880,12 +883,14 @@ export const LaunchAppForm = (props: Props) => {
         </Form.Item>
         {
           showAlgorithm ? (
-            <Form.Item label={t(p("algorithm"))}>
+            <Form.Item
+              label={t(p("algorithm"))}
+            >
               <Space>
                 <Form.Item name={["algorithm", "type"]} noStyle>
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 120 }}
                     onChange={() => {
                       form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
                     }}
@@ -906,11 +911,13 @@ export const LaunchAppForm = (props: Props) => {
                 <Form.Item name={["algorithm", "name"]} noStyle>
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 200 }}
                     onChange={() => {
                       form.setFieldValue(["algorithm", "version"], undefined);
                     }}
                     loading={isAlgorithmLoading}
+                    showSearch
+                    optionFilterProp="label"
                     options={algorithmOptions}
                   />
                 </Form.Item>
@@ -919,6 +926,8 @@ export const LaunchAppForm = (props: Props) => {
                     allowClear
                     style={{ minWidth: 100 }}
                     loading={isAlgorithmVersionsLoading}
+                    showSearch
+                    optionFilterProp="label"
                     options={algorithmVersionOptions}
                   />
                 </Form.Item>
@@ -928,14 +937,18 @@ export const LaunchAppForm = (props: Props) => {
         }
         {
           algorithmVersionId && (
-            <Form.Item label={t(p("algorithmDesc"))}>
+            <Form.Item
+              label={t(p("algorithmDesc"))}
+            >
               {algorithmVersionDescription[algorithmVersionId]}
             </Form.Item>
           )
         }
         {
           showDataset ? (
-            <Form.Item label={t(p("dataset"))}>
+            <Form.Item
+              label={t(p("dataset"))}
+            >
               <Space>
                 <Form.Item name={["dataset", "type"]} noStyle>
                   <Select
@@ -962,11 +975,13 @@ export const LaunchAppForm = (props: Props) => {
                 <Form.Item name={["dataset", "name"]} noStyle>
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 200 }}
                     loading={isDatasetsLoading}
                     onChange={() => {
                       form.setFieldValue(["dataset", "version"], undefined);
                     }}
+                    showSearch
+                    optionFilterProp="label"
                     options={datasetOptions}
                   />
                 </Form.Item>
@@ -975,6 +990,8 @@ export const LaunchAppForm = (props: Props) => {
                     allowClear
                     style={{ minWidth: 100 }}
                     loading={isDatasetVersionsLoading}
+                    showSearch
+                    optionFilterProp="label"
                     options={datasetVersionOptions}
                   />
                 </Form.Item>
@@ -984,19 +1001,23 @@ export const LaunchAppForm = (props: Props) => {
         }
         {
           datasetVersionId && (
-            <Form.Item label={t(p("datasetDesc"))}>
+            <Form.Item
+              label={t(p("datasetDesc"))}
+            >
               {datasetVersionDescription[datasetVersionId]}
             </Form.Item>
           )
         }
         {
           showModel ? (
-            <Form.Item label={t(p("model"))}>
+            <Form.Item
+              label={t(p("model"))}
+            >
               <Space>
                 <Form.Item name={["model", "type"]} noStyle>
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 120 }}
                     onChange={() => {
                       form.setFieldsValue({ model: { name: undefined, version: undefined } });
                     }}
@@ -1017,11 +1038,13 @@ export const LaunchAppForm = (props: Props) => {
                 <Form.Item name={["model", "name"]} noStyle>
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 200 }}
                     onChange={() => {
                       form.setFieldValue(["model", "version"], undefined);
                     }}
                     loading={isModelsLoading }
+                    showSearch
+                    optionFilterProp="label"
                     options={modelOptions}
                   />
                 </Form.Item>
@@ -1030,6 +1053,8 @@ export const LaunchAppForm = (props: Props) => {
                     allowClear
                     style={{ minWidth: 100 }}
                     loading={isModelVersionsLoading}
+                    showSearch
+                    optionFilterProp="label"
                     options={modelVersionOptions}
                   />
                 </Form.Item>
@@ -1039,7 +1064,9 @@ export const LaunchAppForm = (props: Props) => {
         }
         {
           modelVersionId && (
-            <Form.Item label={t(p("modelDesc"))}>
+            <Form.Item
+              label={t(p("modelDesc"))}
+            >
               {modelVersionDescription[modelVersionId]}
             </Form.Item>
           )
