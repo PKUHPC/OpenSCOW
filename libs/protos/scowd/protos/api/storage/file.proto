@@ -193,8 +193,8 @@ message CompressFilesRequest {
   string user_id = 1;
   // 需压缩的文件路径
   repeated string paths = 2;
-  // 目标文件名
-  string archive_name = 3;
+  // 目标压缩文件路径
+  string archive_path = 3;
 }
 
 message CompressFilesResponse {}

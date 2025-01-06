@@ -144,8 +144,8 @@ message CompressFilesRequest {
   string cluster = 2;
   // 需压缩的文件路径
   repeated string paths = 3;
-  // 目标文件名
-  string archive_name = 4;
+  // 目标压缩文件路径
+  string archive_path = 4;
 }
 
 message CompressFilesResponse {}
