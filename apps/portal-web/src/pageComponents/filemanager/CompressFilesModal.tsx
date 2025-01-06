@@ -1,6 +1,7 @@
 import { DownOutlined } from "@ant-design/icons";
 import { App, Form, Input, Modal, Tree, TreeDataNode } from "antd";
 import { join } from "path";
+import { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { FileInfo } from "src/pages/api/file/list";
@@ -39,6 +40,8 @@ export const CompressFilesModal: React.FC<Props> = ({ open, onClose, path, files
 
   const { message, modal } = App.useApp();
 
+  const [loading, setLoading] = useState(false);
+
   const [form] = Form.useForm<FormProps>();
 
   const t = useI18nTranslateToString();
@@ -63,7 +66,7 @@ export const CompressFilesModal: React.FC<Props> = ({ open, onClose, path, files
 
   const onSubmit = async () => {
     const { zipFileName } = await form.validateFields();
-
+    setLoading(true);
     const exists = await api.fileExist({ query: { cluster: cluster, path: join(path, zipFileName + fileSuffix) } });
 
     if (exists.result) {
@@ -85,6 +88,7 @@ export const CompressFilesModal: React.FC<Props> = ({ open, onClose, path, files
       onClose();
       form.resetFields();
     }
+    setLoading(false);
   };
 
   return (
@@ -96,6 +100,7 @@ export const CompressFilesModal: React.FC<Props> = ({ open, onClose, path, files
       onCancel={onClose}
       destroyOnClose
       onOk={form.submit}
+      loading={loading}
     >
       <Form form={form} onFinish={onSubmit}>
         <strong>{"待压缩文件列表"}</strong>
