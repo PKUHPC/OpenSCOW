@@ -130,6 +130,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   const { loginNodes } = useStore(LoginNodeStore);
   const loginNode = loginNodes[cluster.id][0].address;
 
+  const CompressFilesButton = ModalButton(CompressFilesModal, {
+    icon: <CompressOutlined />,
+    disabled: selectedKeys.length === 0,
+  });
+
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
     await api.listFile({ query: { cluster: cluster.id, path } }, signal)
@@ -505,7 +510,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               files={keysToFiles(selectedKeys)}
               reload={reload}
             >
-              "压缩选中"
+              压缩选中
             </CompressFilesButton>
           )
           }
@@ -741,7 +746,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
-const CompressFilesButton = ModalButton(CompressFilesModal, { icon: <CompressOutlined /> });
 
 // function openPreviewLink(href: string) {
 //   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
