@@ -179,6 +179,29 @@ export const MisConfigSchema = Type.Object({
     default: 0.01,
   }),
 
+  bill: Type.Optional(Type.Object({
+    enabled: Type.Boolean({
+      description: "是否生成账单",
+      default: true,
+    }),
+    monthlyCron: Type.Optional(Type.String({
+      description: "执行生成月账单周期任务的cron表达式。每个账户的月账单在每个月只会生成一次，每次执行生成月账单任务的时候，已经生成账单的账户不会再次生成账单。"
+      + "如填写0 1 1~2 * *，则在每个月的1、2号凌晨1点会执行，在2号执行的时候，1号已经生成账单的账户将不会被再次生成账单。",
+      default: "0 1 1~2 * *" })),
+    yearlyCron: Type.Optional(Type.String({
+      description: "执行生成年账单周期的cron表达式。每个账户每年只会生成一次。如填写0 1 1~2 1 *，将在每年1月的1、2号凌晨1点执行，在2号执行的时候，1号已经生成账单的账户将不会被再次生成账单。",
+      default: "0 1 1~2 1 *" })),
+
+    customTerms: Type.Optional(Type.Array(
+      Type.String(), {
+        description: "用户自定生成指定周期的账单。可以填写年份，如2023，则系统在下次生成账单时会生成对应年的账单；可以填写{年份}{两位月份}，如202407，系统将会生成对应月的账单" },
+    )),
+
+    otherChargeTypeText: Type.String({ description: "预定义的未标明类型的消费在账单中展示的名称", default: "其它" }),
+
+
+  }, { description: "账单功能配置" })),
+
   deleteUser: Type.Optional(Type.Object({
     enabled: Type.Boolean({ description: "是否启用从SCOW中删除用户", default: false }),
     nameMarker: Type.String({ description: "用户名删除标识", default: "(已删除)" }),
@@ -222,6 +245,38 @@ export const getMisConfig: GetConfigFn<MisConfigSchema> = (baseConfigPath, logge
     throw new Error("The config jobChargeDecimalPrecision must be one of the values 0, 1, 2, 3 or 4");
   }
 
+  if (config.bill?.enabled) {
+    config.bill.customTerms?.forEach(isValidTerm);
+  }
+
   return config;
 
 };
+
+function isValidTerm(term: string) {
+  const yearOnlyRegex = /^\d{4}$/; // 匹配 YYYY 格式
+  const yearMonthRegex = /^\d{6}$/; // 匹配 YYYYMM 格式
+
+  if (yearOnlyRegex.test(term)) {
+    const year = parseInt(term, 10);
+    const currentYear = new Date().getFullYear();
+    if (!(year < currentYear)) {
+      throw new Error(`Bill config customTerm ${term} must be before this year`);
+    }
+    return;
+  }
+
+  if (yearMonthRegex.test(term)) {
+    const year = parseInt(term.substring(0, 4), 10);
+    const month = parseInt(term.substring(4, 6), 10);
+    const now = new Date();
+    const termDate = new Date(year, month);
+
+    if (!(termDate < now)) {
+      throw new Error(`Bill config customTerm ${term} must be before this month`);
+    }
+    return;
+  }
+
+  throw new Error("Bill config customTerm is required 2023、2024 or 202407 array");
+}

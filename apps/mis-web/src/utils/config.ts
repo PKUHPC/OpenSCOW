@@ -121,6 +121,9 @@ export interface PublicRuntimeConfig {
 
   NOTIF_ENABLED?: boolean;
   NOTIF_ADDRESS?: string;
+
+  BILL_ENABLED?: boolean;
+  CHANGE_JOB_PRICE_TYPE: string;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

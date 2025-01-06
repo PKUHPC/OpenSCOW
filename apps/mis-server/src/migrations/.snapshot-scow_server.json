@@ -13,6 +13,136 @@
           "length": null,
           "mappedType": "integer"
         },
+        "tenant_name": {
+          "name": "tenant_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "所属租户",
+          "mappedType": "string"
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "所属账户",
+          "mappedType": "string"
+        },
+        "account_owner_id": {
+          "name": "account_owner_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账户拥有者id",
+          "mappedType": "string"
+        },
+        "account_owner_name": {
+          "name": "account_owner_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账户拥有者姓名",
+          "mappedType": "string"
+        },
+        "term": {
+          "name": "term",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账期，如202407、2024",
+          "mappedType": "string"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 19,
+          "scale": 4,
+          "mappedType": "decimal"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账单类型，年度账单或月度账单",
+          "mappedType": "string"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "update_time": {
+          "name": "update_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "details": {
+          "name": "details",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "comment": "账单详情，因为扣费类型不确定，此处用JSON展示，便于拓展",
+          "mappedType": "json"
+        }
+      },
+      "name": "account_bill",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "time": {
           "name": "time",
           "type": "datetime",
@@ -1939,6 +2069,159 @@
             "id"
           ],
           "referencedTableName": "account",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "tenant_name": {
+          "name": "tenant_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "所属租户",
+          "mappedType": "string"
+        },
+        "account_name": {
+          "name": "account_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "所属账户",
+          "mappedType": "string"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "用户id",
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "用户姓名",
+          "mappedType": "string"
+        },
+        "term": {
+          "name": "term",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账期，如202407、2024",
+          "mappedType": "string"
+        },
+        "amount": {
+          "name": "amount",
+          "type": "DECIMAL(19,4)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "precision": 19,
+          "scale": 4,
+          "mappedType": "decimal"
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账单类型，年度账单或月度账单",
+          "mappedType": "string"
+        },
+        "create_time": {
+          "name": "create_time",
+          "type": "DATETIME(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "account_bill_id": {
+          "name": "account_bill_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "details": {
+          "name": "details",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "comment": "账单详情，因为扣费类型不确定，此处用JSON展示，便于拓展",
+          "mappedType": "json"
+        }
+      },
+      "name": "user_bill",
+      "indexes": [
+        {
+          "columnNames": [
+            "account_bill_id"
+          ],
+          "composite": false,
+          "keyName": "user_bill_account_bill_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "user_bill_account_bill_id_foreign": {
+          "constraintName": "user_bill_account_bill_id_foreign",
+          "columnNames": [
+            "account_bill_id"
+          ],
+          "localTableName": "user_bill",
+          "referencedColumnNames": [
+            "id"
+          ],
+          "referencedTableName": "account_bill",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }

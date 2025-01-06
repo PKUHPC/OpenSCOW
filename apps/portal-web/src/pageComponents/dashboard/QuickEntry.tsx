@@ -121,6 +121,7 @@ export const QuickEntry: React.FC<Props> = ({ currentClusters, publicConfigClust
         appWithCluster[y.id].clusters.push(currentClusters[idx]);
       });
     });
+
     return appWithCluster;
   }, [currentClusters]) });
 

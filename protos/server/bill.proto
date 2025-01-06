@@ -1,0 +1,92 @@
+/**
+ * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
+ * SCOW is licensed under Mulan PSL v2.
+ * You can use this software according to the terms and conditions of the Mulan PSL v2.
+ * You may obtain a copy of Mulan PSL v2 at:
+ *          http://license.coscl.org.cn/MulanPSL2
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
+ * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
+ * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
+ * See the Mulan PSL v2 for more details.
+ */
+
+ syntax = "proto3";
+
+ package scow.server;
+ import "google/protobuf/struct.proto";
+ import "google/protobuf/timestamp.proto";
+
+ import "common/money.proto";
+
+ enum BillType {
+  SUMMARY = 0 ;
+  MONTHLY = 1 ;
+  YEARLY = 2 ;
+ }
+
+ message BillListItem {
+   int64 id = 1;
+   string tenant_name = 2;
+   string account_name = 3;
+   string account_owner_id = 4;
+   string account_owner_name = 5;
+   optional string term = 6;
+   common.Money amount = 7;
+   string type = 8;
+   optional google.protobuf.Struct details = 9;
+   google.protobuf.Timestamp create_time = 10;
+   google.protobuf.Timestamp update_time = 11;
+  //  BillType为SUMMARY时，所有聚合的账单的id的数组；如果BillType是MONTHLY或YEARLY，该数组中只有当前账单的id
+   repeated int64 ids = 12;
+ }
+
+ message GetBillsRequest {
+   int32 page_size = 1;
+   int32 page = 2;
+   repeated string account_names = 3;
+   BillType type = 4;
+   optional string user_ids_or_names = 5;
+   optional string term_start = 6;
+   optional string term_end = 7;
+   optional string tenant_name = 8;
+ }
+
+ message GetBillsResponse {
+   repeated BillListItem bills = 1;
+   int64 total = 2;
+ }
+
+ message UserBill {
+   int64 id = 1;
+   string account_name = 2;
+   string user_id = 3;
+   string name = 4;
+   string type = 5;
+   common.Money amount = 6;
+   google.protobuf.Struct details = 7;
+   google.protobuf.Timestamp create_time = 8;
+ }
+
+ message GetUserBillsRequest {
+   repeated int64 account_bill_ids = 1;
+ }
+
+ message GetUserBillsResponse {
+   repeated UserBill user_bills = 1;
+ }
+
+
+message GetBillTypesRequest {}
+
+message GetBillTypesResponse {
+    repeated string types = 1;
+  }
+
+ service BillService {
+   rpc GetBills(GetBillsRequest) returns (GetBillsResponse);
+   rpc GetUserBills(GetUserBillsRequest) returns (GetUserBillsResponse);
+
+   rpc GetBillTypes(GetBillTypesRequest) returns (GetBillTypesResponse);
+ }
+
+

@@ -18,6 +18,7 @@ import "server/charging.proto";
 import "server/job.proto";
 import "server/user.proto";
 import "server/account.proto";
+import "server/bill.proto";
 import "google/protobuf/timestamp.proto";
 import "common/ended_job.proto";
 
@@ -114,6 +115,28 @@ message ExportPayRecordResponse {
   repeated PaymentRecord pay_records = 1;
 }
 
+message ExportBillRequest {
+  uint32 count = 1;
+  repeated string account_names = 2;
+  BillType type = 3;
+  optional string user_ids_or_names = 4;
+  optional string term_start = 5;
+  optional string term_end = 6;
+  optional string tenant_name = 7;
+}
+
+message ExportBillResponse {
+  repeated BillListItem bills = 1;
+}
+
+message ExportUserBillRequest {
+  repeated int64 account_bill_ids = 1;
+}
+
+message ExportUserBillResponse {
+  repeated UserBill user_bills = 1;
+}
+
 message ExportJobRecordRequest {
   uint32 count = 1;
   optional google.protobuf.Timestamp job_end_time_start = 2;
@@ -145,5 +168,7 @@ service ExportService {
   rpc ExportUser(ExportUserRequest) returns (stream ExportUserResponse);
   rpc ExportChargeRecord(ExportChargeRecordRequest) returns (stream ExportChargeRecordResponse);
   rpc ExportPayRecord(ExportPayRecordRequest) returns (stream ExportPayRecordResponse);
+  rpc ExportBill(ExportBillRequest) returns (stream ExportBillResponse);
+  rpc ExportUserBill(ExportUserBillRequest) returns (stream ExportUserBillResponse);
   rpc ExportJobRecord(ExportJobRecordRequest) returns (stream ExportJobRecordResponse);
 }

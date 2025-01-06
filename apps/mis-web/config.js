@@ -203,6 +203,9 @@ const buildRuntimeConfig = async (phase, basePath) => {
 
     NOTIF_ENABLED: commonConfig.notification?.enabled,
     NOTIF_ADDRESS: commonConfig.notification?.address,
+
+    BILL_ENABLED: misConfig.bill?.enabled,
+    CHANGE_JOB_PRICE_TYPE: misConfig.changeJobPriceType,
   };
 
   if (!building) {

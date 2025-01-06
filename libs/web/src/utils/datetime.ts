@@ -109,4 +109,36 @@ export const parseMinutes = (time: number, unit: TimeUnits): number => {
 
 };
 
+export const getMonthlyBillPresets = (languageId: string): TimeRangePickerProps["presets"] => {
+  const now = dayjs();
+  const end = now.subtract(1,"month");
 
+  const lMonth = getCurrentLangLibWebText(languageId, "dateTimeLMonth");
+  const tYear = getCurrentLangLibWebText(languageId, "dateTimeTYear");
+  const threeMonths = getCurrentLangLibWebText(languageId, "dateTimeThreeMonths");
+  const sixMonths = getCurrentLangLibWebText(languageId, "dateTimeSixMonths");
+  const oneYear = getCurrentLangLibWebText(languageId, "dateTimeOneYear");
+
+  return [
+    { label: lMonth, value: [now.subtract(1,"month"), end]},
+    { label: tYear, value: [now.startOf("year"), end]},
+    { label: threeMonths, value: [now.subtract(3, "month"), end]},
+    { label: sixMonths, value: [now.subtract(6, "month").startOf("day"), end]},
+    { label: oneYear, value: [now.subtract(1, "year").startOf("day"), end]},
+  ];
+};
+
+export const getYearlyBillPresets = (languageId: string): TimeRangePickerProps["presets"] => {
+  const now = dayjs();
+  const end = now.subtract(1,"year");
+
+  const lastYear = getCurrentLangLibWebText(languageId, "dateTimeLYear");
+  const threeYear = getCurrentLangLibWebText(languageId, "dateTimeThreeYear");
+  const fiveYear = getCurrentLangLibWebText(languageId, "dateTimeFiveYear");
+
+  return [
+    { label: lastYear, value: [now.subtract(1,"year"), end]},
+    { label: threeYear, value: [now.subtract(3,"year"), end]},
+    { label: fiveYear, value: [now.subtract(5,"year"), end]},
+  ];
+};

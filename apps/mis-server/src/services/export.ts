@@ -16,6 +16,7 @@ import { status } from "@grpc/grpc-js";
 import { Loaded } from "@mikro-orm/core";
 import { decimalToMoney } from "@scow/lib-decimal";
 import { account_AccountStateFromJSON } from "@scow/protos/build/server/account";
+import { BillListItem, BillType as BillSearchType, UserBill as UserBillType } from "@scow/protos/build/server/bill";
 import {
   ExportServiceServer,
   ExportServiceService } from "@scow/protos/build/server/export";
@@ -23,12 +24,16 @@ import {
   platformRoleFromJSON,
   platformRoleToJSON, SortDirection, tenantRoleFromJSON, tenantRoleToJSON } from "@scow/protos/build/server/user";
 import { Account, AccountState } from "src/entities/Account";
+import { AccountBill, BillType } from "src/entities/AccountBill";
 import { ChargeRecord } from "src/entities/ChargeRecord";
 import { JobInfo } from "src/entities/JobInfo";
 import { PayRecord } from "src/entities/PayRecord";
 import { User } from "src/entities/User";
 import { UserRole, UserStatus } from "src/entities/UserAccount";
+import { UserBill } from "src/entities/UserBill";
 import { getAccountStateInfo } from "src/utils/accountUserState";
+import { billFilter, buildQueryConditions,generateTermArray, mergeUserBillDetails, processBillSummaries,
+} from "src/utils/bill";
 import {
   getChargesSearchType,
   getChargesSearchTypes,
@@ -429,6 +434,159 @@ export const exportServiceServer = plugin((server) => {
         }
         offset += limit;
       }
+    },
+
+    exportBill: async (call) => {
+      const { request, em } = call;
+      const {
+        accountNames, userIdsOrNames, termStart, termEnd, type, count, tenantName,
+      } = request;
+
+      const knex = em.getKnex();
+      let termArr: string[] = [];
+
+      if (termStart && termEnd) {
+        termArr = generateTermArray(termStart, termEnd, type);
+      }
+
+      const batchSize = 5000;
+      let offset = 0;
+
+      const { writeAsync } = createWriterExtensions(call);
+
+      while (offset < count) {
+        const limit = Math.min(batchSize, count - offset);
+
+        let records: BillListItem[] | undefined = undefined;
+
+        if (type === BillSearchType.SUMMARY) {
+          const query = knex("account_bill as bill")
+            .select([
+              "bill.account_name as accountName",
+              knex.raw("sum(bill.amount) as amount"),
+              knex.raw("MIN(bill.tenant_name) as tenantName"),
+              knex.raw("MIN(bill.account_owner_id) as accountOwnerId"),
+              knex.raw("MIN(bill.account_owner_name) as accountOwnerName"),
+              knex.raw("MIN(bill.create_time) as createTime"),
+              knex.raw("MAX(bill.update_time) as updateTime"),
+            ])
+            .where("bill.type", BillType.MONTHLY)
+            .modify((qb) => {
+              buildQueryConditions(qb, { accountNames, userIdsOrNames, termArr, tenantName, termStart, termEnd, type });
+            })
+            .groupBy("bill.account_name")
+            .limit(limit)
+            .offset(offset);
+
+          const result = await query;
+
+          // 根据当前查询出来的账单账户，去查询所有月账单，将详情分别统计
+          records = await processBillSummaries(em, result, termArr);
+
+        } else {
+          // 年、月账单的正常查询
+          // 构建查询条件
+          const sqlFilter = billFilter({ accountNames, userIdsOrNames, termArr, type, tenantName, termStart, termEnd });
+
+          const items = await em.find(AccountBill, sqlFilter, {
+            limit,
+            offset,
+            orderBy: { createTime: "desc" },
+          });
+
+          records = items.map((x) => {
+            return {
+              ...x,
+              amount: decimalToMoney(x.amount),
+              details: x.details ? x.details : {},
+              createTime: x.createTime.toISOString(),
+              updateTime: x.updateTime.toISOString(),
+              ids: [x.id],
+            };
+          });
+        }
+
+        if (!records || records.length === 0) {
+          break;
+        }
+
+        let data: BillListItem[] = [];
+
+        // 记录传输的总数量
+        let writeTotal = 0;
+
+        for (const row of records) {
+          data.push(row);
+          writeTotal += 1;
+          if (data.length === 200 || writeTotal === records.length) {
+            await new Promise((resolve) => {
+              void writeAsync({ bills: data });
+              // 清空暂存
+              data = [];
+              resolve("done");
+            }).catch((e) => {
+              throw {
+                code: status.INTERNAL,
+                message: "Error when exporting file",
+                details: e?.message,
+              } as ServiceError;
+            });
+          }
+        }
+        offset += limit;
+      }
+    },
+
+    exportUserBill: async (call) => {
+      const { request, em } = call;
+      const { accountBillIds } = request;
+
+      const { writeAsync } = createWriterExtensions(call);
+
+      let records: UserBillType[];
+
+      const items = await em.find(UserBill, { accountBill: { $in: accountBillIds } }, {
+        orderBy: { createTime: "desc" },
+      });
+
+      // 如果只传过来一个账户账单id，那说明不是汇总的数据，直接返回查询的结果
+      if (accountBillIds.length === 1) {
+        records = items.map((x) => {
+          return {
+            ...x,
+            amount: decimalToMoney(x.amount),
+            createTime: x.createTime.toISOString(),
+          };
+        });
+      }
+
+      // 如果是多条数据，根据查询到的数据items中 accountBill 中 userId 相等，合并数据
+      records = mergeUserBillDetails(items);
+
+      let data: UserBillType[] = [];
+
+      // 记录传输的总数量
+      let writeTotal = 0;
+
+      for (const row of records) {
+        data.push(row);
+        writeTotal += 1;
+        if (data.length === 200 || writeTotal === records.length) {
+          await new Promise((resolve) => {
+            void writeAsync({ userBills: data });
+            // 清空暂存
+            data = [];
+            resolve("done");
+          }).catch((e) => {
+            throw {
+              code: status.INTERNAL,
+              message: "Error when exporting file",
+              details: e?.message,
+            } as ServiceError;
+          });
+        }
+      }
+
     },
 
     exportJobRecord: async (call) => {

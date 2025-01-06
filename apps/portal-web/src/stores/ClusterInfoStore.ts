@@ -14,7 +14,8 @@ import { ClusterConfigSchema } from "@scow/config/build/cluster";
 import { getSortedClusterIds } from "@scow/lib-web/build/utils/cluster";
 import { useLocalStorage } from "@scow/lib-web/build/utils/hooks";
 import { useEffect, useState } from "react";
-import { Cluster, getDesktopEnabled, getFileTransferEnabled, getPublicConfigClusters } from "src/utils/cluster";
+import { Cluster, getDesktopEnabled, getFileTransferEnabled, getPublicConfigClusters,
+  isEqual } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
 
 const SCOW_DEFAULT_CLUSTER_ID = "SCOW_DEFAULT_CLUSTER_ID";
@@ -37,7 +38,7 @@ export function ClusterInfoStore(
   // 当前可用集群
   const [currentClusters, setCurrentClusters] = useState<Cluster[]>(!publicConfig.MIS_DEPLOYED
     ? publicConfigClusters : initialCurrentClusters);
-  
+
   // 当前启用中集群
   const [activatedClusters, setActivatedClusters] = useState<Cluster[]>(!publicConfig.MIS_DEPLOYED
     ? publicConfigClusters : initialCurrentClusters);
@@ -46,8 +47,12 @@ export function ClusterInfoStore(
     if (userAssociatedClusterIds) {
       const filteredClusters = initialCurrentClusters
         .filter((x) => userAssociatedClusterIds.includes(x.id));
-  
-      setCurrentClusters(filteredClusters);
+
+      // 当集群keyValue真正有变化时才更新
+      // 防止后续与currentClusters相关的接口会重复调用
+      if (!isEqual(filteredClusters,currentClusters)) {
+        setCurrentClusters(filteredClusters);
+      }
     }
   }, [userAssociatedClusterIds, initialCurrentClusters]);
 

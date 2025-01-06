@@ -53,16 +53,20 @@ import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import type { ExportAccountSchema } from "src/pages/api/file/exportAccount";
+import { ExportBillSchema } from "src/pages/api/file/exportBill";
 import type { ExportChargeRecordSchema } from "src/pages/api/file/exportChargeRecord";
 import type { ExportJobRecordSchema } from "src/pages/api/file/exportJobRecord";
 import type { ExportOperationLogSchema } from "src/pages/api/file/exportOperationLog";
 import type { ExportPayRecordSchema } from "src/pages/api/file/exportPayRecord";
 import type { ExportUserSchema } from "src/pages/api/file/exportUser";
+import type { GetBillsSchema } from "src/pages/api/finance/bill";
+import type { GetBillTypesSchema } from "src/pages/api/finance/billTypes";
 import type { GetChargesSchema } from "src/pages/api/finance/charges";
 import type { GetChargeRecordsTotalCountSchema } from "src/pages/api/finance/getChargeRecordsTotalCount";
 import type { GetUsedPayTypesSchema } from "src/pages/api/finance/getUsedPayTypes";
 import type { FinancePaySchema } from "src/pages/api/finance/pay";
 import type { GetPaymentsSchema } from "src/pages/api/finance/payments";
+import type { GetUserBillsSchema } from "src/pages/api/finance/userBill";
 import type { CompleteInitSchema } from "src/pages/api/init/completeInit";
 import type { CreateInitAdminSchema } from "src/pages/api/init/createInitAdmin";
 import type { InitGetAccountsSchema } from "src/pages/api/init/getAccounts";
@@ -171,6 +175,7 @@ export const api = {
   exportOperationLog: apiClient.fromTypeboxRoute<typeof ExportOperationLogSchema>("GET", "/api/file/exportOperationLog"),
   exportPayRecord: apiClient.fromTypeboxRoute<typeof ExportPayRecordSchema>("GET", "/api/file/exportPayRecord"),
   exportUser: apiClient.fromTypeboxRoute<typeof ExportUserSchema>("GET", "/api/file/exportUser"),
+  exportBill: apiClient.fromTypeboxRoute<typeof ExportBillSchema>("GET", "/api/file/exportBill"),
   exportJobRecord: apiClient.fromTypeboxRoute<typeof ExportJobRecordSchema>("GET", "/api/file/exportJobRecord"),
   getCharges: apiClient.fromTypeboxRoute<typeof GetChargesSchema>("GET", "/api/finance/charges"),
   getChargeRecordsTotalCount: apiClient.fromTypeboxRoute<typeof GetChargeRecordsTotalCountSchema>("GET", "/api/finance/getChargeRecordsTotalCount"),
@@ -197,6 +202,9 @@ export const api = {
   getCustomEventTypes: apiClient.fromTypeboxRoute<typeof GetCustomEventTypesSchema>("GET", "/api/log/getCustomEventTypes"),
   getOperationLogs: apiClient.fromTypeboxRoute<typeof GetOperationLogsSchema>("GET", "/api/log/getOperationLog"),
   getUnreadMessages: apiClient.fromTypeboxRoute<typeof GetUnreadMessagesSchema>("GET", "/api/notification/getUnreadMessages"),
+  getBills: apiClient.fromTypeboxRoute<typeof GetBillsSchema>("GET", "/api/finance/bill"),
+  getUserBills: apiClient.fromTypeboxRoute<typeof GetUserBillsSchema>("GET", "/api/finance/userBill"),
+  getBillTypes: apiClient.fromTypeboxRoute<typeof GetBillTypesSchema>("GET", "/api/finance/billTypes"),
   markMessageRead: apiClient.fromTypeboxRoute<typeof MarkMessageReadSchema>("POST", "/api/notification/markMessageRead"),
   changeEmail: apiClient.fromTypeboxRoute<typeof ChangeEmailSchema>("PATCH", "/api/profile/changeEmail"),
   changePassword: apiClient.fromTypeboxRoute<typeof ChangePasswordSchema>("PATCH", "/api/profile/changePassword"),

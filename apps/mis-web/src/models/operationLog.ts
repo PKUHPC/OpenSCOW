@@ -11,8 +11,8 @@
  */
 
 import { OperationEvent, OperationType as LibOperationType } from "@scow/lib-operation-log";
-import { ExportChargeRecord, ExportJobRecord, ExportOperationLog,
-  ExportPayRecord } from "@scow/protos/build/audit/operation_log";
+import { ExportBill, ExportChargeRecord, ExportJobRecord,ExportOperationLog, ExportPayRecord,
+  ExportUserBill } from "@scow/protos/build/audit/operation_log";
 import { Static, Type } from "@sinclair/typebox";
 import { ValueOf } from "next/dist/shared/lib/constants";
 import { Lang } from "react-typed-i18n";
@@ -174,6 +174,8 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     exportPayRecord: t(pTypes("exportPayRecord")),
     exportOperationLog: t(pTypes("exportOperationLog")),
     exportJobRecord: t(pTypes("exportJobRecord")),
+    exportBill: t(pTypes("exportBill")),
+    exportUserBill: t(pTypes("exportUserBill")),
     setAccountBlockThreshold: t(pTypes("setAccountBlockThreshold")),
     setAccountDefaultBlockThreshold: t(pTypes("setAccountDefaultBlockThreshold")),
     userChangeTenant: t(pTypes("userChangeTenant")),
@@ -293,6 +295,8 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   activateCluster: "040309",
   deactivateCluster: "040310",
   exportJobRecord: "040311",
+  exportBill: "040312",
+  exportUserBill: "040313",
   customEvent: "050001",
 };
 
@@ -612,6 +616,10 @@ export const getOperationDetail = (
         return t(pDetails("deactivateCluster"),
           [operationEvent[logEvent].userId,
             operationEvent[logEvent].clusterId]);
+      case "exportBill":
+        return getExportBillDetail(operationEvent[logEvent], t);
+      case "exportUserBill":
+        return getExportUserBillDetail(operationEvent[logEvent], t);
       case "customEvent": {
         const c = operationEvent[logEvent]?.content;
         return getI18nCurrentText(c, languageId);
@@ -796,4 +804,21 @@ const getExportOperationLogDetail = (exportOperationLog: ExportOperationLog, t: 
       return "-";
   }
 
+};
+
+const getExportBillDetail = (exportBill: ExportBill, t: OperationTextsTransType) => {
+  if (exportBill.tenantName) {
+    if (exportBill.accountNames.length) {
+      return t(pDetails("exportBillFromAccount"), [exportBill.tenantName, exportBill.accountNames.join(",")]);
+    }
+    return t(pDetails("exportBillFromTenant"),[exportBill.tenantName]);
+  }
+  if (exportBill.accountNames.length) {
+    return t(pDetails("exportBillFromAdminAccount"), [exportBill.accountNames.join(",")]);
+  }
+  return t(pDetails("exportBillFromAdmin"));
+};
+
+const getExportUserBillDetail = (exportUserBill: ExportUserBill, t: OperationTextsTransType) => {
+  return t(pDetails("exportUserBillFromAccount"),[exportUserBill.accountName]);
 };

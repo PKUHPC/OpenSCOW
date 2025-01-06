@@ -114,6 +114,7 @@ export default {
     other: "Other",
     noAvailableClusters: "There are currently no available clusters."
     + " Please try again later or contact the administrator.",
+    serialNumber: "Serial Number",
     phone: "Phone",
     organization: "Organization",
   },
@@ -181,6 +182,7 @@ export default {
         tenantPay: "Tenant Pay",
         payments: "Pay Records",
         accountChargeRecords: "Account Consumption Records",
+        accountBills: "Account Bill Records",
         systemDebug: "Platform Operation",
         statusSynchronization: "Block Status Synchronization",
         jobSynchronization: "Jobs Synchronization",
@@ -211,6 +213,7 @@ export default {
         financePayments: "Tenant Pay Records",
         accountPayments: "Account Pay Records",
         accountChargeRecords: "Account Consumption Records",
+        accountBills: "Account Bill Records",
       },
       accountManagement: {
         firstNav: "Accounts",
@@ -220,6 +223,7 @@ export default {
         userManagement: "Users",
         pay: "Pay Records",
         cost: "Consumption Records",
+        bill: "Bill Records",
       },
     },
   },
@@ -394,6 +398,19 @@ export default {
         ipAddress: "IP Address",
         operatorId: "Operator ID",
         searchTypePlaceholder:"Multiple, please separate with commas",
+      },
+      billTable: {
+        statisticalCycle: "Statistical Cycle",
+        term: "Term",
+        totalAmount: "Total Amount",
+        summary: "summary",
+        year: "Year",
+        month: "Month",
+        subtotal: "subtotal",
+        explanation: `{} Supports upward or downward adjustment. If adjusted upwards, the account balance will need to
+        be deducted again, so an additional data will be added to the consumption record, which will be counted as {} 1;
+        If adjusted downwards, the account balance will need to be refunded, so an additional data
+        will be added to the recharge record, and this amount will be counted as {} 2.`,
       },
     },
     dashboard: {
@@ -991,6 +1008,9 @@ export default {
         accountChargeRecords: {
           title: "Account Consumption Records",
         },
+        bills: {
+          title: "Bill Detail",
+        },
       },
       accounts: {
         whitelist: {
@@ -1334,6 +1354,8 @@ export default {
       exportPayRecord: "Export Payment Record",
       exportJobRecord: "Export Job Record",
       exportOperationLog: "Export Operation Log",
+      exportBill: "Export Account Bill",
+      exportUserBill: "Export Account Bill Detail",
       setAccountBlockThreshold: "Set Account Block Threshold",
       setAccountDefaultBlockThreshold: "Set Default Account Block Threshold",
       userChangeTenant: "User Change Tenant",
@@ -1467,6 +1489,11 @@ export default {
       exportOperationLogFromAccount: "Export Operation Log of Account {}",
       exportOperationLogFromTenant: "Export Operation Log of Tenant {}",
       exportOperationLogFromAdmin: "Export Operation Log of Platform",
+      exportBillFromAccount: "Export Bill Which in Tenant {} belong to Account {} ",
+      exportBillFromTenant: "Export Bill of All Accounts in Tenant {}",
+      exportBillFromAdminAccount: "Export Bill of Account {} in Platform",
+      exportBillFromAdmin: "Export Bill of All Accounts in Platform {}",
+      exportUserBillFromAccount: "Export Bill Details of Account {}",
       setAccountBlockThreshold: "Set the block threshold of account {} to {}",
       setAccountDefaultBlockThreshold: "Set the default block threshold of accounts in Tenant {} to {}",
       unsetAccountBlockThreshold: "Reset the block threshold of account {} to default",

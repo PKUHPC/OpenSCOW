@@ -77,3 +77,6 @@ export const getPublicConfigClusters = (clusterConfigs: Record<string, ClusterCo
   return getSortedClusters(clusterConfigs).map((cluster) => ({ id: cluster.id, name: cluster.displayName }));
 };
 
+export function isEqual(a: Cluster[], b: Cluster[]): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
