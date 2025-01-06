@@ -179,6 +179,12 @@ message CopyFileItem {
   string to_path = 3;
 }
 
+message CompressFiles {
+  string cluster_id = 1;
+  repeated string paths = 2;
+  string archive_path = 3;
+}
+
 message SubmitFileItemAsJob {
   string cluster_id = 1;
   string path = 2;
@@ -795,6 +801,7 @@ message CreateOperationLogRequest {
     ExportJobRecord export_job_record = 103;
     ChangePassword change_password = 104;
     ChangeEmail change_email = 105;
+    CompressFiles compress_files = 106;
   }
 }
 
@@ -908,6 +915,7 @@ message OperationLog {
     ExportJobRecord export_job_record = 105;
     ChangePassword change_password = 106;
     ChangeEmail change_email = 107;
+    CompressFiles compress_files = 108;
   }
 }
 

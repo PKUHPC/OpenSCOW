@@ -44,6 +44,35 @@ export const fileServiceServer = plugin((server) => {
       return [{}];
     },
 
+    compressFiles: async ({ request, logger }) => {
+      const { cluster, userId, paths, archivePath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const clusterInfo = configClusters[cluster];
+
+      if (!clusterInfo.scowd?.enabled) {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "To use this interface, you need to enable scowd.",
+        } as ServiceError;
+      }
+
+      const client = getScowdClient(cluster);
+
+      try {
+        logger.info("Starting file compression...");
+        await client.file.compressFiles({ userId, paths, archivePath });
+
+        return [{}];
+      } catch (err) {
+        throw mapTRPCExceptionToGRPC(err);
+      }
+    },
+
     createFile: async ({ request, logger }) => {
 
       const { userId, cluster, path } = request;

@@ -288,6 +288,9 @@ export const scowdAppServices = (cluster: string, client: ScowdClient): AppOps =
           });
         }
       } catch (err) {
+        if (err instanceof DetailedError) {
+          throw err;
+        }
         throw mapTRPCExceptionToGRPC(err);
       }
     },

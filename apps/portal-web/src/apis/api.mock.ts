@@ -126,6 +126,7 @@ export const mockApi: MockApi<typeof api> = {
   listFile: null,
 
   copyFileItem: null,
+  compressFiles: null,
   createFile: null,
   deleteDir: null,
   deleteFile: null,

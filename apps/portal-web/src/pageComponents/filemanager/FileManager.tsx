@@ -1,4 +1,5 @@
 import {
+  CompressOutlined,
   CopyOutlined,
   DatabaseOutlined,
   DeleteOutlined, DownloadOutlined, DownOutlined, EyeInvisibleOutlined,
@@ -23,6 +24,7 @@ import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { urlToDownload, urlToDownloadAndCompress } from "src/pageComponents/filemanager/api";
+import { CompressFilesModal } from "src/pageComponents/filemanager/CompressFilesModal";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -496,6 +498,17 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
           >
             {t(p("tableInfo.paste"))}
           </Button>
+          { scowdEnabled && (
+            <CompressFilesButton
+              cluster={cluster.id}
+              path={path}
+              files={keysToFiles(selectedKeys)}
+              reload={reload}
+            >
+              "压缩选中"
+            </CompressFilesButton>
+          )
+          }
           {
             operation ? (
               operation.started ? (
@@ -728,6 +741,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
+const CompressFilesButton = ModalButton(CompressFilesModal, { icon: <CompressOutlined /> });
 
 // function openPreviewLink(href: string) {
 //   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");
