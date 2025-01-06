@@ -12,8 +12,9 @@
 
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Select, Space, Tooltip } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
+import { publicConfig } from "src/utils/config";
 
 interface Props {
   selectablePartitions: string[];
@@ -26,22 +27,35 @@ interface Props {
 export const PartitionSelector: React.FC<Props> = ({ selectablePartitions,
   isLoading, onChange, value, onReload }) => {
 
-  useEffect(() => {
-    if (selectablePartitions.length && !value) {
-      onChange?.(selectablePartitions[0]);
-    }
-  }, [selectablePartitions, value]);
-
   const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.partitionSelector.");
+  const [placeholder, setPlaceholder] = useState(t(p("selectPartitionPlaceholder")));
+  const isResourceDeployed = publicConfig.SCOW_RESOURCE_ENABLED;
+
+  useEffect(() => {
+
+    if (isLoading) {
+      setPlaceholder(t(p("isLoading")));
+    } else {
+
+      if (selectablePartitions.length > 0 && !value) {
+        onChange?.(selectablePartitions[0]);
+      }
+
+      if (selectablePartitions.length === 0) {
+        setPlaceholder(isResourceDeployed ? t(p("noAssignedPartition")) : t(p("noAvailablePartition")));
+      }
+    }
+
+  }, [selectablePartitions, value, isLoading]);
 
   return (
     <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={selectablePartitions ? selectablePartitions.map((x) => ({ label: x, value: x })) : []}
-        placeholder={t(p("selectPartitionPlaceholder"))}
-        value={value}
+        placeholder={placeholder}
+        value={isLoading ? undefined : value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />

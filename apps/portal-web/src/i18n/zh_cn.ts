@@ -73,12 +73,17 @@ export default {
     // job
     job: {
       accountSelector: {
+        isLoading: "查询中...",
         selectAccountPlaceholder: "请选择账户",
         refreshAccountList: "刷新账户列表",
+        noAvailableAccount: "无可用账户",
       },
       partitionSelector: {
+        isLoading: "查询中...",
         selectPartitionPlaceholder: "请选择分区",
         refreshPartitionList: "刷新分区列表",
+        noAvailablePartition: "无可用分区",
+        noAssignedPartition: "无授权分区",
       },
       allJobsTable: {
         searchForm: {

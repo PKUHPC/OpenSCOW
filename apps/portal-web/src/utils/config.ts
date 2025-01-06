@@ -99,6 +99,8 @@ export interface PublicRuntimeConfig {
   NOTIF_ENABLED?: boolean;
   NOTIF_ADDRESS?: string;
   NOTIF_NAME?: string;
+
+  SCOW_RESOURCE_ENABLED: boolean | undefined;
 }
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;

@@ -73,12 +73,17 @@ export default {
     // job
     job: {
       accountSelector: {
+        isLoading: "Retrieving data...",
         selectAccountPlaceholder: "Select Account",
         refreshAccountList: "Refresh Account List",
+        noAvailableAccount: "No Available Account",
       },
       partitionSelector: {
+        isLoading: "Retrieving data...",
         selectPartitionPlaceholder: "Select Partition",
         refreshPartitionList: "Refresh Partition List",
+        noAvailablePartition: "No Available Partition",
+        noAssignedPartition: "No Assigned Partition",
       },
       allJobsTable: {
         searchForm: {
