@@ -83,6 +83,11 @@ interface Operation {
   completed: FileInfo[];
 }
 
+export interface Compression {
+  started: string[];
+  completed: string[];
+}
+
 const p = prefix("pageComp.fileManagerComp.fileManager.");
 
 enum UploadType {
@@ -125,6 +130,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   });
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
+  const [compression, setCompression] = useState<Compression>({ started: [], completed: []});
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
@@ -390,11 +396,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 
   const items: MenuProps["items"] = [
     {
-      label: "上传文件",
+      label: t(p("uploadFile")),
       key: UploadType.File,
     },
     {
-      label: "上传文件夹",
+      label: t(p("uploadDir")),
       key: UploadType.Dir,
     },
   ];
@@ -448,7 +454,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
           {<Dropdown menu={menuProps}>
             <Button icon={<UploadOutlined />}>
               <Space>
-                上传
+                {t(p("upload"))}
                 <DownOutlined />
               </Space>
             </Button>
@@ -508,9 +514,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               cluster={cluster.id}
               path={path}
               files={keysToFiles(selectedKeys)}
-              reload={reload}
+              setCompression={setCompression}
             >
-              压缩选中
+              {t(p("compressSelected"))}
             </CompressFilesButton>
           )
           }
@@ -529,6 +535,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
                   </a>
                 </span>
               )) : ""
+          }
+          {
+            compression.started.length !== 0 && (
+              <div>
+                <span>
+                  {t(p("compressionInPrograss"))}{`${compression.completed.length} / ${compression.started.length}`}
+                </span>
+                <a onClick={() => setCompression({ started: [], completed: []})} style={{ marginLeft: "4px" }}>
+                  {t("button.cancelButton")}
+                </a>
+              </div>
+            )
           }
         </Space>
         <Space wrap>

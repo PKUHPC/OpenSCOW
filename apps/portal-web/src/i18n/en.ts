@@ -255,7 +255,22 @@ export default {
         fileDirectory: "Directory to Create File",
         fileName: "File Name",
       },
+      compressFilesModal: {
+        compressFailed: "Failed to compress file/folder",
+        compressSuccess: "File/folder compressed successfully",
+        compressRequestSubmit: "Compression request submitted...",
+        compression: "File/folder compression",
+        compressConfirm: "Confirm compression",
+        cancel: "Cancel",
+        compressFileList: "Files to be compressed",
+        compressFileName: "Target compressed file name",
+      },
       fileManager: {
+        upload: "Upload",
+        uploadFile: "Upload File",
+        uploadDir: "Upload Directory",
+        compressionInPrograss: "Compression in progress: ",
+        compressSelected: "Compress Selected",
         preview: {
           cantPreview: "File too large (maximum {}) or format not supported, please download to view",
         },

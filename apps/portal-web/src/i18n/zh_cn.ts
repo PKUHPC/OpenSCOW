@@ -255,7 +255,22 @@ export default {
         fileDirectory: "要创建的文件的目录",
         fileName: "文件名",
       },
+      compressFilesModal: {
+        compressFailed: "压缩文件/文件夹失败",
+        compressSuccess: "压缩文件/文件夹成功",
+        compressRequestSubmit: "压缩请求已提交...",
+        compression: "文件/文件夹压缩",
+        compressConfirm: "确认压缩",
+        cancel: "取消",
+        compressFileList: "待压缩文件列表",
+        compressFileName: "目标压缩文件名",
+      },
       fileManager: {
+        upload: "上传",
+        uploadFile: "上传文件",
+        uploadDir: "上传文件夹",
+        compressionInPrograss: "正在进行压缩: ",
+        compressSelected: "压缩选中",
         preview: {
           cantPreview: "文件过大（最大{}）或者格式不支持，请下载后查看",
         },
