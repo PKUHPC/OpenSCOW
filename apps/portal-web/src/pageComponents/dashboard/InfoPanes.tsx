@@ -59,42 +59,29 @@ export const InfoPanes: React.FC<Props> = ({ selectItem, loading, activeTabKey, 
 
   const theme = useTheme();
 
-  let clusterCardsList;
   // card的每一项
-  if ((successfulClusters?.length ?? 0) > 1) {
-    clusterCardsList = [
-      {
-        key:"platformOverview",
-        tab:
-        <div style={{ width:"max-content", height:"40px",
-          textAlign: "center", lineHeight:"40px",
-          color:`${activeTabKey === "platformOverview" ? "#FFF" : "#000"}`,
-          background:`${activeTabKey === "platformOverview" ? theme.token.colorPrimary : "transparent"}`,
-          borderRadius:"5px",
-          fontWeight:"700",
-          paddingLeft:"20px",
-          paddingRight:"20px",
-        }}
-        >
-          {t(p("platformOverview"))}
-        </div>,
-      },
-      ...successfulClusters?.map((x) => ({
-        key:x.id,
-        tab:typeof (x.name) == "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
-      })) ?? [],
-    ];
-  } else {
-    clusterCardsList =
-      successfulClusters?.map((x) => ({
-        key:x.id,
-        tab:typeof (x.name) == "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
-      })) ?? [];
-    if (clusterCardsList?.[0]?.key) {
-      onTabChange(clusterCardsList[0].key);
-    }
-  }
-
+  const clusterCardsList = [
+    {
+      key:"platformOverview",
+      tab:
+      <div style={{ width:"max-content", height:"40px",
+        textAlign: "center", lineHeight:"40px",
+        color:`${activeTabKey === "platformOverview" ? "#FFF" : "#000"}`,
+        background:`${activeTabKey === "platformOverview" ? theme.token.colorPrimary : "transparent"}`,
+        borderRadius:"5px",
+        fontWeight:"700",
+        paddingLeft:"20px",
+        paddingRight:"20px",
+      }}
+      >
+        {t(p("platformOverview"))}
+      </div>,
+    },
+    ...successfulClusters?.map((x) => ({
+      key:x.id,
+      tab:typeof (x.name) == "string" ? x.name : getI18nConfigCurrentText(x.name, languageId),
+    })) ?? [],
+  ];
 
   const { nodeCount, runningNodeCount, idleNodeCount, notAvailableNodeCount,
     cpuCoreCount, runningCpuCount, idleCpuCount, notAvailableCpuCount,
