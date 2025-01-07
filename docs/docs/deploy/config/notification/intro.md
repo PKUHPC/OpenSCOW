@@ -37,6 +37,11 @@ uiExtension:
 配置消息系统本身启动，需要在 `config/common.yaml` 文件中添加如下配置：
 
 ```YAML
+# 开启 SCOW API TOKEN 保证后端间交互安全
+scowApi:
+  auth:
+    token: <秘密字符串，越长越好>
+
 notification:
   # 是否开启消息系统
   # 非必填，默认为 false

@@ -18,6 +18,8 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
+    "@connectrpc/connect": "1.4.0",
+    "@bufbuild/protobuf": "1.8.0",
     "@ddadaal/tsgrpc-client": "0.17.7",
     "@ddadaal/tsgrpc-common": "0.2.5",
     "@grpc/grpc-js": "1.12.2",

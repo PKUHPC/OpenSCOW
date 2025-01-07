@@ -10,7 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Code, ConnectError, HandlerContext } from "@connectrpc/connect";
 import { ChannelCredentials, ClientOptions } from "@grpc/grpc-js";
+import { ScowApiConfigSchema } from "@scow/config/build/common";
 
 export type ClientConstructor<TClient> =
 new (address: string, credentials: ChannelCredentials, options?: ClientOptions) => TClient;
@@ -33,3 +35,20 @@ export const getClientFn = (
       } : undefined,
   );
 };
+
+export async function checkScowApiToken(context: HandlerContext, config: ScowApiConfigSchema | undefined):
+Promise<null> {
+
+  const authorization = context.requestHeader.get("authorization");
+
+  if (!authorization?.startsWith("Bearer ")) {
+    throw new ConnectError("UNAUTHORIZED", Code.Unauthenticated);
+  }
+
+  if (authorization !== `Bearer ${config?.auth?.token}`) {
+    throw new ConnectError("UNAUTHORIZED", Code.Unauthenticated);
+  }
+
+  return null;
+
+}

@@ -965,6 +965,9 @@ importers:
       '@scow/lib-scheduler-adapter':
         specifier: workspace:*
         version: link:../../libs/scheduler-adapter
+      '@scow/lib-server':
+        specifier: workspace:*
+        version: link:../../libs/server
       '@scow/lib-web':
         specifier: workspace:*
         version: link:../../libs/web
@@ -1480,7 +1483,7 @@ importers:
         version: 1.4.0(@bufbuild/protobuf@1.8.0)(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@connectrpc/protoc-gen-connect-es':
         specifier: 1.4.0
-        version: 1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
+        version: 1.4.0(@bufbuild/protoc-gen-es@1.10.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
         version: 0.17.7(@grpc/grpc-js@1.12.2)
@@ -1842,6 +1845,9 @@ importers:
       '@grpc/grpc-js':
         specifier: 1.12.2
         version: 1.12.2
+      '@scow/config':
+        specifier: workspace:*
+        version: link:../config
       '@scow/notification-protos':
         specifier: workspace:*
         version: link:../protos/notification
@@ -2077,6 +2083,12 @@ importers:
 
   libs/server:
     dependencies:
+      '@bufbuild/protobuf':
+        specifier: 1.8.0
+        version: 1.8.0
+      '@connectrpc/connect':
+        specifier: 1.4.0
+        version: 1.4.0(@bufbuild/protobuf@1.8.0)
       '@ddadaal/tsgrpc-client':
         specifier: 0.17.7
         version: 0.17.7(@grpc/grpc-js@1.12.2)
@@ -3127,6 +3139,16 @@ packages:
 
   '@bufbuild/protobuf@1.8.0':
     resolution: {integrity: sha512-qR9FwI8QKIveDnUYutvfzbC21UZJJryYrLuZGjeZ/VGz+vXelUkK+xgkOHsvPEdYEdxtgUUq4313N8QtOehJ1Q==}
+
+  '@bufbuild/protoc-gen-es@1.10.0':
+    resolution: {integrity: sha512-zBYBsVT/ul4uZb6F+kD7/k4sWNHVVbEPfJwKi0FDr+9VJo8MKIofI6pkr5ksBLr4fi/74r+e/75Xi/0clL5dXg==}
+    engines: {node: '>=14'}
+    hasBin: true
+    peerDependencies:
+      '@bufbuild/protobuf': 1.10.0
+    peerDependenciesMeta:
+      '@bufbuild/protobuf':
+        optional: true
 
   '@bufbuild/protoc-gen-es@1.8.0':
     resolution: {integrity: sha512-jnvBKwHq3o/iOgfKxaxn5Za7ay4oAs8KWgoHiDc9Fsb0g+/d1z+mHlHvmevOiCPcVZsnH6V3LImOJvGStPONpA==}
@@ -14220,6 +14242,15 @@ snapshots:
 
   '@bufbuild/protobuf@1.8.0': {}
 
+  '@bufbuild/protoc-gen-es@1.10.0(@bufbuild/protobuf@1.8.0)':
+    dependencies:
+      '@bufbuild/protoplugin': 1.10.0
+    optionalDependencies:
+      '@bufbuild/protobuf': 1.8.0
+    transitivePeerDependencies:
+      - supports-color
+    optional: true
+
   '@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0)':
     dependencies:
       '@bufbuild/protoplugin': 1.8.0
@@ -14544,6 +14575,16 @@ snapshots:
   '@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0)':
     dependencies:
       '@bufbuild/protobuf': 1.8.0
+
+  '@connectrpc/protoc-gen-connect-es@1.4.0(@bufbuild/protoc-gen-es@1.10.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))':
+    dependencies:
+      '@bufbuild/protobuf': 1.8.0
+      '@bufbuild/protoplugin': 1.10.0
+    optionalDependencies:
+      '@bufbuild/protoc-gen-es': 1.10.0(@bufbuild/protobuf@1.8.0)
+      '@connectrpc/connect': 1.4.0(@bufbuild/protobuf@1.8.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@connectrpc/protoc-gen-connect-es@1.4.0(@bufbuild/protoc-gen-es@1.8.0(@bufbuild/protobuf@1.8.0))(@connectrpc/connect@1.4.0(@bufbuild/protobuf@1.8.0))':
     dependencies:

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+export * from "./api";
 export * from "./apiAuthPlugin";
 export * from "./app";
 export * from "./date";
