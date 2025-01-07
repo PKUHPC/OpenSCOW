@@ -1369,6 +1369,7 @@ export default {
       editUserProfile: "Edit User Information",
       changePassword: "Modify user password",
       changeEmail: "Modify user email",
+      createAiInferenceJob: "Create Inference Job",
     },
     operationDetails: {
       login: "User Login",
@@ -1382,7 +1383,8 @@ export default {
       createDesktop: "Create Desktop (Cluster: {}, Login Node: {}, Desktop name: {}, Desktop type: {})",
       deleteDesktop: "Delete Desktop (Cluster: {}, Login Node: {}, Desktop ID: {})",
       createApp: "Create application (Cluster: {}, ID: {})",
-      createAiTrain: "Create Train (Cluster: {}, ID: {})",
+      createAiTrain: "Create Train Job(Cluster: {}, ID: {})",
+      createAiInferenceJob: "Create Inference Job (Cluster: {}, ID: {})",
       cancelAiTrainOrApp: "Cancel Train Or App (Cluster: {}, ID: {})",
       saveImage: "Save The Job(ID: {}) as an image (Image: {}, Tag: {})",
       createFile: "Create File: {}",

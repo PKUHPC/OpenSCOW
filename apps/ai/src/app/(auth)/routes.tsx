@@ -103,6 +103,11 @@ export const userRoutes: (
               path: `/jobs/${cluster.id}/trainJobs`,
             },
             {
+              Icon: PlusOutlined,
+              text: t("routes.job.infer"),
+              path: `/jobs/${cluster.id}/inference`,
+            },
+            {
               Icon: BookOutlined,
               text: t("routes.job.runningJobs"),
               path: `/jobs/${cluster.id}/runningJobs`,

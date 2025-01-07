@@ -1366,6 +1366,7 @@ export default {
       editUserProfile: "修改用户信息",
       changePassword: "修改用户密码",
       changeEmail: "修改用户邮箱",
+      createAiInferenceJob: "创建推理",
     },
     operationDetails: {
       login: "用户登录",
@@ -1380,6 +1381,7 @@ export default {
       deleteDesktop: "删除桌面(集群：{}, 登陆节点: {}, 桌面ID: {})",
       createApp: "创建应用(集群：{}, ID: {})",
       createAiTrain: "创建训练(集群：{}, ID: {})",
+      createAiInferenceJob: "创建推理(集群：{}, ID: {})",
       cancelAiTrainOrApp: "结束训练或应用(集群：{}, ID: {})",
       saveImage: "将作业(ID: {}), 保存为镜像(镜像：{}, 标签: {})",
       createFile: "新建文件：{}",

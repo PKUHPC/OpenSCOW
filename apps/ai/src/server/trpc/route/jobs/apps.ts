@@ -902,6 +902,17 @@ export const listAppSessions =
 
             }
           }
+          // 推理需要端口
+          else if (sessionMetadata.jobType === JobType.INFER) {
+            if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+              const client = getAdapterClient(clusterId);
+              const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
+              if (connectionInfo?.response?.$case === "appConnectionInfo") {
+                host = connectionInfo.response.appConnectionInfo.host;
+                port = connectionInfo.response.appConnectionInfo.port;
+              }
+            }
+          }
 
           const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
             || terminatedStates.includes(runningJobInfo?.state);
