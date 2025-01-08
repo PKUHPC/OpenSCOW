@@ -12,7 +12,7 @@
 
 import { ReloadOutlined } from "@ant-design/icons";
 import { Button, Select, Space, Tooltip } from "antd";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 
 interface Props {
@@ -26,22 +26,35 @@ interface Props {
 export const AccountListSelector: React.FC<Props> = ({ selectableAccounts, isLoading,
   onChange, value, onReload }) => {
 
-  useEffect(() => {
-    if (selectableAccounts.length && !value) {
-      onChange?.(selectableAccounts[0]);
-    }
-  }, [selectableAccounts, value]);
-
   const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.accountSelector.");
+  const [placeholder, setPlaceholder] = useState(t(p("selectAccountPlaceholder")));
+
+  useEffect(() => {
+
+    if (isLoading) {
+      setPlaceholder(t(p("isLoading")));
+    } else {
+      if (selectableAccounts.length > 0 && !value) {
+        onChange?.(selectableAccounts[0]);
+      }
+      if (selectableAccounts.length === 0) {
+        setPlaceholder(t(p("noAvailableAccount")));
+      }
+    }
+  }, [selectableAccounts, value, isLoading]);
+
+  useEffect(() => {
+
+  }, [isLoading, selectableAccounts]);
 
   return (
     <Space.Compact style={{ width: "100%" }}>
       <Select
         loading={isLoading}
         options={selectableAccounts ? selectableAccounts.map((x) => ({ label: x, value: x })) : []}
-        placeholder={t(p("selectAccountPlaceholder"))}
-        value={value}
+        placeholder={placeholder}
+        value={isLoading ? undefined : value}
         style={{ width: "calc(100% - 32px)" }}
         onChange={(v) => onChange?.(v)}
       />

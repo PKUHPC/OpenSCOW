@@ -188,6 +188,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     editUserProfile: t(pTypes("editUserProfile")),
     changePassword: t(pTypes("changePassword")),
     changeEmail: t(pTypes("changeEmail")),
+    createAiInferenceJob: t(pTypes("createAiInferenceJob")),
   };
 
 };
@@ -207,6 +208,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   createAiTrain: "010402",
   cancelAiTrainOrApp: "010403",
   saveImage: "010404",
+  createAiInferenceJob: "010405",
   createFile: "010501",
   createDirectory: "010502",
   uploadFile: "010503",
@@ -360,6 +362,9 @@ export const getOperationDetail = (
         return t(pDetails("createApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
       case "createAiTrain":
         return t(pDetails("createAiTrain"),
+          [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
+      case "createAiInferenceJob":
+        return t(pDetails("createAiInferenceJob"),
           [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId || "-"]);
       case "cancelAiTrainOrApp":
         return t(pDetails("cancelAiTrainOrApp"), [operationEvent[logEvent].clusterId, operationEvent[logEvent].jobId]);

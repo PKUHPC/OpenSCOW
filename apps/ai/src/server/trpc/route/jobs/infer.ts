@@ -27,8 +27,7 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity, checkEntityAuth, fetchJobInputParams, genPublicOrPrivateDataJsonString,
-  validateUniquePaths } from "src/server/utils/app";
+import { checkCreateAppEntity, fetchJobInputParams, validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
@@ -66,22 +65,17 @@ interface SessionMetadata {
   sessionId: string;
   jobName: string;
   jobId: number;
-  appId?: string;
   submitTime: string;
   image: Image;
-  jobType: JobType
+  jobType: JobType;
+  containerServicePort: number;
 }
 
-const TrainJobInputSchema = z.object({
+const InferenceJobInputSchema = z.object({
   clusterId: z.string(),
-  trainJobName: z.string(),
-  isAlgorithmPrivate: z.boolean().optional(),
-  algorithm: z.number().optional(),
+  InferenceJobName: z.string(),
   image: z.number().optional(),
   remoteImageUrl: z.string().optional(),
-  framework: Framework.optional(),
-  isDatasetPrivate: z.boolean().optional(),
-  dataset: z.number().optional(),
   isModelPrivate: z.boolean().optional(),
   model: z.number().optional(),
   mountPoints: z.array(z.string()).optional(),
@@ -94,24 +88,23 @@ const TrainJobInputSchema = z.object({
   maxTime: z.number(),
   command: z.string(),
   gpuType: z.string().optional(),
-  // TensorFlow特有参数
-  psNodes: z.number().optional(),
-  workerNodes: z.number().optional(),
+  // 容器内服务端口
+  containerServicePort:z.number(),
 });
 
-export type TrainJobInput = z.infer<typeof TrainJobInputSchema>;
+export type InferenceJobInput = z.infer<typeof InferenceJobInputSchema>;
 
-export const trainJob =
+export const submitInferJob =
 procedure
   .meta({
     openapi: {
       method: "POST",
-      path: "/jobs",
-      tags: ["jobs"],
-      summary: "Submit A Train Job",
+      path: "/infer",
+      tags: ["infer"],
+      summary: "Submit A Inference Job",
     },
   })
-  .input(TrainJobInputSchema)
+  .input(InferenceJobInputSchema)
   .output(z.object({
     jobId: z.number(),
   }))
@@ -122,18 +115,18 @@ procedure
     const logInfo = {
       operatorUserId: user.identityId,
       operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.createAiTrain,
+      operationTypeName: OperationType.createAiInferenceJob,
     };
 
     if (res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
-        { clusterId, jobId:(res.data as any).jobId } },
+      { clusterId, jobId:(res.data as any).jobId } },
       OperationResult.SUCCESS);
     }
 
     if (!res.ok) {
       await callLog({ ...logInfo, operationTypePayload:
-        { clusterId } },
+      { clusterId } },
       OperationResult.FAIL);
     }
 
@@ -141,9 +134,9 @@ procedure
   })
   .mutation(
     async ({ input, ctx: { user } }) => {
-      const { clusterId, trainJobName , isAlgorithmPrivate, algorithm, image, framework,
-        remoteImageUrl,isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
-        coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
+      const { clusterId, InferenceJobName , image,
+        remoteImageUrl, isModelPrivate, model, mountPoints = [], account, partition, coreCount,
+        nodeCount, gpuCount, memory, maxTime, command, gpuType,containerServicePort } = input;
       const userId = user.identityId;
 
       const currentClusterIds = await getCurrentClusters(userId);
@@ -158,22 +151,14 @@ procedure
 
       const em = await forkEntityManager();
       const {
-        datasetVersion,
-        algorithmVersion,
         modelVersion,
         image: existImage,
       } = await checkCreateAppEntity({
         em,
-        dataset,
-        algorithm,
+        dataset:undefined,
+        algorithm:undefined,
         image,
         model,
-      });
-
-      // 检查数据集、算法、模型和镜像是否有权限使用
-      checkEntityAuth({
-        datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
-        modelVersion, isModelPrivate, image:existImage, userId,
       });
 
       return await sshConnect(host, userId, logger, async (ssh) => {
@@ -196,8 +181,6 @@ procedure
         // 确保所有映射到容器的路径都不重复
         validateUniquePaths([
           trainJobsDirectory,
-          isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
-          isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
           isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
           ...mountPoints,
         ]);
@@ -221,9 +204,9 @@ procedure
         const entryScript = command;
         await sftpWriteFile(sftp)(remoteEntryPath, entryScript);
 
-        const reply = await asyncClientCall(client.job, "submitJob", {
+        const reply = await asyncClientCall(client.job, "submitInferJob", {
           userId,
-          jobName: trainJobName,
+          jobName: InferenceJobName,
           account,
           partition: partition!,
           coreCount,
@@ -234,63 +217,43 @@ procedure
           workingDirectory: trainJobsDirectory,
           script: remoteEntryPath,
           // 对于AI模块，需要传递的额外参数
-          // 第一个参数确定是创建应用or训练任务，
-          // 第二个参数为创建应用时的appId
-          // 第三个参数为镜像地址
-          // 第四个参数为算法版本地址
-          // 第五个参数为数据集版本地址
-          // 第六个参数为模型版本地址
-          // 第七个参数为多挂载点地址，以逗号分隔
-          // 第八个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
-          // 第九个参数告知适配器 该镜像对应的AI训练框架 如 tensorflow, pytorch 等
-          // 第十个参数为多挂载点地址，以逗号分隔 (此挂载点是只读的)
+          // 第一个参数为镜像地址
+          // 第二个参数为模型版本地址
+          // 第三个参数为多挂载点地址，以逗号分隔
+          // 第四个参数为gpuType, 表示训练时硬件卡的类型，由getClusterConfig接口获取
+          // 第五个参数为多挂载点地址，以逗号分隔 (此挂载点是只读的)
           extraOptions: [
-            JobType.TRAIN,
-            "",
             remoteImageUrl || existImage?.path || "",
-            algorithmVersion
-              ? isAlgorithmPrivate
-                ? genPublicOrPrivateDataJsonString(algorithmVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(algorithmVersion.path,true)
-              : "",
-            datasetVersion
-              ? isDatasetPrivate
-                ? genPublicOrPrivateDataJsonString(datasetVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(datasetVersion.path,true)
-              : "",
             modelVersion
               ? isModelPrivate
-                ? genPublicOrPrivateDataJsonString(modelVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(modelVersion.path,true)
+                ? modelVersion.privatePath
+                : modelVersion.path
               : "",
             mountPoints.join(","),
             gpuType || "",
-            // 如果是单机训练,则训练框架为空，表明为普通训练，华为的卡单机训练也要传框架
-            // 如果nodeCount不为1但同时选定镜像又没有框架标签，该接口会报错
-            (nodeCount === 1 && !gpuType?.startsWith("huawei.com")) ? "" : framework || "",
             aiConfig.publicMountPoints ? aiConfig.publicMountPoints.join(",") : "",
           ],
-          psNodeCount:psNodes,
-          workerNodeCount:workerNodes,
+          containerServicePort,
         }).catch((e) => {
           const ex = e as ServiceError;
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
-            message: `Submit train job failed, ${ex.details}`,
+            message: `Submit infer job failed, ${ex.details}`,
           });
         });
 
         // Save session metadata
         const metadata: SessionMetadata = {
           jobId: reply.jobId,
-          jobName:trainJobName,
+          jobName:InferenceJobName,
           sessionId: scowWorkDirectoryName,
           submitTime: new Date().toISOString(),
           image: {
             name: remoteImageUrl || existImage!.name,
             tag: existImage?.tag || "latest",
           },
-          jobType: JobType.TRAIN,
+          jobType: JobType.INFER,
+          containerServicePort,
         };
         await sftpWriteFile(sftp)(join(trainJobsDirectory, SESSION_METADATA_NAME), JSON.stringify(metadata));
 
@@ -302,14 +265,14 @@ procedure
     },
   );
 
-export const getSubmitTrainParams =
+export const getSubmitInferenceParams =
 procedure
   .meta({
     openapi: {
       method: "GET",
-      path: "/jobs/{jobId}/submissionParameters",
+      path: "/infer/{jobId}/submissionParameters",
       tags: ["jobs"],
-      summary: "Get Submit Train Job Parameters",
+      summary: "Get Submit Infer Job Parameters",
     },
   })
   .input(z.object({
@@ -317,7 +280,7 @@ procedure
     jobId: z.number(),
     sessionId: z.string(),
   }))
-  .output(TrainJobInputSchema)
+  .output(InferenceJobInputSchema)
   .query(async ({ input, ctx: { user } }) => {
     const { clusterId, jobId, sessionId } = input;
     const userId = user.identityId;
@@ -339,78 +302,23 @@ procedure
       const metadataPath = join(jobsDirectory, SESSION_METADATA_NAME);
 
       if (!await sftpExists(sftp, metadataPath)) {
-        return {} as TrainJobInput;
+        return {} as InferenceJobInput;
       }
 
       const content = await sftpReadFile(sftp)(metadataPath);
       const sessionMetadata = JSON.parse(content.toString()) as SessionMetadata;
 
-      if (sessionMetadata.jobType !== JobType.TRAIN) {
+      if (sessionMetadata.jobType !== JobType.INFER) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: `Job type of job ${jobId} is not Train`,
+          message: `Job type of job ${jobId} is not Infer`,
         });
       }
 
       const inputParamsPath = join(homeDir, jobsDirectory, `${jobId}-input.json`);
 
-      return await fetchJobInputParams<TrainJobInput>(
-        inputParamsPath, sftp, TrainJobInputSchema, logger,
+      return await fetchJobInputParams<InferenceJobInput>(
+        inputParamsPath, sftp, InferenceJobInputSchema, logger,
       );
-    });
-  });
-
-export const cancelJob =
-procedure
-  .meta({
-    openapi: {
-      method: "DELETE",
-      path: "/jobs/{jobId}",
-      tags: ["jobs"],
-      summary: "Cancel Train Job or App Session",
-    },
-  })
-  .input(z.object({
-    cluster: z.string(),
-    jobId: z.number(),
-  }))
-  .output(z.void())
-  .use(async ({ input:{ cluster,jobId }, ctx, next }) => {
-    const res = await next({ ctx });
-
-    const { user, req } = ctx;
-    const logInfo = {
-      operatorUserId: user.identityId,
-      operatorIp: parseIp(req) ?? "",
-      operationTypeName: OperationType.cancelAiTrainOrApp,
-
-    };
-
-    if (res.ok) {
-      await callLog({ ...logInfo, operationTypePayload:
-        { clusterId:cluster,jobId } },
-      OperationResult.SUCCESS);
-    }
-
-    if (!res.ok) {
-      await callLog({ ...logInfo, operationTypePayload:
-        { clusterId:cluster,jobId } },
-      OperationResult.FAIL);
-    }
-
-    return res;
-  })
-  .mutation(async ({ input, ctx: { user } }) => {
-
-    const { cluster, jobId } = input;
-    const userId = user.identityId;
-
-    const currentClusterIds = await getCurrentClusters(userId);
-    checkClusterAvailable(currentClusterIds, cluster);
-
-    const client = getAdapterClient(cluster);
-    await asyncClientCall(client.job, "cancelJob", {
-      userId,
-      jobId,
     });
   });

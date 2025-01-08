@@ -19,6 +19,7 @@
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-node": "1.4.0",
     "@grpc/grpc-js": "1.12.2",
-    "@scow/notification-protos": "workspace:*"
+    "@scow/notification-protos": "workspace:*",
+    "@scow/config": "workspace:*"
   }
 }

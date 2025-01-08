@@ -105,6 +105,11 @@ message CreateAiTrain {
   optional uint32 job_id = 2;
 }
 
+message CreateAiInferenceJob {
+  string cluster_id = 1;
+  optional uint32 job_id = 2;
+}
+
 message CancelAiTrainOrApp {
   string cluster_id = 1;
   uint32 job_id = 2;
@@ -800,7 +805,8 @@ message CreateOperationLogRequest {
     ChangeEmail change_email = 105;
     ExportBill export_bill = 106;
     ExportUserBill export_user_bill = 107;
-    CompressFiles compress_files = 108;
+    CreateAiInferenceJob create_ai_inference_job = 108;
+    CompressFiles compress_files = 109;
   }
 }
 
@@ -916,7 +922,8 @@ message OperationLog {
     ChangeEmail change_email = 107;
     ExportBill export_bill = 108;
     ExportUserBill export_user_bill = 109;
-    CompressFiles compress_files = 110;
+    CreateAiInferenceJob create_ai_inference_job = 110;
+    CompressFiles compress_files = 111;
   }
 }
 

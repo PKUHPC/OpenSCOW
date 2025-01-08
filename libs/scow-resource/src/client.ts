@@ -11,14 +11,25 @@
  */
 
 import type { ServiceType } from "@bufbuild/protobuf";
-import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
+import { createPromiseClient, Interceptor, PromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
+import { getCommonConfig } from "@scow/config/build/common";
 import { ClusterPartitionService } from "@scow/scow-resource-protos/build/partition_connect";
 import { join } from "path";
- 
+
 export interface ScowResourceClient {
   resource: PromiseClient<typeof ClusterPartitionService>
 }
+
+const setAuthorization: Interceptor = (next) => async (req) => {
+  const commonConfig = getCommonConfig();
+  const token = commonConfig.scowApi?.auth?.token;
+
+  if (token) {
+    req.header.set("authorization", `Bearer ${token}`);
+  }
+  return next(req);
+};
 
 export function getClient<TService extends ServiceType>(
   scowResourceUrl: string, service: TService,
@@ -26,12 +37,12 @@ export function getClient<TService extends ServiceType>(
   const transport = createConnectTransport({
     baseUrl: join(scowResourceUrl, "/api"),
     httpVersion: "1.1",
-    nodeOptions: {},
+    interceptors: [setAuthorization],
   });
-  
+
   return createPromiseClient(service, transport);
 }
-  
+
 export const getScowResourceClient = (scowResourceUrl: string) => {
   return {
     resource: getClient(scowResourceUrl, ClusterPartitionService),

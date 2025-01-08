@@ -1,9 +1,11 @@
 import { Struct } from "@bufbuild/protobuf";
 import { Code, ConnectError, ConnectRouter } from "@connectrpc/connect";
 import { Knex } from "@mikro-orm/mysql";
+import { checkScowApiToken } from "@scow/lib-server/build/api";
 import { ReadStatus } from "@scow/notification-protos/build/common_pb";
 import { ScowMessageService } from "@scow/notification-protos/build/scow_message_connect";
 import { NoticeType } from "src/models/notice-type";
+import { commonConfig } from "src/server/config/common";
 import { notificationConfig } from "src/server/config/notification";
 import { Message, SenderType } from "src/server/entities/Message";
 import { MessageTarget } from "src/server/entities/MessageTarget";
@@ -21,7 +23,10 @@ import { checkMessageTypeExist, getMessagesTypeData } from "src/utils/message-ty
 
 export default (router: ConnectRouter) => {
   router.service(ScowMessageService, {
-    async systemSendMessage(req) {
+    async systemSendMessage(req, ctx) {
+
+      await checkScowApiToken(ctx, commonConfig.scowApi);
+
       const { systemId, targetIds, messageType, metadata, descriptionData } = req;
       const { targetType } = ensureNotUndefined(req, ["targetType"]);
 

@@ -197,6 +197,8 @@ const buildRuntimeConfig = async (phase, basePath) => {
     NOTIF_ADDRESS: commonConfig.notification?.address,
     NOTIF_NAME: commonConfig.notification?.name,
 
+    SCOW_RESOURCE_ENABLED: commonConfig.scowResource?.enabled,
+
   };
 
   if (!building && !testenv) {

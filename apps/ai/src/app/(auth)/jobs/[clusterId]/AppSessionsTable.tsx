@@ -100,6 +100,17 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
       ellipsis: true,
     },
     {
+      title: t(p("servicePort")),
+      dataIndex: "servicePort",
+      width: "10%",
+      ellipsis: true,
+      render: (_, record) => {
+        if (record.jobType === JobType.INFER) {
+          return record.port;
+        }
+      },
+    },
+    {
       title: t(p("jobType")),
       dataIndex: "jobType",
       width: "8%",
@@ -107,7 +118,10 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
         if (record.jobType === JobType.APP) {
           return t(p("app"));
         }
-        return t(p("train"));
+        else if (record.jobType === JobType.TRAIN) {
+          return t(p("train"));
+        }
+        return t(p("infer"));
       },
     },
     {
@@ -230,6 +244,8 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster, status }) => {
                 }
               } else if (record.jobType === JobType.TRAIN) {
                 basePath += "/trainJobs";
+              } else if (record.jobType === JobType.INFER) {
+                basePath += "/inference";
               }
               router.push(`${basePath}?${searchParams.toString()}`);
             }}

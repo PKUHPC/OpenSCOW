@@ -25,6 +25,7 @@ import {
   listTags,
   saveImage,
 } from "./apps";
+import { getSubmitInferenceParams,submitInferJob } from "./infer";
 import { cancelJob, getSubmitTrainParams, trainJob } from "./jobs";
 
 export const jobsRouter = router({
@@ -42,4 +43,6 @@ export const jobsRouter = router({
   saveImage,
   trainJob,
   getSubmitTrainParams,
+  submitInferJob,
+  getSubmitInferenceParams,
 });

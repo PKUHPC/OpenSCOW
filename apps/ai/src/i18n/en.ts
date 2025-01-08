@@ -34,6 +34,7 @@ export default {
       trainJob: "Training",
       runningJobs: "Running Jobs",
       historyJobs: "Completed Jobs",
+      infer: "Inferring",
     },
     algorithm: {
       title: "Algorithms",
@@ -309,6 +310,9 @@ export default {
       trainJobs:{
         title:"Training",
       },
+      inference:{
+        title:"inferring",
+      },
       appSessionsTable:{
         operateFailed:"Operation failed",
         jobId:"Job ID",
@@ -329,6 +333,8 @@ export default {
         submitAgain:"Submit again",
         enterDir:"Enter directory",
         autoRefresh:"Auto refresh",
+        servicePort:"Infer service port",
+        infer:"Inferring",
       },
       connectToAppLink:{
         connectFailed:"Connect to app failed",
@@ -394,6 +400,17 @@ export default {
         algorithmDesc:"Algorithm Description",
         datasetDesc:"Dataset Description",
         modelDesc:"Model Description",
+        selectAlgorithm:"Please select algorithm",
+        selectDataset:"Please select dataset",
+        selectModel:"Please select model",
+      },
+      LaunchInferenceForm:{
+        submitSuccessfully:"Create successfully",
+        submitFailed:"Create failed",
+        inferConfig:"inference config",
+        containerServicePort:"container service port",
+        unlimitedTime:"unlimited time",
+        addModel:"add model",
       },
       saveImageModal:{
         saveSuccessfully:"Save image successfully",

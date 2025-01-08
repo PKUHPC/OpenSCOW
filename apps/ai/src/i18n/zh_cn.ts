@@ -34,6 +34,7 @@ export default {
       trainJob: "训练",
       runningJobs: "正在运行的作业",
       historyJobs: "已完成的作业",
+      infer: "推理",
     },
     algorithm: {
       title:"算法",
@@ -309,6 +310,9 @@ export default {
       trainJobs:{
         title:"训练",
       },
+      inference:{
+        title:"推理",
+      },
       appSessionsTable:{
         operateFailed:"操作失败",
         jobId:"作业ID",
@@ -329,6 +333,8 @@ export default {
         submitAgain:"再次提交",
         enterDir:"进入目录",
         autoRefresh:"自动刷新",
+        servicePort:"推理服务端口",
+        infer:"推理",
       },
       connectToAppLink:{
         connectFailed:"连接应用失败",
@@ -394,6 +400,17 @@ export default {
         algorithmDesc:"算法描述",
         datasetDesc:"数据集描述",
         modelDesc:"模型描述",
+        selectAlgorithm:"请选择算法",
+        selectDataset:"请选择数据集",
+        selectModel:"请选择模型",
+      },
+      LaunchInferenceForm:{
+        submitSuccessfully:"提交推理成功",
+        submitFailed:"提交推理失败",
+        inferConfig:"推理配置",
+        containerServicePort:"容器内服务端口",
+        unlimitedTime:"不限时",
+        addModel:"添加模型",
       },
       saveImageModal:{
         saveSuccessfully:"保存镜像成功",
