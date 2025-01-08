@@ -296,6 +296,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
       initialValues={{
         ... initialValues,
       }}
+      labelAlign="left"
       onFinish={async () => {
 
         const { appJobName, image, remoteImageUrl, model,mountPoints, account, partition, coreCount,
@@ -372,7 +373,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
                   noStyle
                 >
                   <Select
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 200 }}
                     allowClear
                     onChange={() => {
                       form.setFieldValue("startCommand", undefined);
@@ -510,12 +511,20 @@ export const LaunchInferenceJobForm = (props: Props) => {
         </Form.Item>
         {
           showModel ? (
-            <Form.Item label={t(p("model"))}>
+            <Form.Item
+              label={t(p("model"))}
+              labelCol={{ span: 1, style: { minWidth: "70px" } }}
+              wrapperCol={{ span: 23 }}
+            >
               <Space>
-                <Form.Item name={["model", "type"]} noStyle>
+                <Form.Item
+                  name={["model", "type"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 120 }}
                     onChange={() => {
                       form.setFieldsValue({ model: { name: undefined, version: undefined } });
                     }}
@@ -533,10 +542,14 @@ export const LaunchInferenceJobForm = (props: Props) => {
                     }
                   />
                 </Form.Item>
-                <Form.Item name={["model", "name"]} noStyle>
+                <Form.Item
+                  name={["model", "name"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
-                    style={{ minWidth: 100 }}
+                    style={{ minWidth: 200 }}
                     onChange={() => {
                       form.setFieldValue(["model", "version"], undefined);
                     }}
@@ -544,7 +557,27 @@ export const LaunchInferenceJobForm = (props: Props) => {
                     options={modelOptions}
                   />
                 </Form.Item>
-                <Form.Item name={["model", "version"]} noStyle>
+                <Form.Item
+                  name={["model", "version"]}
+                  noStyle
+                  rules={[
+                    { required: true, message: "" },
+                    {
+                      validator: () => {
+                        const name = form.getFieldValue(["model", "name"]);
+                        const type = form.getFieldValue(["model", "type"]);
+                        const version = form.getFieldValue(["model", "version"]);
+
+                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                        if (!type || !version || !name) {
+                          return Promise.reject(new Error(t(p("selectModel"))));
+                        }
+
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 100 }}

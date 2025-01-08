@@ -400,6 +400,9 @@ export default {
         algorithmDesc:"Algorithm Description",
         datasetDesc:"Dataset Description",
         modelDesc:"Model Description",
+        selectAlgorithm:"Please select algorithm",
+        selectDataset:"Please select dataset",
+        selectModel:"Please select model",
       },
       LaunchInferenceForm:{
         submitSuccessfully:"Create successfully",

@@ -885,9 +885,15 @@ export const LaunchAppForm = (props: Props) => {
           showAlgorithm ? (
             <Form.Item
               label={t(p("algorithm"))}
+              labelCol={{ span: 1, style: { minWidth: "70px" } }}
+              wrapperCol={{ span: 23 }}
             >
               <Space>
-                <Form.Item name={["algorithm", "type"]} noStyle>
+                <Form.Item
+                  name={["algorithm", "type"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 120 }}
@@ -908,7 +914,7 @@ export const LaunchAppForm = (props: Props) => {
                     }
                   />
                 </Form.Item>
-                <Form.Item name={["algorithm", "name"]} noStyle>
+                <Form.Item name={["algorithm", "name"]} noStyle rules={[{ required: true, message: "" }]}>
                   <Select
                     allowClear
                     style={{ minWidth: 200 }}
@@ -921,7 +927,27 @@ export const LaunchAppForm = (props: Props) => {
                     options={algorithmOptions}
                   />
                 </Form.Item>
-                <Form.Item name={["algorithm", "version"]} noStyle>
+                <Form.Item
+                  name={["algorithm", "version"]}
+                  noStyle
+                  rules={[
+                    { required: true, message: "" },
+                    {
+                      validator: () => {
+                        const name = form.getFieldValue(["algorithm", "name"]);
+                        const type = form.getFieldValue(["algorithm", "type"]);
+                        const version = form.getFieldValue(["algorithm", "version"]);
+
+                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                        if (!type || !version || !name) {
+                          return Promise.reject(new Error(t(p("selectAlgorithm"))));
+                        }
+
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 100 }}
@@ -948,9 +974,11 @@ export const LaunchAppForm = (props: Props) => {
           showDataset ? (
             <Form.Item
               label={t(p("dataset"))}
+              labelCol={{ span: 1, style: { minWidth: "70px" } }}
+              wrapperCol={{ span: 23 }}
             >
               <Space>
-                <Form.Item name={["dataset", "type"]} noStyle>
+                <Form.Item name={["dataset", "type"]} noStyle rules={[{ required: true, message: "" }]}>
                   <Select
                     allowClear
                     style={{ minWidth: 120 }}
@@ -972,7 +1000,11 @@ export const LaunchAppForm = (props: Props) => {
                     }
                   />
                 </Form.Item>
-                <Form.Item name={["dataset", "name"]} noStyle>
+                <Form.Item
+                  name={["dataset", "name"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 200 }}
@@ -985,7 +1017,27 @@ export const LaunchAppForm = (props: Props) => {
                     options={datasetOptions}
                   />
                 </Form.Item>
-                <Form.Item name={["dataset", "version"]} noStyle>
+                <Form.Item
+                  name={["dataset", "version"]}
+                  noStyle
+                  rules={[
+                    { required: true, message: "" },
+                    {
+                      validator: () => {
+                        const name = form.getFieldValue(["dataset", "name"]);
+                        const type = form.getFieldValue(["dataset", "type"]);
+                        const version = form.getFieldValue(["dataset", "version"]);
+
+                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                        if (!type || !version || !name) {
+                          return Promise.reject(new Error(t(p("selectDataset"))));
+                        }
+
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 100 }}
@@ -1012,9 +1064,15 @@ export const LaunchAppForm = (props: Props) => {
           showModel ? (
             <Form.Item
               label={t(p("model"))}
+              labelCol={{ span: 1, style: { minWidth: "70px" } }}
+              wrapperCol={{ span: 23 }}
             >
               <Space>
-                <Form.Item name={["model", "type"]} noStyle>
+                <Form.Item
+                  name={["model", "type"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 120 }}
@@ -1035,7 +1093,11 @@ export const LaunchAppForm = (props: Props) => {
                     }
                   />
                 </Form.Item>
-                <Form.Item name={["model", "name"]} noStyle>
+                <Form.Item
+                  name={["model", "name"]}
+                  noStyle
+                  rules={[{ required: true, message: "" }]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 200 }}
@@ -1048,7 +1110,27 @@ export const LaunchAppForm = (props: Props) => {
                     options={modelOptions}
                   />
                 </Form.Item>
-                <Form.Item name={["model", "version"]} noStyle>
+                <Form.Item
+                  name={["model", "version"]}
+                  noStyle
+                  rules={[
+                    { required: true, message: "" },
+                    {
+                      validator: () => {
+                        const name = form.getFieldValue(["model", "name"]);
+                        const type = form.getFieldValue(["model", "type"]);
+                        const version = form.getFieldValue(["model", "version"]);
+
+                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                        if (!type || !version || !name) {
+                          return Promise.reject(new Error(t(p("selectModel"))));
+                        }
+
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <Select
                     allowClear
                     style={{ minWidth: 100 }}

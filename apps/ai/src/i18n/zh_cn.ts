@@ -400,6 +400,9 @@ export default {
         algorithmDesc:"算法描述",
         datasetDesc:"数据集描述",
         modelDesc:"模型描述",
+        selectAlgorithm:"请选择算法",
+        selectDataset:"请选择数据集",
+        selectModel:"请选择模型",
       },
       LaunchInferenceForm:{
         submitSuccessfully:"提交推理成功",
