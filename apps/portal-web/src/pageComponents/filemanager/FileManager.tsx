@@ -514,6 +514,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               cluster={cluster.id}
               path={path}
               files={keysToFiles(selectedKeys)}
+              reload={reload}
               setCompression={setCompression}
             >
               {t(p("compressSelected"))}
@@ -537,7 +538,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               )) : ""
           }
           {
-            compression.started.length !== 0 && (
+            compression.started.length - compression.completed.length > 0 && (
               <div>
                 <span>
                   {t(p("compressionInPrograss"))}{`${compression.completed.length} / ${compression.started.length}`}

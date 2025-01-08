@@ -13,6 +13,7 @@ interface Props {
   path: string;
   files: FileInfo[];
   onClose: () => void;
+  reload: () => void;
   setCompression: React.Dispatch<React.SetStateAction<Compression>>;
 }
 
@@ -38,7 +39,7 @@ const fileManagerP = prefix("pageComp.fileManagerComp.fileManager.");
 const p = prefix("pageComp.fileManagerComp.compressFilesModal.");
 
 export const CompressFilesModal: React.FC<Props> = ({
-  open, onClose, setCompression, path, files, cluster }) => {
+  open, onClose, reload, setCompression, path, files, cluster }) => {
 
   const { message, modal } = App.useApp();
 
@@ -62,6 +63,7 @@ export const CompressFilesModal: React.FC<Props> = ({
       });
       throw error;
     }).then(() => {
+      reload();
       message.success(t(p("compressSuccess")));
       setCompression((compression) => ({ ...compression, completed: compression.completed.concat(zipFileName) }));
     }).catch((e) => {
