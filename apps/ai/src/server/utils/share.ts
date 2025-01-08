@@ -120,12 +120,31 @@ export async function shareFileOrDir(
       }
 
       // 复制并从顶层目录递归修改文件夹权限
-      const cpAndChmodCmd = `nohup cp -r --preserve=links ${sourceFilePath} ${targetFullDir} &&
-      chmod -R 555 ${targetTopDir}`;
-      await ssh.execCommand(cpAndChmodCmd).catch((e) => {
+      try {
+        const cpCmd = "cp";
+        const cpParams = ["-r", "--preserve=links", sourceFilePath, targetFullDir];
+
+        try {
+          await loggedExec(ssh, logger, true, cpCmd, cpParams);
+        } catch (err) {
+          logger.error("Error copying files: %s", err);
+          throw err;
+        }
+
+        const chmodCmd = "chmod";
+        const chmodParams = ["-R", "555", targetTopDir];
+
+        try {
+          await loggedExec(ssh, logger, true, chmodCmd, chmodParams);
+        } catch (err) {
+          logger.error("Error changing permissions: %s", err);
+          throw err;
+        }
+
+      } catch (e) {
         failureCallback?.();
-        logger.info("Failed to share %s to %s with error %s", sourceFilePath, targetFullDir, e);
-      });
+        logger.error("Failed to share %s to %s with error %s", sourceFilePath, targetFullDir, e);
+      }
 
       successCallback?.(targetFullDir);
 
