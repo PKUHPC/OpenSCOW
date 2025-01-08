@@ -76,7 +76,7 @@ export async function getCurrentClusters(userId: string): Promise<string[]> {
   }
 
   const userAffliction
-       = await libWebGetUserInfo(userId, config.MIS_SERVER_URL);
+       = await libWebGetUserInfo(userId, config.MIS_SERVER_URL, commonConfig.scowApi?.auth?.token);
 
   const accountNames = userAffliction?.affiliations.map((a) => (a.accountName));
   const tenantName = userAffliction?.tenantName;
