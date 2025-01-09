@@ -451,14 +451,26 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
       </TopBar>
       <OperationBar>
         <Space wrap>
-          {<Dropdown menu={menuProps}>
-            <Button icon={<UploadOutlined />}>
-              <Space>
-                {t(p("upload"))}
-                <DownOutlined />
-              </Space>
-            </Button>
-          </Dropdown>}
+          { scowdEnabled ? (
+            <Dropdown menu={menuProps}>
+              <Button icon={<UploadOutlined />}>
+                <Space>
+                  {t(p("upload"))}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          ) : (
+            <UploadButton
+              externalOpen={isUploadModalOpen}
+              cluster={cluster.id}
+              path={path}
+              reload={reload}
+              scowdEnabled={scowdEnabled}
+            >
+              {t(p("tableInfo.uploadButton"))}
+            </UploadButton>
+          )}
           <Divider type="vertical" />
           {
             scowdEnabled && (
@@ -765,6 +777,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 const RenameLink = ModalLink(RenameModal);
 const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
+const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
 
 // function openPreviewLink(href: string) {
 //   window.open(href, "ViewFile", "location=yes,resizable=yes,scrollbars=yes,status=yes");

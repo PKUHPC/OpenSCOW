@@ -65,12 +65,18 @@ export const CompressFilesModal: React.FC<Props> = ({
     }).then(() => {
       reload();
       message.success(t(p("compressSuccess")));
-      setCompression((compression) => ({ ...compression, completed: compression.completed.concat(zipFileName) }));
+      setCompression((compression) => {
+        // 如果所有开始的任务都已经完成则清空
+        if (compression.completed.length + 1 === compression.started.length) {
+          return { completed: [], started: []};
+        }
+
+        return { ...compression, completed: compression.completed.concat(zipFileName) };
+      });
     }).catch((e) => {
       throw e;
     });
 
-    message.info(t(p("compressRequestSubmit")));
   };
 
   const onSubmit = async () => {
@@ -118,6 +124,7 @@ export const CompressFilesModal: React.FC<Props> = ({
           style={{ marginTop: "8px" }}
           height={300}
           switcherIcon={<DownOutlined />}
+          defaultExpandedKeys={["root"]}
           treeData={generateCompressFilesTree(path, files)}
         />
         <Form.Item
