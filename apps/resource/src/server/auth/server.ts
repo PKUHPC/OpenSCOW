@@ -3,9 +3,7 @@ import { NextApiRequest, NextApiResponse, NextPageContext } from "next";
 import { NextRequest } from "next/server";
 import { PlatformRole,TenantRole } from "src/models/user";
 import { deleteUserToken, getUserToken } from "src/server/auth/cookie";
-import { validateToken as authValidateToken } from "src/utils/auth";
-import { SimpleUserInfo } from "src/utils/auth/validate-token";
-import { AUTH_INTERNAL_URL, USE_MOCK } from "src/utils/processEnv";
+import { USE_MOCK } from "src/utils/processEnv";
 
 import { ClientUserInfo } from "../trpc/route/auth";
 import { validateToken } from "./token";
@@ -41,19 +39,3 @@ export async function getUserInfo(req: RequestType, res?: NextApiResponse): Prom
   return { ...result, token };
 
 }
-
-export const authenticate = () =>
-  async (req: NextApiRequest): Promise<undefined | SimpleUserInfo> => {
-
-    const token = getUserToken(req);
-    if (!token) { return undefined; }
-
-    const resp = await authValidateToken(AUTH_INTERNAL_URL, token).catch(() => undefined);
-
-    if (!resp) {
-      return undefined;
-    }
-
-    return resp;
-
-  };

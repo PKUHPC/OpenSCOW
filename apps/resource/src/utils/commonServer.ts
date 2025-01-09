@@ -1,6 +1,5 @@
 import { Loaded } from "@mikro-orm/core";
 import { PartitionNames } from "@scow/scow-resource-protos/generated/resource/partition";
-import { authenticate } from "src/server/auth/server";
 import { AccountClusterRule } from "src/server/entities/AccountClusterRule";
 import { AccountPartitionRule } from "src/server/entities/AccountPartitionRule";
 import { TenantClusterRule } from "src/server/entities/TenantClusterRule";
@@ -22,11 +21,6 @@ Promise<string[]> {
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
     return ["hpc01"];
-  }
-
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Forbidden Error");
   }
 
   const em = await forkEntityManager();
@@ -57,11 +51,6 @@ export async function getAccountAssignedPartitionsInCluster(
     return ["compute1", "compute2"];
   }
 
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Forbidden Error");
-  }
-
   const em = await forkEntityManager();
   const found = await em.find(AccountPartitionRule, { accountName, tenantName, clusterId });
 
@@ -84,11 +73,6 @@ export async function getAccountsAssignedClusterPartitions(
     };
   }
 
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Forbidden Error");
-  }
-
   const em = await forkEntityManager();
 
   // 获取集群
@@ -105,7 +89,7 @@ export async function getAccountsAssignedClusterPartitions(
 
 /**
  * 获取租户已授权的集群和分区
- * @param tenantName 
+ * @param tenantName
  * @returns
  */
 export async function getTenantAssignedClusterPartitions(tenantName: string):
@@ -115,11 +99,6 @@ Promise<Record<string, PartitionNames>> {
     return {
       "hpc01": { partitionNames: ["compute1", "compute2"]},
     };
-  }
-
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Forbidden Error");
   }
 
   const em = await forkEntityManager();
@@ -167,7 +146,7 @@ Promise<boolean> {
   await em.flush();
 
   // 通知账户授权集群数据
-  await callHook("accountAssignedToClusters", 
+  await callHook("accountAssignedToClusters",
     { accountName, tenantName, clusterIds: foundDefaultClusterIds }, logger);
 
   return true;

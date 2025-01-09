@@ -8,7 +8,6 @@ import { GetClusterConfigFilesResponse } from "@scow/protos/generated/common/con
 import { USE_MOCK } from "src/utils/processEnv";
 import { getScowClient } from "src/utils/scowClient";
 
-import { authenticate } from "../auth/server";
 import { CLUSTER_CONFIGS_DATA, MOCK_ACTIVATED_CLUSTER_INFO } from "../trpc/route/mock";
 
 // 获取集群配置文件中的信息
@@ -16,12 +15,6 @@ export async function getScowClusterConfigs(): Promise<GetClusterConfigFilesResp
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
     return CLUSTER_CONFIGS_DATA;
-  }
-
-  const resp = authenticate();
-
-  if (!resp) {
-    throw new Error("Can not Access to SCOW mis-server.");
   }
 
   const commonConfigClient = getScowClient(CommonConfigClient);

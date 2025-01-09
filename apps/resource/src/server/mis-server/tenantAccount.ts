@@ -6,18 +6,11 @@ import { logger } from "src/utils/logger";
 import { USE_MOCK } from "src/utils/processEnv";
 import { getScowClient } from "src/utils/scowClient";
 
-import { authenticate } from "../auth/server";
-
 // 获取 scow 数据库中的所有租户信息
 export async function getScowTenants(): Promise<GetTenantsResponse> {
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
     return { names: ["default"]};
-  }
-
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Can not Access to SCOW mis-server.");
   }
 
   const serverTenantClient = getScowClient(TenantServiceClient);
@@ -36,11 +29,6 @@ export async function getScowAccounts(tenantName?: string, accountName?: string)
 
   if (process.env.NODE_ENV === "test" || USE_MOCK) {
     return { results: []};
-  }
-
-  const resp = authenticate();
-  if (!resp) {
-    throw new Error("Can not Access to SCOW mis-server.");
   }
 
   const serverAccountClient = getScowClient(AccountServiceClient);
