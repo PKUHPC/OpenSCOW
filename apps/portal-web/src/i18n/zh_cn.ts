@@ -263,7 +263,6 @@ export default {
       compressFilesModal: {
         compressFailed: "压缩文件/文件夹失败",
         compressSuccess: "压缩文件/文件夹成功",
-        compressRequestSubmit: "压缩请求已提交...",
         compression: "文件/文件夹压缩",
         compressConfirm: "确认压缩",
         cancel: "取消",

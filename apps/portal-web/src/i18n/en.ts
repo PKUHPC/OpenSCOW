@@ -263,7 +263,6 @@ export default {
       compressFilesModal: {
         compressFailed: "Failed to compress file/folder",
         compressSuccess: "File/folder compressed successfully",
-        compressRequestSubmit: "Compression request submitted...",
         compression: "File/folder compression",
         compressConfirm: "Confirm compression",
         cancel: "Cancel",

@@ -115,7 +115,7 @@ export const CompressFilesModal: React.FC<Props> = ({
       onCancel={onClose}
       destroyOnClose
       onOk={form.submit}
-      loading={loading}
+      confirmLoading={loading}
     >
       <Form form={form} onFinish={onSubmit}>
         <strong>{t(p("compressFileList"))}</strong>
