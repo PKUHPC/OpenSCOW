@@ -23,7 +23,7 @@ import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { urlToDownload, urlToDownloadAndCompress } from "src/pageComponents/filemanager/api";
+import { urlToCompressAndDownload,urlToDownload } from "src/pageComponents/filemanager/api";
 import { CompressFilesModal } from "src/pageComponents/filemanager/CompressFilesModal";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
@@ -274,7 +274,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 
   const onDownloadClick = () => {
     const files = keysToFiles(selectedKeys);
-    window.open(urlToDownloadAndCompress(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
+    window.open(urlToCompressAndDownload(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
   };
 
   const onDeleteClick = () => {
@@ -652,7 +652,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
             }
             {
               (i.type === "DIR" && scowdEnabled) && (
-                <a href={urlToDownloadAndCompress(cluster.id, [join(path, i.name)], true)}>
+                <a href={urlToCompressAndDownload(cluster.id, [join(path, i.name)], true)}>
                   {t(p("tableInfo.download"))}
                 </a>
               )

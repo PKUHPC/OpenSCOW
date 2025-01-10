@@ -135,7 +135,7 @@ export const mockApi: MockApi<typeof api> = {
   moveFileItem: null,
 
   downloadFile: null,
-  downloadAndCompressFile: null,
+  compressAndDownloadFile: null,
   uploadFile: null,
   fileExist: null,
   getFileType: null,

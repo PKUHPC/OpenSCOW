@@ -13,7 +13,7 @@
 import { join } from "path";
 import { publicConfig } from "src/utils/config";
 
-export const urlToDownloadAndCompress = (cluster: string, path: string[], download: boolean): string => {
+export const urlToCompressAndDownload = (cluster: string, path: string[], download: boolean): string => {
   const pathParams = path.map((p) => `paths=${encodeURIComponent(p)}`).join("&");
 
   // eslint-disable-next-line @stylistic/max-len
