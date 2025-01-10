@@ -197,7 +197,7 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
-    downloadAndCompress: async (call) => {
+    compressAndDownload: async (call) => {
       const { logger, request: { cluster, paths, userId } } = call;
       await checkActivatedClusters({ clusterIds: cluster });
 
@@ -219,7 +219,7 @@ export const fileServiceServer = plugin((server) => {
       const client = getScowdClient(cluster);
 
       try {
-        const readStream = client.file.downloadAndCompress({
+        const readStream = client.file.compressAndDownload({
           userId, paths, chunkSizeByte: config.DOWNLOAD_CHUNK_SIZE,
         });
 

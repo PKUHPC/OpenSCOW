@@ -10,7 +10,7 @@ import { getClient } from "src/utils/client";
 import { pipeline } from "src/utils/pipeline";
 import { route } from "src/utils/route";
 
-export const DownloadAndCompressFileSchema = typeboxRouteSchema({
+export const CompressAndDownloadFileSchema = typeboxRouteSchema({
   method: "GET",
 
   query: Type.Object({
@@ -47,7 +47,7 @@ function getContentType(filename: string, defaultValue: string) {
 
 const auth = authenticate(() => true);
 
-export default route(DownloadAndCompressFileSchema, async (req, res) => {
+export default route(CompressAndDownloadFileSchema, async (req, res) => {
   const info = await auth(req, res);
   if (!info) { return; }
 
@@ -63,7 +63,7 @@ export default route(DownloadAndCompressFileSchema, async (req, res) => {
     "Content-Disposition": `attachment; ${dispositionParm}`,
   });
 
-  const stream = asyncReplyStreamCall(client, "downloadAndCompress", {
+  const stream = asyncReplyStreamCall(client, "compressAndDownload", {
     cluster, paths, userId: info.identityId,
   });
 

@@ -17,7 +17,7 @@ export const urlToDownloadAndCompress = (cluster: string, path: string[], downlo
   const pathParams = path.map((p) => `paths=${encodeURIComponent(p)}`).join("&");
 
   // eslint-disable-next-line @stylistic/max-len
-  return `${join(publicConfig.BASE_PATH, "/api/file/downloadAndCompress")}?${pathParams}&cluster=${cluster}&download=${download}`;
+  return `${join(publicConfig.BASE_PATH, "/api/file/compressAndDownload")}?${pathParams}&cluster=${cluster}&download=${download}`;
 };
 
 

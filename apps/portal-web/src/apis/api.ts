@@ -27,13 +27,13 @@ import type { LaunchDesktopSchema } from "src/pages/api/desktop/launchDesktop";
 import type { ListAvailableWmsSchema } from "src/pages/api/desktop/listAvailableWms";
 import type { ListDesktopsSchema } from "src/pages/api/desktop/listDesktops";
 import type { CheckTransferKeySchema } from "src/pages/api/file/checkTransferKey";
+import type { CompressAndDownloadFileSchema } from "src/pages/api/file/compressAndDownload";
 import type { CompressFilesSchema } from "src/pages/api/file/compressFiles";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
 import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
 import type { DownloadFileSchema } from "src/pages/api/file/download";
-import type { DownloadAndCompressFileSchema } from "src/pages/api/file/downloadAndCompress";
 import type { FileExistSchema } from "src/pages/api/file/fileExist";
 import type { GetFileTypeSchema } from "src/pages/api/file/getFileType";
 import type { GetHomeDirectorySchema } from "src/pages/api/file/getHome";
@@ -87,13 +87,13 @@ export const api = {
   listAvailableWms: apiClient.fromTypeboxRoute<typeof ListAvailableWmsSchema>("GET", "/api/desktop/listAvailableWms"),
   listDesktops: apiClient.fromTypeboxRoute<typeof ListDesktopsSchema>("GET", "/api/desktop/listDesktops"),
   checkTransferKey: apiClient.fromTypeboxRoute<typeof CheckTransferKeySchema>("POST", "/api/file/checkTransferKey"),
+  compressAndDownloadFile: apiClient.fromTypeboxRoute<typeof CompressAndDownloadFileSchema>("GET", "/api/file/compressAndDownload"),
   compressFiles: apiClient.fromTypeboxRoute<typeof CompressFilesSchema>("PATCH", "/api/file/compressFiles"),
   copyFileItem: apiClient.fromTypeboxRoute<typeof CopyFileItemSchema>("PATCH", "/api/file/copy"),
   createFile: apiClient.fromTypeboxRoute<typeof CreateFileSchema>("POST", "/api/file/createFile"),
   deleteDir: apiClient.fromTypeboxRoute<typeof DeleteDirSchema>("DELETE", "/api/file/deleteDir"),
   deleteFile: apiClient.fromTypeboxRoute<typeof DeleteFileSchema>("DELETE", "/api/file/deleteFile"),
   downloadFile: apiClient.fromTypeboxRoute<typeof DownloadFileSchema>("GET", "/api/file/download"),
-  downloadAndCompressFile: apiClient.fromTypeboxRoute<typeof DownloadAndCompressFileSchema>("GET", "/api/file/downloadAndCompress"),
   fileExist: apiClient.fromTypeboxRoute<typeof FileExistSchema>("GET", "/api/file/fileExist"),
   getFileType: apiClient.fromTypeboxRoute<typeof GetFileTypeSchema>("GET", "/api/file/getFileType"),
   getHomeDirectory: apiClient.fromTypeboxRoute<typeof GetHomeDirectorySchema>("GET", "/api/file/getHome"),
