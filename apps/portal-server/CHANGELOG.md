@@ -1,5 +1,19 @@
 # @scow/portal-server
 
+## 1.8.0
+
+### Patch Changes
+
+- 31a83ad: scowd 交互式应用连接不去代理网关节点获取 IP
+- Updated dependencies [bfad31b]
+- Updated dependencies [afaec8b]
+  - @scow/lib-scow-resource@0.2.4
+  - @scow/lib-server@1.3.10
+  - @scow/config@1.6.3
+  - @scow/protos@1.0.21
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.19
+
 ## 1.7.5
 
 ### Patch Changes

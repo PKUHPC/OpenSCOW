@@ -1,5 +1,25 @@
 # @scow/mis-web
 
+## 1.8.0
+
+### Minor Changes
+
+- 4bcc216: 增加月账单、年账单功能
+
+### Patch Changes
+
+- 00b83a0: 增加推理功能
+- Updated dependencies [bfad31b]
+- Updated dependencies [00b83a0]
+- Updated dependencies [afaec8b]
+  - @scow/lib-scow-resource@0.2.4
+  - @scow/lib-notification@1.0.5
+  - @scow/lib-operation-log@2.1.15
+  - @scow/config@1.6.3
+  - @scow/lib-web@1.4.9
+  - @scow/protos@1.0.21
+  - @scow/rich-error-model@2.0.1
+
 ## 1.7.5
 
 ### Patch Changes

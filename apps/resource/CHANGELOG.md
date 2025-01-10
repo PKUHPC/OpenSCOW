@@ -1,5 +1,21 @@
 # @scow/resource
 
+## 0.2.6
+
+### Patch Changes
+
+- d0b5adb: 删除资源管理与 mis-server 后端相互调用时的冗余认证逻辑
+- bfad31b: 为资源管理系统、通知系统、管理系统、门户系统服务与服务之间的调用增加 token 校验,
+  ** 注意，此 commit 之后，如配置资源管理系统或者通知系统，则需要配置 SCOW API Token **
+- Updated dependencies [bfad31b]
+- Updated dependencies [afaec8b]
+  - @scow/lib-server@1.3.10
+  - @scow/config@1.6.3
+  - @scow/lib-web@1.4.9
+  - @scow/protos@1.0.21
+  - @scow/lib-hook@1.0.21
+  - @scow/lib-scheduler-adapter@1.1.19
+
 ## 0.2.5
 
 ### Patch Changes

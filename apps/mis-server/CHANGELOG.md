@@ -1,5 +1,23 @@
 # @scow/mis-server
 
+## 1.8.0
+
+### Minor Changes
+
+- 4bcc216: 增加月账单、年账单功能
+
+### Patch Changes
+
+- Updated dependencies [bfad31b]
+- Updated dependencies [afaec8b]
+  - @scow/lib-scow-resource@0.2.4
+  - @scow/lib-notification@1.0.5
+  - @scow/lib-server@1.3.10
+  - @scow/config@1.6.3
+  - @scow/protos@1.0.21
+  - @scow/lib-hook@1.0.21
+  - @scow/lib-scheduler-adapter@1.1.19
+
 ## 1.7.5
 
 ### Patch Changes

@@ -1,5 +1,20 @@
 # @scow/notification
 
+## 0.2.6
+
+### Patch Changes
+
+- bfad31b: 为资源管理系统、通知系统、管理系统、门户系统服务与服务之间的调用增加 token 校验,
+  ** 注意，此 commit 之后，如配置资源管理系统或者通知系统，则需要配置 SCOW API Token **
+- Updated dependencies [bfad31b]
+- Updated dependencies [afaec8b]
+  - @scow/lib-notification@1.0.5
+  - @scow/lib-server@1.3.10
+  - @scow/config@1.6.3
+  - @scow/lib-web@1.4.9
+  - @scow/protos@1.0.21
+  - @scow/lib-scheduler-adapter@1.1.19
+
 ## 0.2.5
 
 ### Patch Changes

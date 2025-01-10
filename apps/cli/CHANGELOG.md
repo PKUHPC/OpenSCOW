@@ -1,5 +1,12 @@
 # @scow/cli
 
+## 1.8.0
+
+### Patch Changes
+
+- Updated dependencies [afaec8b]
+  - @scow/config@1.6.3
+
 ## 1.7.5
 
 ## 1.7.4

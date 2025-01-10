@@ -1,5 +1,11 @@
 # @scow/config
 
+## 1.6.3
+
+### Patch Changes
+
+- afaec8b: AI 添加文件编辑功能
+
 ## 1.6.2
 
 ### Patch Changes

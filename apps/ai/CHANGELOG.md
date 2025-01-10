@@ -1,5 +1,31 @@
 # @scow/ai
 
+## 0.3.0
+
+### Minor Changes
+
+- 00b83a0: 增加推理功能
+
+### Patch Changes
+
+- a29b2b4: AI 提交训练和应用，勾选算法/数据集/模型后需变为必填项
+- 78beaac: 删除同名同 tag 镜像后的再次创建提交作业的镜像缓存问题
+- 85d742e: 修复 AI 在分享时，若（算法模型数据集）名称或者版本名称带有空格，则里面的内容不会复制过来
+- b72e60b: AI 训练和应用提交优化:选择 数据集、模型、算法和镜像的时候提供搜索功能
+- afaec8b: AI 添加文件编辑功能
+- 7f3d255: 修复 AI 调用 mis-server 时携带 Scow API token 加强安全认证
+- Updated dependencies [bfad31b]
+- Updated dependencies [00b83a0]
+- Updated dependencies [afaec8b]
+  - @scow/lib-scow-resource@0.2.4
+  - @scow/lib-server@1.3.10
+  - @scow/lib-operation-log@2.1.15
+  - @scow/config@1.6.3
+  - @scow/lib-web@1.4.9
+  - @scow/protos@1.0.21
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.19
+
 ## 0.2.13
 
 ### Patch Changes

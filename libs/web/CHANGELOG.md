@@ -1,5 +1,14 @@
 # @scow/lib-web
 
+## 1.4.9
+
+### Patch Changes
+
+- afaec8b: AI 添加文件编辑功能
+- Updated dependencies [afaec8b]
+  - @scow/config@1.6.3
+  - @scow/protos@1.0.21
+
 ## 1.4.8
 
 ### Patch Changes
