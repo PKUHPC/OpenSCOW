@@ -1,5 +1,5 @@
 ---
-"@scow/grpc-api": major
+"@scow/grpc-api": minor
 ---
 
 增加获取加增加获取月/年账单的接口：GetBills，
