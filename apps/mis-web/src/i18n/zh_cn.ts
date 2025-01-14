@@ -1063,6 +1063,7 @@ export default {
         },
         resourceStatus: {
           resourceStatus: "资源状态",
+          clusterMonitor: "集群监控",
         },
       },
       operationLogs: {

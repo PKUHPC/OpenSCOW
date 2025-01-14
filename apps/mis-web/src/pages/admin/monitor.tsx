@@ -11,7 +11,7 @@
  */
 
 import { joinWithUrl } from "@scow/utils";
-import { Typography } from "antd";
+import { Tabs,Typography } from "antd";
 import { NextPage } from "next";
 import path from "path";
 import { requireAuth } from "src/auth/requireAuth";
@@ -32,7 +32,7 @@ const Container = styled.div`
 const FrameContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 525px;
 `;
 
 const IFrame = styled.iframe`
@@ -62,20 +62,39 @@ export const ResourceStatusPage: NextPage = requireAuth(
 
   const t = useI18nTranslateToString();
 
-  const normalGrafanaUrl = joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL,
-    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}`);
-  const proxyGrafanaUrl = path.join(publicConfig.BASE_PATH, "/api/admin/monitor/getResourceStatus",
-    `/d/${publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid}`);
+  const dashboardUid = publicConfig.CLUSTER_MONITOR.resourceStatus.dashboardUid;
+  let dashboards = publicConfig.CLUSTER_MONITOR.resourceStatus.dashboards;
+
+  const normalGrafanaUrls: string[] = [];
+  const proxyGrafanaUrls: string[] = [];
+
+  if (!(dashboards?.length && dashboards?.length > 0) && dashboardUid) {
+    dashboards = [{ uid: dashboardUid, label: t(p("resourceStatus")) }];
+  }
+
+  dashboards?.map((dashboard) => {
+    normalGrafanaUrls.push(joinWithUrl(publicConfig.CLUSTER_MONITOR.grafanaUrl ?? DEFAULT_GRAFANA_URL,
+      `/d/${dashboard.uid}`));
+    proxyGrafanaUrls.push(path.join(publicConfig.BASE_PATH, "/api/admin/monitor/getResourceStatus",
+      `/d/${dashboard.uid}`));
+  });
 
   return (
     <>
       <Container>
-        <Head title={t(p("resourceStatus"))} />
-        <TitleText>{t(p("resourceStatus"))}</TitleText>
-        { publicConfig.CLUSTER_MONITOR.resourceStatus.proxy
-          ? <FrameContainer><IFrame src={proxyGrafanaUrl}></IFrame></FrameContainer>
-          : <FrameContainer><IFrame src={normalGrafanaUrl}></IFrame></FrameContainer>
-        }
+        <Head title={t(p("clusterMonitor"))} />
+        <TitleText>{t(p("clusterMonitor"))}</TitleText>
+        <Tabs
+          defaultActiveKey={dashboards?.[0]?.uid}
+          items={ dashboards?.map((dashboard, index) => (
+            { key: dashboard?.uid ?? "",
+              label: dashboard?.label,
+              children: (publicConfig.CLUSTER_MONITOR.resourceStatus.proxy
+                ? <FrameContainer><IFrame src={proxyGrafanaUrls[index]}></IFrame></FrameContainer>
+                : <FrameContainer><IFrame src={normalGrafanaUrls[index]}></IFrame></FrameContainer>),
+            }
+          ))}
+        />
       </Container>
     </>
 

@@ -156,7 +156,11 @@ export const MisConfigSchema = Type.Object({
     resourceStatus: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "是否开启资源状态，默认为 false", default: false }),
       proxy: Type.Boolean({ description: "是否通过代理方式嵌入 grafana，默认为 false", default: false }),
-      dashboardUid: Type.String({ description: "默认展示的 grafana 面板 id", default: "shZOtO4Sk" }),
+      dashboardUid: Type.Optional(Type.String({ description: "默认展示的 grafana 面板 id, 优先级低于dashboards" })),
+      dashboards: Type.Optional(Type.Array(Type.Object({
+        uid: Type.String({ description: "配置 grafana tab 面板 id" }),
+        label: Type.String({ description: "配置 grafana tab 面板标签" }),
+      }))),
     })),
     alarmLogs: Type.Optional(Type.Object({
       enabled: Type.Boolean({ description: "是否启用告警日志功能", default: false }),

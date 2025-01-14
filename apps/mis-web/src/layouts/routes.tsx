@@ -152,24 +152,17 @@ export const platformAdminRoutes: (platformRoles: PlatformRole[], t: TransType) 
           },
         ],
       }] : []),
-      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) &&
-      (publicConfig.CLUSTER_MONITOR.resourceStatus.enabled || publicConfig.CLUSTER_MONITOR.alarmLogs.enabled) ? [{
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) && publicConfig.CLUSTER_MONITOR.resourceStatus.enabled ?
+        [{
           Icon: MonitorOutlined,
           text: t(pPlatform("clusterMonitor")),
           path: "/admin/monitor",
-          clickable: false,
-          children: [
-            ...(publicConfig.CLUSTER_MONITOR.resourceStatus.enabled) ? [{
-              Icon: LineChartOutlined,
-              text: t(pPlatform("resourceStatus")),
-              path: "/admin/monitor/resourceStatus",
-            }] : [],
-            ...(publicConfig.CLUSTER_MONITOR.alarmLogs.enabled) ? [{
-              Icon: AlertOutlined,
-              text: t(pPlatform("alarmLog")),
-              path: "/admin/monitor/alarmLog",
-            }] : [],
-          ],
+        }] : []),
+      ...(platformRoles.includes(PlatformRole.PLATFORM_ADMIN) && publicConfig.CLUSTER_MONITOR.alarmLogs.enabled ?
+        [{
+          Icon: AlertOutlined,
+          text: t(pPlatform("alarmLog")),
+          path: "/admin/alarmLog",
         }] : []),
       ...(publicConfig.AUDIT_DEPLOYED && platformRoles.includes(PlatformRole.PLATFORM_ADMIN) ?
         [{

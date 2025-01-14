@@ -106,6 +106,7 @@ export interface PublicRuntimeConfig {
       enabled: boolean | undefined,
       proxy: boolean | undefined,
       dashboardUid: string | undefined,
+      dashboards?: Dashboards[],
     },
     alarmLogs: { enabled: boolean | undefined }
   },
@@ -128,6 +129,11 @@ export interface PublicRuntimeConfig {
 
 export const runtimeConfig: ServerRuntimeConfig = getConfig().serverRuntimeConfig;
 export const publicConfig: PublicRuntimeConfig = getConfig().publicRuntimeConfig;
+
+export interface Dashboards {
+  uid: string;
+  label: string;
+};
 
 export interface NavLink {
   text: string;

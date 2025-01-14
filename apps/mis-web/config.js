@@ -184,6 +184,7 @@ const buildRuntimeConfig = async (phase, basePath) => {
         enabled: misConfig.clusterMonitor?.resourceStatus?.enabled,
         proxy: misConfig.clusterMonitor?.resourceStatus?.proxy,
         dashboardUid: misConfig.clusterMonitor?.resourceStatus?.dashboardUid,
+        dashboards: misConfig.clusterMonitor?.resourceStatus?.dashboards,
       },
       alarmLogs: {
         enabled: misConfig.clusterMonitor?.alarmLogs?.enabled,

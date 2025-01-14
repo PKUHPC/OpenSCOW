@@ -1064,6 +1064,7 @@ export default {
         },
         resourceStatus: {
           resourceStatus: "Resource Status",
+          clusterMonitor: "Monitor",
         },
       },
       operationLogs: {
