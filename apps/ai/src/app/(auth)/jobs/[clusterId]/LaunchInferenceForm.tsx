@@ -14,7 +14,7 @@
 
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { App, Button, Checkbox, Col,
-  Divider, Form, Input, InputNumber, Row, Select, Space, Spin } from "antd";
+  Divider, Form, Input, InputNumber, Radio,Row, Select, Space, Spin } from "antd";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -22,6 +22,7 @@ import { AccountSelector } from "src/components/AccountSelector";
 import { FileSelectModal } from "src/components/FileSelectModal";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import { Status } from "src/models/Image";
+import { ImageSource } from "src/models/Job";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { InferenceJobInput } from "src/server/trpc/route/jobs/infer";
 import { formatSize } from "src/utils/format";
@@ -38,9 +39,9 @@ interface Props {
 
 interface FixedFormFields {
   appJobName: string;
+  imageSource: ImageSource;
   image: { type: AccessibilityType, name: number };
   remoteImageUrl: string | undefined;
-  startCommand?: string;
   isUnlimitedTime: boolean;
   showModel: boolean;
   model: { type: AccessibilityType, name: number, version: number };
@@ -114,6 +115,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
 
   const showModel = Form.useWatch("showModel", form);
   const isUnlimitedTime = Form.useWatch("isUnlimitedTime", form);
+  const imageSource = Form.useWatch("imageSource", form);
 
   const isModelPrivate = Form.useWatch(["model", "type"], form) === AccessibilityType.PRIVATE;
 
@@ -230,14 +232,12 @@ export const LaunchInferenceJobForm = (props: Props) => {
     const inputParams = InferenceJobInput;
     if (inputParams && (inputParams.remoteImageUrl || inputParams.image)) {
       if (!form.isFieldsTouched([
-        "startCommand",
+        "imageSource",
         "remoteImageUrl",
         ["image", "type"],
         ["image", "name"],
       ])) {
-        if ("startCommand" in inputParams) {
-          form.setFieldValue("startCommand", inputParams.startCommand);
-        }
+        form.setFieldValue("imageSource", inputParams.remoteImageUrl ? ImageSource.REMOTE : ImageSource.LOCAL);
         if (images?.items?.length) {
           form.setFieldValue(["image", "name"], inputParams.image);
         } else {
@@ -295,6 +295,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
       form={form}
       initialValues={{
         ... initialValues,
+        imageSource:ImageSource.LOCAL,
       }}
       labelAlign="left"
       onFinish={async () => {
@@ -334,80 +335,103 @@ export const LaunchInferenceJobForm = (props: Props) => {
         <Divider orientation="left" orientationMargin="0">
           {t(pInfer("inferConfig"))}
         </Divider>
+        <Form.Item
+          label={"选择镜像类型"}
+          name="imageSource"
+        >
+          <Radio.Group
+            onChange={() => {
+              form.setFieldsValue({
+                image: { type: undefined, name: undefined },
+                remoteImageUrl: undefined,
+              });
+            }}
+            style={{ userSelect:"none" }}
+          >
+            <Radio value={ImageSource.LOCAL}> 本地镜像</Radio>
+            <Radio value={ImageSource.REMOTE}> 远程镜像</Radio>
+          </Radio.Group>
+        </Form.Item>
         {
-          <>
-            <Form.Item label={t(p("image"))}>
-              <Space>
-                <Form.Item name={["image", "type"]} noStyle>
-                  <Select
-                    allowClear
-                    style={{ minWidth: 100 }}
-                    onChange={() => {
-                      form.setFieldsValue({ image: { name: undefined } });
-                    }}
-                    options={
-                      [
-                        {
-                          value: AccessibilityType.PRIVATE,
-                          label: t(p("privateImage")),
-                        },
-                        {
-                          value:  AccessibilityType.PUBLIC,
-                          label: t(p("publicImage")),
-                        },
-                      ]
-                    }
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["image", "name"]}
-                  rules={[({ getFieldValue }) => ({
-                    validator() {
-                      if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
-                        return Promise.resolve();
+          (imageSource === ImageSource.LOCAL) && (
+            <>
+              <Form.Item label={t(p("image"))} required>
+                <Space>
+                  <Form.Item name={["image", "type"]} noStyle rules={[{ required: true, message: "" }]}>
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      onChange={() => {
+                        form.setFieldsValue({ image: { name: undefined } });
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: t(p("privateImage")),
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: t(p("publicImage")),
+                          },
+                        ]
                       }
-                      return Promise.reject(new Error(t(p("selectImage"))));
-                    },
-                  })]}
-                  dependencies={["remoteImageUrl"]}
-                  noStyle
-                >
-                  <Select
-                    style={{ minWidth: 200 }}
-                    allowClear
-                    onChange={() => {
-                      form.setFieldValue("startCommand", undefined);
-                    }}
-                    loading={isImagesLoading && isImagePublic !== undefined}
-                    options={imageOptions}
-                  />
-                </Form.Item>
-              </Space>
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["image", "name"]}
+                    noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["image", "name"]);
+                          const type = form.getFieldValue(["image", "type"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !name) {
+                            return Promise.reject(new Error(t(p("selectImage"))));
+                          }
+
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
+                  >
+                    <Select
+                      style={{ minWidth: 200 }}
+                      allowClear
+                      loading={isImagesLoading && isImagePublic !== undefined}
+                      showSearch
+                      optionFilterProp="label"
+                      options={imageOptions}
+                    />
+                  </Form.Item>
+                </Space>
+              </Form.Item>
+            </>
+          )
+        }
+        {
+          imageSource !== ImageSource.REMOTE && (
+            <Form.Item label={t(p("imageDesc"))}>
+              {imageId ? imageDescription[imageId] : null }
             </Form.Item>
-            {
-              imageId && (
-                <Form.Item label={t(p("imageDesc"))}>
-                  {imageDescription[imageId]}
-                </Form.Item>
-              )
-            }
+          )
+        }
+        {
+          imageSource === ImageSource.REMOTE && (
             <Form.Item
               label={t(p("remoteImageUrl"))}
               name="remoteImageUrl"
-              rules={[({ getFieldValue }) => ({
-                validator() {
-                  if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error(t(p("selectImage"))));
-                },
-              })]}
-              dependencies={[["image", "name"]]}
+              required
+              rules={[{ required:true }]}
             >
               <Input placeholder={t(p("RemoteImageUrlPlaceholder"))} />
             </Form.Item>
-          </>
+          )
         }
+
         <Form.Item
           label={t(pInfer("containerServicePort"))}
           name="containerServicePort"

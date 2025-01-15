@@ -351,9 +351,7 @@ export default {
         trainConfig:"训练配置",
         appConfig:"应用配置",
         startImage:"启动镜像",
-        imageText1:"请选择镜像或填写远程镜像地址，确保镜像安装了应用{}，",
-
-        imageText2:"并指定启动命令",
+        imageText:"确保镜像安装了应用{}，并指定启动命令",
         useCustomImage:"使用自定义镜像",
         image:"镜像",
         privateImage:"我的镜像",

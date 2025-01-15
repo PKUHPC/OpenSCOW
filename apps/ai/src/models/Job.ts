@@ -10,9 +10,16 @@
  * See the Mulan PSL v2 for more details.
  */
 
+
 export enum JobType {
   APP = "app",
   TRAIN = "train",
   INFER = "infer",
+}
+
+export enum ImageSource {
+  DEFAULT = "default",
+  LOCAL = "local",
+  REMOTE = "remote",
 }
 

@@ -351,9 +351,7 @@ export default {
         trainConfig:"Training configuration",
         appConfig:"Application configuration",
         startImage:"Start image",
-        imageText1:"Please select an image or fill in the remote image address,"
-        + "ensure the image has the application {} installed, ",
-        imageText2:"and specify the start command",
+        imageText:"Ensure that the application {} is installed on the image and specify the startup command",
         useCustomImage:"Use custom image",
         image:"Image",
         privateImage:"My Image",

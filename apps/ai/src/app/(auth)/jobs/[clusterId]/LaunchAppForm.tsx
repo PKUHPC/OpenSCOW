@@ -16,7 +16,7 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Checkbox, Col,
-  Divider, Form, Input, InputNumber, Row, Select, Space, Spin, Typography } from "antd";
+  Divider, Form, Input, InputNumber, Radio, Row, Select, Space, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -26,6 +26,7 @@ import { FileSelectModal } from "src/components/FileSelectModal";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { AlgorithmInterface, AlgorithmVersionInterface } from "src/models/Algorithm";
 import { Status } from "src/models/Image";
+import { ImageSource } from "src/models/Job";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
@@ -57,7 +58,7 @@ interface FixedFormFields {
   appJobName: string;
   showAlgorithm: boolean;
   algorithm: { type: AccessibilityType, name: number, version: number };
-  useCustomImage: boolean;
+  imageSource: ImageSource;
   image: { type: AccessibilityType, name: number };
   remoteImageUrl: string | undefined;
   framework: FrameworkType | undefined;
@@ -130,7 +131,7 @@ export const LaunchAppForm = (props: Props) => {
   const p = prefix("app.jobs.launchAppForm.");
 
   const { clusterId, appName, clusterInfo, isTraining = false,
-    appId, attributes = [], appImage, createAppParams, trainJobInput } = props;
+    appId, attributes = [], appImage, createAppParams, trainJobInput,appComment } = props;
 
   const { message } = App.useApp();
 
@@ -154,7 +155,7 @@ export const LaunchAppForm = (props: Props) => {
   const showAlgorithm = Form.useWatch("showAlgorithm", form);
   const showDataset = Form.useWatch("showDataset", form);
   const showModel = Form.useWatch("showModel", form);
-  const useCustomImage = Form.useWatch("useCustomImage", form);
+  const imageSource = Form.useWatch("imageSource", form);
 
   const isAlgorithmPrivate = Form.useWatch(["algorithm", "type"], form) === AccessibilityType.PRIVATE;
   const isDatasetPrivate = Form.useWatch(["dataset", "type"], form) === AccessibilityType.PRIVATE;
@@ -229,8 +230,6 @@ export const LaunchAppForm = (props: Props) => {
 
   const imageType = Form.useWatch(["image", "type"], form);
   const selectedImage = Form.useWatch(["image", "name"], form);
-  const remoteImageInput = Form.useWatch("remoteImageUrl", form);
-  const customImage = remoteImageInput || selectedImage;
 
   const isImagePublic = imageType !== undefined ? imageType === AccessibilityType.PUBLIC : imageType;
 
@@ -468,13 +467,13 @@ export const LaunchAppForm = (props: Props) => {
     const inputParams = trainJobInput || createAppParams;
     if (inputParams && (inputParams.remoteImageUrl || inputParams.image)) {
       if (!form.isFieldsTouched([
-        "useCustomImage",
+        "imageSource",
         "startCommand",
         "remoteImageUrl",
         ["image", "type"],
         ["image", "name"],
       ])) {
-        form.setFieldValue("useCustomImage", true);
+        form.setFieldValue("imageSource", inputParams.remoteImageUrl ? ImageSource.REMOTE : ImageSource.LOCAL);
         if ("startCommand" in inputParams) {
           form.setFieldValue("startCommand", inputParams.startCommand);
         }
@@ -563,6 +562,7 @@ export const LaunchAppForm = (props: Props) => {
       form={form}
       initialValues={{
         ... initialValues,
+        imageSource: isTraining ? ImageSource.LOCAL : ImageSource.DEFAULT,
       }}
       labelAlign="left"
       onValuesChange={handleFormChange}
@@ -650,40 +650,47 @@ export const LaunchAppForm = (props: Props) => {
         <Divider orientation="left" orientationMargin="0">
           {isTraining ? t(p("trainConfig")) : t(p("appConfig"))}
         </Divider>
-        {!isTraining && (
+        <Form.Item
+          label={"选择镜像类型"}
+          name="imageSource"
+          help={ !isTraining && imageSource !== ImageSource.DEFAULT &&
+            <Typography.Text type="danger">{`${t(p("imageText"),[appName])}`}</Typography.Text>
+          }
+        >
+          <Radio.Group
+            onChange={() => {
+              form.setFieldsValue({
+                image: { type: undefined, name: undefined },
+                remoteImageUrl: undefined,
+                startCommand: undefined,
+              });
+            }}
+            style={{ userSelect:"none" }}
+          >
+            {!isTraining && <Radio value={ImageSource.DEFAULT}> 默认镜像 </Radio>}
+            <Radio value={ImageSource.LOCAL}> 本地镜像</Radio>
+            <Radio value={ImageSource.REMOTE}> 远程镜像</Radio>
+          </Radio.Group>
+        </Form.Item>
+        {imageSource !== ImageSource.REMOTE && (
           <Form.Item
-            label={t(p("startImage"))}
-            help={ useCustomImage &&
-            <Typography.Text type="danger">{`${t(p("imageText1"),[appName])}${t(p("imageText2"))}`}</Typography.Text>
-            }
+            label={"当前选择镜像"}
           >
             <Space>
               <strong>
-                {remoteImageInput ? remoteImageInput : selectedImage
+                {selectedImage
                   ? imageOptions?.find((x) => x.value === selectedImage)?.label
-                  : appImage ? `${appImage?.name}:${appImage?.tag}` : "-"}
+                  : appImage && imageSource === ImageSource.DEFAULT ? `${appImage?.name}:${appImage?.tag}` : "-"}
               </strong>
-              <Form.Item
-                noStyle
-                name="useCustomImage"
-                valuePropName="checked"
-              >
-                <Checkbox onChange={() => {
-                  form.setFieldsValue({
-                    image: { type: undefined, name: undefined }, remoteImageUrl: undefined, startCommand: undefined,
-                  });
-                }}
-                >{t(p("useCustomImage"))}</Checkbox>
-              </Form.Item>
             </Space>
           </Form.Item>
         )}
         {
-          (isTraining || useCustomImage) && (
+          (imageSource === ImageSource.LOCAL) && (
             <>
-              <Form.Item label={t(p("image"))}>
+              <Form.Item label={t(p("image"))} required>
                 <Space>
-                  <Form.Item name={["image", "type"]} noStyle>
+                  <Form.Item name={["image", "type"]} noStyle rules={[{ required: true, message: "" }]}>
                     <Select
                       allowClear
                       style={{ minWidth: 100 }}
@@ -706,16 +713,23 @@ export const LaunchAppForm = (props: Props) => {
                   </Form.Item>
                   <Form.Item
                     name={["image", "name"]}
-                    rules={[({ getFieldValue }) => ({
-                      validator() {
-                        if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
-                          return Promise.resolve();
-                        }
-                        return Promise.reject(new Error(t(p("selectImage"))));
-                      },
-                    })]}
-                    dependencies={["remoteImageUrl"]}
                     noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["image", "name"]);
+                          const type = form.getFieldValue(["image", "type"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !name) {
+                            return Promise.reject(new Error(t(p("selectImage"))));
+                          }
+
+                          return Promise.resolve();
+                        },
+                      },
+                    ]}
                   >
                     <Select
                       style={{ minWidth: 200 }}
@@ -731,44 +745,45 @@ export const LaunchAppForm = (props: Props) => {
                   </Form.Item>
                 </Space>
               </Form.Item>
-              {
-                imageId && (
-                  <Form.Item label={t(p("imageDesc"))}>
-                    {imageDescription[imageId]}
-                  </Form.Item>
-                )
-              }
-              <Form.Item
-                label={t(p("remoteImageUrl"))}
-                name="remoteImageUrl"
-                rules={[({ getFieldValue }) => ({
-                  validator() {
-                    if (getFieldValue(["image", "name"]) || getFieldValue("remoteImageUrl")) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error(t(p("selectImage"))));
-                  },
-                })]}
-                dependencies={[["image", "name"]]}
-              >
-                <Input placeholder={t(p("RemoteImageUrlPlaceholder"))} />
-              </Form.Item>
-              {(customImage && !isTraining) ? (
-                <Form.Item
-                  label={t(p("startCommand"))}
-                  name="startCommand"
-                  rules={[{ required: customImage !== undefined }]}
-                  dependencies={["image", "name"]}
-                >
-                  <Input placeholder={t(p("startCommandPlaceholder"))} />
-                </Form.Item>
-              ) : null }
             </>
           )
         }
         {
+          imageSource !== ImageSource.REMOTE && (
+            <Form.Item label={t(p("imageDesc"))}>
+              {imageId ? imageDescription[imageId] :
+                imageSource === ImageSource.DEFAULT ? getI18nConfigCurrentText(appComment,languageId) :
+                  null }
+            </Form.Item>
+          )
+        }
+        {
+          imageSource === ImageSource.REMOTE && (
+            <Form.Item
+              label={t(p("remoteImageUrl"))}
+              name="remoteImageUrl"
+              required
+              rules={[{ required:true }]}
+            >
+              <Input placeholder={t(p("RemoteImageUrlPlaceholder"))} />
+            </Form.Item>
+          )
+        }
+        {(imageSource !== ImageSource.DEFAULT && !isTraining) ? (
+          <Form.Item
+            label={t(p("startCommand"))}
+            name="startCommand"
+            required
+            rules={[{ required:true }]}
+          >
+            <Input placeholder={t(p("startCommandPlaceholder"))} />
+          </Form.Item>
+        ) : null }
+
+        {
           customFormItems.filter((item) => item?.key?.includes("workingDir"))
         }
+
         <Form.List name="mountPoints">
           {(fields, { add, remove }) => (
             <>
