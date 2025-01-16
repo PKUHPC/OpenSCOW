@@ -25,7 +25,7 @@ interface UploadProgressEvent {
   percent: number;
 }
 
-const p = prefix("pageComp.fileManagerComp.uploadModal.");
+const p = prefix("pageComp.fileManagerComp.uploadDirModal.");
 
 type OnProgressCallback = undefined | ((progressEvent: UploadProgressEvent) => void);
 
@@ -35,7 +35,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const uploadControllers = useRef(new Map<string, AbortController>());
 
   // 使用 ref 来追踪每个文件夹的覆盖确认状态
-  const folderOverwriteMapRef = useRef<Map<string, boolean>>(new Map());
+  const folderOverwriteMapRef = useRef<Set<string>>(new Set());
   // 用于缓存文件夹存在性检查的 Promise
   const folderCheckPromisesRef = useRef<Map<string, Promise<boolean>>>(new Map());
   // 使用 ref 存储已经确认过已存在的目录
@@ -65,10 +65,10 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const showConfirmForFolderOverwrite = (folderName: string): Promise<"overwrite" | "skip"> => {
     return new Promise((resolve) => {
       modal.confirm({
-        title: "文件夹已存在",
-        content: `文件夹 "${folderName}" 已存在，是否覆盖？`,
-        okText: "覆盖",
-        cancelText: "跳过",
+        title: t(p("existedModalTitle")),
+        content: t(p("existedModalContent"), [folderName]),
+        okText: t(p("existedModalOk")),
+        cancelText: t(p("existedModalCancel")),
         maskClosable: false,
         centered: true,
         onOk: () => resolve("overwrite"),
@@ -82,20 +82,10 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
    * @param folderPath 文件夹名称
    * @returns 文件夹是否存在
    */
-  const checkFolderExists = async (folderPath: string, root?: boolean): Promise<boolean> => {
+  const checkFolderExists = async (folderPath: string): Promise<boolean> => {
     // If a check is already in progress, return the existing promise
     if (folderCheckPromisesRef.current.has(folderPath)) {
       return folderCheckPromisesRef.current.get(folderPath)!;
-    }
-
-    if (root) {
-      message.info({
-        content: "正在检查上传目录是否存在...",
-        key: "checkDir",
-        onClose: () => {
-          message.info("检查完成...", 2);
-        },
-      });
     }
 
     // Create a new check promise and cache it
@@ -104,7 +94,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
         const { result } = await api.fileExist({ query: { cluster, path: folderPath } });
         return result;
       } catch {
-        message.error(`检查文件夹 ${folderPath} 是否存在失败`);
+        message.error(t(p("existedCheckFailed"), [folderPath]));
         return false;
       }
     })().finally(() => {
@@ -171,7 +161,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
     // 检查该文件夹的覆盖状态
     if (!folderOverwriteMapRef.current.has(folderPath)) {
       // 未检查过该文件夹，进行存在性检查
-      const exists = await checkFolderExists(folderPath, true);
+      const exists = await checkFolderExists(folderPath);
 
       if (exists) {
         // 检查是否已经有一个确认正在进行
@@ -187,27 +177,25 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
         folderConfirmPromisesRef.current.delete(folderPath);
 
         if (userChoice === "overwrite") {
-          folderOverwriteMapRef.current.set(folderPath, true);
+          folderOverwriteMapRef.current.add(folderPath);
         } else {
-          folderOverwriteMapRef.current.set(folderPath, false);
           return Upload.LIST_IGNORE;
         }
       } else {
         // 文件夹不存在，允许上传
-        folderOverwriteMapRef.current.set(folderPath, true);
+        folderOverwriteMapRef.current.add(folderPath);
       }
     }
 
     // 如果允许上传该文件夹，确保父目录存在
-    if (folderOverwriteMapRef.current.get(folderPath)) {
+    if (folderOverwriteMapRef.current.has(folderPath)) {
       // 获取文件的父目录路径
       const filePath = join(path, relativePath);
       const parentDir = dirname(filePath);
       try {
         await ensureDirectoryExists(parentDir);
         return true;
-      } catch (err) {
-        console.error("确保目录存在时出错:", err);
+      } catch {
         // 目录创建失败，忽略上传
         return Upload.LIST_IGNORE;
       }
@@ -351,7 +339,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   return (
     <Modal
       open={open}
-      title={"上传文件夹"}
+      title={t(p("title"))}
       onCancel={onModalClose}
       destroyOnClose={true}
       maskClosable={false}
@@ -362,7 +350,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
       ]}
     >
       <p>
-        {"文件夹将被上传到"}<strong>{path}</strong>
+        {t(p("pathMention"))}<strong>{path}</strong>
         {t(p("uploadRemark2"))}
       </p>
       {!scowdEnabled && (
