@@ -171,7 +171,6 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
     const relativePath = file.webkitRelativePath || file.name;
     const folderName = relativePath.split("/")[0];
     const folderPath = join(path, folderName);
-
     // 检查文件大小
     const fileMaxSize = convertToBytes(publicConfig.CLIENT_MAX_BODY_SIZE);
 
@@ -187,13 +186,12 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
 
       if (exists) {
         // 检查是否已经有一个确认正在进行
-        const confirmPromise = folderConfirmPromisesRef.current.get(folderPath);
+        let confirmPromise = folderConfirmPromisesRef.current.get(folderPath);
         if (!confirmPromise) {
           // 如果没有，创建一个新的确认 Promise 并缓存
-          const confirmPromise = showConfirmForFolderOverwrite(folderPath);
+          confirmPromise = showConfirmForFolderOverwrite(folderPath);
           folderConfirmPromisesRef.current.set(folderPath, confirmPromise);
         }
-
         const userChoice = await confirmPromise;
         // 一旦确认完成，移除缓存的 Promise
         folderConfirmPromisesRef.current.delete(folderPath);
