@@ -35,7 +35,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const uploadControllers = useRef(new Map<string, AbortController>());
 
   // 使用 ref 来追踪每个文件夹的覆盖确认状态
-  const folderOverwriteMapRef = useRef<Set<string>>(new Set());
+  const folderOverwriteSetRef = useRef<Set<string>>(new Set());
   // 用于缓存文件夹存在性检查的 Promise
   const folderCheckPromisesRef = useRef<Map<string, Promise<boolean>>>(new Map());
   // 使用 ref 存储已经确认过已存在的目录
@@ -44,7 +44,8 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
   const folderEnsureExistPromisesRef = useRef<Map<string, Promise<void>>>(new Map());
   // 用于缓存每个文件夹的确认 Promise
   const folderConfirmPromisesRef = useRef<Map<string, Promise<"overwrite" | "skip">>>(new Map());
-
+  // 使用 Ref 保存前一次 uploadFileList 的内容
+  const previousFileListRef = useRef<UploadFile[]>([]);
 
   const t = useI18nTranslateToString();
 
@@ -56,6 +57,27 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
       setUploadFileList([]);
     };
   }, [open]);
+
+  /**
+   * 检查是否有新的文件夹上传
+   * 如果是的话则清除 folderOverwriteSetRef 和 folderEnsureExistSetRef
+   */
+  useEffect(() => {
+    const previousFileList = previousFileListRef.current;
+    const currentFileList = uploadFileList;
+
+    // Check if new files are added
+    const isNewUpload =
+      previousFileList.length === 0 && currentFileList.length > 0 ||
+      previousFileList.length > 0 && currentFileList.length > previousFileList.length;
+
+    if (isNewUpload) {
+      folderOverwriteSetRef.current.clear();
+      folderEnsureExistSetRef.current.clear();
+    }
+
+    previousFileListRef.current = currentFileList;
+  }, [uploadFileList]);
 
   /**
    * 显示文件夹覆盖确认对话框
@@ -159,7 +181,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
     }
 
     // 检查该文件夹的覆盖状态
-    if (!folderOverwriteMapRef.current.has(folderPath)) {
+    if (!folderOverwriteSetRef.current.has(folderPath)) {
       // 未检查过该文件夹，进行存在性检查
       const exists = await checkFolderExists(folderPath);
 
@@ -177,18 +199,18 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
         folderConfirmPromisesRef.current.delete(folderPath);
 
         if (userChoice === "overwrite") {
-          folderOverwriteMapRef.current.add(folderPath);
+          folderOverwriteSetRef.current.add(folderPath);
         } else {
           return Upload.LIST_IGNORE;
         }
       } else {
         // 文件夹不存在，允许上传
-        folderOverwriteMapRef.current.add(folderPath);
+        folderOverwriteSetRef.current.add(folderPath);
       }
     }
 
     // 如果允许上传该文件夹，确保父目录存在
-    if (folderOverwriteMapRef.current.has(folderPath)) {
+    if (folderOverwriteSetRef.current.has(folderPath)) {
       // 获取文件的父目录路径
       const filePath = join(path, relativePath);
       const parentDir = dirname(filePath);
@@ -219,7 +241,7 @@ export const UploadDirModal: React.FC<Props> = ({ open, onClose, path, reload, c
 
     uploadControllers.current.clear();
     folderCheckPromisesRef.current.clear();
-    folderOverwriteMapRef.current.clear();
+    folderOverwriteSetRef.current.clear();
     folderEnsureExistSetRef.current.clear();
     folderEnsureExistPromisesRef.current.clear();
     folderConfirmPromisesRef.current.clear();
