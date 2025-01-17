@@ -70,7 +70,7 @@ export interface ConnectToAppReply {
   appId: string;
   host: string;
   port: number;
-  password: string;
+  password?: string;
   customFormData?: Record<string, string>;
 }
 

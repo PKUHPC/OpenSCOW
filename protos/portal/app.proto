@@ -60,7 +60,7 @@ message VncAppProps {}
 message ConnectToAppResponse {
   string host = 1;
   uint32 port = 2;
-  string password = 3;
+  optional string password = 3;
   oneof app_props {
     WebAppProps web = 4;
     VncAppProps vnc = 5;

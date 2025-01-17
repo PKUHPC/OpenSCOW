@@ -84,10 +84,13 @@ web:
 
 ### `beforeScript`和`script`
 
-`beforeScript`部分为准备脚本。这个脚本用来准备运行任务的环境。这个脚本要求必须export两个变量：
+`beforeScript`部分为准备脚本。这个脚本用来准备运行任务的环境。
+
+这个脚本要求必须export一个变量：
 
 - `PORT`：程序将会运行在的端口
-- `PASSWORD`: 连接程序用的密码
+
+为了保护软件不被未授权用户访问，我们推荐在程序启动的时候，生成一个密码，并应用使用密码方式进行加密，每次使用应用时均需要输入此密码。若您生成了密码，**必须**在`beforeScript`中将此密码export为`PASSWORD`变量。
 
 `connect`的`formData`项需要使用的变量也需要在此处export。
 
@@ -124,8 +127,7 @@ web:
 | `query`    | 字符串到字符串的字典 | 否       | 连接时附带的query                             |
 | `formData` | 字符串到字符串的字典 | 否       | 如果`method`是POST，这个请求将会带的form data |
 
-
-我们推荐将应用使用密码方式进行加密，所以一般在连接时需要将密码输入给应用。`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在创建时生成的密码。
+`path`, `query`的值和`formData`的值部分可以使用`{{ PASSWORD }}`代替应用在`beforeScript`里export的密码。
 
 此外，如果`formData`需要使用其他变量，可以在准备脚本`beforeScript`中export需要的变量，然后以`{{ 变量名 }}`的形式使用。
 

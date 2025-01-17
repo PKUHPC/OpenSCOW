@@ -33,10 +33,10 @@ interface SessionMetadata {
 
 // All keys are strings except PORT
 interface ServerSessionInfoData {
-  [key: string]: string | number;
+  [key: string]: string | number | undefined;
   HOST: string;
   PORT: number;
-  PASSWORD: string;
+  PASSWORD?: string;
 }
 
 interface ShadowDeskSession {

@@ -189,7 +189,8 @@ export const ConnectTopAppLink: React.FC<Props> = ({
 
         // vnc 应用需要点击连接时 发送connectToApp请求实时刷新密码
         const { host, port, password } = res;
-        openDesktop(cluster.id, host, port, password);
+        // vnc应用一定有密码
+        openDesktop(cluster.id, host, port, password ?? "");
       }
     }
   };

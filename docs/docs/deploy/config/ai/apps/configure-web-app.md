@@ -80,10 +80,9 @@ web:
 
 ### `beforeScript`，`startCommand` 和`script`
 
+`beforeScript`部分为准备脚本。这个脚本用来准备运行任务的环境。
 
-`beforeScript`部分为准备脚本。这个脚本用来准备运行任务的环境。这个脚本要求必须export一个变量：
-
-- `PASSWORD`: 连接程序用的密码
+为了保护软件不被未授权用户访问，我们推荐在程序启动的时候，生成一个密码，并应用使用密码方式进行加密，每次使用应用时均需要输入此密码。若您生成了密码，**必须**在`beforeScript`中将此密码export为`PASSWORD`变量。
 
 `connect`的`formData`项需要使用的变量也需要在此处export。
 
@@ -107,7 +106,6 @@ web:
 | `PORT` | 这个应用启动时容器内的端口|
 | `HOST` | 这个应用启动时容器映射的主机名|
 | `SVCPORT` | 这个应用启动后，SCOW AI 节点可通过`HOST`:`SVCPORT`访问该应用|
-
 
 这些脚本会被提交给调度系统，并最终运行后在计算节点上启动应用。
 

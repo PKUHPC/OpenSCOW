@@ -43,7 +43,7 @@ export const ConnectToAppSchema = typeboxRouteSchema({
       Type.Object({
         host: Type.String(),
         port: Type.Number(),
-        password: Type.String(),
+        password: Type.Optional(Type.String()),
       }),
       Type.Union([
         Type.Object({
