@@ -27,14 +27,13 @@ import { dropDatabase } from "tests/data/helpers";
 
 let server: Server;
 let client: AccountServiceClient;
-let account: Account;
 let tenant: Tenant;
 let user: User;
 
 beforeEach(async () => {
   server = await createServer();
   await server.start();
-  await server.ext.orm.em.fork().persistAndFlush(account);
+  // await server.ext.orm.em.fork().persistAndFlush(account);
 
   tenant = new Tenant({ name: "tenant" });
   await server.ext.orm.em.fork().persistAndFlush(tenant);

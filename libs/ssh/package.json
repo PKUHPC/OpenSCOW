@@ -16,12 +16,12 @@
   ],
   "dependencies": {
     "node-ssh": "13.2.0",
-    "shell-quote": "1.8.1"
+    "shell-quote": "1.8.2"
   },
   "devDependencies": {
     "@types/shell-quote": "1.7.5",
-    "@types/ssh2": "1.15.0",
-    "ts-log": "2.2.5"
+    "@types/ssh2": "1.15.4",
+    "ts-log": "2.2.7"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

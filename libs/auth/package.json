@@ -17,9 +17,8 @@
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
-  "dependencies": {},
   "devDependencies": {
-    "ts-log": "2.2.5"
+    "ts-log": "2.2.7"
   },
   "volta": {
     "extends": "../../package.json"

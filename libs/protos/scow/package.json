@@ -13,10 +13,10 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@grpc/grpc-js": "1.12.2",
+    "@grpc/grpc-js": "1.12.5",
     "@scow/grpc-api": "workspace:*",
-    "long": "5.2.3",
-    "protobufjs": "7.3.2"
+    "long": "5.2.4",
+    "protobufjs": "7.4.0"
   },
   "devDependencies": {
     "ts-proto": "1.180.0"

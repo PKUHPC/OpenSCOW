@@ -23,15 +23,15 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.7",
-    "@ddadaal/tsgrpc-common": "0.2.5",
+    "@ddadaal/tsgrpc-client": "0.17.8",
+    "@ddadaal/tsgrpc-common": "0.2.6",
     "@ddadaal/tsgrpc-server": "0.19.6",
-    "@grpc/grpc-js": "1.12.2",
-    "@mikro-orm/cli": "6.3.13",
-    "@mikro-orm/core": "6.3.13",
-    "@mikro-orm/migrations": "6.3.13",
-    "@mikro-orm/mysql": "6.3.13",
-    "@mikro-orm/seeder": "6.3.13",
+    "@grpc/grpc-js": "1.12.5",
+    "@mikro-orm/cli": "6.4.3",
+    "@mikro-orm/core": "6.4.3",
+    "@mikro-orm/migrations": "6.4.3",
+    "@mikro-orm/mysql": "6.4.3",
+    "@mikro-orm/seeder": "6.4.3",
     "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
@@ -39,9 +39,9 @@
     "@scow/lib-server": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
-    "dayjs": "1.11.11",
-    "pino": "9.3.2",
-    "pino-pretty": "10.3.1"
+    "dayjs": "1.11.13",
+    "pino": "9.6.0",
+    "pino-pretty": "13.0.0"
   },
   "devDependencies": {
     "@types/google-protobuf": "3.15.12"

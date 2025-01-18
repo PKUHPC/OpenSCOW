@@ -32,7 +32,7 @@
     "@scow/lib-server": "workspace:*",
     "@scow/lib-ssh": "workspace:*",
     "@scow/utils": "workspace:*",
-    "@sinclair/typebox": "0.32.34",
+    "@sinclair/typebox": "0.34.13",
     "asn1": "0.2.6",
     "fastify": "4.28.0",
     "fastify-graceful-shutdown": "3.5.3",

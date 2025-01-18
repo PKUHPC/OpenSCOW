@@ -16,14 +16,14 @@
     "!**/*.map"
   ],
   "dependencies": {
-    "@ddadaal/tsgrpc-client": "0.17.7",
-    "@grpc/grpc-js": "1.12.2",
+    "@ddadaal/tsgrpc-client": "0.17.8",
+    "@grpc/grpc-js": "1.12.5",
     "@scow/config": "workspace:*",
     "@scow/protos": "workspace:*",
     "@scow/utils": "workspace:*",
     "mime-types": "2.1.35",
     "nookies": "2.5.2",
-    "zod": "3.23.8"
+    "zod": "3.24.1"
   },
   "peerDependencies": {
     "@ant-design/cssinjs": "1.21.0",
@@ -39,18 +39,18 @@
     "styled-components": "6.1.11"
   },
   "devDependencies": {
-    "@ant-design/icons": "5.3.7",
+    "@ant-design/icons": "5.5.2",
     "@types/mime-types": "2.1.4",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
     "@types/styled-components": "5.1.34",
     "antd": "5.18.3",
-    "dayjs": "1.11.11",
+    "dayjs": "1.11.13",
     "next": "14.2.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-is": "18.3.1",
-    "styled-components": "6.1.11"
+    "react-is": "19.0.0",
+    "styled-components": "6.1.14"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",

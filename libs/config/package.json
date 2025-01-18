@@ -17,10 +17,10 @@
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
     "@scow/lib-config": "workspace:*",
-    "@sinclair/typebox": "0.32.34"
+    "@sinclair/typebox": "0.34.13"
   },
   "devDependencies": {
-    "ts-log": "2.2.5"
+    "ts-log": "2.2.7"
   },
   "volta": {
     "extends": "../../package.json"

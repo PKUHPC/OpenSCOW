@@ -12,27 +12,27 @@
     "lint": "eslint -c ../../eslint.config.js ."
   },
   "dependencies": {
+    "@octokit/rest": "21.1.0",
+    "@scow/config": "workspace:*",
     "@scow/lib-config": "workspace:*",
-    "pkg": "5.8.1",
-    "yargs": "17.7.2",
-    "prompts": "2.4.2",
-    "@sinclair/typebox": "0.32.34",
-    "js-yaml": "4.1.0",
-    "pino": "8.16.2",
-    "pino-pretty": "10.3.1",
-    "@octokit/rest": "20.1.1",
-    "jszip": "3.10.1",
-    "dotenv": "16.4.5",
+    "@sinclair/typebox": "0.34.13",
     "death": "1.1.0",
-    "https-proxy-agent": "7.0.4",
+    "dotenv": "16.4.7",
+    "https-proxy-agent": "7.0.6",
+    "js-yaml": "4.1.0",
+    "jszip": "3.10.1",
     "node-fetch-commonjs": "3.3.2",
-    "@scow/config": "workspace:*"
+    "pino": "9.6.0",
+    "pino-pretty": "13.0.0",
+    "pkg": "5.8.1",
+    "prompts": "2.4.2",
+    "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@types/yargs": "17.0.32",
-    "@types/prompts": "2.4.9",
+    "@types/death": "1.1.5",
     "@types/js-yaml": "4.0.9",
-    "@types/death": "1.1.5"
+    "@types/prompts": "2.4.9",
+    "@types/yargs": "17.0.33"
   },
   "author": "PKUHPC (https://github.com/PKUHPC)",
   "license": "Mulan PSL v2",
