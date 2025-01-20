@@ -111,6 +111,7 @@ export interface NavLink {
   url?: string;
   openInNewPage?: boolean;
   iconPath?: string;
+  clickable?: boolean;
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 };
 

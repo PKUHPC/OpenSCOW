@@ -192,7 +192,7 @@ export const userRoutes: (
           text: link.text,
           path: parentNavPath,
           clickToPath: parentNavPath,
-          clickable: true,
+          clickable: link.clickable,
           openInNewPage: link.openInNewPage,
           children: link.children?.length ? link.children?.map((childLink) => ({
             Icon: !childLink.iconPath ? LinkOutlined : (

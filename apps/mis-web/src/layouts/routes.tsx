@@ -487,6 +487,7 @@ export const getAvailableRoutes = (user: User | undefined, t: TransType): NavIte
           path: parentNavPath,
           clickToPath: parentNavPath,
           openInNewPage: link.openInNewPage,
+          clickable: link.clickable,
           children: childrenLinks,
         };
       }) as NavItemProps[];

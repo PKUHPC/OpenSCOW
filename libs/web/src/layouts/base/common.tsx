@@ -60,7 +60,7 @@ export function createMenuItems(
 
     return {
       icon: iconToNode(route.Icon),
-      key: route.path,
+      key: route.path + route.text,
       label: (
         <Link
           href={route.clickToPath ?? route.path}

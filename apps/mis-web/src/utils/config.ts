@@ -141,6 +141,7 @@ export interface NavLink {
   openInNewPage?: boolean;
   iconPath?: string;
   allowedRoles?: string[];
+  clickable?: boolean;
   children?: (Omit<NavLink, "children" | "url"> & { url: string })[];
 };
 
