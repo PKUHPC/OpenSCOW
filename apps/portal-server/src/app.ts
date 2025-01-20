@@ -24,7 +24,7 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
-import { loggerOptions } from "src/utils/logger";
+import { logger, loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
 import { checkClustersRootUserLogin } from "src/utils/ssh";
@@ -67,6 +67,7 @@ export async function createServer() {
       if (!config.scowd?.enabled) {
         await initShellFile(id, server.logger);
       }
+      server.logger.info(`The scowd of cluster ${id} is already enabled, skipping initShellFile.`);
     }));
     await setupProxyGateway(server.logger, activatedClusters);
   }
