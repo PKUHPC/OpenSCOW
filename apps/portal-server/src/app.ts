@@ -63,7 +63,11 @@ export async function createServer() {
       commonConfig.scowApi?.auth?.token);
 
     await checkClustersRootUserLogin(server.logger, activatedClusters);
-    await Promise.all(Object.entries(activatedClusters).map(async ([id]) => {
+    await Promise.all(Object.entries(activatedClusters).map(async ([id, config]) => {
+      if (config.scowd?.enabled) {
+        server.logger.info(`The scowd of cluster ${id} is already enabled, skipping initShellFile.`);
+        return;
+      }
       await initShellFile(id, server.logger);
     }));
     await setupProxyGateway(server.logger, activatedClusters);
