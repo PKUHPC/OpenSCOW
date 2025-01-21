@@ -1,7 +1,8 @@
 import {
+  CompressOutlined,
   CopyOutlined,
   DatabaseOutlined,
-  DeleteOutlined, EyeInvisibleOutlined,
+  DeleteOutlined, DownloadOutlined, DownOutlined, EyeInvisibleOutlined,
   EyeOutlined, FileAddOutlined, FolderAddOutlined,
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
@@ -10,7 +11,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Divider, Space } from "antd";
+import { App, Button, Divider, Dropdown, MenuProps, Space } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -22,7 +23,8 @@ import { ModalButton, ModalLink } from "src/components/ModalLink";
 import { TitleText } from "src/components/PageTitle";
 import { TableTitle } from "src/components/TableTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { urlToDownload } from "src/pageComponents/filemanager/api";
+import { urlToCompressAndDownload,urlToDownload } from "src/pageComponents/filemanager/api";
+import { CompressFilesModal } from "src/pageComponents/filemanager/CompressFilesModal";
 import { CreateFileModal } from "src/pageComponents/filemanager/CreateFileModal";
 import { FileEditModal } from "src/pageComponents/filemanager/FileEditModal";
 import { FileTable } from "src/pageComponents/filemanager/FileTable";
@@ -30,6 +32,7 @@ import { ImagePreviewer } from "src/pageComponents/filemanager/ImagePreviewer";
 import { MkdirModal } from "src/pageComponents/filemanager/MkdirModal";
 import { PathBar } from "src/pageComponents/filemanager/PathBar";
 import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
+import { UploadDirModal } from "src/pageComponents/filemanager/UploadDirModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
@@ -80,7 +83,17 @@ interface Operation {
   completed: FileInfo[];
 }
 
+export interface Compression {
+  started: string[];
+  completed: string[];
+}
+
 const p = prefix("pageComp.fileManagerComp.fileManager.");
+
+enum UploadType {
+  File = "file",
+  Dir = "dir",
+}
 
 export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEnabled }) => {
 
@@ -117,10 +130,16 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   });
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
+  const [compression, setCompression] = useState<Compression>({ started: [], completed: []});
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
   const loginNode = loginNodes[cluster.id][0].address;
+
+  const CompressFilesButton = ModalButton(CompressFilesModal, {
+    icon: <CompressOutlined />,
+    disabled: selectedKeys.length === 0,
+  });
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
@@ -253,6 +272,11 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     reload();
   };
 
+  const onDownloadClick = () => {
+    const files = keysToFiles(selectedKeys);
+    window.open(urlToCompressAndDownload(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
+  };
+
   const onDeleteClick = () => {
     const files = keysToFiles(selectedKeys);
     modal.confirm({
@@ -343,6 +367,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   }, [editFile, files]);
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isUploadDirModalOpen, setIsUploadDirModalOpen] = useState(false);
 
   useEffect(() => {
     const uploadQuery = queryToString(router.query.uploadModalOpen);
@@ -353,6 +378,37 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     }
   }, []);
 
+  const handleUploadModalClose = () => {
+    setIsUploadModalOpen(false);
+  };
+
+  const handleUploadDirModalClose = () => {
+    setIsUploadDirModalOpen(false);
+  };
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    if (e.key as UploadType === UploadType.File) {
+      setIsUploadModalOpen(true);
+    } else {
+      setIsUploadDirModalOpen(true);
+    }
+  };
+
+  const items: MenuProps["items"] = [
+    {
+      label: t(p("uploadFile")),
+      key: UploadType.File,
+    },
+    {
+      label: t(p("uploadDir")),
+      key: UploadType.Dir,
+    },
+  ];
+
+  const menuProps = {
+    items,
+    onClick: handleMenuClick,
+  };
 
   return (
     <div>
@@ -395,16 +451,39 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
       </TopBar>
       <OperationBar>
         <Space wrap>
-          <UploadButton
-            externalOpen={isUploadModalOpen}
-            cluster={cluster.id}
-            path={path}
-            reload={reload}
-            scowdEnabled={scowdEnabled}
-          >
-            {t(p("tableInfo.uploadButton"))}
-          </UploadButton>
+          { scowdEnabled ? (
+            <Dropdown menu={menuProps}>
+              <Button icon={<UploadOutlined />}>
+                <Space>
+                  {t(p("upload"))}
+                  <DownOutlined />
+                </Space>
+              </Button>
+            </Dropdown>
+          ) : (
+            <UploadButton
+              externalOpen={isUploadModalOpen}
+              cluster={cluster.id}
+              path={path}
+              reload={reload}
+              scowdEnabled={scowdEnabled}
+            >
+              {t(p("tableInfo.uploadButton"))}
+            </UploadButton>
+          )}
           <Divider type="vertical" />
+          {
+            scowdEnabled && (
+              <Button
+                icon={<DownloadOutlined />}
+                danger
+                onClick={onDownloadClick}
+                disabled={selectedKeys.length === 0}
+              >
+                {t(p("tableInfo.downloadSelected"))}
+              </Button>
+            )
+          }
           <Button
             icon={<DeleteOutlined />}
             danger
@@ -442,6 +521,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
           >
             {t(p("tableInfo.paste"))}
           </Button>
+          { scowdEnabled && (
+            <CompressFilesButton
+              cluster={cluster.id}
+              path={path}
+              files={keysToFiles(selectedKeys)}
+              reload={reload}
+              setCompression={setCompression}
+            >
+              {t(p("compressSelected"))}
+            </CompressFilesButton>
+          )
+          }
           {
             operation ? (
               operation.started ? (
@@ -457,6 +548,18 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
                   </a>
                 </span>
               )) : ""
+          }
+          {
+            compression.started.length - compression.completed.length > 0 && (
+              <div>
+                <span>
+                  {t(p("compressionInPrograss"))}{`${compression.completed.length} / ${compression.started.length}`}
+                </span>
+                <a onClick={() => setCompression({ started: [], completed: []})} style={{ marginLeft: "4px" }}>
+                  {t("button.cancelButton")}
+                </a>
+              </div>
+            )
           }
         </Space>
         <Space wrap>
@@ -543,6 +646,13 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
             {
               i.type === "FILE" && (
                 <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
+                  {t(p("tableInfo.download"))}
+                </a>
+              )
+            }
+            {
+              (i.type === "DIR" && scowdEnabled) && (
+                <a href={urlToCompressAndDownload(cluster.id, [join(path, i.name)], true)}>
                   {t(p("tableInfo.download"))}
                 </a>
               )
@@ -643,6 +753,22 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
       />
       <ImagePreviewer previewImage={previewImage} setPreviewImage={setPreviewImage} />
       <FileEditModal previewFile={previewFile} setPreviewFile={setPreviewFile} />
+      <UploadModal
+        open={isUploadModalOpen}
+        onClose={handleUploadModalClose}
+        cluster={cluster.id}
+        path={path}
+        reload={reload}
+        scowdEnabled={scowdEnabled}
+      />
+      <UploadDirModal
+        open={isUploadDirModalOpen}
+        onClose={handleUploadDirModalClose}
+        cluster={cluster.id}
+        path={path}
+        reload={reload}
+        scowdEnabled={scowdEnabled}
+      />
     </div>
   );
 };

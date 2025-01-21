@@ -1,4 +1,3 @@
-
 import { OperationLog } from "@scow/protos/build/audit/operation_log";
 export enum OperationResult {
   UNKNOWN = 0,
@@ -118,4 +117,5 @@ export const OperationType: OperationTypeEnum = {
   changePassword: "changePassword",
   changeEmail: "changeEmail",
   createAiInferenceJob:"createAiInferenceJob",
+  compressFiles: "compressFiles",
 };

@@ -1,14 +1,3 @@
-/**
-   * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
-   * SCOW is licensed under Mulan PSL v2.
-   * You can use this software according to the terms and conditions of the Mulan PSL v2.
-   * You may obtain a copy of Mulan PSL v2 at:
-   *          http://license.coscl.org.cn/MulanPSL2
-   * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
-   * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
-   * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
-   * See the Mulan PSL v2 for more details.
-*/
 syntax = "proto3";
 
 package scow.audit;
@@ -182,6 +171,12 @@ message CopyFileItem {
   string cluster_id = 1;
   string from_path = 2;
   string to_path = 3;
+}
+
+message CompressFiles {
+  string cluster_id = 1;
+  repeated string paths = 2;
+  string archive_path = 3;
 }
 
 message SubmitFileItemAsJob {
@@ -811,6 +806,7 @@ message CreateOperationLogRequest {
     ExportBill export_bill = 106;
     ExportUserBill export_user_bill = 107;
     CreateAiInferenceJob create_ai_inference_job = 108;
+    CompressFiles compress_files = 109;
   }
 }
 
@@ -927,6 +923,7 @@ message OperationLog {
     ExportBill export_bill = 108;
     ExportUserBill export_user_bill = 109;
     CreateAiInferenceJob create_ai_inference_job = 110;
+    CompressFiles compress_files = 111;
   }
 }
 

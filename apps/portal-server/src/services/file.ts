@@ -20,6 +20,7 @@ import {
 } from "@scow/protos/build/portal/file";
 import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
+import { config } from "src/config/env";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 import { getScowdClient, mapTRPCExceptionToGRPC } from "src/utils/scowd";
@@ -41,6 +42,35 @@ export const fileServiceServer = plugin((server) => {
       await clusterops.file.copy({ userId, fromPath, toPath }, logger);
 
       return [{}];
+    },
+
+    compressFiles: async ({ request, logger }) => {
+      const { cluster, userId, paths, archivePath } = request;
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const clusterInfo = configClusters[cluster];
+
+      if (!clusterInfo.scowd?.enabled) {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "To use this interface, you need to enable scowd.",
+        } as ServiceError;
+      }
+
+      const client = getScowdClient(cluster);
+
+      try {
+        logger.info("Starting file compression...");
+        await client.file.compressFiles({ userId, paths, archivePath });
+
+        return [{}];
+      } catch (err) {
+        throw mapTRPCExceptionToGRPC(err);
+      }
     },
 
     createFile: async ({ request, logger }) => {
@@ -165,6 +195,45 @@ export const fileServiceServer = plugin((server) => {
 
       await clusterops.file.download({ userId, path, call }, logger);
 
+    },
+
+    compressAndDownload: async (call) => {
+      const { logger, request: { cluster, paths, userId } } = call;
+      await checkActivatedClusters({ clusterIds: cluster });
+
+      const host = getClusterLoginNode(cluster);
+
+      if (!host) { throw clusterNotFound(cluster); }
+
+      const clusterInfo = configClusters[cluster];
+
+      if (!clusterInfo.scowd?.enabled) {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "To use this interface, you need to enable scowd.",
+        } as ServiceError;
+      }
+
+      const subLogger = logger.child({ userId, paths, cluster });
+      subLogger.info("Download and compress file started");
+      const client = getScowdClient(cluster);
+
+      try {
+        const readStream = client.file.compressAndDownload({
+          userId, paths, chunkSizeByte: config.DOWNLOAD_CHUNK_SIZE,
+        });
+
+        for await (const response of readStream) {
+          // 如果写入返回 false，表示缓冲区已满，需要等待 `drain` 事件
+          if (!call.write(response)) {
+            await new Promise((resolve) => call.once("drain", resolve));
+          }
+        }
+      } catch (err) {
+        throw mapTRPCExceptionToGRPC(err);
+      } finally {
+        call.end();
+      }
     },
 
     upload: async (call) => {

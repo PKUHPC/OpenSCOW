@@ -67,6 +67,16 @@ message DownloadResponse {
   bytes chunk = 1;
 }
 
+message CompressAndDownloadRequest {
+  string user_id = 1;
+  string cluster = 2;
+  repeated string paths = 3; // 需要压缩的文件或目录路径
+}
+
+message CompressAndDownloadResponse {
+  bytes chunk = 1;
+}
+
 message GetHomeDirectoryRequest {
   string user_id = 1;
   string cluster = 2;
@@ -128,6 +138,17 @@ message MakeDirectoryRequest {
 // ALREADY_EXISTS: directory already found
 message MakeDirectoryResponse {
 }
+
+message CompressFilesRequest {
+  string user_id = 1;
+  string cluster = 2;
+  // 需压缩的文件路径
+  repeated string paths = 3;
+  // 目标压缩文件路径
+  string archive_path = 4;
+}
+
+message CompressFilesResponse {}
 
 message InitMultipartUploadRequest {
   string cluster = 1;
@@ -250,6 +271,7 @@ service FileService {
   rpc DeleteDirectory(DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
   rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  rpc CompressAndDownload (CompressAndDownloadRequest) returns (stream CompressAndDownloadResponse);
   rpc GetHomeDirectory(GetHomeDirectoryRequest)
       returns (GetHomeDirectoryResponse);
   rpc ReadDirectory(ReadDirectoryRequest) returns (ReadDirectoryResponse);
@@ -258,6 +280,7 @@ service FileService {
 
   rpc MakeDirectory(MakeDirectoryRequest) returns (MakeDirectoryResponse);
 
+  rpc CompressFiles(CompressFilesRequest) returns (CompressFilesResponse);
   /**
   * InitMultipartUpload 用于初始化文件分片上传。配置开启 scowd 才可使用
   * 获取文件分片临时存储目录、文件分片的大小和已上传的分片

@@ -179,6 +179,26 @@ message DownloadResponse {
   bytes chunk = 1;
 }
 
+message CompressAndDownloadRequest {
+  string user_id = 1;
+  repeated string paths = 2; // 需要压缩的文件或目录路径
+  uint32 chunk_size_byte = 3;
+}
+
+message CompressAndDownloadResponse {
+  bytes chunk = 1;
+}
+
+message CompressFilesRequest {
+  string user_id = 1;
+  // 需压缩的文件路径
+  repeated string paths = 2;
+  // 目标压缩文件路径
+  string archive_path = 3;
+}
+
+message CompressFilesResponse {}
+
 message TransferInfo {
   string to_cluster = 1;
   string file_path = 2;
@@ -247,9 +267,13 @@ service FileService {
   rpc ChangeMode(ChangeModeRequest) returns (ChangeModeResponse) {};
 
   rpc Download(DownloadRequest) returns (stream DownloadResponse);
+  // 下载并压缩，将压缩数据以流的方式返回
+  rpc CompressAndDownload (CompressAndDownloadRequest) returns (stream CompressAndDownloadResponse);
   rpc InitMultipartUpload(InitMultipartUploadRequest) returns (InitMultipartUploadResponse);
   rpc Upload(stream UploadRequest) returns (UploadResponse);
   rpc MergeFileChunks(MergeFileChunksRequest) returns (MergeFileChunksResponse);
+
+  rpc CompressFiles(CompressFilesRequest) returns (CompressFilesResponse);
 
   rpc GetFileMetadata(GetFileMetadataRequest) returns (GetFileMetadataResponse);
   rpc GetHomeDirectory(GetHomeDirectoryRequest) returns (GetHomeDirectoryResponse);

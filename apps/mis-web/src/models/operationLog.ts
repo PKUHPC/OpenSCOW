@@ -104,6 +104,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     deleteDirectory: t(pTypes("deleteDirectory")),
     moveFileItem: t(pTypes("moveFileItem")),
     copyFileItem: t(pTypes("copyFileItem")),
+    compressFiles: t(pTypes("compressFiles")),
     setJobTimeLimit: t(pTypes("setJobTimeLimit")),
     createImage:t(pTypes("createImage")),
     updateImage:t(pTypes("updateImage")),
@@ -218,6 +219,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   submitFileItemAsJob: "010508",
   mergeFileChunks: "010509",
   initMultipartUpload: "010510",
+  compressFiles: "010511",
   setJobTimeLimit: "010601",
   createImage:"010701",
   updateImage:"010702",
@@ -383,6 +385,8 @@ export const getOperationDetail = (
         return t(pDetails("moveFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
       case "copyFileItem":
         return t(pDetails("copyFileItem"), [operationEvent[logEvent].fromPath, operationEvent[logEvent].toPath]);
+      case "compressFiles":
+        return t(pDetails("compressFiles"), [operationEvent[logEvent].paths, operationEvent[logEvent].archivePath]);
       case "setJobTimeLimit":
         return t(pDetails("setJobTimeLimit"),
           [operationEvent[logEvent].clusterId || "unknown",
