@@ -11,7 +11,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Divider, Dropdown, MenuProps, Space } from "antd";
+import { App, Button, Divider, Dropdown, MenuProps, Select, Space } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -35,6 +35,7 @@ import { RenameModal } from "src/pageComponents/filemanager/RenameModal";
 import { UploadDirModal } from "src/pageComponents/filemanager/UploadDirModal";
 import { UploadModal } from "src/pageComponents/filemanager/UploadModal";
 import { FileInfo } from "src/pages/api/file/list";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { LoginNodeStore } from "src/stores/LoginNodeStore";
 import { Cluster } from "src/utils/cluster";
 import { publicConfig } from "src/utils/config";
@@ -128,6 +129,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     src: "",
     scaleStep: 0.5,
   });
+  const { currentClusters } = useStore(ClusterInfoStore);
 
   const [operation, setOperation] = useState<Operation | undefined>(undefined);
   const [compression, setCompression] = useState<Compression>({ started: [], completed: []});
@@ -414,10 +416,21 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     <div>
       <TitleText>
         <span>
-          {t(p("tableInfo.title"), [getI18nConfigCurrentText(cluster.name, languageId)])}
+          { getI18nConfigCurrentText(cluster.name, languageId) }
         </span>
       </TitleText>
       <TopBar>
+        <Select
+          style={{ minWidth: "160px" }}
+          onSelect={(value) => {
+            router.push(`/files/explorer/${value}/~`);
+          }}
+          defaultValue={cluster?.id}
+          options={
+            currentClusters.map((cluster) => ({
+              label: getI18nConfigCurrentText(cluster.name, languageId), value: cluster.id }))
+          }
+        />
         <Button onClick={back} icon={<LeftOutlined />} shape="circle" />
         <Button onClick={forward} icon={<RightOutlined />} shape="circle" />
         <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />

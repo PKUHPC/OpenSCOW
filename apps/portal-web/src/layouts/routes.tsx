@@ -13,7 +13,6 @@
 import {
   CloudServerOutlined,
   CloudSyncOutlined,
-  ClusterOutlined,
   LinkOutlined,
 } from "@ant-design/icons";
 import { NavItemProps } from "@scow/lib-web/build/layouts/base/types";
@@ -146,21 +145,14 @@ export const userRoutes: (
       Icon: FileManagerIcon,
       text: t("routes.file.fileManager"),
       path: "/files",
-      clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
+      clickToPath: `/files/explorer/${defaultCluster?.id ?? currentClusters[0].id}/~`,
       clickable: true,
       children: [
         {
           Icon: ClusterFileManagerIcon,
-          text: t("routes.file.clusterFileManager"),
-          path: "/files/",
-          clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
-          children: currentClusters.map((cluster) => ({
-            Icon: ClusterOutlined,
-            text: getI18nConfigCurrentText(cluster.name, languageId),
-            path: `/files/${cluster.id}`,
-            clickToPath: `/files/${cluster.id}/~`,
-            handleClick: () => { setDefaultCluster(cluster); },
-          } as NavItemProps)),
+          text: t("routes.file.fileManager"),
+          path: "/files/explorer",
+          clickToPath: `/files/explorer/${defaultCluster?.id ?? currentClusters[0].id}/~`,
         },
         ...(crossClusterFileTransfer ? [
           {
