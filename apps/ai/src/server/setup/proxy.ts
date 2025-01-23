@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { getLoginNode } from "@scow/config/build/cluster";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { IncomingMessage } from "http";
 import httpProxy from "http-proxy";
@@ -46,14 +47,14 @@ export function parseProxyTarget(url: string, urlIncludesBasePath: boolean): str
 
   const fullUri = `${(urlIncludesBasePath || basePath === "/") ? "" : basePath}${url}`;
 
-  // const proxyGateway = runtimeConfig.CLUSTERS_CONFIG[clusterId].proxyGateway;
-  // const loginNodes = runtimeConfig.CLUSTERS_CONFIG[clusterId].loginNodes.map((x) => getLoginNode(x).address);
+  const proxyGateway = clusters[clusterId].proxyGateway;
+  const loginNodes = clusters[clusterId].loginNodes.map((x) => getLoginNode(x).address);
 
-  // // if node is login node, not proxy to proxy gateway node
-  // if (proxyGateway && !loginNodes.includes(node)) {
-  //   // proxy to proxy gateway node
-  //   return `${proxyGateway.url}${fullUri}`;
-  // }
+  // if node is login node, not proxy to proxy gateway node
+  if (proxyGateway && !loginNodes.includes(node)) {
+    // proxy to proxy gateway node
+    return `${proxyGateway.url}${fullUri}`;
+  }
 
   // connect directly to compute node
   if (type === "relative") {
