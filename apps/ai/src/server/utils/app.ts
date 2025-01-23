@@ -250,68 +250,58 @@ export const validateUniquePaths = (paths: (string | undefined)[]) => {
 export const genPublicOrPrivateDataJsonString = (path: string | undefined,isPublic: boolean) =>
   JSON.stringify({ path,isPublic });
 
-export const checkEntityAuth = ({ datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
-  modelVersion, isModelPrivate, image, userId }: {
+const checkEntityAccess = ({
+  entity,
+  userId,
+  sharedStatus,
+  entityId,
+}: {
+  entity: { owner: string } | undefined;
+  userId: string;
+  sharedStatus: SharedStatus | undefined;
+  entityId: string | undefined;
+}) => {
+  if (entity && entity.owner !== userId && sharedStatus !== SharedStatus.SHARED) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: `${entityId} is not accessible`,
+    });
+  }
+};
+
+export const checkEntityAuth = ({ datasetVersion, algorithmVersion,modelVersion, image, userId }: {
   datasetVersion: DatasetVersion | undefined,
-  isDatasetPrivate: boolean | undefined,
   algorithmVersion: AlgorithmVersion | undefined,
-  isAlgorithmPrivate: boolean | undefined,
   modelVersion: ModelVersion | undefined,
-  isModelPrivate: boolean | undefined,
   image: ImageEntity | undefined,
   userId: string,
 }) => {
-  if (datasetVersion) {
-    if (isDatasetPrivate && datasetVersion.dataset.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `dataset version id ${datasetVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isDatasetPrivate && datasetVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `dataset version id ${datasetVersion.id} is not accessible`,
-      });
-    }
-  }
 
-  if (algorithmVersion) {
-    if (isAlgorithmPrivate && algorithmVersion.algorithm.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `algorithm version id ${algorithmVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isAlgorithmPrivate && algorithmVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `algorithm version id ${algorithmVersion.id} is not accessible`,
-      });
-    }
-  }
+  checkEntityAccess({
+    entity: datasetVersion?.dataset.getEntity(),
+    userId,
+    sharedStatus: datasetVersion?.sharedStatus,
+    entityId: `dataset version id ${datasetVersion?.id}`,
+  });
 
-  if (modelVersion) {
-    if (isModelPrivate && modelVersion.model.getEntity().owner !== userId) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `model version id ${modelVersion.id} is not belonged to you`,
-      });
-    }
-    if (!isModelPrivate && modelVersion.sharedStatus !== SharedStatus.SHARED) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `model version id ${modelVersion.id} is not accessible`,
-      });
-    }
-  }
+  checkEntityAccess({
+    entity: algorithmVersion?.algorithm.getEntity(),
+    userId,
+    sharedStatus: algorithmVersion?.sharedStatus,
+    entityId: `algorithm version id ${algorithmVersion?.id}`,
+  });
 
-  if (image) {
-    if (image.owner !== userId && !image.isShared) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-        message: `image id ${image.id} is not accessible`,
-      });
-    }
+  checkEntityAccess({
+    entity: modelVersion?.model.getEntity(),
+    userId,
+    sharedStatus: modelVersion?.sharedStatus,
+    entityId: `model version id ${modelVersion?.id}`,
+  });
+
+  if (image && image.owner !== userId && !image.isShared) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: `image id ${image.id} is not accessible`,
+    });
   }
 };

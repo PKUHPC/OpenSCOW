@@ -251,6 +251,7 @@ const CreateAppInputSchema = z.object({
   appJobName: z.string(),
   isAlgorithmPrivate: z.boolean().optional(),
   algorithm: z.number().optional(),
+  isImagePrivate: z.boolean().optional(),
   image: z.number().optional(),
   remoteImageUrl: z.string().optional(),
   startCommand: z.string().optional(),
@@ -316,6 +317,13 @@ export const createAppSession = procedure
       image, startCommand, remoteImageUrl, isDatasetPrivate, dataset, isModelPrivate,
       model, mountPoints = [], account, partition, coreCount, nodeCount, gpuCount, memory,
       maxTime, workingDirectory, customAttributes, gpuType } = input;
+
+    if (appJobName.length > 42) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "The length of appJobName should not exceed 42",
+      });
+    }
 
     const userId = user.identityId;
 
@@ -397,8 +405,7 @@ export const createAppSession = procedure
 
     // 检查数据集、算法、模型和镜像是否有权限使用
     checkEntityAuth({
-      datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
-      modelVersion, isModelPrivate, image:existImage, userId,
+      datasetVersion, algorithmVersion, modelVersion, image:existImage, userId,
     });
 
     return await sshConnect(host, userId, logger, async (ssh) => {

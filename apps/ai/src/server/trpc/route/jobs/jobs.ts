@@ -78,6 +78,7 @@ const TrainJobInputSchema = z.object({
   isAlgorithmPrivate: z.boolean().optional(),
   algorithm: z.number().optional(),
   image: z.number().optional(),
+  isImagePrivate: z.boolean().optional(),
   remoteImageUrl: z.string().optional(),
   framework: Framework.optional(),
   isDatasetPrivate: z.boolean().optional(),
@@ -144,6 +145,14 @@ procedure
       const { clusterId, trainJobName , isAlgorithmPrivate, algorithm, image, framework,
         remoteImageUrl,isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
         coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
+
+      if (trainJobName.length > 42) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "The length of trainJobName should not exceed 42",
+        });
+      }
+
       const userId = user.identityId;
 
       const currentClusterIds = await getCurrentClusters(userId);
@@ -172,8 +181,7 @@ procedure
 
       // 检查数据集、算法、模型和镜像是否有权限使用
       checkEntityAuth({
-        datasetVersion, isDatasetPrivate, algorithmVersion, isAlgorithmPrivate,
-        modelVersion, isModelPrivate, image:existImage, userId,
+        datasetVersion, algorithmVersion,modelVersion, image:existImage, userId,
       });
 
       return await sshConnect(host, userId, logger, async (ssh) => {

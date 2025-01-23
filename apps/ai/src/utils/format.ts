@@ -43,15 +43,6 @@ export const formatSize = (size: number, unitMap: string[] = DEFAULT_UNIT_MAP): 
   return `${size.toFixed(fixedNumber)} ${unitMap[carryCount]}`;
 };
 
-export function truncateString(str: string, maxLength = 52) {
-
-  if (str.length > maxLength) {
-    return str.slice(0, maxLength);
-  }
-
-  return str;
-}
-
 export function convertToBytes(sizeStr: string): number {
   const units: Record<string, number> = {
     K: 1024,

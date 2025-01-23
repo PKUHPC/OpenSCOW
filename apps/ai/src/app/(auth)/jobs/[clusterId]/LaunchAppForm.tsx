@@ -32,7 +32,7 @@ import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
 import { AppCustomAttribute, CreateAppInput } from "src/server/trpc/route/jobs/apps";
 import { FrameworkType, TrainJobInput } from "src/server/trpc/route/jobs/jobs";
-import { formatSize, truncateString } from "src/utils/format";
+import { formatSize } from "src/utils/format";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 
@@ -478,6 +478,9 @@ export const LaunchAppForm = (props: Props) => {
           form.setFieldValue("startCommand", inputParams.startCommand);
         }
         if (images?.items?.length) {
+          form.setFieldValue(["image", "type"], inputParams.isImagePrivate ?
+            AccessibilityType.PRIVATE : AccessibilityType.PUBLIC);
+
           form.setFieldValue(["image", "name"], inputParams.image);
         } else {
           if (inputParams.remoteImageUrl) {
@@ -575,10 +578,11 @@ export const LaunchAppForm = (props: Props) => {
         if (isTraining) {
           await trainJobMutation.mutateAsync({
             clusterId,
-            trainJobName: truncateString(appJobName),
+            trainJobName: appJobName,
             isAlgorithmPrivate,
             algorithm: algorithm?.version,
             image: image?.name,
+            isImagePrivate:!isImagePublic,
             remoteImageUrl,
             framework,
             isDatasetPrivate,
@@ -614,10 +618,11 @@ export const LaunchAppForm = (props: Props) => {
           createAppSessionMutation.mutate({
             clusterId,
             appId: appId!,
-            appJobName:truncateString(appJobName),
+            appJobName,
             isAlgorithmPrivate,
             algorithm: algorithm?.version,
             image: image?.name,
+            isImagePrivate:!isImagePublic,
             remoteImageUrl,
             startCommand,
             isDatasetPrivate,
@@ -644,7 +649,7 @@ export const LaunchAppForm = (props: Props) => {
 
     >
       <Spin spinning={createAppSessionMutation.isLoading || trainJobMutation.isLoading} tip="loading">
-        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 52 }]}>
+        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 42 }]}>
           <Input />
         </Form.Item>
         <Divider orientation="left" orientationMargin="0">

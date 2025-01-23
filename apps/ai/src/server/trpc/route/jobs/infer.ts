@@ -137,6 +137,13 @@ procedure
       const { clusterId, InferenceJobName , image,
         remoteImageUrl, isModelPrivate, model, mountPoints = [], account, partition, coreCount,
         nodeCount, gpuCount, memory, maxTime, command, gpuType,containerServicePort } = input;
+
+      if (InferenceJobName.length > 42) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "The length of InferenceJobName should not exceed 42",
+        });
+      }
       const userId = user.identityId;
 
       const currentClusterIds = await getCurrentClusters(userId);

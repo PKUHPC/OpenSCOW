@@ -329,7 +329,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
 
     >
       <Spin spinning={inferenceJobMutation.isLoading} tip="loading">
-        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 52 }]}>
+        <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 42 }]}>
           <Input />
         </Form.Item>
         <Divider orientation="left" orientationMargin="0">
