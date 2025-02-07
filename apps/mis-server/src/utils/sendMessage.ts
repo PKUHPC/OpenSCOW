@@ -1,19 +1,10 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Struct } from "@bufbuild/protobuf";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
-import { SystemSendMessageRequest } from "@scow/notification-protos/build/scow_message_pb";
+import {
+  MessageData,
+  SystemBatchSendMessagesRequest,
+  SystemSendMessageRequest } from "@scow/notification-protos/build/scow_message_pb";
 import { notifClient } from "src/config/notification";
 import { InternalMessageType } from "src/models/messageType";
 
@@ -92,7 +83,7 @@ interface JobFinished extends BaseMessage {
   };
 }
 
-type Message = AccountLocked | AccountOverdue | AccountRechargeSuccess
+export type Message = AccountLocked | AccountOverdue | AccountRechargeSuccess
   | AccountLowBalance | AccountBalance | AccountUnblocked
   | JobFinished;
 
@@ -109,5 +100,31 @@ export const sendMessage = async (message: Message, logger: Logger) => {
     await notifClient?.scowMessage.systemSendMessage(data);
   } catch (err) {
     logger.error(`send message ${JSON.stringify(data)} err: ${err as any}`);
+  }
+};
+
+// 按批次发送消息
+export const batchSendMessages = async (messages: Message[], logger: Logger, batchSize = 100) => {
+
+  for (let i = 0; i < messages.length; i += batchSize) {
+    const batch = messages.slice(i, i + batchSize); // 获取当前批次的消息
+
+    const data: Partial<SystemBatchSendMessagesRequest> = {
+      systemId: "MIS_SERVER",
+      messages: batch.map((msg) => {
+        const { metadata } = msg;
+        return {
+          ...msg,
+          metadata: Struct.fromJson(metadata),
+        } as MessageData;
+      }),
+    };
+
+    try {
+      logger.info(`send ${data.messages?.length} messages to notification`);
+      await notifClient?.scowMessage.systemBatchSendMessages(data);
+    } catch (err) {
+      logger.error(`send message ${JSON.stringify(data)} err: ${err as any}`);
+    }
   }
 };

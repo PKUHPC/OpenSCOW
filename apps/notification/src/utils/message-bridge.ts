@@ -1,18 +1,7 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { SqlEntityManager } from "@mikro-orm/mysql";
 import { getNotificationNodeClient } from "@scow/lib-notification/build/index";
 import { NoticeType,SenderType, TargetType } from "@scow/notification-protos/build/common_pb";
+import { BridgeMessage } from "@scow/notification-protos/build/message_bridge_pb";
 import { notificationConfig } from "src/server/config/notification";
 
 import { fetchAllUsers } from "./auth/get-user";
@@ -20,6 +9,8 @@ import { logger } from "./logger";
 import { getMessageTypeData } from "./message-type";
 import { getUserNotificationPreferences } from "./notice-type";
 import { replaceTemplate } from "./rendering-message";
+
+const BATCH_SIZE = 100;
 
 interface AdminSendMsgToBridge {
   senderType: SenderType;
@@ -33,7 +24,7 @@ interface AdminSendMsgToBridge {
   noticeTypes: NoticeType[]
 }
 
-interface SystemSendMsgToBridge {
+export interface SystemSendMsgToBridge {
   senderType: SenderType;
   senderId: string;
   targetType: TargetType;
@@ -117,4 +108,50 @@ export async function systemSendMsgToBridge(em: SqlEntityManager, info: SystemSe
       noticeTypes,
     });
   });
+}
+
+export async function systemBatchSendMsgsToBridge(em: SqlEntityManager, infos: SystemSendMsgToBridge[]) {
+  if (!notificationConfig.messageBridge) {
+    return;
+  }
+  const client = getNotificationNodeClient(notificationConfig.messageBridge.address);
+
+  const messages: BridgeMessage[] = [];
+  for (const info of infos) {
+    const { messageType, category, senderType, senderId, targetType, targetIds, metadata } = info;
+
+    const usersInfo = await fetchAllUsers(targetIds, logger);
+
+    usersInfo.forEach(async (info) => {
+      if (info === undefined) {
+        return;
+      }
+
+      // 查询 messageType 的模板信息
+      const messageTypeData = await getMessageTypeData(em, messageType);
+      // 获取当前用户接收的 notice type
+      const noticeTypes = await getUserNotificationPreferences(em, info.identityId, messageType);
+
+      messages.push({
+        messageInfo: {
+          title: messageTypeData.titleTemplate.default ?? "",
+          content: messageTypeData.contentTemplate
+            ? replaceTemplate(metadata.toJson(), messageTypeData.contentTemplate.default) : "",
+          metadata,
+        },
+        messageTypeInfo: { type: messageType, category },
+        senderInfo: { senderType, senderId },
+        targetInfo: { targetType, userInfo: {
+          userId: info?.identityId, name: info?.name, email: info?.email,
+        } },
+        noticeTypes,
+      } as BridgeMessage);
+    });
+  }
+
+  // 按批次发送消息
+  for (let i = 0; i < messages.length; i += BATCH_SIZE) {
+    const batch = messages.slice(i, i + BATCH_SIZE); // 获取当前批次的消息
+    await client.messageBridge.batchSendMessages(batch);
+  }
 }

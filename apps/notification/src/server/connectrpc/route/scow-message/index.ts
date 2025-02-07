@@ -17,7 +17,7 @@ import { toCamelCaseArray } from "src/utils/camelCase";
 import { ensureNotUndefined } from "src/utils/ensure-not-undefined";
 import { forkEntityManager } from "src/utils/get-orm";
 import { logger } from "src/utils/logger";
-import { systemSendMsgToBridge } from "src/utils/message-bridge";
+import { systemBatchSendMsgsToBridge, SystemSendMsgToBridge, systemSendMsgToBridge } from "src/utils/message-bridge";
 import { getMessageConfigWithDefault } from "src/utils/message-config";
 import { checkMessageTypeExist, getMessagesTypeData } from "src/utils/message-type";
 
@@ -90,6 +90,86 @@ export default (router: ConnectRouter) => {
           targetType, targetIds, messageType,
           metadata,
         });
+      }
+
+      return;
+    },
+
+    async systemBatchSendMessages(req, ctx) {
+
+      await checkScowApiToken(ctx, commonConfig.scowApi);
+
+      const { systemId, messages } = req;
+      const em = await forkEntityManager();
+
+      const bridgeMessages: SystemSendMsgToBridge[] = [];
+      for (const msg of messages) {
+        const { targetIds, messageType, metadata, descriptionData } = msg;
+        const { targetType } = ensureNotUndefined(msg, ["targetType"]);
+
+        if (!metadata) {
+          throw new ConnectError(
+            "The metadata field cannot be empty",
+            Code.InvalidArgument,
+          );
+        }
+
+        const messageTypeData = await checkMessageTypeExist(em, messageType);
+        if (!messageTypeData) {
+          throw new ConnectError(
+            `Message type ${messageType} does't exists.`,
+            Code.InvalidArgument,
+          );
+        }
+
+        // TODO: check system id
+        const message = new Message({
+          senderType: SenderType.SYSTEM,
+          senderId: systemId,
+          targetType,
+          messageType,
+          category: messageTypeData.category,
+          metadata: metadata.toJson() as Record<string, string>,
+          descriptionData,
+        });
+
+        em.persist(message);
+
+        const adminMessageConfig = await getMessageConfigWithDefault(em, messageType, NoticeType.SITE_MESSAGE);
+
+        for (const userId of targetIds) {
+        // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理，用户订阅有可能一开始不存在，则还是已管理员设置的为准
+          let messageEnabled = adminMessageConfig.enabled;
+          if (adminMessageConfig.canUserModify && adminMessageConfig.enabled) {
+            const userSub = await em.findOne(UserSubscription,
+              { userId, messageType, noticeType: NoticeType.SITE_MESSAGE });
+
+            if (userSub) messageEnabled = userSub.isSubscribed;
+          }
+
+          if (messageEnabled) {
+            const messageTarget = new MessageTarget({
+              noticeTypes: [NoticeType.SITE_MESSAGE],
+              targetId: userId,
+              targetType: TargetType.USER,
+              message,
+            });
+            em.persist(messageTarget);
+          }
+        }
+
+        bridgeMessages.push({
+          senderType: SenderType.SYSTEM, senderId: systemId,
+          category: messageTypeData.category,
+          targetType, targetIds, messageType,
+          metadata,
+        });
+      }
+
+      await em.flush();
+
+      if (notificationConfig.messageBridge) {
+        systemBatchSendMsgsToBridge(em, bridgeMessages);
       }
 
       return;

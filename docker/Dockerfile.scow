@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM ccimage.pku.edu.cn/mirror/library/node:iron-alpine@sha256:c42db635f7d5742f5565fa85bf56c7b99bc6126dc458a2906699cd3d62512125 AS base
+FROM ccimage.pku.edu.cn/mirror/library/node:22-alpine@sha256:5bfc86520dfe026fd04c14fa55d26bc4917e249ac67bc5c6d8b7fd12b97e2c0e AS base
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
 
@@ -18,6 +18,8 @@ RUN apk update
 FROM base as builder
 
 RUN apk add libc6-compat python3 make gcc g++ curl git
+
+RUN npm i -g corepack@0.31.0
 
 RUN corepack enable
 

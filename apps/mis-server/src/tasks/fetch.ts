@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { Logger } from "@ddadaal/tsgrpc-server";
 import { QueryOrder } from "@mikro-orm/core";
@@ -30,7 +18,7 @@ import { InternalMessageType } from "src/models/messageType";
 import { ClusterPlugin } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { toGrpc } from "src/utils/job";
-import { sendMessage } from "src/utils/sendMessage";
+import { batchSendMessages, Message } from "src/utils/sendMessage";
 
 async function getClusterLatestDate(em: SqlEntityManager, cluster: string, logger: Logger) {
 
@@ -82,6 +70,9 @@ export async function fetchJobs(
 
   const priceMap = await createPriceMap(em, clusterPlugin.clusters, logger);
 
+  // 被 SCOW 记录的作业信息，需要发送消息给用户
+  const savedJobsInfo: JobInfo[] = [];
+
   const persistJobAndCharge = async (jobs: ({ cluster: string } & ClusterJobInfo)[]) => {
 
     const result = await em.transactional(async (em) => {
@@ -124,18 +115,6 @@ export async function fetchJobs(
           // Determine whether the job can be inserted into the database. If not, skip the job
           await em.flush();
 
-          await sendMessage({
-            messageType: InternalMessageType.JobFinished,
-            targetType: TargetType.USER, targetIds: [job.user],
-            metadata: {
-              time: job.endTime!,
-              jobId: job.jobId.toString(),
-              jobName: job.name,
-              cluster: job.cluster,
-              account: job.account,
-              price: price.account?.price.toString() ?? "0",
-            },
-          }, logger);
         } catch (error) {
           logger.warn("invalid job. cluster: %s, jobId: %s, error: %s", job.cluster, job.jobId, error);
           continue;
@@ -200,6 +179,8 @@ export async function fetchJobs(
 
         pricedJobs.push(pricedJob);
       }
+
+      savedJobsInfo.push(...pricedJobs);
       return pricedJobs.map(toGrpc);
     });
 
@@ -302,6 +283,22 @@ export async function fetchJobs(
       );
 
     }
+
+    const messages: Message[] = savedJobsInfo.map((job) => ({
+      messageType: InternalMessageType.JobFinished,
+      targetType: TargetType.USER,
+      targetIds: [job.user],
+      metadata: {
+        time: job.timeEnd.toISOString(),
+        jobId: job.idJob.toString(),
+        jobName: job.jobName,
+        cluster: job.cluster,
+        account: job.account,
+        price: job.accountPrice.toString() ?? "0",
+      },
+    }));
+
+    await batchSendMessages(messages, logger); // 发送当前批次的消息
 
     return { newJobsCount };
   } catch (e) {
