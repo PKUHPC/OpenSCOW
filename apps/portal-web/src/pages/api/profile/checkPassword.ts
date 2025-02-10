@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
+import { HttpError, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { checkPassword as libCheckPassword, getCapabilities } from "@scow/lib-auth";
 import { Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
@@ -59,12 +59,19 @@ export default typeboxRoute(CheckPasswordSchema, async (req, res) => {
         return { 200: { success: result.success } };
       }
     })
-    .catch((e) => {
-      switch (e.status) {
-        case "NOT_SUPPORTED":
-          return { 501: null };
-        default:
-          throw e;
+    .catch(async (e) => {
+
+      if (e instanceof HttpError) {
+        switch (e.status) {
+          case 501:
+            return { 501: null };
+          default:
+            throw e;
+        }
+
+      } else {
+        throw e;
       }
+
     });
 });

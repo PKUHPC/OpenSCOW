@@ -18,6 +18,7 @@ export async function changePassword(
   params: { identityId: string, newPassword: string },
   logger?: Logger,
 ) {
+
   const resp = await fetch(authUrl + "/password", {
     method: "PATCH",
     body: JSON.stringify(params),

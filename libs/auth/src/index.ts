@@ -20,4 +20,5 @@ export { deleteUser } from "./deleteUser";
 export type { Capabilities } from "./getCapabilities";
 export { getCapabilities } from "./getCapabilities";
 export { getUser } from "./getUser";
+export { HttpError } from "./utils";
 export { validateToken } from "./validateToken";

@@ -57,7 +57,6 @@ export const getUserRoute = fp(async (f) => {
         return rep.code(404).send({ code: "USER_NOT_FOUND" });
       }
 
-
     },
   );
 });

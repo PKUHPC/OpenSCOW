@@ -4,7 +4,8 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { QueryOrder, raw } from "@mikro-orm/core";
 import { addUserToAccount, changeEmail as libChangeEmail, createUser, deleteUser,
-  getCapabilities, getUser, removeUserFromAccount,
+  getCapabilities, getUser, HttpError,
+  removeUserFromAccount,
 }
   from "@scow/lib-auth";
 import { decimalToMoney } from "@scow/lib-decimal";
@@ -670,7 +671,7 @@ export const userServiceServer = plugin((server) => {
         await deleteUser(authUrl,
           userId, server.logger)
           .catch(async (e) => {
-            if (e.status === 404) {
+            if (e instanceof HttpError && e.status === 404) {
               throw {
                 code: Status.NOT_FOUND,
                 message: "User not found in LDAP." } as ServiceError;
@@ -990,23 +991,32 @@ export const userServiceServer = plugin((server) => {
           newEmail,
         }, logger)
           .catch(async (e) => {
-            switch (e.status) {
 
-              case "NOT_FOUND":
-                throw {
-                  code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-                } as ServiceError;
+            if (e instanceof HttpError) {
+              switch (e.status) {
 
-              case "NOT_SUPPORTED":
-                throw {
-                  code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
-                } as ServiceError;
+                case 404:
+                  throw {
+                    code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+                  } as ServiceError;
 
-              default:
-                throw {
-                  code: Status.UNKNOWN, message: "LDAP failed to change email",
-                } as ServiceError;
+                case 501:
+                  throw {
+                    code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+                  } as ServiceError;
+
+                default:
+                  throw {
+                    code: Status.UNKNOWN, message: "LDAP failed to change email",
+                  } as ServiceError;
+              }
+            } else {
+              throw {
+                code: Status.UNKNOWN, message: "LDAP failed to change email",
+              } as ServiceError;
             }
+
+
           });
       }
 
@@ -1035,22 +1045,29 @@ export const userServiceServer = plugin((server) => {
           newEmail: email,
         }, logger)
           .catch(async (e) => {
-            switch (e.status) {
 
-              case "NOT_FOUND":
-                throw {
-                  code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
-                } as ServiceError;
+            if (e instanceof HttpError) {
+              switch (e.status) {
 
-              case "NOT_SUPPORTED":
-                throw {
-                  code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
-                } as ServiceError;
+                case 404:
+                  throw {
+                    code: Status.NOT_FOUND, message: `User ${userId} is not found.`,
+                  } as ServiceError;
 
-              default:
-                throw {
-                  code: Status.UNKNOWN, message: "LDAP failed to change email",
-                } as ServiceError;
+                case 501:
+                  throw {
+                    code: Status.UNIMPLEMENTED, message: "Changing email is not supported ",
+                  } as ServiceError;
+
+                default:
+                  throw {
+                    code: Status.UNKNOWN, message: "LDAP failed to change email",
+                  } as ServiceError;
+              }
+            } else {
+              throw {
+                code: Status.UNKNOWN, message: "LDAP failed to change email",
+              } as ServiceError;
             }
           });
       }

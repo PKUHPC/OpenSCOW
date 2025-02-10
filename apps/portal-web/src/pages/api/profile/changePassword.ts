@@ -11,7 +11,7 @@
  */
 
 import { Type, typeboxRoute, typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
-import { changePassword as libChangePassword, getCapabilities } from "@scow/lib-auth";
+import { changePassword as libChangePassword, getCapabilities, HttpError } from "@scow/lib-auth";
 import { OperationType } from "@scow/lib-operation-log";
 import { authenticate } from "src/auth/server";
 import { OperationResult } from "src/models/operationLog";
@@ -88,14 +88,21 @@ export default typeboxRoute(ChangePasswordSchema, async (req, res) => {
     })
     .catch(async (e) => {
       await callLog(logInfo, OperationResult.FAIL);
-      switch (e.status) {
-        case "NOT_FOUND":
-          return { 404: null };
-        case "NOT_SUPPORTED":
-          return { 501: null };
-        default:
-          throw e;
+
+      if (e instanceof HttpError) {
+        switch (e.status) {
+          case 404:
+            return { 404: null };
+          case 501:
+            return { 501: null };
+          default:
+            throw e;
+        }
+
+      } else {
+        throw e;
       }
+
     });
 
 
