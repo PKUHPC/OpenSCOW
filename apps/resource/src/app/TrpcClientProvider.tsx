@@ -59,8 +59,6 @@ export function TrpcClientProvider(props: { baseUrl: string; basePath: string; c
       },
     }),
   }));
-  
-  
   const [trpcClient] = useState(() =>
     trpc.createClient({
       links: [

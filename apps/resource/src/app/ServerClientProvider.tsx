@@ -24,9 +24,9 @@ export function getBaseUrl() {
 
 export const ServerClientProvider = (props: { children: React.ReactNode }) => {
   noStore();
-  const hackBasePath = BASE_PATH === "/" ? "/resource" : BASE_PATH;
+
   return (
-    <TrpcClientProvider baseUrl={getBaseUrl()} basePath={hackBasePath}>
+    <TrpcClientProvider baseUrl={getBaseUrl()} basePath={BASE_PATH}>
       {props.children}
     </TrpcClientProvider>
   );

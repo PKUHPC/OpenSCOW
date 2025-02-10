@@ -30,7 +30,8 @@ uiExtension:
   - # 消息系统UI扩展名称                                 
     name: notif
     # 消息系统的部署Url，此url需能被外网访问
-    # /notif 部分需要与 install.yaml 文件中的 basePath 保持一致
+    # /notif 部分需要与 install.yaml 文件中notification的 basePath 保持一致
+    # 若在install.yaml中配置了最外层的basePath不为"/"，需要在此处的your-server-name1后也加上basePath
     url: http://your-server-name1/notif
 ```
 
@@ -51,6 +52,7 @@ notification:
   name: notif
   # 消息系统部署的url，在内网能访问即可
   # 非必填，默认为 http://notification:3000
+  # 若在install.yaml中配置了最外层的basePath不为"/"，需要在此处的your-server-name2后也加上basePath
   address: http://your-server-name2/notif
 ```
 

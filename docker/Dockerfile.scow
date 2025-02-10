@@ -23,7 +23,6 @@ RUN npm i -g corepack@0.31.0
 
 RUN corepack enable
 
-
 WORKDIR /app
 
 COPY package.json .

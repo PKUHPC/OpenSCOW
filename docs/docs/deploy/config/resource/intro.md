@@ -29,7 +29,8 @@ uiExtension:
   - # 资源管理系统UI扩展名称                                 
     name: resource
     # 资源管理系统的部署Url，此url需能被外网访问
-    # /resource 部分需要与 install.yaml 文件中的 basePath 保持一致
+    # /resource 部分需要与 install.yaml 文件中resource的 basePath 保持一致
+    # 若在install.yaml中配置了最外层的basePath不为"/"，需要在此处的your-domain后也加上basePath
     url: http://your-domain/resource
 ```
 
@@ -43,6 +44,7 @@ resource:
   enabled: true
   # 资源管理系统部署的url，在内网能访问即可
   # 非必填，默认为 http://resource:3000/resource
+  # 若在install.yaml中配置了最外层的basePath不为"/"，需要在此处的your-server-name后也加上basePath
   address: http://your-server-name/resource
   # 启动时是否执行状态同步
   # 必填
