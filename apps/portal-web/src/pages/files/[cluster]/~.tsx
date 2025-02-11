@@ -48,7 +48,7 @@ export const HomeDirFileManagerPage: NextPage = requireAuth(() => true)(() => {
     return <ServerErrorPage />;
   }
 
-  return <Redirect url={join("/files/explorer", cluster, data?.path ?? "")} />;
+  return <Redirect url={join("/files", cluster, data?.path ?? "")} />;
 });
 
 export default HomeDirFileManagerPage;

@@ -145,14 +145,14 @@ export const userRoutes: (
       Icon: FileManagerIcon,
       text: t("routes.file.fileManager"),
       path: "/files",
-      clickToPath: `/files/explorer/${defaultCluster?.id ?? currentClusters[0].id}/~`,
+      clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
       clickable: true,
       children: [
         {
           Icon: ClusterFileManagerIcon,
           text: t("routes.file.fileManager"),
-          path: "/files/explorer",
-          clickToPath: `/files/explorer/${defaultCluster?.id ?? currentClusters[0].id}/~`,
+          path: "/files/",
+          clickToPath: `/files/${defaultCluster?.id ?? currentClusters[0].id}/~`,
         },
         ...(crossClusterFileTransfer ? [
           {

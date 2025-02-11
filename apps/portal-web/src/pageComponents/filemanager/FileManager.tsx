@@ -423,7 +423,7 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
         <Select
           style={{ minWidth: "160px" }}
           onSelect={(value) => {
-            router.push(`/files/explorer/${value}/~`);
+            router.push(`/files/${value}/~`);
           }}
           defaultValue={cluster?.id}
           options={
