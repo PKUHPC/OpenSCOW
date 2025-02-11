@@ -32,6 +32,8 @@ message JobFilter {
   // if length === 0, get from all clusters
   repeated string clusters = 7;
   optional uint64 start_bi_job_index = 8;
+  // if both exist job_id and job_ids, job_id will overwrite job_ids
+  repeated uint64 job_ids = 9;
 }
 
 message GetJobsRequest {

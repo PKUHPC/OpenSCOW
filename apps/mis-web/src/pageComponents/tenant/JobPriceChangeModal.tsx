@@ -10,11 +10,14 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Money } from "@scow/protos/build/common/money";
 import { App, Form, Input, InputNumber, Modal } from "antd";
 import { useState } from "react";
 import { api } from "src/apis";
 import { prefix, useI18nTranslateToString } from "src/i18n";
 import type { GetJobFilter } from "src/pages/api/job/jobInfo";
+import { publicConfig } from "src/utils/config";
+import { moneyToString } from "src/utils/money";
 
 interface Props {
   open: boolean;
@@ -23,6 +26,8 @@ interface Props {
   filter: GetJobFilter;
   reload: () => void;
   target: "account" | "tenant";
+  jobs: JobItem[];
+  setSelectedJobs: (selectJobs: JobItem[]) => void;
 }
 
 interface FormProps {
@@ -30,12 +35,18 @@ interface FormProps {
   reason: string;
 }
 
+interface JobItem {
+  idJob: number;
+  jobName: string;
+  accountPrice?: Money
+}
+
 const p = prefix("pageComp.tenant.jobPriceChangeModal.");
 const pCommon = prefix("common.");
 
 
 
-export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, filter, target, reload }) => {
+export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobs, target, reload, setSelectedJobs }) => {
 
   const t = useI18nTranslateToString();
 
@@ -49,6 +60,16 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
     "tenant": t(p("platformPrice")),
   };
 
+  const jobIds = jobs?.map((record) => {
+    return record?.idJob;
+  });
+  const jobNames = jobs?.map((record) => {
+    return record?.jobName;
+  });
+  const accountPrices = jobs?.map((record) => {
+    return record?.accountPrice ? moneyToString(record.accountPrice) : 0;
+  });
+
   return (
     <Modal
       open={open}
@@ -61,7 +82,7 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
         const { price, reason } = await form.validateFields();
 
         setLoading(true);
-        await api.changeJobPrice({ body: { ...filter, price, reason, target } })
+        await api.changeJobPrice({ body: { jobIds, price, reason, target } })
           .httpError(404, (e) => {
             message.error({
               content: e.message.split(": ")[1],
@@ -74,17 +95,26 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobCount, 
             message.success(t(pCommon("changeSuccess")));
             reload();
             onClose();
+            setSelectedJobs([]);
           })
           .finally(() => setLoading(false));
 
       }}
     >
       <Form form={form}>
-        <Form.Item label={t(p("jobNumber"))}>
-          <strong>{jobCount}</strong>
+        <Form.Item label={t(p("job"))}>
+          <strong>{`${jobNames.toString()}(ID: ${jobIds.toString()})`}</strong>
+        </Form.Item>
+        <Form.Item label={t(p("currentPrice"))}>
+          <strong>{accountPrices.toString()}</strong>
         </Form.Item>
         <Form.Item label={`${t(p("newJob"))}${text[target]}`} name="price" rules={[{ required: true }]}>
-          <InputNumber min={0} step={0.01} addonAfter={t(pCommon("unit"))} />
+          <InputNumber
+            min={0}
+            step={1 / Math.pow(10, publicConfig.JOB_CHARGE_DECIMAL_PRECISION)}
+            precision={publicConfig.JOB_CHARGE_DECIMAL_PRECISION}
+            addonAfter={t(pCommon("unit"))}
+          />
         </Form.Item>
         <Form.Item name="reason" label={t(p("reason"))} rules={[{ required: true }]}>
           <Input.TextArea />

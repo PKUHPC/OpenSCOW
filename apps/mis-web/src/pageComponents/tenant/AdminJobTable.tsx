@@ -63,6 +63,13 @@ interface DiffQuery {
   clusters?: string[] | undefined;
 }
 
+interface JobItem {
+  idJob: number;
+  jobName: string;
+  accountPrice?: Money
+  [key: string]: any
+}
+
 const p = prefix("pageComp.tenant.adminJobTable.");
 const pCommon = prefix("common.");
 
@@ -247,23 +254,27 @@ const ChangePriceButton: React.FC<{
   filter: GetJobFilter;
   count: number;
   target: "account" | "tenant";
+  selectedJobs: JobItem[];
   reload: () => void;
-}> = ({ filter, count, target, reload }) => {
+  setOpen: (openFlag: boolean) => void;
+  setSelectedJobs: (selectJobs: JobItem[]) => void,
+  open: boolean;
+}> = ({ filter, count, target, selectedJobs, open, reload, setOpen, setSelectedJobs }) => {
 
   const t = useI18nTranslateToString();
 
-  const [open, setOpen] = useState(false);
-
   return (
     <>
-      <Button onClick={() => setOpen(true)}>
+      <Button onClick={() => setOpen(true)} disabled={!(selectedJobs?.length > 0)}>
         {t(p("adjust"))}{target === "account" ? t(p("tenantPrice")) : t(p("platformPrice"))}
       </Button>
       <JobPriceChangeModal
+        jobs={selectedJobs}
         target={target}
         reload={reload}
         onClose={() => setOpen(false)}
         open={open}
+        setSelectedJobs={setSelectedJobs}
         filter={filter}
         jobCount={count}
       />
@@ -296,6 +307,8 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
   const { publicConfigClusters } = useStore(ClusterInfoStore);
 
   const [previewItem, setPreviewItem] = useState<JobInfo | undefined>(undefined);
+  const [selectedJobs, setSelectedJobs] = useState<JobItem[]>([]);
+  const [open, setOpen] = useState(false);
 
   return (
     <>
@@ -325,6 +338,10 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
             filter={useMemo(() => filterFormToQuery(filter, rangeSearch), [filter, rangeSearch])}
             count={data ? data.totalCount : 0}
             target={target}
+            selectedJobs={selectedJobs}
+            setSelectedJobs={setSelectedJobs}
+            setOpen={setOpen}
+            open={open}
           />
         </Space>
       </TableTitle>
@@ -342,6 +359,13 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         } : false}
         tableLayout="fixed"
         scroll={{ x: data?.jobs?.length ? 1800 : true }}
+        rowSelection={{ type: "checkbox",
+          onChange: (_, selectedRows) => {
+            setSelectedJobs(selectedRows);
+          },
+          selectedRowKeys: selectedJobs?.map((i) => i.cluster + i.biJobIndex + i.idJob),
+        }}
+
       >
         <Table.Column dataIndex="idJob" width="5.2%" title={t(pCommon("clusterWorkId"))} />
         <Table.Column dataIndex="jobName" ellipsis title={t(pCommon("workName"))} />
@@ -382,8 +406,21 @@ const JobInfoTable: React.FC<JobInfoTableProps> = ({
         <Table.Column<JobInfo>
           title={t(pCommon("more"))}
           fixed="right"
-          width="4%"
-          render={(_, r) => <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>}
+          width="10%"
+          render={(_, r) =>
+            (
+              <>
+                <a
+                  onClick={() => {
+                    setOpen(true);
+                    setSelectedJobs([r]);
+                  }}
+                  style={{ marginRight: 10 }}
+                >{t(pCommon("adjustBill"))}</a>
+                <a onClick={() => setPreviewItem(r)}>{t(pCommon("detail"))}</a>
+              </>
+            )
+          }
         />
       </Table>
       <HistoryJobDrawer

@@ -107,7 +107,7 @@ it("changes job prices", async () => {
   const client = createClient();
 
   await asyncClientCall(client, "changeJobPrice", {
-    filter: { tenantName: data.tenant.name, userId: data.userB.userId, clusters: []},
+    filter: { tenantName: data.tenant.name, userId: data.userB.userId, clusters: [], jobIds: []},
     ipAddress: "",
     operatorId: "123",
     reason: "test",
@@ -155,7 +155,7 @@ it("returns 50 jobs if pageSize is undefined or 0", async () => {
     const client = createClient();
 
     const reply = await asyncClientCall(client, "getJobs", {
-      filter: { tenantName: data.tenant.name, clusters: []},
+      filter: { tenantName: data.tenant.name, clusters: [], jobIds: []},
       page: 1,
       pageSize,
     });
@@ -188,6 +188,7 @@ it("returns jobs starting from start_bi_job_index", async () => {
     pageSize: 100,
     filter: {
       clusters: [],
+      jobIds: [],
       tenantName: data.tenant.name,
       startBiJobIndex: 10,
     },
@@ -216,9 +217,9 @@ it("returns 0 job if Account not exist or is not in scope of permissions", async
 
   await Promise.all([
     // 当用户id与账号无关时，查不到数据
-    test({ tenantName: "default2", clusters: []}),
+    test({ tenantName: "default2", clusters: [], jobIds: []}),
     // 当用户id与账号无关时，查不到数据
-    test({ tenantName: data.tenant.name, userId: "a", accountName: "hpcb", clusters: []}),
+    test({ tenantName: data.tenant.name, userId: "a", accountName: "hpcb", clusters: [], jobIds: []}),
   ]);
 
 });

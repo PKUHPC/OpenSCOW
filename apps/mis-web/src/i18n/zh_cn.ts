@@ -117,6 +117,7 @@ export default {
     serialNumber: "序号",
     phone: "手机号",
     organization: "组织",
+    adjustBill: "调整租户计费",
   },
   dashboard: {
     title: "仪表盘",
@@ -668,7 +669,7 @@ export default {
         batch:"批量搜索",
         precise:"精确搜索",
         jobEndTime: "作业结束时间",
-        adjust:"调整搜索结果所有作业",
+        adjust:"调整所选作业",
         tenantPrice:"租户计费",
         platformPrice:"平台计费",
         jobNumber:"作业数量：",
@@ -705,6 +706,8 @@ export default {
         newJob:"新作业",
         reason:"修改原因",
         modifyButton: "修改",
+        currentPrice: "当前作业租户计费",
+        job: "作业",
       },
       tenantSelector:{
         fresh:"刷新租户列表",

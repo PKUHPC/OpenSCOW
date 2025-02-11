@@ -117,6 +117,7 @@ export default {
     serialNumber: "Serial Number",
     phone: "Phone",
     organization: "Organization",
+    adjustBill: "Adjust Tenant Billing",
   },
   dashboard: {
     title: "Dashboard",
@@ -668,7 +669,7 @@ export default {
         batch: "Batch Search",
         precise: "Precision Search",
         jobEndTime: "Job End Time",
-        adjust: "Adjust all jobs in search results",
+        adjust: "Adjust the billing for the selected job",
         tenantPrice: "Tenant Billing",
         platformPrice: "Platform Billing",
         jobNumber: "Number of Jobs: ",
@@ -706,6 +707,8 @@ export default {
         newJob: "New Job ",
         reason: "Reason for Modification",
         modifyButton: "Modify ",
+        currentPrice: "Current tenant billing for job",
+        job: "Jobs",
       },
       tenantSelector: {
         fresh: "Refresh Tenant List",

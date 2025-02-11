@@ -42,7 +42,7 @@ import { generateGetJobsOptions } from "src/utils/queryOptions";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
-  jobEndTimeStart, jobId, userId, startBiJobIndex,
+  jobEndTimeStart, jobId, userId, startBiJobIndex, jobIds,
 }: JobFilter) {
 
   return {
@@ -61,6 +61,7 @@ function filterJobs({
             ...jobEndTimeEnd ? { $lte: jobEndTimeEnd } : {},
           },
         } : {},
+        ...jobIds?.length > 0 ? { idJob: jobIds } : {},
       },
     tenant: tenantName,
   } as FilterQuery<JobInfoEntity>;
@@ -193,9 +194,9 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, em, 
-              currentActivatedClusters, 
-              logger, 
+              }, em,
+              currentActivatedClusters,
+              logger,
               server.ext,
               server.ext,
               );
@@ -221,10 +222,10 @@ export const jobServiceServer = plugin((server) => {
                 operatorId,
                 type,
                 ipAddress,
-              }, 
-              em, 
-              currentActivatedClusters, 
-              logger, 
+              },
+              em,
+              currentActivatedClusters,
+              logger,
               server.ext,
               server.ext,
               );

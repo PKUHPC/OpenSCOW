@@ -30,7 +30,7 @@ export const ChangeJobPriceSchema = typeboxRouteSchema({
     ...GetJobFilter.properties,
 
     reason: Type.String(),
-
+    jobIds: Type.Array(Type.Number()),
     /**
      * @minimum 0
      */
@@ -61,7 +61,8 @@ export default route(ChangeJobPriceSchema,
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { price, reason, accountName, clusters, jobEndTimeEnd, jobEndTimeStart, jobId, userId, target } = req.body;
+    const { price, reason, jobIds, accountName, clusters, jobEndTimeEnd,
+      jobEndTimeStart, jobId, userId, target } = req.body;
 
     if (
       (target === "account" && !info.tenantRoles.includes(TenantRole.TENANT_ADMIN)) ||
@@ -83,6 +84,7 @@ export default route(ChangeJobPriceSchema,
         jobEndTimeStart,
         jobId,
         userId,
+        jobIds,
       },
       ...(target === "account" ? { accountPrice: money } : { tenantPrice: money }),
       ipAddress: parseIp(req) ?? "",
