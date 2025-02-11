@@ -843,7 +843,7 @@ export const listAppSessions =
 
 
         const terminatedStates = ["BOOT_FAIL", "COMPLETED", "DEADLINE", "FAILED",
-          "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT"];
+          "NODE_FAIL", "PREEMPTED", "SPECIAL_EXIT", "TIMEOUT","CANCELED"];
 
         // If a job is not running, it cannot be ready
         const client = getAdapterClient(clusterId);
@@ -881,6 +881,10 @@ export const listAppSessions =
 
           const runningJobInfo: JobInfo | undefined = runningJobInfoMap[sessionMetadata.jobId];
 
+          if (!runningJobInfo) {
+            return;
+          }
+
           let host: string | undefined = undefined;
           let port: number | undefined = undefined;
 
@@ -893,7 +897,7 @@ export const listAppSessions =
               return;
             }
             // judge whether the app is ready
-            if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            if (runningJobInfo.state === "RUNNING") {
               try {
                 const client = getAdapterClient(clusterId);
                 const connectionInfo =
@@ -911,7 +915,7 @@ export const listAppSessions =
           }
           // 推理需要端口
           else if (sessionMetadata.jobType === JobType.INFER) {
-            if (runningJobInfo && runningJobInfo.state === "RUNNING") {
+            if (runningJobInfo.state === "RUNNING") {
               const client = getAdapterClient(clusterId);
               const connectionInfo = await getAppConnectionInfoFromAdapterForAi(client, sessionMetadata.jobId, logger);
               if (connectionInfo?.response?.$case === "appConnectionInfo") {
@@ -921,8 +925,8 @@ export const listAppSessions =
             }
           }
 
-          const isPendingOrTerminated = runningJobInfo?.state === "PENDING"
-            || terminatedStates.includes(runningJobInfo?.state);
+          const isPendingOrTerminated = runningJobInfo.state === "PENDING"
+            || terminatedStates.includes(runningJobInfo.state);
 
           sessions.push({
             jobId: sessionMetadata.jobId,
@@ -933,22 +937,22 @@ export const listAppSessions =
             submitTime: sessionMetadata.submitTime,
             jobType: sessionMetadata.jobType,
             image: sessionMetadata.image,
-            state: runningJobInfo?.state ?? "ENDED",
+            state: runningJobInfo.state ?? "ENDED",
             dataPath: await sftpRealPath(sftp)(jobDir),
-            runningTime: runningJobInfo?.elapsedSeconds !== undefined
+            runningTime: runningJobInfo.elapsedSeconds !== undefined
               ? formatTime(runningJobInfo.elapsedSeconds * 1000) : "",
-            timeLimit: runningJobInfo?.timeLimitMinutes ? formatTime(runningJobInfo.timeLimitMinutes * 60 * 1000) : "",
-            reason: isPendingOrTerminated ? (runningJobInfo?.reason ?? "") : undefined,
+            timeLimit: runningJobInfo.timeLimitMinutes ? formatTime(runningJobInfo.timeLimitMinutes * 60 * 1000) : "",
+            reason: isPendingOrTerminated ? (runningJobInfo.reason ?? "") : undefined,
             host,
             port,
           });
-
         }));
         const runningStates = ["RUNNING", "PENDING"];
 
-        const filteredSessions = sessions.filter((session) => isRunning
-          ? runningStates.includes(session.state)
-          : !runningStates.includes(session.state))
+        const filteredSessions = sessions.filter((session) =>
+          isRunning
+            ? runningStates.includes(session.state)
+            : !runningStates.includes(session.state))
           .sort((a, b) => b.submitTime.localeCompare(a.submitTime));
 
         const { paginatedItems: paginatedSessions, totalCount } = paginate(
