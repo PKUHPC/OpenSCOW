@@ -1,5 +1,27 @@
 # @scow/mis-server
 
+## 1.8.1
+
+### Patch Changes
+
+- 2632b1d: 已结束作业调整作业计费增加选择功能
+- 1730b01: 修复部分 HttpError 的状态码判断为字符串导致前端无法正常展示错误的问题
+- 217c4a3: 消息系统新增批量发送消息接口，并将作业完成通知改为批量发送
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+- Updated dependencies [1730b01]
+- Updated dependencies [217c4a3]
+  - @scow/lib-config@1.0.2
+  - @scow/lib-auth@1.0.2
+  - @scow/notification-protos@0.1.5
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-notification@1.0.6
+  - @scow/lib-hook@1.0.22
+  - @scow/lib-scow-resource@0.2.5
+  - @scow/lib-server@1.3.11
+  - @scow/lib-scheduler-adapter@1.1.20
+
 ## 1.8.0
 
 ### Minor Changes

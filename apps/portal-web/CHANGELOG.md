@@ -1,5 +1,31 @@
 # @scow/portal-web
 
+## 1.8.1
+
+### Patch Changes
+
+- 9cd4758: 自定义导航重复打开窗口修复以及一级导航增加是否可点击配置
+- eb9664c: 文件管理前端交互优化
+- 174fb6a: 文件管理 ui 调整 bug 修复
+- 71c83bb: 修复 portal 中应用无需密码但是也得生成，不然会报错
+- 1730b01: 修复部分 HttpError 的状态码判断为字符串导致前端无法正常展示错误的问题
+- 916aebc: HPC 文件管理新增文件夹上传，在线压缩和压缩下载功能
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+- Updated dependencies [1730b01]
+- Updated dependencies [217c4a3]
+- Updated dependencies [916aebc]
+  - @scow/lib-config@1.0.2
+  - @scow/lib-web@1.4.10
+  - @scow/lib-auth@1.0.2
+  - @scow/notification-protos@0.1.5
+  - @scow/lib-operation-log@2.1.16
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-notification@1.0.6
+  - @scow/lib-scow-resource@0.2.5
+  - @scow/rich-error-model@2.0.1
+
 ## 1.8.0
 
 ### Patch Changes

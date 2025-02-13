@@ -1,5 +1,12 @@
 # @scow/lib-config
 
+## 1.0.2
+
+### Patch Changes
+
+- 9cd4758: 自定义导航重复打开窗口修复以及一级导航增加是否可点击配置
+- d3c4b57: 集群监控增加多 dashboard 支持、集群监控菜单更改
+
 ## 1.0.1
 
 ### Patch Changes

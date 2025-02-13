@@ -1,5 +1,13 @@
 # @scow/lib-web
 
+## 1.4.10
+
+### Patch Changes
+
+- 9cd4758: 自定义导航重复打开窗口修复以及一级导航增加是否可点击配置
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+
 ## 1.4.9
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @scow/lib-auth
 
+## 1.0.2
+
+### Patch Changes
+
+- 1730b01: 修复部分 HttpError 的状态码判断为字符串导致前端无法正常展示错误的问题
+
 ## 1.0.1
 
 ### Patch Changes

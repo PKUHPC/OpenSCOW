@@ -1,5 +1,12 @@
 # @scow/lib-operation-log
 
+## 2.1.16
+
+### Patch Changes
+
+- 916aebc: HPC 文件管理新增文件夹上传，在线压缩和压缩下载功能
+  - @scow/protos@1.0.22
+
 ## 2.1.15
 
 ### Patch Changes

@@ -1,5 +1,22 @@
 # @scow/notification
 
+## 0.2.7
+
+### Patch Changes
+
+- 217c4a3: 消息系统新增批量发送消息接口，并将作业完成通知改为批量发送
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+- Updated dependencies [217c4a3]
+  - @scow/lib-config@1.0.2
+  - @scow/lib-web@1.4.10
+  - @scow/notification-protos@0.1.5
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-notification@1.0.6
+  - @scow/lib-server@1.3.11
+  - @scow/lib-scheduler-adapter@1.1.20
+
 ## 0.2.6
 
 ### Patch Changes

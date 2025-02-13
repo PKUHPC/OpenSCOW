@@ -1,5 +1,14 @@
 # @scow/test-adapter
 
+## 1.1.10
+
+### Patch Changes
+
+- 217c4a3: 消息系统新增批量发送消息接口，并将作业完成通知改为批量发送
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+  - @scow/lib-config@1.0.2
+
 ## 1.1.9
 
 ### Patch Changes

@@ -1,5 +1,28 @@
 # @scow/ai
 
+## 0.3.1
+
+### Patch Changes
+
+- 4cd4324: AI 创建应用、训练、推理时镜像选择逻辑优化
+- 37f02be: AI 的交互式应用和 ws 代理部分加入代理网关节点相关逻辑
+- 9ee3585: 修复作业会同时出现在未结束和已结束作业的问题
+- 0deefeb: 修复 AI 中若选择的公共镜像，再次提交作业后镜像没法正常展示
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+- Updated dependencies [1730b01]
+- Updated dependencies [916aebc]
+  - @scow/lib-config@1.0.2
+  - @scow/lib-web@1.4.10
+  - @scow/lib-auth@1.0.2
+  - @scow/lib-operation-log@2.1.16
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-scow-resource@0.2.5
+  - @scow/lib-server@1.3.11
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.20
+
 ## 0.3.0
 
 ### Minor Changes

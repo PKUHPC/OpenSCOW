@@ -1,5 +1,16 @@
 # @scow/auth
 
+## 1.8.1
+
+### Patch Changes
+
+- 1730b01: 修复部分 HttpError 的状态码判断为字符串导致前端无法正常展示错误的问题
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+  - @scow/lib-config@1.0.2
+  - @scow/config@1.6.4
+  - @scow/lib-server@1.3.11
+
 ## 1.8.0
 
 ### Patch Changes

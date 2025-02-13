@@ -1,5 +1,25 @@
 # @scow/portal-server
 
+## 1.8.1
+
+### Patch Changes
+
+- 71c83bb: 修复 portal 中应用无需密码但是也得生成，不然会报错
+- 3a27437: 将 initShellFile 逻辑转移至 scowd
+- 916aebc: HPC 文件管理新增文件夹上传，在线压缩和压缩下载功能
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+- Updated dependencies [916aebc]
+  - @scow/lib-config@1.0.2
+  - @scow/scowd-protos@0.2.4
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-scowd@1.1.5
+  - @scow/lib-scow-resource@0.2.5
+  - @scow/lib-server@1.3.11
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.20
+
 ## 1.8.0
 
 ### Patch Changes

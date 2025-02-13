@@ -1,5 +1,11 @@
 # @scow/lib-scow-resource
 
+## 0.2.5
+
+### Patch Changes
+
+- @scow/config@1.6.4
+
 ## 0.2.4
 
 ### Patch Changes

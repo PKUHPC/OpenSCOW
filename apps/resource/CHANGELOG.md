@@ -1,5 +1,20 @@
 # @scow/resource
 
+## 0.2.7
+
+### Patch Changes
+
+- 353e732: 修复修改了 basePath 后没法连接 resource 的问题和补充了 notification 和 resource 的文档
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+  - @scow/lib-config@1.0.2
+  - @scow/lib-web@1.4.10
+  - @scow/config@1.6.4
+  - @scow/protos@1.0.22
+  - @scow/lib-hook@1.0.22
+  - @scow/lib-server@1.3.11
+  - @scow/lib-scheduler-adapter@1.1.20
+
 ## 0.2.6
 
 ### Patch Changes

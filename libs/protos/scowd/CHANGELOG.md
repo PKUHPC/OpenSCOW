@@ -1,5 +1,11 @@
 # @scow/scowd-protos
 
+## 0.2.4
+
+### Patch Changes
+
+- 916aebc: HPC 文件管理新增文件夹上传，在线压缩和压缩下载功能
+
 ## 0.2.3
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @scow/gateway
 
+## 1.8.1
+
+### Patch Changes
+
+- 1d70861: gateway 中增加 ai 和 portal 对 text/stream 的支持
+- Updated dependencies [9cd4758]
+- Updated dependencies [d3c4b57]
+  - @scow/lib-config@1.0.2
+
 ## 1.8.0
 
 ## 1.7.5

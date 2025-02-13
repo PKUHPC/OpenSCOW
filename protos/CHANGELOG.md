@@ -1,5 +1,12 @@
 # @scow/grpc-api
 
+## 1.19.0
+
+### Minor Changes
+
+- 71c83bb: 修复 portal 中应用无需密码但是也得生成，不然会报错
+- 916aebc: HPC 文件管理新增文件夹上传，在线压缩和压缩下载功能
+
 ## 1.18.0
 
 ### Minor Changes

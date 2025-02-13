@@ -1,5 +1,12 @@
 # @scow/docs
 
+## 1.4.7
+
+### Patch Changes
+
+- 353e732: 修复修改了 basePath 后没法连接 resource 的问题和补充了 notification 和 resource 的文档
+- 353e732: 补充资源管理和消息系统的 address 配置文档
+
 ## 1.4.6
 
 ### Patch Changes
