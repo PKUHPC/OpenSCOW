@@ -9,7 +9,7 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:iron-alpine@sha256:558a6416c5e0da2cb0f19bbc766f0a76825a7e76484bc211af0bb1cedbb7ca1e AS base
+FROM node:iron-alpine@sha256:ba8312129a193a1f1a781d93afcf6e641956d6e48e3ddefa9b64cd86790ee64c AS base
 
 RUN apk update
 
