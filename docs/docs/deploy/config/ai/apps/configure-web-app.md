@@ -110,5 +110,36 @@ web:
 这些脚本会被提交给调度系统，并最终运行后在计算节点上启动应用。
 
 ### `attributes`
-  
-[参考门户系统](../../portal/apps/configure-attributes.md)
+
+考虑到扩展性和其他特殊的用法，不对type为`select`的attribute值处理：转义空格、特殊字符（比如引号、$符号、&符号等），管理员配置attribute值时要注意这一点。
+其他的要求[参考门户系统](../../portal/apps/configure-attributes.md)。
+
+## 特殊配置
+
+### VSCode
+
+对于VSCode应用让用户选择`使用镜像内置VSCode`或者`使用平台提供的VSCode版本`
+
+1. 使用镜像内VSCode：即直接使用镜像内自带的VSCode
+2. 使用平台VSCode：
+   1. 管理员提前在ai公共挂载目录（这个也得先在ai的配置文件中配好）准备好提供给用户选择的vscode的各个版本文件
+   2. 在VSCode应用配置文件中增加属性 PATH ，并配置版本值注意要在最后加上`$PATH`，版本对应的ai公共挂载目录值
+   3. 内置VSCode 的value直接配置为`$PATH`即可
+
+参考配置实例
+
+```yaml
+attributes:
+  - type: select
+    name: PATH
+    label: 选择来源或版本
+    required: true  
+    placeholder: 选择内置VSCode或平台提供的VSCode的版本 
+    select:
+      - value: $PATH
+        label: 镜像内VSCode (请填写启动命令, 使用默认镜像无需填写)
+      - value: /nfs/public/vscode/code-server-4.96.1-linux-amd64/bin:$PATH
+        label: version 4.96.1 (请不要填写启动命令)
+      - value: /nfs/public/vscode/code-server-4.96.2-linux-amd64/bin:$PATH
+        label: version 4.96.2 (请不要填写启动命令)
+```

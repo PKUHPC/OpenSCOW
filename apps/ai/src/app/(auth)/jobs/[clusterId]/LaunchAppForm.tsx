@@ -510,6 +510,7 @@ export const LaunchAppForm = (props: Props) => {
       const framework = "framework" in inputParams ? inputParams.framework : undefined;
       const psNodes = "psNodes" in inputParams ? inputParams.psNodes : undefined;
       const workerNodes = "workerNodes" in inputParams ? inputParams.workerNodes : undefined;
+
       form.setFieldsValue({
         mountPoints,
         customFields: {
@@ -528,6 +529,7 @@ export const LaunchAppForm = (props: Props) => {
         psNodes,
         workerNodes,
       });
+
     }
 
   }, [createAppParams, trainJobInput, clusterInfo]);
@@ -612,7 +614,9 @@ export const LaunchAppForm = (props: Props) => {
             if (customFormKey === "workingDir") {
               workingDirectory = customFields[customFormKey]?.toString();
             }
-            customFormKeyValue.customFields[customFormKey] = customFields[customFormKey];
+            if (customFields?.[customFormKey]) {
+              customFormKeyValue.customFields[customFormKey] = customFields[customFormKey];
+            }
           });
 
           createAppSessionMutation.mutate({
@@ -646,7 +650,6 @@ export const LaunchAppForm = (props: Props) => {
         }
       }
       }
-
     >
       <Spin spinning={createAppSessionMutation.isLoading || trainJobMutation.isLoading} tip="loading">
         <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 42 }]}>
@@ -656,11 +659,8 @@ export const LaunchAppForm = (props: Props) => {
           {isTraining ? t(p("trainConfig")) : t(p("appConfig"))}
         </Divider>
         <Form.Item
-          label={"选择镜像类型"}
+          label={t(p("selectImageSource"))}
           name="imageSource"
-          help={ !isTraining && imageSource !== ImageSource.DEFAULT &&
-            <Typography.Text type="danger">{`${t(p("imageText"),[appName])}`}</Typography.Text>
-          }
         >
           <Radio.Group
             onChange={() => {
@@ -672,14 +672,14 @@ export const LaunchAppForm = (props: Props) => {
             }}
             style={{ userSelect:"none" }}
           >
-            {!isTraining && <Radio value={ImageSource.DEFAULT}> 默认镜像 </Radio>}
-            <Radio value={ImageSource.LOCAL}> 本地镜像</Radio>
-            <Radio value={ImageSource.REMOTE}> 远程镜像</Radio>
+            {!isTraining && <Radio value={ImageSource.DEFAULT}> {t(p("defaultImage"))} </Radio>}
+            <Radio value={ImageSource.LOCAL}> {t(p("localImage"))} </Radio>
+            <Radio value={ImageSource.REMOTE}> {t(p("remoteImage"))} </Radio>
           </Radio.Group>
         </Form.Item>
         {imageSource !== ImageSource.REMOTE && (
           <Form.Item
-            label={"当前选择镜像"}
+            label={t(p("currentImage"))}
           >
             <Space>
               <strong>
@@ -774,20 +774,20 @@ export const LaunchAppForm = (props: Props) => {
             </Form.Item>
           )
         }
-        {(imageSource !== ImageSource.DEFAULT && !isTraining) ? (
-          <Form.Item
-            label={t(p("startCommand"))}
-            name="startCommand"
-            required
-            rules={[{ required:true }]}
-          >
-            <Input placeholder={t(p("startCommandPlaceholder"))} />
-          </Form.Item>
-        ) : null }
 
         {
-          customFormItems.filter((item) => item?.key?.includes("workingDir"))
+          customFormItems
         }
+
+        {(!isTraining && imageSource !== ImageSource.DEFAULT) ?
+          (
+            <Form.Item
+              label={t(p("startCommand"))}
+              name="startCommand"
+            >
+              <Input placeholder={t(p("startCommandPlaceholder"))} />
+            </Form.Item>
+          ) : null }
 
         <Form.List name="mountPoints">
           {(fields, { add, remove }) => (
@@ -1331,9 +1331,6 @@ export const LaunchAppForm = (props: Props) => {
         <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
           <InputNumber min={1} step={1} addonAfter={t(p("min"))} />
         </Form.Item>
-        {
-          customFormItems.filter((item) => !item?.key?.includes("workingDir"))
-        }
         <Row>
           {
             currentPartitionInfo?.gpus

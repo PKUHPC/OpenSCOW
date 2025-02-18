@@ -186,7 +186,19 @@ export const scowdAppServices = (cluster: string, client: ScowdClient): AppOps =
 
       let customAttributesExport: string = "";
       for (const key in customAttributes) {
-        const quotedAttribute = quote([customAttributes[key] ?? ""]);
+        let quotedAttribute = "";
+
+        // select类型的属性值是管理员配置的，无需处理特殊字符，可以让配置的特殊字符(如 $)生效
+        if (
+          appConfig.attributes?.find((attribute) =>
+            attribute.name === key && attribute.type === "select",
+          )
+        ) {
+          quotedAttribute = customAttributes[key]?.toString() ?? "";
+        } else {
+          quotedAttribute = quote([customAttributes[key]?.toString() ?? ""]);
+        }
+
         const envItem = `export ${key}=${quotedAttribute}`;
         customAttributesExport = customAttributesExport + envItem + "\n";
       }

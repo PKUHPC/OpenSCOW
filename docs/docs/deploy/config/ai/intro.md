@@ -167,6 +167,10 @@ harborConfig:
   user: user
   # Harbor 仓库可登录用户的登录密码
   password: password
+
+# 选配公共的挂载目录
+# publicMountPoints:
+  # - /nfs/public
 ```
 
 ## 启动服务

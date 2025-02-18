@@ -7,6 +7,8 @@ name: VSCode
 # 这个应用的图标文件在公共文件下的路径
 # logoPath: /test.svg
 
+appComment: 启动命令为 code-server
+
 
 image:
   # 镜像名称
@@ -39,3 +41,23 @@ web:
     path: /login
     formData:
       password: "{{ PASSWORD }}"
+
+# 配置HTML表单，用户可以指定code-server版本
+attributes:
+  - type: select
+    name: PATH
+    label: 选择来源或版本
+    required: false  # 用户必须选择一个版本
+    placeholder: 选择内置VSCode或平台提供的VSCode的版本  # 提示信息
+    # placeholder:
+    #   i18n:
+    #     default: 选择code-server的版本
+    #     en: Choose the version of the code-server
+    #     zh_cn: 选择code-server的版本
+    select:
+      - value: $PATH
+        label: 镜像内vscode (请填写启动命令, 使用默认镜像无需填写)
+      - value: /nfs/public/vscode/code-server-4.96.1-linux-amd64/bin:$PATH
+        label: version 4.96.1 (请不要填写启动命令)
+      - value: /nfs/public/vscode/code-server-4.96.2-linux-amd64/bin:$PATH
+        label: version 4.96.2 (请不要填写启动命令)
