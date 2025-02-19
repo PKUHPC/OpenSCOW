@@ -70,7 +70,7 @@ export const MessageSchema = new EntitySchema<Message>({
     targetType: { enum: true, items: () => TargetType },
     metadata: { type: "json" },
     descriptionData: { type: "array" },
-    messageType: { type: "string", length: 255 },
+    messageType: { type: "string", length: 255, index: true },
     category: { type: "string", length: 255, nullable: false },
     userMessageRead: {
       kind: "1:m",
@@ -84,8 +84,8 @@ export const MessageSchema = new EntitySchema<Message>({
       mappedBy: (messageTarget) => messageTarget.message,
       cascade: [Cascade.REMOVE],
     },
-    expiredAt: { type: "data", columnType: DATETIME_TYPE, nullable: true },
-    createdAt: { type: "date", columnType: DATETIME_TYPE },
+    expiredAt: { type: "data", columnType: DATETIME_TYPE, index: true, nullable: true },
+    createdAt: { type: "date", columnType: DATETIME_TYPE, index: true },
     updatedAt: { type: "date", columnType: DATETIME_TYPE, onUpdate: () => new Date() },
   },
 });

@@ -472,6 +472,36 @@
           "unique": false
         },
         {
+          "columnNames": [
+            "message_type"
+          ],
+          "composite": false,
+          "keyName": "messages_message_type_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "expired_at"
+          ],
+          "composite": false,
+          "keyName": "messages_expired_at_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "created_at"
+          ],
+          "composite": false,
+          "keyName": "messages_created_at_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "PRIMARY",
           "columnNames": [
             "id"

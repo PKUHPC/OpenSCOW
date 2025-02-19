@@ -7,6 +7,7 @@ import { ScowMessageService } from "@scow/notification-protos/build/scow_message
 import { NoticeType } from "src/models/notice-type";
 import { commonConfig } from "src/server/config/common";
 import { notificationConfig } from "src/server/config/notification";
+import { AdminMessageConfig } from "src/server/entities/AdminMessageConfig";
 import { Message, SenderType } from "src/server/entities/Message";
 import { MessageTarget } from "src/server/entities/MessageTarget";
 import { ReadStatus as EntityReadStatus, TargetType, UserMessageRead } from "src/server/entities/UserMessageRead";
@@ -101,9 +102,11 @@ export default (router: ConnectRouter) => {
 
       const { systemId, messages } = req;
       const em = await forkEntityManager();
+      const adminMessageConfigMap = new Map<string, Pick<AdminMessageConfig, "enabled" | "canUserModify"> | null>();
 
       const bridgeMessages: SystemSendMsgToBridge[] = [];
       for (const msg of messages) {
+        let messageConfig = adminMessageConfigMap.get(msg.messageType);
         const { targetIds, messageType, metadata, descriptionData } = msg;
         const { targetType } = ensureNotUndefined(msg, ["targetType"]);
 
@@ -135,10 +138,15 @@ export default (router: ConnectRouter) => {
 
         em.persist(message);
 
+        if (!messageConfig && !adminMessageConfigMap.has(msg.messageType)) {
+          messageConfig = await getMessageConfigWithDefault(em, messageType, NoticeType.SITE_MESSAGE);
+          adminMessageConfigMap.set(msg.messageType, messageConfig);
+        }
+
         const adminMessageConfig = await getMessageConfigWithDefault(em, messageType, NoticeType.SITE_MESSAGE);
 
         for (const userId of targetIds) {
-        // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理，用户订阅有可能一开始不存在，则还是已管理员设置的为准
+          // 只有管理员开启了该消息且允许用户修改才按照用户订阅来处理，用户订阅有可能一开始不存在，则还是已管理员设置的为准
           let messageEnabled = adminMessageConfig.enabled;
           if (adminMessageConfig.canUserModify && adminMessageConfig.enabled) {
             const userSub = await em.findOne(UserSubscription,
