@@ -151,7 +151,7 @@ export const AdminUserTable: React.FC<Props> = ({
       { label: t(pCommon("email")), value: "email" },
       { label: t(p("tenantRole")), value: "tenantRoles" },
       { label: t(pCommon("createTime")), value: "createTime" },
-      { label: t(p("affiliatedAccountName")), value: "availableAccounts" },
+      { label: t(p("affiliatedAccountName")), value: "affiliatedAccounts" },
     ];
   }, [t]);
 

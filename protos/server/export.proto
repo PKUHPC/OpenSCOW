@@ -52,6 +52,7 @@ message ExportedUser {
   google.protobuf.Timestamp create_time = 6;
   repeated TenantRole tenant_roles = 7;
   repeated PlatformRole platform_roles = 8;
+  repeated string affiliated_accounts = 9;
 }
 
 message ExportUserRequest {

@@ -133,6 +133,7 @@ export default route(ExportUserSchema, async (req, res) => {
       email: t(pCommon("email")),
       tenantName:  t(pAdmin("tenant")),
       availableAccounts: t(pAdmin("availableAccounts")),
+      affiliatedAccounts: t(pTenant("affiliatedAccountName")),
       createTime: t(pCommon("createTime")),
       tenantRoles: t(pTenant("tenantRole")),
       platformRoles: t(pAdmin("roles")),
@@ -155,6 +156,7 @@ export default route(ExportUserSchema, async (req, res) => {
         email: x.email,
         tenantName: x.tenantName,
         availableAccounts: x.availableAccounts.join(","),
+        affiliatedAccounts: x.affiliatedAccounts.join(","),
         createTime: x.createTime ? new Date(x.createTime).toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })
           : "",
         tenantRoles: x.tenantRoles.map((x) => TenantRoleI18nTexts[x]).join(","),

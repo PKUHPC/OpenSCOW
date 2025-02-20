@@ -100,6 +100,11 @@ export const exportServiceServer = plugin((server) => {
           .map((ua) => {
             return ua.account.getProperty("accountName");
           }),
+        affiliatedAccounts: x.accounts.getItems()
+          .filter((ua) => ua.account.getProperty("state") !== AccountState.DELETED)
+          .map((ua) => {
+            return ua.account.getProperty("accountName");
+          }),
         tenantName: x.tenant.$.name,
         createTime: x.createTime.toISOString(),
         tenantRoles: x.tenantRoles.map(tenantRoleFromJSON),
