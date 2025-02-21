@@ -167,6 +167,8 @@ export const ChargeTable: React.FC<Props> = ({
 
   // 处理消费记录导出的函数
   const handleExport = async (columns: string[], encoding: Encoding) => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     const totalCount = totalResultData?.totalCount ?? 0;
     if (totalCount > MAX_EXPORT_COUNT) {
       message.error(t(pCommon("exportMaxDataErrorMsg"), [MAX_EXPORT_COUNT]));
@@ -176,6 +178,7 @@ export const ChargeTable: React.FC<Props> = ({
       window.location.href = urlToExport({
         encoding,
         exportApi: "exportChargeRecord",
+        timeZone:timeZone,
         columns,
         count: totalCount,
         query: {

@@ -48,6 +48,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
     searchType: Type.Optional(Type.Enum(SearchType)),
     userIds: Type.Optional(Type.String()),
     encoding: Type.Enum(Encoding),
+    timeZone:Type.Optional(Type.String()),
   }),
 
   responses:{
@@ -62,7 +63,7 @@ export const ExportChargeRecordSchema = typeboxRouteSchema({
 export default route(ExportChargeRecordSchema, async (req, res) => {
   const { query } = req;
 
-  const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds, encoding } = query;
+  const { columns, startTime, endTime, searchType, isPlatformRecords, count, userIds, encoding, timeZone } = query;
   let { accountNames, types } = query;
   accountNames = emptyStringArrayToUndefined(accountNames);
   types = emptyStringArrayToUndefined(types);
@@ -92,7 +93,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
 
     const client = getClient(ExportServiceClient);
 
-    const filename = `charge_record-${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}.csv`;
+    const filename = `charge_record-${new Date().toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" })}.csv`;
     const dispositionParm = "filename* = UTF-8''" + encodeURIComponent(filename);
 
     const contentTypeWithCharset = getContentTypeWithCharset(filename, encoding);
@@ -125,7 +126,7 @@ export default route(ExportChargeRecordSchema, async (req, res) => {
         accountName: x.accountName,
         tenantName: x.tenantName,
         userId: x.userId,
-        time: x.time ? new Date(x.time).toISOString() : "",
+        time: x.time ? new Date(x.time).toLocaleString("zh-CN", { timeZone: timeZone ?? "UTC" }) : "",
         amount: nullableMoneyToString(x.amount),
         type: x.type,
         comment: x.comment,
