@@ -9,11 +9,9 @@
 # See the Mulan PSL v2 for more details.
 
 
-FROM node:22-alpine@sha256:5bfc86520dfe026fd04c14fa55d26bc4917e249ac67bc5c6d8b7fd12b97e2c0e AS base
+FROM node:iron-alpine@sha256:558a6416c5e0da2cb0f19bbc766f0a76825a7e76484bc211af0bb1cedbb7ca1e AS base
 
 RUN apk update && apk add libc6-compat python3 make gcc g++ git
-
-RUN npm i -g corepack@0.31.0
 
 RUN corepack enable
 
