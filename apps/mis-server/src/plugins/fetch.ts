@@ -42,7 +42,9 @@ export const fetchPlugin = plugin(async (f) => {
 
   const task = cron.schedule(
     misConfig.fetchJobs.periodicFetch.cron,
-    () => { void trigger(); },
+    () => { void trigger()?.catch((e) => {
+      logger.error("Error when fetching jobs. %o", e);
+    }); },
     {
       timezone: "Asia/Shanghai",
       scheduled: misConfig.fetchJobs.periodicFetch.enabled,
