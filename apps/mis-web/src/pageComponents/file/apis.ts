@@ -30,7 +30,7 @@ export const urlToExport = ({
   count: number,
   query: Record<string, string | number | boolean | string[] | undefined>
   encoding: Encoding
-  timeZone: string | undefined
+  timeZone?: string | undefined
 },
 ) => {
   const params = new URLSearchParams();
