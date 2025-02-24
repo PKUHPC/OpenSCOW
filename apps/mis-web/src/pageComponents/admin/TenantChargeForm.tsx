@@ -127,7 +127,7 @@ export const TenantChargeForm: React.FC = () => {
       <Form.Item
         name="type"
         label={t(pCommon("type"))}
-        required
+        rules={[{ required: true }]}
         extra={(
           <div style={{ margin: "8px 0" }}>
             <UsedType
