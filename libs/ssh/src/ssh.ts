@@ -151,12 +151,18 @@ export class SSHExecError extends Error {
   }
 }
 
+/**
+ *  注意: parameters 中的空字符串参数会在 SSH 参数构造前被过滤掉以防止 SSH 命令格式错误
+ *  如果后期出现需要单独向 SSH 参数中传递空字符串的形式，需要进行兼容性修改
+ */
 export async function loggedExec(ssh: NodeSSH, logger: Logger, throwIfFailed: boolean,
   cmd: string, parameters: string[], options?: SSHExecCommandOptions) {
 
   const env = options?.execOptions?.env as Record<string, string>;
 
-  const command = constructCommand(cmd, parameters, env);
+  const filteredParameters = parameters.filter((param) => param !== "");
+
+  const command = constructCommand(cmd, filteredParameters, env);
 
   const resp = await ssh.execCommand(command, options);
   logger.info("Command execCommand %s, options %o", command, options);
