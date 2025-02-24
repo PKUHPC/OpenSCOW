@@ -16,7 +16,7 @@ import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Checkbox, Col,
-  Divider, Form, Input, InputNumber, Radio, Row, Select, Space, Spin, Typography } from "antd";
+  Divider, Form, Input, InputNumber, Radio, Row, Select, Space, Spin,Typography } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -35,8 +35,15 @@ import { FrameworkType, TrainJobInput } from "src/server/trpc/route/jobs/jobs";
 import { formatSize } from "src/utils/format";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
+import { styled, useTheme } from "styled-components";
 
 import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
+
+const AfterInputNumber = styled(InputNumber)`
+  .ant-select-focused .ant-select-selector{
+    color: ${({ theme }) => theme.token.colorText } !important;
+  }
+`;
 
 interface Props {
   appId?: string;
@@ -84,6 +91,7 @@ interface CustomFormFields {
   customFields: Record<string, number | string | undefined>;
 }
 type FormFields = CustomFormFields & FixedFormFields;
+type TimeUnit = "min" | "hour" | "day";
 
 interface ClusterConfig {
   partitions: Partition[];
@@ -134,12 +142,14 @@ export const LaunchAppForm = (props: Props) => {
     appId, attributes = [], appImage, createAppParams, trainJobInput,appComment } = props;
 
   const { message } = App.useApp();
+  const theme = useTheme();
 
   const router = useRouter();
 
   const [form] = Form.useForm<FormFields>();
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+  const [maxTimeUnitValue, setMaxTimeUnitValue] = useState<TimeUnit>("min");
 
   const [frameworkOptions, setFrameworkOptions] = useState<{ value: FrameworkType, label: string }[]>([
     {
@@ -562,6 +572,17 @@ export const LaunchAppForm = (props: Props) => {
     }
   };
 
+  const transformTime = (amount: number) => {
+    switch (maxTimeUnitValue) {
+      case "hour":
+        return amount * 60;
+      case "day":
+        return amount * 60 * 24;
+      default:
+        return amount;
+    }
+  };
+
   return (
     <Form
       form={form}
@@ -599,7 +620,7 @@ export const LaunchAppForm = (props: Props) => {
               gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) :
               coreCount,
             gpuCount: gpuCount,
-            maxTime: maxTime,
+            maxTime: transformTime(maxTime),
             memory: memorySize,
             command: command || "",
             gpuType: currentPartitionInfo!.gpuType,
@@ -641,7 +662,7 @@ export const LaunchAppForm = (props: Props) => {
               gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) :
               coreCount,
             gpuCount: gpuCount,
-            maxTime: maxTime,
+            maxTime: transformTime(maxTime),
             memory: memorySize,
             workingDirectory,
             customAttributes: customFormKeyValue.customFields,
@@ -1329,7 +1350,25 @@ export const LaunchAppForm = (props: Props) => {
           </>
         ) : null}
         <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-          <InputNumber min={1} step={1} addonAfter={t(p("min"))} />
+          <AfterInputNumber
+            min={1}
+            step={1}
+            precision={0}
+            theme={theme}
+            addonAfter={
+              (
+                <Select
+                  style={{ flex: "0 1 auto" }}
+                  value={maxTimeUnitValue}
+                  onChange={(value) => setMaxTimeUnitValue(value)}
+                >
+                  <Select.Option value="min">{t(p("min"))}</Select.Option>
+                  <Select.Option value="hour">{t(p("hour"))}</Select.Option>
+                  <Select.Option value="day">{t(p("day"))}</Select.Option>
+                </Select>
+              )
+            }
+          />
         </Form.Item>
         <Row>
           {

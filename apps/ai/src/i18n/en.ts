@@ -388,6 +388,8 @@ export default {
         framework:"Distributed training framework",
         maxTime:"Maximum running time",
         min:"Minutes",
+        hour:"Hours",
+        day: "Days",
         totalGpus:"Total GPUs",
         totalCpus:"Total CPUs",
         totalMem:"Total memory",

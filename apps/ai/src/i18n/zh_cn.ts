@@ -388,6 +388,8 @@ export default {
         framework:"分布式训练框架",
         maxTime:"最长运行时间",
         min:"分钟",
+        hour:"小时",
+        day: "天",
         totalGpus:"总GPU数",
         totalCpus:"总CPU数",
         totalMem:"总内存",

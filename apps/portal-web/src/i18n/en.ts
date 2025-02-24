@@ -471,6 +471,8 @@ export default {
         coreCount: "CPU Cores per Node",
         maxTime: "Maximum Running Time",
         minute: "Minutes",
+        hour:"Hours",
+        day: "Days",
         totalGpuCount: "Total GPU Cards",
         totalCpuCount: "Total CPU Cores",
         totalMemory: "Total Memory Capacity",

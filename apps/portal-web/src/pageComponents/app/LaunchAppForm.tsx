@@ -26,11 +26,17 @@ import { AccountListSelector } from "src/pageComponents/job/AccountListSelector"
 import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
 import { formatSize } from "src/utils/format";
-import { styled } from "styled-components";
+import { styled, useTheme } from "styled-components";
 
 import { PartitionSelector } from "../job/PartitionSelector";
 
 const Text = styled(Typography.Paragraph)`
+`;
+
+const AfterInputNumber = styled(InputNumber)`
+  .ant-select-focused .ant-select-selector{
+    color: ${({ theme }) => theme.token.colorText } !important;
+  }
 `;
 
 interface Props {
@@ -51,6 +57,7 @@ interface FormFields {
   account: string;
   maxTime: number;
 }
+type TimeUnit = "min" | "hour" | "day";
 
 // 生成默认应用名称，命名规则为"集群Id-当前应用名-年月日-时分秒"
 const genAppJobName = (clusterId: string,appName: string): string => {
@@ -74,6 +81,7 @@ const p = prefix("pageComp.app.launchAppForm.");
 export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName, appComment }) => {
 
   const { message, modal } = App.useApp();
+  const theme = useTheme();
 
   const t = useI18nTranslateToString();
   const languageId = useI18n().currentLanguage.id;
@@ -113,7 +121,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
       partition,
       qos,
       account,
-      maxTime,
+      maxTime: transformTime(maxTime),
       customAttributes: customFormKeyValue,
     } })
       .httpError(500, (e) => {
@@ -150,6 +158,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   const [partitionsReloadTrigger, setPartitionsReloadTrigger] = useState<boolean>(false);
   const [accountPartitionsCacheMap, setAccountPartitionsCacheMap] = useState<Record<string, Partition[]>>({});
   const [selectableAccounts, setSelectableAccounts] = useState<string[]>([]);
+  const [maxTimeUnitValue, setMaxTimeUnitValue] = useState<TimeUnit>("min");
 
   const account = Form.useWatch("account", form);
 
@@ -443,6 +452,17 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     ? nodeCount * gpuCount * Math.floor(currentPartitionInfo.cores / currentPartitionInfo.gpus)
     : nodeCount * coreCount;
 
+  const transformTime = (amount: number) => {
+    switch (maxTimeUnitValue) {
+      case "hour":
+        return amount * 60;
+      case "day":
+        return amount * 60 * 24;
+      default:
+        return amount;
+    }
+  };
+
   return (
     <>
       <Form
@@ -549,7 +569,25 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             )
           }
           <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-            <InputNumber min={1} step={1} addonAfter={t(p("minute"))} />
+            <AfterInputNumber
+              min={1}
+              step={1}
+              precision={0}
+              theme={theme}
+              addonAfter={
+                (
+                  <Select
+                    style={{ flex: "0 1 auto" }}
+                    value={maxTimeUnitValue}
+                    onChange={(value) => setMaxTimeUnitValue(value)}
+                  >
+                    <Select.Option value="min">{t(p("minute"))}</Select.Option>
+                    <Select.Option value="hour">{t(p("hour"))}</Select.Option>
+                    <Select.Option value="day">{t(p("day"))}</Select.Option>
+                  </Select>
+                )
+              }
+            />
           </Form.Item>
 
           {customFormItems}

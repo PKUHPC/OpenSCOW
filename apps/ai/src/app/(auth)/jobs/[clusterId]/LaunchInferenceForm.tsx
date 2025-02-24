@@ -28,8 +28,15 @@ import { InferenceJobInput } from "src/server/trpc/route/jobs/infer";
 import { formatSize } from "src/utils/format";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
+import { styled, useTheme } from "styled-components";
 
 import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
+
+const AfterInputNumber = styled(InputNumber)`
+  .ant-select-focused .ant-select-selector{
+    color: ${({ theme }) => theme.token.colorText } !important;
+  }
+`;
 
 interface Props {
   clusterId: string;
@@ -57,6 +64,7 @@ interface FixedFormFields {
 }
 
 type FormFields = FixedFormFields;
+type TimeUnit = "min" | "hour" | "day";
 
 interface ClusterConfig {
   partitions: Partition[];
@@ -106,12 +114,14 @@ export const LaunchInferenceJobForm = (props: Props) => {
   const { clusterId, clusterInfo,InferenceJobInput } = props;
 
   const { message } = App.useApp();
+  const theme = useTheme();
 
   const router = useRouter();
 
   const [form] = Form.useForm<FormFields>();
 
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
+  const [maxTimeUnitValue, setMaxTimeUnitValue] = useState<TimeUnit>("min");
 
   const showModel = Form.useWatch("showModel", form);
   const isUnlimitedTime = Form.useWatch("isUnlimitedTime", form);
@@ -290,6 +300,17 @@ export const LaunchInferenceJobForm = (props: Props) => {
     },
   });
 
+  const transformTime = (amount: number) => {
+    switch (maxTimeUnitValue) {
+      case "hour":
+        return amount * 60;
+      case "day":
+        return amount * 60 * 24;
+      default:
+        return amount;
+    }
+  };
+
   return (
     <Form
       form={form}
@@ -318,7 +339,7 @@ export const LaunchInferenceJobForm = (props: Props) => {
             gpuCount * Math.floor(currentPartitionInfo!.cores / currentPartitionInfo!.gpus) :
             coreCount,
           gpuCount: gpuCount,
-          maxTime: isUnlimitedTime ? 0 : maxTime * 60,
+          maxTime: isUnlimitedTime ? 0 : transformTime(maxTime),
           memory: memorySize,
           command: command || "",
           gpuType: currentPartitionInfo!.gpuType,
@@ -732,7 +753,25 @@ export const LaunchInferenceJobForm = (props: Props) => {
             {
               !isUnlimitedTime ? (
                 <Form.Item name="maxTime" rules={[{ required: true }]}>
-                  <InputNumber min={0.01} step={0.01} addonAfter="小时" />
+                  <AfterInputNumber
+                    min={1}
+                    step={1}
+                    precision={0}
+                    theme={theme}
+                    addonAfter={
+                      (
+                        <Select
+                          style={{ flex: "0 1 auto" }}
+                          value={maxTimeUnitValue}
+                          onChange={(value) => setMaxTimeUnitValue(value)}
+                        >
+                          <Select.Option value="min">{t(p("min"))}</Select.Option>
+                          <Select.Option value="hour">{t(p("hour"))}</Select.Option>
+                          <Select.Option value="day">{t(p("day"))}</Select.Option>
+                        </Select>
+                      )
+                    }
+                  />
                 </Form.Item>
               ) : null
             }
