@@ -11,9 +11,10 @@
  */
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
+import { ServiceError as GrpcServiceError } from "@ddadaal/tsgrpc-common";
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ensureNotUndefined } from "@ddadaal/tsgrpc-server";
-import { ServiceError } from "@grpc/grpc-js";
+import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 import { LockMode, UniqueConstraintViolationException } from "@mikro-orm/core";
 import { createAccount } from "@scow/lib-auth";
@@ -21,6 +22,7 @@ import { removeUserFromAccount } from "@scow/lib-auth";
 import { Decimal, decimalToMoney, moneyToNumber } from "@scow/lib-decimal";
 import { mapTRPCExceptionToGRPC } from "@scow/lib-scow-resource/build/utils";
 import { checkSchedulerApiVersion } from "@scow/lib-server";
+import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { TargetType } from "@scow/notification-protos/build/message_common_pb";
 import { account_AccountStateFromJSON, Account_DisplayedAccountState, AccountServiceServer, AccountServiceService,
   BlockAccountResponse_Result } from "@scow/protos/build/server/account";
@@ -35,6 +37,7 @@ import { Tenant } from "src/entities/Tenant";
 import { User, UserState } from "src/entities/User";
 import { UserAccount, UserRole as EntityUserRole, UserStatus } from "src/entities/UserAccount";
 import { InternalMessageType } from "src/models/messageType";
+import { CLUSTEROPS_ERROR_CODE } from "src/plugins/clusters";
 import { callHook } from "src/plugins/hookClient";
 import { getAccountStateInfo } from "src/utils/accountUserState";
 import { countSubstringOccurrences } from "src/utils/countSubstringOccurrences";
@@ -307,14 +310,14 @@ export const accountServiceServer = plugin((server) => {
       const currentActivatedClusters = await getActivatedClusters(em, logger);
 
       // 如果已配置资源管理扩展功能，向资源管理数据库写入账户的默认授权集群与分区
+      // 创建账户失败时写入的默认授权集群分区不会回滚，下次写入同名租户下同名账户默认集群分区时会覆盖
       if (commonConfig.scowResource?.enabled) {
-        // 此接口建立资源管理事务且不回滚，再次创建相同账户时会正常执行
         await server.ext.resource.assignAccountOnCreate({
           accountName,
           tenantName: tenant.name,
         }).catch(async (e) => {
-          await rollback(e);
-          throw mapTRPCExceptionToGRPC(e);
+          const error = mapTRPCExceptionToGRPC(e);
+          await rollback(error);
         });
       }
 
@@ -341,50 +344,74 @@ export const accountServiceServer = plugin((server) => {
           },
         ).catch(async (e) => {
           await rollback(e);
-          throw e;
         });
       // 如果判断为要在集群中解封时
       } else {
 
         // 条件1：如果配置了资源管理服务，则调用适配器的 unblockAccountWithPartitions 接口
         if (commonConfig.scowResource?.enabled) {
-          await Promise.allSettled(Object.entries(currentActivatedClusters).map(async ([clusterId, cluster]) => {
 
-            await server.ext.clusters.callOnOne(
-              clusterId,
-              logger,
-              async (client) => {
-                await asyncClientCall(client.account, "createAccount", {
-                  accountName, ownerUserId: ownerId,
-                });
-              },
-            );
-
-            // 当前AI集群只能使用AI适配器且不支持分区概念，一旦判断为AI集群只调用原有 unblockAccount 接口
-            // 上述情况以外，如果是HPC集群，调用unblockAccountAssignedPartitionsInCluster
-            if (cluster.ai.enabled) {
+          const results =
+            await Promise.allSettled(Object.entries(currentActivatedClusters).map(async ([clusterId, cluster]) => {
               await server.ext.clusters.callOnOne(
                 clusterId,
                 logger,
                 async (client) => {
-                  await asyncClientCall(client.account, "unblockAccount", {
-                    accountName: account.accountName,
+                  await asyncClientCall(client.account, "createAccount", {
+                    accountName, ownerUserId: ownerId,
                   });
                 },
               );
 
-            } else if (cluster.hpc.enabled) {
-              await unblockAccountAssignedPartitionsInCluster(
-                account.accountName,
-                account.tenant.getProperty("name"),
-                clusterId,
-                server.ext.clusters,
-                logger,
-                server.ext.resource,
-              );
-            }
+              // 当前AI集群只能使用AI适配器且不支持分区概念，一旦判断为AI集群只调用原有 unblockAccount 接口
+              // 上述情况以外，如果是HPC集群，调用unblockAccountAssignedPartitionsInCluster
+              if (cluster.ai.enabled) {
+                await server.ext.clusters.callOnOne(
+                  clusterId,
+                  logger,
+                  async (client) => {
+                    await asyncClientCall(client.account, "unblockAccount", {
+                      accountName: account.accountName,
+                    });
+                  },
+                );
 
-          }));
+              } else if (cluster.hpc.enabled) {
+                await unblockAccountAssignedPartitionsInCluster(
+                  account.accountName,
+                  account.tenant.getProperty("name"),
+                  clusterId,
+                  server.ext.clusters,
+                  logger,
+                  server.ext.resource,
+                );
+              }
+
+            }));
+
+          const errors = results.reduce((acc: { clusterId: string; reason: any }[], result, index) => {
+            if (result.status === "rejected") {
+              acc.push({ clusterId: Object.keys(currentActivatedClusters)[index], reason: result.reason });
+            }
+            return acc;
+          }, []);
+
+          if (errors.length > 0) {
+            const errorDetails = errors.map((error) => {
+              return `Cluster: ${error?.clusterId}, Reason: ${error?.reason.details || error?.reason}`;
+            }).join("; ");
+
+            const error = new GrpcServiceError({
+              code: status.INTERNAL,
+              message: `Account ${accountName} hasn't been created. Unblock failed.`,
+              details: errorDetails,
+              metadata: scowErrorMetadata(CLUSTEROPS_ERROR_CODE, { clusterErrors: JSON.stringify(errorDetails) }),
+            });
+            // 回滚 mis 数据库中数据
+            await rollback(error);
+
+          }
+
         // 条件2：如果没有配置资源管理服务，则调用适配器的 unblockAccount接口进行解封
         } else {
           await server.ext.clusters.callOnAll(
@@ -408,7 +435,6 @@ export const accountServiceServer = plugin((server) => {
             },
           ).catch(async (e) => {
             await rollback(e);
-            throw e;
           });
         }
       }
@@ -525,9 +551,9 @@ export const accountServiceServer = plugin((server) => {
         }
         account.state = AccountState.NORMAL;
         const currentActivatedClusters = await getActivatedClusters(em, logger);
-        await unblockAccount(account, 
-          currentActivatedClusters, 
-          server.ext.clusters, logger, 
+        await unblockAccount(account,
+          currentActivatedClusters,
+          server.ext.clusters, logger,
           server.ext.resource,
         );
       }

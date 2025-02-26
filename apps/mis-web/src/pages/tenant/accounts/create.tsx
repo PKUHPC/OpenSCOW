@@ -63,6 +63,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ tenantName }) => 
       .httpError(404, () => { message.error(t(p("tenantNotExistUser"), [tenantName, ownerId])); })
       .httpError(409, () => { message.error(t(p("accountNameOccupied"))); })
       .httpError(400, () => { message.error(t(p("userIdAndNameNotMatch"))); })
+      .httpError(401, (e) => { message.error(e.message); })
       .then(() => {
         message.success(t(p("createSuccess")));
         form.resetFields();

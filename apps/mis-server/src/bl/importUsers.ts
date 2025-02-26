@@ -40,7 +40,7 @@ export interface ImportUsersData {
 export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   whitelistAll: boolean,
   currentActivatedClusters: Record<string, ClusterConfigSchema>,
-  clusterPlugin: ClusterPlugin["clusters"], 
+  clusterPlugin: ClusterPlugin["clusters"],
   logger: Logger,
   scowResourcePlugin?: ScowResourcePlugin["resource"],
 )
@@ -127,9 +127,9 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
   }
   const finalUserAccounts = userAccounts.filter((_, i) => !indexes.includes(i));
   // 如果已配置资源管理服务，则向数据库写入新创建的账户数据
-  if (commonConfig.scowResource?.enabled) { 
+  if (commonConfig.scowResource?.enabled) {
     await Promise.all(data.accounts.map(async (acc) => {
-      // 失败时已写入的数据不回滚
+      // 失败时已写入的数据不回滚, 再次创同名租户账户时会重新写入默认授权分区
       await scowResourcePlugin?.assignAccountOnCreate({
         accountName: acc.accountName,
         tenantName: tenant.name,
@@ -159,6 +159,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
             await unblockAccount(account, currentActivatedClusters, clusterPlugin, logger, scowResourcePlugin);
           } catch (e) {
             // 集群解锁账户失败，记录失败账户
+            logger.warn("Unblock account %s failed during importing users: %o", account.accountName, e);
             failedUnblockAccounts.push(account.accountName);
             throw e;
           }
@@ -183,6 +184,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
 
     // 判断封锁阈值需要封锁时
     if (shouldBlockInCluster) {
+      // 出现失败时记录失败信息，但不会抛出错误
       await Promise.allSettled(shouldBlockAccounts.map((acc) => {
         return em.transactional(async (em) => {
           const account = await em.findOne(Account, { accountName: acc.accountName },
@@ -194,6 +196,7 @@ export async function importUsers(data: ImportUsersData, em: SqlEntityManager,
               await blockAccount(account, currentActivatedClusters, clusterPlugin, logger);
             } catch (e) {
               // 集群封锁账户失败，记录失败账户
+              logger.warn("Block account %s failed during importing users: %o", account.accountName, e);
               failedBlockAccounts.push(account.accountName);
               throw e;
             }

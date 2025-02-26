@@ -119,6 +119,25 @@ export async function assignCreatedAccount(accountName: string, tenantName: stri
 Promise<boolean> {
 
   const em = await forkEntityManager();
+
+  // 同名租户账户理论上无法重复创建
+  // 确认同名租户下账户是否已存在授权集群和分区，如果存在直接删除重新写入
+  const existedClusters = await em.find(AccountClusterRule, { accountName, tenantName });
+  if (existedClusters.length > 0) {
+    const existedClusterIds = existedClusters.map((item) => (item.clusterId)).join(",");
+    logger.info(`Account ${accountName} in tenant ${tenantName} already assigned to clusters: ${existedClusterIds}.`
+      + "They will be removed during re-assign.");
+    await em.removeAndFlush(existedClusters);
+  }
+  const existedPartitions = await em.find(AccountPartitionRule, { accountName, tenantName });
+  if (existedPartitions.length > 0) {
+    const existedPartitionNames = existedPartitions.map((item) => (item.partition)).join(",");
+    logger.info(
+      `Account ${accountName} in tenant ${tenantName} already assigned to partitions: ${existedPartitionNames}.`
+      + "They will be removed during re-assign.");
+    await em.removeAndFlush(existedPartitions);
+  }
+
   // 获取租户下设置的账户默认授权的集群和分区
   const foundDefaultClusters = await em.find(TenantClusterRule, { tenantName, isAccountDefaultCluster: true });
   const foundDefaultPartitions = await em.find(TenantPartitionRule, { tenantName, isAccountDefaultPartition: true });

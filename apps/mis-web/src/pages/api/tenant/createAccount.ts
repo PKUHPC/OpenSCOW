@@ -54,6 +54,7 @@ export const CreateAccountSchema = typeboxRouteSchema({
     /** ownerId不存在 */
     404: Type.Null(),
     409: Type.Null(),
+    401: Type.Object({ message: Type.String() }),
   },
 });
 
@@ -110,6 +111,7 @@ export default route(CreateAccountSchema,
       .catch(handlegRPCError({
         [Status.ALREADY_EXISTS]: () => ({ 409: null }),
         [Status.NOT_FOUND]: () => ({ 404: null }),
+        [Status.UNAUTHENTICATED]: (e) => ({ 401: { message: e.details } }),
       },
       async () => await callLog(logInfo, OperationResult.FAIL),
       ));

@@ -132,7 +132,7 @@ export const clusterPartitionsInfo = authProcedure
           },
         );
 
-        // 判断适配器返回的调度器名称固定字符串 volcano 
+        // 判断适配器返回的调度器名称固定字符串 volcano
         const isAiCluster = result?.schedulerName === "volcano";
         // 如果是AI集群, 默认分区为[]
         if (isAiCluster) {
@@ -188,27 +188,46 @@ export const currentClustersPartitionsInfo = authProcedure
         const clusterPartitions: ClusterPartition[] = [];
 
         const clustersUtil = await getClusterUtils();
-        await Promise.allSettled(currentClusterIds.map(async (clusterId) => {
-
-          const configInfo = await clustersUtil.callOnOne(
-            clusterId,
-            logger,
-            async (client) => { 
-              return await asyncClientCall(client.config, "getClusterConfig", {}); 
-            },
-          );
-
-          // 判断适配器返回的调度器名称固定字符串 volcano 
-          const isAiCluster = configInfo?.schedulerName === "volcano";
-          // 不写入AI集群的分区数据
-          if (configInfo && !isAiCluster) {
-            const partitions: ClusterPartition[] = configInfo.partitions.map((x) => ({
+        const results =
+          await Promise.allSettled(currentClusterIds.map(async (clusterId) => {
+            const configInfo = await clustersUtil.callOnOne(
               clusterId,
-              partition: x.name,
-            }));
-            clusterPartitions.push(...partitions);
+              logger,
+              async (client) => {
+                return await asyncClientCall(client.config, "getClusterConfig", {});
+              },
+            );
+
+            // 判断适配器返回的调度器名称固定字符串 volcano
+            const isAiCluster = configInfo?.schedulerName === "volcano";
+            // 不写入AI集群的分区数据
+            if (configInfo && !isAiCluster) {
+              const partitions: ClusterPartition[] = configInfo.partitions.map((x) => ({
+                clusterId,
+                partition: x.name,
+              }));
+              clusterPartitions.push(...partitions);
+            }
+          }));
+
+        const errors = results.reduce((acc: { clusterId: string; reason: any }[], result, index) => {
+          if (result.status === "rejected") {
+            acc.push({ clusterId: currentClusterIds[index], reason: result.reason });
           }
-        }));
+          return acc;
+        }, []);
+
+        if (errors.length > 0) {
+          const errorDetails = errors.map((error) => {
+            return `Cluster: ${error?.clusterId}, Reason: ${error?.reason.details || error?.reason}`;
+          }).join("; ");
+          throw new TRPCError({
+            message: `Can not get partitions info, error: ${errorDetails}`,
+            code: "NOT_FOUND",
+          });
+
+        }
+
 
         return clusterPartitions;
       },
