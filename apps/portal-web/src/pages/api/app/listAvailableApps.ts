@@ -12,10 +12,12 @@
 
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
+import { status } from "@grpc/grpc-js";
 import { AppServiceClient } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
+import { handlegRPCError } from "src/utils/server";
 
 // Cannot use App from protos
 export const App = Type.Object({
@@ -41,6 +43,11 @@ export const ListAvailableAppsSchema = typeboxRouteSchema({
     }),
 
     403: Type.Null(),
+
+    500: Type.Object({
+      code: Type.Literal("APP_CONFIG_ERROR"),
+      error: Type.String(),
+    }),
   },
 });
 
@@ -61,6 +68,9 @@ export default /* #__PURE__*/route(ListAvailableAppsSchema, async (req) => {
 
   return asyncUnaryCall(client, "listAvailableApps", { cluster }).then((reply) => {
     return { 200: { apps: reply.apps } };
-  });
+  }, handlegRPCError({
+    [status.UNKNOWN]: (e) => ({ 500: { code: "APP_CONFIG_ERROR" as const,
+      error: e.details } }),
+  }));
 
 });

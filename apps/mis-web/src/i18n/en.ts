@@ -1375,6 +1375,7 @@ export default {
       changePassword: "Modify user password",
       changeEmail: "Modify user email",
       createAiInferenceJob: "Create Inference Job",
+      decompressFile: "Decompress File",
     },
     operationDetails: {
       login: "User Login",
@@ -1509,6 +1510,7 @@ export default {
       changePassword: "User changes their personal password",
       changeEmail: "User changes their personal email",
       editUserProfile: "Modify the information of user (id: {})",
+      decompressFile: "Decompress File {1} in {0} ",
     },
   },
   userRoles: {

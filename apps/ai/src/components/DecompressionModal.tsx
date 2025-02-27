@@ -43,9 +43,7 @@ export const CompressionModal: React.FC<Props> = ({ open, onClose, path, reload,
       form.resetFields();
     },
     onError: (e) => {
-      if (e.data?.code === "CONFLICT") {
-        message.error(t(p("alreadyExisted")));
-      }
+      message.error(e.message);
     },
   });
 

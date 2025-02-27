@@ -31,6 +31,7 @@ import type { CompressAndDownloadFileSchema } from "src/pages/api/file/compressA
 import type { CompressFilesSchema } from "src/pages/api/file/compressFiles";
 import type { CopyFileItemSchema } from "src/pages/api/file/copy";
 import type { CreateFileSchema } from "src/pages/api/file/createFile";
+import type { DecompressFileSchema } from "src/pages/api/file/decompressFile";
 import type { DeleteDirSchema } from "src/pages/api/file/deleteDir";
 import type { DeleteFileSchema } from "src/pages/api/file/deleteFile";
 import type { DownloadFileSchema } from "src/pages/api/file/download";
@@ -102,6 +103,7 @@ export const api = {
   listAvailableTransferClusters: apiClient.fromTypeboxRoute<typeof ListAvailableTransferClustersSchema>("GET", "/api/file/listAvailableTransferClusters"),
   mergeFileChunks: apiClient.fromTypeboxRoute<typeof MergeFileChunksSchema>("POST", "/api/file/mergeFileChunks"),
   mkdir: apiClient.fromTypeboxRoute<typeof MkdirSchema>("POST", "/api/file/mkdir"),
+  decompressFile: apiClient.fromTypeboxRoute<typeof DecompressFileSchema>("POST", "/api/file/decompressFile"),
   moveFileItem: apiClient.fromTypeboxRoute<typeof MoveFileItemSchema>("PATCH", "/api/file/move"),
   queryFileTransferProgress: apiClient.fromTypeboxRoute<typeof QueryFileTransferProgressSchema>("GET", "/api/file/queryFileTransferProgress"),
   startFileTransfer: apiClient.fromTypeboxRoute<typeof StartFileTransferSchema>("POST", "/api/file/startFileTransfer"),

@@ -191,6 +191,7 @@ export const mockApi: MockApi<typeof api> = {
         ],
       },
     ],
+    reservedAppAttributes: [],
   }),
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
@@ -420,6 +421,8 @@ export const mockApi: MockApi<typeof api> = {
       "hpc02": ["gpu"],
     },
   }),
+
+  decompressFile: null,
 };
 
 

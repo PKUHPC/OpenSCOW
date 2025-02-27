@@ -14,20 +14,26 @@ import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Col, Divider, Form, Input, InputNumber, Row, Select, Spin, Typography } from "antd";
 import { Rule } from "antd/es/form";
+import { NamePath } from "antd/es/form/interface";
+import { FormInstance } from "antd/lib";
 import dayjs from "dayjs";
 import Router from "next/router";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useAsync } from "react-async";
+import { useStore } from "simstate";
 import { api } from "src/apis";
+import { ClusterNotAvailablePage } from "src/components/errorPages/ClusterNotAvailablePage";
 import { PageTitle } from "src/components/PageTitle";
 import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
-import { AccountStatusFilter } from "src/models/job";
+import { AccountStatusFilter, ReservedAppAttributeName } from "src/models/job";
 import { AccountListSelector } from "src/pageComponents/job/AccountListSelector";
-import { AppCustomAttribute } from "src/pages/api/app/getAppMetadata";
+import { AppCustomAttribute, FixedValue, ReservedAppAttribute } from "src/pages/api/app/getAppMetadata";
 import { Partition } from "src/pages/api/cluster";
+import { ClusterInfoStore } from "src/stores/ClusterInfoStore";
 import { formatSize } from "src/utils/format";
 import { styled, useTheme } from "styled-components";
 
+import { AdvancedFileSelectModal } from "../filemanager/AdvancedFileSelectModal";
 import { PartitionSelector } from "../job/PartitionSelector";
 
 const Text = styled(Typography.Paragraph)`
@@ -45,6 +51,7 @@ interface Props {
   appName: string;
   attributes: AppCustomAttribute[];
   appComment?: I18nStringType;
+  reservedAppAttributes?: ReservedAppAttribute[];
 }
 
 interface FormFields {
@@ -78,7 +85,14 @@ const inputNumberFloorConfig = {
 
 const p = prefix("pageComp.app.launchAppForm.");
 
-export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, appName, appComment }) => {
+export const LaunchAppForm: React.FC<Props> = ({
+  clusterId, appId, attributes, appName, appComment, reservedAppAttributes }) => {
+
+  const { currentClusters } = useStore(ClusterInfoStore);
+  const currentCluster = currentClusters.find((c) => (c.id === clusterId));
+  if (!currentCluster) {
+    return <ClusterNotAvailablePage />;
+  }
 
   const { message, modal } = App.useApp();
   const theme = useTheme();
@@ -168,6 +182,14 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   const gpuCount = Form.useWatch("gpuCount", form)!;
 
+  // 判断是否配置了 系统APP表单的值为固定值
+  const fixedPartitionName
+    = reservedAppAttributes?.find((x) => (x.name === ReservedAppAttributeName.PARTITION))?.
+      fixedValue?.value?.toString();
+  const fixedAccountName
+    = reservedAppAttributes?.find((x) => (x.name === ReservedAppAttributeName.ACCOUNT))?.fixedValue?.value?.toString();
+
+
   useAsync({ promiseFn: useCallback(async () => {
 
     // 获取上一次提交记录
@@ -183,10 +205,11 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         } })
           .httpError(404, (error) => { message.error(error.message); })
           .then(async (accountsResp) => {
+
             // 保存配置表单以外必填项的对象
             let requiredInputObj = {};
 
-            if (accountsResp?.accounts.length) {
+            if (fixedAccountName || accountsResp?.accounts.length) {
               setSelectableAccounts(accountsResp.accounts);
               const lastSub = lastData?.lastSubmissionInfo;
               const lastAccount = lastSub?.account;
@@ -205,9 +228,10 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                 lastAccount : accountsResp.accounts[0];
 
               // 获取第一次填入账户可用分区
+              // 如果已配置账户固定值，直接获取账户固定值的可用分区
               await api.getAvailablePartitionsForCluster({ query: {
                 cluster: clusterId,
-                accountName: firstInputAccount,
+                accountName: fixedAccountName ?? firstInputAccount,
               } })
                 .then((partitionsResp) => {
                   if (partitionsResp?.partitions.length && partitionsResp?.partitions.length > 0) {
@@ -216,25 +240,31 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     const setLastPartition = !!lastPartition &&
                     resPartitions.some((item) => item.name === lastPartition);
 
-                    const firstPartitionInfo: Partition = setLastPartition ?
-                      resPartitions.find((item) => item.name === lastPartition)!
-                      : resPartitions[0];
-
+                    let firstPartitionInfo: Partition | undefined = undefined;
+                    // 如果分区值已被配置为固定值
+                    if (fixedPartitionName) {
+                      firstPartitionInfo
+                        = resPartitions.find((item) => item.name === fixedPartitionName);
+                    } else {
+                      firstPartitionInfo = setLastPartition ?
+                        resPartitions.find((item) => item.name === lastPartition)
+                        : resPartitions[0];
+                    }
                     setCurrentPartitionInfo(firstPartitionInfo);
                     setAccountPartitionsCacheMap({ [firstInputAccount]: resPartitions });
 
                     const setLastQos = setLastPartition &&
-                      firstPartitionInfo.qos?.some((item) => item === lastQos);
+                      firstPartitionInfo?.qos?.some((item) => item === lastQos);
                     const setLastCoreCount = setLastPartition && lastCoreCount &&
-                      firstPartitionInfo.cores && firstPartitionInfo.cores >= lastCoreCount;
+                      firstPartitionInfo?.cores && firstPartitionInfo.cores >= lastCoreCount;
                     const setLastNodeCount = setLastPartition && lastNodeCount &&
-                      firstPartitionInfo.nodes && firstPartitionInfo.nodes >= lastNodeCount;
+                      firstPartitionInfo?.nodes && firstPartitionInfo.nodes >= lastNodeCount;
                     const setLastGpuCount = setLastPartition && lastGpuCount &&
-                      firstPartitionInfo.gpus && firstPartitionInfo.gpus >= lastGpuCount;
+                      firstPartitionInfo?.gpus && firstPartitionInfo.gpus >= lastGpuCount;
 
                     requiredInputObj = {
                       account: firstInputAccount,
-                      partition: setLastPartition ? lastPartition : firstPartitionInfo.name,
+                      partition: setLastPartition ? lastPartition : firstPartitionInfo?.name,
                       qos: setLastQos ? lastQos : firstPartitionInfo?.qos?.[0],
                       nodeCount: setLastNodeCount ? lastNodeCount : initialValues.nodeCount,
                       coreCount: setLastCoreCount ? lastCoreCount : initialValues.coreCount,
@@ -252,14 +282,15 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                               attributesInputObj[attribute.name] = parseInt(lastAttributes[attribute.name]);
                               break;
                             case "TEXT":
+                            case "FILE":
                               attributesInputObj[attribute.name] = lastAttributes[attribute.name];
                               break;
                             case "SELECT":
                               // 区分是否有GPU，防止没有GPU的分区获取到GPU版本的选项
-                              if (!firstPartitionInfo.gpus) {
+                              if (!firstPartitionInfo?.gpus) {
                                 // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
                                 const selectOptions = attribute.select.filter((x) =>
-                                  !x.requireGpu || (x.requireGpu && firstPartitionInfo.gpus));
+                                  !x.requireGpu || (x.requireGpu && firstPartitionInfo?.gpus));
 
                                 if (selectOptions.some((optionItem) =>
                                   optionItem.value === lastAttributes[attribute.name]))
@@ -346,11 +377,19 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
             newPartitionsMap[account] = data.partitions;
             setAccountPartitionsCacheMap(newPartitionsMap);
             if (data.partitions.length > 0) {
-              setCurrentPartitionInfo(data.partitions[0]);
-              restPartitionInfo(data.partitions[0]);
+
+              // 如果已配置分区固定值，set 分区固定值对应的分区详细信息，如果不存在则为undefined
+              if (fixedPartitionName) {
+                const fixedPartitionInfo = data.partitions.find((p) => (p.name === fixedPartitionName));
+                setCurrentPartitionInfo(fixedPartitionInfo);
+                resetPartitionInfo(fixedPartitionInfo);
+              } else {
+                setCurrentPartitionInfo(data.partitions[0]);
+                resetPartitionInfo(data.partitions[0]);
+              }
             } else {
               setCurrentPartitionInfo(undefined);
-              restPartitionInfo(undefined);
+              resetPartitionInfo(undefined);
             }
           });
       };
@@ -359,7 +398,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
   });
 
   // 当需要重置分区信息时，分区信息重置
-  const restPartitionInfo = (partitionInfo: Partition | undefined) => {
+  const resetPartitionInfo = (partitionInfo: Partition | undefined) => {
     form.setFieldsValue({
       partition: partitionInfo?.name,
       qos: partitionInfo?.qos?.[0],
@@ -385,16 +424,24 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
     setCurrentPartitionInfo(partitionInfo);
   };
 
-
   // 账户手动变更时，如果账户可用分区已经存在于前端缓存，则重置分区和qos
   const handleAccountChange = (account: string) => {
     const cacheMap = accountPartitionsCacheMap[account];
     if (cacheMap) {
-      setCurrentPartitionInfo(cacheMap[0]);
-      restPartitionInfo(cacheMap[0]);
+      // 如果已配置分区固定值，set 分区固定值对应的分区详细信息，如果不存在则为undefined
+      if (fixedPartitionName) {
+        const fixedPartitionInfo = cacheMap.find((x) => (x.name === fixedPartitionName));
+        setCurrentPartitionInfo(fixedPartitionInfo);
+        resetPartitionInfo(fixedPartitionInfo);
+      } else {
+        setCurrentPartitionInfo(cacheMap[0]);
+        resetPartitionInfo(cacheMap[0]);
+      }
+    } else {
+      setCurrentPartitionInfo(undefined);
+      resetPartitionInfo(undefined);
     }
   };
-
 
   const customFormItems = useMemo(() => attributes.map((item, index) => {
     const rules: Rule[] = item.type === "NUMBER"
@@ -405,17 +452,63 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
     // 筛选选项：若没有配置requireGpu直接使用，配置了requireGpu项使用与否则看改分区有无GPU
     const selectOptions = item.select.filter((x) => !x.requireGpu || (x.requireGpu && currentPartitionInfo?.gpus));
-    const initialValue = item.type === "SELECT" ? (item.defaultValue ?? selectOptions[0].value) : item.defaultValue;
-    const inputItem = item.type === "NUMBER" ?
-      (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
-      : item.type === "TEXT" ? (<Input placeholder={getI18nConfigCurrentText(placeholder, languageId)} />)
-        : (
+
+    const formValue = item.fixedValue?.value ?? item.defaultValue;
+    const initialValue = item.type === "SELECT" ?
+      (formValue ?? selectOptions[0].value) : formValue;
+
+    const getAttributeElement = (item: any): JSX.Element => {
+
+      // 如果配置了不可修改的固定值
+      if (item.type !== "SELECT" && item.fixedValue?.value) {
+
+        const currentValue = form.getFieldValue(item.name);
+        const newFormValue = item.type === "NUMBER" ? parseInt(item.fixedValue.value) : item.fixedValue.value;
+        // 保证固定值被写入
+        if (currentValue !== newFormValue) {
+          form.setFieldsValue({ [item.name]: newFormValue });
+          form.validateFields([item.name]);
+        }
+
+        return (<div> {newFormValue} </div>);
+      }
+
+      if (item.type === "NUMBER") {
+        return (<InputNumber placeholder={getI18nConfigCurrentText(placeholder, languageId)} />);
+      } else if (item.type === "TEXT") {
+        return (<Input placeholder={getI18nConfigCurrentText(placeholder, languageId)} />);
+      } else if (item.type === "SELECT") {
+        return (
           <Select
             options={selectOptions.map((x) => ({
               label: getI18nConfigCurrentText(x.label, languageId), value: x.value }))}
             placeholder={getI18nConfigCurrentText(placeholder, languageId)}
           />
         );
+      } else {
+        // 如果 item.type === FILE
+        return (
+          <Input
+            placeholder={item.placeholder}
+            suffix={
+              (
+                <AdvancedFileSelectModal
+                  allowedFileType={["DIR", "FILE"]}
+                  onSubmit={(path: string) => {
+                    form.setFields([{ name: item.name, value: path, touched: true }]);
+                    form.validateFields([item.name]);
+                  }}
+                  clusterId={clusterId}
+                />
+              )
+            }
+          />
+        );
+      }
+
+    };
+
+    const inputItem = getAttributeElement(item);
 
     // 判断是否配置了requireGpu选项
     if (item.type === "SELECT" && item.select.find((i) => i.requireGpu !== undefined)) {
@@ -427,6 +520,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         if (!optionsContained) form.setFieldValue(item.name, null);
       }
     }
+
     return (
       <Form.Item
         key={`${item.name}+${index}`}
@@ -434,6 +528,7 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         name={item.name}
         rules={rules}
         initialValue={initialValue}
+        hidden={item.fixedValue?.hidden}
       >
         {inputItem}
       </Form.Item>
@@ -473,65 +568,101 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
         }}
       >
         <Spin spinning={loading} tip={isSubmitting ? "" : t(p("loading"))}>
-          <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 50 }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label={t(p("account"))}
+          <FixedOrEditableFormItem
+            form={form}
+            name="appJobName"
+            label={t(p("appJobName"))}
+            rules={[{ required: true }, { max: 50 }]}
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.APP_JOB_NAME)
+            }
+            children={(
+              <Input />
+            )}
+          />
+          <FixedOrEditableFormItem
+            form={form}
             name="account"
-            rules={[{ required: true }]}
-          >
-            <AccountListSelector
-              selectableAccounts={ selectableAccounts ?? []}
-              isLoading={unblockedAccountsQuery.isLoading}
-              onReload={handleAccountsReload}
-              onChange={handleAccountChange}
-            />
-          </Form.Item>
+            label={t(p("account"))}
+            rules={[
+              { required: true },
+            ]}
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.ACCOUNT)
+            }
+            children={(
+              <AccountListSelector
+                selectableAccounts={ selectableAccounts ?? []}
+                isLoading={unblockedAccountsQuery.isLoading}
+                onReload={handleAccountsReload}
+                onChange={handleAccountChange}
+              />
+            )}
+          />
 
-          <Form.Item
-            label={t(p("partition"))}
+          <FixedOrEditableFormItem
+            form={form}
             name="partition"
-            rules={[{ required: true }]}
-          >
-            <PartitionSelector
-              isLoading={availablePartitionsForAccountQuery.isLoading || unblockedAccountsQuery.isLoading}
-              selectablePartitions={accountPartitionsCacheMap[account] ?
-                accountPartitionsCacheMap[account].map((x) => x.name) : []}
-              onReload={handlePartitionsReload}
-              onChange={handlePartitionChange}
-            />
-          </Form.Item>
-
-          <Form.Item
-            label={t(p("qos"))}
+            label={t(p("partition"))}
+            rules={[
+              { required: true },
+            ]}
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.PARTITION)
+            }
+            children={(
+              <PartitionSelector
+                isLoading={availablePartitionsForAccountQuery.isLoading || unblockedAccountsQuery.isLoading}
+                selectablePartitions={accountPartitionsCacheMap[account] ?
+                  accountPartitionsCacheMap[account].map((x) => x.name) : []}
+                onReload={handlePartitionsReload}
+                onChange={handlePartitionChange}
+              />
+            )}
+          />
+          <FixedOrEditableFormItem
+            form={form}
             name="qos"
-            rules={[{ required: true }]}
-          >
-            <Select
-              loading={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
-              options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
-            />
-          </Form.Item>
-          <Form.Item
-            label={t(p("nodeCount"))}
+            label={t(p("qos"))}
+            rules={[
+              { required: true },
+            ]}
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.QOS)
+            }
+            children={(
+              <Select
+                loading={(!currentPartitionInfo?.qos) || currentPartitionInfo.qos.length === 0}
+                options={currentPartitionInfo?.qos?.map((x) => ({ label: x, value: x }))}
+              />
+            )}
+          />
+          <FixedOrEditableFormItem
+            form={form}
             name="nodeCount"
+            label={t(p("nodeCount"))}
             dependencies={["partition"]}
             rules={[
               { required: true, type: "integer", max: currentPartitionInfo?.nodes },
             ]}
-          >
-            <InputNumber
-              min={1}
-              max={currentPartitionInfo?.nodes}
-              {...inputNumberFloorConfig}
-            />
-          </Form.Item>
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.NODE_COUNT)
+            }
+            children={(
+              <InputNumber
+                min={1}
+                max={currentPartitionInfo?.nodes}
+                {...inputNumberFloorConfig}
+              />
+            )}
+            isNumberAttribute={true}
+          />
           {
             currentPartitionInfo?.gpus ? (
-              <Form.Item
-                label={t(p("gpuCount"))}
+              <FixedOrEditableFormItem
+                form={form}
                 name="gpuCount"
+                label={t(p("gpuCount"))}
                 dependencies={["partition"]}
                 rules={[
                   {
@@ -540,17 +671,23 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     max: currentPartitionInfo?.gpus / currentPartitionInfo.nodes,
                   },
                 ]}
-              >
-                <InputNumber
-                  min={1}
-                  max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
-                  {...inputNumberFloorConfig}
-                />
-              </Form.Item>
+                fixedValue={
+                  getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.GPU_COUNT)
+                }
+                children={(
+                  <InputNumber
+                    min={1}
+                    max={currentPartitionInfo?.gpus / currentPartitionInfo.nodes}
+                    {...inputNumberFloorConfig}
+                  />
+                )}
+                isNumberAttribute={true}
+              />
             ) : (
-              <Form.Item
-                label={t(p("coreCount"))}
+              <FixedOrEditableFormItem
+                form={form}
                 name="coreCount"
+                label={t(p("coreCount"))}
                 dependencies={["partition"]}
                 rules={[
                   { required: true,
@@ -558,37 +695,52 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
                     max: currentPartitionInfo ?
                       currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined },
                 ]}
-              >
-                <InputNumber
-                  min={1}
-                  max={currentPartitionInfo ?
-                    currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined }
-                  {...inputNumberFloorConfig}
-                />
-              </Form.Item>
+                fixedValue={
+                  getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.CORE_COUNT)
+                }
+                children={(
+                  <InputNumber
+                    min={1}
+                    max={currentPartitionInfo ?
+                      currentPartitionInfo.cores / currentPartitionInfo.nodes : undefined }
+                    {...inputNumberFloorConfig}
+                  />
+                )}
+                isNumberAttribute={true}
+              />
             )
           }
-          <Form.Item label={t(p("maxTime"))} name="maxTime" rules={[{ required: true }]}>
-            <AfterInputNumber
-              min={1}
-              step={1}
-              precision={0}
-              theme={theme}
-              addonAfter={
-                (
-                  <Select
-                    style={{ flex: "0 1 auto" }}
-                    value={maxTimeUnitValue}
-                    onChange={(value) => setMaxTimeUnitValue(value)}
-                  >
-                    <Select.Option value="min">{t(p("minute"))}</Select.Option>
-                    <Select.Option value="hour">{t(p("hour"))}</Select.Option>
-                    <Select.Option value="day">{t(p("day"))}</Select.Option>
-                  </Select>
-                )
-              }
-            />
-          </Form.Item>
+          <FixedOrEditableFormItem
+            form={form}
+            name="maxTime"
+            label={t(p("maxTime"))}
+            rules={[{ required: true }]}
+            fixedValue={
+              getSystemAttributeFixedValue(reservedAppAttributes, ReservedAppAttributeName.MAX_TIME)
+            }
+            children={(
+              <AfterInputNumber
+                min={1}
+                step={1}
+                precision={0}
+                theme={theme}
+                addonAfter={
+                  (
+                    <Select
+                      style={{ flex: "0 1 auto" }}
+                      value={maxTimeUnitValue}
+                      onChange={(value) => setMaxTimeUnitValue(value)}
+                    >
+                      <Select.Option value="min">{t(p("minute"))}</Select.Option>
+                      <Select.Option value="hour">{t(p("hour"))}</Select.Option>
+                      <Select.Option value="day">{t(p("day"))}</Select.Option>
+                    </Select>
+                  )
+                }
+              />
+            )}
+            isNumberAttribute={true}
+          />
 
           {customFormItems}
           <Row>
@@ -645,3 +797,74 @@ export const LaunchAppForm: React.FC<Props> = ({ clusterId, appId, attributes, a
 
   );
 };
+
+const getSystemAttributeFixedValue =
+  (
+    attributes: ReservedAppAttribute[] | undefined,
+    attributeName: ReservedAppAttributeName,
+  ): FixedValue | undefined => {
+    return attributes?.find((x) => (x.name === attributeName))?.fixedValue;
+  };
+
+interface FixedOrEditableFormItemProps {
+  form: FormInstance<FormFields>;
+  name: string;
+  label: string;
+  rules?: object[];
+  dependencies?: NamePath[];
+  fixedValue?: FixedValue;
+  children: React.ReactNode;
+  isNumberAttribute?: boolean;
+  ignoreDependenciesWhenFixed?: boolean;
+}
+
+const FixedOrEditableFormItem: React.FC<FixedOrEditableFormItemProps> = ({
+  form,
+  name,
+  label,
+  rules,
+  dependencies,
+  fixedValue,
+  children,
+  isNumberAttribute,
+  ignoreDependenciesWhenFixed,
+}) => {
+  // 当有固定值时，直接渲染固定值
+  if (fixedValue?.value !== undefined) {
+    const value =
+      isNumberAttribute && typeof fixedValue.value === "string"
+        ? parseInt(fixedValue.value, 10)
+        : fixedValue.value;
+    const currentValue = form.getFieldValue(name);
+    // 保证固定值被写入
+    if (currentValue !== value) {
+      form.setFieldsValue({ [name]: value });
+      form.validateFields([name]);
+    }
+
+    return (
+      <Form.Item
+        name={name}
+        label={label}
+        rules={rules}
+        hidden={fixedValue.hidden}
+        dependencies={ignoreDependenciesWhenFixed ? undefined : dependencies}
+      >
+        <div>{fixedValue.value}</div>
+      </Form.Item>
+    );
+  }
+
+  // 没有固定值时，渲染 Form.Item 和动态子组件
+  return (
+    <Form.Item
+      name={name}
+      label={label}
+      rules={rules}
+      dependencies={dependencies}
+    >
+      {children}
+    </Form.Item>
+  );
+};
+

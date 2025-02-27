@@ -266,6 +266,35 @@ export const fileServiceServer = plugin((server) => {
 
     },
 
+    decompressFile: async ({ request, logger }) => {
+      const { userId, clusterId, filePath, decompressionPath } = request;
+      await checkActivatedClusters({ clusterIds: clusterId });
+
+      const host = getClusterLoginNode(clusterId);
+
+      if (!host) { throw clusterNotFound(clusterId); }
+
+      const clusterInfo = configClusters[clusterId];
+
+      // 如果已经开启scowd，则暂不支持解压缩功能
+      if (clusterInfo.scowd?.enabled) {
+        throw {
+          code: Status.UNIMPLEMENTED,
+          message: "Currently, this interface is not supported in Scowd",
+        } as ServiceError;
+      }
+
+      const subLogger = logger.child({ userId, clusterId, filePath, decompressionPath });
+      subLogger.info("Decompress file started");
+
+      const clusterops = getClusterOps(clusterId);
+
+      await clusterops.file.decompressFile({ userId, filePath, decompressionPath }, logger);
+
+      return [{}];
+
+    },
+
     initMultipartUpload: async ({ request }) => {
 
       const { cluster, userId, path, name } = request;

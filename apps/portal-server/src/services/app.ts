@@ -13,19 +13,22 @@
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType } from "@scow/config/build/app";
+import { AppType, AttributeType } from "@scow/config/build/app";
 import { getI18nSeverTypeFormat } from "@scow/lib-server";
 import {
   AppCustomAttribute,
+  AppCustomAttribute_AttributeType,
   appCustomAttribute_AttributeTypeFromJSON,
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
+  GetAppMetadataResponse_ReservedAppAttribute,
+  getAppMetadataResponse_ReservedAppAttributeNameFromJSON,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, encodeMessage, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
-import { getClusterAppConfigs } from "src/utils/app";
+import { camelToSnakeCase, convertAttributesFixedValue, getClusterAppConfigs } from "src/utils/app";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -132,7 +135,7 @@ export const appServiceServer = plugin((server) => {
         }
 
         switch (attribute.type) {
-          case "number":
+          case AttributeType.number:
             if (customAttributes[attribute.name] && Number.isNaN(Number(customAttributes[attribute.name]))) {
               throw new DetailedError({
                 code: Status.INVALID_ARGUMENT,
@@ -144,10 +147,13 @@ export const appServiceServer = plugin((server) => {
             }
             break;
 
-          case "text":
+          case AttributeType.text:
             break;
 
-          case "select":
+          case AttributeType.file:
+            break;
+
+          case AttributeType.select:
           // check the option selected by user is in select attributes as the config defined
             if (customAttributes[attribute.name]
             && !(attribute.select!.some((optionItem) => optionItem.value === customAttributes[attribute.name]))) {
@@ -219,6 +225,17 @@ export const appServiceServer = plugin((server) => {
         throw { code: Status.NOT_FOUND, message: `app id ${appId} is not found` } as ServiceError;
       }
       const attributes: AppCustomAttribute[] = [];
+      const reservedAppAttributes: GetAppMetadataResponse_ReservedAppAttribute[] = [];
+
+      if (app.reservedAppAttributes) {
+        app.reservedAppAttributes.forEach((item) => {
+          const attributeName = camelToSnakeCase(item.name);
+          reservedAppAttributes.push({
+            name: getAppMetadataResponse_ReservedAppAttributeNameFromJSON(attributeName),
+            fixedValue: convertAttributesFixedValue(item.fixedValue),
+          });
+        });
+      }
 
       if (app.attributes) {
         app.attributes.forEach((item) => {
@@ -235,6 +252,10 @@ export const appServiceServer = plugin((server) => {
             type: appCustomAttribute_AttributeTypeFromJSON(attributeType),
             label: getI18nSeverTypeFormat(item.label),
             name: item.name,
+            // 不读取type为select的fixedValue的值
+            fixedValue:
+              appCustomAttribute_AttributeTypeFromJSON(attributeType) === AppCustomAttribute_AttributeType.SELECT
+                ? undefined : convertAttributesFixedValue(item.fixedValue),
             required: item.required,
             defaultInput: defaultInput,
             placeholder: item.placeholder ? getI18nSeverTypeFormat(item.placeholder) : undefined,
@@ -251,7 +272,7 @@ export const appServiceServer = plugin((server) => {
 
       const comment = app.appComment ? getI18nSeverTypeFormat(app.appComment) : undefined;
 
-      return [{ appName: app.name, attributes: attributes, appComment: comment }];
+      return [{ appName: app.name, attributes: attributes, appComment: comment, reservedAppAttributes }];
     },
 
     listAvailableApps: async ({ request }) => {

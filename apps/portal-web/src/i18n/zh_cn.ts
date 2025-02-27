@@ -478,6 +478,24 @@ export default {
         totalMemory: "总内存容量",
         appCommentTitle: "说明",
       },
+      advancedFileSelectModal: {
+        getHomeDirError: "无法获取用户家目录",
+        onlyHomeDir:"仅可在家目录下操作",
+        notAllowed:"当前文件或文件夹不可选取",
+        select:"选择文件",
+        upload:"上传文件",
+        mkdir:"新建文件夹",
+        decompression:"解压文件",
+      },
+      decompressionModal: {
+        decompression: "解压文件",
+        success: "解压成功",
+        confirmText:"是否确认在同级文件夹解压缩文件",
+        typeError: "文件类型错误",
+        permissionDenied: "无法获取文件权限",
+        unimplementedError: "暂时无法使用该功能",
+        failure: "解压文件失败",
+      },
     },
     dashboard:{
       overviewTable:{

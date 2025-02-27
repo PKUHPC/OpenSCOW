@@ -65,3 +65,41 @@ attributes:
     #     default: "比如：--gpus gres:2 --time 10"
     #     en: "For example: --gpus gres:2 --time 10"
     #     zh_cn: "比如：--gpus gres:2 --time 10"
+    # 如果将sbatchOptions配置为固定值
+    # fixedValue:
+    #   value: "--time 10"
+    #   hidden: false
+
+  # type为file的HTML表单配置
+  # 需使用对应环境变量名称fileDirectory
+  # - type: file
+  #   name: fileDirectory
+  #   label: vscode文件目录
+  #   required: false
+  #   placeholder: 选择vscode文件
+  #   defaultValue: /data/home/demo_admin
+
+
+# 配置系统保留HTML表单项的固定值，其中 maxTime 配置数值单位为分钟
+# reservedAppAttributes:
+#   - name: account
+#     fixedValue:
+#       value: a_abcd
+#       hidden: false
+#   - name: partition
+#     fixedValue:
+#       value: normal
+#   - name: qos
+#     fixedValue:
+#       value: normal
+#       hidden: true
+#   - name: nodeCount
+#     fixedValue:
+#       value: 1
+#   - name: coreCount
+#     fixedValue:
+#       value: 1
+#   - name: maxTime
+#     fixedValue:
+#       value: 10
+

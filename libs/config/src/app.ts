@@ -12,6 +12,7 @@
 
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
+import { isAbsolute } from "path";
 import { DEFAULT_CONFIG_BASE_PATH } from "src/constants";
 import { createI18nStringSchema } from "src/i18n";
 
@@ -30,6 +31,24 @@ export enum AppType {
   web = "web",
   vnc = "vnc",
   shadowDesk = "shadowDesk",
+}
+
+export enum ReservedAppAttributeName {
+  appJobName = "appJobName",
+  account = "account",
+  partition = "partition",
+  qos = "qos",
+  nodeCount = "nodeCount",
+  coreCount = "coreCount",
+  gpuCount = "gpuCount",
+  maxTime = "maxTime",
+}
+
+export enum AttributeType {
+  number = "number",
+  text = "text",
+  select = "select",
+  file = "file",
 }
 
 export const WebAppConfigSchema = Type.Object({
@@ -70,8 +89,16 @@ export const SlurmConfigSchema = Type.Object({
 
 export type SlurmConfigSchema = Static<typeof SlurmConfigSchema>;
 
+
+export const FixedValueSchema = Type.Object({
+  value: Type.Union([Type.String(), Type.Number()], { description: "表单项的固定值，如果配置则不允许修改" }),
+  hidden: Type.Boolean({ description: "是否在页面隐藏，默认不隐藏", default: false }),
+});
+export type FixedValueSchema = Static<typeof FixedValueSchema>;
+
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
+
   logoPath: Type.Optional(Type.String({ description: "App应用图标的图片源路径" })),
   type: Type.Enum(AppType, { description: "应用类型" }),
   slurm: Type.Optional(SlurmConfigSchema),
@@ -80,7 +107,7 @@ export const AppConfigSchema = Type.Object({
   shadowDesk: Type.Optional(ShadowDeskConfigSchema),
   attributes: Type.Optional(Type.Array(
     Type.Object({
-      type:  Type.Enum({ number: "number", text: "text", select: "select" }, { description: "表单类型" }),
+      type:  Type.Enum(AttributeType, { description: "表单类型" }),
       label: createI18nStringSchema({ description: "表单标签" }),
       name: Type.String({ description: "表单字段名" }),
       required: Type.Boolean({ description: "是必填项", default: true }),
@@ -93,12 +120,22 @@ export const AppConfigSchema = Type.Object({
             label: createI18nStringSchema({ description: "表单选项展示给用户的文本" }),
             requireGpu: Type.Optional(Type.Boolean({ description: "表单选项是否只在分区为gpu时展示" })),
           }), { description:"表单选项" },
-        )),
+        ),
+      ),
+      fixedValue: Type.Optional(FixedValueSchema),
     }),
   )),
   appComment: Type.Optional(createI18nStringSchema({ description: "应用说明文字" })),
-
+  reservedAppAttributes: Type.Optional(Type.Array(
+    Type.Object({
+      name: Type.Enum(ReservedAppAttributeName,
+        { description: "系统保留APP表单字段名, 包括作业名，账户，集群，分区，Qos, 节点数，CPU卡数，GPU卡数，最长运行时间" }),
+      fixedValue: FixedValueSchema,
+    }), { description: "为系统保留APP表单字段配置固定值，可选择是否在页面隐藏，同一个字段名重复配置会进行覆盖" },
+  )),
 });
+
+export type ReservedAppAttributeItem = NonNullable<AppConfigSchema["reservedAppAttributes"]>[number];
 
 export type AppConfigSchema = Static<typeof AppConfigSchema>;
 
@@ -119,17 +156,80 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
     }
     if (config.attributes) {
       config.attributes.forEach((item) => {
-        if (item.type === "select" && !item.select) {
+        if (item.type === AttributeType.select && !item.select) {
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type select but select options is not set`);
         }
-        if (item.defaultValue && item.type === "number" && typeof item.defaultValue !== "number") {
+        // type为select类型时，不支持fixedValue，如果配置也不会生效
+        if (item.type === AttributeType.select && item.fixedValue) {
+          logger?.warn(`App ${id}'s form attributes of name ${item.name} is of type select, `
+            + "the configuration for fixedValue will not take effect.");
+        }
+        // 如果配置了 fixedValue，值不能为空字符串
+        if (item.fixedValue && item.fixedValue.value === "") {
+          throw new Error(`
+          App ${id}'s form attributes of name ${item.name} needs a fixed value,
+          but the value is an empty string`);
+        }
+        // 先验证是否配有固定值
+        if (item.fixedValue && item.type === AttributeType.number && typeof item.fixedValue.value !== "number") {
+          throw new Error(`
+          App ${id}'s form attributes of name ${item.name} is of type number,
+          but the default ${item.fixedValue.value} value is not a number`);
+        }
+        // 如果没有配置固定值
+        if (!item.fixedValue &&
+          (item.defaultValue && item.type === AttributeType.number && typeof item.defaultValue !== "number")) {
           throw new Error(`
           App ${id}'s form attributes of name ${item.name} is of type number,
           but the default ${item.defaultValue} value is not a number`);
         }
+        // 如果类型是file,验证配置的value需要为绝对路径
+        if (item.type === AttributeType.file) {
+          const pathToValidate = item.fixedValue?.value ?? item.defaultValue;
+          if (pathToValidate && !isAbsolute(pathToValidate.toString())) {
+            throw new Error(
+              `App ${id}'s form attribute "${item.name}" requires an absolute path, ` +
+              `but the value "${pathToValidate}" is not absolute.`,
+            );
+          }
+        }
       });
     }
+    // 增加对系统保留APP表单字段值的验证
+    if (config.reservedAppAttributes) {
+
+      config.reservedAppAttributes = Array.from(
+        config.reservedAppAttributes.reduce((acc, item) => {
+          // 重复配置，后方覆盖前方
+          acc.set(item.name, item);
+
+          // fixedValue，值不能为空字符串
+          if (item.fixedValue.value === "") {
+            throw new Error(`
+            App ${id}'s form system reserved attributes of name ${item.name} needs a fixed value,
+            but the value is an empty string`);
+          }
+
+          if (
+            (item.name === ReservedAppAttributeName.nodeCount ||
+              item.name === ReservedAppAttributeName.coreCount ||
+              item.name === ReservedAppAttributeName.gpuCount ||
+              item.name === ReservedAppAttributeName.maxTime) &&
+            typeof item.fixedValue.value !== "number"
+          ) {
+            throw new Error(`
+              App ${id}'s system reserved attributes of name ${item.name} is of type number,
+              but the value ${item.fixedValue.value} value is not a number`);
+          }
+
+          return acc;
+        }, new Map<string, ReservedAppAttributeItem>()).values(),
+      );
+
+      config.reservedAppAttributes = Array.from(config.reservedAppAttributes.values());
+    }
+
   });
 
   return appsConfig;

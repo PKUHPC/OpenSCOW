@@ -207,4 +207,9 @@ export const scowdFileServices = (client: ScowdClient): FileOps => ({
       throw mapTRPCExceptionToGRPC(err);
     }
   },
+
+  // TODO scowd decompression
+  decompressFile: async () => {
+    return {};
+  },
 });

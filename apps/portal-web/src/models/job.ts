@@ -91,3 +91,15 @@ export enum TimeUnit {
   HOURS = 1,
   DAYS = 2,
 }
+
+
+export enum ReservedAppAttributeName {
+  APP_JOB_NAME = "APP_JOB_NAME",
+  ACCOUNT = "ACCOUNT",
+  PARTITION = "PARTITION",
+  QOS = "QOS",
+  NODE_COUNT = "NODE_COUNT",
+  CORE_COUNT = "CORE_COUNT",
+  GPU_COUNT = "GPU_COUNT",
+  MAX_TIME = "MAX_TIME",
+}

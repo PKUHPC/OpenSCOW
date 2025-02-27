@@ -115,13 +115,14 @@ attributes:
 
 | 属性         | 类型                           | 是否必填 | 解释                                                                        |
 |------------|------------------------------|------|---------------------------------------------------------------------------|
-| `type`     | `number`, `text` 或者 `select` | 是    | 在HTML表单元素中输入的内容的类型                                                        |
-| `name`     | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartop`使用 |
+| `type`     | `number`, `text`, `select` 或者 `file` | 是    | 在HTML表单元素中输入的内容的类型                                                        |
+| `name`     | 字符串                          | 是    | HTML表单的name属性，在编程中使用，并且会作为计算节点环境变量名，可以在Web应用的`script`或者VNC应用的`xstartup`使用 |
 | `label`    | 字符串                          | 是    | HTML表单的label属性，输入框左侧显示的标签                                                 |
 | `required` | 布尔类型                         | 否    | 如果设置为`true`，用户必须填写此项，如果为`false`，用户可以不填，默认为`true`。                        |
 | `defaultValue` | 字符串或者数字               | 否    | 表单的默认值，`number`类型的默认值必须设置为数字。对于`select`类型的表单，如果没有配置`defaultValue`，则默认值为第一项                      |
 | `placeholder`   | 字符串                        | 否    | 描述输入字段预期值的提示信息，提示用户此处的输入                                                  |
-| `select`   | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例                        |
+| `select`   | 选项的列表                        | 否    | 如果`type`是`select`，必须配置此项，指明具体的选项，具体配置办法见`select`示例                        |                      |
+| `fixedValue`   | 固定值对象                   | 否    | 包含固定值的值`value`和是否在页面中隐藏`hidden`的配置。如果配置此项，则将覆盖`defaultValue`和`placeholder`的配置，表单元素值将为固定值。详细说明参见[配置fixedValue](#配置fixedvalue的html表单)。                     |                      |
 
 ### 配置输入类型为文本的HTML表单
 
@@ -197,6 +198,26 @@ attributes:
 
 如果用户选择v11选项，计算节点的环境变量 `selectVersion=version11` 可以在应用启动时被读取。
 
+### 配置输入类型为文件/文件夹的HTML表单
+
+配置一个输入内容是文件/文件夹的HTML表单，需要指定`type`为`file`，示例如下：
+
+```yaml
+attributes:
+  - type: file
+    name: fileDir
+    label: 附加文件路径
+    required: false
+    defaultValue: /user/test/script.sh
+```
+
+上述配置为一个不必填的，默认值为`/user/test/script.sh`的文件类型的HTML表单配置示例。
+
+如果配置了文件或文件夹的HTML表单类型，用户可以在页面通过文件选择器选择或填写来选择需要的文件的路径，但需注意需要填写的值为`绝对路径`。
+
+如果用户输入了`/user/test/new-script.sh`，且用户具有该绝对路径的读权限，那么计算节点的环境变量`fileDir=/user/test/new-script.sh`可以在应用启动时被读取。
+
+
 ### 配置其他sbatch参数
 
 `name`需要设置为`sbatchOptions`，指定`type`为`text`, 示例如下：
@@ -209,3 +230,14 @@ attributes:
     required: false
     placeholder: "比如：--gpus gres:2 --time 10"
 ```
+
+### 配置fixedValue的HTML表单
+
+对`type`为`text`，`number`或`file`的HTML表单配置固定值，如果配置为固定值，则在页面中不可再修改。如果同时配置了`defaultValue`及`placeholder`等配置，则不再生效，只对配置项中的`fixedValue`的配置生效。
+
+#### fixedValue配置解释
+
+| 属性       | 类型                           | 是否必填  | 解释                                                                                                             |
+|-----------|--------------------------------|----------|------------------------------------------------------------------------------------------------------------------|
+| `value`   | 字符串         | 是    | 必须填写，且值不能为空字符串。HTML表单的`value`属性，在编程中使用，并且会作为计算节点环境变量的值。如果`type`为`number`时只能填入数字，如果`type`为`file`时需要填入绝对路径。    |
+| `hidden`  | 布尔值         | 否    | 是否在页面中隐藏该HTML表单配置。如不配置默认为`false`，在页面中展示为固定值，值为上述`value`。如果配置为`true`，则只会使用`value`的值，但是页面中不再展示。   |

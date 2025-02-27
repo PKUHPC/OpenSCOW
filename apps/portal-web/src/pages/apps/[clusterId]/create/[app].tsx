@@ -12,7 +12,7 @@
 
 import { LoadingOutlined } from "@ant-design/icons";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
-import { App } from "antd";
+import { App, Result } from "antd";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useCallback } from "react";
@@ -45,12 +45,29 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
   const { data, isLoading } = useAsync({
     promiseFn: useCallback(async () => {
       return await api.getAppMetadata({ query: { appId, cluster: clusterId } })
-        .httpError(404, () => { message.error(t("pages.apps.create.error404")); });
+        .httpError(404, () => { message.error(t("pages.apps.create.error404")); })
+        .httpError(500, (e) => {
+          if (e.code === "APP_CONFIG_ERROR") {
+            message.error(e.error);
+          } else {
+            throw e;
+          }
+        });
     }, [appId]),
   });
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return <LoadingOutlined />;
+  }
+
+  if (!data) {
+    return (
+      <Result
+        status="404"
+        title={"404"}
+        subTitle={t("pages.apps.create.error404")}
+      />
+    );
   }
 
   return (
@@ -63,6 +80,7 @@ export const AppIndexPage: NextPage = requireAuth(() => true)(() => {
         appId={appId}
         clusterId={clusterId}
         appComment={data.appComment}
+        reservedAppAttributes={data.reservedAppAttributes}
       />
     </div>
   );

@@ -11,7 +11,7 @@
  */
 
 import { PictureOutlined } from "@ant-design/icons";
-import { Avatar, Card, Col, Result, Row, Spin, Tooltip } from "antd";
+import { Avatar, Card, Col, message, Result, Row, Spin, Tooltip } from "antd";
 import Link from "next/link";
 import { join } from "path";
 import { useCallback, useState } from "react";
@@ -54,7 +54,14 @@ export const CreateAppsTable: React.FC<Props> = ({ clusterId }) => {
   const t = useI18nTranslateToString();
 
   const { data, isLoading } = useAsync({ promiseFn: useCallback(async () => {
-    return await api.listAvailableApps({ query: { cluster: clusterId } });
+    return await api.listAvailableApps({ query: { cluster: clusterId } })
+      .httpError(500, (e) => {
+        if (e.code === "APP_CONFIG_ERROR") {
+          message.error(e.error);
+        } else {
+          throw e;
+        }
+      });
   }, [clusterId]) });
 
   const [imageErrorMap, setImageErrorMap] = useState<ImageErrorMap>({});

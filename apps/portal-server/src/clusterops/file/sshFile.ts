@@ -294,6 +294,57 @@ export const sshFileServices = (host: string): FileOps => ({
     });
   },
 
+  decompressFile: async (request, logger) => {
+    const { userId, filePath, decompressionPath } = request;
+    const getDecompressionCommand = () => {
+      if (filePath.endsWith(".tar")) {
+        return `tar -xf ${filePath} -C ${decompressionPath}`;
+      } else if (filePath.endsWith(".tar.gz") || filePath.endsWith(".tgz")) {
+        return `tar -xzf ${filePath} -C ${decompressionPath}`;
+      } else if (filePath.endsWith(".zip")) {
+        // TODO: 解压文件中文乱码，暂时指定 为 gbk 编码
+        return `unzip -O gbk ${filePath} -d ${decompressionPath}`;
+      } else {
+        throw {
+          code: status.INVALID_ARGUMENT,
+          message: `${filePath} is an unknown file type`,
+        } as ServiceError;
+      }
+    };
+
+    return await sshConnect(host, userId, logger, async (ssh) => {
+      const sftp = await ssh.requestSFTP();
+
+      const stat = await sftpStat(sftp)(filePath).catch((e) => {
+        logger.error(e, "stat %s as %s failed", filePath, userId);
+        throw {
+          code: status.PERMISSION_DENIED,
+          message: `${filePath} is not accessible`,
+        } as ServiceError;
+      });
+
+      if (stat.isDirectory()) {
+        throw {
+          code: status.INVALID_ARGUMENT,
+          message: `${filePath} is a directory`,
+        } as ServiceError;
+      }
+
+      const decompressionCommand = getDecompressionCommand();
+
+      const result = await ssh.execCommand(decompressionCommand);
+      if (result.code !== 0) {
+        throw {
+          code: status.INTERNAL,
+          message: `Failed to execute decompression command: ${result.stderr}`,
+        } as ServiceError;
+      }
+
+      console.dir(result, { depth: null });
+      return [{}];
+    });
+  },
+
   getFileMetadata: async (request, logger) => {
     const { userId, path } = request;
 

@@ -69,6 +69,7 @@ export const statisticServiceServer = plugin((server) => {
         "deleteDirectory",
         "moveFileItem",
         "copyFileItem",
+        "decompressFile",
       ];
 
       const qb = em.createQueryBuilder(OperationLog, "o");

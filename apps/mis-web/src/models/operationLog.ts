@@ -189,6 +189,7 @@ export const getOperationTypeTexts = (t: OperationTextsTransType): {[key in LibO
     changePassword: t(pTypes("changePassword")),
     changeEmail: t(pTypes("changeEmail")),
     createAiInferenceJob: t(pTypes("createAiInferenceJob")),
+    decompressFile: t(pTypes("decompressFile")),
   };
 
 };
@@ -220,6 +221,7 @@ export const OperationCodeMap: {[key in LibOperationType]: string } = {
   mergeFileChunks: "010509",
   initMultipartUpload: "010510",
   compressFiles: "010511",
+  decompressFile: "010512",
   setJobTimeLimit: "010601",
   createImage:"010701",
   updateImage:"010702",
@@ -637,6 +639,9 @@ export const getOperationDetail = (
         return t(pDetails("editUserProfile"),
           [operationEvent[logEvent].userId]);
       }
+      case "decompressFile":
+        return t(pDetails("decompressFile"),
+          [operationEvent[logEvent].decompressionPath, operationEvent[logEvent].filePath]);
       default:
         return "-";
     }

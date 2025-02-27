@@ -137,6 +137,14 @@ export interface GetFileMetadataReply {
   type: string;
 }
 
+export interface DecompressFileRequest {
+  userId: string;
+  filePath: string;
+  decompressionPath: string;
+}
+
+export interface DecompressFileReply {}
+
 export interface FileOps {
   copy(req: CopyRequest, logger: Logger): Promise<CopyReply>;
   move(req: MoveRequest, logger: Logger): Promise<MoveReply>;
@@ -154,6 +162,8 @@ export interface FileOps {
   download(req: DownloadRequest, logger: Logger): Promise<DownloadReply>;
 
   getFileMetadata(req: GetFileMetadataRequest, logger: Logger): Promise<GetFileMetadataReply>;
+
+  decompressFile(req: DecompressFileRequest, logger: Logger): Promise<DecompressFileReply>;
 
   // StartFileTransfer(req: StartFileTransferRequest, logger: Logger): Promise<StartFileTransferReply>;
   // QueryFileTransfer(req: QueryFileTransferRequest, logger: Logger): Promise<QueryFileTransferReply>;

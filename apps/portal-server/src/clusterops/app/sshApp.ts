@@ -1,7 +1,7 @@
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
-import { AppType } from "@scow/config/build/app";
+import { AppType, AttributeType } from "@scow/config/build/app";
 import { getPlaceholderKeys } from "@scow/lib-config/build/parse";
 import { formatTime } from "@scow/lib-scheduler-adapter";
 import { errorInfo, getAppConnectionInfoFromAdapter,getEnvVariables } from "@scow/lib-server";
@@ -177,7 +177,7 @@ export const sshAppServices = (cluster: string, host: string): AppOps => {
           // select类型的属性值是管理员配置的，无需处理特殊字符，可以让配置的特殊字符(如 $)生效
           if (
             appConfig.attributes?.find((attribute) =>
-              attribute.name === key && attribute.type === "select",
+              attribute.name === key && attribute.type === AttributeType.select,
             )
           ) {
             quotedAttribute = customAttributes[key]?.toString() ?? "";

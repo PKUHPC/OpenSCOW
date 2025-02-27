@@ -184,6 +184,12 @@ message SubmitFileItemAsJob {
   string path = 2;
 }
 
+message DecompressFile {
+  string cluster_id = 1;
+  string file_path = 2;
+  string decompression_path = 3;
+}
+
 message SetJobTimeLimit {
   string account_name = 1;
   uint32 job_id = 2;
@@ -807,6 +813,7 @@ message CreateOperationLogRequest {
     ExportUserBill export_user_bill = 107;
     CreateAiInferenceJob create_ai_inference_job = 108;
     CompressFiles compress_files = 109;
+    DecompressFile decompress_file = 110;
   }
 }
 
@@ -924,6 +931,7 @@ message OperationLog {
     ExportUserBill export_user_bill = 109;
     CreateAiInferenceJob create_ai_inference_job = 110;
     CompressFiles compress_files = 111;
+    DecompressFile decompress_file = 112;
   }
 }
 

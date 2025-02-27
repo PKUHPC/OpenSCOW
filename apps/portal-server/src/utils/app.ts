@@ -11,6 +11,7 @@
  */
 
 import { DEFAULT_CONFIG_BASE_PATH } from "@scow/config/build/constants";
+import { FixedValue } from "@scow/protos/build/portal/app";
 import { join } from "path";
 import { getAppConfigs } from "src/config/apps";
 
@@ -42,3 +43,30 @@ export const getClusterAppConfigs = (cluster: string) => {
   return apps;
 
 };
+
+
+
+
+interface FixedValueInput {
+  value: string | number | undefined;
+  hidden?: boolean
+}
+type OutputValue = FixedValue["value"];
+
+export function convertAttributesFixedValue(input: FixedValueInput | undefined):
+{ value: OutputValue; hidden: boolean } | undefined {
+  if (input?.value === undefined) {
+    return undefined;
+  }
+
+  const fixedValue: OutputValue =
+    typeof input.value === "number"
+      ? { $case: "number", number: input.value }
+      : { $case: "text", text: input.value };
+
+  return { value: fixedValue, hidden: input.hidden ?? false };
+}
+
+export function camelToSnakeCase(str: string): string {
+  return str.replace(/([a-z])([A-Z])/g, "$1_$2").toUpperCase();
+}

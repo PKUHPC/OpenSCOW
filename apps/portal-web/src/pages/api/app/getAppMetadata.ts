@@ -14,9 +14,11 @@ import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { getI18nTypeFormat } from "@scow/lib-web/src/utils/typeConversion";
-import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient } from "@scow/protos/build/portal/app";
+import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient,
+  getAppMetadataResponse_ReservedAppAttributeNameToJSON } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
+import { ReservedAppAttributeName } from "src/models/job";
 import { getClient } from "src/utils/client";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
@@ -40,15 +42,26 @@ export const SelectOption = Type.Object({
 });
 export type SelectOption = Static<typeof SelectOption>;
 
+export const FixedValue = Type.Object({
+  value: Type.Union([
+    Type.String(),
+    Type.Number(),
+  ]),
+  hidden: Type.Optional(Type.Boolean()),
+});
+export type FixedValue = Static<typeof FixedValue>;
+
 // Cannot use AppCustomAttribute from protos
 export const AppCustomAttribute = Type.Object({
   type: Type.Union([
     Type.Literal("NUMBER"),
     Type.Literal("SELECT"),
     Type.Literal("TEXT"),
+    Type.Literal("FILE"),
   ]),
   label: I18nStringSchemaType,
   name: Type.String(),
+  fixedValue: Type.Optional(FixedValue),
   required: Type.Boolean(),
   placeholder: Type.Optional(I18nStringSchemaType),
   defaultValue: Type.Optional(Type.Union([
@@ -59,6 +72,12 @@ export const AppCustomAttribute = Type.Object({
   select: Type.Array(SelectOption),
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
+
+export const ReservedAppAttribute = Type.Object({
+  name: Type.Enum(ReservedAppAttributeName),
+  fixedValue: Type.Optional(FixedValue),
+});
+export type ReservedAppAttribute = Static<typeof ReservedAppAttribute>;
 
 export const GetAppMetadataSchema = typeboxRouteSchema({
   method: "GET",
@@ -73,10 +92,16 @@ export const GetAppMetadataSchema = typeboxRouteSchema({
       appName: Type.String(),
       appCustomFormAttributes: Type.Array(AppCustomAttribute),
       appComment: Type.Optional(I18nStringSchemaType),
+      reservedAppAttributes: Type.Array(ReservedAppAttribute),
     }),
 
     // appId not exists
     404: Type.Object({ code: Type.Literal("APP_NOT_FOUND") }),
+
+    500: Type.Object({
+      code: Type.Literal("APP_CONFIG_ERROR"),
+      error: Type.String(),
+    }),
   },
 });
 
@@ -99,6 +124,11 @@ export default /* #__PURE__*/route(GetAppMetadataSchema, async (req, res) => {
       type: appCustomAttribute_AttributeTypeToJSON(item.type) as AppCustomAttribute["type"],
       label: getI18nTypeFormat(item.label),
       name: item.name,
+      fixedValue: (item.fixedValue?.value) ? {
+        value: item.fixedValue.value?.$case === "text" ? item.fixedValue.value.text :
+          item.fixedValue.value.number,
+        hidden: item.fixedValue?.hidden,
+      } : undefined,
       select: item.options?.map((option) => {
         return {
           value: option.value,
@@ -113,11 +143,27 @@ export default /* #__PURE__*/route(GetAppMetadataSchema, async (req, res) => {
       placeholder: getI18nTypeFormat(item.placeholder),
     }));
 
+    const reservedAppAttributes: ReservedAppAttribute[] = reply.reservedAppAttributes.map((item) => ({
+      name: getAppMetadataResponse_ReservedAppAttributeNameToJSON(item.name) as ReservedAppAttributeName,
+      fixedValue: (item.fixedValue?.value) ? {
+        value: item.fixedValue.value?.$case === "text" ? item.fixedValue.value.text :
+          item.fixedValue.value.number,
+        hidden: item.fixedValue?.hidden,
+      } : undefined,
+    }));
+
     const comment = getI18nTypeFormat(reply.appComment);
 
-    return { 200: { appName: reply.appName, appCustomFormAttributes: attributes, appComment: comment } };
+    return { 200: {
+      appName: reply.appName,
+      appCustomFormAttributes: attributes,
+      appComment: comment,
+      reservedAppAttributes,
+    } };
   }, handlegRPCError({
     [status.NOT_FOUND]: () => ({ 404: { code: "APP_NOT_FOUND" } } as const),
+    [status.UNKNOWN]: (e) => ({ 500: { code: "APP_CONFIG_ERROR" as const,
+      error: e.details } }),
   }));
 
 });

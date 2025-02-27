@@ -139,11 +139,20 @@ message SelectOption {
   optional bool require_gpu = 3;
 }
 
+message FixedValue {
+  oneof value {
+    string text = 1;
+    uint32 number = 2;
+  }
+  optional bool hidden = 3;
+}
+
 message AppCustomAttribute {
   enum AttributeType {
     NUMBER = 0;
     TEXT = 1;
     SELECT = 2;
+    FILE = 3;
   }
   AttributeType type = 1;
   I18nStringProtoType label = 2;
@@ -155,12 +164,31 @@ message AppCustomAttribute {
     uint32 number = 7;
   }
   optional I18nStringProtoType placeholder = 8;
+  optional FixedValue fixed_value = 9;
 }
 
 message GetAppMetadataResponse {
+
+  enum ReservedAppAttributeName {
+    UNKNOWN = 0;
+    APP_JOB_NAME = 1;
+    ACCOUNT = 2;
+    PARTITION = 3;
+    QOS = 4;
+    NODE_COUNT = 5;
+    CORE_COUNT = 6;
+    GPU_COUNT = 7;
+    MAX_TIME = 8;
+  }
+  message ReservedAppAttribute {
+    ReservedAppAttributeName name = 1;
+    FixedValue fixed_value = 2;
+  }
+
   string app_name = 1;
   repeated AppCustomAttribute attributes = 2;
   optional I18nStringProtoType app_comment = 3;
+  repeated ReservedAppAttribute reserved_app_attributes = 4;
 }
 
 message ListAvailableAppsRequest {

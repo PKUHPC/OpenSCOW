@@ -478,6 +478,24 @@ export default {
         totalMemory: "Total Memory Capacity",
         appCommentTitle: "Explanation",
       },
+      advancedFileSelectModal: {
+        getHomeDirError: "Unable to retrieve user's home directory",
+        onlyHomeDir: "Operations are only allowed in the home directory",
+        notAllowed: "This file or folder cannot be selected",
+        select: "Select File",
+        upload: "Upload File",
+        mkdir: "Create Folder",
+        decompression: "Decompress File",
+      },
+      decompressionModal: {
+        decompression: "Decompress File",
+        success: "Decompression Successful",
+        confirmText: "Are you sure you want to decompress the file in the same directory?",
+        typeError: "Invalid file type",
+        permissionDenied: "Unable to get file permissions",
+        unimplementedError: "This feature is temporarily unavailable",
+        failure: "Decompression Failed",
+      },
     },
     dashboard:{
       addEntryModal:{

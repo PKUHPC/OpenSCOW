@@ -1,28 +1,16 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { DatabaseOutlined, ExpandOutlined, FolderAddOutlined, UploadOutlined } from "@ant-design/icons";
 import { Button, message, Modal, Tree } from "antd";
 import type { DataNode, EventDataNode } from "antd/es/tree";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useEffect, useState } from "react";
+import React, { Key, useCallback, useEffect, useState } from "react";
+import { useAsync } from "react-async";
+import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
 import { ModalButton } from "src/components/ModalLink";
 import { prefix, useI18nTranslateToString } from "src/i18n";
-import { FileInfo } from "src/models/File";
-import { FileType } from "src/server/trpc/route/file";
-import { getExtension, isDecompressibleFile, isParentOrSameFolder } from "src/utils/file";
-import { trpc } from "src/utils/trpc";
+import { FileInfo, FileType } from "src/pages/api/file/list";
+import { getExtension, isDecompressibleFile, isParentOrSameFolder } from "src/server/file";
 import { styled } from "styled-components";
 
 import { CompressionModal } from "./DecompressionModal";
@@ -50,10 +38,11 @@ const TopBar = styled(FilterFormContainer)`
 `;
 
 interface Props {
-  clusterId: string,
-  allowedExtensions?: string[]
-  allowedFileType: FileType[],
+  clusterId: string;
+  allowedExtensions?: string[];
+  allowedFileType: FileType[];
   onSubmit: (path: string) => void;
+  scowdEnabled?: boolean;
 }
 
 interface DirContent {
@@ -117,9 +106,10 @@ const formatPath = (path: string) => {
 };
 
 
-export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, allowedExtensions, onSubmit }) => {
+export const AdvancedFileSelectModal: React.FC<Props> = ({
+  clusterId, allowedFileType, allowedExtensions, onSubmit, scowdEnabled }) => {
   const t = useI18nTranslateToString();
-  const p = prefix("component.fileSelectModal.");
+  const p = prefix("pageComp.app.advancedFileSelectModal.");
 
   const [visible, setVisible] = useState(false);
   const [prevPath, setPrevPath] = useState<string>("~");
@@ -130,20 +120,36 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   const [dirTree, setDirTree] = useState<DataNode[]>([]);
 
   const CompressionModalButton = ModalButton(CompressionModal, { icon: <ExpandOutlined />,
-    disabled: selectedKeys.length === 0 || !isDecompressibleFile(selectedKeys[0].toString()) });
+    disabled: selectedKeys.length === 0 || !isDecompressibleFile(selectedKeys[0].toString()) || !!scowdEnabled });
 
-  const { data: homeDir } = trpc.file.getHomeDir.useQuery({ clusterId }, {
-    enabled: !!clusterId && path === "~" && visible,
-    onSuccess(data) {
+  const homeDirPromiseFn = useCallback(async () => {
+    return visible ?
+      await api.getHomeDirectory({ query: { cluster: clusterId } }) : { path: "~" };
+  }, [visible]);
+
+  const { data: homeDir, isLoading: isHomeDirLoading } = useAsync({
+    promiseFn: homeDirPromiseFn,
+    onResolve(data) {
       setPrevPath(data.path);
       setPath(data.path);
     },
+    onReject(_) {
+      message.info(t(p("getHomeDirError")));
+    },
   });
 
-  const { data: curDirContent, refetch, isLoading: isDirContentLoading } = trpc.file.listDirectory.useQuery({
-    clusterId: clusterId,
-    path,
-  }, { enabled: !!clusterId && path !== "~" });
+  const listFilePromiseFn = useCallback(async () => {
+    return visible && path !== "~"
+      ? await api.listFile({ query: { cluster: clusterId, path: join("/", path) } })
+      : { items: []};
+  }, [visible, path]);
+
+  const { data: curDirContent, isLoading: isDirContentLoading, reload: curDirContentReload } = useAsync({
+    promiseFn: listFilePromiseFn,
+    onReject(_) {
+      setPath(prevPath);
+    },
+  });
 
   useEffect(() => {
     if (!homeDir?.path || path === "~") return;
@@ -155,12 +161,12 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
   }, [homeDir, path]);
 
   useEffect(() => {
-    if (!curDirContent) return;
+    if (!curDirContent || curDirContent?.items.length === 0) return;
 
     if (dirTree.length === 0) {
-      setDirTree(convertToDirTree(curDirContent, path));
+      setDirTree(convertToDirTree(curDirContent?.items, path));
     } else {
-      setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent));
+      setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent?.items));
     }
   }, [curDirContent]);
 
@@ -242,25 +248,23 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
         centered
         footer={[
           <div key="footer" style={{ display: "flex", flexDirection: "row", justifyContent: "space-between" }}>
-            <div key="left">
+            <div key="left" style={{ display: "flex", gap: "10px" }}>
               <UploadFileButton
+                cluster={clusterId}
                 path={path}
-                clusterId={clusterId}
+                scowdEnabled={!!scowdEnabled}
                 reload={async () => {
-                  await refetch();
-                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
+                  curDirContentReload();
+                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent?.items ?? []));
                 }}
               >
                 {t(p("upload"))}
               </UploadFileButton>
               <MkdirButton
                 key="new"
-                clusterId={clusterId}
+                cluster={clusterId}
                 path={join("/", path)}
-                reload={async (dirName: string) => {
-                  await refetch();
-                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", join(path, dirName), curDirContent ?? []));
-                }}
+                reload={curDirContentReload}
               >
                 {t(p("mkdir"))}
               </MkdirButton>
@@ -268,15 +272,20 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
                 clusterId={clusterId}
                 path={selectedKeys[0]?.toString()}
                 reload={async () => {
-                  await refetch();
-                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent ?? []));
+                  curDirContentReload();
+                  setDirTree(updateTreeData(dirTree, homeDir?.path || "~", path, curDirContent?.items ?? []));
                 }}
               >
-                {t(p("depression"))}
+                {t(p("decompression"))}
               </CompressionModalButton>
             </div>
-            <div key="right">
-              <Button key="cancel" onClick={() => { closeModal(); }}>{t("button.cancelButton")}</Button>
+            <div key="right" style={{ display: "flex", gap: "10px" }}>
+              <Button
+                key="cancel"
+                onClick={() => { closeModal(); }}
+              >
+                {t("button.cancelButton")}
+              </Button>
               <Button key="ok" type="primary" onClick={onOkClick}>{t("button.confirmButton")}</Button>
             </div>
           </div>,
@@ -286,13 +295,13 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
           <TopBar>
             <PathBar
               path={formatPath(path)}
-              loading={isDirContentLoading}
-              onPathChange={async (curPath) => {
+              loading={isDirContentLoading || isHomeDirLoading}
+              onPathChange={(curPath) => {
                 if (!(curPath === path)) {
                   setPrevPath(path);
                   setPath(curPath);
                 } else {
-                  await refetch();
+                  curDirContentReload();
                 }
               }}
               breadcrumbItemRender={(segment, index, curPath) =>
@@ -332,9 +341,9 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
             >
               <FileTable
                 style={{ flex: 1, overflowX: "auto" }}
-                files={curDirContent || []}
+                files={curDirContent?.items || []}
                 filesFilter={(files) => files.filter((file) => !file.name.startsWith("."))}
-                loading={isDirContentLoading}
+                loading={isDirContentLoading || isHomeDirLoading}
                 fileNameRender={(fileName: string) => <Button type="link">{fileName}</Button>}
                 hiddenColumns={["mtime", "mode", "action"]}
                 pagination={false}
@@ -372,4 +381,3 @@ export const FileSelectModal: React.FC<Props> = ({ clusterId, allowedFileType, a
 
 const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
 const UploadFileButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
-

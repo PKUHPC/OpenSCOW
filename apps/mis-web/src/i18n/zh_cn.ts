@@ -1372,6 +1372,7 @@ export default {
       changePassword: "修改用户密码",
       changeEmail: "修改用户邮箱",
       createAiInferenceJob: "创建推理",
+      decompressFile: "解压文件",
     },
     operationDetails: {
       login: "用户登录",
@@ -1506,6 +1507,7 @@ export default {
       changePassword: "用户修改自身密码",
       changeEmail: "用户修改自身邮箱",
       editUserProfile: "修改用户(id: {})的信息",
+      decompressFile: "在路径 {0} 下解压文件 {1}",
     },
   },
   userRoles: {
