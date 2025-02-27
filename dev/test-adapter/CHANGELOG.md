@@ -1,5 +1,11 @@
 # @scow/test-adapter
 
+## 1.1.7
+
+### Patch Changes
+
+- 2cef16e: 更新 node 版本
+
 ## 1.1.6
 
 ### Patch Changes
