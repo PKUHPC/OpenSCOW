@@ -148,7 +148,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to the GitHub Container registry
-        uses: docker/login-action@1f36f5b7a2d2f7bfd524795fc966e6d88c37baa9
+        uses: docker/login-action@327cd5a69de6c009b9ce71bce8395f28e651bf99
         with:
           registry: ${{ env.GITHUB_CR }}
           username: ${{ github.actor }}
