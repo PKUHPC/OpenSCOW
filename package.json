@@ -28,7 +28,7 @@
     "@pnpm/lockfile-file": "9.1.1",
     "@pnpm/logger": "5.0.0",
     "@types/jest": "29.5.12",
-    "@types/node": "20.14.8",
+    "@types/node": "22.13.8",
     "concurrently": "8.2.2",
     "cross-env": "7.0.3",
     "cz-conventional-changelog": "3.3.0",
