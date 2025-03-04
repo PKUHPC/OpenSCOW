@@ -59,10 +59,17 @@ const CreateTenantPageForm: React.FC = () => {
             content: t(p("userNotFound")),
           });
         })
-        .httpError(400, () => {
-          message.error({
-            content: t(p("userStillMaintainsAccountRelationship")),
-          });
+        .httpError(422, (e) => {
+          if (e.code === "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP") {
+            message.error({
+              content: t(p("userStillMaintainsAccountRelationship")),
+            });
+          };
+          if (e.code === "USER_STILL_MAINTAINS_TENANT_ROLES") {
+            message.error({
+              content: t(p("userStillMaintainsTenantRoles")),
+            });
+          };
         })
         .then(() => {
           message.info({ content:t(p("addCompleted")) });

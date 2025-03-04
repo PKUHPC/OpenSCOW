@@ -1120,11 +1120,21 @@ export const userServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      if (user.tenantRoles.length) {
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} still maintains tenant roles.`,
+          details: "USER_STILL_MAINTAINS_TENANT_ROLES",
+        } as ServiceError;
+      }
+
       const userAccount = await em.findOne(UserAccount, { user: user });
 
       if (userAccount) {
         throw {
-          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} still maintains account relationship.`,
+          details: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP",
         } as ServiceError;
       }
 

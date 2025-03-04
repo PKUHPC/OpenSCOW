@@ -79,8 +79,23 @@ export const CreateTenantForm: React.FC = () => {
           <Radio value={UserType.Existing}>{t(p("existingUser"))}</Radio>
         </Radio.Group>
       </Form.Item>
+      {userType === UserType.New && (
+        <Alert
+          style={{ marginBottom: 10 }}
+          banner
+          message={t(p("createTenantByNewUserWarningInfo"))}
+          type="warning"
+          showIcon
+        />
+      )}
       {userType === UserType.Existing && (
-        <Alert style={{ marginBottom: 10 }} banner message={t(p("createTenantWarningInfo"))} type="warning" showIcon />
+        <Alert
+          style={{ marginBottom: 10 }}
+          banner
+          message={t(p("createTenantByExistUserWarningInfo"))}
+          type="warning"
+          showIcon
+        />
       )}
       <Form.Item
         label={t(pCommon("userId"))}

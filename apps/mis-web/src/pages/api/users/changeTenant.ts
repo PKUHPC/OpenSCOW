@@ -39,8 +39,17 @@ export const ChangeTenantSchema = typeboxRouteSchema({
       code: Type.Union([
         Type.Literal("USER_NOT_FOUND"),
         Type.Literal("TENANT_NOT_FOUND"),
+      ]),
+    }),
+
+    409: Type.Object({
+      code: Type.Literal("USER_ALREADY_EXIST_IN_THIS_TENANT"),
+    }),
+
+    422: Type.Object({
+      code: Type.Union([
         Type.Literal("USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP"),
-        Type.Literal("USER_ALREADY_EXIST_IN_THIS_TENANT"),
+        Type.Literal("USER_STILL_MAINTAINS_TENANT_ROLES"),
       ]),
     }),
   },
@@ -76,8 +85,14 @@ export default /* #__PURE__*/typeboxRoute(ChangeTenantSchema, async (req, res) =
     return { 204: null };
   })
     .catch(handlegRPCError({
-      [Status.ALREADY_EXISTS]: () => ({ 404: { code: "USER_ALREADY_EXIST_IN_THIS_TENANT" as const } }),
-      [Status.FAILED_PRECONDITION]: () => ({ 404: { code: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP" as const } }),
+      [Status.ALREADY_EXISTS]: () => ({ 409: { code: "USER_ALREADY_EXIST_IN_THIS_TENANT" as const } }),
+      [Status.FAILED_PRECONDITION]: (e) => {
+        return {
+          422: e.details === "USER_STILL_MAINTAINS_TENANT_ROLES"
+            ? { code: "USER_STILL_MAINTAINS_TENANT_ROLES" as const }
+            : { code: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP" as const },
+        };
+      },
       [Status.NOT_FOUND]: (e) => {
         if (e.details === "USER_NOT_FOUND") {
           return { 404: { code: "USER_NOT_FOUND" as const } };

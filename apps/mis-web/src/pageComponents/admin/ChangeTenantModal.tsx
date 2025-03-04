@@ -31,7 +31,7 @@ interface FormProps {
 const p = prefix("pageComp.admin.changeTenantModal.");
 const pCommon = prefix("common.");
 
-const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClose, reload, open }) => {
+const ChangeTenantModal: React.FC<Props> = ({ tenantName, name, userId, onClose, reload, open }) => {
 
   const t = useI18nTranslateToString();
   const { message } = App.useApp();
@@ -55,20 +55,28 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
           case "TENANT_NOT_FOUND":
             message.error(t(p("tenantNotFound")));
             break;
-          case "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP":
-            message.error(t(p("userStillMaintainsAccountRelationship")));
-            break;
-          case "USER_ALREADY_EXIST_IN_THIS_TENANT":
-            message.error(t(p("userAlreadyExistInThisTenant")));
-            break;
           default:
             message.error(t(pCommon("changeFail")));
         } })
+      .httpError(409, () => {
+        message.error(t(p("userAlreadyExistInThisTenant")));
+      })
+      .httpError(422, (e) => {
+        if (e.code === "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP") {
+          message.error(t(p("userStillMaintainsAccountRelationship")));
+        };
+        if (e.code === "USER_STILL_MAINTAINS_TENANT_ROLES") {
+          message.error(t(p("userStillMaintainsTenantRoles")));
+        };
+      })
       .then(() => {
         message.success(t(pCommon("changeSuccess")));
         form.resetFields();
         reload();
         onClose();
+      })
+      .catch(() => {
+        message.error(t(pCommon("changeFail")));
       })
       .finally(() => setLoading(false));
   };
@@ -80,6 +88,7 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
       onOk={onOK}
       confirmLoading={loading}
       onCancel={onClose}
+      width={550}
     >
       <Alert banner message={t(p("createTenantWarningInfo"))} type="warning" showIcon />
       <Form
@@ -108,4 +117,4 @@ const ChangePasswordModal: React.FC<Props> = ({ tenantName, name, userId, onClos
     </Modal>
   );
 };
-export const ChangeTenantModalLink = ModalLink(ChangePasswordModal);
+export const ChangeTenantModalLink = ModalLink(ChangeTenantModal);

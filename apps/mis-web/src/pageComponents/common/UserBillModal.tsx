@@ -20,7 +20,6 @@ import { ExportFileModaLButton } from "src/pageComponents/common/exportFileModal
 import { MAX_EXPORT_COUNT, urlToExport } from "src/pageComponents/file/apis";
 import { BillInfo } from "src/pages/api/finance/bill";
 import { moneyNumberToString, moneyToString } from "src/utils/money";
-import { styled } from "styled-components";
 
 export interface Props {
   open: boolean;

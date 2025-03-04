@@ -51,7 +51,7 @@ export async function checkAccountBelowThreshold(accountName: string): Promise<A
 
 
 // 定义路由处理函数
-export default typeboxRoute(AccountThresholdSchema, async (req, res) => {
+export default typeboxRoute(AccountThresholdSchema, async (req) => {
   const { accountName } = req.query;
 
   try {

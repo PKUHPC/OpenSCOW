@@ -224,9 +224,9 @@ export const tenantServiceServer = plugin((server) => {
 
               try {
                 await unblockAccount(account,
-                  currentActivatedClusters, 
-                  server.ext.clusters, 
-                  logger, 
+                  currentActivatedClusters,
+                  server.ext.clusters,
+                  logger,
                   server.ext.resource);
                 unBlockedAccounts.push(account.accountName);
               } catch (error) {
@@ -281,11 +281,21 @@ export const tenantServiceServer = plugin((server) => {
         } as ServiceError;
       }
 
+      if (user.tenantRoles.length) {
+        throw {
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} still maintains tenant roles.`,
+          details: "USER_STILL_MAINTAINS_TENANT_ROLES",
+        } as ServiceError;
+      }
+
       const userAccount = await em.findOne(UserAccount, { user: user });
 
       if (userAccount) {
         throw {
-          code: Status.FAILED_PRECONDITION, message: `User ${userId} still maintains account relationship.`,
+          code: Status.FAILED_PRECONDITION,
+          message: `User ${userId} still maintains account relationship.`,
+          details: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP",
         } as ServiceError;
       }
 

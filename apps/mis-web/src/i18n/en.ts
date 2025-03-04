@@ -332,7 +332,7 @@ export default {
         editUserProfile: "edit user profile",
       },
       createTenantForm: {
-        prompt: "Please enter the tenant name and create a new user as the administrator for this tenant.",
+        prompt: "Please enter the tenant name and specify a user as the tenant administrator",
         adminInfo: "Administrator Information",
         userEmail: "User Email",
         userPassword: "User Password",
@@ -340,7 +340,11 @@ export default {
         userType: "User Type",
         newUser: "New User",
         existingUser: "Existing User",
-        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
+        createTenantByExistUserWarningInfo: "After successful creation, the user will be automatically removed"
+        + "from the original tenant and joined this tenant. "
+        + "Please ensure that the user has no associated accounts and is not the tenant administrator"
+        + "or financial personnel of the original tenant",
+        createTenantByNewUserWarningInfo:"After successful creation, the user will automatically join this tenant",
       },
       ImportUsersTable: {
         selectAccount: "Please select an account!",
@@ -380,8 +384,10 @@ export default {
         userNotFound: "User Not Exist",
         tenantNotFound: "Tenant Not Exist",
         userStillMaintainsAccountRelationship: "User still maintains account relationship",
+        userStillMaintainsTenantRoles: "User still maintains tenant roles",
         userAlreadyExistInThisTenant: "User already exists in this tenant",
-        createTenantWarningInfo: "Please ensure that the user no longer has any associated accounts",
+        createTenantWarningInfo: "Please ensure that the user has no associated accounts "
+        + "and is not the tenant administrator or financial personnel of the original tenant",
       },
     },
     commonComponent: {
@@ -1111,6 +1117,7 @@ export default {
           userNotFound: "User Not Exist",
           tenantExist: "Tenant Already Exists",
           userStillMaintainsAccountRelationship: "User still maintains account relationship",
+          userStillMaintainsTenantRoles: "User still maintains tenant roles",
         },
       },
       systemDebug: {

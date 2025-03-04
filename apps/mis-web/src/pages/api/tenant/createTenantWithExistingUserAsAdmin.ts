@@ -35,9 +35,12 @@ export const CreateTenantWithExistingUserAsAdminSchema = typeboxRouteSchema({
   responses: {
     204: Type.Null(),
 
-    /** 用户仍然维持账户关系 */
-    400: Type.Object({
-      code: Type.Literal("USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP"),
+    /** 用户仍然维持账户关系，或是原租户的租户管理员或财务人员 */
+    422: Type.Object({
+      code: Type.Union([
+        Type.Literal("USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP"),
+        Type.Literal("USER_STILL_MAINTAINS_TENANT_ROLES"),
+      ]),
     }),
 
     /** 用户不存在 */
@@ -84,11 +87,13 @@ export default /* #__PURE__*/typeboxRoute(CreateTenantWithExistingUserAsAdminSch
       return { 204: null };
     })
     .catch(handlegRPCError({
-      [status.FAILED_PRECONDITION]: () => ({
-        400:{
-          code: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP" as const,
-        },
-      }),
+      [status.FAILED_PRECONDITION]: (e) => {
+        return {
+          422: e.details === "USER_STILL_MAINTAINS_TENANT_ROLES"
+            ? { code: "USER_STILL_MAINTAINS_TENANT_ROLES" as const }
+            : { code: "USER_STILL_MAINTAINS_ACCOUNT_RELATIONSHIP" as const },
+        };
+      },
       [status.NOT_FOUND]: () => ({
         404:{
           code: "USER_NOT_FOUND" as const,

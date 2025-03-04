@@ -332,15 +332,19 @@ export default {
         editUserProfile: "修改用户信息",
       },
       createTenantForm:{
-        prompt:"请输入租户名并为其创建一个新用户作为该租户的管理员",
+        prompt:"请输入租户名并指定一个用户作为租户管理员",
         adminInfo:"管理员信息",
         userEmail:"用户邮箱",
         userPassword:"用户密码",
         confirmPassword:"确认密码",
         userType: "用户类型",
-        newUser: "新用户",
+        newUser: "新建用户",
         existingUser: "已有用户",
-        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
+        createTenantByExistUserWarningInfo: "创建成功后该用户将自动从原租户中移出并加入本租户，"
+        + "请确保该用户没有任何关联账户且不是原租户的租户管理员或财务人员",
+
+
+        createTenantByNewUserWarningInfo:"创建成功后该用户将自动加入本租户",
       },
       ImportUsersTable:{
         selectAccount:"请选择账户！",
@@ -380,8 +384,10 @@ export default {
         userNotFound: "用户不存在",
         tenantNotFound: "租户不存在",
         userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
+        userStillMaintainsTenantRoles: "该用户仍然是原租户的租户管理员或财务人员",
         userAlreadyExistInThisTenant: "用户已经存在于该租户中",
-        createTenantWarningInfo: "请确保该用户已经没有任何关联账户",
+        createTenantWarningInfo: "请确保该用户没有任何关联账户且不是原租户的租户管理员或财务人员",
+
       },
     },
     commonComponent:{
@@ -1110,6 +1116,7 @@ export default {
           userNotFound: "此用户不存在",
           tenantExist: "租户已存在",
           userStillMaintainsAccountRelationship: "该用户仍然含有账户关系",
+          userStillMaintainsTenantRoles: "该用户仍然是原租户的租户管理员或财务人员",
         },
       },
       systemDebug: {

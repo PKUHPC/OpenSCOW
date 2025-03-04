@@ -147,7 +147,7 @@ export const AddUserButton: React.FC<Props> = ({ refresh, accountName, token, ca
           query: { accountName: currentAffiliation?.accountName ?? "" },
         });
         setIsBelowBlockThreshold(result.isBelowBlockThreshold);
-      } catch (error) {
+      } catch {
         message.error(t(p("arrearsAccount")));
       }
     };

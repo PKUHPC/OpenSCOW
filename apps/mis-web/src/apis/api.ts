@@ -53,7 +53,7 @@ import type { LogoutSchema } from "src/pages/api/auth/logout";
 import type { ValidateTokenSchema } from "src/pages/api/auth/validateToken";
 import type { GetUserStatusSchema } from "src/pages/api/dashboard/status";
 import type { ExportAccountSchema } from "src/pages/api/file/exportAccount";
-import { ExportBillSchema } from "src/pages/api/file/exportBill";
+import type { ExportBillSchema } from "src/pages/api/file/exportBill";
 import type { ExportChargeRecordSchema } from "src/pages/api/file/exportChargeRecord";
 import type { ExportJobRecordSchema } from "src/pages/api/file/exportJobRecord";
 import type { ExportOperationLogSchema } from "src/pages/api/file/exportOperationLog";
