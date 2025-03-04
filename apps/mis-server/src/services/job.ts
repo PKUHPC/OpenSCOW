@@ -42,13 +42,14 @@ import { generateGetJobsOptions } from "src/utils/queryOptions";
 
 function filterJobs({
   clusters, accountName, jobEndTimeEnd, tenantName,
-  jobEndTimeStart, jobId, userId, startBiJobIndex, jobIds,
+  jobEndTimeStart, jobId, userId, startBiJobIndex, biJobIndexs,
 }: JobFilter) {
 
   return {
     ...startBiJobIndex ? { biJobIndex: { $gte: startBiJobIndex } } : {},
     ...userId ? { user: userId } : {},
-    ...clusters.length > 0 ? { cluster: clusters } : {},
+    ...clusters.length > 0 ? { cluster: { $in: clusters } } : {},
+    ...biJobIndexs?.length > 0 ? { biJobIndex: { $in: biJobIndexs } } : {},
     ...jobId
       ? {
         idJob: jobId,
@@ -61,7 +62,6 @@ function filterJobs({
             ...jobEndTimeEnd ? { $lte: jobEndTimeEnd } : {},
           },
         } : {},
-        ...jobIds?.length > 0 ? { idJob: jobIds } : {},
       },
     tenant: tenantName,
   } as FilterQuery<JobInfoEntity>;

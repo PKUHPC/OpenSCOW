@@ -37,6 +37,7 @@ interface FormProps {
 
 interface JobItem {
   idJob: number;
+  biJobIndex: number;
   jobName: string;
   accountPrice?: Money
 }
@@ -60,6 +61,10 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobs, targ
     "tenant": t(p("platformPrice")),
   };
 
+  const biJobIndexs = jobs?.map((record) => {
+    return record?.biJobIndex;
+  });
+
   const jobIds = jobs?.map((record) => {
     return record?.idJob;
   });
@@ -82,7 +87,7 @@ export const JobPriceChangeModal: React.FC<Props> = ({ open, onClose, jobs, targ
         const { price, reason } = await form.validateFields();
 
         setLoading(true);
-        await api.changeJobPrice({ body: { jobIds, price, reason, target } })
+        await api.changeJobPrice({ body: { jobIds, biJobIndexs, price, reason, target } })
           .httpError(404, (e) => {
             message.error({
               content: e.message.split(": ")[1],

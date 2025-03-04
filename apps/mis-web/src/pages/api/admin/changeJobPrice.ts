@@ -31,6 +31,7 @@ export const ChangeJobPriceSchema = typeboxRouteSchema({
 
     reason: Type.String(),
     jobIds: Type.Array(Type.Number()),
+    biJobIndexs: Type.Array(Type.Number()),
     /**
      * @minimum 0
      */
@@ -61,7 +62,7 @@ export default route(ChangeJobPriceSchema,
     const info = await auth(req, res);
     if (!info) { return; }
 
-    const { price, reason, jobIds, accountName, clusters, jobEndTimeEnd,
+    const { price, reason, jobIds, biJobIndexs, accountName, clusters, jobEndTimeEnd,
       jobEndTimeStart, jobId, userId, target } = req.body;
 
     if (
@@ -85,6 +86,7 @@ export default route(ChangeJobPriceSchema,
         jobId,
         userId,
         jobIds,
+        biJobIndexs,
       },
       ...(target === "account" ? { accountPrice: money } : { tenantPrice: money }),
       ipAddress: parseIp(req) ?? "",

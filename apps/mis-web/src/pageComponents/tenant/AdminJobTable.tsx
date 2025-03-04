@@ -65,6 +65,7 @@ interface DiffQuery {
 
 interface JobItem {
   idJob: number;
+  biJobIndex: number;
   jobName: string;
   accountPrice?: Money
   [key: string]: any

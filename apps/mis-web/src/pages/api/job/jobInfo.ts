@@ -164,6 +164,7 @@ export default /* #__PURE__*/typeboxRoute(GetJobInfoSchema, async (req, res) => 
     jobEndTimeStart,
     jobId,
     jobIds: [],
+    biJobIndexs: [],
     clusters: clusters ?? [],
   };
 
