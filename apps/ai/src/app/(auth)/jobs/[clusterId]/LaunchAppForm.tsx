@@ -37,6 +37,7 @@ import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
 import { styled, useTheme } from "styled-components";
 
+import { validateMountPoints } from "./common";
 import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
 
 const AfterInputNumber = styled(InputNumber)`
@@ -824,30 +825,7 @@ export const LaunchAppForm = (props: Props) => {
                       rules={[
                         { required: true, message: t(p("mountsPlaceholder")) },
                         // 添加的自定义校验器以确保挂载点不重复
-                        ({ getFieldValue }) => ({
-                          validator(_, value: string) {
-
-                            const currentValueNormalized = value.replace(/\/+$/, "");
-
-                            const mountPoints: string[] = getFieldValue("mountPoints").map((mountPoint: string) =>
-                              mountPoint.replace(/\/+$/, ""),
-                            );
-
-                            const currentIndex = mountPoints.findIndex((point) => point === currentValueNormalized);
-
-                            const otherMountPoints = mountPoints.filter((_, idx) => idx !== currentIndex);
-                            if (otherMountPoints.includes(currentValueNormalized)) {
-                              return Promise.reject(new Error(t(p("mountsDuplicate"))));
-                            }
-
-                            const workingDirectory = form.getFieldValue("customFields")?.workingDir?.toString();
-                            if (workingDirectory && workingDirectory.replace(/\/+$/, "") === currentValueNormalized) {
-                              return Promise.reject(new Error(t(p("mountsText"))));
-                            }
-
-                            return Promise.resolve();
-                          },
-                        }),
+                        validateMountPoints(t(p("mountsDuplicate")),t(p("mountsText"))),
                       ]}
                     >
                       <Input
