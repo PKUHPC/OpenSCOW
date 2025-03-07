@@ -23,6 +23,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/SCOW",
   "dependencies": {
+    "@connectrpc/connect": "1.6.1",
     "@bufbuild/protobuf": "1.10.0",
     "@ddadaal/tsgrpc-client": "0.17.8",
     "@ddadaal/tsgrpc-common": "0.2.6",
@@ -37,6 +38,7 @@
     "@scow/config": "workspace:*",
     "@scow/lib-auth": "workspace:*",
     "@scow/lib-config": "workspace:*",
+    "@scow/lib-scowd": "workspace:*",
     "@scow/lib-decimal": "workspace:*",
     "@scow/lib-hook": "workspace:*",
     "@scow/lib-notification": "workspace:*",

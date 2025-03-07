@@ -93,7 +93,9 @@ export async function getClustersRuntimeInfo(
 }
 
 
-export const getActivatedClusters = async (em: SqlEntityManager<MySqlDriver>, logger: Logger) => {
+export const getActivatedClusters = async (
+  em: SqlEntityManager<MySqlDriver>, logger: Logger,
+): Promise<Record<string, ClusterConfigSchema>> => {
 
   const clustersDbInfo = await getClustersRuntimeInfo(em, logger);
 

@@ -1,26 +1,14 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { status } from "@grpc/grpc-js";
-import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
+import { getLoginNode } from "@scow/config/build/cluster";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
-import { SftpError, sshConnect as libConnect, SshConnectError, testRootUserSshLogin } from "@scow/lib-ssh";
+import { SftpError, sshConnect as libConnect, SshConnectError } from "@scow/lib-ssh";
 import { NodeSSH } from "node-ssh";
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { Logger } from "ts-log";
 
-import { clusterNotFound, loginNodeNotFound, transferNodeNotFound, transferNotEnabled } from "./errors";
+import { transferNodeNotFound, transferNotEnabled } from "./errors";
 
 interface NodeNetInfo {
   address: string,
@@ -114,37 +102,4 @@ export async function sshConnect<T>(
 
     throw e;
   });
-}
-
-/**
- * Check whether all clusters can be logged in as root user
- */
-export async function checkClustersRootUserLogin(
-  logger: Logger,
-  activatedClusters: Record<string, ClusterConfigSchema>,
-) {
-  await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
-    const node = getLoginNode(loginNodes[0]);
-    logger.info("Checking if root can login to %s by login node %s", displayName, node.name);
-    const error = await testRootUserSshLogin(node.address, rootKeyPair, console);
-    if (error) {
-      logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node.name, error);
-      throw error;
-    } else {
-      logger.info("Root can login to %s by login node %s", displayName, node.name);
-    }
-  }));
-}
-
-/**
- * Check whether login node is in current cluster
- */
-export function checkLoginNodeInCluster(cluster: string, loginNode: string) {
-  const loginNodes = configClusters[cluster]?.loginNodes.map(getLoginNode);
-  if (!loginNodes) {
-    throw clusterNotFound(cluster);
-  }
-  if (!loginNodes.map((x) => x.address).includes(loginNode)) {
-    throw loginNodeNotFound(loginNode);
-  }
 }

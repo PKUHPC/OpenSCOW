@@ -1,5 +1,6 @@
 import { Code, ConnectError } from "@connectrpc/connect";
 import { ServiceError, status } from "@grpc/grpc-js";
+import { Status } from "@grpc/grpc-js/build/src/constants";
 import { getLoginNode } from "@scow/config/build/cluster";
 import { getScowdClient as getClient, ScowdClient } from "@scow/lib-scowd/build/client";
 import { createScowdCertificates } from "@scow/lib-scowd/build/ssl";
@@ -7,8 +8,9 @@ import { removePort } from "@scow/utils";
 import { configClusters } from "src/config/clusters";
 import { config } from "src/config/env";
 
-import { scowdClientNotFound } from "./errors";
-
+export const scowdClientNotFound = (cluster: string) => {
+  return { code: Status.NOT_FOUND, message: `The scowd client on cluster ${cluster} was not found` } as ServiceError;
+};
 export const certificates = createScowdCertificates(config);
 
 export function generateScowdUrl(address: string, scowdPort: number | undefined) {

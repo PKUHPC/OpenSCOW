@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package services.app;
+package api.application;
 
 option go_package = "scowd/protos/gen/api/application;apiv1";
 

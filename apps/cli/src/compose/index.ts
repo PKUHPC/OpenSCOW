@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { chmodSync, mkdirSync } from "fs";
 import path from "path";
 import { LoggingOption, ServiceSpec } from "src/compose/spec";
@@ -66,6 +54,14 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
   };
 
   const nodeOptions = config.misc?.nodeOptions;
+
+  // SCOWD 证书相关配置
+  const scowdSslCaCertPath = config.scowd?.ssl?.caCertPath ?
+    join("/etc/scow", config.scowd.ssl.caCertPath) : "";
+  const scowdSslScowCertPath = config.scowd?.ssl?.scowCertPath ?
+    join("/etc/scow", config.scowd.ssl.scowCertPath) : "";
+  const scowdSslScowPrivateKeyPath = config.scowd?.ssl?.scowPrivateKeyPath ?
+    join("/etc/scow", config.scowd.ssl.scowPrivateKeyPath) : "";
 
   // 适配器证书相关配置
   const adapterSslCaCertPath = config.adapter?.ssl?.caCertPath ?
@@ -261,13 +257,6 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
 
     const portalBasePath = join(BASE_PATH, PORTAL_PATH);
 
-    const scowdSslCaCertPath = config.scowd?.ssl?.caCertPath ?
-      join(configPath, config.scowd.ssl.caCertPath) : "";
-    const scowdSslScowCertPath = config.scowd?.ssl?.scowCertPath ?
-      join(configPath, config.scowd.ssl.scowCertPath) : "";
-    const scowdSslScowPrivateKeyPath = config.scowd?.ssl?.scowPrivateKeyPath ?
-      join(configPath, config.scowd.ssl.scowPrivateKeyPath) : "";
-
     composeSpec.volumes.portal_data = {};
 
     addService("portal-server", {
@@ -343,6 +332,11 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         "SCOW_LAUNCH_APP": "mis-server",
         "DB_PASSWORD": config.mis.dbPassword,
         AUTH_URL: config.auth.custom?.external?.url ?? "",
+
+        SCOWD_SSL_ENABLED: String(config.scowd?.ssl?.enabled ?? false),
+        SCOWD_SSL_CA_CERT_PATH: scowdSslCaCertPath,
+        SCOWD_SSL_SCOW_CERT_PATH: scowdSslScowCertPath,
+        SCOWD_SSL_SCOW_PRIVATE_KEY_PATH: scowdSslScowPrivateKeyPath,
 
         ADAPTER_SSL_ENABLED: String(config.adapter?.ssl?.enabled ?? false),
         ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
@@ -521,7 +515,7 @@ export const createComposeSpec = (config: InstallConfigSchema) => {
         ADAPTER_SSL_CA_CERT_PATH: adapterSslCaCertPath,
         ADAPTER_SSL_SCOW_CERT_PATH: adapterSslScowCertPath,
         ADAPTER_SSL_SCOW_PRIVATE_KEY_PATH: adapterSslScowPrivateKeyPath,
-        
+
         ...serviceLogEnv,
         ...nodeOptions ? { NODE_OPTIONS: nodeOptions } : {},
       },

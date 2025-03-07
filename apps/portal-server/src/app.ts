@@ -1,20 +1,9 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { Server } from "@ddadaal/tsgrpc-server";
 import { omitConfigSpec } from "@scow/lib-config";
 import { libGetCurrentActivatedClusters } from "@scow/lib-server";
 import { readVersionFile } from "@scow/utils/build/version";
 import { configClusters } from "src/config/clusters";
+import { commonConfig } from "src/config/common";
 import { config } from "src/config/env";
 import { plugins } from "src/plugins";
 import { appServiceServer } from "src/services/app";
@@ -24,12 +13,10 @@ import { desktopServiceServer } from "src/services/desktop";
 import { fileServiceServer } from "src/services/file";
 import { jobServiceServer } from "src/services/job";
 import { shellServiceServer } from "src/services/shell";
+import { checkClusters } from "src/utils/clusters";
 import { loggerOptions } from "src/utils/logger";
 import { setupProxyGateway } from "src/utils/proxy";
 import { initShellFile } from "src/utils/shell";
-import { checkClustersRootUserLogin } from "src/utils/ssh";
-
-import { commonConfig } from "./config/common";
 
 export async function createServer() {
 
@@ -62,7 +49,7 @@ export async function createServer() {
       config.MIS_SERVER_URL,
       commonConfig.scowApi?.auth?.token);
 
-    await checkClustersRootUserLogin(server.logger, activatedClusters);
+    await checkClusters(server.logger, activatedClusters);
     await Promise.all(Object.entries(activatedClusters).map(async ([id, config]) => {
       if (config.scowd?.enabled) {
         server.logger.info(`The scowd of cluster ${id} is already enabled, skipping initShellFile.`);

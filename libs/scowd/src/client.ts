@@ -1,33 +1,25 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import type { ServiceType } from "@bufbuild/protobuf";
-import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
+import { type Client, createClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
 import { AppService } from "@scow/scowd-protos/build/application/app_connect";
 import { DesktopService } from "@scow/scowd-protos/build/application/desktop_connect";
+import { ShellService } from "@scow/scowd-protos/build/application/shell_connect";
+import { SystemService } from "@scow/scowd-protos/build/application/system_connect";
 import { FileService } from "@scow/scowd-protos/build/storage/file_connect";
 
 import { SslConfig } from "./ssl";
 
 export interface ScowdClient {
-  file: PromiseClient<typeof FileService>;
-  desktop: PromiseClient<typeof DesktopService>;
-  app: PromiseClient<typeof AppService>;
+  file: Client<typeof FileService>;
+  desktop: Client<typeof DesktopService>;
+  app: Client<typeof AppService>;
+  system: Client<typeof SystemService>;
+  shell: Client<typeof ShellService>;
 }
 
 export function getClient<TService extends ServiceType>(
   scowdUrl: string, service: TService, certificates?: SslConfig,
-): PromiseClient<TService> {
+): Client<TService> {
   const transport = createConnectTransport({
     baseUrl: scowdUrl,
     httpVersion: "2",
@@ -35,7 +27,7 @@ export function getClient<TService extends ServiceType>(
       ...certificates,
     },
   });
-  return createPromiseClient(service, transport);
+  return createClient(service, transport);
 }
 
 export const getScowdClient = (scowdUrl: string, certificates?: SslConfig) => {
@@ -43,5 +35,7 @@ export const getScowdClient = (scowdUrl: string, certificates?: SslConfig) => {
     file: getClient(scowdUrl, FileService, certificates),
     desktop: getClient(scowdUrl, DesktopService, certificates),
     app: getClient(scowdUrl, AppService, certificates),
+    system: getClient(scowdUrl, SystemService, certificates),
+    shell: getClient(scowdUrl, ShellService, certificates),
   } as ScowdClient;
 };

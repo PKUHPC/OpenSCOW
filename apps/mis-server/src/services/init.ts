@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError, status } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -18,6 +6,7 @@ import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { authUrl } from "src/config";
 import { configClusters } from "src/config/clusters";
+import { config } from "src/config/env";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -74,8 +63,13 @@ export const initServiceServer = plugin((server) => {
         .then(async () => {
           // 插入公钥失败也认为是创建用户成功
           // 在所有集群下执行
-          await insertKeyToNewUser(userId, password, server.logger, configClusters)
-            .catch(() => null);
+          // 如果 SCOWD 开启则不需要插入公钥
+          const filterClusterConfig = Object.fromEntries(
+            Object.entries(configClusters).filter(([_, value]) => value.scowd?.enabled !== true));
+
+          await insertKeyToNewUser(userId, password, server.logger, filterClusterConfig)
+            .catch(() => {});
+          
           return true;
         })
         // If the call of creating user of auth fails,  delete the user created in the database.

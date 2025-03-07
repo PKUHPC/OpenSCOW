@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { ServiceError } from "@ddadaal/tsgrpc-common";
 import { Logger, plugin } from "@ddadaal/tsgrpc-server";
 import { status } from "@grpc/grpc-js";
@@ -17,11 +5,13 @@ import { ClusterConfigSchema, getLoginNode } from "@scow/config/build/cluster";
 import {
   createAdapterCertificates, getSchedulerAdapterClient, SchedulerAdapterClient,
 } from "@scow/lib-scheduler-adapter";
+import { getScowdClient } from "@scow/lib-scowd/build/client";
 import { scowErrorMetadata } from "@scow/lib-server/build/error";
 import { testRootUserSshLogin } from "@scow/lib-ssh";
 import { getActivatedClusters, updateCluster } from "src/bl/clustersUtils";
 import { configClusters } from "src/config/clusters";
 import { config, rootKeyPair } from "src/config/env";
+import { certificates as scowdCertificates, generateScowdUrl } from "src/utils/scowd";
 
 type CallOnAllResult<T> = {
   cluster: string;
@@ -69,17 +59,32 @@ export const clustersPlugin = plugin(async (f) => {
       return {};
     });
 
-    await Promise.all(Object.values(activatedClusters).map(async ({ displayName, loginNodes }) => {
+    await Promise.all(Object.values(activatedClusters).map(async ({ displayName, scowd, loginNodes }) => {
       const loginNode = getLoginNode(loginNodes[0]);
       const address = loginNode.address;
       const node = loginNode.name;
-      f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
-      const error = await testRootUserSshLogin(address, rootKeyPair, f.logger);
-      if (error) {
-        f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
-        throw error;
+      const scowdPort = loginNode.scowdPort;
+
+      if (scowd?.enabled && scowdPort) {
+        f.logger.info("Checking whether scowd on cluster %s is running normally", displayName);
+        const scowdUrl = generateScowdUrl(address, scowdPort);
+        const client = getScowdClient(scowdUrl, scowdCertificates);
+
+        try {
+          await client.system.checkHealth({}, { timeoutMs: 10000 });
+          f.logger.info("Scowd runs normally on the login node %s of cluster %s.", node, displayName);
+        } catch (err) {
+          f.logger.info("Scowd is not functioning properly on cluster %s. err: %o",
+            displayName, err);
+        }
       } else {
-        f.logger.info("Root can login to %s by login node %s", displayName, node);
+        f.logger.info("Checking if root can login to %s by login node %s", displayName, node);
+        const error = await testRootUserSshLogin(address, rootKeyPair, f.logger);
+        if (error) {
+          f.logger.info("Root cannot login to %s by login node %s. err: %o", displayName, node, error);
+        } else {
+          f.logger.info("Root can login to %s by login node %s", displayName, node);
+        }
       }
     }));
 

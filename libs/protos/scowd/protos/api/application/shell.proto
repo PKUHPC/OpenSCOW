@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package api.application;
+
+option go_package = "scowd/protos/gen/api/application;apiv1";
+
+message ShellRequest {
+
+  message Connect {
+    string user_id = 1;
+    optional uint32 cols = 2;
+    optional uint32 rows = 3;
+    optional string path = 4;
+  }
+
+  message Resize {
+    uint32 cols = 1;
+    uint32 rows = 2;
+  }
+
+  message Data {
+    bytes data = 1;
+  }
+
+  message Disconnect {
+  }
+
+  oneof message {
+    Connect connect = 1;
+    Resize resize = 2;
+    Data data = 3;
+    Disconnect disconnect = 4;
+  }
+}
+
+message ShellResponse {
+
+  message Data {
+    bytes data = 1;
+  }
+
+  message Exit {
+    optional uint32 code = 1;
+    optional string signal = 2;
+  }
+
+  oneof message {
+    Data data = 1;
+    Exit exit = 2;
+  }
+}
+
+
+service ShellService {
+  rpc Shell(stream ShellRequest) returns (stream ShellResponse) {}
+}

@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -17,10 +5,9 @@ import { getLoginNode } from "@scow/config/build/cluster";
 import { DesktopServiceServer, DesktopServiceService } from "@scow/protos/build/portal/desktop";
 import { getClusterOps } from "src/clusterops";
 import { configClusters } from "src/config/clusters";
-import { checkActivatedClusters } from "src/utils/clusters";
+import { checkActivatedClusters, checkLoginNodeInCluster } from "src/utils/clusters";
 import { ensureEnabled, getDesktopConfig } from "src/utils/desktops";
 import { clusterNotFound } from "src/utils/errors";
-import { checkLoginNodeInCluster } from "src/utils/ssh";
 
 export const desktopServiceServer = plugin((server) => {
 

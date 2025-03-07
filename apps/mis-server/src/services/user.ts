@@ -28,6 +28,7 @@ import { blockUserInAccount, unblockUserInAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { configClusters } from "src/config/clusters";
+import { config } from "src/config/env";
 import { misConfig } from "src/config/mis";
 import { Account,AccountState } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
@@ -463,7 +464,11 @@ export const userServiceServer = plugin((server) => {
           // insert public key
           // 插入公钥失败也认为是创建用户成功
           // 在所有集群下执行
-          await insertKeyToNewUser(identityId, password, server.logger, configClusters)
+          // 如果 SCOWD 开启则不需要插入公钥
+          const filterClusterConfig = Object.fromEntries(
+            Object.entries(configClusters).filter(([_, value]) => value.scowd?.enabled !== true));
+
+          await insertKeyToNewUser(identityId, password, server.logger, filterClusterConfig)
             .catch(() => {});
           return true;
         })

@@ -21,6 +21,7 @@ import { getActivatedClusters, getClustersRuntimeInfo } from "src/bl/clustersUti
 import { configClusters } from "src/config/clusters";
 import { rootKeyPair } from "src/config/env";
 import { Cluster, ClusterActivationStatus } from "src/entities/Cluster";
+import { getScowdClient, mapTRPCExceptionToGRPC } from "src/utils/scowd";
 
 export const misConfigServiceServer = plugin((server) => {
   server.addService<ConfigServiceServer>(ConfigServiceService, {
@@ -116,19 +117,38 @@ export const misConfigServiceServer = plugin((server) => {
         const loginNode = getLoginNode(targetClusterLoginNodes[0]);
         const address = loginNode.address;
         const node = loginNode.name;
-        logger.info("Checking if root can login to cluster (clusterId: %s) by login node %s",
-          clusterId, node);
-        const error = await testRootUserSshLogin(address, rootKeyPair, logger);
 
-        if (error) {
-          logger.info("Root cannot login to cluster (clusterId: %s) by login node %s. err: %o",
-            clusterId, node, error);
-          throw {
-            code: status.FAILED_PRECONDITION,
-            message: `Activate cluster failed, root login check failed in Cluster（ Cluster ID: ${clusterId}） .`,
-          } as ServiceError;
+        if (configClusters[clusterId].scowd?.enabled) {
+          const client = getScowdClient(clusterId);
+
+          try {
+            logger.info("Checking whether scowd is running normally on cluster %s", clusterId);
+
+            await client.system.checkHealth({});
+            logger.info("Scowd runs normally on the login node %s of cluster %s.", node, clusterId);
+          } catch (err) {
+            logger.info("Scowd is not functioning properly on cluster %s. err: %o",
+              clusterId, err);
+
+            throw mapTRPCExceptionToGRPC(err);
+          }
+
         } else {
-          logger.info("Root can login to cluster (clusterId: %s) by login node %s", clusterId, node);
+          logger.info("Checking if root can login to cluster (clusterId: %s) by login node %s",
+            clusterId, node);
+
+          const error = await testRootUserSshLogin(address, rootKeyPair, logger);
+
+          if (error) {
+            logger.info("Root cannot login to cluster (clusterId: %s) by login node %s. err: %o",
+              clusterId, node, error);
+            throw {
+              code: status.FAILED_PRECONDITION,
+              message: `Activate cluster failed, root login check failed in Cluster（ Cluster ID: ${clusterId}） .`,
+            } as ServiceError;
+          } else {
+            logger.info("Root can login to cluster (clusterId: %s) by login node %s", clusterId, node);
+          }
         }
 
         cluster.activationStatus = ClusterActivationStatus.ACTIVATED;
@@ -145,7 +165,6 @@ export const misConfigServiceServer = plugin((server) => {
           clusterId,
           operatorId,
         );
-
 
         return [{ executed: true }];
 
