@@ -14,7 +14,7 @@ import { DatabaseOutlined, FolderAddOutlined } from "@ant-design/icons";
 import { Button, Modal } from "antd";
 import Link from "next/link";
 import { join } from "path";
-import React, { Key, useCallback, useRef, useState } from "react";
+import React, { Key, useCallback, useEffect, useRef, useState } from "react";
 import { useAsync } from "react-async";
 import { api } from "src/apis";
 import { FilterFormContainer } from "src/components/FilterFormContainer";
@@ -63,6 +63,10 @@ const formatPath = (path: string) => {
 
 export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
+  const { data:homeDirectory, isLoading:isGettingHomeDirectoryLoading } = useAsync({
+    promiseFn: useCallback(async () => api.getHomeDirectory({ query: { cluster:cluster.id } }), [cluster.id]),
+  });
+
   const [visible, setVisible] = useState(false);
   const [path, setPath] = useState<string>("/");
   const [selectedKeys, setSelectedKeys] = useState<Key[]>([]);
@@ -94,7 +98,7 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
 
   const closeModal = () => {
     setVisible(false);
-    setPath("/");
+    setPath(homeDirectory?.path ?? "/");
     setSelectedKeys([]);
   };
 
@@ -116,9 +120,17 @@ export const FileSelectModal: React.FC<Props> = ({ cluster, onSubmit }) => {
   const t = useI18nTranslateToString();
   const p = prefix("pageComp.job.fileSelectModal.");
 
+  useEffect(() => {
+    setPath(homeDirectory?.path ?? "/");
+  }, [homeDirectory]);
+
   return (
     <>
-      <Button size="small" onClick={() => { setVisible(true); }}>{t("button.selectButton")}</Button>
+      <Button
+        size="small"
+        loading={isGettingHomeDirectoryLoading}
+        onClick={() => { setVisible(true); }}
+      >{t("button.selectButton")}</Button>
       <Modal
         width={600}
         open={visible}

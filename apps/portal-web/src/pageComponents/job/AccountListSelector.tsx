@@ -59,7 +59,7 @@ export const AccountListSelector: React.FC<Props> = ({ selectableAccounts, isLoa
         onChange={(v) => onChange?.(v)}
       />
       <Tooltip title={t(p("refreshAccountList"))}>
-        <Button icon={<ReloadOutlined spin={isLoading} />} onClick={() => onReload?.()} loading={isLoading} />
+        <Button icon={<ReloadOutlined />} onClick={() => onReload?.()} loading={isLoading} />
       </Tooltip>
     </Space.Compact>
   );
