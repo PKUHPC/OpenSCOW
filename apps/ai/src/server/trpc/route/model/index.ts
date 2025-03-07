@@ -13,7 +13,7 @@
 import { router } from "src/server/trpc/def";
 
 import { createModel, deleteModel, list, updateModel } from "./model";
-import { copyPublicModelVersion, createModelVersion, deleteModelVersion, shareModelVersion,
+import { copyPublicModelVersion, createModelVersion, deleteModelVersion, getMultipleModelVersions, shareModelVersion,
   unShareModelVersion, updateModelVersion, versionList } from "./modelVersion";
 
 export const model = router({
@@ -28,4 +28,5 @@ export const model = router({
   versionList,
   shareModelVersion,
   unShareModelVersion,
+  getMultipleModelVersions,
 });

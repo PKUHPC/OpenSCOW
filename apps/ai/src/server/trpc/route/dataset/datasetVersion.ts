@@ -93,6 +93,55 @@ export const versionList = procedure
       }; }), count };
   });
 
+export const getMultipleDatasetVersions = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/datasets/versions",
+      tags: ["datasetVersion"],
+      summary: "Get multiple datasetVersions",
+    },
+  })
+  .input(z.object({
+    ...paginationSchema.shape,
+    datasetIds: z.array(z.number()),
+    isPublic: booleanQueryParam().optional(),
+  }))
+  .output(z.array(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() })))
+  .query(async ({ input }) => {
+    const em = await forkEntityManager();
+    const { page, pageSize, datasetIds,isPublic } = input;
+
+    const items = await em.find(DatasetVersion,
+      {
+        dataset: { $in: datasetIds },
+        ...isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
+      },
+      {
+        ...paginationProps(page, pageSize),
+        orderBy: { createTime: "desc" },
+      });
+
+    const groupedResults = datasetIds.map((datasetId) => {
+      const datasetItems = items.filter((x) => x.dataset.id === datasetId);
+      return {
+        items: datasetItems.map((x) => ({
+          id: x.id,
+          versionName: x.versionName,
+          versionDescription: x.versionDescription,
+          privatePath: x.privatePath,
+          path: x.path,
+          sharedStatus: x.sharedStatus,
+          createTime: x.createTime ? x.createTime.toISOString() : undefined,
+          datasetId: x.dataset.id,
+        })),
+        count: datasetItems.length,
+      };
+    });
+
+    return groupedResults;
+  });
+
 export const createDatasetVersion = procedure
   .meta({
     openapi: {
@@ -343,7 +392,7 @@ export const deleteDatasetVersion = procedure
 
       const currentClusterIds = await getCurrentClusters(user.identityId);
       checkClusterAvailable(currentClusterIds, dataset.clusterId);
-  
+
       try {
         const host = getClusterLoginNode(dataset.clusterId);
         if (!host) { throw clusterNotFound(dataset.clusterId); }

@@ -27,17 +27,20 @@ import { JobType } from "src/models/Job";
 import { aiConfig } from "src/server/config/ai";
 import { callLog } from "src/server/setup/operationLog";
 import { procedure } from "src/server/trpc/procedure/base";
-import { checkCreateAppEntity, fetchJobInputParams, validateUniquePaths } from "src/server/utils/app";
+import { checkCreateAppEntity, checkEntityAuth, fetchJobInputParams,
+  genPublicOrPrivateDataJsonString, validateUniquePaths } from "src/server/utils/app";
 import { checkClusterAvailable, getAdapterClient } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { getIdPrivate } from "src/utils/app";
 import { isParentOrSameFolder } from "src/utils/file";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
 
 import { getCurrentClusters } from "../../../utils/clusters";
+import { IdPrivateSchema } from "./jobs";
 
 const SESSION_METADATA_NAME = "session.json";
 
@@ -76,8 +79,7 @@ const InferenceJobInputSchema = z.object({
   InferenceJobName: z.string(),
   image: z.number().optional(),
   remoteImageUrl: z.string().optional(),
-  isModelPrivate: z.boolean().optional(),
-  model: z.number().optional(),
+  models: z.array(IdPrivateSchema),
   mountPoints: z.array(z.string()).optional(),
   account: z.string(),
   partition: z.string().optional(),
@@ -135,8 +137,10 @@ procedure
   .mutation(
     async ({ input, ctx: { user } }) => {
       const { clusterId, InferenceJobName , image,
-        remoteImageUrl, isModelPrivate, model, mountPoints = [], account, partition, coreCount,
-        nodeCount, gpuCount, memory, maxTime, command, gpuType,containerServicePort } = input;
+        remoteImageUrl, models, mountPoints = [], account,
+        partition, coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType,containerServicePort } = input;
+
+      const { ids:modelIds, isPrivates:isModelPrivates } = getIdPrivate(models);
 
       if (InferenceJobName.length > 42) {
         throw new TRPCError({
@@ -158,14 +162,19 @@ procedure
 
       const em = await forkEntityManager();
       const {
-        modelVersion,
+        modelVersions,
         image: existImage,
       } = await checkCreateAppEntity({
         em,
-        dataset:undefined,
-        algorithm:undefined,
+        datasets:undefined,
+        algorithms:undefined,
         image,
-        model,
+        models:modelIds,
+      });
+
+      // 检查数据集、算法、模型和镜像是否有权限使用
+      checkEntityAuth({
+        algorithmVersions:[], datasetVersions:[], modelVersions, image:existImage, userId,
       });
 
       return await sshConnect(host, userId, logger, async (ssh) => {
@@ -188,7 +197,9 @@ procedure
         // 确保所有映射到容器的路径都不重复
         validateUniquePaths([
           trainJobsDirectory,
-          isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+          ...isModelPrivates.map((isModelPrivate,idx) =>
+            isModelPrivate ? modelVersions[idx].privatePath : modelVersions[idx].path)
+          ,
           ...mountPoints,
         ]);
 
@@ -231,11 +242,12 @@ procedure
           // 第五个参数为多挂载点地址，以逗号分隔 (此挂载点是只读的)
           extraOptions: [
             remoteImageUrl || existImage?.path || "",
-            modelVersion
-              ? isModelPrivate
-                ? modelVersion.privatePath
-                : modelVersion.path
-              : "",
+            JSON.stringify(
+              modelVersions.map((modelVersion,idx) => isModelPrivates[idx]
+                ? genPublicOrPrivateDataJsonString(modelVersion.privatePath,false)
+                : genPublicOrPrivateDataJsonString(modelVersion.path,true),
+              ))
+            ,
             mountPoints.join(","),
             gpuType || "",
             aiConfig.publicMountPoints ? aiConfig.publicMountPoints.join(",") : "",

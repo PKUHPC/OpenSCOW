@@ -12,11 +12,11 @@
 
 "use client";
 
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined, PlusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { I18nStringType } from "@scow/config/build/i18n";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import { App, Button, Checkbox, Col,
-  Divider, Form, Input, InputNumber, Radio, Row, Select, Space, Spin,Typography } from "antd";
+  Divider, Form, Input, InputNumber, Radio, Row, Select, Space, Spin } from "antd";
 import { Rule } from "antd/es/form";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
@@ -32,6 +32,7 @@ import { DatasetInterface } from "src/server/trpc/route/dataset/dataset";
 import { DatasetVersionInterface } from "src/server/trpc/route/dataset/datasetVersion";
 import { AppCustomAttribute, CreateAppInput } from "src/server/trpc/route/jobs/apps";
 import { FrameworkType, TrainJobInput } from "src/server/trpc/route/jobs/jobs";
+import { getIdPrivate } from "src/utils/app";
 import { formatSize } from "src/utils/format";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
@@ -62,19 +63,32 @@ interface Props {
   trainJobInput?: TrainJobInput
 }
 
+export interface DataAttributes {
+  type?: AccessibilityType;
+  name?: number;
+  version?: number;
+  desc?: string;
+}
+
 interface FixedFormFields {
   appJobName: string;
   showAlgorithm: boolean;
-  algorithm: { type: AccessibilityType, name: number, version: number };
+  algorithmArray: {
+    index: DataAttributes;
+  };
+  datasetArray: {
+    index: DataAttributes;
+  };
+  modelArray: {
+    index: DataAttributes;
+  };
   imageSource: ImageSource;
   image: { type: AccessibilityType, name: number };
   remoteImageUrl: string | undefined;
   framework: FrameworkType | undefined;
   startCommand?: string;
   showDataset: boolean;
-  dataset: { type: AccessibilityType, name: number, version: number };
   showModel: boolean;
-  model: { type: AccessibilityType, name: number, version: number };
   mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
@@ -107,7 +121,6 @@ interface Partition {
   nodes: number;
   comment?: string;
   gpuType?: string;
-
 }
 
 export enum AccessibilityType {
@@ -149,6 +162,9 @@ export const LaunchAppForm = (props: Props) => {
 
   const [form] = Form.useForm<FormFields>();
 
+  // 不关心状态值本身，只是用来触发渲染
+  const [, forceUpdate] = useState(0);
+
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
   const [maxTimeUnitValue, setMaxTimeUnitValue] = useState<TimeUnit>("min");
 
@@ -163,80 +179,199 @@ export const LaunchAppForm = (props: Props) => {
     },
   ]);
 
-  const showAlgorithm = Form.useWatch("showAlgorithm", form);
-  const showDataset = Form.useWatch("showDataset", form);
-  const showModel = Form.useWatch("showModel", form);
   const imageSource = Form.useWatch("imageSource", form);
 
-  const isAlgorithmPrivate = Form.useWatch(["algorithm", "type"], form) === AccessibilityType.PRIVATE;
-  const isDatasetPrivate = Form.useWatch(["dataset", "type"], form) === AccessibilityType.PRIVATE;
-  const isModelPrivate = Form.useWatch(["model", "type"], form) === AccessibilityType.PRIVATE;
+  // 记录添加了多少算法
+  const [algorithmGroups, setAlgorithmGroups] = useState<{}[]>([]);
+  const [datasetGroups, setDatasetGroups] = useState<{}[]>([]);
+  const [modelGroups, setModelGroups] = useState<{}[]>([]);
+
+  // 用户是否修改了算法
+  const [isAlgorithmTouched, setIsAlgorithmTouched] = useState(false);
+  const [isDatasetTouched, setIsDatasetTouched] = useState(false);
+  const [isModelTouched, setIsModelTouched] = useState(false);
+
+  // 添加一组新的 Select 组件
+  const handleAddGroup = (groupType: "algorithm" | "dataset" | "model") => {
+    // 根据传入的 groupType 更新对应的状态
+    switch (groupType) {
+      case "algorithm":
+        setAlgorithmGroups([...algorithmGroups, {}]);
+        setIsAlgorithmTouched(true);
+        break;
+      case "dataset":
+        setDatasetGroups([...datasetGroups, {}]);
+        setIsDatasetTouched(true);
+        break;
+      case "model":
+        setModelGroups([...modelGroups, {}]);
+        setIsModelTouched(true);
+        break;
+      default:
+        break;
+    }
+
+    // 获取 form 中对应的值
+    const values = form.getFieldValue(`${groupType}Array`);
+
+    if (values) {
+      form.setFieldValue([`${groupType}Array`], values.concat([undefined]));
+    } else {
+      form.setFieldValue([`${groupType}Array`], [undefined]);
+    }
+  };
+
+  // 删除一组 Select 组件
+  const handleRemoveGroup = (groupType: "algorithm" | "dataset" | "model", index: number) => {
+    let newGroups;
+    // 根据传入的 groupType 删除对应的组
+    switch (groupType) {
+      case "algorithm":
+        newGroups = algorithmGroups.filter((_, idx) => idx !== index);
+        setAlgorithmGroups(newGroups);
+        setIsAlgorithmTouched(true);
+        break;
+      case "dataset":
+        newGroups = datasetGroups.filter((_, idx) => idx !== index);
+        setDatasetGroups(newGroups);
+        setIsDatasetTouched(true);
+        break;
+      case "model":
+        newGroups = modelGroups.filter((_, idx) => idx !== index);
+        setModelGroups(newGroups);
+        setIsModelTouched(true);
+        break;
+      default:
+        break;
+    }
+
+    // 获取 form 中对应的值
+    const values = form.getFieldValue(`${groupType}Array`);
+    if (values) {
+    // 如果删除的是最后一组，则直接将该组的值置为空
+      if (index === values.length - 1) {
+        form.setFieldValue([`${groupType}Array`, index], undefined);
+        return;
+      }
+
+      // 删除的是中间的组，移动后面的组的值到前一组
+      for (let i = index; i < values.length - 1; i++) {
+        const nextGroup = form.getFieldValue([`${groupType}Array`, i + 1]);
+
+        // 将后面的值设置到当前组
+        form.setFieldValue([`${groupType}Array`, i], nextGroup);
+
+        if (i === values.length - 2) {
+        // 最后一组置空
+          form.setFieldValue([`${groupType}Array`, i + 1], undefined);
+        }
+      }
+    }
+  };
+
+  // 删除某组算法（handleRemoveGroup）后，只是将algorithmArray的某个index置为undefined，
+  // 会让algorithmGroups 和 algorithmValues的长度不一致
+  useEffect(() => {
+    const algorithmValues = form.getFieldValue("algorithmArray");
+    if (algorithmValues && algorithmValues.length > algorithmGroups.length) {
+      form.setFieldValue(["algorithmArray"], form.getFieldValue("algorithmArray").slice(0, algorithmGroups.length));
+    }
+  }, [form,algorithmGroups]);
+
+  useEffect(() => {
+    const datasetValues = form.getFieldValue("datasetArray");
+    if (datasetValues && datasetValues.length > datasetGroups.length) {
+      form.setFieldValue(["datasetArray"], datasetValues.slice(0, datasetGroups.length));
+    }
+  }, [form, datasetGroups]);
+
+  useEffect(() => {
+    const modelValues = form.getFieldValue("modelArray");
+    if (modelValues && modelValues.length > modelGroups.length) {
+      form.setFieldValue(["modelArray"], modelValues.slice(0, modelGroups.length));
+    }
+  }, [form, modelGroups]);
+
 
   const {
-    data: datasets, dataOptions: datasetOptions, isDataLoading:  isDatasetsLoading,
+    privateData: privateDatasets, privateDataOptions: privateDatasetOptions,
+    publicData: publicDatasets, publicDataOptions:publicDatasetOptions,
+    isPrivateDataLoading:  isPrivateDatasetLoading,
+    isPublicDataLoading:  isPublicDatasetLoading,
   } = useDataOptions<DatasetInterface>(
-    form,
-    "dataset",
     trpc.dataset.list.useQuery,
     clusterId,
-    (dataset) => ({ label: `${dataset.name}(${dataset.owner})`, value: dataset.id }),
+    (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
   );
 
   const {
-    dataVersions: datasetVersions,
-    dataVersionOptions: datasetVersionOptions,
-    isDataVersionsLoading: isDatasetVersionsLoading,
-    dataVersionDescription:datasetVersionDescription,
+    privateDataVersions: privateDatasetVersions,
+    privateDataVersionOptions: privateDatasetVersionOptions,
+    isPrivateDataVersionsLoading: isPrivateDatasetVersionsLoading,
+    publicDataVersions: publicDatasetVersions,
+    publicDataVersionOptions: publicDatasetVersionOptions,
+    isPublicDataVersionsLoading:isPublicDatasetVersionsLoading,
   } =
   useDataVersionOptions<DatasetVersionInterface>(
-    form,
+    privateDatasets.map((x) => x.id),
+    publicDatasets.map((x) => x.id),
     "dataset",
-    trpc.dataset.versionList.useQuery,
-    (x) => ({ label: x.versionName, value: x.id }),
+    trpc.dataset.getMultipleDatasetVersions.useQuery,
+    (x) => ({ label: x.versionName, value: x.id, desc:x.versionDescription }),
   );
 
   const {
-    data: algorithms, dataOptions: algorithmOptions, isDataLoading:  isAlgorithmLoading,
+    privateData: privateAlgorithms, privateDataOptions: privateAlgorithmOptions,
+    publicData: publicAlgorithms, publicDataOptions:publicAlgorithmOptions,
+    isPrivateDataLoading:  isPrivateAlgorithmLoading,
+    isPublicDataLoading:  isPublicAlgorithmLoading,
   } = useDataOptions<AlgorithmInterface>(
-    form,
-    "algorithm",
     trpc.algorithm.getAlgorithms.useQuery,
     clusterId,
     (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
   );
 
   const {
-    dataVersions: algorithmVersions,
-    dataVersionOptions: algorithmVersionOptions,
-    isDataVersionsLoading: isAlgorithmVersionsLoading,
-    dataVersionDescription:algorithmVersionDescription,
+    privateDataVersions: privateAlgorithmVersions,
+    privateDataVersionOptions: privateAlgorithmVersionOptions,
+    isPrivateDataVersionsLoading: isPrivateAlgorithmVersionsLoading,
+    publicDataVersions: publicAlgorithmVersions,
+    publicDataVersionOptions: publicAlgorithmVersionOptions,
+    isPublicDataVersionsLoading:isPublicAlgorithmVersionsLoading,
   } =
   useDataVersionOptions<AlgorithmVersionInterface>(
-    form,
+    privateAlgorithms.map((x) => x.id),
+    publicAlgorithms.map((x) => x.id),
     "algorithm",
-    trpc.algorithm.getAlgorithmVersions.useQuery,
-    (x) => ({ label: x.versionName, value: x.id }),
-  );
-
-  const { data: models, dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModelInterface>(
-    form,
-    "model",
-    trpc.model.list.useQuery,
-    clusterId,
-    (x) => ({ label: `${x.name}(${x.owner})`, value: x.id }),
+    trpc.algorithm.getMultipleAlgorithmVersions.useQuery,
+    (x) => ({ label: x.versionName, value: x.id, desc:x.versionDescription }),
   );
 
   const {
-    dataVersions: modelVersions,
-    dataVersionOptions: modelVersionOptions,
-    isDataVersionsLoading: isModelVersionsLoading,
-    dataVersionDescription: modelVersionDescription,
+    privateData: privateModels, privateDataOptions: privateModelOptions,
+    publicData: publicModels, publicDataOptions:publicModelOptions,
+    isPrivateDataLoading:  isPrivateModelLoading,
+    isPublicDataLoading:  isPublicModelLoading,
+  } = useDataOptions<ModelInterface>(
+    trpc.model.list.useQuery,
+    clusterId,
+    (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
+  );
+
+  const {
+    privateDataVersions: privateModelVersions,
+    privateDataVersionOptions: privateModelVersionOptions,
+    isPrivateDataVersionsLoading: isPrivateModelVersionsLoading,
+    publicDataVersions: publicModelVersions,
+    publicDataVersionOptions: publicModelVersionOptions,
+    isPublicDataVersionsLoading:isPublicModelVersionsLoading,
   } =
   useDataVersionOptions<ModelVersionInterface>(
-    form,
+    privateModels.map((x) => x.id),
+    publicModels.map((x) => x.id),
     "model",
-    trpc.model.versionList.useQuery,
-    (x) => ({ label: x.versionName, value: x.id }),
+    trpc.model.getMultipleModelVersions.useQuery,
+    (x) => ({ label: x.versionName, value: x.id, desc:x.versionDescription }),
   );
 
   const imageType = Form.useWatch(["image", "type"], form);
@@ -277,9 +412,6 @@ export const LaunchAppForm = (props: Props) => {
   const framework = Form.useWatch("framework", form);
 
   const imageId = Form.useWatch(["image", "name"], form);
-  const algorithmVersionId = Form.useWatch(["algorithm", "version"], form);
-  const datasetVersionId = Form.useWatch(["dataset", "version"], form);
-  const modelVersionId = Form.useWatch(["model", "version"], form);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -402,76 +534,133 @@ export const LaunchAppForm = (props: Props) => {
     );
   }), [attributes, currentPartitionInfo,languageId]);
 
+  useEffect(() => {
+    const inputParams = trainJobInput || createAppParams;
+
+    // 处理算法相关数据
+    const { ids:algorithmIds, isPrivates:isAlgorithmPrivates } =
+    inputParams?.algorithms?.length ? getIdPrivate(inputParams.algorithms) : {};
+
+    if (algorithmIds?.length && isAlgorithmPrivates?.length) {
+      if (!form.isFieldsTouched(["showAlgorithm"])) {
+        setAlgorithmGroups(new Array(algorithmIds.length).fill({}));
+      }
+    }
+
+    // 处理数据集相关数据
+    const { ids:datasetIds, isPrivates:isDatasetPrivates } =
+    inputParams?.datasets?.length ? getIdPrivate(inputParams.datasets) : {};
+
+    if (datasetIds?.length && isDatasetPrivates?.length) {
+      if (!form.isFieldsTouched(["showDataset"])) {
+        setDatasetGroups(new Array(datasetIds.length).fill({}));
+      }
+    }
+
+    // 处理模型相关数据
+    const { ids:modelIds, isPrivates:isModelPrivates } =
+    inputParams?.models?.length ? getIdPrivate(inputParams.models) : {};
+
+    if (modelIds?.length && isModelPrivates?.length) {
+      if (!form.isFieldsTouched(["showModel"])) {
+        setModelGroups(new Array(modelIds.length).fill({}));
+      }
+    }
+  }, [createAppParams, trainJobInput]);
 
   useEffect(() => {
     // 处理算法相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams?.algorithm !== undefined
-      && inputParams.isAlgorithmPrivate !== undefined) {
-      const { isAlgorithmPrivate, algorithm: algorithmId } = inputParams;
-      // 如果用户修改表单值，则不再初始化数据
-      if (!form.isFieldsTouched(["showAlgorithm",
-        ["algorithm", "type"], ["algorithm", "name"],
-        ["algorithm", "version"]])) {
-        setEntityInitData<AlgorithmVersionInterface, AlgorithmInterface>(
-          "algorithm",
-          algorithms,
-          algorithmVersions,
-          algorithmId,
-          isAlgorithmPrivate,
-          form,
-          "showAlgorithm",
-        );
-      }
+
+    const { ids:algorithmIds, isPrivates:isAlgorithmPrivates } =
+    inputParams?.algorithms?.length ? getIdPrivate(inputParams.algorithms) : {};
+
+    if (algorithmIds?.length && isAlgorithmPrivates?.length) {
+      algorithmIds.forEach((algorithmId,index) => {
+        // 如果用户修改表单值，则不再初始化数据
+        if (!isAlgorithmTouched && !form.isFieldsTouched(["showAlgorithm",
+          ["algorithm",index, "type"], ["algorithm",index, "name"],
+          ["algorithm",index, "version"]])) {
+          setEntityInitData<AlgorithmVersionInterface, AlgorithmInterface>(
+            "algorithmArray",
+            index,
+            privateAlgorithms,
+            privateAlgorithmVersions,
+            publicAlgorithms,
+            publicAlgorithmVersions,
+            algorithmId,
+            isAlgorithmPrivates[index],
+            form,
+            "showAlgorithm",
+          );
+        }
+      });
+
     }
-  }, [createAppParams, trainJobInput, algorithms, algorithmVersions, form]);
+  }, [createAppParams, trainJobInput, privateAlgorithms,publicAlgorithms,
+    privateAlgorithmVersions,publicAlgorithmVersions, form,isAlgorithmTouched]);
 
   useEffect(() => {
     // 处理数据集相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams?.dataset !== undefined
-      && inputParams.isDatasetPrivate !== undefined) {
-      const { isDatasetPrivate, dataset: datasetId } = inputParams;
-      // 如果用户修改表单值，则不再初始化数据
-      if (!form.isFieldsTouched(["showDataset",
-        ["dataset", "type"], ["dataset", "name"],
-        ["dataset", "version"]])) {
-        setEntityInitData<DatasetVersionInterface, DatasetInterface>(
-          "dataset",
-          datasets,
-          datasetVersions,
-          datasetId,
-          isDatasetPrivate,
-          form,
-          "showDataset",
-        );
-      }
+    const { ids:datasetIds, isPrivates:isDatasetPrivates } =
+    inputParams?.datasets?.length ? getIdPrivate(inputParams.datasets) : {};
+
+    if (datasetIds?.length && isDatasetPrivates?.length) {
+      datasetIds.forEach((datasetId,index) => {
+        // 如果用户修改表单值，则不再初始化数据
+        if (!isDatasetTouched && !form.isFieldsTouched(["showDataset",
+          ["dataset",index, "type"], ["dataset",index, "name"],
+          ["dataset",index, "version"]])) {
+          setEntityInitData<DatasetVersionInterface, DatasetInterface>(
+            "datasetArray",
+            index,
+            privateDatasets,
+            privateDatasetVersions,
+            publicDatasets,
+            publicDatasetVersions,
+            datasetId,
+            isDatasetPrivates[index],
+            form,
+            "showDataset",
+          );
+        }
+      });
+
     }
-  }, [ createAppParams, trainJobInput, datasets, datasetVersions, form]);
+  }, [createAppParams, trainJobInput, privateDatasets,publicDatasets,
+    privateDatasetVersions,publicDatasetVersions, form,isDatasetTouched]);
 
   useEffect(() => {
     // 处理模型相关数据
     const inputParams = trainJobInput || createAppParams;
-    if (inputParams?.model !== undefined
-      && inputParams.isModelPrivate !== undefined) {
-      const { isModelPrivate, model: modelId } = inputParams;
-      // 如果用户修改表单值，则不再初始化数据
-      if (!form.isFieldsTouched(["showModel",
-        ["model", "type"], ["model", "name"],
-        ["model", "version"]])) {
-        setEntityInitData<ModelVersionInterface, ModelInterface>(
-          "model",
-          models,
-          modelVersions,
-          modelId,
-          isModelPrivate,
-          form,
-          "showModel",
-        );
-      }
-    }
-  }, [createAppParams, trainJobInput, models, modelVersions, form]);
+    const { ids:modelIds, isPrivates:isModelPrivates } =
+    inputParams?.models?.length ? getIdPrivate(inputParams.models) : {};
 
+    if (modelIds?.length && isModelPrivates?.length) {
+      modelIds.forEach((modelId,index) => {
+        // 如果用户修改表单值，则不再初始化数据
+        if (!isModelTouched && !form.isFieldsTouched(["showModel",
+          ["model",index, "type"], ["model",index, "name"],
+          ["model",index, "version"]])) {
+          setEntityInitData<ModelVersionInterface, ModelInterface>(
+            "modelArray",
+            index,
+            privateModels,
+            privateModelVersions,
+            publicModels,
+            publicModelVersions,
+            modelId,
+            isModelPrivates[index],
+            form,
+            "showModel",
+          );
+        }
+      });
+
+    }
+  }, [createAppParams, trainJobInput, privateModels,publicModels,
+    privateModelVersions,publicModelVersions, form,isModelTouched]);
 
   // 处理镜像
   useEffect(() => {
@@ -595,24 +784,44 @@ export const LaunchAppForm = (props: Props) => {
       onValuesChange={handleFormChange}
       onFinish={async () => {
 
-        const { appJobName, algorithm, dataset, image, remoteImageUrl, framework, startCommand, model,
-          mountPoints, account, partition, coreCount,
+        const { appJobName, image, remoteImageUrl, framework, startCommand,mountPoints, account, partition, coreCount,
           gpuCount, maxTime, command, customFields, psNodes, workerNodes } = await form.validateFields();
+
+        const algorithmVersions =
+        algorithmGroups.map((_,index) => form.getFieldValue(["algorithmArray", index, "version"]))
+          .filter((x) => x !== undefined);
+        const isAlgorithmPrivates =
+        algorithmGroups.map((_,index) =>
+          form.getFieldValue(["algorithmArray", index, "type"]) === AccessibilityType.PRIVATE)
+          .filter((x) => x !== undefined);
+
+        const datasetVersions =
+        datasetGroups.map((_,index) => form.getFieldValue(["datasetArray", index, "version"]))
+          .filter((x) => x !== undefined);
+        const isDatasetPrivates =
+        datasetGroups.map((_,index) =>
+          form.getFieldValue(["datasetArray", index, "type"]) === AccessibilityType.PRIVATE)
+          .filter((x) => x !== undefined);
+
+        const modelVersions =
+        modelGroups.map((_,index) => form.getFieldValue(["modelArray", index, "version"]))
+          .filter((x) => x !== undefined);
+        const isModelPrivates =
+        modelGroups.map((_,index) =>
+          form.getFieldValue(["modelArray", index, "type"]) === AccessibilityType.PRIVATE)
+          .filter((x) => x !== undefined);
 
         if (isTraining) {
           await trainJobMutation.mutateAsync({
             clusterId,
             trainJobName: appJobName,
-            isAlgorithmPrivate,
-            algorithm: algorithm?.version,
+            algorithms:algorithmVersions.map((id,idx) => ({ id,isPrivate:isAlgorithmPrivates[idx] })),
             image: image?.name,
             isImagePrivate:!isImagePublic,
             remoteImageUrl,
             framework,
-            isDatasetPrivate,
-            dataset: dataset?.version,
-            isModelPrivate,
-            model: model?.version,
+            datasets: datasetVersions.map((id,idx) => ({ id,isPrivate:isDatasetPrivates[idx] })),
+            models: modelVersions.map((id,idx) => ({ id,isPrivate:isModelPrivates[idx] })),
             mountPoints,
             account: account,
             partition: partition,
@@ -645,16 +854,13 @@ export const LaunchAppForm = (props: Props) => {
             clusterId,
             appId: appId!,
             appJobName,
-            isAlgorithmPrivate,
-            algorithm: algorithm?.version,
+            algorithms:algorithmVersions.map((id,idx) => ({ id,isPrivate:isAlgorithmPrivates[idx] })),
             image: image?.name,
             isImagePrivate:!isImagePublic,
             remoteImageUrl,
             startCommand,
-            isDatasetPrivate,
-            dataset: dataset?.version,
-            isModelPrivate,
-            model: model?.version,
+            datasets: datasetVersions.map((id,idx) => ({ id,isPrivate:isDatasetPrivates[idx] })),
+            models: modelVersions.map((id,idx) => ({ id,isPrivate:isModelPrivates[idx] })),
             mountPoints,
             account: account,
             partition: partition,
@@ -870,8 +1076,15 @@ export const LaunchAppForm = (props: Props) => {
               valuePropName="checked"
               style={{ display: "inline-block", marginRight: 8 }}
             >
-              <Checkbox onChange={() =>
-                form.setFieldsValue({ algorithm: { type: undefined, name: undefined, version: undefined } })}
+              <Checkbox onChange={(e) => {
+                if (e.target.checked) {
+                  handleAddGroup("algorithm");
+                } else {
+                  setAlgorithmGroups([]);
+                  form.setFieldValue(["algorithmArray"], undefined);
+                }
+              }
+              }
               >
                 {t(p("algorithm"))}
               </Checkbox>
@@ -881,8 +1094,15 @@ export const LaunchAppForm = (props: Props) => {
               valuePropName="checked"
               style={{ display: "inline-block", marginRight: 8 }}
             >
-              <Checkbox onChange={() =>
-                form.setFieldsValue({ dataset: { type: undefined, name: undefined, version: undefined } })}
+              <Checkbox onChange={(e) => {
+                if (e.target.checked) {
+                  handleAddGroup("dataset");
+                } else {
+                  setDatasetGroups([]);
+                  form.setFieldValue(["datasetArray"], undefined);
+                }
+              }
+              }
               >
                 {t(p("dataset"))}
               </Checkbox>
@@ -892,286 +1112,445 @@ export const LaunchAppForm = (props: Props) => {
               valuePropName="checked"
               style={{ display: "inline-block", marginRight: 8 }}
             >
-              <Checkbox onChange={() =>
-                form.setFieldsValue({ model: { type: undefined, name: undefined, version: undefined } })}
+              <Checkbox onChange={(e) => {
+                if (e.target.checked) {
+                  handleAddGroup("model");
+                } else {
+                  setModelGroups([]);
+                  form.setFieldValue(["modelArray"], undefined);
+                }
+              }
+              }
               >
                 {t(p("model"))}
               </Checkbox>
             </Form.Item>
           </div>
         </Form.Item>
-        {
-          showAlgorithm ? (
-            <Form.Item
-              label={t(p("algorithm"))}
-              labelCol={{ span: 1, style: { minWidth: "70px" } }}
-              wrapperCol={{ span: 23 }}
-            >
-              <Space>
-                <Form.Item
-                  name={["algorithm", "type"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 120 }}
-                    onChange={() => {
-                      form.setFieldsValue({ algorithm: { name: undefined, version: undefined } });
-                    }}
-                    options={
-                      [
-                        {
-                          value: AccessibilityType.PRIVATE,
-                          label: t(p("privateAlgorithm")),
-                        },
-                        {
-                          value:  AccessibilityType.PUBLIC,
-                          label: t(p("publicAlgorithm")),
-                        },
-                      ]
-                    }
-                  />
-                </Form.Item>
-                <Form.Item name={["algorithm", "name"]} noStyle rules={[{ required: true, message: "" }]}>
-                  <Select
-                    allowClear
-                    style={{ minWidth: 200 }}
-                    onChange={() => {
-                      form.setFieldValue(["algorithm", "version"], undefined);
-                    }}
-                    loading={isAlgorithmLoading}
-                    showSearch
-                    optionFilterProp="label"
-                    options={algorithmOptions}
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["algorithm", "version"]}
-                  noStyle
-                  rules={[
-                    { required: true, message: "" },
-                    {
-                      validator: () => {
-                        const name = form.getFieldValue(["algorithm", "name"]);
-                        const type = form.getFieldValue(["algorithm", "type"]);
-                        const version = form.getFieldValue(["algorithm", "version"]);
 
-                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
-                        if (!type || !version || !name) {
-                          return Promise.reject(new Error(t(p("selectAlgorithm"))));
-                        }
+        {algorithmGroups.map((_, index) => {
+          const isPrivate = form.getFieldValue(["algorithmArray", index, "type"]) === AccessibilityType.PRIVATE;
 
-                        return Promise.resolve();
+          const algorithmOptions = isPrivate ? privateAlgorithmOptions : publicAlgorithmOptions;
+          const algorithmVersionOptionsArray =
+          isPrivate ? privateAlgorithmVersionOptions : publicAlgorithmVersionOptions;
+
+          const selectedName = form.getFieldValue(["algorithmArray", index, "name"]);
+          const algorithmIndex = algorithmOptions.findIndex((option) => option.value === selectedName);
+
+          const algorithmVersionOptions = algorithmIndex !== -1 && algorithmVersionOptionsArray
+            ? algorithmVersionOptionsArray[algorithmIndex] : [];
+
+          const selectedVersion = form.getFieldValue(["algorithmArray", index, "version"]);
+          const versionIndex = algorithmVersionOptions.findIndex((option) => option.value === selectedVersion);
+
+          return (
+            <>
+              <Form.Item
+                label={`${t(p("algorithm"))}-${index + 1}`}
+                labelCol={{ span: 1, style: { minWidth: "70px" } }}
+                wrapperCol={{ span: 23 }}
+                key={index}
+              >
+                <Space>
+                  <Form.Item
+                    name={["algorithmArray", index, "type"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 120 }}
+                      onChange={() => {
+                        setIsAlgorithmTouched(true);
+                        form.setFieldsValue({
+                          algorithmArray: {
+                            [index]: { name: undefined, version: undefined },
+                          },
+                        });
+                        // 强制再次渲染，不然后面的name，version的selectOptions不会变
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: t(p("privateAlgorithm")),
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: t(p("publicAlgorithm")),
+                          },
+                        ]
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["algorithmArray",index, "name"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 200 }}
+                      onChange={() => {
+                        setIsAlgorithmTouched(true);
+                        form.setFieldValue(["algorithmArray",index, "version"], undefined);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      loading={isPrivate ? isPrivateAlgorithmLoading : isPublicAlgorithmLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      options={algorithmOptions}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["algorithmArray",index, "version"]}
+                    noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["algorithmArray",index, "name"]);
+                          const type = form.getFieldValue(["algorithmArray",index, "type"]);
+                          const version = form.getFieldValue(["algorithmArray",index, "version"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !version || !name) {
+                            return Promise.reject(new Error(t(p("selectAlgorithm"))));
+                          }
+
+                          return Promise.resolve();
+                        },
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 100 }}
-                    loading={isAlgorithmVersionsLoading}
-                    showSearch
-                    optionFilterProp="label"
-                    options={algorithmVersionOptions}
-                  />
-                </Form.Item>
-              </Space>
-            </Form.Item>
-          ) : null
-        }
-        {
-          algorithmVersionId && (
-            <Form.Item
-              label={t(p("algorithmDesc"))}
-            >
-              {algorithmVersionDescription[algorithmVersionId]}
-            </Form.Item>
-          )
-        }
-        {
-          showDataset ? (
-            <Form.Item
-              label={t(p("dataset"))}
-              labelCol={{ span: 1, style: { minWidth: "70px" } }}
-              wrapperCol={{ span: 23 }}
-            >
-              <Space>
-                <Form.Item name={["dataset", "type"]} noStyle rules={[{ required: true, message: "" }]}>
-                  <Select
-                    allowClear
-                    style={{ minWidth: 120 }}
-                    onChange={() => {
-                      form.setFieldsValue({ dataset: { name: undefined, version: undefined } });
-                    }}
-                    options={
-                      [
-                        {
-                          value: AccessibilityType.PRIVATE,
-                          label: t(p("privateDataset")),
+                    ]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      loading={isPrivate ? isPrivateAlgorithmVersionsLoading : isPublicAlgorithmVersionsLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={() => {
+                        setIsAlgorithmTouched(true);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={algorithmVersionOptions}
+                    />
+                  </Form.Item>
+                  {
+                    index === algorithmGroups.length - 1 && (
+                      <PlusCircleOutlined
+                        onClick={() => handleAddGroup("algorithm")}
+                      />
+                    )
+                  }
+                  {algorithmGroups.length > 1 && (
+                    <MinusCircleOutlined
+                      onClick={() => handleRemoveGroup("algorithm",index)}
+                    />
+                  )}
+
+                </Space>
+              </Form.Item>
+              {/* {
+                versionIndex !== -1 && algorithmVersionOptions[versionIndex]?.desc &&
+              ( */}
+              <Form.Item
+                label={t(p("algorithmDesc"))}
+                name={["algorithmArray",index, "desc"]}
+              >
+                {versionIndex !== -1 ? algorithmVersionOptions[versionIndex]?.desc : ""}
+              </Form.Item>
+              {/* )
+              } */}
+            </>
+
+          );
+        })}
+
+        {datasetGroups.map((_, index) => {
+          const isPrivate = form.getFieldValue(["datasetArray", index, "type"]) === AccessibilityType.PRIVATE;
+
+          const datasetOptions = isPrivate ? privateDatasetOptions : publicDatasetOptions;
+          const datasetVersionOptionsArray =
+          isPrivate ? privateDatasetVersionOptions : publicDatasetVersionOptions;
+
+          const selectedName = form.getFieldValue(["datasetArray", index, "name"]);
+          const datasetIndex = datasetOptions.findIndex((option) => option.value === selectedName);
+
+          const datasetVersionOptions = datasetIndex !== -1 && datasetVersionOptionsArray
+            ? datasetVersionOptionsArray[datasetIndex] : [];
+
+          const selectedVersion = form.getFieldValue(["datasetArray", index, "version"]);
+          const versionIndex = datasetVersionOptions.findIndex((option) => option.value === selectedVersion);
+
+          return (
+            <>
+              <Form.Item
+                label={`${t(p("dataset"))}-${index + 1}`}
+                labelCol={{ span: 1, style: { minWidth: "70px" } }}
+                wrapperCol={{ span: 23 }}
+                key={index}
+              >
+                <Space>
+                  <Form.Item
+                    name={["datasetArray", index, "type"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 120 }}
+                      onChange={() => {
+                        setIsDatasetTouched(true);
+                        form.setFieldsValue({
+                          datasetArray: {
+                            [index]: { name: undefined, version: undefined },
+                          },
+                        });
+                        // 强制再次渲染，不然后面的name，version的selectOptions不会变
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: t(p("privateDataset")),
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: t(p("publicDataset")),
+                          },
+                        ]
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["datasetArray",index, "name"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 200 }}
+                      onChange={() => {
+                        setIsDatasetTouched(true);
+                        form.setFieldValue(["datasetArray",index, "version"], undefined);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      loading={isPrivate ? isPrivateDatasetLoading : isPublicDatasetLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      options={datasetOptions}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["datasetArray",index, "version"]}
+                    noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["datasetArray",index, "name"]);
+                          const type = form.getFieldValue(["datasetArray",index, "type"]);
+                          const version = form.getFieldValue(["datasetArray",index, "version"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !version || !name) {
+                            return Promise.reject(new Error(t(p("selectDataset"))));
+                          }
+
+                          return Promise.resolve();
                         },
-                        {
-                          value: AccessibilityType.PUBLIC,
-                          label: t(p("publicDataset")),
-                        },
-
-                      ]
-                    }
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["dataset", "name"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 200 }}
-                    loading={isDatasetsLoading}
-                    onChange={() => {
-                      form.setFieldValue(["dataset", "version"], undefined);
-                    }}
-                    showSearch
-                    optionFilterProp="label"
-                    options={datasetOptions}
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["dataset", "version"]}
-                  noStyle
-                  rules={[
-                    { required: true, message: "" },
-                    {
-                      validator: () => {
-                        const name = form.getFieldValue(["dataset", "name"]);
-                        const type = form.getFieldValue(["dataset", "type"]);
-                        const version = form.getFieldValue(["dataset", "version"]);
-
-                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
-                        if (!type || !version || !name) {
-                          return Promise.reject(new Error(t(p("selectDataset"))));
-                        }
-
-                        return Promise.resolve();
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 100 }}
-                    loading={isDatasetVersionsLoading}
-                    showSearch
-                    optionFilterProp="label"
-                    options={datasetVersionOptions}
-                  />
-                </Form.Item>
-              </Space>
-            </Form.Item>
-          ) : null
-        }
-        {
-          datasetVersionId && (
-            <Form.Item
-              label={t(p("datasetDesc"))}
-            >
-              {datasetVersionDescription[datasetVersionId]}
-            </Form.Item>
-          )
-        }
-        {
-          showModel ? (
-            <Form.Item
-              label={t(p("model"))}
-              labelCol={{ span: 1, style: { minWidth: "70px" } }}
-              wrapperCol={{ span: 23 }}
-            >
-              <Space>
-                <Form.Item
-                  name={["model", "type"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 120 }}
-                    onChange={() => {
-                      form.setFieldsValue({ model: { name: undefined, version: undefined } });
-                    }}
-                    options={
-                      [
-                        {
-                          value: AccessibilityType.PRIVATE,
-                          label: t(p("privateModel")),
-                        },
-                        {
-                          value:  AccessibilityType.PUBLIC,
-                          label: t(p("publicModel")),
-                        },
-                      ]
-                    }
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["model", "name"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 200 }}
-                    onChange={() => {
-                      form.setFieldValue(["model", "version"], undefined);
-                    }}
-                    loading={isModelsLoading }
-                    showSearch
-                    optionFilterProp="label"
-                    options={modelOptions}
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["model", "version"]}
-                  noStyle
-                  rules={[
-                    { required: true, message: "" },
-                    {
-                      validator: () => {
-                        const name = form.getFieldValue(["model", "name"]);
-                        const type = form.getFieldValue(["model", "type"]);
-                        const version = form.getFieldValue(["model", "version"]);
+                    ]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      loading={isPrivate ? isPrivateDatasetVersionsLoading : isPublicDatasetVersionsLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={() => {
+                        setIsDatasetTouched(true);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={datasetVersionOptions}
+                    />
+                  </Form.Item>
+                  {
+                    index === datasetGroups.length - 1 && (
+                      <PlusCircleOutlined
+                        onClick={() => handleAddGroup("dataset")}
+                      />
+                    )
+                  }
+                  {datasetGroups.length > 1 && (
+                    <MinusCircleOutlined
+                      onClick={() => handleRemoveGroup("dataset",index)}
+                    />
+                  )}
 
-                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
-                        if (!type || !version || !name) {
-                          return Promise.reject(new Error(t(p("selectModel"))));
-                        }
+                </Space>
+              </Form.Item>
+              {/* {
+                versionIndex !== -1 && algorithmVersionOptions[versionIndex]?.desc &&
+              ( */}
+              <Form.Item
+                label={t(p("datasetDesc"))}
+                name={["datasetArray",index, "desc"]}
+              >
+                {versionIndex !== -1 ? datasetVersionOptions[versionIndex]?.desc : ""}
+              </Form.Item>
+              {/* )
+              } */}
+            </>
+          );
+        })
+        }
 
-                        return Promise.resolve();
+        {modelGroups.map((_, index) => {
+          const isPrivate = form.getFieldValue(["modelArray", index, "type"]) === AccessibilityType.PRIVATE;
+
+          const modelOptions = isPrivate ? privateModelOptions : publicModelOptions;
+          const modelVersionOptionsArray =
+          isPrivate ? privateModelVersionOptions : publicModelVersionOptions;
+
+          const selectedName = form.getFieldValue(["modelArray", index, "name"]);
+          const modelIndex = modelOptions.findIndex((option) => option.value === selectedName);
+
+          const modelVersionOptions = modelIndex !== -1 && modelVersionOptionsArray
+            ? modelVersionOptionsArray[modelIndex] : [];
+
+          const selectedVersion = form.getFieldValue(["modelArray", index, "version"]);
+          const versionIndex = modelVersionOptions.findIndex((option) => option.value === selectedVersion);
+
+          return (
+            <>
+              <Form.Item
+                label={`${t(p("model"))}-${index + 1}`}
+                labelCol={{ span: 1, style: { minWidth: "70px" } }}
+                wrapperCol={{ span: 23 }}
+                key={index}
+              >
+                <Space>
+                  <Form.Item
+                    name={["modelArray", index, "type"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 120 }}
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        form.setFieldsValue({
+                          modelArray: {
+                            [index]: { name: undefined, version: undefined },
+                          },
+                        });
+                        // 强制再次渲染，不然后面的name，version的selectOptions不会变
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: t(p("privateModel")),
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: t(p("publicModel")),
+                          },
+                        ]
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["modelArray",index, "name"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 200 }}
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        form.setFieldValue(["modelArray",index, "version"], undefined);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      loading={isPrivate ? isPrivateModelLoading : isPublicModelLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      options={modelOptions}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["modelArray",index, "version"]}
+                    noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["modelArray",index, "name"]);
+                          const type = form.getFieldValue(["modelArray",index, "type"]);
+                          const version = form.getFieldValue(["modelArray",index, "version"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !version || !name) {
+                            return Promise.reject(new Error(t(p("selectModel"))));
+                          }
+
+                          return Promise.resolve();
+                        },
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 100 }}
-                    loading={isModelVersionsLoading}
-                    showSearch
-                    optionFilterProp="label"
-                    options={modelVersionOptions}
-                  />
-                </Form.Item>
-              </Space>
-            </Form.Item>
-          ) : null
+                    ]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      loading={isPrivate ? isPrivateModelVersionsLoading : isPublicModelVersionsLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={modelVersionOptions}
+                    />
+                  </Form.Item>
+                  {
+                    index === modelGroups.length - 1 && (
+                      <PlusCircleOutlined
+                        onClick={() => handleAddGroup("model")}
+                      />
+                    )
+                  }
+                  {modelGroups.length > 1 && (
+                    <MinusCircleOutlined
+                      onClick={() => handleRemoveGroup("model",index)}
+                    />
+                  )}
+
+                </Space>
+              </Form.Item>
+              {/* {
+                versionIndex !== -1 && algorithmVersionOptions[versionIndex]?.desc &&
+              ( */}
+              <Form.Item
+                label={t(p("modelDesc"))}
+                name={["modelArray",index, "desc"]}
+              >
+                {versionIndex !== -1 ? modelVersionOptions[versionIndex]?.desc : ""}
+              </Form.Item>
+              {/* )
+              } */}
+            </>
+          );
+        })
         }
-        {
-          modelVersionId && (
-            <Form.Item
-              label={t(p("modelDesc"))}
-            >
-              {modelVersionDescription[modelVersionId]}
-            </Form.Item>
-          )
-        }
+
         <Divider orientation="left" orientationMargin="0">{t(p("resource"))}</Divider>
         <Form.Item
           label={t(p("account"))}

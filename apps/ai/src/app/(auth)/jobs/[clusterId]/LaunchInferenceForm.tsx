@@ -12,7 +12,7 @@
 
 "use client";
 
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { MinusCircleOutlined, PlusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { App, Button, Checkbox, Col,
   Divider, Form, Input, InputNumber, Radio,Row, Select, Space, Spin } from "antd";
 import dayjs from "dayjs";
@@ -25,6 +25,7 @@ import { Status } from "src/models/Image";
 import { ImageSource } from "src/models/Job";
 import { ModelInterface, ModelVersionInterface } from "src/models/Model";
 import { InferenceJobInput } from "src/server/trpc/route/jobs/infer";
+import { getIdPrivate } from "src/utils/app";
 import { formatSize } from "src/utils/format";
 import { parseBooleanParam } from "src/utils/parse";
 import { trpc } from "src/utils/trpc";
@@ -32,6 +33,7 @@ import { styled, useTheme } from "styled-components";
 
 import { validateMountPoints } from "./common";
 import { setEntityInitData, useDataOptions, useDataVersionOptions } from "./hooks";
+import { DataAttributes } from "./LaunchAppForm";
 
 const AfterInputNumber = styled(InputNumber)`
   .ant-select-focused .ant-select-selector{
@@ -52,7 +54,9 @@ interface FixedFormFields {
   remoteImageUrl: string | undefined;
   isUnlimitedTime: boolean;
   showModel: boolean;
-  model: { type: AccessibilityType, name: number, version: number };
+  modelArray: {
+    index: DataAttributes;
+  };
   mountPoints: string[] | undefined;
   partition: string | undefined;
   coreCount: number;
@@ -121,35 +125,98 @@ export const LaunchInferenceJobForm = (props: Props) => {
 
   const [form] = Form.useForm<FormFields>();
 
+  // 不关心状态值本身，只是用来触发渲染
+  const [, forceUpdate] = useState(0);
+
   const [currentPartitionInfo, setCurrentPartitionInfo] = useState<Partition | undefined>();
   const [maxTimeUnitValue, setMaxTimeUnitValue] = useState<TimeUnit>("min");
 
-  const showModel = Form.useWatch("showModel", form);
   const isUnlimitedTime = Form.useWatch("isUnlimitedTime", form);
   const imageSource = Form.useWatch("imageSource", form);
 
-  const isModelPrivate = Form.useWatch(["model", "type"], form) === AccessibilityType.PRIVATE;
+  // 记录添加了多少模型
+  const [modelGroups, setModelGroups] = useState<{}[]>([]);
 
-  const { data: models, dataOptions: modelOptions, isDataLoading:  isModelsLoading } = useDataOptions<ModelInterface>(
-    form,
-    "model",
+  // 用户是否修改了模型
+  const [isModelTouched, setIsModelTouched] = useState(false);
+
+  // 添加一组新的 Select 组件
+  const handleAddModelGroup = () => {
+    setModelGroups([...modelGroups, {}]);
+    setIsModelTouched(true);
+
+    const values = form.getFieldValue("modelArray");
+
+    if (values) {
+      form.setFieldValue(["modelArray"], values.concat([undefined]));
+    } else {
+      form.setFieldValue(["modelArray"], [undefined]);
+    }
+  };
+
+  // 删除一组 Select 组件
+  const handleRemoveModelGroup = (index: number) => {
+    const newGroups = modelGroups.filter((_, idx) => idx !== index);
+    setModelGroups(newGroups);
+    setIsModelTouched(true);
+
+    // 获取 form 中对应的值
+    const values = form.getFieldValue("modelArray");
+    if (values) {
+    // 如果删除的是最后一组，则直接将该组的值置为空
+      if (index === values.length - 1) {
+        form.setFieldValue(["modelArray", index], undefined);
+        return;
+      }
+
+      // 删除的是中间的组，移动后面的组的值到前一组
+      for (let i = index; i < values.length - 1; i++) {
+        const nextGroup = form.getFieldValue(["modelArray", i + 1]);
+
+        // 将后面的值设置到当前组
+        form.setFieldValue(["modelArray", i], nextGroup);
+
+        if (i === values.length - 2) {
+        // 最后一组置空
+          form.setFieldValue(["modelArray", i + 1], undefined);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const modelValues = form.getFieldValue("modelArray");
+    if (modelValues && modelValues.length > modelGroups.length) {
+      form.setFieldValue(["modelArray"], modelValues.slice(0, modelGroups.length));
+    }
+  }, [form, modelGroups]);
+
+  const {
+    privateData: privateModels, privateDataOptions: privateModelOptions,
+    publicData: publicModels, publicDataOptions:publicModelOptions,
+    isPrivateDataLoading:  isPrivateModelLoading,
+    isPublicDataLoading:  isPublicModelLoading,
+  } = useDataOptions<ModelInterface>(
     trpc.model.list.useQuery,
     clusterId,
-    (x) => ({ label: `${x.name}(${x.owner})`, value: x.id }),
+    (x) => ({ label:`${x.name}(${x.owner})`, value: x.id }),
   );
 
   const {
-    dataVersions: modelVersions,
-    dataVersionOptions: modelVersionOptions,
-    isDataVersionsLoading: isModelVersionsLoading,
-    dataVersionDescription: modelVersionDescription,
+    privateDataVersions: privateModelVersions,
+    privateDataVersionOptions: privateModelVersionOptions,
+    isPrivateDataVersionsLoading: isPrivateModelVersionsLoading,
+    publicDataVersions: publicModelVersions,
+    publicDataVersionOptions: publicModelVersionOptions,
+    isPublicDataVersionsLoading:isPublicModelVersionsLoading,
   } =
-  useDataVersionOptions<ModelVersionInterface>(
-    form,
-    "model",
-    trpc.model.versionList.useQuery,
-    (x) => ({ label: x.versionName, value: x.id }),
-  );
+    useDataVersionOptions<ModelVersionInterface>(
+      privateModels.map((x) => x.id),
+      publicModels.map((x) => x.id),
+      "model",
+      trpc.model.getMultipleModelVersions.useQuery,
+      (x) => ({ label: x.versionName, value: x.id, desc:x.versionDescription }),
+    );
 
   const imageType = Form.useWatch(["image", "type"], form);
 
@@ -180,13 +247,10 @@ export const LaunchInferenceJobForm = (props: Props) => {
   }, [images]);
 
   const nodeCount = Form.useWatch("nodeCount", form);
-
   const coreCount = Form.useWatch("coreCount", form);
-
   const gpuCount = Form.useWatch("gpuCount", form)!;
 
   const imageId = Form.useWatch(["image", "name"], form);
-  const modelVersionId = Form.useWatch(["model", "version"], form);
 
   const memorySize = (currentPartitionInfo ?
     currentPartitionInfo.gpus ? nodeCount * gpuCount
@@ -215,28 +279,48 @@ export const LaunchInferenceJobForm = (props: Props) => {
   };
 
   useEffect(() => {
-    // 处理模型相关数据
+    // 处理再次提交作业模型数量
     const inputParams = InferenceJobInput;
-    if (inputParams?.model !== undefined
-      && inputParams.isModelPrivate !== undefined) {
-      const { isModelPrivate, model: modelId } = inputParams;
-      // 如果用户修改表单值，则不再初始化数据
-      if (!form.isFieldsTouched(["showModel",
-        ["model", "type"], ["model", "name"],
-        ["model", "version"]])) {
-        setEntityInitData<ModelVersionInterface, ModelInterface>(
-          "model",
-          models,
-          modelVersions,
-          modelId,
-          isModelPrivate,
-          form,
-          "showModel",
-        );
+    const { ids:modelIds, isPrivates:isModelPrivates } =
+    inputParams?.models?.length ? getIdPrivate(inputParams.models) : {};
+
+    if (modelIds?.length && isModelPrivates?.length) {
+      if (!form.isFieldsTouched(["showModel"])) {
+        setModelGroups(new Array(modelIds.length).fill({}));
       }
     }
-  }, [InferenceJobInput, models, modelVersions, form]);
+  }, [InferenceJobInput]);
 
+  useEffect(() => {
+    // 处理模型相关数据
+    const inputParams = InferenceJobInput;
+    const { ids:modelIds, isPrivates:isModelPrivates } =
+    inputParams?.models?.length ? getIdPrivate(inputParams.models) : {};
+
+    if (modelIds?.length && isModelPrivates?.length) {
+      modelIds.forEach((modelId,index) => {
+        // 如果用户修改表单值，则不再初始化数据
+        if (!isModelTouched && !form.isFieldsTouched(["showModel",
+          ["model",index, "type"], ["model",index, "name"],
+          ["model",index, "version"]])) {
+          setEntityInitData<ModelVersionInterface, ModelInterface>(
+            "modelArray",
+            index,
+            privateModels,
+            privateModelVersions,
+            publicModels,
+            publicModelVersions,
+            modelId,
+            isModelPrivates[index],
+            form,
+            "showModel",
+          );
+        }
+      });
+
+    }
+  }, [InferenceJobInput, privateModels,publicModels,
+    privateModelVersions,publicModelVersions, form,isModelTouched]);
 
   // 处理镜像
   useEffect(() => {
@@ -322,16 +406,23 @@ export const LaunchInferenceJobForm = (props: Props) => {
       labelAlign="left"
       onFinish={async () => {
 
-        const { appJobName, image, remoteImageUrl, model,mountPoints, account, partition, coreCount,
+        const { appJobName, image, remoteImageUrl,mountPoints, account, partition, coreCount,
           gpuCount, maxTime, command, containerServicePort } = await form.validateFields();
+
+        const modelVersions =
+                modelGroups.map((_,index) => form.getFieldValue(["modelArray", index, "version"]))
+                  .filter((x) => x !== undefined);
+        const isModelPrivates =
+                modelGroups.map((_,index) =>
+                  form.getFieldValue(["modelArray", index, "type"]) === AccessibilityType.PRIVATE)
+                  .filter((x) => x !== undefined);
 
         await inferenceJobMutation.mutateAsync({
           clusterId,
           InferenceJobName: appJobName,
           image: image?.name,
           remoteImageUrl,
-          isModelPrivate,
-          model: model?.version,
+          models: modelVersions.map((id,idx) => ({ id,isPrivate:isModelPrivates[idx] })),
           mountPoints,
           account: account,
           partition: partition,
@@ -348,7 +439,6 @@ export const LaunchInferenceJobForm = (props: Props) => {
         });
       }
       }
-
     >
       <Spin spinning={inferenceJobMutation.isLoading} tip="loading">
         <Form.Item name="appJobName" label={t(p("appJobName"))} rules={[{ required: true }, { max: 42 }]}>
@@ -529,101 +619,158 @@ export const LaunchInferenceJobForm = (props: Props) => {
               valuePropName="checked"
               style={{ display: "inline-block", marginRight: 8 }}
             >
-              <Checkbox onChange={() =>
-                form.setFieldsValue({ model: { type: undefined, name: undefined, version: undefined } })}
+              <Checkbox onChange={(e) => {
+                if (e.target.checked) {
+                  handleAddModelGroup();
+                } else {
+                  setModelGroups([]);
+                  form.setFieldValue(["modelArray"], undefined);
+                }
+              }
+              }
               >
                 {t(p("model"))}
               </Checkbox>
             </Form.Item>
           </div>
         </Form.Item>
-        {
-          showModel ? (
-            <Form.Item
-              label={t(p("model"))}
-              labelCol={{ span: 1, style: { minWidth: "70px" } }}
-              wrapperCol={{ span: 23 }}
-            >
-              <Space>
-                <Form.Item
-                  name={["model", "type"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 120 }}
-                    onChange={() => {
-                      form.setFieldsValue({ model: { name: undefined, version: undefined } });
-                    }}
-                    options={
-                      [
-                        {
-                          value: AccessibilityType.PRIVATE,
-                          label: t(p("privateModel")),
-                        },
-                        {
-                          value:  AccessibilityType.PUBLIC,
-                          label: t(p("publicModel")),
-                        },
-                      ]
-                    }
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["model", "name"]}
-                  noStyle
-                  rules={[{ required: true, message: "" }]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 200 }}
-                    onChange={() => {
-                      form.setFieldValue(["model", "version"], undefined);
-                    }}
-                    loading={isModelsLoading }
-                    options={modelOptions}
-                  />
-                </Form.Item>
-                <Form.Item
-                  name={["model", "version"]}
-                  noStyle
-                  rules={[
-                    { required: true, message: "" },
-                    {
-                      validator: () => {
-                        const name = form.getFieldValue(["model", "name"]);
-                        const type = form.getFieldValue(["model", "type"]);
-                        const version = form.getFieldValue(["model", "version"]);
 
-                        // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
-                        if (!type || !version || !name) {
-                          return Promise.reject(new Error(t(p("selectModel"))));
-                        }
+        {modelGroups.map((_, index) => {
+          const isPrivate = form.getFieldValue(["modelArray", index, "type"]) === AccessibilityType.PRIVATE;
 
-                        return Promise.resolve();
+          const modelOptions = isPrivate ? privateModelOptions : publicModelOptions;
+          const modelVersionOptionsArray =
+          isPrivate ? privateModelVersionOptions : publicModelVersionOptions;
+
+          const selectedName = form.getFieldValue(["modelArray", index, "name"]);
+          const modelIndex = modelOptions.findIndex((option) => option.value === selectedName);
+
+          const modelVersionOptions = modelIndex !== -1 && modelVersionOptionsArray
+            ? modelVersionOptionsArray[modelIndex] : [];
+
+          const selectedVersion = form.getFieldValue(["modelArray", index, "version"]);
+          const versionIndex = modelVersionOptions.findIndex((option) => option.value === selectedVersion);
+
+          return (
+            <>
+              <Form.Item
+                label={`${t(p("model"))}-${index + 1}`}
+                labelCol={{ span: 1, style: { minWidth: "70px" } }}
+                wrapperCol={{ span: 23 }}
+                key={index}
+              >
+                <Space>
+                  <Form.Item
+                    name={["modelArray", index, "type"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 120 }}
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        form.setFieldsValue({
+                          modelArray: {
+                            [index]: { name: undefined, version: undefined },
+                          },
+                        });
+                        // 强制再次渲染，不然后面的name，version的selectOptions不会变
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={
+                        [
+                          {
+                            value: AccessibilityType.PRIVATE,
+                            label: t(p("privateModel")),
+                          },
+                          {
+                            value:  AccessibilityType.PUBLIC,
+                            label: t(p("publicModel")),
+                          },
+                        ]
+                      }
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["modelArray",index, "name"]}
+                    noStyle
+                    rules={[{ required: true, message: "" }]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 200 }}
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        form.setFieldValue(["modelArray",index, "version"], undefined);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      loading={isPrivate ? isPrivateModelLoading : isPublicModelLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      options={modelOptions}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name={["modelArray",index, "version"]}
+                    noStyle
+                    rules={[
+                      { required: true, message: "" },
+                      {
+                        validator: () => {
+                          const name = form.getFieldValue(["modelArray",index, "name"]);
+                          const type = form.getFieldValue(["modelArray",index, "type"]);
+                          const version = form.getFieldValue(["modelArray",index, "version"]);
+
+                          // 如果 type 、 version 或 name 其中有一个没有值，返回错误信息
+                          if (!type || !version || !name) {
+                            return Promise.reject(new Error(t(p("selectModel"))));
+                          }
+
+                          return Promise.resolve();
+                        },
                       },
-                    },
-                  ]}
-                >
-                  <Select
-                    allowClear
-                    style={{ minWidth: 100 }}
-                    loading={isModelVersionsLoading}
-                    options={modelVersionOptions}
-                  />
-                </Form.Item>
-              </Space>
-            </Form.Item>
-          ) : null
+                    ]}
+                  >
+                    <Select
+                      allowClear
+                      style={{ minWidth: 100 }}
+                      loading={isPrivate ? isPrivateModelVersionsLoading : isPublicModelVersionsLoading}
+                      showSearch
+                      optionFilterProp="label"
+                      onChange={() => {
+                        setIsModelTouched(true);
+                        forceUpdate((prev) => prev + 1);
+                      }}
+                      options={modelVersionOptions}
+                    />
+                  </Form.Item>
+                  {
+                    index === modelGroups.length - 1 && (
+                      <PlusCircleOutlined
+                        onClick={() => handleAddModelGroup()}
+                      />
+                    )
+                  }
+                  {modelGroups.length > 1 && (
+                    <MinusCircleOutlined
+                      onClick={() => handleRemoveModelGroup(index)}
+                    />
+                  )}
+
+                </Space>
+              </Form.Item>
+              <Form.Item
+                label={t(p("modelDesc"))}
+                name={["modelArray",index, "desc"]}
+              >
+                {versionIndex !== -1 ? modelVersionOptions[versionIndex]?.desc : ""}
+              </Form.Item>
+            </>
+          );
+        })
         }
-        {
-          modelVersionId && (
-            <Form.Item label={t(p("modelDesc"))}>
-              {modelVersionDescription[modelVersionId]}
-            </Form.Item>
-          )
-        }
+
         <Divider orientation="left" orientationMargin="0">{t(p("resource"))}</Divider>
         <Form.Item
           label={t(p("account"))}

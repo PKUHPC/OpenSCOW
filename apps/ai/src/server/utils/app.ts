@@ -28,7 +28,6 @@ import { z } from "zod";
 
 import { clusters } from "../trpc/route/config";
 
-
 export const getClusterAppConfigs = (cluster: string) => {
 
   const commonApps = getAiAppConfigs();
@@ -107,62 +106,95 @@ export const getAllTags = (allApps: Record<string, AppConfigWithClusterSpecific>
   return Array.from(allTags);
 };
 
+// 批量查询版本并保持原顺序
+/**
+ *
+ * @param em
+ * @param entity  实体类，如 AlgorithmVersion、DatasetVersion、ModelVersion
+ * @param ids 要查询的 ID 数组
+ * @param populate 需要填充的字段
+ * @param entityName 用于错误消息
+ * @returns
+ */
+const getVersions = async <T>(
+  em: EntityManager,
+  entity: any,
+  ids: number[],
+  populate: any[],
+  entityName: string,
+): Promise<T[]> => {
+  // 去重并保持顺序
+  const uniqueIds = [...new Set(ids)];
 
+  // 批量查询版本
+  const versions = await em.find(entity,
+    { id: { $in: uniqueIds } },
+    { populate },
+  );
+
+  // 检查是否所有版本都存在
+  const missingIds = uniqueIds.filter((id) => !versions.some((version: any) => version.id === id));
+  if (missingIds.length > 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: `${entityName} version(s) ${missingIds.join(", ")} not found`,
+    });
+  }
+
+  // 保持原 ID 数组的顺序，包括重复的 ID
+  return ids.map((id) => {
+    const foundVersion = versions.find((version: any) => version.id === id);
+    if (!foundVersion) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: `${entityName} version id ${id} is not found`,
+      });
+    }
+
+    return foundVersion as T;
+  });
+};
 
 /**
  * @param orm mikro-orm
- * @param dataset dataset version id
- * @param algorithm algorithm version id
+ * @param datasets dataset version ids
+ * @param algorithms algorithm version ids
  * @param image image id
- * @param model model version id
+ * @param models model version ids
  * @returns datasetVersion, algorithmVersion, modelVersion, image
  * @throws TRPCError if dataset, algorithm, image, model is not found
  */
-export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, model }: {
+export const checkCreateAppEntity = async ({ em, datasets, algorithms, image, models }: {
   em: EntityManager,
-  dataset: number | undefined,
-  algorithm: number | undefined,
+  datasets: number[] | undefined,
+  algorithms: number[] | undefined,
   image: number | undefined,
-  model: number | undefined
+  models: number[] | undefined
 }) => {
-  let algorithmVersion: AlgorithmVersion | undefined;
-  if (algorithm !== undefined) {
-    const selectAlgorithmVersion = await em.findOne(AlgorithmVersion, { id: algorithm }, { populate:["algorithm"]});
 
-    if (!selectAlgorithmVersion) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `algorithm version id ${algorithm} is not found`,
-      });
-    }
-    algorithmVersion = selectAlgorithmVersion;
-  }
+  const algorithmVersions = algorithms ? await getVersions<AlgorithmVersion>(
+    em,
+    AlgorithmVersion,
+    algorithms,
+    ["algorithm"],
+    "algorithm",
+  ) : [];
 
-  let datasetVersion: DatasetVersion | undefined;
-  if (dataset !== undefined) {
-    const selectDatasetVersion = await em.findOne(DatasetVersion, { id: dataset }, { populate:["dataset"]});
+  const datasetVersions = datasets ? await getVersions<DatasetVersion>(
+    em,
+    DatasetVersion,
+    datasets,
+    ["dataset"],
+    "dataset",
+  ) : [];
 
-    if (!selectDatasetVersion) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `dataset version id ${dataset} is not found`,
-      });
-    }
-    datasetVersion = selectDatasetVersion;
-  }
-
-  let modelVersion: ModelVersion | undefined;
-  if (model !== undefined) {
-    const selectedModelVersion = await em.findOne(ModelVersion, { id: model }, { populate:["model"]});
-
-    if (!selectedModelVersion) {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: `model version id ${model} is not found`,
-      });
-    }
-    modelVersion = selectedModelVersion;
-  }
+  const modelVersions = models ? await getVersions<ModelVersion>(
+    em,
+    ModelVersion,
+    models,
+    ["model"],
+    "model",
+  ) : [];
 
   let imageOutput: ImageEntity | undefined;
   if (image !== undefined) {
@@ -177,11 +209,10 @@ export const checkCreateAppEntity = async ({ em, dataset, algorithm, image, mode
     imageOutput = existImage;
   }
 
-
   return {
-    datasetVersion,
-    algorithmVersion,
-    modelVersion,
+    datasetVersions,
+    algorithmVersions,
+    modelVersions,
     image: imageOutput,
   };
 };
@@ -269,33 +300,39 @@ const checkEntityAccess = ({
   }
 };
 
-export const checkEntityAuth = ({ datasetVersion, algorithmVersion,modelVersion, image, userId }: {
-  datasetVersion: DatasetVersion | undefined,
-  algorithmVersion: AlgorithmVersion | undefined,
-  modelVersion: ModelVersion | undefined,
+export const checkEntityAuth = ({ datasetVersions, algorithmVersions,modelVersions, image, userId }: {
+  datasetVersions: DatasetVersion [],
+  algorithmVersions: AlgorithmVersion[],
+  modelVersions: ModelVersion [],
   image: ImageEntity | undefined,
   userId: string,
 }) => {
 
-  checkEntityAccess({
-    entity: datasetVersion?.dataset.getEntity(),
-    userId,
-    sharedStatus: datasetVersion?.sharedStatus,
-    entityId: `dataset version id ${datasetVersion?.id}`,
+  datasetVersions.forEach((datasetVersion) => {
+    checkEntityAccess({
+      entity: datasetVersion.dataset.getEntity(),
+      userId,
+      sharedStatus: datasetVersion?.sharedStatus,
+      entityId: `dataset version id ${datasetVersion?.id}`,
+    });
   });
 
-  checkEntityAccess({
-    entity: algorithmVersion?.algorithm.getEntity(),
-    userId,
-    sharedStatus: algorithmVersion?.sharedStatus,
-    entityId: `algorithm version id ${algorithmVersion?.id}`,
+  algorithmVersions.forEach((algorithmVersion) => {
+    checkEntityAccess({
+      entity: algorithmVersion.algorithm.getEntity(),
+      userId,
+      sharedStatus: algorithmVersion.sharedStatus,
+      entityId: `algorithm version id ${algorithmVersion?.id}`,
+    });
   });
 
-  checkEntityAccess({
-    entity: modelVersion?.model.getEntity(),
-    userId,
-    sharedStatus: modelVersion?.sharedStatus,
-    entityId: `model version id ${modelVersion?.id}`,
+  modelVersions.forEach((modelVersion) => {
+    checkEntityAccess({
+      entity: modelVersion.model.getEntity(),
+      userId,
+      sharedStatus: modelVersion.sharedStatus,
+      entityId: `model version id ${modelVersion?.id}`,
+    });
   });
 
   if (image && image.owner !== userId && !image.isShared) {

@@ -34,6 +34,7 @@ import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
 import { logger } from "src/server/utils/logger";
 import { getClusterLoginNode, sshConnect } from "src/server/utils/ssh";
+import { getIdPrivate } from "src/utils/app";
 import { isParentOrSameFolder } from "src/utils/file";
 import { parseIp } from "src/utils/parse";
 import { z } from "zod";
@@ -72,19 +73,23 @@ interface SessionMetadata {
   jobType: JobType
 }
 
+export const IdPrivateSchema = z.object({
+  id: z.number(),
+  isPrivate: z.boolean(),
+});
+
+export type IdPrivate = z.infer<typeof IdPrivateSchema>;
+
 const TrainJobInputSchema = z.object({
   clusterId: z.string(),
   trainJobName: z.string(),
-  isAlgorithmPrivate: z.boolean().optional(),
-  algorithm: z.number().optional(),
+  algorithms: z.array(IdPrivateSchema),
   image: z.number().optional(),
   isImagePrivate: z.boolean().optional(),
   remoteImageUrl: z.string().optional(),
   framework: Framework.optional(),
-  isDatasetPrivate: z.boolean().optional(),
-  dataset: z.number().optional(),
-  isModelPrivate: z.boolean().optional(),
-  model: z.number().optional(),
+  datasets: z.array(IdPrivateSchema),
+  models: z.array(IdPrivateSchema),
   mountPoints: z.array(z.string()).optional(),
   account: z.string(),
   partition: z.string().optional(),
@@ -142,9 +147,13 @@ procedure
   })
   .mutation(
     async ({ input, ctx: { user } }) => {
-      const { clusterId, trainJobName , isAlgorithmPrivate, algorithm, image, framework,
-        remoteImageUrl,isDatasetPrivate, dataset, isModelPrivate, model, mountPoints = [], account, partition,
-        coreCount, nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
+      const { clusterId, trainJobName ,algorithms, image, framework,
+        remoteImageUrl, datasets,models, mountPoints = [], account, partition, coreCount,
+        nodeCount, gpuCount, memory, maxTime, command, gpuType, psNodes, workerNodes } = input;
+
+      const { ids:algorithmIds, isPrivates:isAlgorithmPrivates } = getIdPrivate(algorithms);
+      const { ids:modelIds, isPrivates:isModelPrivates } = getIdPrivate(models);
+      const { ids:datasetIds, isPrivates:isDatasetPrivates } = getIdPrivate(datasets);
 
       if (trainJobName.length > 42) {
         throw new TRPCError({
@@ -167,21 +176,21 @@ procedure
 
       const em = await forkEntityManager();
       const {
-        datasetVersion,
-        algorithmVersion,
-        modelVersion,
+        datasetVersions,
+        algorithmVersions,
+        modelVersions,
         image: existImage,
       } = await checkCreateAppEntity({
         em,
-        dataset,
-        algorithm,
+        datasets:datasetIds,
+        algorithms:algorithmIds,
         image,
-        model,
+        models:modelIds,
       });
 
       // 检查数据集、算法、模型和镜像是否有权限使用
       checkEntityAuth({
-        datasetVersion, algorithmVersion,modelVersion, image:existImage, userId,
+        datasetVersions, algorithmVersions,modelVersions, image:existImage, userId,
       });
 
       return await sshConnect(host, userId, logger, async (ssh) => {
@@ -204,9 +213,15 @@ procedure
         // 确保所有映射到容器的路径都不重复
         validateUniquePaths([
           trainJobsDirectory,
-          isAlgorithmPrivate ? algorithmVersion?.privatePath : algorithmVersion?.path,
-          isDatasetPrivate ? datasetVersion?.privatePath : datasetVersion?.path,
-          isModelPrivate ? modelVersion?.privatePath : modelVersion?.path,
+          ...isAlgorithmPrivates.map((isAlgorithmPrivate,idx) =>
+            isAlgorithmPrivate ? algorithmVersions[idx].privatePath : algorithmVersions[idx].path)
+          ,
+          ...isDatasetPrivates.map((isDatasetPrivate,idx) =>
+            isDatasetPrivate ? datasetVersions[idx].privatePath : datasetVersions[idx].path)
+          ,
+          ...isModelPrivates.map((isModelPrivate,idx) =>
+            isModelPrivate ? modelVersions[idx].privatePath : modelVersions[idx].path)
+          ,
           ...mountPoints,
         ]);
 
@@ -256,21 +271,24 @@ procedure
             JobType.TRAIN,
             "",
             remoteImageUrl || existImage?.path || "",
-            algorithmVersion
-              ? isAlgorithmPrivate
+            JSON.stringify(
+              algorithmVersions.map((algorithmVersion,idx) => isAlgorithmPrivates[idx]
                 ? genPublicOrPrivateDataJsonString(algorithmVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(algorithmVersion.path,true)
-              : "",
-            datasetVersion
-              ? isDatasetPrivate
+                : genPublicOrPrivateDataJsonString(algorithmVersion.path,true),
+              ))
+            ,
+            JSON.stringify(
+              datasetVersions.map((datasetVersion,idx) => isDatasetPrivates[idx]
                 ? genPublicOrPrivateDataJsonString(datasetVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(datasetVersion.path,true)
-              : "",
-            modelVersion
-              ? isModelPrivate
+                : genPublicOrPrivateDataJsonString(datasetVersion.path,true),
+              ))
+            ,
+            JSON.stringify(
+              modelVersions.map((modelVersion,idx) => isModelPrivates[idx]
                 ? genPublicOrPrivateDataJsonString(modelVersion.privatePath,false)
-                : genPublicOrPrivateDataJsonString(modelVersion.path,true)
-              : "",
+                : genPublicOrPrivateDataJsonString(modelVersion.path,true),
+              ))
+            ,
             mountPoints.join(","),
             gpuType || "",
             // 如果是单机训练,则训练框架为空，表明为普通训练，华为的卡单机训练也要传框架

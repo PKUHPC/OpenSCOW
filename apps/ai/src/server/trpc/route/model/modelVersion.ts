@@ -73,7 +73,7 @@ export const versionList = procedure
         ...input.isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
       },
       {
-        ...paginationProps(input.pageSize, input.pageSize),
+        ...paginationProps(input.page, input.pageSize),
         orderBy: { createTime: "desc" },
       });
 
@@ -89,6 +89,54 @@ export const versionList = procedure
         sharedStatus: x.sharedStatus,
         createTime: x.createTime ? x.createTime.toISOString() : undefined,
       }; }), count };
+  });
+
+export const getMultipleModelVersions = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/models/versions",
+      tags: ["modelVersions"],
+      summary: "get multiple modelVersions",
+    },
+  })
+  .input(z.object({
+    ...paginationSchema.shape,
+    modelIds: z.array(z.number()),
+    isPublic: booleanQueryParam().optional(),
+  }))
+  .output(z.array(z.object({ items: z.array(VersionListSchema), count: z.number() })))
+  .query(async ({ input:{ modelIds, isPublic, page, pageSize } }) => {
+    const em = await forkEntityManager();
+    const items = await em.find(ModelVersion,
+      {
+        model: { $in: modelIds },
+        ...isPublic ? { sharedStatus:SharedStatus.SHARED } : {},
+      },
+      {
+        ...paginationProps(page, pageSize),
+        orderBy: { createTime: "desc" },
+      });
+
+    const groupedResults = modelIds.map((modelId) => {
+      const modelItems = items.filter((x) => x.model.id === modelId);
+      return {
+        items: modelItems.map((x) => ({
+          id: x.id,
+          modelId: x.model.id,
+          versionName: x.versionName,
+          versionDescription: x.versionDescription,
+          algorithmVersion: x.algorithmVersion,
+          path: x.path,
+          privatePath: x.privatePath,
+          sharedStatus: x.sharedStatus,
+          createTime: x.createTime ? x.createTime.toISOString() : undefined,
+        })),
+        count: modelItems.length,
+      };
+    });
+
+    return groupedResults;
   });
 
 export const createModelVersion = procedure

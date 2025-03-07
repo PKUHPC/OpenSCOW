@@ -11,7 +11,7 @@
  */
 
 import { UseQueryResult } from "@tanstack/react-query";
-import { Form, FormInstance } from "antd";
+import { FormInstance } from "antd";
 import { useMemo } from "react";
 import { parseBooleanParam } from "src/utils/parse";
 
@@ -20,6 +20,7 @@ import { AccessibilityType } from "./LaunchAppForm";
 interface Option {
   label: string;
   value: number;
+  desc?: string;
 }
 
 type DataType = "dataset" | "algorithm" | "model";
@@ -28,64 +29,80 @@ type QueryHookFunction<TQueryFnData = any, TError = any, TData = any> =
   (args: TQueryFnData, options?: any) => UseQueryResult<TData, TError>;
 
 export function useDataOptions<T>(
-  form: FormInstance,
-  dataType: DataType,
   queryHook: QueryHookFunction<any, any, { items: T[] }>,
   clusterId: string,
   mapItemToOption: (item: T) => Option,
-): { data: T[], dataOptions: Option[], isDataLoading: boolean } {
-  const typePath = [dataType, "type"];
-  const itemType = Form.useWatch(typePath, form);
-  const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
-  const { data: items, isLoading: isDataLoading } = queryHook({
-    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
+): { privateData: T[], privateDataOptions: Option[], publicData: T[], publicDataOptions: Option[],
+    isPrivateDataLoading: boolean,isPublicDataLoading: boolean } {
+  const { data: privateItems, isLoading: isPrivateDataLoading } = queryHook({
     clusterId,
-  }, { enabled: isItemPublic !== undefined });
+    isPublic: parseBooleanParam(false),
+  });
 
-  const dataOptions = useMemo(() => {
-    return items?.items.map(mapItemToOption) || [];
-  }, [items]);
+  const { data: publicItems, isLoading: isPublicDataLoading } = queryHook({
+    clusterId,
+    isPublic: parseBooleanParam(true),
+  });
 
-  return { data: items?.items || [], dataOptions, isDataLoading: isDataLoading && isItemPublic !== undefined };
+  const privateData = privateItems?.items;
+  const publicData = publicItems?.items;
+
+  const privateDataOptions = useMemo(() => {
+    return privateData?.map(mapItemToOption) || [];
+  }, [privateData]);
+
+  const publicDataOptions = useMemo(() => {
+    return publicData?.map(mapItemToOption) || [];
+  }, [publicData]);
+
+  return { privateData: privateData || [], privateDataOptions,
+    publicData: publicData || [], publicDataOptions,
+    isPrivateDataLoading,isPublicDataLoading };
 }
 
 export function useDataVersionOptions<T>(
-  form: FormInstance,
+  privateIds: number [],
+  publicIds: number [],
   dataType: DataType,
   queryHook: QueryHookFunction,
   mapItemToOption: (item: T) => Option,
-): { dataVersions: T[], dataVersionOptions: Option[], isDataVersionsLoading: boolean,
-    dataVersionDescription: Record<number,string | undefined> } {
-  const typePath = [dataType, "type"];
-  const namePath = [dataType, "name"];
-  const selectedItem = Form.useWatch(namePath, form);
-  const itemType = Form.useWatch(typePath, form);
-  const isItemPublic = itemType !== undefined ? itemType === AccessibilityType.PUBLIC : itemType;
+): { privateDataVersions: T[], privateDataVersionOptions: Option[][], isPrivateDataVersionsLoading: boolean,
+    publicDataVersions: T[], publicDataVersionOptions: Option[][], isPublicDataVersionsLoading: boolean,
+  } {
 
-  const { data: versions, isLoading: isDataVersionsLoading } = queryHook({
-    [`${dataType}Id`]: selectedItem,
-    isPublic : isItemPublic !== undefined ? parseBooleanParam(isItemPublic) : undefined,
-  }, { enabled: selectedItem !== undefined });
+  const { data: privateVersions, isLoading: isPrivateDataVersionsLoading } = queryHook({
+    [`${dataType}Ids`]: privateIds,
+  });
 
-  const dataVersionOptions = useMemo(() => {
-    return versions?.items.map(mapItemToOption);
-  }, [versions]);
+  const { data: publicVersions, isLoading: isPublicDataVersionsLoading } = queryHook({
+    [`${dataType}Ids`]: publicIds, isPublic:"true",
+  });
 
-  const dataVersionDescription = useMemo(() => {
-    const descObj: Record<number,string | undefined> = {};
+  const privateDataVersionOptions = useMemo(() => {
+    return privateVersions?.map((version: any) => {
 
-    versions?.items.forEach((x: any) => {
-      descObj[x.id] = x.versionDescription;
+      return version.items.map(mapItemToOption);
     });
+  }, [privateVersions]);
 
-    return descObj;
-  }, [versions]);
+  const publicDataVersionOptions = useMemo(() => {
+    return publicVersions?.map((version: any) => {
+
+      return version.items.map(mapItemToOption);
+    });
+  }, [publicVersions]);
 
   return {
-    dataVersions: versions?.items || [],
-    dataVersionOptions,
-    isDataVersionsLoading: isDataVersionsLoading && selectedItem !== undefined,
-    dataVersionDescription,
+    privateDataVersions:privateVersions ? privateVersions.reduce((acc: any, curr: any) => {
+      return acc.concat(curr.items);
+    }, []) : [],
+    privateDataVersionOptions,
+    isPrivateDataVersionsLoading,
+    publicDataVersions:publicVersions ? publicVersions.reduce((acc: any, curr: any) => {
+      return acc.concat(curr.items);
+    }, []) : [],
+    publicDataVersionOptions,
+    isPublicDataVersionsLoading,
   };
 }
 
@@ -102,28 +119,36 @@ interface Version {
 }
 
 export function setEntityInitData<T extends Version, U extends EntityWithVersions>(
-  entityType: "algorithm" | "dataset" | "model",
-  entities: U[],
-  versions: T[],
+  entityType: "algorithmArray" | "datasetArray" | "modelArray",
+  index: number,
+  privateEntities: U[],
+  privateVersions: T[],
+  publicEntities: U[],
+  publicVersions: T[],
   entityId: number,
   isPrivate: boolean,
   form: FormInstance,
   setShowKey: string,
 ) {
   form.setFieldValue(setShowKey, true);
-  form.setFieldValue([entityType, "type"], isPrivate ? AccessibilityType.PRIVATE : AccessibilityType.PUBLIC);
+  form.setFieldValue([entityType, index,"type"], isPrivate ? AccessibilityType.PRIVATE : AccessibilityType.PUBLIC);
+
+  const entities = isPrivate ? privateEntities : publicEntities;
+  const versions = isPrivate ? privateVersions : publicVersions;
 
   const foundEntity = entities.find((entity) =>
     entity.versions.some((version) => version.id === entityId),
   );
 
   if (foundEntity) {
-    form.setFieldValue([entityType, "name"], foundEntity.id);
+    form.setFieldValue([entityType,index, "name"], foundEntity.id);
     if (versions.length) {
       const hasVersion = versions.some((version) => version.id === entityId);
       if (hasVersion) {
-        form.setFieldValue([entityType, "version"], entityId);
+        form.setFieldValue([entityType,index, "version"], entityId);
       }
     }
   }
 }
+
+

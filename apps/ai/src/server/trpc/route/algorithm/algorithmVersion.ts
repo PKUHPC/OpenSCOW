@@ -85,6 +85,67 @@ export const getAlgorithmVersions = procedure
     }), count };
   });
 
+export const getMultipleAlgorithmVersions = procedure
+  .meta({
+    openapi: {
+      method: "GET",
+      path: "/algorithms/versions",
+      tags: ["algorithmVersion"],
+      summary: "get multiple algorithmVersions",
+    },
+  })
+  .input(z.object({
+    ...paginationSchema.shape,
+    algorithmIds: z.array(z.number()),
+    isPublic:booleanQueryParam().optional(),
+  }))
+  .output(
+    z.array(
+      z.object({ items: z.array(z.object({
+        id:z.number(),
+        versionName:z.string(),
+        versionDescription:z.string().optional(),
+        path:z.string(),
+        privatePath: z.string(),
+        sharedStatus:z.nativeEnum(SharedStatus),
+        createTime:z.string().optional(),
+      })), count: z.number() }),
+    ),
+  )
+  .query(async ({ input:{ algorithmIds, isPublic, page, pageSize } }) => {
+    const em = await forkEntityManager();
+
+    const items = await em.find(AlgorithmVersion,
+      {
+        algorithm: { $in: algorithmIds },
+        ...isPublic ? { sharedStatus: SharedStatus.SHARED } : {},
+      }
+      , {
+        populate: ["algorithm"],
+        ...paginationProps(page, pageSize),
+        orderBy: { createTime: "desc" },
+      });
+
+    const groupedResults = algorithmIds.map((algorithmId) => {
+      const algorithmItems = items.filter((x) => x.algorithm.id === algorithmId);
+
+      return {
+        items: algorithmItems.map((x) => ({
+          id: x.id,
+          versionName: x.versionName,
+          versionDescription: x.versionDescription,
+          sharedStatus: x.sharedStatus,
+          createTime: x.createTime ? x.createTime.toISOString() : undefined,
+          path: x.path,
+          privatePath: x.privatePath,
+        })),
+        count: algorithmItems.length,
+      };
+    });
+
+    return groupedResults;
+  });
+
 export const createAlgorithmVersion = procedure
   .meta({
     openapi: {
@@ -306,7 +367,7 @@ export const deleteAlgorithmVersion = procedure
 
     // 如果是已分享的数据集版本，则删除分享
     if (algorithmVersion.sharedStatus === SharedStatus.SHARED) {
-   
+
       const currentClusterIds = await getCurrentClusters(user.identityId);
       checkClusterAvailable(currentClusterIds, algorithm.clusterId);
       try {
