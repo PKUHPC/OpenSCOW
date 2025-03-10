@@ -224,7 +224,8 @@ export const AccountTable: React.FC<Props> = ({
           form={form}
           initialValues={query}
           onFinish={async () => {
-            setQuery(await form.validateFields());
+            const { ownerIdOrName, accountName } = await form.validateFields();
+            setQuery({ accountName: accountName?.trim(), ownerIdOrName: ownerIdOrName?.trim() });
             setCurrentPageNum(1);
             setCurrentSortInfo({ field: null, order: null });
           }}

@@ -43,6 +43,7 @@ interface FilterForm {
   jobId: number | undefined;
   accountName?: string;
   userId?: string;
+  name?: string;
   clusters: Cluster[];
 }
 
@@ -235,8 +236,8 @@ export const JobTable: React.FC<Props> = ({
           form={form}
           initialValues={query}
           onFinish={async () => {
-            const currentQuery = await form.validateFields();
-            setQuery(currentQuery);
+            const { userId, name, ...currentQuery } = await form.validateFields();
+            setQuery({ userId: userId?.trim(), name: name?.trim(), ...currentQuery });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
           }}
         >

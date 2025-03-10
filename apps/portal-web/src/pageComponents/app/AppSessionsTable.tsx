@@ -231,9 +231,8 @@ export const AppSessionsTable: React.FC<Props> = ({ cluster }) => {
           form={form}
           initialValues={query}
           onFinish={async () => {
-            setQuery({
-              ...(await form.validateFields()),
-            });
+            const { appJobName } = await form.validateFields();
+            setQuery({ appJobName: appJobName?.trim() });
           }}
         >
           <Form.Item label={t(p("filterForm.appJobName"))} name="appJobName">

@@ -173,7 +173,7 @@ export const AllUsersTable: React.FC<Props> = ({ refreshToken, user }) => {
           initialValues={query}
           onFinish={async () => {
             const { idOrName } = await form.validateFields();
-            setQuery({ idOrName: idOrName === "" ? undefined : idOrName });
+            setQuery({ idOrName: idOrName === "" ? undefined : idOrName?.trim() });
             setPageInfo({ page: 1, pageSize: pageInfo.pageSize });
             setSortInfo({ sortField: undefined, sortOrder: undefined });
           }}
