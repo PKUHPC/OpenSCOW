@@ -32,7 +32,7 @@ const Container = styled.div`
 const FrameContainer = styled.div`
   display: flex;
   width: 100%;
-  height: 525px;
+  height: 69vh;
 `;
 
 const IFrame = styled.iframe`
@@ -45,7 +45,7 @@ const TitleText = styled(Typography.Title)`
 && {
   width: 100vw;
   font-weight: 700;
-  font-size: 24px;
+  font-size: 28px;
   padding: 0 0 10px 20px;
   margin-left: -25px;
   border-bottom: 1px solid #ccc;
@@ -88,7 +88,7 @@ export const ResourceStatusPage: NextPage = requireAuth(
           defaultActiveKey={dashboards?.[0]?.uid}
           items={ dashboards?.map((dashboard, index) => (
             { key: dashboard?.uid ?? "",
-              label: dashboard?.label,
+              label: (<span style={{ fontSize: 16 }}>{dashboard?.label}</span>),
               children: (publicConfig.CLUSTER_MONITOR.resourceStatus.proxy
                 ? <FrameContainer><IFrame src={proxyGrafanaUrls[index]}></IFrame></FrameContainer>
                 : <FrameContainer><IFrame src={normalGrafanaUrls[index]}></IFrame></FrameContainer>),
