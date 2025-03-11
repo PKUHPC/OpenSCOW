@@ -2,8 +2,7 @@ import {
   CompressOutlined,
   CopyOutlined,
   DatabaseOutlined,
-  DeleteOutlined, DownloadOutlined, DownOutlined, EyeInvisibleOutlined,
-  EyeOutlined, FileAddOutlined, FolderAddOutlined,
+  DeleteOutlined, DownloadOutlined, DownOutlined, FileAddOutlined,
   HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
@@ -11,7 +10,7 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { queryToString } from "@scow/lib-web/build/utils/querystring";
 import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
-import { App, Button, Divider, Dropdown, MenuProps, Select, Space } from "antd";
+import { App, Button, Dropdown, MenuProps, Select, Space, Switch } from "antd";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { join } from "path";
@@ -43,16 +42,27 @@ import { convertToBytes } from "src/utils/format";
 import { styled } from "styled-components";
 
 interface Props {
-  cluster: Cluster;
+  initialCluster: Cluster;
   path: string;
   urlPrefix: string;
-  scowdEnabled: boolean;
+  scowdEnabledClusters: string[];
 }
 
 interface PromiseSettledResult {
   status: string;
   value?: FileInfo | undefined;
 }
+
+interface HomePathInfo {
+  clusterId: string;
+  homePath: string;
+}
+
+const SelectPreFix = styled.span`
+  width: 65px;
+  display: flex;
+  align-items: center;
+`;
 
 const TopBar = styled(FilterFormContainer)`
   display: flex;
@@ -96,7 +106,7 @@ enum UploadType {
   Dir = "dir",
 }
 
-export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEnabled }) => {
+export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, scowdEnabledClusters }) => {
 
   const router = useRouter();
 
@@ -116,6 +126,9 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
+  const [cluster, setCluster] = useState<Cluster>(initialCluster);
+  const [homePaths, setHomePaths] = useState<HomePathInfo[]>([]);
+  const [scowdEnabled, setScowdEnabled] = useState<boolean>(!!scowdEnabledClusters?.includes(cluster.id));
 
   const [previewFile, setPreviewFile] = useState({
     open: false,
@@ -166,7 +179,23 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   };
 
   const toHome = () => {
-    router.push(fullUrl("~"));
+    const currentClusterId = cluster.id;
+    const homePathInfo = homePaths.find((item) => item.clusterId === currentClusterId);
+    const currentPath = path;
+    if (homePathInfo) {
+      router.push(fullUrl(homePathInfo.homePath));
+      if (homePathInfo.homePath === currentPath) {
+        reload();
+      }
+    } else {
+      api.getHomeDirectory({ query: { cluster: currentClusterId } }).then((res) => {
+        setHomePaths((homePaths) => [...homePaths, { clusterId: currentClusterId, homePath: res?.path }]);
+        router.push(fullUrl(res?.path ?? ""));
+        if (res?.path === currentPath) {
+          reload();
+        }
+      }).catch((e) => { message.error(e); });
+    }
   };
 
   const back = () => {
@@ -193,6 +222,10 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
         }
       });
   }, [path]);
+
+  useEffect(() => {
+    toHome();
+  }, [cluster]);
 
   const resetSelectedAndOperation = () => {
     setSelectedKeys([]);
@@ -412,18 +445,48 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     onClick: handleMenuClick,
   };
 
+  const newItems: MenuProps["items"] = [
+    {
+      label:
+        <CreateFileButton
+          cluster={cluster.id}
+          path={path}
+          reload={reload}
+        >{t(p("tableInfo.createFile"))}
+        </CreateFileButton>,
+      key: UploadType.File,
+    },
+    {
+      label:
+        <MkdirButton
+          cluster={cluster.id}
+          path={path}
+          reload={reload}
+        >
+          {t(p("tableInfo.mkDir"))}
+        </MkdirButton>,
+      key: UploadType.Dir,
+    },
+  ];
+
+  const newMenuProps = {
+    items: newItems,
+  };
+
   return (
     <div>
       <TitleText>
         <span>
-          { getI18nConfigCurrentText(cluster.name, languageId) }
+          { t(p("tableInfo.title")) }
         </span>
       </TitleText>
       <TopBar>
+        <SelectPreFix>{ `${t(p("cluster"))} :` }</SelectPreFix>
         <Select
           style={{ minWidth: "160px" }}
           onSelect={(value) => {
-            router.push(`/files/${value}/~`);
+            setCluster(currentClusters.find((x) => x.id === value) || { id: value, name: "" });
+            setScowdEnabled(!!scowdEnabledClusters?.includes(value));
           }}
           defaultValue={cluster?.id}
           options={
@@ -461,9 +524,26 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
             ))
           }
         />
+        {
+          publicConfig.ENABLE_SHELL ? (
+            <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank" style={{ marginLeft: 5 }}>
+              <Button icon={<MacCommandOutlined />}>
+                {t(p("tableInfo.openInShell"))}
+              </Button>
+            </Link>
+          ) : null
+        }
       </TopBar>
       <OperationBar>
         <Space wrap>
+          <Dropdown menu={newMenuProps}>
+            <Button icon={<FileAddOutlined />}>
+              <Space>
+                {t(p("tableInfo.new"))}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
           { scowdEnabled ? (
             <Dropdown menu={menuProps}>
               <Button icon={<UploadOutlined />}>
@@ -484,27 +564,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               {t(p("tableInfo.uploadButton"))}
             </UploadButton>
           )}
-          <Divider type="vertical" />
-          {
-            scowdEnabled && (
-              <Button
-                icon={<DownloadOutlined />}
-                danger
-                onClick={onDownloadClick}
-                disabled={selectedKeys.length === 0}
-              >
-                {t(p("tableInfo.downloadSelected"))}
-              </Button>
-            )
-          }
-          <Button
-            icon={<DeleteOutlined />}
-            danger
-            onClick={onDeleteClick}
-            disabled={selectedKeys.length === 0 || operation?.started}
-          >
-            {t(p("tableInfo.deleteSelected"))}
-          </Button>
           <Button
             icon={<CopyOutlined />}
             onClick={() =>
@@ -574,37 +633,28 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
               </div>
             )
           }
+          {
+            scowdEnabled && (
+              <Button
+                icon={<DownloadOutlined />}
+                onClick={onDownloadClick}
+                disabled={selectedKeys.length === 0}
+              >
+                {t(p("tableInfo.downloadSelected"))}
+              </Button>
+            )
+          }
+          <Button
+            icon={<DeleteOutlined />}
+            onClick={onDeleteClick}
+            disabled={selectedKeys.length === 0 || operation?.started}
+          >
+            {t(p("tableInfo.deleteSelected"))}
+          </Button>
         </Space>
         <Space wrap>
-          <Button
-            onClick={onHiddenClick}
-            icon={showHiddenFile ? <EyeInvisibleOutlined /> : <EyeOutlined />}
-          >
-            {showHiddenFile ? t(p("tableInfo.notShowHiddenItem")) : t(p("tableInfo.showHiddenItem"))}
-          </Button>
-          {
-            publicConfig.ENABLE_SHELL ? (
-              <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank">
-                <Button icon={<MacCommandOutlined />}>
-                  {t(p("tableInfo.openInShell"))}
-                </Button>
-              </Link>
-            ) : null
-          }
-          <CreateFileButton
-            cluster={cluster.id}
-            path={path}
-            reload={reload}
-          >
-            {t(p("tableInfo.createFile"))}
-          </CreateFileButton>
-          <MkdirButton
-            cluster={cluster.id}
-            path={path}
-            reload={reload}
-          >
-            {t(p("tableInfo.mkDir"))}
-          </MkdirButton>
+          <span>{`${t(p("tableInfo.showHiddenFiles"))}`}</span>
+          <Switch checked={showHiddenFile} onChange={onHiddenClick}></Switch>
         </Space>
       </OperationBar>
       <FileTable
@@ -788,8 +838,8 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
 
 
 const RenameLink = ModalLink(RenameModal);
-const CreateFileButton = ModalButton(CreateFileModal, { icon: <FileAddOutlined /> });
-const MkdirButton = ModalButton(MkdirModal, { icon: <FolderAddOutlined /> });
+const CreateFileButton = ModalLink(CreateFileModal);
+const MkdirButton = ModalLink(MkdirModal);
 const UploadButton = ModalButton(UploadModal, { icon: <UploadOutlined /> });
 
 // function openPreviewLink(href: string) {

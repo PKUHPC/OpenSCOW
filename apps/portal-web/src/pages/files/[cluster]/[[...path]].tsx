@@ -45,7 +45,6 @@ export const FileManagerPage: NextPage<Props> = requireAuth(() => true)((props: 
   const pathParts = queryToArray(router.query.path);
 
   const cluster = queryToString(router.query.cluster);
-  const [ scowdEnabled, _ ] = useState<boolean>(!!props.scowdEnabledClusters?.includes(cluster));
 
   const t = useI18nTranslateToString();
 
@@ -70,10 +69,10 @@ export const FileManagerPage: NextPage<Props> = requireAuth(() => true)((props: 
     <>
       <Head title={`${getI18nConfigCurrentText(clusterObj.name, languageId)}${t("pages.files.path.title")}`} />
       <FileManager
-        cluster={clusterObj}
+        initialCluster={clusterObj}
         path={fullPath}
         urlPrefix="/files"
-        scowdEnabled={scowdEnabled}
+        scowdEnabledClusters={props.scowdEnabledClusters}
       />
     </>
   );
