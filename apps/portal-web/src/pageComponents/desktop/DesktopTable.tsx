@@ -101,13 +101,6 @@ export const DesktopTable: React.FC<Props> = ({ loginDesktopEnabledClusters }) =
 
   const columns: ColumnsType<DesktopItem> = [
     {
-      title: t(p("tableItem.title")),
-      dataIndex: "desktopId",
-      key: "desktopId",
-      width: "10%",
-      sorter:(a, b) => a.desktopId - b.desktopId,
-    },
-    {
       title: t(p("tableItem.desktopName")),
       dataIndex: "desktopName",
       key: "desktopName",

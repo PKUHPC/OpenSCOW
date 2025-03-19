@@ -102,8 +102,8 @@ export const NewDesktopTableModal: React.FC<Props> = ({
       <Form
         form={form}
         onFinish={onOk}
-        wrapperCol={{ span: 20 }}
-        labelCol={{ span:4, style: { whiteSpace:"normal", textAlign:"left", lineHeight:"16px" } }}
+        wrapperCol={{ span: 18 }}
+        labelCol={{ span:5, style: { whiteSpace:"normal", lineHeight:"16px" } }}
 
       >
         <Form.Item label={t(p("modal.loginNode"))} name="loginNode" rules={[{ required: true }]}>

@@ -422,8 +422,8 @@ export default {
         modal: {
           createNewDesktop: "新建桌面",
           loginNode: "登录节点",
-          wm: "桌面",
-          desktopName: "桌面名",
+          wm: "桌面类型",
+          desktopName: "桌面名称",
         },
       },
     },

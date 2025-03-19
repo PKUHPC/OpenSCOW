@@ -422,7 +422,7 @@ export default {
         modal: {
           createNewDesktop: "Create New Desktop",
           loginNode: "Login Node",
-          wm: "Desktop",
+          wm: "Desktop Type",
           desktopName: "Desktop Name",
         },
       },
