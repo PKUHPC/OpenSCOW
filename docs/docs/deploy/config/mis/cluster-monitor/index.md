@@ -74,6 +74,8 @@ clusterMonitor:
     proxy: true
     # 默认面板 id,默认设置为 shZOtO4Sk
     dashboardUid: "shZOtO4Sk"
+    # 配置多个面板，配置后将覆盖dashboardUid配置项,label用于配置页签头文字
+    # dashboards: [{ uid: "", label: "" }]
 
 ```
 
