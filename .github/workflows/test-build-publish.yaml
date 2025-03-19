@@ -225,6 +225,38 @@ jobs:
           platforms: linux/amd64${{ (github.ref_type == 'tag' || startsWith(github.ref_name, 'arm-')) && ',linux/arm64' || '' }}
 
 
+  deploy-to-pre-server:
+    name: Deploy to Pre Server
+    runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
+    needs:
+      - scow-cli
+      - build-images
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - name: Install SSH dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openssh-client
+
+      # 配置SSH密钥和主机
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.PRE_SERVER_SSH_KEY }}
+          SSH_HOST: ${{ secrets.PRE_SERVER_SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+
+      # 执行命令
+      - name: Execute commands via SSH
+        env:
+          SSH_HOST: ${{ secrets.PRE_SERVER_SSH_HOST }}
+        run: |
+          ssh -o StrictHostKeyChecking=no root@$SSH_HOST "/root/deploy.sh"
+
   release:
     runs-on: ${{ vars.ACTION_RUNNER_LABEL }}
     needs:
