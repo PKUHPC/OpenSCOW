@@ -3,7 +3,7 @@ import {
   CopyOutlined,
   DatabaseOutlined,
   DeleteOutlined, DownloadOutlined, DownOutlined, FileAddOutlined,
-  HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
+  HomeOutlined, MacCommandOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
@@ -62,12 +62,15 @@ const SelectPreFix = styled.span`
   width: 65px;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 `;
 
 const TopBar = styled(FilterFormContainer)`
   display: flex;
   flex-direction: row;
   padding-bottom: 8px;
+  width: 100%;
+  align-items: center;
 
   &>button {
     margin: 0px 4px;
@@ -126,9 +129,11 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<FileInfoKey[]>([]);
-  const [cluster, setCluster] = useState<Cluster>(initialCluster);
+  const currentClusterRef = useRef<Cluster>(initialCluster);
+
   const [homePaths, setHomePaths] = useState<HomePathInfo[]>([]);
-  const [scowdEnabled, setScowdEnabled] = useState<boolean>(!!scowdEnabledClusters?.includes(cluster.id));
+  const [scowdEnabled, setScowdEnabled]
+    = useState<boolean>(!!scowdEnabledClusters?.includes(currentClusterRef.current.id));
 
   const [previewFile, setPreviewFile] = useState({
     open: false,
@@ -149,7 +154,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
   const [showHiddenFile, setShowHiddenFile] = useState(false);
 
   const { loginNodes } = useStore(LoginNodeStore);
-  const loginNode = loginNodes[cluster.id][0].address;
+  const loginNode = loginNodes[currentClusterRef.current.id][0].address;
 
   const CompressFilesButton = ModalButton(CompressFilesModal, {
     icon: <CompressOutlined />,
@@ -158,7 +163,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
 
   const reload = async (signal?: AbortSignal) => {
     setLoading(true);
-    await api.listFile({ query: { cluster: cluster.id, path } }, signal)
+    await api.listFile({ query: { cluster: currentClusterRef.current.id, path } }, signal)
       .then((d) => {
         setFiles(d.items);
       })
@@ -167,7 +172,9 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       });
   };
 
-  const fullUrl = (path: string) => join(urlPrefix, cluster.id, path);
+  const fullUrl = (path: string) => { 
+    return join(urlPrefix, currentClusterRef.current.id, path);
+  };
 
   const up = () => {
     const paths = path.split("/");
@@ -178,8 +185,8 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
     router.push(fullUrl(newPath));
   };
 
-  const toHome = () => {
-    const currentClusterId = cluster.id;
+  const toHome = async (clusterId: string) => {
+    const currentClusterId = clusterId;
     const homePathInfo = homePaths.find((item) => item.clusterId === currentClusterId);
     const currentPath = path;
     if (homePathInfo) {
@@ -188,7 +195,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
         reload();
       }
     } else {
-      api.getHomeDirectory({ query: { cluster: currentClusterId } }).then((res) => {
+      await api.getHomeDirectory({ query: { cluster: currentClusterId } }).then((res) => {  
         setHomePaths((homePaths) => [...homePaths, { clusterId: currentClusterId, homePath: res?.path }]);
         router.push(fullUrl(res?.path ?? ""));
         if (res?.path === currentPath) {
@@ -197,15 +204,6 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       }).catch((e) => { message.error(e); });
     }
   };
-
-  const back = () => {
-    router.back();
-  };
-
-  const forward = () => {
-    history.forward();
-  };
-
 
   useEffect(() => {
     if (path === "~") {
@@ -223,15 +221,10 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       });
   }, [path]);
 
-  useEffect(() => {
-    toHome();
-  }, [cluster]);
-
   const resetSelectedAndOperation = () => {
     setSelectedKeys([]);
     setOperation(undefined);
   };
-
 
   const paste = async () => {
     if (!operation) { return; }
@@ -243,7 +236,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
     const operationApi = operation.op === "copy" ? api.copyFileItem : api.moveFileItem;
 
     const pasteFile = async (file: FileInfo, fromPath: string, toPath: string) => {
-      await operationApi({ body: { cluster: cluster.id, fromPath, toPath } })
+      await operationApi({ body: { cluster: currentClusterRef.current.id, fromPath, toPath } })
         .httpError(415, ({ error }) => {
           modal.error({
             title: t(p("moveCopy.modalErrorTitle"), [file.name, operationText]),
@@ -265,7 +258,8 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
     for (const x of operation.selected) {
       try {
 
-        const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
+        const exists = await api.fileExist({ 
+          query: { cluster: currentClusterRef.current.id, path: join(path, x.name) } });
         if (exists.result) {
           await new Promise<void>((res) => {
             modal.confirm({
@@ -273,9 +267,11 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
               content: t(p("moveCopy.existModalContent"), [x.name]),
               okText: t(p("moveCopy.existModalOk")),
               onOk: async () => {
-                const fileType = await api.getFileType({ query: { cluster: cluster.id, path: join(path, x.name) } });
+                const fileType = await api.getFileType({ 
+                  query: { cluster: currentClusterRef.current.id, path: join(path, x.name) } });
                 const deleteOperation = fileType.type === "dir" ? api.deleteDir : api.deleteFile;
-                await deleteOperation({ query: { cluster: cluster.id, path: join(path, x.name) } });
+                await deleteOperation({ 
+                  query: { cluster: currentClusterRef.current.id, path: join(path, x.name) } });
                 await pasteFile(x, join(operation.originalPath, x.name), join(path, x.name));
                 successfulCount++;
                 res();
@@ -309,7 +305,8 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
 
   const onDownloadClick = () => {
     const files = keysToFiles(selectedKeys);
-    window.open(urlToCompressAndDownload(cluster.id, files.map((x) => join(path, x.name)), true), "_blank");
+    window.open(
+      urlToCompressAndDownload(currentClusterRef.current.id, files.map((x) => join(path, x.name)), true), "_blank");
   };
 
   const onDeleteClick = () => {
@@ -322,7 +319,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
         await Promise.allSettled(files.map(async (x) => {
           return (x.type === "FILE" ? api.deleteFile : api.deleteDir)({
             query: {
-              cluster: cluster.id,
+              cluster: currentClusterRef.current.id,
               path: join(path, x.name),
             },
           }).then(() => x).catch(() => undefined);
@@ -372,7 +369,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       setPreviewImage({
         ...previewImage,
         visible: true,
-        src: urlToDownload(cluster.id, join(path, filename), false),
+        src: urlToDownload(currentClusterRef.current.id, join(path, filename), false),
       });
       return;
     } else if (canPreviewWithEditor(filename)) {
@@ -381,7 +378,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
         filename,
         fileSize: fileSize,
         filePath: join(path, filename),
-        clusterId: cluster.id,
+        clusterId: currentClusterRef.current.id,
       });
       return;
     } else {
@@ -449,7 +446,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
     {
       label:
         <CreateFileButton
-          cluster={cluster.id}
+          cluster={currentClusterRef.current.id}
           path={path}
           reload={reload}
         >{t(p("tableInfo.createFile"))}
@@ -459,7 +456,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
     {
       label:
         <MkdirButton
-          cluster={cluster.id}
+          cluster={currentClusterRef.current.id}
           path={path}
           reload={reload}
         >
@@ -480,23 +477,30 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
           { t(p("tableInfo.title")) }
         </span>
       </TitleText>
-      <TopBar>
-        <SelectPreFix>{ `${t(p("cluster"))} :` }</SelectPreFix>
+      <TopBar> 
+        <SelectPreFix>
+          { `${t(p("cluster"))} :` }
+        </SelectPreFix>
         <Select
           style={{ minWidth: "160px" }}
           onSelect={(value) => {
-            setCluster(currentClusters.find((x) => x.id === value) || { id: value, name: "" });
+            const previousClusterId = currentClusterRef.current.id;
+            const newCluster = currentClusters.find((x) => x.id === value) || { id: value, name: "" };
+            currentClusterRef.current = newCluster;
             setScowdEnabled(!!scowdEnabledClusters?.includes(value));
+
+            // 集群ID被切换时，确保返回家目录
+            if (previousClusterId !== value) {
+              toHome(value);
+            }
           }}
-          defaultValue={cluster?.id}
+          defaultValue={currentClusterRef.current.id}
           options={
             currentClusters.map((cluster) => ({
               label: getI18nConfigCurrentText(cluster.name, languageId), value: cluster.id }))
           }
         />
-        <Button onClick={back} icon={<LeftOutlined />} shape="circle" />
-        <Button onClick={forward} icon={<RightOutlined />} shape="circle" />
-        <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
+        <Button onClick={() => toHome(currentClusterRef.current.id)} icon={<HomeOutlined />} shape="circle" />
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
           path={path}
@@ -526,7 +530,11 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
         />
         {
           publicConfig.ENABLE_SHELL ? (
-            <Link href={`/shell/${cluster.id}/${loginNode}${path}`} target="_blank" style={{ marginLeft: 5 }}>
+            <Link 
+              href={`/shell/${currentClusterRef.current.id}/${loginNode}${path}`}
+              target="_blank" 
+              style={{ marginLeft: 5 }}
+            >
               <Button icon={<MacCommandOutlined />}>
                 {t(p("tableInfo.openInShell"))}
               </Button>
@@ -556,7 +564,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
           ) : (
             <UploadButton
               externalOpen={isUploadModalOpen}
-              cluster={cluster.id}
+              cluster={currentClusterRef.current.id}
               path={path}
               reload={reload}
               scowdEnabled={scowdEnabled}
@@ -595,7 +603,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
           </Button>
           { scowdEnabled && (
             <CompressFilesButton
-              cluster={cluster.id}
+              cluster={currentClusterRef.current.id}
               path={path}
               files={keysToFiles(selectedKeys)}
               reload={reload}
@@ -708,20 +716,20 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
           <Space>
             {
               i.type === "FILE" && (
-                <a href={urlToDownload(cluster.id, join(path, i.name), true)}>
+                <a href={urlToDownload(currentClusterRef.current.id, join(path, i.name), true)}>
                   {t(p("tableInfo.download"))}
                 </a>
               )
             }
             {
               (i.type === "DIR" && scowdEnabled) && (
-                <a href={urlToCompressAndDownload(cluster.id, [join(path, i.name)], true)}>
+                <a href={urlToCompressAndDownload(currentClusterRef.current.id, [join(path, i.name)], true)}>
                   {t(p("tableInfo.download"))}
                 </a>
               )
             }
             <RenameLink
-              cluster={cluster.id}
+              cluster={currentClusterRef.current.id}
               path={join(path, i.name)}
               reload={reload}
             >
@@ -737,7 +745,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
                 onOk: async () => {
                   await (i.type === "FILE" ? api.deleteFile : api.deleteDir)({
                     query: {
-                      cluster: cluster.id,
+                      cluster: currentClusterRef.current.id,
                       path: fullPath,
                     },
                   })
@@ -763,7 +771,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
                         <p>{t(p("tableInfo.submitConfirmNotice"))}</p>
                         <p>
                           {t(p("tableInfo.submitConfirmContent"),
-                            [i.name, getI18nConfigCurrentText(cluster.name, languageId)])}
+                            [i.name, getI18nConfigCurrentText(currentClusterRef.current.name, languageId)])}
                         </p>
                       </>
                     ),
@@ -771,7 +779,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
                     onOk: async () => {
                       await api.submitFileAsJob({
                         body: {
-                          cluster: cluster.id,
+                          cluster: currentClusterRef.current.id,
                           filePath: fullPath,
                         },
                       })
@@ -819,7 +827,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       <UploadModal
         open={isUploadModalOpen}
         onClose={handleUploadModalClose}
-        cluster={cluster.id}
+        cluster={currentClusterRef.current.id}
         path={path}
         reload={reload}
         scowdEnabled={scowdEnabled}
@@ -827,7 +835,7 @@ export const FileManager: React.FC<Props> = ({ initialCluster, path, urlPrefix, 
       <UploadDirModal
         open={isUploadDirModalOpen}
         onClose={handleUploadDirModalClose}
-        cluster={cluster.id}
+        cluster={currentClusterRef.current.id}
         path={path}
         reload={reload}
         scowdEnabled={scowdEnabled}

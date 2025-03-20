@@ -1,6 +1,5 @@
 import { CopyOutlined, DatabaseOutlined, DeleteOutlined, EyeInvisibleOutlined, EyeOutlined,
-  FileAddOutlined, FolderAddOutlined, HomeOutlined, LeftOutlined,
-  RightOutlined, ScissorOutlined, SnippetsOutlined, UploadOutlined,
+  FileAddOutlined, FolderAddOutlined, HomeOutlined, ScissorOutlined, SnippetsOutlined, UploadOutlined,
   UpOutlined } from "@ant-design/icons";
 import { canPreviewWithEditor, isImage } from "@scow/lib-web/build/utils/staticFiles";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
@@ -120,14 +119,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
 
   const toHome = () => {
     router.push(fullUrl("~"));
-  };
-
-  const back = () => {
-    router.back();
-  };
-
-  const forward = () => {
-    history.forward();
   };
 
   useEffect(() => {
@@ -314,8 +305,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
         </span>
       </TitleText>
       <TopBar>
-        <Button onClick={back} icon={<LeftOutlined />} shape="circle" />
-        <Button onClick={forward} icon={<RightOutlined />} shape="circle" />
         <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
