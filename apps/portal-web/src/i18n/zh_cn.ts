@@ -480,6 +480,7 @@ export default {
         totalCpuCount: "总CPU核心数",
         totalMemory: "总内存容量",
         appCommentTitle: "说明",
+        noSelectableQos: "无可用QOS",
       },
       advancedFileSelectModal: {
         getHomeDirError: "无法获取用户家目录",

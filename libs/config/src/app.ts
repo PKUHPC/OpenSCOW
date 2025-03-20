@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { GetConfigFn, getDirConfig } from "@scow/lib-config";
 import { Static, Type } from "@sinclair/typebox";
 import { isAbsolute } from "path";
@@ -89,12 +77,31 @@ export const SlurmConfigSchema = Type.Object({
 
 export type SlurmConfigSchema = Static<typeof SlurmConfigSchema>;
 
-
 export const FixedValueSchema = Type.Object({
   value: Type.Union([Type.String(), Type.Number()], { description: "表单项的固定值，如果配置则不允许修改" }),
-  hidden: Type.Boolean({ description: "是否在页面隐藏，默认不隐藏", default: false }),
+  hidden: Type.Optional(Type.Boolean({ description: "是否在页面隐藏，默认不隐藏" })),
 });
 export type FixedValueSchema = Static<typeof FixedValueSchema>;
+
+export const ReservedConfigSchema = Type.Union([
+  Type.Object({ 
+    type: Type.Literal("fixedValue"),
+    ...FixedValueSchema.properties,
+  }, { description: "为系统保留字段配置固定值形式" }),
+  Type.Object({
+    type: Type.Literal("select"),
+    defaultValue: Type.Optional(Type.Union([Type.String(), Type.Number()])),
+    select: Type.Array(
+      Type.Object({
+        value: Type.Union([Type.String(), Type.Number()], { description: "表单选项key，编程中使用" }),
+        label: Type.Optional(createI18nStringSchema({ description: "表单选项展示给用户的文本" })),
+        requireGpu: Type.Optional(Type.Boolean({ description: "表单选项是否只在分区为gpu时展示" })),
+      }), { description:"表单选项" },
+    ),
+  }, { description: "为系统保留字段配置选项形式" }),
+  // 如果有其他类型保留值配置，继续补充
+]);
+export type ReservedConfigSchema = Static<typeof ReservedConfigSchema>;
 
 export const AppConfigSchema = Type.Object({
   name: Type.String({ description: "App名" }),
@@ -129,9 +136,9 @@ export const AppConfigSchema = Type.Object({
   reservedAppAttributes: Type.Optional(Type.Array(
     Type.Object({
       name: Type.Enum(ReservedAppAttributeName,
-        { description: "系统保留APP表单字段名, 包括作业名，账户，集群，分区，Qos, 节点数，CPU卡数，GPU卡数，最长运行时间" }),
-      fixedValue: FixedValueSchema,
-    }), { description: "为系统保留APP表单字段配置固定值，可选择是否在页面隐藏，同一个字段名重复配置会进行覆盖" },
+        { description: "系统保留APP表单字段名, 包括作业名，账户，集群，分区，Qos, 节点数，CPU卡数，GPU卡数，最长运行时间(分钟)" }),
+      config: ReservedConfigSchema,
+    }), { description: "为系统保留APP表单字段配置固定值或固定选项，可选择是否在页面隐藏，同一个字段名重复配置会进行覆盖" },
   )),
 });
 
@@ -199,13 +206,25 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
     // 增加对系统保留APP表单字段值的验证
     if (config.reservedAppAttributes) {
 
+      const isPositiveInteger = (value: string | number | undefined): boolean => {
+        // 检查是否为数字类型
+        if (!value || typeof value !== "number") {
+          return false;
+        }
+        // 检查是否为整数且大于0
+        return Number.isInteger(value) && value > 0;
+      };
+
       config.reservedAppAttributes = Array.from(
         config.reservedAppAttributes.reduce((acc, item) => {
           // 重复配置，后方覆盖前方
           acc.set(item.name, item);
 
-          // fixedValue，值不能为空字符串
-          if (item.fixedValue.value === "") {
+          const config = item.config;
+
+          // 系统保留APP表单字段值不能为空字符串
+          if ((config.type === "fixedValue" && config.value === "")
+            || (config.type === "select" && (!config.select || config.select.some((option) => option.value === "")))) {
             throw new Error(`
             App ${id}'s form system reserved attributes of name ${item.name} needs a fixed value,
             but the value is an empty string`);
@@ -216,11 +235,13 @@ export const getAppConfigs: GetConfigFn<Record<string, AppConfigSchema>> = (base
               item.name === ReservedAppAttributeName.coreCount ||
               item.name === ReservedAppAttributeName.gpuCount ||
               item.name === ReservedAppAttributeName.maxTime) &&
-            typeof item.fixedValue.value !== "number"
+            ((config.type === "fixedValue" && !isPositiveInteger(config.value)) || 
+            (config.type === "select" && config.select.some((option) => !isPositiveInteger(option.value))) || 
+            (config.type === "select" && config.defaultValue && !isPositiveInteger(config.defaultValue)))
           ) {
             throw new Error(`
-              App ${id}'s system reserved attributes of name ${item.name} is of type number,
-              but the value ${item.fixedValue.value} value is not a number`);
+              App ${id}'s system reserved attributes of name ${item.name} is of type positive integer,
+              but the reserved config value or default value is not positive integer`);
           }
 
           return acc;

@@ -47,6 +47,7 @@ attributes:
     select:
       - value: code-server/4.8.0
         label: version 4.8.0
+        requireGpu: true
       - value: code-server/4.9.0
         label: version 4.9.0
 
@@ -82,24 +83,55 @@ attributes:
 
 # 配置系统保留HTML表单项的固定值，其中 maxTime 配置数值单位为分钟
 # reservedAppAttributes:
+#   # 系统保留APP配置项字段
 #   - name: account
-#     fixedValue:
+#     # 固定值配置
+#     config:
+#       type: fixedValue
 #       value: a_abcd
 #       hidden: false
+      
 #   - name: partition
-#     fixedValue:
-#       value: normal
+#     # 固定选项配置
+#     config:
+#       type: select
+#       select:
+#         - value: normal
+#           label: 分区1-cpu分区
+#         - value: gpu
+#           label: 分区2-gpu分区
+         
 #   - name: qos
-#     fixedValue:
-#       value: normal
-#       hidden: true
-#   - name: nodeCount
-#     fixedValue:
-#       value: 1
-#   - name: coreCount
-#     fixedValue:
-#       value: 1
-#   - name: maxTime
-#     fixedValue:
-#       value: 10
+#     # 固定选项配置
+#     config:
+#       type: select
+#       select:
+#         - value: qos1
+#         - value: qos2
+#         - value: qos3
+#           requireGpu: true
+#         - value: qos4
+#           requireGpu: true
 
+#   - name: nodeCount
+#     config:
+#       type: fixedValue
+#       value: 1
+#       hidden: true
+  
+#   # - name: coreCount
+#   #   config:
+#   #     type: fixedValue
+#   #     value: 1
+#   #     hidden: false
+  
+#   - name: maxTime
+#     config:
+#       type: select
+#       select:
+#         # 如果配置了label则在页面下拉框中显示label值
+#         - value: 100
+#           label: 100 分钟（自定义配置标签）
+#         # 如果没有配置label则页面下拉框中会自动计算显示为 xx天xx小时xx分钟
+#         - value: 1000
+#         - value: 2000

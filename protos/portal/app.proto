@@ -168,7 +168,6 @@ message AppCustomAttribute {
 }
 
 message GetAppMetadataResponse {
-
   enum ReservedAppAttributeName {
     UNKNOWN = 0;
     APP_JOB_NAME = 1;
@@ -180,9 +179,41 @@ message GetAppMetadataResponse {
     GPU_COUNT = 7;
     MAX_TIME = 8;
   }
+
+  enum ReservedConfigType {
+    UNKNOWN_TYPE = 0;
+    FIXED_VALUE = 1;
+    SELECT = 2;
+  }
+
+  message SelectConfig {
+    message SelectOption {
+      oneof value {
+        string text = 1;
+        uint32 number =2;
+      }
+      optional I18nStringProtoType label = 3;
+      optional bool require_gpu = 4;
+    }
+    ReservedConfigType type = 1;
+    oneof default_input {
+      string text = 2;
+      uint32 number = 3;
+    }
+    repeated SelectOption options = 4;
+  }
+
+  message FixedValueConfig {
+    ReservedConfigType type = 1;
+    FixedValue fixed_value = 2;
+  }
+
   message ReservedAppAttribute {
     ReservedAppAttributeName name = 1;
-    FixedValue fixed_value = 2;
+    oneof config {
+      FixedValueConfig fixed_value_config = 2;
+      SelectConfig select_config = 3;
+    };
   }
 
   string app_name = 1;

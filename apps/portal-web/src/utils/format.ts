@@ -10,6 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { Lang } from "react-typed-i18n";
+import en from "src/i18n/en";
+
 const DEFAULT_UNIT_MAP = ["KB", "MB", "GB", "TB", "PB"];
 
 /**
@@ -53,4 +56,26 @@ export function convertToBytes(sizeStr: string): number {
   const size = parseFloat(sizeStr);
 
   return size * units[unit];
+}
+
+export type TransType = (id: Lang<typeof en>, args?: React.ReactNode[]) => string;
+export function formatMinutesToI18nDayHours(
+  minutes: number, 
+  t: TransType,
+): string {
+  
+  const minutesInDay = 1440;
+  const minutesInHour = 60;
+
+  const days = Math.floor(minutes / minutesInDay);
+  const remainingMinutes = minutes % minutesInDay;
+  const hours = Math.floor(remainingMinutes / minutesInHour);
+  const mins = remainingMinutes % minutesInHour;
+
+  const result: string[] = [];
+  if (days > 0) result.push(`${days} ${t("pageComp.app.launchAppForm.day")}`);
+  if (hours > 0) result.push(`${hours} ${t("pageComp.app.launchAppForm.hour")}`);
+  if (mins > 0) result.push(`${mins} ${t("pageComp.app.launchAppForm.minute")}`);
+
+  return result.join(" ");
 }

@@ -1,25 +1,15 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { typeboxRouteSchema } from "@ddadaal/next-typed-api-routes-runtime";
 import { asyncUnaryCall } from "@ddadaal/tsgrpc-client";
 import { status } from "@grpc/grpc-js";
 import { getI18nTypeFormat } from "@scow/lib-web/src/utils/typeConversion";
 import { appCustomAttribute_AttributeTypeToJSON, AppServiceClient,
+  FixedValue as FixedValueProto,
   getAppMetadataResponse_ReservedAppAttributeNameToJSON } from "@scow/protos/build/portal/app";
 import { Static, Type } from "@sinclair/typebox";
 import { authenticate } from "src/auth/server";
 import { ReservedAppAttributeName } from "src/models/job";
 import { getClient } from "src/utils/client";
+import { extractOneOfValue } from "src/utils/convertValue";
 import { route } from "src/utils/route";
 import { handlegRPCError } from "src/utils/server";
 
@@ -73,9 +63,43 @@ export const AppCustomAttribute = Type.Object({
 });
 export type AppCustomAttribute = Static<typeof AppCustomAttribute>;
 
+export const SelectConfigOption = Type.Object({
+  value: Type.Union([
+    Type.String(),
+    Type.Number(),
+  ]),
+  label: Type.Optional(I18nStringSchemaType),
+  requireGpu: Type.Optional(Type.Boolean()),
+});
+export type SelectConfigOption = Static<typeof SelectConfigOption>;
+
+
+export const SelectConfig = Type.Object({
+  type: Type.Literal("select"),
+  defaultValue: Type.Optional(Type.Union([
+    Type.String(),
+    Type.Number(),
+  ])),
+  select: Type.Array(SelectConfigOption),
+});
+export type SelectConfig = Static<typeof SelectConfig>;
+
+export const FixedValueConfig = Type.Object({
+  type: Type.Literal("fixedValue"),
+  fixedValue: FixedValue,
+});
+export type FixedValueConfig = Static<typeof FixedValueConfig>;
+
+export const ReservedConfig = Type.Union([
+  FixedValueConfig,
+  SelectConfig,
+]);
+export type ReservedConfig = Static<typeof ReservedConfig>;
+
+
 export const ReservedAppAttribute = Type.Object({
   name: Type.Enum(ReservedAppAttributeName),
-  fixedValue: Type.Optional(FixedValue),
+  reservedConfig: ReservedConfig,
 });
 export type ReservedAppAttribute = Static<typeof ReservedAppAttribute>;
 
@@ -143,14 +167,48 @@ export default /* #__PURE__*/route(GetAppMetadataSchema, async (req, res) => {
       placeholder: getI18nTypeFormat(item.placeholder),
     }));
 
-    const reservedAppAttributes: ReservedAppAttribute[] = reply.reservedAppAttributes.map((item) => ({
-      name: getAppMetadataResponse_ReservedAppAttributeNameToJSON(item.name) as ReservedAppAttributeName,
-      fixedValue: (item.fixedValue?.value) ? {
-        value: item.fixedValue.value?.$case === "text" ? item.fixedValue.value.text :
-          item.fixedValue.value.number,
-        hidden: item.fixedValue?.hidden,
-      } : undefined,
-    }));
+
+    const getFixedValueResp = (fixedValueProto: FixedValueProto): FixedValue => {
+      if (!fixedValueProto?.value) {
+        // 返回默认值而不是 undefined
+        return { value: "" };
+      }
+      return {
+        value: fixedValueProto.value.$case === "text" ? 
+          fixedValueProto.value.text :
+          fixedValueProto.value.number,
+        hidden: fixedValueProto.hidden,
+      };
+    };
+    
+    const reservedAppAttributes: ReservedAppAttribute[] = reply.reservedAppAttributes.map((item) => {
+
+      const attribute = {
+        name: getAppMetadataResponse_ReservedAppAttributeNameToJSON(item.name) as ReservedAppAttributeName,
+      } as ReservedAppAttribute;
+
+      if (item.config?.$case === "fixedValueConfig" && 
+          item.config.fixedValueConfig.fixedValue) {
+        attribute.reservedConfig = {
+          type: "fixedValue",
+          fixedValue: getFixedValueResp(item.config.fixedValueConfig.fixedValue),
+        };
+      } else if (item.config?.$case === "selectConfig") {
+        attribute.reservedConfig = {
+          type: "select",
+          defaultValue: item.config?.selectConfig.defaultInput ? 
+            extractOneOfValue(item.config?.selectConfig.defaultInput) : undefined,
+          select: item.config?.selectConfig.options?.map((option) => {
+            return {
+              value: option.value !== undefined ? extractOneOfValue(option.value) : "",
+              label: getI18nTypeFormat(option.label),
+              requireGpu: option.requireGpu,
+            };
+          }) || [],
+        };
+      }
+      return attribute;
+    });
 
     const comment = getI18nTypeFormat(reply.appComment);
 

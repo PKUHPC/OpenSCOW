@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { plugin } from "@ddadaal/tsgrpc-server";
 import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
@@ -22,13 +10,16 @@ import {
   AppServiceServer,
   AppServiceService,
   ConnectToAppResponse,
+  FixedValue,
   GetAppMetadataResponse_ReservedAppAttribute,
   getAppMetadataResponse_ReservedAppAttributeNameFromJSON,
+  GetAppMetadataResponse_ReservedConfigType,
   WebAppProps_ProxyType,
 } from "@scow/protos/build/portal/app";
 import { DetailedError, encodeMessage, ErrorInfo } from "@scow/rich-error-model";
 import { getClusterOps } from "src/clusterops";
-import { camelToSnakeCase, convertAttributesFixedValue, getClusterAppConfigs } from "src/utils/app";
+import { camelToSnakeCase, convertAttributesFixedValue, 
+  convertToOneOfValue, getClusterAppConfigs } from "src/utils/app";
 import { checkActivatedClusters } from "src/utils/clusters";
 import { clusterNotFound } from "src/utils/errors";
 
@@ -230,10 +221,44 @@ export const appServiceServer = plugin((server) => {
       if (app.reservedAppAttributes) {
         app.reservedAppAttributes.forEach((item) => {
           const attributeName = camelToSnakeCase(item.name);
-          reservedAppAttributes.push({
+
+          const reservedAppAttribute: GetAppMetadataResponse_ReservedAppAttribute = {
             name: getAppMetadataResponse_ReservedAppAttributeNameFromJSON(attributeName),
-            fixedValue: convertAttributesFixedValue(item.fixedValue),
-          });
+          };
+
+          switch (item.config.type) {
+            case "fixedValue":
+              reservedAppAttribute.config = {
+                $case: "fixedValueConfig", 
+                fixedValueConfig: {
+                  type: GetAppMetadataResponse_ReservedConfigType.FIXED_VALUE,
+                  fixedValue: convertAttributesFixedValue(item.config) as FixedValue,
+                },   
+              };
+              break;
+            case "select":
+              reservedAppAttribute.config = {
+                $case: "selectConfig",
+                selectConfig: {
+                  type: GetAppMetadataResponse_ReservedConfigType.SELECT,
+                  defaultInput: item.config.defaultValue ? 
+                    convertToOneOfValue(item.config.defaultValue) : undefined,
+                  options: item.config.select?.map((x) => {
+                    return {
+                      value: convertToOneOfValue(x.value),
+                      label: x.label ? getI18nSeverTypeFormat(x.label) : undefined,
+                      requireGpu: x.requireGpu,
+                    };
+                  }) ?? [],
+                },
+
+              };
+              break;
+            default:
+              break; 
+          }
+
+          reservedAppAttributes.push(reservedAppAttribute);
         });
       }
 
@@ -241,12 +266,8 @@ export const appServiceServer = plugin((server) => {
         app.attributes.forEach((item) => {
           const attributeType = item.type.toUpperCase();
 
-          let defaultInput: AppCustomAttribute["defaultInput"];
-          if (item.defaultValue && typeof item.defaultValue === "number") {
-            defaultInput = { $case: "number", number: item.defaultValue };
-          } else if (item.defaultValue && typeof item.defaultValue === "string") {
-            defaultInput = { $case: "text", text: item.defaultValue };
-          }
+          const defaultInput: AppCustomAttribute["defaultInput"] = 
+            item.defaultValue ? convertToOneOfValue(item.defaultValue) : undefined;
 
           attributes.push({
             type: appCustomAttribute_AttributeTypeFromJSON(attributeType),

@@ -480,6 +480,7 @@ export default {
         totalCpuCount: "Total CPU Cores",
         totalMemory: "Total Memory Capacity",
         appCommentTitle: "Explanation",
+        noSelectableQos: "No Available QOS",
       },
       advancedFileSelectModal: {
         getHomeDirError: "Unable to retrieve user's home directory",

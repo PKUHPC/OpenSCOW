@@ -2,4 +2,4 @@
 "@scow/config": minor
 ---
 
-增加交互式应用系统保留配置项相关的配置项
+修改 reservedAppAttribute 配置项，支持 type 为 fixedValue 与 select 的两种配置类型。
