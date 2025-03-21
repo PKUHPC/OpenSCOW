@@ -584,16 +584,19 @@ export const LaunchAppForm: React.FC<Props> = ({
         return (
           <Input
             placeholder={item.placeholder}
-            suffix={
+            prefix={
               (
-                <AdvancedFileSelectModal
-                  allowedFileType={["DIR", "FILE"]}
-                  onSubmit={(path: string) => {
-                    form.setFields([{ name: item.name, value: path, touched: true }]);
-                    form.validateFields([item.name]);
-                  }}
-                  clusterId={clusterId}
-                />
+                <div style={{ marginRight: "4px" }}>
+                  <AdvancedFileSelectModal
+                    allowedFileType={["DIR", "FILE"]}
+                    onSubmit={(path: string) => {
+                      form.setFields([{ name: item.name, value: path, touched: true }]);
+                      form.validateFields([item.name]);
+                    }}
+                    clusterId={clusterId}
+                  />
+                </div>
+
               )
             }
           />
