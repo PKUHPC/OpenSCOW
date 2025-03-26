@@ -1,5 +1,16 @@
 # @scow/lib-operation-log
 
+## 2.1.17
+
+### Patch Changes
+
+- de86c6e: 新增 HPC 交互式应用中对保留配置项的自定义配置功能，同时新增 HTML 表单的文件路径配置功能
+  在 HPC 中新增加强版文件选择组件，包括文件解压缩功能
+  修复 AI 中文件解压缩的错误提示及路径刷新等问题
+- Updated dependencies [40b9478]
+- Updated dependencies [67c32a5]
+  - @scow/protos@1.0.23
+
 ## 2.1.16
 
 ### Patch Changes

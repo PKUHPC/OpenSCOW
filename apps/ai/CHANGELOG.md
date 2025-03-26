@@ -1,5 +1,35 @@
 # @scow/ai
 
+## 0.3.2
+
+### Patch Changes
+
+- 11f6329: 修复“同时添加多个挂载点，即使填上了挂载点的值后依然报字段验证错误”的问题
+- b8df1cb: ai 支持添加多个算法数据集模型
+- de86c6e: 新增 HPC 交互式应用中对保留配置项的自定义配置功能，同时新增 HTML 表单的文件路径配置功能
+  在 HPC 中新增加强版文件选择组件，包括文件解压缩功能
+  修复 AI 中文件解压缩的错误提示及路径刷新等问题
+- d2bbecd: 修复门户系统点击工作目录跳转时会返回家目录的问题
+  删除 HPC 和 AI 文件管理部分的前进回退按钮
+- b035b47: select 选项选择的 customField 的值不会被 escape
+- fa51159: 提交任务时长限制增加小时天单位
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [de86c6e]
+- Updated dependencies [ed505ba]
+- Updated dependencies [28acbf5]
+- Updated dependencies [40b9478]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/lib-operation-log@2.1.17
+  - @scow/lib-ssh@1.0.5
+  - @scow/lib-scow-resource@0.2.6
+  - @scow/protos@1.0.23
+  - @scow/lib-server@1.3.12
+  - @scow/lib-web@1.4.11
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.21
+
 ## 0.3.1
 
 ### Patch Changes

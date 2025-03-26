@@ -1,5 +1,11 @@
 # @scow/demo-vagrant
 
+## 2.0.6
+
+### Patch Changes
+
+- 71cb79b: 修改 mis.yaml 文件里关于用户名的默认配置，不允许出现下划线\_
+
 ## 2.0.5
 
 ### Patch Changes

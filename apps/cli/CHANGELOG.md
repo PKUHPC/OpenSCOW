@@ -1,5 +1,16 @@
 # @scow/cli
 
+## 1.8.2
+
+### Patch Changes
+
+- cc0c01e: @octokit/rest 回退 20 版本
+- 71cb79b: 修改 mis.yaml 文件里关于用户名的默认配置，不允许出现下划线\_
+- 6be7582: scowd 替换除跨集群文件传输外的 ssh 所有相关逻辑
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+  - @scow/config@1.7.0
+
 ## 1.8.1
 
 ### Patch Changes

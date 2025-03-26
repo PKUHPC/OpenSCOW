@@ -1,5 +1,14 @@
 # @scow/lib-scow-resource
 
+## 0.2.6
+
+### Patch Changes
+
+- 28acbf5: 修复部分基于 Promise.allSettled 的报错处理或日志不全等问题
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+  - @scow/config@1.7.0
+
 ## 0.2.5
 
 ### Patch Changes

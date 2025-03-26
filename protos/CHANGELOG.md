@@ -1,5 +1,13 @@
 # @scow/grpc-api
 
+## 1.20.0
+
+### Minor Changes
+
+- de86c6e: 在 app.proto 中增加交互式应用系统保留配置项相关的 proto
+  在 file.proto 中新增解压缩文件的接口
+- 3669a48: 修改 app.proto 中 getAppMetadataResoonse 的 ReservedAppAttribute, 支持 fixedValue 与 select 两种配置型
+
 ## 1.19.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # @scow/auth
 
+## 1.8.2
+
+### Patch Changes
+
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [ed505ba]
+  - @scow/config@1.7.0
+  - @scow/lib-ssh@1.0.5
+  - @scow/lib-server@1.3.12
+
 ## 1.8.1
 
 ### Patch Changes

@@ -1,5 +1,21 @@
 # @scow/notification
 
+## 0.2.8
+
+### Patch Changes
+
+- dc2a243: 优化消息系统定时删除过期消息的逻辑
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [40b9478]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/protos@1.0.23
+  - @scow/lib-notification@1.0.7
+  - @scow/lib-server@1.3.12
+  - @scow/lib-web@1.4.11
+  - @scow/lib-scheduler-adapter@1.1.21
+
 ## 0.2.7
 
 ### Patch Changes

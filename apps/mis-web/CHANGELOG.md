@@ -1,5 +1,33 @@
 # @scow/mis-web
 
+## 1.8.2
+
+### Patch Changes
+
+- de86c6e: 新增 HPC 交互式应用中对保留配置项的自定义配置功能，同时新增 HTML 表单的文件路径配置功能
+  在 HPC 中新增加强版文件选择组件，包括文件解压缩功能
+  修复 AI 中文件解压缩的错误提示及路径刷新等问题
+- e4480ec: 租户充值前端增加校验
+- 3d0b7f0: 集群监控仪表图高度及样式调整
+- 2eca5d8: 新建租户和修改租户时限制已存在用户不能为租户管理员或财务人员
+- 28acbf5: 修复部分基于 Promise.allSettled 的报错处理或日志不全等问题
+- 40b9478: jobid 非唯一值导致计费调整 bug 修复
+- 85bb536: 排查去除搜索输入框前后空格
+- 67c32a5: 用户列表关联账户字段导出异常修复
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [de86c6e]
+- Updated dependencies [28acbf5]
+- Updated dependencies [40b9478]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/lib-operation-log@2.1.17
+  - @scow/lib-scow-resource@0.2.6
+  - @scow/protos@1.0.23
+  - @scow/lib-notification@1.0.7
+  - @scow/lib-web@1.4.11
+  - @scow/rich-error-model@2.0.1
+
 ## 1.8.1
 
 ### Patch Changes

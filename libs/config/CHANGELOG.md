@@ -1,5 +1,15 @@
 # @scow/config
 
+## 1.7.0
+
+### Minor Changes
+
+- de86c6e: 修改 reservedAppAttribute 配置项，支持 type 为 fixedValue 与 select 的两种配置类型。
+
+### Patch Changes
+
+- 80bee99: 预生产环境自动更新 scow
+
 ## 1.6.4
 
 ### Patch Changes

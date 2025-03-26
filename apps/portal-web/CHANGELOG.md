@@ -1,5 +1,37 @@
 # @scow/portal-web
 
+## 1.8.2
+
+### Patch Changes
+
+- de86c6e: 新增 HPC 交互式应用中对保留配置项的自定义配置功能，同时新增 HTML 表单的文件路径配置功能
+  在 HPC 中新增加强版文件选择组件，包括文件解压缩功能
+  修复 AI 中文件解压缩的错误提示及路径刷新等问题
+- 2408c29: HPC 提交作业选择工作目录默认修改为家目录
+- eeb58f7: 文件管理 ui 及交互调整
+- 538831d: 桌面布局优化
+- 3669a48: 在交互式应用系统保留配置中扩展增加下拉框选项配置
+- d2bbecd: 修复门户系统点击工作目录跳转时会返回家目录的问题
+  删除 HPC 和 AI 文件管理部分的前进回退按钮
+- 85bb536: 排查去除搜索输入框前后空格
+- c485289: 将交互式应用 HTML 表单文件配置类型的选择添加文件按钮提前
+- fa51159: 提交任务时长限制增加小时天单位
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [de86c6e]
+- Updated dependencies [ed505ba]
+- Updated dependencies [28acbf5]
+- Updated dependencies [40b9478]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/lib-operation-log@2.1.17
+  - @scow/lib-ssh@1.0.5
+  - @scow/lib-scow-resource@0.2.6
+  - @scow/protos@1.0.23
+  - @scow/lib-notification@1.0.7
+  - @scow/lib-web@1.4.11
+  - @scow/rich-error-model@2.0.1
+
 ## 1.8.1
 
 ### Patch Changes

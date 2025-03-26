@@ -1,5 +1,32 @@
 # @scow/mis-server
 
+## 1.8.2
+
+### Patch Changes
+
+- e233b4e: 将 fetchjob 定时任务抛错处理
+- 2eca5d8: 新建租户和修改租户时限制已存在用户不能为租户管理员或财务人员
+- 28acbf5: 修复部分基于 Promise.allSettled 的报错处理或日志不全等问题
+- 40b9478: jobid 非唯一值导致计费调整 bug 修复
+- 6be7582: scowd 替换除跨集群文件传输外的 ssh 所有相关逻辑
+- 67c32a5: 用户列表关联账户字段导出异常修复
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [ed505ba]
+- Updated dependencies [28acbf5]
+- Updated dependencies [40b9478]
+- Updated dependencies [6be7582]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/lib-ssh@1.0.5
+  - @scow/lib-scow-resource@0.2.6
+  - @scow/protos@1.0.23
+  - @scow/lib-scowd@1.1.6
+  - @scow/lib-hook@1.0.23
+  - @scow/lib-notification@1.0.7
+  - @scow/lib-server@1.3.12
+  - @scow/lib-scheduler-adapter@1.1.21
+
 ## 1.8.1
 
 ### Patch Changes

@@ -1,5 +1,31 @@
 # @scow/portal-server
 
+## 1.8.2
+
+### Patch Changes
+
+- de86c6e: 新增 HPC 交互式应用中对保留配置项的自定义配置功能，同时新增 HTML 表单的文件路径配置功能
+  在 HPC 中新增加强版文件选择组件，包括文件解压缩功能
+  修复 AI 中文件解压缩的错误提示及路径刷新等问题
+- 3669a48: 在交互式应用系统保留配置中扩展增加下拉框选项配置
+- 6be7582: scowd 替换除跨集群文件传输外的 ssh 所有相关逻辑
+- Updated dependencies [80bee99]
+- Updated dependencies [de86c6e]
+- Updated dependencies [ed505ba]
+- Updated dependencies [28acbf5]
+- Updated dependencies [40b9478]
+- Updated dependencies [6be7582]
+- Updated dependencies [67c32a5]
+  - @scow/config@1.7.0
+  - @scow/lib-ssh@1.0.5
+  - @scow/lib-scow-resource@0.2.6
+  - @scow/protos@1.0.23
+  - @scow/scowd-protos@0.2.5
+  - @scow/lib-scowd@1.1.6
+  - @scow/lib-server@1.3.12
+  - @scow/rich-error-model@2.0.1
+  - @scow/lib-scheduler-adapter@1.1.21
+
 ## 1.8.1
 
 ### Patch Changes

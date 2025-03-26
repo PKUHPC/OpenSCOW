@@ -1,5 +1,15 @@
 # @scow/protos
 
+## 1.0.23
+
+### Patch Changes
+
+- 40b9478: jobid 非唯一值导致计费调整 bug 修复
+- 67c32a5: 用户列表关联账户字段导出异常修复
+- Updated dependencies [de86c6e]
+- Updated dependencies [3669a48]
+  - @scow/grpc-api@1.20.0
+
 ## 1.0.22
 
 ### Patch Changes

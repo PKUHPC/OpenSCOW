@@ -1,5 +1,11 @@
 # @scow/scowd-protos
 
+## 0.2.5
+
+### Patch Changes
+
+- 6be7582: scowd 替换除跨集群文件传输外的 ssh 所有相关逻辑
+
 ## 0.2.4
 
 ### Patch Changes
