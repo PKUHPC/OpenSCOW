@@ -96,7 +96,12 @@ export const getMultipleAlgorithmVersions = procedure
   })
   .input(z.object({
     ...paginationSchema.shape,
-    algorithmIds: z.array(z.number()),
+    algorithmIds: z.string()
+      .transform((val) => val.split(",").map(Number))
+      .refine((arr) => arr.every((num) => !isNaN(num)), {
+        message: "algorithmIds must be a comma-separated list of numbers",
+      })
+    ,
     isPublic:booleanQueryParam().optional(),
   }))
   .output(

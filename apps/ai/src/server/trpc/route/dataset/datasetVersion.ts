@@ -104,7 +104,12 @@ export const getMultipleDatasetVersions = procedure
   })
   .input(z.object({
     ...paginationSchema.shape,
-    datasetIds: z.array(z.number()),
+    datasetIds: z.string()
+      .transform((val) => val.split(",").map(Number))
+      .refine((arr) => arr.every((num) => !isNaN(num)), {
+        message: "datasetIds must be a comma-separated list of numbers",
+      })
+    ,
     isPublic: booleanQueryParam().optional(),
   }))
   .output(z.array(z.object({ items: z.array(DatasetVersionListSchema), count: z.number() })))

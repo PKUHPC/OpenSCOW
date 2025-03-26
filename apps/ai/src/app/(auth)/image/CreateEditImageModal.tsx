@@ -37,7 +37,7 @@ export interface Props {
 
 interface FormFields {
   id?: number | undefined,
-  cluster: Cluster | undefined,
+  cluster: Cluster,
   name: string,
   tag: string,
   description?: string,
@@ -131,7 +131,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
     } else {
       createMutation.mutate({
         name,
-        clusterId: source === Source.INTERNAL ? cluster?.id : undefined,
+        clusterId: cluster.id,
         tag,
         description,
         source,
@@ -175,19 +175,13 @@ export const CreateEditImageModal: React.FC<Props> = ({
             >
               {sourceText[editData.source]}
             </Form.Item>
-            { editData.source === Source.INTERNAL && (
-              <>
-                <Form.Item
-                  label={t(p("cluster"))}
-                >
-                  {getI18nConfigCurrentText(
-                    clusters.find((x) => (x.id === editData.clusterId))?.name, languageId)
+            <Form.Item
+              label={t(p("cluster"))}
+            >
+              {getI18nConfigCurrentText(
+                clusters.find((x) => (x.id === editData.clusterId))?.name, languageId)
                       ?? editData.clusterId }
-                </Form.Item>
-              </>
-
-            )}
-
+            </Form.Item>
           </>
 
         ) : (
@@ -212,23 +206,15 @@ export const CreateEditImageModal: React.FC<Props> = ({
             >
               <Input />
             </Form.Item>
-            {
-              source === Source.INTERNAL && (
-                <>
-                  <Form.Item
-                    label={t(p("cluster"))}
-                    name="cluster"
-                    rules={[
-                      { required: true },
-                    ]}
-                  >
-                    <SingleClusterSelector />
-                  </Form.Item>
-                </>
-              )
-            }
-
-
+            <Form.Item
+              label={t(p("cluster"))}
+              name="cluster"
+              rules={[
+                { required: true },
+              ]}
+            >
+              <SingleClusterSelector />
+            </Form.Item>
           </>
         )
         }
@@ -254,7 +240,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
             <Form.Item
               label={source === Source.INTERNAL ? t(p("selectImage")) : t(p("imageAddress")) }
               name="sourcePath"
-              rules={[{ required: true }]}
+              rules={[{ required: true }]}  
             >
               <Input
                 disabled={source === Source.INTERNAL}

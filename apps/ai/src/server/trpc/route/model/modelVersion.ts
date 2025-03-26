@@ -102,7 +102,12 @@ export const getMultipleModelVersions = procedure
   })
   .input(z.object({
     ...paginationSchema.shape,
-    modelIds: z.array(z.number()),
+    modelIds: z.string()
+      .transform((val) => val.split(",").map(Number))
+      .refine((arr) => arr.every((num) => !isNaN(num)), {
+        message: "modelIds must be a comma-separated list of numbers",
+      })
+    ,
     isPublic: booleanQueryParam().optional(),
   }))
   .output(z.array(z.object({ items: z.array(VersionListSchema), count: z.number() })))

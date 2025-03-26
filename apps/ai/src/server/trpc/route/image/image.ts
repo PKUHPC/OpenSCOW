@@ -148,7 +148,7 @@ export const createImage = procedure
     description: z.string().optional(),
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
     sourcePath: z.string(),
-    clusterId: z.string().optional(),
+    clusterId: z.string(),
   }))
   .output(z.number())
   .use(async ({ input:{ clusterId, tag }, ctx, next }) => {
@@ -198,8 +198,8 @@ export const createImage = procedure
       });
     };
 
-    // 获取加载镜像的集群节点，如果是远程镜像则使用优先级最高的集群作为本地处理镜像的节点
-    const processClusterId = input.source === Source.INTERNAL ? input.clusterId : getSortedClusterIds(clusters)[0];
+    // 获取加载镜像的集群节点
+    const processClusterId = input.clusterId;
 
     if (!processClusterId) { throw new NoClusterError(name, tag); }
     checkClusterAvailable(currentClusterIds, processClusterId);
@@ -635,7 +635,7 @@ export const copyImage = procedure
 
     const em = await forkEntityManager();
 
-    const { id, newName, newTag,clusterId } = input;
+    const { id, newName, newTag, clusterId } = input;
 
     // tag的唯一标识符
     const tagPostfix = dayjs().unix().toString();
@@ -679,7 +679,9 @@ export const copyImage = procedure
     });
     await em.persistAndFlush(image);
 
-    const processClusterId = getSortedClusterIds(clusters)[0];
+    // 使用原来镜像的集群，防止集群架构不同
+    const processClusterId = clusterId ?? getSortedClusterIds(clusters)[0];
+
     if (!processClusterId) { throw new NoClusterError(newName, newTag); }
 
     const currentClusterIds = await getCurrentClusters(user.identityId);
