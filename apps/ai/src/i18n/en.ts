@@ -535,6 +535,13 @@ export default {
         imageAddress: "Image Address",
         selectImagePlaceHolder: "Please select an image file",
         inputImagePlaceHolder: "Please enter remote image address",
+        imageAddressIsIllegal: "Image address is illegal",
+        userName: "Username",
+        userNamePlaceholder: "Username cannot be empty",
+        tip: "To log in to the mirror site, the following username and password are required." +
+        "Please fill them in when verifying permissions.",
+        password: "Password",
+        passwordPlaceholder: "Password cannot be empty",
       },
       imageListTable: {
         delSuccess: "Delete Image Success",

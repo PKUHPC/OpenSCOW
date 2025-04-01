@@ -535,6 +535,14 @@ export default {
         imageAddress:"镜像地址",
         selectImagePlaceHolder:"请选择镜像文件",
         inputImagePlaceHolder:"请输入远程镜像地址",
+        imageAddressIsIllegal:"镜像地址不合法",
+        userName:"用户名",
+        userNamePlaceholder:"用户名不能为空",
+        tip:"镜像站登录需使用以下用户名密码，权限验证时请填写",
+
+        password:"密码",
+        passwordPlaceholder:"密码不能为空",
+
       },
       imageListTable:{
         delSuccess:"删除镜像成功",

@@ -20,7 +20,7 @@ import { prefix, useI18n, useI18nTranslateToString } from "src/i18n";
 import { getImageTexts, ImageInterface, Source } from "src/models/Image";
 import { Cluster } from "src/server/trpc/route/config";
 import { AppRouter } from "src/server/trpc/router";
-import { imageNameValidation, imageTagValidation } from "src/utils/form";
+import { createInterdependentValidator, imageNameValidation, imageTagValidation } from "src/utils/form";
 import { trpc } from "src/utils/trpc";
 
 import { defaultClusterContext } from "../defaultClusterContext";
@@ -43,6 +43,8 @@ interface FormFields {
   description?: string,
   source: Source,
   sourcePath: string,
+  userName?: string,
+  password?: string,
 }
 
 export const CreateEditImageModal: React.FC<Props> = ({
@@ -122,7 +124,7 @@ export const CreateEditImageModal: React.FC<Props> = ({
 
   const onOk = async () => {
     form.validateFields();
-    const { name, cluster, tag, description, source, sourcePath } = await form.validateFields();
+    const { name, cluster, tag, description, source, sourcePath,userName,password } = await form.validateFields();
     if (isEdit && editData) {
       editMutation.mutate({
         id: editData.id,
@@ -136,6 +138,8 @@ export const CreateEditImageModal: React.FC<Props> = ({
         description,
         source,
         sourcePath,
+        userName,
+        password,
       });
     };
   };
@@ -233,6 +237,9 @@ export const CreateEditImageModal: React.FC<Props> = ({
             >
               <Select
                 style={{ minWidth: "100px" }}
+                onChange={() => {
+                  form.setFieldsValue({ sourcePath: "" });
+                }}
                 options={
                   Object.entries(sourceText).map(([key, value]) => ({ label:value, value:key }))}
               />
@@ -240,7 +247,29 @@ export const CreateEditImageModal: React.FC<Props> = ({
             <Form.Item
               label={source === Source.INTERNAL ? t(p("selectImage")) : t(p("imageAddress")) }
               name="sourcePath"
-              rules={[{ required: true }]}  
+              rules={[
+                { required: true },
+                () => ({
+                  validator(_, value) {
+                    if (!value) return Promise.resolve(); // 为空时交由 required 校验处理
+
+                    if (source !== Source.INTERNAL) {
+
+                      const ImageAddressRegex = new RegExp(
+                        "^(?:[a-zA-Z0-9.-]+(?::\\d+)?\\/)?" + // 可选的 registry（如 docker.io, myregistry.com:5000）
+                        "[a-z0-9._-]+(?:\\/[a-z0-9._-]+)*" + // 镜像名称（支持多级路径）
+                        "(?::[a-zA-Z0-9._-]+|@sha256:[a-fA-F0-9]{64})?$", // 可选的 tag 或 sha256 digest
+                      );
+
+                      if (!ImageAddressRegex.test(value)) {
+                        return Promise.reject(new Error(t(p("imageAddressIsIllegal")))); // 显示错误信息
+                      }
+                    }
+
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
             >
               <Input
                 disabled={source === Source.INTERNAL}
@@ -260,6 +289,31 @@ export const CreateEditImageModal: React.FC<Props> = ({
                   t(p("selectImagePlaceHolder")) : t(p("inputImagePlaceHolder"))}
               />
             </Form.Item>
+            {
+              source === Source.EXTERNAL ? (
+                <>
+                  <Form.Item
+                    label={t(p("userName"))}
+                    name="userName"
+                    dependencies={["password"]}
+                    rules={[createInterdependentValidator<FormFields>("password", t(p("userNamePlaceholder")))]}
+                    tooltip={(
+                      <span>{t(p("tip"))}</span>
+                    )}
+                  >
+                    <Input />
+                  </Form.Item>
+                  <Form.Item
+                    label={t(p("password"))}
+                    name="password"
+                    dependencies={["userName"]}
+                    rules={[createInterdependentValidator<FormFields>("userName", t(p("passwordPlaceholder")))]}
+                  >
+                    <Input.Password />
+                  </Form.Item>
+                </>
+              ) : undefined
+            }
           </>
         ) }
 

@@ -24,7 +24,8 @@ import { procedure } from "src/server/trpc/procedure/base";
 import { checkClusterAvailable } from "src/server/utils/clusters";
 import { clusterNotFound } from "src/server/utils/errors";
 import { forkEntityManager } from "src/server/utils/getOrm";
-import { createHarborImageUrl, getLoadedImage, getPulledImage, pushImageToHarbor } from "src/server/utils/image";
+import { createHarborImageUrl, getLoadedImage, getPulledImage, isValidImageAddress,
+  pushImageToHarbor } from "src/server/utils/image";
 import { logger } from "src/server/utils/logger";
 import { paginationProps } from "src/server/utils/orm";
 import { paginationSchema } from "src/server/utils/pagination";
@@ -149,6 +150,8 @@ export const createImage = procedure
     source: z.enum([Source.INTERNAL, Source.EXTERNAL]),
     sourcePath: z.string(),
     clusterId: z.string(),
+    userName:z.string().optional(),
+    password:z.string().optional(),
   }))
   .output(z.number())
   .use(async ({ input:{ clusterId, tag }, ctx, next }) => {
@@ -183,7 +186,14 @@ export const createImage = procedure
       });
     }
     const em = await forkEntityManager();
-    const { name, tag, source, sourcePath } = input;
+    const { name, tag, source, sourcePath, userName, password } = input;
+
+    if (source === Source.EXTERNAL && !isValidImageAddress(sourcePath)) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: `SourcePath ${sourcePath} is not valid.`,
+      });
+    }
 
     // tag的唯一标识符
     const tagPostfix = dayjs().unix().toString();
@@ -256,6 +266,7 @@ export const createImage = procedure
               clusterId: processClusterId,
               logger,
               sourcePath,
+              loginInfo:{ userName,password },
             }).catch((e) => {
               const ex = e as ServiceError;
               throw new Error(`createImage failed, ${ex.message}`);
@@ -708,8 +719,7 @@ export const copyImage = procedure
             ssh,
             clusterId: processClusterId,
             logger,
-            sourcePath:
-            sharedImage.path,
+            sourcePath:sharedImage.path,
           })
             .catch((e) => {
               const ex = e as ServiceError;

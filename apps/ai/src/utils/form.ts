@@ -12,7 +12,6 @@
 
 import { RuleObject } from "antd/lib/form/index.js";
 
-
 export { confirmPasswordFormItemProps, getEmailRule } from "@scow/lib-web/build/utils/form";
 
 export const noWhiteSpaceRule = {
@@ -28,9 +27,6 @@ export const validateNoChinese = (_: RuleObject, value: any) => {
   }
   return Promise.resolve();
 };
-
-
-
 
 
 export const imageNameValidation = (_: RuleObject, value: any) => {
@@ -51,3 +47,15 @@ export const imageTagValidation = (_: RuleObject, value: any) => {
   return Promise.reject("由字母、数字、\"_\"、\"-\"和\".\"组成，不能以符号开始或结束"); ;
 };
 
+
+export const createInterdependentValidator = <T>(
+  dependentField: keyof T,
+  message: string = "",
+) => ({ getFieldValue }: { getFieldValue: (name: keyof T) => any }) => ({
+  validator(_: RuleObject, value: string) {
+    if (!value && getFieldValue(dependentField)) {
+      return Promise.reject(new Error(message));
+    }
+    return Promise.resolve();
+  },
+});

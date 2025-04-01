@@ -80,23 +80,47 @@ export async function getLoadedImage({
   return match && match.length > 1 ? match[1] : undefined;
 }
 
+
+interface LoginInfo {
+  userName?: string,
+  password?: string,
+}
 // 拉取远程镜像
 export async function getPulledImage({
   ssh,
   logger,
   sourcePath,
   clusterId,
+  loginInfo,
 }: {
   ssh: NodeSSH,
   logger: Logger,
   sourcePath: string,
   clusterId: string,
+  loginInfo?: LoginInfo,
 }): Promise<string | undefined> {
 
   const runtime = getK8sRuntime(clusterId);
   const command = getRuntimeCommand(runtime);
 
+  const { userName, password } = loginInfo ?? {};
+  let isLoggedIn = false;
+
+  const registryMirror = sourcePath.split("/")[0];
+  if (userName && password) {
+    try {
+      await loggedExec(ssh, logger, true, command, ["login", registryMirror, "-u", userName, "-p", password]);
+      isLoggedIn = true;
+    } catch (error: any) {
+      logger.error(`Login ${registryMirror} failed: ${error}`);
+    }
+  }
+
   const pulledResp = await loggedExec(ssh, logger, true, command, ["pull", sourcePath]);
+
+  if (isLoggedIn) {
+    await loggedExec(ssh, logger, true, command, ["logout", registryMirror]);
+  }
 
   return pulledResp ? sourcePath : undefined;
 }
@@ -185,3 +209,13 @@ export const formatContainerId = (clusterId: string, containerId: string) => {
   const prefix = getContainerIdPrefix(runtime);
   return containerId.replace(`${prefix}://`, "");
 };
+
+
+export function isValidImageAddress(imageAddress: string) {
+  const ImageAddressRegex = new RegExp(
+    "^(?:[a-zA-Z0-9.-]+(?::\\d+)?\\/)?" + // 可选的 registry（如 docker.io, myregistry.com:5000）
+    "[a-z0-9._-]+(?:\\/[a-z0-9._-]+)*" + // 镜像名称（支持多级路径）
+    "(?::[a-zA-Z0-9._-]+|@sha256:[a-fA-F0-9]{64})?$", // 可选的 tag 或 sha256 digest
+  );
+  return ImageAddressRegex.test(imageAddress);
+}
