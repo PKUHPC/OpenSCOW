@@ -1,5 +1,8 @@
 stages:
-  - name: Code
+  - name: Code1
+    reviewers: ["Miracle575"]
+
+  - name: Code2
     reviewers: ["ddadaal"]
 
   - name: E2E
