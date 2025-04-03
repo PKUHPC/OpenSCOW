@@ -48,6 +48,6 @@ title: 多集群下的应用配置
 
 :::note
 
-在`config/apps`和`config/clusters/hpc02/apps`下都配置了`vscode.yaml`，若他们在配置文件中的`id`相同，则`hpc01`集群下获取的交互式应用信息应为`config/clusters/hpc02/apps`中的`vscode.yaml`的应用配置信息。
+在`config/apps`和`config/clusters/hpc02/apps`下都配置了`vscode.yaml`，若他们在配置文件中的`id`相同，则`hpc02`集群下获取的交互式应用信息应为`config/clusters/hpc02/apps`中的`vscode.yaml`的应用配置信息。
 
 :::
